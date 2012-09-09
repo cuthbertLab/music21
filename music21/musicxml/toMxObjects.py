@@ -21,33 +21,16 @@ from music21.musicxml import base as mxObjects
 from music21 import common
 from music21 import defaults
 from music21 import exceptions21
-from music21 import xmlnode
 
 # modules that import this include converter.py.
 # thus, cannot import these here
-from music21 import articulations 
 from music21 import bar
-from music21 import beam
-from music21 import chord
-from music21 import clef
-from music21 import duration
-from music21 import dynamics
-from music21 import expressions
-from music21 import harmony # for chord symbols
-from music21 import instrument
-from music21 import interval # for transposing instruments
 from music21 import key
-from music21 import layout
 from music21 import metadata
 from music21 import note
 from music21 import meter
-from music21 import pitch
-from music21 import repeat
 from music21 import spanner
 from music21 import stream
-from music21 import tempo
-from music21 import text # for text boxes
-from music21 import tie
 
 from music21 import environment
 _MOD = "musicxml.toMxObjects"
@@ -117,7 +100,7 @@ def textBoxToMxCredit(textBox):
     return mxCredit
 
 
-def intervalToMXTranspose(int):
+def intervalToMXTranspose(intervalObj):
     '''Convert a music21 Interval into a musicxml transposition specification
 
     >>> from music21 import *
@@ -128,14 +111,14 @@ def intervalToMXTranspose(int):
     '''
     mxTranspose = mxObjects.Transpose()
 
-    rawSemitones = int.chromatic.semitones # will be directed
+    rawSemitones = intervalObj.chromatic.semitones # will be directed
     octShift = 0
     if abs(rawSemitones) > 12:
         octShift, semitones = divmod(rawSemitones, 12)
     else:
         semitones = rawSemitones
 
-    rawGeneric = int.diatonic.generic.directed
+    rawGeneric = intervalObj.diatonic.generic.directed
     if octShift != 0:
         # need to shift 7 for each octave; sign will be correct
         generic = rawGeneric + (octShift * 7)
@@ -143,9 +126,9 @@ def intervalToMXTranspose(int):
         generic = rawGeneric
 
     # must implement the necessary shifts
-    if int.generic.directed > 0:
+    if intervalObj.generic.directed > 0:
         mxTranspose.diatonic = generic - 1
-    elif int.generic.directed < 0:
+    elif intervalObj.generic.directed < 0:
         mxTranspose.diatonic = generic + 1
 
     mxTranspose.chromatic = semitones
@@ -210,7 +193,7 @@ def tempoIndicationToMx(ti):
         # charData of BeatUnit is the type string
         mxSub = mxObjects.BeatUnit(typeToMusicXMLType(d.type))
         mxComponents.append(mxSub)
-        for x in range(d.dots):
+        for i in range(d.dots):
             mxComponents.append(mxObjects.BeatUnitDot())
         if len(numbers) > 0:
             if not hideNumber[i]:
@@ -533,7 +516,7 @@ def durationToMx(d):
             # only presently looking at first dot group
             # also assuming that these are integer values
             # need to handle fractional dots differently
-            for x in range(int(dur.dots)):
+            for i in range(int(dur.dots)):
                 # only need to create object
                 mxDotList.append(mxObjects.Dot())
             mxNote = mxObjects.Note()
@@ -552,7 +535,7 @@ def durationToMx(d):
         # only presently looking at first dot group
         # also assuming that these are integer values
         # need to handle fractional dots differently
-        for x in range(int(d.dots)):
+        for i in range(int(d.dots)):
             # only need to create object
             mxDotList.append(mxObjects.Dot())
         mxNote = mxObjects.Note()
@@ -587,12 +570,12 @@ def durationToMx(d):
                 mxTied.set('type', 'stop')
                 mxNotations.append(mxTied)
             else: # continuation
-                for type in ['stop', 'start']:
+                for tieType in ['stop', 'start']:
                     mxTie = mxObjects.Tie()
-                    mxTie.set('type', type) # start, stop
+                    mxTie.set('type', tieType) # start, stop
                     mxTieList.append(mxTie)
                     mxTied = mxObjects.Tied()
-                    mxTied.set('type', type)
+                    mxTied.set('type', tieType)
                     mxNotations.append(mxTied)
         if len(d.components) > 1:
             mxNote.set('tieList', mxTieList)
@@ -649,12 +632,12 @@ def tupletToMx(tuplet):
         else:
             localType = [tuplet.type] # place in list
 
-        for type in localType:
+        for tupletType in localType:
             mxTuplet = mxObjects.Tuplet()
             # start/stop; needs to bet set by group
-            mxTuplet.set('type', type) 
+            mxTuplet.set('type', tupletType) 
             # only provide other parameters if this tuplet is a start
-            if type == 'start':
+            if tupletType == 'start':
                 mxTuplet.set('bracket', mxObjects.booleanToYesNo(
                              tuplet.bracket)) 
                 mxTuplet.set('placement', tuplet.placement)
@@ -1547,18 +1530,15 @@ def noteheadToMxNotehead(obj, defaultColor=None):
     'yes'
     '''
     mxNotehead = mxObjects.Notehead()
-    nh = None
+    nh = 'normal'
     nhFill = 'default'
     nhParen = False
 
     # default noteheard, regardless of if set as attr
-    nh = 'normal'
     if hasattr(obj, 'notehead'):
         nh = obj.notehead
-    nhFill = 'default'
     if hasattr(obj, 'noteheadFill'):
         nhFill = obj.noteheadFill
-    nhParen = False
     if hasattr(obj, 'noteheadParenthesis'):
         nhParen = obj.noteheadParenthesis
 

@@ -1804,7 +1804,7 @@ def transferTies(score, inPlace = True):
                 tiedNotes.append(el)
                 tiedQL = tieBeneficiary.duration.quarterLength
                 for tiedEl in tiedNotes:
-                     tiedQL += tiedEl.duration.quarterLength
+                    tiedQL += tiedEl.duration.quarterLength
                 tempDuration = duration.Duration(tiedQL)
                 if (tempDuration.type != 'complex' and 
                     len(tempDuration.tuplets) == 0):
@@ -1930,7 +1930,7 @@ class TestExternal(unittest.TestCase):
         self.testPiece.show()
 
     def xtestUnlinked(self):
-        from music21 import stream, note, meter
+        from music21 import note
         s = stream.Stream()
         m = meter.TimeSignature('4/4')
         s.append(m)
@@ -1951,7 +1951,7 @@ class TestExternal(unittest.TestCase):
                 n.pitch.microtone = 20
             elif n.step != 'B' and n.accidental is not None and n.accidental.name == 'flat':
                 n.pitch.microtone = -20
-        mts = midi.translate.streamsToMidiTracks(p)
+        unused_mts = midi.translate.streamsToMidiTracks(p)
 
         p.show('midi')
 

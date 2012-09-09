@@ -128,9 +128,9 @@ def roleToAbbreviation(value):
     ...     post = metadata.roleToAbbreviation(n)
     '''
     # note: probably not the fastest way to do this
-    for id in ROLE_ABBREVIATIONS:
-        if value.lower() == roleAbbreviationsDict[id].lower():
-            return id
+    for role_id in ROLE_ABBREVIATIONS:
+        if value.lower() == roleAbbreviationsDict[role_id].lower():
+            return role_id
     raise MetadataException('no such role: %s' % value)
 
 
@@ -207,7 +207,7 @@ def abbreviationToWorkId(value):
         raise MetadataException('no such work id: %s' % value)
 
 def workIdToAbbreviation(value):
-    '''Get a role id from a string representation.
+    '''Get a work abbreviation from a string representation.
 
     >>> from music21 import *
     >>> metadata.workIdToAbbreviation('localeOfComposition')
@@ -223,10 +223,10 @@ def workIdToAbbreviation(value):
         pass
 
     # slow approach
-    for id in WORK_ID_ABBREVIATIONS:
-        if value.lower() == workIdAbbreviationDict[id].lower():
-            return id
-    raise MetadataException('no such role: %s' % value)
+    for work_id in WORK_ID_ABBREVIATIONS:
+        if value.lower() == workIdAbbreviationDict[work_id].lower():
+            return work_id
+    raise MetadataException('no such work id: %s' % value)
 
 
 
@@ -383,21 +383,21 @@ class Date(base.JSONSerializer):
         if common.isNum(value): # if a number, let pass
             return value, None
         else:
-            str = value
+            dateStr = value
         sym = APPROXIMATE + UNCERTAIN
         found = None
-        for char in str:
+        for char in dateStr:
             if char in sym:
                 found = char
                 break
         if found == None:
-            return str, None
+            return dateStr, None
         elif found in APPROXIMATE:
-            str = str.replace(found, '')
-            return  str, 'approximate'
+            dateStr = dateStr.replace(found, '')
+            return dateStr, 'approximate'
         elif found in UNCERTAIN:
-            str = str.replace(found, '')
-            return  str, 'uncertain'
+            dateStr = dateStr.replace(found, '')
+            return dateStr, 'uncertain'
 
     def _getHasTime(self):
         if self.hour != None or self.minute != None or self.second != None:
@@ -470,7 +470,7 @@ class Date(base.JSONSerializer):
         return '/'.join(msg)
 
 
-    def loadStr(self, str):
+    def loadStr(self, dateStr):
         '''Load a string date representation.
         
         Assume year/month/day/hour:minute:second
@@ -496,10 +496,10 @@ class Date(base.JSONSerializer):
         post = []
         postError = []
 
-        str = str.replace(':', '/')
-        str = str.replace(' ', '')
+        dateStr = dateStr.replace(':', '/')
+        dateStr = dateStr.replace(' ', '')
 
-        for chunk in str.split('/'):
+        for chunk in dateStr.split('/'):
             value, error = self._stripError(chunk)
             post.append(value) 
             postError.append(error)
@@ -1126,14 +1126,14 @@ class Metadata(base.Music21Object):
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
         self._workIds = {}
-        for abbr, id in workIdAbbreviationDict.items():
+        for abbr, work_id in workIdAbbreviationDict.items():
             #abbr = workIdToAbbreviation(id)
-            if id in keywords.keys():
-                self._workIds[id] = Text(keywords[id])
+            if work_id in keywords.keys():
+                self._workIds[work_id] = Text(keywords[work_id])
             elif abbr in keywords.keys():
-                self._workIds[id] = Text(keywords[abbr])
+                self._workIds[work_id] = Text(keywords[abbr])
             else:
-                self._workIds[id] = None
+                self._workIds[work_id] = None
 
         # search for any keywords that match attributes 
         # these are for direct Contributor access, must have defined
@@ -1152,14 +1152,14 @@ class Metadata(base.Music21Object):
         '''Utility attribute access for attributes that do not yet have property definitions. 
         '''
         match = None
-        for abbr, id in workIdAbbreviationDict.items():
+        for abbr, work_id in workIdAbbreviationDict.items():
         #for id in WORK_IDS:
             #abbr = workIdToAbbreviation(id)
-            if name == id:
-                match = id 
+            if name == work_id:
+                match = work_id 
                 break
             elif name == abbr:
-                match = id 
+                match = work_id 
                 break
         if match is None:
             raise AttributeError('object has no attribute: %s' % name)
@@ -1220,15 +1220,15 @@ class Metadata(base.Music21Object):
         '''
         idStr = idStr.lower()
         match = False
-        for abbr, id in workIdAbbreviationDict.items():
+        for abbr, work_id in workIdAbbreviationDict.items():
         #for id in WORK_IDS:
             #abbr = workIdToAbbreviation(id)
-            if id.lower() == idStr:
-                self._workIds[id] = Text(value)
+            if work_id.lower() == idStr:
+                self._workIds[work_id] = Text(value)
                 match = True
                 break
             elif abbr == idStr:
-                self._workIds[id] = Text(value)
+                self._workIds[work_id] = Text(value)
                 match = True
                 break
         if not match:
@@ -1238,7 +1238,6 @@ class Metadata(base.Music21Object):
     def _getTitle(self):
         searchId = ['title', 'popularTitle', 'alternativeTitle', 'movementName']
         post = None
-        match = None
         for key in searchId:
             post = self._workIds[key]
             if post != None: # get first matched
@@ -1684,10 +1683,7 @@ class RichMetadata(Metadata):
         '''Given a Stream object, update attributes with stored objects. 
         '''
         environLocal.printDebug(['RichMetadata: update(): start'])
-
-        # must be a method-level import
-        from music21.analysis import discrete
-
+        
         # clear all old values
         self.keySignatureFirst = None
         #self.keySignatures = []
@@ -1731,6 +1727,8 @@ class RichMetadata(Metadata):
 
 # commenting out temporarily due to memory error     
 # with corpus/beethoven/opus132.xml
+#         # must be a method-level import
+#         from music21.analysis import discrete
    
 #         environLocal.printDebug(['RichMetadata: update(): calling discrete.Ambitus(streamObj)'])
 # 
@@ -1923,7 +1921,10 @@ class MetadataBundle(base.JSONSerializer):
 
 
     def read(self, fp=None):
-        '''Load self from the file path suggested by the name of this MetadataBundle
+        '''
+        Load self from the file path suggested by the name of this MetadataBundle.
+        
+        if fp is None (typical), run self._getFilePath()
         '''
         t = common.Timer()
         t.start()
@@ -1937,7 +1938,12 @@ class MetadataBundle(base.JSONSerializer):
 
 
     def updateAccessPaths(self, pathList):
-        '''For each stored Metatadata object, create an entry for a complete, local file path that returns this.
+        r'''
+        For each stored Metatadata object, create an entry in the dictionary ._accessPaths 
+        where each key is a simple version of the corpus name of the file and the value is
+        the complete, local file path that returns this.
+
+        Uses :meth:`~music21.metadata.MetadataBundle.corpusPathToKey` to generate the keys
 
         The `pathList` parameter is a list of all file paths on the users local system. 
 
@@ -1947,9 +1953,38 @@ class MetadataBundle(base.JSONSerializer):
         []
         >>> len(mb._accessPaths)
         0
+        
         >>> mb.updateAccessPaths(corpus.getWorkList('bwv66.6'))
         >>> len(mb._accessPaths)
         1
+        >>> #_DOCS_SHOW print mb._accessPaths
+        >>> print r"{u'bach_bwv66_6_mxl': u'D:\\eclipse_dev\\music21base\\music21\\corpus\\bach\\bwv66.6.mxl'}" #_DOCS_HIDE
+        {u'bach_bwv66_6_mxl': u'D:\\eclipse_dev\\music21base\\music21\\corpus\\bach\\bwv66.6.mxl'}
+        
+        A slower (but not too slow test) that should do much more. This is
+        what corpus._updateMetadataBundle() does.  Notice that many of 
+        our files contain multiple scores, so while there are 2,300 files,
+        there are over 13,000 scores.
+        
+        >>> coreCorpusPaths = corpus.getCorePaths()
+        >>> #_DOCS_SHOW len(coreCorpusPaths)
+        >>> if len(coreCorpusPaths) > 2200: print '2300' #_DOCS_HIDE
+        2300
+        >>> mdCoreBundle = metadata.MetadataBundle('core')
+        >>> mdCoreBundle.read()
+        >>> len(mdCoreBundle._accessPaths)
+        0
+        >>> mdCoreBundle.updateAccessPaths(coreCorpusPaths)
+        >>> #_DOCS_SHOW len(mdCoreBundle._accessPaths)
+        >>> if len(mdCoreBundle._accessPaths) > 13000: print '13564' #_DOCS_HIDE
+        13564
+        
+        Note that some scores inside an Opus file may have a number in the key
+        that is not present in the path:
+        
+        >>> #_DOCS_SHOW mdCoreBundle._accessPaths['essenFolksong_han1_abc_1']
+        >>> print r"u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'" #_DOCS_HIDE
+        u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'
         '''
         # always clear first
         self._accessPaths = {}
@@ -1967,7 +2002,8 @@ class MetadataBundle(base.JSONSerializer):
     
             match = False
             try:
-                md = self.storage[cp]
+                # MSC: Don't remove this following line: it seems to be important for some reason...
+                md = self.storage[cp] # @UnusedVariable
                 self._accessPaths[cp] = fp
                 match = True
             except KeyError:
@@ -1983,7 +2019,9 @@ class MetadataBundle(base.JSONSerializer):
         #return post
 
     def search(self, query, field=None, extList=None):
-        '''Perform search, on all stored metadata, permit regular expression matching. 
+        '''
+        Perform search, on all stored metadata, permit 
+        regular expression matching. 
 
         Return pairs of file paths and work numbers, or None
 
@@ -2001,11 +2039,17 @@ class MetadataBundle(base.JSONSerializer):
         >>> post = mb.search('cicon', 'composer', extList=['.xml'])
         >>> len(post)
         11
+
         '''
         post = []
         for key in self.storage.keys():
             md = self.storage[key]
-            match, fieldPost = md.search(query, field)
+#            if md.title is not None and 'Renmin' in md.title: # test -- china/chinese/etc.
+#                print key
+#                print "\n"
+#                print self.storage[key]
+            
+            match, unused_fieldPost = md.search(query, field)
             if match:
                 # returns a pair of file path, work number
                 if md.number != "" and md.number is not None:
@@ -2183,7 +2227,6 @@ class Test(unittest.TestCase):
 
 
     def testJSONSerializationMetadata(self):
-        from music21 import corpus
         from music21 import musicxml
         from music21.musicxml import fromMxObjects
         from music21.musicxml import testFiles
@@ -2299,7 +2342,7 @@ class Test(unittest.TestCase):
 
 
     def testRichMetadataA(self):
-        from music21 import base, corpus, metadata
+        from music21 import corpus, metadata
 
         s = corpus.parse('bwv66.6')
         rmd = metadata.RichMetadata()

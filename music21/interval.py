@@ -283,12 +283,12 @@ def convertGeneric(value):
     elif common.isStr(value):
         # first, see if there is a direction term
         directionScalar = ASCENDING # assume ascending
-        for dir in [DESCENDING, ASCENDING]:
-            if directionTerms[dir].lower() in value.lower():
-                directionScalar = dir # assign numeric value
+        for direction in [DESCENDING, ASCENDING]:
+            if directionTerms[direction].lower() in value.lower():
+                directionScalar = direction # assign numeric value
                 # strip direction
                 value = value.lower()
-                value = value.replace(directionTerms[dir].lower(), '')
+                value = value.replace(directionTerms[direction].lower(), '')
                 value = value.strip()
 
         if value.lower() in ['unison']:
@@ -415,7 +415,7 @@ def convertSemitoneToSpecifierGenericMicrotone(count):
 
     count = int(count)
     size = abs(count) % 12
-    oct = abs(count) // 12 # let floor to int 
+    octave = abs(count) // 12 # let floor to int 
 
     if size == 0:
         spec = 'P'
@@ -456,7 +456,7 @@ def convertSemitoneToSpecifierGenericMicrotone(count):
     else:
         raise IntervalException('cannot match interval size: %s' % size)
 
-    return spec, (generic+(oct*7)) * dirScale, cents
+    return spec, (generic+(octave*7)) * dirScale, cents
 
 
 
@@ -840,7 +840,7 @@ class DiatonicInterval(base.Music21Object):
         self.name = ""
         # translate strings, if provided, to integers
         # specifier here is the index number in the prefixSpecs list
-        self.specifier, specifierStr = convertSpecifier(specifier)
+        self.specifier, unused_specifierStr = convertSpecifier(specifier)
         if self.specifier is not None:
             self.name = (prefixSpecs[self.specifier] +
                         str(self.generic.undirected))
@@ -2347,7 +2347,6 @@ class Test(unittest.TestCase):
         pass
     
     def testFirst(self):       
-        from music21 import pitch
         from music21.note import Note
         from music21.pitch import Accidental
         n1 = Note()

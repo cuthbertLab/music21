@@ -80,7 +80,7 @@ class Edge(object):
     >>> i is e.interval
     True
     '''
-    def __init__(self, intervalData=None, id=None, direction='bi'):
+    def __init__(self, intervalData=None, id=None, direction='bi'): # id is okay: @ReservedAssignment
         if common.isStr(intervalData):
             i = interval.Interval(intervalData)
         else:
@@ -280,7 +280,7 @@ class Node(object):
     The `weight` attribute is used to probabilistically select between multiple nodes when multiple nodes satisfy either a branching option in a pathway or a request for a degree. 
 
     '''
-    def __init__(self, id=None, degree=None, weight=1.0):
+    def __init__(self, id=None, degree=None, weight=1.0): # id is okay: @ReservedAssignment
         # store id, either as string, such as terminusLow, or a number. 
         # ids are unique to any node in the network
         self.id = id
@@ -966,8 +966,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         return ((degree-1) % spanCount) + sMin
 
-    def _nodeNameToNodes(self, id, equateTermini=True, 
-        permitDegreeModuli=True):
+    def _nodeNameToNodes(self, id, equateTermini=True, permitDegreeModuli=True): # id is okay: @ReservedAssignment
         '''The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, a node degree (as a number), a terminus string, or a None (indicating 'terminusLow'). 
 
         Return a list of Node objects that match this identifications. 
@@ -1212,7 +1211,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         #pitchObj = p
         n = self._nodes[nodeId]
         #pCollect = p # usually p, unles altered
-        for x in range(stepSize):
+        for i in range(stepSize):
             postEdge, postNode = self._getNext(n, direction)
 
             if len(postEdge) > 1:
@@ -1851,7 +1850,7 @@ class BoundIntervalNetwork(IntervalNetwork):
             fillMinMaxIfNone=False) # avoid recursion by setting false
 
         #environLocal.printDebug(['realize()', 'pre', pre, preNodeId])
-        mergedPitches, mergedNodes =  pre + post, preNodeId + postNodeId
+        mergedPitches, unused_mergedNodes =  pre + post, preNodeId + postNodeId
 
         #environLocal.printDebug(['realizeTermini()', 'pList', mergedPitches, 'pitchReference', pitchReference, 'nodeId', nodeId])
         return mergedPitches[0], mergedPitches[-1]
@@ -2021,7 +2020,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         #g = networkx.DiGraph()
         g = networkx.MultiDiGraph()
 
-        for eId, e in self._edges.items():
+        for unused_eId, e in self._edges.items():
             if e.direction == DIRECTION_ASCENDING:
                 weight = 0.9 # these values are just for display
                 style = 'solid'
@@ -2415,7 +2414,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         # brut force approach might make multiple attempts to realize
 
         # TODO: possibly cache results
-        for trial in range(10):
+        for counter in range(10):
             realizedPitch, realizedNode = self.realize(
                 pitchReference=pitchReference, 
                 nodeId=nodeId, 
@@ -2525,7 +2524,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         matched = []
         noMatch = []
-        notFound = []
+        #notFound = []
 
         for target in pitchTarget:
             found = False
@@ -2627,7 +2626,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
             # realize scales from each pitch, and then compare to pitchTarget   
             # pitchTarget may be a list of pitches
-            matched, noMatch = self.match(p, nodeId, pitchTarget,
+            matched, unused_noMatch = self.match(p, nodeId, pitchTarget,
                                comparisonAttribute=comparisonAttribute,
                                alteredDegrees=alteredDegrees)                
             sortList.append((len(matched), p))
@@ -2728,11 +2727,11 @@ class Test(unittest.TestCase):
         out += "]"
         return out
 
-    def realizePitchOut(self, tuple):
+    def realizePitchOut(self, pitchTuple):
         out = "("
-        out += self.pitchOut(tuple[0])
+        out += self.pitchOut(pitchTuple[0])
         out += ", "
-        out += str(tuple[1])
+        out += str(pitchTuple[1])
         out += ")"
         return out
 
@@ -2782,7 +2781,7 @@ class Test(unittest.TestCase):
         
         # if we know a realized version, we can test if pitches match in that version; returns matched, not found, and no match lists
         # f i s found in a scale where e- is the tonic
-        matched, noMatch = net.match('e-', 1, 'f')
+        matched, unused_noMatch = net.match('e-', 1, 'f')
         self.assertEqual(self.pitchOut(matched), '[F]')
         
         # can search a list of pitches, isolating non-scale tones
@@ -2828,7 +2827,7 @@ class Test(unittest.TestCase):
         
         # can match pitches to a realization of this chord
         # given a chord built form node 2 as g#, are e2 and b6 in this network
-        matched, noMatch = net.match('g#', 2, ['e2', 'b6'])
+        matched, unused_noMatch = net.match('g#', 2, ['e2', 'b6'])
         self.assertEqual(self.pitchOut(matched), '[E2, B6]')
         
         # can find a first node (root) that match any provided pitches
@@ -2883,7 +2882,7 @@ class Test(unittest.TestCase):
     def testGraphedOutput(self):
         # note this relies on networkx
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        netScale = BoundIntervalNetwork(edgeList)
+        unused_netScale = BoundIntervalNetwork(edgeList)
         #netScale.plot(pitchObj='F#', nodeId=3, minPitch='c2', maxPitch='c5')
 
 

@@ -1166,7 +1166,7 @@ class VerticalSlice(base.Music21Object):
     
     def _getObjects(self):
         retList = []
-        for part, objList in self.contentDict.items():
+        for unused_part, objList in self.contentDict.items():
             for m21object in objList:
                 
                 if  m21object == None:
@@ -1201,7 +1201,7 @@ class VerticalSlice(base.Music21Object):
         #scoreFromNote1 = music21Obj.getAllContextsByClass(stream.Score) #EXTREMELY UNRELIABLE AND VERY PRONE TO ERROR>>>>GRRRRR
         from music21 import stream
         retStream = stream.Score()
-        for partNum, elementList in self.contentDict.items():
+        for unused_partNum, elementList in self.contentDict.items():
             p = stream.Part()
             if streamVSCameFrom:
                 foundObj = elementList[0]
@@ -1895,7 +1895,7 @@ class Test(unittest.TestCase):
         '''
         test instantiating an empty VoiceLeadingQuartet
         '''
-        vlq = VoiceLeadingQuartet()
+        unused_vlq = VoiceLeadingQuartet()
 
     def testCopyAndDeepcopy(self):
         #Test copying all objects defined in this module
@@ -1910,8 +1910,8 @@ class Test(unittest.TestCase):
                 continue
             obj = getattr(sys.modules[self.__module__], part)
             if callable(obj) and not isinstance(obj, types.FunctionType):
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                unused_a = copy.copy(obj)
+                unused_b = copy.deepcopy(obj)
 
    
     def test_unifiedTest(self):

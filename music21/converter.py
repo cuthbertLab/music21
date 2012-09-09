@@ -40,26 +40,17 @@ the temp folder on the disk.
 '''
 
 
-import doctest
 import unittest
 
 import copy
 import os
 import re
-import time
 import urllib
 import zipfile
 
-# try:
-#     import cPickle as pickleMod
-# except ImportError:
-#     import pickle as pickleMod
-
-import pickle as pickleMod
-import StringIO # this module is not supported in python3
+# import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
 
-from music21 import base
 from music21 import exceptions21
 from music21 import common
 from music21 import humdrum
@@ -77,9 +68,6 @@ from music21.romanText import base as romanTextModule
 from music21.romanText import translate as romanTextTranslate
 
 from music21.noteworthy import translate as noteworthyTranslate
-
-# the jsonpickle is provided as an extension
-from music21.ext import jsonpickle
 
 from music21 import environment
 _MOD = 'converter.py'
@@ -124,7 +112,7 @@ class ArchiveManager(object):
             if self.fp.endswith('mxl') or self.fp.endswith('md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    f = zipfile.ZipFile(self.fp, 'r')
+                    unused = zipfile.ZipFile(self.fp, 'r')
                 except zipfile.BadZipfile:
                     return False
                 return True
@@ -147,14 +135,14 @@ class ArchiveManager(object):
         return post
 
 
-    def getData(self, name=None, format='musicxml' ):
+    def getData(self, name=None, dataFormat='musicxml' ):
         '''Return data from the archive by name. If no name is given, a default may be available. 
 
         For 'musedata' format this will be a list of strings. For 'musicxml' this will be a single string. 
         '''
         if self.archiveType == 'zip':
             f = zipfile.ZipFile(self.fp, 'r')
-            if name == None and format == 'musicxml': # try to auto-harvest
+            if name == None and dataFormat == 'musicxml': # try to auto-harvest
                 # will return data as a string
                 # note that we need to read the META-INF/container.xml file
                 # and get the rootfile full-path
@@ -169,7 +157,7 @@ class ArchiveManager(object):
                         post = f.read(subFp)
                         break
 
-            elif name == None and format == 'musedata': 
+            elif name == None and dataFormat == 'musedata': 
                 # this might concatenate all parts into a single string
                 # or, return a list of strings
                 # alternative, a different method might return one at a time
@@ -226,9 +214,9 @@ class PickleFilter(object):
         Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle.
         '''
         fpScratch = environLocal.getRootTempDir()
-        format = common.findFormatFile(self.fp)
+        m21Format = common.findFormatFile(self.fp)
 
-        if format == 'pickle': # do not pickle a pickle
+        if m21Format == 'pickle': # do not pickle a pickle
             if self.forceSource:
                 raise PickleFilterException('cannot access source file when only given a file path to a pickled file.')
             writePickle = False # cannot write pickle if no scratch dir
@@ -444,11 +432,11 @@ class ConverterMusicXML(object):
 
         formatSrc = common.findFormatFile(fp)
         # here we determine if we have pickled file or a musicxml file
-        format = common.findFormatFile(fpDst)
+        m21Format = common.findFormatFile(fpDst)
         pickleError = False
 
         c = musicxml.Document()
-        if format == 'pickle':
+        if m21Format == 'pickle':
             environLocal.printDebug(['opening pickled file', fpDst])
             try:
                 c.openPickle(fpDst)
@@ -476,7 +464,7 @@ class ConverterMusicXML(object):
                 writePickle = True
                 fpDst = fp # set to orignal file path
 
-        if format == 'musicxml' or (formatSrc == 'musicxml' and pickleError):
+        if m21Format == 'musicxml' or (formatSrc == 'musicxml' and pickleError):
             environLocal.printDebug(['opening musicxml file:', fpDst])
 
             # here, we can see if this is a mxl or similar archive
@@ -681,7 +669,7 @@ class ConverterMuseData(object):
         if fp.endswith('.zip') or af.isArchive():
             #environLocal.printDebug(['ConverterMuseData: found archive', fp])
             # get data will return all data from the zip as a single string
-            for partStr in af.getData(format='musedata'):
+            for partStr in af.getData(dataFormat='musedata'):
                 #environLocal.printDebug(['partStr', len(partStr)])
                 mdw.addString(partStr)            
         else:
@@ -716,7 +704,7 @@ class Converter(object):
     def __init__(self):
         self._converter = None
 
-    def _setConverter(self, format, forceSource=False):
+    def _setConverter(self, format, forceSource=False): # @ReservedAssignment
         # assume for now tt pickled files are alwasy musicxml
         # this may change in the future
         if format is None:
@@ -746,12 +734,12 @@ class Converter(object):
         else:
             raise ConverterException('no such format: %s' % format)
 
-    def _getDownloadFp(self, dir, ext, url):
-        if dir == None:
+    def _getDownloadFp(self, directory, ext, url):
+        if directory == None:
             raise ValueError
-        return os.path.join(dir, 'm21-' + common.getMd5(url) + ext)
+        return os.path.join(directory, 'm21-' + common.getMd5(url) + ext)
 
-    def parseFile(self, fp, number=None, format=None, forceSource=False):
+    def parseFile(self, fp, number=None, format=None, forceSource=False): # @ReservedAssignment
         '''
         Given a file path, parse and store a music21 Stream.
         
@@ -763,62 +751,64 @@ class Converter(object):
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
+        useFormat = format
 
-        if format is None:
+        if useFormat is None:
             # if the file path is to a directory, assume it is a collection of 
             # musedata parts
             if os.path.isdir(fp):
-                format = 'musedata'
+                useFormat = 'musedata'
             else:
-                format = common.findFormatFile(fp)
-                if format is None:
-                     raise ConverterFileException('cannot find a format extensions for: %s' % fp)
-        self._setConverter(format, forceSource=forceSource)
+                useFormat = common.findFormatFile(fp)
+                if useFormat is None:
+                    raise ConverterFileException('cannot find a format extensions for: %s' % fp)
+        self._setConverter(useFormat, forceSource=forceSource)
         self._converter.parseFile(fp, number=number)
         self.stream.filePath = fp
         self.stream.fileNumber = number        
-        self.stream.fileFormat = format
+        self.stream.fileFormat = useFormat
 
-    def parseData(self, dataStr, number=None, format=None, forceSource=False):
-        '''Given raw data, determine format and parse into a music21 Stream.
+    def parseData(self, dataStr, number=None, format=None, forceSource=False): # @ReservedAssignment
         '''
+        Given raw data, determine format and parse into a music21 Stream.
+        '''
+        useFormat = format
         if common.isListLike(dataStr):
-            format = 'tinyNotation'
-
+            useFormat = 'tinyNotation'
 #         if type(dataStr) == unicode:
 #             environLocal.printDebug(['Converter.parseData: got a unicode string'])
 
         # get from data in string if not specified        
-        if format is None: # its a string
+        if useFormat is None: # its a string
             dataStr = dataStr.lstrip()
-            format, dataStr = self.formatFromHeader(dataStr)
+            useFormat, dataStr = self.formatFromHeader(dataStr)
 
-            if format is not None:
+            if useFormat is not None:
                 pass  
             elif dataStr.startswith('<?xml') or dataStr.startswith('musicxml:'):
-                format = 'musicxml'
+                useFormat = 'musicxml'
             elif dataStr.startswith('MThd') or dataStr.startswith('midi:'):
-                format = 'midi'
+                useFormat = 'midi'
             elif dataStr.startswith('!!!') or dataStr.startswith('**') or dataStr.startswith('humdrum:'):
-                format = 'humdrum'
+                useFormat = 'humdrum'
             elif dataStr.lower().startswith('tinynotation:'):
-                format = 'tinyNotation'
+                useFormat = 'tinyNotation'
             
             # assume MuseData must define a meter and a key
             elif 'WK#:' in dataStr and 'measure' in dataStr:
-                format = 'musedata'
+                useFormat = 'musedata'
             elif 'M:' in dataStr and 'K:' in dataStr:
-                format = 'abc'
+                useFormat = 'abc'
             elif 'Time Signature:' in dataStr and 'm1' in dataStr:
-                format = 'romanText'
+                useFormat = 'romanText'
             else:
                 raise ConverterException('File not found or no such format found for: %s' % dataStr)
 
-        self._setConverter(format)
+        self._setConverter(useFormat)
         self._converter.parseData(dataStr, number=number)
 
 
-    def parseURL(self, url, format=None, number=None):
+    def parseURL(self, url, format=None, number=None): # @ReservedAssignment
         '''Given a url, download and parse the file 
         into a music21 Stream stored in the `stream`
         property of the converter object.
@@ -867,12 +857,12 @@ class Converter(object):
         else:
             ext = 'txt'
 
-        dir = environLocal.getRootTempDir()
-        dst = self._getDownloadFp(dir, ext, url)
+        directory = environLocal.getRootTempDir()
+        dst = self._getDownloadFp(directory, ext, url)
         if not os.path.exists(dst):
             try:
                 environLocal.printDebug(['downloading to:', dst])
-                fp, headers = urllib.urlretrieve(url, filename=dst)
+                fp, unused_headers = urllib.urlretrieve(url, filename=dst)
             except IOError:
                 raise ConverterException('cannot access file: %s' % url)
         else:
@@ -881,12 +871,14 @@ class Converter(object):
 
         # update format based on downloaded fp
         if format is None: # if not provided as an argument
-            format = common.findFormatFile(fp) 
-        self._setConverter(format, forceSource=False)
+            useFormat = common.findFormatFile(fp) 
+        else:
+            useFormat = format
+        self._setConverter(useFormat, forceSource=False)
         self._converter.parseFile(fp, number=number)
         self.stream.filePath = fp
         self.stream.fileNumber = number        
-        self.stream.fileFormat = format
+        self.stream.fileFormat = useFormat
 
 
     validHeaderFormats = ['musicxml', 'midi', 'humdrum', 'tinyNotation', 'musedata', 'abc', 'romanText']
@@ -911,14 +903,14 @@ class Converter(object):
         
         dataStrStartLower = dataStr[:20].lower()
             
-        format = None
+        foundFormat = None
         for possibleFormat in self.validHeaderFormats:
             if dataStrStartLower.startswith(possibleFormat.lower() + ':'):
-                format = possibleFormat
-                dataStr = dataStr[len(format) + 1:]
+                foundFormat = possibleFormat
+                dataStr = dataStr[len(foundFormat) + 1:]
                 dataStr = dataStr.lstrip()
                 break
-        return (format, dataStr)
+        return (foundFormat, dataStr)
             
 
 
@@ -941,21 +933,21 @@ class Converter(object):
 # module level convenience methods
 
 
-def parseFile(fp, number=None, format=None, forceSource=False):
+def parseFile(fp, number=None, format=None, forceSource=False):  #@ReservedAssignment
     '''Given a file path, attempt to parse the file into a Stream.
     '''
     v = Converter()
     v.parseFile(fp, number=number, format=format, forceSource=forceSource)
     return v.stream
 
-def parseData(dataStr, number=None, format=None):
+def parseData(dataStr, number=None, format=None): # @ReservedAssignment
     '''Given musical data represented within a Python string, attempt to parse the data into a Stream.
     '''
     v = Converter()
     v.parseData(dataStr, number=number, format=format)
     return v.stream
 
-def parseURL(url, number=None, format=None, forceSource=False):
+def parseURL(url, number=None, format=None, forceSource=False): # @ReservedAssignment
     '''Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
     '''
     v = Converter()
@@ -1024,32 +1016,32 @@ def parse(value, *args, **keywords):
         number = None
 
     if 'format' in keywords.keys():
-        format = keywords['format']
+        m21Format = keywords['format']
     else:   
-        format = None
+        m21Format = None
 
     if (common.isListLike(value) and len(value) == 2 and 
         value[1] == None and os.path.exists(value[0])):
         # comes from corpus.search
-        return parseFile(value[0], format=format)
+        return parseFile(value[0], format=m21Format)
     elif (common.isListLike(value) and len(value) == 2 and 
         isinstance(value[1], int) and os.path.exists(value[0])):
         # corpus or other file with movement number
-        return parseFile(value[0], format=format).getScoreByNumber(value[1])
+        return parseFile(value[0], format=m21Format).getScoreByNumber(value[1])
     elif common.isListLike(value) or len(args) > 0: # tiny notation list
         if len(args) > 0: # add additional args to a list
             value = [value] + list(args)
         return parseData(value, number=number)
     # a midi string, must come before os.path.exists test
     elif value.startswith('MThd'):
-        return parseData(value, number=number, format=format)
+        return parseData(value, number=number, format=m21Format)
     elif os.path.exists(value):
-        return parseFile(value, number=number, format=format, forceSource=forceSource)
+        return parseFile(value, number=number, format=m21Format, forceSource=forceSource)
     elif (value.startswith('http://') or value.startswith('https://')): 
         # its a url; may need to broaden these criteria
-        return parseURL(value, number=number, format=format, forceSource=forceSource)
+        return parseURL(value, number=number, format=m21Format, forceSource=forceSource)
     else:
-        return parseData(value, number=number, format=format)
+        return parseData(value, number=number, format=m21Format)
 
 
 
@@ -1184,7 +1176,7 @@ class TestExternal(unittest.TestCase):
         urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
         urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
         for url in [urlA, urlB, urlC]:
-            post = parseURL(url)
+            unused_post = parseURL(url)
 
 
     def testFreezer(self):
@@ -1221,8 +1213,8 @@ class Test(unittest.TestCase):
                 continue
             obj = getattr(sys.modules[self.__module__], part)
             if callable(obj) and not isinstance(obj, types.FunctionType):
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
 
     def testConversionMX(self):
@@ -1348,7 +1340,7 @@ class Test(unittest.TestCase):
 
         mxString = testPrimitive.timeSignatures11c
         a = parse(mxString)
-        part = a.parts[0]
+        unused_part = a.parts[0]
 
 
         mxString = testPrimitive.timeSignatures11d
@@ -1454,8 +1446,6 @@ class Test(unittest.TestCase):
 
 
     def testConversionMXMetadata(self):
-
-        from music21.musicxml import testPrimitive
         from music21.musicxml import testFiles
 
         a = parse(testFiles.mozartTrioK581Excerpt)
@@ -1497,7 +1487,7 @@ class Test(unittest.TestCase):
     def testConversionMXTies(self):
         
         from music21.musicxml import testPrimitive
-        from music21 import stream, layout, clef
+        from music21 import clef
 
         a = parse(testPrimitive.multiMeasureTies)
         #a.show()
@@ -1535,10 +1525,8 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiBasic(self):
-        from music21 import common
-
-        dir = common.getPackageDir(relative=False, remapSep=os.sep)
-        for fp in dir:
+        directory = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in directory:
             if fp.endswith('midi'):
                 break
 
@@ -1546,8 +1534,8 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test01.mid')
 
-        s = parseFile(fp)
-        s = parse(fp)
+        unused_s = parseFile(fp)
+        unused_s = parse(fp)
 
         c = ConverterMidi()
         c.parseFile(fp)
@@ -1565,7 +1553,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiNotes(self):
-        from music21 import common, meter, key, chord, note
+        from music21 import meter, key, chord, note
 
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test01.mid')
         # a simple file created in athenacl
@@ -1702,12 +1690,10 @@ class Test(unittest.TestCase):
     def testConversionMusedata(self):
         
         from music21.musedata import testFiles
-        from music21 import corpus
-        from music21 import stream
 
         cmd = ConverterMuseData()
         cmd.parseData(testFiles.bach_cantata5_mvmt3)
-        s = cmd.stream
+        unused_s = cmd.stream
         #s.show()
 
         # test data id
@@ -1747,12 +1733,12 @@ class Test(unittest.TestCase):
         self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
 
         # returns a list of strings
-        self.assertEqual(af.getData(format='musedata')[0][:30], '378\n1080  1\nBach Gesells\nchaft')
+        self.assertEqual(af.getData(dataFormat='musedata')[0][:30], '378\n1080  1\nBach Gesells\nchaft')
 
 
         #mdw = musedataModule.MuseDataWork()
         # can add a list of strings from getData
-        #mdw.addString(af.getData(format='musedata'))
+        #mdw.addString(af.getData(dataFormat='musedata'))
         #self.assertEqual(len(mdw.files), 4)
 # 
 #         mdpList = mdw.getParts()
@@ -1766,15 +1752,6 @@ class Test(unittest.TestCase):
                 'testPrimitive', 'test01')
         cmd = ConverterMuseData()
         cmd.parseFile(fp)
-
-
-
-    def testMadrigalsA(self):
-
-        from music21 import corpus, converter
-        s = corpus.parse('madrigal.3.12.xml')
-
-        #s.show()
 
 
 #-------------------------------------------------------------------------------

@@ -13,7 +13,7 @@
 Music21 class for dealing with Roman Numeral analysis
 '''
 
-import doctest,unittest
+import unittest
 import copy
 import re
 
@@ -149,11 +149,11 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
 #    <music21.roman.RomanNumeral #iiio/7 in d minor>
 
     '''
-    stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
-                       'diminished' : {3: -1, 5: -1, 6: -1, 7: -2},
-                       'half-diminished': {3: -1, 5: -1, 6: -1, 7: -1},
-                       'augmented': {5: 1},
-                       }
+#    stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
+#                       'diminished' : {3: -1, 5: -1, 6: -1, 7: -2},
+#                       'half-diminished': {3: -1, 5: -1, 6: -1, 7: -1},
+#                       'augmented': {5: 1},
+#                       }
     chordObjSemiclosed = chordObj.semiClosedPosition(inPlace=False)
     root = chordObj.root()
     thirdType = chordObjSemiclosed.semitonesFromChordStep(3)
@@ -178,7 +178,7 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     else:
         fifthName = ""
 
-    (stepNumber, alter, rootAlterationString, discard) = figureTupletSolo(root, keyObj, keyObj.tonic)
+    (stepNumber, alter, rootAlterationString, unused) = figureTupletSolo(root, keyObj, keyObj.tonic)
 
     if keyObj.mode == 'minor' and stepNumber in [6, 7]:
         if alter == 1.0:
@@ -211,7 +211,7 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     inversionString = figureFromChordAndKey(chordObj, alteredKeyObj)
     if len(inversionString) > 0 and inversionString[0] == 'o':
         if fifthName == 'o':
-            fifthName == ""
+            fifthName = ""
     #print (inversionString, fifthName)
     rnString = rootAlterationString + stepRoman + fifthName + inversionString
     try:
@@ -267,7 +267,7 @@ def figureTupletSolo(pitchObj, keyObj, bass):
     >>> figureTupletSolo(pitch.Pitch('A-3'), key.Key('C'), pitch.Pitch('F#2'))
     (3, -1.0, 'b', <music21.pitch.Pitch A-3>)
     '''
-    (scaleStep, scaleAccidental) = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
+    (unused_scaleStep, scaleAccidental) = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
     
     thisInterval = interval.notesToInterval(bass, pitchObj)
     aboveBass = thisInterval.diatonic.generic.mod7
@@ -330,8 +330,8 @@ def figureFromChordAndKey(chordObj, keyObj=None):
 
     third = chordObj.third
     fifth = chordObj.fifth
-    seventh = chordObj.seventh
-    for figureTuplet in sorted(chordFigureTuplets, key=lambda tuple: tuple[0], reverse=True):
+    #seventh = chordObj.seventh
+    for figureTuplet in sorted(chordFigureTuplets, key=lambda tup: tup[0], reverse=True):
         (diatonicIntervalNum, alter, alterStr, pitchObj) = figureTuplet
         if diatonicIntervalNum != 1 and pitchObj is third:
             if chordObj.isMajorTriad() or chordObj.isMinorTriad():
@@ -421,7 +421,7 @@ class RomanNumeral(harmony.Harmony):
     
     >>> from music21 import *
     >>> V = roman.RomanNumeral('V') # could also use 5
-    >>> V.quality   # TODO: document better! what is inherited from Chord and what is new here...
+    >>> V.quality
     'major'
     >>> V.inversion()
     0
@@ -432,6 +432,7 @@ class RomanNumeral(harmony.Harmony):
     >>> V.pitches  # default key-- C Major
     [<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>]
     
+    # TODO: document better! what is inherited from Chord and what is new here...
     
     >>> neapolitan = roman.RomanNumeral('N6', 'c#') # could also use "bII6"
     >>> neapolitan.key
@@ -654,7 +655,7 @@ class RomanNumeral(harmony.Harmony):
             self.caseMatters = False
             figure = common.toRoman(figure)
 
-         # store raw figure before calling setKeyOrScale
+        # store raw figure before calling setKeyOrScale
         self._figure = figure            
         self._scale = None # this is set when _setKeyOrScale() is called
         self.impliedScale = None
@@ -914,7 +915,7 @@ class RomanNumeral(harmony.Harmony):
         else:
             return
 
-        newPitches = []
+        #newPitches = []
         for i in range(len(correctSemitones)): # 3,5,7
             thisChordStep = chordStepsToExamine[i]
             thisCorrect = correctSemitones[i]
@@ -1288,7 +1289,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -1302,8 +1303,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
     def testFBN(self):
         fbn = fbNotation.Notation('6,3')
@@ -1312,8 +1313,6 @@ class Test(unittest.TestCase):
         self.assertEqual(sdb, 7)
 
     def testFigure(self):
-        from music21 import scale
-        
         r1 = RomanNumeral('V')
         self.assertEqual(r1.scaleOffset, None)
         self.assertEqual(r1.pitches, chord.Chord(["G4","B4","D5"]).pitches)
@@ -1324,7 +1323,7 @@ class Test(unittest.TestCase):
         self.assertEqual(r1.scaleOffset.diatonic.niceName, "Doubly-Augmented Unison")
 
         cM = scale.MajorScale('C')
-        r2 = RomanNumeral('ii', cM)
+        unused_r2 = RomanNumeral('ii', cM)
 
         dminor = key.Key('d')
         rn = RomanNumeral('ii/o65', dminor)
@@ -1384,7 +1383,7 @@ class Test(unittest.TestCase):
 
 
     def testYieldRemoveA(self):
-        from music21 import corpus, stream, key, note
+        from music21 import stream, key, note
 #        s = corpus.parse('madrigal.3.1.rntxt')
         m = stream.Measure()
         m.append(key.KeySignature(4))
@@ -1435,7 +1434,7 @@ class Test(unittest.TestCase):
 
 
     def testYieldRemoveB(self):
-        from music21 import stream, note, corpus
+        from music21 import stream, note
 
         m = stream.Measure()
         m.append(key.KeySignature(4))
@@ -1456,7 +1455,7 @@ class Test(unittest.TestCase):
 
 
     def testYieldRemoveC(self):
-        from music21 import stream, note, corpus
+        from music21 import corpus
 
         s = corpus.parse('madrigal.5.8.rntxt')
         # first measure's active site is the Part
@@ -1485,7 +1484,7 @@ class Test(unittest.TestCase):
                 
 
     def testNeapolitanAndHalfDiminished(self):
-        from music21 import key, roman
+        from music21 import roman
         alteredChordHalfDim3rdInv = roman.RomanNumeral('bii/o42', scale.MajorScale('F'))
         self.assertEqual([str(p) for p in alteredChordHalfDim3rdInv.pitches],
                          ['F-4', 'G-4', 'B--4', 'D--5'])

@@ -152,19 +152,19 @@ class Instrument(base.Music21Object):
         '''
         # NOTE: this is used in musicxml output, not in midi output
         maxMidi = 16
-        filter = []
+        channelFilter = []
         for e in usedChannels:
             if e != None:
-                filter.append(e)
+                channelFilter.append(e)
 
-        if len(filter) == 0:
+        if len(channelFilter) == 0:
             self.midiChannel = 0
             return 0
-        elif len(filter) >= maxMidi:
+        elif len(channelFilter) >= maxMidi:
             raise InstrumentException("we are out of midi channels! help!")
         else:
             for ch in range(maxMidi):
-                if ch in filter:
+                if ch in channelFilter:
                     continue
                 elif ch % 16 == 10:
                     continue # skip 10 /perc for now
@@ -1361,11 +1361,11 @@ def fromString(instrumentString):
             thisBestName = thisInstrument.bestName().lower()
             if bestInstClass is None or len(thisBestName.split())\
              >= len(bestName.split()) and not issubclass(bestInstClass, thisInstClass):
-                 # priority is also given to same length instruments which fall later
-                 # on in the string (i.e. Bb Piccolo Trumpet)
-                 bestInstClass = thisInstClass
-                 bestInstrument = thisInstrument
-                 bestName = thisBestName
+                # priority is also given to same length instruments which fall later
+                # on in the string (i.e. Bb Piccolo Trumpet)
+                bestInstClass = thisInstClass
+                bestInstrument = thisInstrument
+                bestName = thisBestName
         except KeyError:
             pass
     if bestInstClass is None:
@@ -1405,7 +1405,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import types, copy
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -1419,12 +1419,12 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
 
     def testMusicXMLExport(self):
-        from music21 import stream, note, meter
+        from music21 import stream, note
 
         s1 = stream.Stream()
         i1 = Violin()
@@ -1580,7 +1580,7 @@ class Test(unittest.TestCase):
         from music21 import instrument, stream, note
 
         # basic case of instruments in Parts
-        s = stream.Score()
+        #s = stream.Score()
         p1 = stream.Part() 
         p1.append(instrument.Piano())
         p1.repeatAppend(note.Note('a'), 6)

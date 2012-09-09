@@ -710,25 +710,25 @@ def updateTupletType(durationList):
         tuplet, dur = tupletMap[i]
 
         if i > 0:
-            tupletPrevious, durPrevious = tupletMap[i - 1]
+            tupletPrevious, unused_durPrevious = tupletMap[i - 1]
         else: 
-            tupletPrevious, durPrevious = None, None
+            tupletPrevious, unused_durPrevious = None, None
 
         if i < len(tupletMap) - 1:
-            tupletNext, durNext = tupletMap[i + 1]
-            if tupletNext != None:
-                nextNormalType = tupletNext.durationNormal.type
-            else:
-                nextNormalType = None
+            tupletNext, unused_durNext = tupletMap[i + 1]
+#            if tupletNext != None:
+#                nextNormalType = tupletNext.durationNormal.type
+#            else:
+#                nextNormalType = None
         else: 
-            tupletNext, durNext = None, None
-            nextNormalType = None
+            tupletNext, unused_durNext = None, None
+#            nextNormalType = None
 
 #         environLocal.printDebug(['updateTupletType previous, this, next:', 
 #                                  tupletPrevious, tuplet, tupletNext])
 
         if tuplet != None:
-            thisNormalType = tuplet.durationNormal.type
+#            thisNormalType = tuplet.durationNormal.type
             completionCount += dur.quarterLength
             # if previous tuplet is None, always start
             # always reset completion target
@@ -1122,7 +1122,7 @@ class Tuplet(object):
         # actual is what is presented to viewer
         numActual = self.numberNotesActual
         numNormal = self.numberNotesNormal
-        dur = self.durationActual
+        #dur = self.durationActual
         
         if numActual in [3] and numNormal in [2]:
             return 'Triplet'
@@ -1536,7 +1536,7 @@ class DurationUnit(DurationCommon):
         ''')
 
     def setTypeFromNum(self, typeNum):
-        numberFound = None
+        #numberFound = None
         if str(typeNum) in typeFromNumDict.keys():
             self.type = typeFromNumDict[str(typeNum)]
         else:
@@ -2530,28 +2530,28 @@ class Duration(DurationCommon):
     #---------------------------------------------------------------------------
     # output formats
 
-    def write(self, fmt='musicxml', fp=None):
+    def write(self, format='musicxml', fp=None): # format is okay here @ReservedAssignment
         '''
         As in Music21Object.write: Writes a file in the given format (musicxml by default)
         
         A None file path will result in temporary file.
         '''
-        format, ext = common.findFormat(fmt)
-        if format == None:
-            raise DurationException('bad format (%s) provided to write()' % fmt)
-        elif format == 'musicxml':
+        foundFormat, ext = common.findFormat(format)
+        if foundFormat == None:
+            raise DurationException('bad format (%s) provided to write()' % format)
+        elif foundFormat == 'musicxml':
             from music21.musicxml import m21ToString
             if fp == None:
                 fp = environLocal.getTempFile(ext)
             dataStr = m21ToString.fromDuration(self)
         else:
-            raise DurationException('cannot support writing in this format, %s yet' % format)
+            raise DurationException('cannot support writing in this format, %s yet' % foundFormat)
         f = open(fp, 'w')
         f.write(dataStr)
         f.close()
         return fp
 
-    def show(self, format='musicxml'):
+    def show(self, format='musicxml'): # format is okay here... @ReservedAssignment
         '''
         Same as Music21Object.show().
         '''
@@ -3036,7 +3036,7 @@ class TestExternal(unittest.TestCase):
 
         a = stream.Stream()
 
-        for x in range(30):
+        for i in range(30):
             ql = random.choice([1, 2, 3, 4, 5]) + random.choice([0, .25, .5, .75])
             # w/ random.choice([0,.33333,.666666] gets an error
             n = note.Note()
@@ -3058,7 +3058,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -3072,8 +3072,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
 
     def testTuple(self):
@@ -3155,19 +3155,20 @@ class Test(unittest.TestCase):
         self.assertEqual(c.quarterLength, 1.0)
 
     def testTupletTypeComplete(self):
-        '''Test settinf of tuplet type when durations sum to expected completion
+        '''
+        Test setting of tuplet type when durations sum to expected completion
         '''
         # default tuplets group into threes when possible
         test, match = ([.333333] * 3 + [.1666666] * 6,
             ['start', None, 'stop', 'start', None, 'stop', 'start', None, 'stop'])
-        input = []
+        inputTuplets = []
         for qLen in test:
             d = Duration()
             d.quarterLength = qLen
-            input.append(d)
-        updateTupletType(input)
+            inputTuplets.append(d)
+        updateTupletType(inputTuplets)
         output = []
-        for d in input:
+        for d in inputTuplets:
             output.append(d.tuplets[0].type)
         self.assertEqual(output, match)
 
@@ -3180,7 +3181,7 @@ class Test(unittest.TestCase):
         tup5 = Duration()
         tup5.quarterLength = .2 # default is 5 in the space of 4 16th
 
-        input = [copy.deepcopy(tup6), copy.deepcopy(tup6), copy.deepcopy(tup6),
+        inputTuplets = [copy.deepcopy(tup6), copy.deepcopy(tup6), copy.deepcopy(tup6),
         copy.deepcopy(tup6), copy.deepcopy(tup6), copy.deepcopy(tup6),
         copy.deepcopy(tup5), copy.deepcopy(tup5), copy.deepcopy(tup5),
         copy.deepcopy(tup5), copy.deepcopy(tup5)]
@@ -3188,16 +3189,17 @@ class Test(unittest.TestCase):
         match = ['start', None, None, None, None, 'stop',
                  'start', None, None, None, 'stop']
 
-        updateTupletType(input)
+        updateTupletType(inputTuplets)
         output = []
-        for d in input:
+        for d in inputTuplets:
             output.append(d.tuplets[0].type)
         self.assertEqual(output, match)
 
 
 
     def testTupletTypeIncomplete(self):
-        '''Test setting of tuplet type when durations do not sum to expected
+        '''
+        Test setting of tuplet type when durations do not sum to expected
         completion. 
         '''
 
@@ -3206,14 +3208,14 @@ class Test(unittest.TestCase):
         test, match = ([.333333] * 2 + [.1666666] * 5,
             ['start', None, None, 'stop', 'start', None, 'stop']
             )
-        input = []
+        inputDurations = []
         for qLen in test:
             d = Duration()
             d.quarterLength = qLen
-            input.append(d)
-        updateTupletType(input)
+            inputDurations.append(d)
+        updateTupletType(inputDurations)
         output = []
-        for d in input:
+        for d in inputDurations:
             output.append(d.tuplets[0].type)
         #environLocal.printDebug(['got', output])
         self.assertEqual(output, match)

@@ -8,7 +8,8 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''This module defines an object representation of MusicXML, used for converting to and from MusicXML and music21.
+'''
+This module defines an object representation of MusicXML, used for converting to and from MusicXML and music21.
 '''
 import sys
 
@@ -21,7 +22,7 @@ currentStdOut = sys.stdout
 currentStdIn = sys.stdin
 currentStdErr = sys.stderr
 reload(sys)
-sys.setdefaultencoding('utf-8')
+sys.setdefaultencoding('utf-8') # @UndefinedVariable
 sys.stdout = currentStdOut
 sys.stdin = currentStdIn
 sys.stderr = currentStdErr
@@ -760,29 +761,29 @@ class Score(MusicXMLElementList):
         each dictionary containing number, a list of part ids, 
         and a mx PartGroup object.
         '''
-        open = []
-        closed = []
+        openParts = []
+        closedParts = []
         # the parts list object contains both ScorePart and PartGroup objs
         for p in self.partListObj:
             if isinstance(p, PartGroup):
                 n = p.get('number')
-                type = p.get('type')
-                if type == 'start':
+                partType = p.get('type')
+                if partType == 'start':
                     coll = {}
                     coll['number'] = n
                     coll['scorePartIds'] = []
                     coll['partGroup'] = p
-                    open.append(coll)
-                elif type == 'stop':
-                    for c in open:
+                    openParts.append(coll)
+                elif partType  == 'stop':
+                    for c in openParts:
                         if c['number'] == n:
-                            open.remove(c)
-                            closed.append(c)
+                            openParts.remove(c)
+                            closedParts.append(c)
                             break
             elif isinstance(p, ScorePart):
-                for c in open: # add to all open collections
+                for c in openParts: # add to all open collections
                     c['scorePartIds'].append(p.get('id'))
-        return closed
+        return closedParts
 
     def getScorePart(self, partId):
         '''Get an instrument, as defined in a ScorePart object, from a Score. 
@@ -829,13 +830,13 @@ class Score(MusicXMLElementList):
         if partId in partNames.keys():
             idFound = partId
         else:
-            for id in self.getPartIds():
-                if id.lower() == partId.lower(): # assume always lower
-                    idFound = id
+            for thisPartId in self.getPartIds():
+                if thisPartId.lower() == partId.lower(): # assume always lower
+                    idFound = thisPartId 
                     break
                 # check for part name
-                elif partId.lower() == partNames[id].lower(): 
-                    idFound = id
+                elif partId.lower() == partNames[thisPartId].lower(): 
+                    idFound = thisPartId
                     break
         if idFound is None:
             raise MusicXMLException('no part with id %s' % partId)
@@ -1198,17 +1199,19 @@ class Part(MusicXMLElementList):
         #self.set('id', defaults.partId)
 
     def getStavesCount(self):
-        '''Look ahead into the measure Attributes and return the highest number of staves used in this part.
         '''
-        max = 1
+        Look ahead into the measure Attributes and return the highest number 
+        of staves used in this part.
+        '''
+        maxStaves = 1
         for c in self.componentList:
             if c._tag == 'measure':
                 if c.attributesObj is not None:
                     if c.attributesObj.staves is not None:
                         count = int(c.attributesObj.staves)
-                        if count > max:
-                            max = count
-        return max
+                        if count > maxStaves:
+                            maxStaves = count
+        return maxStaves
 
 
 class Measure(MusicXMLElementList):
@@ -1279,8 +1282,8 @@ class Measure(MusicXMLElementList):
             # keep existing divisions
 
         #counter = 0
-        noteThis = None
-        noteNext = None
+        #noteThis = None
+        #noteNext = None
         for pos in range(len(self.componentList)):
             #environLocal.printDebug(['Measure.update()', counter])
             obj = self.componentList[pos]
@@ -1922,7 +1925,7 @@ class Ending(MusicXMLElement):
 
 
 class Segno(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'segno'
         # attributes
@@ -1930,7 +1933,7 @@ class Segno(MusicXMLElement):
         self._attr['default-x'] = None
 
 class Coda(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'coda'
         # attributes
@@ -2053,7 +2056,7 @@ class Note(MusicXMLElement):
 
 
 class Forward(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'forward'
         # attributes
@@ -2067,7 +2070,7 @@ class Forward(MusicXMLElement):
 
 
 class Backup(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'backup'
         # attributes
@@ -2082,7 +2085,7 @@ class Backup(MusicXMLElement):
 
 
 class Rest(MusicXMLElementList):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElementList.__init__(self)
         self._tag = 'rest'
         self.componentList = [] # stores display-step, display-octave
@@ -2103,13 +2106,13 @@ class Rest(MusicXMLElementList):
 
 
 class DisplayStep(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'display-step'
         self.charData = None # only content
 
 class DisplayOctave(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'display-octave'
         self.charData = None # only content
@@ -2122,7 +2125,7 @@ class Notations(MusicXMLElementList):
     Notations contains many elements, including Ornaments.
     Most of these are stored in the .componentList
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElementList.__init__(self)
         self._tag = 'notations'
         self.componentList = []  # objects that are part of this node
@@ -2259,7 +2262,7 @@ class Notations(MusicXMLElementList):
 
 
 class Dynamics(MusicXMLElementList):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElementList.__init__(self)
         self._tag = 'dynamics'
         # attributes
@@ -2277,7 +2280,7 @@ class Dynamics(MusicXMLElementList):
         return c
 
 class Articulations(MusicXMLElementList):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElementList.__init__(self)
         self._tag = 'articulations'
         # attributes
@@ -2290,7 +2293,7 @@ class Articulations(MusicXMLElementList):
         return c
 
 class Technical(MusicXMLElementList):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElementList.__init__(self)
         self._tag = 'technical'
         # attributes
@@ -2342,7 +2345,7 @@ class TechnicalMark(MusicXMLElement):
 
 
 class Grace(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'grace'
         # attributes
@@ -2360,7 +2363,7 @@ class Wedge(MusicXMLElement):
     >>> w.tag
     'wedge'
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'wedge'
         # attributes
@@ -2381,7 +2384,7 @@ class OctaveShift(MusicXMLElement):
     >>> os.tag
     'octave-shift'
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'octave-shift'
 
@@ -2398,7 +2401,7 @@ class Bracket(MusicXMLElement):
     >>> b.tag
     'bracket'
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'bracket'
 
@@ -2423,7 +2426,7 @@ class WavyLine(MusicXMLElement):
     >>> wl.tag
     'wavy-line'
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'wavy-line'
         # attributes
@@ -2442,7 +2445,7 @@ class Glissando(MusicXMLElement):
     >>> g.tag
     'glissando'
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'glissando'
         # attributes
@@ -2460,7 +2463,7 @@ class Dashes(MusicXMLElement):
     >>> d.tag
     'dashes'
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'dashes'
 
@@ -2478,7 +2481,7 @@ class Ornaments(MusicXMLElementList):
 
     Ornaments are stored on the notations object. 
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElementList.__init__(self)
         self._tag = 'ornaments'
         self.componentList = []  # objects tt are part of this node
@@ -2488,35 +2491,35 @@ class Ornaments(MusicXMLElementList):
 
 
 class TrillMark(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'trill-mark'
         self._attr['placement'] = None # above/below
 
 class Mordent(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'mordent'
         self._attr['long'] = None # yes/no
 
 class InvertedMordent(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'inverted-mordent'
 
 
 class Turn(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'turn'
 
 class DelayedTurn(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'delayed-turn'
 
 class InvertedTurn(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'inverted-turn'
 
@@ -2524,17 +2527,17 @@ class AccidentalMark(MusicXMLElement):
     '''Used inside an ornament definition; chardata holds the
     accidental type
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'accidental-mark'
 
 class Shake(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'shake'
 
 class Schleifer(MusicXMLElement): # type of slide
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'schleifer'
 
@@ -2543,7 +2546,7 @@ class Tremolo(MusicXMLElement):
     '''Tremolo may or may not extend over multiple notes.
     Char data may store integer number.
     '''
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'tremolo'
         # type may or may not be defined
@@ -2551,7 +2554,7 @@ class Tremolo(MusicXMLElement):
         self._attr['number'] = None # for id
 
 class Notehead(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'notehead'
         # attributes
@@ -2565,13 +2568,13 @@ class Notehead(MusicXMLElement):
 #"slash", "triangle", "diamond", "square", "cross", "x" , "circle-x", "inverted triangle", "arrow down", "arrow up", "slashed", "back slashed", "normal", "cluster", "none", "do", "re", "mi", "fa", "so", "la", "ti" 
 
 class Dot(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'dot'
     
 
 class Tie(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'tie'
         # attributes
@@ -2579,7 +2582,7 @@ class Tie(MusicXMLElement):
 
 
 class Fermata(MusicXMLElement):
-    def __init__(self, type=None):
+    def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'fermata'
         # attributes
@@ -3894,7 +3897,7 @@ class Document(object):
         saxparser.setFeature(xml.sax.handler.feature_namespaces, 0)   
         return saxparser
 
-    def _load(self, fileLike, file=True, audit=False):
+    def _load(self, fileLike, isFile=True, audit=False):
         saxparser = self._getParser()
         #t = common.Timer()
         #t.start()
@@ -3902,7 +3905,7 @@ class Document(object):
         h = Handler(self.tagLib) 
         saxparser.setContentHandler(h)
 
-        if not file:
+        if not isFile:
             # StringIO.StringIO is supposed to handle unicode
             fileLikeOpen = StringIO.StringIO(fileLike)
 
@@ -4080,7 +4083,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -4094,15 +4097,15 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
     def testTagLib(self):
         t = TagLib()
         # create some conditions that would trigger an error
         t['sign'].charData = 'G'
         t['pitch'].start()
-        ok, msg = t.audit()
+        ok, unused_msg = t.audit()
         # should be an error
         self.assertEqual(ok, 0)
 
@@ -4600,8 +4603,7 @@ class Test(unittest.TestCase):
     def testMergeAttributes(self):
         a1 = Attributes()
         a2 = Attributes()
-        a3 = Attributes()
-
+        
         a1.divisions = 10
 
         mxClef = Clef()
@@ -4697,7 +4699,7 @@ class Test(unittest.TestCase):
                         self.assertEqual(c.repeatObj.get('direction'), 'backward')
                         self.assertEqual(c.repeatObj.get('times'), None)
                         #print c.repeatObj.direction
-        s = corpus.parse('opus18no1/movement3', extList=['.xml'])
+        unused_s = corpus.parse('opus18no1/movement3', extList=['.xml'])
         os.remove('movement3.xml')
 
     def testHarmonyA(self):
@@ -4836,7 +4838,7 @@ if __name__ == "__main__":
     # this is a temporary hack to get encoding working right
     # this may not be the best way to do this
     reload(sys)
-    sys.setdefaultencoding("utf-8")
+    sys.setdefaultencoding("utf-8") # @UndefinedVariable
 
     import music21
     music21.mainTest(Test)

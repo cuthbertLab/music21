@@ -132,12 +132,12 @@ def testOld():
     print("The difference in cents between a Just Major 3rd and a Pythagorean d4 is " + centsCompare(M3ji, Diminished4))
     
     majorST = IntervalRatio(17,16)
-    minorST = IntervalRatio(18,17)
+    unused_minorST = IntervalRatio(18,17)
     
     collat7 = IntervalRatio(7,4)
-    collat7sub = collat7.add(majorST)
-    ET7th = ET(10)
-    unison = ET(0)
+    unused_collat7sub = collat7.add(majorST)
+    unused_ET7th = ET(10)
+    unused_unison = ET(0)
     
     #print centsCompare(minorST.add(majorST), unison)
     
@@ -155,14 +155,14 @@ class Test(unittest.TestCase):
         P5 = IntervalRatio(3,2)
         P4 = IntervalRatio(4,3)
         WT = P5.sub(P4)
-        post = "Whole tone in ratio " + WT.ratio
-        post = "Whole tone in decimal " + str(WT.decimal)
+        unused_post = "Whole tone in ratio " + WT.ratio
+        unused_post = "Whole tone in decimal " + str(WT.decimal)
         
         P5_12times = P5.times(12)
-        post = "12 Perfect fifths exceeds an octave by " + P5_12times.ratio_octaveless
+        junk = "12 Perfect fifths exceeds an octave by " + P5_12times.ratio_octaveless
         
         P8_7times = P8.times(7)
-        post = "your Wolf fifth will be too small by " + centsCompare(P5_12times, P8_7times) + " cents"
+        junk = "your Wolf fifth will be too small by " + centsCompare(P5_12times, P8_7times) + " cents"
         
         #P11 = Interval(8,3)
         #P11.show()
@@ -174,30 +174,30 @@ class Test(unittest.TestCase):
         ET = ETIntervalRatio
         
         P5et = ET(7)
-        post = "A pythagorean Perfect 5 is  " + centsCompare(P5,P5et) + " cents above an ET P5"
+        junk = "A pythagorean Perfect 5 is  " + centsCompare(P5,P5et) + " cents above an ET P5"
         
         WTet = ET(2)
-        post = "A pythagorean Whole tone is " + centsCompare(WT,WTet) + " cents above an ET WT"
+        junk = "A pythagorean Whole tone is " + centsCompare(WT,WTet) + " cents above an ET WT"
         
         ditone = WT.add(WT)
         M3et = ET(4)
         M3ji = IntervalRatio(5,4)
-        post = "Ditone to M3 in ET        : " + centsCompare(ditone, M3et) + " cents higher;"
-        post = "M3 in ET to 5:4 major 3rd : " + centsCompare(M3et, M3ji) + " cents higher;"
-        post = "Ditone to 5:4 major 3rd   : " + centsCompare(ditone, M3ji) + " cents higher;"
+        junk = "Ditone to M3 in ET        : " + centsCompare(ditone, M3et) + " cents higher;"
+        junk = "M3 in ET to 5:4 major 3rd : " + centsCompare(M3et, M3ji) + " cents higher;"
+        junk = "Ditone to 5:4 major 3rd   : " + centsCompare(ditone, M3ji) + " cents higher;"
         
         
         Diminished4 = P4.times(8).reduce()
-        post = "A diminished fourth is " + str(Diminished4.octaveless_decimal)
-        post = "The difference in cents between a Just Major 3rd and a Pythagorean d4 is " + centsCompare(M3ji, Diminished4)
+        junk = "A diminished fourth is " + str(Diminished4.octaveless_decimal)
+        junk = "The difference in cents between a Just Major 3rd and a Pythagorean d4 is " + centsCompare(M3ji, Diminished4)
         
         majorST = IntervalRatio(17,16)
-        minorST = IntervalRatio(18,17)
+        #minorST = IntervalRatio(18,17)
         
         collat7 = IntervalRatio(7,4)
-        collat7sub = collat7.add(majorST)
-        ET7th = ET(10)
-        unison = ET(0)
+        unused_collat7sub = collat7.add(majorST)
+        unused_ET7th = ET(10)
+        unused_unison = ET(0)
 
 if __name__ == "__main__":    
     import music21

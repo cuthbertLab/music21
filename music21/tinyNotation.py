@@ -667,8 +667,8 @@ class Test(unittest.TestCase):
         for thisNote in st:
             ret += self.compactNoteInfo(thisNote) + "\n"
         
-        d1 = st.duration
-        l1 = d1.quarterLength
+        #d1 = st.duration
+        #l1 = d1.quarterLength
         self.assertAlmostEquals(st.duration.quarterLength, 6.0)
         
         ret += "Total duration of Stream: " + str(st.duration.quarterLength) + "\n"

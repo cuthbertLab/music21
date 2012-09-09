@@ -14,19 +14,17 @@ import os
 import re
 import time
 import sys
-import threading 
 import unittest
 import textwrap
-import distutils
 
-try:
-    import readline
-except ImportError:
-    pass
+#try:
+#    import readline
+#except ImportError:
+#    pass
 
 try:
     import StringIO # python 2 
-except:
+except ImportError:
     from io import StringIO # python3 (also in python 2.6+)
 
 
@@ -128,10 +126,10 @@ def findInstallations():
     '''Find all music21 references found in site packages, or possibly look at the running code as well.
     '''
     found = []
-    dir = getSitePackages()
-    for fn in os.listdir(dir):
+    sitePackages = getSitePackages()
+    for fn in os.listdir(sitePackages):
         if fn.startswith('music21'):
-            found.append(os.path.join(dir, fn))
+            found.append(os.path.join(sitePackages, fn))
     try:
         # see if we can import music21
         import music21
@@ -147,7 +145,7 @@ def findInstallationsEggInfo():
     # only get those that end w/ egg-info
     post = []
     for fp in found:
-        dir, fn = os.path.split(fp)
+        unused_dir, fn = os.path.split(fp)
         if fn.endswith('egg-info') or fn.endswith('egg'):
             post.append(fn)
     return post
@@ -175,10 +173,10 @@ def getUserData():
         
     post['music21 egg-info current'] = findInstallationsEggInfoStr()
 
-    try:
+    if hasattr(os, 'uname'):
         uname = os.uname()
         post['os.uname'] = '%s, %s, %s' % (uname[0], uname[2], uname[4])
-    except: # catch all
+    else: # catch all
         post['os.uname'] = 'None'
 
     post['time.gmtime'] = time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
@@ -812,9 +810,9 @@ class AskInstall(YesOrNo):
             fileLikeOpen = StringIO.StringIO()
             sys.stdout = fileLikeOpen
 
-            dir, fn = os.path.split(fp)
+            directory, unused_fn = os.path.split(fp)
             pyPath = sys.executable
-            cmd = 'cd %s; sudo %s setup.py install' % (dir, pyPath)
+            cmd = 'cd %s; sudo %s setup.py install' % (directory, pyPath)
             post = os.system(cmd)
 
             fileLikeOpen.close()
@@ -1415,7 +1413,7 @@ class ConfigurationAssistant(object):
                 force = None
 
             d.askUser(force=force)
-            post = d.getResult()
+            unused_post = d.getResult()
             # post may be an error; no problem calling perform action anyways
             try:
                 d.performAction(simulate=self._simulate)
@@ -1638,19 +1636,18 @@ class Test(unittest.TestCase):
 
 
     def testConfigurationAssistant(self):
-        ca = ConfigurationAssistant(simulate=True)
+        unused_ca = ConfigurationAssistant(simulate=True)
 
     
     def testAskInstall(self):
-        d = AskInstall()
+        unused_d = AskInstall()
         #d.askUser()
         #d.getResult()
         #d.performAction()
 
 
     def testGetUserData(self):
-
-        d = AskSendInstallationReport()
+        unused_d = AskSendInstallationReport()
 #         d.askUser()
 #         d.getResult()
 #         d.performAction()
@@ -1658,7 +1655,7 @@ class Test(unittest.TestCase):
         
     def testGetUserData2(self):
 
-        d = AskAutoDownload()
+        unused_d = AskAutoDownload()
 #         d.askUser()
 #         d.getResult()
 #         d.performAction()
@@ -1666,16 +1663,13 @@ class Test(unittest.TestCase):
 
     def testAnyKey(self):
 
-        d = AnyKey()
+        unused_d = AnyKey()
 #         d.askUser()
 #         d.getResult()
 #         d.performAction()
 
 
 if __name__ == "__main__":
-    import sys
-
-
     # only if running tests
     if len(sys.argv) == 1: # normal conditions
         #music21.mainTest(Test)

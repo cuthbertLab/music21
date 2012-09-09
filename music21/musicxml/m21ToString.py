@@ -34,6 +34,7 @@ with musicxml between the standard music21 objects and musicxml.toMxObjects
 import copy
 import unittest
 
+from music21 import exceptions21
 from music21 import note
 from music21 import stream
 from music21.musicxml import toMxObjects
@@ -48,7 +49,6 @@ def fromMusic21Object(m21Object):
     '''
     classes = m21Object.classes
     if 'Measure' in classes: # must go before Stream
-        post = copy.deepcopy(m21Object)        
         return fromMeasure(m21Object)
     elif 'Stream' in classes:
         return fromStream(m21Object)
@@ -67,7 +67,7 @@ def fromMusic21Object(m21Object):
     elif 'TimeSignature' in classes:
         return fromTimeSignature(m21Object)
     else:
-        raise translate.TranslateException("Cannot translate the object %s to a complete musicXML document; put it in a Stream first!" % m21Object)
+        raise M21ToStringException("Cannot translate the object %s to a complete musicXML document; put it in a Stream first!" % m21Object)
 
 def fromStream(streamObject):
     '''
@@ -282,6 +282,9 @@ def fromPitch(p):
     return fromStream(out)
 
 
+class M21ToStringException(exceptions21.Music21Exception):
+    pass
+
 #--------------------------------------------------
 # Test Classes
 
@@ -293,8 +296,8 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.voiceDouble)
-        raw = fromMusic21Object(s)
-        #s.show()
+        unused_raw = fromMusic21Object(s)
+        # TODO- Test voices out...
 
     def testTextExpressionsB(self):
         from music21 import expressions
@@ -317,7 +320,7 @@ class Test(unittest.TestCase):
 
             p.append(te)
             p.append(note.Note(type='quarter'))
-            for x in range(4):
+            for i in range(4):
                 p.append(note.Rest(type='16th'))
 
         s = stream.Score()
@@ -685,8 +688,6 @@ spirit</words>
     def testStemDirection(self):
         #testing the ability to changing stem directions
 
-        from music21 import converter
-
         n1 = note.Note('c3')
         n1.notehead = 'diamond'
         n1._setStemDirection('double')
@@ -893,7 +894,7 @@ spirit</words>
             n.quarterLength = 0.5
             m.repeatAppend(n, 5)
             s.append(m)
-        raw = fromMusic21Object(s)
+        unused_raw = fromMusic21Object(s)
         # TODO: Test Raw for something!!!!
 
     def testOrnamentA(self):
@@ -1116,7 +1117,6 @@ class TestExternal(unittest.TestCase):
         '''
         from music21 import scale
         from music21 import chord
-        from music21 import harmony
         from music21 import duration
         from music21 import dynamics
         from music21 import meter

@@ -96,7 +96,7 @@ def slashCompoundToFraction(value):
         if m == None: 
             pass
         else:
-            n, d, tempoIndication = m
+            n, d, unused_tempoIndication = m
             post.append((n, d))
     return post
 
@@ -138,7 +138,7 @@ def slashMixedToFraction(valueSrc):
             fraction = slashToFraction(part)
             if fraction == None:
                 raise TimeSignatureException('cannot create time signature from:', valueSrc)
-            n, d, tempoIndication = fraction
+            n, d, unused_tempoIndication = fraction
             pre.append([n, d])
         else: # its just a numerator
             pre.append([int(part), None])
@@ -311,7 +311,7 @@ class MeterTerminal(object):
             # calling _ratioChanged more than necessary
             values = slashToFraction(slashNotation)
             if values is not None: # if failed to parse
-                n, d, tempoIndication = values
+                n, d, unused_tempoIndication = values
             self._numerator = n
             self._denominator = d
         self._ratioChanged() # sets self._duration
@@ -881,7 +881,7 @@ class MeterSequence(MeterTerminal):
                 if dMod > validDenominators[-1]:
                     break
                 seq = []
-                for x in range(i):
+                for j in range(i):
                     seq.append('%s/%s' % (n, dMod))    
                 opts.append(seq)
                 dMod = dMod * 2
@@ -908,7 +908,7 @@ class MeterSequence(MeterTerminal):
                 if nMod <= 1:
                     break
                 seq = []
-                for x in range(i):
+                for j in range(i):
                     seq.append('%s/%s' % (nMod, d))  
                 if seq not in opts:  # may be cases defined elsewhere 
                     opts.append(seq)
@@ -938,7 +938,7 @@ class MeterSequence(MeterTerminal):
                 if dMod < 1 or nMod <= 1:
                     break
                 seq = []
-                for x in range(nMod):
+                for j in range(nMod):
                     seq.append('%s/%s' % (1, dMod))    
                 opts.append(seq)
                 if nMod % 2 != 0: # if no longer even must stop
@@ -971,7 +971,7 @@ class MeterSequence(MeterTerminal):
                 if dCurrent > validDenominators[-1] or nCount > nCountLimit:
                     break
                 seq = []
-                for x in range(nCount):
+                for j in range(nCount):
                     seq.append('%s/%s' % (1, dCurrent))    
                 opts.append(seq)
                 # double count, double denominator
@@ -1021,7 +1021,7 @@ class MeterSequence(MeterTerminal):
         if n % 3 == 0 and n > 3:
             nMod = n / 3
             seq = []
-            for x in range(n/3):
+            for j in range(n/3):
                 seq.append('%s/%s' % (3, d))
             opts.append(seq)
         # odd meters with common groupings
@@ -1711,10 +1711,10 @@ class MeterSequence(MeterTerminal):
         >>> d.weight
         0.5
         '''
-        sum = 0
+        summation = 0
         for obj in self._partition:
-            sum += obj.weight # may be a MeterTerminal or MeterSequence
-        return sum
+            summation += obj.weight # may be a MeterTerminal or MeterSequence
+        return summation
 
     def _setWeight(self, value):
         '''
@@ -1982,15 +1982,15 @@ class MeterSequence(MeterTerminal):
         [(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.25), (3.25, 3.5), (3.5, 4.0)]
         ''' 
         ms = self._getLevelList(level, flat=True)
-        map = []
+        mapping = []
         pos = 0.0
 
         for i in range(len(ms)):
             start = pos
             end = pos + ms[i].duration.quarterLength
-            map.append((start, end))
+            mapping.append((start, end))
             pos += ms[i].duration.quarterLength
-        return map
+        return mapping
 
 
     def getLevelWeight(self, level=0):
@@ -2271,7 +2271,7 @@ class MeterSequence(MeterTerminal):
         # need to quantize by lowest level
         mapMin = self.getLevelSpan(self.depth-1)
         msMin = self.getLevel(self.depth-1)
-        qStart, qEnd = mapMin[msMin.offsetToIndex(qLenPos)]
+        qStart, unused_qEnd = mapMin[msMin.offsetToIndex(qLenPos)]
         if align == 'quantize':
             posMatch = qStart
         else:
@@ -2279,8 +2279,8 @@ class MeterSequence(MeterTerminal):
 
         score = 0
         for level in range(self.depth):
-            map = self.getLevelSpan(level) # get map for each level
-            for start, end in map:
+            mapping = self.getLevelSpan(level) # get mapping for each level
+            for start, end in mapping:
                 if align in ['start', 'quantize']:
                     srcMatch = start
                 elif align == 'end':
@@ -2704,7 +2704,7 @@ class TimeSignature(base.Music21Object):
         # get simple representation; presently, only slashToFraction
         # supports the fast/slow indication
         if common.isStr(value):
-            n, d, tempoIndication = slashToFraction(value)
+            unused_n, unused_d, tempoIndication = slashToFraction(value)
         else:       
             tempoIndication = None
 
@@ -3249,20 +3249,20 @@ class TimeSignature(base.Music21Object):
                 end = pos + dur.quarterLength
 
                 startNext = pos + dur.quarterLength
-                endPrevious = pos
+                #endPrevious = pos
 
                 if i == len(durList) - 1: # last
-                    durNext = None
+                    #durNext = None
                     beamNext = None
                 else:
-                    durNext = durList[i+1]
+                    #durNext = durList[i+1]
                     beamNext = beamsList[i+1]
 
                 if i == 0: # first note in measure
-                    durPrevious = None
+                    #durPrevious = None
                     beamPrevious = None
                 else:
-                    durPrevious = durList[i-1]
+                    #durPrevious = durList[i-1]
                     beamPrevious = beamsList[i-1]
 
                 if beamNext is None and beamPrevious is None:
@@ -3691,7 +3691,7 @@ class TimeSignature(base.Music21Object):
         # get a duration object for the beat; will translate into quarterLength
         # beat int counts from 1; subtrack 1 to get index
         beatDur = self.beatSequence[beatInt-1].duration
-        oStart, oEnd = self.beatSequence.getLevelSpan()[beatInt-1]
+        oStart, unused_oEnd = self.beatSequence.getLevelSpan()[beatInt-1]
         post = oStart + (beatDur.quarterLength * beatFraction)
         # round to 3 values
         return round(post, 4)
@@ -3725,7 +3725,7 @@ class TimeSignature(base.Music21Object):
         (2, 1.0)
         '''
         beatIndex = self.beatSequence.offsetToIndex(qLenPos)
-        start, end = self.beatSequence.offsetToSpan(qLenPos)
+        start, unused_end = self.beatSequence.offsetToSpan(qLenPos)
         return beatIndex + 1, qLenPos - start
 
 
@@ -3754,9 +3754,9 @@ class TimeSignature(base.Music21Object):
         '''
         beatIndex = self.beatSequence.offsetToIndex(qLenPos)
         start, end = self.beatSequence.offsetToSpan(qLenPos)
-        range = end - start
+        totalRange = end - start
         progress = qLenPos - start # how far in QL
-        return beatIndex + 1 + (progress / range)
+        return beatIndex + 1 + (progress / totalRange)
 
 
     def getBeatProportionStr(self, qLenPos):
@@ -3781,13 +3781,13 @@ class TimeSignature(base.Music21Object):
 
         beatIndex = int(self.beatSequence.offsetToIndex(qLenPos))
         start, end = self.beatSequence.offsetToSpan(qLenPos)
-        range = end - start
+        totalRange = end - start
         progress = qLenPos - start # how far in QL
 
-        if (progress / range) == 0.0:
+        if (progress / totalRange) == 0.0:
             post = '%s' % (beatIndex + 1) # just show beat 
         else:
-            a, b = proportionToFraction(progress / range)
+            a, b = proportionToFraction(progress / totalRange)
             post = '%s %s/%s' % (beatIndex + 1, a, b) # just show beat 
         return post
 
@@ -3875,9 +3875,9 @@ class TestExternal(unittest.TestCase):
         meterStrDenominator  = [1,2,4,8,16,32]
         meterStrNumerator = [2,3,4,5,6,7,9,11,12,13]
         
-        for x in range(30):
+        for i in range(30):
             msg = []
-            for y in range(1, random.choice([2,4])):
+            for j in range(1, random.choice([2,4])):
                 msg.append('%s/%s' % (random.choice(meterStrNumerator),
                                       random.choice(meterStrDenominator)))
             ts = music21.meter.TimeSignature('+'.join(msg))
@@ -3916,7 +3916,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -3930,25 +3930,24 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
 
     def testMeterSubdivision(self):
         a = MeterSequence()
         a.load('4/4', 4)
-        str(a) == '{1/4+1/4+1/4+1/4}'
+        self.assertTrue(str(a) == '{1/4+1/4+1/4+1/4}')
         
         a[0] = a[0].subdivide(2)
-        str(a) == '{{1/8+1/8}+1/4+1/4+1/4}'
+        self.assertTrue(str(a) == '{{1/8+1/8}+1/4+1/4+1/4}')
         
-        a[3].subdivide(4)
-        str(a) == '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}'
+        a[3] = a[3].subdivide(4)
+        self.assertTrue(str(a) == '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}', str(a))
         
 
 
     def testMeterDeepcopy(self):
-        import copy
         a = MeterSequence()
         a.load('4/4', 4)        
         b = copy.deepcopy(a)        
@@ -4279,7 +4278,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(beamList), '[None, None, None, <music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>, None]')
 
     def testMixedDurationBeams2(self):
-        from music21 import stream, tinyNotation
+        from music21 import tinyNotation
         bm = tinyNotation.TinyNotationStream('b8 c16 r e. d32', '3/8')
         bm2 = bm.makeNotation()
         beamList = [n.beams for n in bm2.flat.notes]

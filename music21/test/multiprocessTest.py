@@ -76,9 +76,9 @@ class ModuleGather(object):
         append all module paths from _walk() to self.modulePaths.
         Utility function called from os.path.walk()
         '''
-        for file in names:
-            if file.endswith('py'):
-                fp = os.path.join(dirname, file)
+        for fileName in names:
+            if fileName.endswith('py'):
+                fp = os.path.join(dirname, fileName)
                 if not os.path.isdir(fp):
                     self.modulePaths.append(fp)
 

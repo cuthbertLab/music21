@@ -9,7 +9,7 @@
 #-------------------------------------------------------------------------------
 
 
-import doctest, unittest
+import unittest
 
 
 pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
@@ -17676,7 +17676,7 @@ class Test(unittest.TestCase):
         # a basic test to make sure each parse
         from music21 import converter
         for testMaterial in ALL:
-            a = converter.parse(testMaterial)
+            dummy = converter.parse(testMaterial)
 
 
 

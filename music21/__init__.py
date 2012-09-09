@@ -120,7 +120,7 @@ from base import *
 
 #------------------------------------------------------------------------------
 # this bring all of the __all__ names into the music21 package namespace
-from music21 import *
+from music21 import * # @UnresolvedImport
 #------------------------------------------------------------------------------
 # eof
 

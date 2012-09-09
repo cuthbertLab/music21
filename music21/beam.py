@@ -116,7 +116,7 @@ class Beam(base.JSONSerializer):
     <music21.beam.Beam None/start>
     '''
 
-    def __init__(self, type = None, direction = None):
+    def __init__(self, type = None, direction = None): # type is okay @ReservedAssignment
         self.type = type # start, stop, continue, partial
         self.direction = direction # left or right for partial
         self.independentAngle = None
@@ -195,7 +195,7 @@ class Beams(base.JSONSerializer):
         return '<music21.beam.Beams %s>' % '/'.join(msg)
 
 
-    def append(self, type=None, direction=None):
+    def append(self, type=None, direction=None): # type is okay @ReservedAssignment
         '''
         Append a new Beam object to this Beams, automatically creating the Beam object and incrementing the number count. 
         
@@ -213,7 +213,7 @@ class Beams(base.JSONSerializer):
         self.beamsList.append(obj)
 
 
-    def fill(self, level=None, type=None):
+    def fill(self, level=None, type=None): # type is okay @ReservedAssignment
         '''
         A quick way of setting the beams list for a particular duration,
         for instance, fill("16th") will clear the current list of beams in the
@@ -287,7 +287,7 @@ class Beams(base.JSONSerializer):
         if type is not None:
             self.setAll(type)
 
-    def setAll(self, type, direction=None):
+    def setAll(self, type, direction=None): # type is okay @ReservedAssignment
         '''
         setAll is a method of convenience that sets the type 
         of each of the beam objects within the beamsList to the specified type.
@@ -313,7 +313,7 @@ class Beams(base.JSONSerializer):
             beam.type = type
             beam.direction = direction
 
-    def setByNumber(self, number, type, direction=None):
+    def setByNumber(self, number, type, direction=None): # type is okay @ReservedAssignment
         '''Set an internal beam object by number, or rhythmic symbol level
 
         >>> from music21 import *
@@ -343,7 +343,7 @@ class Beams(base.JSONSerializer):
         '''
         # permit providing one argument hyphenated
         if '-' in type:
-            type, direction = type.split('-')
+            type, direction = type.split('-') # type is okay @ReservedAssignment
 
         if type not in ['start', 'stop', 'continue', 'partial']:
             raise BeamException('beam type cannot be %s' % type)

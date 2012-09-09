@@ -145,7 +145,6 @@ class TempoIndication(base.Music21Object):
 
         #environLocal.printDebug(['getPreviousMetronomeMark'])
         # search for TempoIndication objects, not just MetronomeMark objects
-        found = None
         # must provide getElementBefore, as will otherwise return self
         obj = self.getContextByClass('TempoIndication', 
               getElementMethod='getElementBeforeOffset')
@@ -608,7 +607,6 @@ class MetronomeMark(TempoIndication):
             tempoNumber = number
         else: # try to convert
             tempoNumber = float(number)
-        post = None # returned if no match
         # get a items and sort
         matches = []
         for tempoStr, tempoValue in defaultTempoValues.items():
@@ -1020,7 +1018,6 @@ class MetricModulation(TempoIndication):
         if mmOld is not None:
             self._oldMetronome = mmOld
         # if we have an a new referent, then update number
-        mmNew = None
         if (self._newMetronome is not None and 
             self._newMetronome.referent is not None and 
             self._oldMetronome.number is not None):
@@ -1208,7 +1205,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -1218,8 +1215,8 @@ class Test(unittest.TestCase):
                 continue
             obj = getattr(sys.modules[self.__module__], part)
             if callable(obj) and not isinstance(obj, types.FunctionType):
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
 
     def testSetup(self):
@@ -1234,11 +1231,11 @@ class Test(unittest.TestCase):
 
         from music21 import tempo
         # test with no arguments
-        tm = tempo.TempoText()
+        unused_tm = tempo.TempoText()
 
         #environLocal.printDebug(['testing tempo instantion', tm])
 
-        tm = tempo.TempoText("adagio")
+        unused_tm = tempo.TempoText("adagio")
         mm = tempo.MetronomeMark("adagio")
         self.assertEqual(mm.number, 56)
         self.assertEqual(mm.numberImplicit, True)
@@ -1252,7 +1249,7 @@ class Test(unittest.TestCase):
 
         
     def testMetronomeMarkA(self):
-        from music21 import tempo, duration
+        from music21 import tempo
         mm = tempo.MetronomeMark()
         mm.number = 56 # should implicitly set text
         self.assertEqual(mm.text, 'adagio')
@@ -1331,8 +1328,7 @@ class Test(unittest.TestCase):
 
 
     def testGetPreviousMetronomeMarkA(self):
-        import copy
-        from music21 import note, stream, tempo
+        from music21 import stream, tempo
 
         # test getting basic metronome marks
         p = stream.Part()
@@ -1349,8 +1345,7 @@ class Test(unittest.TestCase):
 
 
     def testGetPreviousMetronomeMarkB(self):
-        import copy
-        from music21 import note, stream, tempo
+        from music21 import stream, tempo
 
         # test using a tempo text, will return a default metrone mark if possible
         p = stream.Part()
@@ -1367,8 +1362,7 @@ class Test(unittest.TestCase):
 
 
     def testGetPreviousMetronomeMarkC(self):
-        import copy
-        from music21 import note, stream, tempo
+        from music21 import stream, tempo
 
         # test using a metric modulation
         p = stream.Part()
@@ -1396,7 +1390,7 @@ class Test(unittest.TestCase):
     def testSetReferrentA(self):
         '''Test setting referrents directly via context searches.
         '''
-        from music21 import note, stream, tempo
+        from music21 import stream, tempo
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)
@@ -1420,7 +1414,7 @@ class Test(unittest.TestCase):
         #p.show()
 
     def testSetReferrentB(self):
-        from music21 import stream, note, tempo
+        from music21 import stream, tempo
         s = stream.Stream()
         mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
@@ -1452,7 +1446,7 @@ class Test(unittest.TestCase):
         #s.show()
 
     def testSetReferrentC(self):
-        from music21 import stream, note, tempo
+        from music21 import stream, tempo
         s = stream.Stream()
         mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
@@ -1485,7 +1479,7 @@ class Test(unittest.TestCase):
 
 
     def testSetReferrentD(self):
-        from music21 import stream, note, tempo
+        from music21 import stream, tempo
         s = stream.Stream()
         mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
@@ -1509,7 +1503,7 @@ class Test(unittest.TestCase):
 
 
     def testSetReferrentE(self):
-        from music21 import stream, tempo, note
+        from music21 import stream, tempo
 
         s = stream.Stream()
         mm1 = tempo.MetronomeMark(number=70)
@@ -1544,8 +1538,7 @@ class Test(unittest.TestCase):
 
 
     def testSecondsPerQuarterA(self):
-
-        from music21 import tempo, note, stream
+        from music21 import tempo
         mm = tempo.MetronomeMark(referent=1.0, number=120.0)
         self.assertEqual(mm.secondsPerQuarter(), 0.5)
         self.assertEqual(mm.durationToSeconds(120), 60.0)

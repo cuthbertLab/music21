@@ -10,7 +10,10 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Layout objects provide models of various forms of page or other musical layouts. Layout objects may be used like other :class:`~music21.base.Music21Object` and placed on a :class:`~music21.stream.Stream`.
+'''
+Layout objects provide models of various forms of page or other musical layouts. 
+Layout objects may be used like other :class:`~music21.base.Music21Object` and 
+placed on a :class:`~music21.stream.Stream`.
 '''
 
 

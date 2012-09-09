@@ -27,7 +27,6 @@ from music21 import chord
 from music21 import key
 
 import re
-import copy
 
 from music21 import environment
 from music21.figuredBass import realizerScale
@@ -1519,10 +1518,10 @@ class ChordSymbol(Harmony):
                         #except for the seventh which is minor, thus the transposition down one half step
                         p = p.transpose(-1)
                         self._degreesList.append('-7')
-                        degreeForList = '-7'
+                        #degreeForList = '-7'
                     else:
                         self._degreesList.append(hD.degree)
-                        degreeForList = str(hD.degree)
+                        #degreeForList = str(hD.degree)
                     #adjust the added pitch by degree-alter interval
                     if hD.interval:
                         p = p.transpose(hD.interval)
@@ -1837,7 +1836,7 @@ class TestExternal(unittest.TestCase):
 
         s.makeRests(fillGaps=True, inPlace=True)
         s.append(note.Rest(quarterLength=4))
-        csChords = s.flat.getElementsByClass(chord.Chord)
+        unused_csChords = s.flat.getElementsByClass(chord.Chord)
         #self.assertEqual(len(csChords), 57)
         #s.show()
         #s.show('text')
@@ -1884,9 +1883,9 @@ class TestExternal(unittest.TestCase):
         mod = ['', '-', '#']
         for n in notes:
             for m in mod:
-                for key, val in chordKinds.items():
-                    for type in val:
-                        print n + m + ',' + type, ChordSymbol(n + m + ',' + type).pitches
+                for unused_key, val in chordKinds.items():
+                    for harmony_type in val:
+                        print n + m + ',' + harmony_type, ChordSymbol(n + m + ',' + harmony_type).pitches
 
 
     def labelChordSymbols(self):

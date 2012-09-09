@@ -56,15 +56,15 @@ class Distributor(object):
     def _initPaths(self):
 
         # must be in the dist dir
-        dir = os.getcwd()
-        parentDir = os.path.dirname(dir)
+        directory = os.getcwd()
+        parentDir = os.path.dirname(directory)
         parentContents = os.listdir(parentDir)
         # make sure we are in the the proper directory
         if (not dir.endswith("dist") or 
             'music21' not in parentContents):
-            raise Exception("not in the music21%dist directory: %s" % (os.sep, dir))
+            raise Exception("not in the music21%dist directory: %s" % (os.sep, directory))
     
-        self.fpDistDir = dir
+        self.fpDistDir = directory
         self.fpPackageDir = parentDir # dir with setup.py
         self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
         self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
@@ -210,15 +210,15 @@ class Distributor(object):
         '''
         # call setup.py
         #import setup -- for some reason doesnt work unless called from commandline
-        for type in ['bdist_egg', 'bdist_wininst', 'sdist --formats=gztar']:    
-                environLocal.warn('making %s' % type)
+        for buildType in ['bdist_egg', 'bdist_wininst', 'sdist --formats=gztar']:    
+                environLocal.warn('making %s' % buildType)
 
                 #setup.writeManifestTemplate(self.fpPackageDir)
                 #setup.runDisutils(type)
                 savePath = os.getcwd()
                 os.chdir(self.fpPackageDir)
                 os.system('%s setup.py %s' % 
-                            (PY, type))
+                            (PY, buildType))
                 os.chdir(savePath)
 
 #        os.system('cd %s; %s setup.py bdist_egg' % (self.fpPackageDir, PY))
@@ -271,7 +271,7 @@ class Distributor(object):
             labels = ['OpSys-All', 'Featured', 'Type-Archive']
         
         print(['starting GoogleCode upload of:', fp])
-        status, reason, url = googlecode_upload.upload_find_auth(fp, 
+        status, reason, unused_url = googlecode_upload.upload_find_auth(fp, 
                         project, summary, labels, user)
         print([status, reason])
 
@@ -300,7 +300,6 @@ class Distributor(object):
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
-    import sys
     d = Distributor()
     d.buildNoCorpus = False
     d.build()

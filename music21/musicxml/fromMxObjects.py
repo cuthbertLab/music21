@@ -212,8 +212,8 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
     dActive = None
     for mxObj in mxMetronome.componentList:
         if isinstance(mxObj, musicxmlMod.BeatUnit):
-            type = musicXMLTypeToType(mxObj.charData)
-            dActive = duration.Duration(type=type)
+            durationType = musicXMLTypeToType(mxObj.charData)
+            dActive = duration.Duration(type=durationType)
             durations.append(dActive)
         if isinstance(mxObj, musicxmlMod.BeatUnitDot):
             if dActive is None:
@@ -611,20 +611,20 @@ def mxToDuration(mxNote, inputM21=None):
 
     if mxNote.external['measure'] == None:
         raise FromMxObjectsException(
-        "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
+        "cannot determine MusicXML duration without a reference to a measure (%s)" % mxNote)
 
     mxDivisions = mxNote.external['divisions']
     if mxNote.duration is not None:
         if mxNote.get('type') is not None:
-            type = musicXMLTypeToType(mxNote.get('type'))
+            durationType = musicXMLTypeToType(mxNote.get('type'))
             forceRaw = False
         else: # some rests do not define type, and only define duration
-            type = None # no type to get, must use raw
+            durationType = None # no type to get, must use raw
             forceRaw = True
         mxDotList = mxNote.get('dotList')
         # divide mxNote duration count by divisions to get qL
         qLen = float(mxNote.duration) / float(mxDivisions)
-        mxNotations = mxNote.get('notationsObj')
+        # mxNotations = mxNote.get('notationsObj')
         mxTimeModification = mxNote.get('timeModificationObj')
 
         if mxTimeModification is not None:
@@ -646,11 +646,11 @@ def mxToDuration(mxNote, inputM21=None):
                 d.components = durRaw.components
             except duration.DurationException:
                 environLocal.warn(['mxToDuration', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
-                environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
+                environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
                 durRaw.quarterLength = 1.
         else: # a cooked version builds up from pieces
             durUnit = duration.DurationUnit()
-            durUnit.type = type
+            durUnit.type = durationType
             durUnit.dots = len(mxDotList)
             if not tup == None:
                 durUnit.appendTuplet(tup)
@@ -697,7 +697,7 @@ def mxToTuplet(mxNote, inputM21Object = None):
     else:
         t = inputM21Object
     if t.frozen is True:
-        raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+        raise duration.TupletException("A frozen tuplet (or one attached to a duration) is immutable")
 
     mxTimeModification = mxNote.get('timeModificationObj')
     #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
@@ -706,7 +706,7 @@ def mxToTuplet(mxNote, inputM21Object = None):
     t.numberNotesNormal = int(mxTimeModification.get('normal-notes'))
     mxNormalType = mxTimeModification.get('normal-type')
     # TODO: implement dot
-    mxNormalDot = mxTimeModification.get('normal-dot')
+    # mxNormalDot = mxTimeModification.get('normal-dot')
 
     if mxNormalType != None:
         # this value does not seem to frequently be supplied by mxl
@@ -1094,13 +1094,13 @@ def mxToInstrument(mxScorePart, inputM21=None):
     else:
         i = inputM21
 
-    def _cleanStr(str):
+    def _cleanStr(badStr):
         # need to remove badly-formed strings
-        if str is None:
+        if badStr is None:
             return None
-        str = str.strip()
-        str = str.replace('\n', ' ')
-        return str
+        badStr = badStr.strip()
+        goodStr = badStr.replace('\n', ' ')
+        return goodStr
 
     i.partId = _cleanStr(mxScorePart.get('id'))
     i.partName = _cleanStr(mxScorePart.get('partName'))
@@ -1632,7 +1632,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     if len(mxTieList) > 0:
         
         tieObj = mxToTie(mxNote) # m21 tie object
-                                 # provide entire Note
+                                    # provide entire Note
         # n.tie is defined in GeneralNote as None by default
         n.tie = tieObj
 
@@ -1827,9 +1827,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     if mxMeasure.getVoiceCount() > 1:
         useVoices = True
         # count from zero
-        for id in mxMeasure.getVoiceIndices():
+        for voiceId in mxMeasure.getVoiceIndices():
             v = stream.Voice()
-            v.id = id
+            v.id = voiceId
             m._insertCore(0, v)
     else:
         useVoices = False
@@ -1842,8 +1842,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     nLast = None # store the last-create music21 note for Spanners
     restAndNoteCount = {'rest': 0, 'note': 0}
     chordVoice = None # Sibelius 7.1 only puts a <voice> tag on the
-                      # first note of a chord, so we need to make sure
-                      # that we keep track of the last voice...
+                        # first note of a chord, so we need to make sure
+                        # that we keep track of the last voice...
 
     for i in range(len(mxMeasure)):
         # try to get the next object for chord comparisons
@@ -2040,10 +2040,10 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         currentLyricNumber += 1
                     nLast = n # update
 
-                if mxNote.get('notationsObj') is not None:
-                    for mxObjSub in mxNote.get('notationsObj'):
-                        # deal with ornaments, trill, etc
-                        pass
+#                if mxNote.get('notationsObj') is not None:
+#                    for mxObjSub in mxNote.get('notationsObj'):
+#                        # deal with ornaments, trill, etc
+#                        pass
             else: # its a rest
                 restAndNoteCount['rest'] += 1
                 n = note.Rest()
@@ -2799,10 +2799,11 @@ def mxScoreToMetadata(mxScore, inputM21 = None):
             md._contributors.append(c)
 
     # not yet supported; an encoding is also found in identification obj
-    mxEncoding = mxScore.get('encodingObj')
+    # mxEncoding = mxScore.get('encodingObj')
     
     if inputM21 is None:
         return md
+
 def mxCreatorToContributor(mxCreator, inputM21 = None):
     '''
     Given an mxCreator, fill the necessary parameters of a Contributor.
@@ -2860,8 +2861,7 @@ class Test(unittest.TestCase):
 
 
     def testBarRepeatConversion(self):
-        from music21 import converter, corpus
-        from music21.musicxml import testPrimitive
+        from music21 import corpus
 
         #a = converter.parse(testPrimitive.simpleRepeat45a)
         # this is a good example with repeats
@@ -2911,7 +2911,6 @@ class Test(unittest.TestCase):
     def testMultipleStavesPerPartA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
-        from music21.musicxml import testFiles
         from music21.musicxml import base
 
         mxDoc = base.Document()
@@ -2933,9 +2932,7 @@ class Test(unittest.TestCase):
 
     def testMultipleStavesPerPartB(self):
         from music21 import converter
-        from music21.musicxml import testPrimitive
         from music21.musicxml import testFiles
-        from music21.musicxml import base
 
         s = converter.parse(testFiles.moussorgskyPromenade)
         self.assertEqual(len(s.parts), 2)
@@ -3151,7 +3148,7 @@ class Test(unittest.TestCase):
         # test importing from muscixml
         from music21.musicxml import testPrimitive
         from music21 import converter
-        s = converter.parse(testPrimitive.graceNotes24a)
+        unused_s = converter.parse(testPrimitive.graceNotes24a)
 
         #s.show()
 
@@ -3172,8 +3169,8 @@ class Test(unittest.TestCase):
         xml = m21ToString.fromMusic21Object(c)
         #print xml
         #c.show()
-        input = converter.parse(xml)
-        chordResult = input.flat.notes[0]
+        inputStream = converter.parse(xml)
+        chordResult = inputStream.flat.notes[0]
 #         for n in chordResult:
 #             print n.stemDirection       
 
@@ -3263,8 +3260,7 @@ class Test(unittest.TestCase):
 
 
     def testHarmonyA(self):
-        from music21.musicxml import testPrimitive
-        from music21 import converter, corpus
+        from music21 import corpus
 
         s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)

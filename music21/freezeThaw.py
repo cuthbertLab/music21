@@ -102,9 +102,9 @@ environLocal = environment.Environment(_MOD)
 
 
 try:
-     import cPickle as pickleMod
+    import cPickle as pickleMod
 except ImportError:
-     import pickle as pickleMod
+    import pickle as pickleMod
 #import pickle as pickleMod
 
 #-------------------------------------------------------------------------------
@@ -384,19 +384,19 @@ class StreamFreezer(StreamFreezeThawBase):
         elif streamObj is not None:
             self.stream = streamObj
 
-    def getPickleFp(self, dir):
-        if dir == None:
+    def getPickleFp(self, directory):
+        if directory == None:
             raise ValueError
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
-        return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.p')
+        return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.p')
 
-    def getJsonFp(self, dir):
-        if dir == None:
+    def getJsonFp(self, directory):
+        if directory == None:
             raise ValueError
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
-        return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.json')
+        return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.json')
 
 
     def packStream(self, streamObj = None):
@@ -828,16 +828,16 @@ class StreamFreezer(StreamFreezeThawBase):
         fmt = self.parseWriteFmt(fmt)
 
         if fp is None:
-            dir = environLocal.getRootTempDir()
+            directory = environLocal.getRootTempDir()
             if fmt.startswith('json'):
-                fp = self.getJsonFp(dir)
+                fp = self.getJsonFp(directory)
             else:
-                fp = self.getPickleFp(dir)
+                fp = self.getPickleFp(directory)
         elif os.sep in fp: # assume its a complete path
             fp = fp
         else:
-            dir = environLocal.getRootTempDir()
-            fp = os.path.join(dir, fp)
+            directory = environLocal.getRootTempDir()
+            fp = os.path.join(directory, fp)
 
     
         storage = self.packStream(self.stream)
@@ -925,19 +925,19 @@ class StreamThawer(StreamFreezeThawBase):
     def __init__(self):
         self.stream = None
     
-    def getPickleFp(self, dir):
-        if dir == None:
+    def getPickleFp(self, directory):
+        if directory == None:
             raise ValueError
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
-        return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.p')
+        return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.p')
 
-    def getJsonFp(self, dir):
-        if dir == None:
+    def getJsonFp(self, directory):
+        if directory == None:
             raise ValueError
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
-        return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.json')
+        return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.json')
 
     def unpackStream(self, storage):
         '''
@@ -1001,8 +1001,8 @@ class StreamThawer(StreamFreezeThawBase):
         if os.sep in fp: # assume it's a complete path
             fp = fp
         else:
-            dir = environLocal.getRootTempDir()
-            fp = os.path.join(dir, fp)
+            directory = environLocal.getRootTempDir()
+            fp = os.path.join(directory, fp)
 
         f = open(fp, 'r')
         fileData = f.read() # TODO: do not read entire file
@@ -1024,7 +1024,7 @@ class StreamThawer(StreamFreezeThawBase):
 
         self.stream = self.unpackStream(storage)
 
-    def openStr(self, fileData, format = None):
+    def openStr(self, fileData, pickleFormat = None):
         '''
         Take a string representing a Frozen(pickled/jsonpickled) 
         Stream and convert it to a normal Stream.
@@ -1032,8 +1032,8 @@ class StreamThawer(StreamFreezeThawBase):
         if format is None then the format is automatically
         determined from the string contents.
         '''
-        if format is not None:
-            fmt = format
+        if pickleFormat is not None:
+            fmt = pickleFormat
         else:
             fmt = self.parseOpenFmt(fileData)
 
@@ -1066,7 +1066,7 @@ class Test(unittest.TestCase):
         d = jsp.encode(c)
         ddecode = json.loads(d)
         print json.dumps(ddecode, sort_keys=True, indent=2)
-        junk = jsp.decode(d)
+        dummy = jsp.decode(d)
         
     def xtestSimplePickle(self):
         from music21 import freezeThaw

@@ -211,7 +211,7 @@ def findFormatFile(fp):
     >>> common.findFormatFile('\\\\long\\file\\path\\test.krn')
     'humdrum'
     '''
-    fmt, ext = findFormat(fp.split('.')[-1])
+    fmt, unused_ext = findFormat(fp.split('.')[-1])
     return fmt # may be None if no match
 
 
@@ -240,7 +240,7 @@ def findFormatExtFile(fp):
     >>> common.findFormatExtFile('\\\\long\\file\\path\\test.krn')
     ('humdrum', '.krn')
     '''
-    fileFormat, extOut = findFormat(fp.split('.')[-1])
+    fileFormat, unused_extOut = findFormat(fp.split('.')[-1])
     if fileFormat == None:
         return None, None
     else:
@@ -938,14 +938,14 @@ def unitNormalizeProportion(values):
     #[0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
     """
     # note: negative values should be shifted to positive region first
-    sum = 0
+    summation = 0
     for x in values:
         if x < 0: 
             raise ValueError('value members must be positive')
-        sum += x
+        summation += x
     unit = [] # weights on the unit interval; sum == 1
     for x in values:
-        unit.append((x / float(sum)))
+        unit.append((x / float(summation)))
     return unit
 
 def unitBoundaryProportion(series):
@@ -959,13 +959,13 @@ def unitBoundaryProportion(series):
     """
     unit = unitNormalizeProportion(series)
     bounds = []
-    sum = 0
+    summation = 0
     for i in range(len(unit)):
         if i != len(unit) - 1: # not last
-            bounds.append((sum, sum + unit[i])) 
-            sum += unit[i]
+            bounds.append((summation, summation + unit[i])) 
+            summation += unit[i]
         else: # last, avoid rounding errors
-            bounds.append((sum, 1.0))            
+            bounds.append((summation, 1.0))            
     return bounds
 
 
@@ -1177,19 +1177,19 @@ def fromRoman(num):
     Music21CommonException: input contains an invalid subtraction element: vx
 
     '''
-    input = num.upper()
+    inputRoman = num.upper()
     nums = ['M', 'D', 'C', 'L', 'X', 'V', 'I']
     ints = [1000, 500, 100, 50,  10,  5,   1]
     places = []
-    for c in input:
+    for c in inputRoman:
         if not c in nums:
-            raise Music21CommonException("input is not a valid roman numeral: %s" % input)
-    for i in range(len(input)):
-        c = input[i]
+            raise Music21CommonException("value is not a valid roman numeral: %s" % inputRoman)
+    for i in range(len(inputRoman)):
+        c = inputRoman[i]
         value = ints[nums.index(c)]
         # If the next place holds a larger number, this value is negative.
         try:
-            nextvalue = ints[nums.index(input[i +1])]
+            nextvalue = ints[nums.index(inputRoman[i +1])]
             if nextvalue > value and value in [1, 10, 100]:
                 value *= -1
             elif nextvalue > value:
@@ -1198,9 +1198,10 @@ def fromRoman(num):
             # there is no next place.
             pass
         places.append(value)
-    sum = 0
-    for n in places: sum += n
-    return sum
+    summation = 0
+    for n in places: 
+        summation += n
+    return summation
     # Easiest test for validity...
     #if int_to_roman(sum) == input:
     #   return sum
@@ -1593,9 +1594,9 @@ class DefaultHash(dict):
         
     will create a new List for each element
     '''
-    def __init__(self, hash = None, default=None, callDefault=False):
-        if hash:
-            dict.__init__(self, hash)
+    def __init__(self, dictIn = None, default=None, callDefault=False):
+        if dictIn:
+            dict.__init__(self, dictIn)
         else:
             dict.__init__(self)
         self.default = default
@@ -2150,9 +2151,9 @@ class Test(unittest.TestCase):
 
     def testWeightedSelection(self):
 
-        from music21 import environment
-        _MOD = "common.py"
-        environLocal = environment.Environment(_MOD)
+        #from music21 import environment
+        #_MOD = "common.py"
+        #environLocal = environment.Environment(_MOD)
         
 
         # test equal selection

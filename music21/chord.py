@@ -628,7 +628,6 @@ class Chord(note.NotRest):
         >>> c1.getStemDirection(c1.pitches[0])
         'unspecified'
         '''
-        match = False
         for d in self._components:
             if d.pitch is p: # compare by obj id first
                 return d.stemDirection
@@ -1456,10 +1455,10 @@ class Chord(note.NotRest):
                 prioritizeActiveSite=True, sortByCreationTime=True)
             if sc is None:
                 raise ChordException("Cannot find a Key or Scale context for this chord, so cannot find what scale degrees the pitches correspond to!")
-        if hasattr(sc, 'mode'):
-            mode = sc.mode       ### POSSIBLY USE to describe #7 etc. properly in minor -- not sure...
-        else:
-            mode = ""
+#        if hasattr(sc, 'mode'):
+#            mode = sc.mode       ### POSSIBLY USE to describe #7 etc. properly in minor -- not sure...
+#        else:
+#            mode = ""
         degrees = []
         for thisPitch in self.pitches:
             degree = sc.getScaleDegreeFromPitch(thisPitch, comparisonAttribute='step', direction=scale.DIRECTION_DESCENDING)
@@ -2686,7 +2685,7 @@ class Chord(note.NotRest):
             except ChordException:
                 raise ChordException("Not a normal inversion")
 
-            bassNote = self.bass()
+            #bassNote = self.bass()
             #do all interval calculations with bassNote being one octave below root note
             tempBassPitch = copy.deepcopy(self.bass())
             tempBassPitch.octave = 1
@@ -2902,7 +2901,7 @@ class Chord(note.NotRest):
         else:
             self.closedPosition(forceOctave, inPlace, leaveRedundantPitches)
             c2 = self
-        startOctave = c2.bass().octave
+        #startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches) # no deepcopy needed
 
         while len(remainingPitches) > 0:
@@ -3502,7 +3501,7 @@ class Chord(note.NotRest):
         except ChordException: # if a root cannot be found
             root = self.pitches[0]
 
-        return '%s-%s' % (self.root(), nameStr)
+        return '%s-%s' % (root, nameStr)
 
     pitchedCommonName = property(_getPitchedCommonName,
         doc='''Return the common name of this Chord preceded by its root, if a root is available.
@@ -3815,11 +3814,11 @@ class TestExternal(unittest.TestCase):
 
     def testPostTonalChords(self):
         import random
-        from music21 import note, stream
+        from music21 import stream
         s = stream.Stream()
-        for x in range(30):
+        for i in range(30):
             chordRaw = []
-            for p in range(random.choice([3, 4, 5, 6, 7, 8])):
+            for counter in range(random.choice([3, 4, 5, 6, 7, 8])):
                 pc = random.choice(range(0, 12))
                 if pc not in chordRaw:
                     chordRaw.append(pc)
@@ -3850,7 +3849,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -3864,8 +3863,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
         c1 = Chord(['C4', 'E-4', 'G4'])
         c2 = copy.deepcopy(c1)
@@ -4285,7 +4284,7 @@ class Test(unittest.TestCase):
 
     def testTiesA(self):
         # test creating independent ties for each Pitch
-        from music21 import chord, stream, pitch, tie
+        from music21 import chord
         from music21.musicxml import m21ToString
 
         c1 = chord.Chord(['c', 'd', 'b'])
@@ -4344,7 +4343,7 @@ class Test(unittest.TestCase):
 
 
     def testTiesB(self):
-        from music21 import chord, stream, tie, scale
+        from music21 import stream, scale
         sc = scale.WholeToneScale()
         s = stream.Stream()
         for i in range(7):
@@ -4370,7 +4369,6 @@ class Test(unittest.TestCase):
 
 
     def testVolumePerPitchA(self):
-        import copy
         from music21 import chord, volume
 
         c = chord.Chord(['c4', 'd-4', 'g4'])
@@ -4407,7 +4405,7 @@ class Test(unittest.TestCase):
 
 
     def testVolumePerPitchB(self):
-        from music21 import stream, note, chord
+        from music21 import stream, chord
 
         s = stream.Stream()
         amps = [.1, .5, 1]
@@ -4496,7 +4494,7 @@ class Test(unittest.TestCase):
 
 
     def testGetItemA(self):
-        from music21 import chord, stream
+        from music21 import chord
 
         c = chord.Chord(['c4', 'd-4', 'g4'])
         self.assertEqual(str(c[0].pitch), 'C4')

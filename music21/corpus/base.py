@@ -317,7 +317,16 @@ def getPaths(extList=None, expandExtensions=True,
 
 def _updateMetadataBundle():
     '''
-    Update cached metdata bundles.
+    Load the metadata bundle from JSON and store it in the module
+    global variable _METADATA_BUNDLES, unless the _METADATA_BUNDLES
+    have already been built, in which case, don't do it.
+    
+    relies on the functions getCorePaths, getVirtualPaths,
+    and getLocalPaths.
+
+    Note that this updates the in-memory cached metdata bundles 
+    not the disk caches (that's MUCH slower!) to do that run
+    corpus.metadataCache.metadataCache.py
     '''
     for d, f in (('core', getCorePaths), ('virtual', getVirtualPaths),
                  ('local', getLocalPaths)):
@@ -449,9 +458,9 @@ def getComposerDir(composerName):
 #             dir = moduleName.__path__[0] 
 
         # last check
-        dir = os.path.join(common.getCorpusFilePath(), moduleName)
-        if dir.lower().endswith(composerName.lower()):
-            match = dir     
+        directory = os.path.join(common.getCorpusFilePath(), moduleName)
+        if directory.lower().endswith(composerName.lower()):
+            match = directory
             break
     return match
 
@@ -547,7 +556,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
         #environLocal.printDebug(['movementStrList', movementStrList])
 
         for fp in post:
-            dir, fn = os.path.split(fp)
+            unused_directory, fn = os.path.split(fp)
             if '.' in fn:
                 fnNoExt = fn.split('.')[0]
             else:
@@ -639,12 +648,12 @@ def getWorkReferences(sort=True):
             fileComponents = fileStub.split(os.sep)
             # the first is either a directory for containing components
             # or a top-level name
-            format, ext = common.findFormatExtFile(fileComponents[-1])
+            m21Format, ext = common.findFormatExtFile(fileComponents[-1])
             if ext is None:
                 #environLocal.printDebug(['file that does not seem to have an extension', ext, path])
                 continue
             # if not a file w/ ext, we will get None for format
-            if format == None:
+            if m21Format == None:
                 workStub = fileComponents[0]
             else: # remove the extension
                 workStub = fileComponents[0].replace(ext, '')
@@ -657,9 +666,9 @@ def getWorkReferences(sort=True):
                 ref['works'][workStub]['virtual'] = False
 
             # last component is name
-            format, ext = common.findFormatExtFile(fileComponents[-1])
+            m21Format, ext = common.findFormatExtFile(fileComponents[-1])
             fileDict = {}
-            fileDict['format'] = format
+            fileDict['format'] = m21Format
             fileDict['ext'] = ext
             # all path parts after corpus
             fileDict['corpusPath'] = os.path.join(dirComposer, fileStub)
@@ -707,9 +716,9 @@ def getWorkReferences(sort=True):
         ref['works'][workStub]['title'] = vw.title
 
         for url in vw.urlList:
-            format, ext = common.findFormatExtURL(url)
+            m21Format, ext = common.findFormatExtURL(url)
             fileDict = {}
-            fileDict['format'] = format
+            fileDict['format'] = m21Format
             fileDict['ext'] = ext
             # all path parts after corpus
             fileDict['corpusPath'] = vw.corpusPath
@@ -728,7 +737,7 @@ def getWorkReferences(sort=True):
                 # add title first for sorting
                 sortGroupSub.append([ref['works'][workStub]['title'], workStub])
             sortGroupSub.sort()
-            ref['sortedWorkKeys'] = [y for x, y in sortGroupSub]
+            ref['sortedWorkKeys'] = [y for unused_x, y in sortGroupSub]
             # prepare this sort group
             sortGroup.append([ref['composerDir'], ref])
         sortGroup.sort()
@@ -921,7 +930,7 @@ def uncompressMXL(filename, deleteOriginal=False):
     extractPath = os.path.sep.join(fnList)
     
     fnList.append(unarcname) # new archive name
-    newFilename = os.path.sep.join(fnList) # new filename
+    unused_newFilename = os.path.sep.join(fnList) # new filename
 
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(filename, 'r', compression=zipfile.ZIP_DEFLATED) as myZip:
@@ -1181,7 +1190,7 @@ class Test(unittest.TestCase):
     def testHandelImport(self):
 
         # can get a single file just by file name        
-        fp = getWork('hwv56/movement1-01')# 
+        unused_fp = getWork('hwv56/movement1-01')# 
         fpCollection = getComposer('handel')
         self.assertEqual(len(fpCollection) >= 1, True)
         fpCollection = getComposer('handel', ['md'])

@@ -23,8 +23,9 @@ Additional documentation for and examples of using this module are found in :ref
 
 import os, sys
 import tempfile
-import doctest, unittest
+import unittest
 import xml.sax
+from xml.sax import saxutils
 
 from music21 import exceptions21
 from music21 import common
@@ -326,7 +327,7 @@ class _EnvironmentCore(object):
 
         # need to escape problematic characters for xml storage
         if common.isStr(value):
-            value = xml.sax.saxutils.escape(value).encode('UTF-8')
+            value = saxutils.escape(value).encode('UTF-8')
         # set value
         if key == 'localCorpusPath':
             # only add if unique
@@ -352,23 +353,23 @@ class _EnvironmentCore(object):
             # try to use defined app data directory for preference file
             # this is not available on all windows versions
             if 'APPDATA' in os.environ.keys():
-                dir = os.environ['APPDATA']
+                directory = os.environ['APPDATA']
             elif ('USERPROFILE' in os.environ.keys() and
                 os.path.exists(os.path.join(
                 os.environ['USERPROFILE'], 'Application Data'))):
-                dir = os.path.join(os.environ['USERPROFILE'], 
+                directory = os.path.join(os.environ['USERPROFILE'], 
                                    'Application Data')
             else: # use home directory
-                dir = os.path.expanduser('~')       
-            return os.path.join(dir, 'music21-settings.xml')
+                directory = os.path.expanduser('~')       
+            return os.path.join(directory, 'music21-settings.xml')
         elif platform in ['nix', 'darwin']:
             # alt : os.path.expanduser('~') 
             # might not exist if running as nobody in a webserver...
             if 'HOME' in os.environ.keys(): 
-                dir = os.environ['HOME']
+                directory = os.environ['HOME']
             else:
-                dir = '/tmp/'            
-            return os.path.join(dir, '.music21rc')
+                directory = '/tmp/'            
+            return os.path.join(directory, '.music21rc')
 
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
@@ -443,8 +444,8 @@ class _EnvironmentCore(object):
 
         # need to use __getitem__ here b/c need to covnert debug value
         # to an integer
-        dir, fn = os.path.split(fp)
-        if fp == None or not os.path.exists(dir):
+        directory, unused_fn = os.path.split(fp)
+        if fp == None or not os.path.exists(directory):
             raise EnvironmentException('bad file path: %s' % fp)
 
         settings = self._toSettings(self._ref)
@@ -509,20 +510,20 @@ class _EnvironmentCore(object):
 
     def launch(self, fmt, fp, options='', app=None):
         # see common.fileExtensions for format names 
-        format, ext = common.findFormat(fmt)
-        if format == 'lilypond':
+        m21Format, unused_ext = common.findFormat(fmt)
+        if m21Format == 'lilypond':
             environmentKey = 'lilypondPath'
-        elif format in ['png', 'jpeg']:
+        elif m21Format in ['png', 'jpeg']:
             environmentKey = 'graphicsPath'
-        elif format in ['svg']:
+        elif m21Format in ['svg']:
             environmentKey = 'vectorPath'
-        elif format in ['pdf']:
+        elif m21Format in ['pdf']:
             environmentKey = 'pdfPath'
-        elif format == 'musicxml':
+        elif m21Format == 'musicxml':
             environmentKey = 'musicxmlPath'
-        elif format == 'midi':
+        elif m21Format == 'midi':
             environmentKey = 'midiPath'
-        elif format == 'vexflow':
+        elif m21Format == 'vexflow':
             try:
                 import webbrowser
                 if fp.find('\\') != -1:
@@ -548,7 +549,7 @@ class _EnvironmentCore(object):
 
         platform = common.getPlatform()
         if fpApp is None and platform not in ['win', 'darwin']:
-            raise EnvironmentException("Cannot find a valid application path for format %s. Specify this in your Environment by calling environment.set(%r, 'pathToApplication')" % (format, environmentKey))
+            raise EnvironmentException("Cannot find a valid application path for format %s. Specify this in your Environment by calling environment.set(%r, 'pathToApplication')" % (m21Format, environmentKey))
         
         if platform == 'win' and fpApp is None:
             # no need to specify application here: windows starts the program based on the file extension
@@ -771,7 +772,7 @@ class Environment(object):
     #---------------------------------------------------------------------------
     # methods local to each instance that is created in each module
 
-    def printDebug(self, msg, statusLevel=common.DEBUG_USER, format=None):
+    def printDebug(self, msg, statusLevel=common.DEBUG_USER, debugFormat=None):
         '''
         Format one or more data elements into string, and print it 
         to stderr. The first arg can be a list of strings or a string; 
@@ -785,7 +786,7 @@ class Environment(object):
 #             if msg[0] != self.modNameParent and self.modNameParent != None:
 #                 msg = [self.modNameParent + ':'] + msg
 #             # pass list to common.formatStr
-#             msg = common.formatStr(*msg, format=format)
+#             msg = common.formatStr(*msg, format=debugFormat)
 #             sys.stderr.write(msg)
 
         if _environStorage['instance'].__getitem__('debug') >= statusLevel:
@@ -794,7 +795,7 @@ class Environment(object):
             if msg[0] != self.modNameParent and self.modNameParent != None:
                 msg = [self.modNameParent + ':'] + msg
             # pass list to common.formatStr
-            msg = common.formatStr(*msg, format=format)
+            msg = common.formatStr(*msg, format=debugFormat)
             sys.stderr.write(msg)
 
     def warn(self, msg, header=None):
@@ -977,7 +978,7 @@ def keys():
     return us.keys()
 
 
-def set(key, value):
+def set(key, value): # okay to override set here: @ReservedAssignment
     '''Directly set a single UserSettings key, by providing a key and the appropriate value. This will create a user settings file if necessary.
 
     >>> from music21 import *
@@ -1104,7 +1105,7 @@ class Test(unittest.TestCase):
 
     def testFromSettings(self):
 
-        env = Environment(forcePlatform='darwin')
+        unused_env = Environment(forcePlatform='darwin')
 
         # use a fake ref dict to get settings
         ref = {}

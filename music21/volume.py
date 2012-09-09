@@ -16,7 +16,6 @@ import unittest
 
 from music21 import exceptions21
 from music21 import common
-from music21 import dynamics
 
 from music21 import environment
 _MOD = "volume.py"  
@@ -443,7 +442,7 @@ class Test(unittest.TestCase):
 
 
     def testGetContextSearchB(self):
-        from music21 import stream, note, volume, dynamics
+        from music21 import stream, note, dynamics
         
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
@@ -508,9 +507,9 @@ class Test(unittest.TestCase):
     def testGetRealizedB(self):
         
 
-        from music21 import volume, dynamics, articulations
+        from music21 import articulations
 
-        v1 = volume.Volume(velocity=64)
+        v1 = Volume(velocity=64)
         self.assertEqual(v1.getRealizedStr(), '0.5')
 
         a1 = articulations.StrongAccent()
@@ -602,7 +601,7 @@ class Test(unittest.TestCase):
 
 
     def testRealizeVolumeC(self):
-        from music21 import stream, note, dynamics, articulations
+        from music21 import stream, note, articulations
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)

@@ -14,9 +14,6 @@ _all_ = ['base', 'm21ToString', 'toMxObjects', 'fromMxObjects']
 
 from music21.musicxml.base import *
 
-
-__doc__ = base.__doc__
-
 import m21ToString
 import toMxObjects
 import fromMxObjects

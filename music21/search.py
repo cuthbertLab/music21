@@ -156,10 +156,10 @@ def rhythmicSearch(thisStream, searchStream):
     streamLength = len(thisStream)
     foundEls = []
     for start in range(1 + streamLength - searchLength):
-        miniStream = thisStream[start:start+searchLength]
+        #miniStream = thisStream[start:start+searchLength]
         foundException = False
         for j in range(searchLength):
-            x = searchStream[j].duration
+            #x = searchStream[j].duration
             if "WildcardDuration" in searchStream[j].duration.classes:
                 next
             elif searchStream[j].duration.quarterLength != thisStream[start + j].duration.quarterLength:
@@ -590,7 +590,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -600,8 +600,8 @@ class Test(unittest.TestCase):
                 continue
             obj = getattr(sys.modules[self.__module__], part)
             if callable(obj) and not isinstance(obj, types.FunctionType):
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
     
 

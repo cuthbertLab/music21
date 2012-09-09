@@ -65,17 +65,17 @@ environLocal = environment.Environment(_MOD)
 # check external dependencies and display 
 _missingImport = []
 try:
-    import matplotlib
+    import matplotlib # @UnusedImport
 except ImportError:
     _missingImport.append('matplotlib')
 
 try:
-    import numpy
+    import numpy # @UnusedImport
 except ImportError:
     _missingImport.append('numpy')
 
 try:
-    import scipy
+    import scipy # @UnusedImport
 except ImportError:
     _missingImport.append('scipy')
 
@@ -737,23 +737,23 @@ class DefinedContexts(JSONSerializer):
         locations = [] #self._locationKeys[:]
         #environLocal.printDebug(['DefinedContexts.__deepcopy__', 'self._definedContexts.keys()', self._definedContexts.keys()])
         for idKey in self._definedContexts.keys():
-            dict = self._definedContexts[idKey]
-            if dict['isDead']:
+            singleContextDict = self._definedContexts[idKey]
+            if singleContextDict['isDead']:
                 continue # do not copy dead references
             post = {}
-            post['obj'] = dict['obj'] # already a weak ref
+            post['obj'] = singleContextDict['obj'] # already a weak ref
 
             # not copying the offset in deepcopying means that 
             # the old site becomes a context, not a site
             # this is still experimental
             # post['offset'] = None
 
-            post['offset'] = dict['offset']
+            post['offset'] = singleContextDict['offset']
             if post['offset'] is not None:
                 locations.append(idKey) # if offset not None, a location
 
-            post['time'] = dict['time'] # assume still valid
-            post['class'] = dict['class']
+            post['time'] = singleContextDict['time'] # assume still valid
+            post['class'] = singleContextDict['class']
             post['isDead'] = False
             new._definedContexts[idKey] = post
 
@@ -987,22 +987,22 @@ class DefinedContexts(JSONSerializer):
             objRef = self._prepareObject(obj)
 
         if updateNotAdd:
-            dict = self._definedContexts[idKey]
+            singleContextDict = self._definedContexts[idKey]
         else:
-            dict = {}
+            singleContextDict = {}
 
-        dict['obj'] = objRef # a weak ref
-        dict['offset'] = offset # offset can be None for contexts
-        dict['class'] = classString 
-        dict['isDead'] = False # store to access w/o unwrapping
+        singleContextDict['obj'] = objRef # a weak ref
+        singleContextDict['offset'] = offset # offset can be None for contexts
+        singleContextDict['class'] = classString 
+        singleContextDict['isDead'] = False # store to access w/o unwrapping
         # time is a numeric count, not a real time measure
         if timeValue is None:
-            dict['time'] = self._timeIndex
+            singleContextDict['time'] = self._timeIndex
             self._timeIndex += 1 # increment for next usage
         else:
-            dict['time'] = timeValue
+            singleContextDict['time'] = timeValue
         if not updateNotAdd: # add new/missing information to dictionary
-            self._definedContexts[idKey] = dict
+            self._definedContexts[idKey] = singleContextDict
 
 
     def remove(self, site):
@@ -1071,18 +1071,18 @@ class DefinedContexts(JSONSerializer):
         if idKey in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(idKey))
 
-    def getById(self, id):
+    def getById(self, id): # id is okay here @ReservedAssignment
         '''
         Return the object specified by an id.
         Used for testing and debugging. 
         '''
-        dict = self._definedContexts[id]
+        singleContextDict = self._definedContexts[id]
         # need to check if these is weakref
         #if common.isWeakref(dict['obj']):
         if WEAKREF_ACTIVE:
-            return common.unwrapWeakref(dict['obj'])
+            return common.unwrapWeakref(singleContextDict['obj'])
         else:
-            return dict['obj']
+            return singleContextDict['obj']
 
 
     def _keysByTime(self, newFirst=True):
@@ -1170,19 +1170,19 @@ class DefinedContexts(JSONSerializer):
             
         # get each dict from all defined contexts
         for key in keys:
-            dict = self._definedContexts[key]
+            singleContextDict = self._definedContexts[key]
             # check for None object; default location, not a weakref, keep
-            if dict['obj'] is None:
+            if singleContextDict['obj'] is None:
                 if not excludeNone:
-                    post.append(dict['obj'])
+                    post.append(singleContextDict['obj'])
             elif WEAKREF_ACTIVE:
-                obj = common.unwrapWeakref(dict['obj'])
+                obj = common.unwrapWeakref(singleContextDict['obj'])
                 if obj is None: # dead ref
-                    dict['isDead'] = True
+                    singleContextDict['isDead'] = True
                 else:
                     post.append(obj)
             else:
-                post.append(dict['obj'])
+                post.append(singleContextDict['obj'])
 
         # remove dead references
 #         if autoPurge:
@@ -1557,17 +1557,17 @@ class DefinedContexts(JSONSerializer):
         121.5
         '''
         for idKey in self._definedContexts.keys():
-            dict = self._definedContexts[idKey]
-            if dict['isDead']: # cal alway skip
+            singleContextDict = self._definedContexts[idKey]
+            if singleContextDict['isDead']: # cal alway skip
                 continue
             # must unwrap references before comparison
             #if common.isWeakref(dict['obj']):
             if WEAKREF_ACTIVE:
-                compareObj = common.unwrapWeakref(dict['obj'])
+                compareObj = common.unwrapWeakref(singleContextDict['obj'])
             else:
-                compareObj = dict['obj']
+                compareObj = singleContextDict['obj']
             if compareObj is None: # mark isDead for later removal
-                dict['isDead'] = True
+                singleContextDict['isDead'] = True
                 continue
             if id(compareObj) == id(obj):
                 #environLocal.printDebug(['found object as site', obj, id(obj), 'idKey', idKey])
@@ -3751,8 +3751,8 @@ class Music21Object(JSONSerializer):
         elif fileFormat in ['pdf', 'lily.pdf',]:
             if fp.endswith('.pdf'):
                 fp = fp[:-4]
-            import music21.lily.translate
-            conv = music21.lily.translate.LilypondConverter()
+            from music21.lily import translate as lilyTranslate
+            conv = lilyTranslate.LilypondConverter()
             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
@@ -3760,8 +3760,8 @@ class Music21Object(JSONSerializer):
         elif fileFormat in ['png', 'lily.png']:
             if fp.endswith('.png'):
                 fp = fp[:-4]
-            import music21.lily.translate
-            conv = music21.lily.translate.LilypondConverter()
+            from music21.lily import translate as lilyTranslate # @Reimport
+            conv = lilyTranslate.LilypondConverter()
             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
@@ -3769,8 +3769,8 @@ class Music21Object(JSONSerializer):
         elif fileFormat in ['svg', 'lily.svg']:
             if fp.endswith('.svg'):
                 fp = fp[:-4]
-            import music21.lily.translate
-            conv = music21.lily.translate.LilypondConverter()
+            from music21.lily import translate as lilyTranslate # @Reimport
+            conv = lilyTranslate.LilypondConverter()
             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
@@ -3852,16 +3852,16 @@ class Music21Object(JSONSerializer):
             environLocal.launch('pdf', conv.createPDF(), app=app)
         elif fmt in ['lily.png', 'png', 'lily', 'lilypond']:
             # TODO check that these use environLocal 
-            import music21.lily.translate
-            conv = music21.lily.translate.LilypondConverter()
+            from music21.lily import translate as lilyTranslate
+            conv = lilyTranslate.LilypondConverter()
             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.showPNG()
         elif fmt in ['lily.svg', 'svg']:
             # TODO check that these use environLocal 
-            import music21.lily.translate
-            conv = music21.lily.translate.LilypondConverter()
+            from music21.lily import translate as lilyTranslate # @Reimport
+            conv = lilyTranslate.LilypondConverter()
             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)

@@ -633,7 +633,6 @@ class Spanner(base.Music21Object):
         '''Return the duration span, or the distnace between the first component's offset and the last components offset plus duration. 
         '''
         # these are in order
-        post = []
         idSite = id(site)
 
         # special handling for case of a single component spanner
@@ -650,7 +649,7 @@ class Spanner(base.Music21Object):
                 offsetComponent.append([o, objRef])
         offsetComponent.sort() # sort by offset
         minOffset = offsetComponent[0][0]
-        minComponent = offsetComponent[0][1]
+        #minComponent = offsetComponent[0][1]
 
         maxOffset = offsetComponent[-1][0]
         maxComponent = offsetComponent[-1][1]
@@ -967,8 +966,7 @@ class SpannerBundle(object):
         >>> [sp.idLocal for sp in sb.getByClass('Slur')]
         [1, 2]
         '''
-        found = []
-        # note that this over rides previous values
+        # note that this overrides previous values
         for i, sp in enumerate(self.getByClass(className)):
             # 6 seems to be limit in musicxml processing
             sp.idLocal = (i % maxId) + 1
@@ -1217,16 +1215,16 @@ class Ottava(Spanner):
     '''An octave shift line
 
     >>> from music21 import *
-    >>> os = spanner.Ottava(type='8va')
-    >>> os.type
+    >>> ottava = spanner.Ottava(type='8va')
+    >>> ottava.type
     '8va'
-    >>> os.type = 15
-    >>> os.type
+    >>> ottava.type = 15
+    >>> ottava.type
     '15ma'
-    >>> os.type = 8, 'down'
-    >>> os.type
+    >>> ottava.type = (8, 'down')
+    >>> ottava.type
     '8vb'
-    >>> print os
+    >>> print ottava
     <music21.spanner.Ottava 8vb >
     '''
     def __init__(self, *arguments, **keywords):
@@ -1248,32 +1246,32 @@ class Ottava(Spanner):
     def _getType(self):
         return self._type
 
-    def _setType(self, type):
-        if common.isNum(type) and type in [8, 15]: 
-            if type == 8:
+    def _setType(self, newType):
+        if common.isNum(newType) and newType in [8, 15]: 
+            if newType == 8:
                 self._type = '8va'
             else:
                 self._type = '15ma'
         # try to parse as list of size, dir
-        elif common.isListLike(type) and len(type) >= 1: 
+        elif common.isListLike(newType) and len(newType) >= 1: 
             stub = []
-            if type[0] in [8, '8']:
-                stub.append(str(type[0]))
+            if newType[0] in [8, '8']:
+                stub.append(str(newType[0]))
                 stub.append('v')
-            elif type[0] in [15, '15']:
-                stub.append(str(type[0]))
+            elif newType[0] in [15, '15']:
+                stub.append(str(newType[0]))
                 stub.append('m')
-            if len(type) >= 2 and type[1] in ['down']:
+            if len(newType) >= 2 and newType[1] in ['down']:
                 stub.append('b')
             else: # default if not provided
                 stub.append('a')        
             self._type = ''.join(stub)    
         else:
-            if not common.isStr(type) or type.lower() not in [
+            if not common.isStr(newType) or newType.lower() not in [
                 '8va', '8vb', '15ma', '15mb']:
                 raise SpannerException(
-                    'cannot create Ottava of type: %s' % type)
-            self._type = type.lower()
+                    'cannot create Ottava of type: %s' % newType)
+            self._type = newType.lower()
     
     type = property(_getType, _setType, doc='''
         Get or set Ottava type. This can be set by as complete string (such as 8va or 15mb) or with a pair specifying size and direction.
@@ -1306,10 +1304,10 @@ class Ottava(Spanner):
         '''Return the parameters for the start of this spanners required by MusicXML output. 
 
         >>> from music21 import *
-        >>> os = spanner.Ottava(type='15mb')
-        >>> os.getStartParameters()
+        >>> ottava = spanner.Ottava(type='15mb')
+        >>> ottava.getStartParameters()
         {'type': 'up', 'size': 15}
-        >>> os.getEndParameters()
+        >>> ottava.getEndParameters()
         {'type': 'stop', 'size': 15}
         ''' 
         post = {}
@@ -1321,10 +1319,10 @@ class Ottava(Spanner):
         '''Return the parameters for the start of this spanner required by MusicXML output. 
 
         >>> from music21 import *
-        >>> os = spanner.Ottava(type=8)
-        >>> os.getStartParameters()
+        >>> ottava = spanner.Ottava(type=8)
+        >>> ottava.getStartParameters()
         {'type': 'down', 'size': 8}
-        >>> os.getEndParameters()
+        >>> ottava.getEndParameters()
         {'type': 'stop', 'size': 8}
         ''' 
         post = {}
@@ -1593,7 +1591,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
 
         # how parts might be grouped
-        from music21 import stream, spanner, note, layout
+        from music21 import stream, note, layout
         s = stream.Score()
         p1 = stream.Part()
         p2 = stream.Part()
@@ -1672,11 +1670,10 @@ class Test(unittest.TestCase):
 
     def testDeepcopySpanner(self):
         from music21 import spanner, note
-        import copy
 
         # how slurs might be defined
         n1 = note.Note()
-        n2 = note.Note()
+        #n2 = note.Note()
         n3 = note.Note()
 
         su1 = Slur()
@@ -1738,11 +1735,11 @@ class Test(unittest.TestCase):
         su3.addComponents([n4, n5])
 
 
-        n1a = note.Note()
-        n2a = note.Note()
+        #n1a = note.Note()
+        #n2a = note.Note()
         n3a = note.Note()
         n4a = note.Note()
-        n5a = note.Note()
+        #n5a = note.Note()
 
         sb1 = spanner.SpannerBundle(su1, su2, su3)
         self.assertEqual(len(sb1), 3)
@@ -1766,7 +1763,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatBracketA(self):
-        from music21 import note, spanner, stream
+        from music21 import spanner, stream
 
         m1 = stream.Measure()
         rb1 = spanner.RepeatBracket(m1)
@@ -2099,7 +2096,7 @@ class Test(unittest.TestCase):
 
 
     def testCrescendoA(self):
-        from music21 import stream, note, spanner, chord, dynamics
+        from music21 import stream, note, dynamics
         from music21.musicxml import m21ToString
 
         s = stream.Stream()
@@ -2123,7 +2120,7 @@ class Test(unittest.TestCase):
         
 
     def testLineA(self):
-        from music21 import stream, note, spanner, chord, dynamics
+        from music21 import stream, note, spanner
         from music21.musicxml import m21ToString
 
         s = stream.Stream()
@@ -2142,7 +2139,7 @@ class Test(unittest.TestCase):
 
 
     def testLineB(self):
-        from music21 import stream, note, spanner, chord, dynamics
+        from music21 import stream, note, spanner
         from music21.musicxml import m21ToString
 
         s = stream.Stream()
@@ -2169,7 +2166,7 @@ class Test(unittest.TestCase):
 
 
     def testGlissandoA(self):
-        from music21 import stream, note, spanner, chord, dynamics
+        from music21 import stream, note, spanner
         from music21.musicxml import m21ToString
 
         s = stream.Stream()
@@ -2193,7 +2190,7 @@ class Test(unittest.TestCase):
 
 
     def testGlissandoB(self):
-        from music21 import stream, note, spanner, chord, dynamics
+        from music21 import stream, note, spanner
         from music21.musicxml import m21ToString
 
         s = stream.Stream()

@@ -36,9 +36,8 @@ except ImportError:
     sp = None
     _missingImport.append('scipy')
 
-import doctest, unittest
+import unittest
 
-from music21 import base
 from music21 import repeat
 from music21 import exceptions21
 from music21 import corpus
@@ -734,7 +733,6 @@ def _runExperiment():
         print cType, ": totalSuccesses =", str(totalSuccesses), "totalFailures =", str(totalFailures)
 
 def _plotChoraleContours():
-    from music21 import corpus
     BCI = corpus.chorales.Iterator(1, 75, returnType='filename')
     for chorale in BCI:
         s = corpus.parse(chorale)

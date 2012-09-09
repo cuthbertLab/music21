@@ -17,7 +17,7 @@ The :class:`~music21.key.Key` object is a fuller representation not just of
 a key signature but also of the key of a region. 
 '''
 
-import doctest, unittest
+import unittest
 import copy
 
 from music21 import base
@@ -114,7 +114,7 @@ def sharpsToPitch(sharpCount):
         return pitchInit # C
 
     intervalObj = interval.Interval(intervalStr)
-    for x in range(abs(sharpCount)):
+    for i in range(abs(sharpCount)):
         pitchInit = intervalObj.transposePitch(pitchInit)    
     pitchInit.octave = None
 
@@ -663,7 +663,6 @@ class KeySignature(base.Music21Object):
         >>> ks.getScale()
         <music21.scale.MinorScale F# minor>
         '''
-        from music21 import scale
         pitchObj, mode = self._getPitchAndMode()
         if mode in [None, 'major']:
             return scale.MajorScale(pitchObj)
@@ -941,7 +940,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -955,8 +954,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
 
     def testBasic(self):
@@ -964,7 +963,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a.sharps, None)
 
     def testTonalAmbiguityA(self):
-        from music21 import corpus, stream, key, scale
+        from music21 import corpus, stream
 #         s = corpus.parse('bwv64.2')
 #         k = s.analyze('KrumhanslSchmuckler')
 #         k.tonalCertainty(method='correlationCoefficient')

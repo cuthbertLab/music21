@@ -15,8 +15,6 @@ also by environment.py.
 '''
 
 import copy
-import xml.sax
-from xml.sax import saxutils
 import xml.dom.minidom
 
 
@@ -625,7 +623,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -639,8 +637,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                unused_a = copy.copy(obj)
+                unused_b = copy.deepcopy(obj)
 
 
 

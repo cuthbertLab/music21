@@ -527,7 +527,6 @@ class LanguageDetector(object):
     
     def readExcerpts(self):
         for languageCode in self.languageCodes:
-            pair = '  '
             f = open(os.path.dirname(languageExcerpts.__file__) + os.path.sep + languageCode + '.txt')                
             self.trigrams[languageCode] = Trigram(f.read().split())
             f.close()
@@ -737,7 +736,7 @@ class Test(unittest.TestCase):
 
 
     def testAssembleLyricsA(self):
-        from music21 import text, stream, note
+        from music21 import stream, note
         s = stream.Stream()
         for syl in ['hel-', '-lo', 'a-', '-gain']:
             n = note.Note()

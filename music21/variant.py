@@ -910,7 +910,7 @@ def refineVariant(s, sVariant, inPlace = False):
     variantGroups = sVariant.groups
     replacementDuration = sVariant.replacementDuration
     startOffset = sVariant.getOffsetBySite(s)
-    endOffset = replacementDuration+startOffset
+    #endOffset = replacementDuration+startOffset
     
     # region associated with the given variant in the stream
     returnRegion = variantRegion.replacedElements(returnObject)
@@ -919,7 +919,7 @@ def refineVariant(s, sVariant, inPlace = False):
     returnRegionMeasureList = [i for i in range(len(returnRegion))]
     badnessDict = {}
     listDict = {}
-    variantMeasureList, badness = _getBestListandScore(returnRegion, variantRegion, badnessDict, listDict)
+    variantMeasureList, unused_badness = _getBestListandScore(returnRegion, variantRegion, badnessDict, listDict)
     
     # badness is a measure of how different the streams are. The list returned, variantMeasureList, minimizes that quantity.
     
@@ -931,7 +931,7 @@ def refineVariant(s, sVariant, inPlace = False):
     # each region is processed for variants.
     for regionType, returnStart, returnEnd, variantStart, variantEnd in regions:
         startOffset = returnRegion[returnStart].getOffsetBySite(returnRegion)
-        endOffset = returnRegion[returnEnd-1].getOffsetBySite(returnRegion)+returnRegion[returnEnd-1].duration.quarterLength       
+        #endOffset = returnRegion[returnEnd-1].getOffsetBySite(returnRegion)+returnRegion[returnEnd-1].duration.quarterLength       
         if regionType is 'equal':
             returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
             variantSubRegion = variantRegion.measures(variantStart+1, variantEnd)
@@ -979,7 +979,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace 
     returnObjectMeasureList = [i for i in range(len(returnObject.getElementsByClass("Measure")))]
     badnessDict = {}
     listDict = {}
-    variantObjectMeasureList, badness = _getBestListandScore(returnObject.getElementsByClass("Measure"), variantObject.getElementsByClass("Measure"), badnessDict, listDict)
+    variantObjectMeasureList, unused_badness = _getBestListandScore(returnObject.getElementsByClass("Measure"), variantObject.getElementsByClass("Measure"), badnessDict, listDict)
     
     # badness is a measure of how different the streams are. The list returned, variantMeasureList, minimizes that quantity.
     
@@ -991,7 +991,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace 
     # each region is processed for variants.
     for regionType, returnStart, returnEnd, variantStart, variantEnd in regions:
         startOffset = returnObject.measure(returnStart+1).getOffsetBySite(returnObject)
-        endOffset = returnObject.measure(returnEnd-1).getOffsetBySite(returnObject)+returnObject.measure(returnEnd-1).duration.quarterLength       
+        #endOffset = returnObject.measure(returnEnd-1).getOffsetBySite(returnObject)+returnObject.measure(returnEnd-1).duration.quarterLength       
         if regionType is 'equal':
             returnSubRegion = returnObject.measures(returnStart+1, returnEnd)
             variantSubRegion = variantObject.measures(variantStart+1, variantEnd)
@@ -2356,7 +2356,7 @@ class Test(unittest.TestCase):
         return out
 
     def testBasicA(self):
-        from music21 import variant, stream, note
+        from music21 import variant
 
         o = variant.Variant()
         o.append(note.Note('G3', quarterLength=2.0))
@@ -2372,9 +2372,10 @@ class Test(unittest.TestCase):
 
 
     def testBasicB(self):
-        '''Testing relaying attributes requests to private Stream with __getattr__
         '''
-        from music21 import variant, stream, note
+        Testing relaying attributes requests to private Stream with __getattr__
+        '''
+        from music21 import variant
 
         v = variant.Variant()
         v.append(note.Note('G3', quarterLength=2.0))
@@ -2406,7 +2407,7 @@ class Test(unittest.TestCase):
 
 
     def testVariantClassA(self):
-        from music21 import stream, variant, note
+        from music21 import variant
 
         m1 = stream.Measure()
         v1 = variant.Variant()
@@ -2418,7 +2419,7 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.hasElementOfClass('Measure'), True)
 
     def testDeepCopyVariantA(self):
-        from music21 import note, stream, variant
+        from music21 import variant
     
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
@@ -2452,7 +2453,7 @@ class Test(unittest.TestCase):
 
 
     def testDeepCopyVariantB(self):
-        from music21 import note, stream, variant
+        from music21 import variant
     
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
