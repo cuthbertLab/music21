@@ -10,12 +10,7 @@
 #-------------------------------------------------------------------------------
 
 
-import copy, types, random
-import doctest, unittest
-import sys
-from copy import deepcopy
-
-
+import unittest
 import music21 # needed to do fully-qualified isinstance name checking
 
 from music21 import environment
@@ -35,9 +30,9 @@ class Test(unittest.TestCase):
         pass
 
     def testBasicA(self):
-        from music21 import note, stream
+        from music21 import note
 
-        t1 = note.Lyric('test')
+        unused_t1 = note.Lyric('test')
         #print t1.json
 
         n1 = note.Note('G#3', quarterLength=3)
@@ -57,7 +52,7 @@ class Test(unittest.TestCase):
 
             
     def testBasicB(self):
-        from music21 import note, stream, chord
+        from music21 import chord
 
         c1 = chord.Chord(['c2', 'a4', 'e5'], quarterLength=1.25)
 
@@ -71,7 +66,6 @@ class Test(unittest.TestCase):
 
     def testBasicC(self):
         from music21 import stream, note, converter
-        import copy
 
         s = stream.Stream()
         n1 = note.Note('d2', quarterLength=2.0)
@@ -85,7 +79,7 @@ class Test(unittest.TestCase):
 
 
     def testBasicD(self):
-        from music21 import stream, note, converter, spanner, variant
+        from music21 import stream, note, converter, spanner
         import copy
 
         s = stream.Stream()
@@ -113,7 +107,7 @@ class Test(unittest.TestCase):
 
 
     def testBasicE(self):
-        from music21 import stream, note, corpus, converter
+        from music21 import corpus, converter
         s = corpus.parse('bwv66.6')
 
         temp = converter.freezeStr(s, fmt='pickle')        
@@ -161,7 +155,7 @@ class Test(unittest.TestCase):
 
 
     def testBasicH(self):
-        from music21 import stream, note, corpus, converter
+        from music21 import corpus, converter
         s = corpus.parse('bwv66.6')
 
         temp = converter.freezeStr(s, fmt='jsonpickle')        
@@ -179,14 +173,14 @@ class Test(unittest.TestCase):
         p1 = stream.Part()
         for m in range(3):
             m = stream.Measure()
-            for n in range(4):
+            for i in range(4):
                 m.append(note.Note('C4'))
             p1.append(m)
 
         p2 = stream.Part()
         for m in range(3):
             m = stream.Measure()
-            for n in range(4):
+            for i in range(4):
                 m.append(note.Note('G4'))
             p2.append(m)
 
@@ -231,7 +225,7 @@ class Test(unittest.TestCase):
         # this fails due to finding a weakref
         from music21 import corpus, converter
         s = corpus.parse('beethoven/opus133')
-        data = converter.freezeStr(s, fmt='pickle')
+        unused_data = converter.freezeStr(s, fmt='pickle')
 
 
 

@@ -3745,7 +3745,7 @@ class Test(unittest.TestCase):
             environLocal.printDebug([ah.getTitle()])
             s = translate.museDataWorkToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            dummy = m21ToString.music21ObjectToMusicXML(s)
+            dummy = m21ToString.fromMusic21Object(s)
 
 if __name__ == "__main__":
     import music21

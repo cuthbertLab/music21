@@ -165,7 +165,7 @@ def addLyricsToBassNote(bassNote, notationString = None):
             maxLength = len(fs)
     for fs in n.figureStrings:
         spacesInFront = ''
-        for space in range(maxLength - len(fs)):
+        for i in range(maxLength - len(fs)):
             spacesInFront += ' '
         bassNote.addLyric(spacesInFront + fs, applyRaw = True)
 
@@ -289,7 +289,7 @@ class FiguredBassLine(object):
         if self._paddingLeft != 0.0:
             r = note.Rest(quarterLength = self._paddingLeft)
             bassLine.append(r)
-        for (bassNote, notationString) in self._fbList:
+        for (bassNote, unused_notationString) in self._fbList:
             bassLine.append(bassNote)
         
         bassLine.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -327,7 +327,7 @@ class FiguredBassLine(object):
         previousSegment.quarterLength = previousBassNote.quarterLength
         segmentList.append(previousSegment)
         for k in allKeys[1:]:
-            (startTime, endTime) = k
+            (startTime, unused_endTime) = k
             bassNote = currentMapping[k][-1]
             currentSegment = segment.OverlayedSegment(bassNote, bassNote.notationString, self._fbScale,\
                                                       fbRules, numParts, maxPitch)
@@ -536,7 +536,7 @@ class FiguredBassLine(object):
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
                 movementsBC = segmentList[segmentIndex].movements
-                eliminated = []
+                #eliminated = []
                 for (possibB, possibCList) in movementsBC.items():
                     if len(possibCList) == 0:
                         del movementsBC[possibB]
@@ -647,7 +647,7 @@ class Realization(object):
 
         for segmentIndex in range(1, len(self._segmentList)-1):
             currMovements = self._segmentList[segmentIndex].movements
-            for progIndex in range(len(progressions)):
+            for counter_progIndex in range(len(progressions)):
                 prog = progressions.pop(0)
                 possibB = prog[-1]
                 for possibC in currMovements[possibB]:
@@ -799,7 +799,7 @@ class Realization(object):
         for music21Part in sol0:
             allSols.append(music21Part)
         
-        for solutionCounter in range(1, amountToGenerate):
+        for counter_solution in range(1, amountToGenerate):
             solX = self.generateRandomRealization()
             for partIndex in range(len(solX)):
                 for music21Measure in solX[partIndex]:

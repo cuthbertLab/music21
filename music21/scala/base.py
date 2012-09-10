@@ -42,10 +42,10 @@ For most people you'll want to do something like this:
 import os
 import unittest
 import math, codecs
-try:
-    import StringIO # python 2 
-except:
-    from io import StringIO # python3 (also in python 2.6+)
+#try:
+#    import StringIO # python 2 
+#except:
+#    from io import StringIO # python3 (also in python 2.6+)
 
 
 from music21 import common
@@ -88,8 +88,8 @@ def getPaths():
     else:
         # returns a list with one or more paths
         # the first is the path to the directory that contains xml files
-        dir = moduleName.__path__[0] 
-        dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
+        directory = moduleName.__path__[0] 
+        dirListing = [os.path.join(directory, x) for x in os.listdir(directory)]
 
     paths = {} # return a dictionary with keys and list of alternate names
     for fp in dirListing:
@@ -97,11 +97,11 @@ def getPaths():
             paths[fp] = []
             # store alternative name representations
             # store version with no extension
-            dir, fn = os.path.split(fp)
+            directory, fn = os.path.split(fp)
             fn = fn.replace('.scl', '')
             paths[fp].append(fn)
             # store version with removed underscores
-            dir, fn = os.path.split(fp)
+            directory, fn = os.path.split(fp)
             fn = fn.lower()
             fn = fn.replace('.scl', '')
             fn = fn.replace('_', '')
@@ -398,7 +398,7 @@ def parse(target):
     target = target.replace(' ', '')
     if match is None:
         for fp in getPaths().keys():
-            dir, fn = os.path.split(fp)
+            unused_directory, fn = os.path.split(fp)
             # try exact match
             if target.lower() == fn.lower():
                 match = fp
@@ -443,7 +443,7 @@ def search(target):
     # remove any spaces
     target = target.replace(' ', '')
     for fp in getPaths().keys():
-        dir, fn = os.path.split(fp)
+        unused_directory, fn = os.path.split(fp)
         # try exact match
         if target.lower() == fn.lower():
             if fp not in match:

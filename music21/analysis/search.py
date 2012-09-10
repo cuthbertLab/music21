@@ -192,10 +192,10 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             for e in collElements:
                 # use source offset positions
                 post.insert(e.getOffsetBySite(source), e)
-            dict = {}
-            dict['stream'] = post
-            dict['direction'] = directionLast
-            collMatch.append(dict)
+            dictionary = {}
+            dictionary['stream'] = post
+            dictionary['direction'] = directionLast
+            collMatch.append(dictionary)
             match = False
 
             # if we have not explicitly said to keep the last

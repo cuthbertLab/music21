@@ -258,7 +258,7 @@ class TestExternal(unittest.TestCase):
     def xtestArvoPart(self, show=True):
         partPari(show)
 
-    def testPendulumMusic(self, show=True):  
+    def xtestPendulumMusic(self, show=True):  
         pendulumMusic(show)
 #        pendulumMusic(show = True, 
 #                  loopLength = 210.0, 

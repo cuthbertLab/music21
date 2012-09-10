@@ -12,7 +12,7 @@
 from music21.scala.base import *
 from music21.scala import base
 
-__doc__ = base.__doc__
+__doc__ = base.__doc__ #  @ReservedAssignment @UndefinedVariable
 
 
 

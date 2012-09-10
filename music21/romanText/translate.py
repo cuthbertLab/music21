@@ -124,7 +124,6 @@ import copy
 from music21 import base
 from music21 import exceptions21
 from music21 import common
-from music21 import repeat
 from music21 import bar
 from music21.romanText import base as romanTextModule
 
@@ -149,7 +148,7 @@ def _copySingleMeasure(t, p, kCurrent):
     '''
     # copy from a past location; need to change key
     #environLocal.printDebug(['calling _copySingleMeasure()'])
-    targetNumber, targetRepeat = t.getCopyTarget()
+    targetNumber, unused_targetRepeat = t.getCopyTarget()
     if len(targetNumber) > 1: # this is an encoding error
         raise RomanTextTranslateException('a single measure cannot define a copy operation for multiple measures')
     # TODO: ignoring repeat letters
@@ -179,11 +178,10 @@ def _copyMultipleMeasures(t, p, kCurrent):
     This is used for cases such as:
     m23-25 = m20-22
     '''
-    from music21 import stream
     # the key provided needs to be the current key
     #environLocal.printDebug(['calling _copyMultipleMeasures()'])
 
-    targetNumbers, targetRepeat = t.getCopyTarget()
+    targetNumbers, unused_targetRepeat = t.getCopyTarget()
     if len(targetNumbers) == 1: # this is an encoding error
         raise RomanTextTranslateException('a multiple measure range cannot copy a single measure')
     # TODO: ignoring repeat letters
@@ -285,7 +283,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     keySigCurrent = None
     keySigSet = True  # set a keySignature
     foundAKeySignatureSoFar = False
-    kCurrent, prefixLyric = _getKeyAndPrefix('C') # default if none defined
+    kCurrent, unused_prefixLyric = _getKeyAndPrefix('C') # default if none defined
     prefixLyric = ''
 
     repeatEndings = {}
@@ -621,7 +619,6 @@ def _addRepeatsFromRepeatEndings(s, repeatEndings):
     '''
     given a Stream and the repeatEndings dict, add repeats to the stream...    
     '''
-    from music21 import bar
     from music21 import spanner
     consolidatedRepeats = _consolidateRepeatEndings(repeatEndings)
     for repeatEndingTuple in consolidatedRepeats:
@@ -747,7 +744,7 @@ class TestSlow(unittest.TestCase):
         for tf in testFiles.ALL:
             rtf = romanText.RTFile()
             rth = rtf.readstr(tf) # return handler, processes tokens
-            s = romanTextToStreamOpus(rth) # will run romanTextToStreamScore on all but k273
+            unused_s = romanTextToStreamOpus(rth) # will run romanTextToStreamScore on all but k273
             #s.show()
 
         
@@ -766,7 +763,6 @@ class TestSlow(unittest.TestCase):
         self.assertEqual(s.metadata.composer, 'Claudio Monteverdi')
 
     def testMeasureCopyingA(self):
-        from music21 import romanText
         from music21.romanText import testFiles
 
         s = romanTextToStreamScore(testFiles.swv23)
@@ -852,8 +848,6 @@ class TestSlow(unittest.TestCase):
         
 
     def testOpus(self):
-        from music21 import stream
-        from music21 import romanText
         from music21.romanText import testFiles
 
         o = romanTextToStreamOpus(testFiles.mozartK279)
@@ -877,11 +871,10 @@ class TestSlow(unittest.TestCase):
         
 class Test(unittest.TestCase):
     def testBasicB(self):
-        from music21 import romanText
         from music21.romanText import testFiles
 
-        s = romanTextToStreamScore(testFiles.riemenschneider001)
-        #s.show()
+        unused_s = romanTextToStreamScore(testFiles.riemenschneider001)
+        #unused_s.show()
 
     def testRomanTextString(self):
         from music21 import converter
@@ -937,7 +930,7 @@ m6-7 = m4-5
         
         from music21.romanText import testFiles
         from music21 import converter
-        s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
+        unused_s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
         #s.show('text')
         
 #-------------------------------------------------------------------------------

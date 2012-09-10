@@ -423,7 +423,7 @@ class Segment(object):
             raise SegmentException("Diminished seventh resolution: Not a diminished seventh Segment.")
         dimChordInfo = _unpackSeventhChord(dimChord)
         dimScale = scale.HarmonicMinorScale().deriveByDegree(7, dimChord.root())
-        minorScale = dimScale.getParallelMinor()
+        #minorScale = dimScale.getParallelMinor()
         
         tonic = dimScale.getTonic()
         subdominant = dimScale.pitchFromDegree(4)
@@ -500,7 +500,7 @@ class Segment(object):
 
         tonic = resolution._transpose(augSixthChord.bass(), 'M3')
         majorScale = scale.MajorScale(tonic)
-        minorScale = scale.MinorScale(tonic)
+        #minorScale = scale.MinorScale(tonic)
         resChord = segmentB.segmentChord
         augSixthChordInfo = _unpackSeventhChord(augSixthChord)
 

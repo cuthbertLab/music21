@@ -15,7 +15,7 @@ from music21.features import base
 from music21.features import jSymbolic
 from music21.features import native
 
-__doc__ = base.__doc__
+__doc__ = base.__doc__ #@ReservedAssignment @UndefinedVariable
 
 #------------------------------------------------------------------------------
 # eof

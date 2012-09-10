@@ -881,7 +881,6 @@ class DataSet(object):
     def addFeatureExtractors(self, values):
         '''Add one or more FeatureExtractor objects, either as a list or as an individual object. 
         '''
-        from music21.features import jSymbolic
         # features are instantiated here
         # however, they do not have a data assignment
         if not common.isListLike(values):
@@ -1266,7 +1265,7 @@ class Test(unittest.TestCase):
 
     def testStreamFormsA(self):
 
-        from music21 import corpus, features
+        from music21 import features
 
         s = corpus.parse('hwv56/movement3-05.md')
         di = features.DataInstance(s)
@@ -1306,7 +1305,7 @@ class Test(unittest.TestCase):
 
     def testStreamFormsB(self):
 
-        from music21 import corpus, features, note, stream
+        from music21 import features, note
 
         s = stream.Stream()
         for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5']:
@@ -1324,7 +1323,7 @@ class Test(unittest.TestCase):
 
     def testStreamFormsC(self):
 
-        from music21 import corpus, features, note, stream
+        from music21 import features, note
 
         s = stream.Stream()
         for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5']:
@@ -1365,8 +1364,7 @@ class Test(unittest.TestCase):
 
 
     def testFeatureFail(self):
-        import music21
-        from music21 import stream, features
+        from music21 import features
         from music21 import base
 
         featureExtractors = ['p10', 'p11', 'p12', 'p13']
@@ -1397,9 +1395,8 @@ class Test(unittest.TestCase):
     def xtestComposerClassificationJSymbolic(self):
         '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
         '''
-        from music21 import features, corpus
-        from music21.features import jSymbolic
-        
+        from music21 import features
+                
         featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21']
         
         # will return a list
@@ -1437,8 +1434,7 @@ class Test(unittest.TestCase):
     def xtestRegionClassificationJSymbolicA(self):
         '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
         '''
-        from music21 import features, corpus
-        from music21.features import jSymbolic
+        from music21 import features
 
         featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 
                             'jSymbolic')
@@ -1476,8 +1472,7 @@ class Test(unittest.TestCase):
     def xtestRegionClassificationJSymbolicB(self):
         '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
         '''
-        from music21 import features, corpus
-        from music21.features import jSymbolic
+        from music21 import features
 
         # features common to both collections
         featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 
@@ -1534,7 +1529,7 @@ class Test(unittest.TestCase):
     def xtestOrangeBayesA(self):
         '''Using an already created test file with a BayesLearner.
         '''
-        import orange, orngTree
+        import orange
         data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
         classifier = orange.BayesLearner(data)
         for i in range(len(data)):

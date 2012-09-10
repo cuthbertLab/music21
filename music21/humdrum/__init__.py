@@ -169,7 +169,6 @@ def parseData(data):
     '''
     return spineParser.HumdrumDataCollection(data)
 
-
 #------------------------------------------------------------------------------
 # eof
 

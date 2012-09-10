@@ -23,7 +23,7 @@ import math
 
 from music21 import common
 from music21 import base
-from music21 import exceptions21
+#from music21 import exceptions21
 from music21.features import base as featuresModule
 
 from music21 import environment
@@ -141,7 +141,6 @@ class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        values = [] 
         # already summed by part if parts exist
         histo = self.data['midiIntervalHistogram']
         maxValue = max(histo)
@@ -171,7 +170,6 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        values = [] 
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
         maxValue = max(histo)
@@ -205,7 +203,6 @@ class MostCommonMelodicIntervalPrevalenceFeature(
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        values = [] 
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
         maxValue = max(histo)
@@ -236,7 +233,6 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        values = [] 
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
         count = sum(histo)
@@ -244,7 +240,7 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
         maxIndex = histo.index(maxValue)
         histo[maxIndex] = 0 # set to zero
         secondValue = max(histo)
-        secondIndex = histo.index(secondValue)
+        #secondIndex = histo.index(secondValue)
 
         self._feature.vector[0] = (secondValue / float(count)) / (maxValue / float(count))
 
@@ -585,8 +581,8 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        rising = 0
-        falling = 0
+        #rising = 0
+        #falling = 0
         cBundle = []
         if self.data.partsCount > 0:
             for i in range(self.data.partsCount):
@@ -654,8 +650,8 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        rising = 0
-        falling = 0
+        #rising = 0
+        #falling = 0
         cBundle = []
         if self.data.partsCount > 0:
             for i in range(self.data.partsCount):
@@ -1965,7 +1961,7 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksForEachVoiceFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.4375]
+    [0.4428...]
     '''
     id = 'R24'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1989,7 +1985,7 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
             onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
             onsetsByPart.append(onsets)
 
-        for onserts in onsetsByPart:
+        for onsets in onsetsByPart:
             onsets.sort() # may already be sorted?
             differences = []
             for i, o in enumerate(onsets):
@@ -2693,7 +2689,7 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         '''
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
-        count = 0
+        #count = 0
         if s is not None:
             for p in s.parts:
                 # always one instrument
@@ -2756,7 +2752,7 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitchClassHistogram'])
         # each part has content for each instrument
-        count = 0
+        #count = 0
         for p in s.parts:
             # always one instrument
             i = p.getElementsByClass('Instrument')[0]
@@ -3639,7 +3635,7 @@ def getCompletionStats():
         group = extractorsById[k]
         for i in range(len(group)):
             if group[i] is not None:
-                n = group[i].__name__
+                unused_n = group[i].__name__
                 countTotal += 1
                 if group[i] in featureExtractors:
                     countComplete += 1
@@ -3932,7 +3928,7 @@ class Test(unittest.TestCase):
             p = p.transpose(i)
             s.append(note.Note(copy.deepcopy(p)))
         fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
-        f = fe.extract()
+        unused_f = fe.extract()
         #self.assertEqual(f.vector, [5])
 
         s = stream.Stream()
@@ -3942,7 +3938,7 @@ class Test(unittest.TestCase):
             p = p.transpose(i)
             s.append(note.Note(copy.deepcopy(p)))
         fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
-        f = fe.extract()
+        unused_f = fe.extract()
         #self.assertAlmostEqual(f.vector[0], 1+2/3.)
 
 

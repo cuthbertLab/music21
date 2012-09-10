@@ -12,7 +12,7 @@
 
 from music21.noteworthy.base import *
 from music21.noteworthy import base
-__doc__ = base.__doc__
+__doc__ = base.__doc__ # @ReservedAssignment @UndefinedVariable
 
 #------------------------------------------------------------------------------
 # eof

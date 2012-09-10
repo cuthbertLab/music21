@@ -13,7 +13,7 @@
 from music21.musedata.base import *
 from music21.musedata import base
 
-__doc__ = base.__doc__
+__doc__ = base.__doc__ # @ReservedAssignment @UndefinedVariable
 
 
 

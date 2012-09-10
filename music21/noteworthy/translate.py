@@ -112,11 +112,11 @@ class NoteworthyTranslator(object):
 
     def parseFile(self, filePath):
         try:
-            file = open(filePath)
+            thisFile = open(filePath)
         except:
             raise NoteworthyTranslateException('cannot open %s: ' % filePath)
-        dataList = file.readlines()
-        file.close()
+        dataList = thisFile.readlines()
+        thisFile.close()
         return self.parseList(dataList)
         
     def parseString(self, data):
@@ -191,7 +191,7 @@ class NoteworthyTranslator(object):
             elif command == "Bar":
                 self.createBarlines(attributes)
             elif command == "Flow":
-                currentMeasure = self.createOtherRepetitions(attributes)
+                self.currentMeasure = self.createOtherRepetitions(attributes)
             elif command == "DynamicVariance":
                 self.createDynamicVariance(attributes)
             elif command == "Dynamic":
@@ -313,7 +313,7 @@ class NoteworthyTranslator(object):
         [<music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>, <music21.pitch.Pitch B3>]
         '''
 
-        dictionaries = noteworthyModule.dictionaries
+        #dictionaries = noteworthyModule.dictionaries
         pos = posInfo.rstrip('^') # remove any tie
 ### What does this do???            
         pos = pos.rstrip('x')
@@ -384,55 +384,54 @@ class NoteworthyTranslator(object):
         '''
         dictionaries = noteworthyModule.dictionaries
 
-        oct = 4
-        notename = None
+        octave = 4
         currentClef = self.currentClef                
         dictionary = ""
 
         minPosition = 1
         if currentClef == "TREBLE8dw":
-            oct = 4
+            octave = 4
             minPosition = 1
             dictionary = "dictionaryTreble"
         elif currentClef == "TREBLE8up":
-            oct = 6       
+            octave = 6       
             minPosition = 1
             dictionary = "dictionaryTreble"
         elif currentClef == "BASS":
-            oct = 3
+            octave = 3
             minPosition = -1
             dictionary =  "dictionaryBass"
         elif currentClef == "BASS8dw":
-            oct = 2
+            octave = 2
             minPosition = -1
             dictionary =  "dictionaryBass"
         elif currentClef == "BASS8up":
-            oct = 4
+            octave = 4
             minPosition = -1
             dictionary =  "dictionaryBass"
         elif currentClef == "ALTO":
-            oct = 4
+            octave = 4
             minPosition = 0
             dictionary =  "dictionaryAlto"
         elif currentClef == "TENOR":
-            oct = 3
+            octave = 3
             minPosition = -5
             dictionary =  "dictionaryTenor"
         else: # "TREBLE":
-            oct = 5
+            octave = 5
             minPosition = 1
             dictionary =  "dictionaryTreble"
            
         while positionnote < minPosition or positionnote > (minPosition + 6):
             if positionnote < minPosition:
                 positionnote = positionnote + 7
-                oct = oct - 1
+                octave = octave - 1
             if positionnote > (minPosition + 6):
                 positionnote = positionnote - 7
-                oct = oct + 1  
+                octave = octave + 1  
         notename = dictionaries[dictionary][positionnote]
 
-        return (notename, oct)
+        return (notename, octave)
 
     def translateNote(self, attributes):
         r'''

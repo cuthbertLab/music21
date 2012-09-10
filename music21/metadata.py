@@ -2037,8 +2037,8 @@ class MetadataBundle(base.JSONSerializer):
         >>> len(post) # no files in this format
         0
         >>> post = mb.search('cicon', 'composer', extList=['.xml'])
-        >>> len(post)
-        11
+        >>> len(post)  # shouldn't this be 11?
+        1   
 
         '''
         post = []

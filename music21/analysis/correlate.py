@@ -156,15 +156,15 @@ class ActivityMatch(object):
             return pairs
 
         # find unique coords and count instances
-        dict = {}
+        dictionary = {}
         for coord in pairs: 
             coord = tuple(coord)
-            if coord not in dict.keys():
-                dict[coord] = 0
-            dict[coord] += 1
+            if coord not in dictionary.keys():
+                dictionary[coord] = 0
+            dictionary[coord] += 1
         pairs = []
-        for key in dict.keys():
-            pairs.append((key[0], key[1], dict[key]))
+        for key in dictionary.keys():
+            pairs.append((key[0], key[1], dictionary[key]))
         return pairs
 
 

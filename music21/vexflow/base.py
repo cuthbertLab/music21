@@ -315,7 +315,7 @@ class UIDCounter(object):
     
 
 def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultStavePosition[1]), staffWidth = str(defaultStaveWidth), staveName = 'stave'):
-	'''
+    '''
 	returns a string formated new VexFlow Stave.  
 	
 	Arguments are strings representing the x and y position and the width.
@@ -329,8 +329,8 @@ def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultSta
 	>>> vexflow.staffString('(0 * (((($(window).width()-10) - (2*10))) / 4) + 10)', '((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20)))', '(((($(window).width()-10) - (2*10))) / 4)')
 	'var stave = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));'
 	'''
-	
-	defaultStaff = "".join(
+
+    defaultStaff = "".join(
 			['var ' + staveName + ' = new Vex.Flow.Stave(',
 			 xPosStr,
 			 ",",
@@ -338,7 +338,7 @@ def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultSta
 			 ",",
 			 staffWidth,
 			 ");"])
-	return defaultStaff
+    return defaultStaff
 
 
 #-------------------------------------------------------------------------------
@@ -2229,7 +2229,6 @@ class Test(unittest.TestCase):
     </script>
 </body>
 </html>'''
-        from music21 import note
         n = note.Note('C-')
         v = VexflowNote(n)
         htmlOut = v.generateCode('html')
@@ -2239,7 +2238,7 @@ class Test(unittest.TestCase):
     
     def testMeasureParts(self):
         self.maxDiff = 30000
-        from music21 import corpus, common
+        from music21 import corpus
         b = corpus.parse('bwv1.6.mxl')
         m = b.parts[0].measures(0,1)[2]
         d = fromMeasure(m)
@@ -2285,8 +2284,8 @@ class TestExternal(unittest.TestCase):
         pass
 
     def testShowMeasureWithAccidentals(self):
-        from music21 import corpus, note
-        b = note.Note('B4') 
+        from music21 import corpus
+        #b = note.Note('B4') 
         b = corpus.parse('bwv1.6')
         b.show('vexflow')
     

@@ -12,7 +12,6 @@
 Run from command line to toggle debug status.
 '''
 
-
 import music21.environment
 
 def toggleDebug():

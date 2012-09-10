@@ -11100,16 +11100,24 @@ class Measure(Stream):
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'timeSignatureIsNew': 'Boolean describing if the TimeSignature is different than the previous Measure.',
-
     'clefIsNew': 'Boolean describing if the Clef is different than the previous Measure.',
-
     'keyIsNew': 'Boolean describing if KeySignature is different than the previous Measure.',
-
     'number': 'A number representing the displayed or shown Measure number as presented in a written Score.',
-
-    'numberSuffix': 'If a Measure number has a string annotation, such as "a" or similar, this string is stored here.',
-
-    'layoutWidth': 'A suggestion for layout width, though most rendering systems do not support this designation. Use :class:`~music21.layout.SystemLayout` objects instead.',
+    'numberSuffix': '''If a Measure number has a string annotation, such as "a" or similar, 
+                       this string is stored here. Note that in MusicXML, such suffixes often appear as
+                       prefixes to measure numbers.  In music21 (like most measure numbering systems), these
+                       numbers appear as suffixes.''',
+    'layoutWidth': '''A suggestion for layout width, though most rendering systems do not support 
+                      this designation. Use :class:`~music21.layout.SystemLayout` objects instead.''',
+    'paddingLeft': '''defines empty space at the front of the measure for purposes of determining 
+                      beat, etc for pickup/anacrusis bars.  In 4/4, a measure with a one-beat pickup 
+                      note will have a `paddingLeft` of 3.0. (The name comes from the CSS graphical term
+                      for the amount of padding on the left side of a region.)''',
+    'paddingRight': '''defines empty space at the end of the measure for purposes of determining 
+                       whether or not a measure is filleds.  In 4/4, a piece beginning a one-beat pickup 
+                       note will often have a final measure of three beats, instead of four.  The final
+                       measure should have a `paddingRight` of 1.0. (The name comes from the CSS graphical term
+                       for the amount of padding on the right side of a region.)''',
     }
 
     def __init__(self, *args, **keywords):
@@ -11141,13 +11149,13 @@ class Measure(Stream):
         # on input
         self.layoutWidth = None
 
-    def addRepeat(self):
-        # TODO: write
-        pass
+#    def addRepeat(self):
+#        # TODO: write
+#        pass
 
-    def addTimeDependentDirection(self, time, direction):
-        # TODO: write
-        pass
+#    def addTimeDependentDirection(self, time, direction):
+#        # TODO: write
+#        pass
 
     def measureNumberWithSuffix(self):
         if self.numberSuffix:
@@ -11245,11 +11253,16 @@ class Measure(Stream):
             return None
 
     def barDurationProportion(self, barDuration=None):
-        '''Return a floating point value greater than 0 showing the proportion of the bar duration that is filled based on the highest time of all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
+        '''
+        Return a floating point value greater than 0 showing the proportion 
+        of the bar duration that is filled based on the highest time of 
+        all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
 
-        Bar duration refers to the duration of the Measure as suggested by the TimeSignature. This value cannot be determined without a Time Signature. 
+        Bar duration refers to the duration of the Measure as suggested by 
+        the `TimeSignature`. This value cannot be determined without a `TimeSignature`. 
 
-        An already-obtained Duration object can be supplied with the `barDuration` optional argument. 
+        An already-obtained Duration object can be supplied with the `barDuration` 
+        optional argument. 
 
         >>> from music21 import *
         >>> m = stream.Measure()
@@ -11275,15 +11288,18 @@ class Measure(Stream):
         return self.highestTime / barDuration.quarterLength
 
     def padAsAnacrusis(self):
-        '''Given an incompletely filled Measure, adjust the paddingLeft value to to represent contained events as shifted to fill the right-most duration of the bar.
+        '''
+        Given an incompletely filled Measure, adjust the `paddingLeft` value to to 
+        represent contained events as shifted to fill the right-most duration of the bar.
 
-        Calling this method will overwrite any previously set paddingLeft value, based on the current TimeSignature-derived `barDuration` attribute. 
+        Calling this method will overwrite any previously set `paddingLeft` value, 
+        based on the current TimeSignature-derived `barDuration` attribute. 
 
         >>> from music21 import *
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> n = note.Note()
-        >>> n.quarterLength = 1
+        >>> n.quarterLength = 1.0
         >>> m.append(copy.deepcopy(n))
         >>> m.padAsAnacrusis()
         >>> m.paddingLeft
@@ -11315,7 +11331,9 @@ class Measure(Stream):
 
     #---------------------------------------------------------------------------
     def bestTimeSignature(self):
-        '''Given a Measure with elements in it, get a TimeSignature that contains all elements.
+        '''
+        Given a Measure with elements in it, 
+        get a TimeSignature that contains all elements.
 
         Note: this does not yet accommodate triplets. 
         '''
@@ -11381,9 +11399,8 @@ class Measure(Stream):
         return ts
 
     def _getBarDuration(self):
-        '''Return the bar duration, or the Duration specified by the TimeSignature. 
-
-        '''
+        # Docs in the property.
+        
         # TODO: it is possible that this should be cached or exposed as a method
         # as this search may take some time. 
         if self.timeSignature != None:
@@ -11398,7 +11415,37 @@ class Measure(Stream):
         return ts.barDuration
 
     barDuration = property(_getBarDuration, 
-        doc = '''Return the bar duration, or the Duration specified by the TimeSignature, regardless of what elements are found in this Measure or the highest time. TimeSignature is found first within the Measure, or within a context based search.
+        doc = '''
+        Return the bar duration, or the Duration specified by the TimeSignature, 
+        regardless of what elements are found in this Measure or the highest time. 
+        TimeSignature is found first within the Measure, 
+        or within a context based search.
+        
+        To get the duration of the total length of elements, just use the 
+        `.duration` property.
+        
+        Here we create a 3/4 measure and "over-stuff" it with five quarter notes.
+        `barDuration` still gives a duration of 3.0, or a dotted quarter note,
+        while `.duration` gives a whole note tied to a quarter.
+        
+        >>> from music21 import *
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> m.barDuration
+        <music21.duration.Duration 3.0>
+        >>> m.repeatAppend(note.QuarterNote(), 5)
+        >>> m.barDuration
+        <music21.duration.Duration 3.0>
+        >>> m.duration
+        <music21.duration.Duration 5.0>
+        
+        The objects returned by `barDuration` and `duration` are full :class:`~music21.duration.Duration`
+        objects, will all the relevant properties:
+        
+        >>> m.barDuration.fullName
+        'Dotted Half'
+        >>> m.duration.fullName
+        'Whole tied to Quarter (5.0 total QL)'
         ''')
 
     #---------------------------------------------------------------------------
@@ -11406,14 +11453,6 @@ class Measure(Stream):
     # properties are provided to store and access these attribute
 
     def _getClef(self):
-        '''
-        >>> from music21 import *
-
-        >>> a = stream.Measure()
-        >>> a.clef = clef.TrebleClef()
-        >>> a.clef.sign  # clef is an element
-        'G'
-        '''
         # TODO: perhaps sort by priority?
         clefList = self.getElementsByClass('Clef')
         # only return clefs that have offset = 0.0 
@@ -11424,17 +11463,6 @@ class Measure(Stream):
             return clefList[0]    
     
     def _setClef(self, clefObj):
-        '''
-        >>> from music21 import *
-
-        >>> a = stream.Measure()
-        >>> a.clef = clef.TrebleClef()
-        >>> a.clef.sign    # clef is an element
-        'G'
-        >>> a.clef = clef.BassClef()
-        >>> a.clef.sign
-        'F'
-        '''
         # if clef is None; remove object?
         oldClef = self._getClef()
         if oldClef is not None:
@@ -11446,7 +11474,40 @@ class Measure(Stream):
             return
         self.insert(0, clefObj)
 
-    clef = property(_getClef, _setClef)    
+    clef = property(_getClef, _setClef, doc='''
+        Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
+
+        >>> from music21 import *
+        >>> m = stream.Measure()
+        >>> m.number = 10
+        >>> m.clef = clef.TrebleClef()
+        >>> thisTrebleClef = m.clef
+        >>> thisTrebleClef.sign
+        'G'       
+        >>> thisTrebleClef.getOffsetBySite(m)
+        0.0
+        
+        Setting the clef for the measure a second time removes the previous clef
+        from the measure and replaces it with the new one:
+                
+        >>> m.clef = clef.BassClef()
+        >>> m.clef.sign
+        'F'
+        
+        And the TrebleClef is no longer in the measure:
+        
+        >>> thisTrebleClef.getOffsetBySite(m)
+        Traceback (most recent call last):
+        DefinedContextsException: The object <music21.clef.TrebleClef> is not in site <music21.stream.Measure 10 offset=0.0>.
+        
+        The `.clef` appears in a `.show()` or other call
+        just like any other element
+        
+        >>> m.append(note.WholeNote('D#'))
+        >>> m.show('text')
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.note.Note D#>        
+        ''')
 
     def _getTimeSignature(self):
         '''
@@ -11522,12 +11583,9 @@ class Measure(Stream):
         A key.Key object can be used instead of key.KeySignature,
         since the former derives from the latter.
         
-
         >>> a.keySignature = key.Key('E-', 'major')
         >>> a.keySignature.sharps   
         -3
-
-
         '''
         oldKey = self._getKeySignature()
         if oldKey is not None:
@@ -11739,8 +11797,10 @@ class Part(Stream):
 
 
 class PartStaff(Part):
-    '''A Part subclass for designating music that is represented on a single staff but may only be one of many staffs for a single part.
-    
+    '''
+    A Part subclass for designating music that is 
+    represented on a single staff but may only be one 
+    of many staves for a single part.
     '''
     def __init__(self, *args, **keywords):
         Part.__init__(self, *args, **keywords)
@@ -11783,7 +11843,8 @@ class PartStaff(Part):
 #     
 
 class Score(Stream):
-    """A Stream subclass for handling multi-part music.
+    """
+    A Stream subclass for handling multi-part music.
     
     Absolutely optional (the largest containing Stream in a piece could be
     a generic Stream, or a Part, or a Staff).  And Scores can be
@@ -11808,13 +11869,31 @@ class Score(Stream):
         return self._cache['parts']
 
     parts = property(_getParts, 
-        doc='''Return all :class:`~music21.stream.Part` objects in a :class:`~music21.stream.Score`.
+        doc='''
+        Return all :class:`~music21.stream.Part` objects in a :class:`~music21.stream.Score`.
+
+        It filters out all other things that might be in a Score object, such as Metadata
+        returning just the Parts.
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> parts = s.parts     
-        >>> len(parts)
+        >>> partStream = s.parts     
+        >>> len(partStream)
         4
+        
+        The partStream object is a full `stream.Score` object, thus the elements inside it
+        can be accessed by index number or by id string, or iterated over:
+        
+        >>> partStream[0]
+        <music21.stream.Part Soprano>
+        >>> partStream['Alto']
+        <music21.stream.Part Alto>
+        >>> for p in partStream:
+        ...     print p.id
+        Soprano
+        Alto
+        Tenor
+        Bass
         ''')
 
     def measures(self, numberStart, numberEnd, 
@@ -11889,9 +11968,12 @@ class Score(Stream):
 
 
     def expandRepeats(self):
-        '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
+        '''
+        Expand all repeats, as well as all repeat indications 
+        given by text expressions such as D.C. al Segno.
 
-        This method always returns a new Stream, with deepcopies of all contained elements at all level.
+        This method always returns a new Stream, with deepcopies 
+        of all contained elements at all level.
         '''
         post = Score()
         # this calls on Music21Object, transfers id, groups
@@ -11997,11 +12079,16 @@ class Score(Stream):
         return returnObj
 
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False):
-        '''Given a multi-part :class:`~music21.stream.Score`, return a new Score that combines parts into voices. 
+        '''
+        Given a multi-part :class:`~music21.stream.Score`, 
+        return a new Score that combines parts into voices. 
 
-        The `voiceAllocation` parameter sets the maximum number of voices per Part.
+        The `voiceAllocation` parameter sets the maximum number 
+        of voices per Part.
 
-        The `permitOneVoicePerPart` parameter, if True, will encode a single voice inside a single Part, rather than leaving it as a single Part alone, with no voices. 
+        The `permitOneVoicePerPart` parameter, if True, will encode a 
+        single voice inside a single Part, rather than leaving it as 
+        a single Part alone, with no internal voices. 
 
         >>> from music21 import *
         >>> s = corpus.parse('bwv66.6')
@@ -12105,7 +12192,13 @@ class Score(Stream):
         return s
 
     def implode(self):
-        '''Reduce a polyphonic work into one or more staves.
+        '''
+        Reduce a polyphonic work into two staves.
+        
+        Currently, this is just a synonym for `partsToVoices` with
+        `voiceAllocation = 2`, and `permitOneVoicePerPart = False`,
+        but someday this will have better methods for finding identical
+        parts, etc.
         '''
         voiceAllocation = 2
         permitOneVoicePerPart = False
@@ -12116,9 +12209,12 @@ class Score(Stream):
 
 
     def flattenParts(self, classFilterList=['Note', 'Chord']):
-        '''Given a Score, combine all Parts into a single Part with all elements found in each Measure of the Score. 
+        '''
+        Given a Score, combine all Parts into a single Part 
+        with all elements found in each Measure of the Score. 
 
-        The `classFilterList` can be used to specify which objects contained in Measures are transferred. 
+        The `classFilterList` can be used to specify which objects 
+        contained in Measures are transferred. 
 
         >>> from music21 import *
         >>> s = corpus.parse('bwv66.6')
@@ -12150,11 +12246,13 @@ class Score(Stream):
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False, bestClef=False, **subroutineKeywords):
         '''
-        This method overrides the makeNotation method on Stream, such that a Score object with one or more Parts or Streams that may not contain well-formed notation may be transformed and replaced by well-formed notation. 
+        This method overrides the makeNotation method on Stream, 
+        such that a Score object with one or more Parts or Streams 
+        that may not contain well-formed notation may be transformed 
+        and replaced by well-formed notation. 
 
         If `inPlace` is True, this is done in-place; 
         if `inPlace` is False, this returns a modified deep copy.
-
         '''
         if inPlace:
             returnStream = self
@@ -12266,7 +12364,9 @@ class Score(Stream):
 
 
 class Opus(Stream):
-    '''A Stream subclass for handling multi-work music encodings. Many ABC files, for example, define multiple works or parts within a single file. 
+    '''
+    A Stream subclass for handling multi-work music encodings. 
+    Many ABC files, for example, define multiple works or parts within a single file. 
     '''
 
     #TODO get by title, possibly w/ regex
@@ -12275,7 +12375,8 @@ class Opus(Stream):
         Stream.__init__(self, *args, **keywords)
 
     def getNumbers(self):
-        '''Return a list of all numbers defined in this Opus.
+        '''
+        Return a list of all numbers defined in this Opus.
 
         >>> from music21 import *
         >>> o = corpus.parse('josquin/ovenusbant')
@@ -12288,7 +12389,8 @@ class Opus(Stream):
         return post
 
     def getScoreByNumber(self, opusMatch):
-        '''Get Score objects from this Stream by number. 
+        '''
+        Get Score objects from this Stream by number. 
         Performs title search using the 
         :meth:`~music21.metadata.Metadata.search` method, 
         and returns the first result. 
@@ -12314,7 +12416,10 @@ class Opus(Stream):
 #                 return s
 
     def getScoreByTitle(self, titleMatch):
-        '''Get Score objects from this Stream by a title. Performs title search using the :meth:`~music21.metadata.Metadata.search` method, and returns the first result. 
+        '''
+        Get Score objects from this Stream by a title. 
+        Performs title search using the :meth:`~music21.metadata.Metadata.search` method, 
+        and returns the first result. 
 
         >>> from music21 import *
         >>> o = corpus.parse('essenFolksong/erk5')
@@ -12334,14 +12439,20 @@ class Opus(Stream):
         return self.getElementsByClass(Score)
 
     scores = property(_getScores, 
-        doc='''Return all :class:`~music21.stream.Score` objects in a :class:`~music21.stream.Opus`.
+        doc='''
+        Return all :class:`~music21.stream.Score` objects 
+        in a :class:`~music21.stream.Opus`.
 
         >>> from music21 import *
         ''')
 
 
     def mergeScores(self):
-        '''Some Opus object represent numerous scores that are individual parts of the same work. This method will treat each contained Score as a Part, merging and returning a single Score with merged Metadata.
+        '''
+        Some Opus objects represent numerous scores 
+        that are individual parts of the same work. 
+        This method will treat each contained Score as a Part, 
+        merging and returning a single Score with merged Metadata.
 
         >>> from music21 import *
         >>> o = corpus.parse('josquin/milleRegrets')
@@ -12387,9 +12498,12 @@ class Opus(Stream):
 
     def show(self, fmt=None, app=None):
         '''
-        Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment.
+        Displays an object in a format provided by the 
+        fmt argument or, if not provided, the format 
+        set in the user's Environment.
 
-        This method overrides the behavior specified in :class:`~music21.base.Music21Object` for all
+        This method overrides the behavior specified in 
+        :class:`~music21.base.Music21Object` for all
         formats besides explicit lily.x calls.
         '''
         if fmt is not None and 'lily' in fmt:
@@ -12398,18 +12512,21 @@ class Opus(Stream):
             for s in self.scores:
                 s.show(fmt=fmt, app=app)
 
-
-
 #-------------------------------------------------------------------------------
 # Special stream sub-classes that are instantiated as hidden attributes within other Music21Objects (i.e., Spanner and Variant). 
 
 class SpannerStorage(Stream):
     '''
-    For advanced use. This Stream subclass is only used inside of a Spanner object to provide object storage of connected elements (things the Spanner spans).
+    For advanced use. This Stream subclass is only used 
+    inside of a Spanner object to provide object storage 
+    of connected elements (things the Spanner spans).
 
-    This subclass name can be used to search in an object's DefinedContexts and find any and all locations that are SpannerStorage objects.
+    This subclass name can be used to search in an 
+    object's DefinedContexts and find any and all 
+    locations that are SpannerStorage objects.
 
-    A `spannerParent` keyword argument must be provided by the Spanner in creation. 
+    A `spannerParent` keyword argument must be 
+    provided by the Spanner in creation. 
     '''
     def __init__(self, *arguments, **keywords):
         Stream.__init__(self, *arguments, **keywords)
@@ -12433,9 +12550,12 @@ class VariantStorage(Stream):
     storage of connected elements (things the Variant 
     defines).
 
-    This subclass name can be used to search in an object's DefinedContexts and find any and all locations that are VariantStorage objects.
+    This subclass name can be used to search in an 
+    object's DefinedContexts and find any and all 
+    locations that are VariantStorage objects.
 
-    A `variantParent` keyword argument must be provided by the Variant in creation. 
+    A `variantParent` keyword argument must be provided 
+    by the Variant in creation. 
     '''
     def __init__(self, *arguments, **keywords):
         Stream.__init__(self, *arguments, **keywords)
@@ -12443,8 +12563,6 @@ class VariantStorage(Stream):
         self.variantParent = None
         if 'variantParent' in keywords.keys():
             self.variantParent = keywords['variantParent']
-
-
 
 #-------------------------------------------------------------------------------
 # class GraceStream(Stream):
@@ -12484,7 +12602,8 @@ class VariantStorage(Stream):
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    '''Note: all Stream tests are found in test/testStream.py
+    '''
+    Note: all Stream tests are found in test/testStream.py
     '''
 
     def runTest(self):
@@ -12509,8 +12628,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Stream, Measure]
-
+_DOC_ORDER = [Stream, Measure, Part, Score, Opus]
 
 
 if __name__ == "__main__":

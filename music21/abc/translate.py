@@ -280,11 +280,6 @@ def abcToStreamScore(abcHandler, inputM21=None):
     '''
 
     from music21 import metadata
-    from music21 import stream
-    from music21 import note
-    from music21 import meter
-    from music21 import key
-    from music21 import chord
 
     if inputM21 == None:
         s = stream.Score()
@@ -800,18 +795,17 @@ class Test(unittest.TestCase):
 
     def testTranslateA(self):  
         # this tests a few files in this collection, some of which are hard to parse
-        import os
         from music21 import corpus
         for fn in ['ToCashellImGoingJig.abc', 'SundayIsMyWeddingDayJig.abc', 'SinkHimDoddieHighlandFling.abc', 'RandyWifeOfGreenlawReel.abc', 'PassionFlowerHornpipe.abc', 'NightingaleClog.abc', 'MountainRangerHornpipe.abc', 'LadiesPandelettsReel.abc', 'JauntingCarHornpipe.abc', 'GoodMorrowToYourNightCapJig.abc', 'ChandlersHornpipe.abc', 'AlistairMaclalastairStrathspey.abc']:
             #print fn
-            s = corpus.parse(fn)
+            unused_s = corpus.parse(fn)
             #s.show()
 
     def testTranslateB(self):
 
         from music21 import corpus
         for fn in ['airdsAirs/book4.abc']:
-            s = corpus.parse(fn)
+            unused_s = corpus.parse(fn)
 
             #s.show()
 

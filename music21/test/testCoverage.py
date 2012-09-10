@@ -17,8 +17,8 @@ except ImportError:
     
 import music21
 from music21.test import test as testModule
-from music21 import bar
-import webbrowser
+#from music21 import bar
+#import webbrowser
 
 def runCoverage(show=True):
     if coverage is None:

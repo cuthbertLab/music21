@@ -72,9 +72,9 @@ class ModuleGather(object):
         append all module paths from _walk() to self.modulePaths.
         Utility function called from os.path.walk()
         '''
-        for file in names:
-            if file.endswith('py'):
-                fp = os.path.join(dirname, file)
+        for fileName in names:
+            if fileName.endswith('py'):
+                fp = os.path.join(dirname, fileName)
                 if not os.path.isdir(fp):
                     self.modulePaths.append(fp)
 
@@ -207,7 +207,7 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
     
     environLocal.printDebug('running Tests...\n')
     runner = unittest.TextTestRunner(verbosity=verbosity)
-    testResult = runner.run(s1)  
+    unused_testResult = runner.run(s1)  
 
     # this should work but requires python 2.7 and the testRunner arg does not
     # seem to work properly
@@ -216,10 +216,8 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
-
-    import sys
     reload(sys)
-    sys.setdefaultencoding("UTF-8")
+    sys.setdefaultencoding("UTF-8") # @UndefinedVariable
 
     # if optional command line arguments are given, assume they are  
     # test group arguments

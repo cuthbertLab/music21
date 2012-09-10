@@ -12,7 +12,8 @@
 from music21.romanText.base import *
 from music21.romanText import base
 from music21.romanText import clercqTemperley
-__doc__ = base.__doc__
+
+__doc__ = base.__doc__ #  @ReservedAssignment @UndefinedVariable
 
 
 

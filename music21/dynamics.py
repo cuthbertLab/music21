@@ -156,6 +156,27 @@ class Dynamic(base.Music21Object):
     '''
     classSortOrder = 10
     
+    _DOC_ORDER = ['longName', 'englishName']
+    _DOC_ATTR = {
+        'longName': r'''
+            the name of this dynamic in Italian.
+            
+            >>> from music21 import *
+            >>> d = dynamic.Dynamic('pp')
+            >>> d.longName
+            'pianissimo'
+            ''',
+        'englishName': r'''
+            the name of this dynamic in English.
+            
+            >>> from music21 import *
+            >>> d = dynamics.Dynamic('pp')
+            >>> d.englishName
+            'very soft'
+            ''',
+    }
+
+    
     def __init__(self, value=None):
         base.Music21Object.__init__(self)
 

@@ -15,10 +15,11 @@ This file is not run with the standard test battery presently.
 '''
 
 
-import doctest, unittest
+import unittest
 
 import music21
 from music21 import common, corpus
+from music21.musicxml.m21ToString import fromMusic21Object as toMusicXML
 
 from music21 import environment
 _MOD = 'test/testPerformance.py'
@@ -44,8 +45,8 @@ class Test(unittest.TestCase):
             r = note.Rest()
             s.append(r)
 
-        for x in range(100):        
-            for x in s: # this will create an iterator instances
+        for i in range(100):        
+            for j in s: # this will create an iterator instances
                 pass
 
     def runStreamIterationByElements(self):
@@ -61,8 +62,8 @@ class Test(unittest.TestCase):
             r = note.Rest()
             s.append(r)
 
-        for x in range(100):        
-            for x in s.elements: # this will create an iterator instances
+        for i in range(100):        
+            for j in s.elements: # this will create an iterator instances
                 pass
 
 
@@ -80,7 +81,7 @@ class Test(unittest.TestCase):
             r = note.Rest()
             s.append(r)
 
-        for x in range(2):        
+        for i in range(2):        
             post = s.flat.getElementsByClass([note.Rest, note.Note])
             self.assertEqual(len(post), 1500)
 
@@ -98,7 +99,7 @@ class Test(unittest.TestCase):
             r = note.Rest()
             s.append(r)
 
-        for x in range(2):        
+        for i in range(2):        
             post = s.flat.getElementsByClass(['Rest', 'Note'])
             self.assertEqual(len(post), 1500)
 
@@ -106,7 +107,7 @@ class Test(unittest.TestCase):
     def runParseBeethoven(self):
         '''Loading file: beethoven/opus59no2/movement3
         '''
-        x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
+        junk = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
     def runMusicxmlOutPartsBeethoven(self):
         '''Loading file and rendering musicxml output for each part: beethoven/opus59no2/movement3
@@ -114,36 +115,38 @@ class Test(unittest.TestCase):
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
         for p in x.parts:
-            post = p.musicxml
+            junk = toMusicXML(p)
 
     def runMusicxmlOutScoreBeethoven(self):
         '''Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
-        post = x.musicxml
+        junk = toMusicXML(x)
 
     def runParseHaydn(self):
         '''Loading file: haydn/opus74no1/movement3
         '''
-        x = corpus.parse('haydn/opus74no1/movement3', forceSource=True)
+        junk = corpus.parse('haydn/opus74no1/movement3', forceSource=True)
 
     def runParseSchumann(self):
         '''Loading file: schumann/opus41no1/movement2
         '''
-        x = corpus.parse('schumann/opus41no1/movement2', forceSource=True)
+        junk = corpus.parse('schumann/opus41no1/movement2', forceSource=True)
 
     def runParseLuca(self):
-        '''Loading file: luca/gloria
         '''
-        x = corpus.parse('luca/gloria', forceSource=True)
+        Loading file: luca/gloria
+        '''
+        junk = corpus.parse('luca/gloria', forceSource=True)
 
 
     def runMusicxmlOutLuca(self):
-        '''Loading file and rendering musicxml output: luca/gloria
+        '''
+        Loading file and rendering musicxml output: luca/gloria
         '''
         x = corpus.parse('luca/gloria', forceSource=True)
-        post = x.musicxml
+        junk = toMusicXML(x)
 
 
 
@@ -155,11 +158,12 @@ class Test(unittest.TestCase):
         tsStr = ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/2', '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
 
         for i in range(500):
-            ts = meter.TimeSignature(tsStr[i%len(tsStr)])
+            meter.TimeSignature(tsStr[i%len(tsStr)])
 
 
     def runCreateDurations(self):
-        '''Creating 10000 Duration objects
+        '''
+        Creating 10000 Duration objects
         '''
         from music21 import duration
         qlList = [4, 2, 1, .5, 1/3., .25, .125]
@@ -168,38 +172,35 @@ class Test(unittest.TestCase):
             ql = qlList[i%len(qlList)]
             d = duration.Duration()
             d.quarterLength = ql
-            post = d.quarterLength
+            junk = d.quarterLength
 
     def runCreatePitches(self):
-        '''Creating 50000 Pitch objects
+        '''
+        Creating 50000 Pitch objects
         '''
         from music21 import pitch
         pList = [1.5, 5, 20.333333, 8, 2.5, 'A#', 'b`', 'c6#~']
 
         for i in range(50000):
-            input = pList[i%len(pList)]
-            p = pitch.Pitch(input)
+            inputPName = pList[i%len(pList)]
+            p = pitch.Pitch(inputPName)
             p.transpose('p5', inPlace=True)
 
 
     def runParseABC(self):
         '''Creating loading a large multiwork abc file
         '''
-        from music21 import corpus
-
-        s = corpus.parse('essenFolksong/han1')
+        dummy = corpus.parse('essenFolksong/han1')
 
 
 
     def runGetElementsByContext(self):
         '''Test getting elements by context from a Stream
         '''
-        from music21 import corpus, clef, meter, key
-
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
-        flat = s.flat
-        notes = s.flat.notes
+        unused_flat = s.flat
+        unused_notes = s.flat.notes
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
@@ -222,11 +223,10 @@ class Test(unittest.TestCase):
     def runGetElementsByPrevious(self):
         '''Test getting elements by using the previous method
         '''
-        from music21 import corpus, clef, meter, key
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
-        flat = s.flat
-        notes = s.flat.notes
+        unused_flat = s.flat
+        unused_notes = s.flat.notes
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
@@ -251,10 +251,7 @@ class Test(unittest.TestCase):
     def runParseMonteverdiRNText(self):
         '''Loading file: beethoven/opus59no2/movement3
         '''
-        x = corpus.parse('monteverdi/madrigal.5.3.rntxt', forceSource=True)
-
-
-
+        unused = corpus.parse('monteverdi/madrigal.5.3.rntxt', forceSource=True)
 
     #---------------------------------------------------------------------------
     def testTimingTolerance(self):

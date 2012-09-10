@@ -18,8 +18,6 @@
 import pycallgraph
 import time
 
-
-
 # this class is duplicated from common.py in order to avoid 
 # import the module for clean testing
 class Timer(object):
@@ -49,7 +47,7 @@ class Timer(object):
     def __call__(self):
         '''Reports current time or, if stopped, stopped time.
         '''
-       # if stopped, gets _tDif; if not stopped, gets current time
+        # if stopped, gets _tDif; if not stopped, gets current time
         if self._tStop == None: # if not stoped yet
             t = time.time() - self._tStart
         else:
@@ -83,7 +81,7 @@ class CallTest(object):
 
 class TestImportStar(CallTest):
     def testFocus(self):
-        import music21
+        import music21 # @UnusedImport # the point is timing the import!
 
 
 
@@ -133,7 +131,7 @@ class CallGraph:
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
         '''
         suffix = '.svg'
-        format = suffix[1:]
+        fmt = suffix[1:]
         _MOD = "test.timeGraphs.py"
 
         if runWithEnviron:
@@ -183,12 +181,11 @@ class CallGraph:
         ct.testFocus() # run routine
 
         pycallgraph.stop_trace()
-        pycallgraph.make_dot_graph(fp, format=format)
+        pycallgraph.make_dot_graph(fp, format=fmt)
         print('elapsed time: %s' % t)
         # open the completed file
         print('file path: ' + fp)
         try:
-            from music21 import environment
             environLocal = environment.Environment(_MOD)
             environLocal.launch(format, fp)
         except NameError:

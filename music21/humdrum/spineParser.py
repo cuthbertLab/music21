@@ -42,9 +42,6 @@ SpineParsing consists of several steps.
 * Measures are searched for elements with voice groups and Voice objects are created
 
 '''
-
-import copy
-import doctest
 import unittest
 import math
 import re
@@ -64,8 +61,7 @@ from music21 import clef
 from music21 import stream
 from music21 import common
 from music21 import exceptions21
-from music21.humdrum import testFiles, canonicalOutput
-from music21 import dynamics 
+from music21.humdrum import testFiles #, canonicalOutput
 
 import os
 
@@ -464,7 +460,7 @@ class HumdrumDataCollection(object):
                             if currentSpine.parentSpine is not None:
                                 mergerActive = currentSpine.parentSpine
                             else:
-                                mergerActive == True
+                                mergerActive = True
                             currentSpine.endingPosition = i
                         else:  ## if second merger code is not found then a one-to-one spine "merge" occurs
                             currentSpine.endingPosition = i
@@ -486,8 +482,8 @@ class HumdrumDataCollection(object):
                         if exchangeActive is False:
                             exchangeActive = currentSpine
                         else:  ## if second exchange is not found, then both lines disappear and exception is raised
-                               ## n.b. we allow more than one PAIR of exchanges in a line so long as the first
-                               ## is totally finished by the time the second happens
+                                ## n.b. we allow more than one PAIR of exchanges in a line so long as the first
+                                ## is totally finished by the time the second happens
                             newSpineList.append(currentSpine)
                             newSpineList.append(exchangeActive)
                             exchangeActive = False;
@@ -792,7 +788,7 @@ class HumdrumSpine(object):
     <music21.stream.Part ...>
     
     '''
-    def __init__(self, id=0, eventList = None, streamClass = stream.Stream):
+    def __init__(self, id=0, eventList = None, streamClass = stream.Stream): #@ReservedAssignment
         self.id = id
         if eventList is None:
             eventList = []
@@ -817,15 +813,15 @@ class HumdrumSpine(object):
 
 
     def __repr__(self):
-        repr = "Spine: " + str(self.id)
+        representation = "Spine: " + str(self.id)
         if self.parentSpine:
-            repr += " [child of: " + str(self.parentSpine.id) + "]"
+            representation += " [child of: " + str(self.parentSpine.id) + "]"
         if self.childSpines:
-            repr += " [parent of: "
+            representation += " [parent of: "
             for s in self.childSpines:
-                repr += str(s.id) + " "
-            repr += " ]"
-        return repr
+                representation += str(s.id) + " "
+            representation += " ]"
+        return representation
     
     def append(self, event):
         '''
@@ -1298,18 +1294,18 @@ class SpineCollection(object):
         '''
         self.spines.append(spine)
         
-    def getSpineById(self, id):
+    def getSpineById(self, spineId):
         '''
         returns the HumdrumSpine with the given id.
         
         raises a HumdrumException if the spine with a given id is not found
         '''
         for thisSpine in self.spines:
-            if thisSpine.id == id:
+            if thisSpine.id == spineId:
                 return thisSpine
         raise HumdrumException("Could not find a Spine with that ID")
 
-    def removeSpineById(self, id):
+    def removeSpineById(self, spineId):
         '''
         deletes a spine from the SpineCollection (after inserting, integrating, etc.)
 
@@ -1330,7 +1326,7 @@ class SpineCollection(object):
         raises a HumdrumException if the spine with a given id is not found
         '''
         for s in self.spines:
-            if s.id == id:
+            if s.id == spineId:
                 self.spines.remove(s)
                 return None
         raise HumdrumException("Could not find a Spine with that ID %d" % id)
@@ -1362,7 +1358,7 @@ class SpineCollection(object):
             insertPoints = sorted(thisSpine.childSpineInsertPoints)
             lastHumdrumPosition = -1
             # use _elements for being faster.
-            for (elNum, el) in enumerate(thisSpine.stream._elements):
+            for el in thisSpine.stream._elements:
                 try:
                     humdrumPosition = el.humdrumPosition
                     for i in insertPoints:
@@ -1581,7 +1577,7 @@ class EventCollection(object):
         self.lastEvents = common.defList()
         self.maxSpines = maxSpines
         self.spinePathData = False  
-               ## true if the line contains data about changing spinePaths
+                ## true if the line contains data about changing spinePaths
 
     def addSpineEvent(self, spineNum, spineEvent):
         self.events[spineNum] = spineEvent
@@ -1817,7 +1813,7 @@ def hdStringToNote(contents):
                 thisObject.duration.dots = contents.count('.')
         else:
             dT = int(durationType) + 0.0
-            (remainder, exponents) = math.modf(math.log(dT, 2))
+            (unused_remainder, exponents) = math.modf(math.log(dT, 2))
             basevalue = 2**exponents
             thisObject.duration.type = duration.typeFromNumDict[int(basevalue)]
             newTup = duration.Tuplet()
@@ -2120,7 +2116,7 @@ class Test(unittest.TestCase):
 #        for spineX in hf1.spineCollection:
 #            spineX.stream.id = "spine %s" % str(spineX.id)
 #            masterStream.append(spineX.stream)
-        expectedOutput = canonicalOutput.mazurka6repr
+        #expectedOutput = canonicalOutput.mazurka6repr
 #        self.assertTrue(common.basicallyEqual
 #                          (common.stripAddresses(expectedOutput),
 #                           common.stripAddresses(masterStream._reprText())))
@@ -2134,7 +2130,7 @@ class Test(unittest.TestCase):
         for n in masterStream.recurse():
             if hasattr(n, "pitch") and n.pitch.name == "G#":
                 if n.offset == 2: # beat doesn't work... :-(
-                  GsharpCount += 1
+                    GsharpCount += 1
             elif hasattr(n, "pitches"):
                 if 'G#' in [p.name for p in n.pitches]:
                     if n.offset == 2:
@@ -2149,19 +2145,19 @@ class Test(unittest.TestCase):
         from music21 import converter
         parserPath = os.path.dirname(__file__)
         sineNominePath = parserPath + os.path.sep + 'Missa_Sine_nomine-Kyrie.krn'
-        myScore = converter.parse(sineNominePath)
+        unused_myScore = converter.parse(sineNominePath)
         #myScore.show()
     
     def testSplitSpines(self):
         hf1 = HumdrumDataCollection(testFiles.splitSpines2)
-        masterStream = hf1.stream
+        unused_masterStream = hf1.stream
         #masterStream.show('text')
         
     def testMoveDynamics(self):
         hf1 = HumdrumDataCollection(testFiles.fakeTest)
         #hf1.parseLines()
         #hf1.spineCollection.moveDynamicsAndLyricsToStreams()        
-        s = hf1.stream #.show()
+        unused_s = hf1.stream #.show()
 
 class TestExternal(unittest.TestCase):
 

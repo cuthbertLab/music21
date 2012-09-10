@@ -21,13 +21,7 @@ Low level MuseData conversion is facilitated by the objects in this module and :
 '''
 
 import unittest
-import re, codecs
 import os
-
-try:
-    import StringIO # python 2 
-except:
-    from io import StringIO # python3 (also in python 2.6+)
 
 from music21 import exceptions21
 from music21.musedata import base40
@@ -309,16 +303,16 @@ class MuseDataRecord(object):
                     return 2
             return 0
 
-    def getType(self):
-        # TODO: column 17 self.src[16] defines the graphic note type
-        # this may or may not align with derived quarter length
-        if self.stage == 1:
-            return None
-        else:
-            if len(self.src) == 0:
-                return None
-            data = self.src[16]
-            
+#    def getType(self):
+#        # TODO: column 17 self.src[16] defines the graphic note type
+#        # this may or may not align with derived quarter length
+#        if self.stage == 1:
+#            return None
+#        else:
+#            if len(self.src) == 0:
+#                return None
+#            data = self.src[16]
+#            return data
         
     def getLyrics(self):
         '''Return lyrics as a list.
@@ -624,11 +618,11 @@ class MuseDataMeasure(object):
         if len(data) > 16 and data[16:].strip() != '':
             dataFlag = data[16:].strip()
             if ':|' in dataFlag:
-                repeatForm = None # can be first, second
+                unused_repeatForm = None # can be first, second
                 bl = bar.Repeat(direction='end')
                 bl.style = blStyle
             elif '|:' in dataFlag:   
-                repeatForm = None # can be first, second
+                unused_repeatForm = None # can be first, second
                 bl = bar.Repeat(direction='start')       
                 bl.style = blStyle
         return bl
@@ -1507,8 +1501,9 @@ class MuseDataFile(object):
     def close(self):
         self.file.close()
 
-    def readstr(self, str): 
-        '''Read a string, dividing it into individual parts.
+    def readstr(self, input_str): 
+        '''
+        Read a string, dividing it into individual parts.
         '''
         #environLocal.printDebug(['readstr()', 'len(str)', len(str)])
         # need to split the string into individual parts, as more than 
@@ -1516,8 +1511,8 @@ class MuseDataFile(object):
         commentToggle = False
 
         lines = []
-        srcLines = str.split('\n')
-        lastLineIndex = len(srcLines) - 1
+        srcLines = input_str.split('\n')
+        #lastLineIndex = len(srcLines) - 1
         for i, line in enumerate(srcLines):
             #environLocal.printDebug(['reading line', i, line])
 
@@ -1579,7 +1574,7 @@ class MuseDataWork(object):
             mdf.close()
             self.files.append(mdf)
 
-    def addString(self, str):
+    def addString(self, input_str):
         '''Add a string representation acting like a part file
 
         >>> from music21 import *
@@ -1591,13 +1586,14 @@ class MuseDataWork(object):
         #environLocal.printDebug(['addString str', str])
 #         if str.strip() == '':
 #             raise MuseDataException('passed in empty string to add string')
-        if not common.isListLike(str):
-            strList = [str]
+        if not common.isListLike(input_str):
+            strList = [input_str]
         else:
-            strList = str
-        for str in strList:
+            strList = input_str
+            
+        for thisString in strList:
             mdf = MuseDataFile()
-            mdf.readstr(str) # process string and break into parts
+            mdf.readstr(thisString) # process string and break into parts
             self.files.append(mdf)
 
 
@@ -1635,18 +1631,20 @@ class MuseDataDirectory(object):
         #environLocal.printDebug(['_prepareGroups', dirOrList])
 
         allPaths = []
-        source = None # set where files are coming from
+        # these two were unusued variables.
+        #sep = '/'
+        #source = None # set where files are coming from
         if common.isListLike(dirOrList):
             # assume a flat list from a zip file
-            sep = '/' # sep is always backslash for zip files
-            source = 'zip'
+            #sep = '/' # sep is always backslash for zip files
+            #source = 'zip'
             allPaths = dirOrList
 #             for fp in dirOrList:
 #                 if self.isMusedataFile(fp):
 #                     self.paths.append(fp)
         elif os.path.isdir(dirOrList):
-            source = 'dir'
-            sep = os.sep # sep os.sep
+            #source = 'dir'
+            #sep = os.sep # sep os.sep
             # first, get the contents of the dir and see if it has md files
             for fn in os.listdir(dirOrList):
                 allPaths.append(os.path.join(dirOrList, fn))
@@ -1662,7 +1660,7 @@ class MuseDataDirectory(object):
             raise MuseDataException('cannot get files from the following entity', dirOrList)
 
         for fp in allPaths:
-            dir, fn = os.path.split(fp)
+            unused_directory, fn = os.path.split(fp)
             if not self.isMusedataFile(fn):
                 continue
             numStr, nonNumStr = common.getNumFromStr(fn)
@@ -1677,7 +1675,7 @@ class MuseDataDirectory(object):
         popList = []
         if len(self.paths) > 1:
             for i, fp in enumerate(self.paths):
-                dir, fn = os.path.split(fp)
+                unused_directory, fn = os.path.split(fp)
                 # if it has a number and starts with s
                 numStr, nonNumStr = common.getNumFromStr(fn)
                 if numStr != '' and nonNumStr.startswith('s'):
@@ -1712,7 +1710,7 @@ class MuseDataDirectory(object):
         # directly openable
         #environLocal.printDebug(['isMusedataFile: checking:', fp])
 
-        dir, fn = os.path.split(fp)
+        unused_dir, fn = os.path.split(fp)
         if fp.endswith('.md'):
             return True
         elif fn.startswith('mchan'): # ignore midi declaration files
@@ -1740,7 +1738,6 @@ class Test(unittest.TestCase):
 
 
     def testLoadFromString(self):
-        import os
         from music21.musedata import testFiles
 
         mdw = MuseDataWork()
@@ -1770,8 +1767,6 @@ class Test(unittest.TestCase):
 
 
     def testLoadFromFile(self):
-        import os
-        from music21.musedata import testFiles
 
 
         fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive')
@@ -1873,12 +1868,12 @@ class Test(unittest.TestCase):
    
         fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
 
-        mdd = MuseDataDirectory(fpDir)
+        unused_mdd = MuseDataDirectory(fpDir)
 
         # from archive: note: this is a stage 1 file 
         fpArchive = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
         af = converter.ArchiveManager(fpArchive)
-        mdd = MuseDataDirectory(af.getNames())
+        unused_mdd = MuseDataDirectory(af.getNames())
 
 
     def testStage1A(self):

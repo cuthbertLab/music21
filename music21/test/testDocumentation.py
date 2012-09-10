@@ -14,8 +14,8 @@ Module to test all the code excerpts in the .rst files in the music21 documentat
 
 
 import time
-import os, os.path
-import doctest, unittest
+import os.path
+import doctest
 
 import music21
 _MOD = "test.testDocumentation.py"  

@@ -2316,24 +2316,26 @@ class Music21Object(JSONSerializer):
         Stream in that this can never access the flat representation of a Stream.
 
         >>> from music21 import *
-        >>> a = base.Music21Object()
-        >>> a.offset = 30
-        >>> a.getOffsetBySite(None)
+        >>> n = note.Note('A-4')  # a Music21Objecct
+        >>> n.offset = 30
+        >>> n.getOffsetBySite(None)
         30.0
         
         >>> s1 = stream.Stream()
-        >>> s1.insert(20.5, a)
-        >>> a.getOffsetBySite(s1)
+        >>> s1.id = 'containingStream'
+        >>> s1.insert(20.5, n)
+        >>> n.getOffsetBySite(s1)
         20.5
         >>> s2 = stream.Stream()
-        >>> a.getOffsetBySite(s2)
+        >>> s2.id = 'notContainingStream'
+        >>> n.getOffsetBySite(s2)
         Traceback (most recent call last):
-        ...
-        DefinedContextsException: Could not find the object with id ...
-        
+        DefinedContextsException: The object <music21.note.Note A-> is not in site <music21.stream.Stream notContainingStream>.
         '''
-        return self._definedContexts.getOffsetBySite(site)
-
+        try:
+            return self._definedContexts.getOffsetBySite(site)
+        except DefinedContextsException:
+            raise DefinedContextsException('The object %r is not in site %r.' % (self, site))
 
     def setOffsetBySite(self, site, value):
         '''

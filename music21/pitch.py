@@ -2254,7 +2254,7 @@ class Pitch(base.Music21Object):
             tempAlter = 0
         tempStep = self.step
         if tempAlter != int(tempAlter):
-            raise PitchException('Es geht nicht "german" zu benutzen mit Microtoenen.  Schade!')
+            raise PitchException(u'Es geht nicht "german" zu benutzen mit Microtönen.  Schade!')
         else:
             tempAlter = int(tempAlter)
         if tempStep == 'B':
@@ -2299,7 +2299,7 @@ class Pitch(base.Music21Object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.german
         Traceback (most recent call last):
-        PitchException: Es geht nicht "german" zu benutzen mit Microtoenen.  Schade!
+        PitchException: Es geht nicht "german" zu benutzen mit Microtönen.  Schade!
     
         Note these rarely used pitches:
             

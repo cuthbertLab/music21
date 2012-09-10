@@ -17,10 +17,10 @@ Objects for processing roman numeral analysis text files, as defined and demonst
 import unittest
 import re
 import codecs
-try:
-    import StringIO # python 2 
-except:
-    from io import StringIO # python3 (also in python 2.6+)
+#try:
+#    import StringIO # python 2 
+#except:
+#    from io import StringIO # python3 (also in python 2.6+)
 
 
 from music21 import common
@@ -545,7 +545,6 @@ class RTKeyTypeAtom(RTAtom):
         '''
         This returns a Key, not a KeySignature object
         '''
-        from music21 import key
         myKey = self.src.rstrip(self.footerStrip)
         myKey = key.convertKeyStringToMusic21KeyString(myKey)
         return key.Key(myKey)
@@ -553,7 +552,6 @@ class RTKeyTypeAtom(RTAtom):
     def getKeySignature(self):
         '''Get a KeySignature object.
         '''
-        from music21 import key
         myKey = self.getKey()
         return key.KeySignature(myKey.sharps) 
 
@@ -705,7 +703,6 @@ class RTOptionalKeyOpen(RTAtom):
         return '<RTOptionalKeyOpen %r>' % self.src
     
     def getKey(self):
-        from music21 import key
         # alter flat symbol
         if self.src == '?(b:':
             return key.Key('b')
@@ -737,7 +734,6 @@ class RTOptionalKeyClose(RTAtom):
         return '<RTOptionalKeyClose %r>' % self.src
     
     def getKey(self):
-        from music21 import key
         # alter flat symbol
         if self.src == '?)b:' or self.src == '?)b':
             return key.Key('b')
@@ -1145,9 +1141,8 @@ class RTFile(object):
         self.filename = filename
 
     def openFileLike(self, fileLike):
-        '''Assign a file-like object, such as those provided by StringIO, as an open file object.
-
-        >>> fileLikeOpen = StringIO.StringIO()
+        '''
+        Assign a file-like object, such as those provided by StringIO, as an open file object.
         '''
         self.file = fileLike # already 'open'
     
@@ -1189,7 +1184,7 @@ class Test(unittest.TestCase):
 
         for fileStr in testFiles.ALL:
             f = romanText.RTFile()
-            rth = f.readstr(fileStr) # get a handler from a string
+            unused_rth = f.readstr(fileStr) # get a handler from a string
 
     def testReA(self):
         # gets the index of the end of the measure indication

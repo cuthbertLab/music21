@@ -512,6 +512,12 @@ def getWorkList(workName, movementNumber=None, extList=None):
     >>> len(corpus.getWorkList('bach/artOfFugue_bwv1080', 2, '.md'))
     1
 
+
+    Make sure that 'verdi' just gets the single Verdi piece and not the
+    Monteverdi pieces:
+
+    >>> len(corpus.getWorkList('verdi')) 
+    1
     '''
     if not common.isListLike(extList):
         extList = [extList]
@@ -537,6 +543,21 @@ def getWorkList(workName, movementNumber=None, extList=None):
             post.append(path)
     #environLocal.printDebug(['getWorkList(): post', post])
 
+    if len(post) > 0:
+        # more than one matched...use more stringent criterion:
+        # must have a slash before the name
+        previousPost = post
+        post = []
+        longName = os.sep + workSlashes.lower()
+
+        for path in previousPost:
+            if longName in path.lower():
+                post.append(path)
+            
+        if len(post) == 0:
+            post = previousPost          
+            
+            
     postMvt = []
     if movementNumber is not None and len(post) > 0:
         # store one ore more possible mappings of movement number
@@ -774,7 +795,7 @@ def getWork(workName, movementNumber=None, extList=None):
     if len(post) == 1:
         return post[0]
     elif len(post) == 0:
-        raise CorpusException("Could not find a file/url that met this criteria")
+        raise CorpusException("Could not find a file/url that met these criteria")
     else: # return a list
         return post
 
@@ -827,13 +848,17 @@ def parse(workName, movementNumber=None, number=None,
             wn = os.path.sep.join(workName)
         if wn.endswith(".xml"):
             newWorkName = wn[0:len(wn)-4] + ".mxl" # might be compressed MXL file
-            return parse(newWorkName,movementNumber,number,extList,forceSource)
+            try:
+                return parse(newWorkName,movementNumber,number,extList,forceSource)
+            except CorpusException:
+                # avoids having the name come back with .mxl instead of .xmlrle
+                raise CorpusException("Could not find a work that met this criterion: %s" % workName)
         post = getVirtualWorkList(workName, movementNumber, extList)    
 
     if len(post) == 1:
         fp = post[0]
     elif len(post) == 0:
-        raise CorpusException("Could not find a work that met this criteria %s" % workName)
+        raise CorpusException("Could not find a work that met this criterion: %s" % workName)
     else: # greater than zero:
         fp = post[0] # get first
         

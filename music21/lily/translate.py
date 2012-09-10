@@ -699,7 +699,7 @@ class LilypondConverter(object):
         self.restoreContext()
         return lpSequentialMusic
 
-    def lyPrefixCompositeMusicFromStream(self, streamIn, contextType = None, type = None, beforeMatter = None):
+    def lyPrefixCompositeMusicFromStream(self, streamIn, contextType = None, type = None, beforeMatter = None): #@ReservedAssignment
         r'''
         returns an LyPrefixCompositeMusic object from
         a stream (generally a part, but who knows...)
@@ -741,7 +741,7 @@ class LilypondConverter(object):
         lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
 
         if type is None:
-            type = 'new'
+            type = 'new' #@ReservedAssignment
 
         if optionalId is None:
             lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = type,
@@ -2034,7 +2034,7 @@ class LilypondConverter(object):
 
         return self.tempName
     
-    def runThroughLily(self, format = None, backend = None, fileName = None, skipWriting = False):
+    def runThroughLily(self, format = None, backend = None, fileName = None, skipWriting = False): #@ReservedAssignment
         '''
         creates a .ly file from self.topLevelObject via .writeLyFile
         then runs the file through Lilypond.

@@ -88,8 +88,8 @@ class InstallRunner:
     def _getSitePackageDir(self):
         '''Get the music21 site package dir
         '''
-        dir = distutils.sysconfig.get_python_lib()
-        fp = os.path.join(dir, 'music21')
+        directory = distutils.sysconfig.get_python_lib()
+        fp = os.path.join(directory, 'music21')
         if not os.path.exists(fp):
             raise Exception('cannot find music21 in site-packages: %s' % fp)
         return fp

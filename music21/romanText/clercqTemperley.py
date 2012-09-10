@@ -1327,11 +1327,13 @@ S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
         scoreObj = s.toScore()
         scoreObj.show()
     def xtestA(self):
+        pass
+        '''
         from music21.romanText import clercqTemperley
-        import os
+        
         dt = 'C:/clercqTemperley/dt'
         tdc = 'C:/clercqTemperley/tdc'
-        '''
+ 
         for x in os.listdir(tdc):
             print x
             f = open(os.path.join(tdc, x), 'r')
@@ -1367,8 +1369,8 @@ _DOC_ORDER = [CTSong, CTRule]
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
-   # from music21.romanText import clercqTemperley
-   # test = clercqTemperley.TestExternal()
-   # test.testB()
+    # from music21.romanText import clercqTemperley
+    # test = clercqTemperley.TestExternal()
+    # test.testB()
 #------------------------------------------------------------------------------
 # eof

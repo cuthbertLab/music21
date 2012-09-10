@@ -608,7 +608,7 @@ class StreamFreezer(StreamFreezeThawBase):
         2.0
         >>> n1.getOffsetBySite(p3)
         Traceback (most recent call last):
-        DefinedContextsException: Could not find the object with id ... in the Site marked with idKey ...
+        DefinedContextsException: The object <music21.note.Note C> is not in site <music21.stream.Part ...>.
         '''
         if hierarchyObj is None:
             streamObj = self.stream

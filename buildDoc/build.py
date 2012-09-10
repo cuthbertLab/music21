@@ -1099,21 +1099,16 @@ class RestructuredWriter(object):
         r'''
         Given a docstring, clean it up for RST presentation.
 
-
         Note: can use inspect.getdoc() or inspect.cleandoc(); though
         we need customized approach demonstrated here.
-
 
         >>> rsw = RestructuredWriter()
         >>> rsw.formatDocString("hello #_DOCS_HIDE\n" +\
         ...                     "#_DOCS_SHOW there\n" +\
         ...                     "user!")
         u' there\nuser!\n\n'
-
         '''
-
         # TODO: need to remove lines as follow:
-        # # doctest: +SKIP
         # <BLANKLINE>
 
         if doc == None:

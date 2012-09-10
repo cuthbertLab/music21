@@ -11,7 +11,7 @@
 
 from music21.vexflow.base import *
 from music21.vexflow import base
-__doc__ = base.__doc__
+__doc__ = base.__doc__ # @UndefinedVariable @ReservedAssignment
 
 
 

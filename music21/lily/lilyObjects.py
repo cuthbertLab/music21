@@ -330,19 +330,6 @@ class LyLilypondHeader(LyObject):
         return self.backslash + "header" + self.encloseCurly(self.lilypondHeaderBody)
     
     
-class LyOutputDef(LyObject):
-    def __init__(self):
-        LyObject.__init__(self)        
-        self.scmToken = None
-        self.scmIdentifier = None
-        
-    def stringOutput(self):
-        outputObject = self.getFirstNonNoneAttribute(['scmToken', 'scmIdentifier'])
-        if outputObject is None:
-            raise Exception()
-        else:
-            return outputObject.stringOutput()
-
 class LyEmbeddedScm(LyObject):
     r'''
     represents Scheme embedded in Lilypond code.  
@@ -916,7 +903,7 @@ class LySimultaneousMusic(LyObject):
             musicListSO = self.musicList.stringOutput()
         else:
             musicListSO = ""
-        tag = ""
+        #tag = ""
         if self.displayTag is True:
             return self.backslash + "simultaneous " + self.encloseCurly(musicListSO)
         else:
@@ -1113,7 +1100,7 @@ class LyPrefixCompositeMusic(LyObject):
                        | relative_music
                        | re_rhythmed_music
     '''
-    def __init__(self, type = None, genericPrefixMusicScm = None,
+    def __init__(self, type = None, genericPrefixMusicScm = None, #@ReservedAssignment
                  simpleString = None, optionalId = None, optionalContextMod = None,
                  music = None, fraction = None, repeatedMusic = None,
                  pitchAlsoInChords1 = None, pitchAlsoInChords2 = None,
