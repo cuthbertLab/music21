@@ -11,17 +11,15 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-import copy
-import math
-
-import os
-import random
-import sys
 from time import time
+import math
+import os
+import unittest
 
 from music21 import scale
 from music21 import search
-from music21.audioSearch.base import *
+from music21.audioSearch import base as audioSearch
+#from music21.audioSearch.base import *
 
 from music21 import environment
 _MOD = 'audioSearch/transcriber.py'
@@ -69,14 +67,14 @@ class ScoreFollower(object):
         while(self.result is False): 
             self.result = self.repeatTranscription()    
 
-        if plot == True:
-            try:
-                import matplotlib.pyplot # for find
-            except ImportError:
-                raise AudioSearchException("Cannot plot without matplotlib installed.")
-                
-            matplotlib.pyplot.plot(listplot)
-            matplotlib.pyplot.show()
+#        if plot == True:
+#            try:
+#                import matplotlib.pyplot # for find
+#            except ImportError:
+#                raise AudioSearchException("Cannot plot without matplotlib installed.")
+#                
+#            matplotlib.pyplot.plot(listplot)
+#            matplotlib.pyplot.show()
         environLocal.printDebug("* END")
 
 
@@ -119,24 +117,24 @@ class ScoreFollower(object):
 
         environLocal.printDebug("repeat transcription starting")
         if self.useMic == True:
-            freqFromAQList = getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
+            freqFromAQList = audioSearch.getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
         else:
-            freqFromAQList, self.waveFile, self.currentSample = getFrequenciesFromPartialAudioFile(self.waveFile, length=self.seconds_recording, startSample=self.currentSample)
+            freqFromAQList, self.waveFile, self.currentSample = audioSearch.getFrequenciesFromPartialAudioFile(self.waveFile, length=self.seconds_recording, startSample=self.currentSample)
             if self.totalFile == 0:
                 self.totalFile = self.waveFile.getnframes()
         
         environLocal.printDebug("got Frequencies from Microphone")
 
         time_start = time()
-        detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, self.useScale)
-        detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
-        (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
-        (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+        detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, self.useScale)
+        detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
+        (detectedPitchObjects, unused_listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
+        (notesList, durationList) = audioSearch.joinConsecutiveIdenticalPitches(detectedPitchObjects)
         self.silencePeriodDetection(notesList)
         environLocal.printDebug("made it to here...")
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
         #print "1"
-        transcribedScore, self.qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=self.qle) 
+        transcribedScore, self.qle = audioSearch.notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=self.qle) 
         #print "2"
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition)
         #print "3"
@@ -151,7 +149,7 @@ class ScoreFollower(object):
 
         if self.useMic == False: # reading from the disc (only for TESTS)
             # skip ahead the processing time.
-            freqFromAQList, junk, self.currentSample = getFrequenciesFromPartialAudioFile(self.waveFile, length=self.processing_time, startSample=self.currentSample)
+            freqFromAQList, junk, self.currentSample = audioSearch.getFrequenciesFromPartialAudioFile(self.waveFile, length=self.processing_time, startSample=self.currentSample)
            
         if self.lastNotePosition > len(self.scoreNotesOnly):
             #print "finishedPerforming"
@@ -463,8 +461,8 @@ class ScoreFollower(object):
             END_OF_SCORE = True
             environLocal.printDebug("LAST PART OF THE SCORE")
             
-        lastCountdown = self.countdown
-        position, self.countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, self.countdown, self.firstNotePage, self.lastNotePage)
+        #lastCountdown = self.countdown
+        position, self.countdown = audioSearch.decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, self.countdown, self.firstNotePage, self.lastNotePage)
         
         totalLength = 0    
         number = int(listOfParts[position].id)
@@ -479,9 +477,9 @@ class ScoreFollower(object):
         else:
             probabilityHit = listOfParts[position].matchProbability
 
-        listOfParts2 = search.approximateNoteSearch(transcribedScore.flat.notesAndRests, totScores)
-        listOfParts3 = search.approximateNoteSearchNoRhythm(transcribedScore.flat.notesAndRests, totScores)    
-        listOfParts4 = search.approximateNoteSearchOnlyRhythm(transcribedScore.flat.notesAndRests, totScores)        
+        unused_listOfParts2 = search.approximateNoteSearch(transcribedScore.flat.notesAndRests, totScores)
+        unused_listOfParts3 = search.approximateNoteSearchNoRhythm(transcribedScore.flat.notesAndRests, totScores)    
+        unused_listOfParts4 = search.approximateNoteSearchOnlyRhythm(transcribedScore.flat.notesAndRests, totScores)        
 #        print "PROBABILITIES:",
 #        print "pitches and durations weighted (current)",listOfParts[position].matchProbability,
 #        print "pitches and durations without weighting" , listOfParts2[position].matchProbability,

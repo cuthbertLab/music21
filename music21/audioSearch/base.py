@@ -244,20 +244,20 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
         (thresholds, pitches) = prepareThresholds()
    
     inputPitchLog2 = math.log(inputPitchFrequency, 2)
-    (remainder, oct) = math.modf(inputPitchLog2)
-    oct = int(oct)
+    (remainder, octave) = math.modf(inputPitchLog2)
+    octave = int(octave)
     for i in range(len(thresholds)):
         threshold = thresholds[i]
         if remainder < threshold:
             returnPitch = copy.deepcopy(pitches[i])            
-            returnPitch.octave = oct - 4 ## PROBLEM
+            returnPitch.octave = octave - 4 ## PROBLEM
             #returnPitch.inputFrequency = inputPitchFrequency
             name_note = pitch.Pitch(str(pitches[i]))
             return name_note.frequency, returnPitch
     # else:
     # above highest threshold
     returnPitch = copy.deepcopy(pitches[-1])
-    returnPitch.octave = oct - 3
+    returnPitch.octave = octave - 3
     returnPitch.inputFrequency = inputPitchFrequency
     name_note = pitch.Pitch(str(pitches[-1]))
     return name_note.frequency, returnPitch      
@@ -329,7 +329,6 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
 
     
     from music21.audioSearch import recording
-    storedWaveSampleList = []
     environLocal.printDebug("* start recording")
     storedWaveSampleList = recording.samplesFromRecording(seconds=length,
                                                           storeFile=storeWaveFilename,
@@ -766,7 +765,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     else: #case follower
         return sc,qle
 
-def decisionProcess(list, notePrediction, beginningData, 
+def decisionProcess(partsList, notePrediction, beginningData, 
                     lastNotePosition, countdown, firstNotePage=None, lastNotePage=None):
     '''
     It decides which of the given parts of the score has a better matching with 
@@ -775,7 +774,7 @@ def decisionProcess(list, notePrediction, beginningData,
     it starts a "countdown" in order stop the score following if the bad matching persists.   
     In this case, it does not match the recorded part of the song with any part of the score.
     
-    Inputs: List, contains all the possible parts of the score, sorted from the 
+    Inputs: partsList, contains all the possible parts of the score, sorted from the 
     higher probability to be the best matching at the beginning to the lowest probability.
     notePrediction is the position of the score in which the next note should start.
     beginningData is a list with all the beginnings of the used fragments of the score to find
@@ -825,24 +824,24 @@ def decisionProcess(list, notePrediction, beginningData,
     '''
     i = 0
     position = 0
-    while i < len(list) and beginningData[int(list[i].id)] < notePrediction:
+    while i < len(partsList) and beginningData[int(partsList[i].id)] < notePrediction:
         i = i + 1
         position = i
-    if len(list) == 1: # it happens when you don't play anything during a recording period
+    if len(partsList) == 1: # it happens when you don't play anything during a recording period
         position = 0
         
     dist = math.fabs(beginningData[0] - notePrediction)
-    for i in range(len(list)):
-        if (list[i].matchProbability >= 0.9 * list[0].matchProbability) and (beginningData[int(list[i].id)] > lastNotePosition): #let's take a 90%
-            if math.fabs(beginningData[int(list[i].id)] - notePrediction) < dist:
-                dist = math.fabs(beginningData[int(list[i].id)] - notePrediction)
+    for i in range(len(partsList)):
+        if (partsList[i].matchProbability >= 0.9 * partsList[0].matchProbability) and (beginningData[int(partsList[i].id)] > lastNotePosition): #let's take a 90%
+            if math.fabs(beginningData[int(partsList[i].id)] - notePrediction) < dist:
+                dist = math.fabs(beginningData[int(partsList[i].id)] - notePrediction)
                 position = i 
                 environLocal.printDebug("NICE") 
                 
-    #print "ERRORS", position, len(list), lastNotePosition, list[position].matchProbability , beginningData[int(list[position].id)]
-    if position < len(list) and beginningData[int(list[position].id)] <= lastNotePosition:
-        environLocal.printDebug(" error ? %d, %d" % (beginningData[int(list[position].id)], lastNotePosition))
-    if list[position].matchProbability < 0.6 or len(list) == 1: #the latter for the all-rest case
+    #print "ERRORS", position, len(partsList), lastNotePosition, partsList[position].matchProbability , beginningData[int(partsList[position].id)]
+    if position < len(partsList) and beginningData[int(partsList[position].id)] <= lastNotePosition:
+        environLocal.printDebug(" error ? %d, %d" % (beginningData[int(partsList[position].id)], lastNotePosition))
+    if partsList[position].matchProbability < 0.6 or len(partsList) == 1: #the latter for the all-rest case
         environLocal.printDebug("ARE YOU SURE YOU ARE PLAYING THE RIGHT SONG??")
         countdown = countdown + 1
         environLocal.printDebug('are you playing the right song?')
@@ -854,12 +853,12 @@ def decisionProcess(list, notePrediction, beginningData,
         countdown += 1
         environLocal.printDebug("Excessive distance....? dist=%d" % dist)
         
-    elif (firstNotePage != None and lastNotePage != None) and ((beginningData[int(list[position].id)] < firstNotePage or beginningData[int(list[position].id)] > lastNotePage) and countdown < 2):
+    elif (firstNotePage != None and lastNotePage != None) and ((beginningData[int(partsList[position].id)] < firstNotePage or beginningData[int(partsList[position].id)] > lastNotePage) and countdown < 2):
         countdown += 1
         environLocal.printDebug('playing in a not shown part')
     else:
         countdown = 0
-    environLocal.printDebug('****????**** DECISION PROCESS: dist from expected: %d, beginning data: %d , lastNotePos: %d' %(dist, beginningData[int(list[i].id)],lastNotePosition))
+    environLocal.printDebug('****????**** DECISION PROCESS: dist from expected: %d, beginning data: %d , lastNotePos: %d' %(dist, beginningData[int(partsList[i].id)],lastNotePosition))
     return position, countdown
 
     

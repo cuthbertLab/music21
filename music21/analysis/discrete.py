@@ -107,7 +107,7 @@ class DiscreteAnalysis(object):
         '''Based on solutions found so far with with this processor, return the colors that have been used.
         '''
         post = []
-        for solution, color in self._solutionsFound:
+        for unused_solution, color in self._solutionsFound:
             if color not in post:
                 post.append(color)
         return post    
@@ -116,7 +116,7 @@ class DiscreteAnalysis(object):
         '''Based on solutions found so far with with this processor, return the solutions that have been used.
         '''
         post = []
-        for solution, color in self._solutionsFound:
+        for solution, unused_color in self._solutionsFound:
             if solution not in post:
                 post.append(solution)
         return post   
@@ -574,9 +574,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # the tuple defines a Pitch, as well as the differences value
         # from _getDifference
 
-        if likelyKeysMajor is None or likelyKeysMinor is None:
-            mode = None
-            solution = (None, mode, 0)
+        #if likelyKeysMajor is None or likelyKeysMinor is None:
+        #    mode = None
+        #    solution = (None, mode, 0)
 
         # see which has a higher correlation coefficient, the first major or the
         # the first minor
@@ -638,7 +638,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         <music21.key.Key of B- major>
         '''
         # always take a flat version here, otherwise likely to get nothing
-        solution, color = self.process(sStream.flat, storeAlternatives=True)
+        solution, unused_color = self.process(sStream.flat, storeAlternatives=True)
         # assign best solution
         k = self._solutionToObject(solution)
         for sol in self._alternativeSolutions:
@@ -904,16 +904,16 @@ class Ambitus(DiscreteAnalysis):
         if numColors == None:
             if self._referenceStream != None:
                 # get total range for entire piece
-                min, max = self.getPitchRanges(self._referenceStream)
+                minPitch, maxPitch = self.getPitchRanges(self._referenceStream)
             else:
-                min, max = 0, 130 # a large default
-        else: # create min max
-            min, max = 0, numColors
+                minPitch, maxPitch = 0, 130 # a large default
+        else: # create minPitch maxPitch
+            minPitch, maxPitch = 0, numColors
 
-        valueRange = max - min
+        valueRange = maxPitch - minPitch
         step = 0
         antiBlack = 25
-        for i in range(min, max+1):
+        for i in range(minPitch, maxPitch+1):
             # do not use all 255 to avoid going to black
             val = int(round(((255.0 - antiBlack)/ valueRange) * step)) + antiBlack
             # store in dictionary the accepted values, not the step
@@ -1121,7 +1121,7 @@ class Ambitus(DiscreteAnalysis):
         <music21.interval.Interval m21>
 
         '''
-        solution, color = self.process(sStream)
+        solution, unused_color = self.process(sStream)
         return interval.Interval(solution)
 
 
@@ -1295,7 +1295,7 @@ class Test(unittest.TestCase):
         pass
 
     def testKeyAnalysisKrumhansl(self):
-        from music21 import converter, stream
+        from music21 import converter
 
         p = KrumhanslSchmuckler()
         s1 = converter.parse('c4 d e f g a b c   c#4 d# e# f#', '4/4')
@@ -1310,8 +1310,8 @@ class Test(unittest.TestCase):
         likelyKeysMinor1.sort()
         allResults1 =  likelyKeysMajor1 + likelyKeysMinor1
         #print
-        post = []
-        post = sorted([(y, x) for x, y in allResults1])
+        #post = []
+        unused_post = sorted([(y, x) for x, y in allResults1])
         #print post
 
         p.process(s2)
@@ -1320,8 +1320,8 @@ class Test(unittest.TestCase):
         likelyKeysMinor2.sort()
         allResults2 =  likelyKeysMajor2 + likelyKeysMinor2
         #print
-        post = []
-        post = sorted([(y, x) for x, y in allResults2])
+        #post = []
+        unused_post = sorted([(y, x) for x, y in allResults2])
         #print post
 
         likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3)
@@ -1329,8 +1329,8 @@ class Test(unittest.TestCase):
         likelyKeysMinor3.sort()
         allResults3 =  likelyKeysMajor3 + likelyKeysMinor3
         #print
-        post = []
-        post = sorted([(y, x) for x, y in allResults3])
+        #post = []
+        unused_post = sorted([(y, x) for x, y in allResults3])
         #print post
 
         avg = []
@@ -1339,8 +1339,8 @@ class Test(unittest.TestCase):
             p, count2 = allResults2[i]
             avg.append((p, (count1+count2)/2.0))
         #print
-        post = []
-        post = sorted([(y, x) for x, y in avg])
+        #post = []
+        unused_post = sorted([(y, x) for x, y in avg])
         #print post
 
 
@@ -1352,8 +1352,8 @@ class Test(unittest.TestCase):
         s.append(note.Note('a3'))
         s.append(note.Note('g4'))
 
-        id = MelodicIntervalDiversity()
-        self.assertEqual(str(id.countMelodicIntervals(s)), "{'m7': [<music21.interval.Interval m7>, 1], 'm2': [<music21.interval.Interval m2>, 1]}")
+        mid = MelodicIntervalDiversity()
+        self.assertEqual(str(mid.countMelodicIntervals(s)), "{'m7': [<music21.interval.Interval m7>, 1], 'm2': [<music21.interval.Interval m2>, 1]}")
 
 
         s = stream.Stream()
@@ -1362,18 +1362,18 @@ class Test(unittest.TestCase):
         s.append(note.Note('c3'))
         s.append(note.Note('d3'))
 
-        id = MelodicIntervalDiversity()
-        self.assertEqual(str(id.countMelodicIntervals(s)), "{'M2': [<music21.interval.Interval M2>, 3]}")
+        mid = MelodicIntervalDiversity()
+        self.assertEqual(str(mid.countMelodicIntervals(s)), "{'M2': [<music21.interval.Interval M2>, 3]}")
 
-        self.assertEqual(str(id.countMelodicIntervals(s, ignoreDirection=False)), """{'M-2': [<music21.interval.Interval M-2>, 1], 'M2': [<music21.interval.Interval M2>, 2]}""")
+        self.assertEqual(str(mid.countMelodicIntervals(s, ignoreDirection=False)), """{'M-2': [<music21.interval.Interval M-2>, 1], 'M2': [<music21.interval.Interval M2>, 2]}""")
 
-        id = MelodicIntervalDiversity()
+        mid = MelodicIntervalDiversity()
         s = corpus.parse('hwv56', '1-08')
         #s.show()
 
-        self.assertEqual(str(id.countMelodicIntervals(s.parts[1])), "{'P5': [<music21.interval.Interval P5>, 1], 'P4': [<music21.interval.Interval P4>, 1], 'm3': [<music21.interval.Interval m3>, 1], 'M2': [<music21.interval.Interval M2>, 2]}")
+        self.assertEqual(str(mid.countMelodicIntervals(s.parts[1])), "{'P5': [<music21.interval.Interval P5>, 1], 'P4': [<music21.interval.Interval P4>, 1], 'm3': [<music21.interval.Interval m3>, 1], 'M2': [<music21.interval.Interval M2>, 2]}")
 
-        self.assertEqual(str(id.countMelodicIntervals(s)), "{'M3': [<music21.interval.Interval M3>, 1], 'P4': [<music21.interval.Interval P4>, 5], 'P5': [<music21.interval.Interval P5>, 2], 'M2': [<music21.interval.Interval M2>, 8], 'm3': [<music21.interval.Interval m3>, 3], 'm2': [<music21.interval.Interval m2>, 1]}")
+        self.assertEqual(str(mid.countMelodicIntervals(s)), "{'M3': [<music21.interval.Interval M3>, 1], 'P4': [<music21.interval.Interval P4>, 5], 'P5': [<music21.interval.Interval P5>, 2], 'M2': [<music21.interval.Interval M2>, 8], 'm3': [<music21.interval.Interval m3>, 3], 'm2': [<music21.interval.Interval m2>, 1]}")
         
 
     def testKeyAnalysisSpelling(self):
@@ -1388,7 +1388,7 @@ class Test(unittest.TestCase):
 
 
     def testKeyAnalysisDiverseWeights(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testFiles
         # use a musicxml test file with independently confirmed results
         s = converter.parse(testFiles.edgefield82b)

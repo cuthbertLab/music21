@@ -12,7 +12,7 @@
 
 from music21.abc.base import *
 from music21.abc import base
-__doc__ = base.__doc__
+__doc__ = base.__doc__ #@ReservedAssignment @UndefinedVariable
 
 #------------------------------------------------------------------------------
 # eof

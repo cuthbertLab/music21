@@ -52,7 +52,6 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
     if not isinstance(targetScale, scale.ConcreteScale):
         raise SearchModuleException('scale must be a concrete scale class')
 
-    errors = 0
     degreeLast = None
     pLast = None
     directionLast = None
@@ -65,13 +64,10 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
     clearCollectKeepLast = False
     match = False
     collMatch = [] # return a list of streams
-    pNextAscending = None
-    pNextDescending = None
 
     
-    # assume 0 to max unique; this is 1 to 7 for diatonic
-    dMax = targetScale.abstract.getDegreeMaxUnique()
-    targetDegrees = set(range(1, dMax))
+    ## assume 0 to max unique; this is 1 to 7 for diatonic
+    # dMax = targetScale.abstract.getDegreeMaxUnique()
 
     # if rests are allowed, first
     # strip them out of a copy of the source
@@ -88,8 +84,6 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
     
     # not taking flat
     for eCount, e in enumerate(sourceClean):
-        subPitches = []
-
         # at this time, not handling chords
 
         if eCount < len(sourceClean) - 1:
@@ -122,11 +116,11 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
             # second, see if the degrees are consecutive with the last
             else:
-                if pLast is not None:
-                    pScaleAscending = targetScale.next(pLast, 
-                        direction='ascending')
-                    pScaleDescending = targetScale.next(pLast, 
-                        direction='descending')                
+#                if pLast is not None:
+#                    pScaleAscending = targetScale.next(pLast, 
+#                        direction='ascending')
+#                    pScaleDescending = targetScale.next(pLast, 
+#                        direction='descending')                
 
                 if degreeLast is None: # if we do not have a previous
                     collect = True

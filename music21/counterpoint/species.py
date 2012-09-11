@@ -79,7 +79,7 @@ class ModalCounterpoint(object):
         numParallelFifths = 0
         srcNotes = srcStream.notes
         
-        for note1 in srcStream:
+        for note1 in srcNotes:
             note2 = srcStream.getElementAfterElement(note1, [Note])
             if note2 is not None:
                 if note1.editorial.harmonicInterval.semiSimpleName == "P5" and \
@@ -1278,15 +1278,21 @@ class ModalCounterpoint(object):
 
                 lastInterval = interval.notesToInterval(top.notes[-2], top.notes[-1])
                 if lastInterval.generic.undirected != 2:
-                    goodMelody = False
+                    #goodMelody = False
                     environLocal.printDebug(["rejected because lastInterval was not a second"])
                 
-                if not goodHarmony3: environLocal.printDebug(['bad harmony'])
-                else: environLocal.printDebug(['harmony good'])
-                if not goodMelody3: environLocal.printDebug(['bad melody'])
-                else: environLocal.printDebug(['melody good'])
-                if not thirdsGood3: environLocal.printDebug(['too many thirds'])
-                if not sixthsGood3: environLocal.printDebug(['too many sixths'])
+                if not goodHarmony3: 
+                    environLocal.printDebug(['bad harmony'])
+                else: 
+                    environLocal.printDebug(['harmony good'])
+                if not goodMelody3: 
+                    environLocal.printDebug(['bad melody'])
+                else: 
+                    environLocal.printDebug(['melody good'])
+                if not thirdsGood3: 
+                    environLocal.printDebug(['too many thirds'])
+                if not sixthsGood3: 
+                    environLocal.printDebug(['too many sixths'])
             except ModalCounterpointException:
                 pass
 
@@ -1357,8 +1363,8 @@ class ModalCounterpoint(object):
         harmonies are prevented between all three voices'''
         environLocal.printDebug([currBottom.name, str(currBottom.octave), ', ', currMiddle.name, str(currMiddle.octave)])
         valid = []
-        bottomInt = interval.notesToInterval(prevBottom, currBottom)
-        middleInt = interval.notesToInterval(prevMiddle, currMiddle)
+        #bottomInt = interval.notesToInterval(prevBottom, currBottom)
+        #middleInt = interval.notesToInterval(prevMiddle, currMiddle)
 
         possibleNotes = []
 

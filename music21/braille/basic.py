@@ -398,6 +398,7 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     music21Note._brailleEnglish = []
     falseKeywords = ['beginLongBracketSlur', 'endLongBracketSlur', 'beginLongDoubleSlur', 
                      'endLongDoubleSlur', 'shortSlur', 'beamStart', 'beamContinue']
+    
     for keyword in falseKeywords:
         try:
             globals()[keyword] = getattr(music21Note, keyword)
@@ -409,13 +410,13 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     # opening bracket slur
     # closing bracket slur (if also beginning of next long slur)
     # --------------------
-    if beginLongBracketSlur:
+    if beginLongBracketSlur: #@UndefinedVariable
         noteTrans.append(symbols['opening_bracket_slur'])
         music21Note._brailleEnglish.append(u"Opening bracket slur {0}".format(symbols['opening_bracket_slur']))
-    elif beginLongDoubleSlur:
+    elif beginLongDoubleSlur: #@UndefinedVariable
         noteTrans.append(symbols['opening_double_slur'])
         music21Note._brailleEnglish.append(u"Opening double slur {0}".format(symbols['opening_double_slur']))
-    if endLongBracketSlur and beginLongBracketSlur:
+    if endLongBracketSlur and beginLongBracketSlur: #@UndefinedVariable
         noteTrans.append(symbols['closing_bracket_slur'])
         music21Note._brailleEnglish.append(u"Closing bracket slur {0}".format(symbols['closing_bracket_slur']))
 
@@ -424,10 +425,10 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     allTuplets = music21Note.duration.tuplets
     if len(allTuplets) > 0:
         if allTuplets[0].fullName == 'Triplet':
-            if beamStart:
+            if beamStart: #@UndefinedVariable
                 noteTrans.append(symbols['triplet'])
                 music21Note._brailleEnglish.append(u"Triplet {0}".format(symbols['triplet']))
-            elif beamContinue:
+            elif beamContinue: #@UndefinedVariable
                 globals()['beamContinue'] = False
     
     # signs of expression or execution that precede a note
@@ -482,14 +483,14 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     # note duration
     # -------------
     try:
-        if beamContinue:
+        if beamContinue: #@UndefinedVariable
             nameWithDuration = notesInStep['eighth']
             music21Note._brailleEnglish.append(u"{0} beam {1}".format(music21Note.step, nameWithDuration))
         else:
             nameWithDuration = notesInStep[music21Note.duration.type]
             music21Note._brailleEnglish.append(u"{0} {1} {2}".format(music21Note.step, music21Note.duration.type, nameWithDuration))
         noteTrans.append(nameWithDuration)
-        for dot in range(music21Note.duration.dots):
+        for counter_dot in range(music21Note.duration.dots):
             noteTrans.append(symbols['dot'])
             music21Note._brailleEnglish.append(u"Dot {0}".format(symbols['dot']))
     except KeyError:
@@ -511,14 +512,14 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     # opening double slur
     # closing bracket slur (unless note also has beginning long slur)
     # ----------------------------------
-    if shortSlur:
+    if shortSlur: #@UndefinedVariable
         noteTrans.append(symbols['opening_single_slur'])
         music21Note._brailleEnglish.append(u"Opening single slur {0}".format(symbols['opening_single_slur']))
-    if not(endLongBracketSlur and beginLongBracketSlur):
-        if endLongDoubleSlur:
+    if not(endLongBracketSlur and beginLongBracketSlur): #@UndefinedVariable
+        if endLongDoubleSlur: #@UndefinedVariable
             noteTrans.append(symbols['closing_double_slur'])
             music21Note._brailleEnglish.append(u"Closing bracket slur {0}".format(symbols['closing_double_slur']))
-        elif endLongBracketSlur:
+        elif endLongBracketSlur: #@UndefinedVariable
             noteTrans.append(symbols['closing_bracket_slur'])
             music21Note._brailleEnglish.append(u"Closing bracket slur {0}".format(symbols['closing_bracket_slur']))
 
@@ -558,7 +559,7 @@ def restToBraille(music21Rest):
         simpleRest = rests[music21Rest.duration.type]
         restTrans.append(simpleRest)
         music21Rest._brailleEnglish.append(u"Rest {0} {1}".format(music21Rest.duration.type, simpleRest))
-        for dot in range(music21Rest.duration.dots):
+        for counter_dot in range(music21Rest.duration.dots):
             restTrans.append(symbols['dot'])
             music21Rest._brailleEnglish.append(u"Dot {0}".format(symbols['dot']))
         return u"".join(restTrans)

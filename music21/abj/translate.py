@@ -22,12 +22,8 @@ abjad 2.0 (not 1.1.1) to work.
 '''
 
 from music21 import exceptions21
-import unittest,doctest
-import music21.note
-import music21.common
+import unittest
 import music21.lily.translate
-
-import re
 
 abjadVersion = 2.0
 
@@ -45,7 +41,7 @@ if abjad is not None:
     except:
 #        try:
             # abjad 2.5...
-            from abjad.tools import configurationtools
+            from abjad.tools import configurationtools #@UnresolvedImport
             xstr = configurationtools.get_abjad_version_string()
             abjadVersion = float(xstr)
             # this version is good enough no matter what, so it's fine...
@@ -201,7 +197,7 @@ _DOC_ORDER = [noteToAbjad, streamToAbjad]
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1: # normal conditions
-        import music21
+        #import music21
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()

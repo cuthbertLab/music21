@@ -970,9 +970,12 @@ def unitBoundaryProportion(series):
 
 
 def weightedSelection(values, weights, randomGenerator=None):
-    '''Given a list of values and an equal-sized list of weights, return a randomly selected value using the weight.
+    '''
+    Given a list of values and an equal-sized list of weights, 
+    return a randomly selected value using the weight.
 
-    Example: sum -1 and 1 for 100 values; should be around 0 or at least between -30 and 30
+    Example: sum -1 and 1 for 100 values; should be 
+    around 0 or at least between -30 and 30
 
     >>> from music21 import *
     >>> -30 < sum([common.weightedSelection([-1, 1], [1,1]) for x in range(100)]) < 30
@@ -2163,14 +2166,14 @@ class Test(unittest.TestCase):
                 # equal chance of -1, 1
                 x += weightedSelection([-1, 1], [1,1])
             #environLocal.printDebug(['weightedSelection([-1, 1], [1,1])', x])
-            self.assertEqual(-100 < x < 100, True)
+            self.assertEqual(-200 < x < 200, True)
 
 
         # test a strongly weighed boudnary
         for j in range(10):
             x = 0
             for i in range(1000):
-                # equal chance of -1, 1
+                # 10,000 more chance of 0 than 1.
                 x += weightedSelection([0, 1], [10000,1])
             #environLocal.printDebug(['weightedSelection([0, 1], [10000,1])', x])
             self.assertEqual(0 <= x < 5, True)
@@ -2178,15 +2181,16 @@ class Test(unittest.TestCase):
         for j in range(10):
             x = 0
             for i in range(1000):
-                # equal chance of -1, 1
+                # 10,000 times more likely 1 than 0.
                 x += weightedSelection([0, 1], [1, 10000])
             #environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
-            self.assertEqual(980 <= x < 1020, True)
+            self.assertEqual(980 <= x <= 1000, True)
 
 
         for unused_j in range(10):
             x = 0
             for i in range(1000):
+                # no chance of anything but 0.
                 x += weightedSelection([0, 1], [1, 0])
             #environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
             self.assertEqual(x == 0, True)

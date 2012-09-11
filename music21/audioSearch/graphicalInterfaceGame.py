@@ -11,16 +11,10 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-from music21 import corpus
-from music21 import converter
-from music21 import environment
-from music21 import scale, stream, note, pitch
 
-from music21.audioSearch.base import *
+from music21.audioSearch.base import * #@UnusedWildImport
 from music21.audioSearch import repetitionGame
 import Tkinter
-import time
-import math
  
  
 class SFApp():
@@ -96,7 +90,7 @@ class SFApp():
         self.buttonStart.grid(row=3,column=0,columnspan=3)
     
     def startGame(self):
-        master = self.master
+        #master = self.master
         self.good = True
         self.textFinal.set('WAIT...')
         #self.boxName6.grid(row=4,column=0,columnspan=3) 
@@ -107,7 +101,7 @@ class SFApp():
         
         
     def mainLoop(self):
-        master = self.master
+        #master = self.master
         
 
         if self.good == True:

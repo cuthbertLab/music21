@@ -266,7 +266,7 @@ class ScoreReduction(object):
         self._reductiveNotes = {}
         self._extractReductionEvents(self._chordReduction)
         self._extractReductionEvents(self._score)
-        for key, rn in self._reductiveNotes.items():
+        for unused_key, rn in self._reductiveNotes.items():
             if rn['group'] not in self._reductiveGroups: 
                 self._reductiveGroups.append(rn['group'])
             if rn['voice'] not in self._reductiveVoices: 
@@ -316,7 +316,7 @@ class ScoreReduction(object):
 #                 print gName, m
 #                 m.clef = clef.TrebleClef()
             # TODO: insert into note or chord
-            for key, rn in self._reductiveNotes.items():
+            for unused_key, rn in self._reductiveNotes.items():
                 if oneGroup or rn['group'] == gName:
                     #environLocal.printDebug(['_createReduction(): found reductive note, rn', rn, 'group', gName])
                     gMeasure = gMeasures[rn.measureIndex]
@@ -606,10 +606,10 @@ class PartReduction(object):
                 pass
             elif not common.isListLike(targets):
                 targets = [targets]
-            sum = 0
+            summation = 0
             for e in targets: # a Stream
-                sum += e.volumeScalar # for dynamics
-            return sum / float(len(target))
+                summation += e.volumeScalar # for dynamics
+            return summation / float(len(target))
 
         # supply function to convert one or more targets to number
         if targetToWeight is None:
@@ -790,7 +790,7 @@ class Test(unittest.TestCase):
 
 
     def testExtractionA(self):
-        from music21 import stream, analysis, note, corpus
+        from music21 import analysis, corpus
         s = corpus.parse('bwv66.6')
         #s.show()
         s.parts[0].flat.notes[3].addLyric('test')
@@ -816,7 +816,7 @@ class Test(unittest.TestCase):
 
 
     def testExtractionB(self):
-        from music21 import stream, analysis, note, corpus
+        from music21 import analysis, corpus
         s = corpus.parse('bwv66.6')
 
         s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s/g:Ursatz')
@@ -839,7 +839,7 @@ class Test(unittest.TestCase):
         #post.show()
 
     def testExtractionC(self):
-        from music21 import stream, analysis, note, corpus
+        from music21 import analysis, corpus
         # http://solomonsmusic.net/schenker.htm
         # shows extracting an Ursatz line
         
@@ -868,13 +868,13 @@ class Test(unittest.TestCase):
         sr = analysis.reduction.ScoreReduction()
         sr.chordReduction = chords
         #sr.score = src
-        post = sr.reduce()
+        unused_post = sr.reduce()
         #post.show()        
 
 
     def testExtractionD(self):
         # this shows a score, extracting a single pitch
-        from music21 import stream, analysis, note, corpus
+        from music21 import analysis, corpus
 
         src = corpus.parse('schoenberg/opus19', 6)
         for n in src.flat.notes:
@@ -891,13 +891,13 @@ class Test(unittest.TestCase):
                     
         sr = analysis.reduction.ScoreReduction()
         sr.score = src
-        post = sr.reduce()
+        unused_post = sr.reduce()
         #post.show()        
     
 
     def testExtractionD2(self):
         # this shows a score, extracting a single pitch
-        from music21 import stream, analysis, note, corpus
+        from music21 import analysis, corpus
 
         src = corpus.parse('schoenberg/opus19', 6)
         for n in src.flat.notes:
@@ -914,13 +914,13 @@ class Test(unittest.TestCase):
                     
         sr = analysis.reduction.ScoreReduction()
         sr.score = src
-        post = sr.reduce()
+        unused_post = sr.reduce()
         #post.show()        
 
 
 
     def testExtractionE(self):
-        from music21 import stream, analysis, note, corpus
+        from music21 import analysis, corpus
 
         #src = corpus.parse('opus18no1/movement3.xml').measures(0, 10)
         #src = corpus.parse('hwv56/movement3-02.md').measures(7,10)
@@ -931,14 +931,14 @@ class Test(unittest.TestCase):
         sr = analysis.reduction.ScoreReduction()
         #sr.chordReduction = chords
         sr.score = src
-        post = sr.reduce()
+        unused_post = sr.reduce()
         #post.show()        
         
 
 
     def testPartReductionA(self):
 
-        from music21 import stream, analysis, corpus
+        from music21 import analysis, corpus
 
         s = corpus.parse('bwv66.6')
 
@@ -973,7 +973,7 @@ class Test(unittest.TestCase):
     def testPartReductionB(self, show=False):
         '''Artificially create test cases.
         '''
-        from music21 import stream, note, dynamics, graph, analysis
+        from music21 import dynamics, graph, analysis
         durDynPairsA = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
         durDynPairsB = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
 
@@ -1018,7 +1018,7 @@ class Test(unittest.TestCase):
     def testPartReductionC(self):
         '''Artificially create test cases.
         '''
-        from music21 import stream, note, dynamics, graph, analysis
+        from music21 import dynamics, analysis
 
         s = stream.Score()
         p1 = stream.Part()
@@ -1052,7 +1052,7 @@ class Test(unittest.TestCase):
     def testPartReductionD(self):
         '''Artificially create test cases. Here, uses rests.
         '''
-        from music21 import stream, note, dynamics, graph, analysis
+        from music21 import dynamics, analysis
 
         s = stream.Score()
         p1 = stream.Part()
@@ -1094,7 +1094,7 @@ class Test(unittest.TestCase):
     def testPartReductionE(self):
         '''Artificially create test cases.
         '''
-        from music21 import stream, note, dynamics, graph, analysis
+        from music21 import dynamics, analysis
         s = stream.Score()
         p1 = stream.Part()
         p1.id = 0

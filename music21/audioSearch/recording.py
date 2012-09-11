@@ -62,7 +62,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     '''
     
     try:
-        import pyaudio
+        import pyaudio #@UnresolvedImport
         recordFormatDefault = pyaudio.paInt16
     except (ImportError, SystemExit):
         pyaudio = None

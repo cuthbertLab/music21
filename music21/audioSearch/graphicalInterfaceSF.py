@@ -16,13 +16,11 @@
 
 from music21 import corpus
 from music21 import converter
-from music21 import environment
-from music21 import scale, stream, note, pitch
 import threading
 import Queue as queue
 import Tkinter
 import time
-import math
+#import math
 
 _missingImport = []
 try:
@@ -35,13 +33,13 @@ from music21 import environment
 _MOD = 'audioSearch/graphicalInterfaceSF.py'
 environLocal = environment.Environment(_MOD)
 
-from music21.audioSearch.base import *
-from music21.audioSearch import recording
+from music21.audioSearch.base import * #@UnusedWildImport
+#from music21.audioSearch import recording
 from music21.audioSearch import scoreFollower
  
 try:
-    import AppKit
-except:
+    import AppKit 
+except ImportError:
     try:
         import ctypes
     except:
@@ -79,7 +77,7 @@ class SFApp():
         self.sizeButton = 11   
         
         try: # for windows
-            user32 = ctypes.windll.user32
+            unused_user32 = ctypes.windll.user32 # test for error...
             self.screenResolution = [1024, 600]
             #self.screenResolution = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
             environLocal.printDebug("screen resolution (windows) %d x %d" % (self.screenResolution[0], self.screenResolution[1]))
@@ -556,9 +554,9 @@ class SFApp():
                             self.pageForward()
     #                    print "has played a note not shown in the score (forward)"
                     elif totalPagesToMove < 0:
-                         for i in range(int(math.fabs(totalPagesToMove))):
+                        for i in range(int(math.fabs(totalPagesToMove))):
                             self.pageBackward()                   
-    #                     print "has played a note not shown in the score (backward)"
+    #                   print "has played a note not shown in the score (backward)"
 
             
             elif self.ScF.lastNotePosition >= self.middlePages[self.currentLeftPage] and self.isMoving == False:  #50% case
@@ -636,14 +634,15 @@ class SFApp():
         
 
 class RecordThread(threading.Thread):
-    def __init__(self, inQueue, outQueue, object):
+    def __init__(self, inQueue, outQueue, recordingObject):
         threading.Thread.__init__(self)
         self.inQueue = inQueue
         self.outQueue = outQueue
         self.l = []
-        self.object = object
+        self.object = recordingObject
+
     def run(self):
-        startCommand = self.inQueue.get()
+        unused_startCommand = self.inQueue.get()
         environLocal.printDebug("start command received: recording!")
         self.resultInThread = self.object.repeatTranscription()
         environLocal.printDebug("repeatTranscription has been run")

@@ -135,7 +135,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
             elif analyzedMode == 'minor':
                 keyFeature = 1
             else:
-                raise NativeFeaturesException("should be able to get a mode from something here -- perhaps there are no notes?")
+                raise NativeFeatureException("should be able to get a mode from something here -- perhaps there are no notes?")
 
         self._feature.vector[0] = keyFeature
     
@@ -241,12 +241,12 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
         '''Do processing necessary, storing result in _feature.
         '''
         histo = self.data['noteQuarterLengthHistogram']
-        max = 0
+        maximum = 0
         ql = 0
         for key in histo:
             # all defined keys should be greater than zero, but just in case
-            if histo[key] >= max:
-                max = histo[key]
+            if histo[key] >= maximum:
+                maximum = histo[key]
                 ql = key
         self._feature.vector[0] = ql
 
@@ -271,16 +271,16 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        sum = 0 # count of all 
+        summation = 0 # count of all 
         histo = self.data['noteQuarterLengthHistogram']
         maxKey = 0 # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
-                sum += histo[key]
+                summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self._feature.vector[0] = maxKey / float(sum)
+        self._feature.vector[0] = maxKey / float(summation)
 
 
 
@@ -403,16 +403,16 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        sum = 0 # count of all 
+        summation = 0 # count of all 
         histo = self.data['chordifyPitchClassSetHistogram']
         maxKey = 0 # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
-                sum += histo[key]
+                summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self._feature.vector[0] = maxKey / float(sum)
+        self._feature.vector[0] = maxKey / float(summation)
 
 
 class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -440,16 +440,16 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
-        sum = 0 # count of all 
+        summation = 0 # count of all 
         histo = self.data['chordifySetClassHistogram']
         maxKey = 0 # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
-                sum += histo[key]
+                summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self._feature.vector[0] = maxKey / float(sum)
+        self._feature.vector[0] = maxKey / float(summation)
 
 
 class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -962,8 +962,8 @@ class Test(unittest.TestCase):
         pass
 
     def testIncorrectlySpelledTriadPrevalence(self):
-        from music21 import stream, features, chord, corpus, graph
-
+        from music21 import stream, features, chord
+        
         s = stream.Stream()
         s.append(chord.Chord(['c', 'e', 'g']))
         s.append(chord.Chord(['c', 'e', 'a']))
@@ -976,7 +976,7 @@ class Test(unittest.TestCase):
 
 
     def testLandiniCadence(self):
-        from music21 import converter, features, corpus, graph
+        from music21 import converter, features
 
         s = converter.parse(['f#4 f# e g2', '3/4'])
         fe = features.native.LandiniCadence(s)

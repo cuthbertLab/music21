@@ -54,7 +54,7 @@ class VirtualWork(object):
         post = []
         for ext in extList:
             for url in self.urlList:
-                format, extFound = common.findFormatExtURL(url)
+                unused_format, extFound = common.findFormatExtURL(url)
                 #environLocal.printDebug([extFound, ext])
                 if extFound == ext:
                     post.append(url)
@@ -182,9 +182,10 @@ class TestExternal(unittest.TestCase):
         pass
 
     def testParseURL(self):
-        urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-        urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
-        urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
+        pass
+        #urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+        #urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+        #urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
 
 class Test(unittest.TestCase):
 

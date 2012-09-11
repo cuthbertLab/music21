@@ -3367,7 +3367,7 @@ extractorsById = {'I': [
                   
                   }
 
-def getExtractorByTypeAndNumber(type, number):
+def getExtractorByTypeAndNumber(type, number): #@ReservedAssignment
     '''
     Typical usage:
     
