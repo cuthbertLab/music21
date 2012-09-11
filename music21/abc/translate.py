@@ -40,12 +40,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     Results, as a Part, are built into the provided inputM21 object 
     (a Score or similar Stream) or a newly created Stream.
     '''
-    from music21 import metadata
     from music21 import spanner
-    from music21 import stream
     from music21 import note
-    from music21 import meter
-    from music21 import key
     from music21 import chord
 
     if inputM21 == None:
@@ -345,8 +341,6 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     If a `number` argument is given, and a work is defined by 
     that number, that work is returned. 
     '''
-    from music21 import stream
-
     if inputM21 == None:
         s = stream.Opus()
     else:
@@ -475,7 +469,7 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         from music21 import abc
-        from music21.abc import testFiles
+        #from music21.abc import testFiles
 
         for tf in [
 #             testFiles.fyrareprisarn,
@@ -512,7 +506,7 @@ class Test(unittest.TestCase):
         from music21 import abc
         from music21.abc import testFiles
 
-        for (tf, titleEncoded, meterEncoded, keyEncoded) in [
+        for (tf, titleEncoded, unused_meterEncoded, unused_keyEncoded) in [
             (testFiles.fyrareprisarn, 'Fyrareprisarn', '3/4', 'F'), 
             (testFiles.mysteryReel, 'Mystery Reel', 'C|', 'G'), 
             (testFiles.aleIsDear, 'The Ale is Dear', '4/4', 'D', ),
@@ -661,7 +655,7 @@ class Test(unittest.TestCase):
 
         tf = testFiles.sicutRosa
         af = abc.ABCFile()
-        s = abcToStreamScore(af.readstr(tf))
+        unused_s = abcToStreamScore(af.readstr(tf))
     
         #s.show()
 #         self.assertEqual(len(s.parts), 3)

@@ -516,6 +516,8 @@ class GenericInterval(base.Music21Object):
         <music21.interval.GenericInterval 8>
 
         >>> aInterval = interval.GenericInterval(3)
+        >>> aInterval.directed
+        3
         >>> aInterval.direction
         1
         >>> aInterval.perfectable
@@ -538,6 +540,14 @@ class GenericInterval(base.Music21Object):
         -11
         >>> aInterval.mod7
         4
+        >>> aInterval.directed
+        -12
+        >>> aInterval.undirected
+        12
+
+
+
+
         >>> bInterval = aInterval.complement()
         >>> bInterval.staffDistance
         3

@@ -121,7 +121,9 @@ class XMLNode(object):
 
 
     def loadAttrs(self, attrs):
-        '''Given a SAX attrs object, load all atributes that are named within this object's _attr dictionary. 
+        '''
+        Given a SAX attrs object, load all atributes that are 
+        named within this object's _attr dictionary. 
         '''
         for key in self._attr.keys():
             value = attrs.get(key, "") # from SAX attrs object
@@ -151,10 +153,8 @@ class XMLNode(object):
         Define mappings from expected MusicXML names and specially named attributes in object.
         Return a list of zero or 1 name
         
-        
         Specialize in subclasses as needed, calling this base class to get
         general defaults.
-
 
         All options need to be lower case.
 
@@ -170,7 +170,12 @@ class XMLNode(object):
         return '' # return an empty string if no match
 
     def _convertNameFromXml(self, nameSrc):
-        '''Given an xml attribute/entity name, try to convert it to a Python attribute name. If the python name is given, without and - dividers, the the proper name should be returned
+        '''
+        Given an xml attribute/entity 
+        name, try to convert it to a Python 
+        attribute name. If the Python name 
+        is given, without and - dividers, 
+        the the proper name should be returned
 
         >>> from music21 import *
         >>> a = xmlnode.XMLNode()
@@ -192,7 +197,9 @@ class XMLNode(object):
         return _cacheNameFromXml[nameSrc]
 
     def _convertNameToXml(self, nameSrc):
-        '''Given an a Python attribute name, try to convert it to a XML name.
+        '''
+        Given an a Python attribute name, try 
+        to convert it to a XML name.
         If already an XML name, leave alone.
 
         >>> from music21 import *
@@ -227,7 +234,8 @@ class XMLNode(object):
     #---------------------------------------------------------------------------
         
     def _publicAttributes(self):
-        '''Get all public names from this object.
+        '''
+        Get all public names from this object.
         Used in merging. 
 
         >>> from music21 import *
@@ -241,9 +249,11 @@ class XMLNode(object):
         names = dir(self)
         post = []
         for name in names:
-            if name.startswith('_'): continue
+            if name.startswith('_'): 
+                continue
             # do not want methods
-            if callable(getattr(self, name)): continue
+            if callable(getattr(self, name)): 
+                continue
             post.append(name)
         return post
         

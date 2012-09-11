@@ -1819,11 +1819,11 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         secondsMap = self.data['secondsMap']
-        max = 0.0
+        maxSeconds = 0.0
         for bundle in secondsMap:
-            if bundle['durationSeconds'] > max:
-                max = bundle['durationSeconds']
-        self._feature.vector[0] = max
+            if bundle['durationSeconds'] > maxSeconds:
+                maxSeconds = bundle['durationSeconds']
+        self._feature.vector[0] = maxSeconds
 
  
 class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
@@ -1847,11 +1847,11 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     def _process(self):
         secondsMap = self.data['secondsMap']
         # an arbitrary number from the coll
-        min = secondsMap[0]['durationSeconds'] 
+        minSeconds = secondsMap[0]['durationSeconds'] 
         for bundle in secondsMap:
-            if bundle['durationSeconds'] < min:
-                min = bundle['durationSeconds']
-        self._feature.vector[0] = min 
+            if bundle['durationSeconds'] < minSeconds:
+                minSeconds = bundle['durationSeconds']
+        self._feature.vector[0] = minSeconds 
 
 
 class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):

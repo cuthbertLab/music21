@@ -219,14 +219,14 @@ class WindowedAnalysis(object):
         True
         '''
         if maxWindow == None:
-            max = len(self._windowedStream)
+            maxLength = len(self._windowedStream)
         else:
-            max = maxWindow
+            maxLength = maxWindow
 
         if minWindow == None:
-            min = len(self._windowedStream)
+            minLength = len(self._windowedStream)
         else:
-            min = minWindow
+            minLength = minWindow
         
         if windowType == None:
             windowType = 'overlap'
@@ -245,15 +245,15 @@ class WindowedAnalysis(object):
         metaMatrix = [] 
 
         if common.isNum(windowStepSize):
-            windowSizes = range(min, max+1, windowStepSize)
+            windowSizes = range(minLength, maxLength+1, windowStepSize)
         else:
             num, junk = common.getNumFromStr(windowStepSize)
             windowSizes = []
-            x = min
+            x = minLength
             while True:
                 windowSizes.append(x)
                 x = x * int(round(float(num)))
-                if x > (max * .75):
+                if x > (maxLength * .75):
                     break
 
         if includeTotalWindow:
@@ -312,7 +312,7 @@ class Test(unittest.TestCase):
             wa = WindowedAnalysis(s, p)
             # do smallest and larges
             for i in range(1, 4) + [None]:
-                x, y, z = wa.process(i, i)
+                unused_x, unused_y, unused_z = wa.process(i, i)
     
 
     def testWindowing(self):
@@ -344,34 +344,34 @@ class Test(unittest.TestCase):
 
 
         # window size of 1 gets 2 solutions
-        a, b, c = wa1.process(1, 1, 1, includeTotalWindow=False)
+        a, unused_b, unused_c = wa1.process(1, 1, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 2) 
         self.assertEqual(a[0][0], 1)
         self.assertEqual(a[0][1], 1)
 
         # window size of 2 gets 1 solution
-        a, b, c = wa1.process(2, 2, 1, includeTotalWindow=False)
+        a, unused_b, unused_c = wa1.process(2, 2, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 1)
         # two items in this window
         self.assertEqual(a[0][0], 2)
 
 
         # window size of 1 gets 8 solutiions
-        a, b, c = wa2.process(1, 1, 1, includeTotalWindow=False)
+        a, unused_b, unused_c = wa2.process(1, 1, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 8)
         self.assertEqual(a[0][0], 1)
         self.assertEqual(a[0][1], 1)
 
         # window size of 2 gets 7 solutions
-        a, b, c = wa2.process(2, 2, 1, includeTotalWindow=False)
+        a, unused_b, unused_c = wa2.process(2, 2, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 7)
 
         # window size of 7 gets 2 solutions
-        a, b, c = wa2.process(7, 7, 1, includeTotalWindow=False)
+        a, unused_b, unused_c = wa2.process(7, 7, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 2)
 
         # window size of 8 gets 1 solutions
-        a, b, c = wa2.process(8, 8, 1, includeTotalWindow=False)
+        a, unused_b, unused_c = wa2.process(8, 8, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 1)
 
 
@@ -383,7 +383,7 @@ class Test(unittest.TestCase):
         p = discrete.KrumhanslSchmuckler()
         s = corpus.parse('bach/bwv66.6')
 
-        wa = WindowedAnalysis(s, p)
+        unused_wa = WindowedAnalysis(s, p)
 
 
         plot = graph.PlotWindowedKrumhanslSchmuckler(s, doneAction=None,

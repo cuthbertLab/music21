@@ -179,7 +179,7 @@ def getCorePaths(extList=None, expandExtensions=True):
     
     >>> a = corpus.getCorePaths()
     >>> len(a) # the current number of paths; update when adding to corpus
-    2330
+    2321
     >>> a = corpus.getCorePaths('krn')
     >>> len(a) >= 4
     True
@@ -768,7 +768,16 @@ def getWorkReferences(sort=True):
 
 #-------------------------------------------------------------------------------
 def getWork(workName, movementNumber=None, extList=None):
-    '''Search the corpus, then the virtual corpus, for a work, and return a file path or URL. This method will return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
+    '''
+    Search the corpus, then the virtual corpus, for a work, 
+    and return a file path or URL. 
+    N.B. does not parse the work: but it's suitable for passing
+    to converter.parse.
+    
+    This method will return 
+    either a list of file paths or, if there is a single 
+    match, a single file path. If no matches are found 
+    an Exception is raised. 
 
     >>> from music21 import *
     >>> import os
@@ -780,6 +789,10 @@ def getWork(workName, movementNumber=None, extList=None):
     >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.mxl']))
     True
 
+
+    >>> trecentoFiles = corpus.getWork('trecento')
+    >>> len(trecentoFiles) > 100 and len(trecentoFiles) < 200
+    True
     '''
     if not common.isListLike(extList):
         extList = [extList]

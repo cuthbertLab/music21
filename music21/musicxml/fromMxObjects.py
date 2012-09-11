@@ -447,12 +447,16 @@ def mxToPitch(mxNote, inputM21=None):
     # None is used in musicxml but not in music21
     if acc != None or mxAccidentalCharData != None:
         if mxAccidental is not None: # the source had wanted to show alter
-            accObj = mxToAccidental(mxAccidental)
-        # used to to just use acc value
-        #self.accidental = Accidental(float(acc))
-        # better to use accObj if possible
-            p.accidental = accObj
-            p.accidental.displayStatus = True
+            try:
+                accObj = mxToAccidental(mxAccidental)
+                # used to to just use acc value
+                # self.accidental = Accidental(float(acc))
+                # better to use accObj if possible
+                p.accidental = accObj
+                p.accidental.displayStatus = True
+            except pitch.AccidentalException:
+                # MuseScore 0.9.6 generates Accidentals with empty objects
+                pass
         else:
             # here we generate an accidental object from the alter value
             # but in the source, there was not a defined accidental

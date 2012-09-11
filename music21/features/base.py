@@ -1032,12 +1032,12 @@ class DataSet(object):
                 post.append(v)
         return post
 
-    def _getOutputFormat(self, format):
-        if format.lower() in ['tab', 'orange', 'taborange', None]:
+    def _getOutputFormat(self, featureFormat):
+        if featureFormat.lower() in ['tab', 'orange', 'taborange', None]:
             outputFormat = OutputTabOrange(dataSet=self)
-        elif format.lower() in ['csv', 'comma']:
+        elif featureFormat.lower() in ['csv', 'comma']:
             outputFormat = OutputCSV(dataSet=self)
-        elif format.lower() in ['arff', 'attribute']:
+        elif featureFormat.lower() in ['arff', 'attribute']:
             outputFormat = OutputARFF(dataSet=self)
         else:
             return None
@@ -1064,16 +1064,17 @@ class DataSet(object):
         return of
 
 
-    def getString(self, format='tab'):
+    def getString(self, outputFmt='tab'):
         '''Get a string representation of the data set in a specific format.
         '''
         # pass reference to self to output
-        outputFormat = self._getOutputFormat(format)
+        outputFormat = self._getOutputFormat(outputFmt)
         return outputFormat.getString()
 
 
-    def write(self, fp=None, format=None, includeClassLabel=True):
-        '''Set the output format object. 
+    def write(self, fp=None, format=None, includeClassLabel=True): #@ReservedAssignment
+        '''
+        Set the output format object. 
         '''
         if format is None and fp is not None:
             outputFormat = self._getOutputFormatFromFilePath(fp)
