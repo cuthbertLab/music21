@@ -1150,7 +1150,11 @@ class Pitch(base.Music21Object):
             if not common.isNum(name):       
                 self._setName(name) # set based on string
             else: # is a number
-                self._setPitchClass(name)
+                if name < 12: # is a pitchClass
+                    self._setPitchClass(name)
+                else: # is a midiNumber
+                    self._setPitchClass(name)
+                    self._octave = int(name/12) - 1
 
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch

@@ -543,7 +543,8 @@ class ConverterMidi(object):
 
 #-------------------------------------------------------------------------------
 class ConverterABC(object):
-    '''Simple class wrapper for parsing ABC.
+    '''
+    Simple class wrapper for parsing ABC.
     '''
 
     def __init__(self):
@@ -551,7 +552,11 @@ class ConverterABC(object):
         self._stream = stream.Score()
 
     def parseData(self, strData, number=None):
-        '''Get ABC data, as token list, from a string representation. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
+        '''
+        Get ABC data, as token list, from a string representation. 
+        If more than one work is defined in the ABC data, a  
+        :class:`~music21.stream.Opus` object will be returned; 
+        otherwise, a :class:`~music21.stream.Score` is returned.
         '''
         af = abcModule.ABCFile()
         # do not need to call open or close 

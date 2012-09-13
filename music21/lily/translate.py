@@ -388,6 +388,7 @@ class LilypondConverter(object):
                           \override TupletBracket #'bracket-visibility = ##f
                           \override TupletNumber #'stencil = ##f
                           \override Clef #'transparent = ##t
+                          \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff } 
@@ -401,6 +402,7 @@ class LilypondConverter(object):
                           \override TupletBracket #'bracket-visibility = ##f
                           \override TupletNumber #'stencil = ##f
                           \override Clef #'transparent = ##t
+                          \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff } 
@@ -415,6 +417,7 @@ class LilypondConverter(object):
                           \override TupletBracket #'bracket-visibility = ##f
                           \override TupletNumber #'stencil = ##f
                           \override Clef #'transparent = ##t
+                          \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff } 
@@ -428,6 +431,7 @@ class LilypondConverter(object):
                           \override TupletBracket #'bracket-visibility = ##f
                           \override TupletNumber #'stencil = ##f
                           \override Clef #'transparent = ##t
+                          \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff } 
@@ -449,6 +453,7 @@ class LilypondConverter(object):
                   \override TupletBracket #'bracket-visibility = ##f
                   \override TupletNumber #'stencil = ##f
                   \override Clef #'transparent = ##t
+                  \override OctavateEight #'transparent = ##t
                   \consists "Default_bar_line_engraver"
                 }
         '''

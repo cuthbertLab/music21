@@ -2192,9 +2192,6 @@ class ABCHandlerBar(ABCHandler):
 
         return ah
 
-
-
-
 def mergeLeadingMetaData(barHandlers):
     '''Given a list of ABCHandlerBar, ruturn a list of ABCHandlerBar objects, where leading metadata is merged, if possible, with the bar data following. 
 
@@ -2236,8 +2233,7 @@ def mergeLeadingMetaData(barHandlers):
 #-------------------------------------------------------------------------------
 class ABCFile(object):
     '''
-    ABC File access
-
+    ABC File or String access
     '''
     
     def __init__(self): 
@@ -2276,19 +2272,23 @@ class ABCFile(object):
 
 
     def extractReferenceNumber(self, strSrc, number):
-        '''Extract a single reference number from many defined in a file. This permits loading a single work from a collection/opus without parsing the entire file. 
+        '''
+        Extract a single reference number from many defined in a file. 
+        This permits loading a single work from a collection/opus 
+        without parsing the entire file. 
         '''
         collect = []
         gather = False
         for line in strSrc.split('\n'):
             # must be a single line definition
-            if line.strip().startswith('X:') and line.replace(' ', '') == 'X:%s' % number:
+            # rstrip because of '\r\n' carriage returns
+            if line.strip().startswith('X:') and line.replace(' ', '').rstrip() == 'X:%s' % number:
                 gather = True
             # if already gathering and find another ref number definition
             # stop gathering
-            elif gather == True and line.strip().startswith('X:'):
+            elif gather is True and line.strip().startswith('X:'):
                 break
-            if gather == True:
+            if gather is True:
                 collect.append(line)
 
         if collect == []:
@@ -2297,9 +2297,11 @@ class ABCFile(object):
         post = '\n'.join(collect)
         return post
 
-    
+
     def readstr(self, strSrc, number=None): 
-        '''Read a string and process all Tokens. Returns a ABCHandler instance.
+        '''
+        Read a string and process all Tokens. 
+        Returns a ABCHandler instance.
         '''
         if number is not None:
             # will raise exception if cannot be found

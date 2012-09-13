@@ -36,7 +36,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------Public Merge Functions
-def mergeVariants(streamX, streamY, variantName, inPlace = False):
+def mergeVariants(streamX, streamY, variantName = 'variant', inPlace = False):
     '''
     Takes two streams objects or their derivatives (score, part, measure, etc.) which should be variant versions of the same stream,
     and merges them (determines differences and stores those differences as variant objects in streamX) via the appropriate merge
@@ -109,7 +109,7 @@ def mergeVariants(streamX, streamY, variantName, inPlace = False):
     else:
         raise VariantException("Could not determine what merging method to use. Try using a more specific merging function.")
 
-def mergeVariantScores(aScore, vScore, variantName, inPlace = False):
+def mergeVariantScores(aScore, vScore, variantName = 'variant', inPlace = False):
     '''
     Takes two scores and merges them with mergeVariantMeasureStreams, part-by-part.
     
@@ -177,10 +177,11 @@ def mergeVariantScores(aScore, vScore, variantName, inPlace = False):
     for returnPart, vPart in zip(returnObj.parts, vScore.parts):
         mergeVariantMeasureStreams(returnPart, vPart, variantName, inPlace = True)
     
-    return returnObj
+    if inPlace is False:
+        return returnObj
     
 
-def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
+def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlace = False):
     '''
     Takes two streams of measures and returns a stream (new if inPlace is False) with the second
     merged with the first as variants. This function differs from mergeVariantsEqualDuration by
@@ -2480,8 +2481,6 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut([p for p in s.pitches]), 
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
-
-
 #     def testVariantBundleA(self):
 #         from music21 import note, stream, variant
 # 
@@ -2496,7 +2495,20 @@ class Test(unittest.TestCase):
 #         self.assertEqual(str(vb), '<music21.variant.VariantBundle of size 1>')
 #         self.assertEqual(len(vb), 1) # has one variant
 
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+
+    def testMergeJacopoVariants(self):
+        from music21 import corpus
+        j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
+        j2 = corpus.parse('trecento/PMFC_06-Jacopo-03b')
+        jMerged = mergeVariantScores(j1, j2)
+        jMerged.show('lily.pdf')
+
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
     

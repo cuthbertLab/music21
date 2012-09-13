@@ -78,6 +78,19 @@ class Chord(note.NotRest):
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
     it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in.
 
+
+    A chord can also be created from pitch class numbers:
+    
+    >>> c = chord.Chord([0, 2, 3, 5])
+    >>> c.pitches
+    [<music21.pitch.Pitch C>, <music21.pitch.Pitch D>, <music21.pitch.Pitch E->, <music21.pitch.Pitch F>]
+    
+    Or from MIDI numbers:
+    
+    >>> c = chord.Chord([72, 76, 79])
+    >>> c.pitches
+    [<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>]
+
     OMIT_FROM_DOCS
 
     Test that durations are being created efficiently:
