@@ -7842,7 +7842,9 @@ class Stream(base.Music21Object):
     def _getBeatStr(self):
         return None
 
-    beatStr = property(_getBeatStr, doc='unlike other Music21Objects, streams always have beatStr (beat string) of None')
+    beatStr = property(_getBeatStr, doc='''
+    unlike other Music21Objects, streams always have beatStr (beat string) of None
+    ''')
   
     def _getBeatDuration(self):
         # this returns the duration of the active beat
@@ -7855,6 +7857,93 @@ class Stream(base.Music21Object):
         return None
 
     beatStrength = property(_getBeatStrength, doc='unlike other Music21Objects, streams always have beatStrength of None')
+
+    def beatAndMeasureFromOffset(self, searchOffset, fixZeros = True):
+        '''
+        Returns a two-element tuple of the beat and the Measure object (or the first one
+        if there are several at the same offset; unlikely but possible) for a given
+        offset from the start of this Stream (that contains measures).
+        
+        Recursively searches for measures.  Note that this method assumes that all parts 
+        have measures of consistent length.  If that's not the case, this
+        method can be called on the relevant part.
+        
+        This algorithm should work even for weird time signatures such as 2+3+2/8.
+        
+        >>> from music21 import *
+        >>> bach = corpus.parse('bach/bwv1.6')
+        >>> bach.parts[0].measure(2).getContextByClass('TimeSignature')
+        <music21.meter.TimeSignature 4/4>
+        >>> returnTuples = []
+        >>> for offset in [0.0, 1.0, 2.0, 5.0, 5.5]:
+        ...     returnTuples.append(bach.beatAndMeasureFromOffset(offset))
+        >>> returnTuples
+        [(4.0, <music21.stream.Measure 0 offset=0.0>), (1.0, <music21.stream.Measure 1 offset=1.0>), (2.0, <music21.stream.Measure 1 offset=1.0>), (1.0, <music21.stream.Measure 2 offset=5.0>), (1.5, <music21.stream.Measure 2 offset=5.0>)]
+        
+        To get just the measureNumber and beat, use a transformation like this:
+        >>> [(beat, measureObj.number) for beat, measureObj in returnTuples]
+        [(4.0, 0), (1.0, 1), (2.0, 1), (1.0, 2), (1.5, 2)]
+        
+        Adapted from contributed code by Dmitri Tymoczko.  With thanks to DT.
+        '''     
+        myStream = self
+        if not myStream.hasMeasures():
+            if myStream.hasPartLikeStreams():
+                foundPart = False
+                for subStream in myStream:
+                    if 'Stream' not in subStream.classes:
+                        continue
+                    if subStream.hasMeasures():
+                        foundPart = True
+                        myStream = subStream
+                        break
+                if not foundPart:
+                    raise StreamException("beatAndMeasureFromOffset: couldn't find any parts!")
+                    return False
+            else:
+                if not myStream.hasMeasures():
+                    raise StreamException("beatAndMeasureFromOffset: couldn't find any measures!")
+                    return False    
+        #Now we get the measure containing our offset.  
+        #In most cases this second part of the code does the job.
+        myMeas = myStream.getElementAtOrBefore(searchOffset, classList = ['Measure'])
+        if myMeas is None: 
+            raise StreamException("beatAndMeasureFromOffset: no measure at that offset.")
+        ts1 = myMeas.timeSignature
+        if ts1 is None:
+            ts1 = myMeas.getContextByClass('TimeSignature')
+        
+        if ts1 is None: 
+            raise StreamException("beatAndMeasureFromOffset: could not find a time signature for that place.")
+        try:
+            myBeat = ts1.getBeatProportion(searchOffset - myMeas.offset)
+        except:
+            raise StreamException("beatAndMeasureFromOffset: offset is beyond the end of the piece")
+        foundMeasureNumber = myMeas.number
+        # deal with second half of partial measures...
+        
+        #Now we deal with the problem case, where we have the second half of a partial measure.  These are
+        #treated as unnumbered measures (or measures with suffix 'X') by notation programs, even though they are
+        #logically part of the previous measure.  The variable padBeats will represent extra beats we add to the front
+        #of our partial measure
+        if myMeas.numberSuffix is not None or (fixZeros and foundMeasureNumber == 0):    
+            prevMeas = myStream.getElementBeforeOffset(myMeas.offset, classList = ['Measure'])
+            if prevMeas:
+                ts2 = prevMeas.getContextByClass('TimeSignature')
+                if not ts2: 
+                    raise StreamException("beatAndMeasureFromOffset: partial measure found, but could not find a time signature for the preceeding measure")
+                #foundMeasureNumber = prevMeas.number
+                if prevMeas.highestTime == ts2.barDuration.quarterLength:       # need this for chorales 197 and 280, where we
+                    padBeats = ts2.beatCount                                    # have a full-length measure followed by a pickup in
+                else:                                                           # a new time signature
+                    padBeats = ts2.getBeatProportion(prevMeas.highestTime) - 1
+                return (myBeat + padBeats, prevMeas)
+            else:
+                padBeats = ts1.getBeatProportion(ts1.barDuration.quarterLength - myMeas.duration.quarterLength) - 1    # partial measure at start of piece
+                return (myBeat + padBeats, myMeas)
+        else:
+            return (myBeat, myMeas)
+
 
 
     #---------------------------------------------------------------------------

@@ -88,12 +88,15 @@ class CorpusException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 def _findPaths(fpRoot, extList):
-    '''Given a root fp file path, recursively search all contained paths for files
+    '''
+    Given a root fp file path, recursively search 
+    all contained paths for files
     in fpRoot matching any of the extensions in extList
     
     The `extList` is a list of file extensions. 
     
-    NB: we've tried optimizing with fnmatch but it does not save any time.
+    NB: we've tried optimizing with fnmatch 
+    but it does not save any time.
     '''
     # can replace extension matching with a regex    
     #escape extension dots (if there) for regex
@@ -221,7 +224,11 @@ def getVirtualPaths(extList=None, expandExtensions=True):
 
 def getLocalPaths(extList=None, expandExtensions=True):
     '''
-    Access files in additional directories supplied by the user and defined in environment settings. If additional paths are added on a per-session basis witht the :func:`~music21.corpus.addPath` function, these paths are also retuned with this method. 
+    Access files in additional directories supplied by the user 
+    and defined in environment settings in the 'localCorpusSettings' list. 
+    If additional paths are added 
+    on a per-session basis with the :func:`~music21.corpus.addPath` function, these 
+    paths are also returned with this method. 
     '''
     extList = _translateExtensions(extList=extList,
                 expandExtensions=expandExtensions)
@@ -292,21 +299,21 @@ def addPath(fp):
 
 
 def getPaths(extList=None, expandExtensions=True, 
-    domain=['core', 'virtual', 'local']):
+    domain=['local', 'core', 'virtual']):
     '''
     Get paths from core, virtual, and/or local domains. 
     This is the public interface for getting all corpus 
     paths with one function. 
     '''
     post = []
+    if 'local' in domain:
+        post += getLocalPaths(extList=extList,
+                expandExtensions=expandExtensions)
     if 'core' in domain:
         post += getCorePaths(extList=extList,
                 expandExtensions=expandExtensions)
     if 'virtual' in domain:
         post += getVirtualPaths(extList=extList,
-                expandExtensions=expandExtensions)
-    if 'local' in domain:
-        post += getLocalPaths(extList=extList,
                 expandExtensions=expandExtensions)
     return post
 
@@ -508,10 +515,8 @@ def getWorkList(workName, movementNumber=None, extList=None):
     1
     >>> len(corpus.getWorkList('handel/hwv56', (2,1), '.md'))
     1
-
     >>> len(corpus.getWorkList('bach/artOfFugue_bwv1080', 2, '.md'))
     1
-
 
     Make sure that 'verdi' just gets the single Verdi piece and not the
     Monteverdi pieces:
@@ -789,7 +794,6 @@ def getWork(workName, movementNumber=None, extList=None):
     >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.mxl']))
     True
 
-
     >>> trecentoFiles = corpus.getWork('trecento')
     >>> len(trecentoFiles) > 100 and len(trecentoFiles) < 200
     True
@@ -862,10 +866,10 @@ def parse(workName, movementNumber=None, number=None,
         if wn.endswith(".xml"):
             newWorkName = wn[0:len(wn)-4] + ".mxl" # might be compressed MXL file
             try:
-                return parse(newWorkName,movementNumber,number,extList,forceSource)
+                return parse(newWorkName, movementNumber,number,extList,forceSource)
             except CorpusException:
                 # avoids having the name come back with .mxl instead of .xmlrle
-                raise CorpusException("Could not find a work that met this criterion: %s" % workName)
+                raise CorpusException("Could not find an xml or mxl work that met this criterion: %s" % workName)
         post = getVirtualWorkList(workName, movementNumber, extList)    
 
     if len(post) == 1:
@@ -878,6 +882,7 @@ def parse(workName, movementNumber=None, number=None,
     #return converter.parse(fp, forceSource=forceSource, number=number)
 
     streamObj = converter.parse(fp, forceSource=forceSource, number=number)
+    
     _addCorpusFilepath(streamObj, fp)
     return streamObj
 

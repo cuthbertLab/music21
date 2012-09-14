@@ -430,7 +430,7 @@ def lyricToMx(l):
     mxLyric.set('text', l.text)
     # The next line may or may not be the best behavior. Saving the identifier in the case where it differs from the number may change the lyric ordering. I'm not sure yet.
     mxLyric.set('number', l.identifier)      # Before identifier property added to note.Lyric() ---> mxLyric.set('number', l.number)
-    # mxl expects begin, middle, end, as well as single
+    # musicxl  expects begin, middle, end, as well as single
     mxLyric.set('syllabic', l.syllabic)
     return mxLyric
 
@@ -1237,7 +1237,7 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
         mx = expressionToMx(expObj)
         if mx is not None:
             # some expressions must be wrapped in a musicxml ornament
-            # a m21 Ornament subclass may not be the same as a mxl ornament
+            # a m21 Ornament subclass may not be the same as a musicxl  ornament
             if 'Ornament' in expObj.classes:
                 ornamentsObj = mxObjects.Ornaments()
                 ornamentsObj.append(mx)
@@ -1461,7 +1461,7 @@ def chordToMx(c, spannerBundle=None):
 
             # if this note, not a component duration,
             # need to add this to the last-encountered mxNote
-            # get mxl objs from tie obj
+            # get musicxl  mx objs from tie obj
             tieObj = n.tie
             if tieObj is not None:
                 #environLocal.printDebug(['chordToMx: found tie for pitch', pitchObj])
@@ -1545,7 +1545,7 @@ def noteheadToMxNotehead(obj, defaultColor=None):
     if nh not in note.noteheadTypeNames:
         raise NoteheadException('This notehead type is not supported by MusicXML: "%s"' % nh)
     else:
-        # should only set if needed, otherwise creates extra mxl data
+        # should only set if needed, otherwise creates extra musicxl  data
         #if nh not in ['normal']: 
         mxNotehead.set('charData', nh)
     if nhFill != 'default':
@@ -1875,7 +1875,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxMeasure.insert(0, mxDirection)
             elif 'MetronomeMark' in classes or 'MetricModulation' in classes:
                 #environLocal.printDebug(['measureToMx: found:', obj])
-                # convert m21 offset to mxl divisions
+                # convert m21 offset to musicxl  divisions
                 mxOffset = int(defaults.divisionsPerQuarter *
                            obj.getOffsetBySite(mFlat))
                 # get a list of objects: may be a text expression + metro
@@ -1886,7 +1886,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                     mxMeasure.insert(0, mxDirection)
                     #mxMeasure.componentList.append(mxObj)
             elif 'TextExpression' in classes:
-                # convert m21 offset to mxl divisions
+                # convert m21 offset to musicxl  divisions
                 #environLocal.printDebug(['found TextExpression', obj])
 
                 mxOffset = int(defaults.divisionsPerQuarter *

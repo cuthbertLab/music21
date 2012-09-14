@@ -905,7 +905,7 @@ class HumdrumSpine(object):
         
         Why not just use Stream.makeMeasures()? because
         humdrum measures contain extra information about barlines
-        etc.
+        etc. and pickups are explicitly defined.
         
         >>> from music21 import *
         >>> s1 = stream.Stream()
@@ -913,7 +913,7 @@ class HumdrumSpine(object):
         >>> m1 = stream.Measure()
         >>> m1.number = 1
         >>> s1.append(m1)
-        >>> s1.append(note.HalfNote('C4'))
+        >>> s1.append(note.QuarterNote('C4'))
         >>> m2 = stream.Measure()
         >>> m2.number = 2
         >>> s1.append(m2)
@@ -923,9 +923,9 @@ class HumdrumSpine(object):
         {0.0} <music21.stream.Measure 1 offset=0.0>
         <BLANKLINE>
         {0.0} <music21.note.Note C>
-        {2.0} <music21.stream.Measure 2 offset=2.0>
+        {1.0} <music21.stream.Measure 2 offset=1.0>
         <BLANKLINE>
-        {2.0} <music21.note.Note D>
+        {1.0} <music21.note.Note D>
 
         >>> hds = humdrum.spineParser.HumdrumSpine()        
         >>> s2 = hds.moveElementsIntoMeasures(s1)
@@ -933,8 +933,14 @@ class HumdrumSpine(object):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note C>
-        {2.0} <music21.stream.Measure 2 offset=2.0>
+        {1.0} <music21.stream.Measure 2 offset=1.0>
             {0.0} <music21.note.Note D>        
+        
+        The first measure is correctly identified as a pickup!
+        
+        >>> s2.measure(1).paddingLeft
+        1.0
+        
         '''
         streamOut = streamIn.__class__()
         currentMeasure = stream.Measure()
@@ -979,6 +985,10 @@ class HumdrumSpine(object):
                 else:
                     m1.insert(0, el)
                     streamOut.remove(el)
+            m1TimeSignature = m1.timeSignature
+            if m1TimeSignature is not None:
+                if m1.duration.quarterLength < m1TimeSignature.barDuration.quarterLength:
+                    m1.paddingLeft = m1TimeSignature.barDuration.quarterLength - m1.duration.quarterLength
             
         return streamOut
     

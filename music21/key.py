@@ -477,6 +477,7 @@ class KeySignature(base.Music21Object):
         self._alteredPitchesCached = post
         return post
 
+       
 
     alteredPitches = property(_getAlteredPitches, 
         doc='''

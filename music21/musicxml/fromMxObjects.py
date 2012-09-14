@@ -1863,12 +1863,12 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         # check for backup and forward first
         if isinstance(mxObj, musicxmlMod.Backup):
             # resolve as quarterLength, subtract from measure offset
-            #environLocal.printDebug(['found mxl backup:', mxObj.duration])
+            #environLocal.printDebug(['found musicxl backup:', mxObj.duration])
             offsetMeasureNote -= float(mxObj.duration) / float(divisions)
             continue
         elif isinstance(mxObj, musicxmlMod.Forward):
             # resolve as quarterLength, add to measure offset
-            #environLocal.printDebug(['found mxl forward:', mxObj.duration, 'divisions', divisions])
+            #environLocal.printDebug(['found musicxl forward:', mxObj.duration, 'divisions', divisions])
             offsetMeasureNote += float(mxObj.duration) / float(divisions)
             continue
         elif isinstance(mxObj, musicxmlMod.Print):
