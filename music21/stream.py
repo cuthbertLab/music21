@@ -303,7 +303,10 @@ class Stream(base.Music21Object):
         elif isinstance(key, slice): # get a slice of index values
             # manually inserting elements is critical to setting the element
             # locations
-            found = self.__class__()
+            try:
+                found = self.__class__()
+            except TypeError:
+                raise StreamException("Error in defining class: %r.  Stream subclasses and Music21Objects cannot have required arguments in __init__" % self.__class__)
             for e in self.elements[key]:
                 found.insert(e.getOffsetBySite(self), e)
             # each insert calls this; does not need to be done here
@@ -9512,20 +9515,17 @@ class Stream(base.Music21Object):
         return returnList
 
     def attachIntervalsBetweenStreams(self, cmpStream):
-        '''For each element in self, creates an interval.Interval object in the element's
+        '''
+        For each element in self, creates an interval.Interval object in the element's
         editorial that is the interval between it and the element in cmpStream that
         is sounding at the moment the element in srcStream is attacked.
         
-        
         Remember that if you are comparing two streams with measures, etc., 
         you'll need to flatten each stream as follows:
-
         
         >>> #_DOCS_SHOW stream1.flat.attachIntervalsBetweenStreams(stream2.flat)
-        
             
         Example usage:
-    
     
         >>> from music21 import *
         >>> s1 = converter.parse('C4 d8 e f# g A2 d2', '7/4')

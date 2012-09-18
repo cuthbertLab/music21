@@ -1587,6 +1587,21 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testCopyAndDeepcopy(self):
+        '''Test copying all objects defined in this module
+        '''
+        import sys, types
+        for part in sys.modules[self.__module__].__dict__.keys():
+            match = False
+            for skip in ['_', '__', 'Test', 'Exception']:
+                if part.startswith(skip) or part.endswith(skip):
+                    match = True
+            if match:
+                continue
+            obj = getattr(sys.modules[self.__module__], part)
+            if callable(obj) and not isinstance(obj, types.FunctionType):
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
     def testBasic(self):
 

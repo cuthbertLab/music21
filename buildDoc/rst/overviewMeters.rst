@@ -287,18 +287,26 @@ Numerous methods provide ways to access levels (slices) of the hierarchical stru
 [(0.0, 0.5), (0.5, 1.0), (1.0, 1.5)]
 
 
-Finally, numerous methods provide ways to find and access the relevant nodes (the MeterTerminal or MeterSequence objects) active given a quarter length position into the tree structure. The :meth:`~music21.meter.MeterSequence.positionToIndex` method returns, for a given QL, the index of the active node. The :meth:`~music21.meter.MeterSequence.positionToSpan` method returns, for a given QL, the span of the active node. The :meth:`~music21.meter.MeterSequence.positionToDepth` method returns, for a given QL, the maximum depth at this position. 
+Finally, numerous methods provide ways to find and access the 
+relevant nodes (the MeterTerminal or MeterSequence objects) active 
+given a quarter length position into the tree structure. 
+The :meth:`~music21.meter.MeterSequence.offsetToIndex` method returns, 
+for a given QL, the index of the active node. 
+The :meth:`~music21.meter.MeterSequence.offsetToSpan` method returns, 
+for a given QL, the span of the active node. 
+The :meth:`~music21.meter.MeterSequence.offsetToDepth` method returns, 
+for a given QL, the maximum depth at this position. 
 
 
->>> ms.positionToIndex(2.5)
+>>> ms.offsetToIndex(2.5)
 1
->>> ms.positionToSpan(2.5)
+>>> ms.offsetToSpan(2.5)
 (1.5, 3.0)
->>> ms.positionToDepth(.5)
+>>> ms.offsetToDepth(.5)
 2
->>> ms[0].positionToDepth(.5)
+>>> ms[0].offsetToDepth(.5)
 1
->>> ms.getLevel(1).positionToSpan(.5)
+>>> ms.getLevel(1).offsetToSpan(.5)
 (0, 0.75)
 
 

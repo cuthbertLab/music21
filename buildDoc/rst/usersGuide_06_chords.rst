@@ -12,7 +12,7 @@ A Chord can be created with a list of Pitch objects or strings identical to thos
 >>> from music21 import *
 >>> c1 = chord.Chord(['a#3', 'g4', 'f#5'])
 >>> c1.pitches
-[A#3, G4, F#5]
+[<music21.pitch.Pitch A#3>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch F#5>]
 
 Like with a Note, Duration object properties can be configured from properties on Chord. For example, the Quarter Length of the Chord can be accessed from the :attr:`~music21.chord.Chord.quarterLength` property. (Note that, to get expected results in Python 2.x, one of the values in division must be a floating point value.) The :meth:`~music21.base.Music21Object.show` method can be used to display the results.
 

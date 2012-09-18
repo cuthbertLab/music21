@@ -8,13 +8,18 @@
 #               (Will Ware -- see docs)
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
-#               Some parts of this module are in the Public Domain
+#               Some parts of this module are in the Public Domain, see details.
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Objects and tools for processing MIDI data. 
+Objects and tools for processing MIDI data.  Converts from MIDI files to
+:class:`~music21.midi.MidiEvent`, :class:`~music21.midi.MidiTrack`, and
+:class:`~music21.midi.MidiFile` objects, and vice-versa.
 
-This module uses routines from Will Ware's public domain midi.py from 2001
+Further conversion to-and-from MidiEvent/MidiTrack/MidiFile and music21 Stream,
+Note, etc., objects takes place in :ref:`moduleMidiTranslate`.
+
+This module uses routines from Will Ware's public domain midi.py library from 2001
 see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
 
@@ -101,14 +106,17 @@ def intsToHexString(intList):
     
 
 def getNumber(midiStr, length): 
-    '''Return the value of a string byte from an 8-bit string. Then, return the remaining string.
+    '''
+    Return the value of a string byte or bytes if length > 1
+    from an 8-bit string. 
+    
+    Then, return the remaining string.
 
-    The `length` is the number of chars to read.     
-
+    The `length` is the number of chars to read. 
     This will sum a length greater than 1 if desired.
 
-    Note that MIDI uses big-endian for everything 
-    in python this is the inverse of chr()
+    Note that MIDI uses big-endian for everything.
+    This is the inverse of Python's chr() function.
 
     >>> from music21 import *
     >>> midi.getNumber('test', 0)
@@ -124,13 +132,16 @@ def getNumber(midiStr, length):
     return summation, midiStr[length:] 
 
 def getVariableLengthNumber(midiStr): 
-    '''
-    Given a string of data, strip off a number that might be of variable 
-    size; after finding the appropriate termination, 
+    r'''
+    Given a string of data, strip off a the first character, or all high-byte characters 
+    terminating with one whose ord() function is < 0x80.  Thus a variable number of bytes
+    might be read.
+    
+    After finding the appropriate termination, 
     return the remaining string.
 
     This necessary as DeltaTime times are given with variable size, 
-    and thus may be if different numbers of characters.
+    and thus may be if different numbers of characters are used.
 
     >>> from music21 import *
     >>> midi.getVariableLengthNumber('A-u')
@@ -151,8 +162,18 @@ def getVariableLengthNumber(midiStr):
     >>> midi.getVariableLengthNumber('E')
     (69, '')
 
-    >>> midi.getVariableLengthNumber('\\xff\\x7f')
+    Test that variable length characters work:
+
+    >>> midi.getVariableLengthNumber('\xff\x7f')
     (16383, '')
+    >>> midi.getVariableLengthNumber(u'中xy')
+    (210638584, u'y')
+
+    If no low-byte character is encoded, raises an IndexError
+
+    >>> midi.getVariableLengthNumber(u'中国')
+    Traceback (most recent call last):
+    IndexError: string index out of range
     '''
     # from http://faydoc.tripod.com/formats/mid.htm
     # This allows the number to be read one byte at a time, and when you see a msb of 0, you know that it was the last (least significant) byte of the number.
@@ -263,7 +284,9 @@ class Enumeration(object):
     '''
     Utility object for defining binary MIDI message constants. 
     '''
-    def __init__(self, enumList): 
+    def __init__(self, enumList = None): 
+        if enumList is None:
+            enumList = []
         lookup = { } 
         reverseLookup = {} 
         i = 0 
@@ -356,7 +379,8 @@ metaEvents = Enumeration([("SEQUENCE_NUMBER", 0x00),
 #-------------------------------------------------------------------------------
 class MidiEvent(object): 
     '''
-    A model of a MIDI event, including note-on, note-off, program change, controller change, any many others.
+    A model of a MIDI event, including note-on, note-off, program change, 
+    controller change, any many others.
 
     MidiEvent objects are paired (preceded) by :class:`~music21.midi.base.DeltaTime` 
     objects in the list of events in a MidiTrack object.
@@ -409,7 +433,8 @@ class MidiEvent(object):
 
         self._parameter1 = None # pitch or first data value
         self._parameter2 = None # velocity or second data value
-        #self.data = None # alternative data storage
+
+        # data is a property...
 
         # if this is a Note on/off, need to store original
         # pitch space value in order to determine if this is has a microtone
@@ -889,8 +914,6 @@ class DeltaTime(MidiEvent):
 
 
 
-
-
 class MidiTrack(object): 
     '''
     A MIDI Track. Each track contains a list of 
@@ -1100,7 +1123,9 @@ class MidiFile(object):
     
     def readstr(self, midiStr): 
         '''
-        Read and parse MIDI data as a string.
+        Read and parse MIDI data as a string, putting the
+        data in `.ticksPerQuarterNote` and a list of
+        `MidiTrack` objects in the attribute `.tracks`. 
         '''
         if not midiStr[:4] == "MThd":
             raise MidiException('badly formated midi string, got: %s' % midiStr[:20])
@@ -1140,19 +1165,21 @@ class MidiFile(object):
     
     def write(self): 
         '''
-        Write MIDI data as a file.
+        Write MIDI data as a file to the file opened with `.open()`.
         '''
         ws = self.writestr()
         self.file.write(ws) 
     
     def writestr(self): 
         '''
-        Return MIDI data as a string. 
+        Convert the information in self.ticksPerQuarterNote and the list of
+        MidiTrack objects in self.tracks 
+        into MIDI data and return it as a string.
         '''
         division = self.ticksPerQuarterNote 
         # Don't handle ticksPerSecond yet, too confusing 
         if (division & 0x8000) != 0:
-            raise MidiException('cannot write midi string')
+            raise MidiException('Cannot write midi string unless self.ticksPerQuarterNote is a multiple of 1024')
         midiStr = "MThd" + putNumber(6, 4) + putNumber(self.format, 2) 
         midiStr = midiStr + putNumber(len(self.tracks), 2) 
         midiStr = midiStr + putNumber(division, 2) 
@@ -1165,7 +1192,8 @@ class MidiFile(object):
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
-    '''These are tests that open windows and rely on external software
+    '''
+    These are tests that open windows and rely on external software
     '''
 
     def runTest(self):
@@ -1199,7 +1227,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mf.tracks), 2)
         self.assertEqual(mf.ticksPerQuarterNote, 960)
         self.assertEqual(mf.ticksPerSecond, None)
-        #self.assertEqual(mf.writestr, None)
+        #self.assertEqual(mf.writestr(), None)
 
         # try to write contents
         fileLikeOpen = StringIO.StringIO()

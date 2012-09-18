@@ -3129,7 +3129,7 @@ class HistoricalTwelveToneRow(TwelveToneRow):
     opus = None
     title = None
     
-    def __init__(self, composer, opus, title, row):
+    def __init__(self, composer = None, opus = None, title = None, row = None):
         self.composer = composer
         self.opus = opus
         self.title = title
@@ -3455,6 +3455,38 @@ class Test(unittest.TestCase):
             if getHistoricalRowByName(historicalRow).isTwelveToneRow() == False:
                 nonRows.append(historicalRow)
         self.assertEqual(nonRows, [])
+
+    def testExtractRowParts(self):
+        '''Was a problem in slices'''
+        aRow = getHistoricalRowByName('RowBergViolinConcerto')
+        unused_aRow2 = aRow[0:3]
+        
+    def testPostTonalDocs(self):
+        aRow = getHistoricalRowByName('RowBergViolinConcerto')
+        #aMatrix = aRow.matrix()
+        bStream = stream.Stream()
+        for i in range(0,12,3):
+            aRow2 = aRow[i:i+3]
+            c = chord.Chord(aRow2)
+            c.addLyric(c.primeFormString)
+            c.addLyric(c.forteClass)
+            bStream.append(c)
+
+    def testCopyAndDeepcopy(self):
+        '''Test copying all objects defined in this module
+        '''
+        import sys, types
+        for part in sys.modules[self.__module__].__dict__.keys():
+            match = False
+            for skip in ['_', '__', 'Test', 'Exception']:
+                if part.startswith(skip) or part.endswith(skip):
+                    match = True
+            if match:
+                continue
+            obj = getattr(sys.modules[self.__module__], part)
+            if callable(obj) and not isinstance(obj, types.FunctionType):
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
                 
         

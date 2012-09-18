@@ -206,7 +206,8 @@ In the "Checkout from SVN" window, enter https://music21.googlecode.com/svn/trun
 
 Select the "Use the repository URL as the label" option. Under "Authentication," enter the email 
 address of the Google account that you will be using to which commit access has been granted by the 
-developers, and the password from googlecode.  Go to https://code.google.com/hosting/settings/ to
+developers, and the password from googlecode.  Go to http://code.google.com/p/music21/source/checkout 
+and click on "googlecode.com password" to
 find your googlecode password (it's not your normal gmail/Google account password).   See this image
 for details on how to get the password:
 
@@ -274,19 +275,6 @@ music21, and click "OK."
 
 .. image:: images/usingEclipse/creatingnewpydevproj4.*
     :width: 650
-        
-Next, you can manually add "music21" to your PYTHONPATH?. Click "New Folder" in the right-hand 
-column and search for the music21 folder in your workspace (this is typically under the Documents 
-directory of your user profile if you kept the default).  This gives access to music21 from
-any other projects you might develop.
-
-.. image:: images/usingEclipse/blurred_PYTHONPATH.*
-    :width: 650
-
-After doing so, be sure to hit "Apply" in the "Preferences" dialog box before hitting "OK."
-
-.. image:: images/usingEclipse/creatingnewpydevproj5.*
-    :width: 650
 
 5b. Configuring the Project after finding the interpreter
 ````````````````````````````````````````````````````````````
@@ -301,11 +289,12 @@ clicking the right one).
 .. image:: images/usingEclipse/creatingnewpydevproject_cropped.*
     :width: 650
 
+You don't need to configure Password Recovery.
+
 When prompted to open a PyDev perspective, click "Yes."
 
 .. image:: images/usingEclipse/pydevperspective.*
     :width: 650
-
 
 The SVN checkout will continue (it may take 10-15 minutes and may hang at around 91% for a long time) 
 amidst a screen such as the one shown below. 

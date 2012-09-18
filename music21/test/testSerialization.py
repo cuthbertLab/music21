@@ -60,7 +60,7 @@ class Test(unittest.TestCase):
 
         c2 = chord.Chord()
         c2.json = raw
-        self.assertEqual(str(c1.pitches), '[C2, A4, E5]')
+        self.assertEqual(str(c1.pitches), '[<music21.pitch.Pitch C2>, <music21.pitch.Pitch A4>, <music21.pitch.Pitch E5>]')
         self.assertEqual(c1.quarterLength, 1.25)
 
 
@@ -73,7 +73,7 @@ class Test(unittest.TestCase):
         s.append(note.Note('g~6', quarterLength=.25))
 
         temp = converter.freezeStr(s)
-        post = converter.unfreezeStr(temp)
+        post = converter.thawStr(temp)
         self.assertEqual(len(post.notes), 2)
         self.assertEqual(str(post.notes[0].pitch), 'D2')
 
@@ -98,7 +98,7 @@ class Test(unittest.TestCase):
         sCopy = copy.deepcopy(s)
         temp = converter.freezeStr(sCopy)
 
-        post = converter.unfreezeStr(temp)
+        post = converter.thawStr(temp)
         self.assertEqual(len(post.notes), 2)
         self.assertEqual(str(post.notes[0].pitch), 'D2')
         spPost = post.spanners[0]
@@ -111,7 +111,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
 
         temp = converter.freezeStr(s, fmt='pickle')        
-        sPost = converter.unfreezeStr(temp)
+        sPost = converter.thawStr(temp)
         #sPost.show()
         self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
 
@@ -134,11 +134,11 @@ class Test(unittest.TestCase):
         #converter.freeze(s, fmt='pickle', fp='/_scratch/test.p')
     
         data = converter.freezeStr(s, fmt='pickle')
-        sPost = converter.unfreezeStr(data)
+        sPost = converter.thawStr(data)
         self.assertEqual(len(sPost.notes), 5)
         #sPost.show()
 
-    def testBasicG(self):
+    def xtestJsonPickle(self):
         from music21 import stream, note, converter, spanner
         
         s = stream.Score()
@@ -149,17 +149,17 @@ class Test(unittest.TestCase):
             
         data = converter.freezeStr(s, fmt='jsonpickle')
         #print data
-        sPost = converter.unfreezeStr(data)
+        sPost = converter.thawStr(data)
         self.assertEqual(len(sPost.notes), 5)
         #sPost.show()
 
 
-    def testBasicH(self):
+    def xtestJsonPickle2(self):
         from music21 import corpus, converter
         s = corpus.parse('bwv66.6')
 
         temp = converter.freezeStr(s, fmt='jsonpickle')        
-        sPost = converter.unfreezeStr(temp)
+        sPost = converter.thawStr(temp)
         #sPost.show()
         self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
 
@@ -190,7 +190,7 @@ class Test(unittest.TestCase):
         #s.show()
 
         temp = converter.freezeStr(s, fmt='pickle')        
-        sPost = converter.unfreezeStr(temp)
+        sPost = converter.thawStr(temp)
         self.assertEqual(len(sPost.parts), 2)
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
@@ -212,7 +212,7 @@ class Test(unittest.TestCase):
         #s.show()
 
         temp = converter.freezeStr(s, fmt='pickle')        
-        sPost = converter.unfreezeStr(temp)
+        sPost = converter.thawStr(temp)
         self.assertEqual(len(sPost.parts), 2)
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)

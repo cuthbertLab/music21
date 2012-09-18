@@ -1951,7 +1951,7 @@ class TestExternal(unittest.TestCase):
                 n.pitch.microtone = 20
             elif n.step != 'B' and n.accidental is not None and n.accidental.name == 'flat':
                 n.pitch.microtone = -20
-        unused_mts = midi.translate.streamsToMidiTracks(p)
+        unused_mts = midi.translate.streamHierarchyToMidiTracks(p)
 
         p.show('midi')
 

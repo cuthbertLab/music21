@@ -34,8 +34,8 @@ We can view the fourth and fifth measures of the violin Part by obtaining the Pa
 
 If we want to gather all :class:`~music21.pitch.Pitch` objects from this measure range, we can use the :attr:`~music21.stream.Stream.pitches` property. This returns a list of all Pitch objects. All pitch objects have :attr:`~music21.pitch.Pitch.pitchClass`  and :attr:`~music21.pitch.Pitch.pitchClassStr` properties, providing either integer or string representations, respectively.
 
->>> mRange.pitches
-[A4, F#4, G4, G4, B4, E5, G5, G5, G5, C#6, E6, E6, E6, G6, C#5]
+>>> [str(p) for p in mRange.pitches]
+['A4', 'F#4', 'G4', 'G4', 'B4', 'E5', 'G5', 'G5', 'G5', 'C#6', 'E6', 'E6', 'E6', 'G6', 'C#5']
 >>> [p.pitchClass for p in mRange.pitches]
 [9, 6, 7, 7, 11, 4, 7, 7, 7, 1, 4, 4, 4, 7, 1]
 
@@ -136,18 +136,18 @@ For example, we can create an instance of the row from Alban Berg's *Violin Conc
 
 >>> aRow = serial.getHistoricalRowByName('RowBergViolinConcerto')
 >>> aRow.show('text')
-{0.0} G
-{0.0} B-
-{0.0} D
-{0.0} F#
-{0.0} A
-{0.0} C
-{0.0} E
-{0.0} G#
-{0.0} B
-{0.0} C#
-{0.0} E-
-{0.0} F
+{0.0} <music21.pitch.Pitch G>
+{0.0} <music21.pitch.Pitch B->
+{0.0} <music21.pitch.Pitch D>
+{0.0} <music21.pitch.Pitch F#>
+{0.0} <music21.pitch.Pitch A>
+{0.0} <music21.pitch.Pitch C>
+{0.0} <music21.pitch.Pitch E>
+{0.0} <music21.pitch.Pitch G#>
+{0.0} <music21.pitch.Pitch B>
+{0.0} <music21.pitch.Pitch C#>
+{0.0} <music21.pitch.Pitch E->
+{0.0} <music21.pitch.Pitch F>
 
 >>> aMatrix = aRow.matrix()
 >>> print(aMatrix)

@@ -15,7 +15,7 @@ __all__ = ['translate', 'realtime']
 from music21.midi.base import *
 
 import base
-__doc__ = base.__doc__
+__doc__ = base.__doc__ #@ReservedAssignment @UndefinedVariable
 
 import realtime
 

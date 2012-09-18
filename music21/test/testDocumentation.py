@@ -24,7 +24,7 @@ skipModules = [
                'documenting.rst', # contains info that screws up testing
                ]
 
-def main():
+def main(runOne=False):
     music21init = music21.__file__
     music21dir = os.path.dirname(music21init)
     music21basedir = os.path.dirname(music21dir)
@@ -36,7 +36,7 @@ def main():
     timeStart = time.time()
 
     if not os.path.exists(builddocRstDir):
-        raise Exception("Cannot run tests on documentation because the rst files in builddoc do not exist")
+        raise Exception("Cannot run tests on documentation because the rst files in builddoc/staticDocs do not exist")
     
     for module in os.listdir(builddocRstDir):
         if not module.endswith('.rst'):
@@ -45,6 +45,10 @@ def main():
             continue
         if module in skipModules:
             continue
+        if runOne is not False:
+            if not module.endswith(runOne):
+                continue
+        
         fullModulePath = builddocRstDir + os.sep + module
         print module + ":",
         (failcount, testcount) = doctest.testfile(fullModulePath, optionflags = doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
@@ -63,3 +67,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    #main('overviewMeters.rst')

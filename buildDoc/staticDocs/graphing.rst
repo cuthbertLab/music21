@@ -333,9 +333,3 @@ and which notes are not::
     :width: 600
 
 :download:`See full-size graph <images/graphing-05.png>`
-
-
-
-
-
-

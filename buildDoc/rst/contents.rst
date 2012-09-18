@@ -144,6 +144,7 @@ Module Reference
    moduleTheoryAnalysisTheoryAnalyzer
    moduleTie
    moduleTinyNotation
+   moduleTrecentoCapua
    moduleTrecentoCadencebook
    moduleTrecentoPolyphonicSnippet
    moduleTrecentoTonality

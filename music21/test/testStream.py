@@ -3188,7 +3188,7 @@ class Test(unittest.TestCase):
         n.quarterLength = .5
         s.repeatAppend(n, 6)
         #post = s.midiTracks # get a lost 
-        post = midiTranslate.streamsToMidiTracks(s)
+        post = midiTranslate.streamHierarchyToMidiTracks(s)
 
         self.assertEqual(len(post[0].events), 30)
         # must be an even number

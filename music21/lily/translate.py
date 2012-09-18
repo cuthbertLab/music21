@@ -77,8 +77,6 @@ def makeLettersOnlyId(inputString):
 
 #-------------------------------------------------------------------------------
 class LilypondConverter(object):
-
-
     fictaDef = \
     r'''
     ficta = #(define-music-function (parser location) () #{ \once \set suggestAccidentals = ##t #})
@@ -330,8 +328,6 @@ class LilypondConverter(object):
         
 
         self.context.contents = contents
-        
-        
 
 
     #------- return Lily objects or append to the current context -----------#
@@ -498,18 +494,21 @@ class LilypondConverter(object):
     
     def getLySpacersFromStream(self, streamIn, measuresOnly = True):
         '''
+        Creates a series of Spacer objects for the measures in a Stream Part.
+              
         >>> from music21 import *
         >>> m1 = stream.Measure(converter.parse("a2.", "3/4"))
         >>> m2 = stream.Measure(converter.parse("b2.", "3/4"))
         >>> m3 = stream.Measure(converter.parse("a1", "4/4"))
         >>> m4 = stream.Measure(converter.parse("b1", "4/4"))
         >>> m5 = stream.Measure(converter.parse("c1", "4/4"))
-        >>> m6 = stream.Measure(converter.parse("a2", "2/4"))
+        >>> m6 = stream.Measure(converter.parse("a4 b1", "5/4"))
         >>> streamIn = stream.Stream([m1, m2, m3, m4, m5, m6])
         >>> lpc = lily.translate.LilypondConverter()
         >>> print lpc.getLySpacersFromStream(streamIn)
-        s2. s2. s1 s1 s1 s2
+        s2. s2. s1 s1 s1 s1 s4
 
+        TODO: Low-priority... rare, but possible: tuplet time signatures (3/10)...
         '''
 
         returnString = ''
@@ -523,12 +522,14 @@ class LilypondConverter(object):
 
             try:
                 dur = str(self.lyMultipliedDurationFromDuration(el.duration))
+                returnString = returnString + 's'+ dur
             except:
-                dur = '2.'
+                for c in el.duration.components:
+                    dur = str(self.lyMultipliedDurationFromDuration(c))
+                    returnString = returnString + 's'+ dur
             #if dur == mostRecentDur:
             #    recentDurCount += 1
             #else:
-            returnString = returnString + 's'+ dur
             #    mostRecentDur = dur
             #    recentDurCount = 0
 
@@ -1242,6 +1243,35 @@ class LilypondConverter(object):
         return octaveModChars        
 
     def lyMultipliedDurationFromDuration(self, durationObj):        
+        r'''
+        take a simple Duration (that is one with one DurationUnit
+        object and return a LyMultipliedDuration object:
+        
+        >>> from music21 import *
+        >>> d = duration.Duration(3)
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lyMultipliedDuration = lpc.lyMultipliedDurationFromDuration(d)
+        >>> str(lyMultipliedDuration)
+        '2. '
+        
+        >>> str(lpc.lyMultipliedDurationFromDuration(duration.Duration(8.0)))
+        '\\breve '
+        
+        Does not work with complex durations:
+        
+        >>> d = duration.Duration(5.0)
+        >>> str(lpc.lyMultipliedDurationFromDuration(d))
+        Traceback (most recent call last):
+        LilyTranslateException: DurationException for durationObject <music21.duration.Duration 5.0>: Could not determine durationNumber from None
+
+        Instead split by components:
+        
+        >>> components = d.components
+        >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
+        ['1 ', '4 ']
+        '''
+        
+        
         try:
             number_type = duration.convertTypeToNumber(durationObj.type) # module call
         except duration.DurationException as de:

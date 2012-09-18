@@ -347,8 +347,11 @@ Similarly, the :attr:`~music21.stream.Stream.pitches` property returns all Pitch
 >>> listOut = s.pitches
 >>> len(listOut)
 9
->>> listOut
-[E4, F#4, D#5, D#5, D#5, D#5, D#5, D#5, B5]
+
+Let's print the name of each pitch here:
+
+>>> [str(p) for p in listOut]
+['E4', 'F#4', 'D#5', 'D#5', 'D#5', 'D#5', 'D#5', 'D#5', 'B5']
 
 Gathering elements from a Stream based a single offset or an offset range permits treating the elements as part of timed sequence of events that can be be cut and sliced. 
 

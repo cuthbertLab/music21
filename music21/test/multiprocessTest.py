@@ -272,13 +272,19 @@ def runOneModuleWithoutImp(args):
         return ("LargeException", fp, str(excp))
 
     
-def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
-    '''Run all tests. Group can be test and external
+def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOut = 1):
+    '''
+    Run all tests. Group can be test and external
     '''    
     
     timeStart = time.time()
     poolSize = multiprocessing.cpu_count()
-    print 'Creating %d processes for multiprocessing' % poolSize
+    if poolSize > 2:
+        poolSize = poolSize - leaveOut
+    else:
+        leaveOut = 0
+
+    print 'Creating %d processes for multiprocessing (omitting %d processors)' % (poolSize, leaveOut)
     
 
     modGather = ModuleGather()

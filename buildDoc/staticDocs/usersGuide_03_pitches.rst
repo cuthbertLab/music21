@@ -76,7 +76,11 @@ And our familiar `.transpose()` method also appears on
 
 >>> p2 = p1.transpose('M7')
 >>> p2
-C##4
+<music21.pitch.Pitch C##4>
+
+Notice that at the command line, just printing the variable name
+gives you the representation `<music21.pitch.Pitch C##4>`.  You
+can also get this by typing `repr(p2)`.
 
 As with nearly all music21 objects, we can call 
 :meth:`~music21.base.Music21Object.show` method to display 
@@ -303,7 +307,7 @@ and the default `Duration` is 1.0, or a quarter Note.
 >>> from music21 import *
 >>> n1 = note.Note()
 >>> n1.pitch
-<music21.pitch.Pitch C>
+<music21.pitch.Pitch C4>
 >>> n1.duration
 <music21.duration.Duration 1.0>
 
@@ -331,12 +335,10 @@ true for the most important attributes of `Duration`:
 
 >>> n1.name
 'E-'
->>> n1.pitchClass
-3
 >>> n1.quarterLength
 3.0
->>> n1.type
-'half'
+>>> n1.accidental
+<accidental flat>
 
 Let's change the quarterLength back to 1.0 for now:
 

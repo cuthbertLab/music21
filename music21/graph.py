@@ -65,10 +65,10 @@ except ImportError:
     _missingImport.append('matplotlib')
 
 
-try:
-    import numpy
-except ImportError:
-    _missingImport.append('numpy')
+#try:
+#    import numpy 
+#except ImportError:
+#    _missingImport.append('numpy')
 
 try:
     import networkx
@@ -451,8 +451,8 @@ class Graph(object):
             raise GraphException('No such axis exists: %s' % axisKey)
         # find a shift
         if paddingFraction != 0:
-            range = valueRange[1] - valueRange[0]
-            shift = range * paddingFraction # add 10 percent of range
+            totalRange = valueRange[1] - valueRange[0]
+            shift = totalRange * paddingFraction # add 10 percent of range
         else:
             shift = 0
         # set range with shift
@@ -797,7 +797,7 @@ class GraphColorGrid(Graph):
             ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000', antialiased=False)
 
             # remove spines from each bar plot; cause excessive thickness
-            for loc, spine in ax.spines.iteritems():
+            for unused_loc, spine in ax.spines.iteritems():
                 #spine.set_color('none') # don't draw spine
                 spine.set_linewidth(.3) 
                 spine.set_color('#000000') 
@@ -892,7 +892,7 @@ class GraphColorGridLegend(Graph):
             ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000')
             
             # remove spines from each bar plot; cause excessive thickness
-            for loc, spine in ax.spines.iteritems():
+            for unused_loc, spine in ax.spines.iteritems():
                 #spine.set_color('none') # don't draw spine
                 spine.set_linewidth(.3) 
                 spine.set_color('#000000') 
@@ -912,7 +912,7 @@ class GraphColorGridLegend(Graph):
             # get labels from row data; first of pair
             # need to push y down as need bottom alignment for lower case
             ax.set_xticklabels(
-                [_substituteAccidentalSymbols(x) for x, y in rowData], 
+                [_substituteAccidentalSymbols(x) for x, unused_y in rowData], 
                 fontsize=self.tickFontSize, family=self.fontFamily, horizontalalignment='center', verticalalignment='center', 
                 y=-.4)
             # this is the scaling to see all bars; not necessary
@@ -1072,7 +1072,7 @@ class GraphHorizontalBarWeighted(Graph):
         yPos = 0
         xPoints = [] # store all to find min/max
         yTicks = [] # a list of label, value pairs
-        xTicks = []
+        #xTicks = []
 
         keys = []
         i = 0
@@ -1201,9 +1201,9 @@ class GraphScatterWeighted(Graph):
         ax = self.fig.add_subplot(1, 1, 1)
 
         # need to filter data to weight z values
-        xList = [x for x, y, z in self.data]
-        yList = [y for x, y, z in self.data]
-        zList = [z for x, y, z in self.data]
+        xList = [x for x, unused_y, unused_z in self.data]
+        yList = [y for unused_x, y, unused_z in self.data]
+        zList = [z for unused_x, unused_y, z in self.data]
 
         xMax = max(xList)
         xMin = min(xList)
@@ -1245,7 +1245,7 @@ class GraphScatterWeighted(Graph):
         for i in range(len(self.data)):
             x = xList[i]
             y = yList[i]
-            z, zScalar = zNorm[i] # normalized values
+            z, unused_zScalar = zNorm[i] # normalized values
 
             width=z*xDistort
             height=z*yDistort
@@ -1457,7 +1457,7 @@ class GraphGroupedVerticalBar(Graph):
         ax = self.fig.add_subplot(1, 1, 1)
 
         # b value is a list of values for each bar
-        for a, b in self.data:
+        for unused_a, b in self.data:
             barsPerGroup = len(b)
             # get for legend
             subLabels = sorted(b.keys())
@@ -1468,7 +1468,7 @@ class GraphGroupedVerticalBar(Graph):
 
         xVals = []
         yBundles = []
-        for i, (a, b) in enumerate(self.data):
+        for i, (unused_a, b) in enumerate(self.data):
             # create x vals from index values 
             xVals.append(i)
             yBundles.append([b[key] for key in sorted(b.keys())])
@@ -1480,7 +1480,7 @@ class GraphGroupedVerticalBar(Graph):
                 # get position, then get bar group
                 yVals.append(yBundles[j][i])
             xValsShifted = []
-            xLabels = []
+            #xLabels = []
             for x in xVals:
                 xValsShifted.append(x + (widthShift * i))
 
@@ -1924,7 +1924,7 @@ class PlotStream(object):
 
         '''
         # keys are integers
-        pcCount = self.streamObj.pitchAttributeCount('pitchClass')
+        # pcCount = self.streamObj.pitchAttributeCount('pitchClass')
         # name strings are keys, and enharmonic are thus different
         nameCount = self.streamObj.pitchAttributeCount('name')
         ticks = []
@@ -1948,7 +1948,7 @@ class PlotStream(object):
                 label.append(weights[0][1]) # second value is label
             else:      
                 sub = []
-                for w, name in weights:
+                for unused_w, name in weights:
                     sub.append(name)
                 label.append('/'.join(sub))
             ticks.append([i, ''.join(label)])
@@ -2053,7 +2053,7 @@ class PlotStream(object):
 
         '''
         # keys are integers
-        pcCount = self.streamObj.pitchAttributeCount('pitchClass')
+        # pcCount = self.streamObj.pitchAttributeCount('pitchClass')
         # name strings are keys, and enharmonic are thus different
         nameWithOctaveCount = self.streamObj.pitchAttributeCount(
                              'nameWithOctave')
@@ -2078,7 +2078,7 @@ class PlotStream(object):
                 label.append(weights[0][1]) # second value is label
             else:      
                 sub = []
-                for w, name in weights:
+                for unused_w, name in weights:
                     sub.append(name)
                 label.append('/'.join(sub))
             ticks.append([i, ''.join(label)])
@@ -2093,7 +2093,7 @@ class PlotStream(object):
         That is, show the most commonly used enharmonic first.
         '''
         # keys are integers
-        pcCount = self.streamObj.pitchAttributeCount('pitchClass')
+        # pcCount = self.streamObj.pitchAttributeCount('pitchClass')
         # name strings are keys, and enharmonic are thus different
         nameWithOctaveCount = self.streamObj.pitchAttributeCount(
                              'nameWithOctave')
@@ -2124,7 +2124,7 @@ class PlotStream(object):
                 label.append(weights[0][1]) # second value is label
             else:      
                 sub = []
-                for w, name in weights:
+                for unused_w, name in weights:
                     sub.append(name)
                 label.append('/'.join(sub))
             ticks.append([i, ''.join(label)])
@@ -2263,7 +2263,7 @@ class PlotStream(object):
             raise GraphException('cannot take log of x value: %s' %  x)
         #return pow(x, .5)
 
-    def ticksQuarterLength(self, min=None, max=None, remap=True):
+    def ticksQuarterLength(self, min=None, max=None, remap=True): #@ReservedAssignment
         '''
         Get ticks for quarterLength. 
         
@@ -2293,10 +2293,10 @@ class PlotStream(object):
         else:
             sSrc = self.streamObj
         # get all quarter lengths
-        map = sSrc.attributeCount([note.Note, chord.Chord], 'quarterLength')
+        mapping = sSrc.attributeCount([note.Note, chord.Chord], 'quarterLength')
 
         ticks = []
-        for ql in sorted(map.keys()):
+        for ql in sorted(mapping.keys()):
             if remap:
                 x = self.remapQuarterLength(ql)
             else:
@@ -2478,7 +2478,7 @@ class PlotWindowedAnalysis(PlotStream):
         '''Extract data actually calls the processing routine. 
         '''
         wa = windowed.WindowedAnalysis(self.streamObj, self.processor)
-        solutionMatrix, colorMatrix, metaMatrix = wa.process(self.minWindow, 
+        unused_solutionMatrix, colorMatrix, metaMatrix = wa.process(self.minWindow, 
             self.maxWindow, self.windowStep, windowType=self.windowType)
                 
         # get dictionaries of meta data for each row
@@ -2524,8 +2524,8 @@ class PlotWindowedAnalysis(PlotStream):
         if fp == None:
             fp = environLocal.getTempFile('.png')
 
-        dir, fn = os.path.split(fp)
-        fpLegend = os.path.join(dir, 'legend-' + fn)
+        directory, fn = os.path.split(fp)
+        fpLegend = os.path.join(directory, 'legend-' + fn)
         # call the process routine in the base graph
         self.graph.write(fp)
         # create a new graph of the legend
@@ -2648,7 +2648,7 @@ class PlotHistogram(PlotStream):
     def _extractData(self, dataValueLegit=True):
         data = {}
         dataTick = {}
-        countMin = 0 # could be the lowest value found
+        #countMin = 0 # could be the lowest value found
         countMax = 0
 
         if self.flatten:
@@ -3098,8 +3098,8 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
         am = correlate.ActivityMatch(self.streamObj)
         self.data  = am.pitchToDynamic(dataPoints=True)
 
-        xVals = [x for x,y in self.data]
-        yVals = [y for x,y in self.data]
+        xVals = [x for x, unused_y in self.data]
+        yVals = [y for unused_x, y in self.data]
 
         xTicks = self.fxTicks(min(xVals), max(xVals))
         # ticks dynamics takes no args
@@ -3209,7 +3209,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         self.fyTicks = self.ticksPitchClassUsage
         self.fxTicks = self.ticksOffset # this a method
 
-        self.data, xTicks, yTicks = self._extractData()
+        self.data, xTicks, unused_yTicks = self._extractData()
 
         #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset', 'post processing xTicks', xTicks])
 
@@ -3256,7 +3256,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
         else:
             self.fyTicks = self.ticksPitchSpaceQuartertoneUsage
 
-        self.data, xTicks, yTicks = self._extractData()
+        self.data, xTicks, unused_yTicks = self._extractData()
 
         self.graph = GraphHorizontalBar(*args, **keywords)
         self.graph.setData(self.data)
@@ -3308,7 +3308,6 @@ class PlotHorizontalBarWeighted(PlotStream):
     def _extractData(self):
         '''Extract the data from the Stream.
         '''
-        from music21 import stream
         if 'Score' not in self.streamObj.classes:
             raise GraphException('provided Stream must be Score')
         # parameters: x, span, heightScalar, color, alpha, yShift
@@ -3320,7 +3319,7 @@ class PlotHorizontalBarWeighted(PlotStream):
         data = pr.getGraphHorizontalBarWeightedData()
         #environLocal.printDebug(['data', data])
         uniqueOffsets = []
-        for key, value in data:
+        for unused_key, value in data:
             for dataList in value:
                 start = dataList[0]
                 dur = dataList[1]
@@ -3373,7 +3372,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
 
         # must set part groups if not defined here
         self._getPartGroups()
-        self.data, xTicks, yTicks = self._extractData()
+        self.data, xTicks, unused_yTicks = self._extractData()
 
         self.graph = GraphHorizontalBarWeighted(*args, **keywords)
         self.graph.setData(self.data)
@@ -3504,7 +3503,7 @@ class PlotScatterWeighted(PlotStream):
         yMax = max(yValues)
         # create a count slot for all possibilities of x/y
         # y is the pitch axis; get all contiguous pirches
-        for y, label in self.fyTicks(yMin, yMax):
+        for y, unused_label in self.fyTicks(yMin, yMax):
         #for y in yValues:
             dataCount[y] = [[x, 0] for x in xValues]
 
@@ -3541,7 +3540,7 @@ class PlotScatterWeighted(PlotStream):
         xTicks = self.fxTicks(min(xValues), max(xValues), remap=xLog)
         # create final data list using fy ticks to get values
         data = []
-        for y, label in self.fyTicks(yMin, yMax):
+        for y, unused_label in self.fyTicks(yMin, yMax):
             yIndex = y
             for x, z in dataCount[y]:
                 data.append([x, yIndex, z])
@@ -3667,8 +3666,8 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
         am = correlate.ActivityMatch(self.streamObj)
         self.data = am.pitchToDynamic(dataPoints=False)
 
-        xVals = [x for x,y,z in self.data]
-        yVals = [y for x,y,z in self.data]
+        xVals = [x for x, unused_y, unused_z in self.data]
+        yVals = [y for unused_x, y, unused_z in self.data]
 
         xTicks = self.fxTicks(min(xVals), max(xVals))
         # ticks dynamics takes no args
@@ -3743,7 +3742,7 @@ class Plot3DBars(PlotStream):
         # need to provide spacings even for zero values
         #for y in range(yValues[0], yValues[-1]+1):
         # better to use actual y values
-        for y, label in self.fyTicks(min(yValues), max(yValues)):
+        for y, unused_label in self.fyTicks(min(yValues), max(yValues)):
         #for y in yValues:
             data[y] = [[x, 0] for x in xValues]
         #print _MOD, 'data keys', data.keys()
@@ -3808,7 +3807,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
         self.fyTicks = self.ticksPitchSpaceUsage
 
         # will use self.fx and self.fxTick to extract data
-        self.data, xTicks, yTicks, zTicks = self._extractData()
+        self.data, unused_xTicks, unused_yTicks, unused_zTicks = self._extractData()
 
         self.graph = Graph3DPolygonBars(*args, **keywords)
         self.graph.setData(self.data)
@@ -3926,7 +3925,8 @@ class PlotFeatures(PlotMultiStream):
 #-------------------------------------------------------------------------------
 # public function
 def _getPlotsToMake(*args, **keywords):
-    '''Given format and values arguments, return a list of plot classes.
+    '''
+    Given `format` and `values` arguments, return a list of plot classes.
     '''
     plotClasses = [
         # histograms
@@ -3955,32 +3955,35 @@ def _getPlotsToMake(*args, **keywords):
         PlotDolan,
     ]
 
-    format = ''
+    showFormat = ''
     values = []
 
     # can match by format
     if 'format' in keywords:
-        format = keywords['format']
+        showFormat = keywords['format']
+    elif 'showFormat' in keywords:
+        showFormat = keywords['showFormat']
+
     if 'values' in keywords:
         values = keywords['values'] # should be a list
 
     #environLocal.printDebug(['got args pre conversion', args])
     # if no args, use pianoroll
     foundClassName = None
-    if len(args) == 0 and format == '' and values == []:
-        format = 'horizontalbar'
+    if len(args) == 0 and showFormat == '' and values == []:
+        showFormat = 'horizontalbar'
         values = 'pitch'
     elif len(args) == 1:
         formatCandidate = userFormatsToFormat(args[0])
         #environLocal.printDebug(['formatCandidate', formatCandidate])
         match = False
         if formatCandidate in FORMATS:
-            format = formatCandidate
+            showFormat = formatCandidate
             values = 'pitch'
             match = True
-         # if one arg, assume it is a histogram value
+        # if one arg, assume it is a histogram value
         if formatCandidate in VALUES:
-            format = 'histogram'
+            showFormat = 'histogram'
             values = [args[0]]
             match = True
         # permit directly matching the class name
@@ -3991,23 +3994,23 @@ def _getPlotsToMake(*args, **keywords):
                     foundClassName = className
                     break
     elif len(args) > 1:
-        format = userFormatsToFormat(args[0])
+        showFormat = userFormatsToFormat(args[0])
         values = args[1:] # get all remaining
     if not common.isListLike(values):
         values = [values]
     # make sure we have a list
     values = list(values)
 
-    #environLocal.printDebug(['got args post conversion', 'format', format, 'values', values, 'foundClassName', foundClassName])
+    #environLocal.printDebug(['got args post conversion', 'format', showFormat, 'values', values, 'foundClassName', foundClassName])
 
     # clean data and process synonyms
     # will return unaltered if no change
-    format = userFormatsToFormat(format) 
+    showFormat = userFormatsToFormat(showFormat) 
     values = userValuesToValues(values)
-    #environLocal.printDebug(['plotStream: format, values', format, values])
+    #environLocal.printDebug(['plotStream: format, values', showFormat , values])
 
     plotMake = []
-    if format.lower() == 'all':
+    if showFormat.lower() == 'all':
         plotMake = plotClasses
     elif foundClassName is not None:
         plotMake = [foundClassName] # place in a list
@@ -4015,15 +4018,15 @@ def _getPlotsToMake(*args, **keywords):
         plotMakeCandidates = [] # store pairs of score, class
         for plotClassName in plotClasses:
             # try to match by complete class name
-            if plotClassName.__name__.lower() == format.lower():
+            if plotClassName.__name__.lower() == showFormat.lower():
                 #environLocal.printDebug(['got plot class:', plotClassName])
                 plotMake.append(plotClassName)
 
             # try direct match of format and values
             plotClassNameValues = [x.lower() for x in plotClassName.values]
             plotClassNameFormat = plotClassName.format.lower()
-            if plotClassNameFormat == format.lower():
-                #environLocal.printDebug(['matching format', format])
+            if plotClassNameFormat == showFormat.lower():
+                #environLocal.printDebug(['matching format', showFormat])
                 # see if a matching set of values is specified
                 # normally plots need to match all values 
                 match = []
@@ -4051,7 +4054,7 @@ def _getPlotsToMake(*args, **keywords):
                     plotClassIdentifiers += [x.lower() for x in 
                                             plotClassName.values]
                     # combine format and values args
-                    for requestedValue in [format] + values:
+                    for requestedValue in [showFormat] + values:
                         if requestedValue.lower() in plotClassIdentifiers:
                             plotMake.append(plotClassName)
                             break
@@ -4174,8 +4177,8 @@ class TestExternal(unittest.TestCase):
 
         xPoints = []
         xTicks = []
-        for key, value in data.items():
-            for x, y in value:
+        for unused_key, value in data.items():
+            for x, unused_y in value:
                 if x not in xPoints:
                     xPoints.append(x)
                     xTicks.append(['r', x])
@@ -4186,11 +4189,10 @@ class TestExternal(unittest.TestCase):
 
 
     def testBrokenHorizontal(self):
-        import random
         data = []
         for label in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']:
             points = []
-            for pairs in range(10):
+            for unused_pairs in range(10):
                 start = random.choice(range(150))
                 end = start + random.choice(range(50))
                 points.append((start, end))
@@ -4203,7 +4205,6 @@ class TestExternal(unittest.TestCase):
 
 
     def testPlotHorizontalBarPitchSpaceOffset(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         # do not need to call flat version
         b = PlotHorizontalBarPitchSpaceOffset(a[0], title='Bach (soprano voice)')
@@ -4215,7 +4216,6 @@ class TestExternal(unittest.TestCase):
 
 
     def testPlotHorizontalBarPitchClassOffset(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotHorizontalBarPitchClassOffset(a[0], title='Bach (soprano voice)')
         b.process()
@@ -4227,10 +4227,8 @@ class TestExternal(unittest.TestCase):
 
 
     def testScatterWeighted(self):
-        import random
         data = []
         for i in range(50):
-            points = []
             x = random.choice(range(20))
             y = random.choice(range(20))
             z = random.choice(range(1, 20))
@@ -4241,8 +4239,6 @@ class TestExternal(unittest.TestCase):
         a.process()
 
     def testPlotScatterWeightedPitchSpaceQuarterLength(self):
-        from music21 import corpus      
-
         for xLog in [True, False]:
             a = corpus.parse('bach/bwv57.8')
             b = PlotScatterWeightedPitchSpaceQuarterLength(a[0].flat,
@@ -4258,27 +4254,22 @@ class TestExternal(unittest.TestCase):
 
 
     def testPlotPitchSpace(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramPitchSpace(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchClass(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramPitchClass(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
     def testPlotQuarterLength(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramQuarterLength(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
 
     def testPlotScatterPitchSpaceQuarterLength(self):
-        from music21 import corpus      
-
         for xLog in [True, False]:
 
             a = corpus.parse('bach/bwv57.8')
@@ -4289,14 +4280,12 @@ class TestExternal(unittest.TestCase):
             b.process()
 
     def testPlotScatterPitchClassOffset(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotScatterPitchClassOffset(a[0].flat, title='Bach (soprano voice)')
         b.process()
 
 
     def testPlotScatterPitchSpaceDynamicSymbol(self):
-        from music21 import corpus      
         a = corpus.parse('schumann/opus41no1', 2)
         b = PlotScatterPitchSpaceDynamicSymbol(a[0].flat, title='Schumann (soprano voice)')
         b.process()
@@ -4307,7 +4296,6 @@ class TestExternal(unittest.TestCase):
 
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = Plot3DBarsPitchSpaceQuarterLength(a.flat, title='Bach (soprano voice)')
         b.process()
@@ -4315,15 +4303,16 @@ class TestExternal(unittest.TestCase):
 
 
     def testAll(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         plotStream(a.flat, 'all')
 
 
     def writeAllGraphs(self):
-        '''Write a graphic file for all graphs, naming them after the appropriate class. This is used to generate documentation samples.
         '''
-        import os
+        Write a graphic file for all graphs, 
+        naming them after the appropriate class. 
+        This is used to generate documentation samples.
+        '''
 
         # get some data
         data3DPolygonBars = {1:[], 2:[], 3:[]}
@@ -4367,7 +4356,6 @@ class TestExternal(unittest.TestCase):
 
     def writeGraphColorGrid(self):
         # this is temporary
-        import os
         a = GraphColorGrid(doneAction=None)
         data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
         a.setData(data)
@@ -4383,8 +4371,6 @@ class TestExternal(unittest.TestCase):
         '''Write a graphic file for all graphs, naming them after the appropriate class. This is used to generate documentation samples.
         '''
         # TODO: need to add strip() ties here; but need stripTies on Score
-        import os
-        from music21 import corpus, converter      
         from music21.musicxml import testFiles 
 
         plotClasses = [
@@ -4440,7 +4426,6 @@ class TestExternal(unittest.TestCase):
     def writeGraphingDocs(self):
         '''Write graphing examples for the docs
         '''
-        import random, os
         post = []
 
         a = GraphScatter(doneAction=None)
@@ -4505,8 +4490,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                unused_a = copy.copy(obj)
+                unused_b = copy.deepcopy(obj)
 
 
 
@@ -4534,11 +4519,10 @@ class Test(unittest.TestCase):
         del a
 
     def testBrokenHorizontal(self):
-        import random
         data = []
         for label in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']:
             points = []
-            for pairs in range(10):
+            for i in range(10):
                 start = random.choice(range(150))
                 end = start + random.choice(range(50))
                 points.append((start, end))
@@ -4551,32 +4535,27 @@ class Test(unittest.TestCase):
 
 
     def testPlotPitchSpaceDurationCount(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat, doneAction=None,
                         title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchSpace(self):
-        from music21 import corpus      
         a = corpus.parse('bach')
         b = PlotHistogramPitchSpace(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchClass(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramPitchClass(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPlotQuarterLength(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramQuarterLength(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
 
     def testPitchDuration(self):
-        from music21 import corpus      
         a = corpus.parse('schumann/opus41no1', 2)
         b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schumann (soprano voice)')
         b.process()
@@ -4586,10 +4565,9 @@ class Test(unittest.TestCase):
 
         
     def testPlotWindowed(self, doneAction=None):
-        from music21 import corpus
         if doneAction != None:
             fp = random.choice(corpus.getBachChorales('.xml'))
-            dir, fn = os.path.split(fp)
+            unused_directory, fn = os.path.split(fp)
             a = corpus.parse(fp)
             windowStep = 3 #'2'
             #windowStep = random.choice([1,2,4,8,16,32])
@@ -4612,15 +4590,12 @@ class Test(unittest.TestCase):
 
 
     def testAll(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         plotStream(a.flat, doneAction=None)
 
 
     
     def testColorGridLegend(self, doneAction=None):
-
-        from music21.analysis import discrete
         ks = discrete.KrumhanslSchmuckler()
         data = ks.solutionLegend()
         #print data
@@ -4629,7 +4604,6 @@ class Test(unittest.TestCase):
         a.process()
 
     def testPianoRollFromOpus(self):
-        from music21 import corpus
         o = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         s = o.mergeScores()
 
@@ -4646,7 +4620,7 @@ class Test(unittest.TestCase):
 
 
     def testPlotChordsA(self):
-        from music21 import stream, note, chord, scale
+        from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
         b = PlotHistogram(stream.Stream(), doneAction=None)
@@ -4726,8 +4700,6 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, [[0.5, 0], [4.0, 2], [0.0, 4], [0.0, 5], [0.0, 7], [0.0, 9], [2.5, 11], [2.5, 0], [2.5, 2], [2.5, 4]] )
         #b.write()
 
-
-        from music21 import dynamics
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         s.append(sc.getChord('e3','a3', quarterLength=.5))
@@ -4744,7 +4716,7 @@ class Test(unittest.TestCase):
 
 
     def testPlotChordsB(self):
-        from music21 import stream, note, chord, scale
+        from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -4802,8 +4774,6 @@ class Test(unittest.TestCase):
         #b.write()
 
 
-        from music21 import dynamics
-
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         #s.append(note.Note('c3'))
@@ -4842,7 +4812,7 @@ class Test(unittest.TestCase):
 
 
     def testPlotChordsC(self):
-        from music21 import stream, dynamics, note, scale
+        from music21 import stream, scale
 
         sc = scale.MajorScale('c4')
 
@@ -4956,7 +4926,6 @@ class Test(unittest.TestCase):
 
 
     def testPlotDolanA(self):
-        from music21 import corpus      
         a = corpus.parse('bach/bwv57.8')
         b = PlotDolan(a, title='Bach', doneAction=None)
         b.process()
@@ -4974,15 +4943,13 @@ class Test(unittest.TestCase):
 
 
     def testHorizontalInstrumentationA(self):
-        from music21 import graph, stream
         s = corpus.parse('symphony94/02')
-        g = graph.PlotDolan(s, fillByMeasure=False, segmentByTarget=True, 
+        unused_g = PlotDolan(s, fillByMeasure=False, segmentByTarget=True, 
             normalizeByPart = False, title='Haydn, Symphony No. 94 in G major, Movement II',
             hideYGrid=True, hideXGrid=True, alpha=1, figureSize=[60,4], dpi=300, )
 
 
     def testHorizontalInstrumentationB(self):
-        from music21 import graph, stream, dynamics, corpus
         s = corpus.parse('bwv66.6')
         dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
         i = 0
@@ -5015,16 +4982,10 @@ _DOC_ORDER = [
         Plot3DBarsPitchSpaceQuarterLength,
 ]
 
-
-
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 
-
-
 #------------------------------------------------------------------------------
 # eof
-
-

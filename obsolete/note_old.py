@@ -276,7 +276,6 @@ class SimpleNote(PitchedOrUnpitched):
         
         C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
         '''
-#TODO: add exception throwing
         notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
         noteVals = [0, 2, 4, 5, 7, 9, 11]
         ind = notes.index(self.step.upper())

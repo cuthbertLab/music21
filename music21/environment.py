@@ -799,11 +799,14 @@ class Environment(object):
             sys.stderr.write(msg)
 
     def warn(self, msg, header=None):
-        '''To print a warning to the user, send a list of strings to this
+        '''
+        To print a warning to the user, send a list of strings to this
         method. Similar to printDebug but even if debug is off.
         '''
         if common.isStr(msg):
             msg = [msg] # make into a list
+        elif isinstance(msg, dict):
+            msg = [repr(msg)]
         if header == None:
             if msg[0] != self.modNameParent and self.modNameParent != None:
                 msg = [self.modNameParent + ': WARNING:'] + msg

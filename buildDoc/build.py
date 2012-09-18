@@ -164,6 +164,7 @@ from music21.theoryAnalysis import theoryAnalyzer as theoryAnalysisTheoryAnalyze
 from music21 import tie
 from music21 import tinyNotation
 
+from music21.trecento import capua as trecentoCapua
 from music21.trecento import cadencebook as trecentoCadencebook
 from music21.trecento import polyphonicSnippet as trecentoPolyphonicSnippet
 from music21.trecento import tonality as trecentoTonality
@@ -340,6 +341,7 @@ MODULES = [
     tie,
     tinyNotation,
     # trecento
+    trecentoCapua,
     trecentoCadencebook,
     trecentoPolyphonicSnippet,
     trecentoTonality,

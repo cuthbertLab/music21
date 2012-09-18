@@ -1027,8 +1027,13 @@ def getBachChorales(extList='xml'):
         candidate = os.path.join(baseDir, fn)
         if candidate not in paths: # it may not match extensions
             if not os.path.exists(candidate): # it does not exist at all 
-                environLocal.printDebug(['corpus missing expected file path', 
-                                    candidate])
+                fn2 = fn.replace('mxl', 'xml')
+                candidate2 = os.path.join(baseDir, fn2)
+                if candidate2 in paths:
+                    post.append(candidate2)
+                else:
+                    environLocal.printDebug(['corpus missing expected file path', 
+                                             candidate])
         else:
             post.append(candidate)
     return post

@@ -54,7 +54,6 @@ import zipfile
 from music21 import exceptions21
 from music21 import common
 from music21 import humdrum
-from music21 import midi
 from music21 import musicxml
 from music21 import stream
 from music21 import tinyNotation
@@ -515,23 +514,20 @@ class ConverterMidi(object):
     def parseData(self, strData, number=None):
         '''
         Get MIDI data from a binary string representation.
+        
+        Calls midi.translate.midiStringToStream.
         '''
         from music21.midi import translate as midiTranslate
-        mf = midi.MidiFile()
-        # do not need to call open or close on MidiFile instance
-        mf.readstr(strData)
-        midiTranslate.midiFileToStream(mf, self._stream)
+        midiTranslate.midiStringToStream(strData, self._stream)
 
     def parseFile(self, fp, number=None):
         '''
         Get MIDI data from a file path.
+
+        Calls midi.translate.midiFilePathToStream.
         '''
         from music21.midi import translate as midiTranslate
-        mf = midi.MidiFile()
-        mf.open(fp)
-        mf.read()
-        mf.close()
-        midiTranslate.midiFileToStream(mf, self._stream)
+        midiTranslate.midiFilePathToStream(fp, self._stream)
 
     def _getStream(self):
         return self._stream

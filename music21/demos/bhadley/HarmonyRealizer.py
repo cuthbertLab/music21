@@ -24,8 +24,13 @@
 #    3.
 #    accommodate pop-music specific harmonies (9th/11th/13th chords)
 
-import music21
-from music21 import *
+from music21 import clef
+from music21 import harmony
+from music21 import interval
+from music21 import metadata
+from music21 import note
+from music21 import roman
+from music21 import stream
 from music21 import corpus
 from music21.figuredBass import realizer, rules
 from music21.romanText import clercqTemperley
@@ -215,7 +220,8 @@ class TestExternal(unittest.TestCase):
     
             
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    from music21 import base
+    base.mainTest(Test)
     
     #from music21 import corpus
     #from music21.demos.bhadley import HarmonyRealizer
