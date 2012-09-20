@@ -2880,9 +2880,9 @@ class Tuplet(MusicXMLElement):
 
 class Print(MusicXMLElementList):
     def __init__(self):
-        '''from direction.mod:
+        '''
+        from direction.mod:
 
-        <!--
             The print element contains general printing parameters,
             including the layout elements defined in the layout.mod
             file. The part-name-display and part-abbreviation-display
@@ -2917,18 +2917,16 @@ class Print(MusicXMLElementList):
             current page, system, staff, or measure. Music that
             follows continues to take the default values from the
             layout included in the defaults element.
-        -->
-        <!ELEMENT print (page-layout?, system-layout?, staff-layout*,
+
+            <!ELEMENT print (page-layout?, system-layout?, staff-layout*,
             measure-layout?, measure-numbering?, part-name-display?,
             part-abbreviation-display?)>
-        <!ATTLIST print
+            <!ATTLIST print
             staff-spacing %tenths; #IMPLIED
             new-system %yes-no; #IMPLIED
             new-page %yes-no; #IMPLIED
             blank-page NMTOKEN #IMPLIED
-            page-number CDATA #IMPLIED    
-        >
-
+            page-number CDATA #IMPLIED>
 
         Supported in music21: page-layout, system-layout
         new-system

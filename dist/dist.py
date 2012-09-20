@@ -60,7 +60,7 @@ class Distributor(object):
         parentDir = os.path.dirname(directory)
         parentContents = os.listdir(parentDir)
         # make sure we are in the the proper directory
-        if (not dir.endswith("dist") or 
+        if (not directory.endswith("dist") or 
             'music21' not in parentContents):
             raise Exception("not in the music21%dist directory: %s" % (os.sep, directory))
     
@@ -243,8 +243,10 @@ class Distributor(object):
 
 
     def _uploadPyPi(self):
-        '''Upload source package to PyPI
         '''
+        Upload source package to PyPI
+        '''
+        environLocal.warn('putting bdist_egg on pypi -- looks redundant, but we have to do it again')
         savePath = os.getcwd()
         os.chdir(self.fpPackageDir)
         os.system('%s setup.py bdist_egg upload' % PY)
@@ -277,7 +279,8 @@ class Distributor(object):
 
 
     def upload(self):
-        '''Perform all uploads.
+        '''
+        Perform all uploads.
         '''
         self._uploadPyPi()
 #         for fp in [self.fpTar, self.fpEgg, self.fpWin, 
@@ -302,7 +305,7 @@ class Distributor(object):
 if __name__ == '__main__':
     d = Distributor()
     d.buildNoCorpus = False
-    d.build()
-    d.updatePaths()
+    #d.build()
+    #d.updatePaths()
     #d.upload()
-    
+    d._uploadPyPi()

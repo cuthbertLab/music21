@@ -444,8 +444,6 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
     if show:
         ex.show()
-    else:
-        post = ex.musicxml
 
 #     purcellScore = music21.parseData("Music_for_a_while.musicxml")
 #     thisClef = purcellScore.getElementsByClass(clef.Clef)[0]

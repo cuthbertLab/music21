@@ -14,6 +14,7 @@ music21\classCache.py
 music21\clef.py
 music21\common.py
 music21\configure.py
+music21\contour.py
 music21\converter.py
 music21\defaults.py
 music21\derivation.py
@@ -21,7 +22,9 @@ music21\duration.py
 music21\dynamics.py
 music21\editorial.py
 music21\environment.py
+music21\exceptions21.py
 music21\expressions.py
+music21\freezeThaw.py
 music21\graph.py
 music21\harmony.py
 music21\instrument.py
@@ -66,6 +69,7 @@ music21\analysis\correlate.py
 music21\analysis\discrete.py
 music21\analysis\metrical.py
 music21\analysis\patel.py
+music21\analysis\phrasing.py
 music21\analysis\reduction.py
 music21\analysis\search.py
 music21\analysis\windowed.py
@@ -149,7 +153,7 @@ music21\corpus\bach\bwv127.5.mxl
 music21\corpus\bach\bwv128.5.mxl
 music21\corpus\bach\bwv13.6.mxl
 music21\corpus\bach\bwv130.6.mxl
-music21\corpus\bach\bwv133.6.mxl
+music21\corpus\bach\bwv133.6.xml
 music21\corpus\bach\bwv135.6.mxl
 music21\corpus\bach\bwv136.6.mxl
 music21\corpus\bach\bwv137.5.mxl
@@ -412,7 +416,7 @@ music21\corpus\bach\bwv384.mxl
 music21\corpus\bach\bwv385.mxl
 music21\corpus\bach\bwv386.mxl
 music21\corpus\bach\bwv387.mxl
-music21\corpus\bach\bwv388.mxl
+music21\corpus\bach\bwv388.xml
 music21\corpus\bach\bwv389.mxl
 music21\corpus\bach\bwv39.7.mxl
 music21\corpus\bach\bwv390.mxl
@@ -489,10 +493,10 @@ music21\corpus\bach\bwv64.8.mxl
 music21\corpus\bach\bwv65.2.mxl
 music21\corpus\bach\bwv65.7.mxl
 music21\corpus\bach\bwv66.6.mxl
-music21\corpus\bach\bwv67.4.mxl
+music21\corpus\bach\bwv67.4.xml
 music21\corpus\bach\bwv67.7.mxl
-music21\corpus\bach\bwv69.6-a.mxl
-music21\corpus\bach\bwv69.6.mxl
+music21\corpus\bach\bwv69.6-a.xml
+music21\corpus\bach\bwv69.6.xml
 music21\corpus\bach\bwv7.7.mxl
 music21\corpus\bach\bwv70.11.mxl
 music21\corpus\bach\bwv70.7.mxl
@@ -523,7 +527,6 @@ music21\corpus\bach\bwv95.7.mxl
 music21\corpus\bach\bwv96.6.mxl
 music21\corpus\bach\bwv97.9.mxl
 music21\corpus\bach\bwv99.6.mxl
-music21\corpus\bach\goldbergVariations_bwv988.mxl
 music21\corpus\bach\artOfFugue_bwv1080\01.zip
 music21\corpus\bach\artOfFugue_bwv1080\02.zip
 music21\corpus\bach\artOfFugue_bwv1080\03.zip
@@ -2330,23 +2333,114 @@ music21\corpus\schumann\opus48no2.mxl
 music21\corpus\schumann\opus41no1\movement1.mxl
 music21\corpus\schumann\opus41no1\movement2.mxl
 music21\corpus\schumann\opus41no1\movement3.mxl
-music21\corpus\schumann\opus41no1\movement4.mxl
+music21\corpus\schumann\opus41no1\movement4.xml
 music21\corpus\schumann\opus41no1\movement5.mxl
 music21\corpus\theoryExercises\TriadExercise.mxl
 music21\corpus\theoryExercises\checker_demo.mxl
+music21\corpus\trecento\Fava_Dicant_nunc_iudei.xml
+music21\corpus\trecento\PMFC_01-Lugentium siccentur.xml
+music21\corpus\trecento\PMFC_01-Rex quem metrorum.xml
+music21\corpus\trecento\PMFC_01-Virtutibus laudabilis.xml
+music21\corpus\trecento\PMFC_01-Vos Qui Admiramini Gratissima virginis species.xml
+music21\corpus\trecento\PMFC_04-A lle' s'andrà lo spirt'.xml
+music21\corpus\trecento\PMFC_04-Cara mi donna.xml
+music21\corpus\trecento\PMFC_04-Quanto piu caro.xml
+music21\corpus\trecento\PMFC_04-Si dolce non sono.xml
+music21\corpus\trecento\PMFC_06-Jacopo-01-Aquila-Altera.xml
+music21\corpus\trecento\PMFC_06-Jacopo-02-Con-Gran-Furor.xml
+music21\corpus\trecento\PMFC_06-Jacopo-03a-Di_Novo.xml
+music21\corpus\trecento\PMFC_06-Jacopo-03b-Di_Novo.xml
+music21\corpus\trecento\PMFC_06_10-I' sentì già come l'arco.xml
+music21\corpus\trecento\PMFC_06_8-In Verde Prato.xml
+music21\corpus\trecento\PMFC_06_Giovanni-01-Angnel_son_biancho.xml
+music21\corpus\trecento\PMFC_06_Giovanni-02-Apress_un_fiume_a.xml
+music21\corpus\trecento\PMFC_06_Giovanni-03-Chon_brachi_assai.xml
+music21\corpus\trecento\PMFC_06_Giovanni-04_De_Come_Dolce_Mente.xml
+music21\corpus\trecento\PMFC_06_Giovanni-05_Donna_Gia_Fu_Leggiadra.xml
+music21\corpus\trecento\PMFC_06_Giovanni-06_Fra_Mille_Corvi.xml
+music21\corpus\trecento\PMFC_06_Giovanni-07_In_Sulla_Ripa.xml
+music21\corpus\trecento\PMFC_06_Giovanni-09_Nascoso_El_Viso.xml
+music21\corpus\trecento\PMFC_06_Piero_1-All_onbra d_un perlato.xml
+music21\corpus\trecento\PMFC_06_Piero_2-Chavalcando.xml
+music21\corpus\trecento\PMFC_06_Piero_6a-Quando_laire_comenca.xml
+music21\corpus\trecento\PMFC_12_1-Kyrie Rondello.xml
+music21\corpus\trecento\PMFC_12_10a-Credo PMFC12.10a.xml
+music21\corpus\trecento\PMFC_12_10b-Credo PMFC12.10b.xml
+music21\corpus\trecento\PMFC_12_11a-Credo PMFC12.11a.xml
+music21\corpus\trecento\PMFC_12_11b-Credo PMFC12.11b.xml
+music21\corpus\trecento\PMFC_12_12-Credo Bartholus.xml
+music21\corpus\trecento\PMFC_12_13-Credo London f83-85.xml
+music21\corpus\trecento\PMFC_12_14-Credo Phillippoctus.xml
+music21\corpus\trecento\PMFC_12_15-Sanctus Lorenzo.xml
+music21\corpus\trecento\PMFC_12_16-Sanctus PMFC12.16.xml
+music21\corpus\trecento\PMFC_12_17-Sanctus Gratiosus.xml
+music21\corpus\trecento\PMFC_12_18-Sanctus Mediolano.xml
+music21\corpus\trecento\PMFC_12_19-Sanctus Barbitonsoris.xml
+music21\corpus\trecento\PMFC_12_2-Gloria (Gubbio).xml
+music21\corpus\trecento\PMFC_12_20-Agnus Dei Gherardello.xml
+music21\corpus\trecento\PMFC_12_21-Benedicamus PMFC12.21.xml
+music21\corpus\trecento\PMFC_12_22-Benedicamus PMFC12.22.xml
+music21\corpus\trecento\PMFC_12_23-Benedicamus PMFC12.23.xml
+music21\corpus\trecento\PMFC_12_24-Benedicamus.xml
+music21\corpus\trecento\PMFC_12_3-Gloria Gherardello.xml
+music21\corpus\trecento\PMFC_12_4-Gloria Rvat 1419.xml
+music21\corpus\trecento\PMFC_12_4-Gloria Rvat 1419_bak.xml
+music21\corpus\trecento\PMFC_12_5-Gloria PMFC 12.5.xml
+music21\corpus\trecento\PMFC_12_6-Gloria Gratiosus.xml
+music21\corpus\trecento\PMFC_12_7-Gloria Egardus.xml
+music21\corpus\trecento\PMFC_12_8-Gloria London 29987.xml
+music21\corpus\trecento\PMFC_12_9-Gloria Clementiae Pax.xml
 music21\corpus\trecento\PMFC_13_01-Kyrie-Summe-Clementissime.mxl
+music21\corpus\trecento\PMFC_13_01-Kyrie-Summe-Clementissime.xml
 music21\corpus\trecento\PMFC_13_02-Kyrie-Questa-fanciulla.mxl
 music21\corpus\trecento\PMFC_13_03-Gloria Micinella.xml
-music21\corpus\trecento\PMFC_13_04-Credo Cursor.mxl
-music21\corpus\trecento\PMFC_13_05-Gloria Rosetta.mxl
-music21\corpus\trecento\PMFC_13_06-Gloria Fior Gentil.mxl
-music21\corpus\trecento\PMFC_13_07-Gloria Laus Honor.mxl
-music21\corpus\trecento\PMFC_13_08-Gloria (Ad Ongni Vento).mxl
-music21\corpus\trecento\PMFC_13_09-Gloria Anglicana.mxl
-music21\corpus\trecento\PMFC_13_10-Gloria.mxl
-music21\corpus\trecento\PMFC_13_11-Gloria.mxl
+music21\corpus\trecento\PMFC_13_04-Credo Cursor.xml
+music21\corpus\trecento\PMFC_13_05-Gloria Rosetta.xml
+music21\corpus\trecento\PMFC_13_06-Gloria Fior Gentil.xml
+music21\corpus\trecento\PMFC_13_07-Gloria Laus Honor.xml
+music21\corpus\trecento\PMFC_13_08-Gloria (Ad Ongni Vento).xml
+music21\corpus\trecento\PMFC_13_09-Gloria Anglicana.xml
+music21\corpus\trecento\PMFC_13_10-Gloria.xml
 music21\corpus\trecento\PMFC_13_11-Gloria.xml
-music21\corpus\trecento\PMFC_13_12-Gloria.mxl
+music21\corpus\trecento\PMFC_13_12-Gloria.xml
+music21\corpus\trecento\PMFC_13_13-Gloria.xml
+music21\corpus\trecento\PMFC_13_14-Gloria.xml
+music21\corpus\trecento\PMFC_13_15-Gloria.xml
+music21\corpus\trecento\PMFC_13_16-Gloria.xml
+music21\corpus\trecento\PMFC_13_17-Gloria Spiritus et Alme.xml
+music21\corpus\trecento\PMFC_13_18-Gloria Spiritus et Alme.xml
+music21\corpus\trecento\PMFC_13_19-Credo Scabroso.xml
+music21\corpus\trecento\PMFC_23_15a-Kyrie Humano Generi a.xml
+music21\corpus\trecento\PMFC_23_15b-Kyrie Humano Generi b.xml
+music21\corpus\trecento\PMFC_23_16-Kyrie Apt 16.xml
+music21\corpus\trecento\PMFC_23_17-Kyrie Principum Effectivum.xml
+music21\corpus\trecento\PMFC_23_18-Kyrie Chipre.xml
+music21\corpus\trecento\PMFC_23_19-Kyrie Perrinet.xml
+music21\corpus\trecento\PMFC_23_20-Kyrie O Sacra Virgo Beata.xml
+music21\corpus\trecento\PMFC_23_21-Kyrie Guymont.xml
+music21\corpus\trecento\PMFC_23_22-Kyrie Summe Clementissime.xml
+music21\corpus\trecento\PMFC_23_23-Kyrie Rex Inmense Maiestasis.xml
+music21\corpus\trecento\PMFC_23_24-Kyrie Ave Desiderii.xml
+music21\corpus\trecento\PMFC_23_25-Kyrie Barcelona 853.xml
+music21\corpus\trecento\PMFC_23_26-Kyrie O Virgo Sacrata Maria.xml
+music21\corpus\trecento\PMFC_24_1-Gloria Ciconia 1.xml
+music21\corpus\trecento\PMFC_24_10-Credo Ciconia 10.xml
+music21\corpus\trecento\PMFC_24_11-Credo Ciconia 11.xml
+music21\corpus\trecento\PMFC_24_15-O virum omnimoda.xml
+music21\corpus\trecento\PMFC_24_16-Albane misse celitus.xml
+music21\corpus\trecento\PMFC_24_17-Doctorum principem-Melodia suavissima-Vir mitis.xml
+music21\corpus\trecento\PMFC_24_19-Ut te per omnes celitus- Ingens alumnus padue.xml
+music21\corpus\trecento\PMFC_24_2-Credo Ciconia 2.xml
+music21\corpus\trecento\PMFC_24_20-Padu... serenans.xml
+music21\corpus\trecento\PMFC_24_21-O proles hispanie.xml
+music21\corpus\trecento\PMFC_24_22-O beatum incendium.xml
+music21\corpus\trecento\PMFC_24_3-Gloria Ciconia 3.xml
+music21\corpus\trecento\PMFC_24_4-Credo Ciconia 4.xml
+music21\corpus\trecento\PMFC_24_5-Gloria Ciconia 5 Spiritus et alme.xml
+music21\corpus\trecento\PMFC_24_6-Gloria Ciconia 6 Spiritus et alme.xml
+music21\corpus\trecento\PMFC_24_7-Gloria Suscipe, trinitas.xml
+music21\corpus\trecento\PMFC_24_8-Gloria Ciconia 8.xml
+music21\corpus\trecento\PMFC_24_9-Gloria Ciconia 9.xml
 music21\corpus\verdi\laDonnaEMobile.mxl
 music21\counterpoint\__init__.py
 music21\counterpoint\species.py
@@ -2378,10 +2472,8 @@ music21\demos\bhadley\mrjobaws\featureExtractorMRJOB.py
 music21\demos\josquin\1202a-Missa_Sine_nomine-Kyrie.krn
 music21\demos\josquin\1202a-Missa_Sine_nomine-Kyrie.xml
 music21\demos\josquin\label_intervals.py
-music21\demos\theoryAnalysis\__init__.py
-music21\demos\theoryAnalysis\theoryAnalyzer.py
-music21\demos\theoryAnalysis\theoryResult.py
-music21\demos\theoryAnalysis\wwnortonMGTA.py
+music21\demos\trecento\__init__.py
+music21\demos\trecento\largestAmbitus.py
 music21\doc\__init__.py
 music21\doc\index.html
 music21\doc\music21.html
@@ -2429,11 +2521,11 @@ music21\doc\html\moduleChord.html
 music21\doc\html\moduleClef.html
 music21\doc\html\moduleCommon.html
 music21\doc\html\moduleCompositionPhasing.html
+music21\doc\html\moduleContour.html
 music21\doc\html\moduleConverter.html
 music21\doc\html\moduleCorpusBase.html
 music21\doc\html\moduleCorpusChorales.html
 music21\doc\html\moduleCounterpointSpecies.html
-music21\doc\html\moduleDemosTheoryAnalysisTheoryAnalyzer.html
 music21\doc\html\moduleDuration.html
 music21\doc\html\moduleDynamics.html
 music21\doc\html\moduleEditorial.html
@@ -2472,7 +2564,10 @@ music21\doc\html\moduleMidiTranslate.html
 music21\doc\html\moduleMusedataBase.html
 music21\doc\html\moduleMusedataBase40.html
 music21\doc\html\moduleMusedataTranslate.html
-music21\doc\html\moduleMusicxmlTranslate.html
+music21\doc\html\moduleMusicxmlBase.html
+music21\doc\html\moduleMusicxmlFromMxObjects.html
+music21\doc\html\moduleMusicxmlM21ToString.html
+music21\doc\html\moduleMusicxmlToMxObjects.html
 music21\doc\html\moduleNote.html
 music21\doc\html\moduleNoteworthyTranslate.html
 music21\doc\html\modulePitch.html
@@ -2492,9 +2587,11 @@ music21\doc\html\moduleTempo.html
 music21\doc\html\moduleTestMultiprocessTest.html
 music21\doc\html\moduleTestTest.html
 music21\doc\html\moduleText.html
+music21\doc\html\moduleTheoryAnalysisTheoryAnalyzer.html
 music21\doc\html\moduleTie.html
 music21\doc\html\moduleTinyNotation.html
 music21\doc\html\moduleTrecentoCadencebook.html
+music21\doc\html\moduleTrecentoCapua.html
 music21\doc\html\moduleTrecentoPolyphonicSnippet.html
 music21\doc\html\moduleTrecentoTonality.html
 music21\doc\html\moduleVariant.html
@@ -2502,11 +2599,9 @@ music21\doc\html\moduleVexflowBase.html
 music21\doc\html\moduleVoiceLeading.html
 music21\doc\html\moduleVolume.html
 music21\doc\html\moduleWebappsBase.html
-music21\doc\html\moduleWebappsMusic21wsgiapp.html
 music21\doc\html\moduleXmlnode.html
 music21\doc\html\overviewFormats.html
 music21\doc\html\overviewMeters.html
-music21\doc\html\overviewNotes.html
 music21\doc\html\overviewPostTonal.html
 music21\doc\html\overviewStreams.html
 music21\doc\html\py-modindex.html
@@ -2515,8 +2610,16 @@ music21\doc\html\referenceCorpus.html
 music21\doc\html\search.html
 music21\doc\html\searchindex.js
 music21\doc\html\tutorialFinaleMac.html
+music21\doc\html\usersGuide_02_notes.html
+music21\doc\html\usersGuide_03_pitches.html
+music21\doc\html\usersGuide_06_chords.html
 music21\doc\html\usingEclipse.html
 music21\doc\html\what.html
+music21\doc\html\_downloads\graphing-03.png
+music21\doc\html\_downloads\graphing-05.png
+music21\doc\html\_downloads\graphing-bigDolan.png
+music21\doc\html\_images\02_noteF.png
+music21\doc\html\_images\03_pitches-01.png
 music21\doc\html\_images\ClercqTemperleyExbrown-eyed_girl.png
 music21\doc\html\_images\ClercqTemperleyIntroduction.png
 music21\doc\html\_images\Graph3DPolygonBars.png
@@ -2551,10 +2654,6 @@ music21\doc\html\_images\bachnononharm.png
 music21\doc\html\_images\blurred_PYTHONPATH.png
 music21\doc\html\_images\checker_demo.png
 music21\doc\html\_images\checker_parallelOctaves.png
-music21\doc\html\_images\checkingoutfromSVN.png
-music21\doc\html\_images\checkingoutfromSVN0.png
-music21\doc\html\_images\checkingoutfromSVN2.png
-music21\doc\html\_images\checkingoutfromSVN3.png
 music21\doc\html\_images\checkingoutwithcommit.png
 music21\doc\html\_images\checkoutas.png
 music21\doc\html\_images\checkoutfromSVN.png
@@ -2570,7 +2669,6 @@ music21\doc\html\_images\creatingnewpydevproj2.png
 music21\doc\html\_images\creatingnewpydevproj3.png
 music21\doc\html\_images\creatingnewpydevproj4.png
 music21\doc\html\_images\creatingnewpydevproj5.png
-music21\doc\html\_images\creatingnewpydevproj6.png
 music21\doc\html\_images\creatingnewpydevproject_cropped.png
 music21\doc\html\_images\duration_splitDotGroups.png
 music21\doc\html\_images\dynamics_simple.png
@@ -2634,11 +2732,10 @@ music21\doc\html\_images\graphing-02.png
 music21\doc\html\_images\graphing-03.png
 music21\doc\html\_images\graphing-04.png
 music21\doc\html\_images\graphing-05.png
-music21\doc\html\_images\importingmusic21inpythonconsole.png
+music21\doc\html\_images\graphing-06.png
 music21\doc\html\_images\installSVNconnectors.png
 music21\doc\html\_images\install_subversive1.png
 music21\doc\html\_images\installingpydev1.png
-music21\doc\html\_images\installingsubclipse.png
 music21\doc\html\_images\keyAccidentalByStep.png
 music21\doc\html\_images\keyAccidentalByStep_Before.png
 music21\doc\html\_images\layout_StaffGroup_01.png
@@ -2656,7 +2753,6 @@ music21\doc\html\_images\macScreenSitePackages.png
 music21\doc\html\_images\medren_Ligature_Mensural-Example.png
 music21\doc\html\_images\medren_convertHouseStyle_1.PNG
 music21\doc\html\_images\medren_convertHouseStyle_2.PNG
-music21\doc\html\_images\medren_convertHouseStyle_3.PNG
 music21\doc\html\_images\moduleMetadata-01.png
 music21\doc\html\_images\noteEditorialFictaSharp.png
 music21\doc\html\_images\objectToBraille.png
@@ -2678,7 +2774,6 @@ music21\doc\html\_images\overviewMeters-13.png
 music21\doc\html\_images\overviewMeters-14.png
 music21\doc\html\_images\overviewMeters-15.png
 music21\doc\html\_images\overviewMeters-16.png
-music21\doc\html\_images\overviewNotes-01.png
 music21\doc\html\_images\overviewNotes-02.png
 music21\doc\html\_images\overviewNotes-03.png
 music21\doc\html\_images\overviewNotes-04.png
@@ -2708,6 +2803,12 @@ music21\doc\html\_images\quickStart-04.png
 music21\doc\html\_images\quickStart-05.png
 music21\doc\html\_images\quickStart-06.png
 music21\doc\html\_images\quickStart-07.png
+music21\doc\html\_images\repeat-RepeatFinderDSCH.PNG
+music21\doc\html\_images\repeat-RepeatFinderDSCHsimplified.PNG
+music21\doc\html\_images\repeat-SimplifyExample_Chorale.PNG
+music21\doc\html\_images\repeat-SimplifyExample_ChoraleSimplified.PNG
+music21\doc\html\_images\repeat-rf_hasPickup.PNG
+music21\doc\html\_images\repeat-rf_noPickup.PNG
 music21\doc\html\_images\romanTranslatePitchDistribution.png
 music21\doc\html\_images\runas.png
 music21\doc\html\_images\runningconfigure.png
@@ -2715,6 +2816,20 @@ music21\doc\html\_images\saynotosavingmusic21.png
 music21\doc\html\_images\searchRhythmic1.png
 music21\doc\html\_images\select_4subversive.png
 music21\doc\html\_images\selectresource_checkoutfromSVN.png
+music21\doc\html\_images\serial-findMultisets.png
+music21\doc\html\_images\serial-findSegments.png
+music21\doc\html\_images\serial-findTransformedSegments.png
+music21\doc\html\_images\serial-findTransposedAndInvertedMultisets.png
+music21\doc\html\_images\serial-findTransposedMultisets.png
+music21\doc\html\_images\serial-findTransposedSegments.png
+music21\doc\html\_images\serial-getContiguousSegmentsOfLength2.png
+music21\doc\html\_images\serial-labelMultisets.png
+music21\doc\html\_images\serial-labelSegments.png
+music21\doc\html\_images\serial-labelTransformedSegments.png
+music21\doc\html\_images\serial-labelTransposedAndInvertedMultisets.png
+music21\doc\html\_images\serial-labelTransposedMultisets.png
+music21\doc\html\_images\serial-labelTransposedSegments.png
+music21\doc\html\_images\setting_up_svn_commit.png
 music21\doc\html\_images\slur1_example.png
 music21\doc\html\_images\streamMeasureOffsetMapBWV324.png
 music21\doc\html\_images\streamMelodicIntervals1.png
@@ -2772,11 +2887,11 @@ music21\doc\html\_sources\moduleChord.txt
 music21\doc\html\_sources\moduleClef.txt
 music21\doc\html\_sources\moduleCommon.txt
 music21\doc\html\_sources\moduleCompositionPhasing.txt
+music21\doc\html\_sources\moduleContour.txt
 music21\doc\html\_sources\moduleConverter.txt
 music21\doc\html\_sources\moduleCorpusBase.txt
 music21\doc\html\_sources\moduleCorpusChorales.txt
 music21\doc\html\_sources\moduleCounterpointSpecies.txt
-music21\doc\html\_sources\moduleDemosTheoryAnalysisTheoryAnalyzer.txt
 music21\doc\html\_sources\moduleDuration.txt
 music21\doc\html\_sources\moduleDynamics.txt
 music21\doc\html\_sources\moduleEditorial.txt
@@ -2815,7 +2930,10 @@ music21\doc\html\_sources\moduleMidiTranslate.txt
 music21\doc\html\_sources\moduleMusedataBase.txt
 music21\doc\html\_sources\moduleMusedataBase40.txt
 music21\doc\html\_sources\moduleMusedataTranslate.txt
-music21\doc\html\_sources\moduleMusicxmlTranslate.txt
+music21\doc\html\_sources\moduleMusicxmlBase.txt
+music21\doc\html\_sources\moduleMusicxmlFromMxObjects.txt
+music21\doc\html\_sources\moduleMusicxmlM21ToString.txt
+music21\doc\html\_sources\moduleMusicxmlToMxObjects.txt
 music21\doc\html\_sources\moduleNote.txt
 music21\doc\html\_sources\moduleNoteworthyTranslate.txt
 music21\doc\html\_sources\modulePitch.txt
@@ -2835,9 +2953,11 @@ music21\doc\html\_sources\moduleTempo.txt
 music21\doc\html\_sources\moduleTestMultiprocessTest.txt
 music21\doc\html\_sources\moduleTestTest.txt
 music21\doc\html\_sources\moduleText.txt
+music21\doc\html\_sources\moduleTheoryAnalysisTheoryAnalyzer.txt
 music21\doc\html\_sources\moduleTie.txt
 music21\doc\html\_sources\moduleTinyNotation.txt
 music21\doc\html\_sources\moduleTrecentoCadencebook.txt
+music21\doc\html\_sources\moduleTrecentoCapua.txt
 music21\doc\html\_sources\moduleTrecentoPolyphonicSnippet.txt
 music21\doc\html\_sources\moduleTrecentoTonality.txt
 music21\doc\html\_sources\moduleVariant.txt
@@ -2845,16 +2965,17 @@ music21\doc\html\_sources\moduleVexflowBase.txt
 music21\doc\html\_sources\moduleVoiceLeading.txt
 music21\doc\html\_sources\moduleVolume.txt
 music21\doc\html\_sources\moduleWebappsBase.txt
-music21\doc\html\_sources\moduleWebappsMusic21wsgiapp.txt
 music21\doc\html\_sources\moduleXmlnode.txt
 music21\doc\html\_sources\overviewFormats.txt
 music21\doc\html\_sources\overviewMeters.txt
-music21\doc\html\_sources\overviewNotes.txt
 music21\doc\html\_sources\overviewPostTonal.txt
 music21\doc\html\_sources\overviewStreams.txt
 music21\doc\html\_sources\quickStart.txt
 music21\doc\html\_sources\referenceCorpus.txt
 music21\doc\html\_sources\tutorialFinaleMac.txt
+music21\doc\html\_sources\usersGuide_02_notes.txt
+music21\doc\html\_sources\usersGuide_03_pitches.txt
+music21\doc\html\_sources\usersGuide_06_chords.txt
 music21\doc\html\_sources\usingEclipse.txt
 music21\doc\html\_sources\what.txt
 music21\doc\html\_static\basic.css
@@ -2972,10 +3093,12 @@ music21\musedata\testPrimitive\test03\02.md
 music21\musedata\testPrimitive\test03\__init__.py
 music21\musicxml\__init__.py
 music21\musicxml\base.py
+music21\musicxml\fromMxObjects.py
+music21\musicxml\m21ToString.py
 music21\musicxml\testFiles.py
 music21\musicxml\testMxl.mxl
 music21\musicxml\testPrimitive.py
-music21\musicxml\translate.py
+music21\musicxml\toMxObjects.py
 music21\noteworthy\NWCTEXT_Really_complete_example_file.nwctxt
 music21\noteworthy\Part_OWeisheit.nwctxt
 music21\noteworthy\__init__.py
@@ -6926,6 +7049,7 @@ music21\scala\scl\zwolle2.scl
 music21\test\__init__.py
 music21\test\multiprocessTest.py
 music21\test\test.py
+music21\test\testCoverage.py
 music21\test\testDefault.py
 music21\test\testDocumentation.py
 music21\test\testExternal.py
@@ -6934,12 +7058,16 @@ music21\test\testLint.py
 music21\test\testPerformance.py
 music21\test\testSerialization.py
 music21\test\testStream.py
+music21\test\timeGraphImportStar.py
 music21\test\timeGraphs.py
 music21\test\toggleDebug.py
 music21\test\testDocs\__init__.py
 music21\test\testDocs\conf.py
 music21\test\testDocs\test.py
-music21\test\testDocs\testRst\output.txt
+music21\theoryAnalysis\__init__.py
+music21\theoryAnalysis\theoryAnalyzer.py
+music21\theoryAnalysis\theoryResult.py
+music21\theoryAnalysis\wwnortonMGTA.py
 music21\trecento\__init__.py
 music21\trecento\cadencebook.py
 music21\trecento\cadences.xls
@@ -6951,6 +7079,7 @@ music21\trecento\exceldiff.py
 music21\trecento\findSevs.py
 music21\trecento\findTrecentoFragments.py
 music21\trecento\find_vatican1790.py
+music21\trecento\notation.py
 music21\trecento\polyphonicSnippet.py
 music21\trecento\quodJactatur.py
 music21\trecento\tonality.py

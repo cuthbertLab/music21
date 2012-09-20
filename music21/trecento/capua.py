@@ -1,4 +1,27 @@
 # -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         trecento.capua.py
+# Purpose:      The regola of Nicolaus de Capua for Musica Ficta
+#
+# Authors:      Michael Scott Cuthbert
+#
+# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
+#-------------------------------------------------------------------------------
+
+'''
+The `regola` of Nicolaus de Capua are four rules for determining
+proper `musica ficta`, that is unnotated accidentals.  These rules
+look only at a single melodic voice (which is corresponds to how 
+fourteenth-century music was notated, as successive voices) even
+though they affect the harmony of the period.
+
+The module contains methods for automatically applying the rules
+of Nicolaus de Capua, for putting these accidentals into the Stream,
+and, by running the :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` 
+method of Stream objects, seeing how well these rules correct certain
+harmonic problems in the music.
+'''
 import unittest
 
 from music21 import exceptions21
@@ -23,14 +46,16 @@ class CapuaException(exceptions21.Music21Exception):
 
 def applyCapuaToScore(thisWork):
     '''
-    runs Nicholaus de Capua's rules on a Score object
+    runs Nicolaus de Capua's rules on a Score object,
+    
+    calls `applyCapuaToStream` to each `part.flat` in `parts`.
     '''
     for thisPart in thisWork.parts:
         applyCapuaToStream(thisPart.flat)
 
 def applyCapuaToCadencebookWork(thisWork):
     '''
-    runs Nicholaus de Capua's rules on a set of incipits and cadences as
+    runs Nicolaus de Capua's rules on a set of incipits and cadences as
     :class:`~music21.trecento.polyphonicSnippet.PolyphonicSnippet` objects
     (a Score subclass)
     
@@ -40,11 +65,16 @@ def applyCapuaToCadencebookWork(thisWork):
     >>> bOrig = copy.deepcopy(b)
     >>> trecento.capua.applyCapuaToCadencebookWork(b)
     >>> bFN = b.asScore().flat.notes
+    >>> for n in bFN:
+    ...    trecento.capua.capuaFictaToAccidental(n)
     >>> bOrigFN = bOrig.asScore().flat.notes
     >>> for i in range(len(bFN)):
     ...    if bFN[i].pitch != bOrigFN[i].pitch: 
     ...        print bFN[i].pitch, bOrigFN[i].pitch
-     
+    F#3 F3
+    C#3 C3
+    C#3 C3
+    F#3 F3
     '''
     for thisSnippet in thisWork.snippets:
         applyCapuaToScore(thisSnippet)
@@ -62,19 +92,17 @@ def applyCapuaToStream(thisStream):
     capuaRuleThree(thisStream)
     capuaRuleFourB(thisStream)
 
-## TODO: ruleTwoB -- different interpretation of RuleTwo 
-
 
 def capuaRuleOne(srcStream):
     '''
-    Applies Nicholaus de Capua's first rule to the given srcStream, i.e. if a line descends
+    Applies Nicolaus de Capua's first rule to the given srcStream, i.e. if a line descends
     a major second then ascends back to the original note, the major second is
     made into a minor second. Also copies the relevant accidentals into
     `Note.editorial.misc["saved-accidental"]` and changes `Note.editorial.color`
     for rule 1 (blue green blue).
     
     The relevant Rule number is also stored in `Note.editorial.misc['capua_rule_number']` which
-    can be got out by ORing this.
+    can be got out by OR-ing this.
     
     Returns the number of notes that were changed (not counting notes whose colors were changed).    
     '''

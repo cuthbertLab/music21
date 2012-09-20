@@ -429,6 +429,12 @@ class TrecentoCadenceWork(object):
         <music21.stream.Score ...>
         >>> #_DOCS_HIDE dedutoScore.show()
 
+
+        Changes made to a snippet are reflected in the asScore() score object:
+        
+        >>> deduto.snippets[0].parts[0].flat.notes[0].name = "C###"
+        >>> deduto.asScore().parts[0].flat.notes[0].name
+        'C###'
         '''
         s = stream.Score()
         md = metadata.Metadata()

@@ -9076,7 +9076,11 @@ class Stream(base.Music21Object):
         >>> intervalStream1.show('text')
         {1.0} <music21.interval.Interval M9>
         {4.0} <music21.interval.Interval P8>
-                
+        
+        >>> M9 = intervalStream1[0]
+        >>> M9.noteStart.nameWithOctave, M9.noteEnd.nameWithOctave
+        ('C4', 'D5')
+        
         Using the skip attributes from :meth:`~music21.stream.Stream.findConsecutiveNotes`, 
         we can alter which intervals are reported:
         
@@ -9100,17 +9104,25 @@ class Stream(base.Music21Object):
             firstPitch = None
             secondPitch = None
             if firstNote is not None and secondNote is not None:
+                startIsChord = False
+                endIsChord = False
                 if hasattr(firstNote, "pitch") and firstNote.pitch is not None:
                     firstPitch = firstNote.pitch
                 elif hasattr(firstNote, "pitches") and len(firstNote.pitches) > 0:
                     firstPitch = firstNote.pitches[0]
+                    startIsChord = True
                 if hasattr(secondNote, "pitch") and secondNote.pitch is not None:
                     secondPitch = secondNote.pitch
                 elif hasattr(secondNote, "pitches") and len(secondNote.pitches) > 0:
                     secondPitch = secondNote.pitches[0]
+                    endIsChord = True
                 if firstPitch is not None and secondPitch is not None:
                     returnInterval = interval.notesToInterval(firstPitch, 
-                                     secondPitch)
+                                                              secondPitch)
+                    if startIsChord is False:
+                        returnInterval.noteStart = firstNote
+                    if endIsChord is False:
+                        returnInterval.noteEnd = secondNote
                     returnInterval.offset = (firstNote.offset + 
                                      firstNote.duration.quarterLength)
                     returnInterval.duration = duration.Duration(

@@ -29,8 +29,8 @@ def _getPackagesList():
     #              'music21.composition', 
 
     pkg = common.getPackageDir()
-    for dir in pkg:
-        print('found package: %s' % dir)
+    for directory in pkg:
+        print('found package: %s' % directory)
     return pkg
 
 def _getPackageData():
@@ -111,10 +111,10 @@ def runDisutils(bdistType=None):
     '''
     if bdistType == 'bdist_egg':
         print('using setuptools')
-        from setuptools import setup
+        from setuptools import setup #@UnusedImport
     else:
         print('using distutils')
-        from distutils.core import setup
+        from distutils.core import setup #@Reimport
 
     setup(name = 'music21', 
         version = music21.VERSION_STR,
@@ -140,7 +140,6 @@ if __name__ == '__main__':
     elif sys.argv[1] in ['bdist', 'sdist', 'register', 'bdist_mpkg',
                             'bdist_rpm', 'bdist_deb', 'bdist_wininst',
                             'bdist_egg']:
-        import music21
         fpMusic21 = music21.__path__[0] # list, get first item
         fpPackageDir = os.path.dirname(fpMusic21)
         print('fpPackageDir = %s' % fpPackageDir)

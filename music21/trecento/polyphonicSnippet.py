@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         trecento/polyphonicSnippet.py
+# Purpose:      subclasses for the trecento cadences from a MS Excel spreadsheet
+#
+# Authors:      Michael Scott Cuthbert
+#
+# Copyright:    Copyright © 2009, 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
+#-------------------------------------------------------------------------------
+
 import copy
 import unittest
 
@@ -392,9 +402,10 @@ class TestExternal(unittest.TestCase):
         ps = PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = trecento.cadencebook.BallataSheet().makeWork(3) )
         ps.show('lily.svg')
 
-#------------------------------------------------------------------------------
-# eof
-
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test, TestExternal)
+
+#------------------------------------------------------------------------------
+# eof
+
