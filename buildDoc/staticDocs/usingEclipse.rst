@@ -188,7 +188,7 @@ A "Check Out As" window will appear. Keep the defaults as shown and click "Finis
 .. image:: images/usingEclipse/checkoutas.*
     :width: 650
  
-Continue the process with `Creating a new PyDev Project`_.
+Continue the process with `5. Creating a new PyDev Project`_.
 
 
 4b. Checking Out with Developer Access
@@ -230,7 +230,7 @@ A "Check Out As" window will appear. Keep the defaults as shown and click "Finis
 .. image:: images/usingEclipse/checkoutas.*
     :width: 650
  
-Continue the process with `Creating a new PyDev Project`_.    
+Continue the process with `5. Creating a new PyDev Project`_.    
 
 
 5. Creating a new PyDev Project
@@ -347,7 +347,7 @@ output should be ``[D5, F5, B-5]``.
 
 Next, create an eight-note triplet duration by typing 
 ``trip = duration.Duration(0.333333333333333333)``. (The exact number of 3's doesn't matter, just type a lot of them).
- Music21 recognizes what kind of note typically has 
+Music21 recognizes what kind of note typically has 
 that duration, and prints ``'Eight Triplet (0.33QL)'`` when you type ``trip.fullName`` and press Enter.
 
 .. image:: images/usingEclipse/frommusic21import.*

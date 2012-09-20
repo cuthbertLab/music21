@@ -334,4 +334,4 @@ and which notes are not::
 .. image:: images/graphing-05.*
     :width: 600
 
-:download:`See full-size graph <images/graphing-05.png>`
+:download:`See full-size graph <images/graphing-05.jpg>`
