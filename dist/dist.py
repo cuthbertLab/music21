@@ -306,5 +306,5 @@ if __name__ == '__main__':
     d.buildNoCorpus = False
     d.build()
     d.updatePaths()
-    d.uploadGoogleCode(d.fpTar)
+    d.uploadGoogleCodeOneFile(d.fpTar)
     #d.uploadPyPi()
