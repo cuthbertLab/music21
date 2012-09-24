@@ -242,7 +242,7 @@ class Distributor(object):
             self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
 
 
-    def _uploadPyPi(self):
+    def uploadPyPi(self):
         '''
         Upload source package to PyPI
         '''
@@ -255,7 +255,7 @@ class Distributor(object):
         #os.system('cd %s; %s setup.py bdist_egg upload' % 
         #        (self.fpPackageDir, PY))
 
-    def _uploadGoogleCode(self, fp):
+    def uploadGoogleCodeOneFile(self, fp):
         '''Upload distributions to Google code. Requires googlecode_upload.py script from: 
         http://code.google.com/p/support/source/browse/trunk/scripts/googlecode_upload.py
         '''
@@ -278,11 +278,10 @@ class Distributor(object):
         print([status, reason])
 
 
-    def upload(self):
+    def uploadGoogleCode(self):
         '''
-        Perform all uploads.
+        Upload each file to googleCode.
         '''
-        self._uploadPyPi()
 #         for fp in [self.fpTar, self.fpEgg, self.fpWin, 
 #             self.fpTarNoCorpus, self.fpEggNoCorpus]:
         if self.buildNoCorpus is True:
@@ -292,7 +291,7 @@ class Distributor(object):
             fileList = [self.fpWin, self.fpEgg, self.fpTar]
         
         for fp in fileList:
-            self._uploadGoogleCode(fp)
+            self.uploadGoogleCodeOneFile(fp)
 
 
 
@@ -305,7 +304,7 @@ class Distributor(object):
 if __name__ == '__main__':
     d = Distributor()
     d.buildNoCorpus = False
-    #d.build()
-    #d.updatePaths()
-    #d.upload()
-    d._uploadPyPi()
+    d.build()
+    d.updatePaths()
+    d.uploadGoogleCode(d.fpTar)
+    #d.uploadPyPi()
