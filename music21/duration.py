@@ -21,7 +21,7 @@ also have durations which are equal to the position of the ending of the
 last object in the Stream.
 
 
-Music21 Durations are almost always measured in QuarterNotes, so an
+Music21 Durations are almost always measured in Quarter Notes, so an
 eighth note has a duration of 0.5.  Different Duration-like objects
 support objects such as grace notes which take no duration on the
 page, have a short (but real) duration when played, and have a
