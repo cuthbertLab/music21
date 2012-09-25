@@ -302,7 +302,7 @@ So now you can see the advantage of working with `Note` objects: they
 have both a `.pitch` attribute, which contains a `Pitch` object, and
 a `.duration` attribute, which contains a `Duration` object.  The
 default `Pitch` for a `Note` is `C` (meaning `C4`) 
-and the default `Duration` is 1.0, or a quarter Note.
+and the default `Duration` is 1.0, or a quarter note.
 
 >>> from music21 import *
 >>> n1 = note.Note()
