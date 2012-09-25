@@ -184,7 +184,8 @@ class Groups(list):
             return False
 
     def __ne__(self, other):
-        '''In normal lists, order matters; here it does not. 
+        '''In normal lists, order matters; here it does not.
+        TODO: Test! 
         '''
         if other is None or not isinstance(other, Groups):
             return True
