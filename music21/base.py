@@ -5,6 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Ben Houge
 #
 # Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
@@ -14,6 +15,10 @@
 #    from base import *
 
 '''
+music21.base contains all the most low-level objects that also appear in
+the music21 module (i.e., music21.base.Music21Object is the same as
+music21.Music21Object).
+
 Music21 base classes for :class:`~music21.stream.Stream` objects and elements 
 contained within them. Additional objects for defining and manipulating 
 elements are included.
