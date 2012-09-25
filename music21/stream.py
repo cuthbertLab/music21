@@ -10,9 +10,15 @@
 # Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-'''The :class:`~music21.stream.Stream` and its subclasses, a subclass of the :class:`~music21.base.Music21Object`, is the fundamental container of offset-positioned notation and musical elements in music21. Common Stream subclasses, such as the :class:`~music21.stream.Measure` and :class:`~music21.stream.Score` objects, are defined in this module. 
 '''
-
+The :class:`~music21.stream.Stream` and its subclasses, 
+a subclass of the :class:`~music21.base.Music21Object`, 
+is the fundamental container of offset-positioned notation and 
+musical elements in music21. Common Stream subclasses, such 
+as the :class:`~music21.stream.Measure` 
+and :class:`~music21.stream.Score` objects, are defined in 
+this module. 
+'''
 
 import copy
 import unittest
@@ -52,9 +58,13 @@ class StreamException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class StreamIterator(object):
-    '''An Iterator object used to handle iteration of Streams. The :meth:`~music21.stream.Stream.__iter__` method returns this object, passing a reference to self. 
+    '''
+    An Iterator object used to handle getting items from Streams. 
+    The :meth:`~music21.stream.Stream.__iter__` method 
+    returns this object, passing a reference to self. 
 
-    Note that this iterator automatically sets the active site of returned elements to the the source Stream. 
+    Note that this iterator automatically sets the active site of 
+    returned elements to the the source Stream. 
     '''
     def __init__(self, srcStream):
         self.srcStream = srcStream
@@ -91,14 +101,26 @@ class Stream(base.Music21Object):
     As a subclass of Music21Object, Streams have offsets, 
     priority, id, and groups. 
 
-    Streams may be embedded within other Streams. As each Stream can have its own offset, when Streams are embedded the offset of an element is relatively only to its parent Stream. The :attr:`~music21.stream.Stream.flat` property provides access to a flat representation of all embedded Streams, with offsets relative to the top-level Stream. 
+    Streams may be embedded within other Streams. As each 
+    Stream can have its own offset, when Streams are 
+    embedded the offset of an element is relatively only 
+    to its parent Stream. The :attr:`~music21.stream.Stream.flat` 
+    property provides access to a flat representation of all 
+    embedded Streams, with offsets relative to the 
+    top-level Stream. 
 
-    The Stream :attr:`~music21.stream.Stream.elements` attribute provides the contents of the Stream as a list. Direct access to, and manipulation of, the elements list is not recommended. Instead, use the host of high-level methods available. 
+    The Stream :attr:`~music21.stream.Stream.elements` attribute 
+    returns the contents of the Stream as a list. Direct access 
+    to, and manipulation of, the elements list is not recommended. 
+    Instead, use the host of high-level methods available. 
  
-    The Stream, like all Music21Objects, has a :class:`music21.duration.Duration` that is usually the 
-    "release" time of the chronologically last element in the Stream (that is,
-    the highest onset plus the duration of any element in the Stream).
-    The duration, however, can be "unlinked" and explicitly set independent of the Stream's contents.
+    The Stream, like all Music21Objects, has a 
+    :class:`music21.duration.Duration` that is usually the 
+    "release" time of the chronologically last element in the Stream 
+    (that is, the highest onset plus the duration of 
+    any element in the Stream).
+    The duration, however, can be "unlinked" and explicitly 
+    set independent of the Stream's contents.
 
     The first element passed to the Stream is an optional list,
     tuple, or other Stream of music21 objects which is used to
@@ -407,7 +429,8 @@ class Stream(base.Music21Object):
                 self._cache['index'] = indexCache
 
     def _getElements(self):
-        '''Combines the two storage lists, _elements and _endElements, such that they appear as a single list. 
+        '''
+        Combines the two storage lists, _elements and _endElements, such that they appear as a single list. 
         '''
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
@@ -446,9 +469,16 @@ class Stream(base.Music21Object):
         return value
         
     elements = property(_getElements, _setElements, 
-        doc='''A list representing the elements contained in the Stream. 
+        doc='''
+        A list representing the elements contained in the Stream. 
 
-        Directly getting, setting, and manipulating this list is reserved for advanced usage. Instead, use the the provided high-level methods. When setting .elements, a list of Music21Objects can be provided, or a complete Stream. If a complete Stream is provided, elements are extracted from that Stream. This has the advantage of transferring offset correctly and geting _endElements. 
+        Directly getting, setting, and manipulating this list is 
+        reserved for advanced usage. Instead, use the the 
+        provided high-level methods. When setting .elements, a 
+        list of Music21Objects can be provided, or a complete Stream. 
+        If a complete Stream is provided, elements are extracted 
+        from that Stream. This has the advantage of transferring 
+        offset correctly and geting _endElements. 
 
         >>> from music21 import *
         >>> a = stream.Stream()
@@ -868,7 +898,7 @@ class Stream(base.Music21Object):
     def remove(self, targetOrList, firstMatchOnly=True, shiftOffsets = False): #, renumberMeasures = False):
         '''
         Remove an object from this Stream. Additionally, this Stream is 
-        removed from the object's sites in :class:`~music21.base.DefinedContexts`.
+        removed from the object's sites in :class:`~music21.base.Sites`.
 
 
         By default, only the first match is removed. This can be adjusted with the `firstMatchOnly` parameters.
@@ -1125,8 +1155,8 @@ class Stream(base.Music21Object):
                 # do not use property: .activeSite; set to same weakref obj
                 setattr(new, name, self._activeSite)
             # attributes that require special handling
-            elif name == '_definedContexts':
-                # this calls __deepcopy__ in DefinedContexts
+            elif name == 'sites':
+                # this calls __deepcopy__ in Sites
                 newValue = copy.deepcopy(attrValue, memo)
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
@@ -1134,7 +1164,7 @@ class Stream(base.Music21Object):
                 # keep a reference, not a deepcopy
                 setattr(new, name, self.flattenedRepresentationOf)
             elif name == '_derivation':
-                # keep the old ancestor but need to update the conainer
+                # keep the old ancestor but need to update the container
                 newValue = copy.deepcopy(self._derivation)
                 newValue.setContainer(new)
                 setattr(new, name, newValue)
@@ -1257,7 +1287,7 @@ class Stream(base.Music21Object):
                     raise StreamException('the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (element, id(element), self, id(self)))
         # if we do not purge locations here, we may have ids() for 
         # Stream that no longer exist stored in the locations entry
-        # note that dead locations are also purged from DefinedContexts during
+        # note that dead locations are also purged from Sites during
         # all get() calls. 
         element.purgeLocations()
 
@@ -2269,24 +2299,6 @@ class Stream(base.Music21Object):
         # pass this stream to the analysis procedure
         return discrete.analyzeStream(self, *args, **keywords)
 
-
-
-#     def vector(self, id, **keywords):
-#         '''Given a feature extraction method id, return the analysis vector. For more information on music21 features extractions, se  
-# 
-#         For details on arguments, see :func:`~music21.features.base.vectorById`.
-# 
-#         For feature extractors available from jSymbolic, see :func:`~music21.features.jSymbolic.getExtractorByTypeAndNumber`.
-# 
-#         >>> from music21 import *
-#         >>> s = corpus.parse('hwv56/movement3-05.md')
-#         >>> s.vector('p16') # most common pitch class
-#         [5]
-#         '''
-#         from music21 import features
-#         # pass self as the stream
-#         return features.vectorById(self, id=id, **keywords)
-
     #---------------------------------------------------------------------------
     # methods that act on individual elements without requiring 
     # @ _elementsChanged to fire
@@ -2597,7 +2609,7 @@ class Stream(base.Music21Object):
 
         >>> s2.flat.getOffsetBySite(n1) # this will not work
         Traceback (most recent call last):
-        DefinedContextsException: ...
+        SitesException: ...
 
         >>> s2.flat.getOffsetByElement(n1)
         20.0
@@ -2606,7 +2618,7 @@ class Stream(base.Music21Object):
         '''
         try:
             return obj.getOffsetBySite(self)
-        except base.DefinedContextsException:
+        except base.SitesException:
             return None 
             
 #         post = None
@@ -11599,7 +11611,7 @@ class Measure(Stream):
         
         >>> thisTrebleClef.getOffsetBySite(m)
         Traceback (most recent call last):
-        DefinedContextsException: The object <music21.clef.TrebleClef> is not in site <music21.stream.Measure 10 offset=0.0>.
+        SitesException: The object <music21.clef.TrebleClef> is not in site <music21.stream.Measure 10 offset=0.0>.
         
         The `.clef` appears in a `.show()` or other call
         just like any other element
@@ -12623,7 +12635,7 @@ class SpannerStorage(Stream):
     of connected elements (things the Spanner spans).
 
     This subclass name can be used to search in an 
-    object's DefinedContexts and find any and all 
+    object's Sites and find any and all 
     locations that are SpannerStorage objects.
 
     A `spannerParent` keyword argument must be 
@@ -12652,7 +12664,7 @@ class VariantStorage(Stream):
     defines).
 
     This subclass name can be used to search in an 
-    object's DefinedContexts and find any and all 
+    object's Sites and find any and all 
     locations that are VariantStorage objects.
 
     A `variantParent` keyword argument must be provided 

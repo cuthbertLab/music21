@@ -13,7 +13,6 @@
 
 import unittest
 
-from music21 import base
 from music21 import common
 # imported by stream
 
@@ -23,7 +22,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-class Derivation(base.JSONSerializer):
+class Derivation(object):
     '''
     >>> import copy
     >>> from music21 import *  
@@ -43,8 +42,6 @@ class Derivation(base.JSONSerializer):
     'measure'
     '''
     def __init__(self, container=None):
-        base.JSONSerializer.__init__(self)
-
         # store a reference to the Stream that contains this derivation
         self._container = None
         self._containerId = None # store id to optimize w/o unwrapping
@@ -136,15 +133,6 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
-    def testSerializationA(self):
-        from music21 import derivation
-
-        d = derivation.Derivation()
-        self.assertEqual(d.jsonAttributes(), ['_ancestor', '_ancestorId', '_container', '_containerId', '_method'])
-
-        self.assertEqual(hasattr(d, 'json'), True)
-
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

@@ -247,9 +247,3 @@ Next Steps
 -----------------------------
 
 The following chapters provide introductions to key components of music21. Proceeding through :ref:`usersGuide_02_notes`, :ref:`overviewStreams`, :ref:`overviewFormats`, and :ref:`overviewPostTonal` provide an excellent introduction to the music21 toolkit.
-
-
-
-
-
-

@@ -37,7 +37,7 @@ class PolyphonicSnippet(stream.Score):
     >>> ps.elements[1] is cantus
     True
     >>> ps.elements[1].classes
-    ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'JSONSerializer', 'object']
+    ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'object']
     >>> #_DOCS_SHOW ps.show()
     
     

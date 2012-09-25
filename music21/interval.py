@@ -11,15 +11,11 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-'''This module defines various types of interval objects. 
+'''
+This module defines various types of interval objects. 
 Fundamental classes are :class:`~music21.interval.Interval`, 
 :class:`~music21.interval.GenericInterval`, 
 and :class:`~music21.interval.ChromaticInterval`.
-
-Numerous utility functions are provided for processing and generating intervals.
-
-*module authors: Michael Scott Cuthbert, Jackie Rogoff, Amy Hailes, and Christopher Ariza*
-
 '''
 
 import copy
@@ -378,7 +374,8 @@ def convertGenericToSemitone(value):
     
 
 def convertSemitoneToSpecifierGenericMicrotone(count):
-    '''Given a number of semitones, return a default diatonic specifier and cent offset.
+    '''
+    Given a number of semitones, return a default diatonic specifier and cent offset.
 
     >>> from music21 import *
 
@@ -461,7 +458,8 @@ def convertSemitoneToSpecifierGenericMicrotone(count):
 
 
 def convertSemitoneToSpecifierGeneric(count):
-    '''Given a number of semitones, return a default diatonic specifier.
+    '''
+    Given a number of semitones, return a default diatonic specifier.
 
     >>> from music21 import *
     >>> interval.convertSemitoneToSpecifierGeneric(0)
@@ -771,14 +769,12 @@ class GenericInterval(base.Music21Object):
 
 
 class DiatonicInterval(base.Music21Object):
-    '''A class representing a diatonic interval. Two required arguments are a `specifier` (such as perfect, major, or minor) and a `generic`, an interval size (such as 2, 2nd, or second). 
-
-
-    A DiatonicInterval contains and encapsulates a :class:`~music21.interval.GenericInterval`
-
+    '''
+    A class representing a diatonic interval. Two required arguments are a string `specifier` 
+    (such as perfect, major, or minor) and `generic`, either an int of an interval size (such as 2, 2nd, or second)
+    or a :class:`~music21.music21.interval.GenericInterval` object. 
 
     Two DiatonicIntervals are the same if their GenericIntervals are the same and their specifiers are the same.
-
     '''
     _DOC_ATTR = {
     'name': 'The name of the interval in abbreviated form without direction.',
@@ -944,7 +940,8 @@ class DiatonicInterval(base.Music21Object):
 
 
     def reverse(self):
-        '''Return a DiatonicInterval that is an inversion of this Interval.
+        '''
+        Return a :class:`~music21.music21.interval.DiatonicInterval` that is an inversion of this Interval.
 
         >>> from music21 import *
         >>> aInterval = interval.DiatonicInterval('major', 3)
@@ -961,7 +958,8 @@ class DiatonicInterval(base.Music21Object):
 
 
     def getChromatic(self):
-        '''Return a :class:`music21.interval.ChromaticInterval` based on the size of this Interval.
+        '''
+        Return a :class:`music21.interval.ChromaticInterval` based on the size of this Interval.
 
         >>> from music21 import *
         >>> aInterval = interval.DiatonicInterval('major', 'third')
@@ -969,7 +967,6 @@ class DiatonicInterval(base.Music21Object):
         'Major Third'
         >>> aInterval.getChromatic()
         <music21.interval.ChromaticInterval 4>
-
 
         >>> aInterval = interval.DiatonicInterval('augmented', -5)
         >>> aInterval.niceName
@@ -982,7 +979,7 @@ class DiatonicInterval(base.Music21Object):
         'Minor Second'
         >>> aInterval.getChromatic()
         <music21.interval.ChromaticInterval 1>
-
+        
         '''
         # note: part of this functionality used to be in the function
         # _stringToDiatonicChromatic(), which used to be named something else
@@ -1012,7 +1009,9 @@ class DiatonicInterval(base.Music21Object):
         return c.cents
 
     cents = property(_getCents,
-        doc = '''Return a cents representation of this interval, always assuming equal an equal tempered presentation. 
+        doc = '''
+        Return a cents representation of this interval as a float, 
+        always assuming an equal-tempered presentation. 
 
         >>> from music21 import *
         >>> i = interval.DiatonicInterval('minor', 'second')
@@ -1029,11 +1028,11 @@ class DiatonicInterval(base.Music21Object):
 
 class ChromaticInterval(base.Music21Object):
     '''
-    Chromatic interval class. Unlike a Diatonic interval, this Interval 
-    class treats interval spaces in half-steps.  So Major 3rd and Diminished 4th are the same
-    
+    Chromatic interval class. Unlike a :class:`~music21.music21.interval.DiatonicInterval`, this Interval 
+    class treats interval spaces in half-steps.  So Major 3rd and Diminished 4th are the same.
     
     Two ChromaticIntervals are equal if their size and direction are equal.
+
     '''
     def __init__(self, value = 0):
         '''
@@ -1126,7 +1125,9 @@ class ChromaticInterval(base.Music21Object):
 
 
     def reverse(self):
-        '''Return an inverted interval, that is, reversing the direction.
+        '''
+        Return an inverted :class:`~music21.music21.interval.ChromaticInterval`, 
+        that is, reversing the direction.
 
         >>> from music21 import *
         >>> aInterval = interval.ChromaticInterval(-14)
@@ -1140,7 +1141,8 @@ class ChromaticInterval(base.Music21Object):
         return ChromaticInterval(self.undirected * (-1 * self.direction))
 
     def getDiatonic(self):
-        '''Given a Chromatic interval, return a Diatonic interval object of the
+        '''
+        Given a ChromaticInterval, return a :class:`~music21.music21.interval.DiatonicInterval` object of the
         same size. 
         
         While there is more than one Generic Interval for any given chromatic 
@@ -1173,16 +1175,16 @@ class ChromaticInterval(base.Music21Object):
         specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
     
-    def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True):
-        '''Given a :class:`~music21.pitch.Pitch`  object, return a new, 
+    def transposePitch(self, p):
+        '''
+        Given a :class:`~music21.pitch.Pitch` object, return a new, 
         transposed Pitch, that is transformed 
         according to this ChromaticInterval. 
         
-        `reverse` and `clearAccidentalDisplay` do nothing and will be removed...
-
-        Because ChromaticIntervals do not take into account diatonic spelling,
+        Because :class:`~music21.music21.interval.ChromaticInterval` object 
+        do not take into account diatonic spelling,
         the new Pitch is simplified to the most common intervals.  See
-        :meth:`~music21.pitch.Pitch.simplifyEnharmonic` with mostCommon = True
+        :meth:`~music21.pitch.Pitch.simplifyEnharmonic` with ``mostCommon = True``
         to see the results.
                 
         >>> from music21 import *
@@ -1220,7 +1222,9 @@ class ChromaticInterval(base.Music21Object):
 
 #-------------------------------------------------------------------------------
 def _stringToDiatonicChromatic(value):
-    '''A function for processing interval strings and returning diatonic and chromatic interval objects. Used by the Interval class, below. 
+    '''
+    A function for processing interval strings and returning 
+    diatonic and chromatic interval objects. Used by the Interval class, below. 
 
     >>> _stringToDiatonicChromatic('P5')
     (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
@@ -1273,8 +1277,11 @@ def _stringToDiatonicChromatic(value):
 
 
 def notesToGeneric(n1, n2):
-    '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.GenericInterval` object.
-    works equally well with :class:`~music21.pitch.Pitch` objects
+    '''
+    Given two :class:`~music21.note.Note` objects, 
+    returns a :class:`~music21.interval.GenericInterval` object.
+    
+    Works equally well with :class:`~music21.pitch.Pitch` objects
     
     >>> from music21 import *
     >>> aNote = note.Note('c4')
@@ -1295,7 +1302,10 @@ def notesToGeneric(n1, n2):
     return GenericInterval(genDist)
 
 def notesToChromatic(n1, n2):
-    '''Given two :class:`~music21.note.Note` objects, returns a :class:`~music21.interval.ChromaticInterval` object.
+    '''
+    Given two :class:`~music21.note.Note` objects, 
+    returns a :class:`~music21.interval.ChromaticInterval` object.
+    
     Works equally well with :class:`~music21.pitch.Pitch` objects.
     
     >>> from music21 import *
@@ -1327,7 +1337,6 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     2
     >>> interval.convertSpecifier('major')
     (2, 'M')
-    
     
     Absurdly altered interval:
     
@@ -1364,7 +1373,10 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
 
     
 def intervalsToDiatonic(gInt, cInt):
-    '''Given a :class:`~music21.interval.GenericInterval` and a :class:`~music21.interval.ChromaticInterval` object, return a :class:`~music21.interval.DiatonicInterval`.    
+    '''
+    Given a :class:`~music21.interval.GenericInterval` and 
+    a :class:`~music21.interval.ChromaticInterval` object, 
+    return a :class:`~music21.interval.DiatonicInterval`.    
 
     >>> from music21 import *
     >>> aInterval = interval.GenericInterval('descending fifth')
@@ -1425,9 +1437,15 @@ def intervalFromGenericAndChromatic(gInt, cInt):
 
 
 class Interval(base.Music21Object):
-    '''An Interval class that encapsulates both Chromatic and Diatonic intervals all in one model. 
+    '''
+    An Interval class that encapsulates both :class:`~music21.music21.interval.ChromaticInterval` and 
+    :class:`~music21.music21.interval.DiatonicInterval` objects all in one model. 
 
-     The interval is specified either as named arguments, a :class:`~music21.interval.DiatonicInterval` and a :class:`~music21.interval.ChromaticInterval`, or two :class:`~music21.note.Note` objects, from which both a ChromaticInterval and DiatonicInterval are derived. 
+     The interval is specified either as named arguments, a 
+     :class:`~music21.interval.DiatonicInterval` and 
+     a :class:`~music21.interval.ChromaticInterval`, 
+     or two :class:`~music21.note.Note` objects (or :class:`~music21.music21.interval.Pitch` objects), 
+     from which both a ChromaticInterval and DiatonicInterval are derived. 
 
     >>> from music21 import *
     >>> n1 = note.Note('c3')
@@ -1437,8 +1455,12 @@ class Interval(base.Music21Object):
     <music21.interval.Interval P15>
     >>> aInterval.name
     'P15'
+    >>> aInterval.noteStart is n1
+    True
+    >>> aInterval.noteEnd is n2
+    True
 
-    Reduce to a single octave:
+    Reduce to less than an octave:
 
     >>> aInterval.simpleName
     'P1'
@@ -1448,7 +1470,6 @@ class Interval(base.Music21Object):
     >>> aInterval.semiSimpleName
     'P8'
 
-
     An interval can also be specified directly
 
     >>> aInterval = interval.Interval('m3')
@@ -1456,8 +1477,7 @@ class Interval(base.Music21Object):
     <music21.interval.Interval m3>
     >>> aInterval = interval.Interval('M3')
     >>> aInterval
-    <music21.interval.Interval M3>
-    
+    <music21.interval.Interval M3>    
     
     >>> aInterval = interval.Interval('p5')
     >>> aInterval
@@ -1487,25 +1507,23 @@ class Interval(base.Music21Object):
     >>> aInterval.name
     'm2'
     
+    A single int is treated as a number of half-steps:
     
-    >>> aInterval = interval.Interval(3)
+    >>> aInterval = interval.Interval(4)
     >>> aInterval
-    <music21.interval.Interval m3>
+    <music21.interval.Interval M3>
 
     >>> aInterval = interval.Interval(7)
     >>> aInterval
     <music21.interval.Interval P5>
     
+    If giving a starting note, an ending note has to be specified.
     
-    >>> n1 = note.Note('c3')
-    >>> n2 = note.Note('g3')
-    >>> aInterval = interval.Interval(noteStart=n1, noteEnd=n2)
-    >>> aInterval
-    <music21.interval.Interval P5>
-
     >>> aInterval = interval.Interval(noteStart=n1, noteEnd=None)
     Traceback (most recent call last):
     IntervalException: either both the starting and the ending note.Note must be given or neither can be given.  You cannot have one without the other.
+
+    An Interval can be constructed from a Diatonic and Chromatic Interval object
 
     >>> aInterval = interval.DiatonicInterval('major', 'third')
     >>> bInterval = interval.ChromaticInterval(4)
@@ -1517,11 +1535,8 @@ class Interval(base.Music21Object):
     Traceback (most recent call last):
     IntervalException: either both a DiatonicInterval and a ChromaticInterval object have to be given or neither can be given.  You cannot have one without the other.
 
-
     Two Intervals are the same if their Chromatic and Diatonic intervals
     are the same.  N.B. that interval.Interval('a4') != 'a4' -- maybe it should...
-
-
 
     OMIT_FROM_DOCS
     
@@ -1533,7 +1548,6 @@ class Interval(base.Music21Object):
     >>> aInterval.isStep
     True
     
-
     >>> aInterval = interval.Interval('dd3')
     >>> aInterval.isChromaticStep
     True
@@ -1673,7 +1687,6 @@ class Interval(base.Music21Object):
 
         These rules define all common-practice consonances (and earlier back to about 1300 all imperfect consonances)
 
-
         >>> from music21 import *
         >>> i1 = notesToInterval(note.Note('C'), note.Note('E'))
         >>> i1.isConsonant()
@@ -1715,8 +1728,6 @@ class Interval(base.Music21Object):
         
         >>> a == 'a4'
         False
-        
-        
         '''
         if other == None:
             return False
@@ -1733,7 +1744,8 @@ class Interval(base.Music21Object):
         return Interval(self.diatonic.mod7inversion)
     
     complement = property(_getComplement, 
-        doc='''Return a new Interval object that is the complement of this Interval.
+        doc='''
+        Return a new :class:`~music21.music21.interval.Interval` object that is the complement of this Interval.
 
         >>> from music21 import *
         >>> aInterval = interval.Interval('M3')
@@ -1757,7 +1769,6 @@ class Interval(base.Music21Object):
         that is, the lesser of the number of half-steps in the 
         simpleInterval or its complement.
         
-
         >>> from music21 import *
         >>> aInterval = interval.Interval('M3')
         >>> aInterval.intervalClass
@@ -1766,7 +1777,6 @@ class Interval(base.Music21Object):
         >>> bInterval = interval.Interval('m6')
         >>> bInterval.intervalClass
         4
-
         ''')
 
 
@@ -1789,12 +1799,15 @@ class Interval(base.Music21Object):
         >>> microtoneInterval = interval.Interval(noteStart = n1, noteEnd = n2)
         >>> microtoneInterval.cents
         230.0
-
         ''')
 
 
     def _diatonicIntervalCentShift(self):
-        '''Return the number of cents the diatonic interval needs to be shifted to correspond to microtonal value specified in the chromatic interval.
+        '''
+        Return the number of cents the diatonic 
+        interval needs to be shifted to 
+        correspond to microtonal value specified 
+        in the chromatic interval.
         '''
         dCents = self.diatonic.cents
         cCents = self.chromatic.cents
@@ -1802,7 +1815,8 @@ class Interval(base.Music21Object):
 
     def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True, 
         maxAccidental=4):
-        '''Given a :class:`~music21.pitch.Pitch`  object, return a new, 
+        '''
+        Given a :class:`~music21.pitch.Pitch` object, return a new, 
         transposed Pitch, that is transformed 
         according to this Interval. This is the main public interface to all 
         transposition routines found on higher-level objects. 
@@ -1911,7 +1925,10 @@ class Interval(base.Music21Object):
 
 
     def reverse(self):
-        '''Return an reversed version of this interval. If given Notes, these notes are reversed. 
+        '''
+        Return an reversed version of this interval. 
+        If :class:`~music21.music21.note.Note` objects are stored as
+        `noteStart` and `noteEnd`, these notes are reversed. 
 
         >>> from music21 import *
         >>> n1 = note.Note('c3')
@@ -1922,7 +1939,7 @@ class Interval(base.Music21Object):
         >>> bInterval = aInterval.reverse()
         >>> bInterval
         <music21.interval.Interval P-5>
-        >>> bInterval.noteStart == aInterval.noteEnd
+        >>> bInterval.noteStart is aInterval.noteEnd
         True
         
         >>> aInterval = interval.Interval('m3')
@@ -1935,13 +1952,14 @@ class Interval(base.Music21Object):
             return Interval(diatonic=self.diatonic.reverse(),
                             chromatic=self.chromatic.reverse())
 
-
     def _setNoteStart(self, n):
-        '''Assuming that this interval is defined, we can set a new start note (_noteStart) and automatically have the end note (_noteEnd).
+        '''
+        Assuming that this interval is defined, 
+        we can set a new start note (_noteStart) and 
+        automatically have the end note (_noteEnd).
         '''
         # this is based on the procedure found in transposePitch() and 
         # transposeNote() but offers a more object oriented approach
-
         self._noteStart = n
         pitch1 = n.pitch
         pitch2 = self.transposePitch(pitch1)
@@ -1952,7 +1970,9 @@ class Interval(base.Music21Object):
         return self._noteStart
 
     noteStart = property(_getNoteStart, _setNoteStart, 
-        doc = '''Assuming this Interval has been defined, set the start note (_noteStart) to a new value; this will adjust the value of the end note (_noteEnd).
+        doc = '''
+        Assuming this Interval has been defined, set the start note to a new value; 
+        this will adjust the value of the end note (`noteEnd`).
         
         >>> from music21 import *
         >>> aInterval = interval.Interval('M3')
@@ -1985,11 +2005,12 @@ class Interval(base.Music21Object):
         >>> aInterval.noteStart = note.Note('F#3')
         >>> aInterval.noteEnd.nameWithOctave
         'G3'
-
         ''')
 
     def _setNoteEnd(self, n):
-        '''Assuming that this interval is defined, we can set a new end note (_noteEnd) and automatically have the start note (_noteStart).
+        '''
+        Assuming that this interval is defined, we can 
+        set a new end note (_noteEnd) and automatically have the start note (_noteStart).
         '''
         # this is based on the procedure found in transposePitch() but offers
         # a more object oriented approach
@@ -2004,7 +2025,10 @@ class Interval(base.Music21Object):
         return self._noteEnd
 
     noteEnd = property(_getNoteEnd, _setNoteEnd, 
-        doc = '''Assuming this Interval has been defined, set the end note (_noteEnd) to a new value; this will adjust the value of the start note (_noteStart).
+        doc = '''
+        Assuming this Interval has been defined, set the 
+        end note to a new value; this will adjust 
+        the value of the start note (`noteStart`).
 
         >>> from music21 import *
         >>> aInterval = interval.Interval('M3')
@@ -2038,7 +2062,9 @@ class Interval(base.Music21Object):
 
 #-------------------------------------------------------------------------------
 def getWrittenHigherNote(note1, note2):
-    '''Given two :class:`~music21.note.Note` or :class:`~music21.pitch.Pitch` objects, this function returns the higher object based on diatonic note
+    '''
+    Given two :class:`~music21.note.Note` or :class:`~music21.pitch.Pitch` objects, 
+    this function returns the higher object based on diatonic note
     numbers. Returns the note higher in pitch if the diatonic number is
     the same, or the first note if pitch is also the same.
 
@@ -2048,7 +2074,6 @@ def getWrittenHigherNote(note1, note2):
     >>> higher = interval.getWrittenHigherNote(cis, deses)
     >>> higher is deses
     True
-
 
     >>> aNote = note.Note('c#3')
     >>> bNote = note.Note('d-3')
@@ -2068,7 +2093,9 @@ def getWrittenHigherNote(note1, note2):
     else: return getAbsoluteHigherNote(note1, note2)
 
 def getAbsoluteHigherNote(note1, note2):
-    '''Given two :class:`~music21.note.Note` objects, returns the higher note based on actual pitch.
+    '''
+    Given two :class:`~music21.note.Note` objects, 
+    returns the higher note based on actual frequency.
     If both pitches are the same, returns the first note given.
 
     >>> from music21 import *
@@ -2076,7 +2103,6 @@ def getAbsoluteHigherNote(note1, note2):
     >>> bNote = note.Note('d--3')
     >>> interval.getAbsoluteHigherNote(aNote, bNote)
     <music21.note.Note C#>
-
     '''
     chromatic = notesToChromatic(note1, note2)
     semitones = chromatic.semitones
@@ -2085,7 +2111,9 @@ def getAbsoluteHigherNote(note1, note2):
     else: return note1
 
 def getWrittenLowerNote(note1, note2):
-    '''Given two :class:`~music21.note.Note` objects, returns the lower note based on diatonic note
+    '''
+    Given two :class:`~music21.note.Note` objects, 
+    returns the lower note based on diatonic note
     number. Returns the note lower in pitch if the diatonic number is
     the same, or the first note if pitch is also the same.
 
@@ -2107,7 +2135,9 @@ def getWrittenLowerNote(note1, note2):
     else: return getAbsoluteLowerNote(note1, note2)
 
 def getAbsoluteLowerNote(note1, note2):
-    '''Given two :class:`~music21.note.Note` objects, returns the lower note based on actual pitch.
+    '''
+    Given two :class:`~music21.note.Note` objects, returns 
+    the lower note based on actual pitch.
     If both pitches are the same, returns the first note given.
 
     >>> from music21 import *
@@ -2181,7 +2211,10 @@ def transposePitch(pitch1, interval1):
     return pitch2
 
 def transposeNote(note1, intervalString):
-    '''Given a :class:`~music21.note.Note` and a interval string (such as 'P5') or an Interval object, return a new Note object at the appropriate pitch level. 
+    '''
+    Given a :class:`~music21.note.Note` and 
+    a interval string (such as 'P5') or an Interval object, 
+    return a new Note object at the appropriate pitch level. 
 
     >>> from music21 import *
     >>> aNote = note.Note('c4')
@@ -2195,9 +2228,7 @@ def transposeNote(note1, intervalString):
     >>> bNote = interval.transposeNote(aNote, 'm2')
     >>> bNote
     <music21.note.Note G>
-
     '''
-
     newPitch = transposePitch(note1.pitch, intervalString)
     newNote = copy.deepcopy(note1)
     newNote.pitch = newPitch
@@ -2205,7 +2236,12 @@ def transposeNote(note1, intervalString):
 
 
 def notesToInterval(n1, n2 = None):  
-    '''Given two :class:`~music21.note.Note` objects, returns an :class:`~music21.interval.Interval` object. The same functionality is available by calling the Interval class with two Notes as arguments.
+    '''
+    Given two :class:`~music21.note.Note` objects, returns an 
+    :class:`~music21.interval.Interval` object. The same 
+    functionality is available by calling the Interval class 
+    with two Notes as arguments.
+    
     Works equally well with :class:`~music21.pitch.Pitch` objects.
 
     >>> from music21 import *
@@ -2245,7 +2281,6 @@ def notesToInterval(n1, n2 = None):
 
     >>> interval.notesToInterval(pitch.Pitch('e##4'), pitch.Pitch('f--5'))
     <music21.interval.Interval dddd9>
-
     '''
     # TODO: possibly remove: not clear how this offers any better functionality
     # than just creating an Interval class?
@@ -2267,11 +2302,9 @@ def notesToInterval(n1, n2 = None):
     intObj._noteEnd = n2
     return intObj
 
-
-
 def add(intervalList):
     '''
-    add a list of intervals and return the composite interval
+    Add a list of intervals and return the composite interval
     Intervals can be Interval objects or just strings.
     
     (Currently not particularly efficient for large lists...)
@@ -2305,7 +2338,8 @@ def add(intervalList):
 
 def subtract(intervalList):
     '''
-    starts with the first interval and subtracts the following intervals from it:
+    Starts with the first interval and subtracts the 
+    following intervals from it:
     
     >>> from music21 import *
     >>> interval.subtract(["P5","M3"])
@@ -2328,10 +2362,7 @@ def subtract(intervalList):
     >>> a.chromatic.semitones
     -1
     
-    
-    BUG: should be Descending Augmented Unison, currently giving Oblique Augmented Unison ! AARGH
-    
-    
+    TODO: BUG: should be Descending Augmented Unison, currently giving Oblique Augmented Unison ! AARGH
     '''
     from music21 import pitch
     if len(intervalList) == 0:

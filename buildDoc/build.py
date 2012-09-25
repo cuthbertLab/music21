@@ -635,7 +635,7 @@ class PartitionedClass(PartitionedName):
         >>> len(a.names) > 30
         True
         >>> a.mro
-        (<class 'music21.pitch.Pitch'>, <class 'music21.base.Music21Object'>, <class 'music21.base.JSONSerializer'>, <type 'object'>)
+        (<class 'music21.pitch.Pitch'>, <class 'music21.base.Music21Object'>, <type 'object'>)
 
         '''
         PartitionedName.__init__(self, srcNameEval)
@@ -727,7 +727,7 @@ class PartitionedClass(PartitionedName):
         >>> len(a._createMroLive())
         4
         >>> print a._createMroLive()
-        [<music21.pitch.Pitch C>, <music21.base.Music21Object object at 0x...>, <music21.base.JSONSerializer object at 0x...>, <object object at 0x...>]
+        [<music21.pitch.Pitch C>, <music21.base.Music21Object object at 0x...>, <object object at 0x...>]
         '''
         post = []
         for entry in self.mro:
@@ -1663,6 +1663,7 @@ class Documentation(RestructuredWriter):
                              'quickStart',
                              'usersGuide_02_notes',
                              'usersGuide_03_pitches', 
+                             'usersGuide_04_stream1', 
                              'overviewStreams',
                              'usersGuide_06_chords', 
                              'overviewFormats', 

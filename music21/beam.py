@@ -78,7 +78,6 @@ To get rid of beams on a note do:
 
 import unittest
 
-from music21 import base
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
@@ -87,7 +86,7 @@ from music21 import duration
 class BeamException(exceptions21.Music21Exception):
     pass
 
-class Beam(base.JSONSerializer):
+class Beam(object):
     '''
     A Beam is an object representation of one single beam, that is, one horizontal
     line connecting two notes together (or less commonly a note to a rest).  Thus it
@@ -115,7 +114,6 @@ class Beam(base.JSONSerializer):
     >>> print b2
     <music21.beam.Beam None/start>
     '''
-
     def __init__(self, type = None, direction = None): # type is okay @ReservedAssignment
         self.type = type # start, stop, continue, partial
         self.direction = direction # left or right for partial
@@ -124,17 +122,6 @@ class Beam(base.JSONSerializer):
         # 8th, 16th, etc represented as 1, 2, ...
         self.number = None 
 
-    def jsonAttributes(self):
-        '''
-        Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
-        
-        >>> from music21 import *
-        >>> print beam.Beam().jsonAttributes()
-        ['type', 'direction', 'independentAngle', 'number']
-        '''
-        # add to base class
-        return ['type', 'direction', 'independentAngle', 'number']
-
     def __repr__(self):
         if self.direction == None:
             return '<music21.beam.Beam %s/%s>' % (self.number, self.type)
@@ -142,7 +129,7 @@ class Beam(base.JSONSerializer):
             return '<music21.beam.Beam %s/%s/%s>' % (self.number, self.type, self.direction)        
 
 #-------------------------------------------------------------------------------
-class Beams(base.JSONSerializer):
+class Beams(object):
     '''
     The Beams object stores in it attribute beamsList (a list) all
     the Beam objects defined above.  Thus len(beam.Beams) tells you how many
@@ -170,18 +157,7 @@ class Beams(base.JSONSerializer):
     def __init__(self):
         self.beamsList = []
         self.feathered = False
-
-    def jsonAttributes(self):
-        '''
-        Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
         
-        >>> from music21 import *
-        >>> beam.Beams().jsonAttributes()
-        ['beamsList', 'feathered']
-        '''
-        # add to base class
-        return ['beamsList', 'feathered']
-
     def __iter__(self):
         return common.Iterator(self.beamsList)
 

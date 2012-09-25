@@ -344,7 +344,7 @@ class MicrotoneException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class Microtone(base.JSONSerializer):
+class Microtone(object):
     '''
     The Microtone object defines a pitch transformation above 
     or below a standard Pitch and its Accidental.
@@ -392,8 +392,10 @@ class Microtone(base.JSONSerializer):
     >>> m.alter
     0.3333...
     '''
+    _jsonFreezer = True
+
     def __init__(self, centsOrString=0):
-        base.JSONSerializer.__init__(self)
+        #base.JSONFreezer.__init__(self)
 
         self._centShift = 0
         self._harmonicShift = 1 # the first harmonic is the start
@@ -4659,27 +4661,6 @@ class Test(unittest.TestCase):
             pList.append(str(p))
         self.assertEqual(str(pList), "['A4', 'A~4(+21c)', 'B`4(-11c)', 'B4(+4c)', 'B~4(+17c)', 'C~5(-22c)', 'C#5(-14c)', 'C#~5(-7c)', 'C##5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)', 'E5(+2c)', 'E~5(-1c)', 'F5(-4c)', 'F~5(-9c)', 'F#5(-16c)', 'F#~5(-23c)', 'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']")
 
-    def testJsonSerializationA(self):
-        from music21 import pitch
-        
-        m = pitch.Microtone(40)
-        self.assertEqual(str(m), '(+40c)')
-
-        mAlt = pitch.Microtone()
-        mAlt.json = m.json
-        self.assertEqual(str(mAlt), '(+40c)')
-    
-        a = pitch.Accidental('##')
-        self.assertEqual(str(a), '<accidental double-sharp>')
-        aAlt = pitch.Accidental()
-        aAlt.json = a.json
-        self.assertEqual(str(aAlt), '<accidental double-sharp>')
-
-        p = pitch.Pitch(ps=61.2)
-        self.assertEqual(str(p), 'C#4(+20c)')
-        pAlt = pitch.Pitch()
-        pAlt.json = p.json
-        self.assertEqual(str(pAlt), 'C#4(+20c)')        
         
 #-------------------------------------------------------------------------------
 # define presented order in documentation

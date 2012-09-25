@@ -1151,7 +1151,7 @@ class Tuplet(object):
 
 
 #-------------------------------------------------------------------------------
-class DurationCommon(base.JSONSerializer):
+class DurationCommon(object):
     '''A base class for both Duration and DurationUnit objects.
     '''
     #def __init__(self):
@@ -3311,24 +3311,6 @@ class Test(unittest.TestCase):
 #         d.setQuarterLengthUnlinked(20)
 #         self.assertEqual(d.quarterLength, 20.0) 
 #         self.assertEqual(d.isLinked, False) # note set
-
-
-
-    def testSerializationA(self):
-        from music21 import duration
-        d = duration.DurationUnit(1.5)
-        self.assertEqual(str(d), '<music21.duration.DurationUnit 1.5>')
-
-        dAlt = duration.DurationUnit()
-        dAlt.json = d.json
-        self.assertEqual(str(dAlt), '<music21.duration.DurationUnit 1.5>')
- 
-        d = duration.Duration(2.25)
-        self.assertEqual(str(d), '<music21.duration.Duration 2.25>')
-        dAlt = duration.Duration()
-        dAlt.json = d.json
-        self.assertEqual(str(dAlt), '<music21.duration.Duration 2.25>')
-
 
 
         

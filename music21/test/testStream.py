@@ -345,9 +345,9 @@ class Test(unittest.TestCase):
         sf1 = s1.flat
         sf1.id = "flat s1"
         
-#        for site in n4._definedContexts.getSites():
+#        for site in n4.sites.getSites():
 #            print site.id,
-#            print n4._definedContexts.getOffsetBySite(site)
+#            print n4.sites.getOffsetBySite(site)
         
         self.assertEqual(len(sf1), 4)
         assert(sf1[1] is n2)
@@ -387,7 +387,7 @@ class Test(unittest.TestCase):
         self.assertEqual(midStream[1][0].getOffsetBySite(midStream[1]), 3.0)        
 
         # one location in midstream
-        self.assertEqual(len(midStream._definedContexts), 1)
+        self.assertEqual(len(midStream.sites), 1)
         
         #environLocal.printDebug(['srcStream', srcStream])
         #environLocal.printDebug(['midStream', midStream])
@@ -427,7 +427,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
         mfs = midStream.flat.sorted
-        self.assertEqual(mfs[7]._definedContexts.getOffsetBySite(mfs), 11.0)
+        self.assertEqual(mfs[7].sites.getOffsetBySite(mfs), 11.0)
 
         farStream = Stream()
         for x in range(7):
@@ -851,7 +851,7 @@ class Test(unittest.TestCase):
         # copying while looping: this gets increasingly slow
         for aElement in s:
             environLocal.printDebug(['copying and inserting an element',
-                                     aElement, len(aElement._definedContexts)])
+                                     aElement, len(aElement.sites)])
             bElement = copy.deepcopy(aElement)
             post.insert(aElement.offset, bElement)
             
@@ -933,11 +933,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(a), 1)
 
         # there are two locations, default and the one just added
-        self.assertEqual(len(a[0]._definedContexts), 2)
+        self.assertEqual(len(a[0].sites), 2)
         # this works
-#        self.assertEqual(a[0]._definedContexts.getOffsetByIndex(-1), 50.0)
+#        self.assertEqual(a[0].sites.getOffsetByIndex(-1), 50.0)
 
-#        self.assertEqual(a[0]._definedContexts.getSiteByIndex(-1), a)
+#        self.assertEqual(a[0].sites.getSiteByIndex(-1), a)
         self.assertEqual(a[0].getOffsetBySite(a), 50.0)
         self.assertEqual(a[0].offset, 50.0)
 
@@ -1490,7 +1490,7 @@ class Test(unittest.TestCase):
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        #environLocal.printDebug(['_definedContexts.get() of s1', s1._definedContexts.get()])
+        #environLocal.printDebug(['sites.get() of s1', s1.sites.get()])
 
 
         # attempting to move the substream into a new stream
@@ -1555,17 +1555,17 @@ class Test(unittest.TestCase):
         s1Flat = s1.flat
         # but it has s2 has a context
         self.assertEqual(s1Flat.hasContext(s2), True)
-        #environLocal.printDebug(['_definedContexts.get() of s1Flat', s1Flat._definedContexts.get()])
-        #environLocal.printDebug(['_definedContexts._definedContexts of s1Flat', s1Flat._definedContexts._definedContexts])
+        #environLocal.printDebug(['sites.get() of s1Flat', s1Flat.sites.get()])
+        #environLocal.printDebug(['sites._definedContexts of s1Flat', s1Flat.sites._definedContexts])
 
 
         self.assertEqual(s1Flat.hasContext(s2), True)
 
         # this returns the proper dictionary entry
         #environLocal.printDebug(
-        #    ['s1Flat._definedContexts._definedContexts[id(s1)', s1Flat._definedContexts._definedContexts[id(s2)]])
+        #    ['s1Flat.sites._definedContexts[id(s1)', s1Flat.sites._definedContexts[id(s2)]])
         # we can extract out the same refernce
-        unused_s2Out = s1Flat._definedContexts.getById(id(s2))
+        unused_s2Out = s1Flat.sites.getById(id(s2))
 
         # this works
         post = s1Flat.getContextByClass(clef.Clef)
@@ -1574,7 +1574,7 @@ class Test(unittest.TestCase):
         # this will only work if the callerFirst is manually set to s1Flat
         # otherwise, this interprets the DefinedContext object as the first 
         # caller
-        post = s1Flat._definedContexts.getByClass(clef.Clef, callerFirst=s1Flat)
+        post = s1Flat.sites.getByClass(clef.Clef, callerFirst=s1Flat)
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
 
@@ -4875,10 +4875,10 @@ class Test(unittest.TestCase):
 
         # these test prove that getting a semiFlat stream does not change the
         # activeSite
-        junk = s1._definedContexts.getByClass(meter.TimeSignature)
+        junk = s1.sites.getByClass(meter.TimeSignature)
         self.assertEqual(s1.activeSite, s2)
 
-        junk = s1._definedContexts.getByClass(clef.Clef)
+        junk = s1.sites.getByClass(clef.Clef)
         self.assertEqual(s1.activeSite, s2)
 
         junk = s1.getContextByClass('Clef')

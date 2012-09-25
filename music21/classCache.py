@@ -44,7 +44,7 @@ class Repository(object):
         >>> r = classCache.Repository()
         >>> r.addElement(n)
         >>> r.classes
-        ['Note', 'NotRest', 'GeneralNote', 'Music21Object', 'JSONSerializer',     'object']
+        ['Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
 
         '''
         if len(self._elements) == 0:            
@@ -61,7 +61,7 @@ class Repository(object):
         >>> r = classCache.Repository()
         >>> r.addElement(n)
         >>> r.classes
-        ['Note', 'NotRest', 'GeneralNote', 'Music21Object', 'JSONSerializer',     'object']
+        ['Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
 
         '''
         # check elements first for first match

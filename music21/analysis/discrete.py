@@ -140,7 +140,9 @@ class DiscreteAnalysis(object):
         pass
     
     def process(self, subStream):
-        '''Given a Stream, apply the analysis to all components of this Stream. Expected return is a solution (method specific) and a color value.
+        '''
+        Given a Stream, apply the analysis to all components of this Stream. 
+        Expected return is a solution (method specific) and a color value.
         '''
         pass
 
@@ -879,7 +881,8 @@ keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler, AardenEsse
 
 #------------------------------------------------------------------------------
 class Ambitus(DiscreteAnalysis):
-    '''An basic analysis method for measuring register. 
+    '''
+    An basic analysis method for measuring register. 
     '''
     _DOC_ALL_INHERITED = False
 
@@ -889,8 +892,9 @@ class Ambitus(DiscreteAnalysis):
 
     def __init__(self, referenceStream=None):
         '''
-        >>> p = Ambitus()
-        >>> p.identifiers[0]
+        >>> from music21 import *
+        >>> ambitusAnalysis = analysis.discrete.Ambitus()
+        >>> ambitusAnalysis.identifiers[0]
         'ambitus'
         '''
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
@@ -923,23 +927,25 @@ class Ambitus(DiscreteAnalysis):
         #environLocal.printDebug([self._pitchSpanColors])
     
     def getPitchSpan(self, subStream):
-        '''For a given subStream, return the minimum and maximum pitch space value found. 
+        '''
+        For a given subStream, return the pitch with the minimum and maximum pitch space value found. 
 
         This public method may be used by other classes. 
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
-        >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
-        (66, 71)
+        >>> pitchMin, pitchMax = p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
+        >>> pitchMin.ps, pitchMax.ps
+        (66.0, 71.0)
         >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[6])
-        (69, 73)
+        (<music21.pitch.Pitch A4>, <music21.pitch.Pitch C#5>)
 
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
         >>> p.getPitchSpan(s)
-        (45, 108)
+        (<music21.pitch.Pitch A2>, <music21.pitch.Pitch C8>)
         '''
         ssfn = subStream.flat.notes
         if len(ssfn) == 0:
@@ -948,6 +954,7 @@ class Ambitus(DiscreteAnalysis):
 
         # find the min and max pitch space value for all pitches
         psFound = []
+        pitchesFound = []
         for n in ssfn:
             #environLocal.printDebug([n])
             pitches = []
@@ -956,24 +963,31 @@ class Ambitus(DiscreteAnalysis):
             elif 'Note' in n.classes:
                 pitches = [n.pitch]
             psFound += [p.ps for p in pitches]
-
+            pitchesFound.extend(pitches)
         # in some cases no pitch space values are found due to all rests
         if psFound == []:
             return None
         # use built-in functions
-        return int(min(psFound)), int(max(psFound))
+        minPitchIndex = psFound.index(min(psFound))
+        maxPitchIndex = psFound.index(max(psFound))
+        
+        return pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
 
     
     def getPitchRanges(self, subStream):
-        '''For a given subStream, return the smallest difference between any two pitches and the largest difference between any two pitches. This is used to get the smallest and largest ambitus possible in a given work. 
+        '''
+        For a given subStream, return the smallest .ps difference 
+        between any two pitches and the largest difference 
+        between any two pitches. This is used to get the 
+        smallest and largest ambitus possible in a given work. 
 
         >>> from music21 import *
         >>> p = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
-        >>> p.getPitchSpan(s)
-        (45, 108)
+        >>> [int(thisPitch.ps) for thisPitch in p.getPitchSpan(s)]
+        [45, 108]
         >>> p.getPitchRanges(s)
         (26, 63)
 
@@ -1005,7 +1019,8 @@ class Ambitus(DiscreteAnalysis):
 
 
     def solutionLegend(self, compress=False):
-        '''Return legend data. 
+        '''
+        Return legend data. 
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
@@ -1065,7 +1080,8 @@ class Ambitus(DiscreteAnalysis):
         return data
 
     def solutionUnitString(self):
-        '''Return a string describing the solution values. Used in Legend formation. 
+        '''
+        Return a string describing the solution values. Used in Legend formation. 
         '''
         return 'Half-Steps'
 
@@ -1078,7 +1094,7 @@ class Ambitus(DiscreteAnalysis):
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
         >>> min, max = p.getPitchSpan(s)
-        >>> p.solutionToColor(max-min).startswith('#')
+        >>> p.solutionToColor(max.ps - min.ps).startswith('#')
         True
         '''    
         # a result of None may be possible
@@ -1089,7 +1105,8 @@ class Ambitus(DiscreteAnalysis):
     
     
     def process(self, sStream):
-        '''Given a Stream, return a solution (in half steps) and a color string. 
+        '''
+        Given a Stream, return a solution (as an interval) and a color string. 
 
         >>> from music21 import *
         >>> p = analysis.discrete.Ambitus()
@@ -1097,14 +1114,14 @@ class Ambitus(DiscreteAnalysis):
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
         >>> p.process(s)
-        (63, '#665288')
+        (<music21.interval.Interval m38>, '#665288')
         '''
         post = self.getPitchSpan(sStream)
         if post != None:
-            solution = post[1] - post[0] # max-min
+            solution = interval.Interval(noteStart = post[0], noteEnd = post[1])
         else:
             solution = None
-        color = self.solutionToColor(solution)
+        color = self.solutionToColor(post[1].ps - post[0].ps)
         
         # store solutions for compressed legend generation
         self._solutionsFound.append((solution, color))
@@ -1112,7 +1129,8 @@ class Ambitus(DiscreteAnalysis):
 
 
     def getSolution(self, sStream):
-        '''Procedure to only return an Inteval object.
+        '''
+        Procedure to only return an Inteval object.
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
@@ -1122,7 +1140,7 @@ class Ambitus(DiscreteAnalysis):
 
         '''
         solution, unused_color = self.process(sStream)
-        return interval.Interval(solution)
+        return solution
 
 
 

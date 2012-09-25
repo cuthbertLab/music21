@@ -1790,7 +1790,7 @@ class Variant(base.Music21Object):
             # functionality duplicated from Music21Object
             if name == '_activeSite':
                 setattr(new, name, self.activeSite)
-            elif name == '_definedContexts':
+            elif name == 'sites':
                 newValue = copy.deepcopy(part, memo)
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)

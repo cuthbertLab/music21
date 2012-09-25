@@ -9,7 +9,8 @@
 # Copyright:    Copyright © 2009, 2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''This module defines objects for representing key signatures as well as key 
+'''
+This module defines objects for representing key signatures as well as key 
 areas. The :class:`~music21.key.KeySignature` is used in 
 :class:`~music21.stream.Measure` objects for defining notated key signatures.
 
@@ -726,7 +727,12 @@ class KeySignature(base.Music21Object):
     # not presently in use
 
 #     def jsonAttributes(self):
-#         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+#         '''
+#         Define all attributes of this object that should be JSON serialized for storage 
+#         and re-instantiation. Attributes that name basic Python objects 
+#         or :class:`~music21.freezeThaw.JSONFreezer` subclasses, or dictionaries or lists 
+#         that contain Python objects or 
+#         :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
 #         '''
 #         # only string notation is stored, meaning that any non-default
 #         # internal representations will not be saved
@@ -734,7 +740,7 @@ class KeySignature(base.Music21Object):
 #         return ['sharps', 'mode', '_alteredPitches']
 # 
 # 
-#     def jsonComponentFactory(self, idStr):
+#     def music21ObjectFromString(self, idStr):
 #         '''Given a stored string during JSON serialization, return an object'
 # 
 #         The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 

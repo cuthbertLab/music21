@@ -47,7 +47,7 @@ class LyricException(exceptions21.Music21Exception):
     pass
 
 
-class Lyric(base.JSONSerializer):
+class Lyric(object):
     '''
     An object representing a single Lyric as part of a note's .lyrics property.
     
@@ -93,32 +93,13 @@ class Lyric(base.JSONSerializer):
     '''
 
     def __init__(self, text=None, number=1, syllabic=None, applyRaw = False, identifier=None):
-        base.JSONSerializer.__init__(self)
-
         # these are set by _setTextAndSyllabic
         self.text = None
         # given as begin, middle, end, or single
         self.syllabic = None
-        
         self._setTextAndSyllabic(text, applyRaw)
-
-        self.number = number
-        
+        self.number = number       
         self.identifier = identifier
-
-    def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
-
-        >>> from music21 import *
-        >>> l = note.Lyric()
-        >>> l.jsonAttributes()
-        ['text', 'syllabic', 'number', 'identifier']
-
-        '''
-        # do not need self._autoGatherAttributes()
-        # as this uses public attributes (not underscore leading)
-        # must explicitly define
-        return ['text', 'syllabic', 'number', 'identifier'] # If I understand what this does properly, than adding 'identifier' is reasonable.
 
 
     def __repr__(self):
@@ -280,17 +261,21 @@ class GeneralNote(base.Music21Object):
         self.tie = None # store a Tie object
 
 
-    def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
-
-        >>> from music21 import *
-        >>> gn = note.GeneralNote()
-        >>> gn.jsonAttributes()
-        ['_activeSite', '_activeSiteId', '_definedContexts', '_duration', '_idLastDeepCopyOf', '_overriddenLily', '_priority', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie']
-
-        '''
-        # will already get _duration
-        return self._autoGatherAttributes() + ['lyrics', 'expressions', 'articulations', 'editorial', 'tie']
+#    def jsonAttributes(self):
+#        '''
+#        Define all attributes of this object that should be JSON serialized for storage and 
+#        re-instantiation. Attributes that name basic Python objects or 
+#        :class:`~music21.freezeThaw.JSONFreezer` subclasses, or dictionaries or lists 
+#        that contain Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
+#
+#        >>> from music21 import *
+#        >>> gn = note.GeneralNote()
+#        >>> gn.jsonAttributes()
+#        ['_activeSite', '_activeSiteId', '_duration', '_idLastDeepCopyOf', '_overriddenLily', '_priority', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie']
+#
+#        '''
+#        # will already get _duration
+#        return self.autoGatherAttributes() + ['lyrics', 'expressions', 'articulations', 'editorial', 'tie']
 
 
     #---------------------------------------------------------------------------
@@ -590,11 +575,15 @@ class NotRest(GeneralNote):
         self._volume = None # created on demand
         self.duration.linkage = 'tie'
 
-    def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
-        '''
-        # add to base class
-        return GeneralNote.jsonAttributes(self) + ['_notehead', '_noteheadFill', '_noteheadParenthesis', '_stemDirection', '_volume']
+#    def jsonAttributes(self):
+#        '''
+#        Define all attributes of this object that should be JSON serialized for storage and 
+#        re-instantiation. Attributes that name basic Python objects or 
+#        :class:`~music21.freezeThaw.JSONFreezer` subclasses, or dictionaries or lists 
+#        that contain Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
+#        '''
+#        # add to base class
+#        return GeneralNote.jsonAttributes(self) + ['_notehead', '_noteheadFill', '_noteheadParenthesis', '_stemDirection', '_volume']
 
 
     def __deepcopy__(self, memo=None):
@@ -831,11 +820,11 @@ class Note(NotRest):
         else:
             self.beams = beam.Beams()
 
-    def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
-        '''
-        # add to base class
-        return NotRest.jsonAttributes(self) + ['pitch', 'beams']
+#    def jsonAttributes(self):
+#        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+#        '''
+#        # add to base class
+#        return NotRest.jsonAttributes(self) + ['pitch', 'beams']
 
 
     #---------------------------------------------------------------------------

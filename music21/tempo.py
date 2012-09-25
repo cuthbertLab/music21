@@ -1182,7 +1182,7 @@ def interpolateElements(element1, element2, sourceStream,
         elOffsetSrc = el.getOffsetBySite(sourceStream)
         try:
             el.getOffsetBySite(destinationStream)
-        except base.DefinedContextsException:
+        except base.SitesException:
             if autoAdd is True:
                 destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
                 destinationStream.insert(destinationOffset, el)

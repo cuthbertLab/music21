@@ -5,7 +5,7 @@
 Installing Music21
 ======================================
 
-`Music21` can be installed in many (too many!) different ways.
+`Music21` can be installed in several different ways.
 Advanced users can install music21 as they would any other python package. See the link to advanced instructions below. Other uses should follow the instructions for each platform by following the links below.
 
 

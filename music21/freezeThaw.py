@@ -85,10 +85,13 @@ like the idea of thawing something that's frozen; "unpickling" just doesn't
 seem possible.  In any event, I needed a name that wouldn't already
 exist in the Python namespace.
 '''
+import codecs
 import copy
 import unittest
+import inspect
 import os
 import time
+import json
 
 from music21 import base
 from music21 import common
@@ -168,7 +171,7 @@ class StreamFreezeThawBase(object):
                 e._stream._elementsChanged()
                 e._cache = {}
                 #for el in e._stream.flat:
-                #    print el, el.offset, el._definedContexts._definedContexts
+                #    print el, el.offset, el.sites._definedContexts
                     
 
             self.thawIds(e)
@@ -206,7 +209,8 @@ class StreamFreezeThawBase(object):
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
-        >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
+        >>> bM21Obj.addLocation(aM21Obj, 50)   
+        >>> bM21Obj.activeSite = aM21Obj
         >>> bM21Obj.activeSite != None
         True
         
@@ -226,10 +230,10 @@ class StreamFreezeThawBase(object):
         True
         '''
         #environLocal.printDebug(['unfreezing ids', self])
-        self.thawContextIds(e._definedContexts)
+        self.thawContextIds(e.sites)
 
         # restore containedById
-        e._definedContexts.containedById = id(e)
+        e.sites.containedById = id(e)
 
         # assuming should be called before wrapping weakrefs
         if e._activeSite is not None:
@@ -274,7 +278,7 @@ class StreamFreezeThawBase(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
-        >>> aContexts = base.DefinedContexts()
+        >>> aContexts = base.Sites()
         >>> aContexts.add(aObj)
         >>> aContexts.add(bObj)
         >>> aContexts.add(cObj, 200) # a location
@@ -305,7 +309,7 @@ class StreamFreezeThawBase(object):
         >>> oldLocations == aContexts._locationKeys
         True
         '''
-        #environLocal.printDebug(['defined context entering unfreeze ids', self._definedContexts])
+        #environLocal.printDebug(['defined context entering unfreeze ids', self.sites])
 
         # for encoding to serial, this should be done after weakref unwrapping     
         # for decoding to serial, this should be done before weakref wrapping
@@ -374,7 +378,7 @@ class StreamFreezer(StreamFreezeThawBase):
     True
     '''
     def __init__(self, streamObj=None, fastButUnsafe=False):
-        # must make a deepcopy, as we will be altering DefinedContexts
+        # must make a deepcopy, as we will be altering Sites
         self.stream = None
         if streamObj is not None and fastButUnsafe is False:
             # deepcopy necessary because we mangle sites in the objects
@@ -608,7 +612,7 @@ class StreamFreezer(StreamFreezeThawBase):
         2.0
         >>> n1.getOffsetBySite(p3)
         Traceback (most recent call last):
-        DefinedContextsException: The object <music21.note.Note C> is not in site <music21.stream.Part ...>.
+        SitesException: The object <music21.note.Note C> is not in site <music21.stream.Part ...>.
         '''
         if hierarchyObj is None:
             streamObj = self.stream
@@ -635,7 +639,7 @@ class StreamFreezer(StreamFreezeThawBase):
             orphans = []
             if el.isVariant is True:
                 continue
-            for site in el._definedContexts.getSites():
+            for site in el.sites.getSites():
                 # TODO: this can be optimized to get actually get sites
 
                 if site is None: 
@@ -688,7 +692,8 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
-        >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
+        >>> bM21Obj.addLocation(aM21Obj, 50)   
+        >>> bM21Obj.activeSite = aM21Obj
         >>> bM21Obj.activeSite != None
         True
         >>> oldActiveSiteId = bM21Obj._activeSiteId
@@ -702,7 +707,7 @@ class StreamFreezer(StreamFreezeThawBase):
         '''
         dummy_counter = common.SingletonCounter()
 
-        self.freezeContextIds(e._definedContexts)
+        self.freezeContextIds(e.sites)
         try:
             if e.isSpanner:
                 self.freezeIds(e._components)
@@ -730,7 +735,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> aObj = Mock()
         >>> bObj = Mock()
         
-        >>> aContexts = base.DefinedContexts()
+        >>> aContexts = base.Sites()
         >>> aContexts.add(aObj)
         >>> aContexts.add(bObj)
         >>> oldKeys = aContexts._definedContexts.keys()
@@ -759,7 +764,7 @@ class StreamFreezer(StreamFreezeThawBase):
             post[newKey] = contexts._definedContexts[idKey]
         contexts._definedContexts = post
         contexts._locationKeys = postLocationKeys
-        #environLocal.printDebug(['post freezeids', self._definedContexts])
+        #environLocal.printDebug(['post freezeids', self.sites])
 
         # clear this for setting later
         contexts.containedById = counter()
@@ -1048,8 +1053,655 @@ class StreamThawer(StreamFreezeThawBase):
 
 #---------------------------------------------------------------------------------
 
-class JSONSerializerException(FreezeThawException):
+class JSONFreezerException(FreezeThawException):
     pass
+class JSONThawerException(FreezeThawException):
+    pass
+
+class JSONFreezeThawBase(object):
+    '''
+    Shared functionality for JSONFreeze and JSONThaw    
+    '''
+    # a list of attributes to store.  Also takes the following special attributes
+    # __AUTO_GATHER__ : place all autoGatherAttributes here
+    # __INHERIT__ : place all attributes from the inherited class here # NOT YET!
+    storedClassAttributes = {
+        'music21.beam.Beam': ['type', 'direction', 'independentAngle', 'number'],
+        'music21.beam.Beams': ['beamsList', 'feathered'],
+        'music21.duration.DurationUnit': ['__AUTO_GATHER__'],
+        'music21.duration.Duration': ['__AUTO_GATHER__'],
+        'music21.editorial.NoteEditorial': ['color', 'misc', 'comment'],
+        'music21.editorial.Comment': ['__AUTO_GATHER__'],
+        'music21.metadata.Contributor': ['_role', 'relevance', '_names', '_dateRange'],
+        'music21.metadata.Date': ['year', 'month', 'day', 'hour', 'minute', 'second',
+                                  'yearError', 'monthError', 'dayError', 'hourError', 'minuteError', 'secondError'],
+        'music21.metadata.DateSingle': ['_relevance',  '_dataError', '_data'],
+        'music21.metadata.Metadata': ['_date', '_imprint', '_copyright', '_workIds', '_urls', '_contributors'],
+        'music21.metadata.MetadataBundle': ['storage', 'name'],
+        'music21.metadata.RichMetadata': ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest', 'noteCount', 'quarterLength', '__INHERIT__'],
+        'music21.metadata.Text': ['_data', '_language'],
+        'music21.note.Lyric': ['text', 'syllabic', 'number', 'identifier'],
+        'music21.note.GeneralNote': ['__AUTO_GATHER__', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie'],
+        'music21.note.NotRest': ['__INHERIT__', '_notehead', '_noteheadFill', '_noteheadParenthesis', '_stemDirection', '_volume'],
+        'music21.note.Note': ['__INHERIT__', 'pitch', 'beams'],
+        }
+    def __init__(self, storedObject = None):
+        self.storedObject = storedObject
+        if storedObject is not None:
+            self.className = storedObject.__class__.__module__ + '.' + storedObject.__class__.__name__
+        else:
+            self.className = None
+
+    def music21ObjectFromString(self, idStr):
+        '''
+        Given a stored string during JSON serialization, return an object. 
+        This method effectively converts a string class specification into 
+        a vanilla instance ready for specialization via stored data attributes. 
+
+        A subclass that overrides this method will have access to all 
+        modules necessary to create whatever objects necessary. 
+
+        >>> from music21 import *
+        >>> jss = freezeThaw.JSONFreezer()
+        >>> n = jss.music21ObjectFromString('note.Note')
+        >>> n
+        <music21.note.Note C>
+
+        One can begin with "music21." if you'd like:
+        
+        >>> d = jss.music21ObjectFromString('music21.duration.Duration')
+        >>> d
+        <music21.duration.Duration 0.0>
+
+        Undefined classes give a JSONFreezerException
+
+        >>> jss.music21ObjectFromString('blah.NotAClass')
+        Traceback (most recent call last):
+        JSONFreezerException: Cannot generate a new object from blah.NotAClass
+        '''
+        import music21
+        idStrOrig = idStr
+        if idStr.startswith('music21.'):
+            idStr = idStr[8:]
+        elif idStr.startswith("<class 'music21.") and idStr.endswith("'>"):
+            # old style JSON not used anymore:
+            # changes <class 'music21.metadata.RichMetadata'> to 
+            # metadata.RichMetadata
+            idStr = idStr[16:]
+            idStr = idStr[0:len(idStr)-2]
+        
+        idStrSplits = idStr.split('.')
+        lastInspect = music21
+        for thisMod in idStrSplits:
+            try:
+                nextMod = getattr(lastInspect, thisMod)
+            except AttributeError:
+                raise JSONFreezerException("Cannot generate a new object from %s" % idStrOrig)
+            if inspect.isclass(nextMod) is True:
+                lastInspect = nextMod()
+            elif inspect.ismodule(nextMod) is True:
+                lastInspect = nextMod
+            else:
+                raise JSONFreezerException("All the parts of %s must refer to modules or classes" % idStrOrig)
+
+        return lastInspect
+
+
+class JSONFreezer(JSONFreezeThawBase):
+    '''
+    Class that provides JSON output from an object (whether
+    Music21Object or other).
+    
+    >>> from music21 import *
+    >>> n = note.Note("C#4")
+    >>> jsonF = freezeThaw.JSONFreezer(n)
+    >>> jsonF.storedObject
+    <music21.note.Note C#>
+    >>> jsonF.className
+    'music21.note.Note'
+    '''
+    def __init__(self, storedObject=None):
+        JSONFreezeThawBase.__init__(self, storedObject)
+    #---------------------------------------------------------------------------
+    # override these methods for json functionality
+
+    def autoGatherAttributes(self):
+        '''
+        Gather just the instance data members that are proceeded by an underscore. 
+        
+        Returns a list of those data members
+        
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> jss = freezeThaw.JSONFreezer(n)
+        >>> jss.autoGatherAttributes()
+        ['_activeSite', '_activeSiteId', '_duration', '_idLastDeepCopyOf', '_notehead', '_noteheadFill', '_noteheadParenthesis', '_overriddenLily', '_priority', '_stemDirection', '_volume']
+        '''
+        post = []
+        if self.storedObject is None:
+            return post
+        obj = self.storedObject
+        # names that we always do not need
+        exclude = ['_classes', '_fullyQualifiedClasses']
+        # get class names that exclude instance names
+        # these names will be rejected in final accumulation
+        classNames = []
+        for bundle in inspect.classify_class_attrs(obj.__class__):
+            if (bundle.name.startswith('_') and not 
+                bundle.name.startswith('__')):
+                classNames.append(bundle.name)
+        #environLocal.printDebug(['classNames', classNames])
+        for name in dir(obj):
+            if name.startswith('_') and not name.startswith('__'):
+                attr = getattr(obj, name)
+                #environLocal.printDebug(['inspect.isroutine()', attr, inspect.isroutine(attr)])
+                if (not inspect.ismethod(attr) and not 
+                    inspect.isfunction(attr) and not inspect.isroutine(attr)): 
+                    # class names stored are class attrs, not needed for 
+                    # reinstantiation
+                    if name not in classNames and name not in exclude:
+                        # store the name, not the attr
+                        post.append(name)
+        #environLocal.printDebug(['auto-derived jsonAttributes', post])
+        return post
+
+    def jsonAttributes(self, autoGather = True):
+        '''
+        Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic 
+        Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses, 
+        or dictionaries or lists that contain Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
+        
+        Should be overridden in subclasses.
+        
+        For an object which does not define this, just returns all the _underscore attributes:
+        
+        >>> from music21 import *
+        
+        >>> ed = editorial.NoteEditorial()
+        >>> jsf = freezeThaw.JSONFreezer(ed)
+        >>> jsf.jsonAttributes()
+        ['color', 'misc', 'comment']
+
+        >>> l = note.Lyric()
+        >>> jsf = freezeThaw.JSONFreezer(l)
+        >>> jsf.jsonAttributes()
+        ['text', 'syllabic', 'number', 'identifier']
+
+        Has autoGatherAttributes and others:
+
+        >>> gn = note.GeneralNote()
+        >>> jsf = freezeThaw.JSONFreezer(gn)
+        >>> jsf.jsonAttributes()
+        ['_activeSite', '_activeSiteId', '_duration', '_idLastDeepCopyOf', '_overriddenLily', '_priority', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie']
+        '''
+        if self.storedObject is None:
+            return []
+        
+        attributeList = []
+        if hasattr(self.storedObject, 'fullyQualifiedClasses'):
+            fqClassList = self.storedObject.fullyQualifiedClasses
+        else: # same thing...
+            fqClassList = [x.__module__ + '.' + x.__name__ for x in self.storedObject.__class__.mro()]
+        
+        for i, thisClass in enumerate(fqClassList):
+            inheritFrom = i + 1
+            if thisClass in self.storedClassAttributes:
+                attributeList = self.storedClassAttributes[thisClass]
+                while "__INHERIT__" in attributeList:
+                    inheritMarkerIndex = attributeList.index("__INHERIT__")
+                    attributeList2 = attributeList[0:inheritMarkerIndex]
+                    inheritClass = fqClassList[inheritFrom]
+                    inheritFrom += 1
+                    inheritAttributes = self.storedClassAttributes[inheritClass]
+                    attributeList2.extend(inheritAttributes)
+                    if inheritMarkerIndex != len(attributeList) - 1:
+                        attributeList2.extend(attributeList[inheritMarkerIndex+1:])
+                    attributeList = attributeList2
+                    
+                if "__AUTO_GATHER__" in attributeList:
+                    autoGathered = self.autoGatherAttributes()
+                    # slow way of doing this.
+                    autoGatherMarkerIndex = attributeList.index("__AUTO_GATHER__")
+                    attributeList2 = attributeList[0:autoGatherMarkerIndex]
+                    attributeList2.extend(autoGathered)
+                    if autoGatherMarkerIndex != len(attributeList) - 1:
+                        attributeList2.extend(attributeList[autoGatherMarkerIndex+1:])
+                    attributeList = attributeList2
+                return attributeList
+        if attributeList == [] and autoGather is True:
+            return self.autoGatherAttributes()
+
+
+    def canBeFrozen(self, possiblyFreezeable):
+        '''
+        Returns True or False if this attribute can 
+        be frozen in a way that
+        is stronger than just storing the repr of it.
+        
+        >>> from music21 import *
+        >>> jsf = freezeThaw.JSONFreezer()
+        >>> jsf.canBeFrozen(note.Note())
+        True
+        >>> jsf.canBeFrozen(345)
+        False
+        >>> jsf.canBeFrozen(None)
+        False
+        
+        Lists and Tuples and Dicts return False, but they
+        are not just stored as __repr__, don't worry...
+        
+        >>> jsf.canBeFrozen([7,8])
+        False
+        '''
+        if possiblyFreezeable is None:
+            return False
+        if hasattr(possiblyFreezeable, '_jsonFreezer') and possiblyFreezeable._jsonFreezer is not False:
+            return True
+        if isinstance(possiblyFreezeable, (list, tuple, dict)):
+            return False
+        if isinstance(possiblyFreezeable, (int, str, unicode, float)):
+            return False
+        
+        if hasattr(possiblyFreezeable, 'fullyQualifiedClasses'):
+            fqClassList = possiblyFreezeable.fullyQualifiedClasses
+        else: # same thing...
+            fqClassList = [x.__module__ + '.' + x.__name__ for x in possiblyFreezeable.__class__.mro()]
+
+        for fqName in fqClassList:
+            if fqName in self.storedClassAttributes:
+                return True
+        return False
+
+    #---------------------------------------------------------------------------
+    # core methods for getting and setting
+
+    def getJSONDict(self, includeVersion=False):
+        '''
+        Return a dictionary representation for JSON processing. 
+        All component objects are similarly encoded as dictionaries. 
+        This method is recursively called as needed to store dictionaries 
+        of component objects that are :class:`~music21.freezeThaw.JSONFreezer` subclasses.
+
+        >>> from music21 import *
+        >>> t = metadata.Text('my text')
+        >>> t.language = 'en'
+        >>> jsf = freezeThaw.JSONFreezer(t)
+        >>> jsdict = jsf.getJSONDict()
+        >>> jsdict['__class__']
+        'music21.metadata.Text'
+        >>> jsdict['__attr__']['_language']
+        'en'
+        '''
+        obj = self.storedObject
+        if obj is not None:
+            src = {'__class__': self.className}
+        else:
+            src = {}
+        # always store the version used to create this data
+        if includeVersion is True:
+            src['__version__'] = base.VERSION
+
+        if obj is None:
+            return src
+
+        # flat data attributes
+        flatData = {}
+        if self.storedObject is None:
+            return src
+
+        for attr in self.jsonAttributes():
+            attrValue = getattr(self.storedObject, attr)
+
+            #environLocal.printDebug(['_getJSON', attr, "hasattr(attrValue, 'json')", hasattr(attrValue, 'json')])
+
+            # do not store None values; assume initial/unset state
+            if attrValue is None:
+                continue
+
+            # if, stored on this object, is an object w/ a json method
+            if self.canBeFrozen(attrValue):
+                #environLocal.printDebug(['attrValue', attrValue])
+                internalJSONFreezer = JSONFreezer(attrValue)
+                flatData[attr] = internalJSONFreezer.getJSONDict()
+
+            # handle lists; look for objects that have json attributes
+            elif isinstance(attrValue, (list, tuple)):
+                flatData[attr] = []
+                for attrValueSub in attrValue:
+                    if self.canBeFrozen(attrValueSub):
+                        internalJSONFreezer = JSONFreezer(attrValueSub)
+                        flatData[attr].append(internalJSONFreezer.getJSONDict())
+                    else: # just store normal data
+                        flatData[attr].append(attrValueSub)
+
+            # handle dictionaries; look for objects that have json attributes
+            elif isinstance(attrValue, dict):
+                flatData[attr] = {}
+                for key in attrValue.keys():
+                    attrValueSub = attrValue[key]
+                    # skip None values for efficiency
+                    if attrValueSub is None:
+                        continue
+                    # see if this object stores a json object or otherwise
+                    if self.canBeFrozen(attrValueSub):
+                        internalJSONFreezer = JSONFreezer(attrValueSub)
+                        flatData[attr][key] = internalJSONFreezer.getJSONDict()
+                    else: # just store normal data
+                        flatData[attr][key] = attrValueSub
+            else:
+                flatData[attr] = attrValue
+        src['__attr__'] = flatData
+        return src
+
+    def _getJSON(self):
+        '''
+        Return the dictionary returned by self.getJSONDict() as a JSON string.
+        '''
+        # when called from json property, include version number;
+        # this should mean that only the outermost object has a version number
+        return json.dumps(self.getJSONDict(includeVersion=True))
+                
+    json = property(_getJSON, 
+        doc = '''
+        Get string JSON data for this object. This method is only available if a 
+        JSONFreezer subclass object has been customized and configured by overriding 
+        the following methods: :meth:`~music21.freezeThaw.JSONFreezer.jsonAttributes`, 
+        :meth:`~music21.freezeThaw.JSONFreezer.music21ObjectFromString`.
+        ''')
+
+    def jsonPrint(self):
+        r'''
+        Prints out the json output for a given object:
+        
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> jsf = freezeThaw.JSONFreezer(n)
+        >>> jsf.jsonPrint()
+        {
+          "__attr__": {
+            "_duration": {
+              "__attr__": {
+                "_cachedIsLinked": true, 
+                "_components": [
+                  {
+                    "__attr__": {
+                      "_dots": [
+                        0
+                      ], 
+                      "_link": true, 
+                      "_qtrLength": 1.0, 
+                      "_quarterLengthNeedsUpdating": false, 
+                      "_tuplets": [], 
+                      "_type": "quarter", 
+                      "_typeNeedsUpdating": false
+                    }, 
+                    "__class__": "music21.duration.DurationUnit"
+                  }
+                ], 
+                "_componentsNeedUpdating": false, 
+                "_qtrLength": 1.0, 
+                "_quarterLengthNeedsUpdating": false
+              }, 
+              "__class__": "music21.duration.Duration"
+            }, 
+            "_notehead": "normal", 
+            "_noteheadFill": "default", 
+            "_noteheadParenthesis": false, 
+            "_priority": 0, 
+            "_stemDirection": "unspecified", 
+            "articulations": [], 
+            "beams": {
+              "__attr__": {
+                "beamsList": [], 
+                "feathered": false
+              }, 
+              "__class__": "music21.beam.Beams"
+            }, 
+            "editorial": {
+              "__attr__": {
+                "comment": {
+                  "__attr__": {}, 
+                  "__class__": "music21.editorial.Comment"
+                }, 
+                "misc": {}
+              }, 
+              "__class__": "music21.editorial.NoteEditorial"
+            }, 
+            "expressions": [], 
+            "lyrics": [], 
+            "pitch": {
+              "__attr__": {
+                "_duration": {
+                  "__attr__": {
+                    "_cachedIsLinked": true, 
+                    "_components": [
+                      {
+                        "__attr__": {
+                          "_dots": [
+                            0
+                          ], 
+                          "_link": true, 
+                          "_qtrLength": 1.0, 
+                          "_quarterLengthNeedsUpdating": false, 
+                          "_tuplets": [], 
+                          "_type": "quarter", 
+                          "_typeNeedsUpdating": false
+                        }, 
+                        "__class__": "music21.duration.DurationUnit"
+                      }
+                    ], 
+                    "_componentsNeedUpdating": false, 
+                    "_qtrLength": 1.0, 
+                    "_quarterLengthNeedsUpdating": false
+                  }, 
+                  "__class__": "music21.duration.Duration"
+                }, 
+                "_microtone": {
+                  "__attr__": {
+                    "_centShift": 0, 
+                    "_harmonicShift": 1
+                  }, 
+                  "__class__": "music21.pitch.Microtone"
+                }, 
+                "_octave": 4, 
+                "_priority": 0, 
+                "_step": "C"
+              }, 
+              "__class__": "music21.pitch.Pitch"
+            }
+          }, 
+          "__class__": "music21.note.Note", 
+          "__version__": [
+            1, 
+            3, 
+            0
+          ]
+        }
+        '''
+        print(json.dumps(self.getJSONDict(includeVersion=True), 
+            sort_keys=True, indent=2))
+
+    def jsonWrite(self, fp, unused_format=True):
+        '''
+        Given a file path, write JSON to a file 
+        for this object. 
+        File extension should be .json. File is opened 
+        and closed within this method call. 
+        '''
+        f = codecs.open(fp, mode='w', encoding='utf-8')
+        if not format:
+            f.write(json.dumps(self.getJSONDict(includeVersion=True)))
+        else:
+            f.write(json.dumps(self.getJSONDict(includeVersion=True), 
+            sort_keys=True, indent=2))
+        f.close()
+
+class JSONThawer(JSONFreezeThawBase):
+    '''
+    Class that takes JSON input and makes a Music21Object.    
+    '''
+    def __init__(self, storedObject=None):
+        JSONFreezeThawBase.__init__(self, storedObject)
+
+    def _isComponent(self, target):
+        '''
+        Return a boolean if the provided object is a 
+        dictionary that defines a __class__ key, the necessary 
+        conditions to try to instantiate a component object 
+        with the music21ObjectFromString method.
+        '''
+        # on export, check for attribute
+        if isinstance(target, dict) and '__class__' in target.keys():
+            return True
+        return False
+
+    def _buildComponent(self, src):
+        # get instance from subclass overridden method
+        obj = self.music21ObjectFromString(src['__class__'])
+        # assign dictionary (property takes dictionary or string)
+        self._setJSON(src, obj)
+        return obj
+
+    def _setJSON(self, jsonStr, inputObject = None):
+        '''
+        Set this object based on a JSON string 
+        or instantiated dictionary representation.
+
+        >>> from music21 import *
+        >>> t = metadata.Text('my text')
+        >>> t.language = 'en'
+        >>> jsf = freezeThaw.JSONFreezer(t)
+        >>> jsfJSON = jsf.json
+        
+        >>> tNew = metadata.Text()
+        >>> jsf2 = freezeThaw.JSONThawer(tNew)
+        >>> jsf2.json = jsfJSON
+        >>> str(tNew)
+        'my text'
+
+        Notice that some normal strings come back as unicode:
+        
+        >>> tNew.language
+        u'en'
+        
+        
+        Notes are more complex. Let's not even give an
+        input object this time:
+        
+        >>> n = note.Note("D#5")
+        >>> n.duration.quarterLength = 3.0
+        >>> jsf = freezeThaw.JSONFreezer(n)
+        >>> jsfJSON = jsf.json
+        
+        
+        >>> jsf2 = freezeThaw.JSONThawer()
+        >>> jsf2.json = jsfJSON
+        >>> n2 = jsf2.storedObject
+        >>> n2
+        <music21.note.Note D#>
+        >>> n2.octave
+        5
+        
+        Test that other attributes get updated automatically
+        
+        >>> n2.duration.dots
+        1
+        '''
+        #environLocal.printDebug(['_setJSON: srcStr', jsonStr])
+        if isinstance(jsonStr, dict):
+            d = jsonStr # do not loads  
+        else:
+            d = json.loads(jsonStr)
+
+        if inputObject is not None:
+            obj = inputObject
+        elif self.storedObject is not None:
+            obj = self.storedObject
+        elif d['__class__'] is not None:
+            obj = self.music21ObjectFromString(d['__class__'])
+            self.storedObject = obj
+        else:
+            raise JSONThawerException("Cannot find an object class definition in the jsonStr; you must provide an input object")
+
+        for attr in d.keys():
+            #environLocal.printDebug(['_setJSON: attr', attr, d[attr]])
+            if attr == '__class__':
+                pass
+            elif attr == '__version__':
+                pass
+            elif attr == '__attr__':
+                for key in d[attr].keys():
+                    attrValue = d[attr][key]
+                    if attrValue == None or isinstance(attrValue, 
+                        (int, float)):
+                        setattr(obj, key, attrValue)
+                    # handle a list or tuple, looking for dicts that define objs
+                    elif isinstance(attrValue, (list, tuple)):
+                        subList = []
+                        for attrValueSub in attrValue:
+                            if self._isComponent(attrValueSub):
+                                subList.append(
+                                    self._buildComponent(attrValueSub))
+                            else:
+                                subList.append(attrValueSub)
+                        setattr(obj, key, subList)
+                    # handle a dictionary, looking for dicts that define objs
+                    elif isinstance(attrValue, dict):
+                        # could be a data dict or a dict of objects; 
+                        # if an object, will have a __class__ key
+                        if self._isComponent(attrValue):
+                            setattr(obj, key, self._buildComponent(attrValue))
+                        # its a data dictionary; could contain objects as
+                        # dictionaries, or flat data                           
+                        else:
+                            subDict = {}
+                            for subKey in attrValue.keys():
+                                # this could be flat data or a obj definition
+                                # in a dictionary
+                                attrValueSub = attrValue[subKey]
+                                # if a dictionary, and defines a __class__, 
+                                # create an object
+                                if self._isComponent(attrValueSub):
+                                    subDict[subKey] = self._buildComponent(
+                                        attrValueSub)
+                                else:
+                                    subDict[subKey] = attrValueSub
+                            #setattr(self, key, subDict)
+                            try:
+                                dst = getattr(obj, key)
+                            except AttributeError as ae:
+                                if key == "_storage": # changed name; help older .json files...
+                                    dst = getattr(obj, "storage")
+                                else:
+                                    raise JSONFreezerException("Problem with key: %s for object %s: %s" % (key, obj, ae))
+
+                            # updating the dictionary preserves default 
+                            # values created at init
+                            dst.update(subDict) 
+                    else: # assume a string
+                        setattr(obj, key, attrValue)
+            else:
+                raise JSONFreezerException('cannot handle json attr: %s'% attr)
+
+    json = property(fset=_setJSON, 
+        doc = '''
+        Take string JSON data from :meth:`~music21.freezeThaw.JSONFreezer.json` and 
+        produce an object and store it in
+        self.storedObject.`.
+        ''')
+
+    def jsonRead(self, fp):
+        '''
+        Given a file path, read JSON from a file to this object. 
+        Default file extension should be .json. File is opened 
+        and closed within this method call. 
+
+        returns the stored object
+        '''
+        f = open(fp)
+        self.json = f.read()
+        f.close()
+        return self.storedObject
 
 #------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -1077,7 +1729,7 @@ class Test(unittest.TestCase):
         
 #        for el in c:
 #            storedIds.append(el.id)
-#            storedDefinedContextsIds.append(id(el._definedContexts))
+#            storedSitesIds.append(id(el.sites))
 #            
 #        return
         
@@ -1085,14 +1737,14 @@ class Test(unittest.TestCase):
         n2 = c[1]
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         sf.setupSerializationScaffold()
-        for dummy in n1._definedContexts._definedContexts.keys():
+        for dummy in n1.sites._definedContexts.keys():
             pass
             #print idKey
-            #print n1._definedContexts._definedContexts[idKey]['obj']
-        for dummy in n2._definedContexts._definedContexts.keys():
+            #print n1.sites._definedContexts[idKey]['obj']
+        for dummy in n2.sites._definedContexts.keys():
             pass
             #print idKey
-            #print n2._definedContexts._definedContexts[idKey]['obj']
+            #print n2.sites._definedContexts[idKey]['obj']
 
         dummy_data = pickleMod.dumps(c, protocol=-1)
         
@@ -1240,6 +1892,53 @@ class Test(unittest.TestCase):
         # no longer has s1 as a site
         self.assertEqual(s1 in n1.getSites(), False)
         self.assertEqual(s2 in n1.getSites(), True)
+
+#----------JSON Serialization------------------------------
+
+#    def testDurationJSONSerializationA(self):
+#        from music21 import duration
+#        d = duration.DurationUnit(1.5)
+#        self.assertEqual(str(d), '<music21.duration.DurationUnit 1.5>')
+#
+#        dAlt = duration.DurationUnit()
+#        dAlt.json = d.json
+#        self.assertEqual(str(dAlt), '<music21.duration.DurationUnit 1.5>')
+# 
+#        d = duration.Duration(2.25)
+#        self.assertEqual(str(d), '<music21.duration.Duration 2.25>')
+#        dAlt = duration.Duration()
+#        dAlt.json = d.json
+#        self.assertEqual(str(dAlt), '<music21.duration.Duration 2.25>')
+
+#    def testJSONSerializationPitchA(self):
+#        from music21 import pitch
+#        
+#        m = pitch.Microtone(40)
+#        self.assertEqual(str(m), '(+40c)')
+#
+#        mAlt = pitch.Microtone()
+#        mAlt.json = m.json
+#        self.assertEqual(str(mAlt), '(+40c)')
+#    
+#        a = pitch.Accidental('##')
+#        self.assertEqual(str(a), '<accidental double-sharp>')
+#        aAlt = pitch.Accidental()
+#        aAlt.json = a.json
+#        self.assertEqual(str(aAlt), '<accidental double-sharp>')
+#
+#        p = pitch.Pitch(ps=61.2)
+#        self.assertEqual(str(p), 'C#4(+20c)')
+#        pAlt = pitch.Pitch()
+#        pAlt.json = p.json
+#        self.assertEqual(str(pAlt), 'C#4(+20c)')        
+
+#    def testDerivationSerializationA(self):
+#        from music21 import derivation
+#
+#        d = derivation.Derivation()
+#        self.assertEqual(d.jsonAttributes(), ['_ancestor', '_ancestorId', '_container', '_containerId', '_method'])
+#
+#        self.assertEqual(hasattr(d, 'json'), True)
 
 
 #------------------------------------------------------------------------------

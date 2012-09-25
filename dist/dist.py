@@ -17,6 +17,8 @@ a release), then test/testDocumentation, test/testSerialization, and test/testSt
 
 If all tests pass, run `corpus.cacheMetadata('core')`, buildDoc/build, buildDoc/upload, and
 finally this file.
+
+DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
 
 
@@ -306,5 +308,6 @@ if __name__ == '__main__':
     d.buildNoCorpus = False
     d.build()
     d.updatePaths()
-    d.uploadGoogleCodeOneFile(d.fpTar)
+    d.uploadGoogleCode()
+    #d.uploadGoogleCodeOneFile(d.fpTar)
     #d.uploadPyPi()

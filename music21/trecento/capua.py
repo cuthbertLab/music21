@@ -19,7 +19,7 @@ though they affect the harmony of the period.
 The module contains methods for automatically applying the rules
 of Nicolaus de Capua, for putting these accidentals into the Stream,
 and, by running the :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` 
-method of Stream objects, seeing how well these rules correct certain
+method of :class:`~music21.music21.stream.Stream` objects, seeing how well these rules correct certain
 harmonic problems in the music.
 '''
 import unittest

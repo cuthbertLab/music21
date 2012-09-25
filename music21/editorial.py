@@ -17,7 +17,6 @@ from __future__ import unicode_literals
 
 import unittest
 from music21 import exceptions21
-from music21 import base
 
 class EditorialException(exceptions21.Music21Exception):
     pass
@@ -72,7 +71,7 @@ def getObjectsWithEditorial(listToSearch, editorialStringToFind,
             pass
     return listofOBJToReturn
     
-class NoteEditorial(base.JSONSerializer):
+class NoteEditorial(object):
     '''Editorial comments and special effects that can be applied to notes
     Standard ones are stored as attributes.  Non-standard/one-off effects are
     stored in the dict called "misc":
@@ -120,8 +119,6 @@ class NoteEditorial(base.JSONSerializer):
     }
     
     def __init__(self):
-        base.JSONSerializer.__init__(self)
-
         self.ficta = None  # Accidental object -- N.B. for PRINTING only not for determining intervals
         self.color = None
         self.misc  = {}
@@ -133,12 +130,6 @@ class NoteEditorial(base.JSONSerializer):
         self.melodicIntervalOverRests = None
         self.melodicIntervalsOverRests = []
         self.comment = Comment()
-
-    def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
-        '''
-        # add to base class
-        return ['color', 'misc', 'comment']
 
     def lilyStart(self):
         r'''
@@ -202,7 +193,7 @@ class NoteEditorial(base.JSONSerializer):
         return baseRet
 
         
-class Comment(base.JSONSerializer):
+class Comment(object):
     '''
     an object that adds text above or below a note:
     
@@ -215,7 +206,6 @@ class Comment(base.JSONSerializer):
     
     '''
     def __init__(self):
-        base.JSONSerializer.__init__(self)
         self.position = "below"
         self.text = None
     

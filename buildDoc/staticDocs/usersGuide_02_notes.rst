@@ -404,7 +404,7 @@ So we try to make sure that our `Notes` actually have `Accidentals` before we
 print the `.accidental`'s name, and we do that by using another `if` statement:
 
 >>> if d.accidental is not None:
-...     print d.accidental.name
+...     print(d.accidental.name)
 
 This way is safer because we will only try to print `d.accidental.name` if 
 `d.accidental` is not `None`.  Since it *is* `None` in this case, Python will

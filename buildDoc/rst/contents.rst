@@ -12,6 +12,7 @@ Music21 Documentation
    quickStart
    usersGuide_02_notes
    usersGuide_03_pitches
+   usersGuide_04_stream1
    overviewStreams
    usersGuide_06_chords
    overviewFormats
