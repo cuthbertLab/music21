@@ -41,7 +41,7 @@ class ChoraleList(object):
     >>> from music21 import *
     >>> bcl = corpus.chorales.ChoraleList()
     >>> info358 = bcl.byBudapest[358]
-    >>> for key in info358.keys():
+    >>> for key in info358:
     ...   print key, info358[key]
     budapest 358
     bwv 431
@@ -501,7 +501,7 @@ class ChoraleListRKBWV(object):
     >>> from music21 import *
     >>> bcl = corpus.chorales.ChoraleListRKBWV()
     >>> info155 = bcl.byRiemenschneider[155]
-    >>> for key in info155.keys():
+    >>> for key in info155:
     ...   print key, info155[key]
     kalmus 173
     riemenschneider 155
@@ -1056,7 +1056,7 @@ class Iterator(object):
         
         self.numberingSystem = numberingSystem #This assignment must come before the kwargs
         
-        for key in kwargs.keys():
+        for key in kwargs:
             if key is 'returnType':
                 self.returnType = kwargs[key]
             elif key is 'numberList':
@@ -1382,7 +1382,7 @@ class Iterator(object):
         else:
             self._titleList = []
             for v in value:
-                if v in self._choraleList2.byTitle.keys():
+                if v in self._choraleList2.byTitle:
                     self._titleList.append(v)
                 else:
                     print '%s will be skipped because it is not a recognized title' % v    
@@ -1411,35 +1411,35 @@ class Iterator(object):
             if self._numberingSystem is 'riemenschneider':
                 self._numberList = []
                 for v in sorted(value):
-                    if v in self._choraleList2.byRiemenschneider.keys():
+                    if v in self._choraleList2.byRiemenschneider:
                         self._numberList.append(v)
                     else:
                         print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)
             elif self._numberingSystem is 'kalmus':
                 self._numberList = []
                 for v in sorted(value):
-                    if v in self._choraleList2.byKalmus.keys() and v != 0:
+                    if v in self._choraleList2.byKalmus and v != 0:
                         self._numberList.append(v)
                     else:
                         print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)
             elif self._numberingSystem is 'bwv':
                 self._numberList = []
                 for v in sorted(value):
-                    if v in self._choraleList2.byBWV.keys():
+                    if v in self._choraleList2.byBWV:
                         self._numberList.append(v)
                     else:
                         print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)
             elif self._numberingSystem is 'budapest':
                 self._numberList = []
                 for v in sorted(value):
-                    if v in self._choraleList1.byBudapest.keys():
+                    if v in self._choraleList1.byBudapest:
                         self._numberList.append(v)
                     else:
                         print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem) 
             elif self._numberingSystem is 'baerenreiter':
                 self._numberList = []
                 for v in sorted(value):
-                    if v in self._choraleList1.byBaerenreiter.keys():
+                    if v in self._choraleList1.byBaerenreiter:
                         self._numberList.append(v)
                     else:
                         print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)

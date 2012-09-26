@@ -78,10 +78,10 @@ class VLQTheoryResult(TheoryResult):
         return True if any of the four VLQTheoryResult notes have the editorial key \
         .editorial.misc[miscKey] present and equal to a certain editorialValue (True by default)
         '''
-        return (miscKey in self.vlq.v1n1.editorial.misc.keys() and self.vlq.v1n1.editorial.misc[miscKey] == editorialValue) or \
-            (miscKey in self.vlq.v1n2.editorial.misc.keys() and self.vlq.v1n2.editorial.misc[miscKey] == editorialValue) or \
-            (miscKey in self.vlq.v2n1.editorial.misc.keys() and self.vlq.v2n1.editorial.misc[miscKey] == editorialValue) or \
-            (miscKey in self.vlq.v2n2.editorial.misc.keys() and self.vlq.v2n2.editorial.misc[miscKey] == editorialValue)
+        return (miscKey in self.vlq.v1n1.editorial.misc and self.vlq.v1n1.editorial.misc[miscKey] == editorialValue) or \
+            (miscKey in self.vlq.v1n2.editorial.misc and self.vlq.v1n2.editorial.misc[miscKey] == editorialValue) or \
+            (miscKey in self.vlq.v2n1.editorial.misc and self.vlq.v2n1.editorial.misc[miscKey] == editorialValue) or \
+            (miscKey in self.vlq.v2n2.editorial.misc and self.vlq.v2n2.editorial.misc[miscKey] == editorialValue)
 
     def markNoteEditorial(self, editorialDictKey, editorialValue, editorialMarkList=[1,2,3,4]):        
         '''
@@ -147,8 +147,8 @@ class IntervalTheoryResult(TheoryResult):
         return True if either the noteStart or the noteEnd has the editorial key .editorial.misc[miscKey] \
         present and equal to a certain editorialValue (True by default)
         '''
-        return (miscKey in self.intv.noteStart.editorial.misc.keys() and self.intv.noteStart.editorial.misc[miscKey] == editorialValue) or \
-            (miscKey in self.intv.noteEnd.editorial.misc.keys() and self.intv.noteEnd.editorial.misc[miscKey] == editorialValue)
+        return (miscKey in self.intv.noteStart.editorial.misc and self.intv.noteStart.editorial.misc[miscKey] == editorialValue) or \
+            (miscKey in self.intv.noteEnd.editorial.misc and self.intv.noteEnd.editorial.misc[miscKey] == editorialValue)
     
 # Note Theory Result Object
                   

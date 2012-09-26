@@ -264,7 +264,7 @@ class _EnvironmentCore(object):
 
         # note: this will not get 'localCorpusPath' as there may be more than 
         # one value
-        if key not in self._ref.keys():
+        if key not in self._ref:
             raise EnvironmentException('no preference: %s' % key)
         value = self._ref[key]
         valueStr = str(value).lower()
@@ -296,7 +296,7 @@ class _EnvironmentCore(object):
         # saxutils.escape(msg).encode('UTF-8')
 
         # add local corpus path as a key
-        if key not in self._ref.keys():
+        if key not in self._ref:
             if key != 'localCorpusPath':
                 raise EnvironmentException('no preference: %s' % key)
         if value == '':
@@ -352,9 +352,9 @@ class _EnvironmentCore(object):
         if platform == 'win':
             # try to use defined app data directory for preference file
             # this is not available on all windows versions
-            if 'APPDATA' in os.environ.keys():
+            if 'APPDATA' in os.environ:
                 directory = os.environ['APPDATA']
-            elif ('USERPROFILE' in os.environ.keys() and
+            elif ('USERPROFILE' in os.environ and
                 os.path.exists(os.path.join(
                 os.environ['USERPROFILE'], 'Application Data'))):
                 directory = os.path.join(os.environ['USERPROFILE'], 
@@ -365,7 +365,7 @@ class _EnvironmentCore(object):
         elif platform in ['nix', 'darwin']:
             # alt : os.path.expanduser('~') 
             # might not exist if running as nobody in a webserver...
-            if 'HOME' in os.environ.keys(): 
+            if 'HOME' in os.environ: 
                 directory = os.environ['HOME']
             else:
                 directory = '/tmp/'            
@@ -388,7 +388,7 @@ class _EnvironmentCore(object):
             else:    
                 name = slot.get('name')
                 value = slot.get('value')
-                if name not in ref.keys():
+                if name not in ref:
                     #self.printDebug(['a preference is defined that is longer used: %s' % name])
                     continue
                     # do not set, ignore for now

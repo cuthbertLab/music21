@@ -253,7 +253,7 @@ class StreamForms(object):
         '''Get a form of this Stream, using a cached version if available.
         '''
         # first, check for cached version
-        if key in self._forms.keys():
+        if key in self._forms:
             return self._forms[key]
 
         # else, process, store, and return
@@ -330,7 +330,7 @@ class StreamForms(object):
             histo = {}
             for c in self.__getitem__('chordify.getElementsByClass.Chord'):
                 key = c.forteClassTnI
-                if key not in histo.keys():
+                if key not in histo:
                     histo[key] = 0
                 histo[key] += 1
             self._forms['chordifySetClassHistogram'] = histo
@@ -341,7 +341,7 @@ class StreamForms(object):
             histo = {}
             for c in self.__getitem__('chordify.getElementsByClass.Chord'):
                 key = c.orderedPitchClassesString
-                if key not in histo.keys():
+                if key not in histo:
                     histo[key] = 0
                 histo[key] += 1
             self._forms['chordifyPitchClassSetHistogram'] = histo
@@ -355,7 +355,7 @@ class StreamForms(object):
 
             for c in self.__getitem__('chordify.getElementsByClass.Chord'):
                 for key in keys:
-                    if key not in histo.keys():
+                    if key not in histo:
                         histo[key] = 0
                     # get the function attr, call it, check bool
                     if getattr(c, key)():
@@ -373,7 +373,7 @@ class StreamForms(object):
             histo = {}
             for n in self.__getitem__('flat.notes'):
                 key = n.quarterLength
-                if key not in histo.keys():
+                if key not in histo:
                     histo[key] = 0
                 histo[key] += 1
             self._forms['noteQuarterLengthHistogram'] = histo

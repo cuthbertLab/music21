@@ -472,7 +472,7 @@ def processCodeJSON(json_obj):
     # get information from the json object
     # note: need str() because json object returns an object of unicode type
     code = str(json_obj['code'])
-    if 'xml' in json_obj.keys():
+    if 'xml' in json_obj:
         xmltext = str(json_obj['xml'])
     
         # ADD XML doctype header if not present -- needed for converter to parse

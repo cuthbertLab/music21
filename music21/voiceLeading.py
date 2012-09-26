@@ -919,7 +919,7 @@ def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=No
     for partNum, partObj in enumerate(scoreObjectIsFrom.parts):
         elementStream = partObj.flat.getElementsByOffset(offsetOfObject, mustBeginInSpan=False, classList=classFilterList)
         for el in elementStream.elements:
-            if partNum in contentDict.keys():
+            if partNum in contentDict:
                 contentDict[partNum].append(el)
             else:
                 contentDict[partNum] = el
@@ -1364,7 +1364,7 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
         False
 
         '''  
-        if partNumToIdentify in self.tnlsDict.keys():
+        if partNumToIdentify in self.tnlsDict:
             
             ret = self.tnlsDict[partNumToIdentify].couldBePassingTone()
         else:
@@ -1398,7 +1398,7 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
         True
         '''
 
-        if partNumToIdentify in self.tnlsDict.keys():
+        if partNumToIdentify in self.tnlsDict:
             ret = self.tnlsDict[partNumToIdentify].couldBeNeighborTone()
         else:
             return False
@@ -1901,7 +1901,7 @@ class Test(unittest.TestCase):
         #Test copying all objects defined in this module
         
         import sys, types, copy
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

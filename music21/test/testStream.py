@@ -5357,7 +5357,7 @@ class Test(unittest.TestCase):
             oMin, oMax = sp.getDurationSpanBySite(exFlat)
             dur = oMax - oMin
             beatStr = n.beatStr
-            if beatStr not in melismaByBeat.keys():
+            if beatStr not in melismaByBeat:
                 melismaByBeat[beatStr] = []
             melismaByBeat[beatStr].append(dur)
             #environLocal.printDebug(['start note:', n, 'beat:', beatStr, 'slured duration:', dur])

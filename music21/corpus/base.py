@@ -196,7 +196,7 @@ def getCorePaths(extList=None, expandExtensions=True):
                 expandExtensions=expandExtensions)
     cacheKey = ('core', tuple(extList))
     # not cached, fetch and reset 
-    if cacheKey not in _pathsCache.keys():
+    if cacheKey not in _pathsCache:
         _pathsCache[cacheKey] = _findPaths(common.getCorpusFilePath(), extList)
     return _pathsCache[cacheKey]
 
@@ -234,7 +234,7 @@ def getLocalPaths(extList=None, expandExtensions=True):
                 expandExtensions=expandExtensions)
     cacheKey = ('local', tuple(extList))
     # not cached, fetch and reset 
-    if cacheKey not in _pathsCache.keys():
+    if cacheKey not in _pathsCache:
         # check paths before trying to search
         candidatePaths = environLocal['localCorpusSettings']
         validPaths = []
@@ -293,7 +293,7 @@ def addPath(fp):
 
     _pathsLocalTemp.append(fp)
     # delete all local keys in the cache
-    for key in _pathsCache.keys():
+    for key in _pathsCache:
         if key[0] == 'local':
             del _pathsCache[key]
 
@@ -684,7 +684,7 @@ def getWorkReferences(sort=True):
             else: # remove the extension
                 workStub = fileComponents[0].replace(ext, '')
             # create list location if not already added
-            if workStub not in ref['works'].keys():
+            if workStub not in ref['works']:
                 ref['works'][workStub] = {}
                 ref['works'][workStub]['files'] = []
                 title = common.spaceCamelCase(workStub).title()
@@ -759,7 +759,7 @@ def getWorkReferences(sort=True):
         sortGroup = []
         for ref in post:
             sortGroupSub = []
-            for workStub in ref['works'].keys():
+            for workStub in ref['works']:
                 # add title first for sorting
                 sortGroupSub.append([ref['works'][workStub]['title'], workStub])
             sortGroupSub.sort()

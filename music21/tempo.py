@@ -275,7 +275,7 @@ class TempoText(TempoIndication):
         if value is None:
             value = self._textExpression.content
 
-        for candidate in defaultTempoValues.keys():
+        for candidate in defaultTempoValues:
             candidate = stripText(candidate)
             value = stripText(value)
             # simply look for membership, not a complete match
@@ -578,7 +578,7 @@ class MetronomeMark(TempoIndication):
         else:
             tempoStr = tempoText
         post = None # returned if no match
-        if tempoStr.lower() in defaultTempoValues.keys():
+        if tempoStr.lower() in defaultTempoValues:
             post = defaultTempoValues[tempoStr.lower()]
         # an exact match
         elif tempoStr in defaultTempoValues:
@@ -586,7 +586,7 @@ class MetronomeMark(TempoIndication):
         # look for partial matches
         if post is None:
             for word in tempoStr.split(' '):
-                for key in defaultTempoValues.keys():
+                for key in defaultTempoValues:
                     if key == word.lower():
                         post = defaultTempoValues[key]
         return post
@@ -1206,7 +1206,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

@@ -261,7 +261,7 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
     
     vsList = []
     addAnalysisData(score)
-    if 'VerticalSlices' in score.analysisData.keys() and score.analysisData['VerticalSlices'] != None:
+    if 'VerticalSlices' in score.analysisData and score.analysisData['VerticalSlices'] != None:
         return score.analysisData['VerticalSlices']
 
     # if elements exist at same offset, return both 
@@ -323,7 +323,7 @@ def getVLQs(score, partNum1, partNum2):
     vlqCacheKey = str(partNum1) + "," + str(partNum2)
 
     addAnalysisData(score)    
-    if 'vlqs' in score.analysisData.keys() and vlqCacheKey in score.analysisData['vlqs'].keys():
+    if 'vlqs' in score.analysisData and vlqCacheKey in score.analysisData['vlqs'].keys():
         return score.analysisData['vlqs'][vlqCacheKey]
     
     vlqList = []
@@ -346,7 +346,7 @@ def getVLQs(score, partNum1, partNum2):
             
             vlqList.append(vlq)
         
-    if 'vlqs' not in score.analysisData.keys():
+    if 'vlqs' not in score.analysisData:
         score.analysisData['vlqs'] = {vlqCacheKey: vlqList}
     else:
         score.analysisData['vlqs'][vlqCacheKey] = vlqList
@@ -380,10 +380,10 @@ def getThreeNoteLinearSegments(score, partNum):
     tnlsCacheKey = str(partNum)
     addAnalysisData(score)
 
-    if 'ThreeNoteLinearSegments' in score.analysisData.keys() and tnlsCacheKey in score.analysisData['ThreeNoteLinearSegments'].keys():
+    if 'ThreeNoteLinearSegments' in score.analysisData and tnlsCacheKey in score.analysisData['ThreeNoteLinearSegments']:
         return score.analysisData['ThreeNoteLinearSegments'][tnlsCacheKey]
     else:
-        if 'ThreeNoteLinearSegments' not in score.analysisData.keys():
+        if 'ThreeNoteLinearSegments' not in score.analysisData:
             score.analysisData['ThreeNoteLinearSegments'] = {tnlsCacheKey: getLinearSegments(score, partNum, 3, ['Note'])}
         else:
             score.analysisData['ThreeNoteLinearSegments'][tnlsCacheKey] = getLinearSegments(score, partNum, 3, ['Note'])
@@ -504,7 +504,7 @@ def getVerticalSliceNTuplets(score, ntupletNum):
 
     verticalSliceNTuplets = []
     addAnalysisData(score)
-    if 'VerticalSlices' not in score.analysisData.keys():
+    if 'VerticalSlices' not in score.analysisData:
         verticalSlices = getVerticalSlices(score)
     else:
         verticalSlices = score.analysisData['VerticalSlices']
@@ -665,9 +665,9 @@ def getAllPartNumPairs(score):
     return partNumPairs
 
 def _updateScoreResultDict(score, dictKey, tr):
-    if 'ResultDict' not in score.analysisData.keys():
+    if 'ResultDict' not in score.analysisData:
         score.analysisData['ResultDict'] = {dictKey : [tr] }
-    elif dictKey not in score.analysisData['ResultDict'].keys():
+    elif dictKey not in score.analysisData['ResultDict']:
         score.analysisData['ResultDict'][dictKey] = [tr]
     else:
         score.analysisData['ResultDict'][dictKey].append(tr)
@@ -779,7 +779,7 @@ def _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunct
                    
 def _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunction, responseOffsetMap=[]):
     addAnalysisData(score)
-    if 'VerticalSlices' not in score.analysisData.keys():
+    if 'VerticalSlices' not in score.analysisData:
         unused_vslist = getVerticalSlices(score)
     
     for vs in score.analysisData['VerticalSlices']:
@@ -912,7 +912,7 @@ def getParallelFifths(score, partNum1=None, partNum2 = None):
     testFunction = lambda vlq: vlq.parallelFifth()
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelFifths', testFunction=testFunction)
 
-    if score.analysisData['ResultDict'] and 'parallelFifths' in score.analysisData['ResultDict'].keys():
+    if score.analysisData['ResultDict'] and 'parallelFifths' in score.analysisData['ResultDict']:
         return [tr.vlq for tr in score.analysisData['ResultDict']['parallelFifths']]
     else:
         return None
@@ -978,7 +978,7 @@ def getParallelOctaves(score, partNum1=None, partNum2=None):
     '''
     testFunction = lambda vlq: vlq.parallelOctave()
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelOctaves', testFunction=testFunction)
-    if score.analysisData['ResultDict'] and 'parallelOctaves' in score.analysisData['ResultDict'].keys():
+    if score.analysisData['ResultDict'] and 'parallelOctaves' in score.analysisData['ResultDict']:
         return [tr.vlq for tr in score.analysisData['ResultDict']['parallelOctaves']]
     else:
         return None
@@ -1306,7 +1306,7 @@ def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=
         dictKey = 'accentedPassingTones'
     testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
     _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey=dictKey, testFunction=testFunction, nTupletNum=3)
-    if dictKey in score.analysisData['ResultDict'].keys():
+    if dictKey in score.analysisData['ResultDict']:
         return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in score.analysisData['ResultDict'][dictKey]]
     else:
         return None
@@ -1341,7 +1341,7 @@ def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly
         dictKey = 'accentedNeighborTones'
     testFunction = lambda vst, pn: vst.hasNeighborTone(pn, unaccentedOnly)
     _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey=dictKey, testFunction=testFunction, nTupletNum=3)
-    if dictKey in score.analysisData['ResultDict'].keys():
+    if dictKey in score.analysisData['ResultDict']:
         return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in score.analysisData['ResultDict'][dictKey]]
     else:
         return None
@@ -1549,7 +1549,7 @@ def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, 
         identifyNeighborTones(score, partNum1, dictKey='nt1', unaccentedOnly=unaccentedOnly)
         identifyNeighborTones(score, partNum1, dictKey='nt2', unaccentedOnly=unaccentedOnly)
         identifyImproperResolutions(score, partNum1, partNum2, dictKey='res', editorialMarkList=[1,2,3,4])
-        if 'ResultDict' in score.analysisData.keys() and 'h1' in score.analysisData['ResultDict'].keys():
+        if 'ResultDict' in score.analysisData and 'h1' in score.analysisData['ResultDict']:
             for resultTheoryObject in score.analysisData['ResultDict']['h1'] :
                 if  (resultTheoryObject.hasEditorial('isPassingTone', True) or resultTheoryObject.hasEditorial('isNeigborTone', True)) or \
                     not resultTheoryObject.hasEditorial('isImproperResolution', True):
@@ -1943,7 +1943,7 @@ def getResultsString(score, typeList=None):
     '''
     resultStr = ""
     addAnalysisData(score)
-    for resultType in score.analysisData['ResultDict'].keys():
+    for resultType in score.analysisData['ResultDict']:
         if typeList is None or resultType in typeList:
             resultStr+=resultType+": \n"
             for result in score.analysisData['ResultDict'][resultType]:
@@ -1958,7 +1958,7 @@ def getHTMLResultsString(score, typeList=None):
     '''
     resultStr = ""
     addAnalysisData(score)
-    for resultType in score.analysisData['ResultDict'].keys():
+    for resultType in score.analysisData['ResultDict']:
         if typeList is None or resultType in typeList:
             resultStr+="<b>"+resultType+"</B>: <br /><ul>"
             for result in score.analysisData['ResultDict'][resultType]:
@@ -1972,7 +1972,7 @@ def colorResults(score, color='red', typeList=None):
     colors the notes of all results found in typeList by calling all identify methods on Theory Analyzer.
     '''
     addAnalysisData(score)
-    for resultType in score.analysisData['ResultDict'].keys():
+    for resultType in score.analysisData['ResultDict']:
         if typeList is None or resultType in typeList:
             for result in score.analysisData['ResultDict'][resultType]:
                 result.color(color)
@@ -2013,7 +2013,7 @@ def getKeyMeasureMap(score):
     returns the keymeasuremap in the score, if present. returns None otherwise
     '''
     addAnalysisData(score)
-    if 'KeyMeasureMap' in score.analysisData.keys():
+    if 'KeyMeasureMap' in score.analysisData:
         return score.analysisData['KeyMeasureMap']
     else:
         return None
@@ -2076,7 +2076,7 @@ def getKeyAtMeasure(score, measureNumber):
                 else:
                     return keyMeasureMap[dictKey]
         if measureNumber == 0: #just in case of a pickup measure
-            if 1 in keyMeasureMap.keys():
+            if 1 in keyMeasureMap:
                 return key.Key(key.convertKeyStringToMusic21KeyString(keyMeasureMap[1]))
         else:
             return score.analyze('key')

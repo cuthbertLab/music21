@@ -313,20 +313,20 @@ class Enumeration(object):
 
     def __add__(self, other): 
         lst = [ ] 
-        for k in self.lookup.keys(): 
+        for k in self.lookup: 
             lst.append((k, self.lookup[k])) 
-        for k in other.lookup.keys(): 
+        for k in other.lookup: 
             lst.append((k, other.lookup[k])) 
         return Enumeration(lst) 
 
     def hasattr(self, attr): 
-        if attr in self.lookup.keys():
+        if attr in self.lookup:
             return True
         return False
         #return self.lookup.has_key(attr) 
 
     def hasValue(self, attr): 
-        if attr in self.reverseLookup.keys():
+        if attr in self.reverseLookup:
             return True
         return False
         #return self.reverseLookup.has_key(attr) 

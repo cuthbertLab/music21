@@ -229,7 +229,7 @@ class Dynamic(base.Music21Object):
         if self._volumeScalar is not None:
             return self._volumeScalar
         # use default
-        if self._value in dyanmicStrToScalar.keys():
+        if self._value in dyanmicStrToScalar:
             return dyanmicStrToScalar[self._value]
         return 
 
@@ -413,7 +413,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types, copy
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

@@ -104,11 +104,11 @@ _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
 
-try:
-    import cPickle as pickleMod
-except ImportError:
-    import pickle as pickleMod
-#import pickle as pickleMod
+#try:
+#    import cPickle as pickleMod
+#except ImportError:
+#    import pickle as pickleMod
+import pickle as pickleMod
 
 #-------------------------------------------------------------------------------
 class FreezeThawException(exceptions21.Music21Exception):
@@ -316,7 +316,7 @@ class StreamFreezeThawBase(object):
 
         post = {}
         postLocationKeys = []
-        for idKey in contexts._definedContexts.keys():
+        for idKey in contexts._definedContexts:
             # check if unwrapped, unwrap
             obj = common.unwrapWeakref(contexts._definedContexts[idKey]['obj'])
             if obj is not None:
@@ -752,7 +752,7 @@ class StreamFreezer(StreamFreezeThawBase):
         postLocationKeys = []
         counter = common.SingletonCounter()
 
-        for idKey in contexts._definedContexts.keys():
+        for idKey in contexts._definedContexts:
             if idKey is not None:
                 newKey = counter() # uuid.uuid4()
             else:
@@ -1072,6 +1072,7 @@ class JSONFreezeThawBase(object):
         'music21.duration.Duration': ['__AUTO_GATHER__'],
         'music21.editorial.NoteEditorial': ['color', 'misc', 'comment'],
         'music21.editorial.Comment': ['__AUTO_GATHER__'],
+        'music21.key.KeySignature': ['sharps', 'mode', '_alteredPitches'],
         'music21.metadata.Contributor': ['_role', 'relevance', '_names', '_dateRange'],
         'music21.metadata.Date': ['year', 'month', 'day', 'hour', 'minute', 'second',
                                   'yearError', 'monthError', 'dayError', 'hourError', 'minuteError', 'secondError'],
@@ -1080,11 +1081,17 @@ class JSONFreezeThawBase(object):
         'music21.metadata.MetadataBundle': ['storage', 'name'],
         'music21.metadata.RichMetadata': ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest', 'noteCount', 'quarterLength', '__INHERIT__'],
         'music21.metadata.Text': ['_data', '_language'],
+        'music21.meter.TimeSignature': ['ratioString'],
         'music21.note.Lyric': ['text', 'syllabic', 'number', 'identifier'],
         'music21.note.GeneralNote': ['__AUTO_GATHER__', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie'],
         'music21.note.NotRest': ['__INHERIT__', '_notehead', '_noteheadFill', '_noteheadParenthesis', '_stemDirection', '_volume'],
         'music21.note.Note': ['__INHERIT__', 'pitch', 'beams'],
         }
+
+    postClassCreateCall = {
+        #'music21.meter.TimeSignature': ('ratioChanged',),                   
+        }
+    
     def __init__(self, storedObject = None):
         self.storedObject = storedObject
         if storedObject is not None:
@@ -1146,6 +1153,30 @@ class JSONFreezeThawBase(object):
 
         return lastInspect
 
+    def fullyQualifiedClassFromObject(self, obj):
+        '''
+        return a fullyQualified class name from an object.
+        
+        for Music21Objects you can just do: ``obj.fullyQualifiedClasses[0]``, but
+        this works on any object (such as Durations which aren't Music21Objects)
+        
+        >>> from music21 import *
+        >>> d = duration.DurationUnit()
+        >>> jsbase = freezeThaw.JSONFreezeThawBase()
+        >>> jsbase.fullyQualifiedClassFromObject(d)
+        'music21.duration.DurationUnit'
+
+        Works on class objects as well:
+        
+        >>> dclass = duration.DurationUnit
+        >>> jsbase.fullyQualifiedClassFromObject(dclass)
+        'music21.duration.DurationUnit'
+        '''
+        if inspect.isclass(obj):
+            return obj.__module__ + '.' + obj.__name__ 
+        else:
+            c = obj.__class__
+            return c.__module__ + '.' + c.__name__ 
 
 class JSONFreezer(JSONFreezeThawBase):
     '''
@@ -1241,7 +1272,7 @@ class JSONFreezer(JSONFreezeThawBase):
         if hasattr(self.storedObject, 'fullyQualifiedClasses'):
             fqClassList = self.storedObject.fullyQualifiedClasses
         else: # same thing...
-            fqClassList = [x.__module__ + '.' + x.__name__ for x in self.storedObject.__class__.mro()]
+            fqClassList = [self.fullyQualifiedClassFromObject(x) for x in self.storedObject.__class__.mro()]
         
         for i, thisClass in enumerate(fqClassList):
             inheritFrom = i + 1
@@ -1377,7 +1408,7 @@ class JSONFreezer(JSONFreezeThawBase):
             # handle dictionaries; look for objects that have json attributes
             elif isinstance(attrValue, dict):
                 flatData[attr] = {}
-                for key in attrValue.keys():
+                for key in attrValue:
                     attrValueSub = attrValue[key]
                     # skip None values for efficiency
                     if attrValueSub is None:
@@ -1551,7 +1582,7 @@ class JSONThawer(JSONFreezeThawBase):
         with the music21ObjectFromString method.
         '''
         # on export, check for attribute
-        if isinstance(target, dict) and '__class__' in target.keys():
+        if isinstance(target, dict) and '__class__' in target:
             return True
         return False
 
@@ -1560,6 +1591,13 @@ class JSONThawer(JSONFreezeThawBase):
         obj = self.music21ObjectFromString(src['__class__'])
         # assign dictionary (property takes dictionary or string)
         self._setJSON(src, obj)
+        objFQClass = self.fullyQualifiedClassFromObject(obj)
+        if objFQClass in self.postClassCreateCall:
+            callMethodStr = self.postClassCreateCall[objFQClass][0]
+            # TODO: add args
+            callMethod = getattr(obj, callMethodStr)
+            callMethod(obj)
+        
         return obj
 
     def _setJSON(self, jsonStr, inputObject = None):
@@ -1623,18 +1661,21 @@ class JSONThawer(JSONFreezeThawBase):
         else:
             raise JSONThawerException("Cannot find an object class definition in the jsonStr; you must provide an input object")
 
-        for attr in d.keys():
+        for attr in d:
             #environLocal.printDebug(['_setJSON: attr', attr, d[attr]])
             if attr == '__class__':
                 pass
             elif attr == '__version__':
                 pass
             elif attr == '__attr__':
-                for key in d[attr].keys():
+                for key in d[attr]:
                     attrValue = d[attr][key]
                     if attrValue == None or isinstance(attrValue, 
                         (int, float)):
-                        setattr(obj, key, attrValue)
+                        try:
+                            setattr(obj, key, attrValue)
+                        except AttributeError:
+                            raise JSONThawerException("Cannot set attribute '%s' to %s for obj %r" % (key, attrValue, obj))
                     # handle a list or tuple, looking for dicts that define objs
                     elif isinstance(attrValue, (list, tuple)):
                         subList = []
@@ -1655,7 +1696,7 @@ class JSONThawer(JSONFreezeThawBase):
                         # dictionaries, or flat data                           
                         else:
                             subDict = {}
-                            for subKey in attrValue.keys():
+                            for subKey in attrValue:
                                 # this could be flat data or a obj definition
                                 # in a dictionary
                                 attrValueSub = attrValue[subKey]
@@ -1737,11 +1778,11 @@ class Test(unittest.TestCase):
         n2 = c[1]
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         sf.setupSerializationScaffold()
-        for dummy in n1.sites._definedContexts.keys():
+        for dummy in n1.sites._definedContexts:
             pass
             #print idKey
             #print n1.sites._definedContexts[idKey]['obj']
-        for dummy in n2.sites._definedContexts.keys():
+        for dummy in n2.sites._definedContexts:
             pass
             #print idKey
             #print n2.sites._definedContexts[idKey]['obj']

@@ -217,12 +217,12 @@ class RequestObject(object):
         self.commandList = []
         self.errorList = []
         self.returnDict = {}
-        if "dataDict" in self.json_object.keys():
+        if "dataDict" in self.json_object:
             self.dataDict = json_object['dataDict']
             self._parseData()
-        if "commandList" in self.json_object.keys():
+        if "commandList" in self.json_object:
             self.commandList = self.json_object['commandList']
-        if "returnDict" in self.json_object.keys():
+        if "returnDict" in self.json_object:
             self.returnDict = self.json_object['returnDict']
       
     def addError(self, errorString, exceptionObj = None):
@@ -242,16 +242,16 @@ class RequestObject(object):
         Parses data specified as strings in self.dataDict into objects in self.parsedDataDict
         '''
         for (name,dataDictElement) in self.dataDict.iteritems():
-            if 'data' not in dataDictElement.keys():
+            if 'data' not in dataDictElement:
                 self.addError("no data specified for data element "+unicode(dataDictElement))
                 continue
 
             dataStr = dataDictElement['data']
 
-            if 'fmt' in dataDictElement.keys():
+            if 'fmt' in dataDictElement:
                 fmt = dataDictElement['fmt']
                 
-                if name in self.parsedDataDict.keys():
+                if name in self.parsedDataDict:
                     self.addError("duplicate definition for data named "+str(name)+" "+str(dataDictElement))
                     continue
                 if fmt not in availableDataFormats:
@@ -346,18 +346,18 @@ class RequestObject(object):
         '''
         
         for commandElement in self.commandList:
-            if 'function' in commandElement.keys() and 'attribute'  in commandElement.keys():
+            if 'function' in commandElement and 'attribute'  in commandElement:
                 self.addError("cannot specify both function and attribute for:  "+str(commandElement))
                 continue
             
-            if 'function' in commandElement.keys():
+            if 'function' in commandElement:
                 functionName = commandElement['function']
                 
                 if functionName not in availableFunctions:
                     self.addError("unknown function "+str(functionName)+" :"+str(commandElement))
                     continue
                 
-                if 'argList' not in commandElement.keys():
+                if 'argList' not in commandElement:
                     argList = []
                 else:
                     argList = commandElement['argList']
@@ -368,9 +368,9 @@ class RequestObject(object):
                             continue
                         argList[i] = parsedArg
 
-                if 'caller' in commandElement.keys(): # Caller Specified
+                if 'caller' in commandElement: # Caller Specified
                     callerName = commandElement['caller']
-                    if callerName not in self.parsedDataDict.keys():
+                    if callerName not in self.parsedDataDict:
                         self.addError(callerName+" not defined "+str(commandElement))
                         continue
                     try:
@@ -383,24 +383,24 @@ class RequestObject(object):
                 else: # No caller specified
                     result = eval(functionName)(*argList)
                 
-                if 'resultVariable' in commandElement.keys():
+                if 'resultVariable' in commandElement:
                     resultVarName = commandElement['resultVariable']
                     self.parsedDataDict[resultVarName] = result
                     
-            elif 'attribute' in commandElement.keys():
+            elif 'attribute' in commandElement:
                 attribtueName = commandElement['attribute']
                 
                 if attribtueName not in availableAttribtues:
                     self.addError("unknown attribute "+str(attribtueName)+" :"+str(commandElement))
                     continue
                 
-                if 'args'  in commandElement.keys():
+                if 'args'  in commandElement:
                     self.addError("No args should be specified with attribute :"+str(commandElement))
                     continue
                 
-                if 'caller' in commandElement.keys(): # Caller Specified
+                if 'caller' in commandElement: # Caller Specified
                     callerName = commandElement['caller']
-                    if callerName not in self.parsedDataDict.keys():
+                    if callerName not in self.parsedDataDict:
                         self.addError(callerName+" not defined "+str(commandElement))
                         continue
                     result = eval("self.parsedDataDict[callerName]."+attribtueName)
@@ -409,7 +409,7 @@ class RequestObject(object):
                     self.addError("Caller must be specified with attribute :"+str(commandElement))
                     continue
 
-                if 'resultVariable' in commandElement.keys():
+                if 'resultVariable' in commandElement:
                     resultVarName = commandElement['resultVariable']
                     self.parsedDataDict[resultVarName] = result
                     
@@ -438,7 +438,7 @@ class RequestObject(object):
             return return_obj
         
         for (dataName,fmt) in self.returnDict.iteritems():
-            if dataName not in self.parsedDataDict.keys():
+            if dataName not in self.parsedDataDict:
                 self.addError("Data element "+dataName+" not defined at time of return");
                 continue
             if fmt not in availableDataFormats:
@@ -479,7 +479,7 @@ class RequestObject(object):
         returnVal = None
         foundMatch = False
         
-        if strVal in self.parsedDataDict.keys():
+        if strVal in self.parsedDataDict:
             returnVal = self.parsedDataDict[strVal]
             foundMatch = True
         else:

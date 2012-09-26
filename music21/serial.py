@@ -3439,7 +3439,7 @@ class Test(unittest.TestCase):
                   'c':9, 'c#':10, 'b-':11, 'b':12}
         s = corpus.parse('bwv66.6')
         for n in s.flat.notes:
-            for key in series.keys():
+            for key in series:
                 if n.pitch.pitchClass == pitch.Pitch(key).pitchClass:
                     n.addLyric(series[key])
         match = []
@@ -3476,7 +3476,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

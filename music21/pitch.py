@@ -395,8 +395,6 @@ class Microtone(object):
     _jsonFreezer = True
 
     def __init__(self, centsOrString=0):
-        #base.JSONFreezer.__init__(self)
-
         self._centShift = 0
         self._harmonicShift = 1 # the first harmonic is the start
 
@@ -1864,11 +1862,11 @@ class Pitch(base.Music21Object):
         usrStr = ''.join(octNot)
         octFound = ''.join(octFound)
         # we have nothing but pitch specification
-        if len(usrStr) == 1 and usrStr in STEPREF.keys():
+        if len(usrStr) == 1 and usrStr in STEPREF:
             self._step = usrStr
             self.accidental = None
         # assume everything following pitch is accidental specification
-        elif len(usrStr) > 1 and usrStr[0] in STEPREF.keys():
+        elif len(usrStr) > 1 and usrStr[0] in STEPREF:
             self._step = usrStr[0]
             self.accidental = Accidental(usrStr[1:])
         else:
@@ -4128,7 +4126,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

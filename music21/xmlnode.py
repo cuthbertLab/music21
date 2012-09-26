@@ -125,7 +125,7 @@ class XMLNode(object):
         Given a SAX attrs object, load all atributes that are 
         named within this object's _attr dictionary. 
         '''
-        for key in self._attr.keys():
+        for key in self._attr:
             value = attrs.get(key, "") # from SAX attrs object
             if value.strip() != '': # only modify if not nothing
                 self._attr[key] = value        
@@ -350,7 +350,7 @@ class XMLNode(object):
     def set(self, name, value):
         '''Set an attribute, using either the name of the attribute, a name that can be converter, or a direct attribute on the object. 
         '''
-        #if name in self._attr.keys():
+        #if name in self._attr:
         try:    
             junk = self._attr[name] # will raise error
             self._attr[name] = value
@@ -359,7 +359,7 @@ class XMLNode(object):
             pass
 
         nameDst = self._convertNameToXml(name)
-        #if nameDst in self._attr.keys():
+        #if nameDst in self._attr:
         try:
             junk = self._attr[nameDst] # will raise error
             self._attr[nameDst] = value
@@ -389,7 +389,7 @@ class XMLNode(object):
         
         If available as an object attribute, return this second. 
         '''
-        #if name in self._attr.keys():
+        #if name in self._attr:
         try:
             return self._attr[name]
         except KeyError:
@@ -403,7 +403,7 @@ class XMLNode(object):
 
         # try conversions
         nameDst = self._convertNameToXml(name)
-        #if nameDst in self._attr.keys():
+        #if nameDst in self._attr:
         try:
             return self._attr[nameDst]
         except KeyError:
@@ -634,7 +634,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

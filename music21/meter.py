@@ -2477,7 +2477,12 @@ class TimeSignature(base.Music21Object):
     
     def __init__(self, value='4/4', partitionRequest=None):
         base.Music21Object.__init__(self)
+        self.resetValues(value, partitionRequest)
 
+    def resetValues(self, value = '4/4', partitionRequest = None):
+        '''
+        reset all values according to a new value and partitionRequest
+        '''
         ## MSC: couldn't figure out what this does, so cut for now...
         ## whether the TimeSignature object is inherited from ??
         #self.inherited = False 
@@ -2509,7 +2514,27 @@ class TimeSignature(base.Music21Object):
         '''
         return str(int(self.numerator)) + "/" + str(int(self.denominator))
 
-    ratioString = property(_getRatioString)
+    def _setRatioString(self, newRatioString):
+        '''
+        reset a time signature to a new ratioString
+        '''
+        self.resetValues(newRatioString)
+
+    ratioString = property(_getRatioString, _setRatioString, doc = '''
+        returns a simple string representing the time signature ratio or
+        sets a new one.  Cannot be used for very complex time signatures:
+        
+        >>> from music21 import *
+        >>> threeFour = meter.TimeSignature('3/4')
+        >>> threeFour.ratioString
+        '3/4'
+    
+        >>> threeFour.ratioString = '5/8'
+        >>> threeFour.numerator
+        5
+        >>> threeFour.denominator
+        8
+    ''')
 
     def __str__(self):
         return self.__repr__()
@@ -3917,7 +3942,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):
@@ -4210,15 +4235,20 @@ class Test(unittest.TestCase):
            
 
 
-#     def testJSONStorage(self):
-#         ts = TimeSignature('3/4')
-#         # cannot test to json str as __class__ is different based on context 
-#         #self.assertEqual(ts.json, '{"__attr__": {"stringNotation": "3/4"}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.TimeSignature\'>"}')
-# 
-#         jsString = ts.json
-#         ts = TimeSignature()
-#         ts.json = jsString
-#         self.assertEqual(ts.stringNotation, '3/4')
+    def testJSONStorage(self):
+        from music21 import meter
+        from music21 import freezeThaw
+         
+        ts = meter.TimeSignature('3/4')
+        jsonStr = freezeThaw.JSONFreezer(ts).json
+         
+        # cannot test to json str as __class__ is different based on context 
+        versionStr = str(list(base.VERSION))
+        self.assertEqual(jsonStr, '{"__attr__": {"ratioString": "3/4"}, "__version__": ' + versionStr +', "__class__": "music21.meter.TimeSignature"}')
+ 
+        tsNew = meter.TimeSignature()
+        freezeThaw.JSONThawer(tsNew).json = jsonStr 
+        self.assertEqual(tsNew.ratioString, '3/4')
 
 
     def testMusicxmlDirectOut(self):

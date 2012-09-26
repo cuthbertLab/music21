@@ -581,7 +581,7 @@ def musicXMLTypeToType(value):
     FromMxObjectsException...
     '''
     # MusicXML uses long instead of longa
-    if value not in duration.typeToDuration.keys():
+    if value not in duration.typeToDuration:
         if value == 'long':
             return 'longa'
         else:
@@ -1727,7 +1727,7 @@ def _addToStaffReference(mxObject, target, staffReference):
             key = mxObject.get('number')
         except xmlnode.XMLNodeException:
             return
-    if key not in staffReference.keys():
+    if key not in staffReference:
         staffReference[key] = []
     staffReference[key].append(target)
 
@@ -2193,7 +2193,7 @@ def _getUniqueStaffKeys(staffReferenceList):
     '''
     post = []
     for staffReference in staffReferenceList:
-        for key in staffReference.keys():
+        for key in staffReference:
             if key is not None and key not in post:
                 post.append(key)
     post.sort()
@@ -2203,7 +2203,7 @@ def _getStaffExclude(staffReference, targetKey):
     '''Given a staff reference dictionary, remove and combine in a list all elements that are not part of the given key. Thus, remove all entries under None (common to all) and th e given key. This then is the list of all elements that should be deleted.
     '''
     post = []
-    for key in staffReference.keys():
+    for key in staffReference:
         if key is None or int(key) == int(targetKey):
             continue
         post += staffReference[key]

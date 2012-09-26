@@ -114,7 +114,7 @@ def prependArticle(src, language=None):
 
     if language == None: # get all languages?
         ref = []
-        for key in articleReference.keys():
+        for key in articleReference:
             ref += articleReference[key]
     else:
         ref = articleReference[language]
@@ -150,7 +150,7 @@ def postpendArticle(src, language=None):
 
     if language == None: # get all languages?
         ref = []
-        for key in articleReference.keys():
+        for key in articleReference:
             ref += articleReference[key]
     else:
         ref = articleReference[language]

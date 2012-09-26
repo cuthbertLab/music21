@@ -245,7 +245,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                         shiftLib = {0: magnitude, 1: magnitude, 2: -magnitude}                   
                     elif key.name[1] == '#':                   
                         shiftLib = {0: -magnitude, 1: -magnitude, 2: magnitude}                   
-                    for i in shiftLib.keys():
+                    for i in shiftLib:
                         rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
                 # add to dictionary
                 dst[key.name] = self._rgbToHex(rgbStep)
@@ -1205,7 +1205,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
                             i = i.reverse()
                     # must use directed name for cases where ignoreDirection
                     # is false
-                    if i.directedName not in found.keys():
+                    if i.directedName not in found:
                         found[i.directedName] = [i, 1]
                     else:
                         found[i.directedName][1] += 1 # increment counter

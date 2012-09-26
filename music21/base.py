@@ -13,7 +13,6 @@
 
 # base -- the convention within music21 is that __init__ files contain:
 #    from base import *
-
 '''
 music21.base contains all the most low-level objects that also appear in
 the music21 module (i.e., music21.base.Music21Object is the same as
@@ -273,7 +272,7 @@ class Sites(object):
         new = self.__class__()
         locations = [] #self._locationKeys[:]
         #environLocal.printDebug(['Sites.__deepcopy__', 'self._definedContexts.keys()', self._definedContexts.keys()])
-        for idKey in self._definedContexts.keys():
+        for idKey in self._definedContexts:
             singleContextDict = self._definedContexts[idKey]
             if singleContextDict['isDead']:
                 continue # do not copy dead references
@@ -328,7 +327,7 @@ class Sites(object):
             self.purgeLocations(rescanIsDead=True)
 
         #environLocal.printDebug(['self', self, 'self._definedContexts.keys()', self._definedContexts.keys()])
-        for idKey in self._definedContexts.keys():
+        for idKey in self._definedContexts:
             if WEAKREF_ACTIVE:
             #if common.isWeakref(self._definedContexts[idKey]['obj']):
                 target = self._definedContexts[idKey]['obj']
@@ -362,106 +361,13 @@ class Sites(object):
         >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
         True
         '''
-        for idKey in self._definedContexts.keys():
+        for idKey in self._definedContexts:
             if self._definedContexts[idKey]['obj'] is None:
                 continue # always skip None
             if not common.isWeakref(self._definedContexts[idKey]['obj']):
                 #environLocal.printDebug(['wrapping:', self._definedContexts[idKey]['obj']])
                 post = common.wrapWeakref(self._definedContexts[idKey]['obj'])
                 self._definedContexts[idKey]['obj'] = post
-
-#    def freezeIds(self):
-#        '''
-#        Temporarily replace all stored keys (object ids) 
-#        with a temporary values suitable for usage in pickling.
-#
-#        >>> class Mock(base.Music21Object): 
-#        ...     pass
-#        >>> aObj = Mock()
-#        >>> bObj = Mock()
-#        >>> aContexts = base.Sites()
-#        >>> aContexts.add(aObj)
-#        >>> aContexts.add(bObj)
-#        >>> oldKeys = aContexts._definedContexts.keys()
-#        >>> aContexts.freezeIds()
-#        >>> newKeys = aContexts._definedContexts.keys()
-#        >>> oldKeys == newKeys
-#        False
-#        '''
-#        # need to store self._locationKeys as well
-#        post = {}
-#        postLocationKeys = []
-#        counter = common.SingletonCounter()
-#
-#        for idKey in self._definedContexts.keys():
-#            if idKey is not None:
-#                newKey = counter() # uuid.uuid4()
-#            else:
-#                newKey = idKey # keep None
-#            # might want to store old id?
-#            #environLocal.printDebug(['freezing key:', idKey, newKey])
-#            if idKey in self._locationKeys:
-#                postLocationKeys.append(newKey)
-#            post[newKey] = self._definedContexts[idKey]
-#        self._definedContexts = post
-#        self._locationKeys = postLocationKeys
-#        #environLocal.printDebug(['post freezeids', self._definedContexts])
-#
-#        # clear this for setting later
-#        self.containedById = counter()
-#        self._lastID = -1 # set to inactive
-#
-#    def unfreezeIds(self):
-#        '''
-#        Restore keys to be the id() of the object they contain.
-#
-#        >>> class Mock(base.Music21Object): 
-#        ...     pass
-#        >>> aObj = Mock()
-#        >>> bObj = Mock()
-#        >>> cObj = Mock()
-#        >>> aContexts = base.Sites()
-#        >>> aContexts.add(aObj)
-#        >>> aContexts.add(bObj)
-#        >>> aContexts.add(cObj, 200) # a location
-#
-#        >>> oldKeys = aContexts._definedContexts.keys()
-#        >>> oldLocations = aContexts._locationKeys[:]
-#        >>> aContexts.freezeIds()
-#        >>> newKeys = aContexts._definedContexts.keys()
-#        >>> oldKeys == newKeys
-#        False
-#        >>> aContexts.unfreezeIds()
-#        >>> postKeys = aContexts._definedContexts.keys()
-#        >>> postKeys == newKeys
-#        False
-#        >>> # restored original ids b/c objs are alive
-#        >>> sorted(postKeys) == sorted(oldKeys) 
-#        True
-#        >>> oldLocations == aContexts._locationKeys
-#        True
-#        '''
-#        #environLocal.printDebug(['defined context entering unfreeze ids', self._definedContexts])
-#
-#        # for encoding to serial, this should be done after weakref unwrapping     
-#        # for decoding to serial, this should be done before weakref wrapping
-#
-#        post = {}
-#        postLocationKeys = []
-#        for idKey in self._definedContexts.keys():
-#            # check if unwrapped, unwrap
-#            obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
-#            if obj is not None:
-#                newKey = id(obj)
-#            else:
-#                newKey = None
-#            #environLocal.printDebug(['unfreezing key:', idKey, newKey])
-#            if idKey in self._locationKeys:
-#                postLocationKeys.append(newKey)
-#            post[newKey] = self._definedContexts[idKey]
-#        self._definedContexts = post
-#        self._locationKeys = postLocationKeys
-
 
     #---------------------------------------------------------------------------
     # general
@@ -478,7 +384,7 @@ class Sites(object):
     def _prepareObject(self, obj):
         '''
         Prepare an object for storage. 
-        May be stored as a standard refernce or as a weak reference.
+        May be stored as a standard reference or as a weak reference.
         '''
         # can have this perform differently based on domain
         if obj is None: # leave None alone
@@ -494,12 +400,11 @@ class Sites(object):
         '''
         Add a reference to the Sites collection. 
         If offset is None, it is interpreted as a context
-        If offset is a value, it is intereted as location, i.e., a Stream.
+        If offset is a value, it is interpreted as location, i.e., a Stream.
 
         The `timeValue` argument is used to store the time 
         at which an object is added to locations. 
         This is not the same as `offset` 
-
         '''
         # NOTE: this is a performance critical method
 
@@ -509,7 +414,7 @@ class Sites(object):
             idKey = id(obj)
 
         updateNotAdd = False
-        if idKey in self._definedContexts.keys():
+        if idKey in self._definedContexts:
             updateNotAdd = True 
 
         if offset is not None: # a location, not a context
@@ -604,7 +509,7 @@ class Sites(object):
             self._lastID = -1 # cannot be None
             self._lastOffset = None
         if idKey is None:
-            raise Exception('trying to remove None idKey')
+            raise SitesException('trying to remove None idKey is not allowed')
 
         #environLocal.printDebug(['removeById', idKey, 'self._definedContexts.keys()', self._definedContexts.keys()])
         del self._definedContexts[idKey]
@@ -645,7 +550,7 @@ class Sites(object):
         True
         '''
         post = []
-        for key in self._definedContexts.keys():
+        for key in self._definedContexts:
             post.append((self._definedContexts[key]['time'], key))
         post.sort()
         if newFirst:
@@ -665,7 +570,6 @@ class Sites(object):
         where most-recently assigned objects are returned first. 
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
-
 
         >>> import music21
         >>> class Mock(music21.Music21Object): 
@@ -690,7 +594,7 @@ class Sites(object):
         elif sortByCreationTime in [-1, 'reverse']:
             keyRepository = self._keysByTime(newFirst=False)
         else: # None, or False
-            keyRepository = self._definedContexts.keys()
+            keyRepository = self._definedContexts
 
         post = [] 
         #purgeKeys = []
@@ -1096,7 +1000,7 @@ class Sites(object):
         >>> aLocations.getOffsetByObjectMatch(bSite)
         121.5
         '''
-        for idKey in self._definedContexts.keys():
+        for idKey in self._definedContexts:
             singleContextDict = self._definedContexts[idKey]
             if singleContextDict['isDead']: # cal alway skip
                 continue
@@ -1240,7 +1144,7 @@ class Sites(object):
         '''
 
         match = None
-        for siteId in self._definedContexts.keys():
+        for siteId in self._definedContexts:
             # might need to use almost equals here
             if self._definedContexts[siteId]['offset'] == offset:
                 if self._definedContexts[siteId]['isDead']:
@@ -1347,7 +1251,7 @@ class Sites(object):
             # defined contexts [sic!]
             #if post is None: # no match yet
             # access public method to recurse
-            if id(obj) not in memo.keys():
+            if id(obj) not in memo:
                 # if the object is a Musci21Object
                 #if hasattr(obj, 'getContextByClass'):
                 # store this object as having been searched
@@ -1422,7 +1326,7 @@ class Sites(object):
                 continue # in case the reference is dead
             # if after trying to match name, look in the defined contexts' 
             # defined contexts [sic!]
-            if id(obj) not in memo.keys():
+            if id(obj) not in memo:
                 # if the object is a Musci21Object
                 #if hasattr(obj, 'getContextByClass'):
                 # store this object as having been searched
@@ -1679,7 +1583,7 @@ class Music21Object(object):
         new = self.__class__()
         #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
-        for name in self.__dict__.keys():
+        for name in self.__dict__:
             if name.startswith('__'):
                 continue
 
@@ -2428,7 +2332,7 @@ class Music21Object(object):
             memo = {} # intialize
             #if DEBUG_CONTEXT: print 'X: creating new memo'        
         #printMemo(memo, 'getContextByClass called by: %s %s' % (id(self), self))
-        #if DEBUG_CONTEXT: print 'X: memo:', [(key, memo[key]) for key in memo.keys()]
+        #if DEBUG_CONTEXT: print 'X: memo:', [(key, memo[key]) for key in memo]
 
         post = None
         # first, if this obj is a Stream, we see if the class exists at or
@@ -4406,7 +4310,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

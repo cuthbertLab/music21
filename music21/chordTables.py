@@ -2681,7 +2681,7 @@ def addressToCommonNames(address):
     '''
     address = _validateAddress(address)
     refDict = SCREF[address]
-    if 'name' in refDict.keys():
+    if 'name' in refDict:
         return list(refDict['name']) # convert to a list
     else:
         return None
@@ -2726,7 +2726,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(key), 3)
             if value.keys() != []:
                 # if we have keys, make sure that name is one of them
-                self.assertEqual('name' in value.keys(), True)
+                self.assertEqual('name' in value, True)
 
     def testTnRef(self):
         partition = {}
@@ -2734,7 +2734,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(key), 3)
             # the third value of the key should be -1, 1, or 0
             self.assertEqual(key[2] in [-1, 0, 1], True)
-            if key[0] not in partition.keys():
+            if key[0] not in partition:
                 partition[key[0]] = []
                 partition[key[0]].append(value) # append unique ids
             else:

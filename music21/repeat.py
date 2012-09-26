@@ -1235,7 +1235,7 @@ class Expander(object):
                     # attached to bracket after this repeat segment
                     m = streamObj[i]
                     #environLocal.printDebug(['about to insert m into new', 'id(m)', id(m), 'new', id(new), 'all ids:', [id(e) for e in new]])
-                    #if new.hasElementByObjectId(id(m)):
+                    #if new._hasElementByObjectId(id(m)):
                     #    environLocal.printDebug(['stream already has measure that was not copied in this pass', m])
                         #m = copy.deepcopy(streamObj[i])
                         #new.show('t')
@@ -1293,7 +1293,7 @@ class Expander(object):
             mStart = streamObj[innermost[0]]
             mEnd = streamObj[innermost[-1]]
             for rb in rBrackets:
-                if id(rb) in repeatBracketsMemo.keys():
+                if id(rb) in repeatBracketsMemo:
                     #environLocal.printDebug(['skipping rb as in memo keys:', rb])   
                     break # do not need to look at components         
                 elif rb.hasComponent(mStart) or rb.hasComponent(mEnd):

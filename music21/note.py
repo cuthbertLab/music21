@@ -260,24 +260,6 @@ class GeneralNote(base.Music21Object):
         # note: Chords handle ties differently
         self.tie = None # store a Tie object
 
-
-#    def jsonAttributes(self):
-#        '''
-#        Define all attributes of this object that should be JSON serialized for storage and 
-#        re-instantiation. Attributes that name basic Python objects or 
-#        :class:`~music21.freezeThaw.JSONFreezer` subclasses, or dictionaries or lists 
-#        that contain Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
-#
-#        >>> from music21 import *
-#        >>> gn = note.GeneralNote()
-#        >>> gn.jsonAttributes()
-#        ['_activeSite', '_activeSiteId', '_duration', '_idLastDeepCopyOf', '_overriddenLily', '_priority', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie']
-#
-#        '''
-#        # will already get _duration
-#        return self.autoGatherAttributes() + ['lyrics', 'expressions', 'articulations', 'editorial', 'tie']
-
-
     #---------------------------------------------------------------------------
     def _getColor(self):
         '''Return the Note color. 
@@ -575,17 +557,6 @@ class NotRest(GeneralNote):
         self._volume = None # created on demand
         self.duration.linkage = 'tie'
 
-#    def jsonAttributes(self):
-#        '''
-#        Define all attributes of this object that should be JSON serialized for storage and 
-#        re-instantiation. Attributes that name basic Python objects or 
-#        :class:`~music21.freezeThaw.JSONFreezer` subclasses, or dictionaries or lists 
-#        that contain Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
-#        '''
-#        # add to base class
-#        return GeneralNote.jsonAttributes(self) + ['_notehead', '_noteheadFill', '_noteheadParenthesis', '_stemDirection', '_volume']
-
-
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects 
@@ -819,13 +790,6 @@ class Note(NotRest):
             self.beams = keywords["beams"]
         else:
             self.beams = beam.Beams()
-
-#    def jsonAttributes(self):
-#        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
-#        '''
-#        # add to base class
-#        return NotRest.jsonAttributes(self) + ['pitch', 'beams']
-
 
     #---------------------------------------------------------------------------
     # operators, representations, and transformatioins
@@ -1413,7 +1377,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):
@@ -1788,19 +1752,6 @@ class Test(unittest.TestCase):
         n1Copy = copy.deepcopy(n1)
         self.assertEqual(n1Copy.volume.velocity, 100)
         self.assertEqual(n1Copy.volume.parent, n1Copy)
-
-
-#    def testSerializationA(self):
-#        from music21 import note
-#
-#        gn = note.GeneralNote()
-#        #print gn.json
-#
-#        nr = note.NotRest()
-#        #print nr.json
-#
-#        n = note.Note()
-#        #print n.json
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

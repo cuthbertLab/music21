@@ -13,6 +13,8 @@
 import unittest
 import music21 # needed to do fully-qualified isinstance name checking
 
+from music21 import freezeThaw
+
 from music21 import environment
 _MOD = "testSerialization.py"
 environLocal = environment.Environment(_MOD)
@@ -31,7 +33,6 @@ class Test(unittest.TestCase):
 
     def testBasicA(self):
         from music21 import note
-
         unused_t1 = note.Lyric('test')
         #print t1.json
 
@@ -41,10 +42,10 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.quarterLength, 3.0)        
         self.assertEqual(n1.lyric, 'testing')        
         
-        raw = n1.json
-
         n2 = note.Note()
-        n2.json = raw
+        
+        raw = freezeThaw.JSONFreezer(n1).json
+        freezeThaw.JSONThawer(n2).json = raw
         
         self.assertEqual(n2.pitch.nameWithOctave, 'G#3')    
         self.assertEqual(n2.quarterLength, 3.0)        
@@ -55,11 +56,12 @@ class Test(unittest.TestCase):
         from music21 import chord
 
         c1 = chord.Chord(['c2', 'a4', 'e5'], quarterLength=1.25)
-
-        raw = c1.json
-
         c2 = chord.Chord()
-        c2.json = raw
+
+        raw = freezeThaw.JSONFreezer(c1).json
+        freezeThaw.JSONThawer(c2).json = raw
+
+        
         self.assertEqual(str(c1.pitches), '[<music21.pitch.Pitch C2>, <music21.pitch.Pitch A4>, <music21.pitch.Pitch E5>]')
         self.assertEqual(c1.quarterLength, 1.25)
 
@@ -139,6 +141,7 @@ class Test(unittest.TestCase):
         #sPost.show()
 
     def xtestJsonPickle(self):
+        # jsonpickle doesnt work
         from music21 import stream, note, converter, spanner
         
         s = stream.Score()
@@ -221,10 +224,10 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestBasicK(self):
-        # this fails due to finding a weakref
+    def testBasicK(self):
+        # fails because of weakref
         from music21 import corpus, converter
-        s = corpus.parse('beethoven/opus133')
+        s = corpus.parse('beethoven/opus133').parts[0]
         unused_data = converter.freezeStr(s, fmt='pickle')
 
 

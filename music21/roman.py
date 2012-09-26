@@ -1003,7 +1003,7 @@ class RomanNumeral(harmony.Harmony):
         # try to get Scale or Key object from cache: this will offer
         # performance boost as Scale stores cached pitch segments
         if common.isStr(keyOrScale):
-            if keyOrScale in _keyCache.keys():
+            if keyOrScale in _keyCache:
                 keyOrScale = _keyCache[keyOrScale]
             else:
                 keyOrScale = key.Key(keyOrScale)
@@ -1016,13 +1016,13 @@ class RomanNumeral(harmony.Harmony):
                 raise RomanNumeralException("Cannot call classes on object %s, send only Key or Scale Music21Objects" % keyOrScale)
 
             if 'Key' in keyClasses:
-                if keyOrScale.name in _keyCache.keys():
+                if keyOrScale.name in _keyCache:
                     # use stored scale as already has cache
                     keyOrScale = _keyCache[keyOrScale.name]
                 else:
                     _keyCache[keyOrScale.name] = keyOrScale
             elif 'Scale' in keyClasses:      
-                if keyOrScale.name in _scaleCache.keys():
+                if keyOrScale.name in _scaleCache:
                     # use stored scale as already has cache
                     keyOrScale = _scaleCache[keyOrScale.name]
                 else:
@@ -1290,7 +1290,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

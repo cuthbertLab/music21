@@ -397,7 +397,7 @@ def parse(target):
     # remove any spaces
     target = target.replace(' ', '')
     if match is None:
-        for fp in getPaths().keys():
+        for fp in getPaths():
             unused_directory, fn = os.path.split(fp)
             # try exact match
             if target.lower() == fn.lower():
@@ -406,7 +406,7 @@ def parse(target):
 
     # try again, from cached reduced expressions
     if match is None:        
-        for fp in getPaths().keys():
+        for fp in getPaths():
             # look at alternative names
             for alt in getPaths()[fp]:
                 if target.lower() == alt:
@@ -414,7 +414,7 @@ def parse(target):
                     break
     if match is None:
         # accept partial matches
-        for fp in getPaths().keys():
+        for fp in getPaths():
             # look at alternative names
             for alt in getPaths()[fp]:
                 if target.lower() in alt:
@@ -442,7 +442,7 @@ def search(target):
     # try from stored collections
     # remove any spaces
     target = target.replace(' ', '')
-    for fp in getPaths().keys():
+    for fp in getPaths():
         unused_directory, fn = os.path.split(fp)
         # try exact match
         if target.lower() == fn.lower():
@@ -450,7 +450,7 @@ def search(target):
                 match.append(fp)
 
     # accept partial matches
-    for fp in getPaths().keys():
+    for fp in getPaths():
         # look at alternative names
         for alt in getPaths()[fp]:
             if target.lower() in alt:

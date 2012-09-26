@@ -623,7 +623,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         for nDict in nodes:
             n = Node(id=nDict['id'], degree=nDict['degree'])
-            if 'weight' in nDict.keys():
+            if 'weight' in nDict:
                 n.weight = nDict['weight']
             self._nodes[n.id] = n
 
@@ -919,7 +919,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         else:
             nObj = self._nodes[nId]
 
-        for eId in self._edges.keys():
+        for eId in self._edges:
             eObj = self._edges[eId]
             #environLocal.printDebug(['_nodeIdToEdgeDirections()', eObj])
             for x, y in eObj.connections: # pairs of node ids
@@ -1022,7 +1022,7 @@ class BoundIntervalNetwork(IntervalNetwork):
                 raise IntervalNetworkException('got a strin that has no match:', id)
         elif isinstance(id, Node):
             # look for direct match     
-            for nId in self._nodes.keys():
+            for nId in self._nodes:
                 n = self._nodes[nId]
                 if n is id: # could be a == comparison?
                     return [n] # return only one
@@ -1055,7 +1055,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         elif srcId == TERMINUS_HIGH and direction == DIRECTION_ASCENDING:
             srcId = TERMINUS_LOW
 
-        for k in self._edges.keys():
+        for k in self._edges:
             e = self._edges[k]
             # only getting ascending connections
             pairs = e.getConnections(direction)
@@ -1085,7 +1085,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         '''Return an altered pitch for given node, if an alteration is specified
         in the alteredDegrees dictionary
         '''
-        if n.degree in alteredDegrees.keys():
+        if n.degree in alteredDegrees:
             # check if this direction is the list of directions
 
             directionSpec = alteredDegrees[n.degree]['direction']
@@ -1122,7 +1122,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         if alteredDegrees != {}:
             #TODO: need to take direction into account
             # do reverse transposition
-            if nodeObj.degree in alteredDegrees.keys():
+            if nodeObj.degree in alteredDegrees:
                 p = self.transposePitchAndApplySimplification(
                             alteredDegrees[nodeObj.degree]['interval'].reverse(), pitchObj)
                 return p
@@ -1316,7 +1316,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         if self.deterministic:
             #environLocal.printDebug('using cached scale segment')
             ck = self._getCacheKey(nodeObj, pitchReference, minPitch, maxPitch)
-            if ck in self._ascendingCache.keys():
+            if ck in self._ascendingCache:
                 return self._ascendingCache[ck]
 
         # if this network is octaveDuplicating, than we can shift 
@@ -1491,7 +1491,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         if self.deterministic:
             ck = self._getCacheKey(nodeObj, pitchReference, minPitch, maxPitch, 
                                    includeFirst)
-            if ck in self._descendingCache.keys():
+            if ck in self._descendingCache:
                 return self._descendingCache[ck]
 
         # if this network is octaveDuplicating, than we can shift 
@@ -1874,7 +1874,7 @@ class BoundIntervalNetwork(IntervalNetwork):
                 cacheKey = (pitchReference.nameWithOctave, nodeId)
         else:
             cacheKey = None
-        if cacheKey in self._minMaxCache.keys():
+        if cacheKey in self._minMaxCache:
             return self._minMaxCache[cacheKey]
 
         # first, get termini, then extend by an octave.
@@ -2041,7 +2041,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         nKeys.sort()
         for nId in nKeys:
             n = self._nodes[nId]
-            if n.degree not in degreeCount.keys():
+            if n.degree not in degreeCount:
                 degreeCount[n.degree] = 0
             g.node[nId]['pos'] = (degreeCount[n.degree], n.degree)
             degreeCount[n.degree] += 1

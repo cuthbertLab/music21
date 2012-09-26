@@ -376,7 +376,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             if part.startswith('_') or part.startswith('__'):
                 continue
             elif part in ['Test', 'TestExternal']:

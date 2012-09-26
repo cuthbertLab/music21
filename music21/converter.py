@@ -1005,18 +1005,18 @@ def parse(value, *args, **keywords):
     '''
 
     #environLocal.printDebug(['attempting to parse()', value])
-    if 'forceSource' in keywords.keys():
+    if 'forceSource' in keywords:
         forceSource = keywords['forceSource']
     else:   
         forceSource = False
 
     # see if a work number is defined; for multi-work collections
-    if 'number' in keywords.keys():
+    if 'number' in keywords:
         number = keywords['number']
     else:   
         number = None
 
-    if 'format' in keywords.keys():
+    if 'format' in keywords:
         m21Format = keywords['format']
     else:   
         m21Format = None
@@ -1051,7 +1051,8 @@ def freeze(streamObj, fmt=None, fp=None):
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object. 
 
-    The serialization format is defined by the `fmt` argument; 'pickle' (the default), 'jsonpickle' or 'jsonnative' are presently supported.
+    The serialization format is defined by the `fmt` argument; 'pickle' (the default) is only one 
+    presently supported.  'json' or 'jsonnative' will be used soon.
 
     If no file path is given, a temporary file is used.
 
@@ -1097,13 +1098,17 @@ def thaw(fp):
     return v.stream
 
 
-
 def freezeStr(streamObj, fmt=None):
-    '''Given a StreamObject and a file path, serialize and return a serialization string.
+    '''
+    Given a StreamObject and a file path, 
+    serialize and return a serialization string.
 
-    This function is based on the :class:`~music21.converter.StreamFreezer` object. 
+    This function is based on the 
+    :class:`~music21.converter.StreamFreezer` object. 
 
-    The serialization format is defined by the `fmt` argument; 'pickle' (the default), 'jsonpickle' or 'jsonnative' are presently supported.
+    The serialization format is defined by 
+    the `fmt` argument; 'pickle' (the default), 
+    is the only one presently supported.
 
     >>> from music21 import *
     >>> c = converter.parse('c4 d e f', '4/4')
@@ -1130,7 +1135,8 @@ def freezeStr(streamObj, fmt=None):
     return v.writeStr(fmt=fmt) # returns a string
 
 def thawStr(strData):
-    '''Given a serialization string, defrost into a Stream.
+    '''
+    Given a serialization string, defrost into a Stream.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object. 
     '''
@@ -1205,7 +1211,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

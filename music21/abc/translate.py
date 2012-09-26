@@ -351,7 +351,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     # returns a dictionary of numerical key
     if abcHandler.definesReferenceNumbers():
         abcDict = abcHandler.splitByReferenceNumber()
-        if number != None and number in abcDict.keys():
+        if number != None and number in abcDict:
             s = stream.Score() # return a Stream
             # get number from dictionary; set to new score
             abcToStreamScore(abcDict[number], inputM21=s)

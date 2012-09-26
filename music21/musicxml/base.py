@@ -445,7 +445,8 @@ class TagLib(object):
         return self._t[key]
 
     def getClassName(self, key):
-        '''Get the class or name, or None if none defined.
+        '''
+        Get the class or name, or None if none defined.
 
         >>> from music21 import *
         >>> tl = musicxml.TagLib()
@@ -827,7 +828,7 @@ class Score(MusicXMLElementList):
         '''
         idFound = None
         partNames = self.partIdToNameDict()    
-        if partId in partNames.keys():
+        if partId in partNames:
             idFound = partId
         else:
             for thisPartId in self.getPartIds():
@@ -4082,7 +4083,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):
@@ -4693,7 +4694,7 @@ class Test(unittest.TestCase):
             for c in m.componentList:
                 if isinstance(c, Barline):
                     if c.repeatObj is not None:
-                        self.assertEqual('times' in c.repeatObj._attr.keys(), True)
+                        self.assertEqual('times' in c.repeatObj._attr, True)
                         self.assertEqual(c.repeatObj.get('direction'), 'backward')
                         self.assertEqual(c.repeatObj.get('times'), None)
                         #print c.repeatObj.direction

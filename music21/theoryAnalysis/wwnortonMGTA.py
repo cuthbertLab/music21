@@ -71,7 +71,7 @@ class wwnortonExercise(object):
         #self.modifiedExercise.show('text')
 
     def _updatepn(self,newPartNum,direction):
-        for partName in self.pn.keys():
+        for partName in self.pn:
             existingPartNum = self.pn[partName]
             if existingPartNum > newPartNum:
                 shiftedPartNum = existingPartNum + 1

@@ -610,7 +610,7 @@ def compareSrcStreamCapuaToEditor(srcStream1):
         }
     for note1 in srcStream1.flat.notesAndRests:
         thisDict = compareNoteCapuaToEditor(note1)
-        for thisKey in thisDict.keys():
+        for thisKey in thisDict:
             totalDict[thisKey] += thisDict[thisKey]
     return totalDict
 
@@ -881,7 +881,7 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
                         continue
                     newResults = compareNoteCapuaToEditor(note1)
                     newResults['potentialChange'] = 1
-                    for thisKey in newResults.keys():
+                    for thisKey in newResults:
                         if thisKey == 'alterAll':
                             continue
                         if thisKey == 'capuaNotPmfc' and newResults[thisKey] == 1:
@@ -1183,7 +1183,7 @@ class TestSlow(unittest.TestCase):
                 
                 applyCapuaToStream(srcStream1)
                 thisDict = compareSrcStreamCapuaToEditor(srcStream1)
-                for thisKey in thisDict.keys():
+                for thisKey in thisDict:
                     totalDict[thisKey] += thisDict[thisKey]
     
         self.assertEqual(totalDict['capuaAlt'], 18)

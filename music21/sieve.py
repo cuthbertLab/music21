@@ -142,7 +142,7 @@ def eratosthenes(firstCandidate = 2):
             # update dictionary w/ the next multiple of this prime not already
             # in dicitionary
             nextMult = p + q # prime prime plus the candidate; next multiple
-            while nextMult in D.keys(): # incr x by p until it is a unique key
+            while nextMult in D: # incr x by p until it is a unique key
                 nextMult = nextMult + p
             # re-store the prime under a key of the next multiple
             D[nextMult] = p # x is now the next unique multple to be found
@@ -1303,13 +1303,13 @@ class Sieve(object):
         assert state in ['cmp', 'exp']
         if state == 'cmp':
             libKeys = []
-            for key in self._resLib.keys():
+            for key in self._resLib:
                 if key in self._cmpTree:
                     libKeys.append(key)
             return libKeys
         elif state == 'exp':
             libKeys = []
-            for key in self._resLib.keys():
+            for key in self._resLib:
                 if key in self._expTree:
                     libKeys.append(key)
             return libKeys

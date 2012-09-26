@@ -608,10 +608,10 @@ class Realization(object):
             segmentA = self._segmentList[segmentIndex]
             newPathList = {}
             if len(pathList.keys()) == 0:
-                for possibA in segmentA.movements.keys():
+                for possibA in segmentA.movements:
                     newPathList[possibA] = len(segmentA.movements[possibA])
             else:
-                for possibA in segmentA.movements.keys():
+                for possibA in segmentA.movements:
                     prevValue = 0
                     for possibB in segmentA.movements[possibA]:
                         prevValue += pathList[possibB]
@@ -619,7 +619,7 @@ class Realization(object):
             pathList = newPathList
 
         numSolutions = 0
-        for possibA in pathList.keys():
+        for possibA in pathList:
             numSolutions += pathList[possibA]  
         self._segmentList.reverse()
         return numSolutions
@@ -640,7 +640,7 @@ class Realization(object):
             return progressions
         
         currMovements = self._segmentList[0].movements
-        for possibA in currMovements.keys():
+        for possibA in currMovements:
             possibBList = currMovements[possibA]
             for possibB in possibBList:
                 progressions.append([possibA, possibB])

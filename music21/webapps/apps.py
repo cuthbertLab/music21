@@ -60,7 +60,7 @@ def setupURLCorpusParseApp(agenda):
     
     # Resolve desired output
     outputType = agenda.getData('output')
-    if outputType in templates.outputShortcuts.keys():
+    if outputType in templates.outputShortcuts:
         outputTemplateName = templates.outputShortcuts[outputType]
         agenda.setOutputTemplate(outputTemplateName, ['outputStream'])
     

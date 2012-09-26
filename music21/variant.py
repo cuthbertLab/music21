@@ -1106,7 +1106,7 @@ def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False
         return [],0
     
     # Query Dict for existing results    
-    if (streamXindex, streamYindex, isNone) in badnessDict.keys():
+    if (streamXindex, streamYindex, isNone) in badnessDict:
         badness = badnessDict[(streamXindex,streamYindex,isNone)]
         bestList = listDict[(streamXindex,streamYindex,isNone)]
         return bestList, badness
@@ -1781,7 +1781,7 @@ class Variant(base.Music21Object):
     def __deepcopy__(self, memo):
         new = self.__class__()
         old = self
-        for name in self.__dict__.keys():
+        for name in self.__dict__:
             if name.startswith('__'):
                 continue
             if name == '_cache':
@@ -1911,7 +1911,7 @@ class Variant(base.Music21Object):
             return None # do nothing
         if common.isNum(old):
             # this must be id(obj), not obj.id
-            e = self._stream.getElementByObjectId(old)
+            e = self._stream._getElementByObjectId(old)
             if e is not None:
                 self._stream.replace(e, new, allTargetSites=False)
         else:

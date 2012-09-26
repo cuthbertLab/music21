@@ -961,7 +961,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         # convert the fbnotation string provided in CHORD_TYPES to chordDegrees notation
         types = {3:4, 5:7, 7:11, 9:2, 11:5, 13:9, 2:2, 4:5, 6:9}
         chordDegrees = []
-        if kind in CHORD_TYPES.keys():
+        if kind in CHORD_TYPES:
             for char in fbNotation.split(','):
                 if char == '1':
                     continue
@@ -973,7 +973,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                 chordDegrees.append( types[degree] + alt)
         return chordDegrees
 
-    for chordKind in CHORD_TYPES.keys():
+    for chordKind in CHORD_TYPES:
         chordKindStr = getAbbreviationListGivenChordType(chordKind)
         fbNotationString = getNotationStringGivenChordType(chordKind)
         chordDegrees = convertFBNotationStringToDegrees(chordKind, fbNotationString)
@@ -1004,7 +1004,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                     
     if not kind: # if, after all that, no chord has been found, try to match by degree instead
         numberOfMatchedDegrees = 0
-        for chordKind in CHORD_TYPES.keys():
+        for chordKind in CHORD_TYPES:
             chordKindStr = getAbbreviationListGivenChordType(chordKind)
             fbNotationString = getNotationStringGivenChordType(chordKind)
             chordDegrees = convertFBNotationStringToDegrees(chordKind, fbNotationString)
@@ -1315,7 +1315,7 @@ class ChordSymbol(Harmony):
             # if it's been modified, so we'll just have to try this route....
             figure = self.root().name
     
-            if self.chordKind in CHORD_TYPES.keys():
+            if self.chordKind in CHORD_TYPES:
                 figure += getAbbreviationListGivenChordType(self.chordKind)[0]
             if self.root().name != self.bass().name:
                 figure += '/' + self.bass().name
@@ -1617,7 +1617,7 @@ class ChordSymbol(Harmony):
 
         kind = self.chordKind
  
-        if kind in CHORD_TYPES.keys():
+        if kind in CHORD_TYPES:
             notationString= getNotationStringGivenChordType(kind)
         else:
             notationString= ''

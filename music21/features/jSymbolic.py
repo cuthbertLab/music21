@@ -1738,14 +1738,14 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
 
             # increment all contiguous regions
             for i in range(keyStart, keyEnd+1):
-                if i in regions.keys():
+                if i in regions:
                     regions[i] += 1 # increment
                 else:
                     regions[i] = 1
         # have counts of all start events for each second; average
         total = 0
         for i in range(minKey, maxKey+1):
-            if i in regions.keys(): # there may be gaps
+            if i in regions: # there may be gaps
                 total += regions[i]
         self._feature.vector[0] = total / (maxKey - minKey + 1) # number of slots, inclusive
 
@@ -3631,7 +3631,7 @@ def getCompletionStats():
     '''
     countTotal = 0
     countComplete = 0
-    for k in extractorsById.keys(): # a dictionary of lists
+    for k in extractorsById: # a dictionary of lists
         group = extractorsById[k]
         for i in range(len(group)):
             if group[i] is not None:
@@ -3981,7 +3981,7 @@ class Test(unittest.TestCase):
         fs = features.jSymbolic.extractorsById
         feTotal = 0
         feImplemented = 0
-        for k in fs.keys():
+        for k in fs:
             for i in range(len(fs[k])):
                 if fs[k][i] is not None:
                     feTotal += 1

@@ -248,7 +248,7 @@ def pitchToBase40(pitchToConvert):
     '''
     if type(pitchToConvert) == str:
             pitchToConvert = pitch.Pitch(pitchToConvert)
-    if pitchToConvert.name in base40Representation.keys():
+    if pitchToConvert.name in base40Representation:
         tableNum = base40Representation[pitchToConvert.name]
         base40Num = (40 * (pitchToConvert.octave - 1)) + tableNum
         return base40Num

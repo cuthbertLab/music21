@@ -334,7 +334,7 @@ def setupApplication(agenda, appName = None):
         else:
             raise Exception("appName is None and no appName key in agenda.")
     
-    if appName not in apps.applicationInitializers.keys():
+    if appName not in apps.applicationInitializers:
         raise Exception ("Unknown appName: " + appName)
     
     # Run initializer on agenda - edits it in place.
@@ -471,7 +471,7 @@ class Agenda(dict):
         >>> agenda.getData('a')
         2
         '''
-        if variableName in self['dataDict'].keys():
+        if variableName in self['dataDict']:
             return self['dataDict'][variableName]['data']
         else:
             return None
@@ -578,20 +578,20 @@ class CommandProcessor(object):
         self.outputTemplate = ""
         self.outputArgList = []
         
-        if "dataDict" in agenda.keys():
+        if "dataDict" in agenda:
             self.rawDataDict = agenda['dataDict']
             self._parseData()
         
-        if "commandList" in agenda.keys():
+        if "commandList" in agenda:
             self.commandList = agenda['commandList']
         
-        if "returnDict" in agenda.keys():
+        if "returnDict" in agenda:
             self.returnDict = agenda['returnDict']
 
-        if "outputTemplate" in agenda.keys():
+        if "outputTemplate" in agenda:
             self.outputTemplate = agenda['outputTemplate']
 
-        if "outputArgList" in agenda.keys():
+        if "outputArgList" in agenda:
             self.outputArgList = agenda['outputArgList']
       
     def recordError(self, errorString, exceptionObj = None):
@@ -619,16 +619,16 @@ class CommandProcessor(object):
         Parses data specified as strings in self.dataDict into objects in self.parsedDataDict
         '''
         for (name,dataDictElement) in self.rawDataDict.iteritems():
-            if 'data' not in dataDictElement.keys():
+            if 'data' not in dataDictElement:
                 self.recordError("no data specified for data element "+unicode(dataDictElement))
                 continue
 
             dataStr = dataDictElement['data']
 
-            if 'fmt' in dataDictElement.keys():
+            if 'fmt' in dataDictElement:
                 fmt = dataDictElement['fmt']
                 
-                if name in self.parsedDataDict.keys():
+                if name in self.parsedDataDict:
                     self.recordError("duplicate definition for data named "+str(name)+" "+str(dataDictElement))
                     continue
                 if fmt not in availableDataFormats:
@@ -748,7 +748,7 @@ class CommandProcessor(object):
         '''
         
         for commandElement in self.commandList:
-            typeKeysInCommandList = [k for k in commandElement.keys() if k in ['function', 'attribute', 'method']]
+            typeKeysInCommandList = [k for k in commandElement if k in ['function', 'attribute', 'method']]
             if len(typeKeysInCommandList) != 1:
                 self.recordError("Must have exactly one key denoting type ('function', 'attribute', or 'method'):  "+str(commandElement))
                 continue
@@ -783,7 +783,7 @@ class CommandProcessor(object):
         
         '''
         # Get function name
-        if 'function' not in commandElement.keys():
+        if 'function' not in commandElement:
             self.recordError("No function specified for function command: "+str(commandElement))
             return
             
@@ -793,7 +793,7 @@ class CommandProcessor(object):
         # i.e. processingCommand = commands.reduction
         # then calling a command element with processingCommand(sc) will yield
         # the same result as commands.reduction(sc)
-        if functionName in self.parsedDataDict.keys():
+        if functionName in self.parsedDataDict:
             functionName = self.parsedDataDict[functionName]
         
         # Make sure function is valid for processing on webserver
@@ -802,7 +802,7 @@ class CommandProcessor(object):
             return
         
         # Process arguments
-        if 'argList' not in commandElement.keys():
+        if 'argList' not in commandElement:
             argList = []
         else:
             argList = commandElement['argList']
@@ -818,7 +818,7 @@ class CommandProcessor(object):
             return
         
         # Save it if resutlVar specified
-        if 'resultVar' in commandElement.keys():
+        if 'resultVar' in commandElement:
             resultVarName = commandElement['resultVar']
             self.parsedDataDict[resultVarName] = result
                    
@@ -839,15 +839,15 @@ class CommandProcessor(object):
 
         ''' 
         # Make sure the appropriate keys are set:
-        if 'attribute' not in commandElement.keys():
+        if 'attribute' not in commandElement:
             self.recordError("No attribute specified for attribute command: "+str(commandElement))
             return
         
-        if 'caller' not in commandElement.keys():
+        if 'caller' not in commandElement:
             self.recordError("calle must be specified with attribute :"+str(commandElement))
             return
         
-        if 'resultVar' not in commandElement.keys():
+        if 'resultVar' not in commandElement:
             self.recordError("resultVar must be specified with attribute :"+str(commandElement))
             return
         
@@ -864,7 +864,7 @@ class CommandProcessor(object):
         resultVarName = commandElement['resultVar']
 
         # Make sure the caller is defined        
-        if callerName not in self.parsedDataDict.keys():
+        if callerName not in self.parsedDataDict:
             self.recordError(callerName+" not defined "+str(commandElement))
             return
         
@@ -892,10 +892,10 @@ class CommandProcessor(object):
         
         ''' 
         # Make sure the appropriate keys are set:
-        if 'method' not in commandElement.keys():
+        if 'method' not in commandElement:
             self.recordError("No methodName specified for method command: "+str(commandElement))
             return
-        if 'caller' not in commandElement.keys():
+        if 'caller' not in commandElement:
             self.recordError("No caller specified for method command: "+str(commandElement))
             return
         
@@ -909,7 +909,7 @@ class CommandProcessor(object):
             return
     
         # Process arguments
-        if 'argList' not in commandElement.keys():
+        if 'argList' not in commandElement:
             argList = []
         else:
             argList = commandElement['argList']
@@ -918,7 +918,7 @@ class CommandProcessor(object):
                 argList[i] = parsedArg
 
         # Make sure the caller is defined        
-        if callerName not in self.parsedDataDict.keys():
+        if callerName not in self.parsedDataDict:
             self.recordError(callerName+" not defined "+str(commandElement))
             return
         
@@ -941,7 +941,7 @@ class CommandProcessor(object):
             return
         
         # Save it if resutlVar specified
-        if 'resultVar' in commandElement.keys():
+        if 'resultVar' in commandElement:
             resultVarName = commandElement['resultVar']
             self.parsedDataDict[resultVarName] = result
                       
@@ -965,13 +965,13 @@ class CommandProcessor(object):
             return_obj['errorList'] = self.errorList
             return return_obj
         
-        if len(self.returnDict.keys()) == 0:
-            iterItems = [(k, 'str') for k in self.parsedDataDict.keys()]
+        if len(self.returnDict) == 0:
+            iterItems = [(k, 'str') for k in self.parsedDataDict]
         else:
             iterItems = self.returnDict.iteritems()
         
         for (dataName,fmt) in iterItems:
-            if dataName not in self.parsedDataDict.keys():
+            if dataName not in self.parsedDataDict:
                 self.recordError("Data element "+dataName+" not defined at time of return");
                 continue
             if fmt not in availableDataFormats:
@@ -1066,7 +1066,7 @@ class CommandProcessor(object):
         
         strVal = strVal.strip() # removes whitespace on ends
         
-        if strVal in self.parsedDataDict.keys(): # Used to specify data via variable name
+        if strVal in self.parsedDataDict: # Used to specify data via variable name
             returnVal = self.parsedDataDict[strVal]
         elif strVal in availableFunctions: # Used to specify function via variable name
             returnVal = strVal

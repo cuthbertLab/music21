@@ -29,7 +29,6 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a :
 '''
 import unittest
 import datetime
-#import json
 import os
 #import inspect
 import re
@@ -113,7 +112,7 @@ def abbreviationToRole(value):
     ...    post = metadata.abbreviationToRole(id)
     '''
     value = value.lower()
-    if value in roleAbbreviationsDict.keys():
+    if value in roleAbbreviationsDict:
         return roleAbbreviationsDict[value]
     else:
         raise MetadataException('no such role: %s' % value)
@@ -202,7 +201,7 @@ def abbreviationToWorkId(value):
     ...    post = metadata.abbreviationToWorkId(id)
     '''
     value = value.lower()
-    if value in workIdAbbreviationDict.keys():
+    if value in workIdAbbreviationDict:
         return workIdAbbreviationDict[value]
     else:
         raise MetadataException('no such work id: %s' % value)
@@ -328,7 +327,6 @@ class Date(object):
         'uncertain'
 
         '''
-        #base.JSONFreezer.__init__(self)
         self.year = None
         self.month = None
         self.day = None
@@ -352,14 +350,14 @@ class Date(object):
 
         # set any keywords supplied
         for attr in self.attrNames:
-            if attr in keywords.keys():
+            if attr in keywords:
                 value, error = self._stripError(keywords[attr])
                 setattr(self, attr, value)
                 if error != None:
                     setattr(self, attr+'Error', error)            
         for attr in self.attrNames:
             attr = attr + 'Error'
-            if attr in keywords.keys():
+            if attr in keywords:
                 setattr(self, attr, keywords[attr])
 
     def _stripError(self, value):
@@ -623,7 +621,6 @@ class DateSingle(object):
         >>> str(dd)
         '1805/03/12'
         '''
-        #base.JSONFreezer.__init__(self)
         self._data = [] # store a list of one or more Date objects
         self._relevance = None # managed by property
 
@@ -679,16 +676,6 @@ class DateSingle(object):
         return self._data[0].datetime
 
     datetime = property(_getDatetime)
-
-#    def jsonComponentFactory(self, idStr):
-#        if '.Date' in idStr:
-#            return Date()
-#        else:
-#            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
-
-
-
-
 
 
 class DateRelative(DateSingle):
@@ -835,8 +822,7 @@ class Contributor(object):
         'contributor'
 
         '''
-        #base.JSONFreezer.__init__(self)
-        if 'role' in keywords.keys():
+        if 'role' in keywords:
             # stored in self._role
             self.role = keywords['role'] # validated with property
         else:
@@ -845,9 +831,9 @@ class Contributor(object):
         # a list of Text objects to support various spellings or 
         # language translatiions
         self._names = []
-        if 'name' in keywords.keys(): # a single
+        if 'name' in keywords: # a single
             self._names.append(Text(keywords['name']))
-        if 'names' in keywords.keys(): # many
+        if 'names' in keywords: # many
             for n in keywords['names']:
                 self._names.append(Text(n))
 
@@ -856,9 +842,9 @@ class Contributor(object):
 
         # store birth and death of contributor, if known
         self._dateRange = [None, None]
-        if 'birth' in keywords.keys():
+        if 'birth' in keywords:
             self._dateRange[0] = DateSingle(keywords['birth'])
-        if 'death' in keywords.keys():
+        if 'death' in keywords:
             self._dateRange[1] = DateSingle(keywords['death'])
 
     def _getRole(self):
@@ -945,16 +931,6 @@ class Contributor(object):
             return d-b
         else:
             return None
-
-    #---------------------------------------------------------------------------
-    # overridden methods for json processing 
-
-#    def jsonComponentFactory(self, idStr):
-#        if '.Text' in idStr:
-#            return Text()
-#        else:
-#            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)        
-
 
 class Creator(Contributor):
     '''
@@ -1097,9 +1073,9 @@ class Metadata(base.Music21Object):
         self._workIds = {}
         for abbr, work_id in workIdAbbreviationDict.items():
             #abbr = workIdToAbbreviation(id)
-            if work_id in keywords.keys():
+            if work_id in keywords:
                 self._workIds[work_id] = Text(keywords[work_id])
-            elif abbr in keywords.keys():
+            elif abbr in keywords:
                 self._workIds[work_id] = Text(keywords[abbr])
             else:
                 self._workIds[work_id] = None
@@ -1108,7 +1084,7 @@ class Metadata(base.Music21Object):
         # these are for direct Contributor access, must have defined
         # properties
         for attr in ['composer', 'date', 'title']:
-            if attr in keywords.keys():
+            if attr in keywords:
                 setattr(self, attr, keywords[attr])
         
         # used for the search() methods to determine what attributes
@@ -1525,33 +1501,13 @@ class Metadata(base.Music21Object):
             
 
 
-    #---------------------------------------------------------------------------
-    # overridden methods for json processing 
-
-#    def jsonComponentFactory(self, idStr):
-#        if '.Contributor' in idStr:
-#            return Contributor()
-#        elif '.Creator' in idStr:
-#            return Creator()
-#        elif '.Text' in idStr:
-#            return Text()
-#        elif '.DateSingle' in idStr:
-#            return DateSingle()
-#        elif '.DateRelative' in idStr:
-#            return DateRelative()
-#        elif '.DateBetween' in idStr:
-#            return DateBetween()
-#        elif '.DateSelection' in idStr:
-#            return DateSelection()
-#        else:
-#            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
-
 
 #-------------------------------------------------------------------------------
 class RichMetadata(Metadata):
     '''RichMetadata adds to Metadata information about the contents of the Score 
     it is attached to. TimeSignature, KeySignature and related analytical is stored. 
-    RichMetadata are generally only created in the process of creating stored JSON metadata. 
+    RichMetadata are generally only created in the process of creating stored 
+    JSON metadata. 
     '''
     def __init__(self, *args, **keywords):
         '''
@@ -1581,28 +1537,6 @@ class RichMetadata(Metadata):
 
         # append to existing search attributes from Metdata
         self._searchAttributes += ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest', 'noteCount', 'quarterLength'] 
-
-
-
-    #---------------------------------------------------------------------------
-    # overridden methods for json processing 
-
-#    def jsonComponentFactory(self, idStr):
-#        from music21 import meter
-#        from music21 import key
-#
-#        try:
-#            obj = Metadata.jsonComponentFactory(self, idStr)
-#            return obj
-#        except MetadataException:
-#            pass
-#
-#        if '.TimeSignature' in idStr:
-#            return meter.TimeSignature()
-#        elif '.KeySignature' in idStr:
-#            return key.KeySignature()
-#        else:
-#            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
 
 
     #---------------------------------------------------------------------------
@@ -1719,8 +1653,6 @@ class MetadataBundle(object):
         }
     
     def __init__(self, name='default'):
-        #base.JSONFreezer.__init__(self)
-
         # all keys are strings, all value are Metadata
         # there is apparently a performance boost for using all-string keys
         self.storage = {}
@@ -1732,17 +1664,6 @@ class MetadataBundle(object):
         # this will need to be refreshed after loading json data
         # keys are the same for self.storage
         self._accessPaths = {}
-
-    #---------------------------------------------------------------------------
-    # overridden methods for json processing 
-
-#    def jsonComponentFactory(self, idStr):
-#        if '.Metadata' in idStr:
-#            return Metadata()
-#        elif '.RichMetadata' in idStr:
-#            return RichMetadata()
-#        else:
-#            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
 
     #---------------------------------------------------------------------------
     def corpusPathToKey(self, fp, number=None):
@@ -1866,12 +1787,17 @@ class MetadataBundle(object):
 
 
     def write(self):
-        '''Write the JSON storage of all Metadata or RichMetadata contained in this object. 
+        '''
+        Write the JSON storage of all Metadata or 
+        RichMetadata contained in this object. 
+
+        TODO: Test!
         '''
         fp = self._getFilePath()
         environLocal.printDebug(['MetadataBundle: writing:', fp])
-        self.jsonWrite(fp)
-
+        
+        jsf = freezeThaw.JSONFreezer(self)
+        return jsf.jsonWrite(fp)
 
     def read(self, fp=None):
         '''
@@ -2000,7 +1926,7 @@ class MetadataBundle(object):
 
         '''
         post = []
-        for key in self.storage.keys():
+        for key in self.storage:
             md = self.storage[key]
 #            if md.title is not None and 'Renmin' in md.title: # test -- china/chinese/etc.
 #                print key
@@ -2066,9 +1992,7 @@ class Test(unittest.TestCase):
 
 
     def testJSONSerialization(self):
-
         from music21 import metadata
-        from music21 import freezeThaw
         import json
 
         # test creation and loading of data in a text
@@ -2205,7 +2129,6 @@ class Test(unittest.TestCase):
 
 
     def testJSONSerializationMetadata(self):
-        from music21 import freezeThaw
         from music21 import musicxml
         from music21.musicxml import fromMxObjects
         from music21.musicxml import testFiles
@@ -2216,6 +2139,7 @@ class Test(unittest.TestCase):
         self.assertEqual(md.composer, 'Frank')
 
         #md.jsonPrint()
+
 
         mdNew = metadata.Metadata()
         
@@ -2260,7 +2184,6 @@ class Test(unittest.TestCase):
     def testLoadRichMetadata(self):
         from music21 import corpus
         from music21 import metadata # need fully qualified
-        from music21 import freezeThaw
 
         s = corpus.parse('jactatur')
         self.assertEqual(s.metadata.composer, 'Johannes Ciconia')
@@ -2331,7 +2254,6 @@ class Test(unittest.TestCase):
 
     def testRichMetadataA(self):
         from music21 import corpus, metadata
-        from music21 import freezeThaw
 
         s = corpus.parse('bwv66.6')
         rmd = metadata.RichMetadata()

@@ -605,7 +605,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
         me.pitch = chordComponent.pitch.midi
         if not chordComponent.pitch.isTwelveTone():
             me.centShift = chordComponent.pitch.getCentShiftFromMidi()
-        #if 'volume' in chordComponent.keys():
+        #if 'volume' in chordComponent:
         
         if hasComponentVolumes:
 #             volScalar = chordComponent.volume.getRealized(
@@ -1174,7 +1174,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
 
         # iterate through all past events/channels, and find all
         # that are active and have a pitch bend
-        for key in uniqueChannelEvents.keys():
+        for key in uniqueChannelEvents:
             start, stop, usedChannel = key
             # if offset (start time) is in this range of a found event
             # or if any start or stop is within this span
@@ -1250,7 +1250,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
 
         # key includes channel, so that durations can span once in each channel
         key = (p['offset'], p['offset']+p['duration'], ch)
-        if key not in uniqueChannelEvents.keys():
+        if key not in uniqueChannelEvents:
             # need to count multiple instances of events on the same
             # span and in the same channel (fine if all have the same pitchbend
             uniqueChannelEvents[key] = [] 
@@ -1766,7 +1766,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
     #environLocal.printDebug(['got netPackets:', len(netPackets), 'packetStorage keys (tracks)', packetStorage.keys()])
     # build each track, sorting out the appropriate packets based on track
     # ids
-    for trackId in packetStorage.keys():   
+    for trackId in packetStorage:   
         initChannel = packetStorage[trackId]['initChannel']
         instObj = packetStorage[trackId]['initInstrument']
         # TODO: for a given track id, need to find start/end channel

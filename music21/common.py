@@ -157,7 +157,7 @@ def findFormat(fmt):
     '''
     # make lower case, as some lilypond processing used upper case
     fmt = fmt.lower().strip()
-    for key in fileExtensions.keys():
+    for key in fileExtensions:
         if fmt.startswith('.'):
             fmt = fmt[1:] # strip .
         if fmt == key or fmt in fileExtensions[key]['input']:
@@ -281,7 +281,7 @@ def findFormatExtURL(url):
     elif 'format=stage2' in url or 'format=stage1' in url:
         ext = '.md'
     else: # check for file that ends in all known input extensions
-        for key in fileExtensions.keys():
+        for key in fileExtensions:
             for extSample in fileExtensions[key]['input']:
                 if url.endswith('.' + extSample):
                     ext = '.' + extSample
@@ -1359,7 +1359,7 @@ def formatStr(msg, *arguments, **keywords):
     test 1 2 3
     <BLANKLINE>
     '''
-    if 'format' in keywords.keys():
+    if 'format' in keywords:
         formatType = keywords['format']
     else:
         formatType = None
@@ -1894,7 +1894,7 @@ def findWeakRef(target):
             for x in attr:
                 findWeakRef(x)
 #         elif isinstance(attr, dict):
-#             for x in attr.keys():
+#             for x in attr:
 #                 findWeakRef(attr[x])
 
 xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
@@ -2065,7 +2065,7 @@ class TestMock(object):
         #self._environLocal.printDebug(['__deepcopy__ called, got memo', 
         #                              self, memo])
         new = self.__class__()
-        for name in self.__dict__.keys():
+        for name in self.__dict__:
             if name.startswith('_'): # avoid environemnt
                 continue
             part = getattr(self, name)

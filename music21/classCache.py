@@ -152,7 +152,7 @@ class ClassCache(object):
                 dst.addEndElement(e)                
 
 #         environLocal.printDebug(['loaded parent:', srcStream, 'got repository keys', self.repositories.keys()])
-#         for r in self.repositories.keys():
+#         for r in self.repositories:
 #             environLocal.printDebug([r, len(self.repositories[r])])
 
 

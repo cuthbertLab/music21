@@ -900,7 +900,7 @@ class CTSong(object):
                     for label, subsectionToAppendName, offset in flags:
                         if '*' in label:
                             x = label[1: label.index('*')]
-                        if x in allSubsections.keys():
+                        if x in allSubsections:
                             referencedSubsection = label[1:]
                             match = re.search('^(.*)\*(\d+)', referencedSubsection)
                             if match:

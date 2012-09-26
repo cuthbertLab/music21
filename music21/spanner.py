@@ -266,7 +266,7 @@ class Spanner(base.Music21Object):
         '''
         new = self.__class__()
         old = self
-        for name in self.__dict__.keys():
+        for name in self.__dict__:
             if name.startswith('__'):
                 continue
             if name == '_cache':
@@ -499,7 +499,7 @@ class Spanner(base.Music21Object):
             return None # do nothing
         if common.isNum(old):
             # this must be id(obj), not obj.id
-            e = self._components.getElementByObjectId(old)
+            e = self._components._getElementByObjectId(old)
             # e here is the old element that was spanned by this Spanner
             
 
@@ -1129,7 +1129,7 @@ class RepeatBracket(Spanner):
         self._number = None
         self._numberRange = [] # store a range, inclusive of the single number assignment
         self._numberSpanIsAdjacent = None
-        if 'number' in keywords.keys():
+        if 'number' in keywords:
             self.number = keywords['number']
 
     # property to enforce numerical numbers
@@ -1230,7 +1230,7 @@ class Ottava(Spanner):
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
         self._type = None # can be 8va, 8vb, 15ma, 15mb
-        if 'type' in keywords.keys():
+        if 'type' in keywords:
             self.type = keywords['type'] # use property
         else: # use 8 as a defualt
             self.type = '8va'
@@ -1359,19 +1359,19 @@ class Line(Spanner):
         self._lineType = 'solid' # can be solid, dashed, dotted, wavy
         self.placement = 'above' # can above or below, after musicxml
         
-        if 'lineType' in keywords.keys():
+        if 'lineType' in keywords:
             self.lineType = keywords['lineType'] # use property
 
-        if 'startTick' in keywords.keys():
+        if 'startTick' in keywords:
             self.startTick = keywords['startTick'] # use property
-        if 'endTick' in keywords.keys():
+        if 'endTick' in keywords:
             self.endTick = keywords['endTick'] # use property
-        if 'tick' in keywords.keys():
+        if 'tick' in keywords:
             self.tick = keywords['tick'] # use property
 
-        if 'endHeight' in keywords.keys():
+        if 'endHeight' in keywords:
             self.endHeight = keywords['endHeight'] # use property
-        if 'startHeight' in keywords.keys():
+        if 'startHeight' in keywords:
             self.startHeight = keywords['startHeight'] # use property
 
     def __repr__(self):
@@ -1502,9 +1502,9 @@ class Glissando(Spanner):
         self._lineType = 'wavy'
         self._label = None
 
-        if 'lineType' in keywords.keys():
+        if 'lineType' in keywords:
             self.lineType = keywords['lineType'] # use property
-        if 'label' in keywords.keys(): 
+        if 'label' in keywords: 
             self.label = keywords['label'] # use property
 
     def __repr__(self):
@@ -1591,7 +1591,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

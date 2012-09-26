@@ -67,7 +67,7 @@ class PageLayout(base.Music21Object):
         # store if this is the start of a new page
         self.isNew = None
 
-        for key in keywords.keys():
+        for key in keywords:
             if key.lower() == 'pagenumber':
                 self.pageNumber = keywords[key]
             if key.lower() == 'leftmargin':
@@ -121,7 +121,7 @@ class SystemLayout(base.Music21Object):
         # store if this is the start of a new system
         self.isNew = None
 
-        for key in keywords.keys():
+        for key in keywords:
             if key.lower() == 'leftmargin':
                 self.leftMargin = keywords[key]
             if key.lower() == 'rightmargin':
@@ -184,13 +184,13 @@ class StaffGroup(spanner.Spanner):
         # in musicxml
         self._barTogether = True
 
-        if 'symbol' in keywords.keys():
+        if 'symbol' in keywords:
             self.symbol = keywords['symbol'] # user property
-        if 'barTogether' in keywords.keys():
+        if 'barTogether' in keywords:
             self.barTogether = keywords['barTogether'] # user property
-        if 'name' in keywords.keys():
+        if 'name' in keywords:
             self.name = keywords['name'] # user property
-        if 'abbreviation' in keywords.keys():
+        if 'abbreviation' in keywords:
             self.name = keywords['abbreviation'] # user property
 
 

@@ -544,7 +544,7 @@ class Graph(object):
                     # same format as y, below
                     #plt.xticks(*self.axis[axis]['ticks'], fontsize=7)
 
-                    if 'ticks' in self.axis[axis].keys():
+                    if 'ticks' in self.axis[axis]:
                         values, labels = self.axis[axis]['ticks']
                         #environLocal.printDebug(['x tick labels, x tick values', labels, values])
                         ax.set_xticks(values)
@@ -561,7 +561,7 @@ class Graph(object):
                     # this is the old way ticks were set:
                     #plt.yticks(*self.axis[axis]['ticks'])
                     # new way:
-                    if 'ticks' in self.axis[axis].keys():
+                    if 'ticks' in self.axis[axis]:
                         values, labels = self.axis[axis]['ticks']
                         #environLocal.printDebug(['y tick labels, y tick values', labels, values])
                         ax.set_yticks(values)
@@ -672,7 +672,7 @@ class GraphNetworxGraph(Graph):
             self.setTitle('Network Plot')
 
         self.networkxGraph = None
-        if 'networkxGraph' in keywords.keys():
+        if 'networkxGraph' in keywords:
             self.networkxGraph = keywords['networkxGraph']            
         elif networkx is not None: # if we have this module
             # testing default; temporary
@@ -1013,7 +1013,7 @@ class GraphHorizontalBar(Graph):
         self.setTicks('y', yTicks)  
 
         # first, see if ticks have been set externally
-        if 'ticks' in self.axis['x'].keys() and len(self.axis['x']['ticks']) == 0:
+        if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
             rangeStep = int(xMin+int(round(xRange/10)))
             if rangeStep == 0:
                 rangeStep = 1
@@ -1146,7 +1146,7 @@ class GraphHorizontalBarWeighted(Graph):
         self.setTicks('y', yTicks)  
 
         # first, see if ticks have been set externally
-#         if 'ticks' in self.axis['x'].keys() and len(self.axis['x']['ticks']) == 0:
+#         if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
 #             rangeStep = int(xMin+int(round(xRange/10)))
 #             if rangeStep == 0:
 #                 rangeStep = 1
@@ -1932,7 +1932,7 @@ class PlotStream(object):
             p = pitch.Pitch()
             p.ps = i
             weights = [] # a list of pairs of count/label
-            for key in nameCount.keys():
+            for key in nameCount:
                 if pitch.Pitch(key).pitchClass == i:
                     weights.append((nameCount[key], key))
             weights.sort()
@@ -2062,7 +2062,7 @@ class PlotStream(object):
             p = pitch.Pitch()
             p.ps = i # set pitch space value
             weights = [] # a list of pairs of count/label
-            for key in nameWithOctaveCount.keys():
+            for key in nameWithOctaveCount:
                 if pitch.Pitch(key).ps == i:
                     weights.append((nameWithOctaveCount[key], key))
             weights.sort()
@@ -2108,7 +2108,7 @@ class PlotStream(object):
             p = pitch.Pitch()
             p.ps = i # set pitch space value
             weights = [] # a list of pairs of count/label
-            for key in nameWithOctaveCount.keys():
+            for key in nameWithOctaveCount:
                 if pitch.Pitch(key).ps == i:
                     weights.append((nameWithOctaveCount[key], key))
             weights.sort()
@@ -2684,7 +2684,7 @@ class PlotHistogram(PlotStream):
                     # get the index position, not the value
                     value = dataValues.index(value)
     
-                if value not in data.keys():
+                if value not in data:
                     data[value] = 0
                     # this is the offset that is used to shift labels
                     # into bars; this only is .5 if x values are integers
@@ -3160,7 +3160,7 @@ class PlotHorizontalBar(PlotStream):
                 # rounding to nearest quarter tone
                 numericValue = common.roundToHalfInteger(v) #int(v)
 
-                if numericValue not in dataUnique.keys():
+                if numericValue not in dataUnique:
                     dataUnique[numericValue] = []
                 # all work with offset
                 start = objSub.offset
@@ -3177,7 +3177,7 @@ class PlotHorizontalBar(PlotStream):
         yTicks = self.fyTicks(min(dataUnique.keys()),
                                        max(dataUnique.keys()))
         for numericValue, label in yTicks:
-            if numericValue in dataUnique.keys():
+            if numericValue in dataUnique:
                 data.append([label, dataUnique[numericValue]])
             else:
                 data.append([label, []])
@@ -4477,7 +4477,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types, copy
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

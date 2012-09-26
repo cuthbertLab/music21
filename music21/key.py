@@ -100,7 +100,7 @@ def sharpsToPitch(sharpCount):
     if sharpCount is None:
         sharpCount = 0 # fix for C major
     
-    if sharpCount in _sharpsToPitchCache.keys():
+    if sharpCount in _sharpsToPitchCache:
         # return a deepcopy of the pitch
         return copy.deepcopy(_sharpsToPitchCache[sharpCount])
 
@@ -229,7 +229,7 @@ def pitchToSharps(value, mode=None):
 #    else:
 #        p = value
 #
-#    if (p.name, mode) in _pitchToSharpsCache.keys():            
+#    if (p.name, mode) in _pitchToSharpsCache:            
 #        return _pitchToSharpsCache[(p.name, mode)]
 #
 #
@@ -722,33 +722,6 @@ class KeySignature(base.Music21Object):
         instead.
         ''')
 
-    #---------------------------------------------------------------------------
-    # override these methods for json functionality
-    # not presently in use
-
-#     def jsonAttributes(self):
-#         '''
-#         Define all attributes of this object that should be JSON serialized for storage 
-#         and re-instantiation. Attributes that name basic Python objects 
-#         or :class:`~music21.freezeThaw.JSONFreezer` subclasses, or dictionaries or lists 
-#         that contain Python objects or 
-#         :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
-#         '''
-#         # only string notation is stored, meaning that any non-default
-#         # internal representations will not be saved
-#         # a new default will be created when restored
-#         return ['sharps', 'mode', '_alteredPitches']
-# 
-# 
-#     def music21ObjectFromString(self, idStr):
-#         '''Given a stored string during JSON serialization, return an object'
-# 
-#         The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
-#         '''
-#         return None
-
-
-
 # some ideas
 # c1 = chord.Chord(["D", "F", "A"])
 # k1 = key.Key("C")
@@ -948,7 +921,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

@@ -50,7 +50,6 @@ Example usage:
 import unittest
 import copy
 
-from music21 import base
 from music21 import common
 from music21 import exceptions21
 
@@ -603,7 +602,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     4.5
     '''
     
-    if dType in typeToDuration.keys():
+    if dType in typeToDuration:
         durationFromType = typeToDuration[dType]
     else:
         raise DurationException(
@@ -1238,7 +1237,7 @@ class DurationUnit(DurationCommon):
             self._typeNeedsUpdating = True
             self._quarterLengthNeedsUpdating = False
         else:
-            if prototype not in typeToDuration.keys():
+            if prototype not in typeToDuration:
                 raise DurationException('type (%s) is not valid' % type)
             self.type = prototype 
             self._qtrLength = 0.0
@@ -1510,7 +1509,7 @@ class DurationUnit(DurationCommon):
         2.0
         '''
         # validate
-        if value not in typeToDuration.keys():
+        if value not in typeToDuration:
             raise DurationException("no such type exists: %s" % value)
         if value != self._type: # only update if different
             # link status will be checked in quarterLengthNeeds updating
@@ -1537,7 +1536,7 @@ class DurationUnit(DurationCommon):
 
     def setTypeFromNum(self, typeNum):
         #numberFound = None
-        if str(typeNum) in typeFromNumDict.keys():
+        if str(typeNum) in typeFromNumDict:
             self.type = typeFromNumDict[str(typeNum)]
         else:
             raise DurationException("cannot find number %s" % typeNum)
@@ -3059,7 +3058,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import sys, types
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):

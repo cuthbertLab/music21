@@ -88,9 +88,9 @@ class ReductiveNote(object):
 
     def __repr__(self):
         msg = []
-        for key in self._parameterKeys.keys():
+        for key in self._parameterKeys:
             attr = self._parameterKeys[key]
-            if attr in self._parameters.keys(): # only show those defined
+            if attr in self._parameters: # only show those defined
                 if self._parameters[attr] is not None:
                     msg.append(key)
                     msg.append(':')
@@ -118,7 +118,7 @@ class ReductiveNote(object):
             candidateKey, value = a.split(self._delimitValue)
             candidateKey = candidateKey.strip()
             value = value.strip()
-            if candidateKey.lower() in self._parameterKeys.keys():
+            if candidateKey.lower() in self._parameterKeys:
                 attr = self._parameterKeys[candidateKey]
                 self._parameters[attr] = value
         self._isParsed = True
@@ -131,7 +131,7 @@ class ReductiveNote(object):
         '''
         if self._note.isChord:
             # need to permit specification by pitch
-            if 'pitch' in self._parameters.keys():
+            if 'pitch' in self._parameters:
                 p = pitch.Pitch(self._parameters['pitch'])
                 for sub in self._note: # iterate over compoinents
                     if p.name == sub.pitch.name:
@@ -152,18 +152,18 @@ class ReductiveNote(object):
             n.pitch.accidental.displayStatus = True
         te = None
 
-        if 'octave' in self._parameters.keys():
+        if 'octave' in self._parameters:
             if self._parameters['octave'] is not None:
                 n.pitch.octave = self._parameters['octave']
-        if 'stemDirection' in self._parameters.keys():
+        if 'stemDirection' in self._parameters:
             n.stemDirection = self._parameters['stemDirection']
-        if 'noteheadFill' in self._parameters.keys():
+        if 'noteheadFill' in self._parameters:
             if self._parameters['noteheadFill'] is not None:
                 n.noteheadFill = self._parameters['noteheadFill']
                 #environLocal.printDebug(['set nothead fill:', n.noteheadFill])
-        if 'textBelow' in self._parameters.keys():
+        if 'textBelow' in self._parameters:
             n.addLyric(self._parameters['textBelow'])
-        if 'textAbove' in self._parameters.keys():
+        if 'textAbove' in self._parameters:
             te = expressions.TextExpression(self._parameters['textAbove'])
         return n, te
 

@@ -879,7 +879,8 @@ class Kalimba(PitchedPercussion):
 
 #-------------
 class Percussion(Instrument):
-    pass
+    def __init__(self):
+        Instrument.__init__(self)
 
 class Woodblock(Percussion):
     def __init__(self):
@@ -1250,12 +1251,12 @@ def partitionByInstrument(streamObj):
     names = {} # store unique names
     for e in found:
         # matching here by instrument name
-        if e.instrumentName not in names.keys():
+        if e.instrumentName not in names:
             names[e.instrumentName] = {'Instrument':e} # just store one instance
         
     # create a return object that has a part for each instrument
     post = stream.Score()
-    for iName in names.keys():
+    for iName in names:
         p = stream.Part()
         # add the instrument instance
         p.insert(0, names[iName]['Instrument'])
@@ -1406,7 +1407,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import types, copy
-        for part in sys.modules[self.__module__].__dict__.keys():
+        for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):
