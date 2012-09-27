@@ -9,7 +9,8 @@
 # Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''The duration module contains  
+'''
+The duration module contains  
 :class:`~music21.duration.Duration` objects (among other objects and
 functions).  Duration objects are a fundamental component of 
 :class:`~music21.note.Note` and all Music21Objects, such as 
@@ -1129,7 +1130,8 @@ class Tuplet(object):
             return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
 
     fullName = property(_getFullName, 
-        doc = '''Return the most complete representation of this tuplet in a readable form. 
+        doc = '''
+        Return the most complete representation of this tuplet in a readable form. 
 
         >>> from music21 import *
         >>> t = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 2)
