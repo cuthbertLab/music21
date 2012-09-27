@@ -75,7 +75,12 @@ class Tie(object):
         return False
 
     def __ne__(self, other):
-        '''Inequality. Needed for pitch comparisons.
+        '''
+        Tests for object inequality. Needed for pitch comparisons.
+        
+        >>> from music21 import *
+        >>> tie.Tie('start') != tie.Tie('end')
+        True
         '''
         return not self.__eq__(other)
 
