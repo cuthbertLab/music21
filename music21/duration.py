@@ -780,25 +780,20 @@ class Tuplet(object):
     a "tuple" (immutable list; since there can be nested tuplets) in
     the duration's .tuplets property.
     
-
     The primary representation uses two pairs of note numbers and durations. 
-
 
     The first pair of note numbers and durations describes the representation 
     within the tuplet, or the value presented by the context. This is 
     called "actual." In a standard 8th note triplet this would be 3, eighth. 
     Attributes are `numberNotesActual`, `durationActual`.
 
-
     The second pair of note numbers and durations describes the space that would 
     have been occupied in a normal context. This is called "normal." In a 
     standard 8th note triplet this would be 2, eighth. Attributes 
     are `numberNotesNormal`, `durationNormal`.
 
-
     If duration values are not provided, the `durationActual` and `durationNormal` 
     are assumed to be eighths.
-
 
     If only one duration, either `durationActual` or `durationNormal`, is 
     provided, both are set to the same value.
@@ -1125,7 +1120,7 @@ class Tuplet(object):
         
         if numActual in [3] and numNormal in [2]:
             return 'Triplet'
-        elif numActual in [4] and numNormal in [4]:
+        elif numActual in [5] and numNormal in [4,2]:
             return 'Quintuplet'
         elif numActual in [6] and numNormal in [4]:
             return 'Sextuplet'
@@ -1137,13 +1132,17 @@ class Tuplet(object):
         doc = '''Return the most complete representation of this tuplet in a readable form. 
 
         >>> from music21 import *
-        >>> t = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+        >>> t = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 2)
         >>> t.fullName
-        'Tuplet of 5/4ths'
+        'Quintuplet'
 
         >>> t = duration.Tuplet(numberNotesActual = 3, numberNotesNormal = 2)
         >>> t.fullName
         'Triplet'
+        
+        >>> t = duration.Tuplet(numberNotesActual = 17, numberNotesNormal = 14)
+        >>> t.fullName
+        'Tuplet of 17/14ths'
         ''')
 
 
