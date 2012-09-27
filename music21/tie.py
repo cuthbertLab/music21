@@ -75,11 +75,13 @@ class Tie(object):
         return False
 
     def __ne__(self, other):
+
         '''
         Tests for object inequality. Needed for pitch comparisons.
-        
         >>> from music21 import *
-        >>> tie.Tie('start') != tie.Tie('end')
+        >>> a = tie.Tie('start')
+        >>> b = tie.Tie('end')
+        >>> a != b
         True
         '''
         return not self.__eq__(other)
@@ -92,9 +94,6 @@ class Tie(object):
 class Test(unittest.TestCase):
     
     def runTest(self):
-        pass
-    
-    def testBasic(self):
         pass
     
 
