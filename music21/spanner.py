@@ -44,9 +44,12 @@ class SpannerBundleException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 class Spanner(base.Music21Object):
     '''
-    Spanner objects live on Streams in the same manner as other Music21Objects, but represent and store connections between one or more other Music21Objects.
+    Spanner objects live on Streams in the same manner as other Music21Objects, 
+    but represent and store connections between one or more other Music21Objects.
 
-    Commonly used Spanner subclasses include the :class:`~music21.spanner.Slur`, :class:`~music21.spanner.RepeatBracket`, :class:`~music21.spanner.Crescendo`, and :class:`~music21.spanner.Diminuendo`.
+    Commonly used Spanner subclasses include the :class:`~music21.spanner.Slur`, 
+    :class:`~music21.spanner.RepeatBracket`, :class:`~music21.spanner.Crescendo`, and :class:`~music21.spanner.Diminuendo`
+    objects.
 
     In some cases you will want to subclass Spanner
     for specific purposes.  
@@ -56,7 +59,6 @@ class Spanner(base.Music21Object):
     as Elliott Carter uses in his second string quartet (he marks them
     with an arrow).
 
-
     >>> from music21 import *
     >>> class CarterAccelerandoSign(spanner.Spanner):
     ...    pass
@@ -64,22 +66,22 @@ class Spanner(base.Music21Object):
     >>> n2 = note.Note('D4')
     >>> n3 = note.Note('E4')
     >>> sp1 = CarterAccelerandoSign(n1, n2, n3) # or as a list: [n1, n2, n3]
-    >>> sp1.getComponents()
+    >>> sp1.getSpannedElements()
     [<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>]
     
-    We can iterate over them:
+    We can iterate over a spanner to get the contexts:
     
     >>> for n in sp1:
     ...    print(n),
     <music21.note.Note C> <music21.note.Note D> <music21.note.Note E>
     
     Now we put the notes and the spanner into a Stream object.  Note that
-    the convention is to put the spanner at the beginning:
+    the convention is to put the spanner at the beginning of the innermost
+    Stream that contains all the Spanners:
     
     >>> s = stream.Stream()
     >>> s.append([n1, n2, n3])
     >>> s.insert(0, sp1)
-    
     
     Now we can get at the spanner in one of three ways.
     
@@ -104,14 +106,11 @@ class Spanner(base.Music21Object):
 
     (3) we can get the spanner by looking at the list getSpannerSites() on any object that has a spanner:
     
-
     >>> n2.getSpannerSites()
     [<music21.spanner.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
     
-    
     In this example we will slur a few notes and then iterate over the stream to
     see which are slurred:
-    
     
     >>> n1 = note.Note('C4')
     >>> n2 = note.Note('D4')
@@ -120,7 +119,6 @@ class Spanner(base.Music21Object):
     >>> n5 = note.Note('G4')
     >>> n6 = note.Note('A4')
     
-    
     Create a slur over the second and third notes at instantiation:
     
     >>> slur1 = spanner.Slur([n2, n3])
@@ -128,7 +126,7 @@ class Spanner(base.Music21Object):
     Slur the fifth and the sixth notes by adding them to an existing slur:
     
     >>> slur2 = spanner.Slur()
-    >>> slur2.addComponents([n5, n6])
+    >>> slur2.addSpannedElements([n5, n6])
     
     Now add them all to a stream:
     
@@ -153,7 +151,7 @@ class Spanner(base.Music21Object):
     of part1 and get their first elements:
     
     >>> for thisSpanner in part1.spanners:
-    ...     firstNote = thisSpanner.getComponents()[0]
+    ...     firstNote = thisSpanner.getSpannedElements()[0]
     ...     print firstNote.nameWithOctave
     D4
     G4
@@ -164,7 +162,6 @@ class Spanner(base.Music21Object):
     
     Oh, and of course, slurs do print properly in musicxml:
     
-    
     >>> #_DOCS_SHOW part1.show()
     
     .. image:: images/slur1_example.*
@@ -172,13 +169,20 @@ class Spanner(base.Music21Object):
     
     (the Carter example would not print an arrow since that
     element has no corresponding musicxml representation).
-
+   
+   
+    Implementation notes:
     
+    The elements that are included in a spanner are stored in a
+    Stream subclass called :class:`~music21.music21.stream.SpannerStorage`
+    found as the `.spannedElements` attribute.  That Stream has an
+    attribute called `spannerParent` which links to the original spanner.
+    Thus, `spannedElements` is smart enough to know where it's stored, but
+    it makes deleting/garbage-collecting a spanner a tricky operation:
     
-    OMIT_FROM_DOCS
+    Ex. Prove that the spannedElement Stream is linked to container via `spannerParent`:
     
-    >>> # assert that components Stream subclass is linked to container
-    >>> sp1._components.spannerParent == sp1
+    >>> sp1.spannedElements.spannerParent == sp1
     True
     '''
     # this class attribute provides performance optimized class selection
@@ -203,11 +207,11 @@ class Spanner(base.Music21Object):
         # create a stream subclass, spanner storage; pass a reference
         # to this spanner for getting this spanner from the SpannerStorage 
         # directly
-        self._components = stream.SpannerStorage(spannerParent=self)
+        self.spannedElements = stream.SpannerStorage(spannerParent=self)
         # we do not want to auto sort based on offset or class, as 
         # both are meaningless inside of this Stream (and only have meaning
         # in Stream external to this 
-        self._components.autoSort = False
+        self.spannedElements.autoSort = False
 
         # add arguments as a list or single item
         proc = []
@@ -216,23 +220,23 @@ class Spanner(base.Music21Object):
                 proc += arg
             else:
                 proc.append(arg)
-        self.addComponents(proc)
+        self.addSpannedElements(proc)
 #         if len(arguments) > 1:
-#             self._components.append(arguments)
+#             self.spannedElements.append(arguments)
 #         elif len(arguments) == 1: # assume a list is first arg
-#                 self._components.append(c)
+#                 self.spannedElements.append(c)
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
         self.idLocal = None
-        # after all components have been gathered, setting complete
+        # after all spannedElements have been gathered, setting complete
         # will mark that all parts have been gathered. 
         self.completeStatus = False
 
 
     def __repr__(self):
         msg = [self._reprHead]
-        for c in self.getComponents():
+        for c in self.getSpannedElements():
             objRef = c
             msg.append(repr(objRef))
         msg.append('>')
@@ -240,9 +244,9 @@ class Spanner(base.Music21Object):
 
     def __deepcopy__(self, memo=None):
         '''
-        This produces a new, independent object containing references to the same components. 
-        Components linked in this Spanner must be manually re-set, likely using the 
-        replaceComponent() method.
+        This produces a new, independent object containing references to the same spannedElements. 
+        SpannedElements linked in this Spanner must be manually re-set, likely using the 
+        replaceSpannedElement() method.
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
@@ -251,7 +255,7 @@ class Spanner(base.Music21Object):
 
         >>> sp1 = spanner.Spanner(n1, n2, c1)
         >>> sp2 = copy.deepcopy(sp1)
-        >>> len(sp2.getComponents())
+        >>> len(sp2.spannedElements)
         3
         >>> sp1 is sp2
         False
@@ -282,11 +286,11 @@ class Spanner(base.Music21Object):
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
 
-            # do not deepcopy _components, as this will copy the 
+            # do not deepcopy spannedElements, as this will copy the 
             # contained objects
-            elif name == '_components':
-                for c in old._components:
-                    new._components.append(c)
+            elif name == 'spannedElements':
+                for c in old.spannedElements:
+                    new.spannedElements.append(c)
             else: 
                 #environLocal.printDebug(['Spanner.__deepcopy__', name])
                 newValue = copy.deepcopy(part, memo)
@@ -296,19 +300,19 @@ class Spanner(base.Music21Object):
         return new
 
     #---------------------------------------------------------------------------
-    # as _components is private Stream, unwrap/wrap methods need to override
+    # as spannedElements is private Stream, unwrap/wrap methods need to override
     # Music21Object to get at these objects 
     # this is the same as with Variants
 
     def purgeOrphans(self):
-        self._components.purgeOrphans()
+        self.spannedElements.purgeOrphans()
         base.Music21Object.purgeOrphans(self)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         # Stream
         # base method to perform purge on the Sream
-        self._components.purgeLocations(rescanIsDead=rescanIsDead)
+        self.spannedElements.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
             
     def unwrapWeakref(self):
@@ -318,7 +322,7 @@ class Spanner(base.Music21Object):
         base.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
         #environLocal.printDebug(['spanner unwrapping contained stream'])
-        self._components.unwrapWeakref()
+        self.spannedElements.unwrapWeakref()
         # this presently is not a weakref but in case of future changes
 
     def wrapWeakref(self):
@@ -326,22 +330,22 @@ class Spanner(base.Music21Object):
         '''
         # call base method: this gets defined contexts and active site
         base.Music21Object.wrapWeakref(self)
-        self._components.wrapWeakref()
+        self.spannedElements.wrapWeakref()
 
 
 #    def freezeIds(self):
 #        base.Music21Object.freezeIds(self)
-#        self._components.freezeIds()
+#        self.spannedElements.freezeIds()
 #
 #    def unfreezeIds(self):
 #        base.Music21Object.unfreezeIds(self)
-#        self._components.unfreezeIds()
+#        self.spannedElements.unfreezeIds()
 
 
     def getSpannerStorageId(self):
         '''Return the object id of the SpannerStorage object
         '''
-        return id(self._components)
+        return id(self.spannedElements)
 
     #---------------------------------------------------------------------------
     def __getitem__(self, key):
@@ -359,62 +363,62 @@ class Spanner(base.Music21Object):
         True
         '''
         # delegate to Stream subclass
-        return self._components.__getitem__(key)
+        return self.spannedElements.__getitem__(key)
 
     def __iter__(self):
-        return common.Iterator(self._components)
+        return common.Iterator(self.spannedElements)
 
     def __len__(self):
-        return len(self._components._elements)
+        return len(self.spannedElements._elements)
 
 
-    def getComponents(self):
-        '''Return all components for this Spanner as objects, without weak-refs.  
-
-        As this is a Music21Object, the name here is more specific to avoid name clashes.
+    def getSpannedElements(self):
+        '''
+        Return all the elements of `.spannedElements` for this Spanner 
+        as a list of Music21Objects.  
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> sl = spanner.Spanner()
-        >>> sl.addComponents(n1)
-        >>> sl.getComponents() == [n1]
+        >>> sl.addSpannedElements(n1)
+        >>> sl.getSpannedElements() == [n1]
         True
-        >>> sl.addComponents(n2)
-        >>> sl.getComponents() == [n1, n2]
+        >>> sl.addSpannedElements(n2)
+        >>> sl.getSpannedElements() == [n1, n2]
         True
-        >>> sl.getComponentIds() == [id(n1), id(n2)]
+        >>> sl.getSpannedElementIds() == [id(n1), id(n2)]
         True
         >>> c1 = clef.TrebleClef()
-        >>> sl.addComponents(c1)
-        >>> sl.getComponents() == [n1, n2, c1] # make sure that not sorting
+        >>> sl.addSpannedElements(c1)
+        >>> sl.getSpannedElements() == [n1, n2, c1] # make sure that not sorting
         True
         '''
         post = []
         # use low-level _elements access for speed; do not need to set
         # active sit or iterator
         # must pass into a new list
-        for c in self._components._elements:
+        for c in self.spannedElements._elements:
 #             objRef = c
 #             if objRef is not None:
             post.append(c)
         return post
 
-    def getComponentsByClass(self, classFilterList):
+    def getSpannedElementsByClass(self, classFilterList):
         '''
         >>> from music21 import *
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
         >>> sl = spanner.Spanner()
-        >>> sl.addComponents([n1, n2, c1])
-        >>> sl.getComponentsByClass('Note') == [n1, n2]
+        >>> sl.addSpannedElements([n1, n2, c1])
+        >>> sl.getSpannedElementsByClass('Note') == [n1, n2]
         True
-        >>> sl.getComponentsByClass('Clef') == [c1]
+        >>> sl.getSpannedElementsByClass('Clef') == [c1]
         True
         '''
         # returns a Stream; pack in a list
-        postStream = self._components.getElementsByClass(classFilterList)
+        postStream = self.spannedElements.getElementsByClass(classFilterList)
 #         post = []
 #         for c in postStream:
 #             post.append(objRef)
@@ -422,18 +426,20 @@ class Spanner(base.Music21Object):
         # return raw elements list for speed; attached to a temporary stream
         return postStream._elements
 
-    def getComponentIds(self):
+    def getSpannedElementIds(self):
         '''Return all id() for all stored objects.
         '''
-        if 'componentIds' not in self._cache or self._cache['componentIds'] is None:
-            self._cache['componentIds'] = [id(c) for c in self._components._elements]
-        return self._cache['componentIds']
+        if 'spannedElementIds' not in self._cache or self._cache['spannedElementIds'] is None:
+            self._cache['spannedElementIds'] = [id(c) for c in self.spannedElements._elements]
+        return self._cache['spannedElementIds']
 
 
-    def addComponents(self, components, *arguments, **keywords):  
-        '''Associate one or more components with this Spanner.
+    def addSpannedElements(self, spannedElements, *arguments, **keywords):  
+        '''
+        Associate one or more elements with this Spanner.
 
-        The order that components is added is retained and may or may not be significant to the spanner. 
+        The order in which elements are added is retained and 
+        may or may not be significant to the spanner. 
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
@@ -443,45 +449,48 @@ class Spanner(base.Music21Object):
         >>> n5 = note.Note('d-')
 
         >>> sl = spanner.Spanner()
-        >>> sl.addComponents(n1)
-        >>> sl.addComponents(n2, n3)
-        >>> sl.addComponents([n4, n5])
-        >>> sl.getComponentIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
+        >>> sl.addSpannedElements(n1)
+        >>> sl.addSpannedElements(n2, n3)
+        >>> sl.addSpannedElements([n4, n5])
+        >>> sl.getSpannedElementIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
         True
 
         '''  
         # presently, this does not look for redundancies
-        if not common.isListLike(components):
-            components = [components]
+        if not common.isListLike(spannedElements):
+            spannedElements = [spannedElements]
         # assume all other arguments
-        components += arguments
-        #environLocal.printDebug(['addComponents():', components])
-        for c in components:
-            # create a component instance for each
-            #self._components.append(Component(c))
+        spannedElements += arguments
+        #environLocal.printDebug(['addSpannedElements():', spannedElements])
+        for c in spannedElements:
             if c is None:
                 continue
-            if not self._components.hasElement(c): # not already in storage
-                self._components._appendCore(c)
+            if not self.spannedElements.hasElement(c): # not already in storage
+                self.spannedElements._appendCore(c)
             else:
                 pass
                 # it makes sense to not have multiple copies
                 #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an error.' % (c, self)])
 
-        self._components._elementsChanged()
+        self.spannedElements._elementsChanged()
         # always clear cache
         if len(self._cache) > 0:
             self._cache = {} #common.DefaultHash()
 
-    def hasComponent(self, component):  
-        '''Return True if this Spanner has the component.'''
-        for c in self._components._elements:
-            if id(c) == id(component):
+    def hasSpannedElement(self, spannedElement):  
+        '''Return True if this Spanner has the spannedElement.'''
+        for c in self.spannedElements._elements:
+            if id(c) == id(spannedElement):
                 return True
         return False
 
-    def replaceComponent(self, old, new):
-        '''When copying a Spanner, we need to update the spanner with new references for copied components (if the Notes of a Slur have beenc copied, that Slur's Note references need references to the new Notes). Given the old component, this method will replace the old with the new.
+    def replaceSpannedElement(self, old, new):
+        '''
+        When copying a Spanner, we need to update the 
+        spanner with new references for copied  (if the Notes of a 
+        Slur have been copied, that Slur's Note references need 
+        references to the new Notes). Given the old spanned element, 
+        this method will replace the old with the new.
 
         The `old` parameter can be either an object or object id. 
 
@@ -491,7 +500,7 @@ class Spanner(base.Music21Object):
         >>> c1 = clef.AltoClef()
         >>> c2 = clef.BassClef()
         >>> sl = spanner.Spanner(n1, n2, c1)
-        >>> sl.replaceComponent(c1, c2)
+        >>> sl.replaceSpannedElement(c1, c2)
         >>> sl[-1] == c2
         True
         '''
@@ -499,32 +508,32 @@ class Spanner(base.Music21Object):
             return None # do nothing
         if common.isNum(old):
             # this must be id(obj), not obj.id
-            e = self._components._getElementByObjectId(old)
+            e = self.spannedElements._getElementByObjectId(old)
             # e here is the old element that was spanned by this Spanner
             
 
-            #environLocal.printDebug(['current Spanner.componentIds()', self.getComponentIds()])
-            #environLocal.printDebug(['Spanner.replaceComponent:', 'getElementById result', e, 'old target', old])
+            #environLocal.printDebug(['current Spanner.getSpannedElementIdsIds()', self.getSpannedElementIds()])
+            #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'getElementById result', e, 'old target', old])
             if e is not None:
-                #environLocal.printDebug(['Spanner.replaceComponent:', 'old', e, 'new', new])
+                #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
                 # do not do all Sites: only care about this one
-                self._components.replace(e, new, allTargetSites=False)
+                self.spannedElements.replace(e, new, allTargetSites=False)
         else:
             # do not do all Sites: only care about this one
-            self._components.replace(old, new, allTargetSites=False)
-            #environLocal.printDebug(['Spanner.replaceComponent:', 'old', e, 'new', new])
+            self.spannedElements.replace(old, new, allTargetSites=False)
+            #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
 
-        # while this Spanner now has proper elements in its _components Stream, the element replaced likely has a site left-over from its previous Spanner
+        # while this Spanner now has proper elements in its spannedElements Stream, the element replaced likely has a site left-over from its previous Spanner
 
         # always clear cache
         if len(self._cache) > 0:
             self._cache = {} #common.DefaultHash()
 
-        #environLocal.printDebug(['replaceComponent()', 'id(old)', id(old), 'id(new)', id(new)])
+        #environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old), 'id(new)', id(new)])
 
 
-    def isFirst(self, component):
-        '''Given a component, is it first?
+    def isFirst(self, spannedElement):
+        '''Given a spannedElement, is it first?
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
@@ -534,7 +543,7 @@ class Spanner(base.Music21Object):
         >>> n5 = note.Note('d-')
 
         >>> sl = spanner.Spanner()
-        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.addSpannedElements(n1, n2, n3, n4, n5)
         >>> sl.isFirst(n2)
         False
         >>> sl.isFirst(n1)
@@ -545,14 +554,14 @@ class Spanner(base.Music21Object):
         True
 
         '''
-        idTarget = id(component)
-        objRef = self._components._elements[0]
+        idTarget = id(spannedElement)
+        objRef = self.spannedElements._elements[0]
         if id(objRef) == idTarget:
             return True
         return False
 
     def getFirst(self):
-        '''Get the object of the first component
+        '''Get the object of the first spannedElement
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
@@ -562,17 +571,17 @@ class Spanner(base.Music21Object):
         >>> n5 = note.Note('d-')
 
         >>> sl = spanner.Spanner()
-        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.addSpannedElements(n1, n2, n3, n4, n5)
         >>> sl.getFirst() is n1
         True
         '''
-        return self._components[0]
+        return self.spannedElements[0]
 
-    def isLast(self, component):
-        '''Given a component, is it last?  Returns True or False
+    def isLast(self, spannedElement):
+        '''Given a spannedElement, is it last?  Returns True or False
         '''
-        idTarget = id(component)
-        objRef = self._components._elements[-1]
+        idTarget = id(spannedElement)
+        objRef = self.spannedElements._elements[-1]
 
         if id(objRef) == idTarget:
             return True
@@ -581,7 +590,7 @@ class Spanner(base.Music21Object):
 
 
     def getLast(self):
-        '''Get the object of the first component
+        '''Get the object of the first spannedElement
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
@@ -591,17 +600,17 @@ class Spanner(base.Music21Object):
         >>> n5 = note.Note('d-')
 
         >>> sl = spanner.Spanner()
-        >>> sl.addComponents(n1, n2, n3, n4, n5)
+        >>> sl.addSpannedElements(n1, n2, n3, n4, n5)
         >>> sl.getLast() is n5
         True
 
         '''
-        objRef = self._components.elements[-1]
+        objRef = self.spannedElements.elements[-1]
         return objRef
 
 
     def getOffsetsBySite(self, site):
-        '''Given a site shared by all components, return a list of offset values.
+        '''Given a site shared by all , return a list of offset values.
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
@@ -615,7 +624,7 @@ class Spanner(base.Music21Object):
         '''
         post = []
         idSite = id(site)
-        for c in self._components._elements:
+        for c in self.spannedElements._elements:
             # getting site ids is fast, as weakrefs do not have to be unpacked
             if idSite in c.getSiteIds():
                 o = c.getOffsetBySite(site)
@@ -630,31 +639,40 @@ class Spanner(base.Music21Object):
 
 
     def getDurationSpanBySite(self, site):
-        '''Return the duration span, or the distnace between the first component's offset and the last components offset plus duration. 
+        '''
+        Return the duration span, or the distance between the first spanned element's 
+        offset and the last spanned element's offset plus its duration in quarterLength. 
+        
+        returns a two-element tuple of the offset of the first element and the
+        end-time of the last element.
+        
+        Offsets are relative to the `site` given; this is because it's very
+        likely that different elements in the Spanner are located in different
+        Streams in the hierarchy.
         '''
         # these are in order
         idSite = id(site)
 
-        # special handling for case of a single component spanner
-        if len(self._components) == 1:
-            o = self._components[0].getOffsetBySite(site)
-            return o, o + self._components[0].duration.quarterLength
+        # special handling for case of a single spannedElement spanner
+        if len(self.spannedElements) == 1:
+            o = self.spannedElements[0].getOffsetBySite(site)
+            return o, o + self.spannedElements[0].duration.quarterLength
 
-        offsetComponent = [] # store pairs
-        for c in self._components._elements:
-        #for c in self.getComponents():
+        offsetSpannedElement = [] # store pairs
+        for c in self.spannedElements._elements:
+        #for c in self.getSpannedElements():
             objRef = c
             if idSite in objRef.getSiteIds():
                 o = objRef.getOffsetBySite(site)
-                offsetComponent.append([o, objRef])
-        offsetComponent.sort() # sort by offset
-        minOffset = offsetComponent[0][0]
-        #minComponent = offsetComponent[0][1]
+                offsetSpannedElement.append([o, objRef])
+        offsetSpannedElement.sort() # sort by offset
+        minOffset = offsetSpannedElement[0][0]
+        #minSpannedElement = offsetSpannedElement[0][1]
 
-        maxOffset = offsetComponent[-1][0]
-        maxComponent = offsetComponent[-1][1]
-        if maxComponent.duration is not None:
-            highestTime = maxOffset + maxComponent.duration.quarterLength
+        maxOffset = offsetSpannedElement[-1][0]
+        maxSpannedElement = offsetSpannedElement[-1][1]
+        if maxSpannedElement.duration is not None:
+            highestTime = maxOffset + maxSpannedElement.duration.quarterLength
         else:
             highestTime = maxOffset
     
@@ -662,25 +680,31 @@ class Spanner(base.Music21Object):
 
 
     def getDurationBySite(self, site):
-        '''Return a Duration object representing the value between the first component's offset and the last components offset plus duration. 
+        '''
+        Return a Duration object representing the value between the 
+        first spanned element's offset and the last spanned-element's 
+        offset plus duration. 
         '''
         low, high = self.getDurationSpanBySite(site=site)     
         d = duration.Duration()
         d.quarterLength = high-low
         return d
 
-
-
-
-
-
 #-------------------------------------------------------------------------------
 class SpannerBundle(object):
-    '''A utility object for collecting and processing collections of Spanner objects. This is necessary because often processing routines that happen at many different levels need access to the same collection of spanners. 
+    '''
+    A utility object for collecting and processing 
+    collections of Spanner objects. This is necessary because 
+    often processing routines that happen at many different 
+    levels need access to the same collection of spanners. 
 
-    Because SpannerBundles are so commonly used with :class:`~music21.stream.Stream` objects, the Stream has a :attr:`~music21.stream.Stream.spannerBundle` property that stores and caches a SpannerBundle of the Stream.
+    Because SpannerBundles are so commonly used with 
+    :class:`~music21.stream.Stream` objects, the Stream has a 
+    :attr:`~music21.stream.Stream.spannerBundle` property that stores 
+    and caches a SpannerBundle of the Stream.
 
-    If a Stream or Stream subclass is provided as an argument, all Spanners on this Stream will be accumulated herein. 
+    If a Stream or Stream subclass is provided as an argument, 
+    all Spanners on this Stream will be accumulated herein. 
     '''
     def __init__(self, *arguments, **keywords):
         self._cache = {} #common.DefaultHash()    
@@ -699,10 +723,10 @@ class SpannerBundle(object):
                 self._storage.append(arg)
     
         # a special spanners, stored in storage, can be identified in the 
-        # SpannerBundle as missing a component; the next obj that meets
-        # the class expectation will then be assigned and the component 
+        # SpannerBundle as missing a spannedElement; the next obj that meets
+        # the class expectation will then be assigned and the spannedElement 
         # cleared
-        self._pendingComponentAssignment = []
+        self._pendingSpannedElementAssignment = []
 
     def append(self, other):
         self._storage.append(other)
@@ -823,10 +847,10 @@ class SpannerBundle(object):
         return post
 
 
-    def getByComponent(self, component):
+    def getBySpannedElement(self, spannedElement):
         '''
-        Given a spanner component (an object), 
-        return a new SpannerBundle of all Spanner objects that have this object as a component. 
+        Given a spanner spannedElement (an object), 
+        return a new SpannerBundle of all Spanner objects that have this object as a spannedElement. 
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -837,40 +861,43 @@ class SpannerBundle(object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> sb.getByComponent(n1).list == [su1]
+        >>> sb.getBySpannedElement(n1).list == [su1]
         True
-        >>> sb.getByComponent(n3).list == [su2]
+        >>> sb.getBySpannedElement(n3).list == [su2]
         True
-        >>> sb.getByComponent(n2).list == [su1, su2]
+        >>> sb.getBySpannedElement(n2).list == [su1, su2]
         True
         '''
         # NOTE: this is a performance critical operation
-#         idTarget = id(component)
+#         idTarget = id(spannedElement)
 #         post = self.__class__()
 #         for sp in self._storage: # storage is a list
-#             if idTarget in sp.getComponentIds():
+#             if idTarget in sp.getSpannedElementIds():
 #                 post.append(sp)
 #         return post
 
-        idTarget = id(component)
-        cacheKey = 'getByComponent-%s' % idTarget
+        idTarget = id(spannedElement)
+        cacheKey = 'getBySpannedElement-%s' % idTarget
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage: # storage is a list of spanners
-                if idTarget in sp.getComponentIds():
+                if idTarget in sp.getSpannedElementIds():
                     post.append(sp)
             self._cache[cacheKey] = post
         return self._cache[cacheKey]
 
 
-    def replaceComponent(self, old, new):
-        '''Given a spanner component (an object), replace all old components with new components for all Spanner objects contained in this bundle.
+    def replaceSpannedElement(self, old, new):
+        '''
+        Given a spanner spannedElement (an object), replace all old spannedElements 
+        with new spannedElements 
+        for all Spanner objects contained in this bundle.
 
         The `old` parameter can be either an object or object id. 
 
         If no replacements are found, no errors are raised.
         '''
-        #environLocal.printDebug(['SpannerBundle.replaceComponent()', 'old', old, 'new', new, 'len(self._storage)', len(self._storage)])
+        #environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old, 'new', new, 'len(self._storage)', len(self._storage)])
 
         if common.isNum(old): # assume this is an id
             idTarget = old
@@ -879,13 +906,13 @@ class SpannerBundle(object):
 
         #post = self.__class__() # return a bundle of spanners that had changes
         for sp in self._storage: # Spanners in a list
-            #environLocal.printDebug(['looking at spanner', sp, sp.getComponentIds()])
+            #environLocal.printDebug(['looking at spanner', sp, sp.getSpannedElementIds()])
 
             # must check to see if this id is in this spanner
-            if idTarget in sp.getComponentIds():
-                sp.replaceComponent(old, new)
+            if idTarget in sp.getSpannedElementIds():
+                sp.replaceSpannedElement(old, new)
                 #post.append(sp)
-                #environLocal.printDebug(['replaceComponent()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
+                #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
         if len(self._cache) > 0:
             self._cache = {} #common.DefaultHash()
@@ -1009,10 +1036,10 @@ class SpannerBundle(object):
             self.setIdLocalByClass(className)
     
 
-    def getByComponentAndClass(self, component, className):
-        '''Get all Spanners that both contain the component and match the provided class. 
+    def getBySpannedElementAndClass(self, spannedElement, className):
+        '''Get all Spanners that both contain the spannedElement and match the provided class. 
         '''
-        return self.getByComponent(component).getByClass(className)
+        return self.getBySpannedElement(spannedElement).getByClass(className)
 
     def getByClassIdLocalComplete(self, className, idLocal, completeStatus):
         '''Get all spanners of a specified class `className`, an id `idLocal`, and a `completeStatus`. This is a convenience routine for multiple filtering when searching for relevant Spanners to pair with. 
@@ -1054,24 +1081,24 @@ class SpannerBundle(object):
         return self.getByClass(className).getByCompleteStatus(completeStatus)
 
 
-    def setPendingComponentAssignment(self, sp, className):
+    def setPendingSpannedElementAssignment(self, sp, className):
         ref = {'spanner':sp, 'className':className}
-        self._pendingComponentAssignment.append(ref)
+        self._pendingSpannedElementAssignment.append(ref)
 
-    def freePendingComponentAssignment(self, componentCandidate):
-        if len(self._pendingComponentAssignment) == 0:
+    def freePendingSpannedElementAssignment(self, spannedElementCandidate):
+        if len(self._pendingSpannedElementAssignment) == 0:
             return
 
         remove = None
-        for i, ref in enumerate(self._pendingComponentAssignment):
-            #environLocal.printDebug(['calling freePendingComponentAssignment()', self._pendingComponentAssignment])
-            if componentCandidate.isClassOrSubclass([ref['className']]):
-                ref['spanner'].addComponents(componentCandidate)
+        for i, ref in enumerate(self._pendingSpannedElementAssignment):
+            #environLocal.printDebug(['calling freePendingSpannedElementAssignment()', self._pendingSpannedElementAssignment])
+            if spannedElementCandidate.isClassOrSubclass([ref['className']]):
+                ref['spanner'].addSpannedElements(spannedElementCandidate)
                 remove = i      
-                #environLocal.printDebug(['freePendingComponentAssignment()', 'added component', ref['spanner']])
+                #environLocal.printDebug(['freePendingSpannedElementAssignment()', 'added spannedElement', ref['spanner']])
                 break
         if remove is not None:
-            self._pendingComponentAssignment.pop(remove)
+            self._pendingSpannedElementAssignment.pop(remove)
 
 
 
@@ -1619,7 +1646,7 @@ class Test(unittest.TestCase):
         s.insert(0, sg1)    
 
         self.assertEqual(len(s), 3)
-        self.assertEqual(sg1.getComponents(), [p1, p2])
+        self.assertEqual(sg1.getSpannedElements(), [p1, p2])
         self.assertEqual(sg1.getOffsetsBySite(s), [0.0, 0.0])
 
         # make sure spanners is unified
@@ -1633,12 +1660,12 @@ class Test(unittest.TestCase):
         p1.append(n3)
 
         slur1 = Slur()
-        slur1.addComponents([n1, n3])
+        slur1.addSpannedElements([n1, n3])
 
         p1.append(slur1)
 
         self.assertEqual(len(s), 3)
-        self.assertEqual(slur1.getComponents(), [n1, n3])
+        self.assertEqual(slur1.getSpannedElements(), [n1, n3])
 
         self.assertEqual(slur1.getOffsetsBySite(p1), [0.0, 2.0])
         self.assertEqual(slur1.getOffsetSpanBySite(p1), [0.0, 2.0])
@@ -1651,8 +1678,8 @@ class Test(unittest.TestCase):
         sl2 = Slur()
         sl3 = Slur()
         sp = Spanner([sl1, sl2, sl3])
-        self.assertEqual(len(sp.getComponents()), 3)
-        self.assertEqual(sp.getComponents(), [sl1, sl2, sl3])
+        self.assertEqual(len(sp.getSpannedElements()), 3)
+        self.assertEqual(sp.getSpannedElements(), [sl1, sl2, sl3])
 
         self.assertEqual(sl1.getSpannerSites(), [sp])
 
@@ -1692,15 +1719,15 @@ class Test(unittest.TestCase):
         n3 = note.Note()
 
         su1 = Slur()
-        su1.addComponents([n1, n3])
+        su1.addSpannedElements([n1, n3])
 
         self.assertEqual(n1.getSpannerSites(), [su1])
         self.assertEqual(n3.getSpannerSites(), [su1])
 
         su2 = copy.deepcopy(su1)
 
-        self.assertEqual(su1.getComponents(), [n1, n3])
-        self.assertEqual(su2.getComponents(), [n1, n3])
+        self.assertEqual(su1.getSpannedElements(), [n1, n3])
+        self.assertEqual(su2.getSpannedElements(), [n1, n3])
 
         self.assertEqual(n1.getSpannerSites(), [su1, su2])
         self.assertEqual(n3.getSpannerSites(), [su1, su2])
@@ -1708,14 +1735,14 @@ class Test(unittest.TestCase):
 
         sb1 = spanner.SpannerBundle(su1, su2)
         sb2 = copy.deepcopy(sb1)
-        self.assertEqual(sb1[0].getComponents(), [n1, n3])
-        self.assertEqual(sb2[0].getComponents(), [n1, n3])
+        self.assertEqual(sb1[0].getSpannedElements(), [n1, n3])
+        self.assertEqual(sb2[0].getSpannedElements(), [n1, n3])
         # spanners stored within are not the same objects
         self.assertEqual(id(sb2[0]) != id(sb1[0]), True)
 
 
 
-    def testReplaceComponent(self):
+    def testReplaceSpannedElement(self):
         from music21 import note, spanner
 
         n1 = note.Note()
@@ -1725,29 +1752,29 @@ class Test(unittest.TestCase):
         n5 = note.Note()
 
         su1 = spanner.Slur()
-        su1.addComponents([n1, n3])
+        su1.addSpannedElements([n1, n3])
 
-        self.assertEqual(su1.getComponents(), [n1, n3])
+        self.assertEqual(su1.getSpannedElements(), [n1, n3])
         self.assertEqual(n1.getSpannerSites(), [su1])
 
-        su1.replaceComponent(n1, n2)
-        self.assertEqual(su1.getComponents(), [n2, n3])
+        su1.replaceSpannedElement(n1, n2)
+        self.assertEqual(su1.getSpannedElements(), [n2, n3])
         # this note now has no spanner sites
         self.assertEqual(n1.getSpannerSites(), [])
         self.assertEqual(n2.getSpannerSites(), [su1])
 
         # replace n2 w/ n1
-        su1.replaceComponent(n2, n1)
-        self.assertEqual(su1.getComponents(), [n1, n3])
+        su1.replaceSpannedElement(n2, n1)
+        self.assertEqual(su1.getSpannedElements(), [n1, n3])
         self.assertEqual(n2.getSpannerSites(), [])
         self.assertEqual(n1.getSpannerSites(), [su1])
 
 
         su2 = spanner.Slur()
-        su2.addComponents([n3, n4])
+        su2.addSpannedElements([n3, n4])
 
         su3 = spanner.Slur()
-        su3.addComponents([n4, n5])
+        su3.addSpannedElements([n4, n5])
 
 
         #n1a = note.Note()
@@ -1762,19 +1789,19 @@ class Test(unittest.TestCase):
 
         # n3 is found in su1 and su2
 
-        sb1.replaceComponent(n3, n3a)
+        sb1.replaceSpannedElement(n3, n3a)
         self.assertEqual(len(sb1), 3)
         self.assertEqual(sb1.list, [su1, su2, su3])
 
-        self.assertEqual(sb1[0].getComponents(), [n1, n3a])
+        self.assertEqual(sb1[0].getSpannedElements(), [n1, n3a])
         # check su2
-        self.assertEqual(sb1[1].getComponents(), [n3a, n4])
+        self.assertEqual(sb1[1].getSpannedElements(), [n3a, n4])
 
-        sb1.replaceComponent(n4, n4a)
-        self.assertEqual(sb1[1].getComponents(), [n3a, n4a])
+        sb1.replaceSpannedElement(n4, n4a)
+        self.assertEqual(sb1[1].getSpannedElements(), [n3a, n4a])
 
         # check su3
-        self.assertEqual(sb1[2].getComponents(), [n4a, n5])
+        self.assertEqual(sb1[2].getSpannedElements(), [n4a, n5])
 
 
     def testRepeatBracketA(self):
@@ -1783,7 +1810,7 @@ class Test(unittest.TestCase):
         m1 = stream.Measure()
         rb1 = spanner.RepeatBracket(m1)
         # if added again; it is not really added, it simply is ignored
-        rb1.addComponents(m1)
+        rb1.addSpannedElements(m1)
         self.assertEqual(len(rb1), 1)
 
 
@@ -1842,7 +1869,7 @@ class Test(unittest.TestCase):
         m3.rightBarline = bar.Repeat(direction='end')
         p.append(m3)
         rb1 = spanner.RepeatBracket(number=1)
-        rb1.addComponents(m2, m3)
+        rb1.addSpannedElements(m2, m3)
         self.assertEqual(len(rb1), 2)
         p.insert(0, rb1)
         
@@ -1887,7 +1914,7 @@ class Test(unittest.TestCase):
         m3.rightBarline = bar.Repeat(direction='end')
         p.append(m3)
         rb1 = spanner.RepeatBracket(number=1)
-        rb1.addComponents(m2, m3)
+        rb1.addSpannedElements(m2, m3)
         self.assertEqual(len(rb1), 2)
         p.insert(0, rb1)
         
@@ -1901,7 +1928,7 @@ class Test(unittest.TestCase):
         p.append(m5)
         
         rb2 = spanner.RepeatBracket(number=2)
-        rb2.addComponents(m4, m5)
+        rb2.addSpannedElements(m4, m5)
         self.assertEqual(len(rb2), 2)
         p.insert(0, rb2)
         
@@ -1919,7 +1946,7 @@ class Test(unittest.TestCase):
         p.append(m8)
         
         rb3 = spanner.RepeatBracket(number=3)
-        rb3.addComponents(m6, m8)
+        rb3.addSpannedElements(m6, m8)
         self.assertEqual(len(rb3), 2)
         p.insert(0, rb3)
         
@@ -1942,7 +1969,7 @@ class Test(unittest.TestCase):
         p.append(m12)
         
         rb4 = spanner.RepeatBracket(number=4)
-        rb4.addComponents(m9, m10, m11, m12)
+        rb4.addSpannedElements(m9, m10, m11, m12)
         self.assertEqual(len(rb4), 4)
         p.insert(0, rb4)
         
@@ -2016,25 +2043,25 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p1.spanners), 3)
         m5 = p1.getElementsByClass('Measure')[-2]
         sp3 = p1.spanners[2]
-        self.assertEqual(sp3.hasComponent(m5), True)
+        self.assertEqual(sp3.hasSpannedElement(m5), True)
 #         for m in p1.getElementsByClass('Measure'):
 #             print m, id(m)
 #         for sp in p1.spanners:
-#             print sp, id(sp), [c for c in sp.getComponentIds()]
+#             print sp, id(sp), [c for c in sp.getSpannedElementIds()]
         #p1.show()
 
         p2 = copy.deepcopy(p1)
         self.assertEqual(len(p2.spanners), 3)
         m5 = p2.getElementsByClass('Measure')[-2]
         sp3 = p2.spanners[2]
-        self.assertEqual(sp3.hasComponent(m5), True)
+        self.assertEqual(sp3.hasSpannedElement(m5), True)
 
 
         p3 = copy.deepcopy(p2)
         self.assertEqual(len(p3.spanners), 3)
         m5 = p3.getElementsByClass('Measure')[-2]
         sp3 = p3.spanners[2]
-        self.assertEqual(sp3.hasComponent(m5), True)
+        self.assertEqual(sp3.hasSpannedElement(m5), True)
 
 
 
@@ -2253,11 +2280,54 @@ class Test(unittest.TestCase):
 
         n1 = note.Note()
         sp = spanner.Spanner()
-        sp.addComponents(n1)
+        sp.addSpannedElements(n1)
         sp.completeStatus = True
         self.assertEqual(sp.completeStatus, True)
         self.assertEqual(sp.isFirst(n1), True)
         self.assertEqual(sp.isLast(n1), True)
+
+    def testRemoveSpanners(self):
+        from music21 import stream
+        from music21 import note
+        
+        p = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m1.number = 1
+        m2.number = 2
+        n1 = note.WholeNote("C#4")
+        n2 = note.WholeNote("D#4")
+        m1.insert(0, n1)
+        m2.insert(0, n2)
+        p.append(m1)
+        p.append(m2)
+        sl = Slur([n1, n2])
+        p.insert(0, sl)
+        for x in p:
+            if "Spanner" in x.classes:
+                p.remove(x)
+        self.assertEqual(len(p.spanners), 0)
+
+    def testFreezeSpanners(self):
+        from music21 import stream
+        from music21 import note
+        from music21 import converter
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m2 = stream.Measure()
+        m1.number = 1
+        m2.number = 2
+        n1 = note.WholeNote("C#4")
+        n2 = note.WholeNote("D#4")
+        m1.insert(0, n1)
+        m2.insert(0, n2)
+        p.append(m1)
+        p.append(m2)
+        sl = Slur([n1, n2])
+        p.insert(0, sl)
+        unused_data = converter.freezeStr(p, fmt='pickle')
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

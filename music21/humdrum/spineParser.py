@@ -966,6 +966,8 @@ class HumdrumSpine(object):
                 else:
                     #streamOut.append(el)
                     streamOut._appendCore(el)
+        # update the most recent measure and the surrounding stream, then append the last
+        currentMeasure._elementsChanged()
         streamOut._elementsChanged()
         if len(currentMeasure) > 0:
             streamOut.append(currentMeasure)

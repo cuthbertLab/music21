@@ -5297,23 +5297,23 @@ class Test(unittest.TestCase):
         s1.append(n2)
         s1.insert(su1)
    
-        self.assertEqual(s1.notesAndRests[0] in s1.spanners[0].getComponents(), True)
-        self.assertEqual(s1.notesAndRests[-1] in s1.spanners[0].getComponents(), True)
+        self.assertEqual(s1.notesAndRests[0] in s1.spanners[0].getSpannedElements(), True)
+        self.assertEqual(s1.notesAndRests[-1] in s1.spanners[0].getSpannedElements(), True)
  
         s2 = copy.deepcopy(s1)
 
         # old relations are still valid
         self.assertEqual(len(s1.spanners), 1)
-        self.assertEqual(s1.notesAndRests[0] in s1.spanners[0].getComponents(), True)
-        self.assertEqual(s1.notesAndRests[-1] in s1.spanners[0].getComponents(), True)
+        self.assertEqual(s1.notesAndRests[0] in s1.spanners[0].getSpannedElements(), True)
+        self.assertEqual(s1.notesAndRests[-1] in s1.spanners[0].getSpannedElements(), True)
 
         # new relations exist in new stream.
         self.assertEqual(len(s2.spanners), 1)
-        self.assertEqual(s2.notesAndRests[0] in s2.spanners[0].getComponents(), True)
-        self.assertEqual(s2.notesAndRests[-1] in s2.spanners[0].getComponents(), True)
+        self.assertEqual(s2.notesAndRests[0] in s2.spanners[0].getSpannedElements(), True)
+        self.assertEqual(s2.notesAndRests[-1] in s2.spanners[0].getSpannedElements(), True)
 
 
-        self.assertEqual(s2.spanners[0].getComponents(), [s2.notesAndRests[0], s2.notesAndRests[-1]])
+        self.assertEqual(s2.spanners[0].getSpannedElements(), [s2.notesAndRests[0], s2.notesAndRests[-1]])
 
         unused_post = m21ToString.fromMusic21Object(s2)
         #s2.show('t')
@@ -5731,8 +5731,8 @@ class Test(unittest.TestCase):
         rbSpanners = post.getElementsByClass('RepeatBracket')
         self.assertEqual(len(rbSpanners), 2)
         #post.parts[0].show()
-        unused_firstComponentIds = [id(x) for x in rbSpanners[0].getComponents()]
-        unused_secondComponentIds = [id(x) for x in rbSpanners[1].getComponents()]
+        unused_firstSpannedElementIds = [id(x) for x in rbSpanners[0].getSpannedElements()]
+        unused_secondSpannedElementIds = [id(x) for x in rbSpanners[1].getSpannedElements()]
         #self.assertEqual()
         # TODO: compare ids of new measures
 

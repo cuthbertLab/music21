@@ -1027,7 +1027,7 @@ class Expander(object):
                 m = rb.getLast()
                 # check that they do not overlap: look at all components (starts
                 # and ends) and make sure that none have been found already
-                for m in rb.getComponents():
+                for m in rb.getSpannedElements():
                     if id(m) in spannedMeasureIds:
                         environLocal.printDebug(['found overlapping repeat brackets'])
                         return False
@@ -1296,13 +1296,13 @@ class Expander(object):
                 if id(rb) in repeatBracketsMemo:
                     #environLocal.printDebug(['skipping rb as in memo keys:', rb])   
                     break # do not need to look at components         
-                elif rb.hasComponent(mStart) or rb.hasComponent(mEnd):
+                elif rb.hasSpannedElement(mStart) or rb.hasSpannedElement(mEnd):
                     #environLocal.printDebug(['matched rb as component' ])
                     groupFocus = group
                     break
                 else:
                     pass
-                    #environLocal.printDebug(['rb does not have measure as component', 'rb', rb, 'mEnd', mEnd])
+                    #environLocal.printDebug(['rb does not have measure as a spanned element', 'rb', rb, 'mEnd', mEnd])
             if groupFocus is not None:
                 break
 
@@ -1590,7 +1590,7 @@ class Expander(object):
         # after copying, update repeat brackets (as spanners)
         for m in srcStream:
             # processes uses the spanner bundle stored on this Stream
-            self._repeatBrackets.spannerBundle.replaceComponent(
+            self._repeatBrackets.spannerBundle.replaceSpannedElement(
                 m._idLastDeepCopyOf, m)
 
         #srcStream = self._srcMeasureStream
@@ -3819,12 +3819,12 @@ class Test(unittest.TestCase):
         p.append([m1, m2, m3, m4, m5])
         rb1 = spanner.RepeatBracket([m2, m3], number=1)
         m3.rightBarline = bar.Repeat()
-        self.assertEqual(rb1.hasComponent(m2), True)
-        self.assertEqual(rb1.hasComponent(m3), True)
+        self.assertEqual(rb1.hasSpannedElement(m2), True)
+        self.assertEqual(rb1.hasSpannedElement(m3), True)
         p.append(rb1)
 
         rb2 = spanner.RepeatBracket(m4, number=2)
-        self.assertEqual(rb2.hasComponent(m4), True)
+        self.assertEqual(rb2.hasSpannedElement(m4), True)
         m4.rightBarline = bar.Repeat()
         p.append(rb2)
 
@@ -3867,12 +3867,12 @@ class Test(unittest.TestCase):
         p.append([m1, m2, m3, m4, m5])
         rb1 = spanner.RepeatBracket([m2, m3], number=1)
         m3.rightBarline = bar.Repeat()
-        self.assertEqual(rb1.hasComponent(m2), True)
-        self.assertEqual(rb1.hasComponent(m3), True)
+        self.assertEqual(rb1.hasSpannedElement(m2), True)
+        self.assertEqual(rb1.hasSpannedElement(m3), True)
         p.append(rb1)
 
         rb2 = spanner.RepeatBracket(m4, number=2)
-        self.assertEqual(rb2.hasComponent(m4), True)
+        self.assertEqual(rb2.hasSpannedElement(m4), True)
         m4.rightBarline = bar.Repeat()
         p.append(rb2)
 
@@ -3969,7 +3969,7 @@ class Test(unittest.TestCase):
         ex = Expander(p)
         self.assertEqual(ex._repeatBracketsAreCoherent(), False)
         # can fix overlap even after insertion
-#         rb2.replaceComponent(m3, m5)
+#         rb2.replaceSpannedElement(m3, m5)
 #         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
 
 

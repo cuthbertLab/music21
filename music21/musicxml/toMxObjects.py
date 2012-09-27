@@ -1400,8 +1400,8 @@ def chordToMx(c, spannerBundle=None):
         # this will get all spanners that participate with this note
         # get a new spanner bundle that only has components relevant to this 
         # note.
-        spannerBundle = spannerBundle.getByComponent(c)
-        #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle, n, id(n)])
+        spannerBundle = spannerBundle.getBySpannedElement(c)
+        #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by spannedElement:', spannerBundle, n, id(n)])
 
     #environLocal.printDebug(['chordToMx', c])
     mxNoteList = []
@@ -1577,16 +1577,19 @@ def noteToMxNotes(n, spannerBundle=None):
     >>> musicxmlHalf = musicxmlNoteList[0]
     >>> musicxmlHalf
     <note <pitch step=D alter=1 octave=5> duration=20160 <tie type=start> type=half <accidental charData=sharp> <notations <tied type=start>>> 
+
+
+    TODO: Test with spannerBundle != None
     '''
     #Attributes of notes are merged from different locations: first from the 
     #duration objects, then from the pitch objects. Finally, GeneralNote 
     #attributes are added.
     if spannerBundle is not None and len(spannerBundle) > 0:
         # this will get all spanners that participate with this note
-        # get a new spanner bundle that only has components relevant to this 
+        # get a new spanner bundle that only has spanned elements relevant to this 
         # note.
-        spannerBundle = spannerBundle.getByComponent(n)
-        #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle, n, id(n)])
+        spannerBundle = spannerBundle.getBySpannedElement(n)
+        #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by spannedElement:', spannerBundle, n, id(n)])
 
     mxNoteList = []
     pitchMx = pitchToMx(n.pitch)
@@ -1696,7 +1699,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     #environLocal.printDebug(['measureToMx(): m.isSorted:', m.isSorted, 'm._mutable', m._mutable, 'len(spannerBundle)', len(spannerBundle)])
     if spannerBundle is not None:
         # get all spanners that have this measure as a component    
-        rbSpanners = spannerBundle.getByComponentAndClass(m, 'RepeatBracket')
+        rbSpanners = spannerBundle.getBySpannedElementAndClass(m, 'RepeatBracket')
     else:
         rbSpanners = [] # for size comparison
 

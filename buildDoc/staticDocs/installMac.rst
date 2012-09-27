@@ -84,7 +84,9 @@ The first option is to install music21 in its standard location
 (see below, The Installation Destination). Enter "y" or "yes", or 
 press return to accept the default of "yes". 
 
-Before installation begins you may be asked for your Mac password. 
+Before installation begins you may be asked for your Mac password. (The cursor
+won't move or display any letters when you type in the password.  Just rest assured
+that the characters are being transmitted). 
 As Python packages are stored in a System directory, you need to give permission 
 to write files to that location.  
 

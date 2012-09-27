@@ -69,6 +69,8 @@ class StreamIterator(object):
     def __init__(self, srcStream):
         self.srcStream = srcStream
         self.index = 0
+        self.streamLength = len(self.srcStream)
+        self.srcStreamElements = self.srcStream.elements
 
     def __iter__(self):
         return self
@@ -76,13 +78,15 @@ class StreamIterator(object):
     def next(self):
         # calling .elements here will sort if autoSort = True
         # thus, this does not need to sort or check autoSort status
-        if self.index >= len(self.srcStream):
+        if self.index >= self.streamLength:
             del self.srcStream
+            del self.srcStreamElements
             raise StopIteration
-        # here, the .elements property concatenates both ._elements and 
-        # ._endElements; this may be a performance detriment
         #environLocal.printDebug(['self.srcStream', self.srcStream, self.index, 'len(self.srcStream)', len(self.srcStream), 'len(self._endElements)', len(self.srcStream._endElements), 'len(self.srcStream._elements)', len(self.srcStream._elements), 'len(self.srcStream.elements)', len(self.srcStream.elements)])
-        post = self.srcStream.elements[self.index]
+        try:
+            post = self.srcStreamElements[self.index]
+        except IndexError:
+            raise StreamException("Cannot get index %d from Stream %r, elements were %r" % (self.index, self.srcStream, self.srcStreamElements))
         # here, the activeSite of extracted element is being set to Stream
         # that is the source of the iteration
         post.activeSite = self.srcStream
@@ -268,7 +272,10 @@ class Stream(base.Music21Object):
 
     def __iter__(self):
         '''
-        The Stream iterator, used in all for loops and similar iteration routines. This method returns the specialized :class:`music21.stream.StreamIterator` class, which adds necessary Stream-specific features. 
+        The Stream iterator, used in all for 
+        loops and similar iteration routines. This method returns the 
+        specialized :class:`music21.stream.StreamIterator` class, which 
+        adds necessary Stream-specific features. 
         '''
         return StreamIterator(self)
 
@@ -915,12 +922,10 @@ class Stream(base.Music21Object):
         Remove an object from this Stream. Additionally, this Stream is 
         removed from the object's sites in :class:`~music21.base.Sites`.
 
-
         By default, only the first match is removed. This can be adjusted with the `firstMatchOnly` parameters.
         If a list of objects is passed, they will all be removed. If shiftOffsets is True, then offsets will be
         corrected after object removal. It is more efficient to pass a list of objects than to call remove on
         each object individually if shiftOffsets is True.
-
 
         >>> from music21 import *
         >>> s = stream.Stream()
@@ -1259,7 +1264,7 @@ class Stream(base.Music21Object):
                     #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
                     # this will clear and replace the proper locations on 
                     # the SpannerStorage Stream
-                    spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+                    spannerBundle.replaceSpannedElement(e._idLastDeepCopyOf, e)
                     # need to remove the old SpannerStorage Stream from this element; however, all we have here is the new Spanner and new elements
                     # this must be done here, not when originally copying
                     e.purgeOrphans(excludeStorageStreams=False)
@@ -3331,7 +3336,7 @@ class Stream(base.Music21Object):
 #                 mNew.mergeAttributes(m)
 #                 # replace any spanner associations with this measure
 #                 if len(spannerBundle) > 0:
-#                     spannerBundle.replaceComponent(m, mNew)
+#                     spannerBundle.replaceSpannedElement(m, mNew)
 #                 # active sites get mangled somewhere
 #                 m.restoreActiveSites()
 #                 # will only set on first time through
@@ -8283,7 +8288,7 @@ class Stream(base.Music21Object):
             for e in post.semiFlat:
                 # update based on last id, new object
                 if e.hasSpannerSite:
-                    spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+                    spannerBundle.replaceSpannedElement(e._idLastDeepCopyOf, e)
 
         return post
         
@@ -12088,7 +12093,7 @@ class Score(Stream):
         for e in post.semiFlat:
             # update based on last id, new object
             if e.hasSpannerSite():
-                spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+                spannerBundle.replaceSpannedElement(e._idLastDeepCopyOf, e)
         return post
         
 

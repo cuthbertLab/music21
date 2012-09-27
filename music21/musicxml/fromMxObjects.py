@@ -12,8 +12,8 @@
 '''
 Low-level conversion routines from MusicXML to music21.
 
-This module supposes that the musicxml document has already been parsed by xml.sax and
-is stored as a collection of mxObjects -- equivalent parsing methods could be created
+This module supposes that the musicxml document has already been parsed by xml.sax (by base.Document.read() )
+and is stored as a collection of mxObjects -- equivalent parsing methods could be created
 and fed into `mxScoreToScore` to make this work.
 '''
 import unittest
@@ -1160,8 +1160,8 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
             su.placement = mxObj.get('placement')
             spannerBundle.append(su)
         # add a reference of this note to this spanner
-        su.addComponents(target)
-        #environLocal.printDebug(['adding n', n, id(n), 'su.getComponents', su.getComponents(), su.getComponentIds()])
+        su.addSpannedElements(target)
+        #environLocal.printDebug(['adding n', n, id(n), 'su.getSpannedElements', su.getSpannedElements(), su.getSpannedElementIds()])
         if mxObj.get('type') == 'stop':
             su.completeStatus = True
             # only add after complete
@@ -1180,7 +1180,7 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
             su.placement = mxObj.get('placement')
             spannerBundle.append(su)
         # add a reference of this note to this spanner
-        su.addComponents(target)
+        su.addSpannedElements(target)
         if mxObj.get('type') == 'stop':
             su.completeStatus = True
             # only add after complete
@@ -1200,7 +1200,7 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
             #su.placement = mxObj.get('placement')
             spannerBundle.append(su)
         # add a reference of this note to this spanner
-        su.addComponents(target)
+        su.addSpannedElements(target)
         # can be stop or None; we can have empty single-element tremolo
         if mxObj.get('type') in ['stop', None]:
             su.completeStatus = True
@@ -1219,7 +1219,7 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
             su.lineType = mxObj.get('line-type')
             spannerBundle.append(su)
         # add a reference of this note to this spanner
-        su.addComponents(target)
+        su.addSpannedElements(target)
         if mxObj.get('type') == 'stop':
             su.completeStatus = True
             # only add after complete
@@ -1239,12 +1239,12 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
             spannerBundle.append(sp)
             # define this spanner as needing component assignment from
             # the next general note
-            spannerBundle.setPendingComponentAssignment(sp, 'GeneralNote')
+            spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
         elif mxType == 'diminuendo':
             sp = dynamics.Diminuendo()
             sp.idLocal = idFound
             spannerBundle.append(sp)
-            spannerBundle.setPendingComponentAssignment(sp, 'GeneralNote')
+            spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
         elif mxType == 'stop':
             # need to retrieve an existing spanner
             # try to get base class of both Crescendo and Decrescendo
@@ -1253,7 +1253,7 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
             sp.completeStatus = True
             # will only have a target if this follows the note
             if targetLast is not None:
-                sp.addComponents(targetLast)
+                sp.addSpannedElements(targetLast)
         else:
             raise FromMxObjectsException('unidentified mxType of mxWedge:', mxType)
 
@@ -1272,7 +1272,7 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
             spannerBundle.append(sp)
             # define this spanner as needing component assignment from
             # the next general note
-            spannerBundle.setPendingComponentAssignment(sp, 'GeneralNote')
+            spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
         elif mxType == 'stop':
             # need to retrieve an existing spanner
             # try to get base class of both Crescendo and Decrescendo
@@ -1286,7 +1286,7 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
 
             # will only have a target if this follows the note
             if targetLast is not None:
-                sp.addComponents(targetLast)
+                sp.addSpannedElements(targetLast)
         else:
             raise FromMxObjectsException('unidentified mxType of mxBracket:', mxType)
 
@@ -1304,7 +1304,7 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
             spannerBundle.append(sp)
             # define this spanner as needing component assignment from
             # the next general note
-            spannerBundle.setPendingComponentAssignment(sp, 'GeneralNote')
+            spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
         elif mxType == 'stop':
             # need to retrieve an existing spanner
             # try to get base class of both Crescendo and Decrescendo
@@ -1314,7 +1314,7 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
             sp.endTick = 'none'
             # will only have a target if this follows the note
             if targetLast is not None:
-                sp.addComponents(targetLast)
+                sp.addSpannedElements(targetLast)
         else:
             raise FromMxObjectsException('unidentified mxType of mxBracket:', mxType)
 
@@ -1500,7 +1500,7 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
         spannerBundle = spanner.SpannerBundle()
     else: # if we are passed in as spanner bundle, look for any pending
         # component assignments
-        spannerBundle.freePendingComponentAssignment(c)
+        spannerBundle.freePendingSpannedElementAssignment(c)
 
     # assume that first chord is the same duration for all parts
     mxToDuration(mxNoteList[0], c.duration)
@@ -1597,7 +1597,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         spannerBundle = spanner.SpannerBundle()
     else: # if we are passed in as spanner bundle, look for any pending
         # component assignments
-        spannerBundle.freePendingComponentAssignment(n)
+        spannerBundle.freePendingSpannedElementAssignment(n)
 
     # print object == 'no' and grace notes may have a type but not
     # a duration. they may be filtered out at the level of Stream 
@@ -1959,7 +1959,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     #environLocal.printDebug(['matching RepeatBracket spanner', 'len(rbSpanners)', len(rbSpanners)])
                     rb = rbSpanners[0] # get RepeatBracket
                     # try to add this measure; may be the same
-                    rb.addComponents(m)
+                    rb.addSpannedElements(m)
                     # in general, any rb found should be the opening, and thus
                     # this is the closing; can check
                     if mxEndingObj.get('type') in ['stop', 'discontinue']:
@@ -2488,7 +2488,7 @@ def mxToScore(mxScore, spannerBundle=None, inputM21=None):
         for partId in partGroup['scorePartIds']:
             # get music21 part from partIdDictionary
             try:
-                sg.addComponents(m21PartIdDictionary[partId])
+                sg.addSpannedElements(m21PartIdDictionary[partId])
             except KeyError as ke:
                 raise FromMxObjectsException("Cannot find part in m21PartIdDictionary: %s \n   Full Dict:\n   %r " % (ke, m21PartIdDictionary))
         # use configuration routine to transfer/set attributes;
@@ -3359,11 +3359,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(slurs), 4)
 
         n1, n2 = s.parts[0].flat.notes[3], s.parts[0].flat.notes[5]
-        #environLocal.printDebug(['n1', n1, 'id(n1)', id(n1), slurs[0].getComponentIds(), slurs[0].getComponents()])
-        self.assertEqual(id(n1) == slurs[0].getComponentIds()[0], True)
-        self.assertEqual(id(n2) == slurs[0].getComponentIds()[1], True)
+        #environLocal.printDebug(['n1', n1, 'id(n1)', id(n1), slurs[0].getSpannedElementIds(), slurs[0].getSpannedElementIds()])
+        self.assertEqual(id(n1) == slurs[0].getSpannedElementIds()[0], True)
+        self.assertEqual(id(n2) == slurs[0].getSpannedElementIds()[1], True)
 
-        #environLocal.printDebug(['n2', n2, 'id(n2)', id(n2), slurs[0].getComponentIds()])
+        #environLocal.printDebug(['n2', n2, 'id(n2)', id(n2), slurs[0].getSpannedElementIds()])
 
 
     def testImportWedgeA(self):

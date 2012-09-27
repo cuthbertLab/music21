@@ -30,7 +30,6 @@ from music21 import spanner
 
 from music21 import environment
 
-from sets import Set
 _MOD = 'serial.py'
 environLocal = environment.Environment(_MOD)
 
@@ -1260,7 +1259,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                                             added = False
                                             for j in range(lowerBound, upperBound + 1):
                                                 if added == False:   
-                                                    if len(Set(rowSuperset[j:j+length])) == length:
+                                                    if len(set(rowSuperset[j:j+length])) == length:
                                                         listOfContiguousSegments.append(contigObj)
                                                         added = True
                                         else:
@@ -1320,10 +1319,10 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                                 for i in range(0, len(pitchList)):
                                     if donechecking == False:
                                         activePitchList = pitchList[i:len(pitchList)]
-                                        if len(Set([p.pitchClass for p in activePitchList])) == length:
+                                        if len(set([p.pitchClass for p in activePitchList])) == length:
                                             listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, None))
 #uncomment this line to get shortest        #numnotestodelete = numnotestodelete + 1
-                                        elif len(Set([p.pitchClass for p in activePitchList])) > length:
+                                        elif len(set([p.pitchClass for p in activePitchList])) > length:
                                             numnotestodelete = numnotestodelete + 1
                                         else:
                                             donechecking = True
@@ -1341,9 +1340,9 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                                 if donechecking == False:
                                     activePitchList = pitchList[i:len(pitchList)]
                                     activeseg = ContiguousSegmentOfNotes(list(activePitchList), inputStream, None)
-                                    if len(Set(activeseg.readPitchClassesFromBottom())) >= length:
+                                    if len(set(activeseg.readPitchClassesFromBottom())) >= length:
                                         middleseg = ContiguousSegmentOfNotes(list(activePitchList[1:len(activePitchList)-1]), None, None)
-                                        middlePitchClassSet = Set(middleseg.readPitchClassesFromBottom())
+                                        middlePitchClassSet = set(middleseg.readPitchClassesFromBottom())
                                         setToCheck = middlePitchClassSet.union([activePitchList[0].pitches[-1].pitchClass]).union([activePitchList[-1].pitches[0].pitchClass])
                                         if len(setToCheck) <= length:
                                             listOfContiguousSegments.append(activeseg)
@@ -1452,7 +1451,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                                                 added = False
                                                 for j in range(lowerBound, upperBound + 1):
                                                     if added == False:   
-                                                        if len(Set(rowSuperset[j:j+length])) == length:
+                                                        if len(set(rowSuperset[j:j+length])) == length:
                                                             listOfContiguousSegments.append(contigObj)
                                                             added = True
                                             else:
@@ -1512,10 +1511,10 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                                     for i in range(0, len(pitchList)):
                                         if donechecking == False:
                                             activePitchList = pitchList[i:len(pitchList)]
-                                            if len(Set([p.pitchClass for p in activePitchList])) == length:
+                                            if len(set([p.pitchClass for p in activePitchList])) == length:
                                                 listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
 #uncomment this line to get shortest            #numnotestodelete = numnotestodelete + 1                                                
-                                            elif len(Set([p.pitchClass for p in activePitchList])) > length:
+                                            elif len(set([p.pitchClass for p in activePitchList])) > length:
                                                 numnotestodelete = numnotestodelete + 1
                                             else:
                                                 donechecking = True
@@ -1532,9 +1531,9 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                                     if donechecking == False:
                                         activePitchList = pitchList[i:len(pitchList)]
                                         activeseg = ContiguousSegmentOfNotes(list(activePitchList), inputStream, p)
-                                        if len(Set(activeseg.readPitchClassesFromBottom())) >= length:
+                                        if len(set(activeseg.readPitchClassesFromBottom())) >= length:
                                             middleseg = ContiguousSegmentOfNotes(list(activePitchList[1:len(activePitchList)-1]), None, None)
-                                            middlePitchClassSet = Set(middleseg.readPitchClassesFromBottom())
+                                            middlePitchClassSet = set(middleseg.readPitchClassesFromBottom())
                                             setToCheck = middlePitchClassSet.union([activePitchList[0].pitches[-1].pitchClass]).union([activePitchList[-1].pitches[0].pitchClass])
                                             if len(setToCheck) <= length:
                                                 listOfContiguousSegments.append(activeseg)
@@ -2380,7 +2379,7 @@ def _checkMultisetEquivalence(multiset1, multiset2):
         row2 = pcToToneRow(multiset2)
         multiset2 = row2.pitchClasses()
         
-        uniqueelements = Set(multiset1)
+        uniqueelements = set(multiset1)
         tempsame = True
         for i in uniqueelements:
             if tempsame == True:
@@ -2520,8 +2519,8 @@ def findMultisets(inputStream, searchList, reps = 'skipConsecutive', includeChor
                 if reps == 'ignoreAll':
                     segment = contiguousseg.segment
                     pitchList = contiguousseg.getDistinctPitchClasses()
-#                    if len(Set([p.pitchClass for p in segment[0].pitches]) & Set(multiset)) != 0:
-#                        if len(Set([p.pitchClass for p in segment[-1].pitches]) & Set(multiset)) != 0:
+#                    if len(set([p.pitchClass for p in segment[0].pitches]) and set(multiset)) != 0:
+#                        if len(set([p.pitchClass for p in segment[-1].pitches]) and set(multiset)) != 0:
                     matched = False
                     for i in range(0, len(pitchList) - len(multiset) + 1):
                         if matched == False:
@@ -2554,7 +2553,7 @@ def findMultisets(inputStream, searchList, reps = 'skipConsecutive', includeChor
                                                         listOfPitchClasses.append(lastChordPitches[k].pitchClass)
                                                     else:
                                                         doneAddingLast = True
-                                            if Set(listOfPitchClasses) == Set(multiset):
+                                            if set(listOfPitchClasses) == set(multiset):
                                                 matched = True
                                                 contiguousseg.activeSegment = subsetToCheck
                                                 contiguousseg.matchedSegment = multiset
@@ -2738,8 +2737,8 @@ def findTransposedMultisets(inputStream, searchList, reps = 'skipConsecutive', i
                     if reps == 'ignoreAll':
                         segment = contiguousseg.segment
                         pitchList = contiguousseg.getDistinctPitchClasses()
-    #                    if len(Set([p.pitchClass for p in segment[0].pitches]) & Set(multiset)) != 0:
-    #                        if len(Set([p.pitchClass for p in segment[-1].pitches]) & Set(multiset)) != 0:
+    #                    if len(set([p.pitchClass for p in segment[0].pitches]) and set(multiset)) != 0:
+    #                        if len(set([p.pitchClass for p in segment[-1].pitches]) and set(multiset)) != 0:
                         matched = False
                         for i in range(0, len(pitchList) - len(multiset) + 1):
                             if matched == False:
@@ -2772,7 +2771,7 @@ def findTransposedMultisets(inputStream, searchList, reps = 'skipConsecutive', i
                                                             listOfPitchClasses.append(lastChordPitches[k].pitchClass)
                                                         else:
                                                             doneAddingLast = True
-                                                if Set(listOfPitchClasses) == Set(multiset):
+                                                if set(listOfPitchClasses) == set(multiset):
                                                     matched = True
                                                     contiguousseg.activeSegment = subsetToCheck
                                                     contiguousseg.matchedSegment = baseMultiset
@@ -2929,8 +2928,8 @@ def findTransposedAndInvertedMultisets(inputStream, searchList, reps = 'skipCons
                     if reps == 'ignoreAll':
                         segment = contiguousseg.segment
                         pitchList = contiguousseg.getDistinctPitchClasses()
-    #                    if len(Set([p.pitchClass for p in segment[0].pitches]) & Set(multiset)) != 0:
-    #                        if len(Set([p.pitchClass for p in segment[-1].pitches]) & Set(multiset)) != 0:
+    #                    if len(set([p.pitchClass for p in segment[0].pitches]) and set(multiset)) != 0:
+    #                        if len(set([p.pitchClass for p in segment[-1].pitches]) and set(multiset)) != 0:
                         matched = False
                         for i in range(0, len(pitchList) - len(multiset) + 1):
                             if matched == False:
@@ -2963,7 +2962,7 @@ def findTransposedAndInvertedMultisets(inputStream, searchList, reps = 'skipCons
                                                             listOfPitchClasses.append(lastChordPitches[k].pitchClass)
                                                         else:
                                                             doneAddingLast = True
-                                                if Set(listOfPitchClasses) == Set(multiset):
+                                                if set(listOfPitchClasses) == set(multiset):
                                                     matched = True
                                                     contiguousseg.activeSegment = subsetToCheck
                                                     contiguousseg.matchedSegment = baseMultiset
@@ -3002,8 +3001,8 @@ def findTransposedAndInvertedMultisets(inputStream, searchList, reps = 'skipCons
                     if reps == 'ignoreAll':
                         segment = contiguousseg.segment
                         pitchList = contiguousseg.getDistinctPitchClasses()
-    #                    if len(Set([p.pitchClass for p in segment[0].pitches]) & Set(multiset)) != 0:
-    #                        if len(Set([p.pitchClass for p in segment[-1].pitches]) & Set(multiset)) != 0:
+    #                    if len(set([p.pitchClass for p in segment[0].pitches]) and set(multiset)) != 0:
+    #                        if len(set([p.pitchClass for p in segment[-1].pitches]) and set(multiset)) != 0:
                         matched = False
                         for i in range(0, len(pitchList) - len(multiset) + 1):
                             if matched == False:
@@ -3036,7 +3035,7 @@ def findTransposedAndInvertedMultisets(inputStream, searchList, reps = 'skipCons
                                                             listOfPitchClasses.append(lastChordPitches[k].pitchClass)
                                                         else:
                                                             doneAddingLast = True
-                                                if Set(listOfPitchClasses) == Set(multiset):
+                                                if set(listOfPitchClasses) == set(multiset):
                                                     matched = True
                                                     contiguousseg.activeSegment = subsetToCheck
                                                     contiguousseg.matchedSegment = baseMultiset

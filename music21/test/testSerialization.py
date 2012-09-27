@@ -104,8 +104,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.notes), 2)
         self.assertEqual(str(post.notes[0].pitch), 'D2')
         spPost = post.spanners[0]
-        self.assertEqual(spPost.getComponents(), [post.notes[0], post.notes[1]])
-        self.assertEqual(spPost.getComponentIds(), [id(post.notes[0]), id(post.notes[1])])
+        self.assertEqual(spPost.getSpannedElements(), [post.notes[0], post.notes[1]])
+        self.assertEqual(spPost.getSpannedElementIds(), [id(post.notes[0]), id(post.notes[1])])
 
 
     def testBasicE(self):
@@ -132,7 +132,6 @@ class Test(unittest.TestCase):
         s.append(spanner.Slur(s.notes[0], s.notes[-1]))
         
         # file writing
-        #converter.freeze(s, fmt='jsonpickle', fp='/_scratch/test.json')
         #converter.freeze(s, fmt='pickle', fp='/_scratch/test.p')
     
         data = converter.freezeStr(s, fmt='pickle')
@@ -140,35 +139,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.notes), 5)
         #sPost.show()
 
-    def xtestJsonPickle(self):
-        # jsonpickle doesnt work
-        from music21 import stream, note, converter, spanner
-        
-        s = stream.Score()
-        s.repeatAppend(note.Note('G4'), 5)
-        for i, syl in enumerate(['se-', 'ri-', 'al-', 'iz-', 'ing']):
-            s.notes[i].addLyric(syl)
-        s.append(spanner.Slur(s.notes[0], s.notes[-1]))
-            
-        data = converter.freezeStr(s, fmt='jsonpickle')
-        #print data
-        sPost = converter.thawStr(data)
-        self.assertEqual(len(sPost.notes), 5)
-        #sPost.show()
-
-
-    def xtestJsonPickle2(self):
-        from music21 import corpus, converter
-        s = corpus.parse('bwv66.6')
-
-        temp = converter.freezeStr(s, fmt='jsonpickle')        
-        sPost = converter.thawStr(temp)
-        #sPost.show()
-        self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
-
-        self.assertEqual(len(s.parts[0].notes), len(sPost.parts[0].notes))
-
-        #sPost.show()
 
     def testBasicJ(self):
         from music21 import stream, note, converter
@@ -222,13 +192,41 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.flat.notes), 24)
 
 
+    def testSpannerSerializationOfNotesNotInPickle(self):
+        '''
+        test to see if spanners serialize properly if they
+        contain notes not in the pickle...
+        '''
+        from music21 import stream, spanner, converter
+        from music21 import note
+        n1 = note.Note("D4")
+        n2 = note.Note("E4")
+        n3 = note.Note("F4")
+        slur1 = spanner.Slur([n1, n2])
+        s = stream.Part()
+        s.insert(0, n3)
+        s.insert(0, slur1)
+        data = converter.freezeStr(s, fmt='pickle')
+
+        unused_s2 = converter.thawStr(data)
+        #s2.show('text')
 
 
-    def testBasicK(self):
-        # fails because of weakref
+    def testBigCorpus(self):
         from music21 import corpus, converter
-        s = corpus.parse('beethoven/opus133').parts[0]
-        unused_data = converter.freezeStr(s, fmt='pickle')
+        #import time
+        #print time.time()  # 8.3 sec from pickle; 10.3 sec for forceSource...
+        s = corpus.parse('beethoven/opus133') #, forceSource = True)
+        #print time.time()  # purePython: 33! sec; cPickle: 25 sec
+        #data = converter.freezeStr(s, fmt='pickle')
+        #print time.time()  # cPickle: 5.5 sec!
+        sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
+        data = sf.writeStr()
+                
+        #print time.time() # purePython: 9 sec; cPickle: 3.8 sec!
+        unused_s2 = converter.thawStr(data)
+        #print time.time()
+#        s2.show()
 
 
 

@@ -1794,7 +1794,7 @@ class Variant(base.Music21Object):
                 newValue = copy.deepcopy(part, memo)
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
-            # do not deepcopy _components, as this will copy the 
+            # do not deepcopy _stream, as this will copy the 
             # contained objects
             # this means that the new object is not really free of the 
             # old elements it described
@@ -1891,21 +1891,14 @@ class Variant(base.Music21Object):
 
 
     def replaceElement(self, old, new):
-        '''When copying a Variant, we need to update the Variant with new references for copied elements. Given the old component, this method will replace the old with the new.
+        '''
+        When copying a Variant, we need to update the Variant with new 
+        references for copied elements. Given the old element, 
+        this method will replace the old with the new.
 
         The `old` parameter can be either an object or object id. 
 
-        This method is very similar to the replaceComponent method on Spanner. 
-
-        >>> from music21 import *
-        >>> n1 = note.Note('g')
-        >>> n2 = note.Note('f#')
-        >>> c1 = clef.AltoClef()
-        >>> c2 = clef.BassClef()
-        >>> sl = spanner.Spanner(n1, n2, c1)
-        >>> sl.replaceComponent(c1, c2)
-        >>> sl[-1] == c2
-        True
+        This method is very similar to the replaceSpannedElement method on Spanner. 
         '''
         if old is None:
             return None # do nothing

@@ -309,17 +309,17 @@ class Sites(object):
         ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aContexts = base.Sites()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> common.isWeakref(aContexts.get()[0]) # unwrapping happens 
+        >>> aSites = base.Sites()
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> common.isWeakref(aSites.get()[0]) # unwrapping happens 
         False
-        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+        >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
         True
-        >>> aContexts.unwrapWeakref()
-        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+        >>> aSites.unwrapWeakref()
+        >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
         False
-        >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
+        >>> common.isWeakref(aSites._definedContexts[id(bObj)]['obj'])
         False
         '''
         if purgeLocations is True:
@@ -351,14 +351,14 @@ class Sites(object):
         ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aContexts = base.Sites()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.unwrapWeakref()
-        >>> aContexts.wrapWeakref()
-        >>> common.isWeakref(aContexts._definedContexts[id(aObj)]['obj'])
+        >>> aSites = base.Sites()
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> aSites.unwrapWeakref()
+        >>> aSites.wrapWeakref()
+        >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
         True
-        >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
+        >>> common.isWeakref(aSites._definedContexts[id(bObj)]['obj'])
         True
         '''
         for idKey in self._definedContexts:
@@ -461,22 +461,22 @@ class Sites(object):
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cSite = Mock()
-        >>> aContexts = base.Sites()
-        >>> aContexts.add(aSite, 23)
-        >>> len(aContexts)
+        >>> aSites = base.Sites()
+        >>> aSites.add(aSite, 23)
+        >>> len(aSites)
         1
-        >>> aContexts.add(bSite, 233)
-        >>> len(aContexts)
+        >>> aSites.add(bSite, 233)
+        >>> len(aSites)
         2
-        >>> aContexts.add(cSite, 232223)
-        >>> len(aContexts)
+        >>> aSites.add(cSite, 232223)
+        >>> len(aSites)
         3
-        >>> aContexts.remove(aSite)
-        >>> len(aContexts)
+        >>> aSites.remove(aSite)
+        >>> len(aSites)
         2
 
         OMIT_FROM_DOCS
-        >>> len(aContexts._locationKeys)
+        >>> len(aSites._locationKeys)
         2
 
         '''
@@ -501,7 +501,7 @@ class Sites(object):
 
     def removeById(self, idKey):
         '''
-        Remove a defined contexts entry by id key, 
+        Remove a site entry by id key, 
         which is id() of the object. 
         '''
         # must clear if removing
@@ -541,12 +541,12 @@ class Sites(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
-        >>> aContexts = music21.Sites()
-        >>> aContexts.add(cObj, 345)
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> k = aContexts._keysByTime()
-        >>> aContexts._definedContexts[k[0]]['time'] > aContexts._definedContexts[k[1]]['time'] > aContexts._definedContexts[k[2]]['time']
+        >>> aSites = music21.Sites()
+        >>> aSites.add(cObj, 345)
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> k = aSites._keysByTime()
+        >>> aSites._definedContexts[k[0]]['time'] > aSites._definedContexts[k[1]]['time'] > aSites._definedContexts[k[2]]['time']
         True
         '''
         post = []
@@ -577,15 +577,15 @@ class Sites(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
-        >>> aContexts = music21.Sites()
-        >>> aContexts.add(cObj, 345) # a locations
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.get() == [cObj, aObj, bObj]
+        >>> aSites = music21.Sites()
+        >>> aSites.add(cObj, 345) # a locations
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> aSites.get() == [cObj, aObj, bObj]
         True
-        >>> aContexts.get(locationsTrail=True) == [aObj, bObj, cObj]
+        >>> aSites.get(locationsTrail=True) == [aObj, bObj, cObj]
         True
-        >>> aContexts.get(sortByCreationTime=True) == [bObj, aObj, cObj]
+        >>> aSites.get(sortByCreationTime=True) == [bObj, aObj, cObj]
         True
         '''
         if sortByCreationTime in [True, 1]:
@@ -652,12 +652,12 @@ class Sites(object):
         ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aContexts = music21.Sites()
-        >>> aContexts.add(aObj, 234)
-        >>> aContexts.add(bObj, 3000)
-        >>> len(aContexts._locationKeys) == 2
+        >>> aSites = music21.Sites()
+        >>> aSites.add(aObj, 234)
+        >>> aSites.add(bObj, 3000)
+        >>> len(aSites._locationKeys) == 2
         True
-        >>> len(aContexts.getSites()) == 2
+        >>> len(aSites.getSites()) == 2
         True
         '''
 #         if idExclude is None:
@@ -702,13 +702,13 @@ class Sites(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = stream.Stream()
-        >>> aContexts = music21.Sites()
-        >>> aContexts.add(aObj, 234)
-        >>> aContexts.add(bObj, 3000)
-        >>> aContexts.add(cObj, 200)
-        >>> aContexts.getSitesByClass(Mock) == [aObj, bObj]
+        >>> aSites = music21.Sites()
+        >>> aSites.add(aObj, 234)
+        >>> aSites.add(bObj, 3000)
+        >>> aSites.add(cObj, 200)
+        >>> aSites.getSitesByClass(Mock) == [aObj, bObj]
         True
-        >>> aContexts.getSitesByClass('Stream') == [cObj]
+        >>> aSites.getSitesByClass('Stream') == [cObj]
         True
         '''
         found = []
@@ -1190,14 +1190,14 @@ class Sites(object):
         >>> import time
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aContexts = music21.Sites()
-        >>> aContexts.add(aObj)
+        >>> aSites = music21.Sites()
+        >>> aSites.add(aObj)
         >>> #time.sleep(.05)
-        >>> aContexts.add(bObj)
+        >>> aSites.add(bObj)
         >>> # we get the most recently added object first
-        >>> aContexts.getByClass('Mock', sortByCreationTime=True) == bObj
+        >>> aSites.getByClass('Mock', sortByCreationTime=True) == bObj
         True
-        >>> aContexts.getByClass(Mock, sortByCreationTime=True) == bObj
+        >>> aSites.getByClass(Mock, sortByCreationTime=True) == bObj
         True
 
         OMIT_FROM_DOCS
@@ -1350,15 +1350,15 @@ class Sites(object):
         >>> aObj.attr1 = 234
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aContexts = music21.Sites()
-        >>> aContexts.add(aObj)
-        >>> len(aContexts)
+        >>> aSites = music21.Sites()
+        >>> aSites.add(aObj)
+        >>> len(aSites)
         1
-        >>> aContexts.getAttrByName('attr1') == 234
+        >>> aSites.getAttrByName('attr1') == 234
         True
-        >>> aContexts.removeById(id(aObj))
-        >>> aContexts.add(bObj)
-        >>> aContexts.getAttrByName('attr1') == 98
+        >>> aSites.removeById(id(aObj))
+        >>> aSites.add(bObj)
+        >>> aSites.getAttrByName('attr1') == 98
         True
         '''
         post = None
@@ -1381,11 +1381,11 @@ class Sites(object):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aContexts = music21.Sites()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.setAttrByName('attr1', 'test')
-        >>> aContexts.getAttrByName('attr1') == 'test'
+        >>> aSites = music21.Sites()
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> aSites.setAttrByName('attr1', 'test')
+        >>> aSites.getAttrByName('attr1') == 'test'
         True
         '''
         #post = None
@@ -3002,7 +3002,7 @@ class Music21Object(object):
         '''
         Public interface to operation on Sites.
 
-        NOTE: Any Music21Object subclass that contains private Streams (like Spanner and Variant) must override theses methods
+        NOTE: Any Music21Object subclass that contains private Streams (like Spanner and Variant) must override these methods
 
         >>> import music21
         >>> aM21Obj = music21.Music21Object()

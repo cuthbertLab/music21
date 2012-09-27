@@ -112,7 +112,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         spannerBundle.append(rb)
                     else: # close it here
                         rb = rbSpanners[0] # get RepeatBracket
-                        rb.addComponents(dst)
+                        rb.addSpannedElements(dst)
                         rb.completeStatus = True
                         # this returns 1 or 2 depending on the repeat
                     # in ABC, second repeats close immediately; that is
@@ -135,7 +135,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                                 'RepeatBracket', False)
                     if len(rbSpanners) > 0:
                         rb = rbSpanners[0] # get RepeatBracket
-                        rb.addComponents(dst)
+                        rb.addSpannedElements(dst)
                         rb.completeStatus = True
                         # this returns 1 or 2 depending on the repeat
                         # do not need to append; already in bundle

@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 # Name:         freezeThaw.py
 # Purpose:      Methods for storing any music21 object on disk.  
-#               Uses pickle and jsonpickle
+#               Uses pickle and json
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
@@ -42,43 +42,46 @@ other languages.  (see http://docs.python.org/library/json.html).
 
 Both JSON and Pickle files can
 be huge, but `freezeThaw` can compress them with `gzip` or `ZipFile` and thus they're
-not that large at all. Our implementation of JSON serialization uses the freely distributable `jsonpickle`
+not that large at all. 
+
+
+
+We thought about implementating JSON serialization using the freely distributable `jsonpickle`
 module found in `music21.ext.jsonpickle`.  See that folder's "license.txt" for
 copyright information.
 
-.. warning: 
-    Current versions of jsonpickle do not recreate the same
-    object structures when decoded, so it can't really be used
-    with complex nesting structures like music21 creates.  For instance:
+However, current versions of jsonpickle do not recreate the same
+object structures when decoded, so it can't really be used
+with complex nesting structures like music21 creates.  For instance:
 
-    >>> from music21.ext import jsonpickle as jsp
-    >>> blah = {'hello': 'there'}
-    >>> l = [blah, blah]
-    >>> l[0] is l[1]
-    True
-    >>> d = jsp.encode(l)
-    >>> print d
-    [{"hello": "there"}, {"hello": "there"}]
-    >>> e = jsp.decode(d)
-    >>> e
-    [{u'hello': u'there'}, {u'hello': u'there'}]
-    >>> e[0] is e[1]
-    False
+>>> from music21.ext import jsonpickle as jsp
+>>> blah = {'hello': 'there'}
+>>> l = [blah, blah]
+>>> l[0] is l[1]
+True
+>>> d = jsp.encode(l)
+>>> print d
+[{"hello": "there"}, {"hello": "there"}]
+>>> e = jsp.decode(d)
+>>> e
+[{u'hello': u'there'}, {u'hello': u'there'}]
+>>> e[0] is e[1]
+False
     
-    However, pickle works fine, so we use that by default:
+However, pickle works fine, so we use that by default:
     
-    >>> import pickle
-    >>> f = pickle.dumps(l)
-    >>> f
-    "(lp0\n(dp1\nS'hello'\np2\nS'there'\np3\nsag1\na."
-    
-    Pretty ugly, eh? but it works!
-    
-    >>> g = pickle.loads(f)
-    >>> g
-    [{'hello': 'there'}, {'hello': 'there'}]
-    >>> g[0] is g[1]
-    True
+>>> import pickle
+>>> f = pickle.dumps(l)
+>>> f
+"(lp0\n(dp1\nS'hello'\np2\nS'there'\np3\nsag1\na."
+
+Pretty ugly, eh? but it works!
+
+>>> g = pickle.loads(f)
+>>> g
+[{'hello': 'there'}, {'hello': 'there'}]
+>>> g[0] is g[1]
+True
 
 The name freezeThaw comes from Perl's implementation of similar methods -- I
 like the idea of thawing something that's frozen; "unpickling" just doesn't
@@ -104,11 +107,11 @@ _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
 
-#try:
-#    import cPickle as pickleMod
-#except ImportError:
-#    import pickle as pickleMod
-import pickle as pickleMod
+try:
+    import cPickle as pickleMod
+except ImportError:
+    import pickle as pickleMod
+#import pickle as pickleMod
 
 #-------------------------------------------------------------------------------
 class FreezeThawException(exceptions21.Music21Exception):
@@ -123,214 +126,21 @@ class StreamFreezeThawBase(object):
     def __init__(self):
         self.stream = None
     
-    def teardownSerializationScaffold(self, streamObj = None):
-        '''
-        After rebuilding this Stream from pickled storage, prepare this as a normal `Stream`.
-
-        Calls `wrapWeakRef` and `unFreezeIds` for the `Stream` and each sub-`Stream`.
-
-        If streamObj is None, runs it on the embedded stream
-
-        >>> from music21 import freezeThaw
-        >>> from music21 import *
-        
-        >>> a = stream.Stream()
-        >>> n = note.Note()
-        >>> n.duration.type = "whole"
-        >>> a.repeatAppend(n, 10)
-        >>> sf = freezeThaw.StreamFreezer(a)
-        >>> sf.setupSerializationScaffold()
-
-        >>> st = freezeThaw.StreamThawer()
-        >>> st.teardownSerializationScaffold(a)
-        '''
-
-        if streamObj is None:
-            streamObj = self.stream
-            if streamObj is None:
-                raise FreezeThawException("You need to pass in a stream when creating to work")
-        #environLocal.printDebug(['calling teardownSerializationScaffold', self])
-
-        # turn off sorting before teardown
-        # should save for all. but we don't...
-        storedAutoSort = streamObj.autoSort
-        streamObj.autoSort = False
-
-        allEls = self.findAllM21Objects(streamObj)
-
-        for e in allEls:
-            if e.isVariant:
-#                # works like a whole new hierarchy... # no need for deepcopy
-#                print "TESST"
-#                for el in e._stream.flat:
-#                    print el.offset
-#                for el in e._stream._elements[0]._storedElementOffsets:
-#                    print el, e._stream._elements[0]._storedElementOffsets[el]
-                subSF = StreamThawer()
-                subSF.teardownSerializationScaffold(e._stream)
-                e._stream._elementsChanged()
-                e._cache = {}
-                #for el in e._stream.flat:
-                #    print el, el.offset, el.sites._definedContexts
-                    
-
-            self.thawIds(e)
-            e.wrapWeakref()
-
-        # restore to whatever it was
-        streamObj.autoSort = storedAutoSort
-        streamObj._elementsChanged()
-        containedStreams = streamObj.recurse(streamsOnly = True)
-        for s in containedStreams:
-            if hasattr(s, '_storedElementOffsets'):
-                for e in s._elements:
-                    if hasattr(e, "_preFreezeId"):
-                        if e._preFreezeId in s._storedElementOffsets:
-                            storedOffset = s._storedElementOffsets[e._preFreezeId]
-                            e.setOffsetBySite(s, storedOffset)
-                        del(e._preFreezeId)
-                del(s._storedElementOffsets)
-            s._elementsChanged()
-
-    def thawIds(self, e):
-        '''
-        Restore keys to be the id() of the object they contain
-
-        Does not do much, but calls thawContextIds on e.definedContexts
-        which does a lot!
-
-        TODO: Test Spanner
-
-        >>> from music21 import freezeThaw
-        >>> import music21
-
-        >>> aM21Obj = music21.Music21Object()
-        >>> bM21Obj = music21.Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0
-        >>> bM21Obj.addLocation(aM21Obj, 50)   
-        >>> bM21Obj.activeSite = aM21Obj
-        >>> bM21Obj.activeSite != None
-        True
-        
-        >>> oldActiveSiteId = bM21Obj._activeSiteId
-        
-        >>> sf = freezeThaw.StreamFreezer()
-        >>> sf.freezeIds(bM21Obj)
-
-        >>> newActiveSiteId = bM21Obj._activeSiteId
-        >>> oldActiveSiteId == newActiveSiteId
-        False
-
-        >>> st = freezeThaw.StreamThawer()
-        >>> st.thawIds(bM21Obj)
-        >>> postActiveSiteId = bM21Obj._activeSiteId
-        >>> oldActiveSiteId == postActiveSiteId
-        True
-        '''
-        #environLocal.printDebug(['unfreezing ids', self])
-        self.thawContextIds(e.sites)
-
-        # restore containedById
-        e.sites.containedById = id(e)
-
-        # assuming should be called before wrapping weakrefs
-        if e._activeSite is not None:
-            # this should not be necessary
-            obj = common.unwrapWeakref(e._activeSite)
-            e._activeSiteId = id(obj)
-
-        try:
-            if e.isSpanner:
-                self.thawIds(e._components)
-            #elif e.isVariant:
-            #    self.thawIds(e._stream)
-        except AttributeError:
-            pass # not having isSpanner or isVariant defined
-                    # isn't enough to throw an exception for.
-
     def findAllM21Objects(self, streamObj):
-        allEls = streamObj.recurse()
-        for el in allEls:
-            if hasattr(el, 'rightBarline') and el.rightBarline is not None:
-                allEls.append(el.rightBarline)
-            if hasattr(el, 'leftBarline') and el.leftBarline is not None:
-                allEls.append(el.leftBarline)
-            #if hasattr(el, '_stream') and el._stream is not None and el._stream.isStream is True:
-            #    # maybe don't? Variant
-            #    newEls = self.findAllM21Objects(el._stream)
-            #    allEls.extend(newEls)
-#            if hasattr(el, '_components') and el._components is not None and el._components.isStream is True:
-#                allEls.append(self.findAllM21Objects(el._components))
-        return allEls
-
-
-    def thawContextIds(self, contexts):
         '''
-        Restore keys to be the id() of the object they contain.
-
-        >>> from music21 import freezeThaw
-        >>> from music21 import *
-        
-        >>> class Mock(base.Music21Object): 
-        ...     pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> cObj = Mock()
-        >>> aContexts = base.Sites()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.add(cObj, 200) # a location
-
-        >>> oldKeys = aContexts._definedContexts.keys()
-        >>> oldLocations = aContexts._locationKeys[:]
-
-        >>> sf = freezeThaw.StreamFreezer()
-        >>> sf.freezeContextIds(aContexts)
-
-        >>> newKeys = aContexts._definedContexts.keys()
-        >>> oldKeys == newKeys
-        False
-
-        >>> st = freezeThaw.StreamThawer()
-        >>> st.thawContextIds(aContexts)
-        >>> postKeys = aContexts._definedContexts.keys()
-
-        Notice that order is not retained!
-
-        >>> postKeys == newKeys
-        False
-
-        But sorting returns the original 
-        
-        >>> sorted(postKeys) == sorted(oldKeys) 
-        True
-        >>> oldLocations == aContexts._locationKeys
-        True
+        find all M21 Objects in _elements and _endElements and in nested streams.
         '''
-        #environLocal.printDebug(['defined context entering unfreeze ids', self.sites])
-
-        # for encoding to serial, this should be done after weakref unwrapping     
-        # for decoding to serial, this should be done before weakref wrapping
-
-        post = {}
-        postLocationKeys = []
-        for idKey in contexts._definedContexts:
-            # check if unwrapped, unwrap
-            obj = common.unwrapWeakref(contexts._definedContexts[idKey]['obj'])
-            if obj is not None:
-                newKey = id(obj)
-            else:
-                newKey = None
-            #environLocal.printDebug(['unfreezing key:', idKey, newKey])
-            if idKey in contexts._locationKeys:
-                postLocationKeys.append(newKey)
-            post[newKey] = contexts._definedContexts[idKey]
-        contexts._definedContexts = post
-        contexts._locationKeys = postLocationKeys
-
-
+        allObjs = []
+        for x in streamObj._elements:
+            allObjs.append(x)
+            if x.isStream:
+                allObjs.extend(self.findAllM21Objects(x))
+        for x in streamObj._endElements:
+            allObjs.append(x)
+            if x.isStream:
+                allObjs.extend(self.findAllM21Objects(x))
+        return allObjs
+    
 
 #-------------------------------------------------------------------------------
 class StreamFreezer(StreamFreezeThawBase):
@@ -377,9 +187,13 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> len(s.parts[0].measure(7).notes) == 6
     True
     '''
-    def __init__(self, streamObj=None, fastButUnsafe=False):
+    def __init__(self, streamObj=None, fastButUnsafe=False, topLevel = True, streamIds = None):
         # must make a deepcopy, as we will be altering Sites
         self.stream = None
+        # clear all sites only if the top level.
+        self.topLevel = topLevel
+        self.streamIds = streamIds
+        
         if streamObj is not None and fastButUnsafe is False:
             # deepcopy necessary because we mangle sites in the objects
             # before serialization
@@ -395,14 +209,6 @@ class StreamFreezer(StreamFreezeThawBase):
         streamStr = str(time.time())
         return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.p')
 
-    def getJsonFp(self, directory):
-        if directory == None:
-            raise ValueError
-        # cannot get data from stream, as offsets are broken
-        streamStr = str(time.time())
-        return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.json')
-
-
     def packStream(self, streamObj = None):
         '''
         Prepare the passed in Stream in place, return storage 
@@ -415,19 +221,172 @@ class StreamFreezer(StreamFreezeThawBase):
             streamObj = self.stream
         self.setupSerializationScaffold(streamObj)
         storage = {'stream': streamObj, 'm21Version': base.VERSION}
-        return storage
-
-    def teardownStream(self, streamObj = None):
+        return storage    
+    
+    def setupSerializationScaffold(self, streamObj = None):
         '''
-        Call this after setting packing and writing
+        Prepare this stream and all of its contents for pickle/pickling, that
+        is, serializing and storing an object representation on file or as a string.
 
-        Redundant with teardownSerializationScaffold?
+        The `topLevel` and `streamIdsFound` arguments are used to keep track of recursive calls. 
+
+        Note that this is a destructive process: elements contained within this Stream 
+        will have their sites cleared of all contents not in the hierarchy 
+        of the Streams. Thus, when doing a normal .write('pickle')
+        the Stream is deepcopied.  `fastButUnsafe = True` ignores the destructive
+        parts of this.
+        
+        Calls `purgeUndeclaredIds`, `unwrapWeakref`, and `freezeIds` the stream
+        and each substream.
+
+        >>> from music21 import freezeThaw
+        >>> from music21 import *
+
+        >>> a = stream.Stream()
+        >>> n = note.Note()
+        >>> n.duration.type = "whole"
+        >>> a.repeatAppend(n, 10)
+        >>> sf = freezeThaw.StreamFreezer(a)
+        >>> sf.setupSerializationScaffold()
         '''
         if streamObj is None:
             streamObj = self.stream
-        self.teardownSerializationScaffold(streamObj)
-    
-    def findActiveStreamIdsInHierarchy(self, hierarchyObject = None, getSpanners=True):
+            if streamObj is None:
+                raise FreezeThawException("You need to pass in a stream when creating to work")
+        allEls = streamObj.recurse(restoreActiveSites = False)
+        if self.topLevel is True:
+            self.findActiveStreamIdsInHierarchy(streamObj)
+        
+        for el in allEls:
+            if el.isVariant:
+                # works like a whole new hierarchy... # no need for deepcopy
+                subSF = StreamFreezer(el._stream, fastButUnsafe=True, streamIds = self.streamIds, topLevel = False)
+                subSF.setupSerializationScaffold()
+            elif el.isSpanner:
+                # works like a whole new hierarchy... # no need for deepcopy
+                subSF = StreamFreezer(el.spannedElements, fastButUnsafe=True, streamIds = self.streamIds, topLevel = False)
+                subSF.setupSerializationScaffold()
+
+        self.setupStoredElementOffsetTuples(streamObj)
+        
+
+        if self.topLevel is True:
+            self.recursiveClearSites(streamObj)
+#        for el in allEls:
+#            if self.topLevel is True:
+#                # all done, clear 'dem sites! we don't need them at all
+#                el.sites.clear()
+#            else: # only clear those not in hierarchy, but unwrap all remaining...
+#                elSiteIds = el.sites.getSiteIds()
+#                for thisSiteId in elSiteIds:
+#                    if thisSiteId is None:
+#                        continue
+#                    if thisSiteId not in self.streamIds:
+#                        el.sites.removeById(thisSiteId)           
+#            el.unwrapWeakref()
+#            el._activeSite = None
+                
+    def recursiveClearSites(self, startObj):
+        '''
+        recursively clear all sites, including activeSites, taking into account
+        that spanners and variants behave differently
+
+        To be run after setupStoredElementOffsetTuples() has been run
+        '''
+        if hasattr(startObj, '_storedElementOffsetTuples'):
+            seot = startObj._storedElementOffsetTuples
+            for el, unused_offset in seot:
+                if el.isStream:
+                    self.recursiveClearSites(el)
+                if el.isSpanner:
+                    self.recursiveClearSites(el.spannedElements)
+                if el.isVariant:
+                    self.recursiveClearSites(el._stream)
+                if hasattr(el, '_derivation'):
+                    el._derivation = derivation.Derivation() #reset
+                
+                el.sites.clear()
+                el.activeSite = None
+            startObj._derivation = derivation.Derivation() #reset
+            startObj.sites.clear()
+            startObj.activeSite = None
+
+    def setupStoredElementOffsetTuples(self, streamObj):
+        '''
+        move all elements from ._elements and ._endElements
+        to a new attribute ._storedElementOffsetTuples
+        which contains a list of tuples of the form
+        (el, offset or 'end').
+        
+        
+        >>> from music21 import *
+        >>> from music21 import *
+        >>> s = stream.Measure()
+        >>> n1 = note.Note("C#")
+        >>> n2 = note.Note("E-")
+        >>> bl1 = bar.Barline()
+        >>> s.insert(0.0, n1)
+        >>> s.insert(1.0, n2)
+        >>> s.storeAtEnd(bl1)
+        
+        >>> sfreeze = freezeThaw.StreamFreezer()
+        >>> sfreeze.setupStoredElementOffsetTuples(s)
+        >>> s._elements, s._endElements
+        ([], [])
+        >>> s._storedElementOffsetTuples
+        [(<music21.note.Note C#>, 0.0), (<music21.note.Note E->, 1.0), (<music21.bar.Barline style=regular>, 'end')]
+        >>> n1.getOffsetBySite(s)
+        Traceback (most recent call last):
+        SitesException: The object <music21.note.Note C#> is not in site <music21.stream.Measure 0 offset=0.0>.
+
+        Trying it again, but now with substreams:
+        
+        >>> s2 = stream.Measure()
+        >>> n1 = note.Note("C#")
+        >>> n2 = note.Note("E-")
+        >>> bl1 = bar.Barline()
+        >>> v1 = stream.Voice()
+        >>> n3 = note.Note("F#")
+        >>> v1.insert(2.0, n3)
+        >>> s2.insert(0.0, n1)
+        >>> s2.insert(1.0, n2)
+        >>> s2.storeAtEnd(bl1)
+        >>> s2.insert(2.0, v1)
+        >>> sfreeze.setupStoredElementOffsetTuples(s2)
+
+        >>> v1._storedElementOffsetTuples
+        [(<music21.note.Note F#>, 2.0)]
+        >>> s2._storedElementOffsetTuples
+        [(<music21.note.Note C#>, 0.0), (<music21.note.Note E->, 1.0), (<music21.stream.Voice ...>, 2.0), (<music21.bar.Barline style=regular>, 'end')]
+        '''
+        if hasattr(streamObj, '_storedElementOffsetTuples'):
+            # in the case of a spanner storing a Stream, like a StaffGroup
+            # spanner, it is possible that the elements have already been
+            # transferred.  Thus, we should NOT do this again!
+            return
+        
+        storedElementOffsetTuples = []
+        for e in streamObj._elements:
+            elementTuple = (e, e.getOffsetBySite(streamObj))
+            storedElementOffsetTuples.append(elementTuple)
+            if e.isStream:
+                self.setupStoredElementOffsetTuples(e)
+            e.removeLocationBySite(streamObj)
+#                e._preFreezeId = id(e)
+#                elementDict[id(e)] = e.getOffsetBySite(s)
+        for e in streamObj._endElements:
+            elementTuple = (e, 'end')
+            storedElementOffsetTuples.append(elementTuple)
+            if e.isStream:
+                self.setupStoredElementOffsetTuples(e)
+            e.removeLocationBySite(streamObj)
+        
+        streamObj._storedElementOffsetTuples = storedElementOffsetTuples
+        streamObj._elements = []
+        streamObj._endElements = []
+        streamObj._elementsChanged()
+
+    def findActiveStreamIdsInHierarchy(self, hierarchyObject = None, getSpanners=True, getVariants=True):
         '''
         Return a list of all Stream ids anywhere in the hierarchy.
         
@@ -460,8 +419,7 @@ class StreamFreezer(StreamFreezeThawBase):
         ...         raise Exception("Additional Id Found")
         
         Spanners are included unless getSpanners is False
-        
-        
+                
         >>> staffGroup = layout.StaffGroup([p1, p2])
         >>> sc.insert(0, staffGroup)
         
@@ -481,318 +439,64 @@ class StreamFreezer(StreamFreezeThawBase):
         
         >>> staffGroup.getSpannerStorageId() in foundIds
         True
-                
-        TODO: Get Variants as well...
+        
+        Variants are treated similarly:
+
+        >>> s = stream.Stream()
+        >>> m = stream.Measure()
+        >>> m.append(note.Note(type="whole"))
+        >>> s.append(m)
+        
+        >>> s2 = stream.Stream()
+        >>> m2 = stream.Measure()
+        >>> n2 = note.Note("D#4")
+        >>> n2.duration.type = "whole"
+        >>> m2.append(n2)
+        >>> s2.append(m2)
+        >>> v = variant.Variant(s2)
+        >>> s.insert(0, v)
+        >>> sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
+        >>> allIds = sf.findActiveStreamIdsInHierarchy()
+        >>> len(allIds)
+        4
+        >>> for streamElement in [s, m, m2, v._stream]:
+        ...    if id(streamElement) not in allIds:
+        ...        print "this should not happen...", allIds, id(streamElement)
+
+        N.B. with variants:
+        
+        >>> id(s2) == id(v._stream)
+        False
+        
+        The method also sets self.streamIds to the returned list:
+        
+        >>> sf.streamIds is allIds
+        True
         '''
         if hierarchyObject is None:
             streamObj = self.stream
         else:
             streamObj = hierarchyObject
         streamsFound = streamObj._yieldElementsDownward(streamsOnly=True, 
-                       restoreActiveSites=True)
+                       restoreActiveSites=False)
         streamIds = [id(s) for s in streamsFound]
         
         if getSpanners is True:
             spannerBundle = streamObj.spannerBundle
             streamIds += spannerBundle.getSpannerStorageIds()
-        ## should also get Variants
+        
+        if getVariants is True:
+            for el in streamObj.recurse():
+                if el.isVariant is True:
+                    streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
+        
+        # should not happen that there are duplicates, but possible with spanners...
+        # Python's uniq value...
+        streamIds = list(set(streamIds))
         
         self.streamIds = streamIds
         return streamIds
 
-    
-    def setupSerializationScaffold(self, streamObj = None):
-        '''
-        Prepare this stream and all of its contents for pickle/pickling, that
-        is, serializing and storing an object representation on file or as a string.
-
-        The `topLevel` and `streamIdsFound` arguments are used to keep track of recursive calls. 
-
-        Note that this is a destructive process: elements contained within this Stream 
-        will have their sites cleared of all contents not in the hierarchy 
-        of the Streams. Thus, when doing a normal .write('pickle')
-        the Stream is deepcopied.  `fastButUnsafe = True` ignores the destructive
-        parts of this.
-        
-        Calls `purgeUndeclaredIds`, `unwrapWeakref`, and `freezeIds` the stream
-        and each substream.
-
-        >>> from music21 import freezeThaw
-        >>> from music21 import *
-
-        >>> a = stream.Stream()
-        >>> n = note.Note()
-        >>> n.duration.type = "whole"
-        >>> a.repeatAppend(n, 10)
-        >>> sf = freezeThaw.StreamFreezer(a)
-        >>> sf.setupSerializationScaffold()
-        '''
-        if streamObj is None:
-            streamObj = self.stream
-            if streamObj is None:
-                raise FreezeThawException("You need to pass in a stream when creating to work")
-        # get all Streams that are in this hierarchy
-        
-        streamIdsFound = self.findActiveStreamIdsInHierarchy(streamObj)
-        environLocal.printDebug(['setupSerializationScaffold: streamIdsFound: ', streamIdsFound])
-
-        self.removeSitesNotInHierarchy(streamObj, streamIdsFound)
-
-#        try:
-#            v = streamObj.parts[0].getElementsByClass('Variant')[0]
-#            print "got one"
-#            v.show('t')
-#        except:
-#            pass
-
-        containedStreams = streamObj.recurse(streamsOnly = True)
-        for s in containedStreams:
-            elementDict = {}
-            for e in s._elements:
-                e._preFreezeId = id(e)
-                elementDict[id(e)] = e.getOffsetBySite(s)
-            s._storedElementOffsets = elementDict
-
-        # remove all caches again; the spanner bundle will be here
-        allEls = streamObj.recurse()
-        streamObj._elementsChanged()
-
-        #allEls.append(streamObj)
-        
-        for el in allEls:
-            if el.isVariant:
-                # works like a whole new hierarchy... # no need for deepcopy
-                subSF = StreamFreezer(el._stream, fastButUnsafe=True)
-                subSF.setupSerializationScaffold()
-            self.removeWeakrefsForFreezing(el)
-
-    def removeWeakrefsForFreezing(self, el):
-        '''
-        remove all the places weakrefs tend to hide...
-        '''
-        el.unwrapWeakref()
-        el._activeSite = None
-        el._activeSiteId = None
-        if hasattr(el, '_derivation'): # derives from none
-            el._derivation = derivation.Derivation()
-        self.freezeIds(el)
-        
-        
-    def removeSitesNotInHierarchy(self, hierarchyObj = None, idsInHierarchy = None, excludeStorageStreams=False):
-        '''
-        Removes all sites from all objects in the hierarchy
-        unless its id is listed in idsInHierarchy.
-        
-        >>> from music21 import *
-        >>> sc = stream.Score()
-        >>> p1 = stream.Part()
-        >>> p2 = stream.Part()
-        >>> n1 = note.Note()
-        >>> p1.insert(2.0, n1)
-        >>> sc.insert(0.0, p1)
-        >>> sc.insert(0.0, p2)
-        
-        This part is not part of the hierarchy...
-        
-        >>> p3 = stream.Part()
-        >>> p3.insert(3.0, n1)
-        >>> n1.getOffsetBySite(p1)
-        2.0
-        >>> n1.getOffsetBySite(p3)
-        3.0
-        
-        >>> sf = freezeThaw.StreamFreezer(sc, fastButUnsafe=True)
-        >>> foundIds = sf.findActiveStreamIdsInHierarchy()
-        >>> sf.removeSitesNotInHierarchy(idsInHierarchy = foundIds)
-        
-              # the idsInHierarchy part is optional above, because
-              # findActiveStreamIdsInHierarchy has already been run
- 
-        >>> n1.getOffsetBySite(p1)
-        2.0
-        >>> n1.getOffsetBySite(p3)
-        Traceback (most recent call last):
-        SitesException: The object <music21.note.Note C> is not in site <music21.stream.Part ...>.
-        '''
-        if hierarchyObj is None:
-            streamObj = self.stream
-        else:
-            streamObj = hierarchyObj
-        
-        if idsInHierarchy is None:
-            streamIds = self.streamIds
-        else:
-            streamIds = idsInHierarchy
-
-        # cannot use recurse() because of hidden m21 objects
-        # such as rightBarline, variants, etc...
-#        try:
-#            v = streamObj.parts[0].getElementsByClass('Variant')[0]
-#            print "got two"
-#            v.show('t')
-#        except:
-#            pass
-
-        allEls = self.findAllM21Objects(streamObj)        
-        
-        for el in allEls:
-            orphans = []
-            if el.isVariant is True:
-                continue
-            for site in el.sites.getSites():
-                # TODO: this can be optimized to get actually get sites
-
-                if site is None: 
-                    continue
-                idTarget = id(site)
-                if idTarget in streamIds: # skip all declared ids
-                    continue # do nothing
-                if site.isStream:
-                    if excludeStorageStreams:
-                        # only get those that are not Storage Streams
-                        if ('SpannerStorage' not in site.classes 
-                            and 'VariantStorage' not in site.classes):
-                            #environLocal.printDebug(['removing orphan:', s])
-                            orphans.append(idTarget)
-                    else: # get all 
-                        orphans.append(idTarget)
-
-            for i in orphans:   
-                #environLocal.printDebug(['purgeingUndeclaredIds', i])     
-                el.removeLocationBySiteId(i)        
-
-#        try:
-#            v = streamObj.parts[0].getElementsByClass('Variant')[0]
-#            print "got three"
-#            v.show('t')
-#        except:
-#            pass
-
-    def wrapSpannerWeakRef(self, s):
-        '''
-        Overridden method for wrapping the weakref of a spanner's
-        components.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.wrapWeakref(s)
-        s._components.wrapWeakref()
-
-    def freezeIds(self, e):
-        '''
-        Temporarily replace are stored keys with a different value.
-
-        Does not do much, but calls freezeContextIds on e.definedContexts
-        which does a lot!
-
-        >>> from music21 import freezeThaw
-        >>> import music21
-        
-        >>> aM21Obj = music21.Music21Object()
-        >>> bM21Obj = music21.Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0
-        >>> bM21Obj.addLocation(aM21Obj, 50)   
-        >>> bM21Obj.activeSite = aM21Obj
-        >>> bM21Obj.activeSite != None
-        True
-        >>> oldActiveSiteId = bM21Obj._activeSiteId
-
-        >>> sf = freezeThaw.StreamFreezer()
-        >>> sf.freezeIds(bM21Obj)
-
-        >>> newActiveSiteId = bM21Obj._activeSiteId
-        >>> oldActiveSiteId == newActiveSiteId
-        False
-        '''
-        dummy_counter = common.SingletonCounter()
-
-        self.freezeContextIds(e.sites)
-        try:
-            if e.isSpanner:
-                self.freezeIds(e._components)
-            ##don't; instead make a whole new scaffold
-            #elif e.isVariant:
-            #    self.freezeIds(e._stream)
-        except AttributeError:
-            pass # not having isSpanner or isVariant defined
-                    # isn't enough to throw an exception for.
-        
-        # _activeSite could be a weak ref; may need to manage
-        e._activeSiteId = None # uuid.uuid4() # a place holder
-        e._idLastDeepCopyOf = None # clear
-
-    def freezeContextIds(self, contexts):
-        '''
-        Temporarily replace all stored keys (object ids) 
-        with a temporary values suitable for usage in pickling.
-
-        >>> from music21 import freezeThaw
-        >>> from music21 import *
-        
-        >>> class Mock(base.Music21Object): 
-        ...     pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        
-        >>> aContexts = base.Sites()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> oldKeys = aContexts._definedContexts.keys()
-        
-        >>> sf = freezeThaw.StreamFreezer()
-        >>> sf.freezeContextIds(aContexts)
-
-        >>> newKeys = aContexts._definedContexts.keys()
-        >>> oldKeys == newKeys
-        False
-        '''
-        # need to store self._locationKeys as well
-        post = {}
-        postLocationKeys = []
-        counter = common.SingletonCounter()
-
-        for idKey in contexts._definedContexts:
-            if idKey is not None:
-                newKey = counter() # uuid.uuid4()
-            else:
-                newKey = idKey # keep None
-            # might want to store old id?
-            #environLocal.printDebug(['freezing key:', idKey, newKey])
-            if idKey in contexts._locationKeys:
-                postLocationKeys.append(newKey)
-            post[newKey] = contexts._definedContexts[idKey]
-        contexts._definedContexts = post
-        contexts._locationKeys = postLocationKeys
-        #environLocal.printDebug(['post freezeids', self.sites])
-
-        # clear this for setting later
-        contexts.containedById = counter()
-        contexts._lastID = -1 # set to inactive
-
-
-#    def unwrapWeakref(self, streamObj):
-#        '''Overridden method for unwrapping all Weakrefs.
-#        '''
-#        self.unwrapWeakref(streamObj._derivation)
-#        # call base method: this gets defined contexts and active site
-#        base.Music21Object.unwrapWeakref(streamObj)
-#        # for contained objects that have weak refs
-#        # this presently is not a weakref but in case of future changes
-##         if common.isWeakref(self.flattenedRepresentationOf):
-##             post = common.unwrapWeakref(objRef)
-##             self.flattenedRepresentationOf = post
-#
-#
-#    def wrapWeakref(self, streamObj):
-#        '''Overridden method for unwrapping all Weakrefs.
-#        '''
-#        # call base method: this gets defined contexts and active site
-#        base.Music21Object.wrapWeakref(streamObj)
-#        self.wrapWeakref(streamObj._derivation)
-##         if not common.isWeakref(self.flattenedRepresentationOf):
-##             post = common.wrapWeakref(objRef)
-##             self.flattenedRepresentationOf = post
 
     #---------------------------------------------------------------------------
     def parseWriteFmt(self, fmt):
@@ -843,7 +547,6 @@ class StreamFreezer(StreamFreezeThawBase):
         else:
             directory = environLocal.getRootTempDir()
             fp = os.path.join(directory, fp)
-
     
         storage = self.packStream(self.stream)
 
@@ -856,17 +559,11 @@ class StreamFreezer(StreamFreezeThawBase):
             # packStream() returns a storage dictionary
             pickleMod.dump(storage, f, protocol=-1)
             f.close()
-        elif fmt == 'jsonpickle':
-            data = jsonpickle.encode(storage)
-            f = open(fp, 'w') 
-            f.write(data)
-            f.close()
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
 
-
-        # must restore the passed-in Stream
-        self.teardownStream(self.stream)
+        ## must restore the passed-in Stream
+        #self.teardownStream(self.stream)
         return fp
 
     def writeStr(self, fmt=None):
@@ -880,13 +577,48 @@ class StreamFreezer(StreamFreezeThawBase):
 
         if fmt == 'pickle':
             out = pickleMod.dumps(storage, protocol=-1)
-        elif fmt == 'jsonpickle':
-            out = jsonpickle.encode(storage)
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
 
-        self.teardownStream(self.stream)
+        #self.teardownStream(self.stream)
         return out
+
+#    def findWeakRef(self, streamObj, memo=None):
+#        '''
+#        utility function for debugging.  Finds all weakrefs in the hierarchy and returns
+#        a list of tuples of the weakref and the name of the attribute, and the object
+# 
+#        >>> from music21 import *
+#        >>> n = note.Note()
+#        >>> s = stream.Stream()
+#        >>> s2 = stream.Stream()
+#        >>> s.insert(0, n)
+#        >>> s2.insert(0, n)
+#        >>> ft = freezeThaw.StreamFreezer()
+#        >>> ft.findWeakRef(s)
+#        '''
+#        weakRefList = []
+#        if memo is None:
+#            memo = {}
+#        for x in dir(streamObj):
+#            xValue = getattr(streamObj, x)
+#            if id(xValue) in memo:
+#                continue
+#            else:
+#                memo[id(xValue)] = True
+#            if common.isWeakref(xValue):
+#                weakRefList.append(x, xValue, streamObj)
+#            if common.isIterable(xValue):
+#                for i in xValue:
+#                    if id(i) in memo:
+#                        pass
+#                    else:
+#                        memo[id(i)] = True
+#                        weakRefList.extend(self.findWeakRef(i), memo)
+#            else:
+#                weakRefList.extend(self.findWeakRef(xValue), memo)
+#        return weakRefList
+
 
 class StreamThawer(StreamFreezeThawBase):
     '''
@@ -929,6 +661,124 @@ class StreamThawer(StreamFreezeThawBase):
     '''
     def __init__(self):
         self.stream = None
+
+    def teardownSerializationScaffold(self, streamObj = None):
+        '''
+        After rebuilding this Stream from pickled storage, prepare this as a normal `Stream`.
+
+        Calls `wrapWeakRef` and `unFreezeIds` for the `Stream` and each sub-`Stream`.
+
+        If streamObj is None, runs it on the embedded stream
+
+        >>> from music21 import freezeThaw
+        >>> from music21 import *
+        
+        >>> a = stream.Stream()
+        >>> n = note.Note()
+        >>> n.duration.type = "whole"
+        >>> a.repeatAppend(n, 10)
+        >>> sf = freezeThaw.StreamFreezer(a)
+        >>> sf.setupSerializationScaffold()
+
+        >>> st = freezeThaw.StreamThawer()
+        >>> st.teardownSerializationScaffold(a)
+        '''
+        if streamObj is None:
+            streamObj = self.stream
+            if streamObj is None:
+                raise FreezeThawException("You need to pass in a stream when creating to work")
+
+        storedAutoSort = streamObj.autoSort
+        streamObj.autoSort = False
+
+        self.restoreElementsFromTuples(streamObj)
+
+        allEls = self.findAllM21Objects(streamObj)
+
+        for e in allEls:
+            if e.isVariant:
+#                # works like a whole new hierarchy... # no need for deepcopy
+                subSF = StreamThawer()
+                subSF.teardownSerializationScaffold(e._stream)
+                e._stream._elementsChanged()
+                e._cache = {}
+                #for el in e._stream.flat:
+                #    print el, el.offset, el.sites._definedContexts
+            elif e.isSpanner:
+                subSF = StreamThawer()
+                subSF.teardownSerializationScaffold(e.spannedElements)
+                e.spannedElements._elementsChanged()
+                e._cache = {}
+                    
+
+            #self.thawIds(e)
+            #e.wrapWeakref()
+
+        # restore to whatever it was
+        streamObj.autoSort = storedAutoSort
+        streamObj._elementsChanged()
+
+    def restoreElementsFromTuples(self, streamObj):
+        '''
+        Take a Stream with elements and offsets stored in
+        a list of tuples (element, offset or 'end') at 
+        _storedElementOffsetTuples
+        and restore it to the ._elements and ._endElements lists
+        in the proper locations:
+        
+        >>> from music21 import *
+        >>> s = stream.Measure()
+        >>> s._elements, s._endElements
+        ([], [])
+        
+        >>> n1 = note.Note("C#")
+        >>> n2 = note.Note("E-")
+        >>> bl1 = bar.Barline()
+        >>> tupleList = [(n1, 0.0), (n2, 1.0), (bl1, 'end')]
+        >>> s._storedElementOffsetTuples = tupleList
+        
+        >>> sthaw = freezeThaw.StreamThawer()
+        >>> sthaw.restoreElementsFromTuples(s)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C#>
+        {1.0} <music21.note.Note E->
+        {2.0} <music21.bar.Barline style=regular>        
+        >>> s._endElements
+        [<music21.bar.Barline style=regular>]
+        >>> s[1].getOffsetBySite(s)
+        1.0
+        
+        Trying it again, but now with substreams:
+        
+        >>> s2 = stream.Measure()
+        >>> v1 = stream.Voice()
+        >>> n3 = note.Note("F#")
+        >>> v1._storedElementOffsetTuples = [(n3, 2.0)]
+        >>> tupleList = [(n1, 0.0), (n2, 1.0), (bl1, 'end'), (v1, 2.0)]
+        >>> s2._storedElementOffsetTuples = tupleList
+        >>> sthaw.restoreElementsFromTuples(s2)
+        >>> s2.show('text')
+        {0.0} <music21.note.Note C#>
+        {1.0} <music21.note.Note E->
+        {2.0} <music21.stream.Voice ...>
+            {2.0} <music21.note.Note F#>
+        {5.0} <music21.bar.Barline style=regular>
+        '''
+        if hasattr(streamObj, '_storedElementOffsetTuples'):
+            for e, offset in streamObj._storedElementOffsetTuples:
+                if offset != 'end':
+                    streamObj._insertCore(offset, e)
+                else:
+                    streamObj._storeAtEndCore(e)
+            del(streamObj._storedElementOffsetTuples)
+            streamObj._elementsChanged()
+        
+        for subElement in streamObj:
+            if subElement.isStream is True:
+                # note that the elements may have already been restored
+                # if the spanner stores a part or something in the Stream
+                # for instance in a StaffGroup object
+                self.restoreElementsFromTuples(subElement)
     
     def getPickleFp(self, directory):
         if directory == None:
@@ -936,13 +786,6 @@ class StreamThawer(StreamFreezeThawBase):
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
         return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.p')
-
-    def getJsonFp(self, directory):
-        if directory == None:
-            raise ValueError
-        # cannot get data from stream, as offsets are broken
-        streamStr = str(time.time())
-        return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.json')
 
     def unpackStream(self, storage):
         '''
@@ -954,42 +797,7 @@ class StreamThawer(StreamFreezeThawBase):
         streamObj = storage['stream']
 
         self.teardownSerializationScaffold(streamObj)
-        return streamObj
-
-    def unwrapSpannerWeakRef(self, s):
-        '''
-        Overridden method for unwrapping the weakref of a spanner's
-        components.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.unwrapWeakref(self)
-        # for contained objects that have weak refs
-        #environLocal.printDebug(['spanner unwrapping contained stream'])
-        self._components.unwrapWeakref()
-        # this presently is not a weakref but in case of future changes
-        
-#    def unwrapWeakref(self, streamObj):
-#        '''Overridden method for unwrapping all Weakrefs.
-#        '''
-#        self.unwrapWeakref(streamObj._derivation)
-#        # call base method: this gets defined contexts and active site
-#        base.Music21Object.unwrapWeakref(streamObj)
-#        # for contained objects that have weak refs
-#        # this presently is not a weakref but in case of future changes
-##         if common.isWeakref(self.flattenedRepresentationOf):
-##             post = common.unwrapWeakref(objRef)
-##             self.flattenedRepresentationOf = post
-#
-#
-#    def wrapWeakref(self, streamObj):
-#        '''Overridden method for unwrapping all Weakrefs.
-#        '''
-#        # call base method: this gets defined contexts and active site
-#        base.Music21Object.wrapWeakref(streamObj)
-#        self.wrapWeakref(streamObj._derivation)
-##         if not common.isWeakref(self.flattenedRepresentationOf):
-##             post = common.wrapWeakref(objRef)
-##             self.flattenedRepresentationOf = post
+        return streamObj       
 
     def parseOpenFmt(self, storage):
         '''Look at the file and determine the format
@@ -1552,19 +1360,20 @@ class JSONFreezer(JSONFreezeThawBase):
         print(json.dumps(self.getJSONDict(includeVersion=True), 
             sort_keys=True, indent=2))
 
-    def jsonWrite(self, fp, unused_format=True):
+    def jsonWrite(self, fp, formatOutput=True):
         '''
         Given a file path, write JSON to a file 
         for this object. 
+
         File extension should be .json. File is opened 
         and closed within this method call. 
         '''
         f = codecs.open(fp, mode='w', encoding='utf-8')
-        if not format:
+        if formatOutput is False:
             f.write(json.dumps(self.getJSONDict(includeVersion=True)))
         else:
             f.write(json.dumps(self.getJSONDict(includeVersion=True), 
-            sort_keys=True, indent=2))
+                                  sort_keys=True, indent=2))
         f.close()
 
 class JSONThawer(JSONFreezeThawBase):
@@ -1746,20 +1555,63 @@ class JSONThawer(JSONFreezeThawBase):
 
 #------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def xtestDirectCorpusPickle(self):
-        '''
-        does not work!
-        '''
-        from music21 import corpus
-        from music21.ext import jsonpickle as jsp
-        import json
         
-        c = corpus.parse('bwv66.6').parts[0].measure(0).notes
-        d = jsp.encode(c)
-        ddecode = json.loads(d)
-        print json.dumps(ddecode, sort_keys=True, indent=2)
-        dummy = jsp.decode(d)
+    def testSimpleFreezeThaw(self):
+        from music21 import stream, note
+        s = stream.Stream()
+        sDummy = stream.Stream()
+        n = note.Note()
+        s.insert(2.0, n)
+        sDummy.insert(3.0, n)
+        
+        sf = StreamFreezer(s)
+        out = sf.writeStr()
+        
+        del(s)
+        del(sDummy)
+        del(n)
+        
+        st = StreamThawer()
+        st.openStr(out)
+        outStream = st.stream
+        self.assertEqual(len(outStream), 1)
+        self.assertEqual(outStream[0].offset, 2.0)
+        
+    def testFreezeThawWithSpanner(self):
+        from music21 import stream, note, spanner
+        s = stream.Stream()
+        sDummy = stream.Stream()
+        n = note.Note()
+        sl1 = spanner.Slur([n])
+        s.insert(0.0, sl1)
+        s.insert(2.0, n)
+        sDummy.insert(3.0, n)
+        
+        sf = StreamFreezer(s)
+        out = sf.writeStr()
+        
+        del(s)
+        del(sDummy)
+        del(n)
+        
+        st = StreamThawer()
+        st.openStr(out)
+        outStream = st.stream
+        self.assertEqual(len(outStream), 2)
+        self.assertEqual(outStream.notes[0].offset, 2.0)
+        self.assertIs(outStream.spanners[0].getFirst(), outStream.notes[0])
+
+    def testFreezeThawCorpusFileWithSpanners(self):
+        from music21 import corpus
+        c = corpus.parse('luca/gloria')
+        sf = StreamFreezer(c)
+        data = sf.writeStr(fmt='pickle')
+    
+        st = StreamThawer()
+        st.openStr(data)
+        s = st.stream
+        self.assertEqual(len(s.parts[0].measure(7).notes), 6)
+
         
     def xtestSimplePickle(self):
         from music21 import freezeThaw
@@ -1825,7 +1677,7 @@ class Test(unittest.TestCase):
         #s.show()
         #s.show('t')
         
-    def xtestFreezeThawSimpleVariant(self):
+    def testFreezeThawSimpleVariant(self):
         from music21 import freezeThaw
         from music21 import variant
         from music21 import stream
@@ -1845,17 +1697,14 @@ class Test(unittest.TestCase):
         v = variant.Variant(s2)
         
         s.insert(0, v)
-        #s.show('t')
-        #print v.rightBarline
 
-        sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
+        sf = freezeThaw.StreamFreezer(s)
         d = sf.writeStr()
         
         st = freezeThaw.StreamThawer()
         st.openStr(d)
         s = st.stream
-        s.show('lily.pdf')
-        #s.show('t')
+
 
     def testFreezeThawVariant(self):
         from music21 import freezeThaw
@@ -1877,26 +1726,10 @@ class Test(unittest.TestCase):
         stream2.append(m)
         #c.show('t')
         variant.addVariant(c.parts[0], 6.0, stream2, variantName = 'rhythmic switch', replacementDuration = 3.0)
-#        for i in range(20):
-#            try:
-#                print i
-#                x = c._elements[i]
-#                for j in range(200):
-#                    print j
-#                    print x._elements[j]
-#            except:
-#                pass
-#        v = c._elements[8]._elements[139]
-#        v.show('t')
-#
-#        v1 = c.parts[0].getElementsByClass('Variant')[0]
-#        v1.show('t')
 
-        #c.parts[0].show('t')
-        #c.show('t')
-        #c.show('lily.pdf')
-        #exit()
-        
+        #test Variant is in stream
+        unused_v1 = c.parts[0].getElementsByClass('Variant')[0]
+
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         #sf.v = v
         d = sf.writeStr()
@@ -1908,7 +1741,9 @@ class Test(unittest.TestCase):
         st.openStr(d)
         s = st.stream
         #s.show('lily.pdf')
-        v2 = s.parts[0].getElementsByClass('Variant')[0]
+        p0 = s.parts[0]
+        variants = p0.getElementsByClass('Variant')
+        v2 = variants[0]
         self.assertEqual(v2._stream[0][1].offset, 0.5)
         #v2.show('t')
 
@@ -1924,15 +1759,12 @@ class Test(unittest.TestCase):
         s1.append(n1)
         s2.append(n1)
         
-        sf = freezeThaw.StreamFreezer(s2, fastButUnsafe = True)
+        sf = freezeThaw.StreamFreezer(s2, fastButUnsafe = False)
         sf.setupSerializationScaffold()
-        sf.teardownSerializationScaffold()
 
+        # test safety
         self.assertEqual(s2.hasElement(n1), True)
-        # the scaffold has removes all non-contained sites, so n1
-        # no longer has s1 as a site
-        self.assertEqual(s1 in n1.getSites(), False)
-        self.assertEqual(s2 in n1.getSites(), True)
+        self.assertEqual(s1.hasElement(n1), True)
 
 #----------JSON Serialization------------------------------
 
