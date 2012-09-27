@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 '''
 The `tie` module contains a single class, `Tie` that represents the visual and
-conceptual idea of tied notes.
+conceptual idea of tied notes.  They can be start or stop ties.
 '''
 
 
