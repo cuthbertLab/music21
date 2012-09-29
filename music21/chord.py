@@ -107,6 +107,12 @@ class Chord(note.NotRest):
     True
 
 
+    String attribute okay...
+    
+    >>> myChord = chord.Chord('A4 C#5 E5')
+    >>> myChord
+    <music21.chord.Chord A4 C#5 E5>
+
     '''
     _bass = None
     _root = None
@@ -130,7 +136,8 @@ class Chord(note.NotRest):
     _DOC_ATTR = _TEMPDOC
 
     def __init__(self, notes=[], **keywords):
-
+        if common.isStr(notes) and " " in notes:
+            notes = notes.split()
         # the list of pitch objects is managed by a property; this permits
         # only updating the _chordTablesAddress when pitches has changed
 

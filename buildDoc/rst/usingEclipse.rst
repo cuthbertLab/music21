@@ -76,6 +76,9 @@ You've chosen to run Unix -- you should be able to figure this out on your own. 
 2. Installing PyDev for Eclipse
 ----------------------------------------------
 
+(If you're on windows, be sure to install Python through the normal Windows installation routines, 
+see :ref:`_installWindows`)
+
 PyDev is a Python IDE for Eclipse, which may be used in Python, Jython, 
 and IronPython development. Installing PyDev must be done from inside Eclipse. 
 
@@ -222,7 +225,8 @@ you may need to input this information againthe first time you commit). Also, ma
 .. image:: images/usingEclipse/checkingoutwithcommit.*
     :width: 650
 
-Keep the defaults as shown (your window will say "https://" not "http://") and click "Finish" in the window that follows.
+Keep the defaults as shown (your window will say "https://" not "http://") and 
+click "Finish" in the window that follows.
  
 .. image:: images/usingEclipse/selectresource_checkoutfromSVN.*
     :width: 650
@@ -302,7 +306,8 @@ amidst a screen such as the one shown below.
 .. image:: images/usingEclipse/operationinprogress.*
     :width: 650
 
-Once it is finished, files should appear in the left-hand column of Eclipse with the files of music21, with dates of updates 
+Once it is finished, files should appear in the left-hand 
+column of Eclipse with the files of music21, with dates of updates 
 and names of updaters next to them.
 
 .. image:: images/usingEclipse/SVNfinalview.*

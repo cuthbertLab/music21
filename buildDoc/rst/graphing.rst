@@ -7,22 +7,23 @@
 Graphing Utilities
 ======================================
 
-Music21 can provide data graphs and plots of multiple musical attributes using high-level analysis tools.
+Music21 can create graphs and plots of multiple musical attributes 
+using high-level analysis tools.
 
-Users can create their own custom graphing routines by extending or reworking existing music21 :class:`~music21.graph.Graph` and :class:`~music21.graph.PlotStream` classes. 
+Graphs are any sort of graphical display.  Plots are displays that
+run on a Stream and report data found in a Stream.
 
-Alternatively, music21 provides numerous pre-built plot classes to provide quick access to numerous graphical views.
+Users can create their own custom graphing routines by extending or 
+reworking existing music21 :class:`~music21.graph.Graph` and :class:`~music21.graph.PlotStream` classes. 
 
-
-
-
-
-
+Alternatively, music21 has numerous pre-built Graph and Plot classes 
+for quick access to common graphical views such as piano rolls, etc.
 
 Installing and Using matplotlib
 -------------------------------
 
-The powerful and flexible graphing routines of music21 are provided by the matplotlib and numpy libraries. They can be downloaded from the following URLs:
+The powerful and flexible graphing routines of music21 use the matplotlib and numpy libraries. 
+They can be downloaded from the following URLs:
 
 http://numpy.scipy.org
 http://sourceforge.net/projects/matplotlib/files/
@@ -34,26 +35,29 @@ http://matplotlib.sourceforge.net/users/installing.html
 For more information about matplotlib with music21 see :ref:`advancedGraphing`.
 
 
-
-
-
-
-
-Graphing Streams
+Plotting Streams
 -------------------------------------------------------
 
 Music21 features numerous ways to display the data within a Stream. 
 
-Complete documentation for these graphing objects can be found with the following classes: :class:`~music21.graph.PlotHistogramPitchSpace`, :class:`~music21.graph.PlotHistogramPitchClass`, :class:`~music21.graph.PlotHistogramQuarterLength`, :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`, :class:`~music21.graph.PlotScatterPitchClassOffset`,  :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`,
-:class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`, :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`, :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`, :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`, :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`, 
+Complete documentation for these graphing objects can be found 
+with the following classes: :class:`~music21.graph.PlotHistogramPitchSpace`, 
+:class:`~music21.graph.PlotHistogramPitchClass`, :class:`~music21.graph.PlotHistogramQuarterLength`, 
+:class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`, :class:`~music21.graph.PlotScatterPitchClassOffset`,  :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`,
+:class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`, 
+:class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`, 
+:class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`, :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`, :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`, 
 
 
 The plotStream() Utility Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The graph.py module offers the :func:`~music21.graph.plotStream` function for easy access to graphing music21 Streams. This function requires a Stream as an argument and a number of additional arguments to specify the output of one or more plot types. 
+The graph.py module offers the :func:`~music21.graph.plotStream` function 
+for easy access to graphing music21 Streams. This function requires a Stream 
+as an argument and a number of additional arguments to specify the output of one or more plot types. 
 
-Calling :func:`~music21.graph.plotStream` with no arguments creates a default graph, using :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`, of a flat version of the Stream:
+Calling :func:`~music21.graph.plotStream` with no arguments creates a 
+default graph, using :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`, of a flat version of the Stream:
 
     >>> from music21 import corpus, graph
     >>> aStream = corpus.parse('bach/bwv57.8')
@@ -64,7 +68,8 @@ Calling :func:`~music21.graph.plotStream` with no arguments creates a default gr
         :width: 600
 
 
-Calling :func:`~music21.graph.plotStream` with a Stream and the name of plot class will use that class to create a and display a graph. 
+Calling :func:`~music21.graph.plotStream` with a Stream and the name of plot 
+class will use that class to create a and display a graph. 
 
 
     >>> graph.plotStream(aStream, 'PlotHistogramPitchClass')  
@@ -72,7 +77,9 @@ Calling :func:`~music21.graph.plotStream` with a Stream and the name of plot cla
     .. image:: images/PlotHistogramPitchClass.*
         :width: 600
 
-Alternatively, the type of desired graph can be given as the `format` keyword argument, and list of values desired can be given with the `values` keyword argument. If one or more plots are available that match the requested values, these will be displayed
+Alternatively, the type of desired graph can be given as the `format` keyword argument, 
+and list of values desired can be given with the `values` keyword argument. If one or 
+more plots are available that match the requested values, these will be displayed
 
 
     >>> graph.plotStream(aStream, format='scatterweighted') 
@@ -85,7 +92,8 @@ Alternatively, the type of desired graph can be given as the `format` keyword ar
     .. image:: images/PlotScatterPitchSpaceQuarterLength.*
         :width: 600
 
-Note that the exact same functionality of :func:`~music21.graph.plotStream` is available as the Stream :meth:`~music21.stream.Stream.plot` method.
+Note that the exact same functionality of :func:`~music21.graph.plotStream` is available as the 
+Stream :meth:`~music21.stream.Stream.plot` method.
 
 
     >>> aStream.plot(format='scatterweighted', values='pitchclass') 
@@ -98,7 +106,9 @@ Note that the exact same functionality of :func:`~music21.graph.plotStream` is a
 Creating and Calling Plot Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Graphs can be created and/or written to a file by creating an instance of a plot class with the Stream as an argument. Once created, the object's :meth:`~music21.graph.Graph.process` method is called to obtain a result. The result is determined by the `doneAction` keyword argument.
+Graphs can be created and/or written to a file by creating an instance of a plot class 
+with the Stream as an argument. Once created, the object's :meth:`~music21.graph.Graph.process` method is called 
+to obtain a result. The result is determined by the `doneAction` keyword argument.
 
     >>> from music21 import corpus, graph
     >>> aStream = corpus.parse('bach/bwv57.8')
@@ -109,20 +119,19 @@ Graphs can be created and/or written to a file by creating an instance of a plot
         :width: 600
 
 
-The default Action` is to call :meth:`~music21.graph.Graph.show` method the graph, which will write it as a temporary file and open the graph. To write a graph to a file, the :meth:`~music21.graph.Graph.write`, given a file path, can be used.
-
-
-
-
-
-
+The default `Action` is to call :meth:`~music21.graph.Graph.show` method the graph, which 
+will write it as a temporary file and open the graph. To write a graph to 
+a file, use the :meth:`~music21.graph.Graph.write` with a file path as the argument.
 
 
 Analytical Graphing Objects
 -------------------------------------------------------
 
 Music21 features graphing objects that display the results of analysis.
-Complete documentation for these graphing objects can be found with the following classes: :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`, :class:`~music21.graph.PlotWindowedKrumhanslKessler`, :class:`~music21.graph.PlotWindowedAardenEssen`, :class:`~music21.graph.PlotWindowedSimpleWeights`, :class:`~music21.graph.PlotWindowedBellmanBudge`,  :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`,
+Complete documentation for these graphing objects can be found with the 
+following classes: :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`, 
+:class:`~music21.graph.PlotWindowedKrumhanslKessler`, :class:`~music21.graph.PlotWindowedAardenEssen`, 
+:class:`~music21.graph.PlotWindowedSimpleWeights`, :class:`~music21.graph.PlotWindowedBellmanBudge`,  :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`,
 :class:`~music21.graph.PlotWindowedAmbitus`, :class:`~music21.graph.PlotDolan`
 
 A basic example follows::
@@ -141,28 +150,19 @@ A basic example follows::
 The ActivityMatch Object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ActivityMatch object provides a way to examine, for a given parameter, what other parameters are active. 
-
-
-
-
-
-
-
-
-
-
-
-
-
+The ActivityMatch object provides a way to examine, for a given parameter, 
+what other parameters are active. 
 
 
 Elementary Graphing Classes
 -------------------------------
 
-Music21 provides low-level access to basic graphing routines through classes for each graphing archetype.
+Music21 provides low-level access to basic graphing routines through 
+classes for each graphing archetype.
 
-Complete documentation for these graphing objects can be found with the following classes: :class:`~music21.graph.GraphHorizontalBar`, :class:`~music21.graph.GraphScatterWeighted`, :class:`~music21.graph.GraphScatter`, :class:`~music21.graph.GraphHistogram`, :class:`~music21.graph.Graph3DPolygonBars`.
+Complete documentation for these graphing objects can be found with the 
+following classes: :class:`~music21.graph.GraphHorizontalBar`, :class:`~music21.graph.GraphScatterWeighted`, 
+:class:`~music21.graph.GraphScatter`, :class:`~music21.graph.GraphHistogram`, :class:`~music21.graph.Graph3DPolygonBars`.
 
 
 Two-Dimensional Scatter Plot 
@@ -170,7 +170,10 @@ Two-Dimensional Scatter Plot
 
 A two-dimensional scatter graph can be made from any list of *x*, *y* data pairs. 
 
-The `doneAction` keyword argument determines what happens after the :meth:`~music21.graph.Graph.process` method is called. A 'show' value (the default) will immediately open the output format in platform- and backend-specific viewer. A 'write' value will write the output in backend-specific format using a music21-generated temporary file. 
+The `doneAction` keyword argument determines what happens after 
+the :meth:`~music21.graph.Graph.process` method is called. A 'show' value (the default) will 
+immediately open the output format in platform- and backend-specific viewer. A `write` 
+value will write the output in backend-specific format using a music21-generated temporary file. 
 
 A basic example follows::
 
@@ -194,7 +197,8 @@ The 'alpha' keyword argument sets transparency, from 0 (transparent) to 1 (opaqu
 
 The 'title' keyword argument sets the title of the graph.
 
-The 'colors' keyword argument sets the colors of data points, specified as HTML color codes or matplotlib's single-letter abbreviations.
+The 'colors' keyword argument sets the colors of data points, specified as HTML 
+color codes or matplotlib's single-letter abbreviations.
 
 This example provides basic customization to a scatter graph::
 
@@ -229,7 +233,7 @@ Grouped Bar Graph
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This graph allows you to plot multiple sets of data in parallel bar graphs. Data for this graph is provided
-in a list of tuples of the form (dataLabel, {plotGroup: value, plotGroup2: value ... }). The example below 
+in a list of tuples of the form ``(dataLabel, {plotGroup: value, plotGroup2: value ... })``. The example below 
 iterates through the Bach Chorale corpus using corpus.chorales.Iterator and stores the frequency at which
 each part exhibits notes of each quarter length present. It displays the normalized frequency of each quarterLength
 as four bars, each corresponding to an SATB part.
@@ -279,12 +283,16 @@ The example follows::
 Three-Dimensional Bar Graphs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A three dimensional graph made of numerous rows of bars can be used to plot three-dimensional data. Data for this graph is provided by a dictionary of key-value pairs, where values are equal-sized-lists of values. 
+A three dimensional graph made of numerous rows of bars can be used to graph 
+three-dimensional data. Data for this graph is provided by a dictionary of 
+key-value pairs, where values are equal-sized-lists of values. 
 
-In addition to keyword arguments described for other graphs, this graph supports the following additional keyword arguments.
+In addition to keyword arguments described for other graphs, this graph 
+supports the following additional keyword arguments.
 
 The `barWidth` keyword argument sets the width of bars.
-The `useKeyValues` keyword argument determines whether or not the keys in the data dictionary are interpreted as numerical values or labels.
+The `useKeyValues` keyword argument determines whether or not the keys in the 
+data dictionary are interpreted as numerical values or labels.
 The `zeroFloor` keyword argument determines whether or not the vertical axis is sized to contain 0 or not.
 
 A basic example follows::
@@ -303,7 +311,8 @@ A basic example follows::
     :width: 600
 
 
-Here is an example from music. This graphs the 12 major scales next to each other in terms of frequency showing which notes are present
+Here is an example from music. This graphs the 12 major scales next to each 
+other in terms of frequency showing which notes are present
 and which notes are not::
 
     >>> from music21 import *

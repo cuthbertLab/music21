@@ -10,7 +10,8 @@ Installing Music21 in Windows
 Alternative Installation Methods
 ----------------------------------------------
 
-The following instructions are for general users. If you are an advanced user and have installed other Python packages before, or want to use an EGG, SVN, PIP, or setuptools, you should read :ref:`installAdvanced`.
+The following instructions are for general users. If you are 
+an advanced user and have installed other Python packages before, or want to use an EGG, SVN, PIP, or setuptools, you should read :ref:`installAdvanced`.
 
 
 
@@ -21,8 +22,8 @@ Python is a simple but powerful programming language that music21
 is written in and in which you will write your own programs that 
 use music21.  
 
-Windows users should download and install Python version 2.7 or
-2.8, 2.9, etc. but not 3.0, 3.1, etc.  (If you have 2.6 already,
+Windows users should download and install Python version 2.7 and 
+*not* 3.0, 3.3, etc.  (If you have 2.6 already,
 that will work fine). 
 
 To get Python 2.7 for Windows, go to http://www.python.org/download/ 

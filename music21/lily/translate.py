@@ -61,10 +61,12 @@ def _getCachedCorpusFile(keyName):
 
 def makeLettersOnlyId(inputString):
     '''
+    Takes an id and makes it purely letters by substituting
+    letters for all other characters.
+    
     >>> from music21 import *
     >>> print lily.translate.makeLettersOnlyId('rainbow123@@dfas')
     rainbowxyzmmdfas
-
     '''
     inputString = str(inputString)
     returnString = ''
@@ -356,24 +358,38 @@ class LilypondConverter(object):
     def lyPartsAndOssiaInitFromScore(self, scoreIn):
         r'''
         Takes in a score and returns a block that starts each part context and variant context
-        with an identifier and {\stopStaff s1*n} where n is the number of measures in the score.
+        with an identifier and {\stopStaff s1*n} (or s, whatever is needed for the duration)
+        where n is the number of measures in the score.
         
         >>> from music21 import *
-        >>> lpc = lily.translate.LilypondConverter()
+        >>> import copy
+        
+        Set up score:
+        
         >>> s = stream.Score()
         >>> p1,p2 = stream.Part(), stream.Part()
+        >>> p1.insert(0, meter.TimeSignature('4/4'))
+        >>> p2.insert(0, meter.TimeSignature('4/4'))
         >>> p1.append(variant.Variant(name = 'london'))
         >>> p2.append(variant.Variant(name = 'london'))
         >>> p1.append(variant.Variant(name = 'rome'))
         >>> p2.append(variant.Variant(name = 'rome'))
-        >>> p1.repeatAppend(stream.Measure(), 10)
-        >>> p2.repeatAppend(stream.Measure(), 10)
+        >>> for i in range(4):
+        ...    m = stream.Measure()
+        ...    n = note.WholeNote('D4')
+        ...    m.append(n)
+        ...    p1.append(m)
+        ...    p2.append(copy.deepcopy(m)) 
         >>> p1.id = 'pa'
         >>> p2.id = 'pb'
         >>> s.append(p1)
         >>> s.append(p2)
+        
+        Run method
+        
+        >>> lpc = lily.translate.LilypondConverter()
         >>> print lpc.lyPartsAndOssiaInitFromScore(s)
-        \new Staff  = pa { \stopStaff } 
+        \new Staff  = pa { \stopStaff s1 s1 s1 s1 } 
         \new Staff  = londonpa 
                     \with {
                           \remove "Time_signature_engraver"
@@ -387,7 +403,7 @@ class LilypondConverter(object):
                           \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
-                 { \stopStaff } 
+                 { \stopStaff s1 s1 s1 s1 } 
         \new Staff  = romepa 
                     \with {
                           \remove "Time_signature_engraver"
@@ -401,8 +417,8 @@ class LilypondConverter(object):
                           \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
-                 { \stopStaff } 
-        \new Staff  = pb { \stopStaff } 
+                 { \stopStaff s1 s1 s1 s1 } 
+        \new Staff  = pb { \stopStaff s1 s1 s1 s1 } 
         \new Staff  = londonpb 
                     \with {
                           \remove "Time_signature_engraver"
@@ -416,7 +432,7 @@ class LilypondConverter(object):
                           \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
-                 { \stopStaff } 
+                 { \stopStaff s1 s1 s1 s1 } 
         \new Staff  = romepb 
                     \with {
                           \remove "Time_signature_engraver"
@@ -430,9 +446,7 @@ class LilypondConverter(object):
                           \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
-                 { \stopStaff } 
-        <BLANKLINE>
-
+                 { \stopStaff s1 s1 s1 s1 } 
         '''
         lpMusicList = lyo.LyMusicList()
 
@@ -621,47 +635,46 @@ class LilypondConverter(object):
         return lpGroupedMusicList
 
     
-    def lyNewLyricsFromStream(self, streamIn, sId = None):
-        '''
+    def lyNewLyricsFromStream(self, streamIn, streamId = None, alignment = 'alignBelowContext' ):
+        r'''
         returns a LyNewLyrics object
-        This is a little bit of a hack. This should be switched over to using a prefixed context thing with \new Lyric = "id" \with { } {}
+        
+        This is a little bit of a hack. This should be switched over to using a 
+        prefixed context thing with \new Lyric = "id" \with { } {}
 
         >>> from music21 import *
-        >>> 
+        >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r4 e4_world')
+        >>> s.makeMeasures(inPlace = True)
+        >>> s.id = 'helloWorld'
 
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lyNewLyrics = lpc.lyNewLyricsFromStream(s)
+        >>> print lyNewLyrics
+        \addlyrics { \set alignBelowContext = #"helloWorld"  
+           hel -- 
+           lo__ 
+           world 
+            } 
         '''
-
         lyricsDict = streamIn.lyrics(skipTies = True)
         
-        if sId is None:
-            sId = makeLettersOnlyId(streamIn.id)
-        streamId = "#"+ lyo.LyObject().quoteString(sId)
+        if streamId is None:
+            streamId = makeLettersOnlyId(streamIn.id)
+        
+        streamId = "#"+ lyo.LyObject().quoteString(streamId)
 
         lpGroupedMusicLists = []
         for lyricNum in sorted(lyricsDict):
             lyricList = []
-            lpAlignmentProperty = lyo.LyPropertyOperation(mode = 'set', value1 = 'alignBelowContext', value2 = streamId)
+            lpAlignmentProperty = lyo.LyPropertyOperation(mode = 'set', value1 = alignment, value2 = streamId)
             lyricList.append(lpAlignmentProperty)
-            inWord = False
+
+            self.inWord = False
             for el in lyricsDict[lyricNum]:
-                if el is None and inWord:
-                    text = ' _ '
-                elif el is None and inWord is False:
-                    text = ' _ '
-                elif el.text == '':
-                    text = ' _ '
-                else:
-                    if el.syllabic == 'end':
-                        text = el.text + '__'
-                        inWord = False
-                    elif el.syllabic == 'begin' or el.syllabic == 'middle':
-                        text = el.text + ' --'
-                        inWord = True
-                    else:
-                        text = el.text
-                      
-                lpLyricElement = lyo.LyLyricElement(text)
+                lpLyricElement = self.lyLyricElementFromM21Lyric(el)
                 lyricList.append(lpLyricElement)
+
+            self.inWord = False
 
             lpLyricList = lyo.LyMusicList(lyricList)
             
@@ -672,6 +685,60 @@ class LilypondConverter(object):
         lpNewLyrics = lyo.LyNewLyrics(groupedMusicLists = lpGroupedMusicLists)
 
         return lpNewLyrics
+
+    def lyLyricElementFromM21Lyric(self, m21Lyric):
+        '''
+        Returns a :class:`~music21.music21.lily.lilyObjects.LyLyricElement` object
+        from a :class:`~music21.music21.note.Lyric` object.
+        
+        Uses self.inWord to keep track of whether or not we're in the middle of
+        a word.
+        
+        >>> from music21 import *
+        >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r2 e2 f2_world')
+        >>> s.makeMeasures(inPlace = True)
+        >>> lyrics = s.lyrics()[1]  # get first verse (yes, 1 = first, not 0!)
+
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lpc.lyLyricElementFromM21Lyric(lyrics[0])
+        <music21.lily.lilyObjects.LyLyricElement object "hel --">
+        >>> lpc.inWord
+        True
+        >>> lpc.lyLyricElementFromM21Lyric(lyrics[1])
+        <music21.lily.lilyObjects.LyLyricElement object "lo__">
+        >>> lpc.lyLyricElementFromM21Lyric(lyrics[2])
+        <music21.lily.lilyObjects.LyLyricElement object " _ ">
+        >>> lpc.lyLyricElementFromM21Lyric(lyrics[3])
+        <music21.lily.lilyObjects.LyLyricElement object "world">
+        >>> lpc.inWord
+        False
+        '''
+        
+        if hasattr(self, 'inWord'):
+            inWord = self.inWord
+        else:
+            inWord = False
+        
+        el = m21Lyric
+        if el is None and inWord:
+            text = ' _ '
+        elif el is None and inWord is False:
+            text = ' _ '
+        elif el.text == '':
+            text = ' _ '
+        else:
+            if el.syllabic == 'end':
+                text = el.text + '__'
+                inWord = False
+            elif el.syllabic == 'begin' or el.syllabic == 'middle':
+                text = el.text + ' --'
+                inWord = True
+            else:
+                text = el.text
+        
+        self.inWord = inWord
+        lpLyricElement = lyo.LyLyricElement(text)
+        return lpLyricElement
 
     def lySequentialMusicFromStream(self, streamIn, beforeMatter = None):
         r'''
@@ -739,7 +806,7 @@ class LilypondConverter(object):
             optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
         
 
-        lpNewLyrics = self.lyNewLyricsFromStream(streamIn, sId = makeLettersOnlyId(streamIn.id))
+        lpNewLyrics = self.lyNewLyricsFromStream(streamIn, streamId = makeLettersOnlyId(streamIn.id))
 
         lpSequentialMusic = self.lySequentialMusicFromStream(streamIn, beforeMatter = beforeMatter)
         lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)

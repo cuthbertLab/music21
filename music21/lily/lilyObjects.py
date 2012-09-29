@@ -1726,10 +1726,23 @@ class LySimpleElement(LyObject):
 ## SKIPPING ALL ChordSymbol Markup for now
     
 class LyLyricElement(LyObject):
+    '''
+    Object represents a single Lyric in lilypond.
+    
+    >>> from music21 import *
+    >>> lle = lily.lilyObjects.LyLyricElement("hel_")
+    >>> lle
+    <music21.lily.lilyObjects.LyLyricElement object "hel_">
+    >>> print lle
+    hel_ 
+    '''
     def __init__(self, lyMarkupOrString = None):
         LyObject.__init__(self)
         self.lyMarkupOrString = lyMarkupOrString
         
+    def __repr__(self):
+        return '<%s.%s object "%s">' % (self.__module__, self.__class__.__name__, self.lyMarkupOrString)
+    
     def stringOutput(self):
         return str(self.lyMarkupOrString) + " "
 

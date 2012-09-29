@@ -2,29 +2,33 @@
 
 .. _installMac:
 
-
 Installing Music21 on Mac
 ============================================
 
 Because Apple changes their system details so much
 from one version of OS X to another, installing music21 
 is probably the hardest part of the experience.  
-Once you have that set, the rest should be much less painful.  
+Once you have that set, the rest should be much less painful.
+Trust us that it should work.
+
 Just follow the instructions below carefully and you shouldn't
 have any problems.
 
 
-Check Your Version of Python
+Starting Python and Checking the Version
 ----------------------------------------------
 
 Python is a simple but powerful programming language that music21
 is written in and in which you will write your own programs that 
 use music21.
 
-Mac OS X comes with Python, but it might not be a new enough version 
+Mac OS X comes with Python, but if you have an older version of OS X
+(Leopard or earlier) it might not be a new enough version 
 to run music21. Music21 requires Python 2.6 or 2.7 to run. Python 3 is not yet supported. 
 
-To determine the Python version you have installed, open a terminal (by going to Applications, then Utilities, and then double clicking "Terminal") and enter the following command-line argument (don't type the "$")
+To determine the Python version you have installed, open a 
+terminal (by going to Applications, then Utilities, and then 
+double clicking "Terminal") and enter the following command-line argument (don't type the "$")
 
     $ python -V
 
@@ -42,17 +46,17 @@ on a single computer without any problems.
 Download music21 
 ----------------------------------------------
 
-Download the most-recent music21 package by getting the .tar.gz file
+Download the most-recent music21 package by getting the first .tar.gz file
 from the following URL. 
 
     http://code.google.com/p/music21/downloads/list
 
-The newest version should be at the top.  Do not download the `-no-corpus`
+The newest version should be at the top.  ``Do not download`` the `-no-corpus`
 version of the file.
 
 Once it's downloaded, double-click the icon on your desktop named
-something like music21-1.2.0.tar.gz -- this will create a new directory
-on your desktop called something like "music21-1.2.0".  Look inside it.
+something like music21-1.3.0.tar.gz -- this will create a new directory
+on your desktop called something like "music21-1.3.0".  Look inside it.
 
 You will see the following files:
 
@@ -70,20 +74,21 @@ Python can find it and lets you configure music21.
 
 Double click on the installer.command file to start. 
 This file should open a Terminal window and begin running the Configuration Assistant. 
-As this is a program downloaded from the internet, the System will likely warn you about 
+As this is a program downloaded from the Internet, the System will likely warn you about 
 running it. Go ahead and click "Open".
 
 After waiting a few moments to load modules, the Configuration Assistant begins. 
 
-
 .. image:: images/macScreenConfigAssistantStart.*
     :width: 650
 
-
 The first option is to install music21 in its standard location 
-(see below, The Installation Destination). Enter "y" or "yes", or press return to accept the default of "yes". 
+(see below, The Installation Destination). Enter "y" or "yes", or 
+press return to accept the default of "yes". 
 
-Before installation begins you may be asked for your Mac password. 
+Before installation begins you may be asked for your Mac password. (The cursor
+won't move or display any letters when you type in the password.  Just rest assured
+that the characters are being transmitted). 
 As Python packages are stored in a System directory, you need to give permission 
 to write files to that location.  
 
@@ -96,14 +101,11 @@ your Mac password.  Then click "Allow user to administer this computer".  Then
 close System Preferences and click the music21 `installer.command` button again and
 go back one step.)
 
-
 During installation, a large amount of text will display showing files being copied.
 Sorry about the mess.  Just ignore it!  It means it's working.
 
-
 .. image:: images/macScreenConfigAssistantStart.*
     :width: 650
-
 
 After installation the Configuration Assistant will try to 
 configure your setup. If you have never used music21 before, 
@@ -124,18 +126,14 @@ which is also free and doesn't require you to register to download it.
 
 If one or more MusicXML readers are found, skip ahead to the next instructions.
 
-
 .. image:: images/macScreenConfigAssistantReader.*
     :width: 650
-
 
 If you choose to install Finale Notepad (formerly Finale Reader; hence the pictures below), 
 you will download an installer. Launch the installer immediately, and follow the instructions. 
 
-
 .. image:: images/macScreenConfigAssistantFinaleInstall.*
     :width: 650
-
 
 After installing a MusicXML reader, or if you already have 
 one or more installed, the Configuration Assistant will present you with a 
@@ -144,10 +142,8 @@ default. This means that music21 will attempt to open MusicXML files
 with this application. This setting can be easily changed later. 
 Enter the number of the selection as presented in the list:
 
-
 .. image:: images/macScreenConfigAssistantSelect.*
     :width: 650
-
 
 After selecting a MusicXML reader, you will be asked a number of 
 questions about working with music21. They concern whether music21 can access
@@ -156,10 +152,8 @@ use of music21 and the included corpus of scores.  You have to accept the
 license to continue (we need to retain some rights you know!), but you 
 don't have to give us access to the Internet. 
 
-
 .. image:: images/macScreenConfigAssistantQuestions.*
     :width: 650
-
 
 After the Configuration Assistant is complete, you can close the window when
 it says "[process terminated]".
@@ -202,13 +196,11 @@ like what we see here:
 .. image:: images/macScreenShow.*
     :width: 650
 
-
-
 After Installation
 -------------------------------
 
-CONGRATS! You're done with installing.  You can delete the `music21-1.2.0.tar.gz` file
-and `music21-1.2.0` folder from your desktop now.  
+CONGRATS! You're done with installing.  You can delete the `music21-1.3.0.tar.gz` file
+and `music21-1.3.0` folder from your desktop now.  
 
 After a successful installation, you may proceed to :ref:`quickStart` to 
 begin using music21.
@@ -220,9 +212,6 @@ You may want to configure your Environment to support opening MusicXML
 files with a different Reader. A tutorial for this is provided here: :ref:`tutorialFinaleMac`.
 
 To configure all settings in music21 directly, see :ref:`environment`.
-
-
-
 
 
 Installation Help

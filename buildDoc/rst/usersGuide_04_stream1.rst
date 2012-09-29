@@ -68,7 +68,7 @@ We can check that `noteList` contains our Notes by printing it:
 Now we can write a two-line program that will print the step of each note in noteList.
 Most modern languages have a way of doing some action for each member ("element") in
 a list (also called an "array" or sometimes "row").  In Python this is the "for" command.
-When you type these lines, don't type the "`... `" just like you're not typing the "`>>> `"
+When you type these lines, don't type the `"... "` just like you're not typing the `">>> "`
 line, but do type the spaces at the start of the second line.  (When you're done typing
 `print(thisNote.step)`, you'll probably have to hit enter twice to see the results.)
 
@@ -145,7 +145,7 @@ True
 
 Lists will become important tools in your programming, but they don't know
 anything about music.  To get some intelligence into our music we'll need to
-know about a `music21` object similar to lists, called a :class:`~music21.stream.Stream`
+know about a `music21` object similar to lists, called a :class:`~music21.stream.Stream`.
 
 Creating simple Streams
 ------------------------------------
@@ -187,6 +187,13 @@ command, but we'll now use `stream1` instead of `noteList`:
 C
 F
 B
+
+And we can get the first and the last `Note` in a `Stream` by using the [X] form:
+
+>>> stream1[0]
+<music21.note.Note C>
+>>> stream1[1].accidental
+<accidental sharp>
 
 Okay, so far we've seen that `Streams` can do the same things as lists, but
 can they do more?  Let's call the analyze method on stream to get the
@@ -256,4 +263,64 @@ Or let's see them as a score:
 .. image:: images/usersGuide/04_stream1.*
     :width: 157
 
-You might ask how 
+You might ask why is the piece in common-time (4/4)? This is just the default for new pieces, which is in the 
+`defaults` module:
+
+>>> defaults.meterNumerator
+4
+>>> defaults.meterDenominator
+'quarter'
+
+We'll learn how to switch the :class:`~music21.meter.TimeSignature` soon enough.
+
+If you don't have MIDI or MusicXML configured yet (we'll get to it in a second) and you don't want to have 
+other programs open up, you can show a `Stream` in text in your editor:
+
+>>> stream1.show('text')
+{0.0} <music21.note.Note C>
+{2.0} <music21.note.Note F#>
+{3.0} <music21.note.Note B->
+
+This display shows the `offset` for each element (that is, each object in the Stream) along with
+what class it is, and a little bit more helpful information.  The information is the same as
+what's called the ``__repr__`` (representation) of the object, which is what you get if you type
+its variable name at the prompt:
+
+>>> note1
+<music21.note.Note C>
+
+By the way, Streams have a __repr__ as well:
+
+>>> stream1 
+<music21.stream.Stream 9723420>
+
+that number at the end is the `.id` of the `Stream`, which is a way of identifying it.  Often
+the `.id` of a Stream will be the name of the `Part` ("Violin II"), but if it's undefined
+then a somewhat random number is used (actually the location of the Stream in your computer's
+memory).  We can change the `.id` of a Stream:
+
+>>> stream1.id = 'some notes'
+>>> stream1
+<music21.stream.Stream some notes>
+
+We could have also changed the `.id` of any of our `Note` objects, but it doesn't show up in
+the `Note`'s __repr__:
+
+>>> note1.id = 'my favorite C'
+>>> note1
+<music21.note.Note C>
+
+Now, a `Stream` is a :class:`~music21.base.Music21Object` just like a `Note` is.  This is why
+it has an `.id` attribute and, more importantly, why you can call `.show()` on it. 
+
+What else makes a `Music21Object` what it is?
+It has a `.duration` attribute which stores a `Duration` object:
+
+>>> stream1.duration
+<music21.duration.Duration 4.0>
+>>> stream1.duration.type
+'whole'
+>>> stream1.duration.quarterLength
+4.0
+
+ 
