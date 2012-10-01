@@ -131,6 +131,14 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     >>> rn6
     <music21.roman.RomanNumeral bVII in c minor>
 
+    Diminished and half-diminished seventh chords can omit the third and still be diminished:
+    (n.b. we also demonstrate that chords can be created from a string):
+    
+    >>> rnDim7 = roman.romanNumeralFromChord(chord.Chord("A3 E-4 G-4"), key.Key('b-'))
+    >>> rnDim7
+    <music21.roman.RomanNumeral viio7 in b- minor>
+
+
     For reference, odder notes:
 
     >>> rn7 = roman.romanNumeralFromChord(chord.Chord(['A--4','C-5','E--5']), key.Key('c'))
@@ -209,8 +217,9 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     elif isMajorThird is False:
         stepRoman = stepRoman.lower()
     inversionString = figureFromChordAndKey(chordObj, alteredKeyObj)
+
     if len(inversionString) > 0 and inversionString[0] == 'o':
-        if fifthName == 'o':
+        if fifthName == 'o':  # don't call viio7, viioo7.
             fifthName = ""
     #print (inversionString, fifthName)
     rnString = rootAlterationString + stepRoman + fifthName + inversionString
@@ -291,6 +300,14 @@ figureShorthands = {'53': '',
                     '3': '',
                     '63': '6',
                     '753': '7',
+                    '75': '7', # controversial perhaps
+                    '73': '7', # controversial perhaps
+                    '9753': '9',
+                    '975': '9', # controversial perhaps
+                    '953': '9', # controversial perhaps
+                    '97': '9', # controversial perhaps
+                    '95': '9', # controversial perhaps
+                    '93': '9', # controversial perhaps
                     '653': '65',
                     '6b53': '6b5',
                     '643': '43',
@@ -320,6 +337,11 @@ def figureFromChordAndKey(chordObj, keyObj=None):
     >>> figureFromChordAndKey(chord.Chord(['E3','C4','G4','B-5']), key.Key('C'))
     '6b5'
 
+    We reduce common omissions from seventh chords to be '7' instead
+    of '75', '73', etc.
+
+    >>> figureFromChordAndKey(chord.Chord(['A3','E-4','G-4']), key.Key('b-'))
+    '7'
     '''
     if keyObj is None:
         keyObj = key.Key(chordObj.root())
@@ -361,6 +383,11 @@ def figureFromChordAndKey(chordObj, keyObj=None):
     allFigureString = ''.join(allFigureStringList)
     if allFigureString in figureShorthands:
         allFigureString = figureShorthands[allFigureString]
+
+    # simplify common omissions from 7th chords
+    if allFigureString in ['75', '73']:
+        allFigureString = '7'
+    
     return allFigureString
 
     
@@ -1493,6 +1520,13 @@ class Test(unittest.TestCase):
         cn = alteredChordHalfDim3rdInv.commonName
         self.assertEqual(cn, 'half-diminished seventh chord')
 
+
+    def testOmittedFifth(self):
+        from music21 import roman
+        c = chord.Chord("A3 E-4 G-4")
+        k = key.Key('b-')
+        rnDim7 = roman.romanNumeralFromChord(c, k)
+        self.assertEqual(rnDim7.figure, 'viio7')
 
 class TestExternal(unittest.TestCase):
 

@@ -416,7 +416,9 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
 
 
 class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Fraction of all set class simultaneities that are the most common simultaneity.
+    '''
+    Fraction of all set class simultaneities that the most common simultaneity 
+    occupies.
 
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
@@ -438,7 +440,8 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False 
 
     def _process(self):
-        '''Do processing necessary, storing result in _feature.
+        '''
+        Do processing necessary, storing result in _feature.
         '''
         summation = 0 # count of all 
         histo = self.data['chordifySetClassHistogram']
@@ -453,7 +456,8 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are major triads.
+    '''
+    Percentage of all simultaneities that are major triads.
 
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')

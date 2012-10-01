@@ -14,7 +14,7 @@ from music21.corpus import base
 from music21.corpus import chorales
 from music21.corpus.base import *
 
-__doc__ = base.__doc__
+__doc__ = base.__doc__ #@ReservedAssignment @UndefinedVariable
 
 
 #------------------------------------------------------------------------------

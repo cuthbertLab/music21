@@ -174,13 +174,14 @@ class Spanner(base.Music21Object):
     Implementation notes:
     
     The elements that are included in a spanner are stored in a
-    Stream subclass called :class:`~music21.music21.stream.SpannerStorage`
+    Stream subclass called :class:`~music21.stream.SpannerStorage`
     found as the `.spannedElements` attribute.  That Stream has an
     attribute called `spannerParent` which links to the original spanner.
     Thus, `spannedElements` is smart enough to know where it's stored, but
     it makes deleting/garbage-collecting a spanner a tricky operation:
     
-    Ex. Prove that the spannedElement Stream is linked to container via `spannerParent`:
+    Ex. Prove that the spannedElement Stream is linked to container via 
+    `spannerParent`:
     
     >>> sp1.spannedElements.spannerParent == sp1
     True

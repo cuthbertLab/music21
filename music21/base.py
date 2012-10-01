@@ -395,16 +395,45 @@ class Sites(object):
         else:
             return obj
 
-    def add(self, obj, offset=None, timeValue=None, idKey=None,
-         classString=None):
+    def add(self, obj, offset=None, 
+            timeValue=None, idKey=None, classString=None):
         '''
-        Add a reference to the Sites collection. 
-        If offset is None, it is interpreted as a context
-        If offset is a value, it is interpreted as location, i.e., a Stream.
+        Add a reference to the `Sites` collection for this
+        object. 
 
-        The `timeValue` argument is used to store the time 
-        at which an object is added to locations. 
-        This is not the same as `offset` 
+        N.B. -- like all .sites operations, this is
+        an advanced tool not for standard music21 usage.  Instead of:
+        
+            elObj.add(streamObj, 20.0)
+           
+        use this command, which will take care of `.sites.add` as well
+        as putting `elObj` in `streamObj.elements`:
+        
+            streamObj.insert(20.0, elObj)
+
+        If `offset` is `None`, then `obj` is interpreted as a Context
+        (such as a temperament, a time period, etc.)
+        
+        If `offset` is not `None`, then `obj` is interpreted as location, 
+        i.e., a :class:`~music21.stream.Stream`.  
+
+        `offset` can also be the term `highestTime` which
+        is the highest available time in the obj (used for
+        ``streamObj.append(el)``)
+
+        The `timeValue` argument is used to store the time
+        (in seconds after Jan 1, 1970) when this object was 
+        added to locations. If set to `None`, then the current
+        time is used.
+        
+        `idKey` stores the id() of the obj.  If `None`, then
+        id(obj) is used.
+        
+        `classString` stores the class of obj.  If `None` then
+        `obj.classes[0]` is used.
+        
+        TODO: Tests.  Including updates.
+        
         '''
         # NOTE: this is a performance critical method
 
@@ -426,11 +455,13 @@ class Sites(object):
         # we will not get weakrefs
 
         objRef = None
+
         if obj is not None:
-            classString = obj.classes[0] # get last class
+            if classString is None:
+                classString = obj.classes[0] # get most current class
             objRef = self._prepareObject(obj)
 
-        if updateNotAdd:
+        if updateNotAdd is True:
             singleContextDict = self._definedContexts[idKey]
         else:
             singleContextDict = {}
@@ -453,7 +484,18 @@ class Sites(object):
         '''
         Remove the object (a context or location site) specified 
         from Sites. Object provided can be a location 
-        site or a defined context. 
+        site (i.e., a Stream) or a pure context (like a Temperament). 
+
+        N.B. -- like all .sites operations, this is
+        an advanced tool not for standard music21 usage.  Instead of:
+        
+            elObj.remove(streamObj)
+           
+        use this command, which will take care of `.sites.remove` as well
+        as removing `elObj` from `streamObj.elements`:
+        
+            streamObj.remove(elObj)
+
 
         >>> from music21 import *
         >>> class Mock(base.Music21Object): 
@@ -498,7 +540,6 @@ class Sites(object):
 
         #environLocal.printDebug(['removed site:', 'self._definedContexts.getSites()', self.getSites()])
         
-
     def removeById(self, idKey):
         '''
         Remove a site entry by id key, 
@@ -1356,7 +1397,7 @@ class Sites(object):
         1
         >>> aSites.getAttrByName('attr1') == 234
         True
-        >>> aSites.removeById(id(aObj))
+        >>> aSites.remove(aObj)
         >>> aSites.add(bObj)
         >>> aSites.getAttrByName('attr1') == 98
         True
@@ -1435,7 +1476,7 @@ class Music21Object(object):
     _jsonFreezer = True
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['findAttributeInHierarchy', 'getContextAttr', 'setContextAttr']
+    _DOC_ORDER = ['classes', 'fullyQualifiedClasses', 'findAttributeInHierarchy', 'getContextAttr', 'setContextAttr']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'id': 'A unique identification string (not to be confused with the default `.id()` method.',
@@ -1616,7 +1657,6 @@ class Music21Object(object):
         new.purgeOrphans()
 
         #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
-
         return new
 
 
@@ -1820,7 +1860,7 @@ class Music21Object(object):
         ...     pass
         >>> aSite = Mock()
         >>> a = music21.Music21Object()
-        >>> a.addLocation(aSite, 20)
+        >>> a.sites.add(aSite, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
         30
@@ -1840,7 +1880,7 @@ class Music21Object(object):
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
         >>> a = music21.Music21Object()
-        >>> a.addContext(aObj)
+        >>> a.sites.add(aObj)
         >>> a.getContextAttr('attr1')
         'test'
         '''
@@ -1857,7 +1897,7 @@ class Music21Object(object):
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
         >>> a = music21.Music21Object()
-        >>> a.addContext(aObj)
+        >>> a.sites.add(aObj)
         >>> a.getContextAttr('attr1')
         'test'
         >>> a.setContextAttr('attr1', 3000)
@@ -1867,7 +1907,12 @@ class Music21Object(object):
         return self.sites.setAttrByName(attrName, value)
 
     def addContext(self, obj):
-        '''Add an object to the :class:`~music21.base.Sites` object. For adding a location, use :meth:`~music21.base.Music21Object.addLocation`.
+        '''
+        Add an object to the :class:`~music21.base.Sites` object. 
+        For adding a location, use :meth:`~music21.base.Music21Object.addLocation`.
+
+        DEPRECATED -- use self.sites.add()
+        
 
         >>> import music21
         >>> class Mock(music21.Music21Object): 
@@ -1875,7 +1920,7 @@ class Music21Object(object):
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
         >>> a = music21.Music21Object()
-        >>> a.addContext(aObj)
+        >>> a.sites.add(aObj)
         >>> a.getContextAttr('attr1')
         'test'
         '''
@@ -1894,7 +1939,7 @@ class Music21Object(object):
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
         >>> a = music21.Music21Object()
-        >>> a.addContext(aObj)
+        >>> a.sites.add(aObj)
         >>> a.hasContext(aObj)
         True
         >>> a.hasContext(None)
@@ -1909,26 +1954,29 @@ class Music21Object(object):
 
     def addLocation(self, site, offset):
         '''
+        
+        DEPRECATED: use self.sites.add(site, offset)
+        
         Add a location to the :class:`~music21.base.Sites` object. 
         The supplied object is a reference to the object (the site) that 
         contains an offset of this object.  For example, if this 
         Music21Object was Note, the site would be a Stream (or Stream 
         subclass) and the offset would be a number for the offset. 
 
-
         This is only for advanced location method and is not a complete 
         or sufficient way to add an object to a Stream. 
-
 
         >>> from music21 import note, stream
         >>> s = stream.Stream()
         >>> n = note.Note('E-5')
-        >>> n.addLocation(s, 10)
+        >>> n.sites.add(s, 10)
         '''
         self.sites.add(site, offset)
 
     def getSites(self, idExclude=None):
         '''
+        DEPRECATED: use self.sites.getSites() instead...
+        
         Return a list of all objects that store 
         a location for this object. Will include None, 
         the default empty site placeholder. 
@@ -1948,6 +1996,8 @@ class Music21Object(object):
 
     def getSiteIds(self):
         '''
+        DEPRECATED: use self.sites.getSiteIds() instead.
+
         Return a list of all site Ids, or the 
         id() value of the sites of this object. 
         '''
@@ -1968,71 +2018,74 @@ class Music21Object(object):
         '''
         return id(other) in self.sites.getSiteIds()
 
-    def getCommonSiteIds(self, other):
-        '''Given another music21 object, return a 
-        list of all common site ids. Do not include 
-        the default empty site, None. 
+#    def getCommonSiteIds(self, other):
+#        '''
+#        Given another music21 object, return a 
+#        list of all common site ids. Do not include 
+#        the default empty site, None. 
+#
+#        >>> from music21 import note, stream
+#        >>> s1 = stream.Stream()
+#        >>> s2 = stream.Stream()
+#        >>> n1 = note.Note()
+#        >>> n2 = note.Note()
+#        >>> s1.append(n1)
+#        >>> s1.append(n2)
+#        >>> s2.append(n2)
+#        >>> n1.getCommonSiteIds(n2) == [id(s1)]
+#        True
+#        >>> s2.append(n1)
+#        >>> n1.getCommonSiteIds(n2) == [id(s1), id(s2)]
+#        True
+#        '''
+#        src = self.getSiteIds()
+#        dst = other.getSiteIds()
+#        post = []
+#        for i in src:
+#            if i is None:
+#                continue
+#            if i in dst:
+#                post.append(i)
+#        return post
 
-
-        >>> from music21 import note, stream
-        >>> s1 = stream.Stream()
-        >>> s2 = stream.Stream()
-        >>> n1 = note.Note()
-        >>> n2 = note.Note()
-        >>> s1.append(n1)
-        >>> s1.append(n2)
-        >>> s2.append(n2)
-        >>> n1.getCommonSiteIds(n2) == [id(s1)]
-        True
-        >>> s2.append(n1)
-        >>> n1.getCommonSiteIds(n2) == [id(s1), id(s2)]
-        True
-        '''
-        src = self.getSiteIds()
-        dst = other.getSiteIds()
-        post = []
-        for i in src:
-            if i is None:
-                continue
-            if i in dst:
-                post.append(i)
-        return post
-
-    def getCommonSites(self, other):
-        '''Given another object, return a list of all sites
-        in common between the two objects. 
-
-        >>> from music21 import note, stream
-        >>> s1 = stream.Stream()
-        >>> s2 = stream.Stream()
-        >>> n1 = note.Note()
-        >>> n2 = note.Note()
-        >>> s1.append(n1)
-        >>> s1.append(n2)
-        >>> s2.append(n2)
-        >>> n1.getCommonSites(n2) == [s1]
-        True
-        >>> s2.append(n1)
-        >>> n1.getCommonSites(n2) == [s1, s2]
-        True
-
-        '''
-        src = self.getSites()
-        dstIds = other.getSiteIds()
-        post = []
-        for obj in src:
-            if obj is None:
-                continue
-            if id(obj) in dstIds:
-                post.append(obj)
-        return post
+#    def getCommonSites(self, other):
+#        '''
+#        Given another object, return a list of all sites
+#        in common between the two objects. 
+#
+#        >>> from music21 import note, stream
+#        >>> s1 = stream.Stream()
+#        >>> s2 = stream.Stream()
+#        >>> n1 = note.Note()
+#        >>> n2 = note.Note()
+#        >>> s1.append(n1)
+#        >>> s1.append(n2)
+#        >>> s2.append(n2)
+#        >>> n1.getCommonSites(n2) == [s1]
+#        True
+#        >>> s2.append(n1)
+#        >>> n1.getCommonSites(n2) == [s1, s2]
+#        True
+#
+#        '''
+#        src = self.getSites()
+#        dstIds = other.getSiteIds()
+#        post = []
+#        for obj in src:
+#            if obj is None:
+#                continue
+#            if id(obj) in dstIds:
+#                post.append(obj)
+#        return post
 
     def hasSpannerSite(self):
-        '''Return True if this object is found in 
+        '''
+        DEPRECATED: use self.sites.hasSpannerSite()
+        
+        Return True if this object is found in 
         any Spanner (i.e. has any spanners attached). 
         This is determined by looking 
         for a SpannerStorage Stream class as a Site.
-
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -2053,7 +2106,9 @@ class Music21Object(object):
 
 
     def getSpannerSites(self):
-        '''Return a list of all sites that are 
+        '''
+        
+        Return a list of all sites that are 
         Spanner or Spanner subclasses. This provides a way for 
         objects to be aware of what Spanners they 
         reside in. Note that Spanners are not Stream 
@@ -2078,11 +2133,11 @@ class Music21Object(object):
 
 
     def hasVariantSite(self):
-        '''Return True if this object is found in 
+        '''
+        Return True if this object is found in 
         any Variant
         This is determined by looking 
         for a VariantStorage Stream class as a Site.
-
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -2101,7 +2156,11 @@ class Music21Object(object):
         return self.sites.hasVariantSite()
 
     def removeLocationBySite(self, site):
-        '''Remove a location in the :class:`~music21.base.Sites` object.
+        '''
+        TO-BE DEPRECATED: use self.sites.remove() instead and set activeSite
+        manually.
+        
+        Remove a location in the :class:`~music21.base.Sites` object.
 
         This is only for advanced location method and
         is not a complete or sufficient way to remove an object from a Stream. 
@@ -2109,7 +2168,7 @@ class Music21Object(object):
         >>> from music21 import note, stream
         >>> s = stream.Stream()
         >>> n = note.Note()
-        >>> n.addLocation(s, 10)
+        >>> n.sites.add(s, 10)
         >>> n.activeSite = s
         >>> n.removeLocationBySite(s)
         >>> n.activeSite == None
@@ -2126,13 +2185,16 @@ class Music21Object(object):
 
 
     def removeLocationBySiteId(self, siteId):
-        '''Remove a location in the 
+        '''
+        DEPRECATED -- use sites.removeById and set activeSite manually.
+        
+        Remove a location in the 
         :class:`~music21.base.Sites` object by id.
 
         >>> from music21 import note, stream
         >>> s = stream.Stream()
         >>> n = note.Note()
-        >>> n.addLocation(s, 10)
+        >>> n.sites.add(s, 10)
         >>> n.activeSite = s
         >>> n.removeLocationBySiteId(id(s))
         >>> n.activeSite == None
@@ -2176,41 +2238,41 @@ class Music21Object(object):
             self.removeLocationBySiteId(i)
 
 
-    def purgeUndeclaredIds(self, declaredIds, excludeStorageStreams=True):
-        '''
-        TODO- remove...
-        
-        Remove all sites except those that are declared with 
-        the `declaredIds` list. 
-
-        The `excludeStorageStreams` are SpannerStorage and VariantStorage.
-
-        This method is used in Stream serialization to remove 
-        lingering sites that are the result of temporary Streams. 
-        
-        TODO: Test!
-        '''
-        orphans = []
-        # TODO: this can be optimized to get actually get sites
-        for s in self.sites.getSites():
-            if s is None: 
-                continue
-            idTarget = id(s)
-            if idTarget in declaredIds: # skip all declared ids
-                continue # do nothing
-            if s.isStream:
-                if excludeStorageStreams:
-                    # only get those that are not Storage Streams
-                    if ('SpannerStorage' not in s.classes 
-                        and 'VariantStorage' not in s.classes):
-                        #environLocal.printDebug(['removing orphan:', s])
-                        orphans.append(idTarget)
-                else: # get all 
-                    orphans.append(idTarget)
-
-        for i in orphans:   
-            #environLocal.printDebug(['purgeingUndeclaredIds', i])     
-            self.removeLocationBySiteId(i)        
+#    def purgeUndeclaredIds(self, declaredIds, excludeStorageStreams=True):
+#        '''
+#        TODO- remove...
+#        
+#        Remove all sites except those that are declared with 
+#        the `declaredIds` list. 
+#
+#        The `excludeStorageStreams` are SpannerStorage and VariantStorage.
+#
+#        This method is used in Stream serialization to remove 
+#        lingering sites that are the result of temporary Streams. 
+#        
+#        TODO: Test!
+#        '''
+#        orphans = []
+#        # TODO: this can be optimized to get actually get sites
+#        for s in self.sites.getSites():
+#            if s is None: 
+#                continue
+#            idTarget = id(s)
+#            if idTarget in declaredIds: # skip all declared ids
+#                continue # do nothing
+#            if s.isStream:
+#                if excludeStorageStreams:
+#                    # only get those that are not Storage Streams
+#                    if ('SpannerStorage' not in s.classes 
+#                        and 'VariantStorage' not in s.classes):
+#                        #environLocal.printDebug(['removing orphan:', s])
+#                        orphans.append(idTarget)
+#                else: # get all 
+#                    orphans.append(idTarget)
+#
+#        for i in orphans:   
+#            #environLocal.printDebug(['purgeingUndeclaredIds', i])     
+#            self.removeLocationBySiteId(i)        
 
 
     def purgeLocations(self, rescanIsDead=False):
@@ -2651,7 +2713,9 @@ class Music21Object(object):
 
     def next(self, classFilterList=None, flattenLocalSites=False, 
         beginNearest=True):
-        '''Get the next element found in a site of this Music21Object. 
+        '''
+        Get the next element found in a the activeSite (or other Sites)
+        of this Music21Object. 
 
         The `classFilterList` can be used to specify one or more classes to match.
 
@@ -2669,7 +2733,9 @@ class Music21Object(object):
                         
     def previous(self, classFilterList=None, flattenLocalSites=False,
         beginNearest=True):
-        '''Get the previous element found in a site of this Music21Object. 
+        '''
+        Get the previous element found in the activeSite or other .sites of this 
+        Music21Object. 
 
         The `classFilterList` can be used to specify one or more classes to match.
 
@@ -2728,12 +2794,12 @@ class Music21Object(object):
 
 
     activeSite = property(_getActiveSite, _setActiveSite, 
-        doc='''A reference to the most-recent object used to 
+        doc='''       
+        A reference to the most-recent object used to 
         contain this object. In most cases, this will be a 
         Stream or Stream sub-class. In most cases, an object's 
         activeSite attribute is automatically set when an the 
         object is attached to a Stream.
-        
         
         >>> from music21 import *
         >>> n = note.Note("C#4")
@@ -2753,6 +2819,9 @@ class Music21Object(object):
         >>> n.activeSite = p
         >>> n.offset
         20.0
+        
+        DEVELOPER N.B. -- the guts of this call will
+        be moved to .sites soon.
         ''')
 
     def _getOffset(self):
@@ -2774,7 +2843,8 @@ class Music21Object(object):
         >>> n.offset
         3.0
         
-        There is a branch that does slow searches.  See test/testSerialization to have it active.
+        There is a branch that does slow searches.  
+        See test/testSerialization to have it active.
         '''
         #there is a problem if a new activeSite is being set and no offsets have 
         # been provided for that activeSite; when self.offset is called, 
@@ -2808,7 +2878,8 @@ class Music21Object(object):
         raise Exception('request within %s for offset cannot be made with activeSite of %s (id: %s)' % (self.__class__, self.activeSite, activeSiteId))            
 
     def _setOffset(self, value):
-        '''Set the offset for the activeSite. 
+        '''
+        Set the offset for the activeSite. 
         '''
         # assume that most times this is a number; in that case, the fastest
         # thing to do is simply try to set the offset w/ float(value)
@@ -2841,43 +2912,53 @@ class Music21Object(object):
         as `Part`, `Measure`, or `Voice`.  It is a simpler
         way of calling `o.getOffsetBySite(o.activeSite)`.
 
-        If we put a `Note` into a 
+        If we put a `Note` into a `Stream`, we will see the activeSite changes.
 
         >>> from music21 import *
         >>> n1 = note.Note("D#3")
-        >>> s1 = stream.Measure()
-        >>> s1.insert(10.0, n1)
+        >>> n1.activeSite is None
+        True
+        
+        >>> m1 = stream.Measure()
+        >>> m1.number = 4
+        >>> m1.insert(10.0, n1)
         >>> n1.offset
         10.0
-        >>> n1.activeSite is s1
+        >>> n1.activeSite
+        <music21.stream.Measure 4 offset=0.0>
+
+        >>> n1.activeSite is m1
         True
         
         The most recently referenced `Stream` becomes an object's
         `activeSite` and thus the place where `.offset` looks to
         find its number.  
         
-        >>> s2 = stream.Measure()
-        >>> s2.insert(20.0, n1)
+        >>> m2 = stream.Measure()
+        >>> m2.insert(20.0, n1)
+        >>> m2.number = 5
         >>> n1.offset
         20.0
-        >>> n1.activeSite is s2
+        >>> n1.activeSite is m2
         True
 
         Notice though that `.offset` depends on the `.activeSite`
         which is the most recently accessed/referenced Stream.
         
-        Here we will iterate over the `elements` in `s1` and we
+        Here we will iterate over the `elements` in `m1` and we
         will see that the `.offset` of `n1` now is its offset in
-        `s1` even though we haven't done anything directly to `n1`:
+        `m1` even though we haven't done anything directly to `n1`.
+        Simply iterating over a site is enough to change the `.activeSite`
+        of its elements:
         
-        >>> for element in s1:
+        >>> for element in m1:
         ...     pass
         >>> n1.offset
         10.0 
 
         
-        The property can also set the offset for the object if no container has been
-        set
+        The property can also set the offset for the object if no 
+        container has been set:
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -2885,6 +2966,7 @@ class Music21Object(object):
         >>> n1.offset = 20
         >>> n1.offset
         20.0
+
         >>> s1 = stream.Stream()
         >>> s1.append(n1)
         >>> n1.offset
@@ -2893,22 +2975,33 @@ class Music21Object(object):
         >>> s2.insert(30.5, n1)
         >>> n1.offset
         30.5
+
+        After calling `getElementById` on `s1`, the
+        returned element's `offset` will be its offset
+        in `s1`.
+
         >>> n2 = s1.getElementById('hi')
         >>> n2 is n1
         True
         >>> n2.offset
         0.0
+
+        Iterating over the elements in a Stream will
+        make its `offset` be the offset in iterated
+        Stream.
+
         >>> for thisElement in s2:
         ...     print thisElement.offset
         30.5
         
+        When in doubt, use `.getOffsetBySite(streamObj)`
+        which is safer.
         ''')
 
 
     def _getDuration(self):
         '''
         Gets the DurationObject of the object or None
-
         '''
         from music21 import duration
         # lazy duration creation
@@ -2930,7 +3023,8 @@ class Music21Object(object):
             raise Exception('this must be a Duration object, not %s' % durationObj)
 
     duration = property(_getDuration, _setDuration, 
-        doc = '''Get and set the duration of this object as a Duration object.
+        doc = '''
+        Get and set the duration of this object as a Duration object.
         ''')
 
 
@@ -2947,7 +3041,6 @@ class Music21Object(object):
         >>> ng = n.getGrace()
         >>> ng.isGrace
         True
-
         ''')        
 
 
@@ -2963,7 +3056,8 @@ class Music21Object(object):
         self._priority = value
 
     priority = property(_getPriority, _setPriority,
-        doc = '''Get and set the priority integer value. 
+        doc = '''
+        Get and set the priority integer value. 
 
         Priority specifies the order of processing from left (lowest number)
         to right (highest number) of objects at the same offset.  For 
@@ -2980,7 +3074,7 @@ class Music21Object(object):
         to have Elements that appear non-priority set elements.
 
         In case of tie, there are defined class sort orders defined in 
-        music21.base.CLASS_SORT_ORDER.  For instance, a key signature 
+        `music21.base.CLASS_SORT_ORDER`.  For instance, a key signature 
         change appears before a time signature change before a 
         note at the same offset.  This produces the familiar order of 
         materials at the start of a musical score.
@@ -3002,7 +3096,9 @@ class Music21Object(object):
         '''
         Public interface to operation on Sites.
 
-        NOTE: Any Music21Object subclass that contains private Streams (like Spanner and Variant) must override these methods
+        NOTE: Any Music21Object subclass that 
+        contains private Streams (like Spanner and Variant) must 
+        override these methods.
 
         >>> import music21
         >>> aM21Obj = music21.Music21Object()
@@ -3010,7 +3106,7 @@ class Music21Object(object):
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
-        >>> aM21Obj.addLocation(bM21Obj, 50)
+        >>> aM21Obj.sites.add(bM21Obj, 50)
         >>> aM21Obj.activeSite = bM21Obj
         >>> aM21Obj.unwrapWeakref()
 
@@ -3038,7 +3134,7 @@ class Music21Object(object):
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
-        >>> aM21Obj.addLocation(bM21Obj, 50)
+        >>> aM21Obj.sites.add(bM21Obj, 50)
         >>> aM21Obj.activeSite = bM21Obj
         >>> aM21Obj.unwrapWeakref()
         >>> aM21Obj.wrapWeakref()
@@ -3188,12 +3284,7 @@ class Music21Object(object):
 
         N.B. score.write('lily') returns a bare lilypond file,
         score.show('lily') runs it through lilypond and displays it as a png.
-
-
-        OMIT_FROM_DOCS        
-        This might need to return the file path.
         '''
-
         # note that all formats here must be defined in 
         # common.VALID_SHOW_FORMATS
 
@@ -3253,7 +3344,6 @@ class Music21Object(object):
             returnedFilePath = self.write(fileFormat)
             environLocal.launch(fileFormat, returnedFilePath, app=app)
 
-
         else:
             raise Music21ObjectException('no such show format is supported:', fmt)
 
@@ -3302,7 +3392,7 @@ class Music21Object(object):
         addTies=True, displayTiedAccidentals=False, delta=1e-06):
         '''
         Split an Element into two Elements at a provided 
-        QuarterLength into the Element.
+        `quarterLength` (offset) into the Element.
 
         >>> from music21 import *
         >>> a = note.Note('C#5')
@@ -3334,7 +3424,6 @@ class Music21Object(object):
         >>> c.lyric
         >>> c.expressions
         [<music21.expressions.Trill>, <music21.expressions.Fermata>]
-
 
         Make sure that ties remain as they should be:
         
@@ -3571,8 +3660,8 @@ class Music21Object(object):
     def splitAtDurations(self):
         '''
         Takes a Music21Object (e.g., a note.Note) and returns a list of similar
-        objects with only a single
-        duration.DurationUnit in each. Ties are added if the object supports ties. 
+        objects with only a single duration.DurationUnit in each. 
+        Ties are added if the object supports ties. 
 
         Articulations only appear on the first note.  Same with lyrics.
         
@@ -3595,7 +3684,6 @@ class Music21Object(object):
         >>> b[1].duration.type
         'whole'
         
-        
         >>> c = note.Note()
         >>> c.quarterLength = 2.5
         >>> d, e = c.splitAtDurations()
@@ -3614,7 +3702,6 @@ class Music21Object(object):
         >>> d, e = c.splitAtDurations()
         >>> e.tie.type
         'start'
-        
         
         Rests have no ties:
         
@@ -3666,7 +3753,6 @@ class Music21Object(object):
     #---------------------------------------------------------------------------
     # temporal and beat based positioning
 
-
     def _getMeasureNumber(self):
         '''
         If this object is contained in a Measure, return the measure number
@@ -3684,7 +3770,8 @@ class Music21Object(object):
 
     measureNumber = property(_getMeasureNumber, 
         doc = '''
-        Return the measure number of a Measure that contains this object if the object is in a measure. 
+        Return the measure number of a :class:`~music21.stream.Measure`  that contains this 
+        object if the object is in a measure. 
         
         Returns None if the object is not in a measure.  Also note that by default Measure objects
         have measure number 0.
@@ -4502,8 +4589,8 @@ class Test(unittest.TestCase):
         n = note.Note()
         m.append(n)
         
-        n.pitch.addContext(m)
-        n.pitch.addContext(n) 
+        n.pitch.sites.add(m)
+        n.pitch.sites.add(n) 
         self.assertEqual(n.pitch.getContextAttr('number'), 34)
         n.pitch.setContextAttr('lyric',  
                                n.pitch.getContextAttr('number'))
@@ -4956,7 +5043,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
-        b1.addLocation(s, 'highestTime')
+        b1.sites.add(s, 'highestTime')
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
         
         s.append(n2)

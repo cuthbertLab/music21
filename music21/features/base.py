@@ -242,10 +242,11 @@ class StreamForms(object):
         return self._forms.keys()
 
     def _prepareStream(self, streamObj):
-        '''Common routines done on Streams prior to processing. Return a new Stream
+        '''
+        Common routines done on Streams prior to processing. Return a new Stream
         '''   
         # this causes lots of deepcopys, but an inPlace operation loses 
-        #accuracy on feature extractors         
+        # accuracy on feature extractors         
         streamObj = streamObj.stripTies(retainContainers=True)
         return streamObj
 
@@ -510,7 +511,7 @@ class DataInstance(object):
     (by stripping ties, etc.) and stores 
     multiple commonly-used stream representations once, providing rapid processing. 
     '''
-    def __init__(self, streamObj=None, id=None):
+    def __init__(self, streamObj=None, id=None): #@ReservedAssignment
         self.stream = streamObj
 
         # perform basic operations that are performed on all
@@ -949,7 +950,7 @@ class DataSet(object):
             post.append(True)
         return post
 
-    def addData(self, dataOrStreamOrPath, classValue=None, id=None):
+    def addData(self, dataOrStreamOrPath, classValue=None, id=None): #@ReservedAssignment
         '''Add a Stream, DataInstance, or path to a corpus or local file to this data set.
 
         The class value passed here is assumed to be the same as the classLable assigned at startup. 
@@ -1159,11 +1160,11 @@ def extractorsById(idOrList, library=['jSymbolic', 'native']):
         idOrList = [idOrList]
 
     flatIds = []
-    for id in idOrList:
-        id = id.strip().lower()
-        id.replace('-', '')
-        id.replace(' ', '')
-        flatIds.append(id)
+    for featureId in idOrList:
+        featureId = featureId.strip().lower()
+        featureId.replace('-', '')
+        featureId.replace(' ', '')
+        flatIds.append(featureId)
 
     post = []
     if len(flatIds) == 0:
@@ -1192,7 +1193,7 @@ def extractorById(idOrList, library=['jSymbolic', 'native']):
     return None # no match
 
 
-def vectorById(streamObj, id, library=['jSymbolic', 'native']):
+def vectorById(streamObj, vectorId, library=['jSymbolic', 'native']):
     '''Utility function to get a vector from an extractor
 
     >>> from music21 import *
@@ -1201,7 +1202,7 @@ def vectorById(streamObj, id, library=['jSymbolic', 'native']):
     >>> features.vectorById(s, 'p20')
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
     '''
-    fe = extractorById(id)(streamObj) # call class with stream
+    fe = extractorById(vectorId)(streamObj) # call class with stream
     if fe is None:
         return None # could raise exception
     return fe.extract().vector
@@ -1453,14 +1454,14 @@ class Test(unittest.TestCase):
         for o, name in [(oChina1, 'han1'), 
                         (oChina2, 'han2')]:
             for w in o.scores:
-                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
-                ds.addData(w, classValue='China', id=id)
+                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa1, 'boehme10'), 
                         (oMitteleuropa2, 'boehme20')]:
             for w in o.scores:
-                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
-                ds.addData(w, classValue='Mitteleuropa', id=id)
+                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
         ds.process()
@@ -1489,13 +1490,13 @@ class Test(unittest.TestCase):
         # add works, defining the class value 
         for o, name in [(oChina1, 'han1')]:
             for w in o.scores:
-                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
-                ds.addData(w, classValue='China', id=id)
+                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa1, 'boehme10')]:
             for w in o.scores:
-                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
-                ds.addData(w, classValue='Mitteleuropa', id=id)
+                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
         ds.process()
@@ -1512,13 +1513,13 @@ class Test(unittest.TestCase):
         # add works, defining the class value 
         for o, name in [(oChina2, 'han2')]:
             for w in o.scores:
-                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
-                ds.addData(w, classValue='China', id=id)
+                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa2, 'boehme20')]:
             for w in o.scores:
-                id = 'essenFolksong/%s-%s' % (name, w.metadata.number)
-                ds.addData(w, classValue='Mitteleuropa', id=id)
+                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
         ds.process()

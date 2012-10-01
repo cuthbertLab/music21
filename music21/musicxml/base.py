@@ -34,8 +34,9 @@ import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
 
 try:
-    import cPickle as pickleMod
+    import cPickle as pickleMod # much faster...
 except ImportError:
+    # in case we're on Jython, etc.
     import pickle as pickleMod
 
 import xml.sax

@@ -1268,7 +1268,8 @@ class Chord(note.NotRest):
 
 
     def root(self, newroot=False, find=True):
-        '''Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.)
+        '''
+        Returns or sets the Root of the chord.  if not set, will run findRoot (q.v.)
 
         example:
 
@@ -1309,42 +1310,150 @@ class Chord(note.NotRest):
 
 
     def findRoot(self):
-        ''' Looks for the root by finding the note with the most 3rds above it
+        ''' 
+        Looks for the root usually by finding the note with the most 3rds above it
+        
         Generally use root() instead, since if a chord doesn't know its root, root() will
         run findRoot() automatically.
 
-        example:
+        Example:
+        
         >>> from music21 import *
         >>> cmaj = chord.Chord(['E', 'G', 'C'])
         >>> cmaj.findRoot()
         <music21.pitch.Pitch C>
-        '''
-        oldRoots = copy.copy(self.pitches)
-        newRoots = []
-        roots = 0
-        n = 3
+        
+        For some chords we make an exception.  For instance, this chord in B-flat minor:
+        
+        >>> aDim7no3rd = chord.Chord(['A3', 'E-4', 'G4'])
+        
+        Could be considered an type of E-flat 11 chord with a 3rd, but no 5th, 7th, or 9th,
+        in 5th inversion.  That doesn't make sense, so we should call it an A dim 7th chord
+        with no 3rd.
+        
+        >>> aDim7no3rd.findRoot()
+        <music21.pitch.Pitch A3>
+        
+        The root of a 13th chord (which could be any chord in any inversion) is designed to
+        be the bass:
+        
+        >>> chord.Chord("F3 A3 C4 E-4 G-4 B4 D5").findRoot()
+        <music21.pitch.Pitch F3>
 
-        while True:
-            if (len(oldRoots) == 1):
-                return oldRoots[0]
-            elif (len(oldRoots) == 0):
-                raise ChordException("no notes in chord")
-            for testRoot in oldRoots:
-                if self.getChordStep(n, testRoot): ##n>7 = bug
-                    newRoots.append(testRoot)
-                    roots = roots + 1
-            if (roots == 1):
-                return newRoots.pop()
-            elif (roots == 0):
-                return oldRoots[0]
-            oldRoots = newRoots
-            newRoots = []
-            n = n + 2
-            if (n > 7):
-                n = n - 7
-            if (n == 6):
-                raise ChordException("looping chord with no root: comprises all notes in the scale")
-            roots = 0
+        >>> lotsOfNotes = chord.Chord(['E3','C4','G4','B-4','E5','G5'])
+        >>> r = lotsOfNotes.findRoot()
+        >>> r
+        <music21.pitch.Pitch C4>
+        >>> r is lotsOfNotes.pitches[1]
+        True 
+        '''
+        def rootnessFunction(rootThirdList):
+            '''
+            returns a value for how likely this pitch
+            is to be a root given the number of thirds and fifths above it.
+            
+            Takes a list of True's and Falses's where each value represents whether
+            a note has a 3rd, 5th, 7th, 9th, 11th, and 13th above it
+            and calculates a value based on that.  The highest score on
+            rootnessFunction is the root.
+            
+            This formula might be tweaked if wrong notes are found.
+            
+            rootness function might be divided by the inversion number
+            in case that's a problem.
+            '''
+            score = 0
+            for i, val in enumerate(rootThirdList):
+                if val is True:
+                    score += 1.0/(i+6)
+            return score
+        
+        stepsFound = []
+        nonDuplicatingPitches = []
+        for p in self.pitches:
+            if p.step in stepsFound:
+                continue
+            else:
+                stepsFound.append(p.step)
+                nonDuplicatingPitches.append(p)
+        
+        closedChord = Chord(nonDuplicatingPitches)
+        chordBass = closedChord.bass()
+        lenPitches = len(closedChord.pitches)
+        rootThirdsList = []
+        rootnessFunctionScores = []
+        
+        if len(closedChord.pitches) == 0:
+            raise ChordException("no notes in chord %r" % self)            
+        elif len(closedChord.pitches) == 1:
+            return self.pitches[0]
+        
+        indexOfPitchesWithPerfectlyStackedThirds = []
+        
+        for i,p in enumerate(closedChord.pitches):
+            currentListOfThirds = []
+            for chordStepTest in (3, 5, 7, 2, 4, 6):
+                if closedChord.getChordStep(chordStepTest, p):
+                    currentListOfThirds.append(True)
+                else:
+                    currentListOfThirds.append(False)
+            
+            hasFalse = False
+            for j in range(lenPitches - 1):
+                if currentListOfThirds[j] is False:
+                    hasFalse = True
+            
+            if hasFalse is False:
+                indexOfPitchesWithPerfectlyStackedThirds.append(i)
+            rootThirdsList.append(currentListOfThirds)
+            rootnessScore = rootnessFunction(currentListOfThirds)
+            if p is not chordBass:
+                rootnessScore *= 0.8  # penalize non-bass notes for stacked chords...
+            rootnessFunctionScores.append(rootnessScore)
+
+        # if one pitch has perfectlyStackedThirds, return it always:
+        if len(indexOfPitchesWithPerfectlyStackedThirds) == 1:
+            return closedChord.pitches[indexOfPitchesWithPerfectlyStackedThirds[0]]
+        elif len(indexOfPitchesWithPerfectlyStackedThirds) == len(closedChord.pitches):
+            # they're all equally good. return the bass note.  Is true for 13th chords...
+            return chordBass
+        
+        # no notes (or more than one...) have perfectlyStackedThirds above them.  Return
+        # the highest scoring note...
+        
+        mostRootyIndex = rootnessFunctionScores.index(max(rootnessFunctionScores))
+        
+        return closedChord.pitches[mostRootyIndex]
+        
+#        # fast...not a deepcopy.
+#        oldRoots = copy.copy(self.pitches)
+#        newRoots = []
+#        roots = 0
+#        n = 3
+#
+#        while True:
+#            if (len(oldRoots) == 1):
+#                return oldRoots[0]
+#            elif (len(oldRoots) == 0):
+#                raise ChordException("no notes in chord")
+#            for testRoot in oldRoots:
+#                if self.getChordStep(n, testRoot): ##n>7 = bug
+#                    newRoots.append(testRoot)
+#                    roots = roots + 1
+#            if (roots == 1):
+#                return newRoots.pop()
+#            elif (roots == 0):
+#                return oldRoots[0]
+#            oldRoots = newRoots
+#            newRoots = []
+#            n = n + 2
+#            if (n > 7):
+#                n = n - 7
+#            if (n == 6):
+#                # root of a 13th chord is the bass.
+#                return self.bass()
+#                #raise ChordException("looping chord with no root: comprises all notes in the scale")
+#            roots = 0
 
 
 # this was an old method of assigning duration to a Chord. better now is to use
@@ -2655,8 +2764,9 @@ class Chord(note.NotRest):
         else:
             return False
 
-    def inversion(self, newInversion=None, find=True):
-        ''' returns an integer representing which inversion (if any) the chord is in. Chord
+    def inversion(self, newInversion=None, find=True, testRoot=None):
+        '''
+        Returns an integer representing which inversion (if any) the chord is in. Chord
         does not have to be complete, but determines the inversion by looking at the relationship
         of the bass note to the root. Returns max value of 5 for inversion of a thirteenth chord.
         Returns 0 if bass to root interval is 1 or if interval is not a common inversion (1st-5th).
@@ -2688,8 +2798,15 @@ class Chord(note.NotRest):
         >>> BbEleventh5thInversion.bass(pitch.Pitch('E-4'))
         >>> BbEleventh5thInversion.inversion()
         5
+        
+        if testRoot is True then that temporary root is used instead of self.root()
         '''
         #self._inversion = None
+        if testRoot is not None:
+            rootPitch = testRoot
+        else:
+            rootPitch = self.root()
+        
         if newInversion:
             if common.isNum(newInversion):
                 self._inversion = newInversion
@@ -2698,9 +2815,9 @@ class Chord(note.NotRest):
                     self._inversion = int(newInversion)
                 except:
                     raise ChordException("Inversion must be an integer")
-        elif self._inversion is None and find:
+        elif self._inversion is None and find is True:
             try:
-                if self.root() == None or self.bass() == None:
+                if rootPitch == None or self.bass() == None:
                     return None
             except ChordException:
                 raise ChordException("Not a normal inversion")
@@ -2709,7 +2826,7 @@ class Chord(note.NotRest):
             #do all interval calculations with bassNote being one octave below root note
             tempBassPitch = copy.deepcopy(self.bass())
             tempBassPitch.octave = 1
-            tempRootPitch = copy.deepcopy(self.root())
+            tempRootPitch = copy.deepcopy(rootPitch)
             tempRootPitch.octave = 2
 
             bassToRoot = interval.notesToInterval(tempBassPitch, tempRootPitch).generic.simpleDirected
@@ -4067,13 +4184,16 @@ class Test(unittest.TestCase):
         LowBFlat.name = 'B-'
         LowBFlat.octave = 3
 
+
         chord19 = Chord([MiddleC, HighEFlat, LowBFlat])
+        self.assertEqual(chord19.root(), MiddleC)
+        self.assertEqual(chord19.inversion(), 3)
+        self.assertEqual(chord19.inversionName(), 42)
+        '''assert chord20.inversion() == 4 intentionally raises error'''
+
         chord20 = Chord([LowC, LowBFlat])
         chord20.root(LowBFlat)
 
-        assert chord19.inversion() == 3
-        assert chord19.inversionName() == 42
-        '''assert chord20.inversion() == 4 intentionally raises error'''
 
         chord21 = Chord([MiddleC, HighEFlat, LowGFlat])
         assert chord21.root().name == 'C'
@@ -4139,10 +4259,10 @@ class Test(unittest.TestCase):
         assert chord30.root().name == 'C'
 
 
-        '''Should raise error'''
         chord31 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD, HighF, HighAFlat])
-
-        self.assertRaises(ChordException, chord31.root)
+        # Used to raise an error; now should return middleC
+        #self.assertRaises(ChordException, chord31.root)
+        self.assertEqual(chord31.root(), MiddleC)
 
         chord32 = Chord([MiddleC, MiddleE, MiddleG, MiddleB])
         assert chord32.bass().name == 'C'

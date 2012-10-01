@@ -236,9 +236,6 @@ class StreamFreezer(StreamFreezeThawBase):
         the Stream is deepcopied.  `fastButUnsafe = True` ignores the destructive
         parts of this.
         
-        Calls `purgeUndeclaredIds`, `unwrapWeakref`, and `freezeIds` the stream
-        and each substream.
-
         >>> from music21 import freezeThaw
         >>> from music21 import *
 
@@ -272,20 +269,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         if self.topLevel is True:
             self.recursiveClearSites(streamObj)
-#        for el in allEls:
-#            if self.topLevel is True:
-#                # all done, clear 'dem sites! we don't need them at all
-#                el.sites.clear()
-#            else: # only clear those not in hierarchy, but unwrap all remaining...
-#                elSiteIds = el.sites.getSiteIds()
-#                for thisSiteId in elSiteIds:
-#                    if thisSiteId is None:
-#                        continue
-#                    if thisSiteId not in self.streamIds:
-#                        el.sites.removeById(thisSiteId)           
-#            el.unwrapWeakref()
-#            el._activeSite = None
-                
+
     def recursiveClearSites(self, startObj):
         '''
         recursively clear all sites, including activeSites, taking into account

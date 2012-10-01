@@ -366,9 +366,8 @@ class Stream(base.Music21Object):
 #         #environLocal.printDebug(['calling __del__ from Stream', self])
 #         # this is experimental
 #         # this did not offer improvements, and raised a number of errors
-#         siteId = id(self)
 #         for e in self._elements:
-#             e.removeLocationBySiteId(siteId)
+#             e.sites.remove(self)
 
 
     #---------------------------------------------------------------------------
@@ -458,19 +457,19 @@ class Stream(base.Music21Object):
             value.isStream):
             self._elements = value._elements
             for e in self._elements:
-                e.addLocation(self, e.getOffsetBySite(value))
+                e.sites.add(self, e.getOffsetBySite(value))
                 e.activeSite = self
 
             self._endElements = value._endElements
             for e in self._endElements:
-                e.addLocation(self, e.getOffsetBySite(value))
+                e.sites.add(self, e.getOffsetBySite(value))
                 e.activeSite = self
             self._elementsChanged()
         else:
             # replace the complete elements list
             self._elements = value
             for e in self._elements:
-                e.addLocation(self, e.offset)
+                e.sites.add(self, e.offset)
                 e.activeSite = self
             self._elementsChanged()
         return value
@@ -509,7 +508,9 @@ class Stream(base.Music21Object):
         ''')
 
     def __setitem__(self, key, value):
-        '''Insert an item at a currently filled index position, as represented in the the elements list.
+        '''
+        Insert an item at a currently filled index position, 
+        as represented in the the elements list.
 
         >>> from music21 import *
         >>> a = stream.Stream()
@@ -535,7 +536,7 @@ class Stream(base.Music21Object):
         self._elements[key] = value
         value.activeSite = self
         # must get native offset
-        value.addLocation(self, value.offset)
+        value.sites.add(self, value.offset)
 
         if isinstance(value, Stream): 
             # know that this is now not flat
@@ -1346,7 +1347,7 @@ class Stream(base.Music21Object):
             # are still inserted
             if self.isSorted is True and self.highestTime <= offset:
                 storeSorted = True
-        element.addLocation(self, float(offset))
+        element.sites.add(self, float(offset))
         # need to explicitly set the activeSite of the element
         if setActiveSite:
             element.activeSite = self
@@ -1474,7 +1475,7 @@ class Stream(base.Music21Object):
         '''
         # NOTE: this is not called by append, as that is optimized 
         # for looping multiple elements
-        element.addLocation(self, self.highestTime)
+        element.sites.add(self, self.highestTime)
         # need to explicitly set the activeSite of the element
         element.activeSite = self 
         self._elements.append(element)  
@@ -1676,7 +1677,7 @@ class Stream(base.Music21Object):
             self._addElementPreProcess(e)
             # add this Stream as a location for the new elements, with the 
             # the offset set to the current highestTime
-            e.addLocation(self, highestTime)
+            e.sites.add(self, highestTime)
             # need to explicitly set the activeSite of the element
             e.activeSite = self 
             self._elements.append(e)  
@@ -1700,7 +1701,7 @@ class Stream(base.Music21Object):
         To be called by other methods.
         '''
         self._addElementPreProcess(element)
-        element.addLocation(self, 'highestTime')
+        element.sites.add(self, 'highestTime')
         # need to explicitly set the activeSite of the element
         element.activeSite = self 
         # could also do self.elements = self.elements + [element]
@@ -1748,7 +1749,7 @@ class Stream(base.Music21Object):
         # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)
 
-#         element.addLocation(self, 'highestTime')
+#         element.sites.add(self, 'highestTime')
 #         # need to explicitly set the activeSite of the element
 #         element.activeSite = self 
 #         self._endElements.append(element)  
@@ -1946,12 +1947,12 @@ class Stream(base.Music21Object):
             target = self._elements[i] # target may have been obj id; reassing
             self._elements[i] = replacement
             # place the replacement at the old objects offset for this site
-            replacement.addLocation(self, target.getOffsetBySite(self))
+            replacement.sites.add(self, target.getOffsetBySite(self))
         else:
             # target may have been obj id; reassign
             target = self._endElements[i - eLen] 
             self._endElements[i - eLen] = replacement
-            replacement.addLocation(self, 'highestTime')
+            replacement.sites.add(self, 'highestTime')
 
         target.removeLocationBySite(self)
 
@@ -6632,7 +6633,7 @@ class Stream(base.Music21Object):
             s._endElements = shallowEndElements
     
             for e in shallowElements + shallowEndElements:
-                e.addLocation(s, e.getOffsetBySite(self))
+                e.sites.add(s, e.getOffsetBySite(self))
                 # need to explicitly set activeSite
                 e.activeSite = s 
             # now just sort this stream in place; this will update the 
@@ -6651,7 +6652,7 @@ class Stream(base.Music21Object):
 #         newStream._endElements = shallowEndElements
 # 
 #         for e in shallowElements + shallowEndElements:
-#             e.addLocation(newStream, e.getOffsetBySite(self))
+#             e.sites.add(newStream, e.getOffsetBySite(self))
 #             # need to explicitly set activeSite
 #             e.activeSite = newStream 
 #         # now just sort this stream in place; this will update the 
@@ -11290,9 +11291,12 @@ class Measure(Stream):
 
     #---------------------------------------------------------------------------
     def makeNotation(self, inPlace=False):
-        '''This method calls a sequence of Stream methods on this Measure to prepare notation.
+        '''
+        This method calls a sequence of Stream methods on this 
+        :class:`~music21.stream.Measure` to prepare notation.
 
-        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+        If `inPlace` is True, this is done in-place; if 
+        `inPlace` is False, this returns a modified deep copy.
 
         >>> from music21 import *
         >>> m = stream.Measure()
@@ -11354,7 +11358,8 @@ class Measure(Stream):
         '''
         Return a floating point value greater than 0 showing the proportion 
         of the bar duration that is filled based on the highest time of 
-        all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
+        all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an 
+        overflow of half. 
 
         Bar duration refers to the duration of the Measure as suggested by 
         the `TimeSignature`. This value cannot be determined without a `TimeSignature`. 

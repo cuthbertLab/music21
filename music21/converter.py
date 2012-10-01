@@ -706,8 +706,8 @@ class Converter(object):
         self._converter = None
 
     def _setConverter(self, format, forceSource=False): # @ReservedAssignment
-        # assume for now tt pickled files are alwasy musicxml
-        # this may change in the future
+        # assume for now that pickled files are always musicxml
+        # this WILL change in the future
         if format is None:
             raise ConverterException('Did not find a format from the source file')
         

@@ -246,7 +246,8 @@ def _getKeyAndPrefix(rtKeyOrString):
     return k, prefix
 
 def romanTextToStreamScore(rtHandler, inputM21=None):
-    '''Given a roman text handler or string, return or fill a Score Stream.
+    '''
+    Given a romanText handler or string, return or fill a Score Stream.
     '''
     # accept a string directly; mostly for testing
     if common.isStr(rtHandler):

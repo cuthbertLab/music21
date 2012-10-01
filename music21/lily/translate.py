@@ -688,8 +688,8 @@ class LilypondConverter(object):
 
     def lyLyricElementFromM21Lyric(self, m21Lyric):
         '''
-        Returns a :class:`~music21.music21.lily.lilyObjects.LyLyricElement` object
-        from a :class:`~music21.music21.note.Lyric` object.
+        Returns a :class:`~music21.lily.lilyObjects.LyLyricElement` object
+        from a :class:`~music21.note.Lyric` object.
         
         Uses self.inWord to keep track of whether or not we're in the middle of
         a word.
