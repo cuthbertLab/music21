@@ -904,8 +904,14 @@ class UnpitchedPercussion(Percussion):
         modifier = modifier.lower().strip()
         # BEN: to-do, pull out hyphens, spaces, etc.
         
-        if modifier.lower() in self._modifierToPercMapPitch:
+        
+        if self.inGMPercMap is True and modifier.lower() in self._modifierToPercMapPitch:
             self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
+            
+            # normalize modifiers...
+            if self.percMapPitch in self._percMapPitchToModifier:
+                modifier = self._percMapPitchToModifier[self.percMapPitch]
+        
         self._modifier = modifier
         
     modifier = property(_getModifier, _setModifier, doc='''
@@ -926,12 +932,22 @@ class UnpitchedPercussion(Percussion):
     >>> bd.percMapPitch
     61
     
+    Variations on modifiers can also be used and they get normalized:
+    
+    >>> wb1 = instrument.Woodblock()
+    >>> wb1.percMapPitch
+    76
+    >>> wb1.modifier = 'LO'
+    >>> wb1.percMapPitch
+    77
+    >>> wb1.modifier  # n.b. -- not LO
+    'low'
     ''')
 
 
-class Woodblock(Percussion):
+class Woodblock(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Woodblock'
         self.instrumentAbbreviation = 'Wd Bl'
@@ -939,98 +955,134 @@ class Woodblock(Percussion):
         self.percMapPitch = 76
         self.midiProgram = 115
         
-class TempleBlock(Percussion):
+        self._modifier = 'high'
+        self._modifierToPercMapPitch = { 'high': 76, 'low': 77, 'hi': 76, 'lo': 77 }
+        self._percMapPitchToModifier = { 76: 'high', 77: 'low' }
+                
+        
+class TempleBlock(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Temple Block'
         self.instrumentAbbreviation = 'Temp Bl'
         
-class Castanets(Percussion):
+class Castanets(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Castanets'
         self.instrumentAbbreviation = 'Cas'
         
-class Maracas(Percussion):
+class Maracas(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Maracas'
         self.inGMPercMap = True
         self.percMapPitch = 70
         #TODO: self.instrumentAbbreviation = ''
         
-class Vibraslap(Percussion):
+class Vibraslap(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Vibraslap'
         self.instrumenAbbreviation = 'Vbslp'
         self.inGMPercMap = True
         self.percMapPitch = 58
         
-class FingerCymbals(Percussion):
+class FingerCymbals(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Finger Cymbals'
         self.instrumentAbbreviation = 'Fing Cym'
         
-class CrashCymbals(Percussion):
+class CrashCymbals(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Crash Cymbals'
         self.instrumentAbbreviation = 'Cym'
         self.inGMPercMap = True
         self.percMapPitch = 49
+        self._modifier = "1"
         
-class SuspendedCymbal(Percussion):
+        self._modifierToPercMapPitch = {'1': 49,
+                                        '2': 57,
+                                        }
+        self._percMapPitchToModifier = {49: '1',
+                                        57: '2',
+                                        }
+    
+        
+class SuspendedCymbal(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Suspended Cymbal'
         #TODO: self.instrumentAbbreviation = ''
         
-class SizzleCymbal(Percussion):
+class SizzleCymbal(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Sizzle Cymbal'
         #TODO: self.instrumentAbbreviation = ''
         
-class HiHatCymbal(Percussion):
+class HiHatCymbal(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Hi-Hat Cymbal'
         self.inGMPercMap = True
         self.percMapPitch = 44
+        
+        self._modifier = 'pedal'
+        
+        self._modifierToPercMapPitch = {'pedal': 44,
+                                        'open': 46,
+                                        'closed': 42,
+                                        }
+        self._percMapPitchToModifier = {44: 'pedal',
+                                        46: 'open',
+                                        42: 'closed',
+                                        }
+    
         #TODO: self.instrumentAbbreviation = ''
         
-class Triangle(Percussion):
+class Triangle(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Triangle'
         self.instrumentAbbreviation = 'Tri'
         self.inGMPercMap = True
-        self.percMapPitch = 80
+        self.percMapPitch = 81
+        self._modifier = 'open'
         
-class Cowbell(Percussion):
+        self._modifierToPercMapPitch = {'open': 81,
+                                        'mute': 80,
+                                        }
+        self._percMapPitchToModifier = {80: 'mute',
+                                        81: 'open',
+                                        }
+    
+        
+        
+class Cowbell(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Cowbell'
         self.instrumentAbbreviation = 'Cwb'
         self.inGMPercMap = True
         self.percMapPitch = 56
         
-class Agogo(Percussion):
+class Agogo(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Agogo'
         #TODO: self.instrumentAbbreviation = ''
@@ -1038,28 +1090,37 @@ class Agogo(Percussion):
         self.percMapPitch = 67     
         self.midiProgram = 113
 
-class TamTam(Percussion):
+class TamTam(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Tam-Tam'
         #TODO: self.instrumentAbbreviation = ''
         
-class SleighBells(Percussion):
+class SleighBells(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Sleigh Bells'
         #TODO: self.instrumentAbbreviation = ''
         
-class SnareDrum(Percussion):
+class SnareDrum(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Snare Drum'
         self.instrumentAbbreviation = 'Sn Dr'
         self.inGMPercMap = True
         self.percMapPitch = 38
+        self._modifier = "acoustic"
+        self._modifierToPercMapPitch = {'acoustic': 38,
+                                        'side': 37,
+                                        'electic': 40,
+                                        }
+        self._percMapPitchToModifier = {38: 'acoustic',
+                                        37: 'side',
+                                        40: 'electric',
+                                        }
     
 class TenorDrum(Percussion):
     def __init__(self):
@@ -1078,7 +1139,7 @@ class BongoDrums(UnpitchedPercussion):
         self.percMapPitch = 60
         self._modifier = "high"
         self._modifierToPercMapPitch = { 'high': 60, 'low': 61 }
-        self._percMapPitchToModifer = { 60: 'high', 61: 'low' }
+        self._percMapPitchToModifier = { 60: 'high', 61: 'low' }
     
 class TomTom(Percussion):
     def __init__(self):
