@@ -1219,7 +1219,22 @@ class Unpitched(NotRest):
     isNote = False
     isUnpitched = True
     isRest = False
+    
+    def __init__(self):
+        NotRest.__init__(self)
+        self._storedInstrument = None
         
+    def displayPitch(self):
+        '''
+        returns a pitch object that is the same as the displayStep and displayOctave
+        '''
+        p = pitch.Pitch()
+        p.step = self.displayStep
+        p.octave = self.displayOctave
+        return p
+    
+    
+    
 #-------------------------------------------------------------------------------
 class Rest(GeneralNote):
     '''
