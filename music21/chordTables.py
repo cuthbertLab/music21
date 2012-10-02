@@ -30,8 +30,10 @@ class ChordTablesException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 # TNI structures are defined
-# 0=pitches, 1=ICV, 2=invariance vector (morris), 3 = Z-relation)
-# invariance vector can be used to determine symmetry
+# 0=pitches, 1=ICV, 2=invariance vector (Robert Morris), 3 = Z-relation)
+# invariance vector can be used to determine symmetry. 
+# the first four entries in the invariance vector shows how many invariance there are under Tn, TnI, TnM, TnMI respectively
+# the entries 5-8 show how many map to their complemenets under Tn, TnI, TnM, and TnMI respectively
 # at index 1, a value of 1 is symmetrical
 
 t1   = ((0,), (0,0,0,0,0,0), (1,1,1,1,11,11,11,11), 0) #1-1
