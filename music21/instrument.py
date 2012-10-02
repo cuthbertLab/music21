@@ -21,7 +21,7 @@ or instrument family, such as string pitches, etc.  Information about instrument
 ensembles is also included here though it may later be separated out into its own
 ensemble.py module. 
 '''
-
+import copy
 import unittest
 import sys
 
@@ -45,6 +45,43 @@ environLocal = environment.Environment(_MOD)
 
 class InstrumentException(exceptions21.Music21Exception):
     pass
+
+
+def unbundleInstruments(streamIn, inPlace = False):
+    '''
+    takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.Unpitched` objects
+    and moves their `.storedInstrument` attributes to a new Stream (unless inPlace = True)  
+
+    >>> from music21 import *
+    >>> up1 = note.Unpitched()
+    >>> up1.storedInstrument = instrument.BassDrum()
+    >>> up2 = note.Unpitched()
+    >>> up2.storedInstrument = instrument.Cowbell()
+    >>> s = stream.Stream()
+    >>> s.append(up1)
+    >>> s.append(up2)
+    >>> s2 = instrument.unbundleInstruments(s)
+    >>> s2.show('text')
+    {0.0} <music21.instrument.Instrument Bass Drum>
+    {0.0} <music21.note.Unpitched object at 0x...>
+    {1.0} <music21.instrument.Instrument Cowbell>
+    {1.0} <music21.note.Unpitched object at 0x...>
+    '''    
+    if inPlace is True:
+        s = streamIn
+    else:
+        s = copy.deepcopy(streamIn)
+    
+    for thisObj in s:
+        if 'Unpitched' in thisObj.classes:
+            i = thisObj.storedInstrument
+            off = thisObj.offset
+            s.insert(off, i)
+    
+    
+    
+    if inPlace is False:
+        return s
 
 class Instrument(base.Music21Object):
     '''
