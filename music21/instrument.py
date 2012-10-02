@@ -74,6 +74,8 @@ class Instrument(base.Music21Object):
 
         # define interval to go from written to sounding
         self.transposition = None
+        
+        self.inGMPercMap = False
 
     def __str__(self):
         msg = []
@@ -887,6 +889,45 @@ class Percussion(Instrument):
         Instrument.__init__(self)
         self.inGMPercMap = False
         self.percMapPitch = None
+        
+class UnpitchedPercussion(Percussion):
+    def __init__(self):
+        Percussion.__init__(self)
+        self._modifier = None
+        self._modifierToPercMapPitch = {}
+        
+        
+    def _getModifier(self):
+        return self._modifier
+    
+    def _setModifier(self, modifier):
+        modifier = modifier.lower().strip()
+        # BEN: to-do, pull out hyphens, spaces, etc.
+        
+        if modifier.lower() in self._modifierToPercMapPitch:
+            self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
+        self._modifier = modifier
+        
+    modifier = property(_getModifier, _setModifier, doc='''
+    Returns or sets the modifier for this instrument.  A modifier could
+    be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
+    
+    If the modifier is in the object's _modifierToPercMapPitch dictionary
+    then changing the modifier also changes the .percMapPitch for the object
+    
+    >>> from music21 import *
+    >>> bd = instrument.BongoDrums()
+    >>> bd.modifier
+    'high'
+    
+    >>> bd.percMapPitch
+    60
+    >>> bd.modifier = 'low'
+    >>> bd.percMapPitch
+    61
+    
+    ''')
+
 
 class Woodblock(Percussion):
     def __init__(self):
@@ -1027,23 +1068,27 @@ class TenorDrum(Percussion):
         self.instrumentName = 'Tenor Drum'
         self.instrumentAbbreviation = 'Ten Dr'
 
-class BongoDrums(Percussion):
+class BongoDrums(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Bongo Drums'
         self.instrumentAbbreviation = 'Bgo Dr'
         self.inGMPercMap = True
         self.percMapPitch = 60
+        self._modifier = "high"
+        self._modifierToPercMapPitch = { 'high': 60, 'low': 61 }
+        self._percMapPitchToModifer = { 60: 'high', 61: 'low' }
     
 class TomTom(Percussion):
     def __init__(self):
         Percussion.__init__(self)
         
         self.instrumentName = 'Tom-Tom'
+        #TODO: self.instrumentAbbreviation = ''
         self.inGMPercMap = True
         self.percMapPitch = 41
-        #TODO: self.instrumentAbbreviation = ''
+        
     
 class Timbales(Percussion):
     def __init__(self):
