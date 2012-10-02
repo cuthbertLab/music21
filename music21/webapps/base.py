@@ -82,35 +82,34 @@ Below is an example of a complete JSON request::
 '''
 
 import unittest
-import doctest
 
 # music21 imports
 from music21 import common
 from music21 import converter
-from music21 import stream
-from music21 import corpus
-from music21 import note
-from music21 import features
-from music21 import harmony
-from music21 import clef
-from music21 import tempo
-from music21.theoryAnalysis import theoryAnalyzer
+#from music21 import stream
+#from music21 import corpus
+#from music21 import note
+#from music21 import features
+#from music21 import harmony
+#from music21 import clef
+#from music21 import tempo
+#from music21.theoryAnalysis import theoryAnalyzer
 
 # webapps imports
-import commands
-import templates
+#import commands
+#import templates
 import apps
 
 # python library imports
 import json
-import zipfile
+#import zipfile
 import cgi
 import urlparse
-import re
+#import re
 import sys
 import traceback
 
-import StringIO
+#import StringIO
 
 #-------------------------------------------------------------------------------
 
@@ -217,7 +216,7 @@ def ModWSGIApplication(environ, start_response):
     # Handle any unexpected exceptions
     # TODO: Change output based on environment variables...
     except Exception as e:
-        errorData = 'music21_server_error:\n'
+        errorData = 'music21_server_error: %s\n' % e
         errorData += traceback.format_exc()
         sys.stderr.write(errorData)
         (responseData, responseContentType) = (errorData, 'text/plain')
@@ -476,9 +475,9 @@ class Agenda(dict):
         else:
             return None
         
-    def addCommand(self, type, resultVar, caller, command, argList = None):
+    def addCommand(self, commandType, resultVar, caller, command, argList = None):
         '''
-        Adds the specified command to the commandList of the agenda. type is either "function", "attribute" or method. 
+        Adds the specified command to the commandList of the agenda. `commandType` is either "function", "attribute" or method. 
         resultVar, caller, and command are strings that will result in the form shown below. Set an argument as 
         none to 
         argList should be a list of data encoded in an appropriate 
@@ -499,7 +498,7 @@ class Agenda(dict):
         
         '''        
         commandListElement = {}
-        commandListElement[type] = command
+        commandListElement[commandType] = command
         if resultVar != None:
             commandListElement['resultVar'] = resultVar
         if caller != None:
@@ -935,8 +934,8 @@ class CommandProcessor(object):
         # Call the method        
         try:
             result = getattr(caller, methodName)(*argList)
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
+        except Exception:
+            exc_type, unused_exc_obj, unused_exc_tb = sys.exc_info()
             self.recordError("Error: "+str(exc_type)+" executing method "+str(methodName)+" :"+str(commandElement))
             return
         

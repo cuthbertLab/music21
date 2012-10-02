@@ -24,9 +24,9 @@ content in the environ variable.
 
 '''
 
-from music21 import webapps
+#from music21 import webapps
 from music21 import corpus
-from music21 import common
+#from music21 import common
 
 from os import path
 

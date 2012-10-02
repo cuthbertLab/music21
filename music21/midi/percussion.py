@@ -120,6 +120,25 @@ class PercussionMapper(object):
         >>> pm.midiPitchToInstrument(cabasaPitch)
         Traceback (most recent call last):
         MIDIPercussionException: 69 doesn't map to a valid instrument!
+
+
+        Some music21 Instruments have more than one MidiPitch.  In this case you'll
+        get the same Instrument object but with a different modifier
+        
+        >>> acousticBassDrumPitch = pitch.Pitch(35)
+        >>> acousticBDInstrument = pm.midiPitchToInstrument(acousticBassDrumPitch)
+        >>> acousticBDInstrument
+        <music21.instrument.Instrument Bass Drum>
+        >>> acousticBDInstrument.modifier
+        'acoustic'
+        
+        >>> oneBassDrumPitch = pitch.Pitch(36)
+        >>> oneBDInstrument = pm.midiPitchToInstrument(oneBassDrumPitch)
+        >>> oneBDInstrument
+        <music21.instrument.Instrument Bass Drum>
+        >>> oneBDInstrument.modifier
+        '1'
+        
         '''
         
         if type(midiPitch) == int:
@@ -129,7 +148,14 @@ class PercussionMapper(object):
         if midiNumber not in self.reverseInstrumentMapping:
             raise MIDIPercussionException("%r doesn't map to a valid instrument!" % midiNumber)
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
-        return midiInstrument()
+        
+        midiInstrumentObject = midiInstrument()
+        if midiInstrumentObject.inGMPercMap is True and hasattr(midiInstrumentObject, '_percMapPitchToModifier'):
+            if midiNumber in midiInstrumentObject._percMapPitchToModifier:
+                modifier = midiInstrumentObject._percMapPitchToModifier[midiNumber]
+                midiInstrumentObject.modifier = modifier
+        
+        return midiInstrumentObject
     
     def midiInstrumentToPitch(self, midiInstrument):
         '''
