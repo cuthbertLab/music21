@@ -10,7 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-__all__ = ['translate', 'realtime']
+__all__ = ['translate', 'realtime', 'percussion']
 
 from music21.midi.base import *
 
@@ -18,6 +18,7 @@ import base
 __doc__ = base.__doc__ #@ReservedAssignment @UndefinedVariable
 
 import realtime
+import percussion
 
 #------------------------------------------------------------------------------
 # eof

@@ -7,6 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Cuthbert
 #               Jose Cabal-Ugaz
+#               Ben Houge
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
@@ -225,6 +226,15 @@ class Clavichord(KeyboardInstrument):
         #TODO: self.lowestNote = pitch.Pitch('')
         #TODO: self.highestNote = pitch.Pitch('')
 
+class Celesta(KeyboardInstrument):   
+    def __init__(self):
+        KeyboardInstrument.__init__(self)
+
+        self.instrumentName = 'Celesta'
+        self.instrumentAbbreviation = 'Clst'
+        self.midiProgram = 8
+
+
 #-------------------------------------------------------------------------------
 class Organ(Instrument):
     def __init__(self):
@@ -286,14 +296,6 @@ class Harmonica(Organ):
         
         self.lowestNote = pitch.Pitch('C3')
         self.highestNote = pitch.Pitch('C6')
-
-class Celesta(KeyboardInstrument):   
-    def __init__(self):
-        KeyboardInstrument.__init__(self)
-
-        self.instrumentName = 'Celesta'
-        self.instrumentAbbreviation = 'Clst'
-        self.midiProgram = 8
 
 
 #------------------------------------------------------
@@ -587,6 +589,8 @@ class Whistle(Flute):
 
         self.instrumentName = 'Whistle'
         self.instrumentAbbreviation = 'Whs'
+        self.inGMPercMap = True
+        self.percMapPitch = 71
         self.midiProgram = 78
 
 class Ocarina(Flute):
@@ -881,6 +885,8 @@ class Kalimba(PitchedPercussion):
 class Percussion(Instrument):
     def __init__(self):
         Instrument.__init__(self)
+        self.inGMPercMap = False
+        self.percMapPitch = None
 
 class Woodblock(Percussion):
     def __init__(self):
@@ -888,6 +894,8 @@ class Woodblock(Percussion):
         
         self.instrumentName = 'Woodblock'
         self.instrumentAbbreviation = 'Wd Bl'
+        self.inGMPercMap = True
+        self.percMapPitch = 76
         self.midiProgram = 115
         
 class TempleBlock(Percussion):
@@ -909,7 +917,18 @@ class Maracas(Percussion):
         Percussion.__init__(self)
         
         self.instrumentName = 'Maracas'
+        self.inGMPercMap = True
+        self.percMapPitch = 70
         #TODO: self.instrumentAbbreviation = ''
+        
+class Vibraslap(Percussion):
+    def __init__(self):
+        Percussion.__init__(self)
+        
+        self.instrumentName = 'Vibraslap'
+        self.instrumenAbbreviation = 'Vbslp'
+        self.inGMPercMap = True
+        self.percMapPitch = 58
         
 class FingerCymbals(Percussion):
     def __init__(self):
@@ -924,6 +943,8 @@ class CrashCymbals(Percussion):
         
         self.instrumentName = 'Crash Cymbals'
         self.instrumentAbbreviation = 'Cym'
+        self.inGMPercMap = True
+        self.percMapPitch = 49
         
 class SuspendedCymbal(Percussion):
     def __init__(self):
@@ -944,6 +965,8 @@ class HiHatCymbal(Percussion):
         Percussion.__init__(self)
         
         self.instrumentName = 'Hi-Hat Cymbal'
+        self.inGMPercMap = True
+        self.percMapPitch = 44
         #TODO: self.instrumentAbbreviation = ''
         
 class Triangle(Percussion):
@@ -952,20 +975,26 @@ class Triangle(Percussion):
         
         self.instrumentName = 'Triangle'
         self.instrumentAbbreviation = 'Tri'
+        self.inGMPercMap = True
+        self.percMapPitch = 80
         
-class Cowbells(Percussion):
+class Cowbell(Percussion):
     def __init__(self):
         Percussion.__init__(self)
         
-        self.instrumentName = 'Cowbells'
+        self.instrumentName = 'Cowbell'
         self.instrumentAbbreviation = 'Cwb'
+        self.inGMPercMap = True
+        self.percMapPitch = 56
         
 class Agogo(Percussion):
     def __init__(self):
         Percussion.__init__(self)
         
         self.instrumentName = 'Agogo'
-        #TODO: self.instrumentAbbreviation = ''        
+        #TODO: self.instrumentAbbreviation = ''
+        self.inGMPercMap = True
+        self.percMapPitch = 67     
         self.midiProgram = 113
 
 class TamTam(Percussion):
@@ -988,6 +1017,8 @@ class SnareDrum(Percussion):
         
         self.instrumentName = 'Snare Drum'
         self.instrumentAbbreviation = 'Sn Dr'
+        self.inGMPercMap = True
+        self.percMapPitch = 38
     
 class TenorDrum(Percussion):
     def __init__(self):
@@ -1002,12 +1033,16 @@ class BongoDrums(Percussion):
         
         self.instrumentName = 'Bongo Drums'
         self.instrumentAbbreviation = 'Bgo Dr'
+        self.inGMPercMap = True
+        self.percMapPitch = 60
     
 class TomTom(Percussion):
     def __init__(self):
         Percussion.__init__(self)
         
         self.instrumentName = 'Tom-Tom'
+        self.inGMPercMap = True
+        self.percMapPitch = 41
         #TODO: self.instrumentAbbreviation = ''
     
 class Timbales(Percussion):
@@ -1016,6 +1051,8 @@ class Timbales(Percussion):
         
         self.instrumentName = 'Timbales'
         self.instrumentAbbreviation = 'Tim'
+        self.inGMPercMap = True
+        self.percMapPitch = 65
         
 class CongaDrum(Percussion):
     def __init__(self):
@@ -1023,6 +1060,8 @@ class CongaDrum(Percussion):
         
         self.instrumentName = 'Conga Drum'
         self.instrumentAbbreviation = 'Cga Dr'
+        self.inGMPercMap = True
+        self.percMapPitch = 62
         
 class BassDrum(Percussion):
     def __init__(self):
@@ -1030,6 +1069,9 @@ class BassDrum(Percussion):
         
         self.instrumentName = 'Bass Drum'
         self.instrumentAbbreviation = 'B Dr'
+        self.inGMPercMap = True
+        self.percMapPitch = 35
+
         
 class Taiko(Percussion):
     def __init__(self):
@@ -1045,6 +1087,8 @@ class Tambourine(Percussion):
         
         self.instrumentName = 'Tambourine'
         self.instrumentAbbreviation = 'Tmbn'
+        self.inGMPercMap = True
+        self.percMapPitch = 54
         
 class Whip(Percussion):
     def __init__(self):
@@ -1251,12 +1295,12 @@ def partitionByInstrument(streamObj):
     names = {} # store unique names
     for e in found:
         # matching here by instrument name
-        if e.instrumentName not in names:
+        if e.instrumentName not in names.keys():
             names[e.instrumentName] = {'Instrument':e} # just store one instance
         
     # create a return object that has a part for each instrument
     post = stream.Score()
-    for iName in names:
+    for iName in names.keys():
         p = stream.Part()
         # add the instrument instance
         p.insert(0, names[iName]['Instrument'])
@@ -1407,7 +1451,7 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in this module
         '''
         import types, copy
-        for part in sys.modules[self.__module__].__dict__:
+        for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):
