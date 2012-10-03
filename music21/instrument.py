@@ -75,13 +75,51 @@ def unbundleInstruments(streamIn, inPlace = False):
     for thisObj in s:
         if 'Unpitched' in thisObj.classes:
             i = thisObj.storedInstrument
-            off = thisObj.offset
-            s.insert(off, i)
-    
-    
+            if i is not None:
+                off = thisObj.offset
+                s.insert(off, i)
     
     if inPlace is False:
         return s
+
+def bundleInstruments(streamIn, inPlace = False):
+    '''
+    >>> from music21 import *
+    >>> up1 = note.Unpitched()
+    >>> up1.storedInstrument = instrument.BassDrum()
+    >>> upUnknownInstrument = note.Unpitched()
+    
+    >>> up2 = note.Unpitched()
+    >>> up2.storedInstrument = instrument.Cowbell()
+    >>> s = stream.Stream()
+    >>> s.append(up1)
+    >>> s.append(upUnknownInstrument)
+    >>> s.append(up2)
+    >>> s2 = instrument.unbundleInstruments(s)
+    >>> s3 = instrument.bundleInstruments(s2)
+    >>> for test in s3:
+    ...     print test.storedInstrument
+    Bass Drum
+    Bass Drum
+    Cowbell
+    
+    '''
+    if inPlace is True:
+        s = streamIn
+    else:
+        s = copy.deepcopy(streamIn)
+    
+    for thisObj in s:
+        if 'Instrument' in thisObj.classes:
+            lastInstrument = thisObj
+            s.remove(thisObj)
+        elif 'Unpitched' in thisObj.classes:
+            thisObj.storedInstrument = lastInstrument
+        
+    if inPlace is False:
+        return s
+
+    
 
 class Instrument(base.Music21Object):
     '''
