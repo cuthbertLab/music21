@@ -874,9 +874,72 @@ class Tuba(BrassInstrument):
         self.lowestNote = pitch.Pitch('E-2')
 
     
-#---------
-class PitchedPercussion(Instrument):
+#-------------
+class Percussion(Instrument):
+    def __init__(self):
+        Instrument.__init__(self)
+        self.inGMPercMap = False
+        self.percMapPitch = None
+        
+
+class PitchedPercussion(Percussion):
     pass
+
+
+class UnpitchedPercussion(Percussion):
+    def __init__(self):
+        Percussion.__init__(self)
+        self._modifier = None
+        self._modifierToPercMapPitch = {}        
+        
+    def _getModifier(self):
+        return self._modifier
+    
+    def _setModifier(self, modifier):
+        modifier = modifier.lower().strip()
+        # BEN: to-do, pull out hyphens, spaces, etc.
+        
+        
+        if self.inGMPercMap is True and modifier.lower() in self._modifierToPercMapPitch:
+            self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
+            
+            # normalize modifiers...
+            if self.percMapPitch in self._percMapPitchToModifier:
+                modifier = self._percMapPitchToModifier[self.percMapPitch]
+        
+        self._modifier = modifier
+        
+    modifier = property(_getModifier, _setModifier, doc='''
+    Returns or sets the modifier for this instrument.  A modifier could
+    be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
+    
+    If the modifier is in the object's ._modifierToPercMapPitch dictionary
+    then changing the modifier also changes the .percMapPitch for the object
+    
+    >>> from music21 import *
+    >>> bd = instrument.BongoDrums()
+    >>> bd.modifier
+    'high'
+    
+    >>> bd.percMapPitch
+    60
+    >>> bd.modifier = 'low'
+    >>> bd.percMapPitch
+    61
+    
+    Variations on modifiers can also be used and they get normalized:
+    
+    >>> wb1 = instrument.Woodblock()
+    >>> wb1.percMapPitch
+    76
+    >>> wb1.modifier = 'LO'
+    >>> wb1.percMapPitch
+    77
+    >>> wb1.modifier  # n.b. -- not LO
+    'low'
+    ''')
+
+
 
 class Marimba(PitchedPercussion):
     def __init__(self):
@@ -957,69 +1020,6 @@ class Kalimba(PitchedPercussion):
         self.midiProgram = 108
 
 
-
-#-------------
-class Percussion(Instrument):
-    def __init__(self):
-        Instrument.__init__(self)
-        self.inGMPercMap = False
-        self.percMapPitch = None
-        
-class UnpitchedPercussion(Percussion):
-    def __init__(self):
-        Percussion.__init__(self)
-        self._modifier = None
-        self._modifierToPercMapPitch = {}
-        
-        
-    def _getModifier(self):
-        return self._modifier
-    
-    def _setModifier(self, modifier):
-        modifier = modifier.lower().strip()
-        # BEN: to-do, pull out hyphens, spaces, etc.
-        
-        
-        if self.inGMPercMap is True and modifier.lower() in self._modifierToPercMapPitch:
-            self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
-            
-            # normalize modifiers...
-            if self.percMapPitch in self._percMapPitchToModifier:
-                modifier = self._percMapPitchToModifier[self.percMapPitch]
-        
-        self._modifier = modifier
-        
-    modifier = property(_getModifier, _setModifier, doc='''
-    Returns or sets the modifier for this instrument.  A modifier could
-    be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
-    
-    If the modifier is in the object's ._modifierToPercMapPitch dictionary
-    then changing the modifier also changes the .percMapPitch for the object
-    
-    >>> from music21 import *
-    >>> bd = instrument.BongoDrums()
-    >>> bd.modifier
-    'high'
-    
-    >>> bd.percMapPitch
-    60
-    >>> bd.modifier = 'low'
-    >>> bd.percMapPitch
-    61
-    
-    Variations on modifiers can also be used and they get normalized:
-    
-    >>> wb1 = instrument.Woodblock()
-    >>> wb1.percMapPitch
-    76
-    >>> wb1.modifier = 'LO'
-    >>> wb1.percMapPitch
-    77
-    >>> wb1.modifier  # n.b. -- not LO
-    'low'
-    ''')
-
-
 class Woodblock(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
@@ -1034,7 +1034,6 @@ class Woodblock(UnpitchedPercussion):
         self._modifierToPercMapPitch = { 'high': 76, 'low': 77, 'hi': 76, 'lo': 77 }
         self._percMapPitchToModifier = { 76: 'high', 77: 'low' }
                 
-        
 class TempleBlock(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
@@ -1145,7 +1144,6 @@ class Triangle(UnpitchedPercussion):
                                         }
     
         
-        
 class Cowbell(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
@@ -1197,9 +1195,9 @@ class SnareDrum(UnpitchedPercussion):
                                         40: 'electric',
                                         }
     
-class TenorDrum(Percussion):
+class TenorDrum(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Tenor Drum'
         self.instrumentAbbreviation = 'Ten Dr'
@@ -1272,9 +1270,9 @@ class BassDrum(UnpitchedPercussion):
         self._modifier = self._percMapPitchToModifier[self.percMapPitch]
 
         
-class Taiko(Percussion):
+class Taiko(UnpitchedPercussion):
     def __init__(self):
-        Percussion.__init__(self)
+        UnpitchedPercussion.__init__(self)
         
         self.instrumentName = 'Taiko'
         #TODO: self.instrumentAbbreviation = ''
