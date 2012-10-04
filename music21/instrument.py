@@ -1027,12 +1027,12 @@ class Woodblock(UnpitchedPercussion):
         self.instrumentName = 'Woodblock'
         self.instrumentAbbreviation = 'Wd Bl'
         self.inGMPercMap = True
-        self.percMapPitch = 76
         self.midiProgram = 115
         
         self._modifier = 'high'
         self._modifierToPercMapPitch = { 'high': 76, 'low': 77, 'hi': 76, 'lo': 77 }
         self._percMapPitchToModifier = { 76: 'high', 77: 'low' }
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
                 
 class TempleBlock(UnpitchedPercussion):
     def __init__(self):
@@ -1080,7 +1080,6 @@ class CrashCymbals(UnpitchedPercussion):
         self.instrumentName = 'Crash Cymbals'
         self.instrumentAbbreviation = 'Cym'
         self.inGMPercMap = True
-        self.percMapPitch = 49
         self._modifier = "1"
         
         self._modifierToPercMapPitch = {'1': 49,
@@ -1089,6 +1088,7 @@ class CrashCymbals(UnpitchedPercussion):
         self._percMapPitchToModifier = {49: '1',
                                         57: '2',
                                         }
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
     
         
 class SuspendedCymbal(UnpitchedPercussion):
@@ -1111,7 +1111,6 @@ class HiHatCymbal(UnpitchedPercussion):
         
         self.instrumentName = 'Hi-Hat Cymbal'
         self.inGMPercMap = True
-        self.percMapPitch = 44
         
         self._modifier = 'pedal'
         
@@ -1123,6 +1122,7 @@ class HiHatCymbal(UnpitchedPercussion):
                                         46: 'open',
                                         42: 'closed',
                                         }
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
     
         #TODO: self.instrumentAbbreviation = ''
         
@@ -1133,7 +1133,6 @@ class Triangle(UnpitchedPercussion):
         self.instrumentName = 'Triangle'
         self.instrumentAbbreviation = 'Tri'
         self.inGMPercMap = True
-        self.percMapPitch = 81
         self._modifier = 'open'
         
         self._modifierToPercMapPitch = {'open': 81,
@@ -1142,6 +1141,7 @@ class Triangle(UnpitchedPercussion):
         self._percMapPitchToModifier = {80: 'mute',
                                         81: 'open',
                                         }
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
     
         
 class Cowbell(UnpitchedPercussion):
@@ -1184,7 +1184,6 @@ class SnareDrum(UnpitchedPercussion):
         self.instrumentName = 'Snare Drum'
         self.instrumentAbbreviation = 'Sn Dr'
         self.inGMPercMap = True
-        self.percMapPitch = 38
         self._modifier = "acoustic"
         self._modifierToPercMapPitch = {'acoustic': 38,
                                         'side': 37,
@@ -1194,6 +1193,7 @@ class SnareDrum(UnpitchedPercussion):
                                         37: 'side',
                                         40: 'electric',
                                         }
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
     
 class TenorDrum(UnpitchedPercussion):
     def __init__(self):
@@ -1210,10 +1210,10 @@ class BongoDrums(UnpitchedPercussion):
         self.instrumentAbbreviation = 'Bgo Dr'
         
         self.inGMPercMap = True
+        self._modifier = 'high'
         self._modifierToPercMapPitch = { 'high': 60, 'low': 61 }
         self._percMapPitchToModifier = { 60: 'high', 61: 'low' }
-        self.percMapPitch = 60
-        self._modifier = self._percMapPitchToModifier[self.percMapPitch]
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
         
     
 class TomTom(UnpitchedPercussion):
@@ -1223,12 +1223,12 @@ class TomTom(UnpitchedPercussion):
         self.instrumentName = 'Tom-Tom'
         #TODO: self.instrumentAbbreviation = ''
         self.inGMPercMap = True
+        self._modifier = 'low floor'
         self._modifierToPercMapPitch = { 'low floor': 41, 'high floor': 43, 'low': 45, 
                                          'low-mid': 47, 'high-mid': 48, 'high': 50 }
         self._percMapPitchToModifier = { 41: 'low floor', 43: 'high floor', 45: 'low', 
                                         47: 'low-mid', 48: 'high-mid', 50: 'high' }
-        self.percMapPitch = 41
-        self._modifier = self._percMapPitchToModifier[self.percMapPitch]
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
         
     
 class Timbales(UnpitchedPercussion):
@@ -1238,10 +1238,10 @@ class Timbales(UnpitchedPercussion):
         self.instrumentName = 'Timbales'
         self.instrumentAbbreviation = 'Tim'
         self.inGMPercMap = True
+        self._modifier = 'high'
         self._modifierToPercMapPitch = { 'high': 65, 'low': 66 }
         self._percMapPitchToModifier = { 65: 'high', 66: 'low' }
-        self.percMapPitch = 65
-        self._modifier = self._percMapPitchToModifier[self.percMapPitch]
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
         
         
 class CongaDrum(UnpitchedPercussion):
@@ -1251,10 +1251,10 @@ class CongaDrum(UnpitchedPercussion):
         self.instrumentName = 'Conga Drum'
         self.instrumentAbbreviation = 'Cga Dr'
         self.inGMPercMap = True
+        self._modifier = 'low'
         self._modifierToPercMapPitch = { 'low': 64, 'mute high': 62, 'open high': 63 }
         self._percMapPitchToModifier = { 64: 'low', 62: 'mute high', 63: 'open high' }
-        self.percMapPitch = 64
-        self._modifier = self._percMapPitchToModifier[self.percMapPitch]
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
         
         
 class BassDrum(UnpitchedPercussion):
@@ -1264,10 +1264,10 @@ class BassDrum(UnpitchedPercussion):
         self.instrumentName = 'Bass Drum'
         self.instrumentAbbreviation = 'B Dr'
         self.inGMPercMap = True
+        self._modifier = 'acoustic'
         self._modifierToPercMapPitch = { 'acoustic': 35, '1': 36 }
         self._percMapPitchToModifier = { 35: 'acoustic', 36: '1' }
-        self.percMapPitch = 35
-        self._modifier = self._percMapPitchToModifier[self.percMapPitch]
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
         
 class Taiko(UnpitchedPercussion):
