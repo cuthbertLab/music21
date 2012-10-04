@@ -1031,8 +1031,15 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                         kindStr = chordKindStr[0]
 
     if kind:
+        ## new algorithm makes sus chord be a sus2 in inversion:        
         if inChord.inversion():
-            cs = inChord.root().name + kindStr + '/' + inChord.bass().name
+            if kindStr == 'sus2':
+                inChord.root(inChord.bass())
+                kindStr = 'sus'
+                kind = 'suspended-fourth'
+                cs = inChord.root().name + kindStr
+            else:
+                cs = inChord.root().name + kindStr + '/' + inChord.bass().name
         else:
             cs = inChord.root().name + kindStr
         perfect = set([p.name for p in ChordSymbol(cs).pitches])

@@ -1091,6 +1091,10 @@ def mxToChordSymbol(mxHarmony):
 
 
 def mxToInstrument(mxScorePart, inputM21=None):
+    '''
+    Return a generic instrument.Instrument object from this mxScorePart
+    '''
+    
     # note: transposition values is not set in this operation, but in 
     # mxToStreamPart
     if inputM21 is None:
@@ -1127,6 +1131,8 @@ def mxToInstrument(mxScorePart, inputM21=None):
         if mc is not None:
             i.midiChannel = int(mc) - 1
 
+    if inputM21 is None:
+        return i
 
 #-------------------------------------------------------------------------------
 # unified processors for Chords and Notes

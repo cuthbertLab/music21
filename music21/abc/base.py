@@ -9,15 +9,31 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Objects and resources for processing ABC data. 
+ABC is a music format that, while being able to encode all sorts of scores, is especially
+strong at representing monophonic music, and folk music in particular.
 
-ABC conversion from a file or URL to a :class:`~music21.stream.Stream` is available through the music21 converter module's :func:`~music21.converter.parse` function. 
+Modules in the `music21.abc` package deal with importing ABC into music21.  Most people
+working with ABC data won't need to use this package.  To convert ABC from a file or URL 
+to a :class:`~music21.stream.Stream` use the :func:`~music21.converter.parse` function of
+the `converter` module: 
 
 >>> #_DOCS_SHOW from music21 import *
 >>> #_DOCS_SHOW abcScore = converter.parse('/users/ariza/myScore.abc')
 
+For users who will be editing ABC extensively or need a way to have music21 output ABC
+(which it doesn't do natively), we suggest using the open source EasyABC package:
+http://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader through:
 
-Low level ABC conversion is facilitated by the objects in this module and :func:`music21.abc.translate.abcToStreamScore`.
+>>> #_DOCS_SHOW us = environment.UserSettings()
+>>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/EasyABC.app'
+
+or wherever you have downloaded EasyABC to (PC users might need: 'c:/program files (x86)/easyabc/easyabc.exe')
+(Thanks to Norman Schmidt for the heads up)
+
+There is a two-step process in converting ABC files to Music21 Streams.  First this module
+reads in the text-based .abc file and converts all the information into ABCToken objects.  Then
+the function :func:`music21.abc.translate.abcToStreamScore` of the `music21.abc.translate` module
+translates those Tokens into music21 objects.
 '''
 
 import unittest

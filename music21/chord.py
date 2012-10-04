@@ -1333,6 +1333,9 @@ class Chord(note.NotRest):
         
         >>> aDim7no3rd.findRoot()
         <music21.pitch.Pitch A3>
+        >>> aDim7no3rdInv = chord.Chord(['E-3', 'A4', 'G4'])
+        >>> aDim7no3rdInv.findRoot()
+        <music21.pitch.Pitch A4>
         
         The root of a 13th chord (which could be any chord in any inversion) is designed to
         be the bass:
@@ -1407,8 +1410,8 @@ class Chord(note.NotRest):
                 indexOfPitchesWithPerfectlyStackedThirds.append(i)
             rootThirdsList.append(currentListOfThirds)
             rootnessScore = rootnessFunction(currentListOfThirds)
-            if p is not chordBass:
-                rootnessScore *= 0.8  # penalize non-bass notes for stacked chords...
+#            if p is not chordBass: # doesn't work
+#                rootnessScore *= 0.8  # penalize non-bass notes for stacked chords...
             rootnessFunctionScores.append(rootnessScore)
 
         # if one pitch has perfectlyStackedThirds, return it always:

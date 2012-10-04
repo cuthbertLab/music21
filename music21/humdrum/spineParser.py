@@ -62,9 +62,10 @@ from music21 import stream
 from music21 import common
 from music21 import exceptions21
 from music21.humdrum import testFiles #, canonicalOutput
+from music21.humdrum import instruments 
 
 import os
-
+                                  
 spinePathIndicators = ["*+", "*-", "*^", "*v", "*x", "*"]
 
 
@@ -1352,6 +1353,52 @@ class SpineCollection(object):
         self.moveObjectsToMeasures()
         self.moveDynamicsAndLyricsToStreams()
         self.makeVoices()
+        self.assignIds()
+
+    def assignIds(self):
+        '''
+        assign an ID based on the instrument or just a string of a number if none
+
+        >>> from music21 import *
+        >>> hsc = humdrum.spineParser.SpineCollection()
+        >>> newSpineDefault = hsc.addSpine()
+        >>> newSpineDefault2 = hsc.addSpine()
+        >>> newSpineOboe1 = hsc.addSpine()
+        >>> newSpineOboe2 = hsc.addSpine()
+        >>> newSpineTrumpet = hsc.addSpine()
+        >>> newSpineOboe1.stream.append(instrument.Oboe())
+        >>> newSpineOboe2.stream.append(instrument.Oboe())
+        >>> newSpineTrumpet.stream.append(instrument.Trumpet())
+        >>> hsc.assignIds()
+        >>> for sp in hsc.spines:
+        ...     print sp.stream.id
+        1
+        2
+        Oboe-1
+        Oboe-2
+        Trumpet
+        '''
+        usedIds = {None: 0}
+        firstStreamForEachInstrument = {}
+        for thisSpine in self.spines:
+            spineStream = thisSpine.stream
+            instruments = spineStream.getElementsByClass('Instrument')
+            if len(instruments) == 0:
+                spineInstrument = None
+            else:
+                spineInstrument = instruments[0].instrumentName
+            if spineInstrument not in usedIds:
+                firstStreamForEachInstrument[spineInstrument] = spineStream
+                usedIds[spineInstrument] = 1
+                spineStream.id = spineInstrument
+            elif spineInstrument is None:
+                usedIds[None] += 1
+                spineStream.id = str(usedIds[None])
+            else:
+                if usedIds[spineInstrument] == 1:
+                    firstStreamForEachInstrument[spineInstrument].id = firstStreamForEachInstrument[spineInstrument].id + '-1'
+                usedIds[spineInstrument] += 1
+                spineStream.id = spineInstrument + '-' + str(usedIds[spineInstrument])
 
     def performInsertions(self):
         '''
@@ -2013,16 +2060,26 @@ def kernTandemToObject(tandem):
         return meter.TimeSignature(meterType)
     elif tandem.startswith("*IC"):
         instrumentClass = tandem[3:]
-        # TODO: DO SOMETHING WITH INSTRUMENT CLASS; not in hum2xml
+        try:
+            iObj = instruments.fromHumdrumClass(instrumentClass)
+            return iObj
+        except instruments.HumdrumInstrumentException:
+            return MiscTandem(instrumentClass)        
     elif tandem.startswith("*IG"):
         instrumentGroup = tandem[3:]
+        return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH INSTRUMENT GROUP; not in hum2xml
     elif tandem.startswith("*ITr"):
         instrumentTransposing = True
+        return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH TRANSPOSING INSTRUMENTS; not in hum2xml
     elif tandem.startswith("*I"):
         instrument = tandem[2:]
-        # TODO: SOMETHING WITH INSTRUMENTS; not in hum2xml
+        try:
+            iObj = instruments.fromHumdrumInstrument(instrument)
+            return iObj
+        except instruments.HumdrumInstrumentException:
+            return MiscTandem(instrument)        
     elif tandem.startswith("*k"):
         numSharps = tandem.count('#')
         if numSharps == 0:

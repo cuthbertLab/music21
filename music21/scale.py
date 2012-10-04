@@ -1460,7 +1460,6 @@ class ConcreteScale(Scale):
         and or pitch space values and replace the target pitch with 
         copies of pitches stored in this scale.
 
-
         This is always applied recursively to all sub-Streams. 
         '''
         # we may use a directed or subset of the scale to tune

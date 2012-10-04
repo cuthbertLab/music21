@@ -35,6 +35,9 @@ class PercussionMapper(object):
     <class 'music21.instrument.Vibraslap'>
     
     That's right, vibraslap.
+
+    But you're better off using the midiPitchToInstrument() method below!
+    
     '''
     
     i = instrument
@@ -190,6 +193,8 @@ class PercussionMapper(object):
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
         return pitchObject
+
+    _DOC_ORDER = [midiInstrumentToPitch, midiPitchToInstrument]
 
 class Test(unittest.TestCase):
     

@@ -86,30 +86,30 @@ import unittest
 # music21 imports
 from music21 import common
 from music21 import converter
-#from music21 import stream
-#from music21 import corpus
-#from music21 import note
-#from music21 import features
-#from music21 import harmony
-#from music21 import clef
-#from music21 import tempo
-#from music21.theoryAnalysis import theoryAnalyzer
+from music21 import stream #@UnusedImport
+from music21 import corpus #@UnusedImport
+from music21 import note #@UnusedImport
+from music21 import features #@UnusedImport
+from music21 import harmony #@UnusedImport
+from music21 import clef #@UnusedImport
+from music21 import tempo #@UnusedImport
+from music21.theoryAnalysis import theoryAnalyzer #@UnusedImport
 
 # webapps imports
-#import commands
-#import templates
+import commands #@UnusedImport
+import templates #@UnusedImport
 import apps
 
 # python library imports
 import json
-#import zipfile
+import zipfile #@UnusedImport
 import cgi
 import urlparse
-#import re
+import re #@UnusedImport
 import sys
 import traceback
 
-#import StringIO
+import StringIO #@UnusedImport
 
 #-------------------------------------------------------------------------------
 
