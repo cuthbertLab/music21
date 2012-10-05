@@ -1224,6 +1224,14 @@ class Unpitched(NotRest):
         NotRest.__init__(self)
         self._storedInstrument = None
         
+    def _getStoredInstrument(self):
+        return self._storedInstrument
+    
+    def _setStoredInstrument(self, newValue):
+        self._storedInstrument = newValue
+    
+    storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
+        
     def displayPitch(self):
         '''
         returns a pitch object that is the same as the displayStep and displayOctave
