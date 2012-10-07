@@ -109,10 +109,10 @@ class Harmony(chord.Chord):
         # assume the bass and root are identical and
         # assign the values accordingly
 
-        if self.bass(find=False) == None:
-            self.bass(self.root(find=False))
+        if self._bass == None:
+            self.bass(self._root)
 
-        if self._figure is not None or self.root(find=False) or self.bass(find=False):
+        if self._figure is not None or self._root or self._bass:
             self._updatePitches()
 
         self._updateBasedOnXMLInput(keywords)
@@ -1184,6 +1184,13 @@ class ChordSymbol(Harmony):
     [<music21.pitch.Pitch A-2>, <music21.pitch.Pitch C-3>, <music21.pitch.Pitch E-3>]
     >>> harmony.ChordSymbol('F-dim7').pitches
     [<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>]
+    
+    And now, and example of parsing in the wild:
+    
+    >>> s = corpus.parse('leadsheet/fosterBrownHair')
+    >>> [[str(c.name) for c in c.pitches] for c in s.flat.getElementsByClass(harmony.ChordSymbol)[0:5]]
+    [['F', 'A', 'C'], ['B', 'B-', 'D', 'F'], ['F', 'A', 'C'], ['C', 'E', 'G'], ['F', 'A', 'C']]
+
     '''
 
 
@@ -1372,22 +1379,22 @@ class ChordSymbol(Harmony):
         '''
         nineElevenThirteen = ['dominant-ninth', 'major-ninth', 'minor-ninth', 'dominant-11th', 'major-11th', 'minor-11th', 'dominant-13th', 'major-13th', 'minor-13th']
 
-        if self.root(find=False) == None or self.chordKind == None:
+        if self._root == None or self.chordKind == None:
             return
 
-        fbScale = realizerScale.FiguredBassScale(self.root(), 'major') #create figured bass scale with root as scale
-        self.root().octave = 3 #render in the 3rd octave by default
+        fbScale = realizerScale.FiguredBassScale(self._root, 'major') #create figured bass scale with root as scale
+        self._root.octave = 3 #render in the 3rd octave by default
 
         if self._notationString():
-            pitches = fbScale.getSamplePitches(self.root(), self._notationString())
+            pitches = fbScale.getSamplePitches(self._root, self._notationString())
             pitches.pop(0) #remove duplicated bass note due to figured bass method.
         else:
             pitches = []
-            pitches.append(self.root())
+            pitches.append(self._root)
 
         pitches = self._adjustOctaves(pitches)
 
-        if self.root(find=False).name != self.bass(find=False).name:
+        if self._root.name != self._bass.name:
 
             inversionNum = self.inversion()
 
@@ -1395,8 +1402,8 @@ class ChordSymbol(Harmony):
                 #there is a bass, yet no normal inversion was found....must be added note 
 
                 inversionNum = None
-                self.bass().octave = 2 #arbitrary octave, must be below root, which was arbitrarily chosen as 3 above
-                pitches.append(self.bass())
+                self._bass.octave = 2 #arbitrary octave, must be below root, which was arbitrarily chosen as 3 above
+                pitches.append(self._bass)
         else:
             self.inversion(None)
             inversionNum = None
@@ -1416,7 +1423,7 @@ class ChordSymbol(Harmony):
 
             #self.bass(bassPitch)
             for p in pitches:
-                if p.diatonicNoteNum < self.bass().diatonicNoteNum:
+                if p.diatonicNoteNum < self._bass.diatonicNoteNum:
                     p.octave = p.octave + 1
 
         pitches = self._adjustPitchesForChordStepModifications(pitches)
@@ -1957,12 +1964,15 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 
 if __name__ == "__main__":
-    #from music21 import  *
+    #from music21 import  corpus, harmony
     #t = harmony.TestExternal()
     #t.labelChordSymbols()
- 
+    #s = corpus.parse('leadsheet/fosterBrownHair')
+    #for c in s.flat.getElementsByClass(harmony.ChordSymbol):
+    #    print c.pitches
     import music21
     music21.mainTest(Test)
+
 
 
 #------------------------------------------------------------------------------

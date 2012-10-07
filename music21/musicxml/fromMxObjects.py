@@ -1048,6 +1048,8 @@ def mxToChordSymbol(mxHarmony):
             b.accidental = pitch.Accidental(int(mxBass.get('bassAlter')))
         # set Pitch object on Harmony
         cs.bass(b)
+    else:
+        cs.bass(pitch.Pitch(mxRoot.get('rootStep'))) #set the bass to the root if root is none
 
     mxInversion = mxHarmony.get('inversion')
     if mxInversion is not None:
@@ -1081,7 +1083,7 @@ def mxToChordSymbol(mxHarmony):
             ChordStepModifications.append(hd)
         for hd in ChordStepModifications:
             cs.addChordStepModification(hd)
-
+    cs._updatePitches()
     #environLocal.printDebug(['mxToHarmony(): Harmony object', h])
     return cs
 
@@ -3279,7 +3281,8 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [u'major', u'dominant', u'major', u'major', u'major', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'major'])
 
         match = [str(h.root()) for h in s.flat.getElementsByClass('ChordSymbol')]
-        self.assertEqual(match, ['F', 'C', 'F', 'B-', 'F', 'C', 'G', 'C', 'C', 'F', 'C', 'F', 'F', 'B-', 'F', 'F', 'C', 'F', 'C'])
+        
+        self.assertEqual(match, ['F3', 'C3', 'F3', 'B1', 'F3', 'C3', 'G2', 'C3', 'C3', 'F3', 'C3', 'F3', 'F2', 'B1', 'F2', 'F3', 'C3', 'F3', 'C3'])
 
         s = corpus.parse('monteverdi/madrigal.3.12.xml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 10)
