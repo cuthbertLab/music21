@@ -25,6 +25,8 @@ to graphing data and structures in
 import unittest
 import random, math, os
 
+from music21 import base # for _missingImport
+
 from music21 import note
 from music21 import dynamics
 from music21 import exceptions21
@@ -45,10 +47,17 @@ from music21.ext import webcolors
 
 from music21 import environment
 _MOD = 'graph.py'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment(_MOD)    
 
-_missingImport = []
-try:
+def _getExtendedModules():
+    '''
+    this is done inside a def, so that the slow import of matplotlib is not done
+    in ``from music21 import *`` unless it's actually needed.
+
+    Returns a tuple: (matplotlib, Axes3D, collections, patches, plt, networkx)
+    '''
+    if 'matplotlib' in base._missingImport:
+        raise GraphException('could not find matplotlib, graphing is not allowed')
     import matplotlib
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
@@ -60,28 +69,13 @@ try:
 
     #from matplotlib.colors import colorConverter
     import matplotlib.pyplot as plt
-
-except ImportError:
-    _missingImport.append('matplotlib')
-
-
-#try:
-#    import numpy 
-#except ImportError:
-#    _missingImport.append('numpy')
-
-try:
-    import networkx
-except ImportError:
-    networkx = None # use for testing
-    #_missingImport.append('networkx')
-
-
-if len(_missingImport) > 0:
-    if environLocal['warnings'] in [1, '1', True]:
-        pass
-        #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
-
+    
+    try:
+        import networkx
+    except ImportError:
+        networkx = None # use for testing
+    
+    return (matplotlib, Axes3D, collections, patches, plt, networkx)
 
 #-------------------------------------------------------------------------------
 class GraphException(exceptions21.Music21Exception):
@@ -111,7 +105,8 @@ FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted',
             '3dbars', 'colorgrid', 'horizontalbarweighted']
 
 def userFormatsToFormat(value):
-    '''Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
+    '''
+    Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
     '''
     #environLocal.printDebug(['calling user userFormatsToFormat:', value])
     value = value.lower()
@@ -249,10 +244,7 @@ class Graph(object):
         >>> a = graph.Graph(title='a graph of some data to be given soon', tickFontSize = 9)
         >>> a.setData(['some', 'arbitrary', 'data', 14, 9.04, None])
         '''
-        try:
-            plt
-        except NameError:
-            raise GraphException('could not find matplotlib, graphing is not allowed')
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
         self.data = None
         # define a component dictionary for each axis
         self.axis = {}
@@ -623,6 +615,7 @@ class Graph(object):
         For most matplotlib back ends, this will open 
         a GUI window with the desired graph.
         '''
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
         plt.show()
 
     def write(self, fp=None):
@@ -663,6 +656,7 @@ class GraphNetworxGraph(Graph):
 
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
@@ -686,6 +680,7 @@ class GraphNetworxGraph(Graph):
             except NameError: pass # keep as None
 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
 
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -762,6 +757,8 @@ class GraphColorGrid(Graph):
             self.setFigureSize([9, 6])
                 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         self.fig.subplots_adjust(left=0.15)   
@@ -865,6 +862,8 @@ class GraphColorGridLegend(Graph):
             self.setTitle('Legend')
                 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
 
@@ -973,6 +972,8 @@ class GraphHorizontalBar(Graph):
             self.alpha = .6
 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         self.fig.subplots_adjust(left=0.15)   
@@ -1063,6 +1064,8 @@ class GraphHorizontalBarWeighted(Graph):
 #                 ]
 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         # might need more space here for larger y-axis labels
@@ -1194,6 +1197,8 @@ class GraphScatterWeighted(Graph):
         self._rangeDiameter = self._maxDiameter - self._minDiameter
 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         # these need to be equal to maintain circle scatter points
@@ -1302,6 +1307,8 @@ class GraphScatter(Graph):
         '''
         runs the data through the processor and if doneAction == 'show' (default), show the graph
         '''
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         self.fig.subplots_adjust(left=0.15)
@@ -1385,6 +1392,8 @@ class GraphHistogram(Graph):
             self.alpha = 0.8
 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         self.fig.subplots_adjust(left=0.15)
@@ -1421,11 +1430,8 @@ class GraphGroupedVerticalBar(Graph):
     [('bar0', {'a': 3, 'c': 1, 'b': 2}), ('bar1', {'a': 3, 'c': 1, 'b': 2}), ('bar2', {'a': 3, 'c': 1, 'b': 2}), ('bar3', {'a': 3, 'c': 1, 'b': 2}), ('bar4', {'a': 3, 'c': 1, 'b': 2}), ('bar5', {'a': 3, 'c': 1, 'b': 2}), ('bar6', {'a': 3, 'c': 1, 'b': 2}), ('bar7', {'a': 3, 'c': 1, 'b': 2}), ('bar8', {'a': 3, 'c': 1, 'b': 2}), ('bar9', {'a': 3, 'c': 1, 'b': 2})]
     >>> g.setData(data)
     >>> g.process()
-
     '''
-
     def __init__(self, *args, **keywords):
-
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
@@ -1452,6 +1458,8 @@ class GraphGroupedVerticalBar(Graph):
             fontsize=self.tickFontSize, family=self.fontFamily)
 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         self.fig = plt.figure()
         self.fig.subplots_adjust(bottom=.3)
         ax = self.fig.add_subplot(1, 1, 1)
@@ -1525,6 +1533,8 @@ class _Graph3DBars(Graph):
         self._axisInit()
 
     def process(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         self.fig = plt.figure()
         ax = Axes3D(self.fig)
 
@@ -1611,6 +1621,8 @@ class Graph3DPolygonBars(Graph):
             self.zeroFloor = False
 
     def process(self):
+        (matplotlib, Axes3D, collections, unused_patches, plt, unused_networkx) = _getExtendedModules()
+
         cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(getColor(arg),
                                 alpha=self.alpha)
         self.fig = plt.figure()
@@ -4613,6 +4625,8 @@ class Test(unittest.TestCase):
 
 
     def testGraphNetworxGraph(self):
+        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+
         if networkx is not None:
             b = GraphNetworxGraph(doneAction=None)
             #b = GraphNetworxGraph()

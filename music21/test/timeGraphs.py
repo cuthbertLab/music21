@@ -63,7 +63,7 @@ class Timer(object):
     def __call__(self):
         '''Reports current time or, if stopped, stopped time.
         '''
-       # if stopped, gets _tDif; if not stopped, gets current time
+        # if stopped, gets _tDif; if not stopped, gets current time
         if self._tStop == None: # if not stoped yet
             t = time.time() - self._tStart
         else:
@@ -107,12 +107,13 @@ class M21CallTest(object):
 #-------------------------------------------------------------------------------
 class TestTimeHumdrum(M21CallTest):
     def testFocus(self):
-        masterStream = music21.humdrum.parseData(humdrumTestFiles.mazurka6).stream
+        import music21
+        masterStream = music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6).stream #@UnusedVariable @UndefinedVariable
 
 class TestTimeMozart(M21CallTest):
     def testFocus(self):
         music21 = self.m21
-        a = music21.converter.parse(music21.corpus.getWork('k155')[0])
+        unused = music21.converter.parse(music21.corpus.getWork('k155')[0])
     #    a = music21.converter.parse(mxtf.ALL[1])
 
 class TestTimeCapua1(M21CallTest):
@@ -130,7 +131,7 @@ class TestTimeIsmir(M21CallTest):
     def testFocus(self):
         music21 = self.m21
         s1 = music21.corpus.parse('bach/bwv248')
-        post = s1.musicxml
+        unused = s1.musicxml
 
 
 class TestMakeMeasures(CallTest):
@@ -142,7 +143,7 @@ class TestMakeMeasures(CallTest):
             self.s.append(n)
 
     def testFocus(self):
-        post = self.s.makeMeasures()
+        unused = self.s.makeMeasures()
 
 
 class TestMakeTies(CallTest):
@@ -198,32 +199,32 @@ class TestMusicXMLOutput(CallTest):
             self.s.append(n)
 
     def testFocus(self):
-        post = self.s.musicxml
+        unused = self.s.musicxml
 
 
 class TestMusicXMLOutputParts(CallTest):
     '''This tries to isolate a problem whereby part creation is much faster than score creation. 
     '''
     def __init__(self):
-        import music21
-        self.s = music21.corpus.parse('bach/bwv66.6', forceSource=True)
+        from music21 import corpus
+        self.s = corpus.parse('bach/bwv66.6', forceSource=True)
         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
     def testFocus(self):
         for p in self.s.parts:
-            post = p.musicxml
+            unused = p.musicxml
 
 
 class TestMusicXMLOutputScore(CallTest):
     '''This tries to isolate a problem whereby part creation is much faster than score creation. 
     '''
     def __init__(self):
-        import music21
-        self.s = music21.corpus.parse('bach/bwv66.6', forceSource=True)
+        from music21 import corpus
+        self.s = corpus.parse('bach/bwv66.6', forceSource=True)
         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
     def testFocus(self):
-        post = self.s.musicxml
+        unused = self.s.musicxml
 
 
 class TestABCImport(M21CallTest):
@@ -250,7 +251,7 @@ class TestCreateTimeSignature(CallTest):
 
     def __init__(self):
         from music21.test import testPerformance
-        self.t = test.testPerformance.Test()
+        self.t = testPerformance.Test()
 
     def testFocus(self):
         # create 500 time signatures
@@ -262,7 +263,7 @@ class TestCreateDurations(CallTest):
 
     def __init__(self):
         from music21.test import testPerformance
-        self.t = test.testPerformance.Test()
+        self.t = testPerformance.Test()
 
     def testFocus(self):
         # create 500 time signatures
@@ -275,7 +276,7 @@ class TestParseABC(CallTest):
 
     def __init__(self):
         from music21.test import testPerformance
-        self.t = test.testPerformance.Test()
+        self.t = testPerformance.Test()
 
     def testFocus(self):
         # create 500 time signatures
@@ -291,11 +292,11 @@ class TestMusicXMLObjectTypeChecking(CallTest):
         self.objs = []
         self.count = 100000
         # all objects that would be found in a Measure
-        for x in range(self.count):
+        for i in range(self.count):
             self.objs.append(musicxml.Note())
-        for x in range(self.count):
+        for i in range(self.count):
             self.objs.append(musicxml.Backup())
-        for x in range(self.count):
+        for i in range(self.count):
             self.objs.append(musicxml.Forward())
 
     def testFocus(self):
@@ -332,21 +333,21 @@ class TestGetContextByClassA(CallTest):
 
     def __init__(self):
 
-        from music21 import corpus, clef, meter, key
+        from music21 import corpus
         self.s = corpus.parse('bwv66.6')
 
 
     def testFocus(self):
-        from music21 import corpus, clef, meter, key
+        from music21 import clef, meter, key
         for p in self.s.parts:
             for m in p.getElementsByClass('Measure'):
-                post = m.getContextByClass(clef.Clef)
-                post = m.getContextByClass(meter.TimeSignature)
-                post = m.getContextByClass(key.KeySignature)
+                unused = m.getContextByClass(clef.Clef)
+                unused = m.getContextByClass(meter.TimeSignature)
+                unused = m.getContextByClass(key.KeySignature)
                 for n in m.notesAndRests:
-                    post = n.getContextByClass(clef.Clef)
-                    post = n.getContextByClass(meter.TimeSignature)
-                    post = n.getContextByClass(key.KeySignature)
+                    unused = n.getContextByClass(clef.Clef)
+                    unused = n.getContextByClass(meter.TimeSignature)
+                    unused = n.getContextByClass(key.KeySignature)
             
 
 class TestParseRNText(CallTest):
@@ -381,7 +382,7 @@ class TestMusicXMLMultiPartOutput(CallTest):
 
     def testFocus(self):
         # get musicxml string
-        post = self.s.musicxml
+        unused = self.s.musicxml
 
 
 class TestCommonContextSearches(CallTest):
@@ -391,7 +392,7 @@ class TestCommonContextSearches(CallTest):
         self.s = corpus.parse('bwv66.6')
 
     def testFocus(self):
-        ts = self.s.parts[0].getElementsByClass(
+        unused = self.s.parts[0].getElementsByClass(
             'Measure')[3].getContextByClass('TimeSignature')
 
 
@@ -402,7 +403,7 @@ class TestBigMusicXML(CallTest):
         self.s = corpus.parse('opus41no1')
 
     def testFocus(self):
-        post = self.s.musicxml
+        unused = self.s.musicxml
 
 
 class TestGetElementsByClassA(CallTest):
@@ -412,14 +413,14 @@ class TestGetElementsByClassA(CallTest):
         self.s = corpus.parse('bwv66.6')
 
     def testFocus(self):
-        found = self.s.flat.notes
+        unused = self.s.flat.notes
 
 
 
 class TestGetElementsByClassB(CallTest):
 
     def __init__(self):
-        from music21 import stream, note, clef, meter, classCache, common, chord
+        from music21 import stream, note, clef, meter, chord
         self.s = stream.Stream()
         self.s.repeatAppend(note.Note(), 300)
         self.s.repeatAppend(note.Rest(), 300)
@@ -428,7 +429,7 @@ class TestGetElementsByClassB(CallTest):
         self.s.repeatInsert(clef.BassClef(), [0, 50, 100, 150])
 
     def testFocus(self):
-        for x in range(20): 
+        for i in range(20): 
             self.s.getElementsByClass(['Rest'])
             self.s.getElementsByClass(['Note'])
             self.s.getElementsByClass(['GeneralNote'])
@@ -440,7 +441,7 @@ class TestGetElementsByClassB(CallTest):
 
 class TestGetContextByClassB(CallTest):
     def __init__(self):
-        from music21 import stream, note, meter, converter
+        from music21 import stream, note, meter
 
         self.s = stream.Score()
 
@@ -492,7 +493,7 @@ class TestGetContextByClassB(CallTest):
 
     def testFocus(self):
         #post = self.targetNoteA.getContextByClass('TimeSignature')
-        post = self.targetNoteA.previous('TimeSignature')
+        unused = self.targetNoteA.previous('TimeSignature')
 
 
 
@@ -503,43 +504,35 @@ class TestMeasuresA(CallTest):
         self.s = corpus.parse('symphony94/02')
 
     def testFocus(self):
-        found = self.s.measures(3, 10)
+        unused = self.s.measures(3, 10)
 
 
 class TestMeasuresB(CallTest):
     def __init__(self):
-        from music21 import stream, note, meter, converter
+        from music21 import stream, note, meter
 
         self.s = stream.Score()
-        for pn in [1]:
+        for j in [1]:
             p = stream.Part()
             for mn in range(10):
                 m = stream.Measure()
                 if mn == 0:
                     m.timeSignature = meter.TimeSignature('3/4')
-                for nn in range(3):
+                for i in range(3):
                     m.append(note.Note())
                 p.append(m)
             self.s.insert(0, p)
         #self.s.show()
 
     def testFocus(self):
-        post = self.s.measures(3, 6)
+        unused = self.s.measures(3, 6)
 
-
-class TestImportCorpus(CallTest):
-
-    def __init__(self):
-        pass
-
-    def testFocus(self):
-        import music21.corpus
 
 class TestImportCorpus2(M21CallTest):
 
     def testFocus(self):
         music21 = self.m21
-        bc = music21.corpus.getBachChorales()
+        unused = music21.corpus.getBachChorales()
 
 
 class TestImportCorpus3(CallTest):
@@ -547,7 +540,7 @@ class TestImportCorpus3(CallTest):
 
     def testFocus(self):
         import music21
-        bc = music21.corpus.parse('bach/bwv1.6')
+        bc = music21.corpus.parse('bach/bwv1.6') #@UndefinedVariable @UnusedVariable
 
 
 #-------------------------------------------------------------------------------
@@ -606,7 +599,7 @@ class CallGraph:
         skew results
         '''
         suffix = '.svg'
-        format = suffix[1:]
+        outputFormat = suffix[1:]
         _MOD = "test.timeGraphs.py"
 
         if runWithEnviron:
@@ -656,14 +649,13 @@ class CallGraph:
         ct.testFocus() # run routine
 
         pycallgraph.stop_trace()
-        pycallgraph.make_dot_graph(fp, format=format)
+        pycallgraph.make_dot_graph(fp, format=outputFormat)
         print('elapsed time: %s' % t)
         # open the completed file
         print('file path: ' + fp)
         try:
-            from music21 import environment
             environLocal = environment.Environment(_MOD)
-            environLocal.launch(format, fp)
+            environLocal.launch(outputFormat, fp)
         except NameError:
             pass
 

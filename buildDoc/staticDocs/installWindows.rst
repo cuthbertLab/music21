@@ -9,7 +9,8 @@ Alternative Installation Methods
 ----------------------------------------------
 
 The following instructions are for general users. If you are 
-an advanced user and have installed other Python packages before, or want to use an EGG, SVN, PIP, or setuptools, you should read :ref:`installAdvanced`.
+an advanced user and have installed other Python packages before, 
+or want to use an EGG, SVN, PIP, or setuptools, you should read :ref:`installAdvanced`.
 
 
 

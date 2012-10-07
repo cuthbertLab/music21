@@ -22,6 +22,7 @@ import os
 import wave
 import unittest
 
+from music21 import base
 from music21 import common
 from music21 import exceptions21
 from music21 import features
@@ -38,41 +39,27 @@ environLocal = environment.Environment(_MOD)
 audioChunkLength = 1024
 recordSampleRate = 44100
 
-_missingImport = []
-try:
-    import matplotlib.mlab # for find
-except ImportError:
-    _missingImport.append('matplotlib')
-
-try:    
-    import numpy
-except ImportError:
-    _missingImport.append('numpy')
-
-try:
-    import scipy.signal 
-except ImportError:
-    _missingImport.append('scipy')
-
-if len(_missingImport) > 0:
-    if environLocal['warnings'] in [1, '1', True]:
-        pass
-        #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
-
-
 def histogram(data,bins):
     '''
-    Histogram
-    
+    Partition the list in `data` into a number of bins defined by `bins`
+    and return the number of elements in each bins and a set of `bins` + 1
+    elements where the first element (0) is the start of the first bin,
+    the last element (-1) is the end of the last bin, and every remaining element (i)
+    is the dividing point between one bin and another.
     
     >>> from music21 import *
     >>> data = [1, 1, 4, 5, 6, 0, 8, 8, 8, 8, 8]
-    >>> pdf, bins = audioSearch.histogram(data,8)
-    >>> print pdf
+    >>> outputData, bins = audioSearch.histogram(data,8)
+    >>> print outputData
     [3, 0, 0, 1, 1, 1, 0, 5]
     >>> print bins
     [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    
+
+    >>> outputData, bins = audioSearch.histogram(data,4)
+    >>> print outputData
+    [3, 1, 2, 5]
+    >>> print bins
+    [0, 2, 4, 6, 8]
     '''
     maxValue = max(data)
     minValue = min(data)
@@ -103,10 +90,10 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     in the temporal domain and, consequently, obtains the frequency in each instant 
     of time.
     
-    
     >>> from music21 import *
     >>> import wave
     >>> import os #_DOCS_HIDE
+    >>> import numpy  # you need to have numpy installed to use this
     >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
     >>> wv = wave.open(readPath + 'test_audio.wav', 'r') #_DOCS_HIDE
     >>> #_DOCS_SHOW wv = wave.open("test_audio.wav",'r')
@@ -116,10 +103,15 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     >>> wv.close()
     >>> print finalResult
     143.6276...
-
     '''
-    if len(_missingImport) > 0:
-        raise AudioSearchException("Cannot run autocorrelationFunction without all of numpy, scipy, and matplotlib installed.  Missing %s" % _missingImport)
+    if 'numpy' in base._missingImport or 'scipy' in base._missingImport or 'matplotlib' in base._missingImport:
+        #len(_missingImport) > 0:
+        raise AudioSearchException("Cannot run autocorrelationFunction without all of numpy, scipy, and matplotlib installed.  Missing %s" % base._missingImport)
+    import numpy
+    import scipy.signal
+    import matplotlib
+    import matplotlib.mlab
+    
     recordedSignal = numpy.array(recordedSignal)
     correlation = scipy.signal.fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
     lengthCorrelation = len(correlation) / 2
@@ -142,20 +134,16 @@ def prepareThresholds(useScale=None):
     (including the octave repetition) (Default is a ChromaticScale).
     The second is the pitches of the scale.
     
-    
     A threshold value is the fractional part of the log-base-2 value of the
     frequency.
-    
     
     For instance if A = 440 and B-flat = 460, then the threshold between
     A and B-flat will be 450.  Notes below 450 should be considered As and those
     above 450 should be considered B-flats.
     
-    
     Thus the list returned has one less element than the number of notes in the
     scale + octave repetition.  If useScale is a ChromaticScale, `prepareThresholds`
     will return a 12 element list.  If it's a diatonic scale, it'll have 7 elements.
-    
     
     >>> from music21 import *
     >>> l, p = audioSearch.prepareThresholds(scale.MajorScale('A3'))
@@ -219,15 +207,12 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     It will convert the frequency to be within the range of the default frequencies
     (usually C4 to C5) but the pitch object will have the correct octave.
     
-    
     >>> from music21 import *
     >>> audioSearch.normalizeInputFrequency(441.72)
     (440.0, <music21.pitch.Pitch A4>)
     
-    
     If you will be doing this often, it's best to cache your thresholds and
-    pitches by running `prepareThresholds` once first:
-    
+    pitches by running `prepareThresholds` once first:    
     
     >>> thresholds, pitches = audioSearch.prepareThresholds(scale.ChromaticScale('C4'))
     >>> for fq in [450, 510, 550, 600]:
@@ -268,7 +253,6 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     is a list of :class:~`music21.pitch.Pitch` objects that best match these frequencies 
     and the second element is a list of the frequencies of those objects that can
     be plotted for matplotlib
-    
     
     To-do: only return the former.  The latter can be generated in other ways.
     
@@ -311,7 +295,6 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     return detectedPitchObjects, listplot
 
 
-        
 def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
     '''
     records for length (=seconds) a set of frequencies from the microphone.
@@ -320,14 +303,13 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
     in a wave file.
     
     Returns a list of frequencies detected.
-    
-    
+        
     TODO -- find a way to test... or at least demo
     '''
-    if "numpy" in _missingImport:
+    if "numpy" in base._missingImport:
         raise AudioSearchException("Cannot run getFrequenciesFromMicrophone without numpy installed")
 
-    
+    import numpy
     from music21.audioSearch import recording
     environLocal.printDebug("* start recording")
     storedWaveSampleList = recording.samplesFromRecording(seconds=length,
@@ -347,7 +329,6 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     '''
     gets a list of frequencies from a complete audio file.
     
-    
     >>> from music21 import *
     >>> import os #_DOCS_HIDE
     >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
@@ -356,8 +337,9 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     >>> print freq
     [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
     '''
-    if "numpy" in _missingImport:
+    if "numpy" in base._missingImport:
         raise AudioSearchException("Cannot run getFrequenciesFromAudioFile without numpy installed")
+    import numpy
 
     storedWaveSampleList = []
     environLocal.printDebug("* reading entire file from disk")
@@ -416,12 +398,10 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     101.989786226
     >>> print currentSample  # should be exactly double the previous
     88064
-
-
     '''
-    if "numpy" in _missingImport:
+    if "numpy" in base._missingImport:
         raise AudioSearchException("Cannot run getFrequenciesFromPartialAudioFile without numpy installed")
-
+    import numpy
     
     if waveFilenameOrHandle == 'temp':
         waveFilenameOrHandle = environLocal.getRootTempDir() + os.path.sep + 'temp.wav'
@@ -557,8 +537,7 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     [<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>, ...]
     >>> print durationList
     [72, 6, 14, 23, 34, 40, 27, 36, 35, 15, 17, 15, 6, 33, 22, 13, 16, 39, 35, 38, 27, 27, 27, 8]
-    '''
-    
+    '''    
     #initialization
     REST_FREQUENCY = 10
     detectedPitchObjects[0].frequency = REST_FREQUENCY
@@ -651,17 +630,13 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     If mostRepeatedQuarterLength is another number, it still returns the
     estimated length of a quarter note, but chooses it so that the most
     common note in durationList will be the other note.  See example 2:
-    :
-    
     
     Returns a float -- and not an int.
-    
     
     >>> from music21 import *
     >>> durationList = [20, 19, 10, 30, 6, 21]
     >>> audioSearch.quarterLengthEstimation(durationList)
     20.625    
-    
     
     Example 2: suppose these are the inputted durations for a
     score where most of the notes are half notes.  Show how long
@@ -669,8 +644,6 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     
     >>> audioSearch.quarterLengthEstimation(durationList, mostRepeatedQuarterLength = 2.0)
     10.3125    
-
-
     ''' 
     dl = copy.copy(durationList)
     dl.append(0)
@@ -710,12 +683,10 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     Stream using the information from quarterLengthEstimation
     and quantizeDurations.
     
-    
     returns a :class:`~music21.stream.Score` object, containing
     a metadata object and a single :class:`~music21.stream.Part` object, which in turn
     contains the notes, etc.  Does not run :meth:`~music21.stream.Stream.makeNotation`
-    on the Score.
-    
+    on the Score.    
     
     >>> from music21 import *
     >>> durationList = [20, 19, 10, 30, 6, 21]
@@ -731,8 +702,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
         {2.5} <music21.note.Note F#>
         {4.0} <music21.note.Note C>
         {4.25} <music21.note.Rest rest>    
-    '''
-    
+    '''    
     # rounding lengths    
     p2 = stream.Part() 
     
@@ -785,8 +755,6 @@ def decisionProcess(partsList, notePrediction, beginningData,
     
     Outputs: It returns the beginning of the best matching fragment of 
     score and the countdown.
-    
-    
     
     >>> from music21 import *
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes    

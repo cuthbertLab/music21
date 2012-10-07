@@ -323,4 +323,52 @@ It has a `.duration` attribute which stores a `Duration` object:
 >>> stream1.duration.quarterLength
 4.0
 
- 
+(Notice that the `len()` of a `Stream`, which stands for "length", is not the same as the duration. 
+the `len()` of a Stream is the number of objects stored in it, so `len(stream1)` is 3). 
+
+And, as a `Music21Object`, a `Stream` can be placed inside of another `Stream` object.  Let's create
+a stream, called biggerStream (for reasons that will become obvious), that holds a `Note` D# at the
+beginning
+
+>>> biggerStream = stream.Stream()
+>>> note2 = note.Note("D#5")
+>>> biggerStream.insert(0, note2)
+
+Now we use the `.append` functionality to put `stream1` at the end of `biggerStream`:
+
+>>> biggerStream.append(stream1)
+
+Notice that when we call `.show('text')` on biggerStream, we see not only the presence of `note2`
+and `stream1` but also all the contents of `stream1` as well:
+
+>>> biggerStream.show('text') 
+{0.0} <music21.note.Note D#>
+{1.0} <music21.stream.Stream some notes>
+	{0.0} <music21.note.Note C>
+	{2.0} <music21.note.Note F#>
+	{3.0} <music21.note.Note B->
+
+Notice though that the offsets, the little numbers inside curly brackets, for the elements of
+`stream1` ("some notes") relate only to their positions within `stream1`, not to their position
+within `biggerStream`.  This is because each `Music21Object` knows its offset only in relation
+to its containing `Stream`, not necessarily to the `Stream` containing *that* `Stream`.  
+
+Also notice that `note1` knows that it is in `stream1` but doesn't know that it is somewhere inside
+`biggerStream`:
+
+>>> note1 in stream1
+True
+>>> note1 in biggerStream
+False
+
+All this might not seem like much of a big deal, until we tell you that in music21, `Scores` are
+made up of `Streams` within `Streams` within `Streams`.  So if you have an orchestral score, it is
+a `Stream`, and the viola part is a `Stream` in that `Stream`, and measure 5 of the viola part is a
+`Stream` within that `Stream`, and, if there were a ''divisi'', then each ''diviso'' voice would be
+a `Stream` within that `Stream`.  Each of these `Streams` has a special name and its own class 
+(:class:`~music21.stream.Score`, :class:`~music21.stream.Part`, :class:`~music21.stream.Measure`,
+and :class:`~music21.stream.Voice`), but they are all types of `Streams`.  
+
+So how do we find `note1` inside `biggerStream`?  That's what the next two chapters are about.  
+Click ``Next`` for Chapter 5.  Those with programming experience who have familiarity with
+lists of lists and defining functions might want to skip to Chapter 6 (**LINK**)

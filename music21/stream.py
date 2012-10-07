@@ -4715,33 +4715,48 @@ class Stream(base.Music21Object):
         
         If `addPartIdAsGroup` is True, all elements found in the 
         Stream will have their source Part id added to the 
-        element's Group.  These groups names are useful
-        for partially "de-chordifying" the output.
+        element's pitches' Group.  These groups names are useful
+        for partially "de-chordifying" the output.  If the element chordifies to
+        a :class:`~music21.chord.Chord` object, then the group will be found in each
+        :class:`~music21.pitch.Pitch` element's .groups in Chord.pitches.  If the
+        element chordifies to a single :class:`~music21.note.Note` then .pitch.groups
+        will hold the group name.   
 
         The `addTies` parameter currently does not work for pitches in Chords.
 
         If `toSoundingPitch` is True, all parts that define one or 
-        more transpositions will be transposed to sounding pitch before chordification. True by default. 
+        more transpositions will be transposed to sounding pitch before chordification. 
+        True by default. 
 
 
         >>> from music21 import *
         >>> s = stream.Score()
         >>> p1 = stream.Part()
-        >>> p1.insert(4, note.Note("C#"))
+        >>> p1.id = 'part1'
+        >>> p1.insert(4, note.Note("C#4"))
         >>> p1.insert(5.3, note.Rest())
         >>> p2 = stream.Part()
-        >>> p2.insert(2.12, note.HalfNote("D-"))
+        >>> p2.id = 'part2'
+        >>> p2.insert(2.12, note.HalfNote("D-4"))
         >>> p2.insert(5.5, note.Rest())
         >>> s.insert(0, p1)
         >>> s.insert(0, p2)
         >>> cc = s.chordify()
         >>> cc.show('text')
         {0.0} <music21.note.Rest rest>
-        {2.12} <music21.chord.Chord D->
-        {4.0} <music21.chord.Chord C# D->
-        {4.12} <music21.chord.Chord C#>
+        {2.12} <music21.chord.Chord D-4>
+        {4.0} <music21.chord.Chord C#4 D-4>
+        {4.12} <music21.chord.Chord C#4>
         {5.0} <music21.note.Rest rest>
-
+        
+        Here's how addPartIdAsGroup works:
+        
+        >>> cc2 = s.chordify(addPartIdAsGroup=True)
+        >>> csharpDflatChord = cc2[2]
+        >>> for p in csharpDflatChord.pitches:
+        ...     print p, p.groups
+        C#4 ['part1']
+        D-4 ['part2'] 
 
         >>> s = stream.Stream()
         >>> p1 = stream.Part()
@@ -4776,11 +4791,11 @@ class Stream(base.Music21Object):
         {7.0} <music21.chord.Chord A D3 F#3 A3>
 
         
-        Test that chordifying 
+        Test that chordifying works on a single stream.
     
         >>> f2 = stream.Score()
         >>> f2.insert(0, metadata.Metadata())
-        >>> f2.append(note.Note('C4'))
+        >>> f2.insert(0, note.Note('C4'))
         >>> f2.insert(0, note.Note('D#4'))
         >>> c = f2.chordify()
         >>> cn = c.notes

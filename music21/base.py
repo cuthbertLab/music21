@@ -66,18 +66,19 @@ environLocal = environment.Environment(_MOD)
 
 # check external dependencies and display 
 _missingImport = []
+import imp
 try:
-    import matplotlib # @UnusedImport
+    imp.find_module('matplotlib')
 except ImportError:
     _missingImport.append('matplotlib')
 
 try:
-    import numpy # @UnusedImport
+    imp.find_module('numpy')
 except ImportError:
     _missingImport.append('numpy')
 
 try:
-    import scipy # @UnusedImport
+    imp.find_module('scipy')
 except ImportError:
     _missingImport.append('scipy')
 

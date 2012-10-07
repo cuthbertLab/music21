@@ -1017,12 +1017,14 @@ class Note(NotRest):
         self.pitch.pitchClass = value
 
     pitchClass = property(_getPitchClass, _setPitchClass, 
-        doc = '''Return or set the pitch class from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.pitchClass`.
+        doc = '''Return or set the pitch class from the :class:`~music21.pitch.Pitch` object. 
+        See :attr:`music21.pitch.Pitch.pitchClass`.
         ''')
 
 
     def _getPitchClassString(self):
-        '''Return pitch class string, replacing 10 and 11 as needed. 
+        '''
+        Return pitch class string, replacing 10 and 11 as needed. 
 
         >>> from music21 import *
         >>> d = note.Note()

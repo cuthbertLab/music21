@@ -1,6 +1,6 @@
-.. _usersGuide_06_chords:
+.. _usersGuide_07_chords:
 
-User's Guide, Chapter 6: Chords
+User's Guide, Chapter 7: Chords
 =============================================================
 
 Note and Chord objects, as both subclasses of the :class:`~music21.note.GeneralNote` object, share many features. Both contain a Duration object. A Note has only one Pitch; a Chord, however, contains a list one or more Pitch objects accessed via the :attr:`~music21.chord.Chord.pitches` property. The Chord object additional has numerous analytic methods (such as :meth:`~music21.chord.Chord.isDiminishedSeventh`) as well as a variety of post-tonal tools (such as :attr:`~music21.chord.Chord.forteClass`; see :ref:`overviewPostTonal`).

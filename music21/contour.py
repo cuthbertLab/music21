@@ -8,36 +8,14 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-
-
 '''
 This module defines the ContourFinder and AggregateContour objects.
 '''
 
 import random
-
-_missingImport = []
-try:
-    import matplotlib.pyplot as plt
-
-except ImportError:
-    plt = None
-    _missingImport.append('matplotlib')
-
-try:
-    import numpy
-except ImportError:
-    numpy = None
-    _missingImport.append('numpy')
-
-try:
-    import scipy.stats as sp
-except ImportError:
-    sp = None
-    _missingImport.append('scipy')
-
 import unittest
 
+from music21 import base # for _missingImport testing.
 from music21 import repeat
 from music21 import exceptions21
 from music21 import corpus
@@ -52,6 +30,27 @@ class ContourException(exceptions21.Music21Exception):
 
 class OverwriteException(exceptions21.Music21Exception):
     pass
+
+def _getExtendedModules():
+    '''
+    this is done inside a def, so that the slow import of matplotlib is not done
+    in ``from music21 import *`` unless it's actually needed.
+
+    Returns a tuple: (plt, numpy, sp)
+    '''
+    if 'matplotlib' in base._missingImport:
+        raise ContourException('could not find matplotlib, contour mapping is not allowed (numpy and scipy are also required)')
+    if 'numpy' in base._missingImport:
+        raise ContourException('could not find numpy, contour mapping is not allowed')    
+    #if 'scipy' in base._missingImport:
+    #    raise ContourException('could not find scipy, contour mapping is not allowed')
+    import matplotlib.pyplot as plt
+    import numpy
+    sp = None
+    #import scipy.stats as sp
+    return (plt, numpy, sp)
+
+
 
 class ContourFinder(object):
     def __init__(self, s=None):
@@ -167,7 +166,6 @@ class ContourFinder(object):
         To get a contour where measures map to the metric values, use normalized=False (the default), but to get a contour
         which evenly divides time between 1.0 and 100.0, use normalized=True
         
-        
         >>> from music21 import *
         >>> cf = ContourFinder( corpus.parse('bwv10.7'))
         >>> contour = cf.getContour('dissonance')
@@ -220,9 +218,7 @@ class ContourFinder(object):
             window = 1
             
                 
-        '''                
-
-        
+        '''
         if cType in self._contours:
             if overwrite is False:
                 if metric is not None:
@@ -243,12 +239,8 @@ class ContourFinder(object):
             else:
                 metric, needsChordify = self._metrics[cType]
         else:
-            self._metrics[cType] = (metric, needsChordify)
-        
-            
-        '''    
-       
-            
+            self._metrics[cType] = (metric, needsChordify) 
+        '''
         contour = self.getContourValuesForMetric(metric, window, slide, needsChordify)
         
         if normalized:
@@ -282,10 +274,7 @@ class ContourFinder(object):
         True
         >>> 0.0 in res
         True
-                
-        
         '''
-        
         myKeys = contourDict.keys()
         myKeys.sort()
         numKeys = len(myKeys)
@@ -303,7 +292,8 @@ class ContourFinder(object):
         
     #TODO: give same args as getContour, maybe? Also, test this.
     def plot(self, cType, contour=None, regression=True, order=4, title='Contour Plot', fileName=None):
-        
+        (plt, numpy, sp) = _getExtendedModules() #@UnusedVariable
+
         if contour is None:
             if cType not in self._contours:
                 contour = self.getContour(cType)
@@ -554,6 +544,8 @@ class AggregateContour(object):
         
         Order is the order of the resulting polynomial.  e.g. For a linear regression, order=1.  
         '''
+        (plt, numpy, sp) = _getExtendedModules() #@UnusedVariable
+
         if cType in self._aggContoursPoly:
             return self._aggContoursPoly[cType]
         elif cType in self._aggContoursAsList:
@@ -584,7 +576,8 @@ class AggregateContour(object):
         else:
             contour = self._aggContoursAsList[cType]
         '''
-            
+        (plt, numpy, sp) = _getExtendedModules() #@UnusedVariable
+
         x, y = zip(*contour)   
         
         if showPoints:     
