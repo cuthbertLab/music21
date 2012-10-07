@@ -1324,16 +1324,37 @@ class ChordSymbol(Harmony):
         >>> h = harmony.ChordSymbol(root = 'F', bass = 'D-', kind = 'Neapolitan')
         >>> h.figure
         'FN6/D-'
+        
+        Thanks to Norman Schmidt for code sample and helping fix a bug
+        
+        >>> s = converter.parse('/Users/bhadley/desktop/music.xml')
+        >>> s = s.parts[0].getElementsByClass(stream.Measure)
+        >>> for m in s[12:17]:
+        ...   c = m.getElementsByClass(harmony.ChordSymbol)
+        ...   if(len(c)):
+        ...     chord = c[0].figure
+        ...     print chord.replace('-','b')
+        ...   else:
+        ...     print 'n.c.'
+        B
+        Cm
+        B
+        G6/B
+        Bm
         '''
         if self.chordStepModifications or self.chordKind: #there is no hope to determine the chord from pitches
             # if it's been modified, so we'll just have to try this route....
-            figure = self.root().name
+            if self.root() == None:
+                raise HarmonyException('Cannot find figure. No root to the chord found' , self)
+            else:
+                figure = self.root().name
     
             if self.chordKind in CHORD_TYPES:
                 figure += getAbbreviationListGivenChordType(self.chordKind)[0]
-            if self.root().name != self.bass().name:
-                figure += '/' + self.bass().name
-    
+            if self.bass() != None:
+                if self.root().name != self.bass().name:
+                    figure += '/' + self.bass().name
+            
             for csmod in self.chordStepModifications:
                 if csmod.modType != 'alter':
                     figure += ' ' + csmod.modType + ' ' + str(csmod.degree)
