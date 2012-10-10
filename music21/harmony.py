@@ -1327,7 +1327,7 @@ class ChordSymbol(Harmony):
         
         Thanks to Norman Schmidt for code sample and helping fix a bug
         
-        >>> s = converter.parse('/Users/bhadley/desktop/music.xml')
+        >>> s = corpus.parse('leadsheet/fosterBrownHair.xml')
         >>> s = s.parts[0].getElementsByClass(stream.Measure)
         >>> for m in s[12:17]:
         ...   c = m.getElementsByClass(harmony.ChordSymbol)
@@ -1336,11 +1336,11 @@ class ChordSymbol(Harmony):
         ...     print chord.replace('-','b')
         ...   else:
         ...     print 'n.c.'
-        B
-        Cm
-        B
-        G6/B
-        Bm
+        F
+        G7
+        C
+        C
+        C
         '''
         if self.chordStepModifications or self.chordKind: #there is no hope to determine the chord from pitches
             # if it's been modified, so we'll just have to try this route....
