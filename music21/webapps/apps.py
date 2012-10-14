@@ -67,13 +67,20 @@ def setupURLCorpusParseApp(agenda):
 
 def setupConverterApp(agenda):
     '''
-    Augments an agenda with the data and commands related to the URL Corpus Parse App.
+    Augments an agenda with the data and commands related to the Converter App
+    demoed at the Digital Humanities conference in Hamburg Germany
+    The converter app takes as query values:
     
+    source: a source compatible with converter.parse in quotes (e.g. "tinyNotation:C2 D E F...")
+    output: an output format (musicxml, vexflow, braille...)
+    
+    Example:
+    http://ciconia.mit.edu/music21/webinterface?appName=converterApp&source="tinynotation:F4 A-  B- B c e f2"&output=vexflow
     
     >>> from music21 import *
     >>> agenda = webapps.Agenda()
     >>> agenda.addData('source','tinynotation:F4 A- B- B c e f2')
-    >>> agenda.addData('output',"musicxmlDownload")
+    >>> agenda.addData('output',"musicxml")
     >>> webapps.apps.setupConverterApp(agenda)
 
     >>> processor = webapps.CommandProcessor(agenda)
