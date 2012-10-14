@@ -65,6 +65,36 @@ def setupURLCorpusParseApp(agenda):
         agenda.setOutputTemplate(outputTemplateName, ['outputStream'])
     
 
+def setupConverterApp(agenda):
+    '''
+    Augments an agenda with the data and commands related to the URL Corpus Parse App.
+    
+    
+    >>> from music21 import *
+    >>> agenda = webapps.Agenda()
+    >>> agenda.addData('source','tinynotation:F4 A- B- B c e f2')
+    >>> agenda.addData('output',"musicxmlDownload")
+    >>> webapps.apps.setupConverterApp(agenda)
+
+    >>> processor = webapps.CommandProcessor(agenda)
+    >>> processor.executeCommands()
+    >>> (responseData, responseContentType) = processor.getOutput()
+    >>> responseContentType
+    'application/vnd.recordare.musicxml+xml; charset=utf-8'
+    >>> converter.parse(responseData).flat.notes[0].ps
+    53.0
+    '''
+    if agenda.getData('format') == 'tinyNotation':
+        agenda.addCommand('function','outputStream',None,'converter.parseData',['source','None','tinyNotation'])        
+    else:
+        agenda.addCommand('function','outputStream',None,'converter.parse',['source'])        
+    
+    # Resolve desired output
+    outputTypeShortcut = agenda.getData('output')
+    if outputTypeShortcut in templates.outputShortcuts.keys():
+        outputTemplateName = templates.outputShortcuts[outputTypeShortcut]
+        agenda.setOutputTemplate(outputTemplateName, ['outputStream'])
+
 def setupZipfileApp(agenda):
     pass
 
@@ -72,7 +102,8 @@ def setupZipfileApp(agenda):
 def setupCognitionApp(agenda):
     pass
 
-applicationInitializers = {'corpusParseApp':setupURLCorpusParseApp}
+applicationInitializers = {'corpusParseApp':setupURLCorpusParseApp,
+                           'converterApp':setupConverterApp}
 
 #-------------------------------------------------------------------------------
 # Tests 
