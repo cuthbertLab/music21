@@ -7348,10 +7348,13 @@ class Stream(base.Music21Object):
         elif len(self._elements) == 0:
             self._cache["HighestTime"] = 0.0
             return 0.0
-#        #take the case where a whole note appears a 0.0, but a textExpression (ql=0) at 0.25 -- isSorted would be true, but highestTime should be 4.0 not 0.25
         else:
             highestTimeSoFar = 0.0
-            # TODO: this may not be the fastest way to do this
+            # TODO: optimize for a faster way of doing this.
+            # but cannot simply look at the last element because what if the penultimate element, with a
+            # lower offset has a longer duration than the last?
+            # Take the case where a whole note appears a 0.0, but a textExpression (ql=0) at 0.25 -- 
+            # isSorted would be true, but highestTime should be 4.0 not 0.25
             for e in self._elements:
                 try:
                     candidateOffset = (e.getOffsetBySite(self) + 

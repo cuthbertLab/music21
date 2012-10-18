@@ -233,9 +233,10 @@ def findSimilarGloriaParts():
 def savedSearches():
 #    searchForIntervals("E4 C4 C4 B3") # Assisi 187.1
 #    searchForIntervals("D4 C4 C4 C4")   # Assisi 187.2
-    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
+#    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
 #    searchForNotes("G3 D3 R D3 D3 E3 F3") # Donna si to fallito TEST - last note = F#
 #    searchForIntervals("F3 C3 C3 F3 G3") # Bologna Archivio: Per seguirla TEST
+    searchForNotes("F3 E3 F3 G3 F3 E3")  # Mons archive fragment -- see FB Aetas Aurea post
 #    searchForNotes("D4 D4 C4 D4") # Fortuna Rira Seville 25 TEST! CANNOT FIND    
 #    searchForNotes("D4 C4 B3 A3 G3") # Tenor de monaco so tucto Seville 25
 #    searchForNotes("E4 D4 C4 B3 A3 B3 C4") # Benedicamus Domino Seville 25

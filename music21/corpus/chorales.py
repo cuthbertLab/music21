@@ -1251,6 +1251,7 @@ class Iterator(object):
         
         if self._returnType is 'stream':
             chorale = base.parse(filename)
+                    
             if self.numberingSystem is 'riemenschneider' and self.analysis == True:
                 try:
                     riemenschneiderName = 'bach/choraleAnalyses/riemenschneider%03d.rntxt' % (self._currentIndex + 1)

@@ -410,7 +410,7 @@ def nearestCommonFraction(x, grain=1e-2):
         x = float(x)
 
     values = [1/3., 2/3., 
-              1/6., 2/6., 3/6., 4/6., 5/6.]
+              1/6., 5/6.]
     for v in values:
         if almostEquals(x, v, grain=grain):
             return v
@@ -1170,11 +1170,13 @@ def fromRoman(num):
     1489
 
 
-    some people consider this an error, but you see it in medieval documents:
+    Some people consider this an error, but you see it in medieval documents:
+
     >>> common.fromRoman('ic')
     99
 
-    but things like this are never seen and cause an error:
+    But things like this are never seen, and thus cause an error:
+    
     >>> common.fromRoman('vx')
     Traceback (most recent call last):
     Music21CommonException: input contains an invalid subtraction element: vx
@@ -1276,9 +1278,6 @@ def ordinalAbbreviation(value, plural=False):
     if post != 'st' and plural:
         post += 's'
     return post
-
-                
-
 
 def stripAddresses(textString, replacement = "ADDRESS"):
     '''
@@ -1662,151 +1661,6 @@ class defList(list):
                 else:
                     self.append(self.default())
             self.append(value)
-
-
-
-
-# this presently is not used anywhere in music21
-
-class Scalar(object):
-    '''for those of us who miss perl scalars....'''
-
-    def __init__(self, value = None):
-        self.value = value
-        self.valType = type(value)
-    
-    def toInt(self):
-        '''Return an integer.
-        '''
-        valType = object.__getattribute__(self, "valType")
-        value = object.__getattribute__(self, "value")
-        if valType == int:
-            return value
-        elif valType == float or valType == long or valType == complex:
-            return int(value)
-        elif valType == str or valType == unicode:
-            return len(value)
-        elif value is None:
-            return 0
-        else:
-            raise Exception("Could not force to Int " + valType)
-
-    def toFloat(self):
-        '''Return a float.
-        '''
-        valType = object.__getattribute__(self, "valType")
-        value = object.__getattribute__(self, "value")
-        if valType == float or valType == long:
-            return value
-        elif valType == int or valType == complex:
-            return float(value)
-        elif valType == str or valType == unicode:
-            return len(value) + 0.0
-        elif value is None:
-            return 0.0
-        else:
-            raise Exception("Could not force to Int " + valType)
-      
-    def toUnicode(self):
-        '''Return unicode.
-        '''
-        valType = object.__getattribute__(self, "valType")
-        value = object.__getattribute__(self, "value")
-        if valType == unicode:
-            return value
-        elif valType == str:
-            return unicode(value)
-        elif valType == int or valType == float or valType == complex:
-            return unicode(value)
-        elif valType == None:
-            return ""
-        else:
-            raise Exception("Could not force to Unicode " + valType)
-           
-    def __add__(self, newNum):
-        valType = object.__getattribute__(self, "valType")
-        value = object.__getattribute__(self, "value")
-        newType = type(newNum)
-        if valType in [int, float, complex, long]:
-            if newType in [int, float, complex, long]:
-                return Scalar(value + newNum)
-            else:
-                return Scalar(self.toUnicode() + newNum)
-        elif valType == str:
-            return Scalar(value + str(newNum))
-        elif valType == unicode:
-            return Scalar(value + unicode(newNum))
-        elif value is None:
-            return Scalar(newNum)
-        else:
-            raise Exception("Cannot add type " + valType)
-
-    def __radd__(self, newNum):
-        valType = object.__getattribute__(self, "valType")
-        value = object.__getattribute__(self, "value")
-        newType = type(newNum)
-        if valType in [int, float, complex, long]:
-            if newType in [int, float, complex, long]:
-                return Scalar(newNum + value)
-            else:
-                return Scalar(newNum + self.toUnicode())
-        elif valType == str:
-            return Scalar(str(newNum) + value)
-        elif valType == unicode:
-            if newType != unicode and newType != str:
-                newNum = str(newNum)
-            return Scalar(unicode(newNum) + value)
-        elif value is None:
-            return Scalar(newNum)
-        else:
-            raise Exception("Cannot add type " + valType)
-
-    def __sub__(self, newNum):
-        valType = object.__getattribute__(self, "valType")
-        value = object.__getattribute__(self, "value")
-        #newType = type(newNum)
-
-        if valType == int or valType == float or valType == complex or valType == long:
-            return Scalar(value - newNum)
-        elif valType == str:
-            raise Exception("Wouldnt it be cool to s/x// this?")
-            #return Scalar(value + str(newNum))
-        elif valType == unicode:
-            raise Exception("Wouldnt it be cool to s/x// this?")
-            #return Scalar(value + unicode(newNum))
-        elif value is None:
-            return Scalar(0 - newNum)
-        else:
-            raise Exception("Cannot subtract type %s " % valType)
-
-    def __repr__(self):
-        value = object.__getattribute__(self, "value")
-        return value.__repr__()
-
-    def __mod__(self, value):
-        return int.__mod__(self.toInt(), value)        
-
-    def __rmod__(self, value):
-        return int.__mod__(value, self.toInt())        
-
-    def __getattribute__(self, attribute):
-        try:
-            return object.__getattribute__(self, attribute)
-        except AttributeError:
-            try:
-                print("Trying value method instead...")
-                return self.value.__getattribute__(attribute)
-            except AttributeError:
-                print("Well, that didnt do it, hey, lets try lots of things!")
-                try:
-                    return int.__getattribute__(self.toInt(), attribute)
-                except AttributeError:
-                    try:
-                        return unicode.__getattribute__(self.toUnicode(), attribute)
-                    except AttributeError:
-                        print("no more...")
-                         
-
 
 
 
@@ -2199,7 +2053,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [fromRoman, toRoman, Scalar]
+_DOC_ORDER = [fromRoman, toRoman]
 
 
 if __name__ == "__main__":

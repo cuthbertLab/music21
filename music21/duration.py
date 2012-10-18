@@ -195,9 +195,13 @@ def quarterLengthToClosestType(qLen):
     ('eighth', False)
     >>> duration.quarterLengthToClosestType(1.8)
     ('quarter', False)
+    >>> duration.quarterLengthToClosestType(2.0000000000000001)
+    ('half', True)
     '''
-    if (4.0 / qLen) in typeFromNumDict:
-        return (typeFromNumDict[4.0 / qLen], True)
+    noteLengthType = round(4.0/qLen, 6)
+    
+    if noteLengthType in typeFromNumDict:
+        return (typeFromNumDict[noteLengthType], True)
     else:
         for numDict in sorted(typeFromNumDict.keys()):
             if numDict == 0: 
@@ -3312,7 +3316,13 @@ class Test(unittest.TestCase):
 #         self.assertEqual(d.quarterLength, 20.0) 
 #         self.assertEqual(d.isLinked, False) # note set
 
-
+    def testStrangeMeasure(self):
+        from music21 import corpus
+        j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
+        x = j1.parts[0].getElementsByClass('Measure')[42]
+        x._cache = {}
+        print x.duration
+        print x.duration.components
         
 
 #-------------------------------------------------------------------------------

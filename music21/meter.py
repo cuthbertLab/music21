@@ -3695,7 +3695,7 @@ class TimeSignature(base.Music21Object):
         
         Let's try this on a real piece, a 4/4 chorale with a one beat pickup.  Here we get the
         normal offset from the active TimeSignature but we subtract out the pickup length which
-        is in a `Measure`'s :ref:`~music21.stream.Measure.paddingLeft` property.
+        is in a `Measure`'s :attr:`~music21.stream.Measure.paddingLeft` property.
         
         >>> c = corpus.parse('bwv1.6')
         >>> for m in c.parts[0].getElementsByClass('Measure'):

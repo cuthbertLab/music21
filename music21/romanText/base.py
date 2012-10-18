@@ -76,6 +76,7 @@ class RTToken(object):
     '''
     def __init__(self, src=u''):
         self.src = src # store source character sequence
+        self.lineNumber = 0
 
     def __repr__(self):
         return '<RTToken %r>' % self.src
@@ -840,15 +841,15 @@ class RTHandler(object):
         # tokens are strongly divided between header and body, so can 
         # divide here
         self._tokens = []
+        self.currentLineNumber = 0
 
 
-
-    def _splitAtHeader(self, lines):
+    def splitAtHeader(self, lines):
         '''Divide string into header and non-header; this is done before tokenization. 
 
         >>> from music21 import *
         >>> rth = romanText.RTHandler()
-        >>> rth._splitAtHeader(['Title: s', 'Time Signature:', '', 'm1 g: i'])
+        >>> rth.splitAtHeader(['Title: s', 'Time Signature:', '', 'm1 g: i'])
         (['Title: s', 'Time Signature:', ''], ['m1 g: i'])
 
         '''
@@ -863,39 +864,70 @@ class RTHandler(object):
             raise RomanTextException("Cannot find the first measure definition in this file.  Dumping contextss: %s", lines)
         return lines[:iStartBody], lines[iStartBody:]
     
-    def _tokenizeHeader(self, lines):
-        '''In the header, we only have tagged tokens. 
+    def tokenizeHeader(self, lines):
+        '''
+        In the header, we only have :class:`~music21.romanText.base.RTTagged` tokens. 
         We can this process these all as the same class.
         '''
         post = []
-        for l in lines:
+        for i,l in enumerate(lines):
             l = l.strip()
             if l == '': continue
             # wrap each line in a header token
-            post.append(RTTagged(l))
+            rtt = RTTagged(l)
+            rtt.lineNumber = i + 1
+            post.append(rtt)
+        self.currentLineNumber = len(lines) + 1
         return post
 
-    def _tokenizeAtoms(self, line, container=None):
+    def tokenizeBody(self, lines):
+        '''
+        In the body, we may have measure, time signature, or 
+        note declarations, as well as possible other tagged definitions
+        '''
+        post = []
+        startLineNumber = self.currentLineNumber
+        for i,l in enumerate(lines):
+            currentLineNumber = startLineNumber + i
+            l = l.strip()
+            if l == '': continue
+            # first, see if it is a measure definition, if not, than assume it is tagged data
+            if reMeasureTag.match(l) is not None:
+                rtm = RTMeasure(l)
+                rtm.lineNumber = currentLineNumber                
+                # note: could places these in-line, after post
+                rtm.atoms = self.tokenizeAtoms(rtm.data, container=rtm)
+                for a in rtm.atoms:
+                    a.lineNumber = currentLineNumber
+                post.append(rtm)
+            else:
+                # store items in a measure tag outside of the measure
+                rtt = RTTagged(l)
+                rtt.lineNumber = currentLineNumber
+                post.append(rtt)
+        return post
+
+    def tokenizeAtoms(self, line, container=None):
         '''Given a line of data stored in measure consisting only of Atoms, tokenize and return a list. 
 
         >>> from music21 import *
         >>> rth = romanText.RTHandler()
-        >>> str(rth._tokenizeAtoms('IV b3 ii7 b4 ii'))
+        >>> str(rth.tokenizeAtoms('IV b3 ii7 b4 ii'))
         "[<RTChord 'IV'>, <RTBeat 'b3'>, <RTChord 'ii7'>, <RTBeat 'b4'>, <RTChord 'ii'>]"
 
-        >>> str(rth._tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]'))
+        >>> str(rth.tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]'))
         "[<RTChord 'V7'>, <RTBeat 'b2'>, <RTChord 'V13'>, <RTBeat 'b3'>, <RTChord 'V7'>, <RTChord 'iio6/5[no5]'>]"
 
-        >>> tokenList = rth._tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV')
+        >>> tokenList = rth.tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV')
         >>> str(tokenList)
         "[<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, <RTAnalyticKey 'g:'>, <RTChord 'IV'>]"
         >>> tokenList[9].getKey()
         <music21.key.Key of g minor>
 
-        >>> str(rth._tokenizeAtoms('= m3'))
+        >>> str(rth.tokenizeAtoms('= m3'))
         '[]'
 
-        >>> tokenList = rth._tokenizeAtoms('g;: ||: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i :||')
+        >>> tokenList = rth.tokenizeAtoms('g;: ||: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i :||')
         >>> str(tokenList)
         "[<RTKey 'g;:'>, <RTRepeatStart '||:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>, <RTRepeatStop ':||'>]"
         '''
@@ -936,26 +968,6 @@ class RTHandler(object):
                 post.append(RTChord(word, container))
         return post
 
-    def _tokenizeBody(self, lines):
-        '''
-        In the body, we may have measure, time signature, or 
-        note declarations, as well as possible other tagged definitions
-        '''
-        post = []
-        for l in lines:
-            l = l.strip()
-            if l == '': continue
-            # first, see if it is a measure definition, if not, than assume it is tagged data
-            if reMeasureTag.match(l) is not None:
-                rtm = RTMeasure(l)                
-                # note: could places these in-line, after post
-                rtm.atoms = self._tokenizeAtoms(rtm.data, container=rtm)
-                post.append(rtm)
-            else:
-                # store items in a measure tag outside of the measure
-                post.append(RTTagged(l))
-        return post
-
 
     def tokenize(self, src):
         '''
@@ -963,10 +975,10 @@ class RTHandler(object):
         '''
         # break into lines
         lines = src.split('\n')
-        linesHeader, linesBody = self._splitAtHeader(lines)
+        linesHeader, linesBody = self.splitAtHeader(lines)
         #environLocal.printDebug([linesHeader])        
-        self._tokens += self._tokenizeHeader(linesHeader)        
-        self._tokens += self._tokenizeBody(linesBody)        
+        self._tokens += self.tokenizeHeader(linesHeader)        
+        self._tokens += self.tokenizeBody(linesBody)        
 
 
     def process(self, src):

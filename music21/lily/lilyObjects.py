@@ -965,13 +965,21 @@ class LyContextModList(LyObject):
 
 class LyCompositeMusic(LyObject):
     '''
-    one of LyPrefixCompositeMusic or LyGroupedMusicList stored in self.content
+    one of LyPrefixCompositeMusic or LyGroupedMusicList stored in self.contents
     '''
     def __init__(self, prefixCompositeMusic = None, groupedMusicList = None, newLyrics = None):
         LyObject.__init__(self)
         self.prefixCompositeMusic = prefixCompositeMusic
         self.groupedMusicList = groupedMusicList 
         self.newLyrics = newLyrics
+    
+    def _getContents(self):
+        if self.prefixCompositeMusic is not None:
+            return self.prefixCompositeMusic
+        else:
+            return self.groupedMusicList
+    
+    contents = property(_getContents)
     
     def stringOutput(self):
         if self.newLyrics is not None:

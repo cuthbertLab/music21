@@ -791,6 +791,8 @@ class LilypondConverter(object):
            f 2.  
           } 
         '''
+        compositeMusicType = type
+        
         optionalId = None
         c = streamIn.classes
         if contextType is None:
@@ -813,15 +815,15 @@ class LilypondConverter(object):
         lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList, newLyrics = lpNewLyrics)
         lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
 
-        if type is None:
-            type = 'new' #@ReservedAssignment
+        if compositeMusicType is None:
+            compositeMusicType = 'new'
 
         if optionalId is None:
-            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = type,
+            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = compositeMusicType,
                                                             simpleString = newContext,
                                                             music = lpMusic) 
         else:
-            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = type,
+            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = compositeMusicType,
                                                             optionalId = optionalId,
                                                             simpleString = newContext,
                                                             music = lpMusic)    
@@ -942,7 +944,12 @@ class LilypondConverter(object):
             return
 
         contextObject = self.context
-        currentMusicList = contextObject.contents
+        if hasattr(contextObject, 'contents'):
+            currentMusicList = contextObject.contents
+        else:
+            raise LilyTranslateException("Cannot get a currentMusicList from contextObject %r" % contextObject)
+            
+        
         if hasattr(thisObject, 'startTransparency') and thisObject.startTransparency is True:
             # old hack, replace with the better "hidden" attribute
             lyScheme = lyo.LyEmbeddedScm(self.transparencyStartScheme)
@@ -1472,13 +1479,38 @@ class LilypondConverter(object):
     def setContextForTimeFraction(self, numerator, denominator):
         '''
         Explicitly starts a new context for scaled music (tuplets, etc.)
-        for the given numerator and denominator
+        for the given numerator and denominator (either an int or a string or unicode)
         
         Returns an lpMusicList object contained in an lpSequentialMusic object
         in an lpPrefixCompositeMusic object which sets the times object to a particular
         fraction.
+        
+        >>> from music21 import *
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lpc.context
+        <music21.lily.lilyObjects.LyLilypondTop object at 0x...>
+        >>> lyTop = lpc.context
+        >>> lyoMusicList = lpc.setContextForTimeFraction(5, 4)
+        >>> lyoMusicList
+        <music21.lily.lilyObjects.LyMusicList object at 0x...>
+        >>> lpc.context
+        <music21.lily.lilyObjects.LyMusicList object at 0x...>
+        >>> lpc.context is lyoMusicList
+        True
+        >>> lpc.context.getParent()
+        <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
+        >>> lpc.context.getParent().getParent()
+        <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
+        >>> lpc.context.getParent().getParent().fraction
+        u'5/4'
+        >>> lpc.context.getParent().getParent().type
+        u'times'
+        >>> lpc.context.getParent().getParent().getParent()
+        <music21.lily.lilyObjects.LyLilypondTop object at 0x...>
+        >>> lpc.context.getParent().getParent().getParent() is lyTop
+        True
         '''
-        fraction = numerator + '/' + denominator
+        fraction = unicode(numerator) + '/' + unicode(denominator)
         lpMusicList = lyo.LyMusicList()
         lpSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList)
         ## technically needed, but we can speed things up
@@ -1488,7 +1520,11 @@ class LilypondConverter(object):
         lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='times', 
                                                             fraction = fraction,
                                                             music = lpSequentialMusic)
-        self.context.contents.append(lpPrefixCompositeMusic)
+        currentContents = self.context.contents
+        if currentContents is None:
+            raise LilyTranslateException("Cannot find contents for self.context: %r " % self.context)
+        
+        currentContents.append(lpPrefixCompositeMusic)
         lpPrefixCompositeMusic.setParent(self.context)
         self.newContext(lpMusicList)
         return lpMusicList

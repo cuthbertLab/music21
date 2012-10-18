@@ -75,6 +75,13 @@ numpy and scipy from:
 http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 
+Mac Users can get Matplotlib, Numpy, Scipy, and a few other systems
+compiled for Mac OS X 10.8 (Mountain Lion) or whatever the most recent
+OS is from this site:
+
+http://fonnesbeck.github.com/ScipySuperpack/
+
+
 
 pyaudio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -76,8 +76,7 @@ def sharpsToPitch(sharpCount):
     object set to the appropriate major key value.
 
     >>> from music21 import *
-    >>> key.sharpsToPitch(1)
-    <music21.pitch.Pitch G>
+
     >>> key.sharpsToPitch(1)
     <music21.pitch.Pitch G>
     >>> key.sharpsToPitch(2)
@@ -96,6 +95,19 @@ def sharpsToPitch(sharpCount):
     'F'
     >>> k1.accidental
     <accidental sharp>
+
+    OMIT_FROM_DOCS
+    
+    The second time we do something it should be in the cache, so let's make sure it still works:
+    
+    >>> key.sharpsToPitch(1)
+    <music21.pitch.Pitch G>
+    >>> key.sharpsToPitch(1)
+    <music21.pitch.Pitch G>
+    >>> 1 in key._sharpsToPitchCache
+    True
+    >>> key._sharpsToPitchCache[1]
+    <music21.pitch.Pitch G>
     '''
     if sharpCount is None:
         sharpCount = 0 # fix for C major
@@ -213,6 +225,7 @@ def pitchToSharps(value, mode=None):
     else:
         raise KeyException('Cannot get a sharp number from value')
     
+    # the -1 is because we begin with F not C.
     sharps = fifthsOrder.index(value.step) - 1
     if value.accidental is not None:
         if value.accidental.isTwelveTone() is False:
