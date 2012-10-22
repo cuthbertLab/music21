@@ -889,22 +889,27 @@ class RTHandler(object):
         startLineNumber = self.currentLineNumber
         for i,l in enumerate(lines):
             currentLineNumber = startLineNumber + i
-            l = l.strip()
-            if l == '': continue
-            # first, see if it is a measure definition, if not, than assume it is tagged data
-            if reMeasureTag.match(l) is not None:
-                rtm = RTMeasure(l)
-                rtm.lineNumber = currentLineNumber                
-                # note: could places these in-line, after post
-                rtm.atoms = self.tokenizeAtoms(rtm.data, container=rtm)
-                for a in rtm.atoms:
-                    a.lineNumber = currentLineNumber
-                post.append(rtm)
-            else:
-                # store items in a measure tag outside of the measure
-                rtt = RTTagged(l)
-                rtt.lineNumber = currentLineNumber
-                post.append(rtt)
+            try:
+                l = l.strip()
+                if l == '': continue
+                # first, see if it is a measure definition, if not, than assume it is tagged data
+                if reMeasureTag.match(l) is not None:
+                    rtm = RTMeasure(l)
+                    rtm.lineNumber = currentLineNumber                
+                    # note: could places these in-line, after post
+                    rtm.atoms = self.tokenizeAtoms(rtm.data, container=rtm)
+                    for a in rtm.atoms:
+                        a.lineNumber = currentLineNumber
+                    post.append(rtm)
+                else:
+                    # store items in a measure tag outside of the measure
+                    rtt = RTTagged(l)
+                    rtt.lineNumber = currentLineNumber
+                    post.append(rtt)
+            except Exception:
+                import traceback
+                tracebackMessage = traceback.format_exc()
+                raise RTHandlerException("At line %d (%s) an exception was raised: \n%s" % (currentLineNumber, l, tracebackMessage))
         return post
 
     def tokenizeAtoms(self, line, container=None):
