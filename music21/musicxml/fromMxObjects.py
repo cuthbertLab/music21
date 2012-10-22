@@ -2063,7 +2063,14 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 _addToStaffReference(mxNote, n, staffReference)
                 #m.insert(offsetMeasureNote, n)
                 if useVoices:
-                    m.voices[mxNote.voice]._insertCore(offsetMeasureNote, n)
+                    vCurrent = m.voices[mxNote.voice]
+                    if vCurrent is not None:
+                        vCurrent._insertCore(offsetMeasureNote, n)
+                    else:
+                        # this can happen when a part defines multiple staves
+                        # where one staff uses voices but the other staff does not
+                        m._insertCore(offsetMeasureNote, n)
+                        #print m, n, mxNote
                 else:
                     m._insertCore(offsetMeasureNote, n)
                 offsetIncrement = n.quarterLength
