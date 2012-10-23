@@ -364,7 +364,8 @@ class Chord(note.NotRest):
     # manage pitches property and chordTablesAddress
 
     def seekChordTablesAddress(self):
-        '''Utility method to return the address to the chord table.
+        '''
+        Utility method to return the address to the chord table.
 
         Table addresses are TN based three character codes:
         cardinaltiy, Forte index number, inversion
@@ -3365,6 +3366,101 @@ class Chord(note.NotRest):
         >>> c1.normalFormString
         '<034>'
         ''')
+
+    def geometricNormalForm(self):
+        # eventually build this to call (self) instead of (c) so that a chord can call it
+        '''
+        TODO: Explain better; include Dmitri's name (spelled right)
+        
+        this loop iterates through each interval between two successive notes in the chord
+        if the next successive interval is smaller, it swaps the notes to find the smallest interval between successive pitches
+    
+        Returns a list of pitch class integers
+        
+    
+        Example 1: A major triad has geometricNormalForm of 038 not 047.
+        
+        >>> from music21 import *
+        >>> c1 = chord.Chord("E4 C5 G6 C7")
+        >>> pcList = c1.geometricNormalForm()
+        >>> pcList
+        [0, 3, 8]
+        
+        >>> c2 = chord.Chord(pcList)
+        >>> c2.orderedPitchClassesString
+        '<038>'
+        
+        Compare this to the usual normalForm:
+        
+        >>> c1.normalForm
+        [0, 4, 7]    
+        '''
+        
+        '''
+        order pitches
+        '''
+        pitchClassList = []
+        for i in range (len(self.pitches)):
+            pitchClassList.append(self.pitches[i].pitchClass)
+        sortedPitchClassList = sorted(pitchClassList)  
+        
+      
+    #    c.pitches[0]
+    #    print isinstance(c.pitches[0], str)
+        '''
+        remove duplicates
+        '''
+        uniquePitchClassList = [sortedPitchClassList[0]]
+        
+        for i in range (1, len(sortedPitchClassList)):
+            if sortedPitchClassList[i] != sortedPitchClassList[i-1]:
+                uniquePitchClassList.append(sortedPitchClassList[i])
+        
+        intervalList = []
+        for i in range (1, len(uniquePitchClassList)):
+                l = (uniquePitchClassList[i] - uniquePitchClassList[i-1])%12
+                intervalList.append(l) 
+        
+        intervalList.append((uniquePitchClassList[0] - uniquePitchClassList[-1])%12)    
+        
+        '''
+        make list of rotations
+        '''
+        
+        rotationList = []
+        
+        for i in range (0, len(intervalList)):
+            b = intervalList.pop(0)
+            intervalList.append(b)
+            intervalTuple = tuple(intervalList)
+            rotationList.append(intervalTuple)
+
+        
+        '''
+        sort list of rotations. first entry will be the geometric normal form arranged intervals
+        '''
+        
+        newRotationList = sorted(rotationList)
+        '''
+        take that first entry and assign it as the PCIs that we will want for our chord
+        '''
+        
+    #    geomNormChord = []
+        geomNormChord = newRotationList[0]
+        
+        '''
+        Create final form of Geometric Normal Chord by starting at pc 0 and assigning the notes based on the intervals we just discovered.
+        '''
+        
+        geomNormChordPitches = []
+        intervalSum = 0
+        
+        for i in range (0, len(geomNormChord)):
+            geomNormChordPitches.append(intervalSum)
+            intervalSum += geomNormChord[i]
+          
+        return geomNormChordPitches
+    
 
     def _getForteClassNumber(self):
         '''Get the Forte class index number.
