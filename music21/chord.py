@@ -3370,12 +3370,12 @@ class Chord(note.NotRest):
     def geometricNormalForm(self):
         # eventually build this to call (self) instead of (c) so that a chord can call it
         '''
-        TODO: Explain better; include Dmitri's name (spelled right)
+        Geometric Normal Form, as first defined by Dmitri Tymoczko, orders pitch classes
+        such that the spacing is prioritized with the smallest spacing between the first and 
+        second pitch class first, then the smallest spacing between second and third pitch class, 
+        and so on. This form has unique properties that make it useful.
         
-        this loop iterates through each interval between two successive notes in the chord
-        if the next successive interval is smaller, it swaps the notes to find the smallest interval between successive pitches
-    
-        Returns a list of pitch class integers
+        geometricNormalForm returns a list of pitch class integers in geometric normal form.
         
     
         Example 1: A major triad has geometricNormalForm of 038 not 047.
