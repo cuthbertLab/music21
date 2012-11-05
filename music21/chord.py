@@ -3368,7 +3368,6 @@ class Chord(note.NotRest):
         ''')
 
     def geometricNormalForm(self):
-        # eventually build this to call (self) instead of (c) so that a chord can call it
         '''
         Geometric Normal Form, as first defined by Dmitri Tymoczko, orders pitch classes
         such that the spacing is prioritized with the smallest spacing between the first and 
@@ -3404,9 +3403,6 @@ class Chord(note.NotRest):
             pitchClassList.append(self.pitches[i].pitchClass)
         sortedPitchClassList = sorted(pitchClassList)  
         
-      
-    #    c.pitches[0]
-    #    print isinstance(c.pitches[0], str)
         '''
         remove duplicates
         '''
@@ -3445,7 +3441,6 @@ class Chord(note.NotRest):
         take that first entry and assign it as the PCIs that we will want for our chord
         '''
         
-    #    geomNormChord = []
         geomNormChord = newRotationList[0]
         
         '''
