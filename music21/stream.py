@@ -11450,74 +11450,8 @@ class Measure(Stream):
             pass
             #environLocal.printDebug(['padAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
 
-    #---------------------------------------------------------------------------
-    def bestTimeSignature(self):
-        '''
-        Given a Measure with elements in it, 
-        get a TimeSignature that contains all elements.
-
-        Note: this does not yet accommodate triplets. 
-        '''
-        #TODO: set limit at 11/4?
-        minDurQL = 4 # smallest denominator; start with a whole note
-        # find sum of all durations in quarter length
-        # find if there are any dotted durations
-        minDurDotted = False        
-        sumDurQL = 0
-        for e in self.notesAndRests:
-            if e.quarterLength == 0.0:
-                continue # case of grace durations
-            sumDurQL += e.quarterLength
-            if e.quarterLength < minDurQL:
-                minDurQL = e.quarterLength
-                if e.duration.dots > 0:
-                    minDurDotted = True
-
-        # first, we need to evenly divide min dur into total
-        minDurTest = minDurQL
-        while True:
-            partsFloor = int(sumDurQL / minDurTest)
-            partsReal = sumDurQL / float(minDurTest)
-            if (common.almostEquals(partsFloor, partsReal) or 
-            minDurTest <= duration.typeToDuration[meter.MIN_DENOMINATOR_TYPE]):
-                break
-            # need to break down minDur until we can get a match
-            else:
-                if minDurDotted:
-                    minDurTest = minDurTest / 3.
-                else:
-                    minDurTest = minDurTest / 2.
-                    
-        # see if we can get a type for the denominator      
-        # if we do not have a match; we need to break down this value
-        match = False
-        while True:
-            dType, match = duration.quarterLengthToClosestType(minDurTest) 
-            if match or dType == meter.MIN_DENOMINATOR_TYPE:
-                break
-            if minDurDotted:
-                minDurTest = minDurTest / 3.
-            else:
-                minDurTest = minDurTest / 2.
-
-        minDurQL = minDurTest
-        dType, match = duration.quarterLengthToClosestType(minDurQL) 
-        if not match: # cant find a type for a denominator
-            raise StreamException('cannot find a type for denominator %s' % minDurQL)
-
-        # denominator is the numerical representation of the min type
-        # e.g., quarter is 4, whole is 1
-        for num, typeName in duration.typeFromNumDict.items():
-            if typeName == dType:
-                denominator = num
-        # numerator is the count of min parts in the sum
-        numerator = int(sumDurQL / minDurQL)
-
-        #environLocal.printDebug(['n/d', numerator, denominator])
-
-        ts = meter.TimeSignature()
-        ts.loadRatio(numerator, denominator)
-        return ts
+    #---------------------------------------------------------------------------    
+    
 
     def _getBarDuration(self):
         # Docs in the property.
@@ -11572,6 +11506,51 @@ class Measure(Stream):
     #---------------------------------------------------------------------------
     # Music21Objects are stored in the Stream's elements list 
     # properties are provided to store and access these attribute
+    
+    def bestTimeSignature(self):
+        '''
+        Given a Measure with elements in it, 
+        get a TimeSignature that contains all elements.
+        Calls meter.bestTimeSignature(self)
+            
+        Note: this does not yet accommodate triplets. 
+        
+        
+        We create a simple stream that should be in 3/4
+            
+        >>> from music21 import *
+        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
+        >>> m = stream.Measure()
+        >>> for el in s:
+        ...     m.insert(el.offset, el)
+        
+        But there is no TimeSignature!
+        
+        >>> m.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {2.5} <music21.note.Note F>
+        
+        So, we get the best Time Signature and put it in the Stream.
+        
+        >>> ts = m.bestTimeSignature()
+        >>> ts
+        <music21.meter.TimeSignature 3/4>
+        >>> m.timeSignature = ts
+        >>> m.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {2.5} <music21.note.Note F>
+        
+        For further details about complex time signatures, etc.
+        see `meter.bestTimeSignature()`
+        
+        '''
+        return meter.bestTimeSignature(self)
+    
 
     def _getClef(self):
         # TODO: perhaps sort by priority?

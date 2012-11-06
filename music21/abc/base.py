@@ -38,6 +38,7 @@ translates those Tokens into music21 objects.
 
 import unittest
 import re, codecs
+import copy
 
 from music21 import common
 from music21 import environment
@@ -70,6 +71,7 @@ ABC_BARS = [
 
 # store a mapping of ABC representation to pitch values
 _pitchTranslationCache = {}
+
 
 
 #-------------------------------------------------------------------------------
@@ -789,7 +791,7 @@ class ABCTuplet(ABCToken):
 
     def __repr__(self):
         return '<music21.abc.base.ABCTuplet %r>' % self.src
-
+    
     def updateRatio(self, keySignatureObj=None):
         '''
         Cannot be called until local meter context 
@@ -870,8 +872,76 @@ class ABCTuplet(ABCToken):
 
         #self.qlRemain = self._tupletObj.totalTupletLength()
 
+class ABCTie(ABCToken):
+    '''
+    Handles instances of ties '-' between notes in an ABC score.
+    Ties are treated as an attribute of the note before the '-';
+    the note after is marked as the end of the tie.
+    '''
+    
+    def __init__(self, src):
+        ABCToken.__init__(self, src)
+        self.noteObj = None
+    
+    def __repr__(self):
+        return '<music21.abc.base.ABCTie %r>' % self.src
+
+#TODODJN:
+#CHANGE AND MOVE BESTTIMESIGNATURE. DO IT.
+#(lower priority)WRITE FUNCTIONAL CODE FOR CRESCENDOS
 
 
+class ABCSlurStart(ABCToken):
+    '''
+    ABCSlurStart tokens always precede the notes in a slur.
+    For nested slurs, each open parenthesis gets its own token.
+    '''
+    
+    def __init__(self, src):
+        ABCToken.__init__(self, src)
+        self.slurObj = None
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCSlurStart %r>' % self.src
+    
+    
+    '''
+    Creates a spanner object for each open paren associated with a slur;
+    these slurs are filled with notes until end parens are read.
+    '''
+    def fillSlur(self):
+        from music21 import spanner
+        self.slurObj = spanner.Slur()
+                
+class ABCParenStop(ABCToken):
+    '''
+    A general parenthesis stop;
+    comes at the end of a tuplet, slur, or dynamic marking.
+    '''
+
+    def __init__(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCParenStop %r>' % self.src
+    
+class ABCCrescStart(ABCToken):
+    '''
+    ABCCrescStart tokens always precede the notes in a crescendo.
+    These tokens coincide with the string "!crescendo(";
+    the closing string "!crescendo)" counts as an ABCParenStop.
+    '''
+    
+    def __init__(self, src):
+        ABCToken.__init__(self, src)
+        self.crescObj = None
+    
+    def __repr__(self):
+        return '<music21.abc.base.ABCCrescStart %r>' % self.src
+    
+    def fillCresc(self):
+        from music21 import dynamics
+        self.crescObj = dynamics.Crescendo()    
 
 class ABCBrokenRhythmMarker(ABCToken):
     # given a logical unit, create an object
@@ -916,7 +986,6 @@ class ABCNote(ABCToken):
 
     def __init__(self, src=''):
         ABCToken.__init__(self, src)
-
         # store chord string if connected to this note
         self.chordSymbols = [] 
 
@@ -936,6 +1005,13 @@ class ABCNote(ABCToken):
 
         # store a tuplet if active
         self.activeTuplet = None
+        
+        # store a spanner if active
+        self.applicableSpanners = []
+        
+        # store a tie if active
+        self.tie = None
+        
 
         # set to True if a modification of key signautre
         # set to False if an altered tone part of a Key
@@ -1305,6 +1381,8 @@ class ABCHandler(object):
     def __init__(self):
         # tokens are ABC objects in a linear stream
         self._tokens = []
+        self.activeParens = []
+        self.activeSpanners = []
 
 
     def _getLinearContext(self, strSrc, i):
@@ -1435,6 +1513,7 @@ class ABCHandler(object):
         lastIndex = len(strSrc) - 1
 
         activeChordSymbol = '' # accumulate, then prepend
+        
         while True:    
             if i > lastIndex:
                 break
@@ -1525,6 +1604,46 @@ class ABCHandler(object):
                 self._tokens.append(ABCBrokenRhythmMarker(collect))
                 i = j
                 continue
+            
+            
+            #TODODJN: Fix this!
+            #It's creating tokens, but not filling the crescendo.
+            #(The problem is likely in translate.)
+            #get crescendos. skip over the open paren to avoid confusion.
+            #NB: Nested crescendos are not an issue (not proper grammar).
+            if (c =='!' and cNext == 'c' and cNextNext == 'r'):
+                j = i + 12
+                #handles the end of a crescendo
+                #print self.activeSpanners
+                if strSrc[j - 2] == "(":
+                    self._tokens.append(ABCCrescStart(c))
+                elif strSrc[j - 2] == ")":
+                    self._tokens.append(ABCParenStop(c))
+                i = j
+                continue
+            
+            
+            # get slurs, ensuring that they're not confused for tuplets
+            if (c == '(' and cNext != None and not cNext.isdigit()):
+                j = i + 1
+                self._tokens.append(ABCSlurStart(c))
+                i = j
+                continue
+            
+            # get slur/tuplet ending; treat it as a general parenthesis stop
+            if (c == ')'):
+                j = i + 1
+                self._tokens.append(ABCParenStop(c))
+                i = j
+                continue
+            
+            # get ties between two notes
+            if (c == '-'):
+                j = i + 1
+                self._tokens.append(ABCTie(c))
+                i = j
+                continue
+                
 
             # get chord symbols / guitar chords; collected and joined with
             # chord or notes
@@ -1588,9 +1707,9 @@ class ABCHandler(object):
                     # continue conditions after alpha: 
                     # , register modifiaciton (, ') or number, rhythm indication
                     # number, /, 
-                    elif strSrc[j].isdigit() or strSrc[j] in ',/\'':
+                    elif strSrc[j].isdigit() or strSrc[j] in ',/,\'':
                         j += 1
-                        continue    
+                        continue
                     else: # space, all else: break
                         break
                 # prepend chord symbol
@@ -1655,6 +1774,7 @@ class ABCHandler(object):
         lastKeySignature = None
         lastTimeSignatureObj = None # an m21 object
         lastTupletToken = None # a token obj; keeps count of usage
+        lastTieToken = None
 
         for i in range(len(self._tokens)):
             # get context of tokens
@@ -1691,14 +1811,44 @@ class ABCHandler(object):
                 # token
                 t.updateNoteCount() 
                 lastTupletToken = t
+                self.activeParens.append("Tuplet")
+                                
+            # notes within slur marks need to be added to the spanner
+            if isinstance(t, ABCSlurStart):
+                t.fillSlur()
+                self.activeSpanners.append(t.slurObj)
+                self.activeParens.append("Slur")
+            elif isinstance(t, ABCParenStop):
+                if self.activeParens:
+                    p = self.activeParens.pop()
+                    if p == "Slur" or p == "Crescendo":
+                        self.activeSpanners.pop()
 
+
+            if isinstance(t, ABCTie):
+                # tPrev is guaranteed to be an ABCNote, by the grammar.
+                tPrev.tie = "start"
+                lastTieToken = t
+                
+            if isinstance(t, ABCCrescStart):
+                t.fillCresc()
+                self.activeSpanners.append(t.crescObj)
+                self.activeParens.append("Crescendo")
+                    
+                
+            
             # ABCChord inherits ABCNote, thus getting note is enough for both
             if isinstance(t, (ABCNote, ABCChord)):
                 if lastDefaultQL == None:
                     raise ABCHandlerException('no active default note length provided for note processing. tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
                 t.activeDefaultQuarterLength = lastDefaultQL
                 t.activeKeySignature = lastKeySignature
-
+                t.applicableSpanners = copy.copy(self.activeSpanners)
+                # ends ties one note after they begin
+                if lastTieToken is not None:
+                    t.tie = "stop"
+                    lastTieToken = None
+                                
                 if lastTupletToken == None:
                     pass
                 elif lastTupletToken.noteCount == 0:
@@ -1707,6 +1857,8 @@ class ABCHandler(object):
                     lastTupletToken.noteCount -= 1 # decrement
                     # add a reference to the note
                     t.activeTuplet = lastTupletToken.tupletObj
+                                    
+ 
 
         # parse : call methods to set attributes and parse abc string
         for t in self._tokens:
@@ -2633,7 +2785,7 @@ class Test(unittest.TestCase):
         ah.process(testFiles.theAleWifesDaughter)
         ahm = ah.splitByMeasure()
 
-        self.assertEqual(len(ahm), 11)
+        self.assertEqual(len(ahm), 10)
 
         mergedHandlers = mergeLeadingMetaData(ahm)
         # after merging, one less handler as leading meta data is mergerd
@@ -2729,6 +2881,25 @@ class Test(unittest.TestCase):
         ah = af.read(339) # returns a parsed handler
         af.close()
         self.assertEqual(len(ah), 101)
+        
+    def testSlurs(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.slurTest)
+        self.assertEqual(len(ah), 70) #number of tokens
+        
+    def testTies(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.tieTest)
+        self.assertEqual(len(ah), 73) #number of tokens
+        
+    def testCresc(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.crescTest)
+        self.assertEqual(len(ah), 75)
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

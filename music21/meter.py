@@ -276,6 +276,178 @@ def proportionToFraction(value):
     return None
 
 
+def bestTimeSignature(meas):
+    '''
+    Given a Measure with elements in it, 
+    get a TimeSignature that contains all elements.
+        
+    Note: this does not yet accommodate triplets. 
+        
+    >>> from music21 import *
+    >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
+    >>> m = stream.Measure()
+    >>> for el in s:
+    ...     m.insert(el.offset, el)
+    >>> ts = meter.bestTimeSignature(m)
+    >>> ts
+    <music21.meter.TimeSignature 3/4>
+        
+        
+    >>> s2 = converter.parse('C8. D16 E8 F8. G16 A8', format='tinyNotation')
+    >>> m2 = stream.Measure()
+    >>> for el in s2:
+    ...     m2.insert(el.offset, el)
+    >>> ts2 = meter.bestTimeSignature(m2)
+    >>> ts2
+    <music21.meter.TimeSignature 6/8>
+    
+    >>> s3 = converter.parse('C2 D2 E2', format='tinyNotation')
+    >>> m3 = stream.Measure()
+    >>> for el in s3:
+    ...     m3.insert(el.offset, el)
+    >>> ts3 = meter.bestTimeSignature(m3)
+    >>> ts3
+    <music21.meter.TimeSignature 3/2>
+    
+    
+    >>> s4 = converter.parse('C8. D16 E8 F8. G16 A8 C4. D4.', format='tinyNotation')
+    >>> m4 = stream.Measure()
+    >>> for el in s4:
+    ...     m4.insert(el.offset, el)
+    >>> ts4 = meter.bestTimeSignature(m4)
+    >>> ts4
+    <music21.meter.TimeSignature 12/8>
+    
+    >>> s5 = converter.parse('C4 D2 E4 F2', format='tinyNotation')
+    >>> m5 = stream.Measure()
+    >>> for el in s5:
+    ...     m5.insert(el.offset, el)
+    >>> ts5 = meter.bestTimeSignature(m5)
+    >>> ts5
+    <music21.meter.TimeSignature 6/4>
+    
+    >>> s6 = converter.parse('C4 D16.', format='tinyNotation')
+    >>> m6 = stream.Measure()
+    >>> for el in s6:
+    ...     m6.insert(el.offset, el)
+    >>> ts6 = meter.bestTimeSignature(m6)
+    >>> ts6
+    <music21.meter.TimeSignature 11/32>  
+        
+    '''
+        
+    #TODO: set limit at 11/4?
+    minDurQL = 4 # smallest denominator; start with a whole note
+    # find sum of all durations in quarter length
+    # find if there are any dotted durations
+    minDurDotted = False        
+    sumDurQL = 0
+    #beatStrAvg = 0
+        
+    for e in meas.notesAndRests:
+        if e.quarterLength == 0.0:
+            continue # case of grace durations
+        sumDurQL += e.quarterLength
+        #beatStrAvg += e.beatStrength
+        if e.quarterLength < minDurQL:
+            minDurQL = e.quarterLength
+            if e.duration.dots > 0:
+                minDurDotted = True
+
+
+    # first, we need to evenly divide min dur into total
+    minDurTest = minDurQL
+    while True:
+        partsFloor = int(sumDurQL / minDurTest)
+        partsReal = sumDurQL / float(minDurTest)
+        if (common.almostEquals(partsFloor, partsReal) or 
+        minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
+            break
+        # need to break down minDur until we can get a match
+        else:
+            if minDurDotted:
+                minDurTest = minDurTest / 3.
+            else:
+                minDurTest = minDurTest / 2.
+                    
+    # see if we can get a type for the denominator      
+    # if we do not have a match; we need to break down this value
+    match = False
+    while True:
+        dType, match = duration.quarterLengthToClosestType(minDurTest) 
+        if match or dType == MIN_DENOMINATOR_TYPE:
+            break
+        if minDurDotted:
+            minDurTest = minDurTest / 3.
+        else:
+            minDurTest = minDurTest / 2.
+
+    minDurQL = minDurTest
+    dType, match = duration.quarterLengthToClosestType(minDurQL) 
+    if not match: # cant find a type for a denominator
+        raise MeterException('cannot find a type for denominator %s' % minDurQL)
+
+    # denominator is the numerical representation of the min type
+    # e.g., quarter is 4, whole is 1
+    for num, typeName in duration.typeFromNumDict.items():
+        if typeName == dType:
+            denominator = num
+    # numerator is the count of min parts in the sum
+    numerator = int(sumDurQL / minDurQL)
+        
+    
+    #simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
+    #TODODJN: Least common denominator for 32, 64 
+    denom = common.euclidGCD(numerator, denominator)
+    numerator = numerator / denom
+    denominator = denominator / denom
+
+    # simplifies rare time signatures like 16/16 and 1/1 to 4/4
+    if numerator == denominator and numerator not in [2,4]:
+        numerator = 4
+        denominator = 4
+    elif numerator != denominator and denominator == 1:
+        numerator *= 4
+        denominator *= 4
+    elif numerator != denominator and denominator == 2:
+        numerator *= 2
+        denominator *= 2
+        
+    #a fairly accurate test of whether 3/4 or 6/8 is more appropriate (see doctests)    
+    if (numerator == 3 and denominator == 4):
+        ts1 = TimeSignature('3/4')
+        ts2 = TimeSignature('6/8')
+        str1 = ts1.averageBeatStrength(meas)
+        str2 = ts2.averageBeatStrength(meas)
+            
+        if str1 <= str2:
+            return ts2
+        else:
+            return ts1
+    
+    #tries three time signatures if "simplest" time signature is 6/4 or 3/2
+    elif (numerator == 6 and denominator == 4):
+        ts1 = TimeSignature('6/4')
+        ts2 = TimeSignature('12/8')
+        ts3 = TimeSignature('3/2')
+        str1 = ts1.averageBeatStrength(meas)
+        str2 = ts2.averageBeatStrength(meas)
+        str3 = ts3.averageBeatStrength(meas)
+        m = max(str1, str2, str3)
+        if m == str1:
+            return ts1
+        elif m == str3:
+            return ts3
+        else:
+            return ts2 
+            
+    #environLocal.printDebug(['n/d', numerator, denominator])
+    else:
+        ts = TimeSignature()
+        ts.loadRatio(numerator, denominator)
+        return ts
+
+
 #-------------------------------------------------------------------------------
 class MeterException(exceptions21.Music21Exception):
     pass
@@ -373,6 +545,80 @@ class MeterTerminal(object):
 #             return False
 #         else:
 #             return True
+
+    #TODODJN: is a MeterTerminal as powerful as a measure?
+    '''
+    def bestTimeSignature(self):
+        #
+        Given a Measure with elements in it, 
+        get a TimeSignature that contains all elements.
+
+        Note: this does not yet accommodate triplets. 
+        #
+        #TODO: set limit at 11/4?
+        minDurQL = 4 # smallest denominator; start with a whole note
+        # find sum of all durations in quarter length
+        # find if there are any dotted durations
+        minDurDotted = False        
+        sumDurQL = 0
+        for e in self.notesAndRests:
+            if e.quarterLength == 0.0:
+                continue # case of grace durations
+            sumDurQL += e.quarterLength
+            if e.quarterLength < minDurQL:
+                minDurQL = e.quarterLength
+                if e.duration.dots > 0:
+                    minDurDotted = True
+
+        # first, we need to evenly divide min dur into total
+        minDurTest = minDurQL
+        while True:
+            partsFloor = int(sumDurQL / minDurTest)
+            partsReal = sumDurQL / float(minDurTest)
+            if (common.almostEquals(partsFloor, partsReal) or 
+            minDurTest <= duration.typeToDuration[meter.MIN_DENOMINATOR_TYPE]):
+                break
+            # need to break down minDur until we can get a match
+            else:
+                if minDurDotted:
+                    minDurTest = minDurTest / 3.
+                else:
+                    minDurTest = minDurTest / 2.
+                    
+        # see if we can get a type for the denominator      
+        # if we do not have a match; we need to break down this value
+        match = False
+        while True:
+            dType, match = duration.quarterLengthToClosestType(minDurTest) 
+            if match or dType == meter.MIN_DENOMINATOR_TYPE:
+                break
+            if minDurDotted:
+                minDurTest = minDurTest / 3.
+            else:
+                minDurTest = minDurTest / 2.
+
+        minDurQL = minDurTest
+        dType, match = duration.quarterLengthToClosestType(minDurQL) 
+        if not match: # cant find a type for a denominator
+            raise StreamException('cannot find a type for denominator %s' % minDurQL)
+
+        # denominator is the numerical representation of the min type
+        # e.g., quarter is 4, whole is 1
+        for num, typeName in duration.typeFromNumDict.items():
+            if typeName == dType:
+                denominator = num
+        # numerator is the count of min parts in the sum
+        numerator = int(sumDurQL / minDurQL)
+
+        #environLocal.printDebug(['n/d', numerator, denominator])
+        #TODO: This should change 1/1 to 4/4, 16/16 to 4/4. Simplify to x/4 if possible.
+        #TODO: 6/8? Is avg beatStrength higher for 6/8 or 3/4?
+        #TODO: Shouldn't this be moved to the meter module?
+        ts = meter.TimeSignature()
+        ts.loadRatio(numerator, denominator)
+        return ts
+        '''
+
 
 
     def ratioEqual(self, other):        
@@ -3521,6 +3767,44 @@ class TimeSignature(base.Music21Object):
         msLevel = self.accentSequence.getLevel(level)
         for i in range(len(msLevel)):
             msLevel[i].weight = weightList[i % len(weightList)]
+
+    def averageBeatStrength(self, streamIn, notesOnly = True):
+        '''
+        returns a float of the average beat strength of all objects (or if notesOnly is True
+        [default] only the notes) in the `Stream` specified as streamIn.
+        
+        >>> from music21 import *
+        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
+        >>> sixEight = meter.TimeSignature('6/8')
+        >>> sixEight.averageBeatStrength(s)
+        0.4375
+        >>> threeFour = meter.TimeSignature('3/4')
+        >>> threeFour.averageBeatStrength(s)
+        0.5625
+
+        If `notesOnly` is `False` then test objects will give added
+        weight to the beginning of the measure:
+
+        >>> sixEight.averageBeatStrength(s, notesOnly=False)
+        0.4375
+        >>> s.insert(0.0, clef.TrebleClef())
+        >>> s.insert(0.0, clef.BassClef())
+        >>> sixEight.averageBeatStrength(s, notesOnly=False)
+        0.625
+        '''
+        if notesOnly is True:
+            streamIn = streamIn.notes
+        
+        totalWeight = 0.0
+        totalObjects = len(streamIn)
+        if totalObjects == 0:
+            return 0.0 # or raise exception?  add doc test
+        for el in streamIn:
+            elWeight = self.getAccentWeight(
+                el._getMeasureOffsetOrMeterModulusOffset(self), 
+                forcePositionMatch=True, permitMeterModulus=False)
+            totalWeight += elWeight
+        return totalWeight/totalObjects
 
     def getAccentWeight(self, qLenPos, level=0, forcePositionMatch=False,     
         permitMeterModulus=False):

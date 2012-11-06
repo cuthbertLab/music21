@@ -12,6 +12,7 @@
 
 from music21.abc.base import *
 from music21.abc import base
+from music21.abc import translate
 __doc__ = base.__doc__ #@ReservedAssignment @UndefinedVariable
 
 #------------------------------------------------------------------------------

@@ -386,6 +386,34 @@ E | Ace Ace Ace | Ace BcA GFE | Ace Ace Ace | cag fe^d e2 :|
 #-------------------------------------------------------------------------------
 # raw data for direct translation tests
 
+slurTest = """
+X: 979
+T: Triplets in Slurs, Slurs in Triplets, Nested Slurs
+M: 2/4
+L: 1/16
+K: Edor
+B,2|E^DEE ((3GFG)BA)|E^DEF (3(GFG))BA|(E(^DE)F) (3(GF)G)BA|(E^DEF (3(GFG)))BA|G6
+"""
+
+tieTest = """
+X: 979
+T: Slur test, plus tie tokens
+M: 2/4
+L: 1/16
+K: Edor
+B,2|E^DE-E ((3GFG)BA)|E^DEF (3(G-GG))BA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
+"""
+
+crescTest = """
+X: 979
+T: Tie test, plus crescendo tokens
+M: 2/4
+L: 1/16
+K: Edor
+B,2|!crescendo(!E^DE-E!crescendo)! ((3GFG)BA)|E^DEF (3(G-GG))BA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
+"""
+
+
 testPrimitive = """
 M:4/4
 ed|cecA B2ed|cAcA E2ed|cecA B2ed|c2A2 A2:|

@@ -28,6 +28,7 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import meter
 from music21 import stream
+from music21 import tie
 
 _MOD = 'abc.translate.py'
 environLocal = environment.Environment(_MOD)
@@ -208,8 +209,24 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         n.accidental.displayStatus = t.accidentalDisplayStatus
 
                 n.quarterLength = t.quarterLength
+                
+                # start or end a tie at note n
+                if t.tie is not None:
+                    if t.tie == "start":
+                        n.tie = tie.Tie(t.tie)
+                        n.tie.style = "normal"
+                    elif t.tie == "stop":
+                        n.tie = tie.Tie(t.tie)
+                #TODODJN: How do we fill a crescendo?        
+                for span in t.applicableSpanners:
+                    span.addSpannedElements(n)
+                
                 dst._appendCore(n)
-
+            elif isinstance(t, abcModule.ABCSlurStart):
+                p._appendCore(t.slurObj)
+            elif isinstance(t, abcModule.ABCCrescStart):
+                p._appendCore(t.crescObj)
+                
         dst._elementsChanged()
 
         # append measure to part; in the case of trailing meta data
@@ -399,8 +416,8 @@ def reBar(music21Part, inPlace=True):
     {1.5} <music21.note.Note G>
     
     
-    An example where the time signature wouldn't be the same. This score is probably
-    mistakenly unmarked as 4/4, or is given that time signature by default.
+    An example where the time signature wouldn't be the same. This score is
+    mistakenly marked as 4/4, but has some measures that are longer.
     
     
     >>> music21Part2 = irl[14][1] # 4/4 time signature
