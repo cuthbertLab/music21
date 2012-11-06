@@ -1133,7 +1133,7 @@ class Book(BaseObject):
                 raise XLRDError(
                     'Duplicate entry %r in name_and_scope_map' % (key, ))
             name_and_scope_map[key] = nobj
-            if name_lcase in name_map.has_key:
+            if name_lcase in name_map:
                 name_map[name_lcase].append((nobj.scope, nobj))
             else:
                 name_map[name_lcase] = [(nobj.scope, nobj)]

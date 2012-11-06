@@ -109,7 +109,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
         raise AudioSearchException("Cannot run autocorrelationFunction without all of numpy, scipy, and matplotlib installed.  Missing %s" % base._missingImport)
     import numpy
     import scipy.signal
-    import matplotlib
+    #import matplotlib
     import matplotlib.mlab
     
     recordedSignal = numpy.array(recordedSignal)

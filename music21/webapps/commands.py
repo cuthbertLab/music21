@@ -108,7 +108,7 @@ def generateChords(numChords,kind=''):
             startDegree = random.randrange(0,8)
             inversion = random.randrange(0,3)
             chordPitches = []
-            testDegrees = [d+startDegree-1 for d in traidInversions[inversion] ]
+            #testDegrees = [d+startDegree-1 for d in traidInversions[inversion] ]
             chordPitches = [scl.pitchFromDegree(d+startDegree-1) for d in traidInversions[inversion] ]
             chordType = possibleChordTypes[random.randrange(0,len(possibleChordTypes))]
             c = chord.Chord(chordPitches)
@@ -330,11 +330,8 @@ def correctChordSymbols(worksheet, studentResponse):
     'PITCHES'
     'INVERSION'
     >>> percentCorrect
-    50.0
-    
-    
+    50.0   
     '''
-    from music21 import harmony
     
     numCorrect = 0
     chords1 = worksheet.flat.getElementsByClass(harmony.ChordSymbol)
@@ -402,8 +399,6 @@ def checkLeadSheetPitches(worksheet, returnType=''):
     ['B2', 'D#3', 'F#3']
     ['A2', 'C3', 'D3', 'F#3']
     '''
-    from music21 import chord
-    from music21 import harmony
     #nicePiece = sc
     #incorrectPiece = sc
     
@@ -416,16 +411,16 @@ def checkLeadSheetPitches(worksheet, returnType=''):
     studentsAnswers = worksheet.flat.getElementsByClass(chord.Chord)
     answerKey = worksheet.flat.getElementsByClass(harmony.ChordSymbol)
     
-    correctedAssignment, numCorrect = correctChordSymbols(answerKey, studentsAnswers)
+    correctedAssignment, unused_numCorrect = correctChordSymbols(answerKey, studentsAnswers)
     
     if returnType == 'answerkey':
         
         for chordSymbol in answerKey:
             chordSymbol.writeAsChord = True
-        message = 'answer key displayed'
+        #message = 'answer key displayed'
         return answerKey
     else: 
-        message = 'you got '+str(numCorrect)+' percent correct'
+        #message = 'you got '+str(numCorrect)+' percent correct'
         return correctedAssignment
 
 

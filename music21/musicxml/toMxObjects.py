@@ -1022,7 +1022,8 @@ def instrumentToMx(i):
 def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
     spannerBundle):
     '''
-    Convenience routine to create and add MusicXML objects from music21 objects provided as a target and as a SpannerBundle. 
+    Convenience routine to create and add MusicXML objects from music21 objects provided 
+    as a target and as a SpannerBundle. 
 
     The `target` parameter here may be music21 Note or Chord.
     This may edit the mxNoteList and direction lists in place, and thus returns None.
@@ -1093,8 +1094,10 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         else:
             if su.isFirst(target):
                 proc = ['first']
-            else:
+            elif su.isLast(target):
                 proc = ['last']
+            else:
+                proc = []
         for posSub in proc:
             mxOctaveShift = mxObjects.OctaveShift()
             mxOctaveShift.set('number', su.idLocal)
@@ -1126,8 +1129,10 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         else:
             if su.isFirst(target):
                 proc = ['first']
-            else:
+            elif su.isLast(target):
                 proc = ['last']
+            else:
+                proc = []
 
         for posSub in proc:
             mxWedge = mxObjects.Wedge()
@@ -1159,8 +1164,10 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         else:
             if su.isFirst(target):
                 proc = ['first']
-            else:
+            elif su.isLast(target):
                 proc = ['last']
+            else:
+                proc = []
         for posSub in proc:
             mxBracket = mxObjects.Bracket()
             mxBracket.set('number', su.idLocal)

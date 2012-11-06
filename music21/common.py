@@ -1002,6 +1002,8 @@ def euclidGCD(a, b):
     2
     >>> common.euclidGCD(20,8)
     4
+    >>> common.euclidGCD(20,16)
+    4
     '''
     if b == 0:
         return a

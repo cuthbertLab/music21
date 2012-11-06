@@ -54,6 +54,10 @@ eschbegTransposed = setupTranspositions()
 def generateToneRows(numberToGenerate = 1000):
     '''
     generates a list of random 12-tone rows.
+
+    >>> from music21.demos import eschbeg
+    >>> #_DOCS_SHOW eschbeg.generateToneRows(4)
+    ['T310762985E4', '9E036T472158', '5879E3T12064', '417T26E95038']
     '''
     firstRow = list("0123456789TE")
     returnRows = []
@@ -66,6 +70,10 @@ def generateRandomRows(numberToGenerate = 1000):
     '''
     generates random rows which might have the
     same note twice, but never twice in a row.
+
+    >>> from music21.demos import eschbeg
+    >>> #_DOCS_SHOW eschbeg.generateRandomRows(4)
+    ['67051534121', '05874071696', 'E082T6569674', '4E8383E4E395']
     '''
     returnRows = []
     for i in range(numberToGenerate):
@@ -119,7 +127,8 @@ def findEmbeddedChords(testSet = "0234589", cardinality = 3, skipInverse = False
     finds the trichords (or chords of other cardinalities) in the Aschbeg set or 
     any other set:
     
-    >>> print findEmbeddedChords("0234589")
+    >>> from music21.demos import eschbeg
+    >>> print eschbeg.findEmbeddedChords("0234589")
     [012]: (234) (345) 
     [013]: (235) 
     [023]: (023) (245) 

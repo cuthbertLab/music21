@@ -122,18 +122,17 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
     
     else:
         if returnType == "xml":
-            
-            response_headers = [('Content-type', 'application/vnd.recordare.musicxml+xml'),('Content-disposition','attachment; filename='+filename),
-                ('Content-Length', str(len(resultStr)))]
-    
+            response_headers = [('Content-type', 'application/vnd.recordare.musicxml+xml'),
+                                ('Content-disposition','attachment; filename='+filename),
+                                ('Content-Length', str(len(resultStr))),
+                               ]
             start_response(status, response_headers)
-        
             return [resultStr]
         
         elif returnType == "xmltext":
             
             response_headers = [('Content-type', 'text/plain'),
-                ('Content-Length', str(len(resultStr)))]
+                                ('Content-Length', str(len(resultStr)))]
     
             start_response(status, response_headers)
         
@@ -141,8 +140,8 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
         
         else:
             templateStr = noteflightEmbedTemplate(resultStr,title)
-            response_headers = [('Content-type', 'text/html'),('Content-Length', str(len(templateStr)))]
-    
+            response_headers = [('Content-type', 'text/html'),
+                                ('Content-Length', str(len(templateStr)))]
             start_response(status, response_headers)
         
             return [templateStr]

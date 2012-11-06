@@ -72,13 +72,13 @@ def music21ModWSGIFeatureApplication(environ, start_response):
         return [output]
 
 
-    command = pathInfo
+    #command = pathInfo
 
     formFields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
                 
     # Check if form data is present. If not found, display error
     try:
-        file = formFields['subUploadForm']
+        unused_subUploadFormFile = formFields['subUploadForm']
     except:
         html = """
             <html >
@@ -107,7 +107,7 @@ def music21ModWSGIFeatureApplication(environ, start_response):
     uploadedFile = formFields['fileupload'].file
     filename = formFields['fileupload'].filename
     
-    type = formFields['fileupload'].type
+    uploadType = formFields['fileupload'].type
 
     # Check if filename is empty - display no file chosen error
     if filename == "":
@@ -134,8 +134,8 @@ def music21ModWSGIFeatureApplication(environ, start_response):
         return [html]
 
     
-    # Check if type is zip - display no file chosen error
-    if type != "application/zip":
+    # Check if uploadType is zip - display no file chosen error
+    if uploadType != "application/zip":
         html = """
             <html >
             <body style='font-family:calibri' bgcolor='#EEE' onLoad="toggleExtractors('m21')">
@@ -166,9 +166,9 @@ def music21ModWSGIFeatureApplication(environ, start_response):
     
     featureIDList = list()
     
-    # Check if features selected. Else disp error
+    # Check if features have been selected. Else display error
     try:
-        file = formFields['features']
+        unused_featureFile = formFields['features']
     except:
         html = """
             <html ><body>
@@ -181,8 +181,8 @@ def music21ModWSGIFeatureApplication(environ, start_response):
     
     if common.isListLike(formFields['features']):
         print formFields['features']
-        for id in formFields['features']:
-            featureIDList.append(str(id.value))
+        for featureId in formFields['features']:
+            featureIDList.append(str(featureId.value))
     else:
         featureIDList.append(formFields['features'].value)
     
@@ -435,13 +435,13 @@ def getUploadForm():
         html += "<div id='"+typeId+"extractors' style='display:none; padding-left:10px'>\n"
         html += "<span style='font-size:13'><b>Select: </b><a href=\"javascript:changeAll('" + typeId + "',1)\">All</a>&nbsp;&nbsp;<a href=\"javascript:changeAll('" + typeId + "',0)\">None</a></span><br />\n"
         for extractor in featureInfo[typeId]:
-            id = extractor[0]
+            featureId = extractor[0]
             name = extractor[1]
             desc = extractor[2]
             dimensions = extractor[3]
-            html += "<input type='checkbox' name='features' value='" + id +"' extractortype = '" + typeId + "' onchange='updateCounts(this.checked," + dimensions + ")'/>\n" 
-            html += "<span onClick=toggleDesc('"+ id + "')>"+ name + "</span><br />\n"
-            html += "<div style='font-size:12;display:none;padding-left:16px;margin-bottom:7px' id ='"+id + "desc'>\n"
+            html += "<input type='checkbox' name='features' value='" + featureId +"' extractortype = '" + typeId + "' onchange='updateCounts(this.checked," + dimensions + ")'/>\n" 
+            html += "<span onClick=toggleDesc('"+ featureId + "')>"+ name + "</span><br />\n"
+            html += "<div style='font-size:12;display:none;padding-left:16px;margin-bottom:7px' id ='" + featureId + "desc'>\n"
             html += desc + "<br />(vectors output: " + dimensions + ") " + "<br /></div>\n"
         html += "</div>\n"
     html += "</div>\n"

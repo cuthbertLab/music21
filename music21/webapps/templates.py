@@ -17,17 +17,16 @@ Each template returns a tuple of the form (data, contentType).
 
 '''
 import unittest
-import doctest
 
-from music21 import corpus
+#from music21 import corpus
 from string import Template
 
 
 outputShortcuts = {
     "show(musicxml)"    : "templates.musicxmlText",
     "musicxmlDisplay"   : "templates.musicxmlText",
-    "musicxml"          : "templates.musicxmlText",
     
+    "musicxml"          : "templates.musicxmlFile",
     "write(musicxml)"   : "templates.musicxmlFile",
     "musicxmlDownload"  : "templates.musicxmlFile",
     "musicxmlFile"      : "templates.musicxmlFile",
@@ -103,7 +102,7 @@ def braille(outputStream):
     >>> contentType
     'text/html; charset=utf-8'
     '''
-    from music21 import braille
+#    from music21 import braille
     from music21.braille import translate as btranslate
     
     brailleOutput = u"<html><body><pre>" + btranslate.objectToBraille(outputStream) + u"</pre></body></html>"

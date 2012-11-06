@@ -274,6 +274,11 @@ but since `30` isn't a list, you'll get an error:
 Traceback (most recent call last):
 TypeError: 'int' object is not iterable
 
+For more information on data structures (lists, lists of lists, and things we didn't get to,
+I suggest watching Google's Python tutorial [http://code.google.com/edu/languages/google-python-class/],
+especially class 2).
+
+
 Wrapup
 ---------------------
 In this chapter we looked at how we can look inside lists of lists, which will be

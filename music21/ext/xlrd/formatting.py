@@ -14,7 +14,7 @@ DEBUG = 0
 import copy
 from timemachine import *
 from biffh import BaseObject, unpack_unicode, unpack_string, \
-    upkbits, upkbitsL, fprintf, \
+    upkbits, upkbitsL, fprintf, XLRDError, \
     FUN, FDT, FNU, FGE, FTX, XL_CELL_NUMBER, XL_CELL_DATE
 from struct import unpack
 

@@ -718,9 +718,14 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
 
 
 class AardenEssen(KeyWeightKeyAnalysis):
-    '''Implementation of Aarden-Essen weightings for Krumhansl-Schmuckler key determination algorithm.
+    '''
+    Implementation of Aarden-Essen weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor, which describes these weightings as "Weak tendancy to identify the subdominant key as the tonic."
+    Values from from http://extra.humdrum.org/man/keycor, which 
+    describes these weightings as "Weak tendency to identify the subdominant key as the tonic."
+
+    (N.B. -- we are not sure exactly where the minor weightings come from, and recommend
+    only using these weights for major).
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
@@ -734,7 +739,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
 
     def _getWeights(self, weightType='major'): 
-        ''' Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
+        '''Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
         >>> from music21 import *
         >>> a = analysis.discrete.AardenEssen()

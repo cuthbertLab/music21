@@ -236,7 +236,9 @@ def savedSearches():
 #    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
 #    searchForNotes("G3 D3 R D3 D3 E3 F3") # Donna si to fallito TEST - last note = F#
 #    searchForIntervals("F3 C3 C3 F3 G3") # Bologna Archivio: Per seguirla TEST
-    searchForNotes("F3 E3 F3 G3 F3 E3")  # Mons archive fragment -- see FB Aetas Aurea post
+#    searchForNotes("F3 E3 F3 G3 F3 E3")  # Mons archive fragment -- see FB Aetas Aurea post
+    searchForNotes("F4 G4 F4 B4 G4 A4 G4 F4 E4") # or B-4.  Paris 25406 -- Dominique Gatte pen tests  
+
 #    searchForNotes("D4 D4 C4 D4") # Fortuna Rira Seville 25 TEST! CANNOT FIND    
 #    searchForNotes("D4 C4 B3 A3 G3") # Tenor de monaco so tucto Seville 25
 #    searchForNotes("E4 D4 C4 B3 A3 B3 C4") # Benedicamus Domino Seville 25

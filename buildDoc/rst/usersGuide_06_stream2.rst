@@ -10,6 +10,12 @@ Stream that we demonstrated so far was the :meth:`~music21.base.Music21Object.sh
 using the `('text')` argument:
 
 >>> biggerStream.show('text') 
+{0.0} <music21.note.Note D#>
+{1.0} <music21.stream.Stream some notes>
+	{0.0} <music21.note.Note C>
+	{2.0} <music21.note.Note F#>
+	{3.0} <music21.note.Note B->
+
 
 
 

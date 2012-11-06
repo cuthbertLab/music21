@@ -2978,7 +2978,7 @@ class Test(unittest.TestCase):
 
         #s.show()
         ex = repeat.Expander(s.parts[0])
-        self.assertEqual(ex._findInnermostRepeatIndices(s.parts[0]), [0, 1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertEqual(ex._findInnermostRepeatIndices(s.parts[0].getElementsByClass('Measure')), [0, 1, 2, 3, 4, 5, 6, 7, 8])
         # check boundaries here
 
         # TODO: this is not yet correct, and is making too many copies

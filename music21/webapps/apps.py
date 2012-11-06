@@ -88,6 +88,18 @@ def setupConverterApp(agenda):
     >>> (responseData, responseContentType) = processor.getOutput()
     >>> responseContentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
+    >>> print responseData
+    <?xml version="1.0" encoding="utf-8"?>
+    <!DOCTYPE score-partwise
+      PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+      'http://www.musicxml.org/dtds/partwise.dtd'>
+    <score-partwise>
+      <movement-title>Music21 Fragment</movement-title>
+      <identification>
+        <creator type="composer">Music21</creator>
+      </identification>
+      <part-list>
+    ...
     >>> converter.parse(responseData).flat.notes[0].ps
     53.0
     '''
@@ -98,9 +110,12 @@ def setupConverterApp(agenda):
     
     # Resolve desired output
     outputTypeShortcut = agenda.getData('output')
-    if outputTypeShortcut in templates.outputShortcuts.keys():
+    if outputTypeShortcut in templates.outputShortcuts:
         outputTemplateName = templates.outputShortcuts[outputTypeShortcut]
+        #print outputTemplateName 
         agenda.setOutputTemplate(outputTemplateName, ['outputStream'])
+    #else:
+    #    print "Hiiiiiiiiiiiiiiii!"
 
 def setupZipfileApp(agenda):
     pass

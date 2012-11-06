@@ -599,7 +599,9 @@ def fromMeasure(thisMeasure, mode='txt'):
     if mode not in supportedDisplayModes:
         raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
     
-    return VexflowVoice(thisMeasure.makeNotation(inPlace=False)).generateCode(mode)
+    notationMeasure = thisMeasure.makeNotation(inPlace=False)
+    vfv = VexflowVoice(notationMeasure)
+    return vfv.generateCode(mode)
 
 def vexflowClefFromClef(music21clef):
     '''
@@ -2297,7 +2299,7 @@ _DOC_ORDER = []
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test)#, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

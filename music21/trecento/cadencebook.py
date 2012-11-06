@@ -152,10 +152,10 @@ class TrecentoSheet(object):
         '''
         title = title.lower()
         for i in range(self.totalRows):
-            rowvalues = self.sheet.row_values(i)
-            if rowvalues[1] is None:
+            rowValues = self.sheet.row_values(i)
+            if rowValues[1] is None:
                 continue
-            elif title in rowvalues[1].lower():
+            elif title in rowValues[1].lower():
                 return self.makeWork(i+1)
         return None
 

@@ -1105,7 +1105,8 @@ class CommandProcessor(object):
         to determine which format the output should be in. If an outputTemplate is unspecified or known,
         will return json by default.
         
-        Return is of the style (output, outputType) where outputType is a content-type ready for returning to the server:
+        Return is of the style (output, outputType) where outputType is a content-type ready for returning 
+        to the server:
         "text/plain", "application/json", "text/html", etc.
         '''
         if len(self.errorList) > 0:
