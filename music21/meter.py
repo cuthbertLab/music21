@@ -397,7 +397,6 @@ def bestTimeSignature(meas):
         
     
     #simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
-    #TODODJN: Least common denominator for 32, 64 
     denom = common.euclidGCD(numerator, denominator)
     numerator = numerator / denom
     denominator = denominator / denom
@@ -546,78 +545,7 @@ class MeterTerminal(object):
 #         else:
 #             return True
 
-    #TODODJN: is a MeterTerminal as powerful as a measure?
-    '''
-    def bestTimeSignature(self):
-        #
-        Given a Measure with elements in it, 
-        get a TimeSignature that contains all elements.
 
-        Note: this does not yet accommodate triplets. 
-        #
-        #TODO: set limit at 11/4?
-        minDurQL = 4 # smallest denominator; start with a whole note
-        # find sum of all durations in quarter length
-        # find if there are any dotted durations
-        minDurDotted = False        
-        sumDurQL = 0
-        for e in self.notesAndRests:
-            if e.quarterLength == 0.0:
-                continue # case of grace durations
-            sumDurQL += e.quarterLength
-            if e.quarterLength < minDurQL:
-                minDurQL = e.quarterLength
-                if e.duration.dots > 0:
-                    minDurDotted = True
-
-        # first, we need to evenly divide min dur into total
-        minDurTest = minDurQL
-        while True:
-            partsFloor = int(sumDurQL / minDurTest)
-            partsReal = sumDurQL / float(minDurTest)
-            if (common.almostEquals(partsFloor, partsReal) or 
-            minDurTest <= duration.typeToDuration[meter.MIN_DENOMINATOR_TYPE]):
-                break
-            # need to break down minDur until we can get a match
-            else:
-                if minDurDotted:
-                    minDurTest = minDurTest / 3.
-                else:
-                    minDurTest = minDurTest / 2.
-                    
-        # see if we can get a type for the denominator      
-        # if we do not have a match; we need to break down this value
-        match = False
-        while True:
-            dType, match = duration.quarterLengthToClosestType(minDurTest) 
-            if match or dType == meter.MIN_DENOMINATOR_TYPE:
-                break
-            if minDurDotted:
-                minDurTest = minDurTest / 3.
-            else:
-                minDurTest = minDurTest / 2.
-
-        minDurQL = minDurTest
-        dType, match = duration.quarterLengthToClosestType(minDurQL) 
-        if not match: # cant find a type for a denominator
-            raise StreamException('cannot find a type for denominator %s' % minDurQL)
-
-        # denominator is the numerical representation of the min type
-        # e.g., quarter is 4, whole is 1
-        for num, typeName in duration.typeFromNumDict.items():
-            if typeName == dType:
-                denominator = num
-        # numerator is the count of min parts in the sum
-        numerator = int(sumDurQL / minDurQL)
-
-        #environLocal.printDebug(['n/d', numerator, denominator])
-        #TODO: This should change 1/1 to 4/4, 16/16 to 4/4. Simplify to x/4 if possible.
-        #TODO: 6/8? Is avg beatStrength higher for 6/8 or 3/4?
-        #TODO: Shouldn't this be moved to the meter module?
-        ts = meter.TimeSignature()
-        ts.loadRatio(numerator, denominator)
-        return ts
-        '''
 
 
 
