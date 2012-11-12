@@ -247,6 +247,8 @@ def _getKeyAndPrefix(rtKeyOrString):
 
 def romanTextToStreamScore(rtHandler, inputM21=None):
     '''
+    The main processing module for single-movement RomanText works.
+
     Given a romanText handler or string, return or fill a Score Stream.
     '''
     # accept a string directly; mostly for testing
@@ -388,6 +390,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     o = 0.0 # start offsets at zero
                     previousChordInMeasure = None
                     pivotChordPossible = False
+                    numberOfAtoms = len(t.atoms)
+                    
                     for i, a in enumerate(t.atoms):
                         if isinstance(a, romanTextModule.RTKey) or \
                            ((foundAKeySignatureSoFar == False) and \
@@ -491,9 +495,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 else:
                                     rtt = RomanTextUnprocessedToken(a)
                                     m.insert(o, rtt)
-                            elif tsCurrent is not None and tsCurrent.barDuration.quarterLength == o:
+                            elif tsCurrent is not None and (tsCurrent.barDuration.quarterLength == o or i == numberOfAtoms - 1):
                                 if isinstance(a, romanTextModule.RTRepeatStop):
-                                    m.rightBarline = bar.Repeat(direction='stop')
+                                    m.rightBarline = bar.Repeat(direction='end')
                                 else:
                                     rtt = RomanTextUnprocessedToken(a)
                                     m.insert(o, rtt)
@@ -696,7 +700,17 @@ def fixPickupMeasure(partObject):
             el.offset -= newPadding
 
 def romanTextToStreamOpus(rtHandler, inputM21=None):
-    '''Return either a Score object, or, if a multi-movement work is defined, an Opus object. 
+    '''
+    The main processing routine for RomanText objects that may or may not
+    be multi movement.
+    
+    Takes in a romanText.base.RTFile() object, or a string as rtHandler.
+    
+    Runs `romanTextToStreamScore()` as its main work.
+    
+    If inputM21 is None then it will create a Score or Opus object.
+    
+    Return either a Score object, or, if a multi-movement work is defined, an Opus object. 
     '''
     from music21 import stream
     if common.isStr(rtHandler):
