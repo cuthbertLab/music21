@@ -2153,11 +2153,15 @@ class Pitch(base.Music21Object):
         >>> dis.accidental = pitch.Accidental("#")
         >>> dis.pitchClass
         3
-        >>> dis.pitchClass = 11
+        
+        If a string "A" or "B" is given to pitchClass, it is
+        still returned as an int.
+        
+        >>> dis.pitchClass = "A"
         >>> dis.pitchClass
-        11
+        10
         >>> dis.name
-        'B'
+        'B-'
         ''')
 
 
