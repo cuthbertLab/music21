@@ -357,7 +357,8 @@ def bestTimeSignature(meas):
 
     # first, we need to evenly divide min dur into total
     minDurTest = minDurQL
-    while True:
+    i = 10
+    while i > 0:
         partsFloor = int(sumDurQL / minDurTest)
         partsReal = sumDurQL / float(minDurTest)
         if (common.almostEquals(partsFloor, partsReal) or 
@@ -369,11 +370,13 @@ def bestTimeSignature(meas):
                 minDurTest = minDurTest / 3.
             else:
                 minDurTest = minDurTest / 2.
+        i -= 1
                     
     # see if we can get a type for the denominator      
     # if we do not have a match; we need to break down this value
     match = False
-    while True:
+    i = 10
+    while i>0:
         dType, match = duration.quarterLengthToClosestType(minDurTest) 
         if match or dType == MIN_DENOMINATOR_TYPE:
             break
@@ -381,6 +384,7 @@ def bestTimeSignature(meas):
             minDurTest = minDurTest / 3.
         else:
             minDurTest = minDurTest / 2.
+        i -= 1
 
     minDurQL = minDurTest
     dType, match = duration.quarterLengthToClosestType(minDurQL) 
