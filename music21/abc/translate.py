@@ -29,6 +29,7 @@ from music21 import exceptions21
 from music21 import meter
 from music21 import stream
 from music21 import tie
+from music21 import articulations
 
 _MOD = 'abc.translate.py'
 environLocal = environment.Environment(_MOD)
@@ -217,15 +218,25 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         n.tie.style = "normal"
                     elif t.tie == "stop":
                         n.tie = tie.Tie(t.tie)
-                #TODODJN: How do we fill a crescendo?        
                 for span in t.applicableSpanners:
                     span.addSpannedElements(n)
+                    
+                if t.artic is not None:
+                    n.articulations = []
+                    if t.artic == "staccato":
+                        n.articulations.append(articulations.Staccato())
+                    if t.artic == "upbow":
+                        n.articulations.append(articulations.UpBow())
+                    if t.artic == "downbow":
+                        n.articulations.append(articulations.DownBow())
                 
                 dst._appendCore(n)
             elif isinstance(t, abcModule.ABCSlurStart):
                 p._appendCore(t.slurObj)
             elif isinstance(t, abcModule.ABCCrescStart):
                 p._appendCore(t.crescObj)
+            elif isinstance(t, abcModule.ABCDimStart):
+                p._appendCore(t.dimObj)
                 
         dst._elementsChanged()
 

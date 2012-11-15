@@ -412,7 +412,32 @@ L: 1/16
 K: Edor
 B,2|!crescendo(!E^DE-E!crescendo)! ((3GFG)BA)|E^DEF (3(G-GG))BA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
 """
+dimTest = """
+X: 979
+T: Tie test, plus diminuendo tokens
+M: 2/4
+L: 1/16
+K: Edor
+B,2|!diminuendo(!E^DE-E!diminuendo)! ((3GFG)BA)|E^DEF (3(G-GG))BA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
+"""
 
+staccTest = """
+X: 979
+T: Diminuendo test, plus staccato tokens
+M: 2/4
+L: 1/16
+K: Edor
+B,2|!diminuendo(!.E^D.E-E!diminuendo)! ((3.G.F.G)BA)|E^DEF (3(G-GG))BA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
+"""
+
+bowTest = """
+X: 979
+T: Staccato test, plus bowing articulations
+M: 2/4
+L: 1/16
+K: Edor
+B,2|!diminuendo(!.E^D.E-E!diminuendo)! ((3.G.F.G)BvA)|E^DEF (3(G-GG))BuA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
+"""
 
 testPrimitive = """
 M:4/4

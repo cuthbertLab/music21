@@ -4,6 +4,7 @@
 # Purpose:      music21 classes for dealing with abc data
 #
 # Authors:      Christopher Ariza
+#               Dylan J. Nagler
 #
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
@@ -886,10 +887,6 @@ class ABCTie(ABCToken):
     def __repr__(self):
         return '<music21.abc.base.ABCTie %r>' % self.src
 
-#TODODJN:
-#CHANGE AND MOVE BESTTIMESIGNATURE. DO IT.
-#(lower priority)WRITE FUNCTIONAL CODE FOR CRESCENDOS
-
 
 class ABCSlurStart(ABCToken):
     '''
@@ -941,8 +938,63 @@ class ABCCrescStart(ABCToken):
     
     def fillCresc(self):
         from music21 import dynamics
-        self.crescObj = dynamics.Crescendo()    
+        self.crescObj = dynamics.Crescendo()
+        
+class ABCDimStart(ABCToken):
+    '''
+    ABCDimStart tokens always precede the notes in a diminuendo.
+    They function identically to ABCCrescStart tokens.
+    '''
+    
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        self.dimObj = None
 
+    def __repr__(self):
+        return '<music21.abc.base.ABCDimStart %r>' % self.src
+    
+    def fillDim(self):
+        from music21 import dynamics
+        self.dimObj = dynamics.Diminuendo()
+
+class ABCStaccato(ABCToken):
+    '''
+    ABCStaccato tokens "." precede a note or chord;
+    they are a property of that note/chord.
+    '''
+    
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCStaccato %r>' % self.src
+#TODO: Upbows and downbows can't be translated into musicxml?    
+class ABCUpbow(ABCToken):
+    '''
+    ABCStaccato tokens "." precede a note or chord;
+    they are a property of that note/chord.
+    '''
+    
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCUpbow %r>' % self.src
+    
+class ABCDownbow(ABCToken):
+    '''
+    ABCStaccato tokens "." precede a note or chord;
+    they are a property of that note/chord.
+    '''
+    
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCDownbow %r>' % self.src
+    
+                
+        
 class ABCBrokenRhythmMarker(ABCToken):
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
@@ -973,7 +1025,7 @@ class ABCNote(ABCToken):
     General usage requires multi-pass processing. After being tokenized, 
     each ABCNote needs a number of attributes updates. Attributes to 
     be updated after tokenizing, and based on the linear sequence of 
-    tokens: `inBar`, `inBeam` (not used), `inSlur` (not used), `inGrace` (not used), 
+    tokens: `inBar`, `inBeam` (not used), `inGrace` (not used), 
     `activeDefaultQuarterLength`, `brokenRhythmMarker`, and 
     `activeKeySignature`.  
 
@@ -992,7 +1044,6 @@ class ABCNote(ABCToken):
         # context attributes
         self.inBar = None
         self.inBeam = None
-        self.inSlur = None
         self.inGrace = None
 
         # provide default duration from handler; may change during piece
@@ -1011,6 +1062,10 @@ class ABCNote(ABCToken):
         
         # store a tie if active
         self.tie = None
+        
+        # store articulations if active
+        self.artic = None
+        
         
 
         # set to True if a modification of key signautre
@@ -1383,6 +1438,7 @@ class ABCHandler(object):
         self._tokens = []
         self.activeParens = []
         self.activeSpanners = []
+        self.activeGrace = 0
 
 
     def _getLinearContext(self, strSrc, i):
@@ -1604,23 +1660,36 @@ class ABCHandler(object):
                 self._tokens.append(ABCBrokenRhythmMarker(collect))
                 i = j
                 continue
-            
-            
-            #TODODJN: Fix this!
-            #It's creating tokens, but not filling the crescendo.
-            #(The problem is likely in translate.)
-            #get crescendos. skip over the open paren to avoid confusion.
+
+            #get dynamics. skip over the open paren to avoid confusion.
             #NB: Nested crescendos are not an issue (not proper grammar).
-            if (c =='!' and cNext == 'c' and cNextNext == 'r'):
-                j = i + 12
-                #handles the end of a crescendo
-                #print self.activeSpanners
-                if strSrc[j - 2] == "(":
+            if (c =='!'):
+                if strSrc[i:i+12] == "!crescendo(!":
+                    j = i + 12
                     self._tokens.append(ABCCrescStart(c))
-                elif strSrc[j - 2] == ")":
+                    i = j
+                elif strSrc[i:i+12] == "!crescendo)!":
+                    j = i + 12
                     self._tokens.append(ABCParenStop(c))
-                i = j
+                    i = j
+                elif strSrc[i:i+13] == "!diminuendo(!":
+                    j = i + 13
+                    self._tokens.append(ABCDimStart(c))
+                    i = j
+                elif strSrc[i:i+13] == "!diminuendo)!":
+                    j = i + 13
+                    self._tokens.append(ABCParenStop(c))
+                    i = j
+                #TODO: We're currently skipping over all other "!" expressions
+                else:
+                    j = i + 1
+                    while j < lastIndex:
+                        j += 1
+                        if strSrc[j] == "!":
+                            break
+                    i = j + 1
                 continue
+
             
             
             # get slurs, ensuring that they're not confused for tuplets
@@ -1676,16 +1745,46 @@ class ABCHandler(object):
 
                 i = j
                 continue
+            
+            if (c=="."):
+                j = i + 1
+                self._tokens.append(ABCStaccato(c))
+                i = j
+                continue
+            
+            if (c=="u"):
+                j = i + 1
+                self._tokens.append(ABCUpbow(c))
+                i = j
+                continue
+            
+            if (c=="{"):
+                j = i + 1
+                self.activeGrace = 1
+                i = j
+                continue
+            
+            if (c=="}"):
+                j = i + 1
+                self.activeGrace = 0
+                i = j
+                continue
+            
+            if (c=="v"):
+                j = i + 1
+                self._tokens.append(ABCDownbow(c))
+                i = j
+                continue
 
             # get the start of a note event: alpha, or 
             # ~ tunr/ornament, accidentals ^, =, - as well as ^^
-            if (c.isalpha() or c in '~^=_.'):
+            if (c.isalpha() or c in '~^=_'):
                 # condition where we start with an alpha that is not an alpha
                 # that comes before a pitch indication
                 # H is fermata, L is accent, T is trill
                 # not sure what S is, but josquin/laPlusDesPlus.abc
                 # uses it before pitches; might be a segno
-                foundPitchAlpha = c.isalpha() and c not in 'uvHLTS'
+                foundPitchAlpha = c.isalpha() and c not in 'vHLTS'
                 j = i + 1
 
                 while True:
@@ -1695,7 +1794,7 @@ class ABCHandler(object):
                     # ornaments may precede note names
                     # accidentals (^=_) staccato (.), up/down bow (u, v)
                     elif (foundPitchAlpha == False and 
-                        strSrc[j] in '~=^_.uvHLTS'):
+                        strSrc[j] in '~=^_vHLTS'):
                         j += 1
                         continue                    
                     # only allow one pitch alpha to be a continue condition
@@ -1821,7 +1920,7 @@ class ABCHandler(object):
             elif isinstance(t, ABCParenStop):
                 if self.activeParens:
                     p = self.activeParens.pop()
-                    if p == "Slur" or p == "Crescendo":
+                    if p == "Slur" or p == "Crescendo" or p == "Diminuendo":
                         self.activeSpanners.pop()
 
 
@@ -1830,10 +1929,26 @@ class ABCHandler(object):
                 tPrev.tie = "start"
                 lastTieToken = t
                 
+            if isinstance(t, ABCStaccato):
+                tNext.artic = "staccato"
+                
+            if isinstance(t, ABCUpbow):
+                tNext.artic = "upbow"
+                
+            if isinstance(t, ABCDownbow):
+                tNext.artic = "downbow"
+                
+                
+                
             if isinstance(t, ABCCrescStart):
                 t.fillCresc()
                 self.activeSpanners.append(t.crescObj)
                 self.activeParens.append("Crescendo")
+                
+            if isinstance(t, ABCDimStart):
+                t.fillDim()
+                self.activeSpanners.append(t.dimObj)
+                self.activeParens.append("Diminuendo")
                     
                 
             
@@ -1848,7 +1963,10 @@ class ABCHandler(object):
                 if lastTieToken is not None:
                     t.tie = "stop"
                     lastTieToken = None
-                                
+                #TODO: Tokenize grace notes?
+                if self.activeGrace != 0:
+                    print "Active Grace!"
+                    t.inGrace = True
                 if lastTupletToken == None:
                     pass
                 elif lastTupletToken.noteCount == 0:
@@ -2566,7 +2684,7 @@ class Test(unittest.TestCase):
             (testFiles.fyrareprisarn, 239, 152, 0), 
             (testFiles.mysteryReel, 192, 153, 0), 
             (testFiles.aleIsDear, 291, 206, 32),
-            (testFiles.testPrimitive, 94, 75, 2),
+            (testFiles.testPrimitive, 100, 75, 2),
             (testFiles.kitchGirl, 126, 101, 2),
             (testFiles.williamAndNancy, 127, 93, 0),
             (testFiles.morrisonsJig, 178, 137, 0),
@@ -2899,6 +3017,24 @@ class Test(unittest.TestCase):
         ah = ABCHandler()
         ah.process(testFiles.crescTest)
         self.assertEqual(len(ah), 75)
+        
+    def testDim(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.dimTest)
+        self.assertEqual(len(ah), 75)
+        
+    def testStacc(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.staccTest)
+        self.assertEqual(len(ah), 80)
+        
+    def testBow(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.bowTest)
+        self.assertEqual(len(ah), 82)
         
 
 #-------------------------------------------------------------------------------
