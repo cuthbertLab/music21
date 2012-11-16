@@ -377,7 +377,11 @@ def bestTimeSignature(meas):
     match = False
     i = 10
     while i>0:
-        dType, match = duration.quarterLengthToClosestType(minDurTest) 
+        try:
+            dType, match = duration.quarterLengthToClosestType(minDurTest) 
+        except ZeroDivisionError:
+            raise MeterException("Cannot find a good match for this measure")
+        
         if match or dType == MIN_DENOMINATOR_TYPE:
             break
         if minDurDotted:

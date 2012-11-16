@@ -263,8 +263,6 @@ class Repeat(repeat.RepeatMark, Barline):
                 self.style='light-heavy'
             elif self._direction=='start':
                 self.style='heavy-light'
-        
-        
         else:
             raise BarException('cannot set repeat direction to: %s' % value)
 

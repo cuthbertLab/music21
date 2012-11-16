@@ -1228,12 +1228,27 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
     '''
     # if we have any articulations, they only go on the first of any 
     # component notes
-    mxArticulations = mxObjects.Articulations()
+    mxArticulations = None # create only as needed
+    mxTechnical = None # create only as needed
+
     for artObj in target.articulations:
-        mxArticulationMark = articulationToMxArticulation(artObj)
-        mxArticulations.append(mxArticulationMark)
-    if len(mxArticulations) > 0:
+        if 'TechnicalIndication' not in artObj.classes:
+            if mxArticulations is None:
+                mxArticulations = mxObjects.Articulations()
+            mxArticulationMark = articulationToMxArticulation(artObj)
+            mxArticulations.append(mxArticulationMark)
+        else: # TechnicalIndication
+            if mxTechnical is None:
+                mxTechnical = mxObjects.Technical()
+            mxTechnicalMark = articulationToMxTechnical(artObj)
+            mxTechnical.append(mxTechnicalMark)
+    
+    if mxArticulations is not None and len(mxArticulations) > 0:
         mxNoteList[0].notationsObj.componentList.append(mxArticulations)
+
+    if mxTechnical is not None and len(mxTechnical) > 0:
+        mxNoteList[0].notationsObj.componentList.append(mxTechnical)
+
 
     # notations and articulations are mixed in musicxml
     for expObj in target.expressions:
@@ -1314,7 +1329,53 @@ def articulationToMxArticulation(articulationMark):
     #mxArticulations.append(mxArticulationMark)
     return mxArticulationMark
 
+def articulationToMxTechnical(articulationMark):
+    '''
+    Returns a class (mxTechnicalMark) that represents the
+    MusicXML structure of an articulation mark that is primarily a TechnicalIndication.
 
+    >>> from music21 import *
+    >>> a = articulations.UpBow()
+    >>> a.placement = 'below'
+    >>> mxTechnicalMark = musicxml.toMxObjects.articulationToMxTechnical(a)
+    >>> mxTechnicalMark
+    <up-bow placement=below>
+    '''
+    mappingList = {'UpBow': 'up-bow',
+                   'DownBow': 'down-bow',
+                   'Harmonic': 'harmonic',
+                   'OpenString': 'open-string',
+                   'StringThumbPosition': 'thumb-position',
+                   'StringFingering': 'fingering',
+                   'FrettedPluck': 'pluck',
+                   'DoubleTongue': 'double-tongue',
+                   'TripleTongue': 'triple-tongue',
+                   'Stopped': 'stopped',
+                   'SnapPizzicato': 'snap-pizzicato',
+                   'FretIndication': 'fret',
+                   'StringIndication': 'string',
+                   'HammerOn': 'hammer-on',
+                   'PullOff': 'pull-off',
+                   'FretBend': 'bend',
+                   'FretTap': 'tap',
+                   'OrganHeel': 'heel',
+                   'OrganToe': 'toe',
+                   'HarpFingerNails': 'fingernails',
+#                   'TechnicalIndication': 'other-technical',
+                   }
+    
+    musicXMLTechnicalName = None
+    for c in articulationMark.classes:
+        # go in order of classes to get most specific first...
+        if c in mappingList:
+            musicXMLTechnicalName = mappingList[c]
+            break
+    if musicXMLTechnicalName is None:
+        raise ToMxObjectsException("Cannot translate technical indication %s to musicxml" % articulationMark)
+    mxTechnicalMark = mxObjects.TechnicalMark(musicXMLTechnicalName)
+    mxTechnicalMark.set('placement', articulationMark.placement)
+    #mxArticulations.append(mxArticulationMark)
+    return mxTechnicalMark
 
 
 def expressionToMx(orn):

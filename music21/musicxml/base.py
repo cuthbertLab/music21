@@ -60,7 +60,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 6, 4) 
+VERSION_MINIMUM = (1, 0, 0) 
 
 
 # new objects to add: octave-shift, in direction-type
@@ -2158,7 +2158,8 @@ class Notations(MusicXMLElementList):
         return post
 
     def getArticulations(self):
-        '''A quick way to get all articulations objects; there may be more than 
+        '''
+        A quick way to get all articulations objects; there may be more than 
         one.
 
         Returns a list of ArticulationMark objects
@@ -2169,6 +2170,21 @@ class Notations(MusicXMLElementList):
                 # note: articulation marks are being stripped out
                 post += part.componentList
         return post
+
+    def getTechnical(self):
+        '''
+        A quick way to get all technical objects; there may be more than 
+        one.
+
+        Returns a list of TechnicalMark objects
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Technical):
+                # note: articulation marks are being stripped out
+                post += part.componentList
+        return post
+
 
     def getFermatas(self):
         '''
@@ -2295,6 +2311,11 @@ class Articulations(MusicXMLElementList):
         return c
 
 class Technical(MusicXMLElementList):
+    '''
+    Class for the <technical> musicxml mark which contains
+    things like <up-bow> etc. objects
+    '''
+    
     def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElementList.__init__(self)
         self._tag = 'technical'
@@ -2320,7 +2341,8 @@ class DynamicMark(MusicXMLElement):
 
 
 class ArticulationMark(MusicXMLElement):
-    '''This is not an XML object, but a container for all XML articulation tags.
+    '''
+    This is not an XML object, but a container for all XML articulation tags.
     '''
     def __init__(self, tag):
         MusicXMLElement.__init__(self)
@@ -2333,7 +2355,8 @@ class ArticulationMark(MusicXMLElement):
         self.charData = None # found only in other-articulation tag
 
 class TechnicalMark(MusicXMLElement):
-    '''This is not an XML object, but a container for all XML technical tags.
+    '''
+    This is not an XML object, but a container for all XML technical tags.
     '''
     def __init__(self, tag):
         MusicXMLElement.__init__(self)
@@ -2342,6 +2365,7 @@ class TechnicalMark(MusicXMLElement):
         self._tag = tag
         # attributes
         self._attr['type'] = None
+        self._attr['placement'] = None
         # character data 
         self.charData = None # found in fingering, pluck, other-artic
 
@@ -3016,7 +3040,10 @@ class SystemMargins(MusicXMLElement):
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 class Handler(xml.sax.ContentHandler):
-    '''The SAX handler reads the MusicXML file and builds a corresponding MusicXMLElement object structure.'''
+    '''
+    The SAX handler reads the MusicXML file and builds a 
+    corresponding MusicXMLElement object structure.
+    '''
    
     def __init__(self, tagLib=None):
         if tagLib == None:
@@ -4562,7 +4589,13 @@ class Test(unittest.TestCase):
 
 
     def testDefaults(self):
-        for className in [Score, Work, Identification, Creator, Encoding, Software, PartList, PartGroup, ScorePart, ScoreInstrument, MIDIInstrument, Part, Measure, Attributes, Key, KeyStep, KeyAlter, KeyOctave, Transpose, Time, Clef, Direction, DirectionType, MeasureStyle, Barline, Ending, Repeat, Note, Forward, Backup, Notations, Dynamics, Articulations, Technical, Grace, Notehead, Dot, Tie, Fermata, Accidental, Slur, Tied, Beam, Lyric, Pitch, TimeModification, Tuplet]:
+        for className in [Score, Work, Identification, Creator, Encoding, Software, PartList, 
+                          PartGroup, ScorePart, ScoreInstrument, MIDIInstrument, Part, Measure, 
+                          Attributes, Key, KeyStep, KeyAlter, KeyOctave, Transpose, Time, Clef, 
+                          Direction, DirectionType, MeasureStyle, Barline, Ending, Repeat, Note, 
+                          Forward, Backup, Notations, Dynamics, Articulations, Technical, Grace, 
+                          Notehead, Dot, Tie, Fermata, Accidental, Slur, Tied, Beam, Lyric, Pitch, 
+                          TimeModification, Tuplet]:
 
         # need args
         # DynamicMark, ArticulationMark, TechnicalMark

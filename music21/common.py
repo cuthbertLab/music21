@@ -1480,7 +1480,7 @@ def getCorpusContentDirs():
     >>> fp # this test will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach', 'demos', 'essenFolksong', 'handel', 'haydn', 
     'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'ryansMammoth', 
-    'schoenberg', 'schumann', 'theoryExercises', 'trecento', 'verdi']
+    'schoenberg', 'schumann', 'schumann_clara', 'theoryExercises', 'trecento', 'verdi']
     '''
     dirName = getCorpusFilePath()
     post = []
@@ -1804,6 +1804,35 @@ def stripAccents(inputString):
     #else:
     #    return inputString
 
+def normalizeFilename(name):
+    u'''
+    take a name that might contain unicode characters, punctuation,
+    or spaces and
+    normalize it so that it is POSIX compliant (except for the limit
+    on length).
+    
+    Takes in a string or unicode string and returns a normal string.
+
+    >>> from music21 import *
+    >>> common.normalizeFilename(u'03-Niccolò all\\'lessandra.not really.xml')
+    '03-Niccolo_all_lessandra_not_really.xml'
+    '''
+    import unicodedata
+    extension = None
+    lenName = len(name)
+
+    if lenName > 5 and name[-4] == '.':
+        extension = str(name[lenName - 4:])
+        name = name[:lenName -4]
+
+    if isinstance(name, str):
+        name = unicode(name)
+            
+    name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
+    name = re.sub('[^\w-]', '_', name).strip()
+    if extension is not None:
+        name += extension
+    return name
 
 
 #-------------------------------------------------------------------------------

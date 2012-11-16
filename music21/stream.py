@@ -11464,7 +11464,12 @@ class Measure(Stream):
             tsStream = self.getTimeSignatures(searchContext=True,
                        returnDefault=False, sortByCreationTime=True)
             if len(tsStream) == 0:
-                raise StreamException('cannot determine bar duration without a time signature reference')
+                try:
+                    ts = self.bestTimeSignature()
+                except exceptions21.Music21Exception:
+                    return duration.Duration(self.highestTime)
+                
+                #raise StreamException('cannot determine bar duration without a time signature reference')
             else: # it is the first found
                 ts = tsStream[0]
         return ts.barDuration

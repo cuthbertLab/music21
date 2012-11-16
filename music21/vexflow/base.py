@@ -2268,11 +2268,17 @@ music21Voice0.addTickables(music21Voice0Notes);'''
             var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
 var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
 music21Voice0.addTickables(music21Voice0Notes);
-            var music21Voice0Beam0 = new Vex.Flow.Beam(music21Voice0Notes.slice(0,8));
+            var music21Voice0Beam0 = new Vex.Flow.Beam(music21Voice0Notes.slice(0,2));
+            var music21Voice0Beam1 = new Vex.Flow.Beam(music21Voice0Notes.slice(2,4));
+            var music21Voice0Beam2 = new Vex.Flow.Beam(music21Voice0Notes.slice(4,6));
+            var music21Voice0Beam3 = new Vex.Flow.Beam(music21Voice0Notes.slice(6,8));
             var formatter = new Vex.Flow.Formatter().joinVoices([music21Voice0]).format([music21Voice0], 500);
             music21Voice0.draw(ctx, stave);
 
             music21Voice0Beam0.setContext(ctx).draw();
+            music21Voice0Beam1.setContext(ctx).draw();
+            music21Voice0Beam2.setContext(ctx).draw();
+            music21Voice0Beam3.setContext(ctx).draw();
         });
     </script>
 </body>

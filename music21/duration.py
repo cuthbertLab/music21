@@ -803,11 +803,8 @@ class Tuplet(object):
     If only one duration, either `durationActual` or `durationNormal`, is 
     provided, both are set to the same value.
 
-
     Note that this is a duration modifier, or a generator of ratios to scale 
     quarterLength values in Duration objects.
-
-
 
     >>> from music21 import *
     >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
@@ -821,11 +818,11 @@ class Tuplet(object):
     16th
     >>> print(myTup2.tupletMultiplier())
     0.666...
-
     
     Tuplets may be frozen, in which case they become immutable. Tuplets
-    which are attached to Durations are automatically frozen
-
+    which are attached to Durations are automatically frozen.  Otherwise
+    a tuplet could change without the attached duration knowing about it,
+    which would be a real problem.
     
     >>> myTup.frozen = True
     >>> myTup.tupletActual = [3, 2]
@@ -840,6 +837,19 @@ class Tuplet(object):
     ...
     TupletException: A frozen tuplet (or one attached to a duration) is immutable
     
+
+    Note that if you want to create a note with a simple Tuplet attached to it,
+    you can just change the quarterLength of the note:
+    
+    >>> myNote = note.Note("C#4")
+    >>> myNote.quarterLength = 0.8
+    >>> myNote.duration.fullName
+    'Quarter Quintuplet (0.8QL)'
+    >>> myNote.duration.tuplets
+    (<music21.duration.Tuplet 5/4/quarter>,)
+
+
+
 
     OMIT_FROM_DOCS
     We should also have a tupletGroup spanner.

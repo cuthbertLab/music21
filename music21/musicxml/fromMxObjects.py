@@ -827,7 +827,10 @@ def mxKeyListToKeySignature(mxKeyList, inputM21 = None):
     else: # there may be more than one if we have more staffs per part
         mxKey = mxKeyList[0]
 
-    ks.sharps = int(mxKey.get('fifths'))
+    fifths = mxKey.get('fifths')
+    if fifths is None:
+        fifths = 0
+    ks.sharps = int(fifths)
     mxMode = mxKey.get('mode')
     if mxMode != None:
         ks.mode = mxMode
@@ -1355,6 +1358,74 @@ def mxFermataToFermata(mxFermata, inputM21 = None):
     if inputM21 is None:
         return fermata
 
+def mxTechnicalToArticulation(mxTechnicalMark, inputM21 = None):
+    '''
+    Convert an mxTechnicalMark to a music21.articulations.TechnicalIndication object or one
+    of its subclasses.
+
+    Example: Provided an musicxml.TechnicalMark object (not an mxTechnical object)
+    configure the music21 object.
+
+    Create both a musicxml.ArticulationMark object and a conflicting music21 object:
+            
+    >>> from music21 import *
+    >>> mxTechnicalMark = musicxml.TechnicalMark('up-bow')
+    >>> mxTechnicalMark.set('placement', 'below')
+    >>> a = articulations.DownBow()
+    >>> a.placement = 'above'
+
+    Now override the music21 object with the mxArticulationMark object's characteristics
+
+    >>> musicxml.fromMxObjects.mxTechnicalToArticulation(mxTechnicalMark, inputM21 = a)
+    >>> 'DownBow' in a.classes
+    False
+    >>> 'UpBow' in a.classes
+    True
+    >>> a.placement
+    'below'
+    '''    
+    mappingList = {'up-bow'          : articulations.UpBow,
+                   'down-bow'        : articulations.DownBow,
+                   'harmonic'        : articulations.Harmonic,
+                   'open-string'     : articulations.OpenString,
+                   'thumb-position'  : articulations.StringThumbPosition,
+                   'fingering'       : articulations.StringFingering,
+                   'pluck'           : articulations.FrettedPluck,
+                   'double-tongue'   : articulations.DoubleTongue,
+                   'triple-tongue'   : articulations.TripleTongue,
+                   'stopped'         : articulations.Stopped,
+                   'snap-pizzicato'  : articulations.SnapPizzicato,
+                   'fret'            : articulations.FretIndication,
+                   'string'          : articulations.StringIndication,
+                   'hammer-on'       : articulations.HammerOn,
+                   'pull-off'        : articulations.PullOff,
+                   'bend'            : articulations.FretBend,
+                   'tap'             : articulations.FretTap,
+                   'heel'            : articulations.OrganHeel,
+                   'toe'             : articulations.OrganToe,
+                   'fingernails'     : articulations.HarpFingerNails,
+                   'other-technical' : articulations.TechnicalIndication,
+                   }
+    mxName = mxTechnicalMark.tag
+    if mxName not in mappingList:
+        environLocal.printDebug("Cannot translate %s in %s." % (mxName, mxTechnicalMark))
+    artClass = mappingList[mxName]
+        
+    if inputM21 is None:
+        art = artClass()
+    else:
+        art = inputM21
+        art.__class__ = artClass
+        
+    try:
+        art.placement = mxTechnicalMark.get('placement')
+    except xmlnode.XMLNodeException:
+        pass
+    
+    if inputM21 is None:
+        return art
+
+
 def mxArticulationToArticulation(mxArticulationMark, inputM21 = None):
     '''
     Convert an mxArticulationMark to a music21.articulations.Articulation
@@ -1396,6 +1467,7 @@ def mxArticulationToArticulation(mxArticulationMark, inputM21 = None):
                    'caesura'         : articulations.Caesura,
                    'stress'          : articulations.Stress,
                    'unstress'        : articulations.Unstress,
+                   'other-articulation': articulations.Articulation,
                    }
     mxName = mxArticulationMark.tag
     if mxName not in mappingList:
@@ -1658,7 +1730,15 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
             articulationObj = mxArticulationToArticulation(mxObj)
             n.articulations.append(articulationObj)
 
-        # get any fermatas, store on notations
+        # get any technical marks, a list of mxTechnicalMarks, not mxTechnical
+        # they live with articulations
+        mxTechnicalMarkList = mxNotations.getTechnical()
+        for mxObj in mxTechnicalMarkList:
+            technicalObj = mxTechnicalToArticulation(mxObj)
+            n.articulations.append(technicalObj)
+
+        
+        # get any fermatas, store on expressions
         mxFermataList = mxNotations.getFermatas()
         for mxObj in mxFermataList:
             fermataObj = mxFermataToFermata(mxObj)
@@ -3299,7 +3379,7 @@ class Test(unittest.TestCase):
 
         #s.show()
 
-    def testOrnamentB(self):
+    def testOrnamentandTechnical(self):
         from music21 import corpus
 
         s = corpus.parse('opus133')
@@ -3310,6 +3390,14 @@ class Test(unittest.TestCase):
                 if 'Trill' in e.classes:
                     countTrill += 1
         self.assertEqual(countTrill, 54)
+        
+        # TODO: Get a better test... the single harmonic in the viola part, m. 482 is probably a mistake!
+        countTechnical = 0
+        for n in s.parts[2].flat.notes:
+            for a in n.articulations:
+                if 'TechnicalIndication' in a.classes:
+                    countTechnical += 1
+        self.assertEqual(countTechnical, 1)
 
 
     def testOrnamentC(self):

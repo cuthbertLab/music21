@@ -419,7 +419,7 @@ class XMLNode(object):
                 match = True
                 return getattr(self, candidate)
         if not match:
-            raise XMLNodeException('this object does not have a %s (or %s) attribute' % (name, candidate))
+            raise XMLNodeException('this object (%r) does not have a "%s" (or %s) attribute' % (self, name, candidate))
         
 
     def setDefaults(self):

@@ -438,6 +438,10 @@ class StringHarmonic(Bowing, Harmonic):
 class OpenString(Bowing):
     pass
 
+class StringIndication(Bowing):
+    pass
+
+
 class StringThumbPosition(Bowing):
     '''
     MusicXML -- thumb-position
@@ -472,6 +476,8 @@ class FretIndication(TechnicalIndication):
 class FrettedPluck(FretIndication):
     '''
     specifies plucking fingering for fretted instruments
+    
+    pluck in musicxml
     '''
     pass
 
