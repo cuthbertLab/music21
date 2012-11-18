@@ -1856,7 +1856,7 @@ class Sound(MusicXMLElement):
         self._attr['tempo'] = None # a number in bpm where beat is quarter
         self._attr['dynamics'] = None # can be a value 1 through 127
         self._attr['damper-pedal'] = None # can be yes/no
-        # when used with a pizzacto attribute, can define a midi-instrument
+        # when used with a pizzicato attribute, can define a midi-instrument
         self._attr['pizzicato'] = None # can be yes/no
 
 
@@ -1974,6 +1974,7 @@ class Note(MusicXMLElement):
         self._attr['print-object'] = None # may be yes or no
         self._attr['print-dot'] = None # may be yes or no
         self._attr['print-spacing'] = None # may be yes or no
+        self._attr['pizzicato'] = None # may be yes or no -- duplicates somewhat the sound pizzicato attribute
 
         # simple elements
         self.chord = False # boolean, default is false

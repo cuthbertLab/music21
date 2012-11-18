@@ -1224,7 +1224,12 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
 
 def articulationsAndExpressionsToMx(target, mxNoteList):
     '''
-    The `target` parameter is the music21 object.
+    The `target` parameter is the music21 object (Note, Chord, etc.) that
+    will have the articulation or expression applied.
+    
+    mxNoteList is a list of mxNotes to which these articulations or expressions 
+    apply.  Only the first of the component notes (e.g., of a chord) get the
+    articulations.
     '''
     # if we have any articulations, they only go on the first of any 
     # component notes
@@ -1237,11 +1242,13 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
                 mxArticulations = mxObjects.Articulations()
             mxArticulationMark = articulationToMxArticulation(artObj)
             mxArticulations.append(mxArticulationMark)
-        else: # TechnicalIndication
+        elif 'Pizzicato' not in artObj.classes: # TechnicalIndication that is not Pizzicato
             if mxTechnical is None:
                 mxTechnical = mxObjects.Technical()
             mxTechnicalMark = articulationToMxTechnical(artObj)
             mxTechnical.append(mxTechnicalMark)
+        else: #pizzicato:
+            mxNoteList[0].set('pizzicato', 'yes')
     
     if mxArticulations is not None and len(mxArticulations) > 0:
         mxNoteList[0].notationsObj.componentList.append(mxArticulations)

@@ -380,7 +380,7 @@ class XMLNode(object):
                 match = True
                 break
         if not match:
-            raise XMLNodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
+            raise XMLNodeException('this object (%r) does not have a "%s" (or %s) attribute' % (self, name, candidates))
         
     def get(self, name):
         '''

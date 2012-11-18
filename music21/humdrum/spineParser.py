@@ -64,6 +64,11 @@ from music21 import exceptions21
 from music21.humdrum import testFiles #, canonicalOutput
 from music21.humdrum import instruments 
 
+from music21 import environment
+_MOD = "humdrum.spineParser"
+environLocal = environment.Environment(_MOD)
+
+
 import os
                                   
 spinePathIndicators = ["*+", "*-", "*^", "*v", "*x", "*"]
@@ -1036,54 +1041,34 @@ class KernSpine(HumdrumSpine):
         currentBeamNumbers = 0
         
         for event in self.eventList:
-            eventC = event.contents
-            thisObject = None            
-            if eventC == ".":
-                pass
-            elif eventC.startswith('*'):
-                ## control processing
-                tempObject = kernTandemToObject(eventC)
-                if tempObject is not None:
-                    thisObject = tempObject
-            elif eventC.startswith('='):
-                lastContainer  = hdStringToMeasure(eventC, lastContainer)
-                thisObject = lastContainer
-
-            elif eventC.startswith('!'):
-                ## TODO: process comments
-                pass
-            elif eventC.count(' '):
-                ### multipleNotes
-                notesToProcess = eventC.split()
-                chordNotes = []
-                for noteToProcess in notesToProcess:
-                    thisNote = hdStringToNote(noteToProcess)
-                    chordNotes.append(thisNote)
-                thisObject = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
-                thisObject.duration = chordNotes[0].duration
-
-                if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
-                    for i in range(currentBeamNumbers):
-                        thisObject.beams.append('continue')
-                elif len(thisObject.beams.beamsList) > 0:
-                    if thisObject.beams.beamsList[0].type == 'stop':
-                        currentBeamNumbers = 0
-                    else:
-                        for i in range(len(thisObject.beams.beamsList)):
-                            if thisObject.beams.beamsList[i].type != 'stop':
-                                currentBeamNumbers += 1
-
-                if inTuplet is False and len(thisObject.duration.tuplets) > 0:
-                    inTuplet = True
-                    thisObject.duration.tuplets[0].type = 'start'
-                elif inTuplet is True and len(thisObject.duration.tuplets) == 0:
-                    inTuplet = False
-                    lastNote.duration.tuplets[0].type = 'stop'
-                lastNote = thisObject
-
-            else: # Note or Rest
-                thisObject = hdStringToNote(eventC)
-                if hasattr(thisObject, 'beams'):
+            # event is a SpineEvent object
+            try:
+                eventC = event.contents
+                thisObject = None            
+                if eventC == ".":
+                    pass
+                elif eventC.startswith('*'):
+                    ## control processing
+                    tempObject = kernTandemToObject(eventC)
+                    if tempObject is not None:
+                        thisObject = tempObject
+                elif eventC.startswith('='):
+                    lastContainer  = hdStringToMeasure(eventC, lastContainer)
+                    thisObject = lastContainer
+    
+                elif eventC.startswith('!'):
+                    ## TODO: process comments
+                    pass
+                elif eventC.count(' '):
+                    ### multipleNotes
+                    notesToProcess = eventC.split()
+                    chordNotes = []
+                    for noteToProcess in notesToProcess:
+                        thisNote = hdStringToNote(noteToProcess)
+                        chordNotes.append(thisNote)
+                    thisObject = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
+                    thisObject.duration = chordNotes[0].duration
+    
                     if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
                         for i in range(currentBeamNumbers):
                             thisObject.beams.append('continue')
@@ -1094,20 +1079,48 @@ class KernSpine(HumdrumSpine):
                             for i in range(len(thisObject.beams.beamsList)):
                                 if thisObject.beams.beamsList[i].type != 'stop':
                                     currentBeamNumbers += 1
-                if inTuplet is False and len(thisObject.duration.tuplets) > 0:
-                    inTuplet = True
-                    thisObject.duration.tuplets[0].type = 'start'
-                elif inTuplet is True and len(thisObject.duration.tuplets) == 0:
-                    inTuplet = False
-                    lastNote.duration.tuplets[0].type = 'stop'
-                lastNote = thisObject
-            
-            if thisObject is not None:
-                thisObject.humdrumPosition = event.position
-                thisObject.humdrumSpineId  = event.spineId                
-                thisObject.priority = event.position
-                self.stream._appendCore(thisObject)
-        
+    
+                    if inTuplet is False and len(thisObject.duration.tuplets) > 0:
+                        inTuplet = True
+                        thisObject.duration.tuplets[0].type = 'start'
+                    elif inTuplet is True and len(thisObject.duration.tuplets) == 0:
+                        inTuplet = False
+                        lastNote.duration.tuplets[0].type = 'stop'
+                    lastNote = thisObject
+    
+                else: # Note or Rest
+                    thisObject = hdStringToNote(eventC)
+                    if hasattr(thisObject, 'beams'):
+                        if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
+                            for i in range(currentBeamNumbers):
+                                thisObject.beams.append('continue')
+                        elif len(thisObject.beams.beamsList) > 0:
+                            if thisObject.beams.beamsList[0].type == 'stop':
+                                currentBeamNumbers = 0
+                            else:
+                                for i in range(len(thisObject.beams.beamsList)):
+                                    if thisObject.beams.beamsList[i].type != 'stop':
+                                        currentBeamNumbers += 1
+                    if inTuplet is False and len(thisObject.duration.tuplets) > 0:
+                        inTuplet = True
+                        thisObject.duration.tuplets[0].type = 'start'
+                    elif inTuplet is True and len(thisObject.duration.tuplets) == 0:
+                        inTuplet = False
+                        lastNote.duration.tuplets[0].type = 'stop'
+                    lastNote = thisObject
+                
+                if thisObject is not None:
+                    thisObject.humdrumPosition = event.position
+                    thisObject.humdrumSpineId  = event.spineId                
+                    thisObject.priority = event.position
+                    self.stream._appendCore(thisObject)
+            except exceptions21.Music21Exception as e:
+                import traceback
+                environLocal.warn("Error in parsing event ('%s') at position %r for spine %r: %s" % (event.contents, event.position, event.spineId, str(e)))
+                tb = traceback.format_exc()
+                environLocal.printDebug("Traceback for the exeception: \n%s" % (tb))
+                # traceback... environLocal.printDebug()
+                
         self.stream._elementsChanged()        
         ## still to be done later... move things before first measure to first measure!
 
@@ -1160,7 +1173,6 @@ class SpineEvent(object):
     '''
     A SpineEvent is an event in a HumdrumSpine or ProtoSpine.
 
-
     It's .contents property contains the contents of the spine or 
     it could be '.', in which case it means that a 
     particular event appears after the last event in a different spine.
@@ -1168,22 +1180,16 @@ class SpineEvent(object):
     at this moment in the humdrum file.  Happens if no ProtoSpine exists
     at this point in the file in this tab position.
 
-
-
     Should be initialized with its contents and position in file.
     
-    
-
     These attributes are optional but likely to be very helpful::
     
         position -- event position in the file
         protoSpineId -- ProtoSpine id (0 to N)
         spineId -- id of HumdrumSpine actually attached to (after SpinePaths are parsed)
 
-
     The `toNote()` method converts the contents into a music21 note as
     if it's kern -- useful to have in all spine types.
-    
     
     >>> from music21 import *
     >>> se1 = humdrum.spineParser.SpineEvent('EEE-8')
@@ -1195,7 +1201,6 @@ class SpineEvent(object):
     >>> n = se1.toNote()
     >>> n
     <music21.note.Note E->
-
     '''
     protoSpineId = 0
     spineId = None
@@ -1719,6 +1724,12 @@ def hdStringToNote(contents):
     0
     >>> n.duration.tuplets[0].durationNormal.dots
     2
+    
+    >>> n = humdrum.spineParser.hdStringToNote("gg#q/LL")
+    >>> n.duration
+    <music21.duration.Duration unlinked type:eighth quarterLength:0.0>
+    >>> n.isGrace
+    True
     '''
     
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
@@ -1892,12 +1903,14 @@ def hdStringToNote(contents):
     # TODO: Rewrite after music21 gracenotes are implemented
     if contents.count('q'):
         thisObject = thisObject.getGrace()
+        thisObject.duration.type = 'eighth'
     elif contents.count('Q'):
         thisObject = thisObject.getGrace()
         thisObject.duration.slash = False
+        thisObject.duration.type = 'eighth'
     elif contents.count('P'):
         thisObject = thisObject.getGrace(appogiatura=True)
-    elif  contents.count('p'):
+    elif contents.count('p'):
         pass # end appogiatura duration -- not needed in music21...
     
     # 3.2.10 Beaming
