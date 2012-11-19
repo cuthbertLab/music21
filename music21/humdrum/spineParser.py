@@ -1114,7 +1114,7 @@ class KernSpine(HumdrumSpine):
                     thisObject.humdrumSpineId  = event.spineId                
                     thisObject.priority = event.position
                     self.stream._appendCore(thisObject)
-            except exceptions21.Music21Exception as e:
+            except Exception as e:
                 import traceback
                 environLocal.warn("Error in parsing event ('%s') at position %r for spine %r: %s" % (event.contents, event.position, event.spineId, str(e)))
                 tb = traceback.format_exc()
@@ -1411,7 +1411,7 @@ class SpineCollection(object):
         subspines and put them in their proper location
         '''
         for thisSpine in self.spines:
-            removeSpines = []
+            #removeSpines = []
             if thisSpine.parentSpine is not None:
                 continue
             if len(thisSpine.childSpines) == 0:
@@ -1429,23 +1429,8 @@ class SpineCollection(object):
                         if lastHumdrumPosition > i or humdrumPosition < i:
                             continue
                         ## insert a subspine into this Stream at the current location
-                        newStream._elementsChanged() # update highestTime
-                        startPoint = newStream.highestTime
-                        childrenToInsert = thisSpine.childSpineInsertPoints[i]
+                        self.performSpineInsertion(thisSpine, newStream, i)                        
                         insertPoints.remove(i)
-                        voiceNumber = 0
-                        for insertSpine in childrenToInsert:
-                            removeSpines.append(insertSpine.id)
-                            voiceNumber += 1
-                            voiceStr = 'voice' + str(voiceNumber)
-                            for insertEl in insertSpine.stream._elements:
-                                if insertSpine.isFirstVoice is False and 'Measure' in insertEl.classes:
-                                    pass # only insert one measure object per spine
-                                else:
-                                    insertEl.groups.append(voiceStr)
-                                    #newStream.insert(startPoint + insertEl.offset, insertEl)
-                                    newStream._insertCore(startPoint + insertEl.offset, insertEl)
-                        newStream._elementsChanged() # call between _insertCore and _appendCore
                     lastHumdrumPosition = humdrumPosition
                 except AttributeError: # no el.humdrumPosition
                     pass
@@ -1453,10 +1438,38 @@ class SpineCollection(object):
                 #newStream.append(el)
             newStream._elementsChanged()
             thisSpine.stream = newStream
+            
+            if len(insertPoints) > 0: 
+                # some spines were not inserted because the insertion point was at the end of the parent spine 
+                # happens in some musedata conversions, such as beethoven 5, movement 1.
+                for i in insertPoints:
+                    self.performSpineInsertion(thisSpine, newStream, i)
             #for removeMe in removeSpines:
             #    #needed for some tests
             #    self.removeSpineById(removeMe)
                     
+    def performSpineInsertion(self, thisSpine, newStream, insertionPoint):
+        '''
+        Insert all the spines into newStream that should be inserted into thisSpine at insertionPoint.
+        '''
+        newStream._elementsChanged() # update highestTime
+        startPoint = newStream.highestTime
+        childrenToInsert = thisSpine.childSpineInsertPoints[insertionPoint]
+        voiceNumber = 0
+        for insertSpine in childrenToInsert:
+            #removeSpines.append(insertSpine.id)
+            voiceNumber += 1
+            voiceStr = 'voice' + str(voiceNumber)
+            for insertEl in insertSpine.stream._elements:
+                if insertSpine.isFirstVoice is False and 'Measure' in insertEl.classes:
+                    pass # only insert one measure object per spine
+                else:
+                    insertEl.groups.append(voiceStr)
+                    #newStream.insert(startPoint + insertEl.offset, insertEl)
+                    newStream._insertCore(startPoint + insertEl.offset, insertEl)
+        newStream._elementsChanged() # call between _insertCore and _appendCore
+
+        
     def reclassSpines(self):
         '''
         changes the classes of HumdrumSpines to more specific types 
@@ -2254,7 +2267,9 @@ class TestExternal(unittest.TestCase):
 if __name__ == "__main__":
     #Test().testMoveDynamics()
     import music21
-    music21.mainTest(Test)
+    #c = music21.converter.parse(r'd:\desktop\b5-new.krn')
+    #c.show()
+    music21.mainTest(Test) #, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof
