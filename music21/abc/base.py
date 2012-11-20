@@ -968,7 +968,7 @@ class ABCStaccato(ABCToken):
         
     def __repr__(self):
         return '<music21.abc.base.ABCStaccato %r>' % self.src
-#TODO: Upbows and downbows can't be translated into musicxml?    
+
 class ABCUpbow(ABCToken):
     '''
     ABCStaccato tokens "." precede a note or chord;
@@ -1664,6 +1664,9 @@ class ABCHandler(object):
             #get dynamics. skip over the open paren to avoid confusion.
             #NB: Nested crescendos are not an issue (not proper grammar).
             if (c =='!'):
+                #TODODJN: Generalize to a dictionary based on length:
+                #eg: {'crescendo(' : ABCCrescStart, etc}
+                #calculate length and skip algorithmically
                 if strSrc[i:i+12] == "!crescendo(!":
                     j = i + 12
                     self._tokens.append(ABCCrescStart(c))
@@ -1680,7 +1683,7 @@ class ABCHandler(object):
                     j = i + 13
                     self._tokens.append(ABCParenStop(c))
                     i = j
-                #TODO: We're currently skipping over all other "!" expressions
+                #NB: We're currently skipping over all other "!" expressions
                 else:
                     j = i + 1
                     while j < lastIndex:
@@ -1930,6 +1933,8 @@ class ABCHandler(object):
                 lastTieToken = t
                 
             if isinstance(t, ABCStaccato):
+                #TODODJN: Assumes that tNext is a note or chord
+                #TODODJN: Create list of "things to go on the next note"
                 tNext.artic = "staccato"
                 
             if isinstance(t, ABCUpbow):
@@ -1963,9 +1968,8 @@ class ABCHandler(object):
                 if lastTieToken is not None:
                     t.tie = "stop"
                     lastTieToken = None
-                #TODO: Tokenize grace notes?
+                #TODODJN: Tokenize grace notes?
                 if self.activeGrace != 0:
-                    print "Active Grace!"
                     t.inGrace = True
                 if lastTupletToken == None:
                     pass
@@ -3030,6 +3034,8 @@ class Test(unittest.TestCase):
         ah.process(testFiles.staccTest)
         self.assertEqual(len(ah), 80)
         
+    #TODODJN: For cresc and dim, make sure proper tokens
+    #TODODJN: Make/add to testExternal so that you can have music21 output
     def testBow(self):
         from music21.abc import testFiles
         ah = ABCHandler()
