@@ -1919,6 +1919,9 @@ class Timer(object):
 class Music21CommonException(exceptions21.Music21Exception):
     pass
 
+# NB -- temp files (tempFile) etc. are in environment.py
+
+
 #-------------------------------------------------------------------------------
 class TestMock(object):
     '''A test object with attributes, methods, and properties

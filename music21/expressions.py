@@ -839,7 +839,7 @@ class Fermata(Expression):
          :width: 193
     '''
     shape = "normal"
-    type  = "upright" # for musicmxml, can be upright or inverted
+    type  = "inverted" # for musicmxml, can be upright or inverted, but Finale's idea of an inverted fermata is ass backwards.
     tieAttach = 'last'
 
 #-------------------------------------------------------------------------------

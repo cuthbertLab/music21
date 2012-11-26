@@ -18,6 +18,7 @@ fakeTest = re.sub("\s\s\s\s+", "\t", \
 16d-      -gi-          .          .          .
 =1        =1            =1         =1         =1
 *         *             *^         *          *
+! spine comment    .    .          .          .
 8d-       -ja-          8A#/       4GG#^\ 4D#^\    4g#^/    p
 16A-      -go          16B#/L      .               .        .
 16A-      ic-          16c#/J      .               .        .

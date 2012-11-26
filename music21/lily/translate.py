@@ -205,8 +205,7 @@ class LilypondConverter(object):
              #})
         \header { } 
         \score  {
-              << \new Staff  = ... { \stopStaff }
-               \context Staff  = ... { \startStaff c' 4  
+              << \new Staff  = ... { c' 4  
                       }
                 >>
           }
@@ -317,7 +316,10 @@ class LilypondConverter(object):
         lpVersionScheme = self.versionScheme        
         lpColorScheme = lyo.LyEmbeddedScm(self.colorDef)
         lpHeader = lyo.LyLilypondHeader()
+
+        # here's the heavy work...
         lpScoreBlock = self.lyScoreBlockFromScore(scoreIn)
+        
         lpOutputDefHead = lyo.LyOutputDefHead(defType = 'paper')
         lpOutputDefBody = lyo.LyOutputDefBody(outputDefHead = lpOutputDefHead)
         lpOutputDef = lyo.LyOutputDef(outputDefBody = lpOutputDefBody)
@@ -326,8 +328,6 @@ class LilypondConverter(object):
         
         if scoreIn.metadata is not None:
             self.setHeaderFromMetadata(scoreIn.metadata, lpHeader = lpHeader)
-
-        
 
         self.context.contents = contents
 
@@ -340,8 +340,12 @@ class LilypondConverter(object):
 
         # Also get the variants, and the total number of measures here and make start each staff context with { \stopStaff s1*n} where n is the number of measures.
         if hasattr(scoreIn, 'parts') and len(scoreIn.parts) > 0: # or has variants
-            lpPartsAndOssiaInit = self.lyPartsAndOssiaInitFromScore(scoreIn)
-            lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(scoreIn, scoreInit = lpPartsAndOssiaInit)
+            scoreInFlatVariants = scoreIn.flat.variants
+            if len(scoreInFlatVariants) > 0:
+                lpPartsAndOssiaInit = self.lyPartsAndOssiaInitFromScore(scoreIn)
+                lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(scoreIn, scoreInit = lpPartsAndOssiaInit)
+            else:
+                lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(scoreIn)
             lpCompositeMusic.groupedMusicList = lpGroupedMusicList
         else:
             # treat as a part...
@@ -451,23 +455,6 @@ class LilypondConverter(object):
         lpMusicList = lyo.LyMusicList()
 
         musicList = []
-
-
-        optionalContextMod = r'''
-            \with {
-                  \remove "Time_signature_engraver"
-                  alignAboveContext = #"%s"
-                  fontSize = #-3
-                  \override StaffSymbol #'staff-space = #(magstep -3)
-                  \override StaffSymbol #'thickness = #(magstep -3)
-                  \override TupletBracket #'bracket-visibility = ##f
-                  \override TupletNumber #'stencil = ##f
-                  \override Clef #'transparent = ##t
-                  \override OctavateEight #'transparent = ##t
-                  \consists "Default_bar_line_engraver"
-                }
-        '''
-
         lpMusic = '{ \stopStaff %s}'
 
         for p in scoreIn.parts:
@@ -478,12 +465,6 @@ class LilypondConverter(object):
                                                             optionalId = partId,
                                                             simpleString = 'Staff',
                                                             music = lpMusic % spacerDuration)
-            #lpPrefixCompositeMusicPart.optionalContextMod = r'''
-            #    \with {
-            #          \consists "Default_bar_line_engraver"
-            #    }
-            #'''
-
             musicList.append(lpPrefixCompositeMusicPart)  
             
             variantsAddedForPart = []
@@ -497,8 +478,20 @@ class LilypondConverter(object):
                                                                 optionalId = variantId,
                                                                 simpleString = 'Staff',
                                                                 music = lpMusic % spacerDuration)
-                    
-                    lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod % partIdText
+
+                    contextModList = [r'\remove "Time_signature_engraver"',
+                                      r'alignAboveContext = #"%s"' % partIdText,
+                                      r'fontSize = #-3',
+                                      r"\override StaffSymbol #'staff-space = #(magstep -3)",
+                                      r"\override StaffSymbol #'thickness = #(magstep -3)",
+                                      r"\override TupletBracket #'bracket-visibility = ##f",
+                                      r"\override TupletNumber #'stencil = ##f",
+                                      r"\override Clef #'transparent = ##t",
+                                      r"\override OctavateEight #'transparent = ##t",
+                                      r'\consists "Default_bar_line_engraver"',
+                                      ]
+                    optionalContextMod = lyo.LyContextModification(contextModList)                    
+                    lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod 
                     musicList.append(lpPrefixCompositeMusicVariant)
 
         lpMusicList.contents = musicList
@@ -555,6 +548,9 @@ class LilypondConverter(object):
 
     def lyGroupedMusicListFromScoreWithParts(self, scoreIn, scoreInit = None):
         r'''
+        
+        
+        More complex example showing how the score can be set up with ossia parts...
         
         >>> from music21 import *
         >>> lpc = lily.translate.LilypondConverter()
@@ -779,12 +775,17 @@ class LilypondConverter(object):
 
         >>> from music21 import *
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
+        >>> c.staffLines = 4
+        
         >>> lpc = lily.translate.LilypondConverter()
         >>> lyPrefixCompositeMusicOut = lpc.lyPrefixCompositeMusicFromStream(c, contextType='Staff')
         >>> lyPrefixCompositeMusicOut 
         <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
         >>> print lyPrefixCompositeMusicOut
-        \new Staff = ...{ \time 3/4
+        \new Staff = ... \with {
+         \override StaffSymbol #'line-count = #4
+        }
+        { \time 3/4
            c 4  
            d 4  
            e 4  
@@ -794,6 +795,8 @@ class LilypondConverter(object):
         compositeMusicType = type
         
         optionalId = None
+        contextModList = []
+        
         c = streamIn.classes
         if contextType is None:
             if 'Part' in c:
@@ -806,8 +809,13 @@ class LilypondConverter(object):
         else:
             newContext = contextType
             optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
-        
 
+        if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
+            contextModList.append(r"\override StaffSymbol #'line-count = #%d" % streamIn.staffLines)
+            if streamIn.staffLines % 2 == 0: # even stafflines need a change...
+                pass
+
+        
         lpNewLyrics = self.lyNewLyricsFromStream(streamIn, streamId = makeLettersOnlyId(streamIn.id))
 
         lpSequentialMusic = self.lySequentialMusicFromStream(streamIn, beforeMatter = beforeMatter)
@@ -818,14 +826,15 @@ class LilypondConverter(object):
         if compositeMusicType is None:
             compositeMusicType = 'new'
 
-        if optionalId is None:
-            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = compositeMusicType,
-                                                            simpleString = newContext,
-                                                            music = lpMusic) 
+        if len(contextModList) > 0:
+            contextMod = lyo.LyContextModification(contextModList)
         else:
-            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = compositeMusicType,
+            contextMod = None
+        
+        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = compositeMusicType,
                                                             optionalId = optionalId,
                                                             simpleString = newContext,
+                                                            optionalContextMod = contextMod,
                                                             music = lpMusic)    
         return lpPrefixCompositeMusic
 
@@ -2355,8 +2364,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):
-
-
     def xtestConvertNote(self):
         n = note.Note("C5")
         n.show('lily.png')
@@ -2388,6 +2395,20 @@ class TestExternal(unittest.TestCase):
         from music21 import converter
         j = converter.parse('http://jrp.ccarh.org/cgi-bin/josquin?a=parallel&f=Jos2308-Ave_maris_stella', format='humdrum')
         j.show('lilypond')
+
+    def testStaffLines(self):
+        from music21 import stream
+        s = stream.Score()
+        p = stream.Part()
+        p.append(note.WholeNote("B4"))
+        p.staffLines = 1
+        s.insert(0, p)
+        p2 = stream.Part()
+        p2.append(note.WholeNote("B4"))
+        p2.staffLines = 7
+        s.insert(0, p2)        
+        s.show('lily.png')
+
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":

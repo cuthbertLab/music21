@@ -35,7 +35,7 @@ def newDots(show=True):
     # bach/bwv30.6
 
     # load a Bach Chorale from the music21 corpus of supplied pieces 
-    bwv281 = corpus.parseWork('bach/bwv281.xml')
+    bwv281 = corpus.parse('bach/bwv281.xml')
     
     # get just the bass part using DOM-like method calls
     bass = bwv281.getElementById('Bass')
@@ -60,7 +60,7 @@ def altDots(show=True):
         excerpt.show()
 
 
-    bwv11_6 = corpus.parseWork('bach/bwv11.6.xml')
+    bwv11_6 = corpus.parse('bach/bwv11.6.xml')
     alto = bwv11_6.getElementById('Alto')
     excerpt = alto.measures(13,20)
     music21.analysis.metrical.labelBeatDepth(excerpt)
@@ -70,7 +70,7 @@ def altDots(show=True):
     # 13-20
 
 def newDomSev(show=True):
-    op133 = corpus.parseWork('beethoven/opus133.xml') 
+    op133 = corpus.parse('beethoven/opus133.xml') 
     violin2 = op133.getElementById('2nd Violin')
     
     # an empty container for later display

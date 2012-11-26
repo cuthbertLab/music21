@@ -1278,15 +1278,15 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
 def fermataToMxFermata(fermata):
     '''
     Convert an expressions.Fermata object to a musicxml.Fermata
-    object.
+    object.  Note that the default musicxml is inverted fermatas -- those are what most of us think of as 'upright' fermatas
     
     >>> from music21 import *
     >>> fermata = expressions.Fermata()
     >>> fermata.type
-    'upright'
+    'inverted'
     >>> mxFermata = musicxml.toMxObjects.fermataToMxFermata(fermata)
     >>> mxFermata.get('type')
-    'upright'
+    'inverted'
     '''
     mxFermata = mxObjects.Fermata()
     mxFermata.set('type', fermata.type)

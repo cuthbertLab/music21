@@ -156,6 +156,7 @@ class HumdrumDataCollection(object):
         self.parseProtoSpinesAndEventCollections()
         self.spineCollection = self.createHumdrumSpines()
         self.spineCollection.createMusic21Streams()
+        self.insertGlobalEvents()
         self.parsedLines = True
 
     def parseEventListFromDataStream(self, dataStream = None):
@@ -165,10 +166,8 @@ class HumdrumDataCollection(object):
         largest number of spine events found on any line
         in the file.
         
-        
         It sets self.fileLength to the number of lines (excluding
         totally blank lines) in the file.
-        
         
         The difference between the dataStream and self.eventList
         are the following:
@@ -178,9 +177,7 @@ class HumdrumDataCollection(object):
             * !! lines become :class:`~music21.humdrum.spineParser.GlobalComment` objects
             * all other lines become :class:`~music21.humdrum.spineParser.SpineLine` objects
             
-        
         Returns eventList in addition to setting it as self.eventList.
-        
         
         >>> from music21 import *
         >>> eventString = "!!! COM: Beethoven, Ludwig van\n" + \
@@ -236,16 +233,13 @@ class HumdrumDataCollection(object):
         to get self.eventCollections, which is a list of 
         EventCollection objects, or things that happen simultaneously.
         
-        
         And, more importantly, this method slices self.eventList 
         vertically to get self.protoSpines which is a list
         of ProtoSpines, that is a vertical slice of everything that
         happens in a column, regardless of spine-path indicators.
         
-        
         EventCollection objects store global events at the position.
         ProtoSpines do not.
-        
         
         So self.eventCollections and self.protoSpines can each be
         thought of as a two-dimensional sheet of cells, but where
@@ -255,18 +249,15 @@ class HumdrumDataCollection(object):
         each cell is a SpineEvent object or None (if there's no
         data at that point).  Even '.' (continuation events) get
         translated into SpineEvent objects.
-
         
         Calls :meth:`~music21.humdrum.spineParser.parseEventListFromDataStream`
         if it hasn't already been called.
-        
 
         returns a tuple of protoSpines and eventCollections in addition to
         setting it in the calling object.
         
-                
         >>> from music21 import *
-        >>> eventString = "!!! COM: Beethoven, Ludwig van\n" + \
+        >>> eventString = "!!!COM: Beethoven, Ludwig van\n" + \
         ...               "!! Not really a piece by Beethoven\n" + \
         ...               "**kern\t**dynam\n" + \
         ...               "C4\tpp\n" + \
@@ -278,9 +269,7 @@ class HumdrumDataCollection(object):
         >>> eventCollections is hdc.eventCollections
         True
 
-
         Looking at individual slices is unlikely to tell you much.
-
 
         >>> for thisSlice in eventCollections:
         ...    print thisSlice
@@ -294,16 +283,11 @@ class HumdrumDataCollection(object):
         ...    print thisSlice
         <music21.humdrum.spineParser.ProtoSpine object at 0x...>
         <music21.humdrum.spineParser.ProtoSpine object at 0x...>
-       
-        
+               
         But looking at the individual slices is revealing:
-        
-        
+         
         >>> eventCollections[4].getAllOccurring()
-        [<music21.humdrum.spineParser.SpineEvent D8>, <music21.humdrum.spineParser.SpineEvent pp>]
-    
-       
-        
+        [<music21.humdrum.spineParser.SpineEvent D8>, <music21.humdrum.spineParser.SpineEvent pp>]        
         '''
         if self.eventList == []:
             self.parseEventListFromDataStream()
@@ -342,8 +326,6 @@ class HumdrumDataCollection(object):
                             lastEvent = returnEventCollections[i-1].events[j]
                             if lastEvent is not None:
                                 thisEventCollection.addLastSpineEvent(j, returnEventCollections[i-1].getSpineOccurring(j))
-
-                        
                     else:  ## no data here
                         thisEvent = SpineEvent(None)
                         thisEvent.position = i
@@ -351,8 +333,8 @@ class HumdrumDataCollection(object):
                         thisEventCollection.addSpineEvent(j, thisEvent)
 
                         protoSpineEventList.append(None)
-                else:  ## Global event
-                    if j == 0:
+                else:  ## Global event -- either GlobalComment or GlobalReference
+                    if j == 0: ## adds to all spines but just runs the first time.
                         thisEventCollection.addGlobalEvent(self.eventList[i])
                     thisEvent = SpineEvent(None)
                     thisEvent.position = i
@@ -373,17 +355,14 @@ class HumdrumDataCollection(object):
         and returns a :class:`~music21.humdrum.spineParser.SpineCollection` 
         object that contains HumdrumSpine() objects.
         
-        
         A HumdrumSpine object differs from a ProtoSpine in that it follows
         spinePathData -- a ProtoSpine records all data in a given tab
         position, and thus might consist of data from several
         spines that move around.  HumdrumSpines are smart enough not to
         have this limitation.
         
-
         When we check for spinePathData we look for the following spine 
         path indicators (from HumdrumDoc)::
-            
             
             *+    add a new spine (to the right of the current spine) 
             *-    terminate a current spine                           
@@ -391,8 +370,6 @@ class HumdrumDataCollection(object):
             *v    join (two or more) spines into one                 
             *x    exchange the position of two spines
             *     do nothing                                          
-        
-        
         '''
 
         
@@ -501,6 +478,12 @@ class HumdrumDataCollection(object):
                 currentSpineList = newSpineList
         
         return spineCollection
+
+    def insertGlobalEvents(self):
+        '''
+        
+        '''
+        pass
     
     def _getStream(self):
         if self.parsedLines is False:
@@ -512,7 +495,6 @@ class HumdrumDataCollection(object):
             raise HumdrumException("really? not a single spine in your data? um, not my problem! (well, maybe it is...file a bug report if you have doubled checked your data)")
         elif self.spineCollection.spines[0].stream is None:
             raise HumdrumException("okay, you got at least one spine, but it aint got a stream in it; have you thought of taking up kindergarten teaching? (just kidding, check your data or file a bug report)")
-
         else:
             masterStream = stream.Score()
             for thisSpine in self.spineCollection:
@@ -528,9 +510,7 @@ class HumdrumFile(HumdrumDataCollection):
     '''
     A HumdrumFile is a HumdrumDataCollection which takes 
     as a mandatory argument a filename to be opened and read.
-    '''
-    
-    
+    '''    
     def __init__(self, filename = None):
         if (filename is not None):
             try:
@@ -543,7 +523,6 @@ class HumdrumFile(HumdrumDataCollection):
         '''
         parseFH takes a fileHandle and returns a HumdrumCollection
         '''
-
         spineDataCollection = []
         for line in fileHandle:
             spineDataCollection.append(line)
@@ -560,7 +539,6 @@ class HumdrumLine(object):
     that is aware of its 
     position in the file.
     
-    
     See the documentation for the specific classes mentioned above
     for more details.
     '''
@@ -575,10 +553,8 @@ class SpineLine(HumdrumLine):
     contains one or more spine elements (separated by tabs)
     and not Global elements.
     
-    
     Takes in a position (line number in file, excluding blank lines) 
     and a string of contents.
-    
     
     >>> from music21 import *
     >>> hsl = humdrum.spineParser.SpineLine(
@@ -589,7 +565,6 @@ class SpineLine(HumdrumLine):
     4
     >>> hsl.spineData
     ['C4', '!local comment', '*M[4/4]', '.']
-    
     '''
     position = 0
     contents = ""
@@ -607,8 +582,7 @@ class SpineLine(HumdrumLine):
 class GlobalReference(HumdrumLine):
     r'''
     A GlobalReference is a type of HumdrumLine that contains 
-    information about the humdrum document.
-    
+    information about the humdrum document.    
     
     In humdrum it is represented by three exclamation points 
     followed by non-whitespace followed by a colon.  Examples::
@@ -624,13 +598,11 @@ class GlobalReference(HumdrumLine):
         position   line number in the humdrum file
         contents   string of contents
 
-
     And stores them as three attributes::
 
         position: as above
         code:     non-whitespace code (usually three letters)
         contents: string of contents
-
 
     >>> from music21 import *
     >>> gr = humdrum.spineParser.GlobalReference(
@@ -641,7 +613,6 @@ class GlobalReference(HumdrumLine):
     'COM'
     >>> gr.value
     'Stravinsky, Igor Fyodorovich'
-    
     
     TODO: add parsing of three-digit Kern comment codes into fuller metadata
     '''
@@ -673,18 +644,14 @@ class GlobalComment(HumdrumLine):
     A GlobalComment is a humdrum comment that pertains to all spines
     In humdrum it is represented by two exclamation points (and usually one space)
     
-    
     The GlobalComment object takes two inputs and stores them as attributes::
-    
     
         position (line number in the humdrum file)
         contents (string of contents)
         value    (contents minus !!)
 
-
     The constructor can be passed (position, contents)
     if contents begins with bangs, they are removed along with up to one space directly afterwards
-
 
     >>> from music21 import *
     >>> com1 = humdrum.spineParser.GlobalComment(
@@ -695,7 +662,6 @@ class GlobalComment(HumdrumLine):
     '!! this comment is global'
     >>> com1.value
     'this comment is global'
-
     '''
     position = 0
     contents = ""
@@ -719,7 +685,6 @@ class ProtoSpine(object):
     of a Humdrum file regardless of whether the 2nd column 
     was at some point an independent Spine
     or if it later became a split from the first spine.
-    
 
     See :meth:`~music21.humdrum.spineParser.parseProtoSpinesAndEventCollections`
     for more details on how ProtoSpine objects are created.
@@ -729,8 +694,6 @@ class ProtoSpine(object):
             eventList = []
         self.eventList = eventList
 
-
-
 ############ HUMDRUMSPINES #########################
 # Ready to be parsed...
 
@@ -739,12 +702,10 @@ class HumdrumSpine(object):
     A HumdrumSpine is a representation of a generic HumdrumSpine
     regardless of \*\*definition after spine path indicators have
     been simplified. 
-    
-    
+        
     A HumdrumSpine is a collection of events arranged vertically that have a
     connection to each other.
     Each HumdrumSpine MUST have an id (numeric or string) attached to it.
-
 
     >>> from music21 import *
     >>> SE = humdrum.spineParser.SpineEvent
@@ -756,25 +717,19 @@ class HumdrumSpine(object):
     >>> spine1.parentSpine = 3  # spine 3 is the previous spine leading to this one
     >>> spine1.childSpines = [7,8] # the spine ends by being split into spines 7 and 8
 
-
     we keep weak references to the spineCollection so that we 
     don't have circular references
-
 
     >>> spineCollection1 = humdrum.spineParser.SpineCollection()
     >>> spine1.spineCollection = spineCollection1
 
-
     The spineType property searches the EventList or parentSpine to 
     figure out the spineType
 
-           
     >>> spine1.spineType
     'kern'
-    
-    
+        
     Spines can be iterated through:
-    
     
     >>> for e in spine1:
     ...    print e
@@ -782,17 +737,14 @@ class HumdrumSpine(object):
     c,4
     d#8
     
-    
     If you'd eventually like this spine to be converted to a class
     other than :class:`~music21.stream.Stream`, pass its classname in
     as the streamClass argument:
-    
     
     >>> spine2 = humdrum.spineParser.HumdrumSpine(
     ...              streamClass = stream.Part)
     >>> spine2.stream
     <music21.stream.Part ...>
-    
     '''
     def __init__(self, id=0, eventList = None, streamClass = stream.Stream): #@ReservedAssignment
         self.id = id
@@ -836,12 +788,16 @@ class HumdrumSpine(object):
         self.eventList.append(event)
 
     def __iter__(self):
-        '''Resets the counter to 0 so that iteration is correct'''
+        '''
+        Resets the counter to 0 so that iteration is correct
+        '''
         self.iterIndex = 0
         return self
 
     def next(self):
-        '''Returns the current event and increments the iteration index.'''
+        '''
+        Returns the current event and increments the iteration index.
+        '''
         if self.iterIndex == len(self.eventList):
             raise StopIteration
         thisEvent = self.eventList[self.iterIndex]
@@ -877,7 +833,6 @@ class HumdrumSpine(object):
         else:
             return None
             
-
     def _getSpineType(self):
         '''
         searches the current and parent spineType for a search
@@ -946,7 +901,6 @@ class HumdrumSpine(object):
         
         >>> s2.measure(1).paddingLeft
         1.0
-        
         '''
         streamOut = streamIn.__class__()
         currentMeasure = stream.Measure()
@@ -1020,6 +974,8 @@ class HumdrumSpine(object):
             elif eventC.startswith('='):
                 lastContainer  = hdStringToMeasure(eventC, lastContainer)
                 thisObject = lastContainer
+            elif eventC.startswith('!'):
+                thisObject = SpineComment(eventC)
             else:
                 thisObject = base.ElementWrapper(event)
                 thisObject.humdrumPosition = event.position
@@ -1054,11 +1010,9 @@ class KernSpine(HumdrumSpine):
                         thisObject = tempObject
                 elif eventC.startswith('='):
                     lastContainer  = hdStringToMeasure(eventC, lastContainer)
-                    thisObject = lastContainer
-    
+                    thisObject = lastContainer    
                 elif eventC.startswith('!'):
-                    ## TODO: process comments
-                    pass
+                    thisObject = SpineComment(eventC)
                 elif eventC.count(' '):
                     ### multipleNotes
                     notesToProcess = eventC.split()
@@ -1079,7 +1033,6 @@ class KernSpine(HumdrumSpine):
                             for i in range(len(thisObject.beams.beamsList)):
                                 if thisObject.beams.beamsList[i].type != 'stop':
                                     currentBeamNumbers += 1
-    
                     if inTuplet is False and len(thisObject.duration.tuplets) > 0:
                         inTuplet = True
                         thisObject.duration.tuplets[0].type = 'start'
@@ -1147,8 +1100,7 @@ class DynamSpine(HumdrumSpine):
                     self.stream._appendCore(thisContainer)
                 thisContainer = hdStringToMeasure(eventC)                
             elif eventC.startswith('!'):
-                ## TODO: process comments
-                pass
+                thisObject = SpineComment(eventC)
             elif eventC.startswith('<'):
                 thisObject = dynamics.Diminuendo()
             elif eventC.startswith('>'):
@@ -1220,7 +1172,6 @@ class SpineEvent(object):
         parse the object as a \*\*kern note and return the a
         :class:`~music21.note.Note` object (or Rest, or Chord)
         
-        
         >>> from music21 import *
         >>> se = humdrum.spineParser.SpineEvent('DD#4')
         >>> n = se.toNote()
@@ -1243,7 +1194,6 @@ class SpineCollection(object):
     A SpineCollection is a set of HumdrumSpines with relationships to each 
     other and where their position attributes indicate
     simultaneous onsets.
-
 
     When you iterate over a SpineCollection, it goes from right to
     left, since that's the order that humdrum expects.
@@ -1270,15 +1220,12 @@ class SpineCollection(object):
     def addSpine(self, streamClass = stream.Part):
         '''
         creates a new spine in the collection and returns it.
-        
-        
+                
         By default, the underlying music21 class of the spine is
         :class:`~music21.stream.Part`.  This can be overridden
         by passing in a different streamClass.
         
-        
         Automatically sets the id of the Spine.
-        
         
         >>> from music21 import *
         >>> hsc = humdrum.spineParser.SpineCollection()
@@ -1294,10 +1241,7 @@ class SpineCollection(object):
         Spine: 1
         >>> newSpine2.stream
         <music21.stream.Stream ...>
-        
-        
         '''
-        
         self.newSpine = HumdrumSpine(self.nextFreeId, streamClass = streamClass)
         self.newSpine.spineCollection = self
         self.spines.append(self.newSpine)
@@ -1350,8 +1294,18 @@ class SpineCollection(object):
         raise HumdrumException("Could not find a Spine with that ID %d" % id)
 
 
-
     def createMusic21Streams(self):
+        '''
+        Create Music21 Stream objects from spineCollections by running:
+        
+            self.reclassSpines()
+            self.parseMusic21()
+            self.performInsertions()
+            self.moveObjectsToMeasures()
+            self.moveDynamicsAndLyricsToStreams()
+            self.makeVoices()
+            self.assignIds()
+        '''
         self.reclassSpines()
         self.parseMusic21()
         self.performInsertions()
@@ -1488,9 +1442,25 @@ class SpineCollection(object):
         iterates through the spines by location
         and records the offset and priority for each
         
-        NOT IMPLEMENTED
+        Returns a dictionary where each index is humdrumPosition and the value is a
+        two-element tuple where the first element is the music21 offset and the
+        second element is a list of Music21Objects at that position
         '''
-        pass
+        positionDict = {}
+        for thisSpine in self.spines:
+            if thisSpine.parentSpine == None:
+                sf = thisSpine.stream.flat
+                for el in sf:
+                    if hasattr(el, 'humdrumPosition'):
+                        if el.humdrumPosition not in positionDict:
+                            elementList = [el]
+                            valueTuple = (el.offset, elementList)
+                            positionDict[el.humdrumPosition] = valueTuple
+                        else:
+                            elementList = positionDict[el.humdrumPosition][1]
+                            elementList.append(el)
+        #print positionDict
+        return positionDict
     
     def moveObjectsToMeasures(self):
         '''
@@ -1619,20 +1589,16 @@ class EventCollection(object):
     still sounding, etc.).  The happeningEvent method gets either 
     currentEvent or lastEvent.
 
-
     These objects normally get created by 
     :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parseProtoSpinesAndEventCollections`
     so you won't need to do all the setup.
-
 
     Assume that ec1 is
          C4     pp
          
     and ec2 is:
          D4     .
-         
-
-
+    
     >>> from music21 import *
     >>> SE = humdrum.spineParser.SpineEvent
     >>> eventList1 = [SE('C4'),SE('pp')]
@@ -1646,8 +1612,6 @@ class EventCollection(object):
     2
     >>> ec2.getAllOccurring()
     [<music21.humdrum.spineParser.SpineEvent D4>, <music21.humdrum.spineParser.SpineEvent pp>]
-    
-
     '''
     def __init__(self, maxSpines = 0):
         self.events = common.defList()
@@ -1913,7 +1877,6 @@ def hdStringToNote(contents):
             thisObject.duration.appendTuplet(newTup)
                     
     # 3.2.9 Grace Notes and Groupettos
-    # TODO: Rewrite after music21 gracenotes are implemented
     if contents.count('q'):
         thisObject = thisObject.getGrace()
         thisObject.duration.type = 'eighth'
@@ -2137,7 +2100,27 @@ class MiscTandem(base.Music21Object):
         self.tandem = tandem
     def __repr__(self):
         return "<music21.humdrum.spineParser.MiscTandem %s humdrum control>" % self.tandem
-           
+
+class SpineComment(base.Music21Object):
+    '''
+    A Music21Object that represents a comment in a single spine.
+    
+    >>> from music21 import *
+    >>> sc = humdrum.spineParser.SpineComment('! this is a spine comment')
+    >>> sc
+    <music21.humdrum.spineParser.SpineComment "this is a spine comment">
+    >>> sc.comment
+    'this is a spine comment'
+    '''
+    
+    def __init__(self, comment = ""):
+        base.Music21Object.__init__(self)
+        commentPart = re.sub('^\!+\s?','', comment)
+        self.comment = commentPart
+        
+    def __repr__(self):
+        return '<music21.humdrum.spineParser.SpineComment "%s">' % self.comment
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -2253,6 +2236,15 @@ class Test(unittest.TestCase):
         #hf1.parseLines()
         #hf1.spineCollection.moveDynamicsAndLyricsToStreams()        
         unused_s = hf1.stream #.show()
+
+    def testSpineComments(self):
+        hf1 = HumdrumDataCollection(testFiles.fakeTest)
+        s = hf1.stream #.show()
+        p = s.parts[2] # last part has a comment
+        comments = []
+        for c in p.flat.getElementsByClass('SpineComment'):
+            comments.append(c.comment)
+        self.assertIn('spine comment', comments)
 
 class TestExternal(unittest.TestCase):
 

@@ -11844,6 +11844,7 @@ class Part(Stream):
 
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
+        self.staffLines = 5
 
     def makeAccidentals(self, alteredPitches = None, 
          cautionaryPitchClass=True,

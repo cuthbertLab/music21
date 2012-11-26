@@ -215,7 +215,10 @@ class LyObject(object):
         return c
 
     def encloseCurly(self, arg):
-        if arg is not None:
+        if isinstance(arg, list):
+            strArg = self.newlineIndent.join(arg)
+            return ''.join([' { ', self.newlineIndent, strArg, self.newlineIndent, ' } ', self.newlineIndent])
+        elif arg is not None:
             return ''.join([' { ', self.newlineIndent, str(arg), self.newlineIndent, ' } ', self.newlineIndent])
         else:
             return ' { } '
