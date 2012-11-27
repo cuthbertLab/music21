@@ -220,15 +220,24 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         n.tie = tie.Tie(t.tie)
                 for span in t.applicableSpanners:
                     span.addSpannedElements(n)
-                    
-                if t.artic is not None:
-                    n.articulations = []
-                    if t.artic == "staccato":
+                if t.inGrace:
+                    n = n.getGrace()
+                
+                n.articulations = []    
+                while len(t.artic) > 0:
+                    tmp = t.artic.pop()
+                    if tmp == "staccato":
                         n.articulations.append(articulations.Staccato())
-                    if t.artic == "upbow":
+                    if tmp == "upbow":
                         n.articulations.append(articulations.UpBow())
-                    if t.artic == "downbow":
+                    if tmp == "downbow":
                         n.articulations.append(articulations.DownBow())
+                    if tmp == "accent":
+                        n.articulations.append(articulations.Accent())
+                    if tmp == "strongaccent":
+                        n.articulations.append(articulations.StrongAccent())
+                    if tmp == "tenuto":
+                        n.articulations.append(articulations.Tenuto())
                 
                 dst._appendCore(n)
             elif isinstance(t, abcModule.ABCSlurStart):

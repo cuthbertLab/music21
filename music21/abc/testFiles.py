@@ -436,8 +436,26 @@ T: Staccato test, plus bowing articulations
 M: 2/4
 L: 1/16
 K: Edor
-B,2|!diminuendo(!.E^D.E-E!diminuendo)! ((3.G.F.G)BvA)|E^DEF (3(G-GG))BuA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
+B,2|!diminuendo(!.E^D.E-E!diminuendo)! ((3.G.F.G)BvA)|E^DEF (3(G-GG))BuA|(E(^DuE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
 """
+
+accTest = """
+X: 979
+T: Staccato test, plus accents and tenuto marks
+M: 2/4
+L: 1/16
+K: Edor
+B,2|!diminuendo(!.E^D.E-E!diminuendo)! ((3.G.F.KG)BA)|E^DMEF (3(G-GG))BkMA|(E(^DE)F) (3(kGKF)G)A-A|(E^DEF (3(GFG)))BA|G6
+"""
+graceTest = """
+X: 979
+T: Slur test, plus grace notes
+M: 2/4
+L: 1/16
+K: Edor
+B,2|{E^DEE} E^DEE ((3GFG)BA)|E^DEF {CDEFGAB}(3(GFG))BA|(E(^DE)F) (3(GF)G)BA|(E^DEF (3(GFG)))BA|G6
+"""
+
 
 testPrimitive = """
 M:4/4

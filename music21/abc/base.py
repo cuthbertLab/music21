@@ -993,7 +993,58 @@ class ABCDownbow(ABCToken):
     def __repr__(self):
         return '<music21.abc.base.ABCDownbow %r>' % self.src
     
-                
+class ABCAccent(ABCToken):
+    '''
+    ABCAccent tokens "K" precede a note or chord;
+    they are a property of that note/chord.
+    These appear as ">" in the output.
+    '''
+    
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCAccent %r>' % self.src 
+    
+class ABCStraccent(ABCToken):
+    '''
+    ABCStraccent tokens "k" precede a note or chord;
+    they are a property of that note/chord.
+    These appear as "^" in the output.
+    '''
+    
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCStraccent %r>' % self.src
+    
+class ABCTenuto(ABCToken):
+    '''
+    ABCTenuto tokens "M" precede a note or chord;
+    they are a property of that note/chord.
+    '''
+    
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCTenuto %r>' % self.src
+    
+class ABCGraceStart(ABCToken):
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCGraceStart %r>' % self.src
+    
+class ABCGraceStop(ABCToken):
+    def __init(self, src):
+        ABCToken.__init__(self, src)
+        
+    def __repr__(self):
+        return '<music21.abc.base.ABCGraceStop %r>' % self.src    
+   
         
 class ABCBrokenRhythmMarker(ABCToken):
     # given a logical unit, create an object
@@ -1025,7 +1076,7 @@ class ABCNote(ABCToken):
     General usage requires multi-pass processing. After being tokenized, 
     each ABCNote needs a number of attributes updates. Attributes to 
     be updated after tokenizing, and based on the linear sequence of 
-    tokens: `inBar`, `inBeam` (not used), `inGrace` (not used), 
+    tokens: `inBar`, `inBeam` (not used), `inGrace`, 
     `activeDefaultQuarterLength`, `brokenRhythmMarker`, and 
     `activeKeySignature`.  
 
@@ -1064,7 +1115,7 @@ class ABCNote(ABCToken):
         self.tie = None
         
         # store articulations if active
-        self.artic = None
+        self.artic = []
         
         
 
@@ -1438,7 +1489,6 @@ class ABCHandler(object):
         self._tokens = []
         self.activeParens = []
         self.activeSpanners = []
-        self.activeGrace = 0
 
 
     def _getLinearContext(self, strSrc, i):
@@ -1664,33 +1714,23 @@ class ABCHandler(object):
             #get dynamics. skip over the open paren to avoid confusion.
             #NB: Nested crescendos are not an issue (not proper grammar).
             if (c =='!'):
-                #TODODJN: Generalize to a dictionary based on length:
-                #eg: {'crescendo(' : ABCCrescStart, etc}
-                #calculate length and skip algorithmically
-                if strSrc[i:i+12] == "!crescendo(!":
-                    j = i + 12
-                    self._tokens.append(ABCCrescStart(c))
-                    i = j
-                elif strSrc[i:i+12] == "!crescendo)!":
-                    j = i + 12
-                    self._tokens.append(ABCParenStop(c))
-                    i = j
-                elif strSrc[i:i+13] == "!diminuendo(!":
-                    j = i + 13
-                    self._tokens.append(ABCDimStart(c))
-                    i = j
-                elif strSrc[i:i+13] == "!diminuendo)!":
-                    j = i + 13
-                    self._tokens.append(ABCParenStop(c))
-                    i = j
-                #NB: We're currently skipping over all other "!" expressions
-                else:
-                    j = i + 1
-                    while j < lastIndex:
-                        j += 1
-                        if strSrc[j] == "!":
+                dict = {'!crescendo(!': ABCCrescStart(c),
+                        '!crescendo)!': ABCParenStop(c),
+                        '!diminuendo(!': ABCDimStart(c),
+                        '!diminuendo)!': ABCParenStop(c)
+                        }
+                j = i + 1
+                while j < i + 20: #a reasonable upper bound
+                    if strSrc[j] == "!":
+                        if strSrc[i:j+1] in dict:
+                            self._tokens.append(dict[strSrc[i:j+1]])
+                            i = j + 1
                             break
-                    i = j + 1
+                        #NB: We're currently skipping over all other "!" expressions
+                        else:
+                            i = j + 1
+                            break
+                    j += 1
                 continue
 
             
@@ -1760,22 +1800,40 @@ class ABCHandler(object):
                 self._tokens.append(ABCUpbow(c))
                 i = j
                 continue
-            
+
             if (c=="{"):
                 j = i + 1
-                self.activeGrace = 1
+                self._tokens.append(ABCGraceStart(c))
                 i = j
                 continue
             
             if (c=="}"):
                 j = i + 1
-                self.activeGrace = 0
+                self._tokens.append(ABCGraceStop(c))
                 i = j
                 continue
             
             if (c=="v"):
                 j = i + 1
                 self._tokens.append(ABCDownbow(c))
+                i = j
+                continue
+            
+            if (c=="K"):
+                j = i + 1
+                self._tokens.append(ABCAccent(c))
+                i = j
+                continue
+            
+            if (c=="k"):
+                j = i + 1
+                self._tokens.append(ABCStraccent(c))
+                i = j
+                continue
+            
+            if (c=="M"):
+                j = i + 1
+                self._tokens.append(ABCTenuto(c))
                 i = j
                 continue
 
@@ -1829,9 +1887,9 @@ class ABCHandler(object):
                 # v is up bow; might be: "^Segno"v which also should be dropped
                 # H is fermata
                 # . dot may be staccato, but should be attached to pitch
-                if collect in ['w', 'u', 'v', 'v.', 'h', 'H', 'vk', 'k', 
+                if collect in ['w', 'u', 'v', 'v.', 'h', 'H', 'vk', 
                     'uk', 'U', '~',
-                    '.', '=', 'V', 'v.', 'S', 's', 'i', 'I', 'ui', 'u.', 'K', 'Q', 'Hy', 'Hx', 
+                    '.', '=', 'V', 'v.', 'S', 's', 'i', 'I', 'ui', 'u.', 'Q', 'Hy', 'Hx', 
                     'r', 'm', 'M', 'n', 'N', 'o', 
                     'l', 'L', 'R',
                     'y', 'T', 't', 'x', 'Z']:
@@ -1877,6 +1935,14 @@ class ABCHandler(object):
         lastTimeSignatureObj = None # an m21 object
         lastTupletToken = None # a token obj; keeps count of usage
         lastTieToken = None
+        lastStaccToken = None
+        lastUpToken = None
+        lastDownToken = None
+        lastAccToken = None
+        lastStrAccToken = None
+        lastTenutoToken = None
+        lastGraceToken = None
+        
 
         for i in range(len(self._tokens)):
             # get context of tokens
@@ -1933,15 +1999,22 @@ class ABCHandler(object):
                 lastTieToken = t
                 
             if isinstance(t, ABCStaccato):
-                #TODODJN: Assumes that tNext is a note or chord
-                #TODODJN: Create list of "things to go on the next note"
-                tNext.artic = "staccato"
+                lastStaccToken = t
                 
             if isinstance(t, ABCUpbow):
-                tNext.artic = "upbow"
+                lastUpToken = t
                 
             if isinstance(t, ABCDownbow):
-                tNext.artic = "downbow"
+                lastDownToken = t
+                
+            if isinstance(t, ABCAccent):
+                lastAccToken = t
+                
+            if isinstance(t, ABCStraccent):
+                lastStrAccToken = t
+                
+            if isinstance(t, ABCTenuto):
+                lastTenutoToken = t
                 
                 
                 
@@ -1954,6 +2027,12 @@ class ABCHandler(object):
                 t.fillDim()
                 self.activeSpanners.append(t.dimObj)
                 self.activeParens.append("Diminuendo")
+                
+            if isinstance(t, ABCGraceStart):
+                lastGraceToken = t
+                
+            if isinstance(t, ABCGraceStop):
+                lastGraceToken = None
                     
                 
             
@@ -1968,8 +2047,25 @@ class ABCHandler(object):
                 if lastTieToken is not None:
                     t.tie = "stop"
                     lastTieToken = None
-                #TODODJN: Tokenize grace notes?
-                if self.activeGrace != 0:
+                if lastStaccToken is not None:
+                    t.artic.append("staccato")
+                    lastStaccToken = None
+                if lastUpToken is not None:
+                    t.artic.append("upbow")
+                    lastUpToken = None
+                if lastDownToken is not None:
+                    t.artic.append("downbow")
+                    lastDownToken = None
+                if lastAccToken is not None:
+                    t.artic.append("accent")
+                    lastAccToken = None
+                if lastStrAccToken is not None:
+                    t.artic.append("strongaccent")
+                    lastStrAccToken = None
+                if lastTenutoToken is not None:
+                    t.artic.append("tenuto")
+                    lastTenutoToken = None
+                if lastGraceToken is not None:
                     t.inGrace = True
                 if lastTupletToken == None:
                     pass
@@ -2685,7 +2781,7 @@ class Test(unittest.TestCase):
         from music21.abc import testFiles
 
         for (tf, countTokens, noteTokens, chrodTokens) in [
-            (testFiles.fyrareprisarn, 239, 152, 0), 
+            (testFiles.fyrareprisarn, 241, 152, 0), 
             (testFiles.mysteryReel, 192, 153, 0), 
             (testFiles.aleIsDear, 291, 206, 32),
             (testFiles.testPrimitive, 100, 75, 2),
@@ -3021,12 +3117,27 @@ class Test(unittest.TestCase):
         ah = ABCHandler()
         ah.process(testFiles.crescTest)
         self.assertEqual(len(ah), 75)
+        tokens = ah._tokens
+        i = 0
+        for t in tokens:
+            if isinstance(t, ABCCrescStart):
+                i += 1
+        self.assertEqual(i, 1)
         
+    #TODODJN: Make/add to testExternal so that you can have music21 output?
+    #Is a new module necessary? Or can I just import translate?
+    
     def testDim(self):
         from music21.abc import testFiles
         ah = ABCHandler()
         ah.process(testFiles.dimTest)
         self.assertEqual(len(ah), 75)
+        tokens = ah._tokens
+        i = 0
+        for t in tokens:
+            if isinstance(t, ABCDimStart):
+                i += 1
+        self.assertEqual(i, 1)
         
     def testStacc(self):
         from music21.abc import testFiles
@@ -3034,13 +3145,48 @@ class Test(unittest.TestCase):
         ah.process(testFiles.staccTest)
         self.assertEqual(len(ah), 80)
         
-    #TODODJN: For cresc and dim, make sure proper tokens
-    #TODODJN: Make/add to testExternal so that you can have music21 output
     def testBow(self):
         from music21.abc import testFiles
         ah = ABCHandler()
         ah.process(testFiles.bowTest)
-        self.assertEqual(len(ah), 82)
+        self.assertEqual(len(ah), 83)
+        tokens = ah._tokens
+        i = 0
+        j = 0
+        for t in tokens:
+            if isinstance(t,ABCUpbow):
+                i += 1
+            elif isinstance(t, ABCDownbow):
+                j += 1
+        self.assertEqual(i, 2)
+        self.assertEqual(j, 1)
+        
+    def testAcc(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.accTest)
+        self.assertEqual(len(ah), 86)
+        tokens = ah._tokens
+        i = 0
+        j = 0
+        k = 0
+        for t in tokens:
+            if isinstance(t,ABCAccent):
+                i += 1
+            elif isinstance(t, ABCStraccent):
+                j += 1
+            elif isinstance(t, ABCTenuto):
+                k += 1
+        self.assertEqual(i, 2)
+        self.assertEqual(j, 2)
+        self.assertEqual(k, 2)
+        
+    def testGrace(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.graceTest)
+        self.assertEqual(len(ah), 85)
+        
         
 
 #-------------------------------------------------------------------------------
