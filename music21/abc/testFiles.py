@@ -456,6 +456,14 @@ K: Edor
 B,2|{E^DEE} E^DEE ((3GFG)BA)|E^DEF {CDEFGAB}(3(GFG))BA|(E(^DE)F) (3(GF)G)BA|(E^DEF (3(GFG)))BA|G6
 """
 
+guineapigTest = """
+X: 979
+T: Guinea Pig
+M: 2/4
+L: 1/16
+K: Edor
+B,2|!diminuendo(!KE^DkK.uvME-E!diminuendo)! !GARBAGE! {CDEFGAB} ((3.G.FG){BA}BA)|{E^DMEF} E^DMEF(3(G-GG))BA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
+"""
 
 testPrimitive = """
 M:4/4

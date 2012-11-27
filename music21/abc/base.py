@@ -1714,16 +1714,18 @@ class ABCHandler(object):
             #get dynamics. skip over the open paren to avoid confusion.
             #NB: Nested crescendos are not an issue (not proper grammar).
             if (c =='!'):
-                dict = {'!crescendo(!': ABCCrescStart(c),
-                        '!crescendo)!': ABCParenStop(c),
-                        '!diminuendo(!': ABCDimStart(c),
-                        '!diminuendo)!': ABCParenStop(c)
+                exclaimDict = {'!crescendo(!': ABCCrescStart,
+                        '!crescendo)!': ABCParenStop,
+                        '!diminuendo(!': ABCDimStart,
+                        '!diminuendo)!': ABCParenStop,
                         }
                 j = i + 1
                 while j < i + 20: #a reasonable upper bound
                     if strSrc[j] == "!":
-                        if strSrc[i:j+1] in dict:
-                            self._tokens.append(dict[strSrc[i:j+1]])
+                        if strSrc[i:j+1] in exclaimDict:
+                            exclaimClass = exclaimDict[strSrc[i:j+1]]
+                            exclaimObject = exclaimClass(c)
+                            self._tokens.append(exclaimObject)
                             i = j + 1
                             break
                         #NB: We're currently skipping over all other "!" expressions
@@ -3123,10 +3125,7 @@ class Test(unittest.TestCase):
             if isinstance(t, ABCCrescStart):
                 i += 1
         self.assertEqual(i, 1)
-        
-    #TODODJN: Make/add to testExternal so that you can have music21 output?
-    #Is a new module necessary? Or can I just import translate?
-    
+            
     def testDim(self):
         from music21.abc import testFiles
         ah = ABCHandler()
@@ -3186,6 +3185,12 @@ class Test(unittest.TestCase):
         ah = ABCHandler()
         ah.process(testFiles.graceTest)
         self.assertEqual(len(ah), 85)
+        
+    def testGuineapig(self):
+        from music21.abc import testFiles
+        ah = ABCHandler()
+        ah.process(testFiles.guineapigTest)
+        self.assertEqual(len(ah), 105)
         
         
 
