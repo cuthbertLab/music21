@@ -123,6 +123,7 @@ class HumdrumDataCollection(object):
         elif isinstance(dataStream, basestring):
             dataStream = dataStream.splitlines()
         self.dataStream = dataStream
+        self._storedStream = None
         try:
             self.parseLines(self.dataStream)
         except IOError:
@@ -156,8 +157,8 @@ class HumdrumDataCollection(object):
         self.parseProtoSpinesAndEventCollections()
         self.spineCollection = self.createHumdrumSpines()
         self.spineCollection.createMusic21Streams()
-        self.insertGlobalEvents()
         self.parsedLines = True
+        self.insertGlobalEvents()
 
     def parseEventListFromDataStream(self, dataStream = None):
         r'''
@@ -173,8 +174,8 @@ class HumdrumDataCollection(object):
         are the following:
         
             * Blank lines are skipped.
-            * !!! lines become :class:`~music21.humdrum.spineParser.GlobalReference` objects
-            * !! lines become :class:`~music21.humdrum.spineParser.GlobalComment` objects
+            * !!! lines become :class:`~music21.humdrum.spineParser.GlobalReferenceLine` objects
+            * !! lines become :class:`~music21.humdrum.spineParser.GlobalCommentLine` objects
             * all other lines become :class:`~music21.humdrum.spineParser.SpineLine` objects
             
         Returns eventList in addition to setting it as self.eventList.
@@ -191,8 +192,8 @@ class HumdrumDataCollection(object):
         True
         >>> for e in eList:
         ...     print e
-        <music21.humdrum.spineParser.GlobalReference object at 0x...>
-        <music21.humdrum.spineParser.GlobalComment object at 0x...>
+        <music21.humdrum.spineParser.GlobalReferenceLine object at 0x...>
+        <music21.humdrum.spineParser.GlobalCommentLine object at 0x...>
         <music21.humdrum.spineParser.SpineLine object at 0x...>
         <music21.humdrum.spineParser.SpineLine object at 0x...>
         <music21.humdrum.spineParser.SpineLine object at 0x...>
@@ -214,9 +215,9 @@ class HumdrumDataCollection(object):
             if line == "":
                 continue # technically forbidden by Humdrum but the source of so many errors!
             elif re.match('\!\!\!', line):
-                self.eventList.append(GlobalReference(self.parsePositionInStream, line))
+                self.eventList.append(GlobalReferenceLine(self.parsePositionInStream, line))
             elif re.match('\!\!', line): ## find global comments at the top of the line
-                self.eventList.append(GlobalComment(self.parsePositionInStream, line))
+                self.eventList.append(GlobalCommentLine(self.parsePositionInStream, line))
             else:
                 thisLine = SpineLine(self.parsePositionInStream, line)
                 if thisLine.numSpines > self.maxSpines:
@@ -333,7 +334,7 @@ class HumdrumDataCollection(object):
                         thisEventCollection.addSpineEvent(j, thisEvent)
 
                         protoSpineEventList.append(None)
-                else:  ## Global event -- either GlobalComment or GlobalReference
+                else:  ## Global event -- either GlobalCommentLine or GlobalReferenceLine
                     if j == 0: ## adds to all spines but just runs the first time.
                         thisEventCollection.addGlobalEvent(self.eventList[i])
                     thisEvent = SpineEvent(None)
@@ -481,11 +482,61 @@ class HumdrumDataCollection(object):
 
     def insertGlobalEvents(self):
         '''
+        Insert the Global Events (GlobalReferenceLines and GlobalCommentLines) into an appropriate
+        place in the outer Stream.
         
+        
+        Run after self.spineCollection.createMusic21Streams().  Is run automatically by self.parseLines().
+        uses self.spineCollection.getOffsetsAndPrioritiesByPosition()
         '''
-        pass
+        if hasattr(self, 'globalEventsInserted') and self.globalEventsInserted is True:
+            return
+        self.globalEventsInserted = True
+        positionDict = self.spineCollection.getOffsetsAndPrioritiesByPosition()
+        eventList = self.eventList
+        maxEventList = len(eventList)
+        numberOfGlobalEventsInARow = 0
+        insertList = []
+        appendList = []
+        
+        for i, event in enumerate(eventList):
+            if event.isSpineLine is False:
+                numberOfGlobalEventsInARow += 1
+                insertOffset = None
+                insertPriority = 0
+                for j in range(i+1, maxEventList):
+                    if j in positionDict:
+                        insertOffset = positionDict[j][0]
+                        # hopefully not more than 20 events in a row...
+                        insertPriority = positionDict[j][1][0].priority - 40 + numberOfGlobalEventsInARow
+                        break
+                if event.isReference is True:
+                    # TODO: Fix GlobalReference
+                    el = GlobalReference(event.code, event.value)
+                else:
+                    el = GlobalComment(event.value)
+                el.priority = insertPriority
+                if insertOffset is None:
+                    appendList.append(el)
+                else:
+                    insertTuple = (insertOffset, el)
+                    insertList.append(insertTuple)
+                #self.stream.insert(insertOffset, el)
+            else:
+                numberOfGlobalEventsInARow = 0
+        
+        for offset, el in insertList:
+            self.stream._insertCore(offset, el)
+        if len(insertList) > 0:
+            self.stream._elementsChanged()
+        for el in appendList:
+            self.stream._appendCore(el)
+        if len(appendList) > 0:
+            self.stream._elementsChanged()
     
     def _getStream(self):
+        if self._storedStream is not None:
+            return self._storedStream
         if self.parsedLines is False:
             self.parseLines()
 
@@ -502,6 +553,7 @@ class HumdrumDataCollection(object):
             for thisSpine in self.spineCollection:
                 if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
                     masterStream.insert(thisSpine.stream)
+            self._storedStream = masterStream
             return masterStream
 
     stream = property(_getStream)
@@ -512,6 +564,7 @@ class HumdrumFile(HumdrumDataCollection):
     as a mandatory argument a filename to be opened and read.
     '''    
     def __init__(self, filename = None):
+        self._storedStream = None
         if (filename is not None):
             try:
                 humFH = open(filename)
@@ -532,8 +585,8 @@ class HumdrumLine(object):
     '''
     HumdrumLine is a dummy class for subclassing 
     :class:`~music21.humdrum.spineParser.SpineLine`, 
-    :class:`~music21.humdrum.spineParser.GlobalComment`, and 
-    :class:`~music21.humdrum.spineParser.GlobalReference` classes
+    :class:`~music21.humdrum.spineParser.GlobalCommentLine`, and 
+    :class:`~music21.humdrum.spineParser.GlobalReferenceLine` classes
     all of which represent one horizontal line of 
     text in a :class:`~music21.humdrum.spineParser.HumdrumDataCollection` 
     that is aware of its 
@@ -579,9 +632,9 @@ class SpineLine(HumdrumLine):
         self.contents = contents
         self.spineData = returnList
 
-class GlobalReference(HumdrumLine):
+class GlobalReferenceLine(HumdrumLine):
     r'''
-    A GlobalReference is a type of HumdrumLine that contains 
+    A GlobalReferenceLine is a type of HumdrumLine that contains 
     information about the humdrum document.    
     
     In humdrum it is represented by three exclamation points 
@@ -593,7 +646,7 @@ class GlobalReference(HumdrumLine):
         !!!OPT@@RUS: Vesna svyashchennaya
         !!!OPT@FRE: Le sacre du printemps
 
-    The GlobalReference object takes two inputs::
+    The GlobalReferenceLine object takes two inputs::
 
         position   line number in the humdrum file
         contents   string of contents
@@ -602,10 +655,10 @@ class GlobalReference(HumdrumLine):
 
         position: as above
         code:     non-whitespace code (usually three letters)
-        contents: string of contents
+        value:    its value
 
     >>> from music21 import *
-    >>> gr = humdrum.spineParser.GlobalReference(
+    >>> gr = humdrum.spineParser.GlobalReferenceLine(
     ...        position = 20, contents = "!!!COM: Stravinsky, Igor Fyodorovich\n")
     >>> gr.position
     20
@@ -631,17 +684,17 @@ class GlobalReference(HumdrumLine):
             (code, value) = noExclaim.split(":", 1)
             value = value.strip()
             if (code is None):
-                raise HumdrumException("GlobalReference (!!!) found without a code listed; this is probably a problem! %s " % contents)
+                raise HumdrumException("GlobalReferenceLine (!!!) found without a code listed; this is probably a problem! %s " % contents)
         except IndexError:
-            raise HumdrumException("GlobalReference (!!!) found without a code listed; this is probably a problem! %s " % contents)
+            raise HumdrumException("GlobalReferenceLine (!!!) found without a code listed; this is probably a problem! %s " % contents)
 
         self.contents = contents
         self.code = code
         self.value = value
     
-class GlobalComment(HumdrumLine):
+class GlobalCommentLine(HumdrumLine):
     '''
-    A GlobalComment is a humdrum comment that pertains to all spines
+    A GlobalCommentLine is a humdrum comment that pertains to all spines
     In humdrum it is represented by two exclamation points (and usually one space)
     
     The GlobalComment object takes two inputs and stores them as attributes::
@@ -654,7 +707,7 @@ class GlobalComment(HumdrumLine):
     if contents begins with bangs, they are removed along with up to one space directly afterwards
 
     >>> from music21 import *
-    >>> com1 = humdrum.spineParser.GlobalComment(
+    >>> com1 = humdrum.spineParser.GlobalCommentLine(
     ...          position = 4, contents='!! this comment is global')
     >>> com1.position
     4
@@ -667,6 +720,7 @@ class GlobalComment(HumdrumLine):
     contents = ""
     value    = ""
     isGlobal = True
+    isReference = False
     isComment = True
     isSpineLine = False
     numSpines = 0
@@ -1013,6 +1067,8 @@ class KernSpine(HumdrumSpine):
                     thisObject = lastContainer    
                 elif eventC.startswith('!'):
                     thisObject = SpineComment(eventC)
+                    if thisObject.comment == "":
+                        thisObject = None
                 elif eventC.count(' '):
                     ### multipleNotes
                     notesToProcess = eventC.split()
@@ -1101,6 +1157,9 @@ class DynamSpine(HumdrumSpine):
                 thisContainer = hdStringToMeasure(eventC)                
             elif eventC.startswith('!'):
                 thisObject = SpineComment(eventC)
+                if thisObject.comment == "":
+                    thisObject = None
+
             elif eventC.startswith('<'):
                 thisObject = dynamics.Diminuendo()
             elif eventC.startswith('>'):
@@ -1828,7 +1887,7 @@ def hdStringToNote(contents):
     # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
 
-    ## SPEEDUP -- only search for rational after foundNumber...
+    ## TODO: SPEEDUP -- only search for rational after foundNumber...
     foundRational = re.search("(\d+)\%(\d+)", contents)
     foundNumber = re.search("(\d+)", contents)
     if foundRational:
@@ -2121,6 +2180,66 @@ class SpineComment(base.Music21Object):
     def __repr__(self):
         return '<music21.humdrum.spineParser.SpineComment "%s">' % self.comment
 
+class GlobalComment(base.Music21Object):
+    '''
+    A Music21Object that represents a comment for the whole score
+    
+    >>> from music21 import *
+    >>> sc = humdrum.spineParser.GlobalComment('!! this is a global comment')
+    >>> sc
+    <music21.humdrum.spineParser.GlobalComment "this is a global comment">
+    >>> sc.comment
+    'this is a global comment'
+    '''
+    
+    def __init__(self, comment = ""):
+        base.Music21Object.__init__(self)
+        commentPart = re.sub('^\!\!+\s?','', comment)
+        commentPart = commentPart.strip()
+        self.comment = commentPart
+        
+    def __repr__(self):
+        return '<music21.humdrum.spineParser.GlobalComment "%s">' % self.comment
+
+class GlobalReference(base.Music21Object):
+    '''
+    A Music21Object that represents a reference in the score
+    
+    >>> from music21 import *
+    >>> sc = humdrum.spineParser.GlobalReference('!!!REF:this is a global reference')
+    >>> sc
+    <music21.humdrum.spineParser.GlobalReference REF "this is a global reference">
+    >>> sc.code
+    'REF'
+    >>> sc.value
+    'this is a global reference'
+    
+    Alternate form
+    
+    >>> sc = humdrum.spineParser.GlobalReference('REF', 'this is a global reference')
+    >>> sc
+    <music21.humdrum.spineParser.GlobalReference REF "this is a global reference">
+    >>> sc.code
+    'REF'
+    >>> sc.value
+    'this is a global reference'
+    
+    '''
+    
+    def __init__(self, codeOrAll = "", valueOrNone = None):
+        base.Music21Object.__init__(self)
+        codeOrAll = re.sub('^\!\!\!+','', codeOrAll)
+        codeOrAll = codeOrAll.strip()
+        if valueOrNone is None and ':' in codeOrAll:
+            valueOrNone = re.sub('^.*?\:','', codeOrAll)
+            codeOrAll = re.sub('\:.*$', '', codeOrAll)
+        self.code = codeOrAll
+        self.value = valueOrNone
+        
+    def __repr__(self):
+        return '<music21.humdrum.spineParser.GlobalReference %s "%s">' % (self.code, self.value)
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -2224,7 +2343,7 @@ class Test(unittest.TestCase):
         parserPath = os.path.dirname(__file__)
         sineNominePath = parserPath + os.path.sep + 'Missa_Sine_nomine-Kyrie.krn'
         unused_myScore = converter.parse(sineNominePath)
-        #myScore.show()
+        #unused_myScore.show('text')
     
     def testSplitSpines(self):
         hf1 = HumdrumDataCollection(testFiles.splitSpines2)
@@ -2239,13 +2358,15 @@ class Test(unittest.TestCase):
 
     def testSpineComments(self):
         hf1 = HumdrumDataCollection(testFiles.fakeTest)
+        hf1.parseLines()
         s = hf1.stream #.show()
         p = s.parts[2] # last part has a comment
         comments = []
         for c in p.flat.getElementsByClass('SpineComment'):
             comments.append(c.comment)
         self.assertIn('spine comment', comments)
-
+        #s.show('text')
+    
 class TestExternal(unittest.TestCase):
 
     def runTest(self):
