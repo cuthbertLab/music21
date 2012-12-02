@@ -29,6 +29,7 @@ def L(c, raiseException=False):
     L is a function that takes a major or minor triad and returns a chord that is the L transformation. L transforms a chord to its Leading-Tone exchange. 
     
     Example 1: A C major chord, under P, will return an E minor chord
+    TODO: rewrite L as analysis.neoRiemannian.L(c1)
     
     >>> from music21 import *
     >>> c1 = chord.Chord("C4 E4 G4")
@@ -131,7 +132,11 @@ def LRP_transform(c, transposeInterval, changingPitch):
     return chord.Chord(newChord.pitches)
 
 def LRP_combinations(c, transformationString, raiseException = False, leftOrdered = False):
+    
     '''
+    
+    TODO: explain left vs. right Ordering, explain combinations
+    
     >>> from music21 import *
     >>> c1 = chord.Chord("C4 E4 G4")
     >>> c2 = LRP_combinations(c1, 'LP')
@@ -158,8 +163,7 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
                 elif i == "P":
                     c = P(c)
                 else:
-                    print "this is not a neoriemannian transformation, L, R, or P"
-                    return False
+                    raise LRPException('This is not a NeoRiemannian transformation, L, R, or P')
             return c
         elif leftOrdered is True:
             transformationStringReversed = transformationString[::-1]
@@ -171,7 +175,7 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
                 elif i == "P":
                     c = P(c)
                 else:
-                    raise LRPException('This is not a neoriemannian transformation, L, R, or P')
+                    raise LRPException('This is not a NeoRiemannian transformation, L, R, or P')
             return c
             
     else:
@@ -182,7 +186,7 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
-    def testneoRiemannianTransformations(self):
+    def testNeoRiemannianTransformations(self):
         c2 = chord.Chord('C4 E-4 G4')
         c2_L = L(c2)
         c2_P = P(c2)
@@ -192,23 +196,23 @@ class Test(unittest.TestCase):
         
         c5 = chord.Chord('C4 E4 G4 C5 C5 G5')
         copyC5 = copy.deepcopy(c5)
-        for i in range(20):
+        for i in range(4):
             c5 = L(c5)
         self.assertEqual(copyC5.pitches, c5.pitches)
         
         c5 = chord.Chord('C4 E4 G4 C5 E5 G5')
         copyC5 = copy.deepcopy(c5)
-        for i in range(20):
+        for i in range(4):
             c5 = P(c5)
         self.assertEqual(copyC5.pitches, c5.pitches)
         
         c5 = chord.Chord('C4 E4 G4 C5 C5 G5')
         copyC5 = copy.deepcopy(c5)
-        for i in range(20):
+        for i in range(4):
             c5 = R(c5)
         self.assertEqual(copyC5.pitches, c5.pitches)
         
-    def testneoRiemannianCombinations(self):
+    def testNeoRiemannianCombinations(self):
         c5 = chord.Chord('C4 E4 G4')
         c5_T = LRP_combinations(c5, 'LP')
         self.assertEqual(str(c5_T), "<music21.chord.Chord B3 E4 G#4>") 
