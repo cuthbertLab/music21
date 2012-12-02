@@ -30,6 +30,7 @@ from music21.abj import translate as abjTranslate
 from music21.analysis import correlate as analysisCorrelate
 from music21.analysis import discrete as analysisDiscrete
 from music21.analysis import metrical as analysisMetrical
+from music21.analysis import neoRiemannian as analysisNeoRiemannian
 from music21.analysis import patel as analysisPatel
 from music21.analysis import reduction as analysisReduction
 from music21.analysis import search as analysisSearch
@@ -214,6 +215,7 @@ MODULES = [
     analysisCorrelate,
     analysisDiscrete,
     analysisMetrical,
+    analysisNeoRiemannian,
     analysisPatel,
     analysisReduction,
     analysisSearch,
