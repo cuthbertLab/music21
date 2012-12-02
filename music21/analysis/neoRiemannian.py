@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         LRP.py
+# Name:         neoRiemannian.py
 # Purpose:      Neo-Riemannian Chord Transformations
 #
 # Authors:      Maura Church
@@ -10,7 +10,7 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
-This module defines the L, P, and R objects as called on a chord.Chord. 
+This module defines the L, P, and R objects and their related transformations as called on a chord.Chord. 
 '''
 import unittest
 
@@ -18,6 +18,12 @@ from music21 import exceptions21
 from music21 import chord
 import copy
 
+from music21 import environment
+_MOD = "analysis.neoRiemannian"
+environLocal = environment.Environment(_MOD)
+
+
+#-------------------------------------------------------------------------------
 class LRPException(exceptions21.Music21Exception):
     pass
 
@@ -25,11 +31,12 @@ class leftOrdered:
     pass
 
 def L(c, raiseException=False):
+    #TODO: Figure out how to get analysis.neoRiemannian to work
+    
     '''
     L is a function that takes a major or minor triad and returns a chord that is the L transformation. L transforms a chord to its Leading-Tone exchange. 
     
     Example 1: A C major chord, under P, will return an E minor chord
-    TODO: rewrite L as analysis.neoRiemannian.L(c1)
     
     >>> from music21 import *
     >>> c1 = chord.Chord("C4 E4 G4")
@@ -134,8 +141,13 @@ def LRP_transform(c, transposeInterval, changingPitch):
 def LRP_combinations(c, transformationString, raiseException = False, leftOrdered = False):
     
     '''
-    
-    TODO: explain left vs. right Ordering, explain combinations
+    LRP_combinations is a function that takes a major or minor triad and a transformationString
+    and returns a transformed triad, using the L, R, and P transformations. Certain combinations, such
+    as LPLPLP, are cyclical, and therefore will return the original chord. leftOrdered allows a user
+    to work with the function notation that they prefer. leftOrdered = False, the default, will mean
+    that a transformationString that reads "LPRLPR" will start by transforming the chord by L, then P,
+    then R, etc. Conversely, if leftOrdered = True (set by user), then "LPRLPR" will start by
+    transforming the chord by R, then P, then L--by reading the transformations left to right. 
     
     >>> from music21 import *
     >>> c1 = chord.Chord("C4 E4 G4")
@@ -149,10 +161,15 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
     <music21.chord.Chord C4 F4 A-4 C5 F5>
     
     >>> c5 = chord.Chord("C4 E4 G4 C5 E5")
-    >>> c6 = LRP_combinations(c5, 'LP', leftOrdered = True)
+    >>> c6 = LRP_combinations(c5, 'LPLPLP', leftOrdered = True)
     >>> c6
-    <music21.chord.Chord C4 E-4 A-4 C5 E-5>
+    <music21.chord.Chord C4 E4 G4 C5 E5>
     '''
+#    >>> c5 = chord.Chord("A-4 C4 E-5")
+#    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP')
+#    >>> c6
+#    <music21.chord.Chord A-4 C4 E-5>
+    
     if c.isMajorTriad() == True or c.isMinorTriad() == True:
         if leftOrdered is False: 
             for i in transformationString:
@@ -160,10 +177,12 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
                     c = L(c)
                 elif i == 'R':
                     c = R(c)
-                elif i == "P":
+                elif i == 'P':
                     c = P(c)
                 else:
                     raise LRPException('This is not a NeoRiemannian transformation, L, R, or P')
+            for i in range(len(c.pitches)):
+                c.pitches[i].simplifyEnharmonic(inPlace = True, mostCommon=True)
             return c
         elif leftOrdered is True:
             transformationStringReversed = transformationString[::-1]
@@ -176,6 +195,8 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
                     c = P(c)
                 else:
                     raise LRPException('This is not a NeoRiemannian transformation, L, R, or P')
+            for i in range(len(c.pitches)):
+                c.pitches[i].simplifyEnharmonic(inPlace = True, mostCommon = True)
             return c
             
     else:
@@ -224,6 +245,10 @@ class Test(unittest.TestCase):
         c7 = chord.Chord('C4 E4 G4 C5 E5')
         c7_T = LRP_combinations(c7, 'LP', leftOrdered = True)
         self.assertEqual(str(c7_T), "<music21.chord.Chord C4 E-4 A-4 C5 E-5>") 
+        
+        c8 = chord.Chord('C4 E-4 G4 C5 E-5')
+        c8_T = LRP_combinations(c8, 'LPLPLP', leftOrdered = True)
+        self.assertEqual(str(c8_T), "<music21.chord.Chord C4 E-4 G4 C5 E-5>") 
         
     
 #-------------------------------------------------------------------------------
