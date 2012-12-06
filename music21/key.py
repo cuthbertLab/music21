@@ -420,7 +420,19 @@ class KeySignature(base.Music21Object):
         else:
             output += ", mode %s" % (self.mode)
             return output
-        
+    
+    def __eq__(self, other):
+        '''
+        two KeySignatures are equal if their sharps are equal and their modes are equal
+        '''
+        try:
+            if self.sharps == other.sharps and self.mode == other.mode:
+                return True
+            else:
+                return False
+        except AttributeError:
+            return False
+    
     def __repr__(self):
         return "<music21.key.KeySignature of %s>" % self._strDescription()
 

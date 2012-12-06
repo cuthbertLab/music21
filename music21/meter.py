@@ -2900,7 +2900,7 @@ class TimeSignature(base.Music21Object):
         if common.isStr(value) and (value.lower() == 'common' or value.lower() == 'c'):
             value = '4/4'
             self.symbol = 'common'
-        elif common.isStr(value) and value.lower() == 'cut':
+        elif common.isStr(value) and value.lower() in ['cut', 'allabreve']: #allaBreve is the capella version
             value = '2/2'
             self.symbol = 'cut'
         

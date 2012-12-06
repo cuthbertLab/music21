@@ -22,10 +22,10 @@ fakeTest = re.sub("\s\s\s\s+", "\t", \
 8d-       -ja-          8A#/       4GG#^\ 4D#^\    4g#^/    p
 16A-      -go          16B#/L      .               .        .
 16A-      ic-          16c#/J      .               .        .
-4d-       -kew-         2B#        2r             2d#     f
-4d-       -yan          .          .                .      .
+[4d-       -kew-         2B#        2r             2d#     f
+4d-_       -yan          .          .                .      .
 =2        =2            =2         =2              =2      =2
-2d-      .              4c#        4GG# 4D#        4g#    mp
+2d-]      .              4c#        4GG# 4D#        4g#    mp
 *        *              *v         *v              *      *
 .        .              4E-                        4r     pp
 =3       =3             =3                         =3     =3

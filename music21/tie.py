@@ -19,7 +19,8 @@ import unittest
 
 #-------------------------------------------------------------------------------
 class Tie(object):
-    '''Object added to notes that are tied to other notes. The `type` value is one of start, stop, or continue.
+    '''
+    Object added to notes that are tied to other notes. The `type` value is one of start, stop, or continue.
 
     >>> from music21 import *
     >>> note1 = note.Note()
@@ -47,9 +48,9 @@ class Tie(object):
     two-note-head unison?)
     '''
 
-    def __init__(self, tievalue = 'start'):
+    def __init__(self, type = 'start'): #@ReservedAssignment
         #music21.Music21Object.__init__(self)
-        self.type = tievalue
+        self.type = type
         self.style = "normal"
 
     # investigate using weak-refs for .to and .from

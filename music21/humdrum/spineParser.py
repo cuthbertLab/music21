@@ -2300,7 +2300,7 @@ class Test(unittest.TestCase):
         test loading a fake piece with spine paths, lyrics, dynamics, etc.
         '''
         ms = HumdrumDataCollection(testFiles.fakeTest).stream
-        ms.show('text')
+        ms.show()
 
     def testSpineMazurka(self):    
 #        hf1 = HumdrumFile("d:/web/eclipse/music21misc/mazurka06-2.krn")    

@@ -3716,11 +3716,11 @@ class Test(unittest.TestCase):
         '''
         
         from music21 import corpus
-        s = corpus.parse('ryansMammoth/banjoreel')
+        s = corpus.parse('ryansMammoth/BanjoReel')
         #s.show()
         self.assertEqual(len(s.parts), 1)        
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 12)        
-        self.assertEqual(len(s.parts[0].flat.notes), 59)        
+        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)
+        self.assertEqual(len(s.parts[0].flat.notes), 58)        
 
         bars = s.parts[0].flat.getElementsByClass('Barline')
         self.assertEqual(len(bars), 3)        
@@ -3728,8 +3728,8 @@ class Test(unittest.TestCase):
         s2 = s.expandRepeats()    
         #s2.show()
 
-        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 22)        
-        self.assertEqual(len(s2.parts[0].flat.notes), 107)        
+        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 20)        
+        self.assertEqual(len(s2.parts[0].flat.notes), 105)        
     
 
     def testExpandRepeatsImportedB(self):
@@ -4298,14 +4298,20 @@ class Test(unittest.TestCase):
     def testRepeatEndingsImportedA(self):
 
         from music21 import corpus
-        s = corpus.parse('banjoreel')
+        s = corpus.parse('ryansMammoth/BanjoReel')
+        #s.show()
+        firstNotesList = s.flat.notes.elements
+        #[0:16][16:22][0:16][22:27][27:58][27:58]
+        expandedByHandList = firstNotesList[0:16] + firstNotesList[16:22] + firstNotesList[0:16] + firstNotesList[22:27] + firstNotesList[27:58] + firstNotesList[27:58]
+        expandedByHandNoteNames = [n.nameWithOctave for n in expandedByHandList]
         ex = Expander(s.parts[0])
         post = ex.process()
         #post.show()
         #print [n.nameWithOctave for n in post.flat.notes]
-        self.assertEqual([n.nameWithOctave for n in post.flat.notes], 
-            ['F#4', u'G4', u'G3', 'F#4', u'G4', u'G3', u'A4', u'B4', u'G4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', 'F#4', u'G4', u'G3', 'F#4', u'G4', u'G3', u'A4', u'B4', u'G4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', 'F#4', u'E4', u'D4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', 'F#4', u'E4', u'D4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4']
-)
+        #post.show()
+        secondNotesList = post.flat.notes.elements
+        secondNotesNoteNames = [n.nameWithOctave for n in secondNotesList]
+        self.assertEqual(expandedByHandNoteNames, secondNotesNoteNames)
 
 
 
@@ -4314,7 +4320,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         # last alternate endings in last bars
         # need to add import from abc
-        s = corpus.parse('SmugglersReel')
+        s = corpus.parse('ryansMammoth/SmugglersReel')
         #s.parts[0].show()
         ex = Expander(s.parts[0])
         # this is a Stream resulting form getElements

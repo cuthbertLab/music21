@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         neoRiemannian.py
+# Name:         analysis/neoRiemannian.py
 # Purpose:      Neo-Riemannian Chord Transformations
 #
 # Authors:      Maura Church
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright � 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''

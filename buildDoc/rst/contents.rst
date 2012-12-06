@@ -58,6 +58,7 @@ Module Reference
    moduleAnalysisCorrelate
    moduleAnalysisDiscrete
    moduleAnalysisMetrical
+   moduleAnalysisNeoRiemannian
    moduleAnalysisPatel
    moduleAnalysisReduction
    moduleAnalysisSearch
@@ -74,6 +75,7 @@ Module Reference
    moduleBrailleSegment
    moduleBrailleText
    moduleBrailleTranslate
+   moduleCapellaFromCapellaXML
    moduleChord
    moduleClef
    moduleCommon

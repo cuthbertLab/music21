@@ -8,6 +8,13 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+This module was an attempt to speed up getElementsByClass searches
+for :class:`~music21.stream.Stream` objects by caching each of the classes in
+the Stream, but in the end it offered no significant speed improvements, so
+it is not used.
+'''
+
 
 import unittest
 import collections

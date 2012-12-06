@@ -10,7 +10,8 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Object models of bars and repeats. 
+'''
+Object models of barlines, including repeat barlines. 
 '''
 
 import unittest
@@ -91,17 +92,14 @@ class Barline(base.Music21Object):
     Barlines are conventionally assigned to Measure objects 
     using the leftBarline and rightBarline attributes.
 
-
     >>> from music21 import *
     >>> bl = bar.Barline('double')
     >>> bl
     <music21.bar.Barline style=double>
 
-
     The style can also just be set via a keyword of "style".  Or if no style is specified, 
     a regular barline is returned.  Location can also be explicitly stored, but it's not
     needed except for musicxml translation:
-
 
     >>> bl2 = bar.Barline(style='dashed')
     >>> bl2
@@ -113,7 +111,7 @@ class Barline(base.Music21Object):
     >>> bl4
     <music21.bar.Barline style=final>
     
-    Note that the barline style 'ticked' only is displayed correctly in finale and finale notepad.
+    Note that the barline style 'ticked' only is displayed correctly in Finale and Finale Notepad.
     '''
     validStyles = barStyleDict.keys()
 
@@ -176,9 +174,11 @@ class Barline(base.Music21Object):
 # type <ending> in musicxml is used to mark different endings
 
 class Repeat(repeat.RepeatMark, Barline):
-    '''A Repeat barline.
+    '''
+    A Repeat barline.
 
-    The `direction` parameter can be one of 'start' or 'end.'
+    The `direction` parameter can be one of `start` or `end`.  A `end` followed by a `start`
+    should be encoded as two `bar.Repeat` signs.
 
     >>> from music21 import *
     >>> rep = bar.Repeat(direction='end', times=3)
@@ -205,11 +205,9 @@ class Repeat(repeat.RepeatMark, Barline):
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Repeat direction=end>
 
-
     The method :meth:`~music21.stream.Part.expandRepeats` on a 
     :class:`~music21.stream.Part` object expands the repeats, but
     does not update measure numbers
-
 
     >>> q = p.expandRepeats()
     >>> q.show('text')
@@ -229,8 +227,6 @@ class Repeat(repeat.RepeatMark, Barline):
         {2.0} <music21.note.Note D-->
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Barline style=double>
-
-
     '''
     _repeatDots = None # not sure what this is for; inherited from old modles
 
@@ -239,7 +235,7 @@ class Repeat(repeat.RepeatMark, Barline):
         if direction == 'start':
             style = 'heavy-light'
         else:
-            style = 'light-heavy'
+            style = 'final'
         
         Barline.__init__(self, style=style)
 
@@ -259,10 +255,10 @@ class Repeat(repeat.RepeatMark, Barline):
     def _setDirection(self, value):
         if value.lower() in ['start', 'end']:
             self._direction = value.lower()
-            if self._direction=='end':
-                self.style='light-heavy'
-            elif self._direction=='start':
-                self.style='heavy-light'
+            if self._direction == 'end':
+                self.style = 'final'
+            elif self._direction == 'start':
+                self.style = 'heavy-light'
         else:
             raise BarException('cannot set repeat direction to: %s' % value)
 

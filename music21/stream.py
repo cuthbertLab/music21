@@ -5065,10 +5065,8 @@ class Stream(base.Music21Object):
         the stream. If no TimeSignatures are found in the
         stream, a default of 4/4 is used.
 
-
         If `inPlace` is True, the original Stream is modified and lost
         if `inPlace` is False, this returns a modified deep copy.
-
 
         Many advanced features are available:
     
@@ -11933,13 +11931,18 @@ class PartStaff(Part):
 #     pass
 # 
 # 
-# class System(Stream):
-#     '''Totally optional: designation that all the music in this Stream
-#     belongs in a single system.
-#     '''
-#     systemNumber = 0
-#     systemNumbering = "Score" # or Page; when do system numbers reset?
-# 
+class System(Stream):
+    '''
+    Totally optional and used only in OMR and Capella: a designation that all the 
+    music in this Stream belongs in a single system.
+    
+    The system object has two attributes, systemNumber (which number is it)
+    and systemNumbering which says at what point the numbering of 
+    systems resets.  It can be either "Score" (default), "Opus", or "Page". 
+    '''
+    systemNumber = 0
+    systemNumbering = "Score" # or Page; when do system numbers reset?
+ 
 # class Page(Stream):
 #     '''
 #     Totally optional: designation that all the music in this Stream

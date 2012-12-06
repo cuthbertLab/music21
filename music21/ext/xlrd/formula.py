@@ -1,5 +1,5 @@
 # -*- coding: cp1252 -*-
-
+#@PydevCodeAnalysisIgnore
 ##
 # Module for parsing/evaluating Microsoft Excel formulas.
 #

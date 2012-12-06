@@ -96,7 +96,7 @@ class Lyric(object):
         # these are set by _setTextAndSyllabic
         self.text = None
         # given as begin, middle, end, or single
-        self.syllabic = None
+        self.syllabic = syllabic
         self._setTextAndSyllabic(text, applyRaw)
         self.number = number       
         self.identifier = identifier
@@ -141,7 +141,8 @@ class Lyric(object):
             self.syllabic = 'middle'
         else: # assume single
             self.text = rawText
-            self.syllabic = 'single'
+            if self.syllabic is None or self.syllabic is False:
+                self.syllabic = 'single'
         
     
     def _getIdentifier(self):

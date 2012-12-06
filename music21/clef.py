@@ -73,7 +73,32 @@ class Clef(base.Music21Object):
         return "<music21.clef.%s>" % common.classToClassStr(self.__class__)
         #return "<music21.clef.%s>" % str(self.__class__).split('.')[-1][:-2]
 
-
+    def __eq__(self, other):
+        '''
+        two Clefs are equal if their class is the same, their sign is the same,
+        their line is the same and their octaveChange is the same.
+        
+        >>> from music21 import *
+        >>> c1 = clef.PercussionClef()
+        >>> c2 = clef.NoClef()
+        >>> c1 == c2
+        False
+        >>> c3 = clef.TrebleClef()
+        >>> c4 = clef.TrebleClef()
+        >>> c3 == c4
+        True
+        >>> c4.octaveChange = -1
+        >>> c3 == c4
+        False
+        '''
+        try:
+            if self.__class__ == other.__class__ and self.sign == other.sign \
+                    and self.line == other.line and self.octaveChange == other.octaveChange:
+                return True
+            else:
+                return False
+        except AttributeError:
+            return False
 
 #-------------------------------------------------------------------------------
 class PercussionClef(Clef):

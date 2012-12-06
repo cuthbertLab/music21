@@ -52,6 +52,7 @@ from music21.braille import segment as brailleSegment
 from music21.braille import text as brailleText
 from music21.braille import translate as brailleTranslate
 
+from music21.capella import fromCapellaXML as capellaFromCapellaXML
 #chant
 from music21 import chord
 #chordTables
@@ -236,6 +237,8 @@ MODULES = [
     brailleSegment,
     brailleText,
     brailleTranslate,
+
+    capellaFromCapellaXML,
 
     chord, 
     clef, 

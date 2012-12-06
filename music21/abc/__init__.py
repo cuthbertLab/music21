@@ -6,9 +6,10 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+__ALL__ = ['base','translate','testFiles']
 
 from music21.abc.base import *
 from music21.abc import base

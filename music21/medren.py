@@ -962,7 +962,7 @@ class Ligature(base.Music21Object):
     The mensural length of each note is calculated automatically. 
     To determine if a ligature is cum proprietate, use the :meth:`music21.medren.Ligature.isCumProprietate` method.
     Similarly, to determine if a ligautre is cum perfectione, use the :meth:`music21.medren.Ligature.isCumPerfectione` method.
-    Finally, to determine if a ligature is cum opposite proprietate (C.O.P), use the :meth:`music21.medren.Ligature.isCOP` method. 
+    Finally, to determine if a ligature is cum opposita proprietate (C.O.P), use the :meth:`music21.medren.Ligature.isCOP` method. 
     
     Noteheads can be set to have oblique shape using the :meth:`music21.medren.Ligature.makeOblique` method. Similarly, oblique noteheads can be set to have a square shape using the :meth:`music21.medren.Ligature.makeSquare` method. 
     The shape of a notehead can be determined using the :meth:`music21.medren.Ligature.getNoteheadShape` method. By default, all noteheads in a ligature are square.
@@ -1097,7 +1097,7 @@ class Ligature(base.Music21Object):
         '''
         Takes no arguments
         
-        Returns True if the ligature is cum oposita proprietate (C.O.P), and False otherwise
+        Returns True if the ligature is cum opposita proprietate (C.O.P), and False otherwise
         '''
         return self.notes[0].mensuralType == 'semibrevis'
     

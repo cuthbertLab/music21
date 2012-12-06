@@ -50,6 +50,7 @@ fileExtensions = {
     'scala' : {'input': ['scl'], 'output': 'scl'},
     'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
     'vexflow' : {'input' : ['vexflowDoesNotWork'], 'output': 'html'},
+    'capella' : {'input': ['capx'], 'output': 'capx'},
 }
 
 
@@ -104,7 +105,8 @@ def getMissingImportStr(modNameList):
 
 #-------------------------------------------------------------------------------
 def findFormat(fmt):
-    '''Given a format defined either by a format name or 
+    '''
+    Given a format defined either by a format name or 
     an extension, return the format name as well as the output exensions.
 
     Note that .mxl and .mx are only considered MusicXML input formats. 
@@ -138,6 +140,8 @@ def findFormat(fmt):
     ('braille', '.txt')
     >>> common.findFormat('vexflow')
     ('vexflow', '.html')
+    >>> common.findFormat('capx')
+    ('capella', '.capx')
     
 
     Works the same whether you have a leading dot or not:

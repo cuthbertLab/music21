@@ -60,6 +60,9 @@ from music21 import tinyNotation
 
 from music21.abc import base as abcModule
 from music21.abc import translate as abcTranslate
+
+from music21.capella import fromCapellaXML
+
 from music21.musedata import base as musedataModule
 from music21.musedata import translate as musedataTranslate
 
@@ -631,6 +634,37 @@ class ConverterRomanText(object):
 
 
 
+class ConverterCapella(object):
+    '''
+    Simple class wrapper for parsing Capella .capx XML files.  See capella/fromCapellaXML.
+    '''
+
+    def __init__(self):
+        self._stream = None
+
+    def parseData(self, strData, number=None):
+        '''
+        parse a data stream of uncompessed capella xml
+        
+        N.B. for web parsing, it gets more complex.
+        '''
+        ci = fromCapellaXML.CapellaImporter()
+        ci.parseXMLText(strData)
+        scoreObj = ci.systemScoreFromScore(self.mainDom.documentElement)
+        partScore = ci.partScoreFromSystemScore(scoreObj)
+        self._stream = partScore
+    def parseFile(self, fp, number=None):
+        '''
+        '''
+        ci = fromCapellaXML.CapellaImporter()
+        self._stream = ci.scoreFromFile(fp)
+
+    def _getStream(self):
+        return self._stream
+
+    stream = property(_getStream)
+
+
 
 #-------------------------------------------------------------------------------
 class ConverterMuseData(object):
@@ -725,6 +759,8 @@ class Converter(object):
             self._converter = ConverterMuseData()
         elif format == 'noteworthytext':
             self._converter = ConverterNoteworthy()
+        elif format == 'capella':
+            self._converter = ConverterCapella()
         
         elif format == 'text': # based on extension
             # presently, all text files are treated as roman text
