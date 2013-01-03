@@ -366,6 +366,7 @@ metaEvents = Enumeration([("SEQUENCE_NUMBER", 0x00),
                           ("LYRIC", 0x05), 
                           ("MARKER", 0x06), 
                           ("CUE_POINT", 0x07), 
+                          ("PROGRAM_NAME", 0x08), #optional event is used to embed the patch/program name that is called up by the immediately subsequent Bank Select and Program Change messages. It serves to aid the end user in making an intelligent program choice when using different hardware.
                           ("SOUND_SET_UNSUPPORTED", 0x09),
                           ("MIDI_CHANNEL_PREFIX", 0x20), 
                           ("MIDI_PORT", 0x21), 
