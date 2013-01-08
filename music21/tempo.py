@@ -1150,6 +1150,7 @@ def interpolateElements(element1, element2, sourceStream,
     >>> destStream3 = stream.Stream()
     >>> destStream3.insert(100, element1)
     >>> destStream3.insert(500, element2)
+    >>> eA.id = "blah"
     >>> tempo.interpolateElements(element1, element2, sourceStream, destStream3, autoAdd = False)
     Traceback (most recent call last):
     ...
@@ -1177,17 +1178,17 @@ def interpolateElements(element1, element2, sourceStream,
     scaleAmount = ((endOffsetDest - startOffsetDest + 0.0)/(endOffsetSrc - startOffsetSrc + 0.0))
     
     interpolatedElements = sourceStream.getElementsByOffset(offsetStart = startOffsetSrc, offsetEnd = endOffsetSrc)
-    
     for el in interpolatedElements:
         elOffsetSrc = el.getOffsetBySite(sourceStream)
         try:
-            el.getOffsetBySite(destinationStream)
+            dummy = el.sites.getOffsetByObjectMatch(destinationStream)
+            #print dummy, el
         except base.SitesException:
             if autoAdd is True:
                 destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
                 destinationStream.insert(destinationOffset, el)
             else:
-                raise TempoException("Could not find element %s with id %d in destinationStream and autoAdd is false" % (repr(el), el.id))
+                raise TempoException("Could not find element %s with id %r in destinationStream and autoAdd is false" % (repr(el), el.id))
         else:
             destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
             el.setOffsetBySite(destinationStream, destinationOffset)

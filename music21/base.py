@@ -950,7 +950,7 @@ class Sites(object):
             self.removeById(idKey)
         
 
-    def _getOffsetBySiteId(self, idKey):
+    def getOffsetBySiteId(self, idKey, strictDeadCheck = False):
         '''
         Main method for getting an offset from a location key.
 
@@ -967,14 +967,48 @@ class Sites(object):
         >>> aLocations.add(cSite) # a context
         >>> aLocations.add(bSite, 234) # can add at same offset or a different one
         >>> aLocations.add(dSite) # a context
-        >>> aLocations._getOffsetBySiteId(id(bSite))
+        >>> aLocations.getOffsetBySiteId(id(bSite))
         234
+        
+        If strictDeadCheck is False (default) we can still retrieve the context from a dead weakref.  This is necessary to
+        get the offset from an iterated Stream often.  Eventually, this should become True -- but too many errors for now.
+        
+        >>> idBSite = id(bSite)
+        >>> del(bSite)
+        >>> aLocations._definedContexts[idBSite]['obj']
+        <weakref at 0x...; dead>
+        >>> aLocations._definedContexts[idBSite]['obj'] is None
+        False     
+        >>> common.unwrapWeakref(aLocations._definedContexts[idBSite]['obj']) is None
+        True
+        
+        >>> aLocations.getOffsetBySiteId(idBSite, strictDeadCheck = False) # default
+        234
+        
+        With this, you'll get an exception:
+        
+        >>> aLocations.getOffsetBySiteId(idBSite, strictDeadCheck = True)
+        Traceback (most recent call last):
+        SitesException: Could not find the object with id ... in the Site marked with idKey ... (was there, now site is dead). 
+           object <music21.base.Sites object at 0x...>, definedContexts: {...}
+           containedById = ...
+        
+        
         '''
         # NOTE: this is a core method called very frequently
-        if idKey == self._lastID:
-            return self._lastOffset
+#        if idKey == self._lastID:
+#            return self._lastOffset
         try:
             value = self._definedContexts[idKey]['offset']
+            if WEAKREF_ACTIVE and strictDeadCheck is True and self._definedContexts[idKey]['obj'] is not None:
+                obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+                if obj is None:
+                    #if self._definedContexts[idKey]['isDead'] is True: # not good enough
+                    errorMsg = "Could not find the object with id %s in the Site marked with idKey %s (was there, now site is dead). " % (id(self), idKey)
+                    errorMsg += "\n   object %r, definedContexts: %r" % (self, self._definedContexts)
+                    errorMsg += "\n   containedById = %r" % (self.containedById)
+                    raise SitesException(errorMsg)
+                
         except KeyError:
             errorMsg = "Could not find the object with id %s in the Site marked with idKey %s. " % (id(self), idKey)
             errorMsg += "\n   object %r, definedContexts: %r" % (self, self._definedContexts)
@@ -998,7 +1032,8 @@ class Sites(object):
 
 
     def getOffsets(self):
-        '''Return a list of all offsets.
+        '''
+        Return a list of all offsets.
 
         >>> import music21
         >>> class Mock(music21.Music21Object): 
@@ -1017,7 +1052,7 @@ class Sites(object):
         [0, 234]
         '''
         # here, already having location keys may be an advantage
-        return [self._getOffsetBySiteId(x) for x in self._locationKeys] 
+        return [self.getOffsetBySiteId(x) for x in self._locationKeys] 
 
 
     def getOffsetByObjectMatch(self, obj):
@@ -1028,6 +1063,9 @@ class Sites(object):
         instead, the id() of both the stored 
         object reference and the supplied 
         object is used. 
+
+        this should be replaced by getOffsetBySite(strictDeadCheck = True)...
+        
 
         >>> import music21
         >>> class Mock(music21.Music21Object): 
@@ -1057,7 +1095,7 @@ class Sites(object):
                 continue
             if id(compareObj) == id(obj):
                 #environLocal.printDebug(['found object as site', obj, id(obj), 'idKey', idKey])
-                return self._getOffsetBySiteId(idKey) #dict['offset']
+                return self.getOffsetBySiteId(idKey) #dict['offset']
         raise SitesException('an entry for this object (%s) is not stored in Sites' % obj)
 
     def getOffsetBySite(self, site):
@@ -1086,31 +1124,11 @@ class Sites(object):
             siteId = id(site)
         try:
             # will raise a key error if not found
-            return self._getOffsetBySiteId(siteId) 
+            return self.getOffsetBySiteId(siteId) 
             #post = self._definedContexts[siteId]['offset']
         except SitesException: # the site id is not valid
             #environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
             raise # re-raise Exception
-
-
-    def getOffsetBySiteId(self, siteId):
-        '''
-        For a given site id, return its offset.
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object): 
-        ...    pass
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> aLocations = music21.Sites()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
-        >>> aLocations.getOffsetBySiteId(id(aSite))
-        23
-        >>> aLocations.getOffsetBySiteId(id(bSite))
-        121.5
-        '''
-        return self._getOffsetBySiteId(siteId) 
 
 
     def setOffsetBySite(self, site, value):
