@@ -11,12 +11,18 @@
 '''
 Builds various kinds of music21 distribution files and uploads them to PyPI and GoogleCode.
 
-To do a release, first run test/multiprocessTest.py then test/test.py (normally not necessary,
-because it's slower and mostly duplicates multiprocessTest, but should be done before making
-a release), then test/testDocumentation, test/testSerialization, and test/testStream.
+To do a release, 
 
-If all tests pass, run `corpus.cacheMetadata('core')`, buildDoc/build, buildDoc/upload, and
-finally this file.
+1. update the VERSION and test in base.py and freezeThaw.py
+2. run test/multiprocessTest.py
+3. run test/test.py (normally not necessary,because it's slower and mostly duplicates multiprocessTest, but should be done before making a release), 
+4. then test/testDocumentation
+5. then test/testSerialization
+6. If all tests pass, run `corpus.cacheMetadata('core')`, 
+7. run buildDoc/build
+8. buildDoc/upload
+
+and finally this file.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''

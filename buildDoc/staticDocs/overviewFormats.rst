@@ -25,7 +25,7 @@ We can parse a MusicXML file by providing the :func:`music21.converter.parse` fu
 Alternative, we can provide a URL to the :func:`music21.converter.parse` function that points to the desired file. Assuming proper system configuration (see :ref:`environment`), the file will be downloaded and parsed.
 
 >>> url = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
->>> sAlt = converter.parse(url) 
+>>> sAlt = converter.parse(url) # doctest: +SKIP
 
 
 Note that presently music21 offers limited support for compressed .mxl MusicXML files; this feature will be expanded in the future.

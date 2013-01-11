@@ -50,16 +50,24 @@ def main(runOne=False):
                 continue
         
         fullModulePath = builddocRstDir + os.sep + module
+        #print fullModulePath
         print module + ":",
-        (failcount, testcount) = doctest.testfile(fullModulePath, optionflags = doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
-        if failcount > 0:
-            print "%s had %d failures in %d tests" % (module, failcount, testcount)
-        elif testcount == 0:
-            print "no tests"
-        else:
-            print "all %d tests ran successfully" % (testcount)
-        totalTests += testcount
-        totalFailures += failcount
+        try:
+            (failcount, testcount) = doctest.testfile(fullModulePath, module_relative = False, optionflags = doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+            if failcount > 0:
+                print "%s had %d failures in %d tests" % (module, failcount, testcount)
+            elif testcount == 0:
+                print "no tests"
+            else:
+                print "all %d tests ran successfully" % (testcount)
+            totalTests += testcount
+            totalFailures += failcount
+        except Exception as e:
+            print "failed miserably! %s" % str(e)
+            import traceback
+            tb = traceback.format_exc()
+            print "Here's the traceback for the exeception: \n%s" % (tb)
+
 
     elapsedTime = time.time() - timeStart
     print "Ran %d tests (%d failed) in %.4f seconds" % (totalTests, totalFailures, elapsedTime)

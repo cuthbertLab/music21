@@ -15,8 +15,9 @@
 
 
 
-import unittest, doctest
-from music21 import *
+import unittest
+from music21 import note, stream, clef, metadata, spanner, environment, converter, scale, corpus, common
+
 
 _MOD = 'demo/smt2010.py'
 environLocal = environment.Environment(_MOD)
@@ -35,7 +36,7 @@ class Test(unittest.TestCase):
 
 
     def testStreams01(self):
-        from music21 import note, stream, clef, metadata, spanner
+        #from music21 import note, stream, clef, metadata, spanner
 
 
         #==== "fig-df02"
@@ -279,7 +280,7 @@ class Test(unittest.TestCase):
 
         # based on Stream.testAddSlurByMelisma(self):
 
-        from music21 import corpus, spanner
+        #from music21 import corpus, spanner
         nStart = None; nEnd = None
         
         ex = corpus.parse('luca/gloria').parts['cantus'].measures(1,11)        
@@ -305,7 +306,7 @@ class Test(unittest.TestCase):
         
         for sp in ex.spanners.getElementsByClass('Slur'):  
             #environLocal.printDebug(['sp', n.nameWithOctave, sp])
-            dur = sp.getDurationBySite(exFlatNotes)
+            unused_dur = sp.getDurationBySite(exFlatNotes)
             n = sp.getFirst()
             
         
@@ -316,7 +317,7 @@ class Test(unittest.TestCase):
 
 
     def testScales01(self):
-        from music21 import note, stream, scale, pitch
+        from music21 import pitch
 
 
         #==== "fig-py01"
@@ -330,15 +331,15 @@ class Test(unittest.TestCase):
         assert (sc1.abstract == sc2.abstract) == True
         
         # Without arguments, getPitches() returns a single span 
-        assert str(sc1.getPitches()) == '[G4, A4, B4, C5, D5, E5, F#5, G5]'
-        assert str(sc2.getPitches('c2', 'c3')) == '[C2, D2, E-2, F2, G2, A-2, B-2, C3]'
+        assert common.pitchList(sc1.getPitches()) == '[G4, A4, B4, C5, D5, E5, F#5, G5]'
+        assert common.pitchList(sc2.getPitches('c2', 'c3')) == '[C2, D2, E-2, F2, G2, A-2, B-2, C3]'
         
         # As a Chord, Scale pitches gain additional functionality
         assert sc1.getChord().forteClass == '7-35'
         
         # Given a degree, get the pitch
         assert str(sc1.pitchFromDegree(5)) == 'D5'
-        assert str(sc2.pitchesFromScaleDegrees([7,2], 'e-6', 'e-9')) == '[F6, D7, F7, D8, F8, D9]'
+        assert common.pitchList(sc2.pitchesFromScaleDegrees([7,2], 'e-6', 'e-9')) == '[F6, D7, F7, D8, F8, D9]'
         
         # Get a scale degree from a pitch
         assert sc1.getScaleDegreeFromPitch('d') == 5
@@ -346,10 +347,10 @@ class Test(unittest.TestCase):
         
         # Get the next pitch given step directions
         match = [pitch.Pitch('g2')]
-        for dir in [1, 1, 1, -2, 4, -1, 1, 1, 1]:
+        for direction in [1, 1, 1, -2, 4, -1, 1, 1, 1]:
             # Append the next pitch based on the last-added pitch
-            match.append(sc1.next(match[-1], dir))
-        assert str(match), '[G2, A2, B2, C3, A2, E3, D3, E3, F#3, G3]'
+            match.append(sc1.next(match[-1], direction))
+        assert common.pitchList(match), '[G2, A2, B2, C3, A2, E3, D3, E3, F#3, G3]'
         
         # Derive new scales based on a provided collection or degree
         assert str(sc1.derive(['c4', 'g4', 'b8', 'f2'])) == '<music21.scale.MajorScale C major>'
@@ -363,12 +364,12 @@ class Test(unittest.TestCase):
 
         #==== "fig-py02"
         sc1 = scale.PhrygianScale('g4')
-        assert str(sc1.getPitches()) == '[G4, A-4, B-4, C5, D5, E-5, F5, G5]'
+        assert common.pitchList(sc1.getPitches()) == '[G4, A-4, B-4, C5, D5, E-5, F5, G5]'
         assert str(sc1.getRelativeMajor()) == '<music21.scale.MajorScale E- major>'
         assert str(sc1.getTonic()), str(sc1.getDominant()) == ('G4', 'D5')
         
         sc2 = scale.HypodorianScale('a6')
-        assert str(sc2.getPitches('e2', 'e3')) == '[E2, F#2, G2, A2, B2, C3, D3, E3]'
+        assert common.pitchList(sc2.getPitches('e2', 'e3')) == '[E2, F#2, G2, A2, B2, C3, D3, E3]'
         assert str(sc2.getRelativeMajor()) == '<music21.scale.MajorScale G major>'
         assert str(sc2.getTonic()), str(sc2.getDominant()) == ('A6', 'C7')
 
@@ -387,7 +388,7 @@ class Test(unittest.TestCase):
         #print('\n\nfig-py03')
 
         sc1 = scale.HarmonicMinorScale('a3')
-        assert str(sc1.getPitches()) == '[A3, B3, C4, D4, E4, F4, G#4, A4]'
+        assert common.pitchList(sc1.getPitches()) == '[A3, B3, C4, D4, E4, F4, G#4, A4]'
         assert str(sc1.getTonic()), str(sc1.getDominant()) == ('A3', 'E4')
         
         s = stream.Stream()    
@@ -406,16 +407,16 @@ class Test(unittest.TestCase):
 
 
         sc1 = scale.MelodicMinorScale('c4')
-        assert str(sc1.getPitches(direction='ascending')) == '[C4, D4, E-4, F4, G4, A4, B4, C5]'
-        assert str(sc1.getPitches('c3', 'c5', direction='descending')) == '[C5, B-4, A-4, G4, F4, E-4, D4, C4, B-3, A-3, G3, F3, E-3, D3, C3]'
+        assert common.pitchList(sc1.getPitches(direction='ascending')) == '[C4, D4, E-4, F4, G4, A4, B4, C5]'
+        assert common.pitchList(sc1.getPitches('c3', 'c5', direction='descending')) == '[C5, B-4, A-4, G4, F4, E-4, D4, C4, B-3, A-3, G3, F3, E-3, D3, C3]'
         assert str(sc1.getTonic()), str(sc1.getDominant()) == ('C4', 'G4')
         
         s = stream.Stream()
         p = None
         for i in range(16):
-            dir = random.choice([-1, 1])
+            direction = random.choice([-1, 1])
             for j in range(2):
-                p = sc1.next(p, dir)
+                p = sc1.next(p, direction)
                 s.append(note.Note(p, quarterLength=.25))
         #s.show()
         #==== "fig-py04" end
@@ -424,16 +425,16 @@ class Test(unittest.TestCase):
 
         #==== "fig-py05"
         sc1 = scale.OctatonicScale('e3', 'm2')
-        assert str(sc1.getPitches()) == '[E3, F3, G3, A-3, B-3, C-4, D-4, D4, E4]'
+        assert common.pitchList(sc1.getPitches()) == '[E3, F3, G3, A-3, B-3, C-4, D-4, D4, E4]'
         sc2 = scale.OctatonicScale('e3', 'M2')
-        assert str(sc2.getPitches()) == '[E3, F#3, G3, A3, B-3, C4, D-4, E-4, F-4]'
+        assert common.pitchList(sc2.getPitches()) == '[E3, F#3, G3, A3, B-3, C4, D-4, E-4, F-4]'
         
         part1 = stream.Part()
         part2 = stream.Part()
         durPart1 = [1,1,.5,.5,1]
         durPart2 = [3,1]
         degrees = range(1,9)
-        for m in range(4):
+        for unused in range(4):
             random.shuffle(degrees)
             random.shuffle(durPart1)
             random.shuffle(durPart2)
@@ -463,10 +464,10 @@ class Test(unittest.TestCase):
         #==== "fig-py07"
         # add examples
         sc1 = scale.SieveScale('c4', '3@0|4@0')
-        assert str(sc1.getPitches()) == '[C4, E-4, F-4, G-4, A-4, A4, C5]'
+        assert common.pitchList(sc1.getPitches()) == '[C4, E-4, F-4, G-4, A-4, A4, C5]'
         
         sc2 = scale.SieveScale('c4', '5@0|7@0')
-        assert str(sc2.getPitches()) == '[C4, F4, G4, B-4, D5, E-5, A-5, A5, C#6, E6, F#6, B6]'
+        assert common.pitchList(sc2.getPitches()) == '[C4, F4, G4, B-4, D5, E-5, A-5, A5, C#6, E6, F#6, B6]'
         
         s = stream.Stream()
         pColection = sc2.getPitches('c3', 'c7')
@@ -482,26 +483,26 @@ class Test(unittest.TestCase):
         #==== "fig-py08"
 
         sc1 = scale.RagAsawari('g3')
-        assert str(sc1.getPitches(direction='ascending')) == '[G3, A3, C4, D4, E-4, G4]'
-        assert str(sc1.getPitches(direction='descending')) == '[G4, F4, E-4, D4, C4, B-3, A3, G3]'
+        assert common.pitchList(sc1.getPitches(direction='ascending')) == '[G3, A3, C4, D4, E-4, G4]'
+        assert common.pitchList(sc1.getPitches(direction='descending')) == '[G4, F4, E-4, D4, C4, B-3, A3, G3]'
         
         
         sc2 = scale.RagMarwa('g3')
-        assert str(sc2.getPitches(direction='ascending')) == '[G3, A-3, B3, C#4, E4, F#4, E4, G4, A-4]'
-        assert str(sc2.getPitches(direction='descending')) == '[A-4, G4, A-4, F#4, E4, C#4, B3, A-3, G3]'
+        assert common.pitchList(sc2.getPitches(direction='ascending')) == '[G3, A-3, B3, C#4, E4, F#4, E4, G4, A-4]'
+        assert common.pitchList(sc2.getPitches(direction='descending')) == '[A-4, G4, A-4, F#4, E4, C#4, B3, A-3, G3]'
         
         
         p1 = None
         s = stream.Stream()
-        for dir in ([1]*10) + ([-1]*8) + ([1]*4) + ([-1]*3) + ([1]*4):
-            p1 = sc1.next(p1, dir)
+        for direction in ([1]*10) + ([-1]*8) + ([1]*4) + ([-1]*3) + ([1]*4):
+            p1 = sc1.next(p1, direction)
             s.append(note.Note(p1, quarterLength=.25))
         #s.show()
         
         p1 = None
         s = stream.Stream()
-        for dir in ([1]*10) + ([-1]*8) + ([1]*4) + ([-1]*3) + ([1]*4):
-            p1 = sc2.next(p1, dir)
+        for direction in ([1]*10) + ([-1]*8) + ([1]*4) + ([-1]*3) + ([1]*4):
+            p1 = sc2.next(p1, direction)
             s.append(note.Note(p1, quarterLength=.25))
         #s.show()
 
@@ -509,7 +510,7 @@ class Test(unittest.TestCase):
 
 
         #==== "fig-py09"
-        import random
+        #import random
         sc1 = scale.WeightedHexatonicBlues('c3')
         p = 'c3'
         s = stream.Stream()
@@ -524,7 +525,7 @@ class Test(unittest.TestCase):
 
 
     def testScalesPy06(self):
-        from music21 import corpus, scale, note
+        #from music21 import corpus, scale, note
         from music21 import analysis
 
         scGMajor = scale.MajorScale('g4')
@@ -547,7 +548,7 @@ class Test(unittest.TestCase):
         #part = corpus.parseWork('bwv1080/03').measures(24,29).parts[0]
         #part = corpus.parseWork('bwv1080/03').parts[0]
 
-        from music21 import corpus, scale, note
+        #from music21 import corpus, scale, note
         from music21 import analysis
 
         scDMelodicMinor = scale.MelodicMinorScale('d4')
@@ -594,8 +595,8 @@ class Test(unittest.TestCase):
 
         # get pitches from any range of this scale
         #print(sc1.getPitches('g2', 'c4'))
-        self.assertEqual(str(sc1.getPitches('g2', 'c4')), 
-        '[G2, A-2, B-2, C3, D-3, E-3, F3, G3, A-3, B-3, C4]')
+        self.assertEqual(', '.join([p.nameWithOctave for p in sc1.getPitches('g2', 'c4')]), 
+        'G2, A-2, B-2, C3, D-3, E-3, F3, G3, A-3, B-3, C4')
 
         # get a scale degree from a pitch
         #print(sc1.getScaleDegreeFromPitch('b-'))
@@ -616,7 +617,7 @@ class Test(unittest.TestCase):
 
         # derive a new major scale based on a pitch for a scale degree
         #print(sc1.deriveByDegree(7, 'f#4').pitches)
-        self.assertEqual(str(sc1.deriveByDegree(7, 'f#4').pitches), 
+        self.assertEqual(common.pitchList(sc1.deriveByDegree(7, 'f#4').pitches), 
             '[G3, A3, B3, C4, D4, E4, F#4, G4]')
 
 
@@ -625,7 +626,7 @@ class Test(unittest.TestCase):
 
         # get pitches from any range of this scale
         #print str(sc2.getPitches('g2', 'c4'))
-        self.assertEqual(str(sc2.getPitches('g2', 'c4')), 
+        self.assertEqual(common.pitchList(sc2.getPitches('g2', 'c4')), 
         '[A-2, B-2, C3, D3, F-3, G-3, A-3, B-3, C4]')
 
             # get a scale degree from a pitch
@@ -639,7 +640,7 @@ class Test(unittest.TestCase):
 
         # transpose the scale
         #print(sc2.transpose('m2').pitches)
-        self.assertEqual(str(sc2.transpose('m2').pitches), '[G4, A4, B4, C#5, D#5, E#5, G5]')
+        self.assertEqual(common.pitchList(sc2.transpose('m2').pitches), '[G4, A4, B4, C#5, D#5, E#5, G5]')
 
         # get as a chord and get its forte class
         self.assertEqual(sc2.transpose('m2').chord.forteClass, '6-35')
@@ -680,8 +681,8 @@ class Test(unittest.TestCase):
     def testEx03(self):
 
         # What is the most common closing soprano scale degree by key signature
-        # in the bach chorales?
-        from music21 import graph
+        #s in the bach chorales?
+        #from music21 import graph
 
         results = {}
         for fn in corpus.getBachChorales()[:2]:
@@ -711,7 +712,7 @@ class Test(unittest.TestCase):
         niederlande = corpus.search('niederlande', 'locale')
 
         results = {}
-        for name, group in [('niederlande', niederlande)]:
+        for unused_name, group in [('niederlande', niederlande)]:
             workCount = 0
 
             for fp, n in group:

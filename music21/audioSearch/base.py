@@ -22,7 +22,8 @@ import os
 import wave
 import unittest
 
-from music21 import base
+# cannot call this base, because when audioSearch.__init__.py imports * from base, it overwrites audioSearch.base!
+from music21 import base as music21Base
 from music21 import common
 from music21 import exceptions21
 from music21 import features
@@ -104,9 +105,9 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     >>> print finalResult
     143.6276...
     '''
-    if 'numpy' in base._missingImport or 'scipy' in base._missingImport or 'matplotlib' in base._missingImport:
+    if 'numpy' in music21Base._missingImport or 'scipy' in music21Base._missingImport or 'matplotlib' in music21Base._missingImport:
         #len(_missingImport) > 0:
-        raise AudioSearchException("Cannot run autocorrelationFunction without all of numpy, scipy, and matplotlib installed.  Missing %s" % base._missingImport)
+        raise AudioSearchException("Cannot run autocorrelationFunction without all of numpy, scipy, and matplotlib installed.  Missing %s" % music21Base._missingImport)
     import numpy
     import scipy.signal
     #import matplotlib
@@ -306,7 +307,7 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
         
     TODO -- find a way to test... or at least demo
     '''
-    if "numpy" in base._missingImport:
+    if "numpy" in music21Base._missingImport:
         raise AudioSearchException("Cannot run getFrequenciesFromMicrophone without numpy installed")
 
     import numpy
@@ -337,7 +338,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     >>> print freq
     [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
     '''
-    if "numpy" in base._missingImport:
+    if "numpy" in music21Base._missingImport:
         raise AudioSearchException("Cannot run getFrequenciesFromAudioFile without numpy installed")
     import numpy
 
@@ -399,7 +400,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> print currentSample  # should be exactly double the previous
     88064
     '''
-    if "numpy" in base._missingImport:
+    if "numpy" in music21Base._missingImport:
         raise AudioSearchException("Cannot run getFrequenciesFromPartialAudioFile without numpy installed")
     import numpy
     

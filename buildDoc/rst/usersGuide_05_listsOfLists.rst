@@ -97,8 +97,7 @@ in this case is `listA`, but the program doesn't know that) and get the
 "number" from it.  But if "thing" is not a list, that's where the ``else`` comes
 in, which is what we run if we don't have a list, which just says, print the number.  
 (We're assuming in this case that there are only two types of things in `listB`, 
-numbers and other lists.)  If you get an error, be sure not to
- forget the ending ":" or to indent the next line.
+numbers and other lists.)  If you get an error, be sure not to forget the ending ":" or to indent the next line.
  
 Functions and Recursion
 ---------------------------------
@@ -191,7 +190,7 @@ functions):
 	
 	>>> def squareMe(number):
 	...     print(number * number)
-
+	
 	Now we can try:
 	
 	>>> squareMe(10)
@@ -204,11 +203,11 @@ functions):
 	
 	Notice two things in the last case.  First that pi isn't exactly 3.14 -- we all know that;
 	I just wanted to make sure the math teachers in the room didn't go into conniptions.  Second
-	that we gave the variable `pi` to the function `squareMe`.  But within the function `squareMe`
-    we didn't write: ``print(pi * pi)``; instead within the function, `pi` (or any other variable
-    or number) will simply be called `number`.  (By the way, instead of writing ``print(number * number)``
-    we could have written ``print(number**2)`` since ''\*\*'' is how Python denotes exponents).
-
+	that we gave the variable `pi` to the function `squareMe`.  But within the function `squareMe` we 
+	didn't write: ``print(pi * pi)``; instead within the function, `pi` (or any other variable
+	or number) will simply be called `number`.  (By the way, instead of writing ``print(number * number)``
+	we could have written ``print(number**2)`` since ''\*\*'' is how Python denotes exponents).    
+    
 	At the end of a function, you can either `print` something out, or `return` a value, which can
 	be used for anything else.  Here's ``cubeMe`` which works a lot like ``squareMe``, but it cubes
 	the number and instead of printing it, it returns it:

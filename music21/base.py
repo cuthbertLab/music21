@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Ben Houge
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'1.3.0'
+'1.4.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -43,7 +43,7 @@ under the module "base":
 
 #-------------------------------------------------------------------------------
 # string and tuple must be the same
-VERSION = (1, 3, 0)
+VERSION = (1, 4, 0)
 VERSION_STR = "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
 #-------------------------------------------------------------------------------
 
@@ -3374,7 +3374,9 @@ class Music21Object(object):
     def _getDerivationHierarchy(self):
         post = []
         focus = self
-        while True:
+        endMe = 200
+        while endMe > 0:
+            endMe = endMe - 1 # do not go forever
             # collect activeSite unless activeSite is None;
             # if so, try to get rootDerivation
             candidate = focus.activeSite

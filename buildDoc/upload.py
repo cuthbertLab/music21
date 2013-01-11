@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         upload.py
 # Purpose:      music21 documentation upload utility
@@ -32,7 +32,7 @@ def getDirBuildHtml():
 # this needs to be on level higher then the level of the source
 DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc'
 
-print('provide user:')
+print('provide user name (not password):')
 user = getpass.getpass()
 
 

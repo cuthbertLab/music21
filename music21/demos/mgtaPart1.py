@@ -6,12 +6,12 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
-# License:      LGPL
+# Copyright:    © 2009-2010, 2013 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 import copy
-import unittest, doctest
+import unittest
 import sys
 
 import music21
@@ -20,7 +20,7 @@ from music21 import converter
 from music21 import instrument
 from music21 import interval
 from music21 import note
-from music21 import pitch
+from music21 import musicxml
 
 from music21 import environment
 _MOD = 'mgtaPart1.py'
@@ -45,7 +45,7 @@ def ch1_basic_I_A(show=True, *arguments, **keywords):
     pitches = ['d#3', 'g3', 'g#3', 'c#4', 'd4', 'a4', 'a#4', 'e5', 'f#5', 'a5']
     found = []
     for p in pitches:
-        n = note.Note(p)
+        unused_n = note.Note(p)
         
         # get direction of enharmonic move?
         # a move upward goes from f to g-, then a---
@@ -70,11 +70,11 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
         n2 = note.Note(j)
         i1 = interval.notesToInterval(n1, n2)
         if i1.intervalClass == 1: # by interval class
-            mark = "H"
+            unused_mark = "H"
         elif i1.intervalClass == 2:
-            mark = "W"
+            unused_mark = "W"
         else:
-            mark = "N"
+            unused_mark = "N"
 
 # no keyboard diagram yet!
 #         k1 = keyboard.Diagram()
@@ -93,7 +93,7 @@ def ch1_basic_I_C_1(show=True, *arguments, **keywords):
     of half and whole steps and then mark the key at the end 
     with an asterisk.
     '''
-    from music21 import stream, interval
+    from music21 import stream
     nStart = note.Note('a4')
     intervals = [interval.Interval('w'), interval.Interval('-h'), 
                  interval.Interval('-w'), interval.Interval('-w'),
@@ -174,7 +174,6 @@ def ch1_basic_II_A_2(show=True, *arguments, **keywords):
     Write letter names and octave designations for the pitches written 
     in the treble and bass clefs below.
     '''
-    from music21 import clef
     humdata = '''
 **kern
 1BBD
@@ -206,7 +205,6 @@ def ch1_basic_II_B_1(show=True, *arguments, **keywords):
     p4.
     For each of the five trebleclef pitches on the left, write the alto-clef equivalent on the right. Then label each pitch with the correct name and octave designation.
     '''
-    from music21 import clef
     humdata = '''
 **kern
 1B-
@@ -229,7 +227,6 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
     p4.
     For each of the five bass clef pitches on the left, write the tenor-clef equivalent on the right. Then label each pitch with the correct name and octave designation.
     '''
-    from music21 import clef, converter
     humdata = '**kern\n1F#1e-\n1B\n1D-\n1c\n*-'
     exercise = converter.parseData(humdata)
     for n in exercise.flat.notes: # have to use flat here
@@ -242,7 +239,7 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
 def ch1_basic_II_C(data, intervalShift):
     '''Function for C1, C2, C3, and C4
     '''
-    from music21 import stream, clef, common, chord
+    from music21 import stream, common, chord
     ex = stream.Stream()
     for chunk in data:
         m = stream.Measure()    
@@ -313,7 +310,6 @@ def ch1_writing_I_A_1(show=True, *arguments, **keywords):
 
     Rewrite one active higher 
     '''
-    from music21 import converter, clef
 
     # Purcell, "Music for a While"
     humdata = '''
@@ -371,7 +367,7 @@ def ch1_writing_I_B_1(show=True, *arguments, **keywords):
     p.6 
     Transcribe these melodies into the clef specified without changing octaves.
     '''
-    from music21 import converter, clef, tinyNotation
+    from music21 import tinyNotation
 
     # camptown races
     ex = tinyNotation.TinyNotationStream("g8 g e g", "2/4")
@@ -410,9 +406,6 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
     >>> a = True
     '''
-
-    from music21 import converter, clef
-
     # Purcell, "Music for a While"
     humdata = '''
 **kern
@@ -466,8 +459,8 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
     choices determined by whether the present note is above or below the 
     target end.
     '''
-    import copy, random
-    from music21 import interval, stream, expressions, pitch
+    import random
+    from music21 import stream, expressions, pitch
 
     dirWeight = [-1, 1] # start with an even distribution
     s = stream.Stream()
@@ -486,8 +479,8 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
             break
         if len(s) > 30: # emergency break in case the piece is too long
             break
-        dir = random.choice(dirWeight)
-        if dir == 1:
+        direction = random.choice(dirWeight)
+        if direction == 1:
             i = random.choice(['w', 'h'])
         else:
             i = random.choice(['w-', 'h-'])
@@ -505,7 +498,7 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
     if show:
         s.show()
     else:
-        post = s.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(s)
 
 
 def ch1_writing_II_B(show=True, *arguments, **keywords):
@@ -559,7 +552,7 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     For each of the melodies below, provide the correct meter signature.
     Next to the signature, write in the meter type (e.g. simple triple).
     '''
-    from music21 import stream, clef, note, meter, key
+    from music21 import stream, key
     ex = stream.Stream()
     ex.insert(key.KeySignature(1))    
 
@@ -596,7 +589,7 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 def ch2_basic_I_A_2(show=True, *arguments, **keywords):
@@ -697,7 +690,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 def ch2_basic_II(show=True, *arguments, **keywords):
@@ -722,19 +715,19 @@ def ch2_writing_I_A(tsStr, barGroups):
     ex = stream.Stream()
     ex.insert(0, ts)
     for b in barGroups:
-        sum = 0
+        summation = 0
         for ql in b:
             if ql > 0: # quick encoding: negative values for rests
                 n = note.Note()
             else:
                 n = note.Rest()
             n.quarterLength = abs(ql)
-            sum += abs(ql)
+            summation += abs(ql)
             ex.append(n)
-        if ts.barDuration.quarterLength - sum > 0:
+        if ts.barDuration.quarterLength - summation > 0:
             nFill = note.Note()
             # subtract bar dur from sum of existing notes
-            nFill.quarterLength = ts.barDuration.quarterLength - sum
+            nFill.quarterLength = ts.barDuration.quarterLength - summation
             ex.append(nFill)
     
     return ex
@@ -749,7 +742,7 @@ def ch2_writing_I_A_1(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 def ch2_writing_I_A_2(show=True, *arguments, **keywords):
@@ -760,7 +753,7 @@ def ch2_writing_I_A_2(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 def ch2_writing_I_A_3(show=True, *arguments, **keywords):
     '''p. 14
@@ -770,7 +763,7 @@ def ch2_writing_I_A_3(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 def ch2_writing_I_A_4(show=True, *arguments, **keywords):
     '''p. 14
@@ -780,7 +773,7 @@ def ch2_writing_I_A_4(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 def ch2_writing_I_A_5(show=True, *arguments, **keywords):
     '''p. 14
@@ -790,7 +783,7 @@ def ch2_writing_I_A_5(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 
@@ -850,7 +843,7 @@ def ch2_writing_II_C(show=True, *arguments, **keywords):
 def ch2_writing_III_A(quarterLengthSrc, meterStr):
     '''Function for A1, A2, A3: Add ties. 
     '''
-    from music21 import meter, stream, note
+    from music21 import meter, stream
     ex = stream.Stream()
 
     # the source rhythms
@@ -891,7 +884,7 @@ def ch2_writing_III_A_1(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 def ch2_writing_III_A_2(show=True, *arguments, **keywords):
     '''p. 16
@@ -901,7 +894,7 @@ def ch2_writing_III_A_2(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 def ch2_writing_III_A_3(show=True, *arguments, **keywords):
     '''p. 16
@@ -911,14 +904,13 @@ def ch2_writing_III_A_3(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 def ch2_writing_III_B(src):
     '''Function for B1, B2, B3: Remove ties.
     '''
-    import copy
-    from music21 import meter, stream, note
+    from music21 import stream
     ex = stream.Stream()
 
     # the source rhythms
@@ -957,40 +949,37 @@ def ch2_writing_III_B_1(show=True, *arguments, **keywords):
 
     Renotate the following rhythms without ties. 
     '''
-    from music21 import tinyNotation
     ex = converter.parse("c8~ c16 c16 c16 c16 c8~ c8 c c16 c~ c c c8 c4~ c8", "3/8")
 
     ex = ch2_writing_III_B(ex)
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 def ch2_writing_III_B_2(show=True, *arguments, **keywords):
     '''p. 17
     '''
-    from music21 import tinyNotation
     ex = converter.parse("c4~ c8 c16 c c8 c~ c c c2~ c4 c8 c8 c8~ c16 c c8~ c16 c c2", "4/4")
 
     ex = ch2_writing_III_B(ex)
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 def ch2_writing_III_B_3(show=True, *arguments, **keywords):
     '''p. 17
     '''
-    from music21 import tinyNotation
     ex = converter.parse("c2~ c4 c c~ c8 c c4 c~ c c c2 c2 c2~ c4 c c1~ c2", "3/2")
 
     ex = ch2_writing_III_B(ex)
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 
@@ -1018,7 +1007,7 @@ def ch2_writing_IV_B(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 #-------------------------------------------------------------------------------
@@ -1029,7 +1018,7 @@ def ch2_writing_V_A(show=True, *arguments, **keywords):
 
     Using the meter signature given, add bar lines to the following melodies. 
     '''
-    from music21 import converter, key
+    from music21 import key
 
     # note: tiny is not encoding C#s for c'#4 properly (it seems)
     ex = converter.parse("g#1 f#4 g#4 a1 g#2 f#1 g#4. en8 g#2 f#4 r4 f#4 d#8 B8 e2 r4 e4 a4. a8 a2 g#4 g# b4. e8 a2~ a4 a4 d'n4. d'8 d'n2 c'#4 c'# c'# c'#", "3/2")
@@ -1043,7 +1032,7 @@ def ch2_writing_V_A(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 def ch2_writing_V_B(show=True, *arguments, **keywords):
     '''p. 18
@@ -1372,7 +1361,7 @@ def ch4_basic_IV_B(show=True, *arguments, **keywords):
 
 
 
-def ch4_basic_IV_B(show=True, *arguments, **keywords):
+def ch4_basic_IV_C(show=True, *arguments, **keywords):
     '''p. 37
     '''
     pass
@@ -1599,7 +1588,7 @@ def ch5_writing_IV_A(show=True, *arguments, **keywords):
 
     Note the meter signature, then add bar lines. 
     '''
-    from music21 import stream, clef, note, meter, key
+    from music21 import stream, meter, key
     ex = stream.Stream()
     
     ex.insert(clef.BassClef())
@@ -1623,7 +1612,7 @@ def ch5_writing_IV_A(show=True, *arguments, **keywords):
         # calling show creates measures and allocates notes for the time sig
         ex.show()
     else:
-        post = ex.musicxml
+        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
 
 
 def ch5_writing_IV_B(show=True, *arguments, **keywords):

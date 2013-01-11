@@ -1669,7 +1669,15 @@ class defList(list):
             self.append(value)
 
 
+#-----------------------------
+def pitchList(pitchList):
+    '''
+    utility method that replicates the previous behavior of lists of pitches
 
+    
+
+    '''
+    return '[' + ', '.join([x.nameWithOctave for x in pitchList]) + ']'
 
 #-------------------------------------------------------------------------------
 def wrapWeakref(referent):

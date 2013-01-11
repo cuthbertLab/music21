@@ -72,12 +72,12 @@ certainly don't need to click them now).
     instead of typing "`from music21 import \*`" you can type:
 
     >>> import music21
-
+    
     in which case instead of using the word `note`, you'll need to call it `music21.note`
-
+    
     >>> music21.note # doctest: +SKIP
     <module 'music21.note' from 'D:\music21files\music21\note.pyc'>
- 
+    
     If you are a Python guru, you already knew that.  Probably if you didn't already 
     know that, but you've heard about "polluting your namespace," you have a Python
     guru friend who has screamed, "Never use `import \*`!"  Trust me for now that

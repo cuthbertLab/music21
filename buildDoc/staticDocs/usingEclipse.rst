@@ -75,7 +75,7 @@ You've chosen to run Unix -- you should be able to figure this out on your own. 
 ----------------------------------------------
 
 (If you're on windows, be sure to install Python through the normal Windows installation routines, 
-see :ref:`_installWindows`)
+see :ref:`installWindows`)
 
 PyDev is a Python IDE for Eclipse, which may be used in Python, Jython, 
 and IronPython development. Installing PyDev must be done from inside Eclipse. 

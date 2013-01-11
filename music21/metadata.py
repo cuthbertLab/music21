@@ -1732,6 +1732,7 @@ class MetadataBundle(object):
             numberConverted += 1
             cp = self.corpusPathToKey(fp)
             try:
+                print fp
                 post = converter.parse(fp, forceSource=True)
             except:
                 environLocal.warn('parse failed: %s' % fp)

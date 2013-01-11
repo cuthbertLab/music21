@@ -64,7 +64,7 @@ Module Reference
    moduleAnalysisSearch
    moduleAnalysisWindowed
    moduleArticulations
-   moduleBase
+   moduleAudioSearchBase
    moduleAudioSearchRecording
    moduleAudioSearchTranscriber
    moduleBar
