@@ -1970,11 +1970,11 @@ class Test(unittest.TestCase):
 
     def testMetadataLoadCorpus(self):
         from music21 import musicxml
-        from music21.musicxml import testFiles
+        from music21.musicxml import testFiles as mTF
         from music21.musicxml import fromMxObjects
 
         d = musicxml.Document()
-        d.read(testFiles.mozartTrioK581Excerpt)
+        d.read(mTF.mozartTrioK581Excerpt)
         mxScore = d.score # get the mx score directly
         md = fromMxObjects.mxScoreToMetadata(mxScore)
 
@@ -1986,7 +1986,7 @@ class Test(unittest.TestCase):
         self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
 
 
-        d.read(testFiles.binchoisMagnificat)
+        d.read(mTF.binchoisMagnificat)
         mxScore = d.score # get the mx score directly
         md = fromMxObjects.mxScoreToMetadata(mxScore)
         self.assertEqual(md.composer, 'Gilles Binchois')
