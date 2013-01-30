@@ -61,6 +61,8 @@ class PageLayout(base.Music21Object):
         self.pageNumber = None
         self.leftMargin = None
         self.rightMargin = None
+        self.topMargin = None
+        self.bottomMargin = None
         self.pageHeight = None
         self.pageWidth = None
 
@@ -74,6 +76,10 @@ class PageLayout(base.Music21Object):
                 self.leftMargin = keywords[key]
             if key.lower() == 'rightmargin':
                 self.rightMargin = keywords[key]
+            if key.lower() == 'topmargin':
+                self.topMargin = keywords[key]
+            if key.lower() == 'bottommargin':
+                self.bottomMargin = keywords[key]
             if key.lower() == 'pageheight':
                 self.pageHeight = keywords[key]
             if key.lower() == 'pagewidth':
@@ -112,6 +118,8 @@ class SystemLayout(base.Music21Object):
         
         self.leftMargin = None
         self.rightMargin = None
+        self.topMargin = None
+        self.bottomMargin = None
 
         # this is probably the distance between adjacent systems
         # musicxml also defines a top-system-distance tag; this may not be
@@ -126,6 +134,11 @@ class SystemLayout(base.Music21Object):
                 self.leftMargin = keywords[key]
             if key.lower() == 'rightmargin':
                 self.rightMargin = keywords[key]
+            if key.lower() == 'topmargin':
+                self.topMargin = keywords[key]
+            if key.lower() == 'bottommargin':
+                self.bottomMargin = keywords[key]
+
             if key.lower() == 'distance':
                 self.distance = keywords[key]
             if key.lower() == 'isnew':

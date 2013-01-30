@@ -510,7 +510,8 @@ class Chord(note.NotRest):
             self._components.append(note.Note(p))
 
     pitches = property(_getPitches, _setPitches,
-        doc='''Get or set a list of all Pitch objects in this Chord.
+        doc='''
+        Get or set a list of all Pitch objects in this Chord.
 
         >>> from music21 import *
         >>> c = chord.Chord(["C4", "E4", "G#4"])

@@ -491,7 +491,7 @@ class Dialog(object):
         # define in subclass
 
     def askUser(self, force=None):
-        '''Ask the user, display the querry. The force argument can be provided to test. Sets self._result; does not return a value.
+        '''Ask the user, display the query. The force argument can be provided to test. Sets self._result; does not return a value.
         '''
         # if an introduction is defined, try to use it
         intro = self._rawIntroduction()
@@ -500,7 +500,7 @@ class Dialog(object):
 
         # always call preAskUser: can customize in subclass. must return True
         # or False. if False, askUser cannot continue
-        post = self._preAskUser(force=force)
+        post = self._preAskUser(force=force) 
         if post is False:
             self._result = BadConditions()
             return

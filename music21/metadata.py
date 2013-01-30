@@ -1732,7 +1732,6 @@ class MetadataBundle(object):
             numberConverted += 1
             cp = self.corpusPathToKey(fp)
             try:
-                print fp
                 post = converter.parse(fp, forceSource=True)
             except:
                 environLocal.warn('parse failed: %s' % fp)
@@ -1974,7 +1973,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import fromMxObjects
 
         d = musicxml.Document()
-        d.read(mTF.mozartTrioK581Excerpt)
+        d.read(mTF.mozartTrioK581Excerpt) #@UndefinedVariable
         mxScore = d.score # get the mx score directly
         md = fromMxObjects.mxScoreToMetadata(mxScore)
 
@@ -1986,7 +1985,7 @@ class Test(unittest.TestCase):
         self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
 
 
-        d.read(mTF.binchoisMagnificat)
+        d.read(mTF.binchoisMagnificat) # @UndefinedVariable
         mxScore = d.score # get the mx score directly
         md = fromMxObjects.mxScoreToMetadata(mxScore)
         self.assertEqual(md.composer, 'Gilles Binchois')
@@ -2156,7 +2155,7 @@ class Test(unittest.TestCase):
         # test getting meta data from an imported source
 
         d = musicxml.Document()
-        d.read(testFiles.mozartTrioK581Excerpt)
+        d.read(testFiles.mozartTrioK581Excerpt) # @UndefinedVariable
         mxScore = d.score # get the mx score directly
 
         md = fromMxObjects.mxScoreToMetadata(mxScore)

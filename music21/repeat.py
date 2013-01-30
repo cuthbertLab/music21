@@ -22,7 +22,6 @@ import unittest
 
 from music21 import exceptions21
 from music21 import expressions
-from music21 import search
 from music21 import spanner
 
 
@@ -1662,7 +1661,8 @@ class RepeatFinder(object):
                                 integer such that two measures are equal if their hashes are equal under the \'==\' operator',
                 's': 'The internal stream which is being analyzed for repeated sections'}
     def __init__(self, inpStream=None, defaultMeasureHashFunction=None):
-        
+        from music21 import search
+
         self.s = inpStream
         if defaultMeasureHashFunction is None:
             self.defaultHash = search.translateStreamToString

@@ -216,7 +216,7 @@ class TagLib(object):
         (True, 'TagLib audit: no errors found.')
         >>> tl['note'].start()
         >>> tl.audit()
-        (False, 'TagLib audit: 1 erorrs found:\\ntag <note> left open')
+        (False, 'TagLib audit: 1 errors found:\\ntag <note> left open')
         '''
         self._t = {}
 
@@ -282,7 +282,9 @@ class TagLib(object):
         ('system-layout', False, SystemLayout),  
         ('system-margins', False, SystemMargins),  
         ('right-margin', True),  
-        ('left-margin', True),  
+        ('left-margin', True),
+        ('top-margin', True),
+        ('bottom-margin', True),
         ('system-distance', True),  
         
         ('metronome', False, Metronome), # no char data
@@ -534,7 +536,7 @@ class TagLib(object):
                     errors.append('tag <%s> left element data: %s' % (key, sample))
         if len(errors) != 0:
             ok = False
-            return ok, header + ('%s erorrs found:\n' % len(errors)) + '\n'.join(errors)
+            return ok, header + ('%s errors found:\n' % len(errors)) + '\n'.join(errors)
         else:
             ok = True
             return ok, header + 'no errors found.' 
@@ -2981,29 +2983,31 @@ class PageLayout(MusicXMLElementList):
 
     def _getComponents(self):
         c = [] 
-        c += self.componentList
-        # place after components
+        # place BEFORE for musicxml components
         c.append(('page-height', self.pageHeight))
         c.append(('page-width', self.pageWidth))
+        c += self.componentList
         return c
 
 class PageMargins(MusicXMLElement):
     def __init__(self):
         '''
-        only supports left and right margins for now.
-        
-        and not the type = (odd|even|both) attribute
+        Does not support the type = (odd|even|both) attribute
         '''
         MusicXMLElement.__init__(self)
         self._tag = 'page-margins'
         # simple elements
         self.leftMargin = None
         self.rightMargin = None
+        self.topMargin = None
+        self.bottomMargin = None
 
     def _getComponents(self):
         c = []
         c.append(('left-margin', self.leftMargin))
         c.append(('right-margin', self.rightMargin))
+        c.append(('top-margin', self.topMargin))
+        c.append(('bottom-margin', self.bottomMargin))
         return c
 
 
@@ -3029,11 +3033,15 @@ class SystemMargins(MusicXMLElement):
         # simple elements
         self.leftMargin = None
         self.rightMargin = None
+        self.topMargin = None
+        self.bottomMargin = None
 
     def _getComponents(self):
         c = []
         c.append(('left-margin', self.leftMargin))
         c.append(('right-margin', self.rightMargin))
+        c.append(('top-margin', self.topMargin))
+        c.append(('bottom-margin', self.bottomMargin))
         return c
 
 
@@ -3532,6 +3540,20 @@ class Handler(xml.sax.ContentHandler):
                 self._mxObjs['system-margins'].rightMargin = self._currentTag.charData
             elif self._mxObjs['page-margins'] is not None: 
                 self._mxObjs['page-margins'].rightMargin = self._currentTag.charData
+
+        elif name == 'top-margin': # simple element
+            if self._mxObjs['system-margins'] is not None: 
+                self._mxObjs['system-margins'].topMargin = self._currentTag.charData
+            elif self._mxObjs['page-margins'] is not None: 
+                self._mxObjs['page-margins'].topMargin = self._currentTag.charData
+
+        elif name == 'bottom-margin': # simple element
+            if self._mxObjs['system-margins'] is not None: 
+                self._mxObjs['system-margins'].bottomMargin = self._currentTag.charData
+            elif self._mxObjs['page-margins'] is not None: 
+                self._mxObjs['page-margins'].bottomMargin = self._currentTag.charData
+
+
 
         elif name == 'system-distance': # simple element
             if self._mxObjs['system-layout'] is not None: 
@@ -4329,6 +4351,8 @@ class Test(unittest.TestCase):
         sm = SystemMargins()
         sm.set('leftMargin', 20)
         sm.set('rightMargin', 30)
+        sm.set('topMargin', 40)
+        sm.set('bottomMargin', 50)
 
         sl.append(sm) 
         # system distance contained in sys layout
@@ -4347,6 +4371,8 @@ class Test(unittest.TestCase):
     <system-margins>
       <left-margin>20</left-margin>
       <right-margin>30</right-margin>
+      <top-margin>40</top-margin>
+      <bottom-margin>50</bottom-margin>
     </system-margins>
     <system-distance>55</system-distance>
   </system-layout>
@@ -4607,7 +4633,7 @@ class Test(unittest.TestCase):
     def testTestFiles(self):
         # note: this import path will likel change
         from music21.musicxml import testFiles
-        for score in testFiles.ALL[:1]:
+        for score in testFiles.ALL[:1]: # @UndefinedVariable
             a = Document()
             a.read(score)
 

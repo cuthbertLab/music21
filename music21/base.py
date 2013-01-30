@@ -5,7 +5,6 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
-#               Ben Houge
 #
 # Copyright:    Copyright © 2008-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt

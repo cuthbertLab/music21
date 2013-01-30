@@ -2789,6 +2789,15 @@ def mxPrintToPageLayout(mxPrint, inputM21 = None):
         if data != None:
             pageLayout.rightMargin = float(data)
 
+        data = mxPageMargins.get('topMargin')
+        if data != None:
+            pageLayout.topMargin = float(data)
+
+        data = mxPageMargins.get('bottomMargin')
+        if data != None:
+            pageLayout.bottomMargin = float(data)
+
+
     if inputM21 is None:
         return pageLayout
 
@@ -2849,6 +2858,13 @@ def mxPrintToSystemLayout(mxPrint, inputM21 = None):
         data = mxSystemMargins.get('rightMargin')
         if data != None:
             systemLayout.rightMargin = float(data)
+        data = mxSystemMargins.get('topMargin')
+        if data != None:
+            systemLayout.rightMargin = float(data)
+        data = mxSystemMargins.get('bottomMargin')
+        if data != None:
+            systemLayout.rightMargin = float(data)
+
     
     if mxSystemLayout != [] and mxSystemLayout.systemDistance != None:
         systemLayout.distance = float(mxSystemLayout.systemDistance)
@@ -3033,7 +3049,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testFiles
 
-        s = converter.parse(testFiles.moussorgskyPromenade)
+        s = converter.parse(testFiles.moussorgskyPromenade) # @UndefinedVariable
         self.assertEqual(len(s.parts), 2)
 
         self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 19)

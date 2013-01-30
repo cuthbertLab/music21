@@ -1088,7 +1088,7 @@ def freeze(streamObj, fmt=None, fp=None):
     This function is based on the :class:`~music21.converter.StreamFreezer` object. 
 
     The serialization format is defined by the `fmt` argument; 'pickle' (the default) is only one 
-    presently supported.  'json' or 'jsonnative' will be used soon.
+    presently supported.  'json' or 'jsonnative' will be used once jsonpickle is good enough.
 
     If no file path is given, a temporary file is used.
 
@@ -1193,7 +1193,7 @@ class TestExternal(unittest.TestCase):
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
-        mxString = testFiles.ALL[1]
+        mxString = testFiles.ALL[1] # @UndefinedVariable
         a = ConverterMusicXML()
         a.parseData(mxString)
 
@@ -1491,12 +1491,12 @@ class Test(unittest.TestCase):
     def testConversionMXMetadata(self):
         from music21.musicxml import testFiles
 
-        a = parse(testFiles.mozartTrioK581Excerpt)
+        a = parse(testFiles.mozartTrioK581Excerpt) # @UndefinedVariable
         self.assertEqual(a.metadata.composer, 'Wolfgang Amadeus Mozart')
         self.assertEqual(a.metadata.title, 'Quintet for Clarinet and Strings')
         self.assertEqual(a.metadata.movementName, 'Menuetto (Excerpt from Second Trio)')
 
-        a = parse(testFiles.binchoisMagnificat)
+        a = parse(testFiles.binchoisMagnificat) # @UndefinedVariable
         self.assertEqual(a.metadata.composer, 'Gilles Binchois')
         # this gets the best title available, even though this is movement title
         self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')

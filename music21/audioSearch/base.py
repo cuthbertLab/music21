@@ -109,9 +109,9 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
         #len(_missingImport) > 0:
         raise AudioSearchException("Cannot run autocorrelationFunction without all of numpy, scipy, and matplotlib installed.  Missing %s" % music21Base._missingImport)
     import numpy
-    import scipy.signal
+    import scipy.signal # @UnresolvedImport
     #import matplotlib
-    import matplotlib.mlab
+    import matplotlib.mlab # @UnresolvedImport
     
     recordedSignal = numpy.array(recordedSignal)
     correlation = scipy.signal.fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')

@@ -1321,6 +1321,7 @@ def articulationToMxArticulation(articulationMark):
                    'Caesura'        : 'caesura',
                    'Stress'         : 'stress',
                    'Unstress'       : 'unstress',
+                   'Articulation'   : 'staccato', # WRONG, BUT NO GENERIC MARK EXISTS
                    }
     
     musicXMLArticulationName = None
@@ -1957,12 +1958,16 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxOffset = int(defaults.divisionsPerQuarter *
                            obj.getOffsetBySite(mFlat))
                 # get a list of objects: may be a text expression + metro
-                mxList = tempoIndicationToMx(obj)
-                for mxDirection in mxList: # a list of mxdirections
-                    mxDirection.offset = mxOffset
-                    # uses internal offset positioning, can insert at zero
-                    mxMeasure.insert(0, mxDirection)
-                    #mxMeasure.componentList.append(mxObj)
+                try:
+                    mxList = tempoIndicationToMx(obj)
+                    for mxDirection in mxList: # a list of mxdirections
+                        mxDirection.offset = mxOffset
+                        # uses internal offset positioning, can insert at zero
+                        mxMeasure.insert(0, mxDirection)
+                        #mxMeasure.componentList.append(mxObj)
+                except Exception as e:
+                    environLocal.warn("Could not convert MetronomeMark/MetricModulation %s: %s" % (obj, e))
+            
             elif 'TextExpression' in classes:
                 # convert m21 offset to musicxl  divisions
                 #environLocal.printDebug(['found TextExpression', obj])
@@ -2470,9 +2475,17 @@ def pageLayoutToMxPrint(pageLayout):
     if matchRight and not matchLeft:
         mxPageMargins.set('leftMargin', 0)
 
+    if pageLayout.topMargin != None:
+        mxPageMargins.set('topMargin', pageLayout.topMargin)
+    if pageLayout.bottomMargin != None:
+        mxPageMargins.set('bottomMargin', pageLayout.bottomMargin)
+
+
     # stored on components list
     if matchLeft or matchRight:
         mxPageLayout.append(mxPageMargins)
+
+
 
     mxPrint.append(mxPageLayout)
 
@@ -2521,6 +2534,12 @@ def systemLayoutToMxPrint(systemLayout):
         mxSystemMargins.set('rightMargin', 0)
     if matchRight and not matchLeft:
         mxSystemMargins.set('leftMargin', 0)
+
+    if systemLayout.topMargin != None:
+        mxSystemMargins.set('topMargin', systemLayout.topMargin)
+    if systemLayout.rightMargin != None:
+        mxSystemMargins.set('bottomMargin', systemLayout.bottomMargin)
+ 
 
     # stored on components list
     if matchLeft or matchRight:

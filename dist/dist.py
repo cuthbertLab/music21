@@ -4,8 +4,9 @@
 # Purpose:      Distribution and uploading script
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -95,7 +96,8 @@ class Distributor(object):
             elif self.version in fn and fn.endswith('.exe'):
                 fpNew = fp.replace('.macosx-10.6-intel.exe', '.exe')
                 fpNew = fpNew.replace('.macosx-10.7-x86_64.exe', '.exe')
-                fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.exe')
+                fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.8-intel.exe', '.win32.exe')
                 if fpNew != fp:
                     os.rename(fp, fpNew)
                 self.fpWin = fpNew

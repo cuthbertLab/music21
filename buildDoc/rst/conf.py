@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2010, 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010, 2012-13 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ except ImportError:
 # General substitutions.
 project = 'music21'
 release = music21.VERSION_STR
-copyright = '2009-2012, Michael Scott Cuthbert and the music21 Project'
+copyright = '2008-2013, Michael Scott Cuthbert and the music21 Project'
 
 
 html_last_updated_fmt = '%b %d, %Y'

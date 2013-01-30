@@ -4,8 +4,10 @@
 # Purpose:      Translate ABC and music21 objects
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
+#               Dylan Nagler
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -30,6 +32,9 @@ from music21 import meter
 from music21 import stream
 from music21 import tie
 from music21 import articulations
+from music21 import note
+from music21 import chord
+from music21 import spanner
 
 _MOD = 'abc.translate.py'
 environLocal = environment.Environment(_MOD)
@@ -39,23 +44,20 @@ environLocal = environment.Environment(_MOD)
 def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     '''
     Handler conversion of a single Part of a multi-part score. 
-    Results, as a Part, are built into the provided inputM21 object 
-    (a Score or similar Stream) or a newly created Stream.
+    Results are added into the provided inputM21 object
+    or a newly created Part object
+    
+    The part object is then returned.
     '''
-    from music21 import spanner
-    from music21 import note
-    from music21 import chord
-
     if inputM21 == None:
-        s = stream.Score()
+        p = stream.Part()
     else:
-        s = inputM21
+        p = inputM21
 
     if spannerBundle is None:
         #environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
 
-    p = stream.Part()
 
     # need to call on entire handlers, as looks for special criterial, 
     # like that at least 2 regular bars are used, not just double bars    
@@ -81,10 +83,10 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     barCount = 0
     measureNumber = 1
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
+
     for mh in mergedHandlers:
         # if use measures and the handler has notes; otherwise add to part
         #environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken, 'right:', mh.rightBarToken, 'len(mh)', len(mh)])
-
 
         if useMeasures and mh.hasNotes():
             #environLocal.printDebug(['abcToStreamPart', 'useMeasures', useMeasures, 'mh.hasNotes()', mh.hasNotes()])
@@ -150,7 +152,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # in case need to transpose due to clef indication
         postTransposition = 0
         clefSet = False
-        for t in mh.tokens:    
+        for t in mh.tokens:  
             if isinstance(t, abcModule.ABCMetadata):
                 if t.isMeter():
                     ts = t.getTimeSignatureObject()
@@ -218,8 +220,12 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         n.tie.style = "normal"
                     elif t.tie == "stop":
                         n.tie = tie.Tie(t.tie)
+                ### Was: Extremely Slow for large Opus files... why?
+                ### Answer: some pieces didn't close all their spanners, so
+                ###         everything was in a Slur/Diminuendo, etc.
                 for span in t.applicableSpanners:
                     span.addSpannedElements(n)
+                
                 if t.inGrace:
                     n = n.getGrace()
                 
@@ -246,7 +252,6 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 p._appendCore(t.crescObj)
             elif isinstance(t, abcModule.ABCDimStart):
                 p._appendCore(t.dimObj)
-                
         dst._elementsChanged()
 
         # append measure to part; in the case of trailing meta data
@@ -271,7 +276,6 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         reBar(p, inPlace=True)
     except (ABCTranslateException, meter.MeterException, ZeroDivisionError):
         pass
-    
     # clefs are not typically defined, but if so, are set to the first measure
     # following the meta data, or in the open stream
     if not clefSet:
@@ -298,9 +302,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     for sp in rm:
         spannerBundle.remove(sp)
     p._elementsChanged()
-
-    s.insert(0, p)
-    return s
+    return p
 
 
 def abcToStreamScore(abcHandler, inputM21=None):
@@ -311,7 +313,6 @@ def abcToStreamScore(abcHandler, inputM21=None):
     if the optional parameter inputM21 is given a music21 Stream subclass, it will use that object
     as the outermost object.  However, inner parts will always be made :class:`~music21.stream.Part` objects.
     '''
-
     from music21 import metadata
 
     if inputM21 == None:
@@ -365,8 +366,15 @@ def abcToStreamScore(abcHandler, inputM21=None):
     # find if this token list defines measures
     # this should probably operate at the level of tunes, not the entire
     # token list
+
+    partList = []
     for partHandler in partHandlers:
-        abcToStreamPart(partHandler, s)
+        p = abcToStreamPart(partHandler)
+        partList.append(p)
+
+    for p in partList:
+        s._insertCore(0, p)
+    s._elementsChanged()
     return s
 
 
@@ -379,9 +387,9 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     that number, that work is returned. 
     '''
     if inputM21 == None:
-        s = stream.Opus()
+        opus = stream.Opus()
     else:
-        s = inputM21
+        opus = inputM21
 
     #environLocal.printDebug(['abcToStreamOpus: got number', number])
 
@@ -389,21 +397,24 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     if abcHandler.definesReferenceNumbers():
         abcDict = abcHandler.splitByReferenceNumber()
         if number != None and number in abcDict:
-            s = stream.Score() # return a Stream
             # get number from dictionary; set to new score
-            abcToStreamScore(abcDict[number], inputM21=s)
+            opus = abcToStreamScore(abcDict[number]) # return a score, not an opus
         else: # build entire opus into an opus stream
+            scoreList = []
             for key in sorted(abcDict.keys()):
                 # do not need to set work number, as that will be gathered
                 # with meta data in abcToStreamScore
                 try:
-                    s.append(abcToStreamScore(abcDict[key]))
+                    scoreList.append(abcToStreamScore(abcDict[key]))
                 except:
                     print "Failure for piece number %d" % key
+            for scoreDocument in scoreList:
+                opus._appendCore(scoreDocument)
+            opus._elementsChanged()
 
     else: # just return single entry in opus object
-        s.append(abcToStreamScore(abcHandler))
-    return s
+        opus.append(abcToStreamScore(abcHandler))
+    return opus
 
 def reBar(music21Part, inPlace=True):
     """

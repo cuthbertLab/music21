@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#@PydevCodeAnalysisIgnore
 #
 # Copyright 2006, 2007 Google Inc. All Rights Reserved.
 # Author: danderson@google.com (David Anderson)

@@ -11,11 +11,12 @@ Music21 is an open-source toolkit for Computer-aided musicology.  It is licensed
 About the Authors
 -----------------------
 
-**Michael Cuthbert**, the creator of music21,  is Homer A. Burnell Associate Professor of Music at M.I.T.  
+**Michael Cuthbert**, the creator of music21, is Homer A. Burnell Associate Professor of Music at M.I.T.  
 He received his A.B. *summa cum laude*, A.M. and Ph.D. degrees from Harvard University.   
 Cuthbert spent 2004-05 at the American Academy as a Rome Prize winner in Medieval Studies,
 2009-10 as Fellow at Harvard's Villa I Tatti Center for Italian Renaissance Studies 
 in Florence, and 2012-13 at the Radcliffe Institute.  
+
 Prior to joining the M.I.T. faculty, Cuthbert was on the faculties of Smith 
 and Mount Holyoke Colleges.  He has worked extensively on computer-aided musical analysis,
 fourteenth-century music, and the music of the past forty years.  He has published
@@ -24,16 +25,13 @@ on set analysis of Sub-Saharan African Rhythm and the music of John Zorn. In add
 work on music21, Cuthbert is currently writing a book on sacred music in Italy during the 
 age of the Black Death and Great Papal Schism.
 
-**Christopher Ariza** is Lead Programmer of music21 and Visiting Assistant Professor of Music
-at M.I.T.  Prior to joining the music21 project, Ariza was Assistant Professor of Music
+**Christopher Ariza** is Former Lead Programmer of music21 and was Visiting Assistant Professor of Music
+at M.I.T. from 2010 to 2013.  Prior to joining the music21 project, Ariza was Assistant Professor of Music
 Technology at Towson University in Baltimore.  He has published and presented numerous articles 
 and papers on algorithmic composition and generative music systems.  Ariza received his A.B.
 degree from Harvard University and his M.A. and Ph.D. degrees from New York University.
 
-
-
-
-
+Additional contributions by many MIT students and visitors and the Open Source software community.
 
 
 
@@ -43,7 +41,8 @@ Acknowledgements
 Funding
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The music21 project was made possible by generous research funding from the **Seaver Institute**.
+The music21 project was made possible by generous research funding from the **Seaver Institute** and
+the **National Endowment for the Humanities**/Digging into Data research fund.
 
 In addition, we acknowledge consistent support from `M.I.T.`_, the 
 `School of Humanities Arts and Social Sciences`_, and the `Music and Theater Arts`_ section.
@@ -86,9 +85,9 @@ Their contributions and generosity are greatly appreciated.
 
 * `Michael Good`_ and Recordare.com for creating MusicXML and many discussions about the project.
 
-* `Margaret Greentree`_ has kindly  given permission for distribution of her edited collection 
+* `Margaret Greentree`_ kindly gave permission for distribution of her edited collection 
   of the Bach chorales in MusicXML format as part of the music21 corpus. 
-  Her website contains all these chorales in additional formats.
+  Her website contains all these chorales in additional formats.  Any discoveries we make regarding these chorales are done in her memory.
 
 * `Walter B. Hewlett`_ and The Center for Computer Assisted Research in the Humanities (CCARH) have kindly given permission for distribution of musedata encoded files.
 
@@ -115,10 +114,6 @@ Their contributions and generosity are greatly appreciated.
 .. _Manuel Op de Coul: http://www.huygens-fokker.org/scala
 .. _John Chambers: http://trillian.mit.edu/~jc/music/book
 .. _Jack Campin: http://www.campin.me.uk/
-
-
-
-
 
 
 

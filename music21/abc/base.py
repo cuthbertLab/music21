@@ -5,8 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Dylan J. Nagler
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -1950,6 +1951,11 @@ class ABCHandler(object):
                 elif t.isKey():
                     sharpCount, mode = t._getKeySignatureParameters()
                     lastKeySignature = key.KeySignature(sharpCount, mode)
+                
+                if t.isReferenceNumber():
+                    # reset any spanners or parens at the end of any piece in case they aren't closed.
+                    self.activeParens = []
+                    self.activeSpanners = []
                 continue
             # broken rhythms need to be applied to previous and next notes
             if isinstance(t, ABCBrokenRhythmMarker):
