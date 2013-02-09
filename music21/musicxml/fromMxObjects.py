@@ -132,8 +132,8 @@ def mxCreditToTextBox(mxCredit):
         raise FromMxObjectsException('no credit words defined for a credit tag')
     tb.content = '\n'.join(content) # join with \n
     # take formatting from the first, no matter if multiple are defined
-    tb.positionVertical = mxCredit.componentList[0].get('default-x')
-    tb.positionHorizontal = mxCredit.componentList[0].get('default-y')
+    tb.positionVertical = mxCredit.componentList[0].get('default-y')
+    tb.positionHorizontal = mxCredit.componentList[0].get('default-x')
     tb.justify = mxCredit.componentList[0].get('justify')
     tb.style = mxCredit.componentList[0].get('font-style')
     tb.weight = mxCredit.componentList[0].get('font-weight')
@@ -1711,6 +1711,10 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     if mxNote.get('color') is not None:
         n.color = mxNote.get('color')
 
+    # get x-positioning if any...
+    if mxNote.get('default-x') is not None:
+        n.xPosition = mxNote.get('default-x')
+
     # can use mxNote.tieList instead
     mxTieList = mxNote.get('tieList')
     if len(mxTieList) > 0:
@@ -1790,6 +1794,37 @@ def mxToRest(mxNote, inputM21=None):
         r.color = mxNote.get('color')
 
     return r
+
+#------------------------------------------------------------------------------
+# Defaults
+
+def mxDefaultsToScoreLayout(mxDefaults, inputM21=None):
+    '''
+    Convert a :class:`~music21.musicxml.Defaults` 
+    object to a :class:`~music21.layout.ScoreLayout` 
+    object
+    '''
+    if inputM21 is None:
+        scoreLayout = layout.ScoreLayout()
+    else:
+        scoreLayout = inputM21
+
+    mxScalingObj = mxDefaults.scalingObj    
+    if mxScalingObj is not None:
+        mms = mxScalingObj.millimeters
+        scoreLayout.scalingMillimeters = mms
+        tenths = mxScalingObj.tenths
+        scoreLayout.scalingTenths = tenths
+    
+    for mxLayoutObj in mxDefaults.layoutList:
+        if mxLayoutObj.tag == 'page-layout':
+            scoreLayout.pageLayout = mxPageLayoutToPageLayout(mxLayoutObj)
+        elif mxLayoutObj.tag == 'system-layout':
+            scoreLayout.systemLayout = mxSystemLayoutToSystemLayout(mxLayoutObj)
+        elif mxLayoutObj.tag == 'staff-layout': # according to xsd can be more than one.  meaning?
+            scoreLayout.staffLayoutList.append(mxStaffLayoutToStaffLayout(mxLayoutObj))
+    
+    return scoreLayout
 
 
 
@@ -1965,6 +2000,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             mxPrint = mxObj
             addPageLayout = False
             addSystemLayout = False
+            addStaffLayout = False
             try:
                 addPageLayout = mxPrint.get('new-page')
                 if addPageLayout is not None:
@@ -2000,6 +2036,13 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     if isinstance(layoutType, musicxmlMod.SystemLayout):
                         addSystemLayout = True
                         break
+
+            for layoutType in mxPrint.componentList:
+                if isinstance(layoutType, musicxmlMod.StaffLayout):
+                    addStaffLayout = True
+                    break
+            
+            #--- now we know what we need to add, add em
             if addPageLayout:
                 pl = mxPrintToPageLayout(mxPrint)
                 # store at zero position
@@ -2008,6 +2051,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 sl = mxPrintToSystemLayout(mxPrint)
                 # store at zero position
                 m._insertCore(0, sl)
+            if addStaffLayout:
+                stl = mxPrintToStaffLayout(mxPrint)
+                m._insertCore(0, stl)
 
         # <sound> tags may be found in the Measure, used to define tempo
         elif isinstance(mxObj, musicxmlMod.Sound):
@@ -2054,7 +2100,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         rb.completeStatus = True
                         rb.number = mxEndingObj.get('number')
                     else:
-                        raise FromMxObjectsException('found mx Ending object that is not stop message, even though there is still an open start message.')
+                        environLocal.warn('found mxEnding object that is not stop message, even though there is still an open start message. -- ignoring it')
 
             if barline.location == 'left':
                 #environLocal.printDebug(['setting left barline', barline])
@@ -2533,7 +2579,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     else:
         return streamPart
 
-def mxToScore(mxScore, spannerBundle=None, inputM21=None):
+def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
     '''
     Translate an mxScore into a music21 Score object 
     or puts it into the
@@ -2596,11 +2642,32 @@ def mxToScore(mxScore, spannerBundle=None, inputM21=None):
     md = mxScoreToMetadata(mxScore)
     s._insertCore(0, md)
 
+    if mxScore.defaultsObj is not None:
+        scoreLayout = mxDefaultsToScoreLayout(mxScore.defaultsObj)
+        s._insertCore(0, scoreLayout)
+
     # store credits on Score stream
     for mxCredit in mxScore.creditList:
         co = mxCreditToTextBox(mxCredit)
         s._insertCore(0, co) # insert position does not matter
 
+    ## get supports information
+    mxIdentification = mxScore.identificationObj
+    if mxIdentification is not None:
+        mxEncoding = mxIdentification.encodingObj
+        if mxEncoding is not None:
+            for mxSupports in mxEncoding.supportsList:
+                if (mxSupports.get('attribute') == 'new-system' and
+                    mxSupports.get('value') == 'yes'):
+                    s.definesExplicitSystemBreaks = True
+                    for p in s.parts:
+                        p.definesExplicitSystemBreaks = True
+                elif (mxSupports.get('attribute') == 'new-page' and
+                    mxSupports.get('value') == 'yes'):
+                    s.definesExplicitPageBreaks = True
+                    for p in s.parts:
+                        p.definesExplicitPageBreaks = True
+                    
     # only insert complete spanners; at each level possible, complete spanners
     # are inserted into either the Score or the Part
     # storing complete Part spanners in a Part permits extracting parts with spanners
@@ -2761,19 +2828,37 @@ def mxPrintToPageLayout(mxPrint, inputM21 = None):
         else:
             pageLayout.pageNumber = number
 
-    mxPageLayout = [] # blank
+    mxPageLayout = None # blank
     for x in mxPrint:
         if isinstance(x, musicxmlMod.PageLayout):
             mxPageLayout = x
             break # find first and break
 
-    if mxPageLayout != []:
-        pageHeight = mxPageLayout.get('pageHeight')
-        if pageHeight is not None:
-            pageLayout.pageHeight = float(pageHeight)
-        pageWidth = mxPageLayout.get('pageWidth')
-        if pageWidth is not None:
-            pageLayout.pageWidth = float(pageWidth)
+    if mxPageLayout is not None:
+        mxPageLayoutToPageLayout(mxPageLayout, inputM21 = pageLayout)
+
+
+    if inputM21 is None:
+        return pageLayout
+
+def mxPageLayoutToPageLayout(mxPageLayout, inputM21 = None):
+    '''
+    get a PageLayout object from an mxPageLayout
+    
+    Called out from mxPrintToPageLayout because it
+    is also used in the <defaults> tag
+    '''
+    if inputM21 is None:
+        pageLayout = layout.PageLayout()
+    else:
+        pageLayout = inputM21
+
+    pageHeight = mxPageLayout.get('pageHeight')
+    if pageHeight is not None:
+        pageLayout.pageHeight = float(pageHeight)
+    pageWidth = mxPageLayout.get('pageWidth')
+    if pageWidth is not None:
+        pageLayout.pageWidth = float(pageWidth)
 
     mxPageMargins = None
     for x in mxPageLayout:
@@ -2797,10 +2882,8 @@ def mxPrintToPageLayout(mxPrint, inputM21 = None):
         if data != None:
             pageLayout.bottomMargin = float(data)
 
-
     if inputM21 is None:
         return pageLayout
-
 
 def mxPrintToSystemLayout(mxPrint, inputM21 = None):
     '''
@@ -2839,18 +2922,37 @@ def mxPrintToSystemLayout(mxPrint, inputM21 = None):
         systemLayout.isNew = False
 
     #mxSystemLayout = mxPrint.get('systemLayout')
-    mxSystemLayout = [] # blank
+    mxSystemLayout = None # blank
     for x in mxPrint:
         if isinstance(x, musicxmlMod.SystemLayout):
             mxSystemLayout = x
             break # find first and break
 
+    if mxSystemLayout is not None:
+        mxSystemLayoutToSystemLayout(mxSystemLayout, inputM21 = systemLayout)
+
+    if inputM21 is None:
+        return systemLayout
+
+def mxSystemLayoutToSystemLayout(mxSystemLayout, inputM21 = None):
+    '''
+    get a SystemLayout object from an mxSystemLayout
+    
+    Called out from mxPrintToSystemLayout because it
+    is also used in the <defaults> tag
+    '''
+    if inputM21 is None:
+        systemLayout = layout.SystemLayout()
+    else:
+        systemLayout = inputM21
+
     mxSystemMargins = None
     for x in mxSystemLayout:
         if isinstance(x, musicxmlMod.SystemMargins):
             mxSystemMargins = x
+            break
 
-    if mxSystemMargins != None:
+    if mxSystemMargins is not None:
         data = mxSystemMargins.get('leftMargin')
         if data != None:
             # may be floating point values
@@ -2864,13 +2966,79 @@ def mxPrintToSystemLayout(mxPrint, inputM21 = None):
         data = mxSystemMargins.get('bottomMargin')
         if data != None:
             systemLayout.rightMargin = float(data)
-
     
-    if mxSystemLayout != [] and mxSystemLayout.systemDistance != None:
+    if mxSystemLayout.systemDistance != None:
         systemLayout.distance = float(mxSystemLayout.systemDistance)
+    if mxSystemLayout.topSystemDistance != None:
+        systemLayout.topDistance = float(mxSystemLayout.topSystemDistance)
+
 
     if inputM21 is None:
         return systemLayout
+
+
+def mxPrintToStaffLayout(mxPrint, inputM21 = None):
+    '''
+    Given an mxPrint object, set object data for a StaffLayout object
+
+    >>> from music21 import *
+    >>> mxPrint = musicxml.Print()
+    
+    # this is a red-herring... does nothing here...
+    >>> mxPrint.set('new-system', 'yes')
+    
+    >>> mxStaffLayout = musicxml.StaffLayout()
+    >>> mxStaffLayout.staffDistance = 55
+    >>> mxStaffLayout.set('number', 1)
+    >>> mxPrint.append(mxStaffLayout)
+
+    >>> sl = musicxml.fromMxObjects.mxPrintToStaffLayout(mxPrint)
+    >>> sl.distance
+    55.0
+    >>> sl.staffNumber
+    1
+    '''
+    if inputM21 is None:
+        staffLayout = layout.StaffLayout()
+    else:
+        staffLayout = inputM21
+
+    mxStaffLayout = None # blank
+    for x in mxPrint:
+        if isinstance(x, musicxmlMod.StaffLayout):
+            mxStaffLayout = x
+            break # find first and break
+
+    if mxStaffLayout is not None:
+        mxStaffLayoutToStaffLayout(mxStaffLayout, inputM21 = staffLayout)
+
+    if inputM21 is None:
+        return staffLayout
+
+def mxStaffLayoutToStaffLayout(mxStaffLayout, inputM21 = None):
+    '''
+    get a StaffLayout object from an mxStaffLayout
+    
+    Called out from mxPrintToStaffLayout because it
+    is also used in the <defaults> tag
+    '''
+    if inputM21 is None:
+        staffLayout = layout.StaffLayout()
+    else:
+        staffLayout = inputM21
+    
+    if mxStaffLayout.staffDistance != None:
+        staffLayout.distance = float(mxStaffLayout.staffDistance)
+    data = mxStaffLayout.get('number')
+    if data is not None:
+        staffLayout.staffNumber = int(data)
+
+
+    if inputM21 is None:
+        return staffLayout
+
+
+
 
 #-----------------------------------------------------------------
 # metadata
@@ -3026,9 +3194,9 @@ class Test(unittest.TestCase):
     def testMultipleStavesPerPartA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
-        from music21.musicxml import base
+        from music21.musicxml import xmlHandler
 
-        mxDoc = base.Document()
+        mxDoc = xmlHandler.Document()
         mxDoc.read(testPrimitive.pianoStaff43a)
 
         # parts are stored in component list
@@ -3570,7 +3738,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [mxToScore]
+_DOC_ORDER = [mxScoreToScore]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

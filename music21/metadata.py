@@ -1968,11 +1968,11 @@ class Test(unittest.TestCase):
 
 
     def testMetadataLoadCorpus(self):
-        from music21 import musicxml
+        from music21.musicxml import xmlHandler
         from music21.musicxml import testFiles as mTF
         from music21.musicxml import fromMxObjects
 
-        d = musicxml.Document()
+        d = xmlHandler.Document()
         d.read(mTF.mozartTrioK581Excerpt) #@UndefinedVariable
         mxScore = d.score # get the mx score directly
         md = fromMxObjects.mxScoreToMetadata(mxScore)
@@ -2129,7 +2129,7 @@ class Test(unittest.TestCase):
 
 
     def testJSONSerializationMetadata(self):
-        from music21 import musicxml
+        from music21.musicxml import xmlHandler
         from music21.musicxml import fromMxObjects
         from music21.musicxml import testFiles
         from music21 import metadata # need to not be local...
@@ -2154,7 +2154,7 @@ class Test(unittest.TestCase):
 
         # test getting meta data from an imported source
 
-        d = musicxml.Document()
+        d = xmlHandler.Document()
         d.read(testFiles.mozartTrioK581Excerpt) # @UndefinedVariable
         mxScore = d.score # get the mx score directly
 

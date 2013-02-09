@@ -49,15 +49,26 @@ def translateMonophonicPartToSegments(inputStream, segmentLengths = 30, overlap 
     ['HJHEAAEHHCE@JHGECA@A>@A><A@AAE', '@A>@A><A@AAEEECGHJHGH@CAE@FECA']
     >>> measureLists[0:3]
     [1, 7, 14]
+
+    >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus, algorithm=search.translateDiatonicStreamToString)
+    >>> segments[0:2]
+    ['CRJOMTHCQNALRQPAGFEFDLFDCFEMOO', 'EFDLFDCFEMOOONPJDCBJSNTHLBOGFE']
+    >>> measureLists[0:3]
+    [1, 7, 14]
     '''
     segmentList = []
     measureSegmentList = []
     measureList = []
     
     totalLength = 0
+    previousTuple = (False, False, None) # lastRest, lastTied, lastQL
     for m in inputStream.getElementsByClass('Measure'):
         mNotes = m.flat.getElementsByClass('Note')
-        algorithmOutput = algorithm(mNotes)
+        if algorithm == searchBase.translateDiatonicStreamToString:
+            algorithmOutput, previousTuple = algorithm(mNotes, previousTuple[0], previousTuple[1], previousTuple[2], returnLastTuple=True)
+        else: # not all algorithms can take two streams...
+            algorithmOutput = algorithm(mNotes) 
+        
         mDict = {'measureNumber': m.number, 
                  'data': algorithmOutput, 
                  'dataLength': len(algorithmOutput), 

@@ -166,8 +166,6 @@ class Stream(base.Music21Object):
     {0.0} <music21.stream.Part embeddedPart>
         {0.0} <music21.note.Rest rest>
     {1.0} <music21.note.Note E->
-    
-
     '''
 
     # this static attributes offer a performance boost over other 
@@ -188,6 +186,8 @@ class Stream(base.Music21Object):
     'isFlat': 'Boolean describing whether this Stream contains embedded sub-Streams or Stream subclasses (not flat).',
 
     'flattenedRepresentationOf': 'When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here.',
+    'definesExplicitSystemBreaks': 'Boolean that says whether all system breaks in the piece are explicitly defined.  Only used on musicxml output (maps to the musicxml <supports attribute="new-system"> tag) and only if this is the outermost Stream being shown',
+    'definesExplicitPageBreaks': 'Boolean that says whether all page breaks in the piece are explicitly defined.  Only used on musicxml output (maps to the musicxml <supports attribute="new-page"> tag) and only if this is the outermost Stream being shown',
     }
 
     def __init__(self, givenElements=None, *args, **keywords):
@@ -209,6 +209,8 @@ class Stream(base.Music21Object):
         self.isSorted = True
         self.autoSort = True
         self.isFlat = True  # does it have no embedded Streams
+        self.definesExplicitSystemBreaks = False
+        self.definesExplicitPageBreaks = False
 
         # property for transposition status; 
         self._atSoundingPitch = 'unknown' # True, False, or unknown
@@ -11943,23 +11945,17 @@ class System(Stream):
     systemNumber = 0
     systemNumbering = "Score" # or Page; when do system numbers reset?
  
-# class Page(Stream):
-#     '''
-#     Totally optional: designation that all the music in this Stream
-#     belongs on a single notated page
-#     '''
-#     pageNumber = 0
-#     
 
 class Score(Stream):
     """
     A Stream subclass for handling multi-part music.
     
-    Absolutely optional (the largest containing Stream in a piece could be
+    Almost totally optional (the largest containing Stream in a piece could be
     a generic Stream, or a Part, or a Staff).  And Scores can be
     embedded in other Scores (in fact, our original thought was to call
     this class a Fragment because of this possibility of continuous
-    embedding), but we figure that many people will like calling the largest
+    embedding; though it's probably better to embed a Score in an Opus), 
+    but we figure that many people will like calling the largest
     container a Score and that this will become a standard.
     """
 

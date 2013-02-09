@@ -102,15 +102,21 @@ __all__ = ['base',
 #-------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages
 #from music21.analysis import *
-import sys
-x = sys.stdout
+#import sys
+#x = sys.stdout
 
 
 #-------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
 import base
 from base import *
-
+#del(types)
+#del(sys)
+#del(imp)
+#del(doctest)
+#del(copy)
+#del(codecs)
+#del(unittest)
 #-------------------------------------------------------------------------------
 # place the parse function directly in the music21 namespace
 # this cannot go in music21/base.py

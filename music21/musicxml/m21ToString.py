@@ -129,6 +129,12 @@ def fromDuration(d):
       <identification>
         <creator type="composer">Music21</creator>
       </identification>
+      <defaults>
+        <scaling>
+          <millimeters>7</millimeters>
+          <tenths>40</tenths>
+        </scaling>
+      </defaults>
       <part-list>
       ...
       </part-list>

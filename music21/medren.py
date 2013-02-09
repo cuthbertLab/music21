@@ -992,7 +992,7 @@ class Ligature(base.Music21Object):
     >>> l1.makeOblique(0)
     >>> l1.setStem(0, 'down', 'left')
     >>> print [n.fullName for n in l1.notes]
-    ['brevis A4 ', 'brevis F4 ', 'brevis G4 ', 'brevis A4 ', 'brevis B4-flat ']
+    ['brevis A in octave 4 ', 'brevis F in octave 4 ', 'brevis G in octave 4 ', 'brevis A in octave 4 ', 'brevis B-flat in octave 4 ']
     >>>
     >>> l2 = medren.Ligature(['F4','G4','A4','B-4','D5'])
     >>> l2.setStem(4, 'down', 'left')

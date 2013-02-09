@@ -30,7 +30,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'1.4.0'
+'1.5.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -42,7 +42,7 @@ under the module "base":
 
 #-------------------------------------------------------------------------------
 # string and tuple must be the same
-VERSION = (1, 4, 0)
+VERSION = (1, 5, 0)
 VERSION_STR = "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
 #-------------------------------------------------------------------------------
 
@@ -1535,7 +1535,8 @@ class Music21Object(object):
         >>> ec1.classSortOrder
         5
         ''',
-        'hideObjectOnPrint': 'if set to `True` will not print upon output (only used in MusicXML output at this point).',
+    'hideObjectOnPrint': 'if set to `True` will not print upon output (only used in MusicXML output at this point).',
+    'xPosition': 'if set, defines the display x-position from the start of the container (in musicxml "tenths" by default)',
     }
 
     def __init__(self, *arguments, **keywords):
@@ -1554,6 +1555,8 @@ class Music21Object(object):
         self._priority = 0 # default is zero
 
         self.hideObjectOnPrint = False
+        self.xPosition = None
+        
         if "id" in keywords:
             self.id = keywords["id"]            
         else:

@@ -456,7 +456,7 @@ class Test(unittest.TestCase):
         d = Dynamic('p')
         xmlout = m21ToString.fromMusic21Object(d)
         match = '<p/>'
-        self.assertEquals(xmlout.find(match), 885)
+        self.assertTrue(xmlout.find(match) != -1)
 
 
     def testDynamicsPositionA(self):

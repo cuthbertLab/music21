@@ -256,7 +256,8 @@ vexflowSharpsToKeySignatures = {
 '''
 Variables used in generating full HTML pages within which to view the VexFlow
 '''
-vexflowGlobalCopy = "<script src='http://www.vexflow.com/vexflow.js'/></script>"
+#vexflowGlobalCopy = "<script src='http://www.vexflow.com/vexflow.js'/></script>"
+vexflowGlobalCopy = "<script src='http://www.vexflow.com/support/vexflow-min.js'></script>"
 htmlCanvasPreamble = "".join([r'''<!DOCTYPE HTML>
 <html>
 <head>
@@ -475,7 +476,7 @@ def fromRest(thisRest, mode='txt'):
     <head>
         <meta name='author' content='Music21' />
         <script src='http://code.jquery.com/jquery-latest.js'></script>
-        <script src='http://www.vexflow.com/vexflow.js'/></script>
+        <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
     </head>
     <body>
         <canvas width="525" height="120" id='music21canvas'></canvas>
@@ -535,7 +536,7 @@ def fromChord(thisChord, mode='txt'):
     <head>
         <meta name='author' content='Music21' />
         <script src='http://code.jquery.com/jquery-latest.js'></script>
-        <script src='http://www.vexflow.com/vexflow.js'/></script>
+        <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
     </head>
     <body>
         <canvas width="525" height="120" id='music21canvas'></canvas>
@@ -725,7 +726,7 @@ class VexflowObject(object):
         <head>
             <meta name='author' content='Music21' />
             <script src='http://code.jquery.com/jquery-latest.js'></script>
-            <script src='http://www.vexflow.com/vexflow.js'/></script>
+            <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
         </head>
         <body>
             <canvas width="525" height="120" id='music21canvas'></canvas>
@@ -2205,7 +2206,7 @@ class Test(unittest.TestCase):
 <head>
     <meta name='author' content='Music21' />
     <script src='http://code.jquery.com/jquery-latest.js'></script>
-    <script src='http://www.vexflow.com/vexflow.js'/></script>
+    <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
 </head>
 <body>
     <canvas width="525" height="120" id='music21canvas'></canvas>
@@ -2254,7 +2255,7 @@ music21Voice0.addTickables(music21Voice0Notes);'''
 <head>
     <meta name='author' content='Music21' />
     <script src='http://code.jquery.com/jquery-latest.js'></script>
-    <script src='http://www.vexflow.com/vexflow.js'/></script>
+    <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
 </head>
 <body>
     <canvas width="525" height="120" id='music21canvas'></canvas>
@@ -2293,8 +2294,8 @@ class TestExternal(unittest.TestCase):
 
     def testShowMeasureWithAccidentals(self):
         from music21 import corpus
-        #b = note.Note('B4') 
-        b = corpus.parse('bwv1.6')
+        b = note.Note('B4') 
+        #b = corpus.parse('bwv1.6')
         b.show('vexflow')
     
 #-------------------------------------------------------------------------------
@@ -2305,7 +2306,7 @@ _DOC_ORDER = []
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test)#, TestExternal)
+    music21.mainTest(TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

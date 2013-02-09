@@ -2499,10 +2499,10 @@ class TestExternal(unittest.TestCase):
         j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
         j2 = corpus.parse('trecento/PMFC_06-Jacopo-03b')
         jMerged = mergeVariantScores(j1, j2)
-        #jMerged.show('lily.pdf')
-        jMerged.write('lily')#, fp="d:/desktop/t1.ly")
+        jMerged.show('lily.pdf')
+        #jMerged.write('lily')#, fp="d:/desktop/t1.ly")
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
     

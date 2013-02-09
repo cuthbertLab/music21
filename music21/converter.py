@@ -54,7 +54,6 @@ import zipfile
 from music21 import exceptions21
 from music21 import common
 from music21 import humdrum
-from music21 import musicxml
 from music21 import stream
 from music21 import tinyNotation
 
@@ -65,6 +64,9 @@ from music21.capella import fromCapellaXML
 
 from music21.musedata import base as musedataModule
 from music21.musedata import translate as musedataTranslate
+
+from music21.musicxml import xmlHandler as musicxmlHandler
+
 
 from music21.romanText import base as romanTextModule
 from music21.romanText import translate as romanTextTranslate
@@ -396,7 +398,7 @@ class ConverterMusicXML(object):
         #t = common.Timer()
         #t.start()
         from music21.musicxml import fromMxObjects
-        fromMxObjects.mxToScore(self._mxScore, inputM21 = self._stream)
+        fromMxObjects.mxScoreToScore(self._mxScore, inputM21 = self._stream)
         #self._stream._setMX(self._mxScore)
         #t.stop()
         #environLocal.printDebug(['music21 object creation time:', t])
@@ -410,7 +412,7 @@ class ConverterMusicXML(object):
     #---------------------------------------------------------------------------
     def parseData(self, xmlString, number=None):
         '''Open MusicXML data from a string.'''
-        c = musicxml.Document()
+        c = musicxmlHandler.Document()
         c.read(xmlString)
         self._mxScore = c.score #  the mxScore object from the musicxml Document
         if len(self._mxScore) == 0:
@@ -437,7 +439,7 @@ class ConverterMusicXML(object):
         m21Format = common.findFormatFile(fpDst)
         pickleError = False
 
-        c = musicxml.Document()
+        c = musicxmlHandler.Document()
         if m21Format == 'pickle':
             environLocal.printDebug(['opening pickled file', fpDst])
             try:
@@ -453,7 +455,7 @@ class ConverterMusicXML(object):
                     raise ConverterException(msg)
             # check if this pickle is up to date
             if (hasattr(c.score, 'm21Version') and 
-                c.score.m21Version >= musicxml.VERSION_MINIMUM):
+                c.score.m21Version >= musicxmlHandler.musicxmlMod.VERSION_MINIMUM):
                 pass
                 #environLocal.printDebug(['pickled file version is compatible', c.score.m21Version])
             else:

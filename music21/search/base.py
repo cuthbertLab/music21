@@ -349,7 +349,7 @@ def translateStreamToString(inputStream):
         b += translateNoteWithDurationToBytes(n)
     return b
 
-def translateDiatonicStreamToString(inputStream):
+def translateDiatonicStreamToString(inputStream, previousRest=False, previousTie=False, previousQL=None, returnLastTuple=False):
     r'''
     translates a stream of Notes and Rests only into a string,
     encoding only the .step (no accidental or octave) and whether
@@ -373,11 +373,21 @@ def translateDiatonicStreamToString(inputStream):
     CRZFFAI
     >>> len(streamString)
     7
+    
+    If returnLastTuple is True, returns a triplet of whether the last note
+    was a rest, whether the last note was tied, and what the last quarterLength was,
+    which can be fed back into this algorithm:
+    
+    >>> streamString2, lastTuple = search.translateDiatonicStreamToString(sn, returnLastTuple = True)
+    >>> streamString == streamString2
+    True
+    >>> lastTuple
+    (False, False, 3.0)
     '''
     b = []
-    previousRest = False
-    previousTie = False
-    previousDuration = None
+#    previousRest = False
+#    previousTie = False
+#    previousQL = None
     for n in inputStream:
         if n.isRest:
             if previousRest is True:
@@ -395,17 +405,21 @@ def translateDiatonicStreamToString(inputStream):
         elif n.tie is not None:
             previousTie = True
         ql = n.duration.quarterLength
-        if previousDuration is None or previousDuration == ql:
+        if previousQL is None or previousQL == ql:
             ascShift = 0
-        elif previousDuration > ql:
+        elif previousQL > ql:
             ascShift = 14
         else:
             ascShift = 7
-        previousDuration = ql
+        previousQL = ql
         newName = chr(ord(n.pitch.step) + ascShift)
         b.append(newName)
     
-    return ''.join(b)
+    if returnLastTuple is False:
+        return ''.join(b)
+    else:
+        joined = ''.join(b)
+        return (joined, (previousRest, previousTie, previousQL))
 
 def translateStreamToStringNoRhythm(inputStream):
     '''

@@ -1104,7 +1104,7 @@ class Chord(note.NotRest):
         'Chord {D | F-sharp | A} Quarter'
 
         >>> chord.Chord(['d1', 'e4-', 'b3-'], quarterLength=2/3.).fullName
-        'Chord {D1 | E4-flat | B3-flat} Quarter Triplet (0.67QL)'
+        'Chord {D in octave 1 | E-flat in octave 4 | B-flat in octave 3} Quarter Triplet (0.67QL)'
         ''')
 
     #---------------------------------------------------------------------------
@@ -4574,7 +4574,7 @@ class Test(unittest.TestCase):
         out = out.replace(' ', '')
         out = out.replace('\n', '')
         #print out
-        self.assertEqual(out.find("""<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><stem>up</stem><notehead>normal</notehead><notations><tiedtype="start"/></notations>"""), 1191)
+        self.assertTrue(out.find("""<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><stem>up</stem><notehead>normal</notehead><notations><tiedtype="start"/></notations>""") != -1)
 
 
     def testTiesB(self):

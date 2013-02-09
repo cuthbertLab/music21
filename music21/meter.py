@@ -4481,7 +4481,7 @@ class Test(unittest.TestCase):
         match = '<time><beats>3</beats><beat-type>8</beat-type></time>'
         xmlout = xmlout.replace(' ', '')
         xmlout = xmlout.replace('\n', '')
-        self.assertEqual(xmlout.find(match), 501)
+        self.assertTrue(xmlout.find(match) != -1)
 
 
     def testSlowSixEight(self):

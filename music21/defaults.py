@@ -86,6 +86,11 @@ divisionsPerQuarter = 32*3*3*5*7 # 10080
 ticksPerQuarter = 1024
 
 
+# scaling -- the size of notes in musicxml -- 40 tenths = a 5-line staff
+# so how many millimeters = a staff?
+scalingMillimeters = 7
+scalingTenths = 40
+
 #-----------------------------------------------------------------||||||||||||--
 class Test(unittest.TestCase):
     '''Unit tests

@@ -72,11 +72,11 @@ def textBoxToMxCredit(textBox):
     >>> from music21 import *
     >>> tb = text.TextBox('testing')
     >>> tb.positionVertical = 500
-    >>> tb.positionHorizontal = 500
+    >>> tb.positionHorizontal = 300
     >>> tb.page = 3
     >>> mxCredit = musicxml.toMxObjects.textBoxToMxCredit(tb)
     >>> print mxCredit
-    <credit page=3 <credit-words halign=center default-y=500 default-x=500 valign=top charData=testing>>
+    <credit page=3 <credit-words halign=center default-y=500 default-x=300 valign=top charData=testing>>
     '''
     # use line carriages to separate messages
     mxCredit = mxObjects.Credit()
@@ -1786,22 +1786,34 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
 
     # print objects come before attributes
     # note: this class match is a problem in cases where the object is created in the module itself, as in a test. 
-    mxPrint = None
-    found = m.getElementsByClass('PageLayout')
-    if len(found) > 0:
-        pl = found[0] # assume only one per measure
-        mxPrint = pageLayoutToMxPrint(pl)
-    found = m.getElementsByClass('SystemLayout')
-    if len(found) > 0:
-        sl = found[0] # assume only one per measure
-        if mxPrint is None:
-            mxPrint = systemLayoutToMxPrint(sl)
-        else:
-            mxPrintTemp = systemLayoutToMxPrint(sl)
-            mxPrint.merge(mxPrintTemp)
 
-    if mxPrint is not None:
-        mxMeasure.componentList.append(mxPrint)
+    # do a quick search for any layout objects before searching individually...
+    foundAny = m.getElementsByClass('LayoutBase')
+    if len(foundAny) > 0:
+        mxPrint = None
+        found = m.getElementsByClass('PageLayout')
+        if len(found) > 0:
+            pl = found[0] # assume only one per measure
+            mxPrint = pageLayoutToMxPrint(pl)
+        found = m.getElementsByClass('SystemLayout')
+        if len(found) > 0:
+            sl = found[0] # assume only one per measure
+            if mxPrint is None:
+                mxPrint = systemLayoutToMxPrint(sl)
+            else:
+                mxPrintTemp = systemLayoutToMxPrint(sl)
+                mxPrint.merge(mxPrintTemp, returnDeepcopy = False)
+        found = m.getElementsByClass('StaffLayout')
+        if len(found) > 0:
+            sl = found[0] # assume only one per measure
+            if mxPrint is None:
+                mxPrint = staffLayoutToMxPrint(sl)
+            else:
+                mxPrintTemp = staffLayoutToMxPrint(sl)
+                mxPrint.merge(mxPrintTemp, returnDeepcopy = False)
+
+        if mxPrint is not None:
+            mxMeasure.componentList.append(mxPrint)
 
     # get an empty mxAttributes object
     mxAttributes = mxObjects.Attributes()
@@ -2187,6 +2199,12 @@ def streamToMx(s, spannerBundle=None):
     mxComponents = []
     instList = []
 
+    scoreLayouts = s.getElementsByClass('ScoreLayout')
+    if len(scoreLayouts) > 0:
+        scoreLayout = scoreLayouts[0]
+    else:
+        scoreLayout = None
+
     # search context probably should always be True here
     # to search container first, we need a non-flat version
     # searching a flattened version, we will get contained and non-container
@@ -2292,6 +2310,18 @@ def streamToMx(s, spannerBundle=None):
 
     # merge metadata derived with default created
     mxScore = mxScore.merge(mxScoreDefault, returnDeepcopy=False)
+    # get score defaults if any:
+    if scoreLayout is None:
+        from music21 import layout
+        scoreLayout = layout.ScoreLayout()
+        scoreLayout.scalingMillimeters = defaults.scalingMillimeters
+        scoreLayout.scalingTenths = defaults.scalingTenths
+
+    mxDefaults = scoreLayoutToMxDefaults(scoreLayout)
+    mxScore.defaultsObj = mxDefaults
+
+
+    addSupportsToMxScore(s, mxScore)
 
     mxPartList = mxObjects.PartList()
     # mxComponents is just a list 
@@ -2335,6 +2365,37 @@ def streamToMx(s, spannerBundle=None):
     # set the mxPartList
     mxScore.set('partList', mxPartList)
     return mxScore
+
+def addSupportsToMxScore(s, mxScore):
+    '''
+    add information about what this score actually supports
+
+    Currently, if Stream.definesExplicitSystemBreaks is set to True
+    then a supports new-system tag is added.
+    
+    '''
+    if s.definesExplicitSystemBreaks or s.definesExplicitPageBreaks:
+        mxIdentification = mxScore.get('identification')
+        if mxIdentification is not None:
+            mxEncoding = mxIdentification.get('encoding')
+            if mxEncoding is None:
+                mxEncoding = mxObjects.Encoding()
+                mxIdentification.encodingObj = mxEncoding
+            if s.definesExplicitSystemBreaks is True:
+                mxSupports = mxObjects.Supports()
+                mxSupports.set('attribute', 'new-system')
+                mxSupports.set('type', 'yes')
+                mxSupports.set('value', 'yes')
+                mxSupports.set('element', 'print')
+                mxEncoding.supportsList.append(mxSupports)
+            if s.definesExplicitPageBreaks is True:
+                mxSupports = mxObjects.Supports()
+                mxSupports.set('attribute', 'new-page')
+                mxSupports.set('type', 'yes')
+                mxSupports.set('value', 'yes')
+                mxSupports.set('element', 'print')
+                mxEncoding.supportsList.append(mxSupports)
+
 
 
 #------------------------------------------------------------------------------
@@ -2427,6 +2488,42 @@ def beamsToMx(beamsObj):
 
 #---------------------------------------------------------
 # layout
+def scoreLayoutToMxDefaults(scoreLayout):
+    '''
+    Return a :class:`~music21.musicxml.Defaults` ('mxDefaults')
+    object for a :class:`~music21.layout.ScoreLayout` object.
+    
+    the mxDefaults object might include an mxScaling object.
+    
+    >>> from music21 import *
+    >>> sl = layout.ScoreLayout()
+    >>> sl.scalingMillimeters = 7.24342
+    >>> sl.scalingTenths = 40
+    >>> mxDefaults = musicxml.toMxObjects.scoreLayoutToMxDefaults(sl)
+    >>> mxDefaults
+    <defaults <scaling millimeters=7.24342 tenths=40>>
+    '''
+    mxDefaults = mxObjects.Defaults()
+    if scoreLayout.scalingMillimeters is not None or scoreLayout.scalingTenths is not None:
+        mxScaling = mxObjects.Scaling()
+        mxScaling.millimeters = scoreLayout.scalingMillimeters
+        mxScaling.tenths = scoreLayout.scalingTenths
+        mxDefaults.scalingObj = mxScaling
+
+    if scoreLayout.pageLayout is not None:
+        mxPageLayout = pageLayoutToMxPageLayout(scoreLayout.pageLayout)
+        if mxPageLayout is not None:
+            mxDefaults.layoutList.append(mxPageLayout)
+    if scoreLayout.systemLayout is not None:
+        mxSystemLayout = systemLayoutToMxSystemLayout(scoreLayout.systemLayout)
+        if mxSystemLayout is not None:
+            mxDefaults.layoutList.append(mxSystemLayout)
+    for staffLayout in scoreLayout.staffLayoutList:
+        mxStaffLayout = staffLayoutToMxStaffLayout(staffLayout)
+        mxDefaults.layoutList.append(mxStaffLayout)
+
+    return mxDefaults
+
 
 def pageLayoutToMxPrint(pageLayout):
     '''
@@ -2451,10 +2548,30 @@ def pageLayoutToMxPrint(pageLayout):
     if pageLayout.pageNumber is not None:
         mxPrint.set('page-number', pageLayout.pageNumber)
     
+    mxPageLayout = pageLayoutToMxPageLayout(pageLayout)
+    if mxPageLayout is not None:
+        mxPrint.append(mxPageLayout)
+
+    return mxPrint
+
+def pageLayoutToMxPageLayout(pageLayout):
+    '''
+    returns either an mxPageLayout object from a layout.PageLayout
+    object, or None if there's nothing to set.
+
+    >>> from music21 import *
+    >>> pl = layout.PageLayout(pageNumber = 5, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
+    >>> mxPageLayout = musicxml.toMxObjects.pageLayoutToMxPageLayout(pl)
+    >>> mxPageLayout.get('page-height')
+    4000
+    '''
+    addMxPageLayoutObj = False # true if anything set...
     mxPageLayout = mxObjects.PageLayout()
     if pageLayout.pageHeight != None:
+        addMxPageLayoutObj = True
         mxPageLayout.set('pageHeight', pageLayout.pageHeight)
     if pageLayout.pageWidth != None:
+        addMxPageLayoutObj = True
         mxPageLayout.set('pageWidth', pageLayout.pageWidth)
 
     # TODO- set attribute PageMarginsType
@@ -2483,13 +2600,14 @@ def pageLayoutToMxPrint(pageLayout):
 
     # stored on components list
     if matchLeft or matchRight:
+        addMxPageLayoutObj = True
         mxPageLayout.append(mxPageMargins)
 
 
-
-    mxPrint.append(mxPageLayout)
-
-    return mxPrint
+    if addMxPageLayoutObj is True:
+        return mxPageLayout
+    else:
+        return None
 
 
 def systemLayoutToMxPrint(systemLayout):
@@ -2516,7 +2634,25 @@ def systemLayoutToMxPrint(systemLayout):
     mxPrint = mxObjects.Print()
     if systemLayout.isNew:
         mxPrint.set('new-system', 'yes')
-    
+
+    mxSystemLayout = systemLayoutToMxSystemLayout(systemLayout)
+    if mxSystemLayout is not None:
+        mxPrint.append(mxSystemLayout)
+
+    return mxPrint
+
+def systemLayoutToMxSystemLayout(systemLayout):
+    '''
+    returns either an mxSystemLayout object from a layout.SystemLayout
+    object, or None if there's nothing to set.
+
+    >>> from music21 import *
+    >>> sl = layout.SystemLayout(leftmargin=234, rightmargin=124, distance=3, isNew=True)
+    >>> mxSystemLayout = musicxml.toMxObjects.systemLayoutToMxSystemLayout(sl)
+    >>> mxSystemLayout.get('system-distance')
+    3
+    '''
+    addMxSystemLayout = False # only add if anything set
     mxSystemLayout = mxObjects.SystemLayout()
     mxSystemMargins = mxObjects.SystemMargins()
 
@@ -2535,25 +2671,51 @@ def systemLayoutToMxPrint(systemLayout):
     if matchRight and not matchLeft:
         mxSystemMargins.set('leftMargin', 0)
 
-    if systemLayout.topMargin != None:
-        mxSystemMargins.set('topMargin', systemLayout.topMargin)
-    if systemLayout.rightMargin != None:
-        mxSystemMargins.set('bottomMargin', systemLayout.bottomMargin)
+    # does not exist!
+#    if systemLayout.topMargin != None:
+#        mxSystemMargins.set('topMargin', systemLayout.topMargin)
+#    if systemLayout.rightMargin != None:
+#        mxSystemMargins.set('bottomMargin', systemLayout.bottomMargin)
  
 
     # stored on components list
     if matchLeft or matchRight:
+        addMxSystemLayout = True
         mxSystemLayout.append(mxSystemMargins) 
 
     if systemLayout.distance != None:
         #mxSystemDistance = musicxml.SystemDistance()
         #mxSystemDistance.set('charData', systemLayout.distance)
         # only append if defined
+        addMxSystemLayout = True
         mxSystemLayout.systemDistance = systemLayout.distance
+    if systemLayout.topDistance != None:
+        addMxSystemLayout = True
+        mxSystemLayout.topSystemDistance = systemLayout.topDistance
 
-    mxPrint.append(mxSystemLayout)
+    if addMxSystemLayout is True:
+        return mxSystemLayout
+    else:
+        return None
 
+def staffLayoutToMxPrint(staffLayout):
+    mxPrint = mxObjects.Print()
+    mxStaffLayout = staffLayoutToMxStaffLayout(staffLayout)
+    mxPrint.append(mxStaffLayout)
     return mxPrint
+
+def staffLayoutToMxStaffLayout(staffLayout):
+    '''
+    >>> from music21 import *
+    >>> sl = layout.StaffLayout(distance=34.0, staffNumber=2)
+    >>> mxStaffLayout = musicxml.toMxObjects.staffLayoutToMxStaffLayout(sl)    
+    >>> mxStaffLayout
+    <staff-layout number=2 staff-distance=34.0>
+    '''
+    mxStaffLayout = mxObjects.StaffLayout()
+    mxStaffLayout.staffDistance = staffLayout.distance
+    mxStaffLayout.set('number', staffLayout.staffNumber)
+    return mxStaffLayout
 
 #-----------------------------------------------------------------
 # metadata

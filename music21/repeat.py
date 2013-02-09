@@ -3197,8 +3197,8 @@ class Test(unittest.TestCase):
 
 
     def testRepeatExpressionOnStream(self):
-        from music21 import stream, repeat, musicxml, meter
-        from music21.musicxml import m21ToString
+        from music21 import stream, repeat, meter
+        from music21.musicxml import m21ToString, xmlHandler, fromMxObjects
 
         template = stream.Stream()
         for i in range(5):
@@ -3222,9 +3222,9 @@ class Test(unittest.TestCase):
         raw = m21ToString.fromMusic21Object(s)
         self.assertEqual(raw.find('da capo') > 0, True)
             
-        mxlDocument = musicxml.Document()
+        mxlDocument = xmlHandler.Document()
         mxlDocument.read(raw)
-        s2 = musicxml.fromMxObjects.mxToScore(mxlDocument.score)
+        s2 = fromMxObjects.mxScoreToScore(mxlDocument.score)
         # now, reconverted from the musicxml, we have a RepeatExpression
         self.assertEqual(len(s2.flat.getElementsByClass(repeat.DaCapo)), 1)
 

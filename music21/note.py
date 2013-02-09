@@ -1154,7 +1154,7 @@ class Note(NotRest):
         
         >>> n = note.Note('E~3', quarterLength=2)
         >>> n.fullName
-        'E3-half-sharp Half Note'
+        'E-half-sharp in octave 3 Half Note'
         
         >>> n = note.Note('D', quarterLength=.25)
         >>> n.microtone = 25

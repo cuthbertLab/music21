@@ -1042,7 +1042,7 @@ class Pitch(base.Music21Object):
 
     >>> p3 = pitch.Pitch(name = 'C', accidental = '#', octave = 7, microtone = -30)
     >>> p3.fullName
-    'C7-sharp (-30c)'        
+    'C-sharp in octave 7 (-30c)'        
 
     The full list of supported key words are: `name`, `accidental` (which
     can be a string or an :class:`~music21.pitch.Accidental` object), `octave`,
@@ -2017,16 +2017,18 @@ class Pitch(base.Music21Object):
 
     def _getFullName(self):
         name = '%s' % self._step
-        if self.octave is not None:
-            name += '%s' % self.octave
 
         if self.accidental is not None:
             name += '-%s' % self.accidental._getFullName()
 
+        if self.octave is not None:
+            name += ' in octave %s' % self.octave
+
         if self.microtone.cents != 0:
-            return name + ' ' + self._microtone.__repr__()
-        else:
-            return name
+            name += ' ' + self._microtone.__repr__()
+
+        return name
+
 
     fullName = property(_getFullName, 
         doc = '''
@@ -2038,11 +2040,11 @@ class Pitch(base.Music21Object):
         >>> p = pitch.Pitch('A-3')
         >>> p.microtone = 33.33
         >>> p.fullName
-        'A3-flat (+33c)'
+        'A-flat in octave 3 (+33c)'
         
         >>> p = pitch.Pitch('A`7')
         >>> p.fullName
-        'A7-half-flat'
+        'A-half-flat in octave 7'
         ''')
 
 
@@ -4532,7 +4534,7 @@ class Test(unittest.TestCase):
         match = '<step>D</step><alter>1.5</alter><octave>4</octave>'
         xmlout = xmlout.replace(' ', '')
         xmlout = xmlout.replace('\n', '')
-        self.assertEqual(xmlout.find(match), 621)
+        self.assertTrue(xmlout.find(match) != -1)
 
         s = stream.Stream()
         for pStr in ['A~', 'A#~', 'A`', 'A-`']:
