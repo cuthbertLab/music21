@@ -577,6 +577,8 @@ class LayoutScore(stream.Opus):
     Measures, etc.
     
     Used for computing location of notes, etc.
+    
+    If the score does not change between calls to the various getPosition calls, it is much faster as it uses a cache.
     '''
     def __init__(self, *args, **keywords):
         stream.Opus.__init__(self, *args, **keywords)
@@ -604,6 +606,13 @@ class LayoutScore(stream.Opus):
         >>> (3, 2) #_DOCS_HIDE
         (3, 2)
         '''
+        if 'pageAndSystemNumberFromMeasureNumbers' not in self._cache:
+            self._cache['pageAndSystemNumberFromMeasureNumbers'] = {}
+        dataCache = self._cache['pageAndSystemNumberFromMeasureNumbers']
+        
+        if measureNumber in dataCache:
+            return dataCache[measureNumber]
+        
         foundPage = None
         foundPageId = None
 
@@ -628,8 +637,9 @@ class LayoutScore(stream.Opus):
     
         if foundSystem is None:
             raise LayoutException("that's strange, this measure was supposed to be on this page, but I couldn't find it anywhere!")
-        return (foundPageId, foundSystemId)    
-    
+        dataCache[measureNumber] = (foundPageId, foundSystemId)
+        return (foundPageId, foundSystemId)
+        
     def getMarginsAndSizeForPageId(self, pageId):
         '''
         return a tuple of (top, left, bottom, right, width, height) margins for a given pageId in tenths
@@ -644,6 +654,12 @@ class LayoutScore(stream.Opus):
         >>> (171.0, 204.0, 171.0, 171.0, 1457.0, 1886.0) #_DOCS_HIDE
         (171.0, 204.0, 171.0, 171.0, 1457.0, 1886.0)
         '''
+        if 'marginsAndSizeForPageId' not in self._cache:
+            self._cache['marginsAndSizeForPageId'] = {}
+        dataCache = self._cache['marginsAndSizeForPageId']
+        if pageId in dataCache:
+            return dataCache[pageId]
+        
         ## define defaults
         pageMarginTop = 100
         pageMarginLeft = 100
@@ -687,8 +703,10 @@ class LayoutScore(stream.Opus):
                 pageMarginRight = pl.rightMargin
             if pl.bottomMargin is not None:
                 pageMarginBottom = pl.bottomMargin                 
- 
-        return (pageMarginTop, pageMarginLeft, pageMarginBottom, pageMarginRight, pageWidth, pageHeight)
+
+        dataTuple = (pageMarginTop, pageMarginLeft, pageMarginBottom, pageMarginRight, pageWidth, pageHeight)
+        dataCache[pageId] = dataTuple
+        return dataTuple
 
     def getPositionForSystem(self, pageId, systemId):
         '''
@@ -713,6 +731,15 @@ class LayoutScore(stream.Opus):
 #        >>> gl.getPositionForSystem(1, 1)
 #        (468.0, 4.0, 0.0, 768.0)
         '''
+        if 'positionForSystem' not in self._cache:
+            self._cache['positionForSystem'] = {}
+        positionForSystemCache = self._cache['positionForSystem']
+        if pageId not in positionForSystemCache:
+            positionForSystemCache[pageId] = {}
+        dataCache = positionForSystemCache[pageId]
+        if systemId in dataCache:
+            return dataCache[systemId]
+        
         leftMargin = 0
         rightMargin = 0
         # no top or bottom margins
@@ -764,8 +791,10 @@ class LayoutScore(stream.Opus):
         unused_systemStart, systemHeight = self.getPositionForStaff(pageId, systemId, lastPart)
         
         top = previousDistance + bottomOfLastSystem
-        bottom = systemHeight + previousDistance + bottomOfLastSystem    
-        return (top, leftMargin, rightMargin, bottom)
+        bottom = systemHeight + previousDistance + bottomOfLastSystem
+        dataTuple = (top, leftMargin, rightMargin, bottom)
+        dataCache[systemId] = dataTuple
+        return dataTuple
 
         
     def getPositionForStaff(self, pageId, systemId, partId):
@@ -788,6 +817,19 @@ class LayoutScore(stream.Opus):
 #        >>> gl.getPositionForStaff(0, 1, 0)
 #        (0, 40)
         '''
+        if 'positionForStaff' not in self._cache:
+            self._cache['positionForStaff'] = {}
+        positionForStaffCache = self._cache['positionForStaff']
+        if pageId not in positionForStaffCache:
+            positionForStaffCache[pageId] = {}
+        pageCache = positionForStaffCache[pageId]
+        if systemId not in pageCache:
+            pageCache[systemId] = {}        
+        dataCache = pageCache[systemId]
+        if partId in dataCache:
+            return dataCache[partId]
+
+        
         ## define defaults
         staffDistanceFromPrevious = 0
         staffHeight = 40
@@ -820,7 +862,9 @@ class LayoutScore(stream.Opus):
         staffDistanceFromStart = staffDistanceFromPrevious + previousStaffBottom
         staffBottom = staffDistanceFromStart + staffHeight
         
-        return (staffDistanceFromStart, staffBottom)        
+        dataTuple = (staffDistanceFromStart, staffBottom)
+        dataCache[partId] = dataTuple
+        return dataTuple        
 
     def getPositionForPartMeasure(self, partId, measureNumber, returnFormat='tenths'):
         '''
@@ -844,6 +888,15 @@ class LayoutScore(stream.Opus):
 #        >>> gl.getPositionForPartMeasure(1, 8)
 #        ((783.0, 175.0), (823.0, 398.0), 0)
         '''
+        if 'positionForPartMeasure' not in self._cache:
+            self._cache['positionForPartMeasure'] = {}
+        positionForPartMeasureCache = self._cache['positionForPartMeasure']
+        if measureNumber not in positionForPartMeasureCache:
+            positionForPartMeasureCache[measureNumber] = {}
+        dataCache = positionForPartMeasureCache[measureNumber]
+        if partId in dataCache:
+            return dataCache[partId]
+
         pageId, systemId = self.getPageAndSystemNumberFromMeasureNumber(measureNumber)
         
         startXMeasure, endXMeasure = self.measurePositionWithinStaff(measureNumber, pageId, systemId)
@@ -856,8 +909,9 @@ class LayoutScore(stream.Opus):
         bottom = pageMarginTop + systemTop + staffBottom
         right = pageMarginLeft + systemLeft + endXMeasure
         
+        dataTuple = None
         if returnFormat == 'tenths':
-            return ((top, left), (bottom, right), pageId)
+            dataTuple = ((top, left), (bottom, right), pageId)
         else:
             pageWidth = float(pageWidth)
             pageHeight = float(pageHeight)
@@ -865,8 +919,10 @@ class LayoutScore(stream.Opus):
             leftRatio = left/pageWidth
             bottomRatio = bottom/pageHeight
             rightRatio = right/pageWidth
-            return ((topRatio, leftRatio), (bottomRatio, rightRatio), pageId)
-         
+            dataTuple = ((topRatio, leftRatio), (bottomRatio, rightRatio), pageId)
+        
+        dataCache[partId] = dataTuple
+        return dataTuple
         #return self.getPositionForPartIdSystemIdPageIdMeasure(partId, systemId, pageId, measureNumber, returnFormat)
 
     def measurePositionWithinStaff(self, measureNumber, pageId=None, systemId=None):
@@ -924,7 +980,7 @@ class LayoutScore(stream.Opus):
         numParts = len(self.pages[0].systems[0].parts)
         allRetInfo = []
         for mNum in range(self.startMeasure, self.endMeasure):
-            if printUpdates is True:
+            if printUpdates is True: # so fast now that it's not needed
                 print "Doing measure ", mNum
             mList = []
             for pNum in range(numParts):

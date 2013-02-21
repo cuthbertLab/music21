@@ -135,6 +135,7 @@ from music21 import note
 
 #no docs
 #from music21.noteworthy import base as noteworthyBase
+from music21.noteworthy import binaryTranslate as noteworthyBinaryTranslate
 from music21.noteworthy import translate as noteworthyTranslate
 
 from music21.romanText import base as romanText
@@ -314,6 +315,7 @@ MODULES = [
     note, 
     
 #    noteworthyBase,
+    noteworthyBinaryTranslate,
     noteworthyTranslate,
 
     pitch,
@@ -700,8 +702,12 @@ class PartitionedClass(PartitionedName):
                 _data.append(self._data[i])
 
         for name in self.namesOrdered:
-            if name in forceName:
-                continue # already supplied
+            try:
+                if name in forceName:
+                    continue # already supplied
+            except TypeError as e:
+                environLocal.warn("Could not translate %s : %r\n     Did you put a method in _DOC_ORDER instead of a string?" % (name, e))
+                continue
             # cannot be sure this is the same index as that in self.names
             junk = namesSupply.pop(namesSupply.index(name))
 

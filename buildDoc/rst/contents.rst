@@ -128,6 +128,7 @@ Module Reference
    moduleMusicxmlFromMxObjects
    moduleMusicxmlToMxObjects
    moduleNote
+   moduleNoteworthyBinaryTranslate
    moduleNoteworthyTranslate
    modulePitch
    moduleRepeat

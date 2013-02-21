@@ -37,7 +37,8 @@ fileExtensions = {
     'tinynotation' : {'input': ['tntxt', 'tinynotation'], 'output': 'tntxt'},
      # note: this is setting .zip as default mapping to musedata
     'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
-    'noteworthytext': {'input': ['nwctxt', 'nwc'], 'output': 'nwctxt'},
+    'noteworthy': {'input': ['nwc'], 'output': 'nwc'},
+    'noteworthytext': {'input': ['nwctxt'], 'output': 'nwctxt'},
     'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
     'finale' : {'input': ['mus'], 'output': 'mus'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
@@ -1548,7 +1549,7 @@ def getPackageData():
     # new file extensions
     ext = ['txt', 'xml', 'krn', 'mxl', 'pdf', 'html', 
            'css', 'js', 'png', 'tiff', 'jpg', 'xls', 'mid', 'abc', 'json', 'md', 
-           'zip', 'rntxt', 'command', 'scl', 'nwctxt', 'wav']
+           'zip', 'rntxt', 'command', 'scl', 'nwc', 'nwctxt', 'wav']
 
     # need all dirs, not just packages, and relative to music21
     fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,

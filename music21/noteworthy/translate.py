@@ -183,7 +183,8 @@ class NoteworthyTranslator(object):
                 self.lyricPosition += 1
             elif command == "AddStaff":
                 self.createPart()
-                self.currentKey = key.KeySignature(0)  
+                self.currentKey = key.KeySignature(0)
+                self.activeAccidentals = {}
                 self.lyrics = []
                 self.lyricPosition = 0            
             elif command == "Lyric1":
@@ -308,7 +309,7 @@ class NoteworthyTranslator(object):
         >>> from music21 import *
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
-        >>> pList = nwt.getMultiplePitchesFromPositionInfo('1,b3,5')
+        >>> pList = nwt.getMultiplePitchesFromPositionInfo('1,b3,5^')
         >>> pList
         [<music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>, <music21.pitch.Pitch B3>]
         '''
@@ -825,7 +826,10 @@ class NoteworthyTranslator(object):
         lyrics = []
         space = 0
         allText = attributes['Text']
-        allText = allText.strip('"')        
+        allText = allText.strip('"')
+        allText = allText.replace("\r\n"," ")
+        allText = allText.replace("\r"," ") 
+        allText = allText.replace("\n"," ")    
         for word in allText.split(' '):
             nou = 1
             for wordPart in word.split('-'):
@@ -862,6 +866,42 @@ class Test(unittest.TestCase):
         self.assertEqual(len(myScore.flat.notes), 1)
         self.assertEqual(str(myScore.flat.notes[0].name), "E")
         self.assertEqual(str(myScore.flat.getElementsByClass('Clef')[0]), "<music21.clef.BassClef>")
+
+    def testKeySignatureAtBeginning(self):
+        '''
+        test a problem with accidentals at the end of one staff not being cleared at the beginning of the next
+        
+        showed up in Morley, "Since my tears and lamenting" where Staff 1 ended with a B-natural Picardy, and Staff
+        2 began with a B in a flat key, but was showing up as B-natural also
+        '''
+        
+        info = '''!NoteWorthyComposer(2.0)
+|AddStaff|
+|Clef|Type:Treble
+|Key|Signature:Bb
+|TimeSig|Signature:Common
+|Tempo|Base:Half|Tempo:60|Pos:7|Visibility:Never
+|Note|Dur:Half|Pos:2^|Opts:Stem=Down
+|Bar
+|Note|Dur:Half|Pos:2|Opts:Stem=Down
+|Note|Dur:Half|Pos:n0|Opts:Stem=Down
+|Bar
+|AddStaff|
+|Clef|Type:Treble
+|Key|Signature:Bb
+|TimeSig|Signature:Common
+|Note|Dur:Half|Pos:0^|Opts:Stem=Down
+|Bar
+|Note|Dur:Half|Pos:0|Opts:Stem=Down
+|Note|Dur:Half|Pos:0|Opts:Stem=Down
+|Bar
+!NoteWorthyComposer-End'''
+        nwt = NoteworthyTranslator()
+        s = nwt.parseString(info)
+        #s.show('text')
+        n1 = s.parts[1].getElementsByClass('Measure')[0].notes[0]
+        self.assertEqual(n1.accidental.alter, -1.0)
+        
 
 class TestExternal(unittest.TestCase):
     def runTest(self):

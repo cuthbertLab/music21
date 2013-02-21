@@ -77,7 +77,7 @@ for name in dir(virtual): # look over virtual module
     className = getattr(virtual, name)
     if callable(className):
         obj = className()
-        if isinstance(obj, virtual.VirtualWork) and obj.corpusPath != None:
+        if isinstance(obj, virtual.VirtualWork) and obj.corpusPath != None: # @UndefinedVariable
             VIRTUAL.append(obj)
 
 
@@ -132,7 +132,8 @@ _ALL_EXTENSIONS = (common.findInputExtension('abc') +
                    common.findInputExtension('musedata') +
                    common.findInputExtension('humdrum') +
                    common.findInputExtension('romantext') +
-                   common.findInputExtension('noteworthytext') 
+                   common.findInputExtension('noteworthytext') +
+                   common.findInputExtension('noteworthy')
                 )
 
 def _translateExtensions(extList=None, expandExtensions=True):

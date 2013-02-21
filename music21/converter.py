@@ -71,6 +71,7 @@ from music21.musicxml import xmlHandler as musicxmlHandler
 from music21.romanText import base as romanTextModule
 from music21.romanText import translate as romanTextTranslate
 
+from music21.noteworthy import binaryTranslate as noteworthyBinary # @UnresolvedImport
 from music21.noteworthy import translate as noteworthyTranslate
 
 from music21 import environment
@@ -318,12 +319,9 @@ class ConverterNoteworthy(object):
     '''
     Simple class wrapper for parsing NoteworthyComposer data provided in a file or in a string.
 
-
     Gets data with the file format .nwctxt
-    
-    
+        
     Users should not need this routine.  The basic format is
-    
     
     >>> from music21 import *
     >>> import os #_DOCS_HIDE
@@ -334,10 +332,8 @@ class ConverterNoteworthy(object):
     >>> len(paertStream.parts)
     4
     
-    
     For developers: see the documentation for :meth:`parseData` and :meth:`parseFile`
     to see the low-level usage.
-    
     '''
 
     def __init__(self):
@@ -363,8 +359,6 @@ class ConverterNoteworthy(object):
         '''
         Open Noteworthy data (as nwctxt) from a file path.
         
-                
-        
         >>> from music21 import *
         >>> import os #_DOCS_HIDE
         >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__) #_DOCS_HIDE
@@ -375,6 +369,27 @@ class ConverterNoteworthy(object):
         >>> #_DOCS_SHOW c.stream.show()        
         '''
         self.stream = noteworthyTranslate.NoteworthyTranslator().parseFile(fp)
+
+
+class ConverterNoteworthyBinary(object):
+    '''
+    Simple class wrapper for parsing NoteworthyComposer binary data provided in a file or in a string.
+
+    Gets data with the file format .nwc
+        
+    Users should not need this routine.  Call converter.parse directly    
+    '''
+
+    def __init__(self):
+        self.stream = None
+
+    #---------------------------------------------------------------------------
+    def parseData(self, nwcData):
+        self.stream = noteworthyBinary.NWCConverter().parseString(nwcData)
+
+
+    def parseFile(self, fp, number=None):
+        self.stream = noteworthyBinary.NWCConverter().parseFile(fp)
 
 
 #-------------------------------------------------------------------------------
@@ -761,6 +776,8 @@ class Converter(object):
             self._converter = ConverterMuseData()
         elif format == 'noteworthytext':
             self._converter = ConverterNoteworthy()
+        elif format == 'noteworthy':
+            self._converter = ConverterNoteworthyBinary()
         elif format == 'capella':
             self._converter = ConverterCapella()
         
