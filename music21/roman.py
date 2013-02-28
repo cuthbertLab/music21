@@ -695,6 +695,7 @@ class RomanNumeral(harmony.Harmony):
         
         self._parsingComplete = True
         self._functionalityScore = None
+        self.followsKeyChange = False # it is sometimes helpful to know if this is the first chord after a key change
         
     def __repr__(self):
         if hasattr(self.key, 'tonic'):

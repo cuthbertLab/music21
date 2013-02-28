@@ -220,7 +220,7 @@ class RTTagged(RTToken):
         if self.tag.lower() in ['keysignature', 'key signature']:
             return True
         else:
-            return False
+            return False 
     
     def isNote(self):
         if self.tag.lower() in ['note']:
@@ -564,10 +564,7 @@ class RTKey(RTKeyTypeAtom):
         An RTKey(RTAtom) defines both a change
         in KeySignature and a change in the analyzed Key
         
-        
         They are defined by ";:" after the Key.
-        
-              
         
         >>> from music21 import *
         >>> gminor = romanText.RTKey('g;:')
@@ -640,7 +637,6 @@ class RTKeySignature(RTAtom):
         taking place.
         
         The number after KS defines the number of sharps (negative for flats)
-        
         
         >>> from music21 import *
         >>> gminor = romanText.RTKeySignature('KS-2')

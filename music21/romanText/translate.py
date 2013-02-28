@@ -165,9 +165,12 @@ def _copySingleMeasure(t, p, kCurrent):
             for rnPast in m.getElementsByClass('RomanNumeral'):
                 if kCurrent is None: # should not happen
                     raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
-                rnPast.key = kCurrent
+                if rnPast.followsKeyChange is True:
+                    kCurrent = rnPast.key
+                else:
+                    rnPast.key = kCurrent
             break
-    return m
+    return m, kCurrent
 
 def _copyMultipleMeasures(t, p, kCurrent):
     '''
@@ -208,10 +211,13 @@ def _copyMultipleMeasures(t, p, kCurrent):
             for rnPast in m.getElementsByClass('RomanNumeral'):
                 if kCurrent is None: # should not happen
                     raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
-                rnPast.key = kCurrent
+                if rnPast.followsKeyChange is True:
+                    kCurrent = rnPast.key
+                else:
+                    rnPast.key = kCurrent                
         if mPast.number == targetEnd:
             break
-    return measures
+    return measures, kCurrent
 
 
 def _getKeyAndPrefix(rtKeyOrString):
@@ -358,7 +364,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     lastMeasureToken = t
                 # create a new measure or copy a past measure
                 if len(t.number) == 1 and t.isCopyDefinition: # if not a range
-                    m = _copySingleMeasure(t, p, kCurrent)
+                    m, kCurrent = _copySingleMeasure(t, p, kCurrent)
                     p.append(m)
                     lastMeasureNumber = m.number
                     lastMeasureToken = t
@@ -366,7 +372,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     if len(romans) > 0:
                         previousRn = romans[-1] 
                 elif len(t.number) > 1:
-                    measures = _copyMultipleMeasures(t, p, kCurrent)
+                    measures, kCurrent = _copyMultipleMeasures(t, p, kCurrent)
                     p.append(measures)
                     lastMeasureNumber = measures[-1].number
                     lastMeasureToken = t
@@ -391,6 +397,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     previousChordInMeasure = None
                     pivotChordPossible = False
                     numberOfAtoms = len(t.atoms)
+                    setKeyChangeToken = False # first RomanNumeral object after a key change should have this set to True
                     
                     for i, a in enumerate(t.atoms):
                         if isinstance(a, romanTextModule.RTKey) or \
@@ -411,6 +418,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             else:
                                 m.insert(o, kCurrent)
                             foundAKeySignatureSoFar = True
+                            setKeyChangeToken = True
     
                         elif isinstance(a, romanTextModule.RTKeySignature):
                             try: # this sets the keysignature but not the prefix text
@@ -429,6 +437,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             #try: # this sets the key, not the keysignature
                                 kCurrent, pl = _getKeyAndPrefix(a)
                                 prefixLyric += pl
+                                setKeyChangeToken = True
+
                             #except:
                             #    raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
     
@@ -463,6 +473,11 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     #                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
     #                                        asrc = 'b' + asrc
                                 rn = roman.RomanNumeral(asrc, copy.deepcopy(kCurrent))
+                                if setKeyChangeToken is True:
+                                    rn.followsKeyChange = True
+                                    setKeyChangeToken = False
+                                else:
+                                    rn.followsKeyChange = False
                             except (roman.RomanNumeralException, 
                                 common.Music21CommonException): 
                                 #environLocal.printDebug('cannot create RN from: %s' % a.src)
