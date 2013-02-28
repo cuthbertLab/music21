@@ -463,7 +463,24 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 previousChordInMeasure = firstChord
                                 m.insert(0, firstChord)
                             pivotChordPossible = False
-                        
+                        elif isinstance(a, romanTextModule.RTNoChord):
+                            # use source to evaluation roman 
+                            rn = note.Rest()
+                            if pivotChordPossible == False:
+                                # probably best to find duration
+                                if previousChordInMeasure is None:
+                                    pass # use default duration
+                                else: # update duration of previous chord in Measure
+                                    oPrevious = previousChordInMeasure.getOffsetBySite(m)
+                                    newQL = o - oPrevious
+                                    if newQL <= 0:
+                                        raise RomanTextTranslateException('too many notes in this measure: %s' % t.src)
+                                    previousChordInMeasure.quarterLength = newQL                                                          
+                                prefixLyric = ""
+                                m.insert(o, rn)
+                                previousChordInMeasure = rn
+                                previousRn = rn
+                                pivotChordPossible = False
                         elif isinstance(a, romanTextModule.RTChord):
                             # use source to evaluation roman 
                             try:
@@ -958,6 +975,27 @@ m6-7 = m4-5
 
             self.assertEqual(rnStream[elementNumber + 5].pitches[0].accidental.displayStatus, True)
 
+
+    def testNoChord(self):
+        from music21 import converter
+
+        src = """m1 G: IV || b3 d: III b4 NC
+m2 b2 III6 b3 iv6 b4 ii/o6/5
+m3 NC b3 G: V
+"""
+        s = converter.parse(src, format='romantext')
+        p = s.parts[0]
+        m1 = p.getElementsByClass('Measure')[0]
+        r1 = m1[-1]
+        self.assertIn('Rest', r1.classes)
+        self.assertEqual(r1.quarterLength, 1.0)
+        m2 = p.getElementsByClass('Measure')[1]
+        r2 = m2[0]
+        self.assertIn('Rest', r2.classes)
+        self.assertEqual(r1.quarterLength, 1.0)
+        rn1 = m2[1]
+        self.assertIn('RomanNumeral', rn1.classes)
+        #s.show()
     
     def testEndings(self):
         # has first and second endings...

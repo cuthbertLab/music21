@@ -47,7 +47,7 @@ reKeySignatureAtom = re.compile('KS\-?[0-7]')
 reBeatAtom = re.compile('b[1-9.]+')
 reRepeatStartAtom = re.compile('\|\|\:')
 reRepeatStopAtom = re.compile('\:\|\|')
-
+reNoChordAtom = re.compile('NC')
 
 
 #-------------------------------------------------------------------------------
@@ -457,6 +457,27 @@ class RTChord(RTAtom):
 
     def __repr__(self):
         return '<RTChord %r>' % self.src
+
+class RTNoChord(RTAtom):
+    r'''
+    An RTAtom subclass that defines absence of a chord.  Also contains a reference to the container.
+    
+    >>> from music21 import *
+    >>> chordNC = romanText.RTNoChord('NC')
+    >>> chordNC
+    <RTNoChord 'NC'>
+    '''
+    
+    def __init__(self, src =u'', container=None):
+        RTAtom.__init__(self, src, container)
+
+        # store offset within measure
+        self.offset = None
+        # store a quarterlength duration
+        self.quarterLength = None
+
+    def __repr__(self):
+        return '<RTNoChord %r>' % self.src
 
 
 class RTBeat(RTAtom):
@@ -964,7 +985,8 @@ class RTHandler(object):
                 post.append(RTRepeatStart(word, container))
             elif reRepeatStopAtom.match(word) is not None:
                 post.append(RTRepeatStop(word, container))
-
+            elif reNoChordAtom.match(word) is not None:
+                post.append(RTNoChord(word, container))
             else: # only option is that it is a chord
                 post.append(RTChord(word, container))
         return post
