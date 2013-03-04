@@ -670,11 +670,19 @@ class RomanNumeral(harmony.Harmony):
     omitNotes = re.compile('\[no([1-9])no([1-9])\]')
     omitNote = re.compile('\[no([1-9])\]')
     
+    _DOC_ATTR = {
+                 'scaleCardinality': 'probably you should not need to change this, but stores how many notes are in the scale; defaults to 7 for diatonic, obviously',
+                 'caseMatters': 'boolean to determine whether the case (upper or lowercase) of the figure determines whether it is major or minor.  Defaults to True; not everything has been tested with False yet',
+                 'pivotChord': 'default None: if not None, stores another interpretation of the same RN in a different key; stores a RomanNumeral object'
+                 }
+
+    
     def __init__(self, figure=None, keyOrScale=None, caseMatters = True):
         self.primaryFigure = None
         self.secondaryRomanNumeral = None
         self.secondaryRomanNumeralKey = None
 
+        self.pivotChord = None
         self.caseMatters = caseMatters
         self.scaleCardinality = 7
         

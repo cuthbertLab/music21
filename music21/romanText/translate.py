@@ -518,6 +518,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 pivotChordPossible = True
                             else:
                                 previousChordInMeasure.lyric += "//" + prefixLyric + a.src
+                                previousChordInMeasure.pivotChord = rn
                                 prefixLyric = ""
                                 pivotChordPossible = False
                         elif isinstance(a, romanTextModule.RTRepeat):
@@ -996,6 +997,22 @@ m3 NC b3 G: V
         rn1 = m2[1]
         self.assertIn('RomanNumeral', rn1.classes)
         #s.show()
+        
+    def testPivotChord(self):
+        from music21 import converter
+
+        src = """m1 G: I b3 v d: i b4 V"""
+        s = converter.parse(src, format='romantext')
+        p = s.parts[0]
+        m1 = p.getElementsByClass('Measure')[0]
+        pChord = m1.getElementsByClass('RomanNumeral')[1]
+        self.assertEqual(pChord.key.tonic.step, 'G')
+        self.assertEqual(pChord.figure, 'v')
+        pivot = pChord.pivotChord
+        self.assertEqual(pivot.key.tonic.step, 'D')
+        self.assertEqual(pivot.figure, 'i')
+        #s.show('text')
+        
     
     def testEndings(self):
         # has first and second endings...
