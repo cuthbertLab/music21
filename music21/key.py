@@ -624,7 +624,7 @@ class KeySignature(base.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    # properties
+    # methods
     def transpose(self, value, inPlace=False):
         '''
         Transpose the KeySignature by the user-provided value. 
@@ -634,9 +634,14 @@ class KeySignature(base.Music21Object):
         :class:`music21.interval.Interval` object can be supplied.
 
         >>> a = KeySignature(2)
+        >>> a
+        <music21.key.KeySignature of 2 sharps>
         >>> a.pitchAndMode
         (<music21.pitch.Pitch D>, None)
+        
         >>> b = a.transpose('p5')
+        >>> b
+        <music21.key.KeySignature of 3 sharps>
         >>> b.pitchAndMode
         (<music21.pitch.Pitch A>, None)
         >>> b.sharps
@@ -931,6 +936,58 @@ class Key(KeySignature, scale.DiatonicScale):
         if method == 'correlationCoefficient':
             return self._tonalCertainityCorrelationCoefficient(
                     args, keywords)
+
+    def transpose(self, value, inPlace=False):
+        '''
+        Transpose the Key by the user-provided value. 
+        If the value is an integer, the transposition is treated 
+        in half steps. If the value is a string, any Interval string 
+        specification can be provided. Alternatively, a 
+        :class:`music21.interval.Interval` object can be supplied.
+
+        >>> dMajor = Key("D")
+        >>> dMajor
+        <music21.key.Key of D major>
+        
+        >>> aMaj = dMajor.transpose('p5')
+        >>> aMaj
+        <music21.key.Key of A major>
+        >>> aMaj.sharps
+        3
+        >>> aMaj.tonic
+        <music21.pitch.Pitch A>
+        >>> aMaj.mode
+        'major'
+        
+        inPlace works here
+        
+        >>> changingKey = Key('g')
+        >>> changingKey
+        <music21.key.Key of g minor>
+        >>> changingKey.sharps
+        -2
+        
+        >>> changingKey.transpose('m-3', inPlace=True)
+        >>> changingKey
+        <music21.key.Key of e minor>
+        >>> changingKey.sharps
+        1
+        '''
+        if inPlace is True:
+            super(Key, self).transpose(value, inPlace)
+            post = self
+        else:
+            post = super(Key, self).transpose(value, inPlace)
+        
+        p1, unused_mode = post._getPitchAndMode()
+        post.tonic = p1
+        post._attributesChanged()
+
+        # mode is already set
+        if not inPlace:
+            return post
+        else:
+            return None
 
 
 
