@@ -2126,30 +2126,87 @@ class Music21Object(object):
         return self.sites.hasSpannerSite()
 
 
-    def getSpannerSites(self):
+    def getSpannerSites(self, spannerClassList = None):
         '''
         
-        Return a list of all sites that are 
-        Spanner or Spanner subclasses. This provides a way for 
+        Return a list of all :class:`~music21.spanner.Spanner` objects 
+        (or Spanner subclasses) that contain 
+        this element. This method provides a way for 
         objects to be aware of what Spanners they 
-        reside in. Note that Spanners are not Stream 
-        subclasses, but Music21Objects that are composed with 
-        a specialized Stream subclass, SapnnerStroage
+        reside in. Note that Spanners are not Streams 
+        but specialized Music21Objects that use a  
+        Stream subclass, SpannerStorage, internally to keep track
+        of the elements that are spanned.
 
         >>> from music21 import *
-        >>> n1 = note.Note()
-        >>> n2 = note.Note()
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('D4')
         >>> sp1 = spanner.Slur(n1, n2)
         >>> n1.getSpannerSites() == [sp1]
         True
-        >>> sp2 = spanner.Slur(n2, n1)
+        
+        Note that not all Spanners are in the spanner module. They
+        tend to reside in modules closer to their musical function:
+        
+        >>> sp2 = dynamics.Crescendo(n2, n1)
         >>> n2.getSpannerSites() == [sp1, sp2]
         True
+        
+        Optionally a class name or list of class names can be
+        specified and only Spanners of that class will be returned
+        
+        >>> sp3 = dynamics.Diminuendo(n1, n2)
+        >>> n2.getSpannerSites('Diminuendo') == [sp3]
+        True
+        
+        A larger class name can be used to get all subclasses:
+        
+        >>> n2.getSpannerSites('DynamicWedge') == [sp2, sp3]
+        True
+        >>> n2.getSpannerSites(['Slur','Diminuendo']) == [sp1, sp3]
+        True
+        
+        The order spanners are returned is generally the order that they were
+        added, but that is not guaranteed, so for safety sake, use set comparisons:
+        
+        >>> set(n2.getSpannerSites(['Slur','Diminuendo'])) == set([sp3, sp1])
+        True
+        
+        
+        Example: see which pairs of notes are in the same slur.
+        
+        >>> n3 = note.Note('E4')
+        >>> sp4 = spanner.Slur(n1, n3)
+        
+        >>> for n in [n1, n2, n3]:
+        ...    for nOther in [n1, n2, n3]:
+        ...        if n is nOther:
+        ...            continue
+        ...        nSlurs = n.getSpannerSites('Slur')
+        ...        nOtherSlurs = nOther.getSpannerSites('Slur')
+        ...        for thisSlur in nSlurs:
+        ...            if thisSlur in nOtherSlurs:
+        ...               print("%s shares a slur with %s" % (n.name, nOther.name))
+        C shares a slur with D
+        C shares a slur with E
+        D shares a slur with C
+        E shares a slur with C
         '''
         found = self.sites.getSitesByClass('SpannerStorage')
         post = []
+        if spannerClassList is not None:
+            if not common.isListLike(spannerClassList):
+                spannerClassList = [spannerClassList]
+                
         for obj in found:
-            post.append(obj.spannerParent)
+            if spannerClassList is None:
+                post.append(obj.spannerParent)
+            else:
+                for spannerClass in spannerClassList:
+                    if spannerClass in obj.spannerParent.classes:
+                        post.append(obj.spannerParent)
+                        break
+                     
         return post
 
 

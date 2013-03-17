@@ -1783,9 +1783,7 @@ class Stream(base.Music21Object):
         >>> st1.highestOffset
         33.0
         
-        
         In the single argument form with an object, inserts the element at its stored offset:
-        
         
         >>> n1 = note.Note("C#")
         >>> n1.offset = 30.0
@@ -1833,6 +1831,10 @@ class Stream(base.Music21Object):
         {4.0} <music21.note.Note F>
         {5.0} <music21.note.Note G>
         {7.0} <music21.note.Note G>
+        
+        
+        As an FYI, there is no removeAndShift() function, so the opposite of
+        insertAndShift(el) is remove(el, shiftOffsets=True).
         '''
         # need to find the highest time after the insert  
         if itemOrNone is not None: # we have an offset and an element
