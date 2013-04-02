@@ -338,7 +338,7 @@ class StaffLayout(LayoutBase):
         self.distance = None
         self.staffNumber = None
         self.staffSize = None
-        self.hidden = False
+        self.hidden = None  # True = hidden; False = shown; None = inherit
 
         for key in keywords:
             if key.lower() == 'distance':
@@ -902,7 +902,7 @@ class LayoutScore(stream.Opus):
         is always of height 40 (4 spaces of 10-tenths each)
                
         >>> from music21 import *
-        >>> lt = corpus.parse('demos/layoutTest.xml', forceSource=True)
+        >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
 
         The first staff (staff 0) of each page/system always begins at height 0 and should end at
@@ -965,20 +965,34 @@ class LayoutScore(stream.Opus):
         >>> ls.getPositionForStaff(0, 3, 2)
         (133.0, 173.0)
 
+
+        Tests for a score with PartStaff objects:
+        >>> lt = corpus.parse('demos/layoutTestMore.xml', forceSource=True)
+        >>> ls = layout.divideByPages(lt, fastMeasures = True)
+        >>> ls.getPositionForStaff(0, 0, 0)
+        (0.0, 40.0)
+        >>> ls.getPositionForStaff(0, 0, 1)
+        (133.0, 173.0)
+        >>> ls.getPositionForStaff(0, 0, 2)
+        (235.0, 275.0)
+
+
+        >>> ls.getPositionForStaff(0, 2, 0)
+        (0.0, 40.0)
+        >>> ls.getPositionForStaff(0, 2, 1)
+        (40.0, 40.0)
+        >>> ls.getPositionForStaff(0, 2, 2)
+        (40.0, 40.0)
+
+
         '''
         if 'positionForStaff' not in self._cache:
             self._cache['positionForStaff'] = {}
-        
         positionForStaffCache = self._cache['positionForStaff']
-        if pageId not in positionForStaffCache:
-            positionForStaffCache[pageId] = {}
-        pageCache = positionForStaffCache[pageId]
-        if systemId not in pageCache:
-            pageCache[systemId] = {}        
-        dataCache = pageCache[systemId]
-        if staffId in dataCache:
-            return dataCache[staffId]
-
+        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        if cacheKey in positionForStaffCache:
+            return positionForStaffCache[cacheKey]
+        
         if 'staffSizeCache' not in self._cache:
             self._cache['staffSizeCache'] = {}        
         staffSizeCache = self._cache['staffSizeCache']
@@ -1010,7 +1024,7 @@ class LayoutScore(stream.Opus):
         except: 
             environLocal.warn("No measures found in pageId %d, systemId %d, staffId %d" % (pageId, systemId, staffId))
 
-        hiddenStaff = False
+        hiddenStaff = self.getStaffHiddenAttribute(pageId, systemId, staffId) #False
         allStaffLayouts = firstMeasureOfStaff.getElementsByClass('StaffLayout')
         if len(allStaffLayouts) > 0:
             #print "Got staffLayouts: "
@@ -1023,8 +1037,8 @@ class LayoutScore(stream.Opus):
                 staffHeight = staffHeight * (staffLayoutObj.staffSize/100.0)
                 #print "Got staffHeight of %d for partId %d" % (staffHeight, partId)
                 staffSizeDefined = True
-            if staffLayoutObj.hidden is True:
-                hiddenStaff = True
+            #if staffLayoutObj.hidden is True:
+            #    hiddenStaff = True
         
         searchSystemId = systemId
         searchPageId = pageId
@@ -1048,6 +1062,11 @@ class LayoutScore(stream.Opus):
             staffHeight = 0
             staffDistanceFromPrevious = 0
         #print partId, pageId, systemId, staffHeight
+
+        #hiddenStaffNew = self.getStaffHiddenAttribute(pageId, systemId, staffId)
+        #if hiddenStaff != hiddenStaffNew:
+        #    print "Hidden Discrepancy (%r, %r) for %d, %d, %d" % (hiddenStaff, hiddenStaffNew, pageId, systemId, staffId)
+        
         
         if staffId > 0:
             unused_staffDistanceFromStart, previousStaffBottom = self.getPositionForStaff(pageId, systemId, staffId - 1)
@@ -1058,9 +1077,83 @@ class LayoutScore(stream.Opus):
         staffBottom = staffDistanceFromStart + staffHeight
         
         dataTuple = (staffDistanceFromStart, staffBottom)
-        dataCache[staffId] = dataTuple
+        positionForStaffCache[cacheKey] = dataTuple
         #print dataTuple
-        return dataTuple        
+        return dataTuple
+    
+    def getStaffHiddenAttribute(self, pageId, systemId, staffId):
+        '''
+        returns the staffLayout.hidden attribute for a staffId, or if it is not
+        defined, recursively search through previous staves until one is found.
+
+        >>> from music21 import *
+        >>> lt = corpus.parse('demos/layoutTestMore.xml', forceSource=True)
+        >>> ls = layout.divideByPages(lt, fastMeasures = True)
+        >>> ls.getStaffHiddenAttribute(0, 0, 0)
+        False
+        >>> ls.getStaffHiddenAttribute(0, 0, 1)
+        False
+        >>> ls.getStaffHiddenAttribute(0, 1, 1)
+        True
+        >>> ls.getStaffHiddenAttribute(0, 2, 1)
+        True
+        >>> ls.getStaffHiddenAttribute(0, 3, 1)
+        False
+        '''
+        if 'staffHiddenAttribute' not in self._cache:
+            self._cache['staffHiddenAttribute'] = {}
+        
+        staffHiddenCache = self._cache['staffHiddenAttribute']
+        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        if cacheKey in staffHiddenCache:
+            return staffHiddenCache[cacheKey]
+
+        thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
+
+        
+        staffLayoutObject = None
+        allStaffLayoutObjects = thisStaff.flat.getElementsByClass('StaffLayout', returnStreamSubClass=False)
+        if len(allStaffLayoutObjects) > 0:
+            staffLayoutObject = allStaffLayoutObjects[0]
+        if staffLayoutObject is None or staffLayoutObject.hidden is None:
+            previousPageId, previousSystemId = self.getSystemBeforeThis(pageId, systemId)
+            if previousPageId is None:
+                hiddenTag = False
+            else:
+                hiddenTag = self.getStaffHiddenAttribute(previousPageId, previousSystemId, staffId)
+        else:
+            hiddenTag = staffLayoutObject.hidden
+
+        staffHiddenCache[cacheKey] = hiddenTag
+        return hiddenTag
+
+
+    def getSystemBeforeThis(self, pageId, systemId):
+        '''
+        given a pageId and systemId, get the (pageId, systemId) for the previous system.
+        
+        return (None, None) if it's the first system on the first page
+
+        This test score has five systems on the first page, three on the second, and two on the third
+        
+        >>> from music21 import *
+        >>> lt = corpus.parse('demos/layoutTestMore.xml', forceSource=True)
+        >>> ls = layout.divideByPages(lt, fastMeasures = True)
+        >>> systemId = 1
+        >>> pageId = 2  # last system, last page
+        >>> while systemId is not None:
+        ...    pageId, systemId = ls.getSystemBeforeThis(pageId, systemId)
+        ...    print (pageId, systemId),
+        (2, 0) (1, 2) (1, 1) (1, 0) (0, 4) (0, 3) (0, 2) (0, 1) (0, 0) (None, None)
+        '''
+        if systemId > 0:
+            return pageId, systemId - 1
+        else:
+            if pageId == 0:
+                return (None, None)
+            previousPageId = pageId - 1
+            numSystems = len(self.pages[previousPageId].systems)
+            return previousPageId, numSystems -1
 
     def getPositionForStaffMeasure(self, staffId, measureNumber, returnFormat='tenths'):
         '''
