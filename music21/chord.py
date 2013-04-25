@@ -1461,20 +1461,6 @@ class Chord(note.NotRest):
 #            roots = 0
 
 
-# this was an old method of assigning duration to a Chord. better now is to use
-# an overridden Duration property, as done below.
-
-#     def duration(self, newDur = 0):
-#         '''Duration of the chord can be defined here OR it should return the duration
-#         of the first note of the chord
-#         '''
-#         if (newDur):
-#             self._duration = newDur
-#         elif (self._duration is None and len(self.pitches) > 0):
-#             self._duration = self.pitches[0].duration
-#         return self._duration
-
-
     def _getDuration(self):
         '''
         Gets the DurationObject of the object or None
@@ -4050,7 +4036,7 @@ class TestExternal(unittest.TestCase):
         s = stream.Stream()
         for i in range(30):
             chordRaw = []
-            for counter in range(random.choice([3, 4, 5, 6, 7, 8])):
+            for i in range(random.choice([3, 4, 5, 6, 7, 8])):
                 pc = random.choice(range(0, 12))
                 if pc not in chordRaw:
                     chordRaw.append(pc)

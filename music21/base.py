@@ -3245,7 +3245,11 @@ class Music21Object(object):
  
         fileFormat, ext = common.findFormat(fmt)
         if fileFormat not in common.VALID_WRITE_FORMATS:
-            raise Music21ObjectException('cannot support showing in this format yet: %s' % fileFormat)
+            if fileFormat is None:
+                raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
+            else:
+                raise Music21ObjectException('cannot support showing in this format yet: %s' % fileFormat)
+
 
         if fileFormat is None:
             raise Music21ObjectException('bad format (%s) provided to write()' % fmt)

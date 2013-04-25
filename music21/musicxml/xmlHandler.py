@@ -202,9 +202,11 @@ class Handler(xml.sax.ContentHandler):
 
         # generic handling for all other tag types
         else:
-            mxClassName = self.t.getClassName(name)
-            # not all tags have classes; soem are simple entities
+            mxClassName = self.t.getClassName(name)            
+            # not all tags have classes; some are simple entities
             if mxClassName is not None:
+                if mxClassName == 'StaffDetails':
+                    pass
                 self._mxObjs[name] = mxClassName()
                 # loading attrs when none are defined is not a problem
                 self._mxObjs[name].loadAttrs(attrs)
@@ -459,6 +461,13 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'divisions':
             self._mxObjs['attributes'].divisions = self._currentTag.charData
             self._divisionsLast = self._currentTag.charData
+
+        elif name == 'staff-details':
+            self._mxObjs['attributes'].staffDetailsList.append(self._mxObjs['staff-details'])
+
+        elif name == 'staff-size':
+            self._mxObjs['staff-details'].staffSize = self._currentTag.charData
+    
     
         elif name == 'forward':
             self._mxObjs['measure'].componentList.append(

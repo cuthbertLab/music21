@@ -733,7 +733,10 @@ class MidiEvent(object):
             if self.type not in ['PROGRAM_CHANGE', 
                 'CHANNEL_KEY_PRESSURE']:
                 # this results in a two-part string, like '\x00\x00'
-                data = chr(self._parameter1) + chr(self._parameter2) 
+                try:
+                    data = chr(self._parameter1) + chr(self._parameter2) 
+                except ValueError:
+                    raise MidiException("Problem with representing either %d or %d" % (self._parameter1, self._parameter2))
             elif self.type in ['PROGRAM_CHANGE']:
                 #environLocal.printDebug(['trying to add program change data: %s' % self.data])
                 try:

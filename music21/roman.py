@@ -494,6 +494,12 @@ class RomanNumeral(harmony.Harmony):
     >>> diminishedSharpSeven = roman.RomanNumeral('vii', em)
     >>> [str(p) for p in diminishedSharpSeven.pitches]
     ['D#5', 'F#5', 'A5']
+    >>> minorSharpSeven = roman.RomanNumeral('vii#5', em)
+    >>> [str(p) for p in minorSharpSeven.pitches]
+    ['D#5', 'F#5', 'A#5']
+    
+
+
     >>> majorFlatSix = roman.RomanNumeral('VI', em)
     >>> [str(p) for p in majorFlatSix.pitches]
     ['C5', 'E5', 'G5']

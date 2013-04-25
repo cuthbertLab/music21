@@ -239,7 +239,11 @@ class TagLib(object):
         ('tremolo', False, Tremolo), 
         
         ('attributes', False, Attributes), 
+        
         ('divisions', True), 
+        ('staff-details', False, StaffDetails),
+        ('staff-size', True),
+        
         ('forward', False, Forward), 
         ('backup', False, Backup), 
         ('grace', False, Grace),  
@@ -1345,11 +1349,12 @@ class Attributes(MusicXMLElement):
         # more than one pair of beat and beat-type is used for composite signatures
         self.timeList = [] 
         self.clefList = []
+        self.staffDetailsList = []
         self.transposeObj = None # needs to be an ojbect
         self.measureStyleObj = None # for slash notation, mult rests
 
         # not yet implemented
-        self.staffDetails = None # shows different stave styles
+        #self.staffDetails = None # shows different stave styles
         self.directive = None
 
         self._crossReference['timeList'] = ['time']
@@ -1387,6 +1392,24 @@ class Attributes(MusicXMLElement):
         mxKey = Key()
         mxKey.setDefaults()
         self.keyList.append(mxKey)
+
+class StaffDetails(MusicXMLElement):
+    # contains information about staff size, staff number, printing, etc.
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'staff-details'
+        self._attr['number'] = None
+        self._attr['print-object'] = True
+        self.staffSize = None
+        self._crossReference['number'] = ['number']
+        self._crossReference['print-object'] = ['print-object', 'printObject']
+
+    def _getComponents(self):
+        c = []
+        c.append(('staff-size', self.staffSize))
+        return c
+
+    
 
 class Key(MusicXMLElement):
     # permits traditional and non-traditional keys

@@ -52,7 +52,7 @@ class WindowedAnalysis(object):
         # store a windowed Stream, partitioned into bars of 1/4
         self._windowedStream = self._getMinimumWindowStream() 
 
-    def _getMinimumWindowStream(self):
+    def _getMinimumWindowStream(self, timeSignature='1/4'):
         ''' Take the loaded stream and restructure it into measures of 1 quarter note duration.
 
         >>> from music21 import *
@@ -74,14 +74,14 @@ class WindowedAnalysis(object):
         # create a stream that contains just a 1/4 time signature; this is 
         # the minimum window size (and partitioning will be done by measure)
         meterStream = stream.Stream()
-        meterStream.insert(0, meter.TimeSignature('1/4'))
+        meterStream.insert(0, meter.TimeSignature(timeSignature))
         
         # makeTies() splits the durations into proper measure boundaries for 
         # analysis; this means that a duration that spans multiple 1/4 measures
         # will be represented in each of those measures
         measured = self._srcStream.makeMeasures(meterStream)
         # need to make sure we only have Measures here, as layout.StaffGroup
-        # or similar objs may be reatined
+        # or similar objs may be retained
         measured.removeByNotOfClass('Measure')
         measured.makeTies(inPlace=True)
         return measured

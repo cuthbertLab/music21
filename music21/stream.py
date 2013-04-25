@@ -2368,21 +2368,38 @@ class Stream(base.Music21Object):
         >>> found = a.getElementsByClass(note.Rest, returnStreamSubClass = False)
         >>> found.__class__.__name__
         'Stream'
+        
+        
+        If `returnStreamSubClass` == 'list' then a generic list is returned.
+        Generally not to be used, but can help in certain speed-critical applications
+        where say only the length of the returned list or the presence or absence of elements matters:
+        
+        >>> foundList = a.flat.getElementsByClass(note.Rest, returnStreamSubClass = 'list')
+        >>> len(foundList)
+        25
+
+        
         '''
         # TODO: could add `domain` parameter to allow searching only _elements, 
         # or _endElements, or both; possible performance hit
         # NOTE: this is a performance critical operation 
+        returnList = False
         if returnStreamSubClass:
             try:
                 found = self.__class__()
             except TypeError:
                 found = Stream()
+        elif returnStreamSubClass == 'list':
+            found = []
+            returnList = True
         else:
             found = Stream()
-        found.derivesFrom = self
-        found.derivationMethod = 'getElementsByClass'
-        # passing on auto sort status may or may not be what is needed here
-        found.autoSort = self.autoSort
+            
+        if returnList is False:
+            found.derivesFrom = self
+            found.derivationMethod = 'getElementsByClass'
+            # passing on auto sort status may or may not be what is needed here
+            found.autoSort = self.autoSort
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, (list, tuple)):
@@ -2401,7 +2418,8 @@ class Stream(base.Music21Object):
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
         # if this stream was sorted, the resultant stream is sorted
-        found.isSorted = self.isSorted
+        if returnList is False:
+            found.isSorted = self.isSorted
 
         # to use class cache, class must be provided as a string, 
         # and there must be only one class
@@ -2418,11 +2436,19 @@ class Stream(base.Music21Object):
         for e in self._elements:
             #eClasses = e.classes # store once, as this is property call
             if e.isClassOrSubclass(classFilterList):
-                found._insertCore(e.getOffsetBySite(self), e, ignoreSort=True)                
+                if returnList is False:
+                    found._insertCore(e.getOffsetBySite(self), e, ignoreSort=True)
+                else:
+                    found.append(e)  
         for e in self._endElements:
             if e.isClassOrSubclass(classFilterList):
-                found._storeAtEndCore(e)
-        found._elementsChanged()
+                if returnList is False:
+                    found._storeAtEndCore(e)
+                else:
+                    found.append(e)
+        
+        if returnList is False:
+            found._elementsChanged()
         return found
 
 
@@ -7936,7 +7962,11 @@ class Stream(base.Music21Object):
         #treated as unnumbered measures (or measures with suffix 'X') by notation programs, even though they are
         #logically part of the previous measure.  The variable padBeats will represent extra beats we add to the front
         #of our partial measure
-        if myMeas.numberSuffix is not None or (fixZeros and foundMeasureNumber == 0):    
+        numSuffix = myMeas.numberSuffix
+        if numSuffix == "":
+            numSuffix = None
+        
+        if numSuffix is not None or (fixZeros and foundMeasureNumber == 0):    
             prevMeas = myStream.getElementBeforeOffset(myMeas.offset, classList = ['Measure'])
             if prevMeas:
                 ts2 = prevMeas.getContextByClass('TimeSignature')

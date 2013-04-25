@@ -58,17 +58,17 @@ def _getExtendedModules():
     '''
     if 'matplotlib' in base._missingImport:
         raise GraphException('could not find matplotlib, graphing is not allowed')
-    import matplotlib
+    import matplotlib # @UnresolvedImport
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
     #matplotlib.use('WXAgg')
 
-    from mpl_toolkits.mplot3d import Axes3D
-    from matplotlib import collections
-    from matplotlib import patches
+    from mpl_toolkits.mplot3d import Axes3D # @UnresolvedImport
+    from matplotlib import collections # @UnresolvedImport
+    from matplotlib import patches # @UnresolvedImport
 
     #from matplotlib.colors import colorConverter
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt # @UnresolvedImport
     
     try:
         import networkx

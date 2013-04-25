@@ -44,7 +44,7 @@ def _getExtendedModules():
         raise ContourException('could not find numpy, contour mapping is not allowed')    
     #if 'scipy' in base._missingImport:
     #    raise ContourException('could not find scipy, contour mapping is not allowed')
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt # @UnresolvedImport
     import numpy
     sp = None
     #import scipy.stats as sp
@@ -74,7 +74,7 @@ class ContourFinder(object):
                 :width: 600
                 
         '''
-        self.s = s
+        self.s = s # a stream.Score object
         self.sChords = None #lazy evaluation...
         self.key = None
         

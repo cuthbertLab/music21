@@ -871,10 +871,7 @@ def mxClefToClef(mxClefList, inputM21 = None):
     >>> c = musicxml.fromMxObjects.mxClefToClef(a)
     >>> c
     <music21.clef.TabClef>
-
-    '''
-
-    
+    '''    
     if not common.isListLike(mxClefList):
         mxClef = mxClefList # its not a list
     else: # just get first for now
@@ -1831,32 +1828,38 @@ def mxDefaultsToScoreLayout(mxDefaults, inputM21=None):
 #-------------------------------------------------------------------------------
 # Measures
 
-def _addToStaffReference(mxObject, target, staffReference):
-    '''Utility routine for importing musicXML objects; here, we store a reference to the music21 object in a dictionary, where keys are the staff values. Staff values may be None, 1, 2, etc.
+def addToStaffReference(mxObjectOrNumber, music21Object, staffReference):
     '''
-    #environLocal.printDebug(['_addToStaffReference(): called with:', target])
-    if common.isListLike(mxObject):
-        if len(mxObject) > 0:
-            mxObject = mxObject[0] # if a chord, get the first components
+    Utility routine for importing musicXML objects; 
+    here, we store a reference to the music21 object in a dictionary, 
+    where keys are the staff values. Staff values may be None, 1, 2, etc.
+    '''
+    #environLocal.printDebug(['addToStaffReference(): called with:', music21Object])
+    if common.isListLike(mxObjectOrNumber):
+        if len(mxObjectOrNumber) > 0:
+            mxObjectOrNumber = mxObjectOrNumber[0] # if a chord, get the first components
         else: # if an empty list
-            environLocal.printDebug(['got an mxObject as an empty list', mxObject])
+            environLocal.printDebug(['got an mxObject as an empty list', mxObjectOrNumber])
             return
     # add to staff reference
-    if hasattr(mxObject, 'staff'):
-        key = mxObject.staff
+    if hasattr(mxObjectOrNumber, 'staff'):
+        key = mxObjectOrNumber.staff
     # some objects store staff assignment simply as number
     else:
         try:
-            key = mxObject.get('number')
+            key = mxObjectOrNumber.get('number')
         except xmlnode.XMLNodeException:
             return
+        except AttributeError: # a normal number
+            key = mxObjectOrNumber
     if key not in staffReference:
         staffReference[key] = []
-    staffReference[key].append(target)
+    staffReference[key].append(music21Object)
 
 
 def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
-    '''Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object)
+    '''
+    Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object)
     into a music21 :class:`~music21.stream.Measure`.
 
     If an `inputM21` object reference is provided, this object will be
@@ -1865,6 +1868,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     The `spannerBundle` that is passed in is used to accumulate any created Spanners.
     This Spanners are not inserted into the Stream here.
 
+
+    Returns a tuple of (music21.stream.Measure object, staffReference (a dictionary for partStaffs of
+    elements that only belong to a single staff), and a transposition)
     '''
     if inputM21 == None:
         m = stream.Measure()
@@ -1919,22 +1925,68 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     #environLocal.printDebug(['mxAttriutes clefList', mxAttributes.clefList, 
     #                        mxAttributesInternal])
 
+    staffLayoutObjects = []
+
     # getting first for each of these for now
-    if mxAttributesInternal and len(mxAttributes.timeList) != 0:
-        for mxSub in mxAttributes.timeList:
-            ts = mxToTimeSignature(mxSub)
-            _addToStaffReference(mxSub, ts, staffReference)
-            m._insertCore(0, ts)
-    if mxAttributesInternal and len(mxAttributes.clefList) != 0:
-        for mxClef in mxAttributes.clefList:
-            cl = mxClefToClef(mxClef)
-            _addToStaffReference(mxClef, cl, staffReference)
-            m._insertCore(0, cl)
-    if mxAttributesInternal and len(mxAttributes.keyList) != 0:
-        for mxSub in mxAttributes.keyList:
-            ks = mxKeyListToKeySignature(mxSub)
-            _addToStaffReference(mxSub, ks, staffReference)
-            m._insertCore(0, ks)
+    if mxAttributesInternal:
+        if len(mxAttributes.timeList) != 0:
+            for mxSub in mxAttributes.timeList:
+                ts = mxToTimeSignature(mxSub)
+                addToStaffReference(mxSub, ts, staffReference)
+                m._insertCore(0, ts)
+        if len(mxAttributes.clefList) != 0:
+            for mxClef in mxAttributes.clefList:
+                cl = mxClefToClef(mxClef)
+                addToStaffReference(mxClef, cl, staffReference)
+                m._insertCore(0, cl)
+        if len(mxAttributes.keyList) != 0:
+            for mxSub in mxAttributes.keyList:
+                ks = mxKeyListToKeySignature(mxSub)
+                addToStaffReference(mxSub, ks, staffReference)
+                m._insertCore(0, ks)
+        if len(mxAttributes.staffDetailsList) != 0:
+            for mxStaffDetails in mxAttributes.staffDetailsList:
+                foundMatch = False
+                # perhaps we've already put a staffLayout into the measure?
+                if mxStaffDetails._attr['number'] is not None:
+                    for stl in staffLayoutObjects:
+                        if stl.staffNumber == int(mxStaffDetails._attr['number']):
+                            stl.staffSize = float(mxStaffDetails.staffSize)
+                            foundMatch = True
+                            break
+                else:
+                    for stl in staffLayoutObjects:
+                        if stl.staffSize is None:
+                            stl.staffSize = float(mxStaffDetails.staffSize)
+                            foundMatch = True
+                            
+                        
+                if foundMatch is False:
+                    staffSize = None
+                    try:
+                        staffSize = float(mxStaffDetails.staffSize)
+                    except TypeError:
+                        staffSize = None                    
+                    if mxStaffDetails._attr['number'] is not None:
+                        stl = layout.StaffLayout(staffSize = staffSize, staffNumber=int(mxStaffDetails._attr['number']))
+                    else:
+                        stl = layout.StaffLayout(staffSize = staffSize)
+                    
+                    if 'print-object' in mxStaffDetails._attr:
+                        staffPrinted = mxStaffDetails._attr['print-object']
+                        if staffPrinted == 'no' or staffPrinted is False:
+                            stl.hidden = True
+                        elif staffPrinted == 'yes' or staffPrinted is True:
+                            stl.hidden = False
+                    #else:
+                    #    print mxStaffDetails._attr
+                    
+                    addToStaffReference(mxStaffDetails, stl, staffReference)
+                    m._insertCore(0, stl)
+                    staffLayoutObjects.append(stl)
+                    #staffLayoutsAlreadySetList.append(stl)
+                    #print "Got an mxStaffDetails %r" % mxStaffDetails
+                
 
     # transposition may be defined for a Part in the Measure attributes
     transposition = None
@@ -1979,6 +2031,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             mxObjNext = mxMeasure[i + 1]
         else:
             mxObjNext = None
+        
         #environLocal.printDebug(['handling', mxObj])
 
         # NOTE: tests have shown that using isinstance() here is much faster
@@ -2052,8 +2105,20 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 # store at zero position
                 m._insertCore(0, sl)
             if addStaffLayout:
-                stl = mxPrintToStaffLayout(mxPrint)
-                m._insertCore(0, stl)
+                stlList = mxPrintToStaffLayoutList(mxPrint)
+                for stl in stlList:
+                    foundPrevious = False
+                    for stlSetFromAttributes in staffLayoutObjects:
+                        if stlSetFromAttributes.staffNumber == stl.staffNumber or stlSetFromAttributes.staffNumber is None or stl.staffNumber is None:
+                            foundPrevious = True
+                            stlSetFromAttributes.distance = stl.distance
+                            if stlSetFromAttributes.hidden is None:
+                                stlSetFromAttributes.hidden = stl.hidden
+                            break
+                    if foundPrevious is False:
+                        addToStaffReference(str(stl.staffNumber), stl, staffReference)
+                        m._insertCore(0, stl)
+
 
         # <sound> tags may be found in the Measure, used to define tempo
         elif isinstance(mxObj, musicxmlMod.Sound):
@@ -2151,7 +2216,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     except FromMxObjectsException as strerror:
                         raise FromMxObjectsException('cannot translate note in measure %s: %s' % (mNumRaw, strerror))
 
-                    _addToStaffReference(mxNote, n, staffReference)
+                    addToStaffReference(mxNote, n, staffReference)
                     if useVoices:
                         useVoice = mxNote.voice
                         if useVoice is None:
@@ -2186,7 +2251,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 restAndNoteCount['rest'] += 1
                 n = note.Rest()
                 mxToRest(mxNote, inputM21=n)
-                _addToStaffReference(mxNote, n, staffReference)
+                addToStaffReference(mxNote, n, staffReference)
                 #m.insert(offsetMeasureNote, n)
                 if useVoices:
                     vCurrent = m.voices[mxNote.voice]
@@ -2217,7 +2282,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     c.lyrics.append(lyricObj)
                     currentLyricNumber += 1
 
-                _addToStaffReference(mxNoteList, c, staffReference)
+                addToStaffReference(mxNoteList, c, staffReference)
                 if useVoices:
                     useVoice = mxNote.voice
                     if useVoice is None:
@@ -2249,7 +2314,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 # in rare cases there may be more than one dynamic in the same
                 # direction, so we iterate
                 for d in mxToDynamicList(mxObj):
-                    _addToStaffReference(mxObj, d, staffReference)
+                    addToStaffReference(mxObj, d, staffReference)
                     #m.insert(offsetMeasureNote, d)
                     m._insertCore(offsetMeasureNote + offsetDirection, d)
 
@@ -2257,22 +2322,22 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # TODO: multiple spanners
 #             if mxObj.getWedge() is not None:
 #                 w = mxToWedge(mxObj)
-#                 _addToStaffReference(mxObj, w, staffReference)
+#                 addToStaffReference(mxObj, w, staffReference)
 #                 m._insertCore(offsetMeasureNote, w)
 
             if mxObj.getSegno() is not None:
                 rm = mxToSegno(mxObj.getSegno())
-                _addToStaffReference(mxObj, rm, staffReference)
+                addToStaffReference(mxObj, rm, staffReference)
                 m._insertCore(offsetMeasureNote, rm)
             if mxObj.getCoda() is not None:
                 rm = mxToCoda(mxObj.getCoda())
-                _addToStaffReference(mxObj, rm, staffReference)
+                addToStaffReference(mxObj, rm, staffReference)
                 m._insertCore(offsetMeasureNote, rm)
 
             if mxObj.getMetronome() is not None:
                 #environLocal.printDebug(['got getMetronome', mxObj.getMetronome()])
                 mm = mxToTempoIndication(mxObj.getMetronome())
-                _addToStaffReference(mxObj, mm, staffReference)
+                addToStaffReference(mxObj, mm, staffReference)
                 # need to look for metronome marks defined above
                 # and look for text defined below
                 m._insertCore(offsetMeasureNote, mm)
@@ -2291,16 +2356,16 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     if re is not None:
                         # the repeat expression stores a copy of the text
                         # expression within it; replace it here on insertion
-                        _addToStaffReference(mxObj, re, staffReference)
+                        addToStaffReference(mxObj, re, staffReference)
                         m._insertCore(offsetMeasureNote + offsetDirection, re)
                     else:
-                        _addToStaffReference(mxObj, te, staffReference)
+                        addToStaffReference(mxObj, te, staffReference)
                         m._insertCore(offsetMeasureNote + offsetDirection, te)
 
         elif isinstance(mxObj, musicxmlMod.Harmony):
             mxHarmony = mxObj
             h = mxToChordSymbol(mxHarmony)
-            _addToStaffReference(mxObj, h, staffReference)
+            addToStaffReference(mxObj, h, staffReference)
             m._insertCore(offsetMeasureNote, h)
 
 
@@ -2329,26 +2394,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
 #-------------------------------------------------------------------------------
 # Streams
-def _getUniqueStaffKeys(staffReferenceList):
-    '''Given a list of staffReference dictionaries, collect and return a list of all unique keys except None
-    '''
-    post = []
-    for staffReference in staffReferenceList:
-        for key in staffReference:
-            if key is not None and key not in post:
-                post.append(key)
-    post.sort()
-    return post
-
-def _getStaffExclude(staffReference, targetKey):
-    '''Given a staff reference dictionary, remove and combine in a list all elements that are not part of the given key. Thus, remove all entries under None (common to all) and th e given key. This then is the list of all elements that should be deleted.
-    '''
-    post = []
-    for key in staffReference:
-        if key is None or int(key) == int(targetKey):
-            continue
-        post += staffReference[key]
-    return post
 
 
 def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
@@ -2504,52 +2549,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
     streamPartStaff = None
     if mxPart.getStavesCount() > 1:
-        # transfer all spanners to the streamPart such that they get
-        # updated in copying, then remove them
-        rm = []
-        for sp in spannerBundle.getByCompleteStatus(True):
-            streamPart._insertCore(0, sp)
-            rm.append(sp)
-        # remove from original spanner bundle
-        for sp in rm:
-            spannerBundle.remove(sp)
-
-        # get staves will return a number, between 1 and count
-        #for staffCount in range(mxPart.getStavesCount()):
-        for staffCount in _getUniqueStaffKeys(staffReferenceList):
-            partIdStaff = '%s-Staff%s' % (partId, staffCount)
-            #environLocal.printDebug(['partIdStaff', partIdStaff, 'copying streamPart'])
-            # this deepcopy is necessary, as we will remove components
-            # in each staff that do not belong
-            streamPartStaff = copy.deepcopy(streamPart)
-            # assign this as a PartStaff, a subclass of Part
-            streamPartStaff.__class__ = stream.PartStaff
-            # remove all elements that are not part of this staff
-            mStream = streamPartStaff.getElementsByClass('Measure')
-            for i, staffReference in enumerate(staffReferenceList):
-                staffExclude = _getStaffExclude(staffReference, staffCount)
-                m = mStream[i]
-                for eRemove in staffExclude:
-                    for eMeasure in m:
-                        if eMeasure._idLastDeepCopyOf == id(eRemove):
-                            m.remove(eMeasure)
-                    for v in m.voices:
-                        v.remove(eRemove)
-                        for eVoice in v.elements:
-                            if eVoice._idLastDeepCopyOf == id(eRemove):
-                                v.remove(eVoice)
-                # after adjusting voices see if voices can be reduced or
-                # removed
-                #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices before:', len(m.voices)])
-                m.flattenUnnecessaryVoices(force=False, inPlace=True)
-                #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices after:', len(m.voices)])
-            # TODO: copying spanners may have created orphaned
-            # spanners that no longer have valid connections
-            # in this part; should be deleted
-            streamPartStaff.addGroupForElements(partIdStaff)
-            streamPartStaff.groups.append(partIdStaff)
-            streamPartStaff._elementsChanged()
-            s._insertCore(0, streamPartStaff)
+        separateOutPartStaffs(mxPart, streamPart, spannerBundle, s, staffReferenceList, partId)
     else:
         streamPart.addGroupForElements(partId) # set group for components 
         streamPart.groups.append(partId) # set group for stream itself
@@ -2578,6 +2578,93 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         return streamPartStaff
     else:
         return streamPart
+
+def separateOutPartStaffs(mxPart, streamPart, spannerBundle, s, staffReferenceList, partId):
+    '''
+    given an mxPart and other necessary information, insert into the score (s) multiple
+    PartStaff objects separating the information for one part from the other
+    '''
+    # transfer all spanners to the streamPart such that they get
+    # updated in copying, then remove them
+    rm = []
+    for sp in spannerBundle.getByCompleteStatus(True):
+        streamPart._insertCore(0, sp)
+        rm.append(sp)
+    # remove from original spanner bundle
+    for sp in rm:
+        spannerBundle.remove(sp)
+
+    # get staves will return a number, between 1 and count
+    #for staffCount in range(mxPart.getStavesCount()):
+    for staffNumber in _getUniqueStaffKeys(staffReferenceList):
+        partStaffId = '%s-Staff%s' % (partId, staffNumber)
+        #environLocal.printDebug(['partIdStaff', partIdStaff, 'copying streamPart'])
+        # this deepcopy is necessary, as we will remove components
+        # in each staff that do not belong
+        
+        # TODO: Do n-1 deepcopies, instead of n, since the last PartStaff can just remove from the original Part
+        streamPartStaff = copy.deepcopy(streamPart)
+        # assign this as a PartStaff, a subclass of Part
+        streamPartStaff.__class__ = stream.PartStaff
+        streamPartStaff.id = partStaffId
+        # remove all elements that are not part of this staff
+        mStream = streamPartStaff.getElementsByClass('Measure')
+        for i, staffReference in enumerate(staffReferenceList):
+            staffExclude = _getStaffExclude(staffReference, staffNumber)
+            if len(staffExclude) > 0:
+                m = mStream[i]
+                for eRemove in staffExclude:
+                    for eMeasure in m:
+                        if eMeasure._idLastDeepCopyOf == id(eRemove):
+                            m.remove(eMeasure)
+                            break
+                    for v in m.voices:
+                        v.remove(eRemove)
+                        for eVoice in v.elements:
+                            if eVoice._idLastDeepCopyOf == id(eRemove):
+                                v.remove(eVoice)
+            # after adjusting voices see if voices can be reduced or
+            # removed
+            #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices before:', len(m.voices)])
+            m.flattenUnnecessaryVoices(force=False, inPlace=True)
+            #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices after:', len(m.voices)])
+        # TODO: copying spanners may have created orphaned
+        # spanners that no longer have valid connections
+        # in this part; should be deleted
+        streamPartStaff.addGroupForElements(partStaffId)
+        streamPartStaff.groups.append(partStaffId)
+        streamPartStaff._elementsChanged()
+        s._insertCore(0, streamPartStaff)
+
+def _getUniqueStaffKeys(staffReferenceList):
+    '''
+    Given a list of staffReference dictionaries, 
+    collect and return a list of all unique keys except None
+    '''
+    post = []
+    for staffReference in staffReferenceList:
+        for key in staffReference:
+            if key is not None and key not in post:
+                post.append(key)
+    post.sort()
+#    if len(post) > 0:
+#        print post
+    return post
+
+def _getStaffExclude(staffReference, targetKey):
+    '''
+    Given a staff reference dictionary, remove and combine in a list all elements that 
+    are not part of the given key. Thus, return a list of all entries to remove.
+    It keeps those elements under staff key None (common to all) and 
+    those under given key. This then is the list of all elements that should be deleted.
+    '''
+    post = []
+    for key in staffReference:
+        if key is None or int(key) == int(targetKey):
+            continue
+        post += staffReference[key]
+    return post
+
 
 def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
     '''
@@ -2977,9 +3064,9 @@ def mxSystemLayoutToSystemLayout(mxSystemLayout, inputM21 = None):
         return systemLayout
 
 
-def mxPrintToStaffLayout(mxPrint, inputM21 = None):
+def mxPrintToStaffLayoutList(mxPrint, inputM21 = None):
     '''
-    Given an mxPrint object, set object data for a StaffLayout object
+    Given an mxPrint object, return a list of StaffLayout objects (may be empty)
 
     >>> from music21 import *
     >>> mxPrint = musicxml.Print()
@@ -2992,34 +3079,28 @@ def mxPrintToStaffLayout(mxPrint, inputM21 = None):
     >>> mxStaffLayout.set('number', 1)
     >>> mxPrint.append(mxStaffLayout)
 
-    >>> sl = musicxml.fromMxObjects.mxPrintToStaffLayout(mxPrint)
+    >>> slList = musicxml.fromMxObjects.mxPrintToStaffLayoutList(mxPrint)
+    >>> sl = slList[0]
     >>> sl.distance
     55.0
     >>> sl.staffNumber
     1
     '''
-    if inputM21 is None:
-        staffLayout = layout.StaffLayout()
-    else:
-        staffLayout = inputM21
+    staffLayout = layout.StaffLayout()
+    staffLayoutList = []
 
-    mxStaffLayout = None # blank
     for x in mxPrint:
         if isinstance(x, musicxmlMod.StaffLayout):
-            mxStaffLayout = x
-            break # find first and break
-
-    if mxStaffLayout is not None:
-        mxStaffLayoutToStaffLayout(mxStaffLayout, inputM21 = staffLayout)
-
-    if inputM21 is None:
-        return staffLayout
+            sl = mxStaffLayoutToStaffLayout(x)
+            staffLayoutList.append(sl)
+    
+    return staffLayoutList
 
 def mxStaffLayoutToStaffLayout(mxStaffLayout, inputM21 = None):
     '''
     get a StaffLayout object from an mxStaffLayout
     
-    Called out from mxPrintToStaffLayout because it
+    Called out from mxPrintToStaffLayoutList because it
     is also used in the <defaults> tag
     '''
     if inputM21 is None:
@@ -3029,9 +3110,13 @@ def mxStaffLayoutToStaffLayout(mxStaffLayout, inputM21 = None):
     
     if mxStaffLayout.staffDistance != None:
         staffLayout.distance = float(mxStaffLayout.staffDistance)
-    data = mxStaffLayout.get('number')
-    if data is not None:
-        staffLayout.staffNumber = int(data)
+    try:
+        data = mxStaffLayout.get('number')
+        if data is not None:
+            staffLayout.staffNumber = int(data)
+    except xmlnode.XMLNodeException:
+        pass
+
 
 
     if inputM21 is None:

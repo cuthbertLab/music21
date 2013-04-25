@@ -84,7 +84,7 @@ SmartScore Pro tends to produce very good MusicXML layout data.
 '''
 
 # may need to have object to convert between size units
-
+import copy
 import unittest
 
 from music21 import base
@@ -591,7 +591,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
         for el in thisPageAll:
             if 'Part' not in el.classes and 'StaffGroup' not in el.classes: 
                 thisPage.insert(el.getOffsetBySite(thisPageAll), el)
-        firstMeasureOfFirstPart = thisPageAll.parts[0].getElementsByClass('Measure')[0]
+        firstMeasureOfFirstPart = thisPageAll.parts[0].getElementsByClass('Measure', returnStreamSubClass='list')[0]
         for el in firstMeasureOfFirstPart:
             if 'PageLayout' in el.classes:
                 thisPage.pageLayout = el       
@@ -611,12 +611,22 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
             for p in thisSystem.parts:
                 p.__class__ = Staff
-                allStaffLayouts = p.flat.getElementsByClass('StaffLayout')
+                allStaffLayouts = p.flat.getElementsByClass('StaffLayout',returnStreamSubClass='list')
                 if len(allStaffLayouts) > 0:
+                    #if len(allStaffLayouts) > 1:
+                    #    print "Got many staffLayouts"
                     p.staffLayout = allStaffLayouts[0]
             
-            allSystemLayouts = thisSystem.flat.getElementsByClass('SystemLayout')
-            if len(allSystemLayouts) > 0:
+            allSystemLayouts = thisSystem.flat.getElementsByClass('SystemLayout', returnStreamSubClass='list')
+            if len(allSystemLayouts) > 1:
+                richestSystemLayout = copy.deepcopy(allSystemLayouts[0])
+                for sl in allSystemLayouts[1:]:
+                    for attribute in ('distance', 'topDistance', 'leftMargin', 'rightMargin'):
+                        if getattr(richestSystemLayout, attribute) is None and getattr(sl, attribute) is not None:
+                            setattr(richestSystemLayout, attribute, getattr(sl, attribute))
+                    #print sl, sl.measureNumber
+                thisSystem.systemLayout = richestSystemLayout
+            elif len(allSystemLayouts) == 1:
                 thisSystem.systemLayout = allSystemLayouts[0]
             else:
                 thisSystem.systemLayout = None
@@ -811,28 +821,29 @@ class LayoutScore(stream.Opus):
         N.B. right is NOT the width -- it is different.  It is the offset to the right margin.  weird, inconsistent, but most useful...
         bottom is the hard part to compute...
         
-#        >>> from music21 import *
-#        >>> g = corpus.parse('luca/gloria')
-#        >>> gl = layout.divideByPages(g)
-#        >>> gl.getPositionForSystem(0, 0)
-#        (62.0, 1.0, 0.0, 362.0)
-#        >>> gl.getPositionForSystem(0, 1)
-#        (468.0, 4.0, 0.0, 768.0)
-#        >>> gl.getPositionForSystem(0, 2)
-#        (874.0, 4.0, 0.0, 1174.0)
-#        >>> gl.getPositionForSystem(1, 0)
-#        (62.0, 4.0, 0.0, 362.0)
-#        >>> gl.getPositionForSystem(1, 1)
-#        (468.0, 4.0, 0.0, 768.0)
+        >>> from music21 import *
+        >>> lt = corpus.parse('demos/layoutTestMore.xml')
+        >>> ls = layout.divideByPages(lt, fastMeasures = True)
+        >>> ls.getPositionForSystem(0, 0)
+        (211.0, 70.0, 0.0, 696.0)
+        >>> ls.getPositionForSystem(0, 1)
+        (810.0, 0.0, 0.0, 1173.0)
+        >>> ls.getPositionForSystem(0, 2)
+        (1340.0, 67.0, 92.0, 1610.0)
+        >>> ls.getPositionForSystem(0, 3)
+        (1724.0, 0.0, 0.0, 2030.0)
+        >>> ls.getPositionForSystem(0, 4)
+        (2144.0, 0.0, 0.0, 2583.0)
         '''
         if 'positionForSystem' not in self._cache:
             self._cache['positionForSystem'] = {}
         positionForSystemCache = self._cache['positionForSystem']
-        if pageId not in positionForSystemCache:
-            positionForSystemCache[pageId] = {}
-        dataCache = positionForSystemCache[pageId]
-        if systemId in dataCache:
-            return dataCache[systemId]
+        cacheKey = '%d-%d' % (pageId, systemId)
+        if cacheKey in positionForSystemCache:
+            return positionForSystemCache[cacheKey]
+
+        if pageId == 0 and systemId == 4:
+            pass
         
         leftMargin = 0
         rightMargin = 0
@@ -873,6 +884,8 @@ class LayoutScore(stream.Opus):
                 if sl.distance is not None:
                     previousDistance = sl.distance
 
+
+
         if systemId > 0:
             lastSystemDimensions = self.getPositionForSystem(pageId, systemId - 1)
             bottomOfLastSystem = lastSystemDimensions[3]
@@ -884,9 +897,9 @@ class LayoutScore(stream.Opus):
         unused_systemStart, systemHeight = self.getPositionForStaff(pageId, systemId, lastStaff)
         
         top = previousDistance + bottomOfLastSystem
-        bottom = systemHeight + previousDistance + bottomOfLastSystem
+        bottom = top + systemHeight
         dataTuple = (top, leftMargin, rightMargin, bottom)
-        dataCache[systemId] = dataTuple
+        positionForSystemCache[cacheKey] = dataTuple
         return dataTuple
 
         
@@ -976,100 +989,39 @@ class LayoutScore(stream.Opus):
         >>> ls.getPositionForStaff(0, 0, 2)
         (235.0, 275.0)
 
-
         >>> ls.getPositionForStaff(0, 2, 0)
         (0.0, 40.0)
         >>> ls.getPositionForStaff(0, 2, 1)
         (40.0, 40.0)
         >>> ls.getPositionForStaff(0, 2, 2)
         (40.0, 40.0)
-
-
+        
+        System 4 has the top staff hidden, which has been causing problems:
+        
+        >>> ls.getPositionForStaff(0, 4, 0)
+        (0.0, 0.0)
+        >>> ls.getPositionForStaff(0, 4, 1)
+        (0.0, 40.0)
         '''
+        #if staffId == 99:
+        #    staffId = 1
         if 'positionForStaff' not in self._cache:
             self._cache['positionForStaff'] = {}
         positionForStaffCache = self._cache['positionForStaff']
         cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
         if cacheKey in positionForStaffCache:
             return positionForStaffCache[cacheKey]
-        
-        if 'staffSizeCache' not in self._cache:
-            self._cache['staffSizeCache'] = {}        
-        staffSizeCache = self._cache['staffSizeCache']
-        if staffId not in staffSizeCache:
-            staffSizeCache[staffId] = {}
-        staffSizePartCache = staffSizeCache[staffId]
-        if pageId not in staffSizePartCache:
-            staffSizePartCache[pageId] = {}
-        
-        ## define defaults
-        staffHeight = 40.0  # should be (Number of Lines - 1) * 10.
-        staffSizeDefined = False
-        
-        if staffId != 0:
-            staffDistanceFromPrevious = 60.0 # sensible default?
-            
-            if self.scoreLayout is not None:
-                scl = self.scoreLayout
-                if len(scl.staffLayoutList) > 0:
-                    staffDistanceFromPrevious = scl.staffLayoutList[0].distance
-        else:
-            staffDistanceFromPrevious = 0.0
-            
-
-        # override global information with staff specific pageLayout
-        thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
-        try:
-            firstMeasureOfStaff = thisStaff.getElementsByClass('Measure')[0]
-        except: 
-            environLocal.warn("No measures found in pageId %d, systemId %d, staffId %d" % (pageId, systemId, staffId))
-
+                
         hiddenStaff = self.getStaffHiddenAttribute(pageId, systemId, staffId) #False
-        allStaffLayouts = firstMeasureOfStaff.getElementsByClass('StaffLayout')
-        if len(allStaffLayouts) > 0:
-            #print "Got staffLayouts: "
-            staffLayoutObj = allStaffLayouts[0]
-            if staffId != 0:
-                if staffLayoutObj.distance is not None:
-                    staffDistanceFromPrevious = staffLayoutObj.distance
-                    #print "Staff distance from previous: %d" % (staffDistanceFromPrevious)
-            if staffLayoutObj.staffSize is not None:
-                staffHeight = staffHeight * (staffLayoutObj.staffSize/100.0)
-                #print "Got staffHeight of %d for partId %d" % (staffHeight, partId)
-                staffSizeDefined = True
-            #if staffLayoutObj.hidden is True:
-            #    hiddenStaff = True
-        
-        searchSystemId = systemId
-        searchPageId = pageId
-        while staffSizeDefined is False:
-            searchSystemId -= 1
-            if searchSystemId == -1:
-                searchSystemId = 99 # quick but reasonable upper bound
-                searchPageId -= 1
-            if searchPageId == -1:
-                staffSizeDefined = True
-                break
-            else:
-                if searchPageId not in staffSizePartCache or len(staffSizePartCache[searchPageId]) == 0:
-                    continue
-                if searchSystemId not in staffSizePartCache[searchPageId]:
-                    continue
-                staffHeight = staffSizePartCache[searchPageId][searchSystemId]
-                staffSizeDefined = True 
-        staffSizePartCache[pageId][systemId] = staffHeight
-        if hiddenStaff is True:
-            staffHeight = 0
-            staffDistanceFromPrevious = 0
-        #print partId, pageId, systemId, staffHeight
-
-        #hiddenStaffNew = self.getStaffHiddenAttribute(pageId, systemId, staffId)
-        #if hiddenStaff != hiddenStaffNew:
-        #    print "Hidden Discrepancy (%r, %r) for %d, %d, %d" % (hiddenStaff, hiddenStaffNew, pageId, systemId, staffId)
-        
+        if hiddenStaff is not True:
+            staffDistanceFromPrevious = self.getStaffDistanceFromPrevious(pageId, systemId, staffId)
+            staffHeight = self.getStaffSizeFromLayout(pageId, systemId, staffId)
+        else: # hiddenStaff is True
+            staffHeight = 0.0
+            staffDistanceFromPrevious = 0.0
         
         if staffId > 0:
-            unused_staffDistanceFromStart, previousStaffBottom = self.getPositionForStaff(pageId, systemId, staffId - 1)
+            unused_previousStaffTop, previousStaffBottom = self.getPositionForStaff(pageId, systemId, staffId - 1)
         else:
             previousStaffBottom = 0
         
@@ -1078,8 +1030,135 @@ class LayoutScore(stream.Opus):
         
         dataTuple = (staffDistanceFromStart, staffBottom)
         positionForStaffCache[cacheKey] = dataTuple
-        #print dataTuple
         return dataTuple
+    
+    def getStaffDistanceFromPrevious(self, pageId, systemId, staffId):
+        '''
+        return the distance of this staff from the previous staff in the same system
+        
+        for staffId = 0, this is always 0.0
+        
+        TODO:tests, now that this is out from previous
+        '''
+        if staffId == 0:
+            return 0.0
+       
+        
+        if 'distanceFromPrevious' not in self._cache:
+            self._cache['distanceFromPrevious'] = {}
+        positionForStaffCache = self._cache['distanceFromPrevious']
+        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        if cacheKey in positionForStaffCache:
+            return positionForStaffCache[cacheKey]
+
+        # if this is the first non-hidden staff in the score then also return 0
+        foundVisibleStaff = False
+        i = staffId - 1
+        while i >= 0:
+            hiddenStatus = self.getStaffHiddenAttribute(pageId, systemId, i)
+            if hiddenStatus is False:
+                foundVisibleStaff = True
+                break
+            else:
+                i = i - 1
+        if foundVisibleStaff is False:
+            positionForStaffCache[cacheKey] = 0.0
+            return 0.0
+        
+        # nope, not first staff or first visible staff...
+
+                
+        staffDistanceFromPrevious = 60.0 # sensible default?
+        
+        if self.scoreLayout is not None:
+            scl = self.scoreLayout
+            if len(scl.staffLayoutList) > 0:
+                for sltemp in scl.staffLayoutList:
+                    distanceTemp = sltemp.distance
+                    if distanceTemp is not None:
+                        staffDistanceFromPrevious = distanceTemp
+                        break
+                    
+        # override global information with staff specific pageLayout
+        thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
+        try:
+            firstMeasureOfStaff = thisStaff.getElementsByClass('Measure', returnStreamSubClass='list')[0]
+        except: 
+            firstMeasureOfStaff = stream.Stream()
+            environLocal.warn("No measures found in pageId %d, systemId %d, staffId %d" % (pageId, systemId, staffId))
+
+        allStaffLayouts = firstMeasureOfStaff.getElementsByClass('StaffLayout', returnStreamSubClass='list')
+        if len(allStaffLayouts) > 0:
+            #print "Got staffLayouts: "
+            for sltemp in allStaffLayouts:
+                distanceTemp = sltemp.distance
+                if distanceTemp is not None:
+                    staffDistanceFromPrevious = distanceTemp
+                    break
+
+        positionForStaffCache[cacheKey] = staffDistanceFromPrevious
+        return staffDistanceFromPrevious
+        
+    def getStaffSizeFromLayout(self, pageId, systemId, staffId):
+        '''
+        Get the currently active staff-size for a given pageId, systemId, and staffId.
+        
+        Note that this does not take into account the hiddenness of the staff, which
+        if True makes the effective size 0.0 -- see getStaffHiddenAttribute
+        
+        >>> from music21 import *
+        >>> lt = corpus.parse('demos/layoutTest.xml', forceSource=True)
+        >>> ls = layout.divideByPages(lt, fastMeasures = True)
+        >>> ls.getStaffSizeFromLayout(0, 0, 0)
+        40.0
+        >>> ls.getStaffSizeFromLayout(0, 0, 1)
+        32.0
+        >>> ls.getStaffSizeFromLayout(0, 0, 2)
+        40.0
+        >>> ls.getStaffSizeFromLayout(0, 1, 1)
+        32.0
+        >>> ls.getStaffSizeFromLayout(0, 2, 1)
+        48.0
+        >>> ls.getStaffSizeFromLayout(0, 3, 1)
+        32.0
+        '''
+        if 'staffSize' not in self._cache:
+            self._cache['staffSize'] = {}
+        staffSizeCache = self._cache['staffSize']
+        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        if cacheKey in staffSizeCache:
+            return staffSizeCache[cacheKey]
+
+        thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
+        try:
+            firstMeasureOfStaff = thisStaff.getElementsByClass('Measure')[0]        
+        except: 
+            firstMeasureOfStaff = stream.Stream()
+            environLocal.warn("No measures found in pageId %d, systemId %d, staffId %d" % (pageId, systemId, staffId))
+
+        numStaffLines = 5  # should be taken from staff attributes
+        numSpaces = numStaffLines - 1
+        staffSizeBase = numSpaces * 10.0
+        staffSizeDefinedLocally = False
+
+        allStaffLayouts = firstMeasureOfStaff.getElementsByClass('StaffLayout', returnStreamSubClass='list')
+        if len(allStaffLayouts) > 0:
+            #print "Got staffLayouts: "
+            staffLayoutObj = allStaffLayouts[0]
+            if staffLayoutObj.staffSize is not None:
+                staffSize = staffSizeBase * (staffLayoutObj.staffSize/100.0)
+                #print "Got staffHeight of %d for partId %d" % (staffHeight, partId)
+                staffSizeDefinedLocally = True
+
+        if staffSizeDefinedLocally is False:
+            previousPageId, previousSystemId = self.getSystemBeforeThis(pageId, systemId)
+            if previousPageId is None:
+                staffSize = staffSizeBase
+            else:
+                staffSize = self.getStaffSizeFromLayout(previousPageId, previousSystemId, staffId)
+
+        staffSizeCache[cacheKey] = staffSize
+        return staffSize
     
     def getStaffHiddenAttribute(self, pageId, systemId, staffId):
         '''
@@ -1112,7 +1191,7 @@ class LayoutScore(stream.Opus):
 
         
         staffLayoutObject = None
-        allStaffLayoutObjects = thisStaff.flat.getElementsByClass('StaffLayout', returnStreamSubClass=False)
+        allStaffLayoutObjects = thisStaff.flat.getElementsByClass('StaffLayout', returnStreamSubClass='list')
         if len(allStaffLayoutObjects) > 0:
             staffLayoutObject = allStaffLayoutObjects[0]
         if staffLayoutObject is None or staffLayoutObject.hidden is None:
@@ -1196,6 +1275,10 @@ class LayoutScore(stream.Opus):
         
         >>> ls.getPositionForStaffMeasure(0, 23)
         ((1703.0, 1345.0), (1743.0, 1606.0), 0)
+        >>> ls.getPositionForStaffMeasure(1, 23) #hidden
+        ((1743.0, 1345.0), (1743.0, 1606.0), 0)
+        >>> ls.getPositionForStaffMeasure(0, 24)
+        ((195.0, 100.0), (235.0, 431.0), 1)
         >>> ls.getPositionForStaffMeasure(1, 24)
         ((328.0, 100.0), (360.0, 431.0), 1)
         '''

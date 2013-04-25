@@ -183,7 +183,7 @@ def getCorePaths(extList=None, expandExtensions=True):
     
     >>> a = corpus.getCorePaths()
     >>> len(a) # the current number of paths; update when adding to corpus
-    2326
+    2328
     >>> a = corpus.getCorePaths('krn')
     >>> len(a) >= 4
     True
