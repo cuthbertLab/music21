@@ -91,7 +91,7 @@ affinityNames = {AFFINITY_SIGNATURE: "Signature Grouping",
                  AFFINITY_SPLIT1_NOTEGROUP: "Split Note Grouping",
                  AFFINITY_SPLIT2_NOTEGROUP: "Split Note Grouping"}
 
-excludeFromBrailleElements = [spanner.Slur, layout.SystemLayout, layout.PageLayout]
+excludeFromBrailleElements = [spanner.Slur, layout.SystemLayout, layout.PageLayout, layout.StaffLayout]
 
 GROUPING_KEYSIG = key.KeySignature(0)
 GROUPING_TIMESIG = meter.TimeSignature("4/4")

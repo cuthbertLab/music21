@@ -1047,6 +1047,8 @@ class KernSpine(HumdrumSpine):
     def parse(self):
         lastContainer = hdStringToMeasure('=0')
         inTuplet = False
+        currentTupletLength = 0.0
+        desiredTupletLength = 0.0
         lastNote = None
         currentBeamNumbers = 0
         
@@ -1089,12 +1091,28 @@ class KernSpine(HumdrumSpine):
                             for i in range(len(thisObject.beams.beamsList)):
                                 if thisObject.beams.beamsList[i].type != 'stop':
                                     currentBeamNumbers += 1
+                                    
+                    # nested tuplets not supported by humdrum...
                     if inTuplet is False and len(thisObject.duration.tuplets) > 0:
                         inTuplet = True
+                        desiredTupletDuration = thisObject.duration.tuplets[0].totalTupletLength()
+                        currentTupletDuration = thisObject.duration.quarterLength
                         thisObject.duration.tuplets[0].type = 'start'
                     elif inTuplet is True and len(thisObject.duration.tuplets) == 0:
                         inTuplet = False
+                        desiredTupletDuration = 0.0
+                        currentTupletDuration = 0.0
                         lastNote.duration.tuplets[0].type = 'stop'
+                    elif inTuplet is True:
+                        currentTupletDuration += thisObject.duration.quarterLength
+                        if (currentTupletDuration == desiredTupletDuration or 
+                            # check for things like 6 6 3 6 6; redundant with previous, but written out for clarity
+                            currentTupletDuration/desiredTupletDuration == int(currentTupletDuration/desiredTupletDuration) 
+                            ):
+                            thisObject.duration.tuplets[0].type = 'stop'
+                            inTuplet = False
+                            currentTupletDuration = 0.0
+                            desiredTupletDuration = 0.0
                     lastNote = thisObject
     
                 else: # Note or Rest
@@ -1110,12 +1128,28 @@ class KernSpine(HumdrumSpine):
                                 for i in range(len(thisObject.beams.beamsList)):
                                     if thisObject.beams.beamsList[i].type != 'stop':
                                         currentBeamNumbers += 1
+                    # nested tuplets not supported by humdrum...
                     if inTuplet is False and len(thisObject.duration.tuplets) > 0:
                         inTuplet = True
+                        desiredTupletDuration = thisObject.duration.tuplets[0].totalTupletLength()
+                        currentTupletDuration = thisObject.duration.quarterLength
                         thisObject.duration.tuplets[0].type = 'start'
                     elif inTuplet is True and len(thisObject.duration.tuplets) == 0:
                         inTuplet = False
+                        desiredTupletDuration = 0.0
+                        currentTupletDuration = 0.0
                         lastNote.duration.tuplets[0].type = 'stop'
+                    elif inTuplet is True:
+                        currentTupletDuration += thisObject.duration.quarterLength
+                        if (currentTupletDuration == desiredTupletDuration or 
+                            # check for things like 6 6 3 6 6; redundant with previous, but written out for clarity
+                            currentTupletDuration/desiredTupletDuration == int(currentTupletDuration/desiredTupletDuration) 
+                            ):
+                            thisObject.duration.tuplets[0].type = 'stop'
+                            inTuplet = False
+                            currentTupletDuration = 0.0
+                            desiredTupletDuration = 0.0
+
                     lastNote = thisObject
                 
                 if thisObject is not None:
