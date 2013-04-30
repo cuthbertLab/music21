@@ -911,7 +911,9 @@ class Converter(object):
             if formatFromURL is None: # cannot figure out what it is
                 raise ConverterException('cannot determine file format of url: %s' % url)
         else:
-            ext = 'txt'
+            unused_formatType, ext = common.findFormat(format)
+            if ext is None:
+                ext = '.txt'
 
         directory = environLocal.getRootTempDir()
         dst = self._getDownloadFp(directory, ext, url)

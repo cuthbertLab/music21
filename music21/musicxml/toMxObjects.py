@@ -609,10 +609,14 @@ def tupletToMx(tuplet):
     >>> a.type = 'start'
     >>> a.bracket = True
     >>> b, c = musicxml.toMxObjects.tupletToMx(a)
+    >>> b
+    <time-modification actual-notes=6 normal-notes=4 normal-type=16th>
+    >>> c
+    [<tuplet bracket=yes placement=above type=start>]
     '''
     mxTimeModification = mxObjects.TimeModification()
-    mxTimeModification.set('actual-notes', tuplet.numberNotesActual)
-    mxTimeModification.set('normal-notes', tuplet.numberNotesNormal)
+    mxTimeModification.set('actual-notes', int(tuplet.numberNotesActual))
+    mxTimeModification.set('normal-notes', int(tuplet.numberNotesNormal))
     mxTimeModification.set('normal-type', tuplet.durationNormal.type)
     if tuplet.durationNormal.dots > 0: # only one dot supported...
         mxTimeModification.set('normal-dot', True)
