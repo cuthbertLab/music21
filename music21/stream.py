@@ -4554,6 +4554,7 @@ class Stream(base.Music21Object):
                     removeRedundantPitches=removeRedundantPitches,
                     gatherArticulations=gatherArticulations,
                     gatherExpressions=gatherExpressions,
+                    transferGroupsToPitches=transferGroupsToPitches,
                     inPlace=True, makeRests=makeRests)
             return returnObj # exit
     
@@ -4565,6 +4566,7 @@ class Stream(base.Music21Object):
                     removeRedundantPitches=removeRedundantPitches,
                     gatherArticulations=gatherArticulations,
                     gatherExpressions=gatherExpressions,
+                    transferGroupsToPitches=transferGroupsToPitches,
                     inPlace=True, makeRests=makeRests)
             return returnObj # exit
 
@@ -4680,14 +4682,19 @@ class Stream(base.Music21Object):
                     # these are references, not copies, for now
                     tempComponents = []
                     for n in subNotes:
-                        if n.isChord:
+                        if n.isChord:  # TODO: this code should be the same as before: combine.
                             cSub = n._components
                         else:
                             cSub = [n]
+                            
+                        if transferGroupsToPitches:
+                            if len(n.groups) > 0:
+                                for comp in cSub:
+                                    for g in n.groups:
+                                        comp.pitch.groups.append(g)
+#                            for g in comp.groups:
+#                                comp.pitch.groups.append(g)
                         for comp in cSub:
-                            if transferGroupsToPitches:
-                                for g in comp.groups:
-                                    comp.pitch.groups.append(g)
                             tempComponents.append(comp)
                     c.pitches = [comp.pitch for comp in tempComponents]
                     for comp in tempComponents:

@@ -3086,7 +3086,6 @@ def mxPrintToStaffLayoutList(mxPrint, inputM21 = None):
     >>> sl.staffNumber
     1
     '''
-    staffLayout = layout.StaffLayout()
     staffLayoutList = []
 
     for x in mxPrint:

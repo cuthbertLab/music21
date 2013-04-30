@@ -5717,7 +5717,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testFiles
         from music21 import converter
         # testing a file a file with dynamics
-        a = converter.parse(testFiles.schumannOp48No1)
+        a = converter.parse(testFiles.schumannOp48No1) # @UndefinedVariable
         unused_b = a.flat
         #b = a.flat.extendDuration(dynamics.Dynamic)    
 
