@@ -219,8 +219,11 @@ class TinyNotationStream(stream.Stream):
                 raise duration.DurationException(str(value) + " in context " + str(thisNoteStr))
 #            except Exception, (value):
 #                raise Exception(str(value) + "in context " + str(thisNoteStr) + ": " + str(stringRep) )
-            
+            #try:
             noteList.append(tN.note)
+            #except TinyNotationException:
+            #    raise TinyNotationException(thisNoteStr + " " + str(noteStrs))
+            
 
             if parseStatus['endTuplet'] == True:
                 parseStatus['endTuplet'] = False

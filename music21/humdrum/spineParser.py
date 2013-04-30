@@ -68,6 +68,7 @@ from music21 import environment
 _MOD = "humdrum.spineParser"
 environLocal = environment.Environment(_MOD)
 
+flavors = {'JRP': False}
 
 import os
                                   
@@ -1558,11 +1559,23 @@ class SpineCollection(object):
     def moveObjectsToMeasures(self):
         '''
         run moveElementsIntoMeasures for each HumdrumSpine
-        that is not a subspine
+        that is not a subspine.
+        
+        Also fixes up the tuplets using duration.TupletFixer
         '''
+        tf = duration.TupletFixer()
+        
         for thisSpine in self.spines:
             if thisSpine.parentSpine == None:
                 thisSpine.stream = thisSpine.moveElementsIntoMeasures(thisSpine.stream)
+                
+                # fix tuplet groups
+                for m in thisSpine.stream.getElementsByClass('Measure'):
+                    tf.setStream(m)
+                    tupletGroups = tf.findTupletGroups(incorporateGroupings = True)
+                    for tg in tupletGroups:
+                        tf.fixBrokenTupletDuration(tg)
+                
                 thisSpine.measuresMoved = True
 
     def moveDynamicsAndLyricsToStreams(self):
@@ -1784,8 +1797,9 @@ def hdStringToNote(contents):
     Note that this is one note in the time of a double-dotted quarter, 
     not a double-dotted quarter-note triplet (incorrectly used in
     http://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
+    and the Josquin Research Project [JRP]
     but contradicts the specification in
-    http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#tuplets    
+    http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#tuplets )  
 
     >>> n = humdrum.spineParser.hdStringToNote("6..fff")
     >>> n.duration.quarterLength
@@ -1794,6 +1808,22 @@ def hdStringToNote(contents):
     0
     >>> n.duration.tuplets[0].durationNormal.dots
     2
+    
+    If you want the incorrect definition, set humdrum.spineParser.flavors['JRP'] = True
+    before calling converter.parse() or anything like that:
+    
+    >>> humdrum.spineParser.flavors['JRP'] = True
+    >>> n = humdrum.spineParser.hdStringToNote("6..fff")
+    >>> n.duration.quarterLength
+    1.166666...
+    >>> n.duration.dots
+    2
+    >>> n.duration.tuplets[0].durationNormal.dots
+    0
+    
+    
+    
+    
     
     >>> n = humdrum.spineParser.hdStringToNote("gg#q/LL")
     >>> n.duration
@@ -1964,11 +1994,18 @@ def hdStringToNote(contents):
             newTup.numberNotesActual = dT/gcd
             newTup.numberNotesNormal = float(basevalue)/gcd
             
-            if contents.count('.'):
+            # The Josquin Research Project uses an incorrect definition of 
+            # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = "JRP" 
+            # code that uses this other method...
+            JRP = flavors['JRP']
+            if JRP is False and contents.count('.'):
                 newTup.durationNormal.dots = contents.count('.')
             
             thisObject.duration.appendTuplet(newTup)
-                    
+            if JRP is True and contents.count('.'):
+                thisObject.duration.dots = contents.count('.')
+            # call Duration.TupletFixer after to correct this.
+            
     # 3.2.9 Grace Notes and Groupettos
     if contents.count('q'):
         thisObject = thisObject.getGrace()

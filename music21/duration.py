@@ -682,6 +682,8 @@ def updateTupletType(durationList):
     True
     >>> g.tuplets[0].type == 'stop'
     True
+    
+    TODO: Move to TupletFixer
     '''
     #environLocal.printDebug(['calling updateTupletType'])
     tupletMap = [] # a list of tuplet obj / dur pairs  
@@ -3031,6 +3033,204 @@ class AppogiaturaDuration(GraceDuration):
 #     pass
 
 
+class TupletFixer(object):
+    '''
+    The TupletFixer object takes in a flat stream and tries to fix the
+    brackets and time modification values of the tuplet so that they
+    reflect proper beaming, etc.  It does not alter the quarterLength
+    of any notes.
+    '''
+    def __init__(self, streamIn = None):
+        self.streamIn = streamIn
+        self._resetValues()
+        
+    def setStream(self, streamIn):        
+        '''
+        Define a stream to work on and reset all temporary variables.
+        '''
+        self.streamIn = streamIn
+        self._resetValues()
+
+    def _resetValues(self):
+        self.allTupletGroups = []
+        self.currentTupletNotes = []
+        self.currentTupletDefinition = None
+        self.totalTupletDuration = None
+        self.currentTupletDuration = None
+        
+    def findTupletGroups(self, incorporateGroupings = False):
+        '''
+        Finds all tuplets in the stream and puts them into groups.
+        
+        If incorporateGroupings is True, then a tuplet.type="stop"
+        ends a tuplet group even if the next note is a tuplet.
+        
+        
+        This demonstration has three groups of tuplets, two sets of 8th note tuplets and one of 16ths:
+        
+        >>> from music21 import *
+        >>> c = converter.parse('tinynotation: 4/4 trip{c8 d e} f4 trip{c#8 d# e#} g8 trip{c-16 d- e-}')
+        >>> tf = duration.TupletFixer(c) # no need to flatten this stream
+        >>> tupletGroups = tf.findTupletGroups()
+        >>> tupletGroups
+        [[<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>], 
+         [<music21.note.Note C#>, <music21.note.Note D#>, <music21.note.Note E#>], 
+         [<music21.note.Note C->, <music21.note.Note D->, <music21.note.Note E->]]
+
+        These groups are stored in TupletFixer.allTupletGroups:
+        
+        >>> tupletGroups is tf.allTupletGroups
+        True
+        
+        
+        Demonstration with incorporateGroupings:
+        
+        
+        >>> s = stream.Stream()
+        >>> for i in range(9):
+        ...    n = note.Note()
+        ...    n.ps = 60 + i
+        ...    n.duration.quarterLength = 1.0/3
+        ...    if i % 3 == 2:
+        ...        n.duration.tuplets[0].type = 'stop'
+        ...    s.append(n)
+        >>> tf = duration.TupletFixer(s) 
+        >>> tupletGroups = tf.findTupletGroups(incorporateGroupings = True)
+        >>> tupletGroups
+        [[<music21.note.Note C>, <music21.note.Note C#>, <music21.note.Note D>], 
+         [<music21.note.Note E->, <music21.note.Note E>, <music21.note.Note F>], 
+         [<music21.note.Note F#>, <music21.note.Note G>, <music21.note.Note G#>]]
+
+        Without incorporateGroupings we just get one big set of tuplets
+        
+        >>> tupletGroups = tf.findTupletGroups()
+        >>> len(tupletGroups)
+        1
+        >>> len(tupletGroups[0])
+        9
+        '''
+        self.allTupletGroups = []
+        currentTupletGroup = []
+        tupletActive = False
+        for n in self.streamIn.notesAndRests:
+            if len(n.duration.tuplets) == 0: # most common case first
+                if tupletActive is True:
+                    self.allTupletGroups.append(currentTupletGroup)
+                    currentTupletGroup = []
+                    tupletActive = False
+                continue
+            else:
+                if tupletActive is False:
+                    tupletActive = True
+                currentTupletGroup.append(n)
+                if incorporateGroupings and n.duration.tuplets[0].type == 'stop':
+                    self.allTupletGroups.append(currentTupletGroup)
+                    currentTupletGroup = []
+                    tupletActive = False
+        if tupletActive:
+            self.allTupletGroups.append(currentTupletGroup)
+        
+        return self.allTupletGroups
+            
+    def fixBrokenTupletDuration(self, tupletGroup):
+        r'''
+        tries to fix cases like triplet quarter followed by triplet
+        eighth to be a coherent tuplet.
+
+        requires a tuplet group from findTupletGroups() or TupletFixer.allTupletGroups
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        
+        >>> n1 = note.Note()
+        >>> n1.duration.quarterLength = 2.0/3
+        >>> s.append(n1)
+        >>> n2 = note.Note()
+        >>> n2.duration.quarterLength = 1.0/3
+        >>> s.append(n2)
+
+        >>> n1.duration.tuplets[0]
+        <music21.duration.Tuplet 3/2/quarter>
+        >>> n2.duration.tuplets[0]
+        <music21.duration.Tuplet 3/2/eighth>
+        
+        >>> tf = duration.TupletFixer(s) # no need to flatten this stream
+        >>> tupletGroups = tf.findTupletGroups()
+        >>> tf.fixBrokenTupletDuration(tupletGroups[0])
+
+        >>> n1.duration.tuplets[0]
+        <music21.duration.Tuplet 3/2/eighth>
+        >>> n1.duration.quarterLength
+        0.666...
+        >>> n2.duration.tuplets[0]
+        <music21.duration.Tuplet 3/2/eighth>
+                
+        More complex example, from a piece by Josquin:
+        
+        >>> humdr = "**kern *M3/1 3.c 6d 3e 3f 3d 3%2g 3e 3f#"
+        >>> humdrLines = '\n'.join(humdr.split())
+        >>> humdrum.spineParser.flavors['JRP'] = True
+        >>> s = converter.parse(humdrLines, format='humdrum')
+        
+        >>> m1 = s.parts[0].measure(1)
+        >>> tf = duration.TupletFixer(m1)
+        >>> tupletGroups = tf.findTupletGroups(incorporateGroupings = True)
+        >>> tf.fixBrokenTupletDuration(tupletGroups[-1])
+        >>> m1[-1].duration.tuplets[0]
+        <music21.duration.Tuplet 3/2/whole>
+        >>> m1[-1].duration.quarterLength
+        1.333...
+        '''
+        if len(tupletGroup) == 0:
+            return
+        firstTup = tupletGroup[0].duration.tuplets[0]
+        totalTupletDuration = firstTup.totalTupletLength()
+        currentTupletDuration = 0.0
+        smallestTupletTypeOrdinal = None
+        largestTupletTypeOrdinal = None
+        
+        for n in tupletGroup:
+            currentTupletDuration += n.duration.quarterLength
+            thisTup = n.duration.tuplets[0]
+            thisTupType = thisTup.durationActual.type
+            thisTupTypeOrdinal = ordinalTypeFromNum.index(thisTupType)
+
+            if smallestTupletTypeOrdinal is None:
+                smallestTupletTypeOrdinal = thisTupTypeOrdinal
+            elif thisTupTypeOrdinal > smallestTupletTypeOrdinal:
+                smallestTupletTypeOrdinal = thisTupTypeOrdinal
+
+            if largestTupletTypeOrdinal is None:
+                largestTupletTypeOrdinal = thisTupTypeOrdinal
+            elif thisTupTypeOrdinal < largestTupletTypeOrdinal:
+                largestTupletTypeOrdinal = thisTupTypeOrdinal
+
+                
+        if round(currentTupletDuration, 7) == round(totalTupletDuration, 7):
+            return
+        else:
+            excessRatio = round(currentTupletDuration / totalTupletDuration, 7)
+            inverseExcessRatio = round(1.0/excessRatio, 7)
+            
+            if excessRatio == int(excessRatio): # divide tuplets into smaller
+                largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]
+                
+                #print largestTupletTypeOrdinal, largestTupletType
+                for n in tupletGroup:
+                    n.duration.tuplets[0].durationNormal.type = largestTupletType
+                    n.duration.tuplets[0].durationActual.type = largestTupletType
+
+            elif inverseExcessRatio == int(inverseExcessRatio): # redefine tuplets by GCD
+                smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
+                for n in tupletGroup:
+                    n.duration.tuplets[0].durationNormal.type = smallestTupletType
+                    n.duration.tuplets[0].durationActual.type = smallestTupletType
+            else:
+                pass
+                # print "Crazy!", currentTupletDuration, totalTupletDuration, excess 
+        
+        
+        
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
 
@@ -3326,7 +3526,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(d.quarterLength, 20.0) 
 #         self.assertEqual(d.isLinked, False) # note set
 
-    def testStrangeMeasure(self):
+    def xtestStrangeMeasure(self):
         from music21 import corpus
         j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
         x = j1.parts[0].getElementsByClass('Measure')[42]
@@ -3337,7 +3537,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [convertQuarterLengthToType, Duration, Tuplet]
+_DOC_ORDER = [Duration, Tuplet, DurationUnit, convertQuarterLengthToType, TupletFixer]
 
 if __name__ == "__main__":
     import music21
