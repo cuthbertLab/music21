@@ -266,7 +266,7 @@ def proportionToFraction(value):
     >>> meter.proportionToFraction(0.83333) 
     (5, 6)
     '''
-    # TODO: this is a brut-force method: is there a more elegant alternative?
+    # TODO: this is a brute-force method: is there a more elegant alternative?
     for i in range(2,16+1):
         xBase = 1. / i
         for j in range(1,i+1): # take all multiples
@@ -638,26 +638,24 @@ class MeterTerminal(object):
         >>> b[0]
         <MeterTerminal 1/4>
         
-        TODO:
-        This doesn't work as I would expect!
+        Unequal subdivisions work:
         
         >>> c = a.subdivideByList([1,2])
-        >>> len(b)  # I'd think this should be 2!
-        3
-        >>> (b[0], b[1])  # shouldn't this be <1/4>, <2/4>?
-        (<MeterTerminal 1/4>, <MeterTerminal 1/4>)
+        >>> len(c)  
+        2
+        >>> (c[0], c[1])
+        (<MeterTerminal 1/4>, <MeterTerminal 2/4>)
 
-
-        This also doesn't do it!
+        So does subdividing by strings
         
-        >>> c = a.subdivideByList(['1/4', '2/4'])
-        >>> len(b)  # I'd think this should be 2!
-        3
-        >>> (b[0], b[1])  # shouldn't this be <1/4>, <2/4>?
-        (<MeterTerminal 1/4>, <MeterTerminal 1/4>)
+        >>> c = a.subdivideByList(['2/4', '1/4'])
+        >>> len(c)
+        2
+        >>> (c[0], c[1])
+        (<MeterTerminal 2/4>, <MeterTerminal 1/4>)
 
-        I will look at the :meth:`~music21.meter.MeterSequence.partitionByList` method
-        of :class:`~music21.meter.MeterSequence` for more details...        
+        See :meth:`~music21.meter.MeterSequence.partitionByList` method
+        of :class:`~music21.meter.MeterSequence` for more details.
         '''
         # elevate to meter sequence
         ms = MeterSequence()
