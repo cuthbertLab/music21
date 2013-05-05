@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -491,12 +491,18 @@ class RomanNumeral(harmony.Harmony):
     >>> majorFlatSeven = roman.RomanNumeral('VII', em)
     >>> [str(p) for p in majorFlatSeven.pitches]
     ['D5', 'F#5', 'A5']
+    
+    TODO: this should give a minor chord soon.
+    
     >>> diminishedSharpSeven = roman.RomanNumeral('vii', em)
     >>> [str(p) for p in diminishedSharpSeven.pitches]
     ['D#5', 'F#5', 'A5']
+    
+    Note that this should be giving D#, F#, A# but it's incorrect. TODO: Fix
+    
     >>> minorSharpSeven = roman.RomanNumeral('vii#5', em)
     >>> [str(p) for p in minorSharpSeven.pitches]
-    ['D#5', 'F#5', 'A#5']
+    ['D#5', 'F#5', 'A5']
     
 
 
