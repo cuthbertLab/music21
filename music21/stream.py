@@ -4844,6 +4844,9 @@ class Stream(base.Music21Object):
         # TODO: need to handle flat Streams contained in a Stream   
         # TODO: need to handle voices
         # even if those component Stream do not have Measures
+        
+        # TODO: make chordify have an option where the Pitches are not deepcopied from the original, but
+        #       are the same.
 
         # for makeChords, below
         transferGroupsToPitches = False

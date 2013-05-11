@@ -1779,7 +1779,54 @@ sousaStars = re.sub("\s\s\s\s","\t",
 '''
 )
 
+multipartSanctus = re.sub("\s\s\s\s","\t",
+'''!!!COM: Palestrina, Giovanni Perluigi da
+**kern    **kern    **kern    **kern
+*Ibass    *Itenor    *Icalto    *Icant
+!Bassus    !Tenor    !Altus    !Cantus
+*clefF4    *clefGv2    *clefG2    *clefG2
+*M4/2    *M4/2    *M4/2    *M4/2
+=1    =1    =1    =1
+0r    0r    1g    1r
+.    .    1a    1cc
+=2    =2    =2    =2
+0r    0r    1g    1dd
+.    .    1r    1cc
+*-    *-    *-    *-
+!! Pleni
+**kern    **kern    **kern
+*Ibass    *Itenor    *Icalto
+*clefF4    *clefGv2    *clefG2
+*M4/2    *M4/2    *M4/2
+=3    =3    =3
+1G    1r    0r
+1A    1c    .
+=4    =4    =4
+1B    1d    1r
+1c    1e    1g
+*-    *-    *-
+!! Hosanna
+**kern    **kern    **kern    **kern
+*Ibass    *Itenor    *Icalto    *Icant
+*clefF4    *clefGv2    *clefG2    *clefG2
+*M3/2    *M3/2    *M3/2    *M3/2
+=5    =5    =5    =5
+1r    1r    1g    1r
+2r    2r    [2a    [2cc
+=5    =5    =5    =5
+1r    1r    2a]    2cc]
+.    .    2f    1dd
+2r    2r    2g    .
+*-    *-    *-    *-
+''')
+
+
 
 #------------------------------------------------------------------------------
 # eof
 
+if __name__ == '__main__':
+    from music21 import converter
+    unused_s = converter.parse(multipartSanctus, format='humdrum')
+    #s = corpus.parse('palestrina/Sanctus_0.krn')
+    #print s

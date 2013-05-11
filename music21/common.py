@@ -1484,7 +1484,7 @@ def getCorpusContentDirs():
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach', 'demos', 'essenFolksong', 'handel', 'haydn', 
-    'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'ryansMammoth', 
+    'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina', 'ryansMammoth', 
     'schoenberg', 'schumann', 'schumann_clara', 'theoryExercises', 'trecento', 'verdi']
     '''
     dirName = getCorpusFilePath()

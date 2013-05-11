@@ -118,17 +118,18 @@ class HumdrumDataCollection(object):
     '''
     parsedLines = False
     
-    def __init__(self, dataStream = [] ):
+    def __init__(self, dataStream = [], parseLines = True):
         if dataStream is []:
             raise HumdrumException("dataStream is not optional, specify some lines")
         elif isinstance(dataStream, basestring):
             dataStream = dataStream.splitlines()
         self.dataStream = dataStream
         self._storedStream = None
-        try:
-            self.parseLines(self.dataStream)
-        except IOError:
-            raise
+        if parseLines is True:
+            try:
+                self.parseLines(self.dataStream)
+            except IOError:
+                raise
 
     def parseLines(self, dataStream = None):
         '''
@@ -145,6 +146,14 @@ class HumdrumDataCollection(object):
             dataStream = self.dataStream
             if dataStream is None:
                 raise HumdrumException('Need a list of lines (dataStream) to parse!')
+
+        hasOpus, dataCollections = self.determineIfDataStreamIsOpus(dataStream)
+        if hasOpus is True: # Palestrina data collection, maybe others
+            self.parseOpusDataCollections(dataCollections)
+            return
+
+        
+        
         self.maxSpines = 0
 
         # parse global comments and figure out the maximum number of spines we will have
@@ -161,6 +170,129 @@ class HumdrumDataCollection(object):
         self.parsedLines = True
         self.insertGlobalEvents()
 
+    def determineIfDataStreamIsOpus(self, dataStream = None):
+        r'''
+        Some Humdrum files contain multiple pieces in one file
+        which are better represented as :class:`~music21.stream.Opus`
+        file containing multiple scores.
+        
+        This method examines that dataStream (or self.dataStream) and
+        if it only has a single piece then it returns (False, None).
+        
+        If it has multiple pieces, it returns True and a list of dataStreams.
+        
+        >>> from pprint import pprint as pp
+        >>> from music21 import *
+        >>> mps = humdrum.testFiles.multipartSanctus
+        >>> hdc = humdrum.spineParser.HumdrumDataCollection(mps, parseLines = False)
+        >>> (hasOpus, dataCollections) = hdc.determineIfDataStreamIsOpus()
+        >>> hasOpus
+        True
+        >>> pp(dataCollections)
+        [['!!!COM: Palestrina, Giovanni Perluigi da',
+          '**kern\t**kern\t**kern\t**kern',
+          '*Ibass\t*Itenor\t*Icalto\t*Icant',
+          '!Bassus\t!Tenor\t!Altus\t!Cantus',
+          '*clefF4\t*clefGv2\t*clefG2\t*clefG2',
+          '*M4/2\t*M4/2\t*M4/2\t*M4/2',
+          '=1\t=1\t=1\t=1',
+          '0r\t0r\t1g\t1r',
+          '.\t.\t1a\t1cc',
+          '=2\t=2\t=2\t=2',
+          '0r\t0r\t1g\t1dd',
+          '.\t.\t1r\t1cc',
+          '*-\t*-\t*-\t*-'],
+         ['!! Pleni',
+          '**kern\t**kern\t**kern',
+          '*Ibass\t*Itenor\t*Icalto',
+          '*clefF4\t*clefGv2\t*clefG2',
+          '*M4/2\t*M4/2\t*M4/2',
+          '=3\t=3\t=3',
+          '1G\t1r\t0r',
+          '1A\t1c\t.',
+          '=4\t=4\t=4',
+          '1B\t1d\t1r',
+          '1c\t1e\t1g',
+          '*-\t*-\t*-'],
+         ['!! Hosanna',
+          '**kern\t**kern\t**kern\t**kern',
+          '*Ibass\t*Itenor\t*Icalto\t*Icant',
+          '*clefF4\t*clefGv2\t*clefG2\t*clefG2',
+          '*M3/2\t*M3/2\t*M3/2\t*M3/2',
+          '=5\t=5\t=5\t=5',
+          '1r\t1r\t1g\t1r',
+          '2r\t2r\t[2a\t[2cc',
+          '=5\t=5\t=5\t=5',
+          '1r\t1r\t2a]\t2cc]',
+          '.\t.\t2f\t1dd',
+          '2r\t2r\t2g\t.',
+          '*-\t*-\t*-\t*-']]
+        '''
+        if dataStream is None:
+            dataStream = self.dataStream
+        
+        startPositions = []
+        endPositions = []
+        for i, line in enumerate(dataStream):
+            l = line.rstrip()
+            if re.search('^(\*\-\t)*\*\-$', l):
+                endPositions.append(i)
+            elif re.search('^(\*\*\w+\t)*\*\*\w+$', l):
+                startPositions.append(i)
+        if len(startPositions) < 2:
+            return (False, None)
+        if endPositions[-1] > startPositions[-1]:
+            # properly formed .krn with *- at end
+            pass
+        else:
+            # improperly formed .krn without *- at end
+            endPositions.append(len(dataStream))
+            
+        dataCollections = []
+        for i in range(len(endPositions)):
+            if i == 0:
+                endPos = endPositions[i]
+                dataCollections.append(dataStream[:endPos+1])
+            elif i == len(endPositions) -1:
+                # ignore endPosition and grab to end of file
+                startPos = endPositions[i-1] + 1
+                dataCollections.append(dataStream[startPos:])
+            else:
+                # ignore startPositions, grab comments etc. between scores
+                startPos = endPositions[i-1] + 1 
+                endPos = endPositions[i] + 1
+                dataCollections.append(dataStream[startPos:endPos])
+        return (True, dataCollections)
+    
+    def parseOpusDataCollections(self, dataCollections):
+        '''
+        take a dataCollection from `determineIfDataStreamIsOpus`
+        and set self.stream to be an Opus instead.
+
+        >>> from music21 import *
+        >>> mps = humdrum.testFiles.multipartSanctus
+        >>> hdc = humdrum.spineParser.HumdrumDataCollection(mps, parseLines = False)
+        >>> (hasOpus, dataCollections) = hdc.determineIfDataStreamIsOpus()
+        >>> if hasOpus is True:
+        ...     op = hdc.parseOpusDataCollections(dataCollections)
+        ...     print len(op.scores)
+        ...     for sc in op.scores:
+        ...        print sc
+        3
+        <music21.stream.Score section_1>
+        <music21.stream.Score section_2>
+        <music21.stream.Score section_3>        
+        '''
+        opus = stream.Opus()
+        for i, dc in enumerate(dataCollections):
+            hdc = HumdrumDataCollection(dc)
+            sc = hdc.stream 
+            sc.id = 'section_' + str(i + 1)
+            opus.append(sc)
+    
+        self._storedStream = opus
+        return opus
+    
     def parseEventListFromDataStream(self, dataStream = None):
         r'''
         Sets self.eventList from a dataStream (that is, a
@@ -565,6 +697,7 @@ class HumdrumFile(HumdrumDataCollection):
     as a mandatory argument a filename to be opened and read.
     '''    
     def __init__(self, filename = None):
+        self.dataStream = None
         self._storedStream = None
         if (filename is not None):
             try:
@@ -1048,8 +1181,6 @@ class KernSpine(HumdrumSpine):
     def parse(self):
         lastContainer = hdStringToMeasure('=0')
         inTuplet = False
-        currentTupletLength = 0.0
-        desiredTupletLength = 0.0
         lastNote = None
         currentBeamNumbers = 0
         

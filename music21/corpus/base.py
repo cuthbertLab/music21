@@ -181,15 +181,16 @@ def getCorePaths(extList=None, expandExtensions=True):
 
     >>> from music21 import *
     
-    >>> a = corpus.getCorePaths()
-    >>> len(a) # the current number of paths; update when adding to corpus
-    2328
-    >>> a = corpus.getCorePaths('krn')
-    >>> len(a) >= 4
+    >>> corpusFilePaths = corpus.getCorePaths()
+    >>> len(corpusFilePaths) # the current number of paths; update when adding to corpus
+    3045
+
+    >>> kernFilePaths = corpus.getCorePaths('krn')
+    >>> len(kernFilePaths) >= 500
     True
 
-    >>> a = corpus.getCorePaths('abc')
-    >>> len(a) >= 10
+    >>> abcFilePaths = corpus.getCorePaths('abc')
+    >>> len(abcFilePaths) >= 100
     True
 
     '''

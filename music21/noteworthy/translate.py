@@ -370,7 +370,7 @@ class NoteworthyTranslator(object):
                 p.accidental = stepAccidental
         return p
 
-    def getStepAndOctaveFromPosition(self, positionnote):
+    def getStepAndOctaveFromPosition(self, positionNote):
         '''
         Given an int representing the position on the staff for the
         current clef, 
@@ -423,14 +423,14 @@ class NoteworthyTranslator(object):
             minPosition = 1
             dictionary =  "dictionaryTreble"
            
-        while positionnote < minPosition or positionnote > (minPosition + 6):
-            if positionnote < minPosition:
-                positionnote = positionnote + 7
+        while positionNote < minPosition or positionNote > (minPosition + 6):
+            if positionNote < minPosition:
+                positionNote = positionNote + 7
                 octave = octave - 1
-            if positionnote > (minPosition + 6):
-                positionnote = positionnote - 7
+            if positionNote > (minPosition + 6):
+                positionNote = positionNote - 7
                 octave = octave + 1  
-        notename = dictionaries[dictionary][positionnote]
+        notename = dictionaries[dictionary][positionNote]
 
         return (notename, octave)
 

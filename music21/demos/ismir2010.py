@@ -10,22 +10,15 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-import unittest, doctest
-import sys
-from copy import deepcopy
+import unittest
 
 
-import music21
-from music21 import *
+from music21 import corpus, converter, stream, chord, graph, meter, pitch
 import music21.analysis.metrical
 
-from music21.note import Note
-from music21.meter import TimeSignature
-from music21.stream import Measure
 
 
-import os, random
-from music21 import corpus, key
+import os
 
 #-------------------------------------------------------------------------------
 def newDots(show=True):
@@ -78,39 +71,39 @@ def newDomSev(show=True):
     
     for thisMeasure in violin2.getElementsByClass('Measure'):
     
-      # get a list of consecutive notes, skipping unisons, octaves,
-         # and rests (and putting nothing in their places)
-      notes = thisMeasure.findConsecutiveNotes(
-      skipUnisons = True, skipOctaves = True, 
-      skipRests = True, noNone = True )
+        # get a list of consecutive notes, skipping unisons, octaves,
+        # and rests (and putting nothing in their places)
+        notes = thisMeasure.findConsecutiveNotes(
+                                                 skipUnisons = True, skipOctaves = True, 
+                                                 skipRests = True, noNone = True )
     
-      pitches = stream.Stream(notes).pitches
+        pitches = stream.Stream(notes).pitches
       
-      for i in range(len(pitches) - 3):
-        # makes every set of 4 notes into a whole-note chord
-        testChord = chord.Chord(pitches[i:i+4])           
-        testChord.duration.type = "whole" 
-    
-        if testChord.isDominantSeventh():
-          # A dominant-seventh chord was found in this measure.
-
-          # We label the chord with the measure number
-          # and the first note of the measure with the Forte Prime form
+        for i in range(len(pitches) - 3):
+            # makes every set of 4 notes into a whole-note chord
+            testChord = chord.Chord(pitches[i:i+4])           
+            testChord.duration.type = "whole" 
         
-          testChord.lyric = "m. " + str(thisMeasure.number)
-          
-          primeForm = chord.Chord(thisMeasure.pitches).primeFormString
-          firstNote = thisMeasure.notesAndRests[0]
-          firstNote.lyric = primeForm
-          
-          # Thus we append the chord in closed position and  then 
-          #  the measure containing the chord.
+            if testChord.isDominantSeventh():
+                # A dominant-seventh chord was found in this measure.
     
-          chordMeasure = stream.Measure()
-          chordMeasure.append(
-            testChord.closedPosition())
-          display.append(chordMeasure)
-          display.append(thisMeasure)
+                # We label the chord with the measure number
+                # and the first note of the measure with the Forte Prime form
+            
+                testChord.lyric = "m. " + str(thisMeasure.number)
+              
+                primeForm = chord.Chord(thisMeasure.pitches).primeFormString
+                firstNote = thisMeasure.notesAndRests[0]
+                firstNote.lyric = primeForm
+              
+                # Thus we append the chord in closed position and  then 
+                #  the measure containing the chord.
+        
+                chordMeasure = stream.Measure()
+                chordMeasure.append(
+                  testChord.closedPosition())
+                display.append(chordMeasure)
+                display.append(thisMeasure)
     
     if (show is True):
         display.show()
@@ -119,7 +112,7 @@ def melodicChordExpression(show=True):
     '''This method not only searches the entire second violin part of a complete string quarter for a seventh chord expressed melodically, but creates new notation to display the results with analytical markup. 
     '''
     #from music21 import *
-    from music21 import corpus, stream, chord
+    #from music21 import corpus, stream, chord
     beethovenScore = corpus.parseWork(
                   'beethoven/opus133.xml') 
     # parts are given IDs by the MusicXML part name 
@@ -163,7 +156,7 @@ def melodicChordExpression(show=True):
     
 def  pitchDensity(show=True):
 
-    from music21 import corpus, graph
+    #from music21 import corpus, graph
     
     beethovenScore = corpus.parseWork('opus133.xml')
     celloPart = beethovenScore.getElementById('Cello')
@@ -181,11 +174,11 @@ def  pitchDensity(show=True):
 
 def pitchQuarterLengthUsageWeightedScatter(show=True):
     
-    from music21 import converter, graph
+    #from music21 import converter, graph
     from music21.musicxml import testFiles as xml
     from music21.humdrum import testFiles as kern
     
-    mozartStream = converter.parse(xml.mozartTrioK581Excerpt)
+    mozartStream = converter.parse(xml.mozartTrioK581Excerpt) # @UndefinedVariable
     notes = mozartStream.flat.stripTies()
     g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
         title='Mozart Trio K. 581 Excerpt')
@@ -208,18 +201,16 @@ def pitchQuarterLengthUsageWeightedScatter(show=True):
 
 
 def pitchQuarterLengthUsage3D(show=True):
-    
-    from music21 import converter, graph
     from music21.musicxml import testFiles as xml
     from music21.humdrum import testFiles as kern
 
-    mozartStream = music21.parse(
-        xml.mozartTrioK581Excerpt)
+    mozartStream = converter.parse(
+        xml.mozartTrioK581Excerpt) # @UndefinedVariable
     g = graph.Plot3DBarsPitchSpaceQuarterLength(
         mozartStream.flat.stripTies(), colors=['r'])
     g.process()
     
-    chopinStream = music21.parse(kern.mazurka6)
+    chopinStream = converter.parse(kern.mazurka6)
     g = graph.Plot3DBarsPitchSpaceQuarterLength(
         chopinStream.flat.stripTies(), colors=['b']) 
     g.process()
@@ -230,8 +221,9 @@ def pitchQuarterLengthUsage3D(show=True):
 
 def messiaen(show = True):
     #messiaen = #converter.parse('d:/docs/research/music21/ismir-2010/messiaen_valeurs_part2.xml')
-    messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
-
+    #messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
+    mall = converter.parse('/Users/cuthbert/desktop/messiaen_valeurs_2012.xml')
+    messiaen = mall[1]
     #messiaen.show()
     notes = messiaen.flat.stripTies()
     g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
@@ -239,6 +231,7 @@ def messiaen(show = True):
     
     if (show is True):
         g.process()
+
 
 
 def schumann(show = True):
@@ -298,18 +291,17 @@ def demoGettingWorks():
     
 
     # Can obtain works from an integrated corpus 
-    s1 = corpus.parseWork('bach/bwv103.6')
-    s2 = corpus.parseWork('bach/bwv18.5-lz')
+    s1 = corpus.parseWork('bach/bwv103.6') # @UnusedVariable
+    s2 = corpus.parseWork('bach/bwv18.5-lz') # @UnusedVariable
 
     # Can parse data stored in MusicXML files locally or online:
-    s = converter.parse('http://www.musicxml.org/xml/elite.xml')
+    s = converter.parse('http://www.musicxml.org/xml/elite.xml') # @UnusedVariable
 
     # Can parse data stored in MIDI files locally or online:
-    s = converter.parse('http://www.jsbchorales.net/down/midi/010306b_.mid')
-
+    s = converter.parse('http://www.jsbchorales.net/down/midi/010306b_.mid') # @UnusedVariable
 
     # Can parse data stored in Kern files locally or online:
-    s = converter.parse('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/371chorales&file=chor120.krn')
+    s = converter.parse('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/371chorales&file=chor120.krn') # @UnusedVariable
 
 
 
@@ -338,9 +330,9 @@ def demoBasic():
 
     # A Part might contain numerous Measure Streams
     len(soprano.getElementsByClass('Measure'))
-    mRange = soprano.measures(14,16)
+    mRange = soprano.measures(14,16) # @UnusedVariable
     #mRange.show()
-   # mRange.sorted.show('text') # here we can see this
+    # mRange.sorted.show('text') # here we can see this
 
 
 
@@ -382,7 +374,6 @@ def demoBasic():
 
 
 def beethovenSearch():
-
     op133 = corpus.parseWork('beethoven/opus133.xml') 
     violin2 = op133.getElementById('2nd Violin')
     
@@ -390,36 +381,39 @@ def beethovenSearch():
     display = stream.Stream() 
     
     for m in violin2.getElementsByClass('Measure'):
-      notes = m.findConsecutiveNotes(
-        skipUnisons=True, skipOctaves=True, 
-        skipRests=True, noNone=True )
+        notes = m.findConsecutiveNotes(
+                                       skipUnisons=True, skipOctaves=True, 
+                                       skipRests=True, noNone=True )
      
-      pitches = stream.Stream(notes).pitches  
-      for i in range(len(pitches) - 3):
+        pitches = stream.Stream(notes).pitches  
+        for i in range(len(pitches) - 3):
         # makes every set of 4 notes into a whole-note chord
-        testChord = chord.Chord(pitches[i:i+4])       
-        testChord.duration.type = "whole" 
+            testChord = chord.Chord(pitches[i:i+4])       
+            testChord.duration.type = "whole" 
         
-        if testChord.isDominantSeventh():
-          testChord.lyric = "m. " + str(m.number)
-          m.notesAndRests[0].lyric = chord.Chord(m.pitches).primeFormString
-               
-          chordMeasure = stream.Measure()
-          chordMeasure.append(testChord.closedPosition())
-          display.append(chordMeasure)
-          display.append(m)    
+            if testChord.isDominantSeventh():
+                testChord.lyric = "m. " + str(m.number)
+                m.notesAndRests[0].lyric = chord.Chord(m.pitches).primeFormString
+                   
+                chordMeasure = stream.Measure()
+                chordMeasure.append(testChord.closedPosition())
+                display.append(chordMeasure)
+                display.append(m)    
     display.show()
 
 
 
 def demoGraphMessiaen():
     # use Messiaen, ciconia, bach
-    fp = '/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml'
+
+    #fp = '/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml'
+    fp = '/Users/cuthbert/desktop/messiaen_valeurs_2012.xml'
     dpi = 300
+    part = 2
 
-    pieceTitle = 'Messiaen, Mode de valeurs..., Part 2'
+    pieceTitle = 'Messiaen, Mode de valeurs..., Part ' + str(part + 1)
 
-    s = converter.parse(fp).stripTies()
+    s = converter.parse(fp).parts[part].stripTies()
 
     s.plot('histogram', 'pitchspace', dpi=dpi, title='Pitch Space Usage, %s' % pieceTitle)
 
@@ -467,14 +461,12 @@ def demoGraphBach():
 
 
 def demoGraphMozartChopin():
-
-    from music21 import converter
     from music21.musicxml import testFiles as xmlTest
     from music21.humdrum import testFiles as kernTest  
 
     dpi = 300
 
-    mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt)
+    mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt) # @UndefinedVariable
     g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), dpi=dpi, title='Mozart Trio K. 581, Excerpt', colors=['#CD4F39'], alpha=.8)
     g.process()
     
@@ -497,16 +489,16 @@ def demoBeethoven133():
 
 
 def demoCombineTransform():
-    from music21 import corpus, interval
+    from music21 import interval
 
     s1 = corpus.parseWork('bach/bwv103.6')
     s2 = corpus.parseWork('bach/bwv18.5-lz')
 
     keyPitch1 = s1.analyze('key')[0]
-    gap1 = interval.Interval(keyPitch1, pitch.Pitch('C'))
+    unused_gap1 = interval.Interval(keyPitch1, pitch.Pitch('C'))
 
     keyPitch2 = s2.analyze('key')[0]
-    gap2 = interval.Interval(keyPitch2, pitch.Pitch('C'))
+    unused_gap2 = interval.Interval(keyPitch2, pitch.Pitch('C'))
 
     sCompare = stream.Stream()
     sCompare.insert(0, s1.parts['bass'])
@@ -519,8 +511,8 @@ def demoCombineTransform():
 
 def demoBachSearch():
 
-    import os, random
-    from music21 import corpus, key
+    import random
+    from music21 import key
     
     fpList = corpus.getBachChorales('.xml')
     random.shuffle(fpList)
@@ -573,26 +565,26 @@ def demoBachSearchBrief():
     choraleList = corpus.getBachChorales()
     results = stream.Stream()
     for filePath in choraleList:
-      fileName = os.path.split(filePath)[1]
-      pieceName = fileName.replace('.xml', '')
-      chorale = converter.parse(filePath)
-      print fileName
-      key = chorale.analyze('key')
-      if key.mode == 'minor':
-        lastChordPitches = []
-        for part in chorale.parts:
-          lastChordPitches.append(part.flat.pitches[-1])
-        lastChord = chord.Chord(lastChordPitches)
-        lastChord.duration.type = "whole"
-        lastChord.transpose("P8", inPlace=True)
-        if lastChord.isMinorTriad() is False and lastChord.isIncompleteMinorTriad() is False:
-          continue
-        lastChord.lyric = pieceName
-        m = stream.Measure()
-        m.keySignature = chorale.flat.getElementsByClass(
-          'KeySignature')[0]
-        m.append(lastChord)
-        results.append(m.makeAccidentals(inPlace=True))
+        fileName = os.path.split(filePath)[1]
+        pieceName = fileName.replace('.xml', '')
+        chorale = converter.parse(filePath)
+        print fileName
+        key = chorale.analyze('key')
+        if key.mode == 'minor':
+            lastChordPitches = []
+            for part in chorale.parts:
+                lastChordPitches.append(part.flat.pitches[-1])
+            lastChord = chord.Chord(lastChordPitches)
+            lastChord.duration.type = "whole"
+            lastChord.transpose("P8", inPlace=True)
+            if lastChord.isMinorTriad() is False and lastChord.isIncompleteMinorTriad() is False:
+                continue
+            lastChord.lyric = pieceName
+            m = stream.Measure()
+            m.keySignature = chorale.flat.getElementsByClass(
+              'KeySignature')[0]
+            m.append(lastChord)
+            results.append(m.makeAccidentals(inPlace=True))
     results.show()
 
 
@@ -643,9 +635,9 @@ class TestExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
+    #if len(sys.argv) == 1: # normal conditions
+    #    music21.mainTest(Test)
+    #elif len(sys.argv) > 1:
         pass
         #newDots()
         #altDots()
@@ -677,8 +669,8 @@ if __name__ == "__main__":
 
         #demoBachSearchBrief()
 
-        demoGraphMessiaenBrief()
-
+        #demoGraphMessiaenBrief()
+        demoGraphMessiaen()
 
 #------------------------------------------------------------------------------
 # eof

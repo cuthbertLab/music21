@@ -49,7 +49,7 @@ def L(c, raiseException=False):
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
     ...     c4 = analysis.neoRiemannian.L(c3, raiseException=True)
-    ... except LRPException:
+    ... except analysis.neoRiemannian.LRPException:
     ...     pass
     
     '''
@@ -82,7 +82,7 @@ def P(c, raiseException=False):
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
     ...     c4 = analysis.neoRiemannian.P(c3, raiseException=True)
-    ... except LRPException:
+    ... except analysis.neoRiemannian.LRPException:
     ...     pass
     
     '''
@@ -115,7 +115,7 @@ def R(c, raiseException=False):
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
     ...     c4 = analysis.neoRiemannian.R(c3, raiseException=True)
-    ... except LRPException:
+    ... except analysis.neoRiemannian.LRPException:
     ...     pass
     
     '''

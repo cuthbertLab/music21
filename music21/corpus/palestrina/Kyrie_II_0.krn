@@ -1,0 +1,220 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Alma Redemptoris mater
+!!!OTL: Kyrie II
+**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Ibass	*Itenor	*Icalto	*Icalto	*Icant
+!Bassus 2	!Bassus 1	!Tenor	!Altus 2	!Altus 1	!Cantus
+*clefF4	*clefF4	*clefGv2	*clefG2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*F:ion	*F:ion	*F:ion	*F:ion	*F:ion	*F:ion
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=1	=1	=1	=1	=1	=1
+0r	0r	0r	0r	2.f	1.ff
+.	.	.	.	4g	.
+.	.	.	.	4a	.
+.	.	.	.	4b-	.
+.	.	.	.	[2cc	2ee
+=2	=2	=2	=2	=2	=2
+0r	0r	1r	1r	2cc]	1dd
+.	.	.	.	2b-	.
+.	.	2r	2.f	[1a	[1cc
+.	.	[2f	.	.	.
+.	.	.	4g	.	.
+=3	=3	=3	=3	=3	=3
+0r	0r	2f]	4a	2a]	1cc]
+.	.	.	4b-	.	.
+.	.	2e	1cc	2g	.
+.	.	1d	.	2a	2.f
+.	.	.	2b	[2f	.
+.	.	.	.	.	4g
+=4	=4	=4	=4	=4	=4
+2r	2.F	0c	1cc	4f]	4a
+.	.	.	.	4g	4b-
+1F	.	.	.	1a	2.cc
+.	4G	.	.	.	.
+.	4A	.	1r	.	.
+.	4B-	.	.	.	4dd
+2E	[2c	.	.	2g	4ee
+.	.	.	.	.	4cc
+=5	=5	=5	=5	=5	=5
+1D	2c]	2.F	1r	1f	2ff
+.	2B-	.	.	.	2ff
+.	.	4G	.	.	.
+1C	[1c	4A	2r	1r	4ee
+.	.	4B-	.	.	4dd
+.	.	4c	2g	.	4ee
+.	.	4d	.	.	4ff
+=6	=6	=6	=6	=6	=6
+0r	2c]	2e	2c	0r	2ee
+.	2B-	2.f	2d	.	2.dd
+.	1A	.	2e	.	.
+.	.	4e	.	.	4cc
+.	.	2c	2f	.	[2cc
+=7	=7	=7	=7	=7	=7
+1r	1G	1d	1g	1r	2cc]
+.	.	.	.	.	2b
+2.F	2r	1f	1a	2r	[1cc
+.	[2F	.	.	[2a	.
+4G	.	.	.	.	.
+=8	=8	=8	=8	=8	=8
+4A	2F]	1c	0r	2a]	1cc]
+4B-	.	.	.	.	.
+1c	2E	.	.	2g	.
+.	1D	1d	.	2.f	2r
+2B-	.	.	.	.	[2ff
+.	.	.	.	4g	.
+=9	=9	=9	=9	=9	=9
+1.c	1C	2.e	2r	2a	2ff]
+.	.	.	4c	2g	1ee
+.	.	4f	4d	.	.
+.	1r	1g	4e	2c	.
+.	.	.	4f	.	.
+2B-	.	.	[2g	2d	[2dd
+=10	=10	=10	=10	=10	=10
+1A	0r	1c	2g]	2e	4dd]
+.	.	.	.	.	4cc
+.	.	.	2f	2c	1cc
+1G	.	1d	1g	2r	.
+.	.	.	.	[2g	2b
+=11	=11	=11	=11	=11	=11
+1A	2r	1c	2e	2g]	1cc
+.	1c	.	2c	2f	.
+1G	.	1r	1d	[1g	1r
+.	2B-	.	.	.	.
+=12	=12	=12	=12	=12	=12
+1C	1c	0r	1e	2g]	2r
+.	.	.	.	2c	1cc
+1r	2F	.	2a	1d	.
+.	2G	.	2g	.	2b-
+=13	=13	=13	=13	=13	=13
+0r	2A	1r	4f	2c	2cc
+.	.	.	4e	.	.
+.	1B-	.	4d	1d	2f
+.	.	.	4c	.	.
+.	.	2r	2B-	.	2g
+.	2A	[2f	2c	2c	2a
+=14	=14	=14	=14	=14	=14
+1r	1G	2f]	2d	1B-	1b-
+.	.	2e	2B-	.	.
+2r	2F	2f	1c	1r	2a
+[2c	2A	2c	.	.	2f
+=15	=15	=15	=15	=15	=15
+2c]	1G	1d	1r	2r	0g
+2B-	.	.	.	1g	.
+1c	1C	4e	2r	.	.
+.	.	4f	.	.	.
+.	.	4g	[2cc	2e	.
+.	.	4e	.	.	.
+=16	=16	=16	=16	=16	=16
+2F	0r	2f	2cc]	2a	0r
+2G	.	2d	2b-	4g	.
+.	.	.	.	4f	.
+2A	.	2c	2cc	2e	.
+[2B-	.	4B-	2f	4d	.
+.	.	4A	.	4c	.
+=17	=17	=17	=17	=17	=17
+2B-]	1r	2G	2g	4d	0r
+.	.	.	.	4e	.
+2A	.	2c	2a	1f	.
+1G	2r	1B-	1b-	.	.
+.	2G	.	.	2e	.
+=18	=18	=18	=18	=18	=18
+1F	2A	1c	1a	1f	2r
+.	2F	.	.	.	1ff
+2r	1c	2r	1g	1r	.
+2C	.	2c	.	.	2ee
+=19	=19	=19	=19	=19	=19
+2D	0F	2A	[0f	2r	1.ff
+2BB-	.	2d	.	1b-	.
+1F	.	1c	.	.	.
+.	.	.	.	2a	2cc
+=20	=20	=20	=20	=20	=20
+2BB-	0r	2r	1f]	2b-	2dd
+2D	.	1f	.	2f	2b-
+1C	.	.	1r	1g	[1cc
+.	.	2e	.	.	.
+=21	=21	=21	=21	=21	=21
+1F	0r	1f	0r	4a	2cc]
+.	.	.	.	4b-	.
+.	.	.	.	4cc	2a
+.	.	.	.	4a	.
+1r	.	2B-	.	2b-	2dd
+.	.	2c	.	4a	4cc
+.	.	.	.	4g	4b-
+=22	=22	=22	=22	=22	=22
+0r	0r	2d	2r	2f	2a
+.	.	2e-	1cc	2.g	2g
+.	.	1d	.	.	2a
+.	.	.	.	4f	.
+.	.	.	2b-	[2f	2f
+=23	=23	=23	=23	=23	=23
+0r	2r	1c	2cc	2f]	1g
+.	1c	.	2g	2e	.
+.	.	2F	2a	1f	2cc
+.	2B-	[2f	2b-	.	2dd
+=24	=24	=24	=24	=24	=24
+2r	1c	2f]	1g	2r	1cc
+1c	.	2e	.	2g	.
+.	2F	2f	1r	2a	1r
+2B-	2G	2d	.	4g	.
+.	.	.	.	4f	.
+=25	=25	=25	=25	=25	=25
+1c	1.A	1c	2r	2e	2r
+.	.	.	2e	2e	1cc
+2F	.	1r	2f	2c	.
+2G	2G	.	2d	2g	2b-
+=26	=26	=26	=26	=26	=26
+1A	1F	2r	4f	1c	2cc
+.	.	.	4e	.	.
+.	.	1c	4d	.	2f
+.	.	.	4c	.	.
+1G	1r	.	1d	1r	1g
+.	.	2B-	.	.	.
+=27	=27	=27	=27	=27	=27
+1F	2r	2c	2.f	2r	2.a
+.	2F	2F	.	2a	.
+.	.	.	8e	.	4b-
+.	.	.	8d	.	.
+1r	2E	2G	1c	2g	1cc
+.	2F	2A	.	2f	.
+=28	=28	=28	=28	=28	=28
+1r	1BB-	2.B-	1f	2d	1dd
+.	.	.	.	1f	.
+.	.	4A	.	.	.
+2r	1C	1G	2r	.	1cc
+2C	.	.	2cc	2e	.
+=29	=29	=29	=29	=29	=29
+2D	1F	[0F	2a	[0f	2r
+2BB-	.	.	1b-	.	2dd
+1F	2r	.	.	.	2cc
+.	2F	.	2a	.	[2ff
+=30	=30	=30	=30	=30	=30
+0BB-	2D	1F_	2.b-	1f_	4ff]
+.	.	.	.	.	4ee
+.	2BB-	.	.	.	4dd
+.	.	.	8a	.	4cc
+.	.	.	8g	.	.
+.	1B-	1F_	2f	1f_	1dd
+.	.	.	2g	.	.
+=31	=31	=31	=31	=31	=31
+0F	0A	0F]	0a	0f]	0cc
+==	==	==	==	==	==
+*-	*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Antiphon
+!!!PWK: Masses, Book 11
+!!!RNB: Cadence finals: C
+!!!YOR: Le Opere Complete, v. 28, p. 148
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

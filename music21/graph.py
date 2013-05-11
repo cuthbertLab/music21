@@ -217,7 +217,8 @@ class Graph(object):
     '''
     A music21.graph.Graph is an object that represents a visual graph or 
     plot, automating the creation and configuration of this graph in matplotlib.
-    It is a low-level object that most music21 users do not need to call directly; yet, as most graphs will take keyword arguments that specify the
+    It is a low-level object that most music21 users do not need to call directly; 
+    yet, as most graphs will take keyword arguments that specify the
     look of graphs, they are important to know about.
 
     The keyword arguments can be provided for configuration are: 
@@ -236,6 +237,8 @@ class Graph(object):
     a file on disk (this is the default), while 'show' opens an 
     interactive GUI browser.  The
     third option, None, does the processing but does not write any output.
+    
+    TODO: add color for individual points.
     '''
 
     def __init__(self, *args, **keywords):
@@ -991,8 +994,10 @@ class GraphHorizontalBar(Graph):
             keys.append(key)
             # provide a list of start, end points;
             # then start y position, bar height
-            ax.broken_barh(points, (yPos+self._margin, self._barHeight),
-                        facecolors=getColor(self.colors[i%len(self.colors)]), alpha=self.alpha)
+            faceColor = getColor(self.colors[i % len(self.colors)])            
+            
+            ax.broken_barh(points, (yPos + self._margin, self._barHeight),
+                        facecolors=faceColor, alpha=self.alpha)
             for xStart, xLen in points:
                 xEnd = xStart + xLen
                 for x in [xStart, xEnd]:
@@ -4405,7 +4410,7 @@ class TestExternal(unittest.TestCase):
 
 
         # 3d graphs
-        (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),
+        (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'), # @UndefinedVariable
 
         (PlotWindowedKrumhanslSchmuckler, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
         (PlotWindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
