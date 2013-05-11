@@ -48,7 +48,7 @@ def L(c, raiseException=False):
     
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = analysis.neoRiemannian.L(c3, raiseException=True)
+    ...     c4 = L(c3, raiseException=True)
     ... except analysis.neoRiemannian.LRPException:
     ...     pass
     
@@ -61,7 +61,7 @@ def L(c, raiseException=False):
         changingPitch = c.fifth
     else:
         if raiseException is True:
-            raise LRPException('Cannot perform R on this chord: not a Major or Minor triad')
+            raise LRPException('Cannot perform L on this chord: not a Major or Minor triad')
         return c
 
     return LRP_transform(c, transposeInterval, changingPitch)
@@ -81,10 +81,9 @@ def P(c, raiseException=False):
     
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = analysis.neoRiemannian.P(c3, raiseException=True)
+    ...     c4 = P(c3, raiseException=True)
     ... except analysis.neoRiemannian.LRPException:
     ...     pass
-    
     '''
     if c.isMajorTriad() == True:
         transposeInterval = "-A1"
@@ -94,7 +93,7 @@ def P(c, raiseException=False):
         changingPitch = c.third
     else:
         if raiseException is True:
-            raise LRPException('Cannot perform R on this chord: not a Major or Minor triad')
+            raise LRPException('Cannot perform P on this chord: not a Major or Minor triad')
         return c
 
     return LRP_transform(c, transposeInterval, changingPitch)
@@ -114,7 +113,7 @@ def R(c, raiseException=False):
     
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = analysis.neoRiemannian.R(c3, raiseException=True)
+    ...     c4 = R(c3, raiseException=True)
     ... except analysis.neoRiemannian.LRPException:
     ...     pass
     
