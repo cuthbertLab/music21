@@ -1397,6 +1397,18 @@ class ChordSymbol(Harmony):
 
         >>> [str(p) for p in harmony.ChordSymbol(root='D', bass='F', kind='minor-seventh').pitches]
         ['F3', 'A3', 'C4', 'D4']
+
+
+        Note that this ChordSymbol creates what looks like a B- minor-seventh chord in first inversion, but is
+        considered to be a D- chord in root position.
+
+        >>> csMaj6 = harmony.ChordSymbol(root='D-', kind='major-sixth')
+        >>> [str(p) for p in csMaj6.pitches]
+        ['D-3', 'F3', 'A-3', 'B-3']
+        >>> csMaj6.root()
+        <music21.pitch.Pitch D->
+        >>> csMaj6.inversion()
+        0
         '''
         nineElevenThirteen = ['dominant-ninth', 'major-ninth', 'minor-ninth', 'dominant-11th', 'major-11th', 'minor-11th', 'dominant-13th', 'major-13th', 'minor-13th']
 

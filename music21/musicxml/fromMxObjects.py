@@ -1048,15 +1048,13 @@ def mxToChordSymbol(mxHarmony):
     >>> mxKind.charData = 'major-sixth'
     >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
     >>> cs
-    <music21.harmony.ChordSymbol B-6/D->
+    <music21.harmony.ChordSymbol D-6>
     >>> cs.figure
-    'B-6/D-'
+    'D-6'
     >>> cs.pitches
     [<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch B-3>]
     >>> cs.root()
-    <music21.pitch.Pitch B-3>
-
-    
+    <music21.pitch.Pitch D-3>  
     '''
     
     #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
@@ -1123,6 +1121,8 @@ def mxToChordSymbol(mxHarmony):
             cs.addChordStepModification(hd)
     cs._updatePitches()
     #environLocal.printDebug(['mxToHarmony(): Harmony object', h])
+    if cs.root().name != r.name:
+        cs.root(r)
     return cs
 
 
