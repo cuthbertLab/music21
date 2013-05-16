@@ -2323,7 +2323,7 @@ def kernTandemToObject(tandem):
         instrumentTransposing = True
         return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH TRANSPOSING INSTRUMENTS; not in hum2xml
-    elif tandem.startswith("*I"):
+    elif tandem.startswith("*I"): # order has to be last
         instrument = tandem[2:]
         try:
             iObj = instruments.fromHumdrumInstrument(instrument)

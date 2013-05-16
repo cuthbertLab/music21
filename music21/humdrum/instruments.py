@@ -220,6 +220,11 @@ class HumdrumInstrumentException(exceptions21.Music21Exception):
     pass
 
 def fromHumdrumClass(hdclass):
+    '''
+    >>> from music21 import *
+    >>> humdrum.instruments.fromHumdrumClass('vox')
+    <music21.instrument.Instrument Voice>
+    '''
     from music21 import instrument
     try:
         i = humdrumInstrumentClassToInstrument[hdclass]
@@ -229,6 +234,11 @@ def fromHumdrumClass(hdclass):
         raise HumdrumInstrumentException('Cannot get an instrument from this humdrum class *IC%s' % hdclass)
 
 def fromHumdrumInstrument(hdinst):
+    '''
+    >>> from music21 import *
+    >>> humdrum.instruments.fromHumdrumInstrument('calto')
+    <music21.instrument.Instrument Alto>
+    '''
     from music21 import instrument
     try:
         i = humdrumInstruments[hdinst]
@@ -253,6 +263,17 @@ class Test(unittest.TestCase):
         for x in humdrumInstruments:
             i = humdrumInstruments[x]
             self.assertNotEqual(getattr(instrument, i)().instrumentName, None)
+
+
+    def testHumdrumParse(self):
+        from music21 import corpus
+        c = corpus.parse('Palestrina/Kyrie')
+        foundInstruments = []
+        for x in c.recurse():
+            if 'Instrument' in x.classes:
+                foundInstruments.append(str(x))
+        self.assertEqual(foundInstruments, ['Alto', 'Alto', 'Alto', 'Tenor', 'Alto', 'Bass', 'Tenor'])
+        print c.parts[1].flat.getInstrument()
 
 if __name__ == '__main__':
     import music21

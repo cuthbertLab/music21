@@ -3240,7 +3240,7 @@ class Stream(base.Music21Object):
     # _getNotes and _getPitches are found with the interval routines
 
     def measures(self, numberStart, numberEnd, 
-        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False):
+        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False, ignoreNumbers=False):
         '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
@@ -3252,6 +3252,8 @@ class Stream(base.Music21Object):
         >>> b = a.parts[0].measures(4,6)
         >>> len(b.getElementsByClass('Measure'))
         3
+
+        if ignoreNumbers is True, then it ignores defined measureNumbers and uses 0-indexed measure objects
 
         '''
         returnObj = self.__class__()
@@ -3284,18 +3286,22 @@ class Stream(base.Music21Object):
             spannerBundle = srcObj.spannerBundle
 
         # can use _elements here, as we do not need _endElements
-        for m in mStream._elements:
+        for index, m in enumerate(mStream._elements):
             #environLocal.printDebug(['m', m])
             # mId is a tuple of measure nmber and any suffix
-            try:
-                mNumber = int(m.number)
-            except ValueError:
-                raise StreamException('found problematic measure number: %s' % mNumber)
-            # id combines suffice w/ number 
-            mId = (mNumber, m.numberSuffix)
+            if ignoreNumbers is False:
+                try:
+                    mNumber = int(m.number)
+                except ValueError:
+                    raise StreamException('found problematic measure number: %s' % mNumber)
+                # id combines suffice w/ number 
+                mId = (mNumber, m.numberSuffix)
+            else:
+                mNumber = index
+                mId = (index, None)
             # store unique measure numbers for reference
-            if m.number not in mNumbersUnique:
-                mNumbersUnique.append(m.number)
+            if mNumber not in mNumbersUnique:
+                mNumbersUnique.append(mNumber)
             if mId not in mapRaw:
                 mapRaw[mId] = [] # use a list
             # these will be in order by measure number
@@ -3433,7 +3439,7 @@ class Stream(base.Music21Object):
 
     def measure(self, measureNumber, 
         collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], 
-        searchContext=False):
+        searchContext=False, ignoreNumbers=False):
         '''
         Given a measure number, return a single 
         :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
@@ -3459,7 +3465,7 @@ class Stream(base.Music21Object):
         if len(self.getElementsByClass('Measure')) >= 1:
             #environLocal.printDebug(['got measures from getElementsByClass'])
             s = self.measures(measureNumber, measureNumber, collect=collect, 
-                              searchContext=searchContext)
+                              searchContext=searchContext, ignoreNumbers=ignoreNumbers)
             if len(s) == 0:
                 return None
             else:
@@ -5655,8 +5661,11 @@ class Stream(base.Music21Object):
                 mNext = Measure()
                 # set offset to last offset plus total length
                 moffset = m.getOffsetBySite(measureStream)
-                mNext.offset = (moffset + 
-                                lastTimeSignature.barDuration.quarterLength)
+                if lastTimeSignature is not None:                    
+                    mNext.offset = (moffset + 
+                                    lastTimeSignature.barDuration.quarterLength)
+                else:
+                    mNext.offset = moffset
                 if len(meterStream) == 0: # in case no meters are defined
                     ts = meter.TimeSignature()
                     ts.load('%s/%s' % (defaults.meterNumerator, 
@@ -5664,7 +5673,7 @@ class Stream(base.Music21Object):
                 else: # get the last encountered meter
                     ts = meterStream.getElementAtOrBefore(mNext.offset)
                 # only copy and assign if not the same as the last
-                if not lastTimeSignature.ratioEqual(ts):
+                if lastTimeSignature is not None and not lastTimeSignature.ratioEqual(ts):
                     mNext.timeSignature = copy.deepcopy(ts)
                 # increment measure number
                 mNext.number = m.number + 1
@@ -12044,7 +12053,7 @@ class Score(Stream):
         ''')
 
     def measures(self, numberStart, numberEnd, 
-        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False):
+        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False, ignoreNumbers=False):
         '''This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
 
         The `collect` argument is a list of classes that will be collected. 
@@ -12066,7 +12075,7 @@ class Score(Stream):
         for p in self.parts:
             # insert all at zero
             measuredPart = p.measures(numberStart, numberEnd,
-                        collect, gatherSpanners=gatherSpanners)
+                        collect, gatherSpanners=gatherSpanners, ignoreNumbers=ignoreNumbers)
             post.insert(0, measuredPart)
         # must manually add any spanners; do not need to add .flat, as Stream.measures will handle lower level
         if gatherSpanners:
@@ -12078,7 +12087,7 @@ class Score(Stream):
 
     def measure(self, measureNumber, 
         collect=[clef.Clef, meter.TimeSignature, 
-        instrument.Instrument, key.KeySignature], gatherSpanners=True):
+        instrument.Instrument, key.KeySignature], gatherSpanners=True, ignoreNumbers=False):
         '''
         Given a measure number, 
         return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
@@ -12103,7 +12112,7 @@ class Score(Stream):
         for p in self.getElementsByClass('Part'):
             # insert all at zero
             mStream = p.measures(measureNumber, measureNumber, 
-                collect=collect, gatherSpanners=gatherSpanners)
+                collect=collect, gatherSpanners=gatherSpanners, ignoreNumbers=ignoreNumbers)
             if len(mStream) > 0:
                 post.insert(0, mStream)
 

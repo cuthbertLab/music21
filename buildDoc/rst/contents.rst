@@ -103,6 +103,7 @@ Module Reference
    moduleFiguredBassResolution
    moduleFiguredBassRules
    moduleFiguredBassSegment
+   moduleFreezeThaw
    moduleGraph
    moduleHarmony
    moduleHumdrum

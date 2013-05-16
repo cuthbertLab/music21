@@ -14,7 +14,7 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 
 To do a release, 
 
-1. update the VERSION and test in base.py and freezeThaw.py
+1. update the VERSION and test in base.py
 2. run test/multiprocessTest.py
 3. run test/test.py (normally not necessary,because it's slower and mostly duplicates multiprocessTest, but should be done before making a release), 
 4. then test/testDocumentation
@@ -23,7 +23,9 @@ To do a release,
 7. run buildDoc/build
 8. buildDoc/upload
 
-and finally this file.
+and finally this file. (you'll need your GoogleCode password and will need to enter it THREE times)
+
+then update PyPI
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
@@ -318,4 +320,4 @@ if __name__ == '__main__':
     d.updatePaths()
     d.uploadGoogleCode()
     #d.uploadGoogleCodeOneFile(d.fpTar)
-    #d.uploadPyPi()
+    d.uploadPyPi()

@@ -2356,6 +2356,7 @@ def subtract(intervalList):
     <music21.interval.Interval P1>
     >>> interval.subtract(["A1","P1"])
     <music21.interval.Interval A1>
+    
     >>> a = interval.subtract(["P5","A5"])
     >>> a.niceName
     'Augmented Unison'

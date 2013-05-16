@@ -578,10 +578,10 @@ class CallGraph:
         #self.callTest = TestBigMusicXML
 
         #self.callTest = TestMeasuresA
-        self.callTest = TestTimeMozart
+        #self.callTest = TestTimeMozart
         #self.callTest = TestTimeIsmir
         #self.callTest = TestGetContextByClassB
-        #self.callTest = TestMeasuresB
+        self.callTest = TestMeasuresB
         #self.callTest = TestImportCorpus
         #self.callTest = TestImportCorpus3
 
@@ -649,7 +649,7 @@ class CallGraph:
         ct.testFocus() # run routine
 
         pycallgraph.stop_trace()
-        pycallgraph.make_dot_graph(fp, format=outputFormat)
+        pycallgraph.make_dot_graph(fp, format=outputFormat, tool='/usr/local/bin/dot')
         print('elapsed time: %s' % t)
         # open the completed file
         print('file path: ' + fp)

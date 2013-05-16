@@ -181,7 +181,7 @@ class CallGraph:
         ct.testFocus() # run routine
 
         pycallgraph.stop_trace()
-        pycallgraph.make_dot_graph(fp, format=fmt)
+        pycallgraph.make_dot_graph(fp, format=fmt, tool='/usr/local/bin/dot')
         print('elapsed time: %s' % t)
         # open the completed file
         print('file path: ' + fp)

@@ -1189,7 +1189,7 @@ class ChordSymbol(Harmony):
     
     >>> s = corpus.parse('leadsheet/fosterBrownHair')
     >>> [[str(c.name) for c in c.pitches] for c in s.flat.getElementsByClass(harmony.ChordSymbol)[0:5]]
-    [['F', 'A', 'C'], ['B', 'B-', 'D', 'F'], ['F', 'A', 'C'], ['C', 'E', 'G'], ['F', 'A', 'C']]
+    [['F', 'A', 'C'], ['B-', 'D', 'F'], ['F', 'A', 'C'], ['C', 'E', 'G'], ['F', 'A', 'C']]
 
     '''
 

@@ -4,13 +4,15 @@
 # Purpose:      Tools for creating a score reduction.
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-'''Tools for generation reduction displays, showing a score and or a chord reduction, and one or more reductive representation lines.
-
+'''
+Tools for generation reduction displays, showing a score and or a chord reduction, 
+and one or more reductive representation lines.
 '''
 
 
@@ -41,7 +43,9 @@ class ReductiveEventException(exceptions21.Music21Exception):
 
  
 class ReductiveNote(object):
-    '''The extraction of an event from a score and specification of where and how it should be presented in a reductive score.
+    '''
+    The extraction of an event from a score and specification of where 
+    and how it should be presented in a reductive score.
 
     A specification string, as well as Note, must be provided for parsing.
     '''
@@ -69,7 +73,9 @@ class ReductiveNote(object):
 
     def __init__(self, specification, note, measureIndex, measureOffset):
         '''
-        A specification must be created when access the Measure that the source note is found in. Storing the measure and index position provides significant performance optimization, as we do no have to search every note when generated the reduction. 
+        A specification must be created when access the Measure that the source note 
+        is found in. Storing the measure and index position provides significant 
+        performance optimization, as we do no have to search every note when generated the reduction. 
 
         The `measureIndex` is the index of measure where this is found, not
         the measure number. The `measureOffset` is the position in the measure
@@ -174,6 +180,9 @@ class ScoreReductionException(exceptions21.Music21Exception):
 
 
 class ScoreReduction(object):
+    '''
+    An object to reduce a score.
+    '''
     def __init__(self, *args, **keywords):
         # store a list of one or more reductions
         self._reductiveNotes = {}
@@ -386,15 +395,24 @@ class PartReductionException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class PartReduction(object):
-    '''A part reduction reduces a Score into on or more parts. Parts are combined based on a part group dictionary. Each resulting part is then segmented by an object. This object is assigned as floating-point value. . 
+    '''
+    A part reduction reduces a Score into on or more parts. 
+    Parts are combined based on a part group dictionary. 
+    Each resulting part is then segmented by an object. 
+    This object is assigned as floating-point value.
 
     This reduction is designed to work with the GraphHorizontalBarWeighted and related Plot subclasses.
 
-    If the `fillByMeasure` parameter is True, and if measures are available, each part will segment by Measure divisions, and look for the target activity only once per Measure. If more than one target is found in the Measure, values will be averaged. If `fillByMeasure` is False, the part will be segmented by each Note. 
+    If the `fillByMeasure` parameter is True, and if measures are available, 
+    each part will segment by Measure divisions, and look for the target activity only once per Measure. 
+    If more than one target is found in the Measure, values will be averaged. 
+    If `fillByMeasure` is False, the part will be segmented by each Note. 
 
-    The `segmentByTarget` parameter is True, segments, which may be Notes or Measures, will be divided if necessary to show changes that occur over the duration of the segment by a target object. 
+    The `segmentByTarget` parameter is True, segments, which may be Notes or Measures, 
+    will be divided if necessary to show changes that occur over the duration of the segment by a target object. 
 
-    If the `normalizeByPart` parameter is True, each part will be normalized within the range only of that part. If False, all parts will be normalized by the max of all parts. The default is True. 
+    If the `normalizeByPart` parameter is True, each part will be normalized within 
+    the range only of that part. If False, all parts will be normalized by the max of all parts. The default is True. 
 
     If the `normalize` parameter is False, no normalization will take place. The default is True. 
 
@@ -442,7 +460,9 @@ class PartReduction(object):
                 break
 
     def _createPartBundles(self):
-        '''Fill the _partBundles list with dictionaries, each dictionary defining a name (part id or supplied), a color, and list of Parts that match.
+        '''
+        Fill the _partBundles list with dictionaries, 
+        each dictionary defining a name (part id or supplied), a color, and list of Parts that match.
         '''
         self._partBundles = []
         if self._partGroups is not None:

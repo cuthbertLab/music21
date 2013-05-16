@@ -3,9 +3,10 @@
 # Name:         testSerialization.py
 # Purpose:      tests for serializing music21 objects
 #
-# Authors:      Christopher Ariza
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-13 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 

@@ -3920,7 +3920,6 @@ class Music21Object(object):
         >>> [n._getMeasureOffset() for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
         '''
-
         if self.activeSite != None and self.activeSite.isMeasure:
             #environLocal.printDebug(['found activeSite as Measure, using for offset'])
             offsetLocal = self.getOffsetBySite(self.activeSite)
@@ -3931,10 +3930,16 @@ class Music21Object(object):
             m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeActiveSite=False)
             if m is not None:
                 #environLocal.printDebug(['using found Measure for offset access'])     
-                if includeMeasurePadding:       
-                    offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
-                else:
-                    offsetLocal = self.getOffsetBySite(m)
+                try:
+                    if includeMeasurePadding:       
+                        offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
+                    else:
+                        offsetLocal = self.getOffsetBySite(m)
+                except SitesException:
+                    try:
+                        offsetLocal = self.offset
+                    except:
+                        offsetLocal = 0.0
 
             else: # hope that we get the right one
                 #environLocal.printDebug(['_getMeasureOffset(): cannot find a Measure; using standard offset access'])

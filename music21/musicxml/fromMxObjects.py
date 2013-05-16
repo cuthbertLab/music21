@@ -1021,6 +1021,44 @@ def mxToRepeatExpression(mxDirection):
 # Harmony
 
 def mxToChordSymbol(mxHarmony):
+    '''
+    Converts an musicxml.base.Harmony() object to a harmony.ChordSymbol object
+    
+    >>> from music21 import *
+    >>> mxHarmony = musicxml.Harmony()
+    >>> mxKind = musicxml.Kind()
+    >>> mxKind.charData = 'major-seventh'
+    >>> mxHarmony.kindObj = mxKind
+    >>> mxRoot = musicxml.Root()
+    >>> mxRoot.set('root-step', 'D')
+    >>> mxRoot.set('root-alter', '-1')
+    >>> mxHarmony.rootObj = mxRoot
+    >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+    >>> cs
+    <music21.harmony.ChordSymbol D-maj7>
+    >>> cs.figure
+    'D-maj7'
+    >>> cs.pitches
+    [<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch C4>]
+    >>> cs.root()
+    <music21.pitch.Pitch D-3>
+    
+    TODO: this is very classically-oriented.  Make it more Jazz/Rock like.
+    
+    >>> mxKind.charData = 'major-sixth'
+    >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+    >>> cs
+    <music21.harmony.ChordSymbol B-6/D->
+    >>> cs.figure
+    'B-6/D-'
+    >>> cs.pitches
+    [<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch B-3>]
+    >>> cs.root()
+    <music21.pitch.Pitch B-3>
+
+    
+    '''
+    
     #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
     cs = harmony.ChordSymbol()
 
@@ -1049,7 +1087,7 @@ def mxToChordSymbol(mxHarmony):
         # set Pitch object on Harmony
         cs.bass(b)
     else:
-        cs.bass(pitch.Pitch(mxRoot.get('rootStep'))) #set the bass to the root if root is none
+        cs.bass(r) #set the bass to the root if root is none
 
     mxInversion = mxHarmony.get('inversion')
     if mxInversion is not None:
@@ -3637,7 +3675,12 @@ class Test(unittest.TestCase):
 
         match = [str(h.root()) for h in s.flat.getElementsByClass('ChordSymbol')]
         
-        self.assertEqual(match, ['F3', 'C3', 'F3', 'B1', 'F3', 'C3', 'G2', 'C3', 'C3', 'F3', 'C3', 'F3', 'F2', 'B1', 'F2', 'F3', 'C3', 'F3', 'C3'])
+        self.assertEqual(match, ['F3', 'C3', 'F3', 'B-2', 'F3', 'C3', 'G2', 'C3', 'C3', 'F3', 'C3', 'F3', 'F2', 'B-2', 'F2', 'F3', 'C3', 'F3', 'C3'])
+
+        match = set([str(h.figure) for h in s.flat.getElementsByClass('ChordSymbol')])
+        
+        self.assertEqual(match, set(['F','F7','B-','C7','G7','C']))
+
 
         s = corpus.parse('monteverdi/madrigal.3.12.xml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 10)

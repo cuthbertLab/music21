@@ -1727,8 +1727,8 @@ class MetadataBundle(object):
         for fp in pathList:
             environLocal.printDebug(['updateMetadataCache: examining:', fp])
             if printDebugAfter > 0 and numberConverted % printDebugAfter == 0 and numberConverted > 0:
-                environLocal.warn("updated %d files, %d to go; total errors: %d" %
-                                  (numberConverted, len(pathList) - numberConverted, len(fpError)))
+                environLocal.warn("updated %d files, %d to go; total errors: %d ... last file %s" %
+                                  (numberConverted, len(pathList) - numberConverted, len(fpError), fp))
             numberConverted += 1
             cp = self.corpusPathToKey(fp)
             try:

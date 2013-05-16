@@ -97,6 +97,8 @@ from music21.figuredBass import resolution as figuredBassResolution
 from music21.figuredBass import rules as figuredBassRules
 from music21.figuredBass import segment as figuredBassSegment
 
+from music21 import freezeThaw
+
 from music21 import graph
 
 from music21 import harmony
@@ -276,6 +278,8 @@ MODULES = [
     figuredBassResolution,
     figuredBassRules,
     figuredBassSegment,
+    
+    freezeThaw,
     
     graph,
     
