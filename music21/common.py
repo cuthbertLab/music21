@@ -629,6 +629,35 @@ def isNum(usrData):
 #     else:
 #         return False        
 
+def contiguousList(inputListOrTuple):
+    '''
+    returns bool True or False if a list containing ints contains only contiguous (increasing) values
+    
+    requires the list to be sorted first
+    
+    >>> from music21 import *
+    >>> l = [3, 4, 5, 6]
+    >>> common.contiguousList(l)
+    True
+    >>> l.append(8)
+    >>> common.contiguousList(l)
+    False
+
+    Sorting matters
+
+    >>> l.append(7)
+    >>> common.contiguousList(l)
+    False
+    >>> common.contiguousList(sorted(l))
+    True
+    '''
+    currentMaxVal = inputListOrTuple[0]
+    for i in range(1, len(inputListOrTuple)):
+        newVal = inputListOrTuple[i]
+        if newVal != currentMaxVal + 1:
+            return False
+        currentMaxVal += 1
+    return True 
 
 def isStr(usrData):
     """Check of usrData is some form of string, including unicode.

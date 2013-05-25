@@ -1514,8 +1514,10 @@ def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSigna
         if abs(beatDivisionOffset) > ts.beatDivisionDurations:
             raise Exception()
         i = len(ts.beatDivisionDurations) - abs(beatDivisionOffset)
-        offset += ts.beatDivisionDurations[i].quarterLength
-        
+        try:
+            offset += ts.beatDivisionDurations[i].quarterLength
+        except IndexError:
+            environRules.warn('Problem in converting a time signature in measure %d, offset may be wrong' % music21Measure.number)
     bs = copy.deepcopy(ts.beatSequence)
     try:  
         bs.partitionByCount(value, loadDefault = False)

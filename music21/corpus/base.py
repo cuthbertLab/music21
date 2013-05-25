@@ -274,7 +274,7 @@ def addPath(fp):
     the :class:`~music21.environment.UserSettings` object. 
 
     >>> from music21 import *
-    >>> #_DOCS_SHOW coprus.addPath('~/Documents')
+    >>> #_DOCS_SHOW corpus.addPath('~/Documents')
 
     alternatively, add a directory permanently (see link above 
     for more details):

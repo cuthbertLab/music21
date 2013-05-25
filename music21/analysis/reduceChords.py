@@ -345,7 +345,7 @@ class Test(unittest.TestCase):
         p = cr.multiPartReduction(c, maxChords = 3, closedPosition=True)
         #p = cr.multiPartReduction(c, closedPosition=True)
         c.insert(0, p)
-        c.show()
+        #c.show()
         
 
 #-------------------------------------------------------------------------------

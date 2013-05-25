@@ -1144,12 +1144,33 @@ class RepeatBracket(Spanner):
     <music21.spanner.RepeatBracket 3 <music21.stream.Measure 0 offset=0.0>>
     >>> sp.getNumberList() # the list of repeat numbers
     [3]
+    >>> sp.number
+    '3'
+    
     >>> sp.number = '1-3' # range of repeats
     >>> sp.getNumberList()
     [1, 2, 3]
+    >>> sp.number
+    '1-3'
+    
     >>> sp.number = [2,3] # range of repeats
     >>> sp.getNumberList()
     [2, 3]
+    >>> sp.number
+    '2, 3'
+
+    >>> sp.number = '1, 2, 3' # comma separated
+    >>> sp.getNumberList()
+    [1, 2, 3]
+    >>> sp.number
+    '1-3'
+
+
+    >>> sp.number = '1, 2, 3, 7' # disjunct
+    >>> sp.getNumberList()
+    [1, 2, 3, 7]
+    >>> sp.number
+    '1, 2, 3, 7'
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
@@ -1157,6 +1178,8 @@ class RepeatBracket(Spanner):
         self._number = None
         self._numberRange = [] # store a range, inclusive of the single number assignment
         self._numberSpanIsAdjacent = None
+        self._numberSpanIsContiguous = None
+
         if 'number' in keywords:
             self.number = keywords['number']
 
@@ -1167,13 +1190,16 @@ class RepeatBracket(Spanner):
         if len(self._numberRange) == 1:
             return str(self._number)
         else:
-            if self._numberSpanIsAdjacent:
+            if self._numberSpanIsContiguous is False:
+                return ', '.join([str(x) for x in self._numberRange])                
+            elif self._numberSpanIsAdjacent:
                 return '%s, %s' % (self._numberRange[0], self._numberRange[-1])
             else: # range of values
                 return '%s-%s' % (self._numberRange[0], self._numberRange[-1])
 
     def _setNumber(self, value):
-        '''Set the bracket number. There may be range of values provided
+        '''
+        Set the bracket number. There may be range of values provided
         '''
         if value in ['', None]:
             # assume this is 1 
@@ -1187,17 +1213,34 @@ class RepeatBracket(Spanner):
                 else:
                     raise SpannerException('number for RepeatBracket must be a number, not %r' % value)
             self._number = min(self._numberRange)
+            self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
+            if (len(self._numberRange) == 2) and (self._numberRange[0] == self._numberRange[1] - 1):
+                self._numberSpanIsAdjacent = True
+            else:
+                self._numberSpanIsAdjacent = False
+
         elif common.isStr(value):
             # assume defined a range with a dash; assumed inclusive
             if '-' in value:
                 start, end = value.split('-')
                 self._numberRange = range(int(start), int(end)+1)
                 self._numberSpanIsAdjacent = False
-            elif ',' in value: # assuming only two values
-                start, end = value.split(',')
-                self._numberRange = range(int(start), int(end)+1)
-                # mark as contiguous numbers
-                self._numberSpanIsAdjacent = True
+                self._numberSpanIsContiguous = True
+
+            elif ',' in value:
+                self._numberRange = [] # clear
+                for x in value.split(','):
+                    x = int(x.strip())
+                    self._numberRange.append(x)
+                self._number = min(self._numberRange)
+                
+                # returns bool 
+                self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
+                if (len(self._numberRange) == 2) and (self._numberRange[0] == self._numberRange[1] - 1):
+                    self._numberSpanIsAdjacent = True
+                else:
+                    self._numberSpanIsAdjacent = False
+                
             elif value.isdigit():
                 self._numberRange.append(int(value))
             else:
