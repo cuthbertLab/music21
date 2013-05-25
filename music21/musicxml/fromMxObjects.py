@@ -1059,7 +1059,7 @@ def mxToChordSymbol(mxHarmony):
     
     #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
     cs = harmony.ChordSymbol()
-
+    
     mxKind = mxHarmony.get('kind')
     if mxKind is not None:
         cs.chordKind = mxKind.charData
@@ -1096,6 +1096,7 @@ def mxToChordSymbol(mxHarmony):
         cs.romanNumeral = mxFunction # goes to roman property
 
     mxDegree = mxHarmony.get('degree')
+    
     if mxDegree is not None: # a list of components
         ChordStepModifications = []
         hd = None
@@ -1111,9 +1112,12 @@ def mxToChordSymbol(mxHarmony):
             elif isinstance(mxSub, musicxmlMod.DegreeAlter):
                 hd.interval = int(mxSub.charData)
             elif isinstance(mxSub, musicxmlMod.DegreeType):
-                hd.type = mxSub.charData
+                hd.modType = mxSub.charData
             else:
                 raise FromMxObjectsException('found unexpected object in degree tag: %s' % mxSub)
+            
+        
+        
         # must get last on loop exit
         if hd is not None:
             ChordStepModifications.append(hd)
@@ -3871,6 +3875,6 @@ if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-
+   
 #------------------------------------------------------------------------------
 # eof

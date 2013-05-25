@@ -1159,10 +1159,10 @@ class ChordSymbol(Harmony):
     You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
 
     >>> [str(p) for p in harmony.ChordSymbol('C35b7b9#11b13').pitches]
-    ['C3', 'D-3', 'E3', 'F#3', 'G3', 'A-3', 'B-3']
+    ['C2', 'E2', 'G2', 'D-3', 'F#3', 'A-3', 'B-3']
 
     >>> [str(p) for p in harmony.ChordSymbol('C35911').pitches]
-    ['C3', 'D3', 'E3', 'F3', 'G3']
+    ['C2', 'E2', 'G2', 'D3', 'F3']
                                                                                                                                                           
     to prevent ambiguity in notation....
 
@@ -1175,7 +1175,7 @@ class ChordSymbol(Harmony):
     >>> [str(p) for p in harmony.ChordSymbol('Db35').pitches]
     ['D3', 'F3', 'A3']
     >>> [str(p) for p in harmony.ChordSymbol('D,35b7b9#11b13').pitches]
-    ['D3', 'E-3', 'F#3', 'G#3', 'A3', 'B-3', 'C4']
+    ['D2', 'F#2', 'A2', 'E-3', 'G#3', 'B-3', 'C4']
     >>> harmony.ChordSymbol('Am').pitches
     [<music21.pitch.Pitch A2>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>]
     >>> harmony.ChordSymbol('A-m').pitches
@@ -1341,9 +1341,37 @@ class ChordSymbol(Harmony):
         C
         C
         C
+        
+        Thanks to David Bolton for catching the bug tested below:
+        
+        >>> from music21 import musicxml
+        >>> mxHarmony = musicxml.Harmony()
+        >>> mxKind = musicxml.Kind()
+        >>> mxKind.charData = 'dominant'
+        >>> mxHarmony.kindObj = mxKind
+        >>> mxRoot = musicxml.Root()
+        >>> mxRoot.set('root-step', 'C')
+        >>> mxHarmony.rootObj = mxRoot
+        >>> mxDegree = musicxml.Degree()
+        >>> val = musicxml.DegreeValue()
+        >>> val.charData = 9
+        >>> alt = musicxml.DegreeAlter()
+        >>> alt.charData = -1
+        >>> modType = musicxml.DegreeType()
+        >>> modType.charData = 'add'
+        >>> mxDegree.componentList = [val,alt,modType]
+        >>> mxHarmony.degreeObj = mxDegree
+        >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+        >>> cs.figure
+        'C7 add b9'
+        >>> cs.pitches
+        [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch B-3>, <music21.pitch.Pitch D-4>]
         '''
+      
+        
         if self.chordStepModifications or self.chordKind: #there is no hope to determine the chord from pitches
             # if it's been modified, so we'll just have to try this route....
+            
             if self.root() == None:
                 raise HarmonyException('Cannot find figure. No root to the chord found' , self)
             else:
@@ -1356,10 +1384,17 @@ class ChordSymbol(Harmony):
                     figure += '/' + self.bass().name
             
             for csmod in self.chordStepModifications:
-                if csmod.modType != 'alter':
-                    figure += ' ' + csmod.modType + ' ' + str(csmod.degree)
+                if csmod.interval != None:
+                    numAlter = csmod.interval.semitones
+                    if numAlter > 0:
+                        s = '#'
+                    else:
+                        s = 'b'
+                    prefix = s*abs(numAlter)
+                    
+                    figure += ' ' + csmod.modType +" " +  prefix + str(csmod.degree)
                 else:
-                    figure += ' ' + csmod.modType + ' ' + csmod.interval.simpleName
+                    figure += ' ' + csmod.modType + ' ' + str(csmod.degree)
     
             return figure
         else: # if neither chordKind nor chordStepModifications, best bet is probably to 
@@ -1572,6 +1607,8 @@ class ChordSymbol(Harmony):
                     #adjust the added pitch by degree-alter interval
                     if hD.interval:
                         p = p.transpose(hD.interval)
+                        if hD.degree >= 7:
+                            p.octave = p.octave + 1
                     pitches.append(p)
                 elif hD.modType == 'subtract':
                     pitchFound = False
@@ -2003,9 +2040,13 @@ if __name__ == "__main__":
     #s = corpus.parse('leadsheet/fosterBrownHair')
     #for c in s.flat.getElementsByClass(harmony.ChordSymbol):
     #    print c.pitches
+    #from music21 import *
+    #s = converter.parse('/Users/bhadley/Desktop/sam.xml')
+    #cs = s.flat.getElementsByClass(harmony.ChordSymbol)
+    #m = cs[0]
+    #print m.findFigure() 
     import music21
     music21.mainTest(Test)
-
 
 
 #------------------------------------------------------------------------------
