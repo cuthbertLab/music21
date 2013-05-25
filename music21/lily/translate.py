@@ -109,6 +109,9 @@ class LilypondConverter(object):
      \revert Rest #'transparent
      \revert Dots #'transparent
      '''.lstrip()
+    bookHeader = r'''
+    \include "lilypond-book-preamble.ly"
+    '''.lstrip()
  
     accidentalConvert = {"double-sharp": u"isis",
                          "double-flat": u"eses",
@@ -165,6 +168,8 @@ class LilypondConverter(object):
         self.minorVersion = 13
         self.versionString = self.topLevelObject.backslash + "version " + self.topLevelObject.quoteString(str(self.majorVersion) + '.' + str(self.minorVersion))
         self.versionScheme = lyo.LyEmbeddedScm(self.versionString)
+        self.headerScheme  = lyo.LyEmbeddedScm(self.bookHeader)
+        
         self.backend  = 'ps'
         
         if self.majorVersion >= 2:
@@ -197,6 +202,7 @@ class LilypondConverter(object):
         >>> n = note.Note()
         >>> print lily.translate.LilypondConverter().textFromMusic21Object(n)
         \version "2.13" 
+        \include "lilypond-book-preamble.ly"
         color = #(define-music-function (parser location color) (string?) #{ 
                 \once \override NoteHead #'color = #(x11-color $color) 
                 \once \override Stem #'color = #(x11-color $color)
@@ -269,8 +275,10 @@ class LilypondConverter(object):
         '''
         contents = []
         lpVersionScheme = self.versionScheme        
+        lpHeaderScheme = self.headerScheme        
         lpColorScheme = lyo.LyEmbeddedScm(self.colorDef)
         contents.append(lpVersionScheme)
+        contents.append(lpHeaderScheme)
         contents.append(lpColorScheme)
 
         for thisScore in opusIn.scores:
@@ -314,6 +322,7 @@ class LilypondConverter(object):
             scoreIn = scoreIn.makeNotation(inPlace = False)
         
         lpVersionScheme = self.versionScheme        
+        lpHeaderScheme = self.headerScheme
         lpColorScheme = lyo.LyEmbeddedScm(self.colorDef)
         lpHeader = lyo.LyLilypondHeader()
 
@@ -324,7 +333,7 @@ class LilypondConverter(object):
         lpOutputDefBody = lyo.LyOutputDefBody(outputDefHead = lpOutputDefHead)
         lpOutputDef = lyo.LyOutputDef(outputDefBody = lpOutputDefBody)
         lpLayout = lyo.LyLayout()
-        contents = [lpVersionScheme, lpColorScheme, lpHeader, lpScoreBlock, lpOutputDef, lpLayout]
+        contents = [lpVersionScheme, lpHeaderScheme, lpColorScheme, lpHeader, lpScoreBlock, lpOutputDef, lpLayout]
         
         if scoreIn.metadata is not None:
             self.setHeaderFromMetadata(scoreIn.metadata, lpHeader = lpHeader)
@@ -2230,6 +2239,7 @@ class LilypondConverter(object):
 
         most users will just call stream.write('lily.pdf') on a stream.
         '''
+        self.headerScheme.content = "" # clear header
         lilyFile = self.runThroughLily(backend='ps', format = 'pdf', fileName = fileName)
         return lilyFile
 

@@ -250,6 +250,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamObj = self.stream
             if streamObj is None:
                 raise FreezeThawException("You need to pass in a stream when creating to work")
+        self.unwrapVolumeWeakrefs(streamObj)
         allEls = streamObj.recurse(restoreActiveSites = False)
         if self.topLevel is True:
             self.findActiveStreamIdsInHierarchy(streamObj)
@@ -265,7 +266,6 @@ class StreamFreezer(StreamFreezeThawBase):
                 subSF.setupSerializationScaffold()
 
         self.setupStoredElementOffsetTuples(streamObj)
-        
 
         if self.topLevel is True:
             self.recursiveClearSites(streamObj)
@@ -481,6 +481,20 @@ class StreamFreezer(StreamFreezeThawBase):
         self.streamIds = streamIds
         return streamIds
 
+    def unwrapVolumeWeakrefs(self, streamObj = None):
+        '''
+        note.Note().volume._parent stores a weakRef -- unwrap it for pickling.
+        '''        
+        if streamObj is None:
+            streamObj = self.stream
+        for n in streamObj.recurse():
+            if 'NotRest' not in n.classes:
+                continue
+            if hasattr(n, 'volume') and n.volume is not None and n.volume._parent is not None:
+                n.volume._parent = common.unwrapWeakref(n.volume._parent)
+                if 'Chord' in n.classes:
+                    for el in n:
+                        el.volume._parent = common.unwrapWeakref(el.volume._parent)
 
     #---------------------------------------------------------------------------
     def parseWriteFmt(self, fmt):
@@ -699,6 +713,7 @@ class StreamThawer(StreamFreezeThawBase):
             #e.wrapWeakref()
 
         # restore to whatever it was
+        self.wrapVolumeWeakrefs(streamObj)
         streamObj.autoSort = storedAutoSort
         streamObj._elementsChanged()
 
@@ -763,7 +778,24 @@ class StreamThawer(StreamFreezeThawBase):
                 # if the spanner stores a part or something in the Stream
                 # for instance in a StaffGroup object
                 self.restoreElementsFromTuples(subElement)
-    
+
+    def wrapVolumeWeakrefs(self, streamObj = None):
+        '''
+        note.Note().volume._parent should store a weakRef -- wrap it after unpickling.
+        '''        
+        if streamObj is None:
+            streamObj = self.stream
+        for n in streamObj.recurse():
+            if 'NotRest' not in n.classes:
+                continue
+            if hasattr(n, 'volume') and n.volume is not None and n.volume._parent is not None:
+                n.volume._parent = common.wrapWeakref(n.volume._parent)
+                if 'Chord' in n.classes:
+                    for el in n:
+                        el.volume._parent = common.wrapWeakref(el.volume._parent)
+
+
+
     def getPickleFp(self, directory):
         if directory == None:
             raise ValueError
@@ -1797,6 +1829,17 @@ class Test(unittest.TestCase):
 #
 #        self.assertEqual(hasattr(d, 'json'), True)
 
+
+    def testPickleMidi(self):
+        from music21 import converter
+        from music21 import midi
+        a = os.path.dirname(midi.__file__) + os.sep + 'testPrimitive' + os.sep + 'test03.mid'
+
+        #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+        c = converter.parse(a)
+        f = converter.freezeStr(c)
+        d = converter.thawStr(f)
+        self.assertEqual(d[1][20].volume._parent.__class__.__name__, 'weakref')
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":

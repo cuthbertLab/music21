@@ -1877,6 +1877,8 @@ def normalizeFilename(name):
     return name
 
 
+
+
 #-------------------------------------------------------------------------------
 _singletonCounter = {}
 _singletonCounter['value'] = 0

@@ -1157,7 +1157,7 @@ def thaw(fp):
 
 def freezeStr(streamObj, fmt=None):
     '''
-    Given a StreamObject and a file path, 
+    Given a StreamObject 
     serialize and return a serialization string.
 
     This function is based on the 
