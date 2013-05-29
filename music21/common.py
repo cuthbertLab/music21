@@ -1886,12 +1886,17 @@ def normalizeFilename(name):
 
 def runningUnderIPython():
     '''
-    return BOOL if we are running under iPython:
+    return bool if we are running under iPython Notebook (not iPython)
+    
+    (no tests, since will be different)
+    
+    This post:
+    http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
+    says not to do this, but really, I can't think of another way to have different output as default.
     '''
-    try:
-        __IPYTHON__ # @UndefinedVariable
+    if sys.stderr.__class__.__name__ == 'OutStream':
         return True
-    except NameError:
+    else:
         return False
 
 
