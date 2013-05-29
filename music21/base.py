@@ -3309,7 +3309,7 @@ class Music21Object(object):
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.createPDF(fp)
-        elif fileFormat in ['png', 'lily.png']:
+        elif fileFormat in ['png', 'lily.png','ipython','ipython.png']:
             if fp.endswith('.png'):
                 fp = fp[:-4]
             from music21.lily import translate as lilyTranslate # @Reimport
@@ -3317,7 +3317,13 @@ class Music21Object(object):
             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
-            return conv.createPNG(fp)
+            convertedFilePath = conv.createPNG(fp)
+            if fileFormat in ['ipython','ipython.png']:
+                from music21.ipython21 import objects as ipythonObjects
+                ipo = ipythonObjects.IPythonPNGObject(convertedFilePath)
+                return ipo
+            else:
+                return convertedFilePath
         elif fileFormat in ['svg', 'lily.svg']:
             if fp.endswith('.svg'):
                 fp = fp[:-4]
@@ -3371,7 +3377,10 @@ class Music21Object(object):
         # common.VALID_SHOW_FORMATS
 
         if fmt == None: # get setting in environment
-            fmt = environLocal['showFormat']
+            if common.runningUnderIPython():
+                fmt = 'ipython'
+            else:
+                fmt = environLocal['showFormat']
         if common.isStr(fmt) != True:
             raise Music21ObjectException('format must be a string, not whatever this is: %s' % fmt)
 
@@ -3413,7 +3422,10 @@ class Music21Object(object):
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.showSVG()
-
+        elif fmt in ['ipython','ipython.png']:
+            # same as write... ipython %load_ext ipython21/ipExtension.py takes care of this.
+            return self.write(fileFormat)
+            
         elif fmt in ['musicxml', 'midi']: # a format that writes a file
             returnedFilePath = self.write(fileFormat)
             environLocal.launch(fileFormat, returnedFilePath, app=app)

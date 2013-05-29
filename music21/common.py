@@ -52,6 +52,7 @@ fileExtensions = {
     'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
     'vexflow' : {'input' : ['vexflowDoesNotWork'], 'output': 'html'},
     'capella' : {'input': ['capx'], 'output': 'capx'},
+    'ipython' : {'input': ['ipython.png'], 'output': 'png'},
 }
 
 
@@ -77,8 +78,8 @@ DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js']
-VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js']
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 
@@ -143,6 +144,12 @@ def findFormat(fmt):
     ('vexflow', '.html')
     >>> common.findFormat('capx')
     ('capella', '.capx')
+    >>> common.findFormat('png')
+    ('png', '.png')
+    >>> common.findFormat('ipython')
+    ('ipython', '.png')
+    >>> common.findFormat('ipython.png')
+    ('ipython', '.png')
     
 
     Works the same whether you have a leading dot or not:
@@ -1877,6 +1884,15 @@ def normalizeFilename(name):
     return name
 
 
+def runningUnderIPython():
+    '''
+    return BOOL if we are running under iPython:
+    '''
+    try:
+        __IPYTHON__ # @UndefinedVariable
+        return True
+    except NameError:
+        return False
 
 
 #-------------------------------------------------------------------------------

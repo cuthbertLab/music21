@@ -291,7 +291,10 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
             returnDefault=False)) > 0:
         # call make beams for now; later, import beams
         #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
-        p.makeBeams()
+        try:
+            p.makeBeams()
+        except meter.MeterException as e:
+            environLocal.warn("Error in beaming...ignoring: %s" % str(e))
 
     # copy spanners into topmost container; here, a part
     rm = []
@@ -407,7 +410,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                 try:
                     scoreList.append(abcToStreamScore(abcDict[key]))
                 except:
-                    print "Failure for piece number %d" % key
+                    environLocal.warn("Failure for piece number %d" % key)
             for scoreDocument in scoreList:
                 opus._appendCore(scoreDocument)
             opus._elementsChanged()

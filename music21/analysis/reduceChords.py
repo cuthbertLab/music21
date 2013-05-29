@@ -313,7 +313,7 @@ class Test(unittest.TestCase):
         pass
 
     def testSimpleMeasure(self):
-        from music21 import stream, chord
+        from music21 import chord
         s = stream.Measure()
         c1 = chord.Chord('C4 E4 G4 C5')
         c1.quarterLength = 2.0
@@ -341,7 +341,7 @@ class Test(unittest.TestCase):
         
 
         cr = ChordReducer()
-        cr.printDebug = True
+        #cr.printDebug = True
         p = cr.multiPartReduction(c, maxChords = 3, closedPosition=True)
         #p = cr.multiPartReduction(c, closedPosition=True)
         c.insert(0, p)

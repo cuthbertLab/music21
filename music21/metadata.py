@@ -1566,9 +1566,13 @@ class RichMetadata(Metadata):
             if localValue != None and favorSelf:
                 continue
             else:
-                otherValue = getattr(other, name)
-                if otherValue is not None:
-                    setattr(self, name, otherValue)
+                try:
+                    if other is not None:
+                        otherValue = getattr(other, name)
+                        if otherValue is not None:
+                            setattr(self, name, otherValue)
+                except AttributeError:
+                    pass
 
 
     def update(self, streamObj):
@@ -1742,29 +1746,35 @@ class MetadataBundle(object):
                 # need to get scores from each opus?
                 # problem here is that each sub-work has metadata, but there
                 # is only a single source file
-                for s in post.scores:
-                    md = s.metadata
-                    # updgrade md to rmd
-                    rmd = RichMetadata()
-                    rmd.merge(md)
-                    rmd.update(s) # update based on Stream
-                    if md.number == None:
-                        environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', fp])
-                    else:
-                        # update path to include work number
-                        cp = self.corpusPathToKey(fp, number=md.number)
-                        environLocal.printDebug(['addFromPaths: storing:', cp])
-                        self.storage[cp] = rmd
+                for scoreNumber, s in enumerate(post.scores):
+                    try:
+                        md = s.metadata
+                        # updgrade md to rmd
+                        rmd = RichMetadata()
+                        rmd.merge(md)
+                        rmd.update(s) # update based on Stream
+                        if md.number == None:
+                            environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', fp])
+                        else:
+                            # update path to include work number
+                            cp = self.corpusPathToKey(fp, number=md.number)
+                            environLocal.printDebug(['addFromPaths: storing:', cp])
+                            self.storage[cp] = rmd
+                    except Exception as e:
+                        environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored" % (scoreNumber, fp))
                     del s # for memory conservation
             else:
-                md = post.metadata
-                if md is None:
-                    continue    
-                rmd = RichMetadata()
-                rmd.merge(md)
-                rmd.update(post) # update based on Stream
-                environLocal.printDebug(['updateMetadataCache: storing:', cp])
-                self.storage[cp] = rmd
+                try:
+                    md = post.metadata
+                    if md is None:
+                        continue    
+                    rmd = RichMetadata()
+                    rmd.merge(md)
+                    rmd.update(post) # update based on Stream
+                    environLocal.printDebug(['updateMetadataCache: storing:', cp])
+                    self.storage[cp] = rmd
+                except Exception as e:
+                    environLocal.warn("Had a problem with extracting metadata for %s, piece ignored" % (fp))
     
             # explicitly delete the imported object for memory conservation
             del post
