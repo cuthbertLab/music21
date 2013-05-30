@@ -48,7 +48,7 @@ def L(c, raiseException=False):
     
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = L(c3, raiseException=True)
+    ...     c4 = analysis.neoRiemannian.L(c3, raiseException=True)
     ... except analysis.neoRiemannian.LRPException:
     ...     pass
     
@@ -81,7 +81,7 @@ def P(c, raiseException=False):
     
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = P(c3, raiseException=True)
+    ...     c4 = analysis.neoRiemannian.P(c3, raiseException=True)
     ... except analysis.neoRiemannian.LRPException:
     ...     pass
     '''
@@ -113,7 +113,7 @@ def R(c, raiseException=False):
     
     >>> try:
     ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = R(c3, raiseException=True)
+    ...     c4 = analysis.neoRiemannian.R(c3, raiseException=True)
     ... except analysis.neoRiemannian.LRPException:
     ...     pass
     
@@ -319,3 +319,4 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
+
