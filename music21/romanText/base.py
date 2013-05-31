@@ -75,7 +75,6 @@ class RTToken(object):
 
     ::
     
-        
         >>> rtt = romanText.RTToken('||:')
         >>> rtt
         <RTToken '||:'>
@@ -148,7 +147,6 @@ class RTTagged(RTToken):
         Composer: Fanny Mendelssohn
         
     ::
-
         
         >>> rttag = romanText.RTTagged('Title: Die Jahrzeiten')
         >>> rttag.tag
@@ -183,7 +181,6 @@ class RTTagged(RTToken):
 
         ::
 
-            
             >>> rth = romanText.RTTagged('Composer: Claudio Monteverdi')
             >>> rth.isComposer()
             True
@@ -597,7 +594,6 @@ class RTAtom(RTToken):
 
     Each atom store a reference to its container (normally an RTMeasure).
 
-    
     >>> chordIV = romanText.RTAtom('IV')
     >>> beat4 = romanText.RTAtom('b4')
     
@@ -622,7 +618,6 @@ class RTChord(RTAtom):
     r'''An RTAtom subclass that defines a chord.  Also contains a reference to
     the container.
     
-    
     >>> chordIV = romanText.RTChord('IV')
     '''
     
@@ -641,7 +636,6 @@ class RTChord(RTAtom):
 class RTNoChord(RTAtom):
     r'''An RTAtom subclass that defines absence of a chord.  Also contains a
     reference to the container.
-    
     
     >>> chordNC = romanText.RTNoChord('NC')
     >>> chordNC
@@ -802,7 +796,6 @@ class RTAnalyticKey(RTKeyTypeAtom):
         being analyzed.  It does not in itself create a :class:~'music21.key.Key'
         object.
         
-        
         >>> gminor = romanText.RTAnalyticKey('g:')
         >>> gminor
         <RTAnalyticKey 'g:'>
@@ -829,7 +822,6 @@ class RTKeySignature(RTAtom):
         does it change the analysis taking place.
         
         The number after KS defines the number of sharps (negative for flats).
-        
         
         >>> gminor = romanText.RTKeySignature('KS-2')
         >>> gminor
@@ -874,7 +866,6 @@ class RTOptionalKeyOpen(RTAtom):
         affect the roman numeral analysis.  (For instance, it is
         possible to analyze in Bb major, while remaining in g minor)
         
-        
         >>> possibleKey = romanText.RTOptionalKeyOpen('?(Bb:')
         >>> possibleKey
         <RTOptionalKeyOpen '?(Bb:'>
@@ -905,7 +896,6 @@ class RTOptionalKeyClose(RTAtom):
 
         For example, it is ossible to analyze in Bb major, while remaining in g
         minor.
-        
         
         >>> possibleKey = romanText.RTOptionalKeyClose('?)Bb:')
         >>> possibleKey
@@ -939,7 +929,6 @@ class RTPhraseMarker(RTAtom):
 class RTPhraseBoundary(RTPhraseMarker):
     def __init__(self, src =u'||', container=None):
         '''
-        
         >>> phrase = romanText.RTPhraseBoundary('||')
         >>> phrase
         <RTPhraseBoundary '||'>
@@ -953,7 +942,6 @@ class RTPhraseBoundary(RTPhraseMarker):
 class RTEllisonStart(RTPhraseMarker):
     def __init__(self, src =u'|*', container=None):
         '''
-        
         >>> phrase = romanText.RTEllisonStart('|*')
         >>> phrase
         <RTEllisonStart '|*'>
@@ -967,7 +955,6 @@ class RTEllisonStart(RTPhraseMarker):
 class RTEllisonStop(RTPhraseMarker):
     def __init__(self, src =u'|*', container=None):
         '''
-        
         >>> phrase = romanText.RTEllisonStop('*|')
         >>> phrase
         <RTEllisonStop '*|'>
@@ -982,7 +969,6 @@ class RTRepeat(RTAtom):
 
     def __init__(self, src =u'', container=None):
         '''
-        
         >>> repeat = romanText.RTRepeat('||:')
         >>> repeat
         <RTRepeat '||:'>
@@ -997,7 +983,6 @@ class RTRepeatStart(RTRepeat):
 
     def __init__(self, src =u'||:', container=None):
         '''
-        
         >>> repeat = romanText.RTRepeatStart()
         >>> repeat
         <RTRepeatStart u'||:'>
@@ -1012,7 +997,6 @@ class RTRepeatStop(RTRepeat):
 
     def __init__(self, src =u':||', container=None):
         '''
-        
         >>> repeat = romanText.RTRepeatStop()
         >>> repeat
         <RTRepeatStop u':||'>
@@ -1040,7 +1024,6 @@ class RTHandler(object):
         '''Divide string into header and non-header; this is done before
         tokenization.
 
-        
         >>> rth = romanText.RTHandler()
         >>> rth.splitAtHeader(['Title: s', 'Time Signature:', '', 'm1 g: i'])
         (['Title: s', 'Time Signature:', ''], ['m1 g: i'])
@@ -1107,7 +1090,6 @@ class RTHandler(object):
         '''Given a line of data stored in measure consisting only of Atoms,
         tokenize and return a list.
 
-        
         >>> rth = romanText.RTHandler()
         >>> str(rth.tokenizeAtoms('IV b3 ii7 b4 ii'))
         "[<RTChord 'IV'>, <RTBeat 'b3'>, <RTChord 'ii7'>, <RTBeat 'b4'>, <RTChord 'ii'>]"
@@ -1185,7 +1167,6 @@ class RTHandler(object):
 
     def definesMovements(self, countRequired=2):
         '''Return True if more than one movement is defined in a RT file.
-
         
         >>> rth = romanText.RTHandler()
         >>> rth.process('Movement: 1 \\n Movement: 2 \\n \\n m1')
@@ -1208,7 +1189,6 @@ class RTHandler(object):
     def definesMovement(self):
         '''Return True if this handler has 1 or more movement.
 
-        
         >>> rth = romanText.RTHandler()
         >>> rth.process('Movement: 1 \\n \\n m1')
         >>> rth.definesMovements()
@@ -1222,24 +1202,35 @@ class RTHandler(object):
         '''If we have movements defined, return a list of RTHandler objects,
         representing header information and each movement, in order. 
 
-        
-        >>> rth = romanText.RTHandler()
-        >>> rth.process('Title: Test \\n Movement: 1 \\n m1 \\n Movement: 2 \\n m1')
-        >>> post = rth.splitByMovement(False)
-        >>> len(post)
-        3
-        >>> len(post[0])
-        1
-        >>> post[0].__class__
-        <class 'music21.romanText.base.RTHandler'>
-        >>> len(post[1]), len(post[2])
-        (2, 2)
+        ::
 
-        >>> post = rth.splitByMovement(duplicateHeader=True)
-        >>> len(post)
-        2
-        >>> len(post[0]), len(post[1])
-        (3, 3)
+            >>> rth = romanText.RTHandler()
+            >>> rth.process('Title: Test \\n Movement: 1 \\n m1 \\n Movement: 2 \\n m1')
+            >>> post = rth.splitByMovement(False)
+            >>> len(post)
+            3
+
+        ::
+
+            >>> len(post[0])
+            1
+
+        ::
+
+            >>> post[0].__class__
+            <class 'music21.romanText.base.RTHandler'>
+            >>> len(post[1]), len(post[2])
+            (2, 2)
+
+        ::
+
+            >>> post = rth.splitByMovement(duplicateHeader=True)
+            >>> len(post)
+            2
+            >>> len(post[0]), len(post[1])
+            (3, 3)
+
+        Return list.
         '''
         post = []
         sub = []
