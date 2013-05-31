@@ -73,13 +73,9 @@ class RTToken(object):
     A multi-pass parsing procedure is likely necessary, as RomanText permits
     variety of groupings and markings.
 
-    ::
-    
-        >>> rtt = romanText.RTToken('||:')
-        >>> rtt
-        <RTToken '||:'>
-
-    Return Roman text token.
+    >>> rtt = romanText.RTToken('||:')
+    >>> rtt
+    <RTToken '||:'>
     '''
     def __init__(self, src=u''):
         self.src = src # store source character sequence
@@ -146,19 +142,15 @@ class RTTagged(RTToken):
         Title: Die Jahrzeiten
         Composer: Fanny Mendelssohn
         
-    ::
-        
-        >>> rttag = romanText.RTTagged('Title: Die Jahrzeiten')
-        >>> rttag.tag
-        'Title'
-        >>> rttag.data
-        'Die Jahrzeiten'
-        >>> rttag.isTitle()
-        True
-        >>> rttag.isComposer()
-        False
-
-    Return Roman text tagged token.
+    >>> rttag = romanText.RTTagged('Title: Die Jahrzeiten')
+    >>> rttag.tag
+    'Title'
+    >>> rttag.data
+    'Die Jahrzeiten'
+    >>> rttag.isTitle()
+    True
+    >>> rttag.isComposer()
+    False
     '''
     def __init__(self, src =u''):
         RTToken.__init__(self, src)
@@ -179,19 +171,15 @@ class RTTagged(RTToken):
     def isComposer(self):
         '''True is the tag represents a composer.
 
-        ::
-
-            >>> rth = romanText.RTTagged('Composer: Claudio Monteverdi')
-            >>> rth.isComposer()
-            True
-            >>> rth.isTitle()
-            False
-            >>> rth.isWork()
-            False
-            >>> rth.data 
-            'Claudio Monteverdi'
-
-        Return boolean.
+        >>> rth = romanText.RTTagged('Composer: Claudio Monteverdi')
+        >>> rth.isComposer()
+        True
+        >>> rth.isTitle()
+        False
+        >>> rth.isWork()
+        False
+        >>> rth.data 
+        'Claudio Monteverdi'
         '''
         if self.tag.lower() in ['composer']:
             return True
@@ -200,40 +188,29 @@ class RTTagged(RTToken):
     def isTitle(self):
         '''True if tag represents a title, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('Title: This is a title.')
+        >>> tag.isTitle()
+        True
 
-            >>> tag = romanText.RTTagged('Title: This is a title.')
-            >>> tag.isTitle()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isTitle()
-            False
-
-        Return boolean.
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isTitle()
+        False
         '''
         if self.tag.lower() in ['title']:
             return True
         return False
 
     def isPiece(self):
-        '''True if tag represents a piece, otherwise False.
+        '''
+        True if tag represents a piece, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('Piece: This is a piece.')
+        >>> tag.isPiece()
+        True
 
-            >>> tag = romanText.RTTagged('Piece: This is a piece.')
-            >>> tag.isPiece()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isPiece()
-            False
-
-        Return boolean.
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isPiece()
+        False
         '''
         if self.tag.lower() in ['piece']:
             return True
@@ -242,19 +219,13 @@ class RTTagged(RTToken):
     def isAnalyst(self):
         '''True if tag represents a analyst, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('Analyst: This is an analyst.')
+        >>> tag.isAnalyst()
+        True
 
-            >>> tag = romanText.RTTagged('Analyst: This is an analyst.')
-            >>> tag.isAnalyst()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isAnalyst()
-            False
-
-        Return boolean.
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isAnalyst()
+        False
         '''
         if self.tag.lower() in ['analyst']:
             return True
@@ -263,19 +234,13 @@ class RTTagged(RTToken):
     def isProofreader(self):
         '''True if tag represents a proofreader, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('Proofreader: This is a proofreader.')
+        >>> tag.isProofreader()
+        True
 
-            >>> tag = romanText.RTTagged('Proofreader: This is a proofreader.')
-            >>> tag.isProofreader()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isProofreader()
-            False
-
-        Return boolean.
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isProofreader()
+        False
         '''
         if self.tag.lower() in ['proofreader', 'proof reader']:
             return True
@@ -284,21 +249,15 @@ class RTTagged(RTToken):
     def isTimeSignature(self):
         '''True if tag represents a time signature, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('TimeSignature: This is a time signature.')
+        >>> tag.isTimeSignature()
+        True
 
-            >>> tag = romanText.RTTagged('TimeSignature: This is a time signature.')
-            >>> tag.isTimeSignature()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isTimeSignature()
-            False
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isTimeSignature()
+        False
 
         TimeSignature header data can be found intermingled with measures. 
-
-        Return boolean.
         '''
         if self.tag.lower() in ['timesignature', 'time signature']:
             return True
@@ -307,17 +266,13 @@ class RTTagged(RTToken):
     def isKeySignature(self):
         '''True if tag represents a key signature, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('KeySignature: This is a key signature.')
+        >>> tag.isKeySignature()
+        True
 
-            >>> tag = romanText.RTTagged('KeySignature: This is a key signature.')
-            >>> tag.isKeySignature()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isKeySignature()
-            False
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isKeySignature()
+        False
 
         KeySignatures are a type of tagged data found outside of measures,
         such as "Key Signature: Bb," meaning one flat.
@@ -325,8 +280,6 @@ class RTTagged(RTToken):
         Note: this is not the same as a key definition found inside of a
         Measure. These are represented by RTKey objects, defined below, and are
         not RTTagged objects, but RTAtom subclasses. 
-
-        Return boolean.
         '''
         if self.tag.lower() in ['keysignature', 'key signature']:
             return True
@@ -336,19 +289,13 @@ class RTTagged(RTToken):
     def isNote(self):
         '''True if tag represents a note, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('Note: This is a note.')
+        >>> tag.isNote()
+        True
 
-            >>> tag = romanText.RTTagged('Note: This is a note.')
-            >>> tag.isNote()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isNote()
-            False
-
-        Return boolean.
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isNote()
+        False
         '''
         if self.tag.lower() in ['note']:
             return True
@@ -357,19 +304,13 @@ class RTTagged(RTToken):
     def isForm(self):
         '''True if tag represents a form, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('Form: This is a form.')
+        >>> tag.isForm()
+        True
 
-            >>> tag = romanText.RTTagged('Form: This is a form.')
-            >>> tag.isForm()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isForm()
-            False
-
-        Return boolean.
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isForm()
+        False
         '''
         if self.tag.lower() in ['form']:
             return True
@@ -378,19 +319,13 @@ class RTTagged(RTToken):
     def isPedal(self):
         '''True if tag represents a pedal, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('Pedal: This is a pedal.')
+        >>> tag.isPedal()
+        True
 
-            >>> tag = romanText.RTTagged('Pedal: This is a pedal.')
-            >>> tag.isPedal()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isPedal()
-            False
-
-        Return boolean.
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isPedal()
+        False
         '''
         if self.tag.lower() in ['pedal']:
             return True
@@ -402,19 +337,15 @@ class RTTagged(RTToken):
         The "work" is not defined as a header tag, but is used to represent
         all tags, often placed after Composer, for the work or pieces designation. 
 
-        ::
-
-            >>> rth = romanText.RTTagged('Madrigal: 4.12')
-            >>> rth.isTitle()
-            False
-            >>> rth.isWork()
-            True
-            >>> rth.tag
-            'Madrigal'
-            >>> rth.data 
-            '4.12'
-
-        Return boolean.
+        >>> rth = romanText.RTTagged('Madrigal: 4.12')
+        >>> rth.isTitle()
+        False
+        >>> rth.isWork()
+        True
+        >>> rth.tag
+        'Madrigal'
+        >>> rth.data 
+        '4.12'
         '''
         if self.tag == 'Work' or self.tag == 'Madrigal':
             return True
@@ -424,19 +355,13 @@ class RTTagged(RTToken):
     def isMovement(self):
         '''True if tag represents a movement, otherwise False.
 
-        ::
+        >>> tag = romanText.RTTagged('Movement: This is a movement.')
+        >>> tag.isMovement()
+        True
 
-            >>> tag = romanText.RTTagged('Movement: This is a movement.')
-            >>> tag.isMovement()
-            True
-
-        ::
-
-            >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
-            >>> tag.isMovement()
-            False
-
-        Return boolean.
+        >>> tag = romanText.RTTagged('Nothing: Nothing at all.')
+        >>> tag.isMovement()
+        False
         '''
         if self.tag.lower() in ['movement']:
             return True
@@ -467,7 +392,6 @@ class RTMeasure(RTToken):
     Endings are indicated by a single letter after the measure number, such as
     "a" for first ending.
 
-    
     >>> rtm = romanText.RTMeasure('m15a V6 b1.5 V6/5 b2 I b3 viio6')
     >>> rtm.data
     'V6 b1.5 V6/5 b2 I b3 viio6'
@@ -498,7 +422,6 @@ class RTMeasure(RTToken):
         '''Return the number or numbers as a list, as well as any repeat
         indications.
 
-        
         >>> rtm = romanText.RTMeasure()
         >>> rtm._getMeasureNumberData('m77')
         ([77], [''])
@@ -568,7 +491,6 @@ class RTMeasure(RTToken):
         '''If this measure defines a copy operation, return two lists defining
         the measures to copy; the second list has the repeat data.
 
-        
         >>> rtm = romanText.RTMeasure('m35-36 = m29-30')
         >>> rtm.number
         [35, 36]
@@ -671,7 +593,6 @@ class RTBeat(RTAtom):
         '''Given a time signature, return the offset position specified by this
         beat.
 
-        
         >>> rtb = romanText.RTBeat('b1.5')
         >>> rtb.getOffset(meter.TimeSignature('3/4'))
         0.5
@@ -760,7 +681,6 @@ class RTKey(RTKeyTypeAtom):
         in the analyzed Key.
         
         They are defined by ";:" after the Key.
-        
         
         >>> gminor = romanText.RTKey('g;:')
         >>> gminor
@@ -1202,35 +1122,26 @@ class RTHandler(object):
         '''If we have movements defined, return a list of RTHandler objects,
         representing header information and each movement, in order. 
 
-        ::
+        >>> rth = romanText.RTHandler()
+        >>> rth.process('Title: Test \\n Movement: 1 \\n m1 \\n Movement: 2 \\n m1')
+        >>> post = rth.splitByMovement(False)
+        >>> len(post)
+        3
 
-            >>> rth = romanText.RTHandler()
-            >>> rth.process('Title: Test \\n Movement: 1 \\n m1 \\n Movement: 2 \\n m1')
-            >>> post = rth.splitByMovement(False)
-            >>> len(post)
-            3
+        >>> len(post[0])
+        1
 
-        ::
+        >>> post[0].__class__
+        <class 'music21.romanText.base.RTHandler'>
+        >>> len(post[1]), len(post[2])
+        (2, 2)
 
-            >>> len(post[0])
-            1
+        >>> post = rth.splitByMovement(duplicateHeader=True)
+        >>> len(post)
+        2
 
-        ::
-
-            >>> post[0].__class__
-            <class 'music21.romanText.base.RTHandler'>
-            >>> len(post[1]), len(post[2])
-            (2, 2)
-
-        ::
-
-            >>> post = rth.splitByMovement(duplicateHeader=True)
-            >>> len(post)
-            2
-            >>> len(post[0]), len(post[1])
-            (3, 3)
-
-        Return list.
+        >>> len(post[0]), len(post[1])
+        (3, 3)
         '''
         post = []
         sub = []

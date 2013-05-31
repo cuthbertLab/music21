@@ -151,8 +151,7 @@ def _copySingleMeasure(t, p, kCurrent):
     #environLocal.printDebug(['calling _copySingleMeasure()'])
     targetNumber, unused_targetRepeat = t.getCopyTarget()
     if len(targetNumber) > 1: # this is an encoding error
-        raise RomanTextTranslateException('a single measure cannot define a ' \
-            'copy operation for multiple measures')
+        raise RomanTextTranslateException('a single measure cannot define a copy operation for multiple measures')
     # TODO: ignoring repeat letters
     target = targetNumber[0]
     for mPast in p.getElementsByClass('Measure'):
@@ -160,16 +159,12 @@ def _copySingleMeasure(t, p, kCurrent):
             try:
                 m = copy.deepcopy(mPast)
             except TypeError:
-                raise RomanTextTranslateException('Failed to copy measure %d: ' \
-                    'did you perhaps parse an RTOpus object with ' \
-                    'romanTextToStreamScore instead of romanTextToStreamOpus?' % \
-                    (mPast.number))
+                raise RomanTextTranslateException('Failed to copy measure %d: did you perhaps parse an RTOpus object with romanTextToStreamScore instead of romanTextToStreamOpus?' % (mPast.number))
             m.number = t.number[0]
             # update all keys
             for rnPast in m.getElementsByClass('RomanNumeral'):
                 if kCurrent is None: # should not happen
-                    raise RomanTextTranslateException('attempting to copy a ' \
-                        'measure but no past key definitions are found')
+                    raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
                     kCurrent = rnPast.key
                 else:
@@ -192,18 +187,15 @@ def _copyMultipleMeasures(t, p, kCurrent):
 
     targetNumbers, unused_targetRepeat = t.getCopyTarget()
     if len(targetNumbers) == 1: # this is an encoding error
-        raise RomanTextTranslateException('a multiple measure range cannot copy ' \
-            'a single measure')
+        raise RomanTextTranslateException('a multiple measure range cannot copy a single measure')
     # TODO: ignoring repeat letters
     targetStart = targetNumbers[0]
     targetEnd = targetNumbers[1]
     
     if t.number[1] - t.number[0] != targetEnd - targetStart:
-        raise RomanTextTranslateException('both the source and destination ' \
-            'sections need to have the same number of measures')
+        raise RomanTextTranslateException('both the source and destination sections need to have the same number of measures')
     elif t.number[0] < targetEnd:
-        raise RomanTextTranslateException('the source section cannot overlap ' \
-            'with the destination section')
+        raise RomanTextTranslateException('the source section cannot overlap with the destination section')
 
     measures = []
     for mPast in p.getElementsByClass('Measure'):
@@ -211,19 +203,14 @@ def _copyMultipleMeasures(t, p, kCurrent):
             try:
                 m = copy.deepcopy(mPast)
             except TypeError:
-                raise RomanTextTranslateException('Failed to copy measure %d ' \
-                    'to measure range %d-%d: did you perhaps parse an RTOpus ' \
-                        'object with romanTextToStreamScore instead of ' \
-                        'romanTextToStreamOpus?' % \
-                        (mPast.number, targetStart, targetEnd))
+                raise RomanTextTranslateException('Failed to copy measure %d to measure range %d-%d: did you perhaps parse an RTOpus object with romanTextToStreamScore instead of romanTextToStreamOpus?' % (mPast.number, targetStart, targetEnd))
             
             m.number = t.number[0] + mPast.number - targetStart
             measures.append(m)
             # update all keys
             for rnPast in m.getElementsByClass('RomanNumeral'):
                 if kCurrent is None: # should not happen
-                    raise RomanTextTranslateException('attempting to copy a ' \
-                        'measure but no past key definitions are found')
+                    raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
                     kCurrent = rnPast.key
                 else:
@@ -237,22 +224,18 @@ def _getKeyAndPrefix(rtKeyOrString):
     '''Given an RTKey specification, return the Key and a string prefix based
     on the tonic:
 
-    ::
-
-        >>> romanText.translate._getKeyAndPrefix('c')
-        (<music21.key.Key of c minor>, 'c: ')
-        >>> romanText.translate._getKeyAndPrefix('F#')
-        (<music21.key.Key of F# major>, 'F#: ')
-        >>> romanText.translate._getKeyAndPrefix('Eb')
-        (<music21.key.Key of E- major>, 'E-: ')
-        >>> romanText.translate._getKeyAndPrefix('Bb')
-        (<music21.key.Key of B- major>, 'B-: ')
-        >>> romanText.translate._getKeyAndPrefix('bb')
-        (<music21.key.Key of b- minor>, 'b-: ')
-        >>> romanText.translate._getKeyAndPrefix('b#')
-        (<music21.key.Key of b# minor>, 'b#: ')
-
-    Return tuple.
+    >>> romanText.translate._getKeyAndPrefix('c')
+    (<music21.key.Key of c minor>, 'c: ')
+    >>> romanText.translate._getKeyAndPrefix('F#')
+    (<music21.key.Key of F# major>, 'F#: ')
+    >>> romanText.translate._getKeyAndPrefix('Eb')
+    (<music21.key.Key of E- major>, 'E-: ')
+    >>> romanText.translate._getKeyAndPrefix('Bb')
+    (<music21.key.Key of B- major>, 'B-: ')
+    >>> romanText.translate._getKeyAndPrefix('bb')
+    (<music21.key.Key of b- minor>, 'b-: ')
+    >>> romanText.translate._getKeyAndPrefix('b#')
+    (<music21.key.Key of b# minor>, 'b#: ')
     '''
     from music21 import key
     if common.isStr(rtKeyOrString):
@@ -314,7 +297,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     for t in rtHandler.tokens:
         try:
 
-            #environLocal.printDebug(['token', t])
+            # environLocal.printDebug(['token', t])
             if t.isTitle():
                 md.title = t.data            
 
@@ -333,7 +316,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             elif t.isTimeSignature():
                 tsCurrent = meter.TimeSignature(t.data)
                 tsSet = False
-                #environLocal.printDebug(['tsCurrent:', tsCurrent])
+                # environLocal.printDebug(['tsCurrent:', tsCurrent])
 
             elif t.isKeySignature():
                 if t.data == "":
@@ -343,20 +326,20 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 else:
                     pass 
                     # better to print a message
-                    #environLocal.printDebug(['still need to write a generic RomanText KeySignature routine.  this is just temporary'])
-                    #raise RomanTextTranslateException("still need to write a generic RomanText KeySignature routine.  this is just temporary")
+                    # environLocal.printDebug(['still need to write a generic RomanText KeySignature routine.  this is just temporary'])
+                    # raise RomanTextTranslateException("still need to write a generic RomanText KeySignature routine.  this is just temporary")
                 keySigSet = False
-                #environLocal.printDebug(['keySigCurrent:', keySigCurrent])
+                # environLocal.printDebug(['keySigCurrent:', keySigCurrent])
                 foundAKeySignatureSoFar = True
 
             elif t.isMeasure():
-                #environLocal.printDebug(['handling measure token:', t])
+                # environLocal.printDebug(['handling measure token:', t])
     
                 if t.variantNumber is not None:
-                    #environLocal.printDebug(['skipping variant: %s' % t])
+                    # environLocal.printDebug(['skipping variant: %s' % t])
                     continue
                 if t.variantLetter is not None:
-                    #environLocal.printDebug(['skipping variant: %s' % t])
+                    # environLocal.printDebug(['skipping variant: %s' % t])
                     continue
     
                 # if this measure number is more than 1 greater than the last
@@ -430,13 +413,13 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             # found a change of Key+KeySignature or
                             # just found a change of analysis but no keysignature so far
                     
-                            #environLocal.printDebug(['handling key token:', a])
+                            # environLocal.printDebug(['handling key token:', a])
                             try: # this sets the key and the keysignature
                                 kCurrent, pl = _getKeyAndPrefix(a)
                                 prefixLyric += pl
                             except:
                                 raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
-                            #insert at beginning of measure if at beginning -- for things like pickups.
+                            # insert at beginning of measure if at beginning -- for things like pickups.
                             if m.number < 2:
                                 m.insert(0, kCurrent)
                             else:
