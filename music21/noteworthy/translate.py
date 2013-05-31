@@ -860,7 +860,8 @@ class Test(unittest.TestCase):
         pass
     def testBasic(self):
         import os
-        nwcTranslatePath = os.path.dirname(__file__)
+        from music21 import common
+        nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
         simplePath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt'#'NWCTEXT_Really_complete_example_file.nwctxt' # ## #'Part_OWeisheit.nwctxt' #
         myScore = NoteworthyTranslator().parseFile(simplePath)
         self.assertEqual(len(myScore.flat.notes), 1)
@@ -908,7 +909,8 @@ class TestExternal(unittest.TestCase):
         pass
     def testPaert(self):
         import os
-        nwcTranslatePath = os.path.dirname(__file__)
+        from music21 import common
+        nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
         paertPath = nwcTranslatePath + os.path.sep + 'NWCTEXT_Really_complete_example_file.nwctxt' #'Part_OWeisheit.nwctxt' #
         #paertPath = r'D:\docs\research\music21\elvis\Wegman Masses\01\Caput\01 Kyrie.nwctxt'
         myScore = NoteworthyTranslator().parseFile(paertPath)

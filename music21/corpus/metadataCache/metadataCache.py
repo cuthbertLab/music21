@@ -78,8 +78,61 @@ def cacheMetadata(domainList=['local','core', 'virtual']):
     environLocal.warn(['cache: final writing time:', t])
     
     for fp in fpError:
-        environLocal.warn('path failed to parse: %s' % fp)        
+        environLocal.warn('path failed to parse: %s' % fp)
 
+### multiprocessing module
+
+def cacheCoreMetadataMultiprocess(ipythonMod = None, stopAfter = None): 
+    '''The core cache is all locally-stored corpus files. 
+    '''
+    from music21 import corpus, metadata
+
+    t = common.Timer()
+    t.start()
+
+    # store list of file paths that caused an error
+    #fpError = []
+
+    mdb = metadata.MetadataBundle('core')
+
+    pathsFull = corpus.getCorePaths()
+    pathsShort = []
+    lenCorpusPath = len(common.getCorpusFilePath())
+    
+    for i,p in enumerate(pathsFull):
+        pathsShort.append(p[lenCorpusPath:])
+        if stopAfter is not None and i >= stopAfter:
+            break
+    
+    environLocal.warn([
+            'metadata cache: starting processing of paths:', len(pathsShort)])
+    
+    #mdb.addFromPaths(paths[-3:])
+    # returns any paths that failed to load
+    for i in range(0, len(pathsShort), 100):
+        maxI = min(i+100, len(pathsShort))
+        pathsChunk = pathsShort[i:maxI]
+        environLocal.warn('Starting multiprocessing with chunk %d, first is %s' % (i, pathsChunk[0]))
+        allKeys = ipythonMod.map_async(cacheCoreMetadataMultiprocessHelper, pathsChunk)
+        for thisKey in allKeys:
+            for thisSubKey in thisKey:
+                    mdb.storage[thisSubKey[0]] = thisSubKey[1]
+    
+    #print mdb.storage
+    mdb.write() # will use a default file path based on domain
+
+    environLocal.warn(['cache: writing time:', t, 'md items:', len(mdb.storage)])
+    del mdb
+
+def cacheCoreMetadataMultiprocessHelper(filePath = None):
+    from music21 import metadata
+    mdb = metadata.MetadataBundle('core')
+    unused_fpError = mdb.addFromPaths([filePath], printDebugAfter = 0, useCorpus=True) 
+    allRetElements = []
+    for thisKey in mdb.storage:
+        appendTuple = (thisKey, mdb.storage[thisKey])
+        allRetElements.append(appendTuple)
+    return allRetElements
 
 if __name__ == "__main__":
     import sys

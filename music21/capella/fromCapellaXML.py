@@ -888,7 +888,8 @@ class TestExternal(unittest.TestCase):
         ci = CapellaImporter()
         #ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
         import os
-        capellaDirPath = os.path.dirname(__file__)
+        from music21 import common
+        capellaDirPath = common.getSourceFilePath() + os.path.sep + 'capella'
         oswaldPath = capellaDirPath + os.path.sep + r'Nu_rue_mit_sorgen.capx'
         partScore = ci.scoreFromFile(oswaldPath)
         partScore.show()
@@ -896,7 +897,8 @@ class TestExternal(unittest.TestCase):
     def xtestImportSorgen(self):
         ci = CapellaImporter()
         import os
-        capellaDirPath = os.path.dirname(__file__)
+        from music21 import common
+        capellaDirPath = common.getSourceFilePath() + os.path.sep + 'capella'
         oswaldPath = capellaDirPath + os.path.sep + r'Nu_rue_mit_sorgen.capx'
 
         ci.readCapellaXMLFile(oswaldPath)

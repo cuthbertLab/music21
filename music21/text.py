@@ -21,7 +21,6 @@ import random
 
 from music21 import base
 from music21 import exceptions21
-from music21 import languageExcerpts
 from music21 import environment
 from music21 import common
 
@@ -527,7 +526,8 @@ class LanguageDetector(object):
     
     def readExcerpts(self):
         for languageCode in self.languageCodes:
-            f = open(os.path.dirname(languageExcerpts.__file__) + os.path.sep + languageCode + '.txt')                
+            thisExcerpt = common.getSourceFilePath() + os.sep + 'languageExcerpts' + os.sep + languageCode + '.txt'
+            f = open(thisExcerpt)                
             self.trigrams[languageCode] = Trigram(f.read().split())
             f.close()
 

@@ -325,7 +325,7 @@ class ConverterNoteworthy(object):
     
     
     >>> import os #_DOCS_HIDE
-    >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__) #_DOCS_HIDE 
+    >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
     >>> paertPath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE 
     >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
     >>> paertStream = converter.parse(paertPath)
@@ -361,7 +361,7 @@ class ConverterNoteworthy(object):
         
         
         >>> import os #_DOCS_HIDE
-        >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__) #_DOCS_HIDE
+        >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
         >>> filePath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
         >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt') 
         >>> c = converter.ConverterNoteworthy()

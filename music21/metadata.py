@@ -1701,7 +1701,7 @@ class MetadataBundle(object):
     
     
 
-    def addFromPaths(self, pathList, printDebugAfter = 0):
+    def addFromPaths(self, pathList, printDebugAfter = 0, useCorpus=False):
         '''Parse and store metadata from numerous files.
 
         If any files cannot be loaded, their file paths 
@@ -1726,7 +1726,8 @@ class MetadataBundle(object):
         fpError = [] # store errors
 
         # converter imports modules that import metadata
-        from music21 import converter
+        from music21 import converter, corpus
+        
         numberConverted = 0
         for fp in pathList:
             environLocal.printDebug(['updateMetadataCache: examining:', fp])
@@ -1736,7 +1737,10 @@ class MetadataBundle(object):
             numberConverted += 1
             cp = self.corpusPathToKey(fp)
             try:
-                post = converter.parse(fp, forceSource=True)
+                if useCorpus is False:
+                    post = converter.parse(fp, forceSource=True)
+                else:
+                    post = corpus.parse(fp, forceSource=True)
             except:
                 environLocal.warn('parse failed: %s' % fp)
                 fpError.append(fp)
@@ -1746,23 +1750,27 @@ class MetadataBundle(object):
                 # need to get scores from each opus?
                 # problem here is that each sub-work has metadata, but there
                 # is only a single source file
-                for scoreNumber, s in enumerate(post.scores):
-                    try:
-                        md = s.metadata
-                        # updgrade md to rmd
-                        rmd = RichMetadata()
-                        rmd.merge(md)
-                        rmd.update(s) # update based on Stream
-                        if md.number == None:
-                            environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', fp])
-                        else:
-                            # update path to include work number
-                            cp = self.corpusPathToKey(fp, number=md.number)
-                            environLocal.printDebug(['addFromPaths: storing:', cp])
-                            self.storage[cp] = rmd
-                    except Exception as e:
-                        environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored" % (scoreNumber, fp))
-                    del s # for memory conservation
+                try:
+                    for scoreNumber, s in enumerate(post.scores):
+                        try:
+                            md = s.metadata
+                            # updgrade md to rmd
+                            rmd = RichMetadata()
+                            rmd.merge(md)
+                            rmd.update(s) # update based on Stream
+                            if md.number == None:
+                                environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', fp])
+                            else:
+                                # update path to include work number
+                                cp = self.corpusPathToKey(fp, number=md.number)
+                                environLocal.printDebug(['addFromPaths: storing:', cp])
+                                self.storage[cp] = rmd
+                        except Exception as e:
+                            environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored: %s" % (scoreNumber, fp, str(e)))
+                        del s # for memory conservation
+                except Exception as e:
+                    environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored: %s" % (scoreNumber, fp, str(e)))
+
             else:
                 try:
                     md = post.metadata

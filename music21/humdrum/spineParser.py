@@ -2542,7 +2542,7 @@ class Test(unittest.TestCase):
         
     def testParseSineNomine(self):
         from music21 import converter
-        parserPath = os.path.dirname(__file__)
+        parserPath = common.getSourceFilePath() + os.path.sep + 'humdrum'
         sineNominePath = parserPath + os.path.sep + 'Missa_Sine_nomine-Kyrie.krn'
         unused_myScore = converter.parse(sineNominePath)
         #unused_myScore.show('text')
