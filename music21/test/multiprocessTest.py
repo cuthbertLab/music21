@@ -22,12 +22,14 @@ building a new release.
 
 Run test/testDocumentation after this.
 '''
+import doctest
+import importlib
 import multiprocessing
+import os
+import sys
 import time
-
-import unittest, doctest
-import os, sys
 import types
+import unittest
 
 import music21
 from music21 import base
@@ -233,11 +235,12 @@ def runOneModuleWithoutImp(args):
     
     try:
         moduleName = modGath._getName(fp)
-        docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
-    
-        
-        s1 = doctest.DocTestSuite(optionflags=docTestOptions)
-    
+        globs = importlib.import_module('music21').__dict__.copy()
+        docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE|doctest.REPORT_ONLY_FIRST_FAILURE)
+        s1 = doctest.DocTestSuite(
+            globs=globs,
+            optionflags=docTestOptions,
+            )
         
         # get Test classes in moduleObject
         if not hasattr(moduleObject, 'Test'):
@@ -245,7 +248,11 @@ def runOneModuleWithoutImp(args):
         else:
             s1.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(moduleObject.Test))
         try:
-            s3 = doctest.DocTestSuite(moduleObject, optionflags=docTestOptions)
+            globs = importlib.import_module('music21').__dict__.copy()
+            s3 = doctest.DocTestSuite(moduleObject,
+                globs=globs,
+                optionflags=docTestOptions,
+                )
             s1.addTests(s3)
         except ValueError:
             environLocal.printDebug('%s cannot load Doctests' % moduleObject)

@@ -35,7 +35,7 @@ available after importing music21.
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
 
->>> from music21 import *
+
 >>> base.Music21Object
 <class 'music21.base.Music21Object'>
 '''
@@ -48,9 +48,11 @@ VERSION_STR = "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
 
 import codecs
 import copy
+import doctest
+import importlib
 import sys
 import types
-import unittest, doctest
+import unittest
 #import uuid
 
 #-----all exceptions are in the exceptions21 package.
@@ -227,7 +229,7 @@ class Sites(object):
     def __len__(self):
         '''Return the total number of references.
 
-        >>> from music21 import *
+        
         >>> class Mock(base.Music21Object): 
         ...     pass
         >>> aObj = Mock()
@@ -250,7 +252,7 @@ class Sites(object):
         though the new Note instance is not actually found in the old Stream.
 
         >>> import copy
-        >>> from music21 import *
+        
         >>> class Mock(base.Music21Object): 
         ...     pass
         >>> aObj = Mock()
@@ -304,7 +306,7 @@ class Sites(object):
         '''
         Unwrap any and all weakrefs stored.
 
-        >>> from music21 import *
+        
         >>> class Mock(base.Music21Object): 
         ...     pass
         >>> aObj = Mock()
@@ -346,7 +348,7 @@ class Sites(object):
         '''
         Wrap all stored objects with weakrefs.
 
-        >>> from music21 import *
+        
         >>> class Mock(base.Music21Object): 
         ...     pass
         >>> aObj = Mock()
@@ -497,7 +499,7 @@ class Sites(object):
             streamObj.remove(elObj)
 
 
-        >>> from music21 import *
+        
         >>> class Mock(base.Music21Object): 
         ...     pass
         >>> aSite = Mock()
@@ -1512,7 +1514,7 @@ class Music21Object(object):
         
         All undefined classes have classSortOrder of 20 -- same as note.Note
         
-        >>> from music21 import *
+        
         >>> m21o = base.Music21Object()
         >>> m21o.classSortOrder
         20
@@ -1590,7 +1592,7 @@ class Music21Object(object):
         `id` and `groups` attributes from another music21 object. 
         Can be useful for copy-like operations.
 
-        >>> from music21 import *
+        
         >>> m1 = base.Music21Object()
         >>> m2 = base.Music21Object()
         >>> m1.id = 'music21Object1'
@@ -1725,7 +1727,7 @@ class Music21Object(object):
         object belongs to -- starting with the object's class name and going up the mro()
         for the object.  Very similar to Perl's @ISA array:
     
-        >>> from music21 import *
+        
         >>> q = note.QuarterNote()
         >>> q.classes
         ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
@@ -1763,7 +1765,7 @@ class Music21Object(object):
         object belongs to -- starting with the object's class name and going up the mro()
         for the object.  Very similar to Perl's @ISA array:
     
-        >>> from music21 import *
+        
         >>> q = note.QuarterNote()
         >>> q.fullyQualifiedClasses
         ['music21.note.QuarterNote', 'music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 'music21.base.Music21Object', '__builtin__.object']
@@ -1783,7 +1785,7 @@ class Music21Object(object):
         we search its activeSite and up through the hierarchy until we find a value for
         this attribute.  Or it Returns None if there is no match. 
 
-        >>> from music21 import *
+        
         >>> m = stream.Measure()
         >>> m.number = 12
         >>> n = note.Note()
@@ -1848,7 +1850,7 @@ class Music21Object(object):
         Note that this is different than the getOffsetByElement() method on 
         Stream in that this can never access the flat representation of a Stream.
 
-        >>> from music21 import *
+        
         >>> n = note.Note('A-4')  # a Music21Objecct
         >>> n.offset = 30
         >>> n.getOffsetBySite(None)
@@ -2028,7 +2030,7 @@ class Music21Object(object):
         '''
         Return True if other is a site in this Music21Object
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> n = note.Note()
         >>> s.append(n)
@@ -2108,7 +2110,7 @@ class Music21Object(object):
         This is determined by looking 
         for a SpannerStorage Stream class as a Site.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n2 = note.Note()
         >>> n3 = note.Note()
@@ -2138,7 +2140,7 @@ class Music21Object(object):
         Stream subclass, SpannerStorage, internally to keep track
         of the elements that are spanned.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')
         >>> sp1 = spanner.Slur(n1, n2)
@@ -2217,7 +2219,7 @@ class Music21Object(object):
         This is determined by looking 
         for a VariantStorage Stream class as a Site.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n2 = note.Note()
         >>> n3 = note.Note()
@@ -2377,7 +2379,7 @@ class Music21Object(object):
         element in its current hierarchy.  For instance, take this stream of
         changing time signatures:
         
-        >>> from music21 import *
+        
         >>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
         >>> s2 = s1.makeMeasures()
         >>> s2.show('t')
@@ -2799,7 +2801,7 @@ class Music21Object(object):
 
         The `flattenLocalSites` parameter determines if the sites of this element (e.g., a Measure's Part) are flattened on first search. When True, elements contained in adjacent containers may be selected first. 
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bwv66.6')
         >>> s.parts[0].measure(3).next() == s.parts[0].measure(4)
         True
@@ -2819,7 +2821,7 @@ class Music21Object(object):
 
         The `flattenLocalSites` parameter determines if the sites of this element (e.g., a Measure's Part) are flattened on first search. When True, elements contained in adjacent containers may be selected first. 
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bwv66.6')
         >>> s.parts[0].measure(3).previous() == s.parts[0].measure(2)
         True
@@ -2879,7 +2881,7 @@ class Music21Object(object):
         activeSite attribute is automatically set when an the 
         object is attached to a Stream.
         
-        >>> from music21 import *
+        
         >>> n = note.Note("C#4")
         >>> p = stream.Part()
         >>> p.insert(20.0, n)
@@ -2905,7 +2907,7 @@ class Music21Object(object):
     def _getOffset(self):
         '''Get the offset for the activeSite.
         
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> m = stream.Measure()
         >>> m.id = 'm1'
@@ -2992,7 +2994,7 @@ class Music21Object(object):
 
         If we put a `Note` into a `Stream`, we will see the activeSite changes.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note("D#3")
         >>> n1.activeSite is None
         True
@@ -3038,7 +3040,7 @@ class Music21Object(object):
         The property can also set the offset for the object if no 
         container has been set:
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n1.id = 'hi'
         >>> n1.offset = 20
@@ -3112,7 +3114,7 @@ class Music21Object(object):
     isGrace = property(_getIsGrace, doc = '''
         Return True or False if this music21 object has a GraceDuration.
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.isGrace
         False
@@ -3477,7 +3479,7 @@ class Music21Object(object):
         is contained within. This provides a way of seeing 
         Streams contained within Streams.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv66.6')
         >>> [str(e.__class__) for e in s[1][2][3].derivationHierarchy]
         ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"]
@@ -3490,7 +3492,7 @@ class Music21Object(object):
         Split an Element into two Elements at a provided 
         `quarterLength` (offset) into the Element.
 
-        >>> from music21 import *
+        
         >>> a = note.Note('C#5')
         >>> a.duration.type = 'whole'
         >>> a.articulations = [articulations.Staccato()]
@@ -3669,7 +3671,7 @@ class Music21Object(object):
         that are partitioned and tied with the specified quarter 
         length list durations.
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = 3
         >>> post = n.splitByQuarterLengths([1,1,1])
@@ -3763,7 +3765,7 @@ class Music21Object(object):
         
         Fermatas should be on last note, but not done yet.
 
-        >>> from music21 import *
+        
         >>> a = note.Note()
         >>> a.duration.clear() # remove defaults
         >>> a.duration.addDurationUnit(duration.Duration('half'))
@@ -3877,7 +3879,7 @@ class Music21Object(object):
         :class:`~music21.stream.Measure` object.  Otherwise it will use :meth:`~music21.base.Music21Object.getContextByClass`
         to find the number of the measure it was most recently added to. 
         
-        >>> from music21 import *
+        
         >>> m = stream.Measure()
         >>> m.number = 12
         >>> n = note.Note()
@@ -3920,7 +3922,7 @@ class Music21Object(object):
         defined as `paddingLeft` (for pickup measures, etc.), padding will be added to the 
         native offset gathered from the object. 
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = 2
         >>> m = stream.Measure()
@@ -3966,7 +3968,7 @@ class Music21Object(object):
         otherwise based on meter modulus of the TimeSignature. 
         This assumes that a TimeSignature has already been found.
 
-        >>> from music21 import *
+        
         >>> m = stream.Measure()
         >>> ts1 = meter.TimeSignature('3/4')
         >>> m.insert(0, ts1)
@@ -4010,7 +4012,7 @@ class Music21Object(object):
         Return a beat designation based on local 
         Measure and TimeSignature
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = 2
         >>> m = stream.Measure()
@@ -4040,7 +4042,7 @@ class Music21Object(object):
         contain a floating-point designation between 0 and 1 to 
         show proportional progress through the beat.
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = .5
         >>> m = stream.Measure()
@@ -4076,7 +4078,7 @@ class Music21Object(object):
         Measure. Beat values count from 1 and contain a 
         fractional designation to show progress through the beat.
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = .5
         >>> m = stream.Measure()
@@ -4101,7 +4103,7 @@ class Music21Object(object):
         active for this object as found in the most recently 
         positioned Measure.
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = 2
         >>> m = stream.Measure()
@@ -4123,7 +4125,7 @@ class Music21Object(object):
 
         If extending beyond the Measure, or in a Stream with a TimeSignature, the meter modulus value will be returned. 
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = .5
         >>> m = stream.Measure()
@@ -4147,7 +4149,7 @@ class Music21Object(object):
     def _getBeatStrength(self):
         '''Return an accent weight based on local Measure and TimeSignature. If the offset of this object does not match a defined accent weight, a minimum accent weight will be returned.
 
-        >>> from music21 import *
+        
         >>> n = note.Note("D#7")
         >>> n.quarterLength = .25
         >>> m = stream.Measure()
@@ -4206,7 +4208,7 @@ class Music21Object(object):
         of this object does not match a defined accent weight, a 
         minimum accent weight will be returned.
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = .5
         >>> m = stream.Measure()
@@ -4267,7 +4269,7 @@ class Music21Object(object):
         Get or set the the duration of this object in seconds, assuming 
         that this object has a :class:`~music21.tempo.MetronomeMark` or :class:`~music21.tempo.MetricModulation` in its past context.
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note(), 12)
         >>> s.insert(0, tempo.MetronomeMark(number=120))
@@ -5589,8 +5591,13 @@ def mainTest(*testClasses):
     else: 
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        s1 = doctest.DocTestSuite('__main__', 
-        optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
+        globs = importlib.import_module('music21').__dict__.copy()
+        optionflags = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE|doctest.REPORT_ONLY_FIRST_FAILURE)
+        s1 = doctest.DocTestSuite(
+            '__main__',
+            globs=globs,
+            optionflags=optionflags,
+            )
 
     verbosity = 1
     if 'verbose' in testClasses or 'verbose' in sys.argv:

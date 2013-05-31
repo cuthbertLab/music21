@@ -17,6 +17,7 @@ Runs great, but slowly on multiprocessor systems.
 
 
 
+import importlib
 import unittest, doctest
 import os, imp, sys
 
@@ -159,10 +160,15 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
 
     >>> print(None)
     None
-    '''    
-    docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
+    '''
+    globs = importlib.import_module('music21').__dict__.copy()
+    docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE|doctest.REPORT_ONLY_FIRST_FAILURE)
     # in case there are any tests here, get a suite to load up later
-    s1 = doctest.DocTestSuite(__name__, optionflags=docTestOptions)
+    s1 = doctest.DocTestSuite(
+        __name__,
+        globs=globs,
+        optionflags=docTestOptions
+        )
 
     modGather = ModuleGather()
     modules = modGather.load(restoreEnvironmentDefaults)
@@ -199,7 +205,12 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(testCase)
             s1.addTests(s2)
         try:
-            s3 = doctest.DocTestSuite(module, optionflags=docTestOptions)
+            globs = importlib.import_module('music21').__dict__.copy()
+            s3 = doctest.DocTestSuite(
+                module,
+                globs=globs,
+                optionflags=docTestOptions,
+                )
             s1.addTests(s3)
         except ValueError:
             environLocal.printDebug('%s cannot load Doctests' % module)
