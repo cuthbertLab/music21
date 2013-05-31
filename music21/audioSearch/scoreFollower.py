@@ -90,10 +90,10 @@ class ScoreFollower(object):
         bad matchings or the score has finished.
          
         
-        
+        >>> from music21.audioSearch import scoreFollower 
         >>> scoreNotes = ["c4", "d", "e", "f", "g", "a", "b", "c'", "c", "e", "g", "c'", "a", "f", "d", "c#", "d#", "f#","c", "e", "g", "c'", "a", "f", "d", "c#", "d#", "f#"]
         >>> scNotes = converter.parse(" ".join(scoreNotes), "4/4")
-        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.useMic = False
         >>> import os #_DOCS_HIDE
         >>> readPath = os.path.dirname(__file__) + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
@@ -168,9 +168,9 @@ class ScoreFollower(object):
         Detection of consecutive periods of silence. 
         Useful if the musician has some consecutive measures of silence.
         
-        
+        >>> from music21.audioSearch import scoreFollower 
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> notesList = []
         >>> notesList.append(note.Rest())
         >>> ScF.notesCounter = 3
@@ -182,7 +182,7 @@ class ScoreFollower(object):
         1
         
 
-        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> notesList = []
         >>> notesList.append(note.Rest())
         >>> notesList.append(note.Note())
@@ -223,8 +223,9 @@ class ScoreFollower(object):
         
         
         >>> from time import time
+        >>> from music21.audioSearch import scoreFollower
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-        >>> ScF = ScoreFollower(scoreStream=scNotes)        
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)        
         >>> ScF.begins = True
         >>> ScF.startSearchAtSlot = 15
         >>> ScF.countdown = 0
@@ -242,7 +243,7 @@ class ScoreFollower(object):
         The last matching was good, so it calculates the position in which it starts
         to search at, and the position in which the music should start.
         
-        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
         >>> ScF.begins = False
         >>> ScF.countdown = 0
@@ -263,7 +264,7 @@ class ScoreFollower(object):
         Now it doesn't change the slot in which it starts to search at.
         It also predicts the position in which the music should start.
         
-        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = False
         >>> ScF.countdown = 1
         >>> ScF.startSearchAtSlot = 15
@@ -285,7 +286,7 @@ class ScoreFollower(object):
         The note prediction is also the beginning of the page.
         
 
-        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = False
         >>> ScF.countdown = 2
         >>> ScF.startSearchAtSlot = 15
@@ -307,7 +308,7 @@ class ScoreFollower(object):
         The note prediction is also the beginning of the page.
         
 
-        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = False
         >>> ScF.countdown = 4
         >>> ScF.startSearchAtSlot = 15
@@ -326,7 +327,7 @@ class ScoreFollower(object):
         Countdown = 5: 
         Now it stops the program         
         
-        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = False
         >>> ScF.countdown = 5
         >>> ScF.startSearchAtSlot = 15
@@ -407,8 +408,9 @@ class ScoreFollower(object):
         
         
         >>> from time import time
+        >>> from music21.audioSearch import scoreFollower
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
-        >>> ScF = ScoreFollower(scoreStream=scNotes)  
+        >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)  
         >>> ScF.scoreNotesOnly = ScF.scoreStream.flat.notesAndRests 
         >>> ScF.lastNotePosition = 14
         >>> ScF.seconds_recording = 10
