@@ -93,11 +93,10 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     
     
     >>> import wave
-    >>> import os #_DOCS_HIDE
+    >>> import os
     >>> import numpy  # you need to have numpy installed to use this
-    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> wv = wave.open(readPath + 'test_audio.wav', 'r') #_DOCS_HIDE
-    >>> #_DOCS_SHOW wv = wave.open("test_audio.wav",'r')
+
+    >>> wv = wave.open(common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav', 'r')
     >>> data = wv.readframes(1024)
     >>> samps = numpy.fromstring(data, dtype=numpy.int16)
     >>> finalResult = audioSearch.autocorrelationFunction(samps, 44100)
@@ -258,11 +257,12 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     To-do: only return the former.  The latter can be generated in other ways.
     
     
+    >>> import os
+
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
-    >>> import os #_DOCS_HIDE
-    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
-    >>> #_DOCS_SHOW freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> readPath = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav'
+    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
+
     >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
@@ -331,10 +331,9 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     gets a list of frequencies from a complete audio file.
     
     
-    >>> import os #_DOCS_HIDE
-    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> freq = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
-    >>> #_DOCS_SHOW freq = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> import os
+    >>> readPath = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav'
+    >>> freq = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
     >>> print freq
     [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
     '''
@@ -373,8 +372,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     
     >>> #_DOCS_SHOW readFile = 'pachelbel.wav' 
     >>> import os #_DOCS_HIDE
-    >>> readPath = os.path.dirname(__file__) #_DOCS_HIDE
-    >>> readFile = readPath + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
+    >>> readFile = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
     >>> frequencyList, pachelbelFileHandle, currentSample  = audioSearch.getFrequenciesFromPartialAudioFile(readFile, length=1.0)
     >>> for i in range(5):
     ...     print frequencyList[i]
@@ -518,10 +516,11 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     
     N.B. the returned list is NOT a :class:`~music21.stream.Stream`.    
 
-    >>> import os #_DOCS_HIDE
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
-    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
+
+    >>> import os
+    >>> readPath = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav'
+    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
     >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
@@ -753,9 +752,10 @@ def decisionProcess(partsList, notePrediction, beginningData,
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes    
     >>> scoreStream = scNotes    
     >>> import os #_DOCS_HIDE
-    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
-    >>> #_DOCS_SHOW freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    
+    >>> readPath = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
+    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath) #_DOCS_HIDE
+    >>> #_DOCS_SHOW freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
     >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))

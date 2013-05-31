@@ -96,7 +96,7 @@ class ScoreFollower(object):
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.useMic = False
         >>> import os #_DOCS_HIDE
-        >>> readPath = os.path.dirname(__file__) + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
+        >>> readPath = common.getSourceFilePath() + os.sep + 'audioSearch' + os.sep + 'test_audio.wav' #_DOCS_HIDE
         >>> ScF.waveFile = readPath #_DOCS_HIDE
         >>> #_DOCS_SHOW ScF.waveFile = 'test_audio.wav'
         >>> ScF.seconds_recording = 10
