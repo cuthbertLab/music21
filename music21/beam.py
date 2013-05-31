@@ -33,7 +33,7 @@ automatically given the current meter.
 Suppose you had a measure of two eighths and a quarter and wanted to explicitly beam the two eighth notes.
 You could do this:
 
->>> from music21 import *
+
 >>> m = stream.Measure()
 >>> n1 = note.Note('C4', quarterLength = 0.5)
 >>> n2 = note.Note('D4', quarterLength = 0.5)
@@ -96,7 +96,7 @@ class Beam(object):
     it is defined later on.
     
     Here are two ways to define the start of a beam
-    >>> from music21 import *
+    
     >>> b1 = beam.Beam(type = 'start')
     >>> b2 = beam.Beam('start')
     
@@ -136,7 +136,7 @@ class Beams(object):
     beams the note currently has on it, and iterating over a Beams object gives 
     you each Beam.
     
-    >>> from music21 import *
+    
     >>> n = note.Note(type='16th')
     >>> isinstance(n.beams, beam.Beams)
     True
@@ -175,7 +175,7 @@ class Beams(object):
         '''
         Append a new Beam object to this Beams, automatically creating the Beam object and incrementing the number count. 
         
-        >>> from music21 import *
+        
         >>> beams = beam.Beams()
         >>> beams.append('start')
         >>> beams.beamsList
@@ -202,7 +202,7 @@ class Beams(object):
         Both "eighth" and "8th" work.  Adding more than six beams (i.e. things like
         512th notes) raises an error.
 
-        >>> from music21 import *
+        
         >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> len(a)
@@ -272,7 +272,7 @@ class Beams(object):
         Acceptable directions (start, stop, continue, etc.) are listed under 
         Beam() above.
 
-        >>> from music21 import *
+        
         >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
@@ -292,7 +292,7 @@ class Beams(object):
     def setByNumber(self, number, type, direction=None): # type is okay @ReservedAssignment
         '''Set an internal beam object by number, or rhythmic symbol level
 
-        >>> from music21 import *
+        
         >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
@@ -336,7 +336,7 @@ class Beams(object):
     def getByNumber(self, number):
         '''Gets an internal beam object by number...
 
-        >>> from music21 import *
+        
         >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
@@ -357,7 +357,7 @@ class Beams(object):
     def getTypeByNumber(self, number):
         '''Get beam type, with direction, by number
 
-        >>> from music21 import *
+        
         >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
@@ -377,7 +377,7 @@ class Beams(object):
     def getTypes(self):
         '''Returns a list of all beam types defined for the current beams
 
-        >>> from music21 import *
+        
         >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
@@ -390,7 +390,7 @@ class Beams(object):
         '''Returns a list of all defined beam numbers; it should normally be
         a set of consecutive integers, but it might not be.
 
-        >>> from music21 import *
+        
         >>> a = beam.Beams()
         >>> a.fill('32nd')
         >>> a.getNumbers()

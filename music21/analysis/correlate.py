@@ -102,7 +102,7 @@ class ActivityMatch(object):
 
         If `dataPoints` is True, all data matches between source and destination are returned. If false, 3 point weighted coordinates are created for each unique match. 
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv8.6.xml')
         >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat.sorted)
         >>> am.pitchToDynamic()

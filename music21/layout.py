@@ -108,7 +108,7 @@ class ScoreLayout(LayoutBase):
     
     PageLayout objects may be found on Measure or Part Streams.    
 
-    >>> from music21 import *
+    
     >>> pl = layout.PageLayout(pageNumber = 4, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
     >>> pl.pageNumber
     4
@@ -169,7 +169,7 @@ class ScoreLayout(LayoutBase):
         returns 0.0 if either of scalingMillimeters or scalingTenths
         is undefined.
         
-        >>> from music21 import *
+        
         >>> sl = layout.ScoreLayout(scalingMillimeters = 2.0, scalingTenths=10)
         >>> print sl.tenthsToMillimeters(10)
         2.0
@@ -188,7 +188,7 @@ class PageLayout(LayoutBase):
     
     PageLayout objects may be found on Measure or Part Streams.    
 
-    >>> from music21 import *
+    
     >>> pl = layout.PageLayout(pageNumber = 4, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
     >>> pl.pageNumber
     4
@@ -253,7 +253,7 @@ class SystemLayout(LayoutBase):
     Importantly, if isNew is True then this object 
     indicates that a new system should start here.
     
-    >>> from music21 import *
+    
     >>> sl = layout.SystemLayout(leftMargin=234, rightMargin=124, distance=3, isNew=True)
     >>> sl.distance
     3
@@ -305,7 +305,7 @@ class StaffLayout(LayoutBase):
     The musicxml equivalent <staff-layout> lives in
     the <defaults> and in <print> attributes.
     
-    >>> from music21 import *
+    
     >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize = 113)
     >>> sl.distance
     3
@@ -371,7 +371,7 @@ class StaffGroup(spanner.Spanner):
     brace, or other symbol, and may have a common name.
 
     
-    >>> from music21 import *
+    
     >>> p1 = stream.Part()
     >>> p2 = stream.Part()
     >>> p1.append(note.WholeNote('C5'))
@@ -440,7 +440,7 @@ class StaffGroup(spanner.Spanner):
 
         Currently Mensurstrich i
 
-        >>> from music21 import *
+        
         >>> sg = layout.StaffGroup()
         >>> sg.barTogether = 'yes'
         >>> sg.barTogether
@@ -467,7 +467,7 @@ class StaffGroup(spanner.Spanner):
     symbol = property(_getSymbol, _setSymbol, doc = '''
         Get or set the symbol value, with either Boolean values or yes or no strings.
 
-        >>> from music21 import *
+        
         >>> sg = layout.StaffGroup()
         >>> sg.symbol = 'Brace'
         >>> sg.symbol
@@ -492,7 +492,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     (because our spanner gathering algorithm is currently O(n^2);
     something TODO: to fix.)
     
-    >>> from music21 import *
+    
     >>> lt = corpus.parse('demos/layoutTest.xml')
     >>> len(lt.parts)
     3
@@ -704,7 +704,7 @@ class LayoutScore(stream.Opus):
         
         Similarly, the first systemId on each page will be 0
     
-        >>> from music21 import *
+        
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> l = layout.divideByPages(lt, fastMeasures=True)
         >>> l.getPageAndSystemNumberFromMeasureNumber(80)
@@ -750,7 +750,7 @@ class LayoutScore(stream.Opus):
         
         Default of (100, 100, 100, 100, 850, 1100) if undefined
         
-        >>> from music21 import *
+        
         >>> #_DOCS_SHOW g = corpus.parse('luca/gloria')
         >>> #_DOCS_SHOW g.parts[0].getElementsByClass('Measure')[22].getElementsByClass('PageLayout')[0].leftMargin = 204.0
         >>> #_DOCS_SHOW gl = layout.divideByPages(g)
@@ -821,7 +821,7 @@ class LayoutScore(stream.Opus):
         N.B. right is NOT the width -- it is different.  It is the offset to the right margin.  weird, inconsistent, but most useful...
         bottom is the hard part to compute...
         
-        >>> from music21 import *
+        
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> ls.getPositionForSystem(0, 0)
@@ -914,7 +914,7 @@ class LayoutScore(stream.Opus):
         taken into account, but not non 5-line staves.  Thus a normally sized staff
         is always of height 40 (4 spaces of 10-tenths each)
                
-        >>> from music21 import *
+        
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
 
@@ -1106,7 +1106,7 @@ class LayoutScore(stream.Opus):
         Note that this does not take into account the hiddenness of the staff, which
         if True makes the effective size 0.0 -- see getStaffHiddenAttribute
         
-        >>> from music21 import *
+        
         >>> lt = corpus.parse('demos/layoutTest.xml', forceSource=True)
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> ls.getStaffSizeFromLayout(0, 0, 0)
@@ -1165,7 +1165,7 @@ class LayoutScore(stream.Opus):
         returns the staffLayout.hidden attribute for a staffId, or if it is not
         defined, recursively search through previous staves until one is found.
 
-        >>> from music21 import *
+        
         >>> lt = corpus.parse('demos/layoutTestMore.xml', forceSource=True)
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> ls.getStaffHiddenAttribute(0, 0, 0)
@@ -1215,7 +1215,7 @@ class LayoutScore(stream.Opus):
 
         This test score has five systems on the first page, three on the second, and two on the third
         
-        >>> from music21 import *
+        
         >>> lt = corpus.parse('demos/layoutTestMore.xml', forceSource=True)
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> systemId = 1
@@ -1244,7 +1244,7 @@ class LayoutScore(stream.Opus):
         If returnFormat is "float", returns each as a number from 0 to 1 where 0 is the 
         top or left of the page, and 1 is the bottom or right of the page.
 
-        >>> from music21 import *
+        
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
 
@@ -1329,7 +1329,7 @@ class LayoutScore(stream.Opus):
         no staffId is needed since (at least for now) all measures begin and end at the same
         X position
 
-        >>> from music21 import *
+        
         >>> l = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(l, fastMeasures = True)
         >>> ls.measurePositionWithinSystem(1, 0, 0)
@@ -1383,7 +1383,7 @@ class LayoutScore(stream.Opus):
         returns a list of dictionaries, where each dictionary gives the measure number
         and other information, etc. in the document.
         
-        # >>> from music21 import *
+        # 
         # >>> g = corpus.parse('luca/gloria')
         # >>> gl = layout.divideByPages(g)
         # >>> gl.getAllMeasurePositionsInDocument()

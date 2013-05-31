@@ -74,7 +74,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
     Example: Mozart k155, mvmt 2 (musicxml) is explicitly encoded as being in Major:
 
     
-    >>> from music21 import *
+    
     >>> mozart155mvmt2 = corpus.parse('mozart/k155', 2)
     >>> fe = features.native.QualityFeature(mozart155mvmt2)
     >>> f = fe.extract()
@@ -143,7 +143,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
 #-------------------------------------------------------------------------------
 class TonalCertainty(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.TonalCertainty(s)
     >>> f = fe.extract()
@@ -171,7 +171,7 @@ class TonalCertainty(featuresModule.FeatureExtractor):
 
 class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.FirstBeatAttackPrevalence(s)
     '''
@@ -193,7 +193,7 @@ class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
 
 class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.UniqueNoteQuarterLengths(s)
     >>> fe.extract().vector 
@@ -222,7 +222,7 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
 
 class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MostCommonNoteQuarterLength(s)
     >>> fe.extract().vector 
@@ -253,7 +253,7 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
 
 class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MostCommonNoteQuarterLengthPrevalence(s)
     >>> fe.extract().vector 
@@ -287,7 +287,7 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
 class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     '''Difference between the longest and shortest quarter lengths.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.RangeOfNoteQuarterLengths(s)
     >>> fe.extract().vector 
@@ -324,7 +324,7 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
 class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     '''Number of unique pitch class simultaneities.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.UniquePitchClassSetSimultaneities(s)
     >>> fe.extract().vector
@@ -354,7 +354,7 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
 class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     '''Number of unique set class simultaneities.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.UniqueSetClassSimultaneities(s)
     >>> fe.extract().vector
@@ -385,7 +385,7 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     featuresModule.FeatureExtractor):
     '''Fraction of all pitch class simultaneities that are the most common simultaneity.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MostCommonPitchClassSetSimultaneityPrevalence(s)
     >>> fe.extract().vector
@@ -420,7 +420,7 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     Fraction of all set class simultaneities that the most common simultaneity 
     occupies.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MostCommonSetClassSimultaneityPrevalence(s)
     >>> fe.extract().vector
@@ -459,7 +459,7 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     Percentage of all simultaneities that are major triads.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MajorTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector
@@ -489,7 +489,7 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are minor triads.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector # same as major in this work
@@ -518,7 +518,7 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are dominant seventh.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.DominantSeventhSimultaneityPrevalence(s)
     >>> fe.extract().vector 
@@ -547,7 +547,7 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
 class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are diminished triads.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DiminishedTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector 
@@ -578,7 +578,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     Gives the proportion of all simultaneities which form triads (major,
     minor, diminished, or augmented)
     
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.TriadSimultaneityPrevalence(s)
     >>> fe.extract().vector 
@@ -612,7 +612,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are diminished seventh chords.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.native.DiminishedSeventhSimultaneityPrevalence(s)
     >>> fe.extract().vector 
@@ -655,7 +655,7 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     mistake in most editions... -- it doesn't alter this analysis though
     since the A and E in the bass are gone)
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('mozart/k155', 2)
     >>> fe = features.native.IncorrectlySpelledTriadPrevalence(s)
     >>> fe.extract().vector 
@@ -701,7 +701,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
        
     Sample test on the beatles' "here comes the sun"
     
-    >>> from music21 import *
+    
     >>> s = converter.parse('http://wikifonia.org/node/8859') # here comes the sun
     >>> fe = features.native.ChordBassMotionFeature(s)
     >>> fe.extract().vector 
@@ -775,7 +775,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     composer's popularity today, as measured by the number of
     Google search results (log-10)
 
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW s = corpus.parse('mozart/k155', 2)
     >>> s = stream.Score() #_DOCS_HIDE
     >>> s.append(metadata.Metadata()) #_DOCS_HIDE
@@ -833,7 +833,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
 class LandiniCadence(featuresModule.FeatureExtractor):
     '''Return a bolean if one or more Parts end with a Landini-like cadential figure.
 
-    >>> from music21 import *
+    
     '''
     id = 'MC1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -895,7 +895,7 @@ class LanguageFeature(featuresModule.FeatureExtractor):
     
     Detect that the language of "For unto us a child is born" is English.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('handel/hwv56/movement1-13.md') 
     >>> fe = features.native.LanguageFeature(s)
     >>> fe.extract().vector

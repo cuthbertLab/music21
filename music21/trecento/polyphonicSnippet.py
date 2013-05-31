@@ -28,7 +28,7 @@ class PolyphonicSnippet(stream.Score):
     is the time signature if not the same as the time signature of the parentPiece.
     
 
-    >>> from music21 import *
+    
     >>> cantus = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
     >>> tenor = trecento.trecentoCadence.TrecentoCadenceStream("F1. f2. e4. d", '6/8')
     >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = trecento.cadencebook.BallataSheet().makeWork(3))
@@ -166,7 +166,7 @@ class PolyphonicSnippet(stream.Score):
         returns the length. (in quarterLengths) for the longest line
         in the parts
         
-        >>> from music21 import *
+        
         >>> s1 = stream.Part([note.WholeNote()])
         >>> s2 = stream.Part([note.HalfNote()])
         >>> s3 = stream.Part([note.QuarterNote()])
@@ -191,7 +191,7 @@ class PolyphonicSnippet(stream.Score):
         returns the number of measures short that each stream is compared to the longest stream.
         
         
-        >>> from music21 import *
+        
         >>> s1 = stream.Part([note.WholeNote()])
         >>> s2 = stream.Part([note.HalfNote()])
         >>> s3 = stream.Part([note.QuarterNote()])
@@ -224,7 +224,7 @@ class Incipit(PolyphonicSnippet):
         Pads a Stream with a bunch of rests at the
         end to make it the same length as the longest line
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('1/4')
         >>> s1 = stream.Part([ts])
         >>> s1.repeatAppend(note.QuarterNote(), 4)
@@ -290,7 +290,7 @@ class FrontPaddedSnippet(PolyphonicSnippet):
         '''Pads a line with a bunch of rests at the
         front to make it the same length as the longest line
         
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('1/4')
         >>> s1 = stream.Part([ts])
         >>> s1.repeatAppend(note.QuarterNote(), 4)

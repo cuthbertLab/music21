@@ -14,7 +14,7 @@ Medium-level conversion routines to take music21
 Streams and other objects and get a full MusicXML String
 from them.  In general do not use this module.  Instead call:
 
->>> from music21 import *
+
 >>> s = converter.parse('tinyNotation: 3/4 C4 D E r2.').makeMeasures()
 >>> #_DOCS_SHOW s.show('musicxml')
 
@@ -90,7 +90,7 @@ def fromMeasure(m):
     representation of a Measure, not for partial 
     solutions in Part or Stream production.
 
-    >>> from music21 import *
+    
     >>> m = stream.Measure()
     >>> m.repeatAppend(note.Note('g3'), 4)
     >>> post = musicxml.m21ToString.fromMeasure(m)
@@ -116,7 +116,7 @@ def fromDuration(d):
     
     Rarely rarely used.  Only if you call .show() on a duration object
     
-    >>> from music21 import *
+    
     >>> d = duration.Duration(4.0)
     >>> dxml = musicxml.m21ToString.fromDuration(d)
     >>> print dxml
@@ -258,7 +258,7 @@ def fromGeneralNote(n):
     Translate a music21 :class:`~music21.note.Note` into a 
     complete MusicXML representation.
 
-    >>> from music21 import *
+    
     >>> n = note.Note('c3')
     >>> n.quarterLength = 3
     >>> post = musicxml.m21ToString.fromGeneralNote(n)

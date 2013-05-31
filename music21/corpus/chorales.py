@@ -38,7 +38,7 @@ class ChoraleList(object):
     numberings since it only includes BWV 250-438.
 
 
-    >>> from music21 import *
+    
     >>> bcl = corpus.chorales.ChoraleList()
     >>> info358 = bcl.byBudapest[358]
     >>> for key in info358:
@@ -498,7 +498,7 @@ class ChoraleListRKBWV(object):
     riemenschneider, and bwv numbering systems.
 
 
-    >>> from music21 import *
+    
     >>> bcl = corpus.chorales.ChoraleListRKBWV()
     >>> info155 = bcl.byRiemenschneider[155]
     >>> for key in info155:
@@ -934,7 +934,7 @@ class Iterator(object):
     
     numberList = [list, of, numbers]
     
-    >>> from music21 import *
+    
     >>> for chorale in corpus.chorales.Iterator(1,4, returnType = 'filename'):
     ...    print chorale
     bach/bwv269
@@ -1131,7 +1131,7 @@ class Iterator(object):
         of the current iteration. If the numberingSystem is 'title', the chorale is instead queried by Title
         from the titleList and the numberList is ignored.
         
-        >>> from music21 import *
+        
         >>> BCI = corpus.chorales.Iterator()
         >>> riemenschneider1 = BCI._returnChorale()
         >>> riemenschneider1.show('text')
@@ -1278,7 +1278,7 @@ class Iterator(object):
         are set to the lowest and highest numbers in the selected list. If the numberingSystem is 'title', the _numberList
         is set to None, and the currentNumber and highestNumber are set to the lowest and highest indices in the titleList.
         
-        >>> from music21 import *
+        
         >>> BCI = corpus.chorales.Iterator()
         >>> BCI.numberingSystem = 'riemenschneider'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])

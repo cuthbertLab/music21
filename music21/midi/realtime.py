@@ -39,7 +39,7 @@ class StreamPlayer(object):
     Set up a detuned piano (where each key has a random but consistent detuning from 30 cents flat to sharp)
     and play a Bach Chorale on it in real time.
     
-    >>> from music21 import *
+    
     >>> import random
     >>> keyDetune = []
     >>> for i in range(0, 127):

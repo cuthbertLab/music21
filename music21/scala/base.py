@@ -25,7 +25,7 @@ with the :func:`~music21.scala.search` function.
 To create a :class:`~music21.scale.ScalaScale` instance, simply 
 provide a root pitch and the name of the scale. Scale names are given as a the scala .scl file name. 
 
->>> from music21 import *
+
 >>> mbiraScales = scala.search('mbira')
 >>> mbiraScales
 ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
@@ -119,7 +119,7 @@ def getPaths():
 class ScalaPitch(object):
     '''Representation of a scala pitch notation
 
-    >>> from music21 import *
+    
     >>> sp = scala.ScalaPitch(' 1066.667 cents')
     >>> print sp.parse()
     1066.667
@@ -306,7 +306,7 @@ class ScalaFile(object):
     Interface for reading and writing scala files. 
     On reading, returns a :class:`~music21.scala.ScalaStorage` object.
 
-    >>> from music21 import *
+    
     >>> sf = scala.ScalaFile() 
     '''
     
@@ -433,7 +433,7 @@ def parse(target):
 def search(target):
     '''Search the scala archive for matches based on a string
 
-    >>> from music21 import *
+    
     >>> mbiraScales = scala.search('mbira')
     >>> mbiraScales
     ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']

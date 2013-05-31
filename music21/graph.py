@@ -158,7 +158,7 @@ def userValuesToValues(valueList):
 def getColor(color):
     '''Convert any specification of a color to a hexadecimal color used by matplotlib. 
 
-    >>> from music21 import *
+    
     >>> graph.getColor('red')
     '#ff0000'
     >>> graph.getColor('Steel Blue')
@@ -243,7 +243,7 @@ class Graph(object):
 
     def __init__(self, *args, **keywords):
         '''
-        >>> from music21 import *
+        
         >>> a = graph.Graph(title='a graph of some data to be given soon', tickFontSize = 9)
         >>> a.setData(['some', 'arbitrary', 'data', 14, 9.04, None])
         '''
@@ -651,7 +651,7 @@ class GraphNetworxGraph(Graph):
         'networkxGraph' : '''An instance of a networkx graph object.'''
     }
 
-#     >>> from music21 import *
+#     
 #     >>> #_DOCS_SHOW g = graph.GraphNetworxGraph()
 # 
 #     .. image:: images/GraphNetworxGraph.*
@@ -741,7 +741,7 @@ class GraphColorGrid(Graph):
     Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
     
     
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW g = graph.GraphColorGrid()
     >>> g = graph.GraphColorGrid(doneAction=None) #_DOCS_HIDE
     >>> data = [['#55FF00', '#9b0000', '#009b00'], ['#FFD600', '#FF5600'], ['#201a2b', '#8f73bf', '#a080d5', '#403355', '#999999']]
@@ -837,7 +837,7 @@ class GraphColorGridLegend(Graph):
     
     Data is provided as a list of lists of colors, where colors are specified as a hex triplet, or the common HTML color codes, and based on analysis-specific mapping of colors to results.
     
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW g = graph.GraphColorGridLegend()
     >>> g = graph.GraphColorGridLegend(doneAction=None) #_DOCS_HIDE
     >>> data = []
@@ -949,7 +949,7 @@ class GraphHorizontalBar(Graph):
 
         Data provided is a list of pairs, where the first value becomes the key, the second value is a list of x-start, x-length values.
 
-        >>> from music21 import *
+        
         >>> #_DOCS_SHOW a = graph.GraphHorizontalBar(doneAction='show')
         >>> a = graph.GraphHorizontalBar(doneAction=None)  #_DOCS_HIDE
         >>> data = [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
@@ -1174,7 +1174,7 @@ class GraphHorizontalBarWeighted(Graph):
 class GraphScatterWeighted(Graph):
     '''A scatter plot where points are scaled in size to represent the number of values stored within.
 
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW g = graph.GraphScatterWeighted()
     >>> g = graph.GraphScatterWeighted(doneAction=None) #_DOCS_HIDE
     >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]
@@ -1292,7 +1292,7 @@ class GraphScatterWeighted(Graph):
 class GraphScatter(Graph):
     '''Graph two parameters in a scatter plot. Data representation is a list of points of values. 
 
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW g = graph.GraphScatter()
     >>> g = graph.GraphScatter(doneAction=None) #_DOCS_HIDE
     >>> data = [(x, x*x) for x in range(50)]
@@ -1368,7 +1368,7 @@ class GraphHistogram(Graph):
     is only one of each x value, and y value is the count or magnitude
     of that value
 
-    >>> from music21 import *
+    
     >>> import random
     >>> #_DOCS_SHOW g = graph.GraphHistogram()
     >>> g = graph.GraphHistogram(doneAction=None) #_DOCS_HIDE
@@ -1426,7 +1426,7 @@ class GraphGroupedVerticalBar(Graph):
     Data set is simply a list of x and y pairs, where there
     is only one of each x value, and y value is a list of values
 
-    >>> from music21 import *
+    
     >>> import random
     >>> #_DOCS_SHOW g = graph.GraphGroupedVerticalBar()
     >>> g = graph.GraphGroupedVerticalBar(doneAction=None) #_DOCS_HIDE
@@ -1531,7 +1531,7 @@ class _Graph3DBars(Graph):
         For each dictionary, a list of value pairs, where each pair is the
         (x, y) coordinates.
        
-        >>> a = _Graph3DBars()
+        >>> a = graph._Graph3DBars()
         '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y', 'z']
@@ -1591,7 +1591,7 @@ class Graph3DPolygonBars(Graph):
 
     Note: Due to matplotib issue Axis ticks do not seem to be adjustable without distorting the graph.
 
-    >>> from music21 import *
+    >>> import random
     >>> #_DOCS_SHOW g = graph.Graph3DPolygonBars()
     >>> g = graph.Graph3DPolygonBars(doneAction=None) #_DOCS_HIDE
     >>> data = {1:[], 2:[], 3:[]}
@@ -1912,7 +1912,7 @@ class PlotStream(object):
         when choosing whether to display as sharp or flat use
         the most commonly used enharmonic.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv324.xml')
         >>> s.analyze('key')
         <music21.key.Key of G major>
@@ -1979,7 +1979,7 @@ class PlotStream(object):
         Uses the default label for each pitch class regardless of what is in the `Stream`
         (unlike `ticksPitchClassUsage()`)
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
         >>> a.ticksPitchClass()
@@ -1997,7 +1997,7 @@ class PlotStream(object):
         '''
         Utility method to get ticks in pitch space only for every octave.
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
         >>> a.ticksPitchSpaceOctave()
@@ -2015,7 +2015,7 @@ class PlotStream(object):
     def ticksPitchSpaceChromatic(self, pitchMin=36, pitchMax=100):
         r'''Utility method to get ticks in pitch space values.
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
         >>> a.ticksPitchSpaceChromatic(20, 24)
@@ -2053,7 +2053,7 @@ class PlotStream(object):
             showEnharmonic=False, blankLabelUnused=True, hideUnused=False):
         '''Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv324.xml')
         >>> a = graph.PlotStream(s.parts[0])
         >>> [x for x, y in a.ticksPitchSpaceUsage(hideUnused=True)]
@@ -2163,7 +2163,7 @@ class PlotStream(object):
 
         The `remap` parameter is not yet used.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv281.xml')
         >>> a = graph.PlotStream(s)
         >>> a.ticksOffset() # on whole score, showing anacrusis spacing
@@ -2291,7 +2291,7 @@ class PlotStream(object):
         Note that mix and max do nothing, but must be included
         in order to set the tick style.
 
-        >>> from music21 import * 
+         
         >>> s = stream.Stream()
         >>> for t in ['32nd', '16th', 'eighth', 'quarter', 'half']:
         ...     n = note.Note()
@@ -2327,7 +2327,7 @@ class PlotStream(object):
         '''
         Utility method to get ticks in dynamic values:
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
         >>> a.ticksDynamics()
@@ -2555,7 +2555,7 @@ class PlotWindowedAnalysis(PlotStream):
 class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
     '''Stream plotting of windowed version of Krumhansl-Schmuckler analysis routine. See :class:`~music21.analysis.discrete.KrumhanslSchmuckler` for more details.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv66.6')
     >>> p = graph.PlotWindowedKrumhanslSchmuckler(s.parts[0], doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW p = graph.PlotWindowedKrumhanslSchmuckler(s.parts[0])
@@ -2629,7 +2629,7 @@ class PlotWindowedTemperleyKostkaPayne(PlotWindowedAnalysis):
 class PlotWindowedAmbitus(PlotWindowedAnalysis):
     '''Stream plotting of basic pitch span. 
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv66.6')
     >>> p = graph.PlotWindowedAmbitus(s.parts[0], doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW p = graph.PlotWindowedAmbitus(s.parts[0])
@@ -2729,7 +2729,7 @@ class PlotHistogram(PlotStream):
 class PlotHistogramPitchSpace(PlotHistogram):
     '''A histogram of pitch space.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -2779,7 +2779,7 @@ class PlotHistogramPitchSpace(PlotHistogram):
 class PlotHistogramPitchClass(PlotHistogram):
     '''A histogram of pitch class
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHistogramPitchClass(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -2827,7 +2827,7 @@ class PlotHistogramPitchClass(PlotHistogram):
 class PlotHistogramQuarterLength(PlotHistogram):
     '''A histogram of pitch class
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHistogramQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -2956,7 +2956,7 @@ class PlotScatter(PlotStream):
 class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     '''A scatter plot of pitch space and quarter length
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -3001,7 +3001,7 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
 class PlotScatterPitchClassQuarterLength(PlotScatter):
     '''A scatter plot of pitch class and quarter length
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -3048,7 +3048,7 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
 class PlotScatterPitchClassOffset(PlotScatter):
     '''A scatter plot of pitch class and offset
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -3093,7 +3093,7 @@ class PlotScatterPitchClassOffset(PlotScatter):
 class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
     '''A graph of dynamics used by pitch space.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('schumann/opus41no1', 2) #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('schumann/opus41no1', 2)
@@ -3207,7 +3207,7 @@ class PlotHorizontalBar(PlotStream):
 class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
     '''A graph of events, sorted by pitch class, over time
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHorizontalBarPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -3250,7 +3250,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
 class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
     '''A graph of events, sorted by pitch space, over time
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHorizontalBarPitchSpaceOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -3364,7 +3364,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
     If the `normalizeByPart` parameter is True, each part will be normalized within the range only of that part. If False, all parts will be normalized by the max of all parts. The default is True. 
 
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
     >>> i = 0
@@ -3570,7 +3570,7 @@ class PlotScatterWeighted(PlotStream):
 class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
     '''A graph of event, sorted by pitch, over time
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -3614,7 +3614,7 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
 class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
     '''A graph of event, sorted by pitch class, over time.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -3661,7 +3661,7 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
     '''A graph of dynamics used by pitch space.
 
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('schumann/opus41no1', 2)
     >>> p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s)
@@ -3801,7 +3801,7 @@ class Plot3DBars(PlotStream):
 class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     '''A scatter plot of pitch and quarter length
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW from music21.musicxml import testFiles
@@ -4125,7 +4125,7 @@ def plotStream(streamObj, *args, **keywords):
     * :class:`~music21.graph.PlotDolan`
 
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')

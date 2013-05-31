@@ -358,7 +358,7 @@ class Dialog(object):
     def prependPromptHeader(self, msg):
         '''Add a message to the front of the stored prompt header.
 
-        >>> from music21 import *
+        
         >>> d = configure.Dialog()
         >>> d.prependPromptHeader('test')
         >>> d._promptHeader
@@ -377,7 +377,7 @@ class Dialog(object):
 
     def appendPromptHeader(self, msg):
         '''
-        >>> from music21 import *
+        
         >>> d = configure.Dialog()
         >>> d.appendPromptHeader('test')
         >>> d._promptHeader
@@ -398,7 +398,7 @@ class Dialog(object):
     def _askTryAgain(self, default=True, force=None):
         '''What to do if input is incomplete
 
-        >>> from music21 import *
+        
         >>> d = configure.YesOrNo(default=True)
         >>> d._askTryAgain(force='yes')
         True
@@ -619,7 +619,7 @@ class AnyKey(Dialog):
 class YesOrNo(Dialog):
     '''Ask a yes or no question.
 
-    >>> from music21 import *
+    
     >>> d = configure.YesOrNo(default=True)
     >>> d.askUser('yes') # force arg for testing
     >>> d.getResult()
@@ -649,7 +649,7 @@ class YesOrNo(Dialog):
     def _rawQuery(self):
         '''Return a multiline presentation of the question.
 
-        >>> from music21 import *
+        
         >>> d = configure.YesOrNo(default=True)
         >>> d._rawQuery()
         'Enter Yes or No (default is Yes): '
@@ -657,7 +657,7 @@ class YesOrNo(Dialog):
         >>> d._rawQuery()
         'Enter Yes or No (default is No): '
 
-        >>> from music21 import *
+        
         >>> d = configure.YesOrNo(default=True, promptHeader='Would you like more time?')
         >>> d._rawQuery()
         'Would you like more time? Enter Yes or No (default is Yes): '
@@ -670,7 +670,7 @@ class YesOrNo(Dialog):
     def _parseUserInput(self, raw):
         '''Translate string to desired output. Pass None and '' (as no input), as NoInput objects, and pass all other outputs as IncompleteInput objects. 
 
-        >>> from music21 import *
+        
         >>> d = configure.YesOrNo()
         >>> d._parseUserInput('y')
         True
@@ -698,7 +698,7 @@ class YesOrNo(Dialog):
     def _evaluateUserInput(self, raw):
         '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
     
-        >>> from music21 import *
+        
         >>> d = configure.YesOrNo()
         >>> d._evaluateUserInput('y')
         True
@@ -739,7 +739,7 @@ class YesOrNo(Dialog):
 class AskOpenInBrowser(YesOrNo):
     '''Ask the user if the want to open a URL in a browser.
 
-    >>> from music21 import *
+    
     >>> d = configure.AskOpenInBrowser('http://mit.edu/music21')
     '''
     def __init__(self, urlTarget, default=True, tryAgain=True,
@@ -783,7 +783,7 @@ class AskOpenInBrowser(YesOrNo):
 class AskInstall(YesOrNo):
     '''Ask the user if they want to enable auto-downloading
 
-    >>> from music21 import *
+    
     '''
     def __init__(self, default=True, tryAgain=True,
         promptHeader=None):
@@ -840,7 +840,7 @@ class AskInstall(YesOrNo):
 class AskSendInstallationReport(YesOrNo):
     '''Ask the user if they want to send a report regarding their system and usage.
 
-    >>> from music21 import *
+    
     '''
     def __init__(self, default=True, tryAgain=True,
         promptHeader=None, additionalEntries={}):
@@ -903,7 +903,7 @@ class AskSendInstallationReport(YesOrNo):
 class SelectFromList(Dialog):
     '''General class to select values from a list.
 
-    >>> from music21 import *
+    
     >>> d = configure.SelectFromList() # empty selection list
     >>> d.askUser('no') # results in bad condition
     >>> d.getResult()
@@ -938,7 +938,7 @@ class SelectFromList(Dialog):
     def _askFillEmptyList(self, default=None, force=None):
         '''What to do if the selection list is empty. Only return True or False: if we should continue or not.
 
-        >>> from music21 import *
+        
         >>> d = configure.SelectFromList(default=True)
         >>> d._askFillEmptyList(force='yes')
         True
@@ -965,7 +965,7 @@ class SelectFromList(Dialog):
     def _preAskUser(self, force=None):
         '''Before we ask user, we need to to run _askFillEmptyList list if the list is empty.
 
-        >>> from music21 import *
+        
         >>> d = configure.SelectFromList()
         >>> d._preAskUser('no') # force for testing
         False
@@ -987,7 +987,7 @@ class SelectFromList(Dialog):
     def _rawQuery(self, force=None):
         '''Return a multiline presentation of the question.
 
-        >>> from music21 import *
+        
         >>> d = configure.SelectFromList()
         >>> d._rawQuery(['a', 'b', 'c'])
         ['[1] a', '[2] b', '[3] c', ' ', 'Select a number from the preceding options: ']
@@ -1018,7 +1018,7 @@ class SelectFromList(Dialog):
     def _parseUserInput(self, raw):
         '''Convert all values to an integer, or return NoInput or IncompleteInput. Do not yet evaluate whether the number is valid in the context of the selection choices. 
 
-        >>> from music21 import *
+        
         >>> d = configure.SelectFromList()
         '''
         #environLocal.printDebug(['SelectFromList', '_parseUserInput', 'raw', raw])
@@ -1042,7 +1042,7 @@ class SelectFromList(Dialog):
     def _evaluateUserInput(self, raw):
         '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
     
-        >>> from music21 import *
+        
         '''
         rawParsed = self._parseUserInput(raw)
         # means no answer: return default
@@ -1057,7 +1057,7 @@ class SelectFromList(Dialog):
 class AskAutoDownload(SelectFromList):
     '''General class to select values from a list.
 
-    >>> from music21 import *
+    
     '''
     def __init__(self, default=1, tryAgain=True, promptHeader=None):
         SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
@@ -1132,7 +1132,7 @@ class AskAutoDownload(SelectFromList):
 class SelectFilePath(SelectFromList):
     '''General class to select values from a list.
 
-    >>> from music21 import *
+    
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
@@ -1172,7 +1172,7 @@ class SelectFilePath(SelectFromList):
         '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
     
         Here, we convert the user-selected number into a file path
-        >>> from music21 import *
+        
         '''
         rawParsed = self._parseUserInput(raw)
         # if NoInput: and a default, return default
@@ -1199,7 +1199,7 @@ class SelectFilePath(SelectFromList):
 class SelectMusicXMLReader(SelectFilePath):
     '''Select a MusicXML Reader by presenting a user a list of options. 
 
-    >>> from music21 import *
+    
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
@@ -1270,7 +1270,7 @@ class SelectMusicXMLReader(SelectFilePath):
     def _askFillEmptyList(self, default=None, force=None):
         '''If we do not have an musicxml readers, ask user if they want to download. 
 
-        >>> from music21 import *
+        
         '''
         platform = common.getPlatform()
         if platform == 'win':

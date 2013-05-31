@@ -49,7 +49,7 @@ def convertKeyStringToMusic21KeyString(textString):
     bb as B-flat minor and Bb as B-flat major.
     
     
-    >>> from music21 import *
+    
     >>> key.convertKeyStringToMusic21KeyString('Eb')
     'E-'
     >>> key.convertKeyStringToMusic21KeyString('f#')
@@ -75,7 +75,7 @@ def sharpsToPitch(sharpCount):
     '''Given a number a positive/negative number of sharps, return a Pitch 
     object set to the appropriate major key value.
 
-    >>> from music21 import *
+    
 
     >>> key.sharpsToPitch(1)
     <music21.pitch.Pitch G>
@@ -162,7 +162,7 @@ def pitchToSharps(value, mode=None):
     the Locrian mode in print.  David Cohen and I (MSC) have been
     looking for this for years).
 
-    >>> from music21 import *
+    
 
     >>> key.pitchToSharps('c')
     0
@@ -334,7 +334,7 @@ class KeySignature(base.Music21Object):
     
     If you are starting with the name of a key, see the :class:`~music21.key.Key` object.
 
-    >>> from music21 import *
+    
 
     >>> A = key.KeySignature(3)
     >>> A
@@ -444,7 +444,7 @@ class KeySignature(base.Music21Object):
         a :class:`music21.pitch.Pitch` object that 
         names this key and the value of :attr:`~music21.key.KeySignature.mode`.
 
-        >>> from music21 import *
+        
        
         >>> key.KeySignature(-7).pitchAndMode
         (<music21.pitch.Pitch C->, None)
@@ -510,7 +510,7 @@ class KeySignature(base.Music21Object):
         Return a list of music21.pitch.Pitch objects that are altered by this 
         KeySignature. That is, all Pitch objects that will receive an accidental.  
 
-        >>> from music21 import *
+        
 
         >>> a = key.KeySignature(3)
         >>> a.alteredPitches
@@ -546,14 +546,14 @@ class KeySignature(base.Music21Object):
         for that note in this key (using the natural minor for minor)
         or None if there is none.
 
-        >>> from music21 import *
+        
         
         >>> g = key.KeySignature(1)
         >>> g.accidentalByStep("F")
         <accidental sharp>
         >>> g.accidentalByStep("G")
 
-        >>> f = KeySignature(-1)
+        >>> f = key.KeySignature(-1)
         >>> bbNote = note.Note("B-5")
         >>> f.accidentalByStep(bbNote.step)
         <accidental flat>     
@@ -569,7 +569,7 @@ class KeySignature(base.Music21Object):
         Set all notes to the correct notes for a key using the 
         note's Key Context.  Before:              
         
-        >>> from music21 import *
+        
         >>> s1 = stream.Stream()
         >>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
         >>> s1.append(note.HalfNote("C"))
@@ -633,7 +633,7 @@ class KeySignature(base.Music21Object):
         specification can be provided. Alternatively, a 
         :class:`music21.interval.Interval` object can be supplied.
 
-        >>> a = KeySignature(2)
+        >>> a = key.KeySignature(2)
         >>> a
         <music21.key.KeySignature of 2 sharps>
         >>> a.pitchAndMode
@@ -685,7 +685,7 @@ class KeySignature(base.Music21Object):
         Return a scale that is representative of this key signature
         and mode.
 
-        >>> from music21 import *
+        
         >>> ks = key.KeySignature(3)
         >>> ks
         <music21.key.KeySignature of 3 sharps>
@@ -721,7 +721,7 @@ class KeySignature(base.Music21Object):
         then it sets the number of flats.  Equivalent to musicxml's 'fifths'
         feature
         
-        >>> from music21 import *
+        
         >>> ks1 = key.KeySignature(2)
         >>> ks1.sharps
         2
@@ -801,7 +801,7 @@ class Key(KeySignature, scale.DiatonicScale):
     It probably has a scale (or scales) associated with it and a KeySignature,
     but not necessarily.
 
-    >>> from music21 import *
+    
     >>> cm = key.Key('c')  # cminor.
     >>> cm
     <music21.key.Key of c minor>
@@ -945,7 +945,7 @@ class Key(KeySignature, scale.DiatonicScale):
         specification can be provided. Alternatively, a 
         :class:`music21.interval.Interval` object can be supplied.
 
-        >>> dMajor = Key("D")
+        >>> dMajor = key.Key("D")
         >>> dMajor
         <music21.key.Key of D major>
         
@@ -961,7 +961,7 @@ class Key(KeySignature, scale.DiatonicScale):
         
         inPlace works here
         
-        >>> changingKey = Key('g')
+        >>> changingKey = key.Key('g')
         >>> changingKey
         <music21.key.Key of g minor>
         >>> changingKey.sharps

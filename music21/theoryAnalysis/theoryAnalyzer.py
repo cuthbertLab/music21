@@ -43,7 +43,7 @@ a direct pointer to the original object in the score.
 You can then iterate through these objects and access the attributes directly. Here is an example
 of this that will analyze the root motion in a score:
 
-    >>> from music21 import *
+    
     >>> p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
     >>> p = harmony.realizeChordSymbolDurations(p)
     >>> averageMotion = 0
@@ -108,7 +108,7 @@ As an example, the steps involved in these methods calls include:
 7. if all checks are true, the passingTone or neighborTone is removed from the score (because the whole point of parsing the score into voiceLeadingObjects was to maintain a direct pointer to the original object in the score.
 8. the gap created by the deletion is filled in by extending the duration of the previous note
 
-    >>> from music21 import *
+    
     >>> p = corpus.parse('bwv6.6').measures(0,20)
     >>> #_DOCS_SHOW p.show()
         .. image:: images/completebach.*
@@ -178,7 +178,7 @@ def addAnalysisData(score):
 
     also adds to any embedded Streams...
 
-    >>> from music21 import *
+    
     >>> p = stream.Part()
     >>> s = stream.Score()
     >>> s.insert(0, p)
@@ -218,7 +218,7 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
     to determine what vertical slices to take. Default is to return only objects of
     type Note, Chord, Harmony, and Rest.
     
-    >>> from music21 import *
+    
 
     >>> n1 = note.Note('c5')
     >>> n1.quarterLength = 4
@@ -254,7 +254,7 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
     >>> p1.append(harmony.ChordSymbol('D', quarterLength = 3))
     >>> p1.append(harmony.ChordSymbol('E7', quarterLength = 4))
     >>> sc3.append(p1)
-    >>> getVerticalSlices(sc3)
+    >>> theoryAnalysis.theoryAnalyzer.getVerticalSlices(sc3)
     [<music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol C>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol D>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol E7>]})  ]
 
     '''   
@@ -300,7 +300,7 @@ def getVLQs(score, partNum1, partNum2):
     extracts and returns a list of the :class:`~music21.voiceLeading.VoiceLeadingQuartet` 
     objects present between partNum1 and partNum2 in the score
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -359,7 +359,6 @@ def getThreeNoteLinearSegments(score, partNum):
     objects present in partNum in the score (three note linear segments are made up of ONLY
     three notes)
     
-    >>> from music21 import *
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
     >>> part0.append(note.Note('c4'))
@@ -395,7 +394,7 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     the partNum specified, the length of which specified by lengthLinearSegment: 
     Currently Supported: :class:`~music21.voiceLeading.ThreeNoteLinearSegment` 
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -480,7 +479,7 @@ def getVerticalSliceNTuplets(score, ntupletNum):
     extracts and returns a list of the :class:`~music21.voiceLeading.VerticalSliceNTuplet` or the 
     corresponding subclass (currently only supports triplets) 
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -533,7 +532,7 @@ def getHarmonicIntervals(score, partNum1, partNum2):
     returns a list of all the harmonic intervals (:class:`~music21.interval.Interval` ) 
     occurring between the two specified parts.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -571,7 +570,7 @@ def getMelodicIntervals(score, partNum):
     '''
     returns a list of all the melodic intervals (:class:`~music21.interval.Interval`) in the specified part.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -604,7 +603,7 @@ def getNotes(score, partNum):
     '''
     returns a list of notes present in the score. If Rests are present, appends None to the list
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> p = stream.Part()
@@ -635,7 +634,7 @@ def getAllPartNumPairs(score):
     Gets a list of all possible pairs of partNumbers:
     tuples (partNum1, partNum2) where 0 <= partNum1 < partnum2 < numParts
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -849,7 +848,7 @@ def identifyParallelFifths(score, partNum1 = None, partNum2 = None, color = None
     and stores the resulting list of VLQTheoryResult objects in ``score.analysisData['ResultDict']['parallelFifths']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -885,7 +884,7 @@ def getParallelFifths(score, partNum1=None, partNum2 = None):
     Identifies all parallel fifths in score, or only the parallel fifths found between partNum1 and partNum2, and
     returns these as instances of :class:`~music21.voiceLeading.VoiceLeadingQuartet`
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -924,7 +923,7 @@ def identifyParallelOctaves(score, partNum1 = None, partNum2 = None, color = Non
     and stores the resulting list of ``VLQTheoryResult`` objects in ``score.analysisData['ResultDict']['parallelOctaves']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -958,7 +957,7 @@ def getParallelOctaves(score, partNum1=None, partNum2=None):
     or only the parallel octaves found between partNum1 and partNum2, and
     returns these as instances of :class:`~music21.voiceLeading.VoiceLeadingQuartet`
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -990,7 +989,7 @@ def identifyParallelUnisons(score, partNum1 = None, partNum2 = None, color = Non
     and stores the resulting list of VLQTheoryResult objects in ``score.analysisData['ResultDict']['parallelUnisons']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1031,7 +1030,7 @@ def identifyHiddenFifths(score, partNum1 = None, partNum2 = None, color = None,d
     and stores the resulting list of VLQTheoryResult objects in ``self.resultDict['hiddenFifths']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1066,7 +1065,7 @@ def identifyHiddenOctaves(score, partNum1 = None, partNum2 = None, color = None,
     and stores the resulting list of VLQTheoryResult objects in ``score.analysisData['ResultDict']['hiddenOctaves']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1101,7 +1100,7 @@ def identifyImproperResolutions(score, partNum1 = None, partNum2 = None, color =
     and stores the resulting list of VLQTheoryResult objects in ``self.resultDict['improperResolution']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1138,7 +1137,7 @@ def identifyLeapNotSetWithStep(score, partNum1 = None, partNum2 = None, color = 
     and stores the resulting list of VLQTheoryResult objects in ``self.resultDict['leapNotSetWithStep']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1170,7 +1169,7 @@ def identifyOpensIncorrectly(score, partNum1 = None, partNum2 = None, color = No
     '''
     Identifies if the piece opens correctly; calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.opensIncorrectly`
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1201,7 +1200,7 @@ def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = N
     '''
     Identifies if the piece closes correctly; calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.closesIncorrectly`
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1243,7 +1242,7 @@ def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey 
     Optionally label each identified passing tone with an editorial :class:`~music21.editorial.NoteEditorial` value of 
     editorialValue at ``note.editorial.misc[editorialDictKey]``
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> sc.insert(0, meter.TimeSignature('2/4'))
@@ -1280,7 +1279,7 @@ def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=
     returns a list of all passing tones present in the score, as identified by 
     :meth:`~music21.voiceLeading.VerticalSliceTriplet.hasPassingTone`
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> sc.insert(0, meter.TimeSignature('2/4'))
@@ -1315,7 +1314,7 @@ def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly
     '''
     returns a list of all passing tones present in the score, as identified by :meth:`~music21.voiceLeading.VerticalSliceTriplet.hasNeighborTone`
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> sc.insert(0, meter.TimeSignature('2/4'))
@@ -1351,7 +1350,7 @@ def removePassingTones(score, dictKey = 'unaccentedPassingTones'):
     primitively removes the passing tones found in a piece and fills the gap by extending note duraitons 
     (method under development)
 
-    >>> from music21 import *
+    
     >>> sc = stream.Score()
     >>> sc.insert(0, meter.TimeSignature('2/4'))
     >>> part0 = stream.Part()
@@ -1392,7 +1391,7 @@ def removeNeighborTones(score, dictKey = 'unaccentedNeighborTones'):
     primitively removes the neighbor tones found in a piece and fills the gap by extending note duraitons 
     (method under development)
     
-    >>> from music21 import *
+    
     >>> from music21.theoryAnalysis import *
     >>> sc = stream.Score()
     >>> sc.insert(0, meter.TimeSignature('2/4'))
@@ -1437,7 +1436,7 @@ def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey
     specify unaccentedOnly to identify only unaccented neighbor tones (neighbor tones on weak beats). unaccentedOnly
     by default set to True
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> sc.insert(0, meter.TimeSignature('2/4'))
@@ -1476,7 +1475,7 @@ def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, 
     and stores the resulting list of IntervalTheoryResultObject objects in ``self.resultDict['dissonantHarmonicIntervals']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
             
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1512,7 +1511,7 @@ def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, 
     '''
     Identifies dissonant harmonic intervals that are not passing tones or neighbor tones or don't resolve correctly
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1574,7 +1573,7 @@ def identifyDissonantMelodicIntervals(score, partNum = None, color = None, dictK
     IntervalTheoryResultObject objects in ``self.resultDict['dissonantMelodicIntervals']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1674,7 +1673,7 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
     in the list. For example, if only roman numerals were to be written for the vertical slice at offset 0, 6, and 7
     in the piece, pass ``responseOffsetMap = [0,6,7]``
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1760,7 +1759,7 @@ def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = N
     :class:`~music21.theoryAnalysis.theoryAnalyzerIntervalTheoryResult` created with ``.value`` set to the the string most commonly
     used to identify the interval (0 through 9, with A4 and d5)
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1806,7 +1805,7 @@ def identifyScaleDegrees(score, partNum = None, color = None, dictKey = 'scaleDe
     '''
     identify all the scale degrees in the score in partNum, or if not specified ALL partNums
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1847,7 +1846,7 @@ def identifyMotionType(score, partNum1 = None, partNum2 = None, color = None, di
     :class:`~music21.theoryResult.VLQTheoryResult` by calling :meth:`~music21.voiceLeading.VoiceLeadingQuartet.motionType`
     Possible values for VLQTheoryResult are 'Oblique', 'Parallel', 'Similar', 'Contrary', 'Anti-Parallel', 'No Motion'
     
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1914,7 +1913,7 @@ def getResultsString(score, typeList=None):
     '''
     returns string of all results found by calling all identify methods on the TheoryAnalyzer score
 
-    >>> from music21 import *
+    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1982,7 +1981,7 @@ def removeFromAnalysisData(score, dictKeys):
     remove a a result entry or entries from the resultDict by specifying which key or keys in the dictionary
     you'd like remove. Pass in a list of dictKeys or just a single dictionary key.
     
-    >>> from music21 import *
+    
     >>> sc = stream.Score()
     >>> theoryAnalysis.theoryAnalyzer.addAnalysisData(sc)
     >>> sc.analysisData['ResultDict'] = {'sampleDictKey': 'sample response', 'h1':'another sample response', 5:'third sample response'}
@@ -2025,7 +2024,7 @@ def setKeyMeasureMap(score, keyMeasureMap):
     for analysis purposes only - no key object is actually added to the score.
     Check the music xml to verify measure numbers; pickup measures are usually 0.
 
-    >>> from music21 import *
+    
     >>> from music21.theoryAnalysis import *
     >>> n1 = note.Note('c5')
     >>> n1.quarterLength = 4
@@ -2053,7 +2052,7 @@ def getKeyAtMeasure(score, measureNumber):
     uses keyMeasureMap to return music21 key object. If keyMeasureMap not specified,
     returns key analysis of theory score as a whole. 
     
-    >>> from music21 import *
+    
     >>> from music21.theoryAnalysis import *
     >>> s = stream.Score()
     >>> theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(s, {1:'C', 2:'G', 4:'a', 7:'C'})

@@ -60,7 +60,7 @@ def assembleLyrics(streamIn, lineNumber=1):
 
     The `lineNumber` parameter determines which line of text is assembled.
     
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> n1 = note.Note()
     >>> n1.lyric = "Hi"
@@ -99,7 +99,7 @@ def assembleLyrics(streamIn, lineNumber=1):
 def prependArticle(src, language=None):
     '''Given a text string, if an article is found in a trailing position with a comma, place the article in front and remove the comma. 
 
-    >>> from music21 import *
+    
     >>> text.prependArticle('Ale is Dear, The')
     'The Ale is Dear'
     >>> text.prependArticle('Ale is Dear, The', 'en')
@@ -135,7 +135,7 @@ def prependArticle(src, language=None):
 def postpendArticle(src, language=None):
     '''Given a text string, if an article is found in a leading position, place it at the end with a comma. 
 
-    >>> from music21 import *
+    
     >>> text.postpendArticle('The Ale is Dear')
     'Ale is Dear, The'
     >>> text.postpendArticle('The Ale is Dear', 'en')
@@ -207,8 +207,8 @@ class TextFormat(object):
     justify = property(_getJustify, _setJustify, 
         doc = '''Get or set the the justification.
 
-        >>> from music21 import *
-        >>> tf = TextFormat()
+        
+        >>> tf = text.TextFormat()
         >>> tf.justify = 'center'
         >>> tf.justify
         'center'
@@ -228,8 +228,8 @@ class TextFormat(object):
     style = property(_getStyle, _setStyle, 
         doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
 
-        >>> from music21 import *
-        >>> tf = TextFormat()
+        
+        >>> tf = text.TextFormat()
         >>> tf.style = 'bold'
         >>> tf.style
         'bold'
@@ -249,8 +249,8 @@ class TextFormat(object):
     weight = property(_getWeight, _setWeight, 
         doc = '''Get or set the weight, as normal, or bold.
 
-        >>> from music21 import *
-        >>> tf = TextFormat()
+        
+        >>> tf = text.TextFormat()
         >>> tf.weight = 'bold'
         >>> tf.weight
         'bold'
@@ -270,8 +270,8 @@ class TextFormat(object):
     size = property(_getSize, _setSize, 
         doc = '''Get or set the size.
 
-        >>> from music21 import *
-        >>> tf = TextFormat()
+        
+        >>> tf = text.TextFormat()
         >>> tf.size = 20
         >>> tf.size
         20.0
@@ -294,8 +294,8 @@ class TextFormat(object):
     letterSpacing = property(_getLetterSpacing, _setLetterSpacing, 
         doc = '''Get or set the letter spacing.
 
-        >>> from music21 import *
-        >>> tf = TextFormat()
+        
+        >>> tf = text.TextFormat()
         >>> tf.letterSpacing = 20
         >>> tf.letterSpacing
         20.0
@@ -384,7 +384,7 @@ class TextBox(base.Music21Object, TextFormat):
     content = property(_getContent, _setContent, 
         doc = '''Get or set the the content.
 
-        >>> from music21 import *
+        
         >>> te = text.TextBox('testing')
         >>> te.content
         'testing'
@@ -405,7 +405,7 @@ class TextBox(base.Music21Object, TextFormat):
     page = property(_getPage, _setPage, 
         doc = '''Get or set the the page number. The first page (page 1) is the default. 
 
-        >>> from music21 import *
+        
         >>> te = text.TextBox('testing')
         >>> te.content
         'testing'
@@ -424,7 +424,7 @@ class TextBox(base.Music21Object, TextFormat):
         doc = '''
         Get or set the vertical position.
 
-        >>> from music21 import *
+        
         >>> te = text.TextBox('testing')
         >>> te.positionVertical = 1000
         >>> te.positionVertical
@@ -443,7 +443,7 @@ class TextBox(base.Music21Object, TextFormat):
         doc = '''
         Get or set the vertical position.
 
-        >>> from music21 import *
+        
         >>> te = text.TextBox('testing')
         >>> te.positionHorizontal = 200
         >>> te.positionHorizontal
@@ -467,7 +467,7 @@ class TextBox(base.Music21Object, TextFormat):
         doc = '''
         Get or set the vertical align. Valid values are top, middle, bottom, and baseline
 
-        >>> from music21 import *
+        
         >>> te = text.TextBox('testing')
         >>> te.alignVertical = 'top'
         >>> te.alignVertical
@@ -488,7 +488,7 @@ class TextBox(base.Music21Object, TextFormat):
         doc = '''
         Get or set the horicontal align.
 
-        >>> from music21 import *
+        
         >>> te = text.TextBox('testing')
         >>> te.alignHorizontal = 'right'
         >>> te.alignHorizontal
@@ -536,7 +536,7 @@ class LanguageDetector(object):
         returns the code of the most likely language for a passage, works on unicode or ascii.
         current languages: en, fr, de, it, cn
 
-        >>> from music21 import *
+        
         >>> ld = text.LanguageDetector()
         >>> ld.mostLikelyLanguage("Hello there, how are you doing today? I haven't seen you in a while.")
         'en'
@@ -562,7 +562,7 @@ class LanguageDetector(object):
         
         The codes are the index of the language name in LanguageDetector.languageCodes + 1
         
-        >>> ld = LanguageDetector()
+        >>> ld = text.LanguageDetector()
         >>> for i in range(0, len(ld.languageCodes)):
         ...    print i+1, ld.languageCodes[i]
         1 en

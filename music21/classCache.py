@@ -46,7 +46,7 @@ class Repository(object):
     def addElement(self, e):
         '''Add an element to the repository
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> r = classCache.Repository()
         >>> r.addElement(n)
@@ -63,7 +63,7 @@ class Repository(object):
     def addEndElement(self, e):
         '''Add an element to the repository
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> r = classCache.Repository()
         >>> r.addElement(n)
@@ -81,7 +81,7 @@ class Repository(object):
 
     def insertIntoStream(self, targetStream, offsetSite):
         '''
-        >>> from music21 import *
+        
         >>> s1 = stream.Stream()
         >>> n1 = note.Note()
         >>> s1.insert(30, n1)
@@ -120,7 +120,7 @@ class ClassCache(object):
 
     def load(self, srcStream):
         '''
-        >>> from music21 import *
+        
         >>> s1 = stream.Stream()
         >>> s1.repeatAppend(note.Note(), 4)
         >>> s1.repeatAppend(note.Rest(), 4)
@@ -178,7 +178,7 @@ class ClassCache(object):
         `classFilterList` must be a list.
         `targetStream` is the Stream to build and return
 
-        >>> from music21 import *
+        
         >>> s1 = stream.Stream()
         >>> s1.repeatAppend(note.Note(), 4)
         >>> s1.repeatAppend(note.Rest(), 4)

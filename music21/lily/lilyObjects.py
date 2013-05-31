@@ -96,13 +96,13 @@ class LyObject(object):
         Returns a dictionary and sets self.lilyAttributes to that dictionary, for a m21Object
         of class classLookup using the mapping of self.m21toLy[classLookup]
         
-        >>> from music21 import *
+        
         >>> class Mock(base.Music21Object): pass
         >>> m = Mock()
         >>> m.mockAttribute = 32
         >>> m.mockAttribute2 = None
         
-        >>> lm = LyMock()
+        >>> lm = lily.lilyObjects.LyMock()
         
         LyMock (our test class) defines mappings for two classes:
         to LyMock.lilyAttributes:
@@ -138,10 +138,10 @@ class LyObject(object):
         Returns a dictionary and sets self.lilyAttributes to that dictionary, for a m21Object
         of class classLookup using the mapping of self.m21toLy[classLookup]
         
-        >>> from music21 import *
+        
         >>> class Mock(base.Music21Object): pass
         >>> m = Mock()
-        >>> lm = LyMock()
+        >>> lm = lily.lilyObjects.LyMock()
         
         LyMock (our test class) defines certain mappings from the m21 Mock class
         to LyMock.lilyAttributes:
@@ -229,7 +229,7 @@ class LyObject(object):
         internal quotation marks backslash'd out
         and an extra space at the end.
         
-        >>> m = LyObject()
+        >>> m = lily.lilyObjects.LyObject()
         >>> print m.quoteString(r'Hello "there"!')
         "Hello \"there\"!" 
         '''
@@ -385,8 +385,8 @@ class LyAssignment(LyObject):
     if self.propertyPath is not None, uses type 2
     else uses type 1 or raises an exception.
 
-    >>> lyii = LyIdentifierInit(string = "hi")
-    >>> lya = LyAssignment(assignmentId = "title", identifierInit = lyii)
+    >>> lyii = lily.lilyObjects.LyIdentifierInit(string = "hi")
+    >>> lya = lily.lilyObjects.LyAssignment(assignmentId = "title", identifierInit = lyii)
     >>> print lya
     title = "hi" 
     
@@ -419,7 +419,7 @@ class LyAssignment(LyObject):
 class LyIdentifierInit(LyObject):
     r'''
     
-    >>> lyii = LyIdentifierInit(string = "hello")
+    >>> lyii = lily.lilyObjects.LyIdentifierInit(string = "hello")
     >>> print lyii
     "hello" 
     '''
@@ -596,7 +596,7 @@ class LyScoreBlock(LyObject):
     
     with all the real stuff being in self.scoreBody
     
-    >>> lysb = LyScoreBlock(scoreBody = "hello")
+    >>> lysb = lily.lilyObjects.LyScoreBlock(scoreBody = "hello")
     >>> print lysb
     \score { hello }
     '''
@@ -689,7 +689,7 @@ class LyOutputDefHead(LyObject):
     r'''
     defType can be paper, midi, or layout.
 
-    >>> lyODH = LyOutputDefHead()
+    >>> lyODH = lily.lilyObjects.LyOutputDefHead()
     >>> lyODH.defType = 'midi'
     >>> print lyODH.stringOutput()
     \midi
@@ -1177,10 +1177,10 @@ class LyModeChangingHead(LyObject):
     .hasContext = False
     .mode = ['note', 'drum', 'figure', 'chord', 'lyric']
     
-    >>> l = LyModeChangingHead(hasContext = True, mode = 'drum')
+    >>> l = lily.lilyObjects.LyModeChangingHead(hasContext = True, mode = 'drum')
     >>> print l.stringOutput()
     \drummode
-    >>> l2 = LyModeChangingHead(hasContext = False, mode = 'chord')
+    >>> l2 = lily.lilyObjects.LyModeChangingHead(hasContext = False, mode = 'chord')
     >>> print l2.stringOutput()
     \chords
     
@@ -1646,8 +1646,8 @@ class LyStenoDuration(LyObject):
     
     a duration number followed by one or more dots
     
-    >>> from music21 import *
-    >>> lsd = LyStenoDuration('2', 2)
+    
+    >>> lsd = lily.lilyObjects.LyStenoDuration('2', 2)
     >>> print lsd
     2..
     
@@ -1740,7 +1740,7 @@ class LyLyricElement(LyObject):
     '''
     Object represents a single Lyric in lilypond.
     
-    >>> from music21 import *
+    
     >>> lle = lily.lilyObjects.LyLyricElement("hel_")
     >>> lle
     <music21.lily.lilyObjects.LyLyricElement object "hel_">

@@ -41,7 +41,7 @@ def translateMonophonicPartToSegments(inputStream, segmentLengths = 30, overlap 
     overlap of `overlap` using the algorithm of `algorithm`. Returns two lists, a list of segments, and
     a list of measure numbers that match the segments.
     
-    >>> from music21 import *
+    
     >>> luca = corpus.parse('luca/gloria')
     >>> lucaCantus = luca.parts[0]
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)
@@ -115,7 +115,7 @@ def indexScoreParts(scoreFile, *args, **kwds):
     Creates segment and measure lists for each part of a score
     Returns list of dictionaries of segment and measure lists
     
-    >>> from music21 import *
+    
     >>> luca = corpus.parse('luca/gloria')
     >>> scoreList = search.segment.indexScoreParts(luca)
     >>> scoreList[1]['segmentList'][0]
@@ -135,7 +135,7 @@ def indexScoreFilePaths(scoreFilePaths, giveUpdates = False, *args, **kwds):
     returns a dictionary of the lists from indexScoreParts for each score in 
     scoreFilePaths
     
-    >>> from music21 import *
+    
     >>> fps = corpus.search('bwv19')
     >>> fpsNamesOnly = [x[0] for x in fps]
     >>> len(fpsNamesOnly)
@@ -197,29 +197,33 @@ def getDifflibOrPyLev(seq2 = None, junk=None):
     return smObject
 
 def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeReverse = False):
-    r'''
-    find the level of similarity between each pair of segments in a scoreDict.
+    r'''Find the level of similarity between each pair of segments in a scoreDict.
     
-    takes twice as long as it should because it does not cache the pairwise similarity.
+    This takes twice as long as it should because it does not cache the pairwise similarity.
     
-    >>> from music21 import *
-    >>> fps = corpus.search('bwv19')
-    >>> fpsNamesOnly = [x[0] for x in fps]
-    >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
-    >>> scoreSim = scoreSimilarity(scoreDict)
-    >>> len(scoreSim)
-    671
+    ::
+ 
+        >>> fps = corpus.search('bwv19')
+        >>> fpsNamesOnly = [x[0] for x in fps]
+        >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
+        >>> scoreSim = search.segment.scoreSimilarity(scoreDict)
+        >>> len(scoreSim)
+        671
     
     Returns a tuple of first score name, first score voice number, first score
     measure number, second score name, second score voice number, second score
     measure number, and similarity score (0 to 1).
     
-    >>> import pprint
-    >>> pprint.pprint(scoreSim[64:68])
-    [(u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 3, 17, 0.0),
-     (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 4, 22, 0.0),
-     (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.45...),
-     (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 1, 5, 0.339...)]
+    ::
+
+        >>> import pprint
+        >>> pprint.pprint(scoreSim[64:68]) #doctest: +ELLIPSIS
+        [(u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 3, 17, 0.0),
+         (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 4, 22, 0.0),
+         (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.377...),
+         (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 1, 5, 0.339...)]
+
+    Return tuple.
     '''
     similarityScores = []
     scoreIndex = 0

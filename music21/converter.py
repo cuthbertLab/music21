@@ -32,7 +32,7 @@ faster since we store a parsed version of each file as a "pickle" object in
 the temp folder on the disk.
 
 
->>> from music21 import *
+
 >>> #_DOCS_SHOW s = converter.parse('d:/mydocs/schubert.krn')
 >>> s = converter.parse(humdrum.testFiles.schubert) #_DOCS_HIDE
 >>> s
@@ -265,7 +265,7 @@ class ConverterHumdrum(object):
         '''Open Humdrum data from a string
 
         >>> humdata = '**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-'
-        >>> c = ConverterHumdrum()
+        >>> c = converter.ConverterHumdrum()
         >>> s = c.parseData(humdata)
         '''
         self.data = humdrum.parseData(humdrumString)
@@ -295,7 +295,7 @@ class ConverterTinyNotation(object):
         '''Open TinyNotation data from a string or list
 
         >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
-        >>> c = ConverterTinyNotation()
+        >>> c = converter.ConverterTinyNotation()
         >>> s = c.parseData(tnData)
         '''
         if common.isStr(tnData):
@@ -323,7 +323,7 @@ class ConverterNoteworthy(object):
         
     Users should not need this routine.  The basic format is
     
-    >>> from music21 import *
+    
     >>> import os #_DOCS_HIDE
     >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__) #_DOCS_HIDE 
     >>> paertPath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE 
@@ -344,7 +344,7 @@ class ConverterNoteworthy(object):
         r'''Open Noteworthy data from a string or list
 
         >>> nwcData = "!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|Type:Treble\n|Note|Dur:Whole|Pos:1^"
-        >>> c = ConverterNoteworthy()
+        >>> c = converter.ConverterNoteworthy()
         >>> c.parseData(nwcData)
         >>> c.stream.show('text')
         {0.0} <music21.stream.Part ...>
@@ -359,12 +359,12 @@ class ConverterNoteworthy(object):
         '''
         Open Noteworthy data (as nwctxt) from a file path.
         
-        >>> from music21 import *
+        
         >>> import os #_DOCS_HIDE
         >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__) #_DOCS_HIDE
         >>> filePath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
         >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt') 
-        >>> c = ConverterNoteworthy()
+        >>> c = converter.ConverterNoteworthy()
         >>> c.parseFile(filePath)
         >>> #_DOCS_SHOW c.stream.show()        
         '''
@@ -885,7 +885,7 @@ class Converter(object):
         is accepted.
         
         
-        >>> from music21 import *
+        
         >>> #_DOCS_SHOW jeanieLightBrownURL = 'http://www.wikifonia.org/node/4391'
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
@@ -950,7 +950,7 @@ class Converter(object):
         
         Not case sensitive.
         
-        >>> from music21 import *
+        
         >>> c = converter.Converter()
         >>> c.formatFromHeader('tinynotation: C4 E2')
         ('tinyNotation', 'C4 E2')
@@ -1042,7 +1042,7 @@ def parse(value, *args, **keywords):
     
 
 
-    >>> from music21 import *
+    
     >>> s = converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c")
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 3/4>
@@ -1115,7 +1115,7 @@ def freeze(streamObj, fmt=None, fp=None):
 
     The file path is returned.
     
-    >>> from music21 import *
+    
     >>> c = converter.parse('c4 d e f', '4/4')
     >>> c.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -1167,7 +1167,7 @@ def freezeStr(streamObj, fmt=None):
     the `fmt` argument; 'pickle' (the default), 
     is the only one presently supported.
 
-    >>> from music21 import *
+    
     >>> c = converter.parse('c4 d e f', '4/4')
     >>> c.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>

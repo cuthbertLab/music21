@@ -40,7 +40,7 @@ def L(c, raiseException=False):
     
     Example 1: A C major chord, under P, will return an E minor chord
     
-    >>> from music21 import *
+    
     >>> c1 = chord.Chord("C4 E4 G4")
     >>> c2 = analysis.neoRiemannian.L(c1)
     >>> c2.pitches
@@ -73,7 +73,7 @@ def P(c, raiseException=False):
     
     Example 1: A C major chord, under P, will return an C minor chord
     
-    >>> from music21 import *
+    
     >>> c2 = chord.Chord("C4 E4 G4")
     >>> c3 = analysis.neoRiemannian.P(c2)
     >>> c3.pitches
@@ -105,7 +105,7 @@ def R(c, raiseException=False):
     
     Example 1: A C major chord, under R, will return an A minor chord
     
-    >>> from music21 import *
+    
     >>> c1 = chord.Chord("C4 E4 G4")
     >>> c2 = analysis.neoRiemannian.R(c1)
     >>> c2.pitches
@@ -157,7 +157,7 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
     if simplifyEnharmonic= True, the resulting chord will be simplified to notes with at most 1 flat
     or 1 sharp, in their most common form. 
     
-    >>> from music21 import *
+    
     >>> c1 = chord.Chord("C4 E4 G4")
     >>> c2 = analysis.neoRiemannian.LRP_combinations(c1, 'LP')
     >>> c2
@@ -247,7 +247,7 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
     
 def completeHexatonic(c):
     '''
-    >>> from music21 import *
+    
     >>> c1 = chord.Chord("C4 E4 G4")
     >>> analysis.neoRiemannian.completeHexatonic(c1)
     [<music21.chord.Chord C4 E-4 G4>, 

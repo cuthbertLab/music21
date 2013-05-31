@@ -40,7 +40,7 @@ def fromStream(inputStream):
  
 class GregorianStream(stream.Stream):
     r'''
-    >>> from music21 import *
+    
     >>> s = chant.GregorianStream()
     >>> s.append(clef.AltoClef())
     >>> n = chant.GregorianNote("C4")
@@ -82,7 +82,7 @@ class GregorianStream(stream.Stream):
     def clefToGABC(self, clef):
         '''
        
-        >>> from music21 import *
+        
         >>> s = chant.GregorianStream()
         >>> c = clef.AltoClef()
         >>> s.clefToGABC(c)
@@ -103,7 +103,7 @@ class GregorianNote(note.Note):
     
     Example: a very special note.
     
-    >>> from music21 import *
+    
     >>> n = chant.GregorianNote("C4")
     >>> n.liquescent = True 
     >>> n.quilisma = True
@@ -207,7 +207,7 @@ class GregorianNote(note.Note):
         see http://home.gna.org/gregorio/gabc/ for more details.  'd' = lowest line
        
         
-        >>> from music21 import *
+        
         >>> n = chant.GregorianNote("C4")
         >>> c = clef.AltoClef()
         >>> n.toBasicGABC(c)
@@ -272,13 +272,13 @@ class GregorianNote(note.Note):
         
     See the docs for Gregorio for graphical representations of these figures.
     
-    >>> from music21 import *
+    
     >>> n = chant.GregorianNote("D3")
     >>> n.fill
     u'solid'
     >>> n.fill = 'cavum'
     >>> n.fill
-    u'cavum'
+    'cavum'
     
     ''')
 
@@ -320,7 +320,7 @@ class BaseScoreConverter(object):
     
     def writeFile(self, text=None):
         '''
-        >>> from music21 import *
+        
         >>> bsc = chant.BaseScoreConverter()
         >>> filePath = bsc.writeFile('hello')
         >>> assert(filePath.endswith('.gabc')) #_DOCS_HIDE
@@ -344,7 +344,7 @@ class BaseScoreConverter(object):
         converts a .gabc file to LaTeX using the
         gregorio converter.  Returns the filename with .tex substituted for .gabc
         
-        >>> from music21 import *
+        
         >>> bsc = chant.BaseScoreConverter()
         >>> #_DOCS_SHOW newFp = bsc.launchGregorio('~cuthbert/Library/Gregorio/examples/Populas.gabc')
         >>> #_DOCS_SHOW bsc.gregorioCommand
@@ -462,7 +462,7 @@ SCOREGOESHERE
         r'''
         Puts the correct information into the TeXWrapper for the document
         
-        >>> from music21 import *
+        
         >>> wrapper = chant.DefaultTeXWrapper()
         >>> class Converter():
         ...    score = r'\note{C}' + "\n" + r'\endgregorioscore %' + "\n" + r'\endinput %'

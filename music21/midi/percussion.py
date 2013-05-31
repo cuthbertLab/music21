@@ -29,7 +29,7 @@ class PercussionMapper(object):
     
     Give me the instrument that corresponds to MIDI note 58!
     
-    >>> from music21 import *
+    
     >>> pm = midi.percussion.PercussionMapper()
     >>> pm.reverseInstrumentMapping[58]
     <class 'music21.instrument.Vibraslap'>
@@ -95,7 +95,7 @@ class PercussionMapper(object):
         '''
         Takes a pitch.Pitch object or int and returns the corresponding instrument in the GM Percussion Map.
         
-        >>> from music21 import *
+        
         >>> pm = midi.percussion.PercussionMapper()
         >>> cowPitch = pitch.Pitch(56)
         >>> cowbell = pm.midiPitchToInstrument(cowPitch)
@@ -165,7 +165,7 @@ class PercussionMapper(object):
         Takes an instrument.Instrument object and returns a pitch object
         with the corresponding MIDI note, according to the GM Percussion Map.
         
-        >>> from music21 import *
+        
         >>> pm = midi.percussion.PercussionMapper()
         >>> myCow = instrument.Cowbell()
         >>> cowPitch = pm.midiInstrumentToPitch(myCow)

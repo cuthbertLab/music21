@@ -63,7 +63,7 @@ class MuseDataRecord(object):
     def isRest(self):
         '''Return a boolean if this record is a rest. 
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('D4     1        s     d  ]]')
         >>> mdr.isRest()
         False
@@ -79,12 +79,12 @@ class MuseDataRecord(object):
     def isTied(self):
         '''Return a boolean if this record is tied. 
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('D4     8-       h     d        -')
         >>> mdr.isTied()
         True
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('C4     1        s     u  [[')
         >>> mdr.isTied()
         False
@@ -120,7 +120,7 @@ class MuseDataRecord(object):
 
     def isBack(self):
         '''
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('back   4')
         >>> mdr.isBack()
         True
@@ -133,7 +133,7 @@ class MuseDataRecord(object):
 
     def _getPitchParameters(self):
         '''
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> mdr.isNote()
         True
@@ -173,7 +173,7 @@ class MuseDataRecord(object):
     def _getAccidentalObject(self):
         '''Return a music21 Accidental object for the representation.
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> mdr._getAccidentalObject()
         >>> mdr = musedata.MuseDataRecord('F#4    1        s #   d  ==')
@@ -224,7 +224,7 @@ class MuseDataRecord(object):
     def getPitchObject(self):
         '''Get the Pitch object defined by this record. This may be a note, chord, or grace pitch.
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> p = mdr.getPitchObject()
         >>> p.nameWithOctave
@@ -264,7 +264,7 @@ class MuseDataRecord(object):
 
     def getQuarterLength(self, divisionsPerQuarterNote=None):
         '''
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> mdr.getQuarterLength(4)
         0.25
@@ -317,7 +317,7 @@ class MuseDataRecord(object):
     def getLyrics(self):
         '''Return lyrics as a list.
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('D4     2        e     u                    con-')
         >>> mdr.stage = 2
         >>> mdr.getLyrics()
@@ -339,7 +339,7 @@ class MuseDataRecord(object):
     def getBeams(self):
         '''Return complete span of characters defining beams.
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('E2     1        s     u  =')
         >>> mdr.getBeams()
         '='
@@ -366,7 +366,7 @@ class MuseDataRecord(object):
     def _getAdditionalNotations(self):        
         '''Return an articulation object or None
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p')
         >>> mdr._getAdditionalNotations()
         '.p'
@@ -402,7 +402,7 @@ class MuseDataRecord(object):
     def getArticulationObjects(self):        
         '''Return a list of 0 or more music21 Articulation objects
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p')
         >>> mdr.getArticulationObjects()
         [<music21.articulations.Staccato>]
@@ -443,7 +443,7 @@ class MuseDataRecord(object):
     def getExpressionObjects(self):        
         '''Return a list of 0 or more music21 Articulation objects
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      t')
         >>> mdr.getExpressionObjects()
         [<music21.expressions.Trill>]
@@ -477,7 +477,7 @@ class MuseDataRecord(object):
     def getDynamicObjects(self):        
         '''Return a list of 0 or more music21 Dyanmic objects
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('C5    12        e     u         ff')
         >>> mdr.getDynamicObjects()
         [<music21.dynamics.Dynamic ff >]
@@ -520,7 +520,7 @@ class MuseDataRecord(object):
     def hasCautionaryAccidental(self):        
         '''Return a boolean if this note has a cautionary accidental.
 
-        >>> from music21 import *
+        
         >>> mdr = musedata.MuseDataRecord('F5     3        t n   d  ==[   (+')
         >>> mdr.hasCautionaryAccidental()
         True
@@ -763,7 +763,7 @@ class MuseDataPart(object):
 
     def _getDigitsFollowingTag(self, line, tag):
         '''
-        >>> from music21 import *
+        
         >>> mdp = musedata.MuseDataPart()
         >>> mdp._getDigitsFollowingTag('junk WK#:2345', 'WK#:')
         '2345'
@@ -795,7 +795,7 @@ class MuseDataPart(object):
     def _getAlphasFollowingTag(self, line, tag, keepSpace=False, 
         keepCase=False):
         '''
-        >>> from music21 import *
+        
         >>> mdp = musedata.MuseDataPart()
         >>> mdp._getAlphasFollowingTag('Group memberships: sound, score', 'Group memberships:')
         'sound,score'
@@ -823,7 +823,7 @@ class MuseDataPart(object):
 
     def getWorkNumber(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -848,7 +848,7 @@ class MuseDataPart(object):
 
     def getMovementNumber(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -870,7 +870,7 @@ class MuseDataPart(object):
     def getDirective(self):
         '''The directive field is generally used to store tempo indications.This indication, however, is frequently not provided.
 
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.hwv56_movement1_17)
@@ -892,7 +892,7 @@ class MuseDataPart(object):
 
     def getSource(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -917,7 +917,7 @@ class MuseDataPart(object):
 
     def getWorkTitle(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -937,9 +937,9 @@ class MuseDataPart(object):
 
     def getMovementTitle(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
-        >>> mdw = MuseDataWork()
+        >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
         >>> mdw.getParts()[0].getMovementTitle()
         'Aria'
@@ -951,7 +951,7 @@ class MuseDataPart(object):
 
     def getPartName(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -967,7 +967,7 @@ class MuseDataPart(object):
 
     def getGroupMemberships(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -987,7 +987,7 @@ class MuseDataPart(object):
 
     def getGroupMembershipsTotal(self, membership='score'):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1018,7 +1018,7 @@ class MuseDataPart(object):
 
     def getGroupMembershipNumber(self, membership='score'):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1058,7 +1058,7 @@ class MuseDataPart(object):
     def _getAttributesRecord(self):
         '''The attributes record is not in a fixed position, but is the first line that starts with a $.
 
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1088,7 +1088,7 @@ class MuseDataPart(object):
 
     def _getKeyParameters(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1111,7 +1111,7 @@ class MuseDataPart(object):
 
     def getKeySignature(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1128,7 +1128,7 @@ class MuseDataPart(object):
 
     def _getTimeSignatureParameters(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1161,7 +1161,7 @@ class MuseDataPart(object):
 
     def getTimeSignatureObject(self):
         '''     
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1173,7 +1173,7 @@ class MuseDataPart(object):
 
     def _getNumberOfStaves(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1195,7 +1195,7 @@ class MuseDataPart(object):
 
     def _getClefParameters(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1242,7 +1242,7 @@ class MuseDataPart(object):
     def getClefObject(self, voice=1):
         '''Return a music21 clef object based on a two character clef definition.
 
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1298,7 +1298,7 @@ class MuseDataPart(object):
         '''
         Get the transposition, if defined, from the Metadata header. 
 
-        >>> from music21 import *
+        
         >>> import os.path
         >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> fp2 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '02.md')
@@ -1323,7 +1323,7 @@ class MuseDataPart(object):
     def getTranspositionIntervalObject(self):
         '''If this part defines a transposition, return a corresponding Interval object. 
 
-        >>> from music21 import *
+        
         >>> import os.path
         >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> fp2 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '02.md')
@@ -1342,7 +1342,7 @@ class MuseDataPart(object):
 
     def getDivisionsPerQuarterNote(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
@@ -1382,7 +1382,7 @@ class MuseDataPart(object):
     # dealing with measures and notes
     def _getMeasureBoundaryIndices(self, src=None):
         '''
-        >>> from music21 import *
+        
         >>> mdp = musedata.MuseDataPart()
         >>> mdp.stage == None
         True
@@ -1577,7 +1577,7 @@ class MuseDataWork(object):
     def addString(self, input_str):
         '''Add a string representation acting like a part file
 
-        >>> from music21 import *
+        
         >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)

@@ -73,7 +73,7 @@ class DiscreteAnalysis(object):
 
     def _hexToRgb(self, value):
         '''Utility conversion method    
-        >>> da = DiscreteAnalysis()
+        >>> da = analysis.discrete.DiscreteAnalysis()
         >>> da._hexToRgb('#ffffff')
         [255, 255, 255]
         >>> da._hexToRgb('#000000')
@@ -85,7 +85,7 @@ class DiscreteAnalysis(object):
 
     def _rgbLimit(self, value):
         '''Utility conversion method    
-        >>> da = DiscreteAnalysis()
+        >>> da = analysis.discrete.DiscreteAnalysis()
         >>> da._rgbLimit(300)
         255
         >>> da._rgbLimit(-30)
@@ -122,9 +122,12 @@ class DiscreteAnalysis(object):
         return post   
 
     def solutionLegend(self, compress=False):
-        '''A list of pairs showing all discrete results and the assigned color. Data should be organized to be passed to :class:`music21.graph.GraphColorGridLegend`.
+        '''A list of pairs showing all discrete results and the assigned color.
+        Data should be organized to be passed to 
+        :class:`music21.graph.GraphColorGridLegend`.
 
-        If `compress` is True, the legend will only show values for solutions that have been encountered. 
+        If `compress` is True, the legend will only show values for solutions
+        that have been encountered. 
         '''
         pass
 
@@ -203,7 +206,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     
     def _fillColorDictionaries(self):
         '''
-        >>> p = KrumhanslSchmuckler()
+        >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> len(p._majorKeyColors)
         15
         >>> p._majorKeyColors['C']
@@ -254,9 +257,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def _getSharpFlatCount(self, subStream):
         '''Determine count of sharps and flats in a Stream
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> p = KrumhanslSchmuckler()
+        >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> p._getSharpFlatCount(s.flat)
         (87, 0)
         '''
@@ -274,7 +277,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def _getWeights(self, weightType='major'): 
         ''' Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
-        >>> a = KrumhanslSchmuckler()
+        >>> a = analysis.discrete.KrumhanslSchmuckler()
         >>> len(a._getWeights('major'))
         12
         >>> len(a._getWeights('minor'))
@@ -292,7 +295,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''Given a flat Stream, obtain a pitch class distribution. The value of each pitch class is scaled by its duration in quarter lengths.
 
         >>> from music21 import note, stream, chord
-        >>> a = KrumhanslSchmuckler()
+        >>> a = analysis.discrete.KrumhanslSchmuckler()
         >>> s = stream.Stream()
         >>> n1 = note.Note('c')
         >>> n1.quarterLength = 3
@@ -396,7 +399,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def solutionLegend(self, compress=False):
         ''' Returns a list of lists of possible results for the creation of a legend.
 
-        >>> from music21 import *
+        
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> post = p.solutionLegend()
         '''
@@ -499,7 +502,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     def _bestKeyEnharmonic(self, pitchObj, mode, sStream=None):
         '''
-        >>> from music21 import *
+        
         >>> ks = analysis.discrete.KrumhanslSchmuckler()
         >>> s = converter.parse('b-4 e- f g-', '4/4')
         >>> ks._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor', s)
@@ -628,7 +631,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         Note that all alternative solutions are returned as Key objects and stored on a list found at Key.alternateInterpretations.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> p.getSolution(s) # this seems correct
@@ -667,7 +670,7 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     def _getWeights(self, weightType='major'): 
         ''' Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
-        >>> from music21 import *
+        
         >>> a = analysis.discrete.KrumhanslSchmuckler()
         >>> len(a._getWeights('major'))
         12
@@ -699,7 +702,7 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
     def _getWeights(self, weightType='major'): 
         ''' Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
-        >>> from music21 import *
+        
         >>> a = analysis.discrete.KrumhanslKessler()
         >>> len(a._getWeights('major'))
         12
@@ -741,7 +744,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
     def _getWeights(self, weightType='major'): 
         '''Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
-        >>> from music21 import *
+        
         >>> a = analysis.discrete.AardenEssen()
         >>> len(a._getWeights('major'))
         12
@@ -777,7 +780,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
     def _getWeights(self, weightType='major'): 
         ''' Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
-        >>> from music21 import *
+        
         >>> a = analysis.discrete.SimpleWeights()
         >>> len(a._getWeights('major'))
         12
@@ -810,7 +813,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     def _getWeights(self, weightType='major'): 
         ''' Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
-        >>> from music21 import *
+        
         >>> a = analysis.discrete.BellmanBudge()
         >>> len(a._getWeights('major'))
         12
@@ -847,7 +850,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     def _getWeights(self, weightType='major'): 
         ''' Returns the key weights. To provide different key weights, subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
-        >>> from music21 import *
+        
         >>> a = analysis.discrete.TemperleyKostkaPayne()
         >>> len(a._getWeights('major'))
         12
@@ -897,7 +900,7 @@ class Ambitus(DiscreteAnalysis):
 
     def __init__(self, referenceStream=None):
         '''
-        >>> from music21 import *
+        
         >>> ambitusAnalysis = analysis.discrete.Ambitus()
         >>> ambitusAnalysis.identifiers[0]
         'ambitus'
@@ -937,7 +940,7 @@ class Ambitus(DiscreteAnalysis):
 
         This public method may be used by other classes. 
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> pitchMin, pitchMax = p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
@@ -986,7 +989,7 @@ class Ambitus(DiscreteAnalysis):
         between any two pitches. This is used to get the 
         smallest and largest ambitus possible in a given work. 
 
-        >>> from music21 import *
+        
         >>> p = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
@@ -1027,7 +1030,7 @@ class Ambitus(DiscreteAnalysis):
         '''
         Return legend data. 
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus(s.parts[0]) #provide ref stream
         >>> len(p.solutionLegend())
@@ -1039,7 +1042,7 @@ class Ambitus(DiscreteAnalysis):
         [2, 2]
 
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> p = Ambitus()
+        >>> p = analysis.discrete.Ambitus()
         >>> p.solutionLegend(compress=True) # empty if nothing processed
         [['', []], ['', []]]
 
@@ -1093,7 +1096,7 @@ class Ambitus(DiscreteAnalysis):
 
     def solutionToColor(self, result):
         '''
-        >>> from music21 import *
+        
         >>> p = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
@@ -1113,7 +1116,7 @@ class Ambitus(DiscreteAnalysis):
         '''
         Given a Stream, return a solution (as an interval) and a color string. 
 
-        >>> from music21 import *
+        
         >>> p = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
@@ -1137,7 +1140,7 @@ class Ambitus(DiscreteAnalysis):
         '''
         Procedure to only return an Inteval object.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> p.getSolution(s)
@@ -1247,7 +1250,7 @@ def analyzeStream(streamObj, *args, **keywords):
     :class:`~music21.analysis.discrete.Ambitus`
     :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bach/bwv66.6')
     >>> analysis.discrete.analyzeStream(s, 'Krumhansl')
     <music21.key.Key of f# minor>

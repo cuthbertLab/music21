@@ -74,7 +74,7 @@ def generateChords(numChords,kind=''):
     app. These chords may be dissonant or consonant. if kind = 'diatonicTriads',
     only diatonic triads will be generated
         
-    >>> from music21 import *
+    
     >>> sc = webapps.commands.generateChords(4,'diatonicTriads')
     >>> a = webapps.commands.runPerceivedDissonanceAnalysis(sc,[1.2,3.2,5.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
@@ -156,28 +156,59 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     each of which is a dictionary containing these keys:
     {'stream', 'numUserIdentified', 'numMusic21Identified', 'numBothIdentified', 'accuracy', 'romans', 'key'}
 
-    >>> from music21 import *
-    >>> piece = corpus.parse('bwv7.7').measures(0,3)
-    >>> offsetList = [1.1916666666666667,2.3641666666666667,3.6041666666666665,4.5808333333333335,\
-                      6.131666666666667,8.804166666666667,10.148333333333333,11.700833333333334]
-    >>> analysisDict = runPerceivedDissonanceAnalysis(piece, offsetList)
-    >>> a = analysisDict['fullScore']
-    >>> a['numMusic21Identified']
-    7
-    >>> a['numBothIdentified']
-    3
-    >>> a['numUserIdentified']
-    8
-    >>> a['romans']
-    ['v43', 'iio65', 'bVIIb73']
-    >>> b = analysisDict['nonharmonicTonesRemovedScore']
-    >>> b['numMusic21Identified']
-    5
-    >>> b['numBothIdentified']
-    2
-    >>> b['accuracy']
-    40.0 
+    ::
+
+        >>> piece = corpus.parse('bwv7.7').measures(0,3)
+        >>> offsetList = [
+        ...     1.1916666666666667,
+        ...     2.3641666666666667,
+        ...     3.6041666666666665,
+        ...     4.5808333333333335,
+        ...     6.131666666666667,
+        ...     8.804166666666667,
+        ...     10.148333333333333,
+        ...     11.700833333333334,
+        ...     ]
+        >>> analysisDict = webapps.commands.runPerceivedDissonanceAnalysis(piece, offsetList)
+        >>> a = analysisDict['fullScore']
+
+    ::
+
+        >>> a['numMusic21Identified']
+        7
+
+    ::
+
+        >>> a['numBothIdentified']
+        3
+
+    ::
+
+        >>> a['numUserIdentified']
+        8
+
+    ::
+
+        >>> a['romans']
+        ['v43', 'iio65', 'bVIIb73']
+
+    ::
+    
+        >>> b = analysisDict['nonharmonicTonesRemovedScore']
+        >>> b['numMusic21Identified']
+        5
+
+    ::
+
+        >>> b['numBothIdentified']
+        2
+
+    ::
+
+        >>> b['accuracy']
+        40.0 
    
+    Return dictionary.
     '''
     withoutNonharmonictonesScore = copy.deepcopy(scoreIn)
     theoryAnalyzer.removePassingTones(withoutNonharmonictonesScore)
@@ -193,9 +224,9 @@ def _withinRange(dataList, lowLim, upperLim):
     '''helper function: returns true if there exists a number in dataList 
     for which the inequality lowLim <= number < upperLim
     
-    >>> _withinRange([1,5.5,8], 2,3)
+    >>> webapps.commands._withinRange([1,5.5,8], 2,3)
     False
-    >>> _withinRange([1,5.5,8], 4,6)
+    >>> webapps.commands._withinRange([1,5.5,8], 4,6)
     True
     '''
     dataList.sort()
@@ -215,7 +246,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     * Red: the user did not recognize as a dissonant vertical slice RED
     * Blue: the user recognized it as a dissonant vertical slice BLUE
        
-    >>> from music21 import *
+    
     >>> s = stream.Score()
     >>> p = stream.Part()
     >>> c1 = chord.Chord(['C3','E3','G3'])
@@ -303,34 +334,39 @@ def createMensuralCanon(sc):
     return canonStream
 
 def correctChordSymbols(worksheet, studentResponse):
-    
-    '''
-    Written for hackday demo: accepts as parameters a stream with chord symbols (the worksheet)
+    '''Written for hackday demo: accepts as parameters a stream with chord symbols (the worksheet)
     and the student's attempt to write out the pitches for each chord symbol of the worksheet.
     The student's work is returned with annotations, and the percentage correct is also returned
     
-    >>> from music21 import *
-    >>> worksheet = stream.Stream()
-    >>> worksheet.append(harmony.ChordSymbol('C'))
-    >>> worksheet.append(harmony.ChordSymbol('G7'))
-    >>> worksheet.append(harmony.ChordSymbol('B-'))
-    >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
-    >>> studentResponse = stream.Stream()
-    >>> studentResponse.append(clef.TrebleClef())
+    
+    ::
 
-    >>> studentResponse.append(chord.Chord(['C','E','G']))
-    >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
-    >>> studentResponse.append(chord.Chord(['B-', 'C']))
-    >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
-    >>> newScore, percentCorrect = correctChordSymbols( worksheet, studentResponse)
-    >>> for x in newScore.notes:
-    ...  x.lyric
-    ':)'
-    ':)'
-    'PITCHES'
-    'INVERSION'
-    >>> percentCorrect
-    50.0   
+        >>> worksheet = stream.Stream()
+        >>> worksheet.append(harmony.ChordSymbol('C'))
+        >>> worksheet.append(harmony.ChordSymbol('G7'))
+        >>> worksheet.append(harmony.ChordSymbol('B-'))
+        >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
+        >>> studentResponse = stream.Stream()
+        >>> studentResponse.append(clef.TrebleClef())
+
+    ::
+
+        >>> studentResponse.append(chord.Chord(['C','E','G']))
+        >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
+        >>> studentResponse.append(chord.Chord(['B-', 'C']))
+        >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
+        >>> newScore, percentCorrect = webapps.commands.correctChordSymbols(
+        ...     worksheet, studentResponse)
+        >>> for x in newScore.notes:
+        ...  x.lyric
+        ':)'
+        ':)'
+        'PITCHES'
+        'INVERSION'
+        >>> percentCorrect
+        50.0   
+
+    Return object.
     '''
     
     numCorrect = 0
@@ -384,14 +420,14 @@ def checkLeadSheetPitches(worksheet, returnType=''):
     a stream with both the chord symbols and student's chords, and returns the corrected
     stream. if returnType=answerkey, the score is returned with the leadsheet pitches realized
     
-    >>> from music21 import *
+    
     >>> worksheet = stream.Stream()
     >>> worksheet.append(harmony.ChordSymbol('C'))
     >>> worksheet.append(harmony.ChordSymbol('G7'))
     >>> worksheet.append(harmony.ChordSymbol('B'))
     >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
 
-    >>> answerKey = checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
+    >>> answerKey = webapps.commands.checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
     >>> for x in answerKey.notes:
     ...     [str(p) for p in x.pitches]
     ['C3', 'E3', 'G3']

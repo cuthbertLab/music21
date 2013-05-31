@@ -60,7 +60,7 @@ def applyCapuaToCadencebookWork(thisWork):
     (a Score subclass)
     
     >>> import copy
-    >>> from music21 import *
+    
     >>> b = trecento.cadencebook.BallataSheet().makeWork(331) # Francesco, Non Creder Donna
     >>> bOrig = copy.deepcopy(b)
     >>> trecento.capua.applyCapuaToCadencebookWork(b)
@@ -558,7 +558,7 @@ def compareThreeFictas(srcStream1, srcStream2):
     
     srcStream1 and srcStream2 should be .flat.notesAndRests
     
-    >>> from music21 import *
+    
     >>> b = trecento.cadencebook.BallataSheet().makeWork(331).asScore()
     >>> #_DOCS_SHOW b.show()
     >>> trecento.capua.applyCapuaToStream(b.parts[0].flat.notesAndRests)
@@ -783,7 +783,7 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
     or if correctionType == "min6" find all instances of a minor 6th moving outward to octave and see how often the PMFC
     editors correct it to a Major 6th and how often Capua gets it.
 
-#    >>> from music21 import *
+#    
 #    >>> (totalDict, foundPieceOpus) = findCorrections(correctionType="Maj3", 2, 50)
 #    >>> print totalDict
 #    {'potentialChange': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, 'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82}
@@ -899,7 +899,7 @@ def improvedHarmony(startPiece = 2, endPiece = 459):
     
     Returns a dict showing the results
     
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW trecento.capua.improvedHarmony()
     >>> print "{'imperfCapua': 22, 'imperfIgnored': 155, 'perfCapua': 194, 'perfIgnored': 4057}" #_DOCS_HIDE
     {'imperfCapua': 22, 'imperfIgnored': 155, 'perfCapua': 194, 'perfIgnored': 4057}

@@ -121,7 +121,7 @@ def prependBlankMeasures(myStream, measuresToAppend = 1, inPlace = True):
     adds one (default) or more blank measures (filled with
     rests) to be beginning of myStream
     
-    >>> from music21 import *
+    
     >>> from music21.trecento import quodJactatur
     >>> qj = quodJactatur.getQJ()
     >>> qj.duration.quarterLength

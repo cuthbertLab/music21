@@ -58,7 +58,7 @@ def dynamicStrFromDecimal(n):
     with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff')
     0 returns "n" (niente), while ppp and fff are the loudest dynamics used.
     
-    >>> from music21 import *
+    
     >>> dynamics.dynamicStrFromDecimal(0.25)
     'pp'
     >>> dynamics.dynamicStrFromDecimal(1)
@@ -117,7 +117,7 @@ class Dynamic(base.Music21Object):
     Object representation of Dynamics.
     
     
-    >>> from music21 import *
+    
     >>> pp1 = dynamics.Dynamic('pp')
     >>> pp1.value
     'pp'
@@ -161,7 +161,7 @@ class Dynamic(base.Music21Object):
         'longName': r'''
             the name of this dynamic in Italian.
             
-            >>> from music21 import *
+            
             >>> d = dynamic.Dynamic('pp')
             >>> d.longName
             'pianissimo'
@@ -169,7 +169,7 @@ class Dynamic(base.Music21Object):
         'englishName': r'''
             the name of this dynamic in English.
             
-            >>> from music21 import *
+            
             >>> d = dynamics.Dynamic('pp')
             >>> d.englishName
             'very soft'
@@ -245,7 +245,7 @@ class Dynamic(base.Music21Object):
 
         As mezzo is at .5, the unit interval range is doubled for generating final output. The default output is .5.
 
-        >>> from music21 import *
+        
         >>> d = dynamics.Dynamic('mf')
         >>> d.volumeScalar
         0.55...
@@ -282,7 +282,7 @@ class Dynamic(base.Music21Object):
     positionVertical = property(_getPositionVertical, _setPositionVertical,
         doc='''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
 
-        >>> from music21 import *
+        
         >>> te = expressions.TextExpression()
         >>> te.positionVertical = 10
         >>> te.positionVertical

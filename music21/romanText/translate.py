@@ -20,7 +20,7 @@ This module is really only needed for people extending the parser,
 for others it's simple to get Harmony, RomanNumeral, Key (or KeySignature) 
 and other objects out of an rntxt file by running this:
 
->>> from music21 import *
+
 >>> monteverdi = corpus.parse('monteverdi/madrigal.3.1.rntxt')
 >>> monteverdi.show('text')
 {0.0} <music21.metadata.Metadata object at 0x...>
@@ -225,17 +225,17 @@ def _getKeyAndPrefix(rtKeyOrString):
     Given an RTKey specification, return 
     the Key and a string prefix based on the tonic. 
 
-    >>> _getKeyAndPrefix('c')
+    >>> romanText.translate._getKeyAndPrefix('c')
     (<music21.key.Key of c minor>, 'c: ')
-    >>> _getKeyAndPrefix('F#')
+    >>> romanText.translate._getKeyAndPrefix('F#')
     (<music21.key.Key of F# major>, 'F#: ')
-    >>> _getKeyAndPrefix('Eb')
+    >>> romanText.translate._getKeyAndPrefix('Eb')
     (<music21.key.Key of E- major>, 'E-: ')
-    >>> _getKeyAndPrefix('Bb')
+    >>> romanText.translate._getKeyAndPrefix('Bb')
     (<music21.key.Key of B- major>, 'B-: ')
-    >>> _getKeyAndPrefix('bb')
+    >>> romanText.translate._getKeyAndPrefix('bb')
     (<music21.key.Key of b- minor>, 'b-: ')
-    >>> _getKeyAndPrefix('b#')
+    >>> romanText.translate._getKeyAndPrefix('b#')
     (<music21.key.Key of b# minor>, 'b#: ')
 
     '''
@@ -573,7 +573,7 @@ def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber = None):
     
     Does not yet work for skipped measures...
     
-    >>> from music21 import *
+    
     >>> rtm = romanText.RTMeasure('m15a V6 b1.5 V6/5 b2 I b3 viio6')
     >>> rtm.repeatLetter
     ['a']
@@ -624,11 +624,11 @@ def _consolidateRepeatEndings(repeatEndings):
 
     For the sake of demo and testing, we will use strings instead of measure objects.
 
-    >>> from music21 import *
+    
     >>> repeatEndings = {1: [(5, 'm5a'), (6, 'm6a'), (17, 'm17'), (18, 'm18'), (19, 'm19'), (23, 'm23a')], 
     ...                  2: [(5, 'm5b'), (6, 'm6b'), (20, 'm20'), (21, 'm21'), (23, 'm23b')], 
     ...                  3: [(23, 'm23c')]}
-    >>> print _consolidateRepeatEndings(repeatEndings)
+    >>> print romanText.translate._consolidateRepeatEndings(repeatEndings)
     [(['m5a', 'm6a'], 1), (['m17', 'm18', 'm19'], 1), (['m23a'], 1), (['m5b', 'm6b'], 2), (['m20', 'm21'], 2), (['m23b'], 2), (['m23c'], 3)]
     '''
     returnList = []
@@ -682,7 +682,7 @@ def fixPickupMeasure(partObject):
 
     Demonstration: an otherwise incorrect part
     
-    >>> from music21 import *
+    
     >>> p = stream.Part()
     >>> m0 = stream.Measure()
     >>> m0.number = 0

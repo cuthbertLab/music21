@@ -41,7 +41,7 @@ class Wildcard(m21Base.Music21Object):
     matches a single object in a music21 stream.  Equivalent to the
     regular expression "."
 
-    >>> from music21 import *
+    
     >>> wc1 = search.Wildcard()
     >>> wc1.pitch = pitch.Pitch("C")
     >>> st1 = stream.Stream()
@@ -64,7 +64,7 @@ def rhythmicSearch(thisStream, searchStream):
     
     Example 1: First we will set up a simple stream for searching:
     
-    >>> from music21 import *
+    
     >>> thisStream = tinyNotation.TinyNotationStream("c4. d8 e4 g4. a8 f4. c4.", "3/4")
     >>> thisStream.show('text')
     {0.0} <music21.meter.TimeSignature 3/4>
@@ -174,7 +174,7 @@ def approximateNoteSearch(thisStream, otherStreams):
     well it matches)
 
 
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
     >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
     >>> o1.id = 'o1'
@@ -213,7 +213,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     well it matches)
 
 
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
     >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
     >>> o1.id = 'o1'
@@ -251,7 +251,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     well it matches)
 
 
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
     >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
     >>> o1.id = 'o1'
@@ -288,7 +288,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     well it matches)
 
 
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
     >>> o1 = converter.parse("c4 d8 e GG2 a' b-4", "4/4")
     >>> o1.id = 'o1'
@@ -335,7 +335,7 @@ def translateStreamToString(inputStream):
     takes a stream of notesAndRests only and returns
     a string for searching on.
     
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d8 r16 FF8. a'8 b-2.", "3/4")
     >>> sn = s.flat.notesAndRests
     >>> streamString = search.translateStreamToString(sn)
@@ -365,7 +365,7 @@ def translateDiatonicStreamToString(inputStream, previousRest=False, previousTie
     O-U = note of shorter length than previous
     Z = rest
     
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d8~ d16 r16 FF8 F#8 a'8 b-2.", "3/4")
     >>> sn = s.flat.notesAndRests
     >>> streamString = search.translateDiatonicStreamToString(sn)
@@ -426,7 +426,7 @@ def translateStreamToStringNoRhythm(inputStream):
     takes a stream of notesAndRests only and returns
     a string for searching on.
     
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d e FF a' b-", "4/4")
     >>> sn = s.flat.notesAndRests
     >>> search.translateStreamToStringNoRhythm(sn)
@@ -443,7 +443,7 @@ def translateStreamToStringOnlyRhythm(inputStream):
     takes a stream of notesAndRests only and returns
     a string for searching on.
     
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d8 e16 FF8. a'8 b-2.", "3/4")
     >>> sn = s.flat.notesAndRests
     >>> streamString = search.translateStreamToStringOnlyRhythm(sn)
@@ -464,7 +464,7 @@ def translateNoteToByte(n):
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
     
-    >>> from music21 import *
+    
     >>> n = note.Note("C4")
     >>> search.translateNoteToByte(n)
     '<'
@@ -491,7 +491,7 @@ def translateNoteWithDurationToBytes(n):
     followed by the log of the quarter length (fitted to 1-127, see formula below)
     followed by 's', 'c', or 'e' if includetieByte is True and there is a tie
 
-    >>> from music21 import *
+    
     >>> n = note.Note("C4")
     >>> n.duration.quarterLength = 3  # dotted half
     >>> trans = search.translateNoteWithDurationToBytes(n)
@@ -524,21 +524,21 @@ def translateNoteTieToByte(n):
     of its tie status.
     's' if start tie, 'e' if stop tie, 'c' if continue tie, and '' if no tie
     
-    >>> from music21 import *
+    
     >>> n = note.Note("E")
-    >>> translateNoteTieToByte(n)
+    >>> search.translateNoteTieToByte(n)
     ''
     
     >>> n.tie = tie.Tie("start")
-    >>> translateNoteTieToByte(n)
+    >>> search.translateNoteTieToByte(n)
     's'
     
     >>> n.tie.type = 'continue'
-    >>> translateNoteTieToByte(n)
+    >>> search.translateNoteTieToByte(n)
     'c'
     
     >>> n.tie.type = 'stop'
-    >>> translateNoteTieToByte(n)
+    >>> search.translateNoteTieToByte(n)
     'e'
     '''
     if n.tie is None:
@@ -559,7 +559,7 @@ def translateDurationToBytes(n):
     currently returns the chr() for the note's midi number. or chr(127) for rests
     followed by the log of the quarter length (fitted to 1-127, see formula below)
 
-    >>> from music21 import *
+    
     >>> n = note.Note("C4")
     >>> n.duration.quarterLength = 3  # dotted half
     >>> trans = search.translateDurationToBytes(n)
@@ -591,7 +591,7 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
     measures: a list of measures containing the rhythm
     rhythmString: a string representation of the rhythm (see translateStreamToStringOnlyRhythm)
 
-    >>> from music21 import *
+    
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRythms(bach)
     >>> for dict in sortedRhythms[0:3]:

@@ -130,7 +130,7 @@ class FeatureExtractor(object):
     def getAttributeLabels(self): 
         '''Return a list of string in a form that is appropriate for data storage.
     
-        >>> from music21 import *
+        
         >>> fe = features.jSymbolic.AmountOfArpeggiationFeature()
         >>> fe.getAttributeLabels()
         ['Amount_of_Arpeggiation']
@@ -164,7 +164,7 @@ class FeatureExtractor(object):
     def _prepareFeature(self):
         '''Prepare a new Feature object for data acquisition.
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> fe = features.jSymbolic.InitialTimeSignatureFeature(s)
         >>> fe._prepareFeature()
@@ -553,7 +553,7 @@ class DataInstance(object):
     def setClassLabel(self, classLabel, classValue=None):
         '''Set the class label, as well as the class value if known. The class label is the attribute name used to define the class of this data instance.
 
-        >>> from music21 import *
+        
         >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
         >>> s = stream.Stream() #_DOCS_HIDE
         >>> di = features.DataInstance(s)
@@ -578,7 +578,7 @@ class DataInstance(object):
     def __getitem__(self, key):
         '''Get a form of this Stream, using a cached version if available.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bwv66.6')
         >>> di = features.DataInstance(s)
         >>> len(di['flat'])
@@ -650,7 +650,7 @@ class OutputTabOrange(OutputFormat):
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
 
-        >>> from music21 import *
+        
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet()
         >>> ds.addFeatureExtractors(f)
@@ -727,7 +727,7 @@ class OutputCSV(OutputFormat):
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
 
-        >>> from music21 import *
+        
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer')
         >>> ds.addFeatureExtractors(f)
@@ -762,7 +762,7 @@ class OutputARFF(OutputFormat):
 
     See http://weka.wikispaces.com/ARFF+%28stable+version%29 for more details
 
-    >>> from music21 import *
+    
     >>> oa = features.OutputARFF()
     >>> oa._ext
     '.arff'
@@ -774,7 +774,7 @@ class OutputARFF(OutputFormat):
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
 
-        >>> from music21 import *
+        
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer')
         >>> ds.addFeatureExtractors(f)
@@ -848,7 +848,7 @@ class DataSet(object):
 
     Multiple DataInstance objects, a FeatureSet, and an OutputFormat. 
 
-    >>> from music21 import *
+    
     >>> ds = features.DataSet(classLabel='Composer')
     >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature, features.jSymbolic.InitialTimeSignatureFeature]
     >>> ds.addFeatureExtractors(f)
@@ -894,7 +894,7 @@ class DataSet(object):
         includeId=True):
         '''Return a list of all attribute labels. Optionally add a class label field and/or an id field.
 
-        >>> from music21 import *
+        
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getAttributeLabels(includeId=False)
@@ -913,7 +913,7 @@ class DataSet(object):
     def getDiscreteLabels(self, includeClassLabel=True, includeId=True):
         '''Return column labels for discrete status.
 
-        >>> from music21 import *
+        
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getDiscreteLabels()
@@ -933,7 +933,7 @@ class DataSet(object):
     def getClassPositionLabels(self, includeId=True):
         '''Return column labels for the presence of a class definition
 
-        >>> from music21 import *
+        
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getClassPositionLabels()
@@ -1047,7 +1047,7 @@ class DataSet(object):
     def _getOutputFormatFromFilePath(self, fp):
         '''Get an output format from a file path if possible, otherwise return None.
 
-        >>> from music21 import *
+        
         >>> ds = features.DataSet()
         >>> ds._getOutputFormatFromFilePath('test.tab')
         <music21.features.base.OutputTabOrange object at ...>
@@ -1093,10 +1093,10 @@ def allFeaturesAsList(streamInput):
     
     streamInput can be Add a Stream, DataInstance, or path to a corpus or local file to this data set.
     
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
     >>> s = converter.parse('c4 d e2', '4/4') #_DOCS_HIDE
-    >>> f = allFeaturesAsList(s)
+    >>> f = features.allFeaturesAsList(s)
     >>> f[1][0:3]
     [[1], [0.6899992497638124], [2]]
     >>> len(f[0]) > 65
@@ -1125,7 +1125,7 @@ def allFeaturesAsList(streamInput):
 def extractorsById(idOrList, library=['jSymbolic', 'native']):
     '''Given one or more :class:`~music21.features.FeatureExtractor` ids, return the appropriate  subclass. An optional `library` argument can be added to define which module is used. Current options are jSymbolic and native.
 
-    >>> from music21 import *
+    
     >>> [x.id for x in features.extractorsById('p20')]
     ['P20']
     >>> [x.id for x in features.extractorsById(['p19', 'p20'])]
@@ -1179,7 +1179,7 @@ def extractorsById(idOrList, library=['jSymbolic', 'native']):
 def extractorById(idOrList, library=['jSymbolic', 'native']):
     '''Get the first feature matched by extractorsById().
 
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> s.append(pitch.Pitch('a4'))
     >>> fe = features.extractorById('p20')(s) # call class
@@ -1196,7 +1196,7 @@ def extractorById(idOrList, library=['jSymbolic', 'native']):
 def vectorById(streamObj, vectorId, library=['jSymbolic', 'native']):
     '''Utility function to get a vector from an extractor
 
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> s.append(pitch.Pitch('a4'))
     >>> features.vectorById(s, 'p20')
@@ -1216,7 +1216,7 @@ def getIndex(featureString, extractorType=None):
     optionally include the extractorType ('jsymbolic' or 'native' if known
     and searching will be made more efficient
     
-    >>> from music21 import *
+    
     >>> features.getIndex('Range')
     (59, 'jsymbolic')
     >>> features.getIndex('Ends With Landini Melodic Contour')

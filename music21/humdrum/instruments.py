@@ -221,7 +221,7 @@ class HumdrumInstrumentException(exceptions21.Music21Exception):
 
 def fromHumdrumClass(hdclass):
     '''
-    >>> from music21 import *
+    
     >>> humdrum.instruments.fromHumdrumClass('vox')
     <music21.instrument.Instrument Voice>
     '''
@@ -235,7 +235,7 @@ def fromHumdrumClass(hdclass):
 
 def fromHumdrumInstrument(hdinst):
     '''
-    >>> from music21 import *
+    
     >>> humdrum.instruments.fromHumdrumInstrument('calto')
     <music21.instrument.Instrument Alto>
     '''

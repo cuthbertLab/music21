@@ -166,7 +166,7 @@ class Notation(object):
         bass and (if necessary) how to modify the corresponding pitches
         accordingly.
     
-        >>> from music21 import *
+        
         >>> from music21.figuredBass import notation as n
         >>> notation1 = n.Notation('#6,5') #__init__ method calls _parseNotationColumn()
         >>> notation1.figureStrings
@@ -227,7 +227,7 @@ class Notation(object):
         Provided the numbers and modifierStrings of a parsed notation column, 
         translates it to longhand.
         
-        >>> from music21 import *
+        
         >>> from music21.figuredBass import notation as n
         >>> notation1 = n.Notation('#6,5') #__init__ method calls _parseNotationColumn()
         >>> str(notation1.origNumbers) + " -> " + str(notation1.numbers)
@@ -287,7 +287,7 @@ class Notation(object):
         A modifier object keeps track of both the modifier string
         and its corresponding pitch Accidental.
         
-        >>> from music21 import *
+        
         >>> from music21.figuredBass import notation as n
         >>> notation1 = n.Notation('#4,2+') #__init__ method calls _getModifiers()
         >>> notation1.modifiers[0]
@@ -311,7 +311,7 @@ class Notation(object):
         Turns the numbers and Modifier objects into Figure objects, each corresponding
         to a number with its Modifier.
         
-        >>> from music21 import *
+        
         >>> from music21.figuredBass import notation as n
         >>> notation2 = n.Notation('-6,-') #__init__ method calls _getFigures()
         >>> notation2.figures[0] 
@@ -433,7 +433,7 @@ class Modifier(object):
     
     def _toAccidental(self):
         '''
-        >>> from music21 import *
+        
         >>> from music21.figuredBass import notation as n
         >>> m1 = n.Modifier('#')
         >>> m2 = n.Modifier('-')

@@ -91,7 +91,7 @@ def getMissingImportStr(modNameList):
     Given a list of missing module names, returns a nicely-formatted message to the user
     that gives instructions on how to expand music21 with optional packages.
     
-    >>> from music21 import *
+    
     >>> common.getMissingImportStr(['matplotlib'])
     'Certain music21 functions might need the optional package matplotlib; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/html/installAdditional.html'
     >>> common.getMissingImportStr(['matplotlib', 'numpy'])
@@ -113,7 +113,7 @@ def findFormat(fmt):
 
     Note that .mxl and .mx are only considered MusicXML input formats. 
 
-    >>> from music21 import *
+    
     >>> common.findFormat('mx')
     ('musicxml', '.xml')
     >>> common.findFormat('.mxl')
@@ -181,7 +181,7 @@ def findFormat(fmt):
 def findInputExtension(fmt):
     '''Given an input format, find and return all possible input extensions.
 
-    >>> from music21 import *
+    
     >>> a = common.findInputExtension('musicxml')
     >>> a
     ['.xml', '.mxl', '.mx']
@@ -207,7 +207,7 @@ def findInputExtension(fmt):
 def findFormatFile(fp):
     '''Given a file path (relative or absolute) return the format
 
-    >>> from music21 import *
+    
     >>> common.findFormatFile('test.xml')
     'musicxml'
     >>> common.findFormatFile('long/file/path/test-2009.03.02.xml')
@@ -230,7 +230,7 @@ def findFormatFile(fp):
 def findFormatExtFile(fp):
     '''Given a file path (relative or absolute) find format and extension used (not the output extension)
 
-    >>> from music21 import *
+    
     >>> common.findFormatExtFile('test.mx')
     ('musicxml', '.mx')
     >>> common.findFormatExtFile('long/file/path/test-2009.03.02.xml')
@@ -262,7 +262,7 @@ def findFormatExtFile(fp):
 def findFormatExtURL(url):
     '''Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
 
-    >>> from music21 import *
+    
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
     >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
@@ -310,7 +310,7 @@ def basicallyEqual(a, b):
     '''
     returns true if a and b are equal except for whitespace differences
 
-    >>> from music21 import *
+    
     >>> a = " hello there "
     >>> b = "hello there"
     >>> c = " bye there "
@@ -335,7 +335,7 @@ def cleanupFloat(floatNum, maxDenominator=1000):
     it to a fractions.Fraction object limited to
     a denominator of maxDenominator
     
-    >>> from music21 import *
+    
     >>> common.cleanupFloat(0.33333327824)
     0.333333333333...
     
@@ -358,7 +358,7 @@ def cleanupFloat(floatNum, maxDenominator=1000):
 def roundToHalfInteger(num):
     '''Given a floating-point number, round to the nearest half-integer.  
 
-    >>> from music21 import *
+    
     >>> common.roundToHalfInteger(1.2)
     1
     >>> common.roundToHalfInteger(1.35)
@@ -406,7 +406,7 @@ def nearestCommonFraction(x, grain=1e-2):
     '''Given a value that suggests a floating point fraction, like .33, 
     return a float that provides greater specification, such as .333333333
         
-    >>> from music21 import *
+    
     >>> common.nearestCommonFraction(.333) == 1/3.
     True
     >>> common.nearestCommonFraction(.33) == 1/3.
@@ -433,7 +433,7 @@ def greaterThan(x, y = 0.0, grain=1e-7):
     '''
     greaterThan returns True if x is greater than and not almostEquals y
 
-    >>> from music21 import *
+    
     >>> common.greaterThan(5, 4)
     True
     >>> common.greaterThan(5.05, 5.02)
@@ -460,7 +460,7 @@ def lessThan(x, y = 0.0, grain=1e-7):
     '''
     lessThan -- returns True if x is less than and not almostEquals y
 
-    >>> from music21 import *
+    
     >>> common.lessThan(5, 4)
     False
     >>> common.lessThan(5.2, 5.5)
@@ -482,7 +482,7 @@ def lessThanOrEqual(x, y = 0.0, grain=1e-7):
     '''
     lessThan -- returns True if x is less than and not almostEquals y
 
-    >>> from music21 import *
+    
     >>> common.lessThanOrEqual(4, 4)
     True
     >>> common.lessThanOrEqual(5.2, 5.5)
@@ -504,7 +504,7 @@ def isPowerOfTwo(n):
     of a power of 2. Uses almostEquals so that a float whose reminder after
     taking a log is nearly zero is still True
 
-    >>> from music21 import *
+    
     >>> common.isPowerOfTwo(3)
     False
     >>> common.isPowerOfTwo(18)
@@ -535,7 +535,7 @@ def nearestMultiple(n, unit):
     '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as the difference (error) to 
     seven significant digits.
 
-    >>> from music21 import *
+    
     >>> print common.nearestMultiple(.25, .25)
     (0.25, 0.0)
     >>> print common.nearestMultiple(.35, .25)
@@ -590,7 +590,7 @@ def nearestMultiple(n, unit):
 def standardDeviation(coll, bassel=False):
     '''Given a collection of values, return the standard deviation.
 
-    >>> from music21 import *
+    
     >>> common.standardDeviation([2,4,4,4,5,5,7,9])
     2.0
     >>> common.standardDeviation([600, 470, 170, 430, 300])
@@ -613,7 +613,7 @@ def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
     IMPROVE: when 2.6 is everywhere: add numbers class.
 
-    >>> from music21 import *
+    
     >>> common.isNum(3.0)
     True
     >>> common.isNum(3)
@@ -642,7 +642,7 @@ def contiguousList(inputListOrTuple):
     
     requires the list to be sorted first
     
-    >>> from music21 import *
+    
     >>> l = [3, 4, 5, 6]
     >>> common.contiguousList(l)
     True
@@ -669,7 +669,7 @@ def contiguousList(inputListOrTuple):
 def isStr(usrData):
     """Check of usrData is some form of string, including unicode.
 
-    >>> from music21 import *
+    
     >>> common.isStr(3)
     False
     >>> common.isStr('sharp')
@@ -689,7 +689,7 @@ def isListLike(usrData):
     """
     Returns True if is a List or a Set or a Tuple
 
-    >>> from music21 import *
+    
     >>> common.isListLike([])
     True
     >>> common.isListLike('sharp')
@@ -711,7 +711,7 @@ def isIterable(usrData):
     """
     Returns True if is the object can be iter'd over
 
-    >>> from music21 import *
+    
     >>> common.isIterable([5, 10])
     True
     >>> common.isIterable('sharp')
@@ -730,7 +730,7 @@ def isIterable(usrData):
 def toUnicode(usrStr):
     '''Convert this tring to a uncode string; if already a unicode string, do nothing.
         
-    >>> from music21 import *
+    
     >>> common.toUnicode('test')
     u'test'
     >>> common.toUnicode(u'test')
@@ -747,7 +747,7 @@ def toUnicode(usrStr):
 def classToClassStr(classObj):
     '''Convert a class object to a class string.
 
-    >>> from music21 import *
+    
     >>> common.classToClassStr(note.Note)
     'Note'
     >>> common.classToClassStr(chord.Chord)
@@ -759,7 +759,7 @@ def classToClassStr(classObj):
 def getNumFromStr(usrStr, numbers='0123456789'):
     '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
 
-    >>> from music21 import *
+    
     >>> common.getNumFromStr('23a')
     ('23', 'a')
     >>> common.getNumFromStr('23a954sdfwer')
@@ -781,7 +781,7 @@ def getNumFromStr(usrStr, numbers='0123456789'):
 def numToIntOrFloat(value):
     '''Given a number, return an integer if it is very close to an integer, otherwise, return a float.
 
-    >>> from music21 import *
+    
     >>> common.numToIntOrFloat(1.0)
     1
     >>> common.numToIntOrFloat(1.00003)
@@ -803,7 +803,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
 
     If replaceUnderscore is True (default) then underscores also become spaces (but without the _)
 
-    >>> from music21 import *
+    
     >>> common.spaceCamelCase('thisIsATest')
     'this Is A Test'
     >>> common.spaceCamelCase('ThisIsATest')
@@ -883,7 +883,7 @@ def dotMultiplier(dots):
     '''
     dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots
     
-    >>> from music21 import *
+    
     >>> common.dotMultiplier(1)
     1.5
     >>> common.dotMultiplier(2)
@@ -906,7 +906,7 @@ def decimalToTuplet(decNum):
 
     returns (numerator, denominator)
 
-    >>> from music21 import *
+    
     >>> common.decimalToTuplet(1.5)
     (3, 2)
     >>> common.decimalToTuplet(1.25)
@@ -965,7 +965,7 @@ def decimalToTuplet(decNum):
 def unitNormalizeProportion(values):
     """Normalize values within the unit interval, where max is determined by the sum of the series.
 
-    >>> from music21 import *
+    
     >>> common.unitNormalizeProportion([0,3,4])
     [0.0, 0.42857142857142855, 0.5714285714285714]
     >>> common.unitNormalizeProportion([1,1,1])
@@ -992,7 +992,7 @@ def unitNormalizeProportion(values):
 def unitBoundaryProportion(series):
     """Take a series of parts with an implied sum, and create unit-interval boundaries proportional to the series components.
 
-    >>> from music21 import *
+    
     >>> common.unitBoundaryProportion([1,1,2])
     [(0, 0.25), (0.25, 0.5), (0.5, 1.0)]
     >>> common.unitBoundaryProportion([8,1,1])
@@ -1018,7 +1018,7 @@ def weightedSelection(values, weights, randomGenerator=None):
     Example: sum -1 and 1 for 100 values; should be 
     around 0 or at least between -30 and 30
 
-    >>> from music21 import *
+    
     >>> -30 < sum([common.weightedSelection([-1, 1], [1,1]) for x in range(100)]) < 30
     True
     '''
@@ -1038,7 +1038,7 @@ def weightedSelection(values, weights, randomGenerator=None):
 def euclidGCD(a, b):
     '''use Euclid\'s algorithm to find the GCD of a and b
 
-    >>> from music21 import *
+    
     >>> common.euclidGCD(2,4)
     2
     >>> common.euclidGCD(20,8)
@@ -1055,7 +1055,7 @@ def euclidGCD(a, b):
 def approximateGCD(values, grain=1e-4):
     '''Given a list of values, find the lowest common divisor of floating point values. 
 
-    >>> from music21 import *
+    
     >>> common.approximateGCD([2.5,10, .25])
     0.25
     >>> common.approximateGCD([2.5,10])
@@ -1130,7 +1130,7 @@ def lcm(filterList):
     '''
     Find the least common multiple of a list of values
     
-    >>> from music21 import *
+    
     >>> common.lcm([3,4,5])
     60
     >>> common.lcm([3,4])
@@ -1151,7 +1151,7 @@ def lcm(filterList):
 def groupContiguousIntegers(src):
     '''Given a list of integers, group contiguous values into sub lists
 
-    >>> from music21 import *
+    
     >>> common.groupContiguousIntegers([3, 5, 6])
     [[3], [5, 6]]
     >>> common.groupContiguousIntegers([3, 4, 6])
@@ -1200,7 +1200,7 @@ def fromRoman(num):
 
     http://code.activestate.com/recipes/81611-roman-numerals/
     
-    >>> from music21 import *
+    
     >>> common.fromRoman('ii')
     2
     >>> common.fromRoman('vii')
@@ -1261,7 +1261,7 @@ def toRoman(num):
     
     Convert a number from 1 to 3999 to a roman numeral
     
-    >>> from music21 import *
+    
     >>> common.toRoman(2)
     'II'
     >>> common.toRoman(7)
@@ -1329,7 +1329,7 @@ def stripAddresses(textString, replacement = "ADDRESS"):
     that a function gives an expected result even if the result
     contains references to memory locations.  So for instance:
 
-    >>> from music21 import *
+    
     >>> common.stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
     '{0.0} <music21.clef.TrebleClef object at ADDRESS>'
     
@@ -1362,7 +1362,7 @@ def sortFilesRecent(fileList):
     '''Given two files, sort by most recent. Return only the file
     paths.
 
-    >>> from music21 import *
+    
     >>> import os
     >>> a = os.listdir(os.curdir)
     >>> b = common.sortFilesRecent(a)
@@ -1380,7 +1380,7 @@ def sortFilesRecent(fileList):
 def getMd5(value=None):
     '''Return a string from an md5 haslib
     
-    >>> from music21 import *
+    
     >>> common.getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6'
     '''
@@ -1395,7 +1395,7 @@ def formatStr(msg, *arguments, **keywords):
     '''Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
-    >>> from music21 import *
+    
     >>> a = common.formatStr('test', '1', 2, 3)
     >>> print a
     test 1 2 3
@@ -1496,7 +1496,7 @@ def getTestDocsFilePath():
 def getMetadataCacheFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache. 
 
-    >>> from music21 import *
+    
     >>> fp = common.getMetadataCacheFilePath()
     >>> fp.endswith('corpus/metadataCache') or fp.endswith(r'corpus\metadataCache')
     True
@@ -1506,7 +1506,7 @@ def getMetadataCacheFilePath():
 def getCorpusFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache. 
 
-    >>> from music21 import *
+    
     >>> fp = common.getCorpusFilePath()
     >>> fp.endswith('music21/corpus') or fp.endswith(r'music21\corpus')
     True
@@ -1516,7 +1516,7 @@ def getCorpusFilePath():
 def getCorpusContentDirs():
     '''Get all dirs that are found in the corpus that contain content; that is, exclude dirst that have code or other resoures.
 
-    >>> from music21 import *
+    
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach', 'demos', 'essenFolksong', 'handel', 'haydn', 
@@ -1743,7 +1743,7 @@ def unwrapWeakref(referent):
     or a weak reference to an object.  It returns obj() if it's a weakref 
     and obj if it's not.
     
-    >>> from music21 import *
+    
     >>> class Mock(object): 
     ...     pass
     >>> a1 = Mock()
@@ -1767,7 +1767,7 @@ def unwrapWeakref(referent):
 def isWeakref(referent):
     '''Test if an object is a weakref
 
-    >>> from music21 import *
+    
     >>> class Mock(object): 
     ...     pass
     >>> a1 = Mock()
@@ -1833,7 +1833,7 @@ def stripAccents(inputString):
     '''
     removes accents from unicode strings.
     
-    >>> from music21 import *
+    
     >>> s = u'tr\u00e8s vite'
     >>> u'\u00e8' in s
     True
@@ -1862,7 +1862,7 @@ def normalizeFilename(name):
     
     Takes in a string or unicode string and returns a normal string.
 
-    >>> from music21 import *
+    
     >>> common.normalizeFilename(u'03-Niccolò all\\'lessandra.not really.xml')
     '03-Niccolo_all_lessandra_not_really.xml'
     '''

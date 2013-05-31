@@ -48,7 +48,7 @@ def histogram(data,bins):
     the last element (-1) is the end of the last bin, and every remaining element (i)
     is the dividing point between one bin and another.
     
-    >>> from music21 import *
+    
     >>> data = [1, 1, 4, 5, 6, 0, 8, 8, 8, 8, 8]
     >>> outputData, bins = audioSearch.histogram(data,8)
     >>> print outputData
@@ -91,7 +91,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     in the temporal domain and, consequently, obtains the frequency in each instant 
     of time.
     
-    >>> from music21 import *
+    
     >>> import wave
     >>> import os #_DOCS_HIDE
     >>> import numpy  # you need to have numpy installed to use this
@@ -100,7 +100,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     >>> #_DOCS_SHOW wv = wave.open("test_audio.wav",'r')
     >>> data = wv.readframes(1024)
     >>> samps = numpy.fromstring(data, dtype=numpy.int16)
-    >>> finalResult = autocorrelationFunction(samps, 44100)
+    >>> finalResult = audioSearch.autocorrelationFunction(samps, 44100)
     >>> wv.close()
     >>> print finalResult
     143.6276...
@@ -146,7 +146,7 @@ def prepareThresholds(useScale=None):
     scale + octave repetition.  If useScale is a ChromaticScale, `prepareThresholds`
     will return a 12 element list.  If it's a diatonic scale, it'll have 7 elements.
     
-    >>> from music21 import *
+    
     >>> l, p = audioSearch.prepareThresholds(scale.MajorScale('A3'))
     >>> for i in range(len(l)):
     ...    print "%s < %.2f < %s" % (p[i], l[i], p[i+1])
@@ -186,7 +186,7 @@ def interpolation(correlation, peak):
    
     Returns the x coordinate of the vertex of that parabola.
 
-    >>> from music21 import *
+    
     >>> import numpy
     >>> f = [2, 3, 1, 6, 4, 2, 3, 1]
     >>> audioSearch.interpolation(f, numpy.argmax(f))
@@ -208,7 +208,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     It will convert the frequency to be within the range of the default frequencies
     (usually C4 to C5) but the pitch object will have the correct octave.
     
-    >>> from music21 import *
+    
     >>> audioSearch.normalizeInputFrequency(441.72)
     (440.0, <music21.pitch.Pitch A4>)
     
@@ -217,7 +217,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     
     >>> thresholds, pitches = audioSearch.prepareThresholds(scale.ChromaticScale('C4'))
     >>> for fq in [450, 510, 550, 600]:
-    ...      print normalizeInputFrequency(fq, thresholds, pitches)
+    ...      print audioSearch.normalizeInputFrequency(fq, thresholds, pitches)
     (440.0, <music21.pitch.Pitch A4>)
     (523.25113..., <music21.pitch.Pitch C5>)
     (277.18263..., <music21.pitch.Pitch C#5>)
@@ -257,15 +257,15 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     
     To-do: only return the former.  The latter can be generated in other ways.
     
-    >>> from music21 import *
+    
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
     >>> import os #_DOCS_HIDE
     >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
+    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
     >>> #_DOCS_SHOW freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
-    >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
-    >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
-    >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
+    >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
+    >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
+    >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
     >>> [str(p) for p in detectedPitchObjects]
     ['A5', 'A5', 'A5', 'D5', 'D4', 'B4', 'A4', 'F4', 'E-4', 'C#3', 'B3', 'B3', 'B3', 'A3', 'G3',...]   
     '''
@@ -330,10 +330,10 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     '''
     gets a list of frequencies from a complete audio file.
     
-    >>> from music21 import *
+    
     >>> import os #_DOCS_HIDE
     >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> freq = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
+    >>> freq = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
     >>> #_DOCS_SHOW freq = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
     >>> print freq
     [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
@@ -371,12 +371,11 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     
     It returns a list with the frequencies, a variable with the file descriptor, and the end sample position.
     
-    >>> from music21 import *
     >>> #_DOCS_SHOW readFile = 'pachelbel.wav' 
     >>> import os #_DOCS_HIDE
     >>> readPath = os.path.dirname(__file__) #_DOCS_HIDE
     >>> readFile = readPath + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
-    >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile(readFile, length=1.0)
+    >>> frequencyList, pachelbelFileHandle, currentSample  = audioSearch.getFrequenciesFromPartialAudioFile(readFile, length=1.0)
     >>> for i in range(5):
     ...     print frequencyList[i]
     143.627689055
@@ -389,7 +388,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
 
     Now read the next 1 second...
     
-    >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0, startSample = currentSample)
+    >>> frequencyList, pachelbelFileHandle, currentSample  = audioSearch.getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0, startSample = currentSample)
     >>> for i in range(5):
     ...     print frequencyList[i]
     187.798213268
@@ -441,9 +440,8 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
     It detects the pitches of the notes from a list of frequencies, using thresholds which
     depend on the useScale option. If useScale is None, the default value is the Major Scale beginning C4.
     
-    >>> from music21 import *
     >>> freqFromAQList=[143.627689055,99.0835452019,211.004784689,4700.31347962,2197.9431119]
-    >>> pitchesList = detectPitchFrequencies(freqFromAQList, useScale=scale.MajorScale('C4'))
+    >>> pitchesList = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.MajorScale('C4'))
     >>> for i in range(5):
     ...     print pitchesList[i]
     146.832383959
@@ -469,10 +467,8 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     It smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.
     
-    
-    >>> from music21 import *
     >>> inputPitches=[440, 440, 440, 440, 442, 443, 441, 470, 440, 441, 440, 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441, 440, 440, 440, 440, 440, 442, 443, 441, 440, 440]
-    >>> result=smoothFrequencies(inputPitches)
+    >>> result = audioSearch.smoothFrequencies(inputPitches)
     >>> print result
     [440, 440, 440, 440, 445, 445, 446, 446, 442, 442, 441, 441, 434, 433, 432, 430, 436, 437, 438, 439, 439, 439, 439, 439, 439, 440, 440, 440, 440, 440, 440, 440]
     '''
@@ -520,20 +516,16 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     or :class:`~music21.note.Rest` objects (each of quarterLength 1.0) 
     and a list of how many were joined together to make that object.
     
-    
     N.B. the returned list is NOT a :class:`~music21.stream.Stream`.    
 
-
-
-    >>> from music21 import *
     >>> import os #_DOCS_HIDE
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
     >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
-    >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
-    >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
-    >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
-    >>> (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
+    >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
+    >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
+    >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
+    >>> (notesList, durationList) = audioSearch.joinConsecutiveIdenticalPitches(detectedPitchObjects)
     >>> print notesList
     [<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>, ...]
     >>> print durationList
@@ -601,7 +593,7 @@ def quantizeDuration(length):
     on the standard music21 methodology.
     
     
-    >>> from music21 import *
+    
     >>> audioSearch.quantizeDuration(1.01)
     1.0
     >>> audioSearch.quantizeDuration(1.70)
@@ -634,7 +626,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     
     Returns a float -- and not an int.
     
-    >>> from music21 import *
+    
     >>> durationList = [20, 19, 10, 30, 6, 21]
     >>> audioSearch.quarterLengthEstimation(durationList)
     20.625    
@@ -689,7 +681,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     contains the notes, etc.  Does not run :meth:`~music21.stream.Stream.makeNotation`
     on the Score.    
     
-    >>> from music21 import *
+    
     >>> durationList = [20, 19, 10, 30, 6, 21]
     >>> n = note.Note
     >>> noteList = [n('C#4'), n('D5'), n('B4'), n('F#5'), n('C5'), note.Rest()]
@@ -757,18 +749,18 @@ def decisionProcess(partsList, notePrediction, beginningData,
     Outputs: It returns the beginning of the best matching fragment of 
     score and the countdown.
     
-    >>> from music21 import *
+    
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes    
     >>> scoreStream = scNotes    
     >>> import os #_DOCS_HIDE
     >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
-    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
+    >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
     >>> #_DOCS_SHOW freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
-    >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
-    >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
-    >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
-    >>> (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    >>> transcribedScore, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=None)
+    >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
+    >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
+    >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
+    >>> (notesList, durationList) = audioSearch.joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    >>> transcribedScore, qle = audioSearch.notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=None)
     >>> hop = 6
     >>> tn_recording = 24
     >>> totScores = []
@@ -785,7 +777,7 @@ def decisionProcess(partsList, notePrediction, beginningData,
     >>> notePrediction = 0
     >>> lastNotePosition = 0
     >>> countdown = 0
-    >>> positionInList, countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
+    >>> positionInList, countdown = audioSearch.decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
     >>> print positionInList
     0
     >>> print countdown # the result is 1 because the song used is completely different from the score!!

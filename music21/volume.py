@@ -31,7 +31,7 @@ class VolumeException(exceptions21.Music21Exception):
 class Volume(object):
     '''The Volume object lives on NotRest objects and subclasses. It is not a Music21Object subclass. 
 
-    >>> from music21 import *
+    
     >>> v = volume.Volume()     
     '''
     def __init__(self, parent=None, velocity=None, velocityScalar=None, 
@@ -105,7 +105,7 @@ class Volume(object):
     velocity = property(_getVelocity, _setVelocity, doc = '''
         Get or set the velocity value, a numerical value between 0 and 127 and available setting amplitude on each Note or Pitch in chord. 
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.volume.velocity = 20
         >>> n.volume.parent == n
@@ -137,7 +137,7 @@ class Volume(object):
 
         When setting this value, an integer-based velocity value will be derived and stored. 
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.volume.velocityScalar = .5
         >>> n.volume.velocity
@@ -171,7 +171,7 @@ class Volume(object):
     def mergeAttributes(self, other):
         '''Given another Volume object, gather all attributes except parent. Values are always copied, not passed by reference. 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> v1 = volume.Volume()
         >>> v1.velocity = 111
@@ -203,7 +203,7 @@ class Volume(object):
 
         The `velocityIsRelative` tag determines if the velocity value includes contextual values, such as dynamics and and accents, or not. 
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
         >>> s.insert([0, dynamics.Dynamic('p'), 1, dynamics.Dynamic('mp'), 2, dynamics.Dynamic('mf'), 3, dynamics.Dynamic('f')])
@@ -297,7 +297,7 @@ class Volume(object):
         useArticulations=True, baseLevel=0.5, clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing. 
 
-        >>> from music21 import *
+        
         >>> v = volume.Volume(velocity=64)
         >>> v.getRealizedStr()
         '0.5'
@@ -321,7 +321,7 @@ class Volume(object):
     cachedRealized = property(_getCachedRealized, doc='''
         Return the cached realized value of this volume. This will be the last realized value or, if that value has not been set, a newly realized value. If the caller knows that the realized values have all been recently set, using this property will add significant performance boost.
 
-        >>> from music21 import *
+        
         >>> v = volume.Volume(velocity=128)
         >>> v.cachedRealized
         1.0
@@ -333,7 +333,7 @@ class Volume(object):
     cachedRealizedStr = property(_getCachedRealizedStr, doc='''
         Convenience property for testing.
 
-        >>> from music21 import *
+        
         >>> v = volume.Volume(velocity=128)
         >>> v.cachedRealizedStr
         '1.0'

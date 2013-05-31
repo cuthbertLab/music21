@@ -73,12 +73,9 @@ def figuredBassFromStream(streamPart):
     way of converting from a notated version of a figured bass (such as in a MusicXML file) to 
     a realized version of the same line.
     
-    
-    >>> from music21 import tinyNotation
-    >>> from music21.figuredBass import realizer
     >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
-    >>> fb = realizer.figuredBassFromStream(s)
-    >>> fbRules = rules.Rules()
+    >>> fb = figuredBass.realizer.figuredBassFromStream(s)
+    >>> fbRules = figuredBass.rules.Rules()
     >>> fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
     >>> fbRealization = fb.realize(fbRules)
     >>> fbRealization.getNumSolutions()
@@ -213,7 +210,7 @@ class FiguredBassLine(object):
         Use this method to add (bassNote, notationString) pairs to the bass line. Elements
         are realized in the order they are added.
         
-        >>> from music21 import *
+        
         >>> from music21.figuredBass import realizer
         >>> from music21 import key
         >>> from music21 import meter
@@ -369,7 +366,7 @@ class FiguredBassLine(object):
         if `maxPitch` is None, uses pitch.Pitch('B5')
 
         
-        >>> from music21 import *
+        
         >>> from music21.figuredBass import realizer
         >>> from music21.figuredBass import rules
         >>> from music21 import key

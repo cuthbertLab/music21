@@ -59,7 +59,7 @@ class Spanner(base.Music21Object):
     as Elliott Carter uses in his second string quartet (he marks them
     with an arrow).
 
-    >>> from music21 import *
+    
     >>> class CarterAccelerandoSign(spanner.Spanner):
     ...    pass
     >>> n1 = note.Note('C4')
@@ -90,7 +90,7 @@ class Spanner(base.Music21Object):
     >>> for e in s:
     ...    print e
     <music21.note.Note C>
-    <music21.spanner.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
+    <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
     <music21.note.Note D>
     <music21.note.Note E>
     
@@ -101,13 +101,13 @@ class Spanner(base.Music21Object):
     >>> spannerCollection = s.spanners # a stream object
     >>> for thisSpanner in spannerCollection:
     ...     print thisSpanner
-    <music21.spanner.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
+    <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
 
 
     (3) we can get the spanner by looking at the list getSpannerSites() on any object that has a spanner:
     
     >>> n2.getSpannerSites()
-    [<music21.spanner.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
+    [<music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
     
     In this example we will slur a few notes and then iterate over the stream to
     see which are slurred:
@@ -249,7 +249,7 @@ class Spanner(base.Music21Object):
         SpannedElements linked in this Spanner must be manually re-set, likely using the 
         replaceSpannedElement() method.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
@@ -351,7 +351,7 @@ class Spanner(base.Music21Object):
     #---------------------------------------------------------------------------
     def __getitem__(self, key):
         '''
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.BassClef()
@@ -378,7 +378,7 @@ class Spanner(base.Music21Object):
         Return all the elements of `.spannedElements` for this Spanner 
         as a list of Music21Objects.  
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> sl = spanner.Spanner()
@@ -407,7 +407,7 @@ class Spanner(base.Music21Object):
 
     def getSpannedElementsByClass(self, classFilterList):
         '''
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
@@ -442,7 +442,7 @@ class Spanner(base.Music21Object):
         The order in which elements are added is retained and 
         may or may not be significant to the spanner. 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> n3 = note.Note('e')
@@ -495,7 +495,7 @@ class Spanner(base.Music21Object):
 
         The `old` parameter can be either an object or object id. 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
@@ -536,7 +536,7 @@ class Spanner(base.Music21Object):
     def isFirst(self, spannedElement):
         '''Given a spannedElement, is it first?
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> n3 = note.Note('e')
@@ -564,7 +564,7 @@ class Spanner(base.Music21Object):
     def getFirst(self):
         '''Get the object of the first spannedElement
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> n3 = note.Note('e')
@@ -593,7 +593,7 @@ class Spanner(base.Music21Object):
     def getLast(self):
         '''Get the object of the first spannedElement
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> n3 = note.Note('e')
@@ -613,7 +613,7 @@ class Spanner(base.Music21Object):
     def getOffsetsBySite(self, site):
         '''Given a site shared by all , return a list of offset values.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> s = stream.Stream()
@@ -746,7 +746,7 @@ class SpannerBundle(object):
     def remove(self, item):
         '''Remove a stored Spanner from the bundle with an instance. Each reference must have a matching id() value.
 
-        >>> from music21 import *
+        
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
         >>> su2 = spanner.Slur()
@@ -796,7 +796,7 @@ class SpannerBundle(object):
 
         Returns a new SpannerBundle object
 
-        >>> from music21 import *
+        
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
         >>> su2 = spanner.Slur()
@@ -824,7 +824,7 @@ class SpannerBundle(object):
     def getByCompleteStatus(self, completeStatus):
         '''Get spanners by matching status of `completeStatus` to the same attribute
 
-        >>> from music21 import *
+        
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
         >>> su1.completeStatus = True
@@ -853,7 +853,7 @@ class SpannerBundle(object):
         Given a spanner spannedElement (an object), 
         return a new SpannerBundle of all Spanner objects that have this object as a spannedElement. 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n2 = note.Note()
         >>> n3 = note.Note()
@@ -921,7 +921,7 @@ class SpannerBundle(object):
     def getByClass(self, className):
         '''Given a spanner class, return a bundle of all Spanners of the desired class. 
 
-        >>> from music21 import *
+        
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()
         >>> sb = spanner.SpannerBundle()
@@ -980,7 +980,7 @@ class SpannerBundle(object):
         position of the contents of the spanner have no bearing on 
         its idLocal (since we don't even put anything into the spanners).
 
-        >>> from music21 import *
+        
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()
         >>> su3 = spanner.Slur()
@@ -1015,7 +1015,7 @@ class SpannerBundle(object):
         
         Calling this method is destructive: existing idLocal values will be lost.
 
-        >>> from music21 import *
+        
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()
         >>> su3 = spanner.Slur()
@@ -1045,7 +1045,7 @@ class SpannerBundle(object):
     def getByClassIdLocalComplete(self, className, idLocal, completeStatus):
         '''Get all spanners of a specified class `className`, an id `idLocal`, and a `completeStatus`. This is a convenience routine for multiple filtering when searching for relevant Spanners to pair with. 
 
-        >>> from music21 import *
+        
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()
         >>> su2.idLocal = 3
@@ -1064,7 +1064,7 @@ class SpannerBundle(object):
     def getByClassComplete(self, className, completeStatus):
         '''Get all spanner of a specified class `className` and a `completeStatus`. Convenience routine for multiple filtering
 
-        >>> from music21 import *
+        
         >>> su1 = spanner.Slur()
         >>> su1.completeStatus = True
         >>> su2 = layout.StaffGroup()
@@ -1134,7 +1134,7 @@ class RepeatBracket(Spanner):
 
     It is assumed that numbering starts from 1. Numberings above 2 are permitted. The `number` keyword argument can be used to pass in the desired number. 
 
-    >>> from music21 import *
+    
     >>> m = stream.Measure()
     >>> sp = spanner.RepeatBracket(m, number=1)
     >>> sp # can be one or more measures
@@ -1260,7 +1260,7 @@ class RepeatBracket(Spanner):
     def getNumberList(self):
         '''Get a contiguous list of repeat numbers that are applicable for this instance.
 
-        >>> from music21 import *
+        
         >>> rb = spanner.RepeatBracket()
         >>> rb.number = '1,2'
         >>> rb.getNumberList()
@@ -1285,7 +1285,7 @@ class RepeatBracket(Spanner):
 class Ottava(Spanner):
     '''An octave shift line
 
-    >>> from music21 import *
+    
     >>> ottava = spanner.Ottava(type='8va')
     >>> ottava.type
     '8va'
@@ -1347,7 +1347,7 @@ class Ottava(Spanner):
     type = property(_getType, _setType, doc='''
         Get or set Ottava type. This can be set by as complete string (such as 8va or 15mb) or with a pair specifying size and direction.
 
-        >>> from music21 import *
+        
         >>> os = spanner.Ottava()
         >>> os.type = 15, 'down'
         >>> os.type
@@ -1374,7 +1374,7 @@ class Ottava(Spanner):
     def getStartParameters(self):
         '''Return the parameters for the start of this spanners required by MusicXML output. 
 
-        >>> from music21 import *
+        
         >>> ottava = spanner.Ottava(type='15mb')
         >>> ottava.getStartParameters()
         {'type': 'up', 'size': 15}
@@ -1389,7 +1389,7 @@ class Ottava(Spanner):
     def getEndParameters(self):
         '''Return the parameters for the start of this spanner required by MusicXML output. 
 
-        >>> from music21 import *
+        
         >>> ottava = spanner.Ottava(type=8)
         >>> ottava.getStartParameters()
         {'type': 'down', 'size': 8}
@@ -1408,7 +1408,7 @@ class Line(Spanner):
 
     Brackets can take many line types. 
 
-    >>> from music21 import *
+    
     >>> b = spanner.Line()
     >>> b.lineType = 'dotted'
     >>> b.lineType
@@ -1487,7 +1487,7 @@ class Line(Spanner):
     tick = property(_getTick, _setTick, doc='''
         Set the start and end tick to the same value
 
-        >>> from music21 import *
+        
         >>> b = spanner.Line()
         >>> b.tick = 'arrow'
         >>> b.startTick
@@ -1511,7 +1511,7 @@ class Line(Spanner):
     lineType = property(_getLineType, _setLineType, doc='''
         Get or set the lineType property. Valid line types are "solid", "dashed", "dotted", or "wavy".
 
-        >>> from music21 import *
+        
         >>> b = spanner.Line()
         >>> b.lineType = 'dotted'
         >>> b.lineType = 'junk'

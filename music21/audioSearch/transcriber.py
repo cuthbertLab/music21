@@ -94,7 +94,7 @@ def monophonicStreamFromFile(fileName, useScale=None):
 
     We demonstrate with an audio file beginning with an ascending scale.
     
-    >>> from music21 import *
+    >>> import os
     >>> waveFile = os.path.dirname(__file__) + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
     >>> #_DOCS_SHOW waveFile = 'test_audio.wav'
     >>> p = audioSearch.transcriber.monophonicStreamFromFile(waveFile)

@@ -48,9 +48,8 @@ def musicxmlText(outputStream):
     '''
     Takes in a stream outputStream and returns its musicxml with content-type 'text/plain' for displaying in a browser
     
-    >>> from music21 import *
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
-    >>> (output, contentType) = musicxmlText(sc)
+    >>> (output, contentType) = webapps.templates.musicxmlText(sc)
     >>> contentType
     'text/plain; charset=utf-8'
     >>> 'score-partwise' in output
@@ -64,13 +63,13 @@ def musicxmlFile(outputStream):
     '''
     Takes in a stream outputStream and returns its musicxml with content-type 'application/vnd.recordare.musicxml+xml' for downloading
     
-    >>> from music21 import *
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
-    >>> (output, contentType) = musicxmlFile(sc)
+    >>> (output, contentType) = webapps.templates.musicxmlFile(sc)
     >>> contentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
     >>> 'score-partwise' in output
     True
+
     '''
     from music21.musicxml import m21ToString
     musicxmlString = m21ToString.fromMusic21Object(outputStream)
@@ -81,11 +80,11 @@ def vexflow(outputStream):
     Takes in a stream outputStream, generates an HTML representation of it using vexflow, and
     outputs it with content-type text/html for displying in a browser.
     
-    >>> from music21 import *
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
     >>> (output, contentType) = webapps.templates.vexflow(sc)
     >>> contentType
     'text/html; charset=utf-8'
+
     '''
     from music21 import vexflow
     outputHTML = vexflow.fromObject(outputStream, mode='html')
@@ -96,7 +95,6 @@ def braille(outputStream):
     Takes in a stream outputStream, generates the braille representation of it, and returns
     the unicode output with content-type text/html for display in a browser
   
-    >>> from music21 import *
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
     >>> (output, contentType) = webapps.templates.braille(sc)
     >>> contentType
@@ -115,7 +113,6 @@ def noteflightEmbed(outputStream):
     
     TODO: Change javascript and noteflight embed to relate to be server-specific
   
-    >>> from music21 import *
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
     >>> (output, contentType) = webapps.templates.noteflightEmbed(sc)
     >>> contentType

@@ -211,7 +211,7 @@ class ScoreReduction(object):
     score = property(_getScore, _setScore, doc='''
         Get or set the Score. Setting the score set a deepcopy of the score; the score set here will not be altered.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bwv66.6')
         >>> sr = analysis.reduction.ScoreReduction()
         >>> sr.score = s

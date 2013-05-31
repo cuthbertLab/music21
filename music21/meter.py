@@ -49,7 +49,7 @@ _meterSequenceDivisionOptions = {}
 
 def slashToFraction(value):
     '''
-    >>> from music21 import *
+    
     >>> meter.slashToFraction('3/8')
     (3, 8, None)
     >>> meter.slashToFraction('7/32')
@@ -79,7 +79,7 @@ def slashToFraction(value):
 
 def slashCompoundToFraction(value):
     '''
-    >>> from music21 import *
+    
     >>> meter.slashCompoundToFraction('3/8+2/8')
     [(3, 8), (2, 8)]
     >>> meter.slashCompoundToFraction('5/8')
@@ -106,7 +106,7 @@ def slashMixedToFraction(valueSrc):
     a list of pairs. If originally given as a summed numerator; break
     into separate fractions.
 
-    >>> from music21 import *
+    
     >>> meter.slashMixedToFraction('3/8+2/8')
     ([(3, 8), (2, 8)], False)
 
@@ -167,7 +167,7 @@ def fractionToSlashMixed(fList):
     '''Given a list of fraction values, compact numerators by sum if
     denominators are the same 
 
-    >>> from music21 import *
+    
     >>> meter.fractionToSlashMixed([(3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)])
     [('3+2+5', 8), ('3', 4), ('2+1+4', 16)]
     '''
@@ -204,7 +204,7 @@ def fractionToSlashMixed(fList):
 def fractionSum(fList):
     '''Given a list of fractions represented as a list, find the sum
     
-    >>> from music21 import *
+    
     >>> meter.fractionSum([(3,8), (5,8), (1,8)])
     (9, 8)
     >>> meter.fractionSum([(1,6), (2,3)])
@@ -248,7 +248,7 @@ def fractionSum(fList):
 def proportionToFraction(value):
     '''Given a floating point proportional value between 0 and 1, return the best-fit slash-base fraction
 
-    >>> from music21 import *
+    
     >>> meter.proportionToFraction(.5)
     (1, 2)
     >>> meter.proportionToFraction(.25)
@@ -283,7 +283,7 @@ def bestTimeSignature(meas):
         
     Note: this does not yet accommodate triplets. 
         
-    >>> from music21 import *
+    
     >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
     >>> m = stream.Measure()
     >>> for el in s:
@@ -468,7 +468,7 @@ class MeterTerminal(object):
     '''
     A MeterTerminal is a nestable primitive of rhythmic division
 
-    >>> from music21 import *
+    
     >>> a = meter.MeterTerminal('2/4')
     >>> a.duration.quarterLength
     2.0
@@ -589,7 +589,7 @@ class MeterTerminal(object):
         subdividing it into the given number of parts.  Each of those parts
         is a MeterTerminal
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterTerminal('3/4')
         >>> b = a.subdivideByCount(3)
         >>> isinstance(b, meter.MeterSequence)
@@ -630,7 +630,7 @@ class MeterTerminal(object):
         Return a MeterSequence dividing this
         MeterTerminal according to the numeratorList
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterTerminal('3/4')
         >>> b = a.subdivideByList([1,1,1])
         >>> len(b)
@@ -667,7 +667,7 @@ class MeterTerminal(object):
         '''Return a MeterSequence
         based on another MeterSequence
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('1/4+1/4+1/4')
         >>> a
         <MeterSequence {1/4+1/4+1/4}>
@@ -710,7 +710,7 @@ class MeterTerminal(object):
 
     def _setWeight(self, value):
         '''
-        >>> from music21 import *
+        
         >>> a = meter.MeterTerminal('2/4')
         >>> a.weight = .5
         >>> a.weight
@@ -728,7 +728,7 @@ class MeterTerminal(object):
 
     def _setNumerator(self, value):
         '''
-        >>> from music21 import *
+        
         >>> a = meter.MeterTerminal('2/4')
         >>> a.duration.quarterLength
         2.0
@@ -746,7 +746,7 @@ class MeterTerminal(object):
 
     def _setDenominator(self, value):
         '''
-        >>> from music21 import *
+        
         >>> a = meter.MeterTerminal('2/4')
         >>> a.duration.quarterLength
         2.0
@@ -785,7 +785,7 @@ class MeterTerminal(object):
         duration gets or sets a duration value that
         is equal in length to the totalLength
         
-        >>> from music21 import *
+        
         >>> a = meter.MeterTerminal()
         >>> a.numerator = 3
         >>> a.denominator = 8
@@ -892,7 +892,7 @@ class MeterSequence(MeterTerminal):
         Notably, self._levelListCache is not copied, 
         which may not be needed in the copy and may be large. 
 
-        >>> from music21 import *
+        
         >>> from copy import deepcopy
         >>> ms1 = meter.MeterSequence('4/4+3/8')
         >>> ms2 = deepcopy(ms1)
@@ -927,7 +927,7 @@ class MeterSequence(MeterTerminal):
         '''
         Return the length of the partition list
        
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a
         <MeterSequence {1/4+1/4+1/4+1/4}>
@@ -940,7 +940,7 @@ class MeterSequence(MeterTerminal):
         '''
         Support iteration of top level partitions
         
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4', 2)
         >>> for x in a:
         ...     print repr(x)
@@ -952,7 +952,7 @@ class MeterSequence(MeterTerminal):
     def __getitem__(self, key):
         '''Get an MeterTerminal from _partition
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a[3].numerator
         1
@@ -966,7 +966,7 @@ class MeterSequence(MeterTerminal):
         '''
         Insert items at index positions.
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a[0] = a[0].subdivide(2)
         >>> a
@@ -998,7 +998,7 @@ class MeterSequence(MeterTerminal):
         This simply gets restatements of the same fraction in smaller units, 
         up to the largest valid denominator. 
 
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsFractionsUpward(2, 4)
         [['4/8'], ['8/16'], ['16/32'], ['32/64'], ['64/128']]
@@ -1022,7 +1022,7 @@ class MeterSequence(MeterTerminal):
     def _divisionOptionsFractionsDownward(self, n, d, opts=None):
         '''Get restatements of the same fraction in larger units
 
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsFractionsDownward(2, 4)
         [['1/2']]
@@ -1046,7 +1046,7 @@ class MeterSequence(MeterTerminal):
 
     def _divisionOptionsAdditiveMultiplesDownward(self, n, d, opts=None):
         '''
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsAdditiveMultiplesDownward(1, 16)
         [['1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64'], ['1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128']]
@@ -1071,7 +1071,7 @@ class MeterSequence(MeterTerminal):
     def _divisionOptionsAdditiveMultiples(self, n, d, opts=None):
         '''Additive multiples with the same denominators.
 
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsAdditiveMultiples(4, 16)
         [['2/16', '2/16']]
@@ -1098,7 +1098,7 @@ class MeterSequence(MeterTerminal):
 
     def _divisionOptionsAdditiveMultiplesEvenDivision(self, n, d, opts=None):
         '''
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsAdditiveMultiplesEvenDivision(4, 16)
         [['1/8', '1/8']]
@@ -1129,7 +1129,7 @@ class MeterSequence(MeterTerminal):
 
     def _divisionOptionsAdditiveMultiplesUpward(self, n, d, opts=None):
         '''
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsAdditiveMultiplesUpward(4, 16)
         [['1/16', '1/16', '1/16', '1/16'], ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64']]
@@ -1166,7 +1166,7 @@ class MeterSequence(MeterTerminal):
        
         It is assumed that these values are provided in order of priority
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence()
         >>> a._divisionOptionsAlgo(4,4)
         [['1/4', '1/4', '1/4', '1/4'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['1/2', '1/2'], ['4/4'], ['2/4', '2/4'], ['2/2'], ['1/1'], ['8/8'], ['16/16'], ['32/32'], ['64/64'], ['128/128']]
@@ -1254,7 +1254,7 @@ class MeterSequence(MeterTerminal):
         Currently does nothing except to allow partitioning 5/8 as 2/8,2/8,1/8 as a possibility
         (sim for 5/16, etc.)
         
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsPreset(5, 8)
         [['2/8', '2/8', '1/8'], ['2/8', '1/8', '2/8']]
@@ -1332,7 +1332,7 @@ class MeterSequence(MeterTerminal):
         
         This will destroy any established structure in the stored partition.
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4')
         >>> a.partitionByCount(2)
         >>> str(a)
@@ -1402,7 +1402,7 @@ class MeterSequence(MeterTerminal):
         Given a numerator list, partition MeterSequence into a new list
         of MeterTerminals
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4')
         >>> a.partitionByList([1,1,1,1])
         >>> str(a)
@@ -1483,7 +1483,7 @@ class MeterSequence(MeterTerminal):
         Set partition to that found in another
         MeterSequence
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4', 4)
         >>> str(a)
         '{1/4+1/4+1/4+1/4}'
@@ -1519,7 +1519,7 @@ class MeterSequence(MeterTerminal):
         are treated as beat counts; lists are treated as numerator lists; 
         MeterSequence objects are partitioned by calling partitionByOtherMeterSequence(). 
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('5/4+3/8')
         >>> len(a)
         2
@@ -1559,7 +1559,7 @@ class MeterSequence(MeterTerminal):
 
         Divisions value may optionally be a MeterSequence, from which a top-level partitioning structure is derived.
 
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence('2/4')
         >>> ms.partition(2)
         >>> ms
@@ -1599,7 +1599,7 @@ class MeterSequence(MeterTerminal):
     def _subdivideNested(self, processObjList, divisions):
         '''Recursive nested call routine. Return a reference to the newly created level.
 
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence('2/4')
         >>> ms.partition(2)
         >>> ms
@@ -1634,7 +1634,7 @@ class MeterSequence(MeterTerminal):
 
         `normalizeDenominators`, if True, will reduce all denominators to the same minimum level. 
 
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence('4/4')
         >>> ms.subdivideNestedHierarchy(1)
         >>> ms
@@ -1754,7 +1754,7 @@ class MeterSequence(MeterTerminal):
     partitionStr = property(_getPartitionStr, 
         doc = '''Return the number of top-level partitions in this MeterSequence as a string. 
 
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence('2/4+2/4')
         >>> ms
         <MeterSequence {2/4+2/4}>
@@ -1791,7 +1791,7 @@ class MeterSequence(MeterTerminal):
 
         loading is a destructive operation.
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence()
         >>> a.load('4/4', 4)
         >>> str(a)
@@ -1879,7 +1879,7 @@ class MeterSequence(MeterTerminal):
 
     def _getWeight(self):
         '''
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('3/4')
         >>> a.partition(3)
         >>> a.weight = 1
@@ -1941,7 +1941,7 @@ class MeterSequence(MeterTerminal):
         This return a list and not a new MeterSequence b/c MeterSequence objects are generally immutable and thus it does not make sense
         to concatenate them.
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('3/4')
         >>> a.partition(3)
         >>> b = a._getFlatList()
@@ -1976,7 +1976,7 @@ class MeterSequence(MeterTerminal):
         '''
         Return a new MeterSequence composed of the flattend representation.
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('3/4', 3)
         >>> b = a.flat
         >>> len(b)
@@ -2036,7 +2036,7 @@ class MeterSequence(MeterTerminal):
     def isUniformPartition(self, depth=0):
         '''Return True if the top-level partitions have equal durations
 
-        >>> from music21 import *
+        
         >>> ms = meter.MeterSequence('3/8+2/8+3/4')
         >>> ms.isUniformPartition()
         False
@@ -2073,7 +2073,7 @@ class MeterSequence(MeterTerminal):
         '''
         Recursive utility function
 
-        >>> from music21 import *
+        
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
         >>> b[3] = b[3].subdivide(2)
@@ -2127,7 +2127,7 @@ class MeterSequence(MeterTerminal):
         reationship but that represents any partitions found at the rquested
         level. A sort of flatness with variable depth.
         
-        >>> from music21 import *
+        
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
         >>> b[3] = b[3].subdivide(2)
@@ -2147,7 +2147,7 @@ class MeterSequence(MeterTerminal):
         '''
         For a given level, return the time span of each terminal or sequnece
 
-        >>> from music21 import *
+        
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
         >>> b[3] = b[3].subdivide(2)
@@ -2178,7 +2178,7 @@ class MeterSequence(MeterTerminal):
         The weightList is an array of weights found in the components.
         The MeterSequence has a ._weight attribute, but it is not used here
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a.getLevelWeight()
         [0.25, 0.25, 0.25, 0.25]
@@ -2212,7 +2212,7 @@ class MeterSequence(MeterTerminal):
         '''
         The `weightList` is an array of weights to be applied to a single level of the MeterSequence.
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a.setLevelWeight([1, 2, 3, 4])
         >>> a.getLevelWeight()
@@ -2252,9 +2252,9 @@ class MeterSequence(MeterTerminal):
         Given an offset in quarterLengths (0.0 through self.duration.quarterLength), return
         the index of the active MeterTerminal or MeterSequence
 
-        >>> from music21 import *
         
-        >>> a = MeterSequence('4/4')
+        
+        >>> a = meter.MeterSequence('4/4')
         >>> a.offsetToIndex(.5)
         0
         >>> a.offsetToIndex(3.5)
@@ -2312,7 +2312,7 @@ class MeterSequence(MeterTerminal):
 
         The len of the returned list also provides the depth at the specified qLen. 
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('3/4', 3)
         >>> a[1] = a[1].subdivide(4)
         >>> a
@@ -2373,7 +2373,7 @@ class MeterSequence(MeterTerminal):
         greater than the duration of the Meter will be accepted 
         as the modulus of the total meter duration. 
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('3/4', 3)
         >>> a.offsetToSpan(.5)
         (0, 1.0)
@@ -2410,7 +2410,7 @@ class MeterSequence(MeterTerminal):
         Given a lenPos, return the weight of the active region.
         Only applies to the top-most level of partitions
 
-        >>> from music21 import *
+        
         >>> a = meter.MeterSequence('3/4', 3)
         >>> a.offsetToWeight(0.0)
         0.3333333333333333...
@@ -2429,7 +2429,7 @@ class MeterSequence(MeterTerminal):
         '''
         Given a qLenPos, return the maximum available depth at this position
 
-        >>> from music21 import *
+        
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
         >>> b[3] = b[3].subdivide(2)
@@ -2482,7 +2482,7 @@ class TimeSignature(base.Music21Object):
     will work within music21 but they won't necessarily display properly in musicxml, lilypond, etc.  So
     best is to create structures like this:
     
-    >>> from music21 import *
+    
     >>> s = stream.Score()
     >>> p = stream.Part()
     >>> m1 = stream.Measure()
@@ -2687,7 +2687,7 @@ class TimeSignature(base.Music21Object):
         '''
         returns a simple string representing the time signature ratio:
         
-        >>> from music21 import *
+        
         >>> threeFour = meter.TimeSignature('3/4')
         >>> threeFour.ratioString
         '3/4'
@@ -2704,7 +2704,7 @@ class TimeSignature(base.Music21Object):
         returns a simple string representing the time signature ratio or
         sets a new one.  Cannot be used for very complex time signatures:
         
-        >>> from music21 import *
+        
         >>> threeFour = meter.TimeSignature('3/4')
         >>> threeFour.ratioString
         '3/4'
@@ -2738,7 +2738,7 @@ class TimeSignature(base.Music21Object):
     def _setDefaultBeatPartitions(self, favorCompound=True):
         '''Set default beat partitions based on numerator and denominator.
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> len(ts.beatSequence) # first, not zeroth, level stores beat
         3
@@ -2818,7 +2818,7 @@ class TimeSignature(base.Music21Object):
     def _setDefaultAccentWeights(self, depth=3):
         '''This sets default accent weights based on common hierarchical notions for meters; each beat is given a weight, as defined by the top level count of self.beatSequence
 
-        >>> from music21 import *
+        
         >>> ts1 = meter.TimeSignature('4/4')
         >>> ts1._setDefaultAccentWeights(4)
         >>> [mt.weight for mt in ts1.accentSequence]
@@ -2962,7 +2962,7 @@ class TimeSignature(base.Music21Object):
 #     stringNotation = property(_getStringNotation, _setStringNotation, 
 #         doc = '''Get or set the TimeSignature by a simple string value. This permits loading a time signature by a string parameter. 
 # 
-#         >>> from music21 import *
+#         
 #         >>> ts = meter.TimeSignature('6/8')
 #         >>> ts.stringNotation
 #         '6/8'
@@ -2980,7 +2980,7 @@ class TimeSignature(base.Music21Object):
     totalLength = property(_getTotalLength, 
         doc = '''Total length of the TimeSignature, in Quarter Lengths.
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('6/8')
         >>> ts.totalLength
         3.0
@@ -2997,7 +2997,7 @@ class TimeSignature(base.Music21Object):
         (for complex TimeSignatures, note that this comes from the .beamSequence
         of the TimeSignature)
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.numerator
         3
@@ -3020,7 +3020,7 @@ class TimeSignature(base.Music21Object):
         (for complex TimeSignatures, note that this comes from the .beamSequence
         of the TimeSignature)
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.denominator
         4
@@ -3039,7 +3039,7 @@ class TimeSignature(base.Music21Object):
         barDuration gets or sets a duration value that
         is equal in length to the totalLength
         
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature('3/8')
         >>> d = a.barDuration
         >>> d.type
@@ -3062,7 +3062,7 @@ class TimeSignature(base.Music21Object):
     barDuration = property(_getBarDuration, _setBarDuration, 
         doc = '''Return a :class:`~music21.duration.Duration` object equal to the total length of this TimeSignature. 
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('5/16')
         >>> ts.barDuration
         <music21.duration.Duration 1.25>
@@ -3072,7 +3072,7 @@ class TimeSignature(base.Music21Object):
 
     def _getBeatLengthToQuarterLengthRatio(self):
         '''
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature('3/2')
         >>> a.beatLengthToQuarterLengthRatio
         2.0
@@ -3104,7 +3104,7 @@ class TimeSignature(base.Music21Object):
     def _setBeatCount(self, value):
         '''Setting a beat-count directly is a simple, high-level way to configure the beatSequence. Note that his may not configure lower level partitions correctly, and will raise an error if the provided beat count is not supported by the overall duration of the .beatSequence MeterSequence.
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('6/8')
         >>> ts.beatCount # default is 2 beats
         2
@@ -3139,7 +3139,7 @@ class TimeSignature(base.Music21Object):
 
         When setting beat units, one level of sub-partitions is automatically defined. Users can provide beat count values as integers or as lists of durations. For more precise configuration of the beat MeterSequence, manipulate the .beatSequence attribute directly. 
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatCount
         3
@@ -3159,7 +3159,7 @@ class TimeSignature(base.Music21Object):
     beatCountName = property(_getBeatCountName,
         doc = '''Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple.
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatCountName
         'Triple'
@@ -3186,7 +3186,7 @@ class TimeSignature(base.Music21Object):
     beatDuration = property(_getBeatDuration, 
         doc = '''Return a :class:`~music21.duration.Duration` object equal to the beat unit of this Time Signature, if and only if this TimeSignatyure has a uniform beat unit.
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatDuration
         <music21.duration.Duration 1.0>
@@ -3224,7 +3224,7 @@ class TimeSignature(base.Music21Object):
     beatDivisionCount = property(_getBeatDivisionCount,
         doc = '''Return the count of background beat units found within one beat, or the number of subdivisions in the beat unit in this TimeSignature.
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatDivisionCount
         2
@@ -3260,7 +3260,7 @@ class TimeSignature(base.Music21Object):
     beatDivisionCountName = property(_getBeatDivisionCountName,
         doc = '''Return the beat count name, or the name given for the number of beat units. For example, 2/4 is duple; 9/4 is triple.
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatDivisionCountName
         'Simple'
@@ -3291,7 +3291,7 @@ class TimeSignature(base.Music21Object):
     beatDivisionDurations = property(_getBeatDivisionDurations, 
         doc = '''Return the beat division, or the durations that make up one beat, as a list of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats. 
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatDivisionDurations
         [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>]
@@ -3315,7 +3315,7 @@ class TimeSignature(base.Music21Object):
     beatSubDivisionDurations = property(_getBeatSubDivisionDurations, 
         doc = '''Return a subdivision of the beat division, or a list of :class:`~music21.duration.Duration` objects representing each beat division divided by two. 
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatSubDivisionDurations
         [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>]
@@ -3334,7 +3334,7 @@ class TimeSignature(base.Music21Object):
     classification = property(_getClassification, 
         doc = '''Return the classification of this TimeSignature, such as Simple Triple or Compound Quadruple.
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.classification
         'Simple Triple'
@@ -3362,7 +3362,7 @@ class TimeSignature(base.Music21Object):
         Must process a list at  time, because we cannot tell when a beam ends
         unless we see the context of adjoining durations.
 
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature('2/4', 2)
         >>> a.beamSequence[0] = a.beamSequence[0].subdivide(2)
         >>> a.beamSequence[1] = a.beamSequence[1].subdivide(2)
@@ -3625,7 +3625,7 @@ class TimeSignature(base.Music21Object):
         '''
         Set an independent display value for a meter.
 
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature()
         >>> a.load('3/4')
         >>> a.setDisplay('2/8+2/8+2/8')
@@ -3654,7 +3654,7 @@ class TimeSignature(base.Music21Object):
         '''Return True or False if the qLenPos is at the start of an accent
         division.
 
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.accentSequence.partition([2,1])
         >>> a.accentSequence
@@ -3679,7 +3679,7 @@ class TimeSignature(base.Music21Object):
 
         If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument.
 
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature('4/4', 4)
         >>> len(a.accentSequence)
         4
@@ -3707,7 +3707,7 @@ class TimeSignature(base.Music21Object):
         returns a float of the average beat strength of all objects (or if notesOnly is True
         [default] only the notes) in the `Stream` specified as streamIn.
         
-        >>> from music21 import *
+        
         >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
         >>> sixEight = meter.TimeSignature('6/8')
         >>> sixEight.averageBeatStrength(s)
@@ -3748,7 +3748,7 @@ class TimeSignature(base.Music21Object):
 
         If `permitMeterModulus` is True, quarter length positions greater than the duration of the Meter will be accepted as the modulus of the total meter duration. 
 
-        >>> from music21 import *
+        
         >>> ts1 = meter.TimeSignature('3/4')
         >>> [ts1.getAccentWeight(x) for x in range(3)]
         [1.0, 0.5, 0.5]
@@ -3781,7 +3781,7 @@ class TimeSignature(base.Music21Object):
         
         In v.1.4 -- getBeat will probably do what getBeatProportion does now...
 
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeat(0)
         1
@@ -3796,7 +3796,7 @@ class TimeSignature(base.Music21Object):
     def getBeatOffsets(self):
         '''Return offset positions in a list for the start of each beat, assuming this object is found at offset zero.
 
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature('3/4')
         >>> a.getBeatOffsets()
         [0.0, 1.0, 2.0]
@@ -3837,7 +3837,7 @@ class TimeSignature(base.Music21Object):
         Ex. 1: beat duration for 3/4 is always 1.0
         no matter where in the meter you query.
 
-        >>> from music21 import *
+        
         >>> ts1 = meter.TimeSignature('3/4')
         >>> ts1.getBeatDuration(.5)
         <music21.duration.Duration 1.0>
@@ -3871,7 +3871,7 @@ class TimeSignature(base.Music21Object):
         '''
         Given a beat value, convert into an offset position. 
 
-        >>> from music21 import *
+        
         >>> ts1 = meter.TimeSignature('3/4')
         >>> ts1.getOffsetFromBeat(1)
         0.0
@@ -3949,7 +3949,7 @@ class TimeSignature(base.Music21Object):
         is. 
 
 
-        >>> from music21 import *
+        
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeatProgress(0)
         (1, 0)
@@ -3980,7 +3980,7 @@ class TimeSignature(base.Music21Object):
 
         For faster, integer values, use simply `.getBeat()`
 
-        >>> from music21 import *
+        
         >>> ts1 = meter.TimeSignature('3/4')
         >>> ts1.getBeatProportion(0.0)
         1.0
@@ -4005,7 +4005,7 @@ class TimeSignature(base.Music21Object):
     def getBeatProportionStr(self, qLenPos):
         '''Return a string presentation of the beat. 
 
-        >>> from music21 import *
+        
         >>> ts1 = meter.TimeSignature('3/4')
         >>> ts1.getBeatProportionStr(0.0)
         '1'
@@ -4040,8 +4040,8 @@ class TimeSignature(base.Music21Object):
 
         The `align` parameter is passed to the :meth:`~music21.meter.MeterSequence.offsetToDepth` method, and can be used to find depths based on start position overlaps. 
 
-        >>> from music21 import *
-        >>> a = TimeSignature('3/4', 3)
+        
+        >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeatDepth(0)
         1
         >>> a.getBeatDepth(1)
@@ -4049,7 +4049,7 @@ class TimeSignature(base.Music21Object):
         >>> a.getBeatDepth(2)
         1
 
-        >>> b = TimeSignature('3/4', 1)
+        >>> b = meter.TimeSignature('3/4', 1)
         >>> b.beatSequence[0] = b.beatSequence[0].subdivide(3)
         >>> b.beatSequence[0][0] = b.beatSequence[0][0].subdivide(2)
         >>> b.beatSequence[0][1] = b.beatSequence[0][1].subdivide(2)

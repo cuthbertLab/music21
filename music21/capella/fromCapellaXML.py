@@ -147,7 +147,7 @@ class CapellaImporter(object):
         Utility method, especially for the documentation examples/tests, which uses
         `xml.dom.minidom` to parse the string and returns its `.documentElement` object.
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> funnyTag = ci.domElementFromText('<funny yes="definitely"><greg/>hi<greg><ha>ha</ha><greg type="embedded"/></greg></funny>')
         >>> funnyTag
@@ -175,7 +175,7 @@ class CapellaImporter(object):
         
         If `tag` is omitted then all element nodes are returned.
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> funnyTag = ci.domElementFromText('<funny yes="definitely"><greg/>hi<greg><ha>ha</ha><greg type="embedded"/></greg></funny>')
         >>> g = ci.getChildrenByTag(funnyTag, 'greg')
@@ -342,7 +342,7 @@ class CapellaImporter(object):
         A Stream can be given as an optional argument, in which case the objects of this
         Stream are appended to this object.
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> noteObjectsString = r"""
         ...           <noteObjects>
@@ -417,7 +417,7 @@ class CapellaImporter(object):
         '''
         Returns a :class:`~music21.rest.Rest` object from a <rest> tag. 
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> restElement = ci.domElementFromText('<rest><duration base="1/2"/></rest>')
         >>> r = ci.restFromRest(restElement)
@@ -436,7 +436,7 @@ class CapellaImporter(object):
         returns a :class:`~music21.note.Note` or :class:`~music21.chord.Chord` from a chordElement -- a `Note`
         is returned if the <chord> has one <head> element, a `Chord` is returned if there are multiple <head> elements.
 
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> chordElement = ci.domElementFromText('<chord><duration base="1/1"/><heads><head pitch="G4"/></heads></chord>')
         >>> n = ci.chordOrNoteFromChord(chordElement)
@@ -486,7 +486,7 @@ class CapellaImporter(object):
         '''
         returns a list of :class:`~music21.note.Note` elements for each <head> in <heads> 
 
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> headsElement = ci.domElementFromText('<heads><head pitch="B7"><alter step="-1"/></head><head pitch="C2"/></heads>')
         >>> ci.notesFromHeads(headsElement)
@@ -504,7 +504,7 @@ class CapellaImporter(object):
         part of Chord._components if there are multiple, but in any case, it needs to be a Note
         not a Pitch for now, because it could have Tie information
 
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> headElement = ci.domElementFromText('<head pitch="B7"><alter step="-1"/><tie end="true"/></head>')
         >>> n = ci.noteFromHead(headElement)
@@ -543,7 +543,7 @@ class CapellaImporter(object):
         '''
         return a :class:`~music21.pitch.Accidental` object from an <alter> tag.
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> alter = ci.domElementFromText('<alter step="-1"/>')
         >>> ci.accidentalFromAlter(alter)
@@ -572,7 +572,7 @@ class CapellaImporter(object):
         
         if begin == 'true' then Tie.type = start
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> tieEl = ci.domElementFromText('<tie begin="true"/>')
         >>> ci.tieFromTie(tieEl)
@@ -614,7 +614,7 @@ class CapellaImporter(object):
         '''
         returns a list of :class:`~music21.note.Lyric` objects from a <lyric> tag
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> lyricEl = ci.domElementFromText('<lyric><verse i="0" hyphen="true">di</verse><verse i="1">man,</verse><verse i="2">frau,</verse></lyric>')
         >>> ci.lyricListFromLyric(lyricEl)
@@ -634,7 +634,7 @@ class CapellaImporter(object):
         '''
         returns a :class:`~music21.note.Lyric` object from a <verse> tag
 
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> verse = ci.domElementFromText('<verse i="0" hyphen="true">di&quot;</verse>')
         >>> ci.lyricFromVerse(verse)
@@ -676,7 +676,7 @@ class CapellaImporter(object):
         '''
         returns a :class:`~music21.clef.Clef` object or subclass from a <clefSign> tag. 
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> clefSign = ci.domElementFromText('<clefSign clef="treble"/>')
         >>> ci.clefFromClefSign(clefSign)
@@ -720,7 +720,7 @@ class CapellaImporter(object):
         '''
         Returns a :class:`~music21.key.KeySignature` object from a keySign tag. 
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> keySign = ci.domElementFromText('<keySign fifths="-1"/>')
         >>> ci.keySignatureFromKeySign(keySign)
@@ -734,7 +734,7 @@ class CapellaImporter(object):
         '''
         Returns a :class:`~music21.meter.TimeSignature` object from a timeSign tag. 
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> timeSign = ci.domElementFromText('<timeSign time="4/4"/>')
         >>> ci.timeSignatureFromTimeSign(timeSign)
@@ -749,7 +749,7 @@ class CapellaImporter(object):
     
     def durationFromDuration(self, durationElement):
         '''
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> durationTag = ci.domElementFromText('<duration base="1/32" dots="1"/>')
         >>> d = ci.durationFromDuration(durationTag)
@@ -798,7 +798,7 @@ class CapellaImporter(object):
         '''
         Returns a :class:`~music21.duration.Tuplet` object from a <tuplet> tag. 
 
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> tupletTag = ci.domElementFromText('<tuplet count="3"/>')
         >>> ci.tupletFromTuplet(tupletTag)    
@@ -840,7 +840,7 @@ class CapellaImporter(object):
         Returns a LIST of :class:`~music21.bar.Barline` or :class:`~music21.bar.Repeat` objects
         because the `repEndBegin` type requires two `bar.Repeat` objects to encode in `music21`. 
         
-        >>> from music21 import *
+        
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> barlineTag = ci.domElementFromText('<barline type="end"/>')
         >>> ci.barlineListFromBarline(barlineTag)    

@@ -50,7 +50,7 @@ class ModalCounterpoint(object):
         harmonic interval of a fifth.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('A3')
         >>> n3 = note.Note('B3')
@@ -97,7 +97,7 @@ class ModalCounterpoint(object):
         not a parallel fifth.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('A3')
         >>> n3 = note.Note('B3')
@@ -139,7 +139,7 @@ class ModalCounterpoint(object):
         returns True if the two harmonic intervals are P5 and False otherwise.
         
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('D4')
@@ -169,7 +169,7 @@ class ModalCounterpoint(object):
         there is a hidden fifth and false otherwise.
         
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('E4')
@@ -211,7 +211,7 @@ class ModalCounterpoint(object):
         any note that has harmonic interval of an octave and is preceded by a
         harmonic interval of an octave.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('A3')
         >>> n3 = note.Note('B3')
@@ -265,7 +265,7 @@ class ModalCounterpoint(object):
         but is not a parallel octave.
         
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('F3')
         >>> n2 = note.Note('A3')
         >>> n3 = note.Note('A3')
@@ -310,7 +310,7 @@ class ModalCounterpoint(object):
         harmonic intervals are P8 and False otherwise.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('A3')
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('A4')
@@ -342,7 +342,7 @@ class ModalCounterpoint(object):
         returns True if there is a hidden octave and false otherwise.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('A3')
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('F4')
@@ -383,7 +383,7 @@ class ModalCounterpoint(object):
         any note that has harmonic interval of P1 and is preceded by a P1.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('A4')
         >>> n3 = note.Note('B4')
@@ -431,7 +431,7 @@ class ModalCounterpoint(object):
         harmonic intervals are P1 and False otherwise.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('A3')
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('A3')
@@ -463,7 +463,7 @@ class ModalCounterpoint(object):
         intervals include 'P1', 'P5', 'P8', 'm3', 'M3', 'm6', and 'M6'.
 
 
-        >>> from music21 import *
+        
         >>> c = note.Note('C4')
         >>> d = note.Note('D4')
         >>> e = note.Note('E4')
@@ -491,7 +491,7 @@ class ModalCounterpoint(object):
         for middle harmonies.
 
 
-        >>> from music21 import *
+        
         >>> c = note.Note('C4')
         >>> d = note.Note('D4')
         >>> e = note.Note('E4')
@@ -520,7 +520,7 @@ class ModalCounterpoint(object):
         final interval must be a perfect unison or octave.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('A4')
         >>> n3 = note.Note('D4')
@@ -576,7 +576,7 @@ class ModalCounterpoint(object):
         to be a fifth.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('A4')
         >>> n3 = note.Note('B4')
@@ -615,7 +615,7 @@ class ModalCounterpoint(object):
         first stream given) that create illegal harmonies when attacked.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('A4')
         >>> n3 = note.Note('B4')
@@ -651,7 +651,7 @@ class ModalCounterpoint(object):
         SHOULD BE RENAMED isValidMelody?
 
 
-        >>> from music21 import *
+        
         >>> c = note.Note('C4')
         >>> d = note.Note('D4')
         >>> e = note.Note('E#4')
@@ -678,7 +678,7 @@ class ModalCounterpoint(object):
         SHOULD BE RENAMED allValidMelody?
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G-4')
         >>> n2 = note.Note('A4')
         >>> n3 = note.Note('B4')
@@ -712,7 +712,7 @@ class ModalCounterpoint(object):
         SHOULD BE RENAMED countBadMelodies?
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('G-4')
         >>> n2 = note.Note('A4')
         >>> n3 = note.Note('B4')
@@ -750,7 +750,7 @@ class ModalCounterpoint(object):
         "Parallel Fifth" and "Hidden Fifth".
 
         
-        >>> from music21 import *
+        
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')
         >>> n3 = note.Note('E4')
@@ -778,7 +778,7 @@ class ModalCounterpoint(object):
         "Parallel Octave" and "Hidden Octave".
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')
         >>> n3 = note.Note('E4')
@@ -806,7 +806,7 @@ class ModalCounterpoint(object):
         otherwise.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('E4')
         >>> n2 = note.Note('F4')
         >>> n3 = note.Note('G4')
@@ -846,7 +846,7 @@ class ModalCounterpoint(object):
 ##        interval names.
 ##
 ##
-##        >>> from music21 import *
+##        
 ##        >>> cp = ModalCounterpoint()
 ##        >>> iList1 = ['m3', 'M3', 'm6']
 ##        >>> cp.thirdCounter(iList1, 0)
@@ -876,7 +876,7 @@ class ModalCounterpoint(object):
         otherwise.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('E4')
         >>> n2 = note.Note('F4')
         >>> n3 = note.Note('G4')
@@ -917,7 +917,7 @@ class ModalCounterpoint(object):
 ##        interval names.
 ##
 ##
-##        >>> from music21 import *
+##        
 ##        >>> cp = ModalCounterpoint()
 ##        >>> iList1 = ['m6', 'M6', 'm3']
 ##        >>> cp.sixthCounter(iList1, 0)
@@ -947,7 +947,7 @@ class ModalCounterpoint(object):
         raises the sixth if applicable to avoid augmented intervals.
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('G4')
         >>> n3 = note.Note('A4')
@@ -1576,7 +1576,7 @@ def getRandomCF(mode = None):
     into a note and a scale object.
 
 
-    >>> from music21 import *
+    
     >>> cf = counterpoint.species.getRandomCF()
     >>> cf.keys()
     ['notes', 'mode']

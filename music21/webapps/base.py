@@ -186,7 +186,7 @@ def ModWSGIApplication(environ, start_response):
     
     The request to the application should have the following structures:
 
-    >>> from music21 import *
+    
     >>> import StringIO
     >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
     >>> wsgiInput = StringIO.StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
@@ -241,7 +241,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     Note that variables specified via query string will be returned as a list if
     they are specified more than once (e.g. ``?b=3&b=4`` will yeld ``['3', '4']`` as the value of b
     
-    >>> from music21 import *
+    
     >>> import StringIO
     >>> requestInput = StringIO.StringIO() # requestInput should be buffer from the server application. Using StringIO for demonstration
     >>> requestInput.write('{"dataDict":{"a":{"data":3}}}')
@@ -399,7 +399,7 @@ class Agenda(dict):
         
         Initializes core key values 'dataDict', 'commandList', 'returnDict'
 
-        >>> from music21 import *
+        
         >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
@@ -414,7 +414,7 @@ class Agenda(dict):
         Raises an error if one attempts to set 'dataDict', 'returnDict', or 'commandList'
         to values that are not of the corresponding dict/list type.
 
-        >>> from music21 import *
+        
         >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
@@ -438,7 +438,7 @@ class Agenda(dict):
         Given a variable name, data, and optionally format, constructs the proper dataDictElement structure,
         and adds it to the dataDict of the agenda.
         
-        >>> from music21 import *
+        
         >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
@@ -461,7 +461,7 @@ class Agenda(dict):
         Given a variable name, returns the data stored in the agenda for that variable name. If no data is stored,
         returns the value None.        
 
-        >>> from music21 import *
+        
         >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
@@ -486,7 +486,7 @@ class Agenda(dict):
         
             ``<resultVar> = <caller>.<command>(<argList>)``
         
-        >>> from music21 import *
+        
         >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
@@ -513,7 +513,7 @@ class Agenda(dict):
         '''
         Specifies the output template that will be used for the agenda.
         
-        >>> from music21 import *
+        
         >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
@@ -528,11 +528,11 @@ class Agenda(dict):
         '''
         Runs json.loads on jsonRequestStr and loads the resulting structure into the agenda object.
         
-        >>> from music21 import *
+        
         >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
-        >>> agenda.loadJson(sampleJsonStringSimple)
+        >>> agenda.loadJson(webapps.sampleJsonStringSimple)
         >>> agenda
         {'dataDict': {u'myNum': {u'fmt': u'int', u'data': u'23'}}, 'returnDict': {u'myNum': u'int'}, 'commandList': []}
 
@@ -1022,7 +1022,7 @@ class CommandProcessor(object):
         
         If the input corresponds to none of these types, it is returned as a string.
         
-        >>> from music21 import *
+        
         >>> agenda = webapps.Agenda()
         >>> agenda.addData("a",2)
         >>> agenda.addData("b",[1,2,3],"list")

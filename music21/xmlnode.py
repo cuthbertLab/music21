@@ -75,7 +75,7 @@ class XMLNodeException(exceptions21.Music21Exception):
 class XMLNode(object):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = xmlnode.XMLNode()
         >>> a.set('charData', 'test')
         '''
@@ -95,7 +95,7 @@ class XMLNode(object):
 
     def _getAttributes(self):
         '''Return a list of attribute names / value pairs
-        >>> from music21 import *
+        
         >>> a = xmlnode.XMLNode()
         >>> a._getAttributes()
         []
@@ -132,7 +132,7 @@ class XMLNode(object):
 
     def hasAttrs(self):
         '''
-        >>> from music21 import *
+        
         >>> a = xmlnode.XMLNode()
         >>> a.hasAttrs()
         False
@@ -158,7 +158,7 @@ class XMLNode(object):
 
         All options need to be lower case.
 
-        >>> from music21 import *
+        
         >>> a = xmlnode.XMLNode()
         >>> a._convertNameCrossReference('characterData')
         'charData'
@@ -177,7 +177,7 @@ class XMLNode(object):
         is given, without and - dividers, 
         the the proper name should be returned
 
-        >>> from music21 import *
+        
         >>> a = xmlnode.XMLNode()
         >>> a._convertNameFromXml('char-data')
         'charData'
@@ -202,7 +202,7 @@ class XMLNode(object):
         to convert it to a XML name.
         If already an XML name, leave alone.
 
-        >>> from music21 import *
+        
         >>> a = xmlnode.XMLNode()
         >>> a._convertNameToXml('charData')
         'char-data'
@@ -238,7 +238,7 @@ class XMLNode(object):
         Get all public names from this object.
         Used in merging. 
 
-        >>> from music21 import *
+        
         >>> a = xmlnode.XMLNode()
         >>> len(a._publicAttributes())
         2
@@ -274,7 +274,7 @@ class XMLNode(object):
         '''Given another similar or commonly used XMLNode object, combine
         all attributes and return a new object.
 
-        >>> from music21 import *
+        
         >>> a = xmlnode.XMLNode()
         >>> a.set('charData', 'green')
 

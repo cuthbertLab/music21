@@ -43,7 +43,7 @@ def mergeVariants(streamX, streamY, variantName = 'variant', inPlace = False):
     function for their type. This will not know how to deal with scores meant for mergePartAsOssia(). If this is the intention, use
     that function instead.
     
-    >>> from music21 import *
+    
     >>> aScore, vScore= stream.Score(), stream.Score()
     
     >>> ap1 = stream.Part(converter.parse("  a4 b c d    e2 f2   g2 f4 g4 ", "4/4").makeMeasures())
@@ -113,7 +113,7 @@ def mergeVariantScores(aScore, vScore, variantName = 'variant', inPlace = False)
     '''
     Takes two scores and merges them with mergeVariantMeasureStreams, part-by-part.
     
-    >>> from music21 import *
+    
     >>> aScore, vScore= stream.Score(), stream.Score()
     
     >>> ap1 = stream.Part(converter.parse("  a4 b c d    e2 f2   g2 f4 g4 ", "4/4").makeMeasures())
@@ -193,7 +193,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
     In this example, the second bar has been deleted in the second version, a new bar has been inserted between the
     original third and fourth bars, and two bars have been added at the end.
     
-    >>> from music21 import *
+    
     >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
     >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
     >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
@@ -242,7 +242,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
     .. image:: images/variant_measuresStreamMergeStream2.*
         :width: 600
 
-    >>> mergedStream = mergeVariantMeasureStreams(stream1, stream2, 'paris', inPlace = False)
+    >>> mergedStream = variant.mergeVariantMeasureStreams(stream1, stream2, 'paris', inPlace = False)
     >>> mergedStream.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.note.Note A>
@@ -366,7 +366,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     same differences from the default will be saved as separate variant objects (i.e. more than once under different names).
     Also, note that a streams with bars of differing lengths will not behave properly.
     
-    >>> from music21 import *
+    
     >>> stream1 = stream.Stream()
     >>> stream2paris = stream.Stream()
     >>> stream3london = stream.Stream()
@@ -391,7 +391,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     ...    n = note.Note(pitchName)
     ...    n.duration.type = durType
     ...    stream3london.append(n)
-    >>> mergedStreams = mergeVariantsEqualDuration([stream1, stream2paris, stream3london], ['paris', 'london'])
+    >>> mergedStreams = variant.mergeVariantsEqualDuration([stream1, stream2paris, stream3london], ['paris', 'london'])
     >>> mergedStreams.show('t')
     {0.0} <music21.note.Note A>
     {1.0} <music21.variant.Variant object of length 1.0>
@@ -463,7 +463,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     ...        m.append(n)
     ...    tempPart.append(m)
     >>> stream2.append(tempPart)
-    >>> mergedStreams = mergeVariantsEqualDuration([stream1, stream2], ['paris'])
+    >>> mergedStreams = variant.mergeVariantsEqualDuration([stream1, stream2], ['paris'])
     >>> mergedStreams.show('t')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -544,7 +544,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     ...        m.append(n)
     ...    tempPart.append(m)
     >>> streamDifferentMeasures.append(tempPart)
-    >>> mergedStreams = mergeVariantsEqualDuration([stream1, streamDifferentMeasures], ['paris'])
+    >>> mergedStreams = variant.mergeVariantsEqualDuration([stream1, streamDifferentMeasures], ['paris'])
     Traceback (most recent call last):
     ...
     VariantException: _mergeVariants cannot merge streams which are of different lengths
@@ -608,7 +608,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
     Note that this method has no way of knowing if a variant is supposed to be a different duration than the segment of stream which it replaces
     because that information is not contained in the format of score this method is designed to deal with.
     
-    >>> from music21 import *
+    
     >>> mainstream = converter.parse("  A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ", "4/4")
     >>> ossiastream = converter.parse(" r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ", "4/4")
     >>> mainstream.makeMeasures(inPlace = True)
@@ -734,7 +734,7 @@ def addVariant(s, startOffset, sVariant, variantName = None, variantGroups = Non
     replaces (replacementDuration). If replacementDuration is 0, this is an insertion. If sVariant is 
     None, this is a deletion.
     
-    >>> from music21 import *
+    
     >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
     >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
     >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
@@ -757,7 +757,7 @@ def addVariant(s, startOffset, sVariant, variantName = None, variantGroups = Non
     ...    n.duration.type = durType
     ...    m.append(n)
     >>> stream2.append(m)
-    >>> addVariant(stream1, 4.0, stream2, variantName = 'rhythmic switch', replacementDuration = 4.0)
+    >>> variant.addVariant(stream1, 4.0, stream2, variantName = 'rhythmic switch', replacementDuration = 4.0)
     >>> stream1.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.note.Note A>
@@ -783,7 +783,7 @@ def addVariant(s, startOffset, sVariant, variantName = None, variantGroups = Non
     >>> variant1 = variant.Variant()
     >>> variant1.repeatAppend(note.Note('f'), 3)
     >>> startOffset = 3.0
-    >>> addVariant(stream1, startOffset, variant1, variantName = 'paris', replacementDuration = 3.0)
+    >>> variant.addVariant(stream1, startOffset, variant1, variantName = 'paris', replacementDuration = 3.0)
     >>> stream1.show('text')
     {0.0} <music21.note.Note E>
     {1.0} <music21.note.Note E>
@@ -836,7 +836,7 @@ def refineVariant(s, sVariant, inPlace = False):
     
     Note that this code does not work properly yet.
     
-    >>> from music21 import *
+    
     >>> v = variant.Variant()
     >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
     >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
@@ -866,7 +866,7 @@ def refineVariant(s, sVariant, inPlace = False):
     ...    s.append(m)
     >>> s.insert(4.0, v)
 
-    >>> refineVariant(s, v, inPlace = True)
+    >>> variant.refineVariant(s, v, inPlace = True)
     >>> s.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.note.Note A>
@@ -1022,10 +1022,10 @@ def getMeasureHashes(s):
     Takes in a stream containing measures and returns a list of hashes, one for each measure. Currently
     implemented with search.translateStreamToString()
     
-    >>> from music21 import *
+    
     >>> s = converter.parse("c4 d8. e16 FF4 a'4 b-2", "2/4")
     >>> sm = s.makeMeasures()
-    >>> hashes = getMeasureHashes(sm)
+    >>> hashes = variant.getMeasureHashes(sm)
     >>> hashes
     ['<P>K@<', ')PQP', 'FZ']
     '''
@@ -1060,7 +1060,7 @@ def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False
     in the list where this function has determined that the bar appearing
     in streamY does not have a counterpart in streamX anywhere and is an insertion.
     
-    >>> from music21 import *
+    
     >>> badnessDict = {}
     >>> listDict = {}
     >>> stream1 = stream.Stream()
@@ -1090,7 +1090,7 @@ def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False
     ...        n.duration.type = durType
     ...        m.append(n)
     ...    stream2.append(m)
-    >>> kList, kBadness = _getBestListandScore(stream1, stream2, badnessDict, listDict, isNone = False)
+    >>> kList, kBadness = variant._getBestListandScore(stream1, stream2, badnessDict, listDict, isNone = False)
     >>> kList
     [0, 1, 2, 'addedBar']
     '''
@@ -1169,12 +1169,12 @@ def _diffscore(measureX, measureY):
     isNone is true (i.e. testing when a bar does not associate with any existing bars the reference
     stream), is well matched with the similarity scores generated by this function.
     
-    >>> from music21 import *
+    
     >>> m1 = stream.Measure()
     >>> m2 = stream.Measure()
     >>> m1.append([note.Note('e'), note.Note('f'), note.Note('g'), note.Note('a')])
     >>> m2.append([note.Note('e'), note.Note('f'), note.Note('g#'), note.Note('a')])
-    >>> _diffscore(m1, m2)
+    >>> variant._diffscore(m1, m2)
     0.4
     
     '''
@@ -1196,13 +1196,13 @@ def _getRegionsFromStreams(streamX,streamY):
     '''
     Takes in two streams, returns a list of 5-tuples via difflib.get_opcodes() working on measure differences.
     
-    >>> from music21 import *
+    
     >>> s1 = converter.parse("d4 e8. f16 GG4 b'4 b-2 c4 d8. e16 FF4 a'4 b-2", "2/4")
     >>> #                     *0:Eq  *1:Rep        * *3:Eq             *6:In
     >>> s2 = converter.parse("d4 e8. f16 FF4 b'4 c4 d8. e16 FF4 a'4 b-2 b-2", "2/4")
     >>> s1m = s1.makeMeasures()
     >>> s2m = s2.makeMeasures()
-    >>> regions = _getRegionsFromStreams(s1m, s2m)
+    >>> regions = variant._getRegionsFromStreams(s1m, s2m)
     >>> regions
     [('equal', 0, 1, 0, 1), ('replace', 1, 3, 1, 2), ('equal', 3, 6, 2, 5), ('insert', 6, 6, 5, 6)]
     
@@ -1223,7 +1223,7 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
     function will compare streamB to the streamA as well as the variant streams contained in streamA.
     Note that variant streams in streamB will be ignored and lost.
     
-    >>> from music21 import *
+    
     >>> stream1 = stream.Stream()
     >>> stream2 = stream.Stream()
     >>> data1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
@@ -1240,7 +1240,7 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
     ...    n = note.Note(pitchName)
     ...    n.duration.type = durType
     ...    stream2.append(n)
-    >>> mergedStreams = _mergeVariants(stream1, stream2, variantName = 'paris')
+    >>> mergedStreams = variant._mergeVariants(stream1, stream2, variantName = 'paris')
     >>> mergedStreams.show('t')
     {0.0} <music21.note.Note A>
     {1.0} <music21.variant.Variant object of length 1.0>
@@ -1279,7 +1279,7 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
     {10.0} <music21.note.Note A>
     
     >>> stream1.append(note.Note('e'))
-    >>> mergedStreams = _mergeVariants(stream1, stream2, variantName = ['paris'])
+    >>> mergedStreams = variant._mergeVariants(stream1, stream2, variantName = ['paris'])
     Traceback (most recent call last):
     ...
     VariantException: _mergeVariants cannot merge streams which are of different lengths
@@ -1373,7 +1373,7 @@ def _generateVariant(noteList, originStream, start, variantName = None):
     ...    noteList.append(n)
     >>> start = originStream.notes[2].offset
     >>> variantName = 'paris'
-    >>> v = _generateVariant(noteList, originStream, start, variantName)
+    >>> v = variant._generateVariant(noteList, originStream, start, variantName)
     >>> v.show('text')
     {0.0} <music21.note.Note C>
     {0.5} <music21.note.Note A>
@@ -1402,34 +1402,34 @@ def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace
     it will perform this action on the stream itself; otherwise it will return a modified copy. If recurse is True, this
     method will work on variants within container objects within the stream (like parts).
     
-    >>> from music21 import *
+    
     >>> #                                         *                                            *                                *
     >>> s = converter.parse("      d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
     >>> s2 = converter.parse("     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4    f1", "4/4")
     >>> #                                        replacement                            insertion                            deletion
     >>> s.makeMeasures(inPlace = True)
     >>> s2.makeMeasures(inPlace = True)
-    >>> mergeVariants(s, s2, variantName = 'london', inPlace = True)
+    >>> variant.mergeVariants(s, s2, variantName = 'london', inPlace = True)
     
     >>> newPart = stream.Part(s)
     >>> newStream = stream.Score()
     >>> newStream.append(newPart)
     
-    >>> returnStream = makeAllVariantsReplacements(newStream, recurse = False)
+    >>> returnStream = variant.makeAllVariantsReplacements(newStream, recurse = False)
     >>> for v in returnStream.parts[0].variants:
     ...     print (v.offset, v.lengthType, v.replacementDuration)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
     
-    >>> returnStream = makeAllVariantsReplacements(newStream, variantNames = ['france'], recurse = True)
+    >>> returnStream = variant.makeAllVariantsReplacements(newStream, variantNames = ['france'], recurse = True)
     >>> for v in returnStream.parts[0].variants:
     ...     print (v.offset, v.lengthType, v.replacementDuration)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
     
-    >>> makeAllVariantsReplacements(newStream, recurse = True, inPlace = True)
+    >>> variant.makeAllVariantsReplacements(newStream, recurse = True, inPlace = True)
     >>> for v in newStream.parts[0].variants:
     ...     print (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (4.0, 'replacement', 4.0, 4.0)
@@ -1460,7 +1460,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
     This is a helper function for makeAllVariantsReplacements. It iterates through the appropriate variants
     and performs the variant changing operation to eliminate strict deletion and insertion variants.
     
-    >>> from music21 import *
+    
     >>> #                            *                           *                                            *                                *                           *
     >>> s = converter.parse("                   d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1    ", "4/4")
     >>> s2 = converter.parse("     a4 b c d     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4          ", "4/4")
@@ -1579,7 +1579,7 @@ def _getNextElements(s, v, numberOfElements = 1):
     This is a helper function for makeAllVariantsReplacements() which returns the next element in s
     of the type of elements found in the variant v so that if can be added to v.
     
-    >>> from music21 import *
+    
     >>> #                          *                       *
     >>> s1 = converter.parse('             b4 c d e    f4 g a b   d4 e f g   ', '4/4')
     >>> s2 = converter.parse(' e4 f g a    b4 c d e               d4 e f g   ', '4/4')
@@ -1658,7 +1658,7 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     This is a helper function for makeAllVariantsReplacements() which returns the previous element in s
     of the type of elements found in the variant v so that if can be added to v.
     
-    >>> from music21 import *
+    
     >>> #                                      *                       *
     >>> s1 = converter.parse(' a4 b c d                b4 c d e    f4 g a b    ', '4/4')
     >>> s2 = converter.parse(' a4 b c d    e4 f g a    b4 c d e                ', '4/4')
@@ -1734,7 +1734,7 @@ class Variant(base.Music21Object):
 
     To use Variants from a Stream, see the :func:`~music21.stream.Stream.activateVariants` method. 
 
-    >>> from music21 import *
+    
     >>> v = variant.Variant()
     >>> v.repeatAppend(note.Note(), 8)
     >>> len(v.notes)
@@ -1924,7 +1924,7 @@ class Variant(base.Music21Object):
     highestTime = property(_getHighestTime, doc='''
         This property masks calls to Stream.highestTime. Assuming `exposeTime` is False, this always returns zero, making the Variant always take zero time. 
 
-        >>> from music21 import *
+        
         >>> v = variant.Variant()
         >>> v.append(note.Note(quarterLength=4))
         >>> v.highestTime
@@ -1941,7 +1941,7 @@ class Variant(base.Music21Object):
     highestOffset = property(_getHighestOffset, doc='''
         This property masks calls to Stream.highestOffset. Assuming `exposeTime` is False, this always returns zero, making the Variant always take zero time. 
 
-        >>> from music21 import *
+        
         >>> v = variant.Variant()
         >>> v.append(note.Note(quarterLength=4))
         >>> v.highestOffset
@@ -1955,7 +1955,7 @@ class Variant(base.Music21Object):
 
         This method must be overridden, otherwise Music21Object.show() is called.
 
-        >>> from music21 import *
+        
         >>> v = variant.Variant()
         >>> v.repeatAppend(note.Note(quarterLength=.25), 8)
         >>> v.show('t')
@@ -1981,7 +1981,7 @@ class Variant(base.Music21Object):
     containedHighestTime = property(_getContainedHighestTime, doc='''
         This property calls the contained Stream.highestTime.
 
-        >>> from music21 import *
+        
         >>> v = variant.Variant()
         >>> v.append(note.Note(quarterLength=4))
         >>> v.containedHighestTime
@@ -1994,7 +1994,7 @@ class Variant(base.Music21Object):
     containedHighestOffset = property(_getContainedHighestOffset, doc='''
         This property calls the contained Stream.highestOffset.
 
-        >>> from music21 import *
+        
         >>> v = variant.Variant()
         >>> v.append(note.Note(quarterLength=4))
         >>> v.append(note.Note())
@@ -2051,7 +2051,7 @@ class Variant(base.Music21Object):
         In regions that are strictly replaced, only elements that share a class with an element in the variant
         are captured. Elsewhere, all elements are captured.
         
-        >>> from music21 import *
+        
         >>> s = converter.parse("d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
         >>> s.makeMeasures(inPlace = True)
         >>> v1stream = converter.parse("       a2. b-8 a8", "4/4")
@@ -2108,7 +2108,7 @@ class Variant(base.Music21Object):
 
         A second example:
         
-        >>> from music21 import *
+        
         >>> v = variant.Variant()
         >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
         >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
@@ -2221,7 +2221,7 @@ class Variant(base.Music21Object):
         '''   
         remove replaced elements from a referenceStream or activeSite
  
-        >>> from music21 import *
+        
         >>> v = variant.Variant()
         >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
         >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]

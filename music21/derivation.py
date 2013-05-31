@@ -25,7 +25,7 @@ environLocal = environment.Environment(_MOD)
 class Derivation(object):
     '''
     >>> import copy
-    >>> from music21 import *  
+      
     >>> s1 = stream.Stream()
     >>> s2 = stream.Stream()
     >>> d1 = derivation.Derivation(s1)
@@ -101,7 +101,7 @@ class Derivation(object):
     def unwrapWeakref(self):
         '''Unwrap any and all weakrefs stored.
 
-        >>> from music21 import *  
+          
         >>> s1 = stream.Stream()
         >>> s2 = stream.Stream()
         >>> d1 = derivation.Derivation(s1) # sets container

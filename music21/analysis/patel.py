@@ -35,7 +35,7 @@ def nPVI(streamForAnalysis):
     streams (the norm) these two measures will be identical.
 
 
-    >>> from music21 import *
+    
     >>> s2 = converter.parse('C4 D E F G', '4/4').notesAndRests
     >>> analysis.patel.nPVI(s2)
     0.0
@@ -77,7 +77,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     intervals.
     
     
-    >>> from music21 import *
+    
     >>> s2 = converter.parse('C4 D E F# G#', '4/4').notesAndRests
     >>> analysis.patel.melodicIntervalVariability(s2)
     0.0

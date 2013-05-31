@@ -98,7 +98,7 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     the root of the chord is considered the key (if the chord has a major third, it's major;
     otherwise it's minor).
     
-    >>> from music21 import *
+    
     >>> rn = roman.romanNumeralFromChord(chord.Chord(['E-3','C4','G-6']), key.Key('g#'))
     >>> rn
     <music21.roman.RomanNumeral bivo6 in g# minor>
@@ -243,14 +243,14 @@ def figureTuplets(chordObj, keyObj):
     
     For instance, in C major, F# D A- C# would be:
 
-    >>> from music21 import *
-    >>> figureTuplets(chord.Chord(['F#2','D3','A-3','C#4']), key.Key('C'))
+    
+    >>> roman.figureTuplets(chord.Chord(['F#2','D3','A-3','C#4']), key.Key('C'))
     [(1, 1.0, '#', <music21.pitch.Pitch F#2>), 
      (6, 0.0, '', <music21.pitch.Pitch D3>), 
      (3, -1.0, 'b', <music21.pitch.Pitch A-3>), 
      (5, 1.0, '#', <music21.pitch.Pitch C#4>)]
 
-    >>> figureTuplets(chord.Chord(['E3','C4','G4','B-5']), key.Key('C'))
+    >>> roman.figureTuplets(chord.Chord(['E3','C4','G4','B-5']), key.Key('C'))
     [(1, 0.0, '', <music21.pitch.Pitch E3>), 
      (6, 0.0, '', <music21.pitch.Pitch C4>), 
      (3, 0.0, '', <music21.pitch.Pitch G4>), 
@@ -264,17 +264,18 @@ def figureTuplets(chordObj, keyObj):
     return retList
 
 def figureTupletSolo(pitchObj, keyObj, bass):
-    '''
-    return a single tuplet for a pitch and key
-    showing the interval above the bass,
-    its alteration from a step in the given key, an
-    alteration string, and the pitch object.
+    '''Return a single tuplet for a pitch and key showing the interval above
+    the bass, its alteration from a step in the given key, an alteration string,
+    and the pitch object.
     
     For instance, in C major, an A-3 above an F# bass would be:
 
-    >>> from music21 import *
-    >>> figureTupletSolo(pitch.Pitch('A-3'), key.Key('C'), pitch.Pitch('F#2'))
-    (3, -1.0, 'b', <music21.pitch.Pitch A-3>)
+    ::
+
+        >>> roman.figureTupletSolo(pitch.Pitch('A-3'), key.Key('C'), pitch.Pitch('F#2'))
+        (3, -1.0, 'b', <music21.pitch.Pitch A-3>)
+
+    Return tuplet.
     '''
     (unused_scaleStep, scaleAccidental) = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
     
@@ -319,29 +320,41 @@ figureShorthands = {'53': '',
                     }
 
 def figureFromChordAndKey(chordObj, keyObj=None):
-    '''
-    returns the post RN figure for a given chord in a given key.
-    if keyObj is none, it uses the root as a major key
+    '''Returns the post RN figure for a given chord in a given key.
+
+    If keyObj is none, it uses the root as a major key:
     
-    >>> from music21 import *
-    >>> figureFromChordAndKey(chord.Chord(['F#2','D3','A-3','C#4']), key.Key('C'))
-    '6#5b3'
+    ::
+
+        >>> roman.figureFromChordAndKey(chord.Chord(['F#2','D3','A-3','C#4']), key.Key('C'))
+        '6#5b3'
 
     The method substitutes shorthand (e.g., '6' not '63')
 
-    >>> figureFromChordAndKey(chord.Chord(['E3','C4','G4']), key.Key('C'))
-    '6'
+    ::
 
-    >>> figureFromChordAndKey(chord.Chord(['E3','C4','G4','B-5']), key.Key('F'))
-    '65'
-    >>> figureFromChordAndKey(chord.Chord(['E3','C4','G4','B-5']), key.Key('C'))
-    '6b5'
+        >>> roman.figureFromChordAndKey(chord.Chord(['E3','C4','G4']), key.Key('C'))
+        '6'
+
+    ::
+
+        >>> roman.figureFromChordAndKey(chord.Chord(['E3','C4','G4','B-5']), key.Key('F'))
+        '65'
+
+    ::
+
+        >>> roman.figureFromChordAndKey(chord.Chord(['E3','C4','G4','B-5']), key.Key('C'))
+        '6b5'
 
     We reduce common omissions from seventh chords to be '7' instead
     of '75', '73', etc.
 
-    >>> figureFromChordAndKey(chord.Chord(['A3','E-4','G-4']), key.Key('b-'))
-    '7'
+    ::
+
+        >>> roman.figureFromChordAndKey(chord.Chord(['A3','E-4','G-4']), key.Key('b-'))
+        '7'
+
+    Return string.
     '''
     if keyObj is None:
         keyObj = key.Key(chordObj.root())
@@ -393,22 +406,24 @@ def figureFromChordAndKey(chordObj, keyObj=None):
     
     
 def expandShortHand(shorthand):
-    '''
-    expands shorthand notation into a list with all figures expanded
+    '''Expands shorthand notation into a list with all figures expanded
     
-    >>> from music21.roman import expandShortHand
-    >>> expandShortHand("64")
-    ['6', '4']
-    >>> expandShortHand("973")
-    ['9', '7', '3']
-    >>> expandShortHand("11b3")
-    ['11', 'b3']
-    >>> expandShortHand("b13#9-6")
-    ['b13', '#9', '-6']
-    >>> expandShortHand("-")
-    ['5', '-3']
-    >>> expandShortHand("6/4")
-    ['6', '4']
+    ::
+
+        >>> roman.expandShortHand("64")
+        ['6', '4']
+        >>> roman.expandShortHand("973")
+        ['9', '7', '3']
+        >>> roman.expandShortHand("11b3")
+        ['11', 'b3']
+        >>> roman.expandShortHand("b13#9-6")
+        ['b13', '#9', '-6']
+        >>> roman.expandShortHand("-")
+        ['5', '-3']
+        >>> roman.expandShortHand("6/4")
+        ['6', '4']
+
+    Return list.
     '''
     shorthand = shorthand.replace('/', '')
     if ENDWITHFLAT_RE.match(shorthand):
@@ -446,7 +461,7 @@ class RomanNumeral(harmony.Harmony):
     treated as if they are in C major).
     
     
-    >>> from music21 import *
+    
     >>> V = roman.RomanNumeral('V') # could also use 5
     >>> V.quality
     'major'
@@ -504,15 +519,12 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in minorSharpSeven.pitches]
     ['D#5', 'F#5', 'A5']
     
-
-
     >>> majorFlatSix = roman.RomanNumeral('VI', em)
     >>> [str(p) for p in majorFlatSix.pitches]
     ['C5', 'E5', 'G5']
     >>> minorSharpSix = roman.RomanNumeral('vi', em)
     >>> [str(p) for p in minorSharpSix.pitches]
     ['C#5', 'E5', 'G#5']
-
 
     Either of these is the same way of getting a minor iii in a minor key:
 
@@ -524,11 +536,9 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in minoriiiB.pitches]
     ['G4', 'B-4', 'D5']
     
-   
     Can also take a scale object, here we build a first-inversion chord
     on the raised-three degree of D-flat major, that is, F#-major (late
     Schubert would be proud...)
-    
     
     >>> sharp3 = roman.RomanNumeral('#III6', scale.MajorScale('D-'))
     >>> sharp3.scaleDegreeWithAlteration
@@ -544,9 +554,6 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in sharp3.pitches]
     ['A-4', 'C5', 'E-5']
     
-
-   
-   
     >>> leadingToneSeventh = roman.RomanNumeral('viio', scale.MajorScale('F'))
     >>> [str(p) for p in leadingToneSeventh.pitches]
     ['E5', 'G5', 'B-5']
@@ -585,16 +592,12 @@ class RomanNumeral(harmony.Harmony):
     >>> openFifth.pitches
     [<music21.pitch.Pitch C5>, <music21.pitch.Pitch G5>]
 
-    
     Some theoretical traditions express a viio7 as a V9 chord with omitted root.  Music21 allows that:
-
 
     >>> fiveOhNine = roman.RomanNumeral('V9[no1]', key.Key('g'))
     >>> [str(p) for p in fiveOhNine.pitches]
     ['F#5', 'A5', 'C6', 'E-6']
 
-
-    
     Just for kicks (no worries if this is goobley-gook):
     
     >>> ots = scale.OctatonicScale("C2")
@@ -616,7 +619,6 @@ class RomanNumeral(harmony.Harmony):
     >>> r.secondaryRomanNumeral
     <music21.roman.RomanNumeral V in e minor>
 
-
     Dominant 7ths can be specified by putting d7 at end:
 
     >>> r = roman.RomanNumeral('bVIId7', key.Key('B-'))
@@ -631,13 +633,10 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in r.pitches]
     ['G5', 'B5', 'D6', 'F6']
 
-
-
     >>> r2 = roman.RomanNumeral('V42/V7/vi', key.Key('C'))
     >>> [str(p) for p in r2.pitches]
     ['A4', 'B4', 'D#5', 'F#5']
 
-    
     OMIT_FROM_DOCS
     Things that were giving us trouble
     >>> dminor = key.Key('d')
@@ -651,7 +650,6 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in rn3.pitches]
     ['F4', 'A4', 'C5']
 
-
     Should be the same as above no matter when the key is set:
     
     >>> r = roman.RomanNumeral('VId7', key.Key('B-'))
@@ -661,7 +659,6 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in r.pitches]
     ['G5', 'B5', 'D6', 'F6']
     
-
     This was getting B-flat.
 
     >>> r = roman.RomanNumeral('VId7')
@@ -986,7 +983,7 @@ class RomanNumeral(harmony.Harmony):
         read-only property that returns either the romanNumeralAlone (e.g. just II)
         or the frontAlterationAccidental.modifier + romanNumeralAlone (e.g. #II)
         
-        >>> from music21 import *
+        
         >>> rn = roman.RomanNumeral("#II7")
         >>> rn.romanNumeral
         '#II'
@@ -1016,7 +1013,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         returns the figure and the key and mode as a string
         
-        >>> from music21 import *
+        
         >>> rn = roman.RomanNumeral('V65/V', 'e')
         >>> rn.figureAndKey
         'V65/V in e minor'
@@ -1102,8 +1099,8 @@ class RomanNumeral(harmony.Harmony):
         Gets or Sets the current Key (or Scale object) for a given RomanNumeral object.
         If a new key is set, then the pitches will probably change
         
-        >>> from music21 import *
-        >>> r1 = RomanNumeral('V')
+        
+        >>> r1 = roman.RomanNumeral('V')
         
         (implicit C-major)
         
@@ -1132,7 +1129,7 @@ class RomanNumeral(harmony.Harmony):
 #    def nextInversion(self):
 #        '''Invert the harmony one position, or place the next member after the current bass as the bass
 #
-#        >>> from music21 import *
+#        
 #        >>> sc1 = scale.MajorScale('g4')
 #        >>> h1 = scale.RomanNumeral(sc1, 5)
 #        >>> h1.getPitches()
@@ -1170,7 +1167,7 @@ class RomanNumeral(harmony.Harmony):
         given a notationObject from :class:`music21.figuredBass.notation.Notation`
         return the scaleDegree of the bass.
         
-        >>> from music21 import *
+        
         >>> fbn = figuredBass.notation.Notation('6,3')
         >>> V = roman.RomanNumeral('V')
         >>> V.bassScaleDegreeFromNotation(fbn)
@@ -1219,7 +1216,7 @@ class RomanNumeral(harmony.Harmony):
         
         Numbers are ordinal not cardinal.
 
-        >>> from music21 import *
+        
         >>> rn1 = roman.RomanNumeral('V7')
         >>> rn1.functionalityScore
         80
@@ -1239,7 +1236,7 @@ def identifyAsTonicOrDominant(inChord, inKey):
     Useful when you know inChord is either tonic or dominant, but only two pitches are provided in the chord.
     If neither tonic nor dominant is possibly correct, False is returned
     
-    >>> from music21 import *
+    
     >>> roman.identifyAsTonicOrDominant(['B2','F5'], key.Key('C'))
     'V65'
     >>> roman.identifyAsTonicOrDominant(['B3','G4'], key.Key('g'))

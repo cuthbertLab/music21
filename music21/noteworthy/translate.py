@@ -130,7 +130,7 @@ class NoteworthyTranslator(object):
         Returns a :class:`~music21.stream.Score` object
         
         
-        >>> from music21 import *
+        
         >>> data = []
         >>> data.append("!NoteWorthyComposer(2.0)\n")
         >>> data.append("|AddStaff|\n")
@@ -286,7 +286,7 @@ class NoteworthyTranslator(object):
         removes ties and alteration signs.  Otherwise
         is same as getOnePitchFromPosition()
 
-        >>> from music21 import *
+        
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
         >>> p = nwt.getPitchFromPositionInfo('b3^') # removes ties
@@ -306,7 +306,7 @@ class NoteworthyTranslator(object):
         returns a list of pitch objects given the Pos:... info
         for a chord.
         
-        >>> from music21 import *
+        
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
         >>> pList = nwt.getMultiplePitchesFromPositionInfo('1,b3,5^')
@@ -331,7 +331,7 @@ class NoteworthyTranslator(object):
         '''
         get one pitch from a position...
 
-        >>> from music21 import *
+        
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
         >>> p = nwt.getOnePitchFromPosition('b3')
@@ -376,7 +376,7 @@ class NoteworthyTranslator(object):
         current clef, 
         returns a string for the step and an int for the octave
 
-        >>> from music21 import *
+        
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
         >>> (step, octave) = nwt.getStepAndOctaveFromPosition(3)
@@ -438,7 +438,7 @@ class NoteworthyTranslator(object):
         r'''
         Translation of a music21 note from a NWC note.       
     
-        >>> from music21 import *
+        
         
         >>> measure = stream.Measure()
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
@@ -477,7 +477,7 @@ class NoteworthyTranslator(object):
     def translateChord(self, attributes):
         r'''
         Translation of a music21 chord from a NWC one.      
-        >>> from music21 import *
+        
         >>> measure = stream.Measure()
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
@@ -516,7 +516,7 @@ class NoteworthyTranslator(object):
         Translation of a music21 rest.  Adds the rest to the given measure.
         
         
-        >>> from music21 import *
+        
         >>> measureIn = stream.Measure()
         >>> measureIn.append(note.HalfNote("C#4"))
         
@@ -545,7 +545,7 @@ class NoteworthyTranslator(object):
         \|Clef\|Type:ClefType\|OctaveShift:Octave Down (or Up)
                
          
-        >>> from music21 import *
+        
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createClef({"Type": "Treble"})
@@ -622,7 +622,7 @@ class NoteworthyTranslator(object):
         Adds a new key signature to the given measure.  Returns the number of sharps (negative for flats)
         
         
-        >>> from music21 import *
+        
         >>> measureIn = stream.Measure()
         >>> measureIn.append(note.Rest(quarterLength = 3.0))
         
@@ -649,7 +649,7 @@ class NoteworthyTranslator(object):
     def createTimeSignature(self, attributes):
         r'''
         Adding a time signature in the score.      
-        >>> from music21 import *
+        
         
         >>> measure = stream.Measure()
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
@@ -685,7 +685,7 @@ class NoteworthyTranslator(object):
         Translates bar lines into music21.
         
         
-        >>> from music21 import *
+        
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentPart = stream.Part()
@@ -747,7 +747,7 @@ class NoteworthyTranslator(object):
     def createOtherRepetitions(self, attributes):
         r'''
         Repetitions like "Coda", "Segno" and some others.
-        >>> from music21 import *
+        
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
@@ -777,7 +777,7 @@ class NoteworthyTranslator(object):
         r'''
         Adding dynamics like "crescendo" to the measure.       
         
-        >>> from music21 import *
+        
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createDynamicVariance({"Style" : "Crescendo", "Pos": "-6"})
@@ -800,7 +800,7 @@ class NoteworthyTranslator(object):
         r'''
         Adding dynamics like "fff", "pp", ... to the measure.    
 
-        >>> from music21 import *
+        
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createDynamics({"Style":"fff","Pos":"-8"})
@@ -816,7 +816,7 @@ class NoteworthyTranslator(object):
         r'''
         Get a list of lyrics from a Lyric line
     
-        >>> from music21 import *
+        
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> Lyricslist = nwt.createLyrics({'Text':'"Hello world"'})

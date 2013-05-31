@@ -44,7 +44,7 @@ environLocal = environment.Environment(_MOD)
 class DurationFeature(featuresModule.FeatureExtractor):
     '''A feature extractor that extracts the duration in seconds.
 
-    >>> from music21 import *
+    
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -64,7 +64,7 @@ class DurationFeature(featuresModule.FeatureExtractor):
 
 class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv887')
     >>> fe = features.jSymbolic.MelodicIntervalHistogramFeature(s)
     >>> f = fe.extract()
@@ -91,7 +91,7 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
 
 class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.AverageMelodicIntervalFeature(s)
     >>> f = fe.extract()
@@ -122,7 +122,7 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
 
 class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.MostCommonMelodicIntervalFeature(s)
     >>> f = fe.extract()
@@ -151,7 +151,7 @@ class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
 class DistanceBetweenMostCommonMelodicIntervalsFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.DistanceBetweenMostCommonMelodicIntervalsFeature(s)
     >>> f = fe.extract()
@@ -184,7 +184,7 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
 class MostCommonMelodicIntervalPrevalenceFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.MostCommonMelodicIntervalPrevalenceFeature(s)
     >>> f = fe.extract()
@@ -214,7 +214,7 @@ class MostCommonMelodicIntervalPrevalenceFeature(
 class RelativeStrengthOfMostCommonIntervalsFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.RelativeStrengthOfMostCommonIntervalsFeature(s)
     >>> f = fe.extract()
@@ -247,7 +247,7 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
   
 class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.NumberOfCommonMelodicIntervalsFeature(s)
     >>> f = fe.extract()
@@ -277,7 +277,7 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
 
 class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.AmountOfArpeggiationFeature(s)
     >>> f = fe.extract()
@@ -312,7 +312,7 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
  
 class RepeatedNotesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'M9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -341,7 +341,7 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
 
 class ChromaticMotionFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'm10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -370,7 +370,7 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
  
 class StepwiseMotionFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'M11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -399,7 +399,7 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
 
 class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'M12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -429,7 +429,7 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
  
 class MelodicFifthsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'M13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -459,7 +459,7 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
 
 class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'M14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -489,7 +489,7 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
 
 class MelodicOctavesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'M15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -521,7 +521,7 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     '''
     Returns the fraction of melodic intervals that are rising rather than falling.  Unisons are omitted
     
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.DirectionOfMotionFeature(s)
     >>> f = fe.extract()
@@ -562,7 +562,7 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
  
 class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
     >>> f = fe.extract()
@@ -630,7 +630,7 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
  
 class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
     >>> f = fe.extract()
@@ -687,7 +687,7 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
 
 class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.MostCommonPitchPrevalenceFeature(s)
     >>> fe.extract().vector[0] + .0001  # slightly less than .3 on 32-bit systems
@@ -717,7 +717,7 @@ class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
 
 class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.MostCommonPitchClassPrevalenceFeature(s)
     >>> fe.extract().vector
@@ -748,7 +748,7 @@ class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
 
 class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.RelativeStrengthOfTopPitchesFeature(s)
     >>> fe.extract().vector
@@ -783,7 +783,7 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
 
 class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.RelativeStrengthOfTopPitchClassesFeature(s)
     >>> fe.extract().vector
@@ -819,7 +819,7 @@ class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
 
 class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.IntervalBetweenStrongestPitchesFeature(s)
     >>> fe.extract().vector
@@ -853,7 +853,7 @@ class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
 class IntervalBetweenStrongestPitchClassesFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.IntervalBetweenStrongestPitchClassesFeature(s)
     >>> fe.extract().vector
@@ -888,7 +888,7 @@ class IntervalBetweenStrongestPitchClassesFeature(
 
 class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.NumberOfCommonPitchesFeature(s)
     >>> fe.extract().vector
@@ -919,7 +919,7 @@ class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
  
 class PitchVarietyFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.PitchVarietyFeature(s)
     >>> fe.extract().vector
@@ -949,7 +949,7 @@ class PitchVarietyFeature(featuresModule.FeatureExtractor):
 
 class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.PitchClassVarietyFeature(s)
     >>> fe.extract().vector
@@ -979,7 +979,7 @@ class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
  
 class RangeFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.RangeFeature(s)
     >>> fe.extract().vector
@@ -1011,7 +1011,7 @@ class RangeFeature(featuresModule.FeatureExtractor):
  
 class MostCommonPitchFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.MostCommonPitchFeature(s)
     >>> fe.extract().vector
@@ -1038,7 +1038,7 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
 
 class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.PrimaryRegisterFeature(s)
     >>> fe.extract().vector
@@ -1070,7 +1070,7 @@ class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
 
 class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.ImportanceOfBassRegisterFeature(s)
     >>> fe.extract().vector
@@ -1102,7 +1102,7 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
  
 class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.ImportanceOfMiddleRegisterFeature(s)
     >>> fe.extract().vector
@@ -1135,7 +1135,7 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
  
 class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.ImportanceOfHighRegisterFeature(s)
     >>> fe.extract().vector
@@ -1169,7 +1169,7 @@ class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
 
 class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.MostCommonPitchClassFeature(s)
     >>> fe.extract().vector
@@ -1197,7 +1197,7 @@ class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
 
 class DominantSpreadFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'P17'
 
@@ -1212,7 +1212,7 @@ class DominantSpreadFeature(featuresModule.FeatureExtractor):
  
 class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'P18'
 
@@ -1228,7 +1228,7 @@ class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
 class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that finds a features array with bins corresponding to the values of the basic pitch histogram.
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.BasicPitchHistogramFeature(s)
     >>> f = fe.extract()
@@ -1257,7 +1257,7 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
  
 class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.PitchClassDistributionFeature(s)
     >>> f = fe.extract()
@@ -1291,7 +1291,7 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     A feature array with bins corresponding to the values of the 5ths pitch class histogram.
 
 
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.FifthsPitchHistogramFeature(s)
     >>> f = fe.extract()
@@ -1329,7 +1329,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
     See features.native.QualityFeature for a music21 improvement on this method
 
-    >>> from music21 import *
+    
     >>> mozart155mvmt2 = corpus.parse('mozart/k155', 2)
     >>> fe = features.jSymbolic.QualityFeature(mozart155mvmt2)
     >>> f = fe.extract()
@@ -1375,7 +1375,7 @@ class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     Not yet implemented in music21
     
-    >>> from music21 import *
+    
     '''
     id = 'P23'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1392,7 +1392,7 @@ class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
 
 class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'P24'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1409,7 +1409,7 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
 
 class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'P25'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1427,7 +1427,7 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
 # class PrevalenceOfMicroTonesFeature(featuresModule.FeatureExtractor):
 #     '''
 # 
-#     >>> from music21 import *
+#     
 #     '''
 #     id = 'P26'
 #     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1446,7 +1446,7 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
  
 class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1463,7 +1463,7 @@ class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 
 class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1482,7 +1482,7 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
         featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1499,7 +1499,7 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
 
 class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1517,7 +1517,7 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 class StrengthOfSecondStrongestRhythmicPulseFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1537,7 +1537,7 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
 class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1555,7 +1555,7 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
 class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1572,7 +1572,7 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
 
 class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1589,7 +1589,7 @@ class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
  
 class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1607,7 +1607,7 @@ class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
  
 class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1621,7 +1621,7 @@ class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
 
 class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1638,7 +1638,7 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
  
 class PolyrhythmsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1655,7 +1655,7 @@ class PolyrhythmsFeature(featuresModule.FeatureExtractor):
  
 class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1673,7 +1673,7 @@ class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
 class BeatHistogramFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that finds a feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).
 
-    >>> from music21 import *
+    
     '''
     id = 'R14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1703,7 +1703,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
     midi performances.
     
     
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.NoteDensityFeature(s)
     >>> f = fe.extract()
@@ -1753,7 +1753,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
 
 class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageNoteDurationFeature(s)
     >>> f = fe.extract()
@@ -1784,7 +1784,7 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
 
 class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'R18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1801,7 +1801,7 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
  
 class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MaximumNoteDurationFeature(s)
     >>> f = fe.extract()
@@ -1828,7 +1828,7 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
  
 class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MinimumNoteDurationFeature(s)
     >>> f = fe.extract()
@@ -1856,7 +1856,7 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
 
 class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.StaccatoIncidenceFeature(s)
     >>> f = fe.extract()
@@ -1884,7 +1884,7 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
 
 class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
     >>> f = fe.extract()
@@ -1919,7 +1919,7 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
  
 class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.VariabilityOfTimeBetweenAttacksFeature(s)
     >>> f = fe.extract()
@@ -1956,7 +1956,7 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 class AverageTimeBetweenAttacksForEachVoiceFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksForEachVoiceFeature(s)
     >>> f = fe.extract()
@@ -2004,7 +2004,7 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
 class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(s)
     >>> f = fe.extract()
@@ -2055,7 +2055,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #class IncidenceOfCompleteRestsFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
-#    >>> from music21 import *
+#    
 #    '''
 #    def __init__(self, dataOrStream=None, *arguments, **keywords):
 #        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -2068,7 +2068,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #class MaximumCompleteRestDurationFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
-#    >>> from music21 import *
+#    
 #    '''
 #    def __init__(self, dataOrStream=None, *arguments, **keywords):
 #        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -2081,7 +2081,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #class AverageRestDurationPerVoiceFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
-#    >>> from music21 import *
+#    
 #    '''
 #    def __init__(self, dataOrStream=None, *arguments, **keywords):
 #        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -2094,7 +2094,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #class AverageVariabilityOfRestDurationsAcrossVoicesFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
-#    >>> from music21 import *
+#    
 #    '''
 #    def __init__(self, dataOrStream=None, *arguments, **keywords):
 #        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -2110,7 +2110,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 
 class InitialTempoFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.InitialTempoFeature(s)
     >>> f = fe.extract()
@@ -2143,7 +2143,7 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
  
 class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('3/4'))
     >>> fe = features.jSymbolic.InitialTimeSignatureFeature(s1)
@@ -2173,7 +2173,7 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
  
 class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('3/4'))
     >>> s2 = stream.Stream()
@@ -2212,7 +2212,7 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
 
 class TripleMeterFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('5/4'))
     >>> s2 = stream.Stream()
@@ -2243,7 +2243,7 @@ class TripleMeterFeature(featuresModule.FeatureExtractor):
 
 class QuintupleMeterFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('5/4'))
     >>> s2 = stream.Stream()
@@ -2275,7 +2275,7 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
 class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     '''A feature exractor that sets the feature to 1 if the time signature is changed one or more times during the recording.
 
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('3/4'))
     >>> s2 = stream.Stream()
@@ -2321,7 +2321,7 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
  
 class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'D1'
 
@@ -2336,7 +2336,7 @@ class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
 
 class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'D2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2351,7 +2351,7 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
  
 class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'D3'
 
@@ -2366,7 +2366,7 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
  
 class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'D4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2386,7 +2386,7 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 
 class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.MaximumNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
@@ -2428,7 +2428,7 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation. Here, Parts are treated as voices
     
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
@@ -2469,7 +2469,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
     '''
     Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.
     
-    >>> from music21 import *
+    
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.VariabilityOfNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
@@ -2501,7 +2501,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
 
 class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2514,7 +2514,7 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
 
 class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2528,7 +2528,7 @@ class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
 
 class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2542,7 +2542,7 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
 
 class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2556,7 +2556,7 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
  
 class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2570,7 +2570,7 @@ class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
  
 class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2586,7 +2586,7 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
  
 class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2601,7 +2601,7 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
 
 class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2616,7 +2616,7 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
  
 class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T13'
 
@@ -2631,7 +2631,7 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
 
 class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2645,7 +2645,7 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
 
 class VoiceSeparationFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'T20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2665,7 +2665,7 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
 
 class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.AcousticGuitar())
     >>> s1.append(note.Note())
@@ -2706,7 +2706,7 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
 
 class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'I2'
 
@@ -2725,7 +2725,7 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
 class NotePrevalenceOfPitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.AcousticGuitar())
     >>> s1.repeatAppend(note.Note(), 4)
@@ -2763,7 +2763,7 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
 class NotePrevalenceOfUnpitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'I4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2780,7 +2780,7 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
 class TimePrevalenceOfPitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'I5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2796,7 +2796,7 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
 class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.AcousticGuitar())
     >>> s1.repeatAppend(note.Note(), 5)
@@ -2837,7 +2837,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
 class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'I7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2852,7 +2852,7 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
 
 class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.AcousticGuitar())
     >>> s1.append(note.Note())
@@ -2889,7 +2889,7 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 
 class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'I9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2904,7 +2904,7 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 
 class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
-    >>> from music21 import *
+    
     '''
     id = 'I10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2942,7 +2942,7 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
 
 class StringKeyboardFractionFeature(InstrumentFractionFeature):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.Piano())
     >>> s1.repeatAppend(note.Note(), 9)
@@ -2968,7 +2968,7 @@ class StringKeyboardFractionFeature(InstrumentFractionFeature):
 class AcousticGuitarFractionFeature(InstrumentFractionFeature):
     '''A feature exractor that extracts the fraction of all Note Ons belonging to acoustic guitar patches (General MIDI patches 25 to 26).
 
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.AcousticGuitar())
     >>> s1.repeatAppend(note.Note(), 3)
@@ -2993,7 +2993,7 @@ class AcousticGuitarFractionFeature(InstrumentFractionFeature):
 
 class ElectricGuitarFractionFeature(InstrumentFractionFeature):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.ElectricGuitar())
     >>> s1.repeatAppend(note.Note(), 4)
@@ -3018,7 +3018,7 @@ class ElectricGuitarFractionFeature(InstrumentFractionFeature):
 
 class ViolinFractionFeature(InstrumentFractionFeature):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.Violin())
     >>> s1.repeatAppend(note.Note(), 2)
@@ -3042,7 +3042,7 @@ class ViolinFractionFeature(InstrumentFractionFeature):
 
 class SaxophoneFractionFeature(InstrumentFractionFeature):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.SopranoSaxophone())
     >>> s1.repeatAppend(note.Note(), 6)
@@ -3067,7 +3067,7 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
 class BrassFractionFeature(InstrumentFractionFeature):
     '''A feature exractor that extracts the fraction of all Note Ons belonging to brass patches (General MIDI patches 57 or 68).
 
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.SopranoSaxophone())
     >>> s1.repeatAppend(note.Note(), 6)
@@ -3092,7 +3092,7 @@ class BrassFractionFeature(InstrumentFractionFeature):
 
 class WoodwindsFractionFeature(InstrumentFractionFeature):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.Flute())
     >>> s1.repeatAppend(note.Note(), 3)
@@ -3118,7 +3118,7 @@ class WoodwindsFractionFeature(InstrumentFractionFeature):
 
 class OrchestralStringsFractionFeature(InstrumentFractionFeature):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.Violoncello())
     >>> s1.repeatAppend(note.Note(), 4)
@@ -3142,7 +3142,7 @@ class OrchestralStringsFractionFeature(InstrumentFractionFeature):
 
 class StringEnsembleFractionFeature(InstrumentFractionFeature):
     '''
-    >>> from music21 import *
+    
     '''
     # TODO: add tests, do not yet have instrument to model
     id = 'I19'
@@ -3160,7 +3160,7 @@ class StringEnsembleFractionFeature(InstrumentFractionFeature):
  
 class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
     '''
-    >>> from music21 import *
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.ElectricOrgan())
     >>> s1.repeatAppend(note.Note(), 8)
@@ -3371,8 +3371,8 @@ def getExtractorByTypeAndNumber(type, number): #@ReservedAssignment
     '''
     Typical usage:
     
-    >>> from music21 import *
-    >>> t5 = getExtractorByTypeAndNumber('T', 5)
+    
+    >>> t5 = features.jSymbolic.getExtractorByTypeAndNumber('T', 5)
     >>> t5.__name__
     'VoiceEqualityNoteDurationFeature'
     >>> bachExample = corpus.parse('bach/bwv66.6')
@@ -3382,18 +3382,18 @@ def getExtractorByTypeAndNumber(type, number): #@ReservedAssignment
     Features unimplemented in jSymbolic but documented in the dissertation return None
     
     
-    >>> getExtractorByTypeAndNumber('C', 20) is None
+    >>> features.jSymbolic.getExtractorByTypeAndNumber('C', 20) is None
     True
     
     
     Totally unknown features return an exception:
     
     
-    >>> getExtractorByTypeAndNumber('L', 900)
+    >>> features.jSymbolic.getExtractorByTypeAndNumber('L', 900)
     Traceback (most recent call last):
     ...
     JSymbolicFeatureException: Could not find any jSymbolic features of type L
-    >>> getExtractorByTypeAndNumber('C', 200)
+    >>> features.jSymbolic.getExtractorByTypeAndNumber('C', 200)
     Traceback (most recent call last):
     ...
     JSymbolicFeatureException: jSymbolic features of type C do not have number 200
@@ -3625,7 +3625,7 @@ QualityFeature, #p22
 
 def getCompletionStats():
     '''
-    >>> from music21 import *
+    
     >>> features.jSymbolic.getCompletionStats()
     completion stats: 70/111 (0.6306...)
     '''

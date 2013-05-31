@@ -55,7 +55,7 @@ class WindowedAnalysis(object):
     def _getMinimumWindowStream(self, timeSignature='1/4'):
         ''' Take the loaded stream and restructure it into measures of 1 quarter note duration.
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.Ambitus()
         >>> # placing one part into analysis
@@ -97,7 +97,7 @@ class WindowedAnalysis(object):
 
         Returns two lists for results, each equal in size to the length of minimum windows minus the window size plus one. If we have 20 1/4 windows, then the results lists will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc. 
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> wa = analysis.windowed.WindowedAnalysis(s, p)
@@ -195,7 +195,7 @@ class WindowedAnalysis(object):
 
         If `includeTotalWindow` is True, the largest window size will always be added. 
 
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> # placing one part into analysis

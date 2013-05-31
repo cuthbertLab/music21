@@ -43,7 +43,7 @@ class TrecentoCadenceStream(tinyNotation.TinyNotationStream):
     '''
     Subclass of Tiny Notation that calls TrecentoCadenceNote instead of TinyNotationNote    
     
-    >>> from music21 import *
+    
     >>> dLucaGloriaIncipit = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
     >>> dLucaGloriaIncipit.makeMeasures(inPlace = True)
     >>> dLucaGloriaIncipit.rightBarline = 'final'

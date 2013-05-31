@@ -54,7 +54,7 @@ class TwelveToneMatrix(stream.Stream):
 
     __OMIT_FROM_DOCS__
 
-    >>> from music21 import *
+    
     >>> aMatrix = serial.rowToMatrix([0,2,11,7,8,3,9,1,4,10,6,5])
     '''
     
@@ -116,7 +116,7 @@ class ToneRow(stream.Stream):
         '''
         Convenience function showing the pitch classes of a :class:`~music21.serial.ToneRow` as a list.
         
-        >>> from music21 import *
+        
         >>> L = [5*i for i in range(0,12)]
         >>> quintupleRow = serial.pcToToneRow(L)
         >>> quintupleRow.pitchClasses()
@@ -135,7 +135,7 @@ class ToneRow(stream.Stream):
         '''
         Convenience function showing the note names of a :class:`~music21.serial.ToneRow` as a list.
         
-        >>> from music21 import *
+        
         >>> chromatic = serial.pcToToneRow(range(0,12))
         >>> chromatic.noteNames()
         ['C', 'C#', 'D', 'E-', 'E', 'F', 'F#', 'G', 'G#', 'A', 'B-', 'B']
@@ -154,7 +154,7 @@ class ToneRow(stream.Stream):
         Describes whether or not a :class:`~music21.serial.ToneRow` constitutes a twelve-tone row. Note that a
         :class:`~music21.serial.TwelveToneRow` object might not be a twelve-tone row.
         
-        >>> from music21 import *
+        
         >>> serial.pcToToneRow(range(0,12)).isTwelveToneRow()
         True
         >>> serial.pcToToneRow(range(0,10)).isTwelveToneRow()
@@ -180,7 +180,7 @@ class ToneRow(stream.Stream):
         Convenience function returning a :class:`~music21.serial.TwelveToneRow` with the same pitches.
         Note that a :class:`~music21.serial.ToneRow` may be created without being a true twelve tone row.
         
-        >>> from music21 import *
+        
         >>> a = serial.pcToToneRow(range(0,11))
         >>> type(a)
         <class 'music21.serial.ToneRow'>
@@ -205,7 +205,7 @@ class ToneRow(stream.Stream):
         '''
         Convenience function describing if two rows are the same.
         
-        >>> from music21 import *
+        
         >>> row1 = serial.pcToToneRow([6, 7, 8])
         >>> row2 = serial.pcToToneRow([-6, 19, 128])
         >>> row3 = serial.pcToToneRow([6, 7, -8])
@@ -236,7 +236,7 @@ class ToneRow(stream.Stream):
         Returns the string of intervals between consecutive pitch classes of a :class:`~music21.serial.ToneRow`.
         'T' = 10, 'E' = 11.
         
-        >>> from music21 import *
+        
         >>> cRow = serial.pcToToneRow([0])
         >>> cRow.getIntervalsAsString()
         ''
@@ -271,7 +271,7 @@ class ToneRow(stream.Stream):
         the transformations Pn and In start on the pitch class n, and the transformations
         Rn and RIn end on the pitch class n.
        
-        >>> from music21 import *
+        
         >>> chromatic = serial.pcToToneRow(range(0,12))
         >>> chromatic.pitchClasses()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -338,7 +338,7 @@ class ToneRow(stream.Stream):
         transform the row appropriately (without transposition), then transpose the resulting
         row by n semitones.
        
-        >>> from music21 import *
+        
         >>> chromatic = serial.pcToToneRow(range(0,12))
         >>> chromatic.pitchClasses()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -380,7 +380,7 @@ class ToneRow(stream.Stream):
         
         See :meth:`~music21.serial.zeroCenteredTransformation` for an explanation of this convention.
         
-        >>> from music21 import *
+        
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1])
         >>> reversechromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9])
         >>> chromatic.findZeroCenteredTransformations(reversechromatic)
@@ -425,7 +425,7 @@ class ToneRow(stream.Stream):
         
         See :meth:`~music21.serial.originalCenteredTransformation` for an explanation of this convention.
         
-        >>> from music21 import *
+        
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 0, 1])
         >>> reversechromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 'B', 'A', 9])
         >>> chromatic.findOriginalCenteredTransformations(reversechromatic)
@@ -489,7 +489,7 @@ class TwelveToneRow(ToneRow):
         '''
         Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.  That object can just be printed (or displayed via .show())
         
-        >>> from music21 import *
+        
         >>> src = serial.getHistoricalRowByName('RowSchoenbergOp37')
         >>> [p.name for p in src]
         ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B']
@@ -539,7 +539,7 @@ class TwelveToneRow(ToneRow):
         twelve-tone rows stored by music21: see :func:`music21.serial.getHistoricalRowByName`.
         Returns a list of names of historical rows to which the input row is identical.
         
-        >>> from music21 import *
+        
         >>> row = serial.pcToToneRow([2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6])
         >>> row.findHistorical()
         ['RowSchoenbergOp32']
@@ -567,7 +567,7 @@ class TwelveToneRow(ToneRow):
         in :meth:`~music21.serial.findZeroCenteredTransformations` and 
         :meth:`~music21.serial.findOriginalCenteredTransformations`.
         
-        >>> from music21 import *
+        
         >>> row = serial.pcToToneRow([5, 9, 11, 3, 6, 7, 4, 10, 0, 8, 2, 1])
         >>> row.findTransformedHistorical('original')
         [('RowSchoenbergOp32', [('R', 11)])]
@@ -595,7 +595,7 @@ class TwelveToneRow(ToneRow):
         '''
         Describes whether or not a :class:`~music21.serial.TwelveToneRow` is an all-interval row.
         
-        >>> from music21 import *
+        
         >>> chromatic = serial.pcToToneRow(range(0,12))
         >>> chromatic.pitchClasses()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -632,7 +632,7 @@ class TwelveToneRow(ToneRow):
         
         Named for John Link who discovered them.
         
-        >>> from music21 import *
+        
         >>> bergLyric = serial.getHistoricalRowByName('RowBergLyricSuite')
         >>> bergLyric.pitchClasses()
         [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
@@ -682,7 +682,7 @@ class TwelveToneRow(ToneRow):
         '''
         Describes whether or not a :class:`~music21.serial.TwelveToneRow` is a Link Chord.
         
-        >>> from music21 import *
+        
         >>> bergLyric = serial.getHistoricalRowByName('RowBergLyricSuite')
         >>> bergLyric.pitchClasses()
         [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
@@ -716,7 +716,7 @@ class TwelveToneRow(ToneRow):
         :meth:`~music21.serial.zeroCenteredTransformation` and 
         :meth:`~music21.serial.originalCenteredTransformation` explanations of these conventions.
         
-        >>> from music21 import *
+        
         >>> moses = serial.getHistoricalRowByName('RowSchoenbergMosesAron')
         >>> moses.pitchClasses()
         [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]
@@ -781,7 +781,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     def __init__(self, segment, containerStream, partNumber):
         
         '''
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> p = stream.Part()
         >>> n1 = note.Note('c4')
@@ -827,7 +827,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         '''
         Returns the list of pitch classes in the segment, reading pitches within chords from bottom to top.
         
-        >>> from music21 import *
+        
         >>> sc = stream.Score()
         >>> n1 = note.Note('d4')
         >>> n1.quarterLength = 1
@@ -855,7 +855,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         Returns a list of distinct pitch classes in the segment, in order of appearance,
         where pitches in a chord are read from bottom to top.
         
-        >>> from music21 import *
+        
         >>> sc = stream.Score()
         >>> n1 = note.Note('d4')
         >>> n1.quarterLength = 1
@@ -915,7 +915,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
     
     To begin, we create a stream on which we will apply the function.
     
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 6
@@ -1125,7 +1125,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
     __OMIT_FROM_DOCS__
     
     >>> import copy
-    >>> from music21 import *
+    
     >>> sc = stream.Score()
     >>> p = stream.Part()
     >>> c1 = chord.Chord(['c4', 'd4'])
@@ -1616,7 +1616,7 @@ def findSegments(inputStream, searchList, reps = 'skipConsecutive', includeChord
     :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
     
-    >>> from music21 import *
+    
     >>> sc = stream.Score()
     >>> part = stream.Part()
     >>> sig = meter.TimeSignature('2/4')
@@ -1806,7 +1806,7 @@ def labelSegments(inputStream, segmentDict, reps = 'skipConsecutive', includeCho
     to call this function with too large of a segmentDict, as a note being contained
     in too many segments will result in some spanners not showing.
     
-    >>> from music21 import *
+    
     >>> part = stream.Part()
     >>> sig = meter.TimeSignature('2/4')
     >>> part.append(sig)
@@ -1873,7 +1873,7 @@ def findTransposedSegments(inputStream, searchList, reps = 'skipConsecutive', in
     :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
     
-    >>> from music21 import *
+    
     >>> part = stream.Part()
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 6
@@ -2031,7 +2031,7 @@ def labelTransposedSegments(inputStream, segmentDict, reps = 'skipConsecutive', 
     to call this function with too large of a segmentDict, as a note being contained
     in too many segments will result in some spanners not showing.
     
-    >>> from music21 import *
+    
     >>> part = stream.Part()
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 6
@@ -2120,7 +2120,7 @@ def findTransformedSegments(inputStream, searchList, reps = 'skipConsecutive', i
     :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
     
-    >>> from music21 import *
+    
     >>> n1 = note.Note('c#4')
     >>> n2 = note.Note('e4')
     >>> n3 = note.Note('d#4')
@@ -2281,7 +2281,7 @@ def labelTransformedSegments(inputStream, segmentDict, reps = 'skipConsecutive',
     to call this function with too large of a segmentDict, as a note being contained
     in too many segments will result in some spanners not showing.
     
-    >>> from music21 import *
+    
     >>> c1 = chord.Chord(['c#4', 'e4'])
     >>> c2 = chord.Chord(['d#4', 'f4'])
     >>> c3 = chord.Chord(['e4', 'g4'])
@@ -2362,7 +2362,7 @@ def _checkMultisetEquivalence(multiset1, multiset2):
     '''
     Boolean describing if two multisets of pitch classes are the same.
     
-    >>> from music21 import *
+    
     >>> serial._checkMultisetEquivalence([3, 4, 5], [3, 3, 4, 5])
     False
     >>> serial._checkMultisetEquivalence([10, 'A', -7], [-2, 5, -2])
@@ -2410,7 +2410,7 @@ def findMultisets(inputStream, searchList, reps = 'skipConsecutive', includeChor
     matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
     
-    >>> from music21 import *
+    
     >>> part = stream.Part()
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 4
@@ -2598,7 +2598,7 @@ def labelMultisets(inputStream, multisetDict, reps = 'skipConsecutive', includeC
     As a result, it is possible that at points in the stream there will be more than six spanners active 
     simultaneously, which may result in some spanners not showing correctly in XML format, or not at all.
     
-    >>> from music21 import *
+    
     >>> part = stream.Part()
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 4
@@ -2654,7 +2654,7 @@ def findTransposedMultisets(inputStream, searchList, reps = 'skipConsecutive', i
     matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
     
-    >>> from music21 import *
+    
     >>> part = stream.Part()
     >>> n1 = note.Note('c4')
     >>> n2 = note.Note('c#4')
@@ -2681,7 +2681,7 @@ def findTransposedMultisets(inputStream, searchList, reps = 'skipConsecutive', i
     
     __OMIT_FROM_DOCS__
     
-    >>> from music21 import *
+    
     >>> part2 = stream.Part()
     >>> n1 = chord.Chord(['c4', 'c5'])
     >>> n2 = chord.Chord(['c#4', 'c#5'])
@@ -2821,7 +2821,7 @@ def labelTransposedMultisets(inputStream, multisetDict, reps = 'skipConsecutive'
     We can label all instances of three of the same pitch classes occurring in a row in one of the chorales.
     We learn the obvious - it appears that the alto section would be the most bored while performing this chorale.
     
-    >>> from music21 import *
+    
     >>> bach = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW serial.labelTransposedMultisets(bach, {'x3':[0, 0, 0]}, reps = 'includeAll', includeChords = False).show()
     
@@ -2859,7 +2859,7 @@ def findTransposedAndInvertedMultisets(inputStream, searchList, reps = 'skipCons
     matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
     
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> n1 = note.Note('c4')
     >>> n2 = note.Note('e-4')
@@ -3080,7 +3080,7 @@ def labelTransposedAndInvertedMultisets(inputStream, multisetDict, reps = 'skipC
     As a result, it is possible that at points in the stream there will be more than six spanners active 
     simultaneously, which may result in some spanners not showing correctly in XML format, or not at all.
     
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> n1 = note.Note('c4')
     >>> n2 = note.Note('e-4')
@@ -3287,7 +3287,7 @@ def getHistoricalRowByName(rowName):
     
     RowWebernOp31
     
-    >>> from music21 import *
+    
     >>> a = serial.getHistoricalRowByName('RowWebernOp29')
     >>> a.row
     [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]
@@ -3314,7 +3314,7 @@ def pcToToneRow(pcSet):
     '''A convenience function that, given a list of pitch classes represented as integers
     and turns it in to a :class:`~music21.serial.ToneRow` object.
 
-    >>> from music21 import *
+    
     >>> a = serial.pcToToneRow(range(12))
     >>> a.show('text')
     {0.0} <music21.pitch.Pitch C>

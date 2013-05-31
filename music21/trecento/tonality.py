@@ -57,7 +57,7 @@ class TonalityCounter(object):
     
     >>> from music21.trecento import cadencebook
     >>> threeBallata = cadencebook.BallataSheet()[15:18]
-    >>> tc1 = TonalityCounter(threeBallata)
+    >>> tc1 = trecento.tonality.TonalityCounter(threeBallata)
     >>> tc1.run() 
     >>> print tc1.output
                         Bench'amar    C    D
@@ -179,7 +179,7 @@ def nonLandiniTonality(show = True):
     the tenor (streamName = "T") and the A cadence (which we would believe
     would end the piece)
     
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW trecento.tonality.nonLandiniTonality(show = True)
     
     

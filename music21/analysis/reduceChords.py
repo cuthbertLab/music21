@@ -11,7 +11,7 @@
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 
->>> from music21 import *
+
 
 '''
 import unittest
@@ -26,7 +26,7 @@ def testMeasureStream1():
     '''
     returns a simple measure stream for testing:
     
-    >>> from music21 import *
+    
     >>> s = analysis.reduceChords.testMeasureStream1()
     >>> s.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -53,7 +53,7 @@ class ChordReducer(object):
 
     def reduceMeasureToNChords(self, measureObj, numChords = 1, weightAlgorithm=None, trimBelow=0.25):
         '''
-        >>> from music21 import *
+        
         >>> s = analysis.reduceChords.testMeasureStream1()     
         >>> cr = analysis.reduceChords.ChordReducer()
         
@@ -143,7 +143,7 @@ class ChordReducer(object):
     
     def computeMeasureChordWeights(self, measureObj, weightAlgorithm = None):
         '''
-        >>> from music21 import *
+        
         >>> s = analysis.reduceChords.testMeasureStream1().notes      
         >>> cr = analysis.reduceChords.ChordReducer()
         >>> cws = cr.computeMeasureChordWeights(s)

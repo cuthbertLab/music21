@@ -43,7 +43,7 @@ class HarmonyException(exceptions21.Music21Exception):
 
 class Harmony(chord.Chord):
     '''
-    >>> from music21 import *
+    
     >>> h = harmony.ChordSymbol()
     >>> h.root('B-3')
     >>> h.bass('D')
@@ -62,7 +62,7 @@ class Harmony(chord.Chord):
     that dictates whether the object will be written to a score as a chord (with pitches realized) or with just the
     figure (as in Chord Symbols).
 
-    >>> from music21 import *
+    
     >>> h = harmony.ChordSymbol('C7/E')
     >>> h.root()
     <music21.pitch.Pitch C4>
@@ -182,7 +182,7 @@ class Harmony(chord.Chord):
         if the pitches of the harmony object have been modified after being instantiated,
         call :meth:`music21.harmony.findFigure` to deduce the new figure
 
-        >>> from music21 import *
+        
         >>> h = harmony.ChordSymbol('CM')
         >>> h.figure
         'CM'
@@ -211,7 +211,7 @@ class Harmony(chord.Chord):
         is changed, but chord symbol objects do not and the key provides more information about the musical
         context from where the harmony object was extracted.
         
-        >>> from music21 import *
+        
         >>> r1 = roman.RomanNumeral('V')
         >>> r1.pitches
         [<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>]
@@ -242,7 +242,7 @@ class Harmony(chord.Chord):
     def addChordStepModification(self, degree):
         '''Add a harmony degree specification to this Harmony as a :class:`~music21.harmony.ChordStepModification` object.
 
-        >>> from music21 import *
+        
         >>> hd = harmony.ChordStepModification('add', 4)
         >>> h = harmony.ChordSymbol()
         >>> h.addChordStepModification(hd)
@@ -288,7 +288,7 @@ class Harmony(chord.Chord):
     romanNumeral = property(_getRoman, _setRoman, doc='''
         Get or set the romanNumeral numeral function of the Harmony as a :class:`~music21.romanNumeral.RomanNumeral` object. String representations accepted by RomanNumeral are also accepted.
 
-        >>> from music21 import *
+        
         >>> h = harmony.ChordSymbol()
         >>> h.romanNumeral = 'III'
         >>> h.romanNumeral
@@ -317,7 +317,7 @@ class ChordStepModification(object):
 
         if alter or subtract: degree-alter is relative to degree already in the chord based on its kind element
 
-    >>> from music21 import *
+    
     >>> hd = harmony.ChordStepModification('add', 4)
     >>> hd
     <music21.harmony.ChordStepModification modType=add degree=4 interval=None>
@@ -383,7 +383,7 @@ class ChordStepModification(object):
     modType = property(_getModType, _setModType, doc='''
         Get or set the ChordStepModification modification type, where permitted types are the strings add, subtract, or alter.
 
-        >>> from music21 import *
+        
         >>> hd = harmony.ChordStepModification()
         >>> hd.modType = 'add'
         >>> hd.modType
@@ -420,7 +420,7 @@ class ChordStepModification(object):
     interval = property(_getInterval, _setInterval, doc='''
         Get or set the alteration of this degree as a :class:`~music21.interval.Interval` object.
 
-        >>> from music21 import *
+        
         >>> hd = harmony.ChordStepModification()
         >>> hd.interval = 1
         >>> hd.interval
@@ -441,7 +441,7 @@ class ChordStepModification(object):
 
     degree = property(_getDegree, _setDegree, doc='''
 
-        >>> from music21 import *
+        
         >>> hd = harmony.ChordStepModification()
         >>> hd.degree = 3
         >>> hd.degree
@@ -526,7 +526,7 @@ CHORD_TYPES = {
 
 def addNewChordSymbol(chordTypeName, fbNotationString, AbbreviationList):
     '''
-    >>> from music21 import *
+    
     >>> harmony.addNewChordSymbol('BethChord', '1,3,-6,#9', ['MH','beth'])
     >>> [str(p) for p in harmony.ChordSymbol('BMH').pitches]
     ['B2', 'C##3', 'D#3', 'G3']
@@ -553,7 +553,7 @@ def getNotationStringGivenChordType(chordType):
     '''
     get the notation string (fbnotation style) associated with this :class:`music21.harmony.ChordSymbol` chordType
     
-    >>> from music21 import *
+    
     >>> harmony.getNotationStringGivenChordType('German')
     '1,-3,#4,-6'
     '''
@@ -563,7 +563,7 @@ def getAbbreviationListGivenChordType(chordType):
     '''
     get the Abbreviation list (all allowed Abbreviations that map to this :class:`music21.harmony.ChordSymbol` object)
     
-    >>> from music21 import *
+    
     >>> harmony.getAbbreviationListGivenChordType('minor-major-13th')
     ['mM13', 'minmaj13']
     '''
@@ -573,7 +573,7 @@ def getCurrentAbbreviationFor(chordType):
     '''
     return the current Abbreviation for a given :class:`music21.harmony.ChordSymbol` chordType
     
-    >>> from music21 import *
+    
     >>> harmony.getCurrentAbbreviationFor('dominant-seventh')
     '7'
     '''
@@ -583,7 +583,7 @@ def changeAbbreviationFor(chordType, changeTo):
     '''
     change the current Abbreviation used for a certain :class:`music21.harmony.ChordSymbol` chord type
     
-    >>> from music21 import *
+    
     >>> harmony.getCurrentAbbreviationFor('minor')
     'm'
     >>> harmony.changeAbbreviationFor('minor', 'min')
@@ -601,8 +601,8 @@ def chordSymbolFromChord(inChord):
     get the :class:`~music21.harmony.chordSymbol` object from the chord, using 
     :meth:`music21.harmony.chordSymbolFigureFromChord`
     
-    >>> from music21 import *
-    >>> chordSymbolFromChord(chord.Chord(['D3','F3','A3','B-3']))
+    
+    >>> harmony.chordSymbolFromChord(chord.Chord(['D3','F3','A3','B-3']))
     <music21.harmony.ChordSymbol B-maj7/D>
     '''
     return ChordSymbol(chordSymbolFigureFromChord(inChord))
@@ -621,7 +621,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     set includeChordType to true (default is False) to return a tuple, the first
     element being the figure and the second element the identified chord type
     
-    >>> from music21 import *
+    
     >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C3','E3','G3'])) #standard example
     'C'
 
@@ -1093,7 +1093,7 @@ class ChordSymbol(Harmony):
 
     The music xml-based approach to instantiating Chord Symbol objects:
 
-    >>> from music21 import *
+    
     >>> cs = harmony.ChordSymbol(kind='minor',kindStr = 'm', root='C', bass = 'E-')
     >>> cs
     <music21.harmony.ChordSymbol Cm/E->
@@ -1340,7 +1340,7 @@ class ChordSymbol(Harmony):
         return the chord symbol figure associated with this chord. This method tries to deduce
         what information it can from the provided pitches.
 
-        >>> from music21 import *
+        
         >>> h = harmony.ChordSymbol(root = 'F', bass = 'D-', kind = 'Neapolitan')
         >>> h.figure
         'FN6/D-'
@@ -1486,7 +1486,7 @@ class ChordSymbol(Harmony):
         '''calculate the pitches in the chord symbol and update all associated
         variables, including bass, root, inversion and chord
 
-        >>> from music21 import *
+        
         >>> [str(p) for p in harmony.ChordSymbol(root='C', bass='E', kind='major').pitches]
         ['E3', 'G3', 'C4']
         >>> [str(p) for p in harmony.ChordSymbol(root='C', bass='G', kind='major').pitches]
@@ -1810,7 +1810,7 @@ def realizeChordSymbolDurations(piece):
     continues duration until another chord symbol is located or the piece ends. Useful for
 
 
-    >>> from music21 import *
+    
     >>> s = stream.Score()
     >>> s.append(harmony.ChordSymbol('C'))
     >>> s.repeatAppend(note.Note('C'), 4)

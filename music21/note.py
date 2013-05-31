@@ -55,7 +55,7 @@ class Lyric(object):
     Lyric objects are needed for working with multiple lyrics.
     
     
-    >>> from music21 import *
+    
     >>> l = note.Lyric(text="hello")
     >>> l
     <music21.note.Lyric number=1 syllabic=single text="hello">
@@ -148,7 +148,7 @@ class Lyric(object):
     def _getIdentifier(self):
         '''For identifier property
         
-        >>> from music21 import *
+        
         >>> l = note.Lyric()
         >>> l.number = 12
         >>> l.identifier
@@ -214,7 +214,7 @@ class GeneralNote(base.Music21Object):
     objects directly, and not use this underlying
     structure.
     
-    >>> from music21 import *
+    
     >>> gn = note.GeneralNote(type = '16th', dots = 2)
     >>> gn.quarterLength
     0.4375
@@ -272,7 +272,7 @@ class GeneralNote(base.Music21Object):
         uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
         No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
 
-        >>> from music21 import *
+        
         >>> a = note.GeneralNote()
         >>> a.duration.type = 'whole'
         >>> a.color = '#235409'
@@ -317,7 +317,7 @@ class GeneralNote(base.Music21Object):
         Note, Chord, or Rest. This is a simplified version of the more general 
         :meth:`~music21.note.GeneralNote.addLyric` method.
         
-        >>> from music21 import *
+        
         >>> a = note.Note('A4')
         >>> a.lyrics
         []
@@ -339,7 +339,7 @@ class GeneralNote(base.Music21Object):
         '''Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. The lyricIdentifier
         can also be set.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n1.addLyric("hello")
         >>> n1.lyrics[0].text
@@ -413,7 +413,7 @@ class GeneralNote(base.Music21Object):
         the index specified (0 by default), using index + 1 as the inserted lyric's
         line number. shifts line numbers of all following lyrics in list 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n1.addLyric("second")
         >>> n1.lyrics
@@ -447,7 +447,7 @@ class GeneralNote(base.Music21Object):
     def _getQuarterLength(self):
         '''Return quarter length
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = 2.0
         >>> n.quarterLength
@@ -461,7 +461,7 @@ class GeneralNote(base.Music21Object):
     quarterLength = property(_getQuarterLength, _setQuarterLength, 
         doc = '''Return the Duration as represented in Quarter Length.
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.quarterLength = 2.0
         >>> n.quarterLength
@@ -472,7 +472,7 @@ class GeneralNote(base.Music21Object):
     def augmentOrDiminish(self, scalar, inPlace=True):
         '''Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy.
 
-        >>> from music21 import *
+        
         >>> n = note.Note('g#')
         >>> n.quarterLength = 3
         >>> n.augmentOrDiminish(2)
@@ -510,7 +510,7 @@ class GeneralNote(base.Music21Object):
     def getGrace(self, appogiatura=False):
         '''Return a grace version of this NotRest
 
-        >>> from music21 import *
+        
         >>> n = note.Note('G4', quarterLength=2)
         >>> n.duration.quarterLength        
         2.0
@@ -586,7 +586,7 @@ class NotRest(GeneralNote):
     stemDirection = property(_getStemDirection, _setStemDirection, doc=
         '''Get or set the stem direction of this NotRest object. Valid stem direction names are found in note.stemDirectionNames (see below).
 
-        >>> from music21 import *
+        
         >>> note.stemDirectionNames
         ['up', 'down', 'noStem', 'double', 'unspecified', 'none']
 
@@ -615,7 +615,7 @@ class NotRest(GeneralNote):
         Get or set the notehead type of this NotRest object. 
         Valid notehead type names are found in note.noteheadTypeNames (see below):
 
-        >>> from music21 import *
+        
         >>> note.noteheadTypeNames
         ['slash', 'triangle', 'diamond', 'square', 'cross', 'x', 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
 
@@ -647,7 +647,7 @@ class NotRest(GeneralNote):
     noteheadFill = property(_getNoteheadFill, _setNoteheadFill, doc='''
         Get or set the note head fill status of this NotRest. Valid note head fill values are yes, no, default, and None.
 
-        >>> from music21 import *
+        
         
         >>> n = note.Note()
         >>> n.noteheadFill = 'no'
@@ -706,7 +706,7 @@ class NotRest(GeneralNote):
     volume = property(_getVolume, _setVolume, 
         doc = '''Get and set the :class:`~music21.volume.Volume` object of this object. Volume objects are created on demand.
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n1.volume.velocity = 120
         >>> n2 = note.Note()
@@ -805,7 +805,7 @@ class Note(NotRest):
         (since __eq__'s docs don't display)
         
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n1.pitch.name = 'G#'
         >>> n2 = note.Note()
@@ -841,7 +841,7 @@ class Note(NotRest):
     def __ne__(self, other):
         '''Inequality. 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note()
         >>> n1.pitch.name = 'G#'
         >>> n2 = note.Note()
@@ -894,7 +894,7 @@ class Note(NotRest):
         Adds an accidental to the Note, given as an Accidental object.
         Also alters the name of the note
         
-        >>> from music21 import *
+        
         >>> a = note.Note()
         >>> a.step = "D"
         >>> a.name 
@@ -952,7 +952,7 @@ class Note(NotRest):
         
         C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
 
-        >>> from music21 import *
+        
         >>> a = note.Note()
         >>> a.pitch = pitch.Pitch('d-4')
         >>> a.midi
@@ -974,7 +974,7 @@ class Note(NotRest):
         
         C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
 
-        >>> from music21 import *
+        
         >>> a = note.Note()
         >>> a.ps = 60.5
         >>> a.midi
@@ -1005,7 +1005,7 @@ class Note(NotRest):
     def _getPitchClass(self):
         '''Return pitch class
 
-        >>> from music21 import *
+        
         >>> d = note.Note()
         >>> d.pitch = pitch.Pitch('d-4')
         >>> d.pitchClass
@@ -1027,7 +1027,7 @@ class Note(NotRest):
         '''
         Return pitch class string, replacing 10 and 11 as needed. 
 
-        >>> from music21 import *
+        
         >>> d = note.Note()
         >>> d.pitch = pitch.Pitch('b')
         >>> d.pitchClassString
@@ -1038,7 +1038,7 @@ class Note(NotRest):
     def _setPitchClassString(self, value):
         '''
 
-        >>> from music21 import *
+        
         >>> d = note.Note()
         >>> d.pitch = pitch.Pitch('b')
         >>> d.pitchClassString = 'a'
@@ -1083,7 +1083,7 @@ class Note(NotRest):
         This property is designed to provide an interface analogous to 
         that found on :class:`~music21.chord.Chord`.
 
-        >>> from music21 import *
+        
         >>> n = note.Note('g#')
         >>> n.nameWithOctave
         'G#'
@@ -1101,7 +1101,7 @@ class Note(NotRest):
     def transpose(self, value, inPlace=False):
         '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
 
-        >>> from music21 import *
+        
         >>> a = note.Note('g4')
         >>> b = a.transpose('m3')
         >>> b
@@ -1147,7 +1147,7 @@ class Note(NotRest):
     fullName = property(_getFullName, 
         doc = '''Return the most complete representation of this Note, providing duration and pitch information.
 
-        >>> from music21 import *
+        
         >>> n = note.Note('A-', quarterLength=1.5)
         >>> n.fullName
         'A-flat Dotted Quarter Note'
@@ -1256,7 +1256,7 @@ class Rest(GeneralNote):
     However, the property :attr:`~music21.stream.Stream.notesAndRests` of Streams
     gets rests as well.
         
-    >>> from music21 import *
+    
     >>> r = note.Rest()
     >>> r.isRest
     True
@@ -1292,7 +1292,7 @@ class Rest(GeneralNote):
         A Music21 rest is equal to another object if that object is also a rest which 
         has the same duration.
         
-        >>> from music21 import *
+        
         >>> r1 = note.Rest()
         >>> r2 = note.Rest()
         >>> r1 == r2
@@ -1310,7 +1310,7 @@ class Rest(GeneralNote):
         '''
         Inequality
         
-        >>> from music21 import *
+        
         >>> r1 = note.Rest()
         >>> r2 = note.Rest()
         >>> r1 != r2
@@ -1334,7 +1334,7 @@ class Rest(GeneralNote):
     fullName = property(_getFullName, 
         doc = '''Return the most complete representation of this Rest, providing duration information.
 
-        >>> from music21 import *
+        
         >>> r = note.Rest(quarterLength=1.5)
         >>> r.fullName
         'Dotted Quarter Rest'

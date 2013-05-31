@@ -40,7 +40,7 @@ def realizeOrnaments(srcObject):
     convert them into a list of objects that represents
     the performed version of the object:
     
-    >>> from music21 import *
+    
     >>> n1 = note.Note("D5")
     >>> n1.quarterLength = 1
     >>> n1.expressions.append(expressions.WholeStepMordent())
@@ -117,7 +117,7 @@ class TextExpression(Expression, text.TextFormat):
     Conventional expressive indications are text 
     like "agitato" or "con fuoco."
 
-    >>> from music21 import *
+    
     >>> te = expressions.TextExpression('testing')
     >>> te.size = 24
     >>> te.size
@@ -170,7 +170,7 @@ class TextExpression(Expression, text.TextFormat):
     content = property(_getContent, _setContent, 
         doc = '''Get or set the the content.
 
-        >>> from music21 import *
+        
         >>> te = expressions.TextExpression('testing')
         >>> te.content
         'testing'
@@ -190,7 +190,7 @@ class TextExpression(Expression, text.TextFormat):
     enclosure = property(_getEnclosure, _setEnclosure, 
         doc = '''Get or set the the enclosure.
 
-        >>> from music21 import *
+        
         >>> te = expressions.TextExpression()
         >>> te.justify = 'center'
         >>> te.enclosure = None
@@ -226,7 +226,7 @@ class TextExpression(Expression, text.TextFormat):
         staves; other staves are not yet implemented)
 
 
-        >>> from music21 import *
+        
         >>> te = expressions.TextExpression()
         >>> te.positionVertical = 10
         >>> te.positionVertical
@@ -313,14 +313,14 @@ class GeneralMordent(Ornament):
         The third is an empty list (since there are no notes at the end of a mordent)
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note("C4")
         >>> n1.quarterLength = 0.5
         >>> m1 = expressions.Mordent()
         >>> m1.realize(n1)
         ([<music21.note.Note C>, <music21.note.Note B>], <music21.note.Note C>, [])
         
-        >>> from music21 import *
+        
         >>> n2 = note.Note("C4")
         >>> n2.quarterLength = 0.125
         >>> m2 = expressions.GeneralMordent()
@@ -375,7 +375,7 @@ class GeneralMordent(Ornament):
 class Mordent(GeneralMordent):
     '''A normal Mordent.
 
-    >>> from music21 import *
+    
     >>> m = expressions.Mordent()
     >>> m.direction
     'down'
@@ -390,7 +390,7 @@ class Mordent(GeneralMordent):
 class HalfStepMordent(Mordent):
     '''A half step normal Mordent.
 
-    >>> from music21 import *
+    
     >>> m = expressions.HalfStepMordent()
     >>> m.direction
     'down'
@@ -404,7 +404,7 @@ class HalfStepMordent(Mordent):
 class WholeStepMordent(Mordent):
     '''A whole step normal Mordent.
 
-    >>> from music21 import *
+    
     >>> m = expressions.WholeStepMordent()
     >>> m.direction
     'down'
@@ -420,7 +420,7 @@ class WholeStepMordent(Mordent):
 class InvertedMordent(GeneralMordent):
     '''An inverted Mordent.
 
-    >>> from music21 import *
+    
     >>> m = expressions.InvertedMordent()
     >>> m.direction
     'up'
@@ -434,7 +434,7 @@ class InvertedMordent(GeneralMordent):
 class HalfStepInvertedMordent(InvertedMordent):
     '''A half-step inverted Mordent.
 
-    >>> from music21 import *
+    
     >>> m = expressions.HalfStepInvertedMordent()
     >>> m.direction
     'up'
@@ -448,7 +448,7 @@ class HalfStepInvertedMordent(InvertedMordent):
 class WholeStepInvertedMordent(InvertedMordent):
     '''A whole-step inverted Mordent.
 
-    >>> from music21 import *
+    
     >>> m = expressions.WholeStepInvertedMordent()
     >>> m.direction
     'up'
@@ -465,7 +465,7 @@ class WholeStepInvertedMordent(InvertedMordent):
 class Trill(Ornament):
     '''A basic trill marker.
 
-    >>> from music21 import *
+    
     >>> m = expressions.Trill()
     >>> m.placement
     'above'
@@ -491,14 +491,14 @@ class Trill(Ornament):
         The second is None because the trill "eats up" the whole note.
         The third is a list of the notes at the end if nachschlag is True, and empty list if False.
         
-        >>> from music21 import *
+        
         >>> n1 = note.Note("C4")
         >>> n1.quarterLength = 0.5
         >>> t1 = expressions.Trill()
         >>> t1.realize(n1)
         ([<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note C>, <music21.note.Note D>], None, [])
         
-        >>> from music21 import *
+        
         >>> n2 = note.Note("D4")
         >>> n2.quarterLength = 0.125
         >>> t2 = expressions.Trill()
@@ -570,7 +570,7 @@ class Trill(Ornament):
 class HalfStepTrill(Trill):
     '''A basic trill marker.
 
-    >>> from music21 import *
+    
     >>> m = expressions.HalfStepTrill()
     >>> m.placement
     'above'
@@ -584,7 +584,7 @@ class HalfStepTrill(Trill):
 class WholeStepTrill(Trill):
     '''A basic trill marker.
 
-    >>> from music21 import *
+    
     >>> m = expressions.WholeStepTrill()
     >>> m.placement
     'above'
@@ -644,7 +644,7 @@ class Turn(Ornament):
         >>> t1.realize(n1)
         ([], <music21.note.Note C>, [<music21.note.Note D>, <music21.note.Note C>, <music21.note.Note B->, <music21.note.Note C>])
         
-        >>> from music21 import *
+        
         >>> m2 = stream.Measure()
         >>> m2.append(key.KeySignature(5))
         >>> n2 = note.Note("B4")
@@ -654,7 +654,7 @@ class Turn(Ornament):
         ([], <music21.note.Note B>, [<music21.note.Note A#>, <music21.note.Note B>, <music21.note.Note C#>, <music21.note.Note B>])
 
         
-        >>> from music21 import *
+        
         >>> n2 = note.Note("C4")
         >>> n2.quarterLength = 0.125
         >>> t2 = expressions.Turn()
@@ -741,14 +741,14 @@ class GeneralAppoggiatura(Ornament):
         The third is an empty list (since there are no notes at the end of an appoggiatura)
 
 
-        >>> from music21 import *
+        
         >>> n1 = note.Note("C4")
         >>> n1.quarterLength = 0.5
         >>> a1 = expressions.Appoggiatura()
         >>> a1.realize(n1)
         (<music21.note.Note D>, <music21.note.Note C>, [])
         
-        >>> from music21 import *
+        
         >>> n2 = note.Note("C4")
         >>> n2.quarterLength = 1
         >>> a2 = expressions.HalfStepInvertedAppoggiatura()
@@ -827,7 +827,7 @@ class Fermata(Expression):
     expression) set .tieAttach to 'all' or 'first'
     instead of 'last'. 
     
-    >>> from music21 import *
+    
     >>> p1 = stream.Part()
     >>> p1.append(meter.TimeSignature('6/8'))
     >>> n1 = note.Note("D-2")
@@ -851,7 +851,7 @@ class TrillExtensionException(exceptions21.Music21Exception):
 class TrillExtension(spanner.Spanner):
     '''A wavy line trill extension, placed between two notes. Note that some MusicXML readers include a trill symbol with the wavy line.
 
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note(), 8)
     >>> # create between notes 2 and 3
@@ -880,7 +880,7 @@ class TrillExtension(spanner.Spanner):
     placement = property(_getPlacement, _setPlacement, doc='''
         Get or set the placement as either above or below.
 
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note(), 8)
         >>> te = expressions.TrillExtension(s.notes[1], s.notes[2])

@@ -66,7 +66,7 @@ class ContourFinder(object):
         ContourFinder looks at a moving window of m measures, and moves that window by n measures each time.  
         M and n are specified by 'window' and 'slide', which are both 1 by default.    
         
-        >>> from music21 import *
+        
         >>> s = corpus.parse('bwv29.8')
         >>> #_DOCS_SHOW ContourFinder(s).plot('tonality')
         
@@ -92,7 +92,6 @@ class ContourFinder(object):
         Sets the key of ContourFinder's internal stream.  If not set manually, self.key will
         be determined by self.s.analyze('key'). 
         
-        >>> from music21 import *
         '''
         self.key = key
         
@@ -107,10 +106,9 @@ class ContourFinder(object):
         e.g. if window=4 and slide=2, metric = f, the result will be of the form:
         { measures 1-4: f(measures 1-4), measures 3-6: f(measures 3-6), measures 5-8: f( measures5-8), ...}
         
-        >>> from music21 import *
         >>> metric = lambda s: len(s.measureOffsetMap())
         >>> c = corpus.parse('bwv10.7')
-        >>> res = ContourFinder(c).getContourValuesForMetric(metric, 3, 2, False)
+        >>> res = contour.ContourFinder(c).getContourValuesForMetric(metric, 3, 2, False)
         >>> #set([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21]).issubset(set(res.keys()))
         >>> res.keys()
         [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21]
@@ -166,27 +164,36 @@ class ContourFinder(object):
         To get a contour where measures map to the metric values, use normalized=False (the default), but to get a contour
         which evenly divides time between 1.0 and 100.0, use normalized=True
         
-        >>> from music21 import *
-        >>> cf = ContourFinder( corpus.parse('bwv10.7'))
-        >>> contour = cf.getContour('dissonance')
-        >>> [ contour[x] for x in sorted(contour.keys()) ]
-        [0.0, 0.25, 0.5, 0.5, 0.0, 0.0, 0.25, 0.75, 0.0, 0.0, 0.5, 0.75, 0.75, 0.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75, 0.75, 0.0]
+        ::
+
+            >>> cf = contour.ContourFinder( corpus.parse('bwv10.7'))
+            >>> mycontour = cf.getContour('dissonance')
+            >>> [mycontour[x] for x in sorted(mycontour.keys())]
+            [0.0, 0.25, 0.5, 0.5, 0.0, 0.0, 0.25, 0.75, 0.0, 0.0, 0.5, 0.75, 0.75, 0.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75, 0.75, 0.0]
         
-        >>> contour = cf.getContour('always one', 2, 2, metric= lambda x: 1.0)
-        >>> [ contour[x] for x in sorted(contour.keys()) ]
-        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        ::
+
+            >>> mycontour = cf.getContour('always one', 2, 2, metric= lambda x: 1.0)
+            >>> [mycontour[x] for x in sorted(mycontour.keys())]
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         
-        >>> contour = cf.getContour('spacing', metric = lambda x: 2, overwrite=False)
-        Traceback (most recent call last):
-        OverwriteException: Attempted to overwrite 'spacing' metric but did not specify overwrite=True
+        ::
+
+            >>> mycontour = cf.getContour('spacing', metric = lambda x: 2, overwrite=False)
+            Traceback (most recent call last):
+            OverwriteException: Attempted to overwrite 'spacing' metric but did not specify overwrite=True
         
-        >>> contour = cf.getContour('spacing', slide=3, metric = lambda x: 2.0, overwrite=True)
-        >>> [ contour[x] for x in sorted(contour.keys()) ]
-        [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+        ::
+
+            >>> mycontour = cf.getContour('spacing', slide=3, metric = lambda x: 2.0, overwrite=True)
+            >>> [mycontour[x] for x in sorted(mycontour.keys())]
+            [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
         
-        >>> contour = cf.getContour('spacing')
-        >>> [ contour[x] for x in sorted(contour.keys()) ]
-        [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+        ::
+
+            >>> mycontour = cf.getContour('spacing')
+            >>> [mycontour[x] for x in sorted(mycontour.keys())]
+            [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
         
         '''
         
@@ -255,18 +262,18 @@ class ContourFinder(object):
         '''
         Normalize a contour dictionary so that the values of the keys range from 0.0 to length.
         
-        >>> contour = { 0.0: 1.0, 3.0: 0.5, 6.0: 0.8, 9.0: 0.3, 12.0: 0.15, 
+        >>> mycontour = { 0.0: 1.0, 3.0: 0.5, 6.0: 0.8, 9.0: 0.3, 12.0: 0.15, 
         ...            15.0: 0.13, 18.0: 0.4, 21.0: 0.6 }
-        >>> res = ContourFinder()._normalizeContour(contour, 100)
+        >>> res = contour.ContourFinder()._normalizeContour(mycontour, 100)
         >>> resKeys = res.keys()
         >>> resKeys.sort()
-        >>> contourKeys = contour.keys()
+        >>> contourKeys = mycontour.keys()
         >>> contourKeys.sort()
         >>> len(contourKeys) == len(resKeys)
         True
         >>> x = True
         >>> for i in range( len(contourKeys)):
-        ...    if contour[contourKeys[i]] != res[resKeys[i]]:
+        ...    if mycontour[contourKeys[i]] != res[resKeys[i]]:
         ...        x = False
         >>> x
         True
@@ -333,10 +340,10 @@ class ContourFinder(object):
         '''
         Returns a version of contourDict where the keys-to-values mapping is scrambled.  
         
-        >>> from music21 import *
+        
         >>> myDict = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9, 10:10, 11:11, 12:12, 13:13, 
         ...           14:14, 15:15, 16:16, 17:17, 18:18, 19:19, 20:20}
-        >>> res = ContourFinder().randomize(myDict)
+        >>> res = contour.ContourFinder().randomize(myDict)
         >>> res == myDict
         False
         >>> sorted(res.keys()) == sorted(myDict.keys())
@@ -390,13 +397,13 @@ class ContourFinder(object):
         
         To work correctly, input must contain measures and no parts.
         
-        >>> from music21 import *
+        
         >>> c = corpus.parse('bwv102.7').chordify()
-        >>> ContourFinder().dissonanceMetric( c.measures(1, 1) )
+        >>> contour.ContourFinder().dissonanceMetric( c.measures(1, 1) )
         0.25
-        >>> ContourFinder().dissonanceMetric( c.measures(8, 8) )
+        >>> contour.ContourFinder().dissonanceMetric( c.measures(8, 8) )
         0.5
-        >>> ContourFinder().dissonanceMetric( c.measures(1, 10)) < 1.0
+        >>> contour.ContourFinder().dissonanceMetric( c.measures(1, 10)) < 1.0
         True
         '''
         
@@ -756,3 +763,4 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
+

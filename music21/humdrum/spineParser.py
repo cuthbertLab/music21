@@ -14,7 +14,7 @@ native humdrum code into music21 streams.  Most music21 users will
 simply want to call:
 
 
->>> from music21 import *
+
 >>> #_DOCS_SHOW myFile = converter.parse('myfile.krn')
 >>> #_DOCS_SHOW myFile.show()
 
@@ -182,7 +182,7 @@ class HumdrumDataCollection(object):
         If it has multiple pieces, it returns True and a list of dataStreams.
         
         >>> from pprint import pprint as pp
-        >>> from music21 import *
+        
         >>> mps = humdrum.testFiles.multipartSanctus
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(mps, parseLines = False)
         >>> (hasOpus, dataCollections) = hdc.determineIfDataStreamIsOpus()
@@ -269,7 +269,7 @@ class HumdrumDataCollection(object):
         take a dataCollection from `determineIfDataStreamIsOpus`
         and set self.stream to be an Opus instead.
 
-        >>> from music21 import *
+        
         >>> mps = humdrum.testFiles.multipartSanctus
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(mps, parseLines = False)
         >>> (hasOpus, dataCollections) = hdc.determineIfDataStreamIsOpus()
@@ -313,7 +313,7 @@ class HumdrumDataCollection(object):
             
         Returns eventList in addition to setting it as self.eventList.
         
-        >>> from music21 import *
+        
         >>> eventString = "!!! COM: Beethoven, Ludwig van\n" + \
         ...               "!! Not really a piece by Beethoven\n" + \
         ...               "**kern\t**dynam\n" + \
@@ -390,7 +390,7 @@ class HumdrumDataCollection(object):
         returns a tuple of protoSpines and eventCollections in addition to
         setting it in the calling object.
         
-        >>> from music21 import *
+        
         >>> eventString = "!!!COM: Beethoven, Ludwig van\n" + \
         ...               "!! Not really a piece by Beethoven\n" + \
         ...               "**kern\t**dynam\n" + \
@@ -743,7 +743,7 @@ class SpineLine(HumdrumLine):
     Takes in a position (line number in file, excluding blank lines) 
     and a string of contents.
     
-    >>> from music21 import *
+    
     >>> hsl = humdrum.spineParser.SpineLine(
     ...         position = 7, contents="C4\t!local comment\t*M[4/4]\t.\n")
     >>> hsl.position
@@ -791,7 +791,7 @@ class GlobalReferenceLine(HumdrumLine):
         code:     non-whitespace code (usually three letters)
         value:    its value
 
-    >>> from music21 import *
+    
     >>> gr = humdrum.spineParser.GlobalReferenceLine(
     ...        position = 20, contents = "!!!COM: Stravinsky, Igor Fyodorovich\n")
     >>> gr.position
@@ -840,7 +840,7 @@ class GlobalCommentLine(HumdrumLine):
     The constructor can be passed (position, contents)
     if contents begins with bangs, they are removed along with up to one space directly afterwards
 
-    >>> from music21 import *
+    
     >>> com1 = humdrum.spineParser.GlobalCommentLine(
     ...          position = 4, contents='!! this comment is global')
     >>> com1.position
@@ -895,7 +895,7 @@ class HumdrumSpine(object):
     connection to each other.
     Each HumdrumSpine MUST have an id (numeric or string) attached to it.
 
-    >>> from music21 import *
+    
     >>> SE = humdrum.spineParser.SpineEvent
     >>> spineEvents = [SE('**kern'),SE('c,4'), SE('d#8')]
     >>> spine1Id = 5
@@ -1056,7 +1056,7 @@ class HumdrumSpine(object):
         humdrum measures contain extra information about barlines
         etc. and pickups are explicitly defined.
         
-        >>> from music21 import *
+        
         >>> s1 = stream.Stream()
         >>> s1.append(meter.TimeSignature('2/4'))
         >>> m1 = stream.Measure()
@@ -1368,7 +1368,7 @@ class SpineEvent(object):
     The `toNote()` method converts the contents into a music21 note as
     if it's kern -- useful to have in all spine types.
     
-    >>> from music21 import *
+    
     >>> se1 = humdrum.spineParser.SpineEvent('EEE-8')
     >>> se1.position = 40
     >>> se1.contents
@@ -1397,7 +1397,7 @@ class SpineEvent(object):
         parse the object as a \*\*kern note and return the a
         :class:`~music21.note.Note` object (or Rest, or Chord)
         
-        >>> from music21 import *
+        
         >>> se = humdrum.spineParser.SpineEvent('DD#4')
         >>> n = se.toNote()
         >>> n
@@ -1452,7 +1452,7 @@ class SpineCollection(object):
         
         Automatically sets the id of the Spine.
         
-        >>> from music21 import *
+        
         >>> hsc = humdrum.spineParser.SpineCollection()
         >>> newSpine = hsc.addSpine()
         >>> newSpine.id
@@ -1496,7 +1496,7 @@ class SpineCollection(object):
         '''
         deletes a spine from the SpineCollection (after inserting, integrating, etc.)
 
-        >>> from music21 import *
+        
         >>> hsc = humdrum.spineParser.SpineCollection()
         >>> newSpine = hsc.addSpine()
         >>> newSpine.id
@@ -1543,7 +1543,7 @@ class SpineCollection(object):
         '''
         assign an ID based on the instrument or just a string of a number if none
 
-        >>> from music21 import *
+        
         >>> hsc = humdrum.spineParser.SpineCollection()
         >>> newSpineDefault = hsc.addSpine()
         >>> newSpineDefault2 = hsc.addSpine()
@@ -1836,7 +1836,7 @@ class EventCollection(object):
     and ec2 is:
          D4     .
     
-    >>> from music21 import *
+    
     >>> SE = humdrum.spineParser.SpineEvent
     >>> eventList1 = [SE('C4'),SE('pp')]
     >>> eventList2 = [SE('D4'),SE('.')]
@@ -1903,7 +1903,7 @@ def hdStringToNote(contents):
     http://wiki.humdrum.org/index.php/Rational_rhythms
     are fully implemented:
 
-    >>> from music21 import *
+    
     >>> n = humdrum.spineParser.hdStringToNote("CC3%2")
     >>> n.duration.quarterLength
     2.6666666...
@@ -2254,7 +2254,7 @@ def kernTandemToObject(tandem):
     
     This method converts them to music21 objects.
     
-    >>> from music21 import *
+    
     >>> m = humdrum.spineParser.kernTandemToObject('*M3/1')
     >>> m
     <music21.meter.TimeSignature 3/1>
@@ -2366,7 +2366,7 @@ class SpineComment(base.Music21Object):
     '''
     A Music21Object that represents a comment in a single spine.
     
-    >>> from music21 import *
+    
     >>> sc = humdrum.spineParser.SpineComment('! this is a spine comment')
     >>> sc
     <music21.humdrum.spineParser.SpineComment "this is a spine comment">
@@ -2386,7 +2386,7 @@ class GlobalComment(base.Music21Object):
     '''
     A Music21Object that represents a comment for the whole score
     
-    >>> from music21 import *
+    
     >>> sc = humdrum.spineParser.GlobalComment('!! this is a global comment')
     >>> sc
     <music21.humdrum.spineParser.GlobalComment "this is a global comment">
@@ -2407,7 +2407,7 @@ class GlobalReference(base.Music21Object):
     '''
     A Music21Object that represents a reference in the score
     
-    >>> from music21 import *
+    
     >>> sc = humdrum.spineParser.GlobalReference('!!!REF:this is a global reference')
     >>> sc
     <music21.humdrum.spineParser.GlobalReference REF "this is a global reference">

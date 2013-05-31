@@ -66,7 +66,7 @@ def charToBinary(char):
     '''
     Convert a char into its binary representation. Useful for debugging. 
     
-    >>> from music21 import *
+    
     >>> midi.charToBinary('a')
     '01100001'
     '''
@@ -89,7 +89,7 @@ def intsToHexString(intList):
     '''
     Convert a list of integers into a hex string, suitable for testing MIDI encoding.
     
-    >>> from music21 import *
+    
     >>> # note on, middle c, 120 velocity
     >>> midi.intsToHexString([144, 60, 120])
     '\\x90<x'
@@ -118,7 +118,7 @@ def getNumber(midiStr, length):
     Note that MIDI uses big-endian for everything.
     This is the inverse of Python's chr() function.
 
-    >>> from music21 import *
+    
     >>> midi.getNumber('test', 0)
     (0, 'test')
     >>> midi.getNumber('test', 2)
@@ -143,7 +143,7 @@ def getVariableLengthNumber(midiStr):
     This necessary as DeltaTime times are given with variable size, 
     and thus may be if different numbers of characters are used.
 
-    >>> from music21 import *
+    
     >>> midi.getVariableLengthNumber('A-u')
     (65, '-u')
     >>> midi.getVariableLengthNumber('-u')
@@ -196,7 +196,7 @@ def getNumbersAsList(midiStr):
     Used for reading data messages where each byte encodes 
     a different discrete value. 
 
-    >>> from music21 import *
+    
     >>> midi.getNumbersAsList('\\x00\\x00\\x00\\x03')
     [0, 0, 0, 3]
     '''
@@ -209,7 +209,7 @@ def putNumber(num, length):
     '''
     Put a single number as a hex number at the end of a string `length` bytes long.
     
-    >>> from music21 import *
+    
     >>> midi.putNumber(3, 4)
     '\\x00\\x00\\x00\\x03'
     >>> midi.putNumber(0, 1)
@@ -223,7 +223,7 @@ def putNumber(num, length):
 
 def putVariableLengthNumber(x): 
     '''
-    >>> from music21 import *
+    
     >>> midi.putVariableLengthNumber(4)
     '\\x04'
     >>> midi.putVariableLengthNumber(127)
@@ -260,7 +260,7 @@ def putNumbersAsList(numList):
     Translate a list of numbers (0-255) into a character byte strings. 
     Used for encoding data messages where each byte encodes a different discrete value. 
 
-    >>> from music21 import *
+    
     >>> midi.putNumbersAsList([0, 0, 0, 3])
     '\\x00\\x00\\x00\\x03'
 
@@ -407,7 +407,7 @@ class MidiEvent(object):
     The `data` attribute is used for storing other messages, 
     such as SEQUENCE_TRACK_NAME string values. 
 
-    >>> from music21 import *
+    
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = "NOTE_ON"
@@ -522,7 +522,7 @@ class MidiEvent(object):
     
         The `bendRange` parameter gives the number of half steps in the bend range.
 
-        >>> from music21 import *
+        
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1.setPitchBend(50)
@@ -576,7 +576,7 @@ class MidiEvent(object):
         
     def _parseChannelVoiceMessage(self, midiStr):
         '''
-        >>> from music21 import *
+        
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> remainder = me1._parseChannelVoiceMessage(midi.intsToHexString([144, 60, 120]))
@@ -779,7 +779,7 @@ class MidiEvent(object):
         '''
         Return a boolean if this is a note-on message and velocity is not zero.
 
-        >>> from music21 import *
+        
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1.type = "NOTE_ON"
@@ -798,7 +798,7 @@ class MidiEvent(object):
         Return a boolean if this is should be interpreted as a note-off message, 
         either as a real note-off or as a note-on with zero velocity.
 
-        >>> from music21 import *
+        
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1.type = "NOTE_OFF"
@@ -825,7 +825,7 @@ class MidiEvent(object):
         '''
         Return a boolean if this is a DeltaTime subclass.
 
-        >>> from music21 import *
+        
         >>> mt = midi.MidiTrack(1)
         >>> dt = midi.DeltaTime(mt)
         >>> dt.isDeltaTime()
@@ -842,7 +842,7 @@ class MidiEvent(object):
         is a NOTE_ON message, and the other is a NOTE_OFF message
         for this pitch on this channel.  Otherwise returns False
 
-        >>> from music21 import *
+        
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1.type = "NOTE_ON"
@@ -896,7 +896,7 @@ class DeltaTime(MidiEvent):
     The `channel` attribute, inherited from MidiEvent is not used and set to None
     unless overridden (don't!).
 
-    >>> from music21 import *
+    
     >>> mt = midi.MidiTrack(1)
     >>> dt = midi.DeltaTime(mt)
     >>> dt.time = 380
@@ -930,7 +930,7 @@ class MidiTrack(object):
 
     TODO: Better Docs
 
-    >>> from music21 import *
+    
     >>> mt = midi.MidiTrack(0)
     
     '''
@@ -1099,7 +1099,7 @@ class MidiFile(object):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
 
         >>> import StringIO  # in python3.0 use "from io import StringIO"
-        >>> from music21 import *
+        
         >>> fileLikeOpen = StringIO.StringIO()
         >>> mf = midi.MidiFile()
         >>> mf.openFileLike(fileLikeOpen)

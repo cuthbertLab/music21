@@ -31,7 +31,7 @@ def labelBeatDepth(streamIn):
 
     This assumes that the Stream is already partitioned into Measures.
 
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> ts = meter.TimeSignature('4/4')
     >>> s.insert(0, ts)
@@ -88,7 +88,7 @@ def thomassenMelodicAccent(streamIn):
     
     Example from Thomassen, figure 5:
     
-    >>> from music21 import *
+    
     >>> s = converter.parse('c4 c c d e d d', '7/4')
     >>> analysis.metrical.thomassenMelodicAccent(s.flat.notes)
     >>> for n in s.flat.notes:

@@ -62,7 +62,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     For more information on mensural types, please see the documentation for :class:`music21.medren.generalMensuralNote`.
     If no mensural type is specified, it is assumed to be the same as the previous note. I.e., c(SB) B c d is a string of semibrevises. 
     
-    >>> from music21 import *
+    
     >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)')
     >>> tTNN.note.pitch
     <music21.pitch.Pitch A4>
@@ -72,7 +72,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     An additional stem may be added by specifying direction: S for a sidestem, D for a downstem, and an empty string to reset. 
     For example, adding [D] to a note string would add a downstem to that note. Stems must still follow the rules outlined in :meth:`music21.medren.MensuralNote.setStem()`.
     
-    >>> from music21 import *
+    
     >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SB)[S]')
     >>> tTNN.note.getStems()
     ['side']
@@ -85,7 +85,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     Valid orietations are L for left, R for right, and an empty string to reset. For example, adding {DL} to a note string would add a left flag to that note's downstem.
     Flags must still follow the rules outlined in :meth:`music21.medren.MensuralNote.setFlag()`.
     
-    >>> from music21 import *
+    
     >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM){UL}')
     >>> tTNN.note.getStems()
     ['up']
@@ -94,7 +94,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     
     Multiple flags may be added by placing a space between direction-orientation pairs, as shown in the following complex example:
     
-    >>> from music21 import *
+    
     >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM)[D]{UL DR}')
     >>> tTNN.note.getStems()
     ['up', 'down']
@@ -104,7 +104,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     
     5. It is also possible to create ligatures using the TinyTrecentoNotationNote class. Put all notes in a ligature within < and > symbols.
     
-    >>> from music21 import *
+    
     >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f g a g f >')
     >>> tTNN.note 
     <music21.medren.Ligature...>
@@ -131,7 +131,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     6. Separate objects in a TinyNotationStream by spaces. To add a mensural clef to the stream, add $, followed by the clef type (F or C) to the string. If the clef line on the staff is non-standard, include that after the type.
     For example, $F2 would indicate an F-clef on the second line of the staff. To add a divisione to a tiny notation stream, simply include the divisione abbreviation in the string. For example, .p. would indicate senaria perfecta.
     
-    >>> from music21 import *
+    
     >>> tTNS = trecento.notation.TinyTrecentoNotationStream('$C3 .p. c(SB) d e p d(B) <e d c>')
     >>> tTNS.show('text')
     {0.0} <music21.clef.MensuralClef>
@@ -385,7 +385,7 @@ class Divisione(meter.TimeSignature):
     Valid names are 'quaternaria', 'senaria imperfect', 'senaria perfecta', 'novenaria', 'octonaria', and 'duodenaria'.
     The corresponding symbols are '.q.', '.i.', '.p.', '.n.', '.o.', and '.d.'. 
     
-    >>> from music21 import *
+    
     >>> d = trecento.notation.Divisione('senaria imperfecta')
     >>> d.standardSymbol
     '.i.'
@@ -444,7 +444,7 @@ class Divisione(meter.TimeSignature):
     minimaPerBrevis = property(_getMinimaPerBrevis, _setMinimaPerBrevis, 
                                 doc = '''Used to get and set the number of minima in a 'measure' (the number of minima before a punctus occurs) under the given divisione.
                                 
-                                >>> from music21 import *
+                                
                                 >>> n = trecento.notation.Divisione('.n.')
                                 >>> n.minimaPerBrevis
                                 9
@@ -468,7 +468,7 @@ def convertTrecentoStream(inpStream, inpDiv = None):
     
     Anonymous, Se per dureça.  Padua, Biblioteca Universitaria, MS 1115.  Folio Ar.
     
-    >>> from music21 import *
+    
     >>> upperString = ".p. $C1 g(B) g(M) f e g f e p g(SB) f(SM) e d e(M) f p e(SB) e(SM) f e d(M) c p "
     >>> upperString += "d(SB) r e p f(M) e d e d c p d(SB) c(M) d c d p e(SB) r(M) g f e p g(SB) a(SM) g f e(M) d p "
     >>> upperString += "e(SB) f(SM) e d c(M) d e(L) a(SB) a p b(M) a g a g f p g f e f e f p "
@@ -707,7 +707,7 @@ class TranslateBrevisLength(object):
         and see that the second is more logical.  Note that the strength itself is meaningless
         except when compared to other possible lengths for the same notes.
         
-        >>> from music21 import *
+        
         >>> div = trecento.notation.Divisione('.n.')
         >>> names = ['SB', 'M', 'M', 'M', 'SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -786,7 +786,7 @@ class TranslateBrevisLength(object):
         lenRem =     input of the remaining SM in the measure. Gets updated and returned.
         shrinkable_indices = tuple of indices of elements able to take up slack (i.e. ending SB, or downstem SB)
         
-        >>> from music21 import *
+        
         >>> div = trecento.notation.Divisione('.n.')
         >>> names = ['SB', 'M', 'M', 'M', 'SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -845,7 +845,7 @@ class TranslateBrevisLength(object):
         cannot be determined without taking into account the context (e.g., semiminims, semibreves)
         then None is placed in that list.        
 
-        >>> from music21 import *
+        
         >>> div = trecento.notation.Divisione('.i.')
         >>> names = ['SB', 'M','SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -919,7 +919,7 @@ class TranslateBrevisLength(object):
         and the values are a list of indices in self.brevisLength (and unchangeableNoteLengthsList)
         which are those types...
 
-        >>> from music21 import *
+        
         >>> div = trecento.notation.Divisione('.n.')
         >>> names = ['SB', 'M', 'M', 'M', 'SB', 'M']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -1045,7 +1045,7 @@ class TranslateBrevisLength(object):
 
     def translateDivI(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
         '''
-        >>> from music21 import *
+        
         >>> div = trecento.notation.Divisione('.i.')
         >>> names = ['SB', 'M', 'SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -1098,7 +1098,7 @@ class TranslateBrevisLength(object):
 
     def translateDivN(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
         '''
-        >>> from music21 import *    
+            
         >>> div = trecento.notation.Divisione('.n.')
         >>> names = ['SB', 'M', 'M', 'M', 'SB', 'M']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -1228,7 +1228,7 @@ class TranslateBrevisLength(object):
 
     def translateDivPQ(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
         '''
-        >>> from music21 import *
+        
         >>> div = trecento.notation.Divisione('.q.')        
         >>> names = ['SB','SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]        
@@ -1461,7 +1461,7 @@ class TranslateBrevisLength(object):
 
     def translateDivOD(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
         '''
-        >>> from music21 import *
+        
         >>> div = trecento.notation.Divisione('.o.')
         >>> names = ['SB', 'SB', 'SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -1709,10 +1709,10 @@ class TranslateBrevisLength(object):
 
 def _allCombinations(combinationList, num):
     '''
-    >>> _allCombinations(['a', 'b'], 2)
+    >>> trecento.notation._allCombinations(['a', 'b'], 2)
     [[], ['b'], ['a', 'b'], ['a']]
 
-    >>> _allCombinations(['a', 'b', 'c'], 2)
+    >>> trecento.notation._allCombinations(['a', 'b', 'c'], 2)
     [[], ['c'], ['b', 'c'], ['b'], ['a', 'b'], ['a', 'c'], ['a']]
 
     '''

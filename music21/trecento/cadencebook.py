@@ -43,7 +43,7 @@ class TrecentoSheet(object):
     See the specialized subclasses below, esp. BallataSheet for more details.
 
 
-    >>> from music21 import *
+    
     >>> kyrieSheet = trecento.cadencebook.TrecentoSheet(sheetname = 'kyrie')
     >>> for thisKyrie in kyrieSheet:
     ...     print thisKyrie.title
@@ -114,7 +114,7 @@ class TrecentoSheet(object):
 
         Row 1 is a header, so makeWork(2) gives the first piece.
         
-        >>> from music21 import *
+        
         >>> ballataSheet = trecento.cadencebook.BallataSheet()
         >>> b = ballataSheet.makeWork(3)
         >>> print(b.title)
@@ -127,7 +127,7 @@ class TrecentoSheet(object):
         '''
         return the first work with TITLE in the work's title.  Case insensitive
         
-        >>> from music21 import *
+        
         >>> ballataSheet = trecento.cadencebook.BallataSheet()
         >>> farina = ballataSheet.workByTitle('farina')
         >>> print(farina.title)
@@ -168,7 +168,7 @@ class CacciaSheet(TrecentoSheet):
     2011-May: none encoded.
     
     
-    >>> from music21 import *
+    
     >>> cacciaSheet = trecento.cadencebook.CacciaSheet()
     '''
     
@@ -213,7 +213,7 @@ class GloriaSheet(TrecentoSheet):
     2011-August: all encoded except some very fragmentary pieces.
     
     
-    >>> from music21 import *
+    
     >>> cadenceSpreadSheet = trecento.cadencebook.GloriaSheet()
     >>> gloriaNo20 = cadenceSpreadSheet.makeWork(20)
     >>> incipit = gloriaNo20.incipit
@@ -296,7 +296,7 @@ class TrecentoCadenceWork(object):
     
     test just creating an empty TrecentoCadenceWork:
     
-    >>> from music21 import *
+    
     >>> tcw = trecento.cadencebook.TrecentoCadenceWork()
     '''
     beginSnippetPositions = [8]
@@ -360,7 +360,7 @@ class TrecentoCadenceWork(object):
         '''
         returns all snippets as a :class:`~music21.stream.Opus` object
 
-        >>> from music21 import *
+        
         >>> deduto = trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
         u'Deduto sey a quel'
@@ -420,7 +420,7 @@ class TrecentoCadenceWork(object):
         '''
         returns all snippets as a score chunk
 
-        >>> from music21 import *
+        
         >>> deduto = trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
         u'Deduto sey a quel'
@@ -493,7 +493,7 @@ class TrecentoCadenceWork(object):
         undefined
         
         
-        >>> from music21 import *
+        
         >>> bs = trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> accurIncipit = accur.incipit
@@ -516,7 +516,7 @@ class TrecentoCadenceWork(object):
         incipits of the piece.
 
 
-        >>> from music21 import *
+        
         >>> bs = trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> accurSnippets = accur.getOtherSnippets()
@@ -554,7 +554,7 @@ class TrecentoCadenceWork(object):
         gets a "snippet" which is a collection of up to 3 lines of music, a timeSignature
         and a description of the cadence.
 
-        >>> from music21 import *
+        
         >>> bs = trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> print(accur.getSnippetAtPosition(12))
@@ -579,7 +579,7 @@ class TrecentoCadenceWork(object):
         and returns a list of Streams and other information
         
         
-        >>> from music21 import *
+        
         >>> block1 = ['e4 f g a', 'g4 a b cc', '', 'no-cadence', '2/4']
         >>> bs = trecento.cadencebook.BallataSheet()
         >>> dummyPiece = bs.makeWork(2)
@@ -676,7 +676,7 @@ class TrecentoCadenceWork(object):
         Get all streams in the work as a List, losing association with
         the other polyphonic units.
         
-        >>> from music21 import *
+        
         >>> b = trecento.cadencebook.BallataSheet().makeWork(20)
         >>> sList = b.getAllStreams()
         >>> sList
@@ -697,7 +697,7 @@ class TrecentoCadenceWork(object):
         returns a nicely formatted string giving the page numbers in PMFC where the piece
         can be found
         
-        >>> bs = BallataSheet()
+        >>> bs = trecento.cadencebook.BallataSheet()
         >>> altroCheSospirar = bs.makeWork(4)
         >>> altroCheSospirar.title
         u'Altro che sospirar'

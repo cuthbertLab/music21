@@ -64,7 +64,7 @@ def makeLettersOnlyId(inputString):
     Takes an id and makes it purely letters by substituting
     letters for all other characters.
     
-    >>> from music21 import *
+    
     >>> print lily.translate.makeLettersOnlyId('rainbow123@@dfas')
     rainbowxyzmmdfas
     '''
@@ -198,7 +198,7 @@ class LilypondConverter(object):
         r'''
         get a proper lilypond text file for writing from a music21 object
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> print lily.translate.LilypondConverter().textFromMusic21Object(n)
         \version "2.13" 
@@ -267,7 +267,7 @@ class LilypondConverter(object):
         whose string representation accurately reflects all the Score objects
         in this Opus object.
 
-        >>> from music21 import *
+        
         >>> #_DOCS_SHOW fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
         >>> #_DOCS_SHOW lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW lpc.loadObjectFromOpus(fifeOpus, makeNotation = False)
@@ -311,10 +311,10 @@ class LilypondConverter(object):
         creates a filled topLevelObject (lily.lilyObjects.LyLilypondTop)
         whose string representation accurately reflects this Score object.
         
-        >>> from music21 import *
+        
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
-        >>> b = _getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
+        >>> b = lily.translate._getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
         >>> lpc.loadObjectFromScore(b)
         >>> #print lpc.topLevelObject
         '''
@@ -374,7 +374,7 @@ class LilypondConverter(object):
         with an identifier and {\stopStaff s1*n} (or s, whatever is needed for the duration)
         where n is the number of measures in the score.
         
-        >>> from music21 import *
+        
         >>> import copy
         
         Set up score:
@@ -512,7 +512,7 @@ class LilypondConverter(object):
         '''
         Creates a series of Spacer objects for the measures in a Stream Part.
               
-        >>> from music21 import *
+        
         >>> m1 = stream.Measure(converter.parse("a2.", "3/4"))
         >>> m2 = stream.Measure(converter.parse("b2.", "3/4"))
         >>> m3 = stream.Measure(converter.parse("a1", "4/4"))
@@ -561,10 +561,10 @@ class LilypondConverter(object):
         
         More complex example showing how the score can be set up with ossia parts...
         
-        >>> from music21 import *
+        
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
-        >>> b = _getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
+        >>> b = lily.translate._getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
         >>> lpPartsAndOssiaInit = lpc.lyPartsAndOssiaInitFromScore(b)
         >>> lpGroupedMusicList = lpc.lyGroupedMusicListFromScoreWithParts(b, scoreInit = lpPartsAndOssiaInit)
         >>> print lpGroupedMusicList
@@ -647,7 +647,7 @@ class LilypondConverter(object):
         This is a little bit of a hack. This should be switched over to using a 
         prefixed context thing with \new Lyric = "id" \with { } {}
 
-        >>> from music21 import *
+        
         >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r4 e4_world')
         >>> s.makeMeasures(inPlace = True)
         >>> s.id = 'helloWorld'
@@ -699,7 +699,7 @@ class LilypondConverter(object):
         Uses self.inWord to keep track of whether or not we're in the middle of
         a word.
         
-        >>> from music21 import *
+        
         >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r2 e2 f2_world')
         >>> s.makeMeasures(inPlace = True)
         >>> lyrics = s.lyrics()[1]  # get first verse (yes, 1 = first, not 0!)
@@ -749,7 +749,7 @@ class LilypondConverter(object):
         r'''
         returns a LySequentialMusic object from a stream
 
-        >>> from music21 import *
+        
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> lpc = lily.translate.LilypondConverter()
         >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(c)
@@ -782,7 +782,7 @@ class LilypondConverter(object):
         returns an LyPrefixCompositeMusic object from
         a stream (generally a part, but who knows...)
 
-        >>> from music21 import *
+        
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> c.staffLines = 4
         
@@ -856,9 +856,9 @@ class LilypondConverter(object):
         
         (should eventually replace the main Score parts finding tools)
         
-        >>> from music21 import *
+        
         >>> lpc = lily.translate.LilypondConverter()
-        >>> lpMusicList = lyo.LyMusicList()
+        >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
         >>> lpc.context.contents
         []
@@ -881,7 +881,7 @@ class LilypondConverter(object):
         >>> m = stream.Measure()
         >>> m.insert(0, v1)
         >>> m.insert(0, v2)
-        >>> lpMusicList = lyo.LyMusicList()
+        >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
         >>> lpc.appendObjectsToContextFromStream(m)
         >>> print lpc.context # internal spaces removed...
@@ -1033,7 +1033,7 @@ class LilypondConverter(object):
         appends lySimpleMusicFromNoteOrRest to the
         current context.
         
-        >>> from music21 import *
+        
         >>> n = note.Note("C#4")
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
@@ -1108,7 +1108,7 @@ class LilypondConverter(object):
         read-only property that returns a string of the lilypond representation of
         a note (or via subclassing, rest or chord)
         
-        >>> from music21 import *
+        
         >>> conv = lily.translate.LilypondConverter()
 
         >>> n0 = note.Note("D#5")
@@ -1161,9 +1161,9 @@ class LilypondConverter(object):
         Adds an LyEmbeddedScm object to the context's contents if the object's has a .beams
         attribute.
         
-        >>> from music21 import *
+        
         >>> lpc = lily.translate.LilypondConverter()
-        >>> lpMusicList = lyo.LyMusicList()
+        >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
         >>> lpc.context.contents
         []
@@ -1210,9 +1210,9 @@ class LilypondConverter(object):
         Adds an LyEmbeddedScm object to the context's contents if the object's stem direction
         is set (currrently, only "up" and "down" are supported).
         
-        >>> from music21 import *
+        
         >>> lpc = lily.translate.LilypondConverter()
-        >>> lpMusicList = lyo.LyMusicList()
+        >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
         >>> lpc.context.contents
         []
@@ -1236,7 +1236,7 @@ class LilypondConverter(object):
     def lySimpleMusicFromChord(self, chordObj):
         '''
         
-        >>> from music21 import *
+        
         >>> conv = lily.translate.LilypondConverter()
         >>> c1 = chord.Chord(["C#2", "E4", "D#5"])
         >>> c1.quarterLength = 3.5
@@ -1339,7 +1339,7 @@ class LilypondConverter(object):
         take a simple Duration (that is one with one DurationUnit
         object and return a LyMultipliedDuration object:
         
-        >>> from music21 import *
+        
         >>> d = duration.Duration(3)
         >>> lpc = lily.translate.LilypondConverter()
         >>> lyMultipliedDuration = lpc.lyMultipliedDurationFromDuration(d)
@@ -1390,7 +1390,7 @@ class LilypondConverter(object):
         converts a Clef object to a
         lilyObjects.LyEmbeddedScm object
         
-        >>> from music21 import *
+        
         >>> tc = clef.TrebleClef()
         >>> conv = lily.translate.LilypondConverter()
         >>> lpEmbeddedScm = conv.lyEmbeddedScmFromClef(tc)
@@ -1426,7 +1426,7 @@ class LilypondConverter(object):
         converts a Key or KeySignature object
         to a lilyObjects.LyEmbeddedScm object
 
-        >>> from music21 import *
+        
         >>> d = key.KeySignature(-1)
         >>> d.mode = 'minor'
         >>> conv = lily.translate.LilypondConverter()
@@ -1456,7 +1456,7 @@ class LilypondConverter(object):
         convert a :class:`~music21.meter.TimeSignature` object 
         to a lilyObjects.LyEmbeddedScm object
 
-        >>> from music21 import *
+        
         >>> ts = meter.TimeSignature('3/4')
         >>> conv = lily.translate.LilypondConverter()
         >>> print conv.lyEmbeddedScmFromTimeSignature(ts)
@@ -1503,7 +1503,7 @@ class LilypondConverter(object):
         in an lpPrefixCompositeMusic object which sets the times object to a particular
         fraction.
         
-        >>> from music21 import *
+        
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpc.context
         <music21.lily.lilyObjects.LyLilypondTop object at 0x...>
@@ -1622,7 +1622,7 @@ class LilypondConverter(object):
     def lyPrefixCompositeMusicFromRelatedVariants(self, variantList, activeSite = None, coloredVariants = False):
         r'''
 
-        >>> from music21 import *
+        
         >>> s1 = converter.parse("a4 a a a  a1", "4/4")
         >>> s2 = converter.parse("b4 b b b", "4/4")
         >>> s3 = converter.parse("c4 c c c", "4/4")
@@ -1856,7 +1856,7 @@ class LilypondConverter(object):
     def lyPrefixCompositeMusicFromVariant(self, variantObject, replacedElements, coloredVariants = False):
         r'''
         
-        >>> from music21 import *
+        
         >>> pstream = converter.parse("a4 b c d   e4 f g a", "4/4")
         >>> pstream.makeMeasures(inPlace = True)
         >>> p = stream.Part(pstream)
@@ -1890,7 +1890,7 @@ class LilypondConverter(object):
             {3.0} <music21.note.Note D>
 
         >>> print lpc.addedVariants
-        [u'london']
+        ['london']
         
         '''
         replacedElementsClef = replacedElements[0].getContextByClass('Clef')
@@ -2008,7 +2008,7 @@ class LilypondConverter(object):
         r'''
         returns a LyOssiaMusic object from a stream
 
-        >>> from music21 import *
+        
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> v = variant.Variant(c)
         >>> lpc = lily.translate.LilypondConverter()
@@ -2047,7 +2047,7 @@ class LilypondConverter(object):
         Returns a lilypond.lilyObjects.LyLilypondHeader object
         set with data from the metadata object
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata()
         >>> md.title = 'My Title'
         >>> md.alternativeTitle = 'My "sub"-title'
@@ -2092,7 +2092,7 @@ class LilypondConverter(object):
         
         uses self.currentMeasure
         
-        >>> from music21 import *
+        
         >>> lpc = lily.translate.LilypondConverter()
         >>> m = stream.Measure()
         >>> m.number = 2
@@ -2143,7 +2143,7 @@ class LilypondConverter(object):
 
         returns a scheme object or None if not needed
 
-        >>> from music21 import *
+        
         >>> m = stream.Measure()
         >>> m.append(meter.TimeSignature('3/4'))
         >>> m.paddingLeft = 2.0

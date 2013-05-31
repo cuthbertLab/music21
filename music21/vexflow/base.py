@@ -294,7 +294,7 @@ class UIDCounter(object):
     '''
     generic counter object for keeping track of the number of objects used.
     
-    >>> from music21 import *
+    
     >>> uidc = vexflow.UIDCounter(UIDStart = 20)
     >>> uidc.UID
     20
@@ -323,7 +323,7 @@ def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultSta
 	
 	They are strings because a Javascript function can be used in lieu of the number.
 	
-	>>> from music21 import *
+	
 	>>> vexflow.staffString()
 	'var stave = new Vex.Flow.Stave(10,0,500);'
 	
@@ -366,7 +366,7 @@ def fromObject(thisObject, mode='txt'):
 
     TODO: Unit Tests (one for each supportedMusic21Class)
 
-    >>> from music21 import *
+    
     >>> print vexflow.fromObject(note.Note('C4'))
     new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
     
@@ -432,7 +432,7 @@ def fromScore(thisScore, mode='txt'):
     '''
     Parses a music21 score into VexFlow code
 
-    >>> from music21 import *
+    
     >>> a = corpus.parse('bwv66.6')
     >>> #print vexflow.fromScore(a, mode='txt') 
     
@@ -449,7 +449,7 @@ def fromStream(thisStream, mode='txt'):
     Checks if it has parts. If so, parses like a Score.
     Otherwise, just flattens it and parses it like a Part
 
-    >>> from music21 import *
+    
     >>> #print vexflow.fromStream(tinyNotation.TinyNotationStream('c8 d8 e-4 dd4 cc2'), mode='txt')
     >>> #print vexflow.fromStream(tinyNotation.TinyNotationStream('C8 D8 E-4 d4 c2'), mode='txt')
     '''
@@ -465,7 +465,7 @@ def fromRest(thisRest, mode='txt'):
     '''
     Parses a music21 rest into VexFlow code
 
-    >>> from music21 import *
+    
     >>> a = note.Rest()
     >>> print vexflow.fromRest(a, mode='txt')
     new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})
@@ -511,7 +511,7 @@ def fromNote(thisNote, mode='txt'):
     '''
     Parses a music21 note into VexFlow string code
 
-    >>> from music21 import *
+    
     >>> print vexflow.fromNote(note.Note('C4'), mode='txt')
     new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
 
@@ -525,7 +525,7 @@ def fromChord(thisChord, mode='txt'):
     '''
     Parses a music21 chord into VexFlow code
 
-    >>> from music21 import *
+    
     >>> a = chord.Chord(['C3', 'E-3', 'G3', 'C4'])
     >>> print vexflow.fromChord(a, mode='txt')
     new Vex.Flow.StaveNote({keys: ["Cn/3", "Eb/3", "Gn/3", "Cn/4"], duration: "q"})
@@ -572,7 +572,7 @@ def fromPart(thisPart, mode='txt'):
     '''
     Parses a music21 part into VexFlow code
 
-    >>> from music21 import *
+    
     >>> a = corpus.parse('bwv66.6').parts[1]
     >>> textOut = vexflow.fromPart(a, mode='txt')
     '''
@@ -584,7 +584,7 @@ def fromMeasure(thisMeasure, mode='txt'):
     r'''
     Parses a music21 measure into VexFlow code
 
-    >>> from music21 import *
+    
     >>> b = corpus.parse('bwv1.6.mxl')
     >>> m = b.parts[0].measures(0,1)[2]
     >>> d = vexflow.fromMeasure(m)
@@ -608,7 +608,7 @@ def vexflowClefFromClef(music21clef):
     '''
     Given a music21 clef object, returns the vexflow clef
 
-    >>> from music21 import *
+    
     >>> vexflow.vexflowClefFromClef(clef.TrebleClef())
     'treble'
 
@@ -674,7 +674,7 @@ class VexflowObject(object):
         returns a string creating a new Vex.Flow.Voice with the number of beats
         at the current indentation level.
         
-        >>> from music21 import *
+        
         >>> vo = vexflow.VexflowObject()
         >>> print vo.getVoiceString(2.0).rstrip()
                 var voice = new Vex.Flow.Voice({
@@ -714,7 +714,7 @@ class VexflowObject(object):
         Currently supported modes are `txt` (returns the VexFlow code which can be used in conjunction with
         other VexFlow code) and `html` (returns standalone HTML code for displaying just this note.)
 
-        >>> from music21 import *
+        
         >>> n = note.Note('C-')
         >>> v = vexflow.VexflowNote(n)
         >>> v.generateCode('txt')
@@ -789,7 +789,7 @@ class VexflowObject(object):
         '''
         gets the Vexflow StemDirection String
         
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> vfn = vexflow.VexflowNote(n)
         >>> vfn.stemDirectionCode()
@@ -837,7 +837,7 @@ class VexflowObject(object):
         
         Currently Vexflow's layout engine only supports single dotted notes however!
         
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.duration.dots = 1
         >>> vn = vexflow.VexflowNote(n)
@@ -850,7 +850,7 @@ class VexflowObject(object):
         '''
         returns a string of Vexflow code if there is a fermata and '' if not
 
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.expressions.append(expressions.Fermata())
         >>> vn = vexflow.VexflowNote(n)
@@ -916,7 +916,7 @@ class VexflowObject(object):
         if clef is None then we look at self.clefContext for more information,
         otherwise treble is assumed.  Clef is a Vexflow clef name #TODO: CHANGE THIS!
         
-        >>> from music21 import *
+        
         >>> vfn1 = vexflow.VexflowNote(note.Note('C4'))
         >>> vfn1
         <music21.vexflow.base.VexflowNote object at 0x...>
@@ -981,7 +981,7 @@ class VexflowObject(object):
         '''
         Given a music21 Note (or Pitch) object, returns the vexflow duration
     
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> vfn = vexflow.VexflowNote(n)
         >>> vfn.vexflowDuration()
@@ -1014,28 +1014,49 @@ class VexflowNote(VexflowObject):
 
     TODO: __str__
 
-    >>> from music21 import *
-    >>> n = note.Note('C-')
-    >>> v = vexflow.VexflowNote(n)
-    >>> v.vexflowKey()
-    'Cb/4'
-    >>> v.vexflowDuration()
-    'q'
-    >>> v.vexflowCode()
-    'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
 
-    >>> n = tinyNotation.TinyNotationNote('c##2.').note
-    >>> n.stemDirection = 'up'
-    >>> v = VexflowNote(n)
-    >>> v.vexflowKey()
-    'C##/4'
-    >>> v.vexflowDuration()
-    'hd'
-    >>> v.stemDirectionCode()
-    'stem_direction: Vex.Flow.StaveNote.STEM_UP'
-    >>> v.vexflowCode()
-    'new Vex.Flow.StaveNote({keys: ["C##/4"], duration: "hd", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addDotToAll()'
+    ::
+
+        >>> n = note.Note('C-')
+        >>> v = vexflow.VexflowNote(n)
+        >>> v.vexflowKey()
+        'Cb/4'
+
+    ::
+
+        >>> v.vexflowDuration()
+        'q'
+
+    ::
+
+        >>> v.vexflowCode()
+        'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
+
+    ::
+
+        >>> n = tinyNotation.TinyNotationNote('c##2.').note
+        >>> n.stemDirection = 'up'
+        >>> v = vexflow.VexflowNote(n)
+        >>> v.vexflowKey()
+        'C##/4'
+
+    ::
+
+        >>> v.vexflowDuration()
+        'hd'
+
+
+        >>> v.stemDirectionCode()
+        'stem_direction: Vex.Flow.StaveNote.STEM_UP'
+
+    ::
+
+            >>> v.vexflowCode()
+        'new Vex.Flow.StaveNote({keys: ["C##/4"], duration: "hd", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addDotToAll()'
+
+    Return VexFlow note instance.
     '''
+
     def __init__(self, music21note = None, clef=None):
         '''
         music21note must be a :class:`music21.note.Note` object.
@@ -1151,7 +1172,7 @@ class VexflowRest(VexflowObject):
         '''
         Returns a string which is the generated the vexflow code needed to render this rest object
 
-        >>> from music21 import *
+        
         >>> r = note.Rest()
         >>> vr = vexflow.VexflowRest(r)
         >>> vr.vexflowCode()
@@ -1291,7 +1312,7 @@ class VexflowVoice(object):
         Creates the code to create a new voice object with the
         name stored in `self.voiceName`.
         
-        >>> from music21 import *
+        
         >>> s = stream.Measure()
         >>> s.append(note.Note('c4'))
         >>> s.append(note.Note('d4'))
@@ -1313,7 +1334,7 @@ class VexflowVoice(object):
         returns a list of all the notesAndRests in the originalMeasure
         represented as VexflowObjects
 
-        >>> from music21 import *
+        
         >>> s = stream.Measure()
         >>> s.append(note.Note('c4'))
         >>> s.append(note.Note('d4'))
@@ -1343,7 +1364,7 @@ class VexflowVoice(object):
         note the plural.  Generates an String that is a Javascript array
         of all the vexflow notes in a measure:
 
-        >>> from music21 import *
+        
         >>> s = stream.Measure()
         >>> s.append(note.Note('c4'))
         >>> s.append(note.Note('d4'))
@@ -1363,7 +1384,7 @@ class VexflowVoice(object):
         '''
         Returns a string that generates the code necessary to display this voice.
 
-        >>> from music21 import *
+        
         >>> s = stream.Measure()
         >>> s.append(note.Note('c4'))
         >>> s.append(note.Note('d4'))

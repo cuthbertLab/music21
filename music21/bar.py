@@ -49,14 +49,12 @@ def styleToMusicXMLBarStyle(value):
     essentially just changes the names of 'double' and 'final'
     to 'light-light' and 'light-heavy'
 
-
     Does not do error checking to make sure it's a valid name,
     since setting the style on a Barline object already does that.
     
-
-    >>> styleToMusicXMLBarStyle('final')
+    >>> bar.styleToMusicXMLBarStyle('final')
     'light-heavy'
-    >>> styleToMusicXMLBarStyle('regular')
+    >>> bar.styleToMusicXMLBarStyle('regular')
     'regular'
     '''
     if value.lower() in reverseBarStyleDict:
@@ -92,7 +90,7 @@ class Barline(base.Music21Object):
     Barlines are conventionally assigned to Measure objects 
     using the leftBarline and rightBarline attributes.
 
-    >>> from music21 import *
+    
     >>> bl = bar.Barline('double')
     >>> bl
     <music21.bar.Barline style=double>
@@ -143,7 +141,7 @@ class Barline(base.Music21Object):
     style = property(_getStyle, _setStyle, 
         doc = '''Get and set the Barline style property.
 
-        >>> from music21 import *
+        
         >>> b = bar.Barline()
         >>> b.style = 'tick'
         >>> b.style
@@ -180,7 +178,7 @@ class Repeat(repeat.RepeatMark, Barline):
     The `direction` parameter can be one of `start` or `end`.  A `end` followed by a `start`
     should be encoded as two `bar.Repeat` signs.
 
-    >>> from music21 import *
+    
     >>> rep = bar.Repeat(direction='end', times=3)
     >>> rep
     <music21.bar.Repeat direction=end times=3>

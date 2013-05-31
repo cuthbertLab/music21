@@ -45,7 +45,7 @@ def offsetToMidi(o):
     
     Returns an int.
     
-    >>> from music21 import *
+    
     >>> print defaults.ticksPerQuarter
     1024
     >>> midi.translate.offsetToMidi(20.5)
@@ -59,14 +59,14 @@ def durationToMidi(d):
     
     Depends on *defaults.ticksPerQuarter*, Returns an int.
     
-    >>> from music21 import *
+    
     >>> n = note.Note()
     >>> n.duration.type = 'half'
     >>> midi.translate.durationToMidi(n.duration)
     2048
     
     >>> d = duration.Duration()
-    >>> dReference = midiToDuration(1024, inputM21DurationObject = d)
+    >>> dReference = midi.translate.midiToDuration(1024, inputM21DurationObject=d)
     >>> dReference is d
     True
     >>> d.type
@@ -91,7 +91,7 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     as *inputM21DurationObject*
     
     
-    >>> from music21 import *
+    
     >>> d = midi.translate.midiToDuration(1024)
     >>> d
     <music21.duration.Duration 1.0>
@@ -241,7 +241,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     In this example, we start a NOTE_ON event at offset 1.0 that lasts for 2.0 quarter notes until we
     send a zero-velocity NOTE_ON (=NOTE_OFF) event for the same pitch.
 
-    >>> from music21 import *
+    
 
     >>> mt = midi.MidiTrack(1)
     >>> dt1 = midi.DeltaTime(mt)
@@ -333,7 +333,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     
     The `channel` can be specified, otherwise channel 1 is assumed.
 
-    >>> from music21 import *
+    
     >>> n1 = note.Note('C#4')
     >>> eventList = midi.translate.noteToMidiEvents(n1)
     >>> eventList
@@ -411,7 +411,7 @@ def noteToMidiFile(inputM21):
     Converts a single Music21 Note to an entire :class:`~music21.midi.base.MidiFile` object
     with one track, on channel 1.
 
-    >>> from music21 import *
+    
     >>> n1 = note.Note('C4')
     >>> n1.quarterLength = 6
     >>> mf = midi.translate.noteToMidiFile(n1)
@@ -461,7 +461,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     All DeltaTime objects except the first are ignored.
     
 
-    >>> from music21 import *
+    
     >>> mt = midi.MidiTrack(1)
 
     >>> dt1 = midi.DeltaTime(mt)
@@ -566,7 +566,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     
     See noteToMidiEvents above for more details.
 
-    >>> from music21 import *
+    
     >>> c = chord.Chord(['c3','g#4', 'b5'])
     >>> c.volume = volume.Volume(velocity=90)
     >>> c.volume.velocityIsRelative = False
@@ -712,7 +712,7 @@ def midiEventsToTimeSignature(eventList):
     '''
     Convert a single MIDI event into a music21 TimeSignature object.
 
-    >>> from music21 import *
+    
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = "TIME_SIGNATURE"
@@ -771,7 +771,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
 
     Returns a two-element list
 
-    >>> from music21 import *
+    
     >>> ts = meter.TimeSignature('5/4')
     >>> eventList = midi.translate.timeSignatureToMidiEvents(ts)
     >>> eventList[0]
@@ -808,7 +808,7 @@ def midiEventsToKeySignature(eventList):
     '''
     Convert a single MIDI event into a :class:`~music21.key.KeySignature` object.
 
-    >>> from music21 import *
+    
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = "KEY_SIGNATURE"
@@ -869,7 +869,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     where the first is an empty DeltaTime (unless includeDeltaTime is False) and the second
     is a KEY_SIGNATURE :class:`~music21.midi.base.MidiEvent`
 
-    >>> from music21 import *
+    
     >>> ks = key.KeySignature(2)
     >>> ks
     <music21.key.KeySignature of 2 sharps>
@@ -930,7 +930,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     r'''
     Given any TempoIndication, convert it to a MIDI tempo indication. 
 
-    >>> from music21 import *
+    
     >>> mm = tempo.MetronomeMark(number=90)
     >>> events = midi.translate.tempoToMidiEvents(mm)
     >>> events[0]
@@ -1380,7 +1380,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     '''
     Note that quantization takes place in stream.py since it's useful not just for MIDI.
 
-    >>> from music21 import *
+    
     >>> import os
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
     >>> mf = midi.MidiFile()
@@ -1848,7 +1848,7 @@ def streamToMidiFile(inputM21):
     '''
     Converts a Stream hierarchy into a :class:`~music21.midi.base.MidiFile` object.
     
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> n = note.Note('g#')
     >>> n.quarterLength = .5
@@ -1890,7 +1890,7 @@ def midiFilePathToStream(filePath, inputM21=None):
     return a :class:`~music21.stream.Score` object (or if inputM21 is passed in,
     use that object instead).
     
-    >>> from music21 import *
+    
     >>> import os #_DOCS_HIDE
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid') #_DOCS_HIDE
     >>> #_DOCS_SHOW fp = '/Users/test/music21/midi/testPrimitive/test05.mid'
@@ -1922,7 +1922,7 @@ def midiFileToStream(mf, inputM21=None):
     
     The `inputM21` object can specify an existing Stream (or Stream subclass) to fill.
 
-    >>> from music21 import *
+    
     >>> import os
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
     >>> mf = midi.MidiFile()

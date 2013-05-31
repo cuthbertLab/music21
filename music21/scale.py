@@ -35,7 +35,7 @@ scale step for pitch, and, for any given pitch ascend or descend to the
 next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 
 
->>> from music21 import *
+
 >>> sc1 = scale.MajorScale('a')
 >>> [str(p) for p in sc1.getPitches('g2', 'g4')]
 ['G#2', 'A2', 'B2', 'C#3', 'D3', 'E3', 'F#3', 'G#3', 'A3', 'B3', 'C#4', 'D4', 'E4', 'F#4']
@@ -113,7 +113,7 @@ class Scale(base.Music21Object):
         Given a data format as "other" (a ConcreteScale, Chord, Stream, List of Pitches, or single Pitch), 
         extract all unique Pitches using comparisonAttribute to test for them.
         
-        >>> from music21 import *
+        
         >>> pStrList = ['A4','D4','E4','F-4','D4','D5', 'A', 'D#4']
         >>> pList = [pitch.Pitch(p) for p in pStrList]
         >>> nList = [note.Note(p) for p in pStrList]
@@ -242,7 +242,7 @@ class AbstractScale(Scale):
 
     def __eq__(self, other):
         '''
-        >>> from music21 import *
+        
         >>> as1 = scale.AbstractScale()
         >>> as2 = scale.AbstractScale()
         >>> as1 == as2
@@ -279,7 +279,7 @@ class AbstractScale(Scale):
         
         Here we treat the augmented triad as a scale:
         
-        >>> from music21 import *
+        
         >>> p1 = pitch.Pitch("C4")
         >>> p2 = pitch.Pitch("E4")
         >>> p3 = pitch.Pitch("G#4")
@@ -361,7 +361,7 @@ class AbstractScale(Scale):
         
         Something like:
         
-        >>> from music21 import *
+        
         >>> pitchListStrs = "a b c d e f g a".split()
         >>> pitchList = [pitch.Pitch(p) for p in pitchListStrs]
         
@@ -488,7 +488,7 @@ class AbstractScale(Scale):
 
         Create an abstract pentatonic scale:
 
-        >>> from music21 import *
+        
         >>> pitchList = ["C#4","D#4","F#4","G#4","A#4"]
         >>> absc = scale.AbstractScale()
         >>> absc.buildNetworkFromPitches([pitch.Pitch(p) for p in pitchList])
@@ -614,7 +614,7 @@ class AbstractScale(Scale):
     def plot(self, *args, **keywords):
         '''Create and display a plot.
         '''
-#         >>> from music21 import *
+#         
 #         >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
 #         >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
 #         >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -652,7 +652,7 @@ class AbstractDiatonicScale(AbstractScale):
 
     def __eq__(self, other):
         '''
-        >>> from music21 import *
+        
         >>> as1 = scale.AbstractDiatonicScale('major')
         >>> as2 = scale.AbstractDiatonicScale('lydian')
         >>> as3 = scale.AbstractDiatonicScale('ionian')
@@ -676,7 +676,7 @@ class AbstractDiatonicScale(AbstractScale):
     def _buildNetwork(self, mode=None):
         '''Given sub-class dependent parameters, build and assign the BoundIntervalNetwork.
 
-        >>> from music21 import *
+        
         >>> sc = scale.AbstractDiatonicScale()
         >>> sc._buildNetwork('lydian')
         >>> [str(p) for p in sc.getRealization('f4', 1, 'f2', 'f6')]
@@ -794,7 +794,7 @@ class AbstractOctatonicScale(AbstractScale):
         '''
         Given sub-class dependent parameters, build and assign the BoundIntervalNetwork.
 
-        >>> from music21 import *
+        
         >>> sc = scale.AbstractDiatonicScale()
         >>> sc._buildNetwork('lydian')
         >>> [str(p) for p in sc.getRealization('f4', 1, 'f2', 'f6')] 
@@ -1225,7 +1225,7 @@ class ConcreteScale(Scale):
     Here we treat a diminished triad as a scale:
     
     
-    >>> from music21 import *
+    
     >>> myscale = scale.ConcreteScale(pitches = ["C4", "E-4", "G-4", "A4"])
     >>> myscale.getTonic()
     <music21.pitch.Pitch C4>
@@ -1238,7 +1238,7 @@ class ConcreteScale(Scale):
     A scale that lasts two octaves and uses quarter tones (D~)
     
     
-    >>> from music21 import *
+    
     >>> complexscale = scale.ConcreteScale(pitches = ["C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
     >>> complexscale.getTonic()
     <music21.pitch.Pitch C#3>
@@ -1307,7 +1307,7 @@ class ConcreteScale(Scale):
     isConcrete = property(_isConcrete, 
         doc = '''Return True if the scale is Concrete, that is, it has a defined Tonic. 
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale('c')
         >>> sc1.isConcrete
         True
@@ -1321,7 +1321,7 @@ class ConcreteScale(Scale):
     def __eq__(self, other):
         '''For concrete equality, the stored abstract objects must evaluate as equal, as well as local attributes. 
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale('c')
         >>> sc2 = scale.MajorScale('c')
         >>> sc3 = scale.MinorScale('c')
@@ -1381,7 +1381,7 @@ class ConcreteScale(Scale):
     name = property(_getName, 
         doc = '''Return or construct the name of this scale.
 
-        >>> from music21 import *
+        
         >>> sc = scale.DiatonicScale() # abstract, as no defined tonic
         >>> sc.name
         'Abstract diatonic'
@@ -1395,7 +1395,7 @@ class ConcreteScale(Scale):
     def getTonic(self):
         '''Return the tonic. 
 
-        >>> from music21 import *
+        
         >>> sc = scale.ConcreteScale(tonic = 'e-4')
         >>> sc.getTonic()
         <music21.pitch.Pitch E-4>
@@ -1411,7 +1411,7 @@ class ConcreteScale(Scale):
     abstract = property(_getAbstract, 
         doc='''Return the AbstractScale instance governing this ConcreteScale.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale('d')
         >>> sc2 = scale.MajorScale('b-')
         >>> sc1 == sc2
@@ -1432,7 +1432,7 @@ class ConcreteScale(Scale):
         note: it does not makes sense to transpose an abstract scale;
         thus, only concrete scales can be transposed.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale('C')
         >>> sc2 = sc1.transpose('p5')
         >>> sc2
@@ -1518,7 +1518,7 @@ class ConcreteScale(Scale):
     def romanNumeral(self, degree):
         '''Return a RomanNumeral object built on the specified scale degree.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale('a-4')
         >>> h1 = sc1.romanNumeral(1)
         >>> h1.root()
@@ -1609,7 +1609,7 @@ class ConcreteScale(Scale):
         '''
         Given a scale degree, return a deepcopy of the appropriate pitch. 
 
-        >>> from music21 import *
+        
         >>> sc = scale.MajorScale('e-')
         >>> sc.pitchFromDegree(2)
         <music21.pitch.Pitch F4>
@@ -1650,7 +1650,7 @@ class ConcreteScale(Scale):
         of all matches over the entire range. 
 
 
-        >>> from music21 import *
+        
         >>> sc = scale.MajorScale('e-')
         >>> sc.pitchesFromScaleDegrees([3,7])
         [<music21.pitch.Pitch G4>, <music21.pitch.Pitch D5>]
@@ -1678,7 +1678,7 @@ class ConcreteScale(Scale):
         Given two degrees, provide the interval as an interval.Interval object.
 
 
-        >>> from music21 import *
+        
         >>> sc = scale.MajorScale('e-')
         >>> sc.intervalBetweenDegrees(3, 7)
         <music21.interval.Interval P5>
@@ -1708,7 +1708,7 @@ class ConcreteScale(Scale):
         comparisonAttribute to `pitchClass`
         
 
-        >>> from music21 import *
+        
         >>> sc = scale.MajorScale('e-')
         >>> sc.getScaleDegreeFromPitch('e-2')
         1
@@ -1756,7 +1756,7 @@ class ConcreteScale(Scale):
         tuple of the degree of the scale and an accidental (or None) needed to get this
         pitch.
         
-        >>> from music21 import *
+        
         >>> cmaj = key.Key('C')
         >>> cmaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E'))
         (3, None)
@@ -1913,7 +1913,7 @@ class ConcreteScale(Scale):
         for altered notes.
          
          
-        >>> from music21 import *
+        
         >>> eflatMaj = key.Key('E-')
         >>> eflatMaj.solfeg(pitch.Pitch('G'))
         'mi'
@@ -1969,7 +1969,7 @@ class ConcreteScale(Scale):
         True, 'ascending', or 'descending'.
 
 
-        >>> from music21 import *
+        
         >>> sc = scale.MajorScale('e-')
         >>> print(sc.next('e-5'))
         F5
@@ -1988,7 +1988,7 @@ class ConcreteScale(Scale):
         <music21.pitch.Pitch G5>
 
 
-        >>> from music21 import *
+        
         >>> sc = scale.HarmonicMinorScale('g')
         >>> sc.next('g4', 'descending')
         <music21.pitch.Pitch F#4>
@@ -2041,7 +2041,7 @@ class ConcreteScale(Scale):
         getNeighbor=True, comparisonAttribute='name'):
         '''Given another pitch, as well as an origin and a direction, determine if this other pitch is in the next in the scale.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale('g')
         >>> sc1.isNext('d4', 'c4', 'ascending')
         True
@@ -2075,7 +2075,7 @@ class ConcreteScale(Scale):
         (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), 
         return a named dictionary of pitch lists with keys 'matched' and 'notMatched'.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale('g')
         >>> sc2 = scale.MajorScale('d')
         >>> sc3 = scale.MajorScale('a')
@@ -2125,7 +2125,7 @@ class ConcreteScale(Scale):
         a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), 
         return a list of pitches that are found in this Scale but are not found in the provided object. 
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale('g4')
         >>> [str(p) for p in sc1.findMissing(['d'])]
         ['G4', 'A4', 'B4', 'C5', 'E5', 'F#5', 'G5']
@@ -2155,7 +2155,7 @@ class ConcreteScale(Scale):
 
         If you are working with Diatonic Scales, you will probably want to change the `comparisonAttribute` to `name`.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale()
         >>> sc1.deriveRanked(['c', 'e', 'b'])
         [(3, <music21.scale.MajorScale G major>), (3, <music21.scale.MajorScale C major>), (2, <music21.scale.MajorScale B major>), (2, <music21.scale.MajorScale A major>)]
@@ -2214,7 +2214,7 @@ class ConcreteScale(Scale):
         How the "closest-matching" scale is defined still needs to be
         refined and will probably change in the future.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale()
         >>> sc1.derive(['c#', 'e', 'g#'])
         <music21.scale.MajorScale B major>
@@ -2247,7 +2247,7 @@ class ConcreteScale(Scale):
         If you are working with Diatonic Scales, you will 
         probably want to change the `comparisonAttribute` to `name`.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale()
         >>> sc1.deriveAll(['c', 'e', 'b'])
         [<music21.scale.MajorScale G major>, <music21.scale.MajorScale C major>]
@@ -2294,7 +2294,7 @@ class ConcreteScale(Scale):
 
         Find a major scale with C as the 7th degree:
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale()
         >>> sc1.deriveByDegree(7, 'c')
         <music21.scale.MajorScale D- major>
@@ -2372,7 +2372,7 @@ class DiatonicScale(ConcreteScale):
         '''
         Return the tonic of the diatonic scale. 
 
-        >>> from music21 import *
+        
         >>> sc = scale.MajorScale('e-')
         >>> sc.getTonic()
         <music21.pitch.Pitch E-4>
@@ -2396,7 +2396,7 @@ class DiatonicScale(ConcreteScale):
         '''
         Return the dominant. 
 
-        >>> from music21 import *
+        
         >>> sc = scale.MajorScale('e-')
         >>> sc.getDominant()
         <music21.pitch.Pitch B-4>
@@ -2411,7 +2411,7 @@ class DiatonicScale(ConcreteScale):
         '''
         Return the leading tone. 
 
-        >>> from music21 import *
+        
         >>> sc = scale.MinorScale('c')
         >>> sc.getLeadingTone()
         <music21.pitch.Pitch B4>
@@ -2437,7 +2437,7 @@ class DiatonicScale(ConcreteScale):
         Return a parallel minor scale based on this 
         concrete scale.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale(pitch.Pitch('a'))
         >>> [str(p) for p in sc1.pitches]
         ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5']
@@ -2457,7 +2457,7 @@ class DiatonicScale(ConcreteScale):
     def getParallelMajor(self):
         '''Return a concrete relative major scale
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MinorScale(pitch.Pitch('g'))
         >>> [str(p) for p in sc1.pitches]
         ['G4', 'A4', 'B-4', 'C5', 'D5', 'E-5', 'F5', 'G5']
@@ -2474,7 +2474,7 @@ class DiatonicScale(ConcreteScale):
         '''
         Return a relative minor scale based on this concrete scale.
 
-        >>> from music21 import *
+        
         >>> sc1 = scale.MajorScale(pitch.Pitch('a'))
         >>> [str(p) for p in sc1.pitches]
         ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5']
@@ -2489,7 +2489,7 @@ class DiatonicScale(ConcreteScale):
         '''
         Return a concrete relative major scale
 
-        >>> from music21 import *
+        
 
         >>> sc1 = scale.MinorScale(pitch.Pitch('g'))
         >>> [str(p) for p in sc1.pitches]
@@ -2518,7 +2518,7 @@ class DiatonicScale(ConcreteScale):
 class MajorScale(DiatonicScale):
     '''A Major Scale
 
-    >>> sc = MajorScale(pitch.Pitch('d'))
+    >>> sc = scale.MajorScale(pitch.Pitch('d'))
     >>> sc.pitchFromDegree(7).name
     'C#'
     '''
@@ -2533,7 +2533,7 @@ class MajorScale(DiatonicScale):
 class MinorScale(DiatonicScale):
     '''A natural minor scale, or the Aeolian mode.
 
-    >>> sc = MinorScale(pitch.Pitch('g'))
+    >>> sc = scale.MinorScale(pitch.Pitch('g'))
     >>> [str(p) for p in sc.pitches]
     ['G4', 'A4', 'B-4', 'C5', 'D5', 'E-5', 'F5', 'G5']
     '''
@@ -2546,7 +2546,7 @@ class MinorScale(DiatonicScale):
 class DorianScale(DiatonicScale):
     '''A natural minor scale, or the Aeolian mode.
 
-    >>> sc = DorianScale(pitch.Pitch('d'))
+    >>> sc = scale.DorianScale(pitch.Pitch('d'))
     >>> [str(p) for p in sc.pitches]
     ['D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5']
     '''
@@ -2559,7 +2559,7 @@ class DorianScale(DiatonicScale):
 class PhrygianScale(DiatonicScale):
     '''A phrygian scale
 
-    >>> sc = PhrygianScale(pitch.Pitch('e'))
+    >>> sc = scale.PhrygianScale(pitch.Pitch('e'))
     >>> [str(p) for p in sc.pitches]
     ['E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5']
     '''
@@ -2572,11 +2572,11 @@ class PhrygianScale(DiatonicScale):
 class LydianScale(DiatonicScale):
     '''A lydian scale
 
-    >>> sc = LydianScale(pitch.Pitch('f'))
+    >>> sc = scale.LydianScale(pitch.Pitch('f'))
     >>> [str(p) for p in sc.pitches]
     ['F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5']
 
-    >>> sc = LydianScale(pitch.Pitch('c'))
+    >>> sc = scale.LydianScale(pitch.Pitch('c'))
     >>> [str(p) for p in sc.pitches]
     ['C4', 'D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C5']
     '''
@@ -2588,11 +2588,11 @@ class LydianScale(DiatonicScale):
 class MixolydianScale(DiatonicScale):
     '''A mixolydian scale
 
-    >>> sc = MixolydianScale(pitch.Pitch('g'))
+    >>> sc = scale.MixolydianScale(pitch.Pitch('g'))
     >>> [str(p) for p in sc.pitches]
     ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5']
 
-    >>> sc = MixolydianScale(pitch.Pitch('c'))
+    >>> sc = scale.MixolydianScale(pitch.Pitch('c'))
     >>> [str(p) for p in sc.pitches]
     ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B-4', 'C5']
     '''
@@ -2605,10 +2605,10 @@ class MixolydianScale(DiatonicScale):
 class HypodorianScale(DiatonicScale):
     '''A hypodorian scale
 
-    >>> sc = HypodorianScale(pitch.Pitch('d'))
+    >>> sc = scale.HypodorianScale(pitch.Pitch('d'))
     >>> [str(p) for p in sc.pitches]
     ['A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4']
-    >>> sc = HypodorianScale(pitch.Pitch('c'))
+    >>> sc = scale.HypodorianScale(pitch.Pitch('c'))
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B-3', 'C4', 'D4', 'E-4', 'F4', 'G4']
     '''
@@ -2621,7 +2621,7 @@ class HypodorianScale(DiatonicScale):
 class HypophrygianScale(DiatonicScale):
     '''A hypophrygian scale
 
-    >>> sc = HypophrygianScale(pitch.Pitch('e'))
+    >>> sc = scale.HypophrygianScale(pitch.Pitch('e'))
     >>> sc.abstract.octaveDuplicating
     True
     >>> [str(p) for p in sc.pitches]
@@ -2642,10 +2642,10 @@ class HypophrygianScale(DiatonicScale):
 class HypolydianScale(DiatonicScale):
     '''A hypolydian scale
 
-    >>> sc = HypolydianScale(pitch.Pitch('f'))
+    >>> sc = scale.HypolydianScale(pitch.Pitch('f'))
     >>> [str(p) for p in sc.pitches]
     ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5']
-    >>> sc = HypolydianScale(pitch.Pitch('c'))
+    >>> sc = scale.HypolydianScale(pitch.Pitch('c'))
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4']
     '''
@@ -2658,10 +2658,10 @@ class HypolydianScale(DiatonicScale):
 class HypomixolydianScale(DiatonicScale):
     '''A hypolydian scale
 
-    >>> sc = HypomixolydianScale(pitch.Pitch('g'))
+    >>> sc = scale.HypomixolydianScale(pitch.Pitch('g'))
     >>> [str(p) for p in sc.pitches]
     ['D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5']
-    >>> sc = HypomixolydianScale(pitch.Pitch('c'))
+    >>> sc = scale.HypomixolydianScale(pitch.Pitch('c'))
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B-3', 'C4', 'D4', 'E4', 'F4', 'G4']
     '''
@@ -2674,11 +2674,11 @@ class HypomixolydianScale(DiatonicScale):
 class LocrianScale(DiatonicScale):
     '''A locrian scale
 
-    >>> sc = LocrianScale(pitch.Pitch('b'))
+    >>> sc = scale.LocrianScale(pitch.Pitch('b'))
     >>> [str(p) for p in sc.pitches]
     ['B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5']
 
-    >>> sc = LocrianScale(pitch.Pitch('c'))
+    >>> sc = scale.LocrianScale(pitch.Pitch('c'))
     >>> [str(p) for p in sc.pitches]
     ['C4', 'D-4', 'E-4', 'F4', 'G-4', 'A-4', 'B-4', 'C5']
     '''
@@ -2691,11 +2691,11 @@ class LocrianScale(DiatonicScale):
 class HypolocrianScale(DiatonicScale):
     '''A hypolocrian scale
 
-    >>> sc = HypolocrianScale(pitch.Pitch('b'))
+    >>> sc = scale.HypolocrianScale(pitch.Pitch('b'))
     >>> [str(p) for p in sc.pitches]
     ['F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5']
 
-    >>> sc = HypolocrianScale(pitch.Pitch('c'))
+    >>> sc = scale.HypolocrianScale(pitch.Pitch('c'))
     >>> [str(p) for p in sc.pitches]
     ['G-3', 'A-3', 'B-3', 'C4', 'D-4', 'E-4', 'F4', 'G-4']
     '''
@@ -2708,11 +2708,11 @@ class HypolocrianScale(DiatonicScale):
 class HypoaeolianScale(DiatonicScale):
     '''A hypoaeolian scale
 
-    >>> sc = HypoaeolianScale(pitch.Pitch('a'))
+    >>> sc = scale.HypoaeolianScale(pitch.Pitch('a'))
     >>> [str(p) for p in sc.pitches]
     ['E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5']
 
-    >>> sc = HypoaeolianScale(pitch.Pitch('c'))
+    >>> sc = scale.HypoaeolianScale(pitch.Pitch('c'))
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A-3', 'B-3', 'C4', 'D4', 'E-4', 'F4', 'G4']
     '''
@@ -2731,7 +2731,7 @@ class HypoaeolianScale(DiatonicScale):
 class HarmonicMinorScale(DiatonicScale):
     '''A harmonic minor scale
 
-    >>> sc = HarmonicMinorScale('e4')
+    >>> sc = scale.HarmonicMinorScale('e4')
     >>> [str(p) for p in sc.pitches]
     ['E4', 'F#4', 'G4', 'A4', 'B4', 'C5', 'D#5', 'E5']
     >>> sc.getTonic()
@@ -2741,7 +2741,7 @@ class HarmonicMinorScale(DiatonicScale):
     >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
     <music21.pitch.Pitch E4>
 
-    >>> sc = HarmonicMinorScale()
+    >>> sc = scale.HarmonicMinorScale()
     >>> sc.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
     [(3, <music21.scale.HarmonicMinorScale F harmonic minor>), (3, <music21.scale.HarmonicMinorScale E harmonic minor>), (2, <music21.scale.HarmonicMinorScale B harmonic minor>), (2, <music21.scale.HarmonicMinorScale A harmonic minor>)]    
     '''
@@ -2761,7 +2761,7 @@ class HarmonicMinorScale(DiatonicScale):
 class MelodicMinorScale(DiatonicScale):
     '''A melodic minor scale
 
-    >>> sc = MelodicMinorScale('e4')
+    >>> sc = scale.MelodicMinorScale('e4')
     '''
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
@@ -2790,7 +2790,7 @@ class OctatonicScale(ConcreteScale):
 class OctaveRepeatingScale(ConcreteScale):
     '''A concrete cyclical scale, based on a cycle of intervals. These intervals do not have to be octave completing, and thus may produce scales that do no
 
-    >>> from music21 import *
+    
     >>> sc = scale.OctaveRepeatingScale('c4', ['m3', 'M3']) #
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>, 
@@ -2815,7 +2815,7 @@ class OctaveRepeatingScale(ConcreteScale):
 class CyclicalScale(ConcreteScale):
     '''A concrete cyclical scale, based on a cycle of intervals. These intervals do not have to be octave completing, and thus may produce scales that do no
 
-    >>> from music21 import *
+    
     >>> sc = scale.CyclicalScale('c4', 'p5') # can give one list
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>]
@@ -2837,7 +2837,7 @@ class CyclicalScale(ConcreteScale):
 class ChromaticScale(ConcreteScale):
     '''A concrete cyclical scale, based on a cycle of half steps. These intervals do not have to be octave completing, and thus may produce scales that do no
 
-    >>> from music21 import *
+    
     >>> sc = scale.ChromaticScale('g2') 
     >>> [str(p) for p in sc.pitches]
     ['G2', 'A-2', 'A2', 'B-2', 'B2', 'C3', 'C#3', 'D3', 'E-3', 'E3', 'F3', 'F#3', 'G3']
@@ -2872,7 +2872,7 @@ class ChromaticScale(ConcreteScale):
 class WholeToneScale(ConcreteScale):
     '''A concrete whole-tone scale. 
 
-    >>> from music21 import *
+    
     >>> sc = scale.WholeToneScale('g2') 
     >>> [str(p) for p in sc.pitches]
     ['G2', 'A2', 'B2', 'C#3', 'D#3', 'E#3', 'G3']
@@ -2903,7 +2903,7 @@ class WholeToneScale(ConcreteScale):
 class SieveScale(ConcreteScale):
     '''A scale created from a Xenakis sieve logical string, based on the :class:`~music21.sieve.Sieve` object definition. The complete period of the sieve is realized as intervals and used to create a scale. 
 
-    >>> from music21 import *
+    
     >>> sc = scale.SieveScale('c4', '3@0') 
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>]
@@ -2951,7 +2951,7 @@ class ScalaScale(ConcreteScale):
     path to a Scala .scl file, or a raw string representation, can be used. 
 
 
-    >>> sc = ScalaScale('g4', 'mbira banda')
+    >>> sc = scale.ScalaScale('g4', 'mbira banda')
     >>> [str(p) for p in sc.pitches]
     ['G4', 'A4(-15c)', 'B4(-11c)', 'C#5(-7c)', 'D~5(+6c)', 'E5(+14c)', 'F~5(+1c)', 'A-5(+2c)']
 
@@ -2961,7 +2961,7 @@ class ScalaScale(ConcreteScale):
     set the tonic to C4
 
 
-    >>> sc = ScalaScale('pelog_9')
+    >>> sc = scale.ScalaScale('pelog_9')
     >>> [str(p) for p in sc.pitches]
     ['C4', 'D`4(-17c)', 'D~4(+17c)', 'F~4(-17c)', 'G`4(+17c)', 'A-4', 'A~4(-17c)', 'C5']
 
@@ -2969,7 +2969,7 @@ class ScalaScale(ConcreteScale):
     If no scale with that name can be found then it raises an exception:
 
 
-    >>> sc = ScalaScale('badFileName.scl')
+    >>> sc = scale.ScalaScale('badFileName.scl')
     Traceback (most recent call last):
     ScaleException: Could not find a file named badFileName.scl in the scala database
 
@@ -3015,7 +3015,7 @@ class ScalaScale(ConcreteScale):
 class RagAsawari(ConcreteScale):
     '''A concrete pseudo-raga scale. 
 
-    >>> from music21 import *
+    
     >>> sc = scale.RagAsawari('c2') 
     >>> [str(p) for p in sc.pitches]
     ['C2', 'D2', 'F2', 'G2', 'A-2', 'C3']
@@ -3033,7 +3033,7 @@ class RagAsawari(ConcreteScale):
 class RagMarwa(ConcreteScale):
     '''A concrete pseudo-raga scale. 
 
-    >>> from music21 import *
+    
     >>> sc = scale.RagMarwa('c2') 
     
     this gets a pitch beyond the terminus b/c of descending form max
@@ -3057,7 +3057,7 @@ class RagMarwa(ConcreteScale):
 class WeightedHexatonicBlues(ConcreteScale):
     '''A concrete scale based on a dynamic mixture of a minor pentatonic and the hexatonic blues scale.
 
-    >>> from music21 import *
+    
     '''
 
     def __init__(self, tonic=None):

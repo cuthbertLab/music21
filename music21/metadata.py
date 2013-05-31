@@ -15,7 +15,7 @@ The :class:`~music21.metadata.Metadata` object is the main public interface to m
 
 The following example creates a :class:`~music21.stream.Stream` object, adds a :class:`~music21.note.Note` object, and configures and adds the :attr:`~music21.metadata.Metadata.title` and :attr:`~music21.metadata.Metadata.composer` properties of a Metadata object. 
 
->>> from music21 import *
+
 >>> s = stream.Stream()
 >>> s.append(note.Note())
 >>> s.insert(metadata.Metadata())
@@ -61,7 +61,7 @@ UNCERTAIN = ['?', 'z']
 def errorToSymbol(value):
     '''Convert an error string (appoximate, uncertain) into a symbol.
 
-    >>> from music21 import *
+    
     >>> metadata.errorToSymbol('approximate')
     '~'
     >>> metadata.errorToSymbol('uncertain')
@@ -103,7 +103,7 @@ ROLES = roleAbbreviationsDict.values()
 def abbreviationToRole(value):
     '''Get ROLE_ABBREVIATIONS as string-like attributes, used for Contributors. 
 
-    >>> from music21 import *
+    
     >>> metadata.abbreviationToRole('com')
     'composer'
     >>> metadata.abbreviationToRole('lib')
@@ -121,7 +121,7 @@ def abbreviationToRole(value):
 def roleToAbbreviation(value):
     '''Get a role id from a string representation.
 
-    >>> from music21 import *
+    
     >>> metadata.roleToAbbreviation('composer')
     'com'
     >>> for n in metadata.ROLES:
@@ -194,7 +194,7 @@ WORK_IDS = workIdAbbreviationDict.values()
 def abbreviationToWorkId(value):
     '''Get work id abbreviations.
 
-    >>> from music21 import *
+    
     >>> metadata.abbreviationToWorkId('otl')
     'title'
     >>> for id in metadata.WORK_ID_ABBREVIATIONS: 
@@ -209,7 +209,7 @@ def abbreviationToWorkId(value):
 def workIdToAbbreviation(value):
     '''Get a work abbreviation from a string representation.
 
-    >>> from music21 import *
+    
     >>> metadata.workIdToAbbreviation('localeOfComposition')
     'opc'
     >>> for n in metadata.WORK_IDS:
@@ -246,7 +246,7 @@ class Text(object):
     def __init__(self, data='', language=None):
         '''
         
-        >>> from music21 import *
+        
         >>> td = metadata.Text('concerto in d', 'en')
         >>> str(td)
         'concerto in d'
@@ -276,7 +276,7 @@ class Text(object):
     language = property(_getLanguage, _setLanguage, 
         doc = '''Set the language of the Text stored within.
 
-        >>> from music21 import *
+        
         >>> t = metadata.Text('my text')
         >>> t.language = 'en'
         >>> t.language  
@@ -286,7 +286,7 @@ class Text(object):
     def getNormalizedArticle(self):
         '''Return a string representation with normalized articles.
 
-        >>> from music21 import *
+        
         >>> td = metadata.Text('Ale is Dear, The', 'en')
         >>> str(td)
         'Ale is Dear, The'
@@ -315,7 +315,7 @@ class Date(object):
     '''
     def __init__(self, *args, **keywords):
         '''
-        >>> from music21 import *
+        
         >>> a = metadata.Date(year=1843, yearError='approximate')
         >>> a.year
         1843
@@ -363,7 +363,7 @@ class Date(object):
     def _stripError(self, value):
         '''Strip error symbols from a numerical value. Return cleaned source and sym. Only one error symbol is expected per string.
 
-        >>> from music21 import *
+        
         >>> d = metadata.Date()
         >>> d._stripError('1247~')
         ('1247', 'approximate')
@@ -401,7 +401,7 @@ class Date(object):
     hasTime = property(_getHasTime, 
         doc = '''Return True if any time elements are defined.
 
-        >>> from music21 import *
+        
         >>> a = metadata.Date(year=1843, month=3, day=3)
         >>> a.hasTime
         False
@@ -419,7 +419,7 @@ class Date(object):
     hasError = property(_getHasError, 
         doc = '''Return True if any data points have error defined. 
 
-        >>> from music21 import *
+        
         >>> a = metadata.Date(year=1843, month=3, day=3, dayError='approximate')
         >>> a.hasError
         True
@@ -431,7 +431,7 @@ class Date(object):
     def __str__(self):
         '''Return a string representation, including error if defined. 
 
-        >>> from music21 import *
+        
         >>> d = metadata.Date()
         >>> d.loadStr('3030?/12~/?4')
         >>> str(d)
@@ -468,7 +468,7 @@ class Date(object):
         
         Assume year/month/day/hour:minute:second
 
-        >>> from music21 import *
+        
         >>> d = metadata.Date()
         >>> d.loadStr('3030?/12~/?4')
         >>> d.month, d.monthError
@@ -512,7 +512,7 @@ class Date(object):
     def loadDatetime(self, dt):
         '''Load time data from a datetime object.
 
-        >>> from music21 import *
+        
         >>> import datetime
         >>> dt = datetime.datetime(2005, 02, 01)
         >>> dt
@@ -533,7 +533,7 @@ class Date(object):
     def loadOther(self, other):
         '''Load values based on another Date object:
 
-        >>> from music21 import *
+        
         >>> a = metadata.Date(year=1843, month=3, day=3)
         >>> b = metadata.Date()
         >>> b.loadOther(a)
@@ -547,7 +547,7 @@ class Date(object):
     def load(self, value):
         '''Load values by string, datetime object, or Date object.
 
-        >>> from music21 import *
+        
         >>> a = metadata.Date(year=1843, month=3, day=3)
         >>> b = metadata.Date()
         >>> b.load(a)
@@ -567,7 +567,7 @@ class Date(object):
     def _getDatetime(self):
         '''Get a datetime object from a metadata.Date() object
 
-        >>> from music21 import *
+        
         >>> a = metadata.Date(year=1843, month=3, day=3)
         >>> str(a)
         '1843/03/03'
@@ -610,7 +610,7 @@ class DateSingle(object):
 
     def __init__(self, data='', relevance='certain'):
         '''
-        >>> from music21 import *
+        
         >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
         >>> str(dd)
         '2009/12/31'
@@ -661,7 +661,7 @@ class DateSingle(object):
     def _getDatetime(self):
         '''Get a datetime object.
 
-        >>> from music21 import *
+        
         >>> a = metadata.DateSingle('1843/03/03')
         >>> str(a)
         '1843/03/03'
@@ -685,7 +685,7 @@ class DateRelative(DateSingle):
 
     def __init__(self, data='', relevance='after'):
         '''
-        >>> from music21 import *
+        
         >>> dd = metadata.DateRelative('2009/12/31', 'prior')
         >>> str(dd)
         '2009/12/31'
@@ -714,7 +714,7 @@ class DateBetween(DateSingle):
 
     def __init__(self, data=[], relevance='between'):
         '''
-        >>> from music21 import *
+        
         >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'])
         >>> str(dd)
         '2009/12/31 to 2010/01/28'
@@ -761,7 +761,7 @@ class DateSelection(DateSingle):
 
     def __init__(self, data='', relevance='or'):
         '''
-        >>> from music21 import *
+        
         >>> dd = metadata.DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')
         >>> str(dd)
         '2009/12/31 or 2010/01/28 or 1894/01/28'
@@ -812,7 +812,7 @@ class Contributor(object):
 
     def __init__(self, *args, **keywords ):
         '''
-        >>> from music21 import *
+        
         >>> td = metadata.Contributor(role='composer', name='Chopin, Fryderyk')
         >>> td.role
         'composer'
@@ -863,7 +863,7 @@ class Contributor(object):
         The role is what part this Contributor plays in the work. 
         Both full roll strings and roll abbreviations may be used.
 
-        >>> from music21 import *
+        
         >>> td = metadata.Contributor()
         >>> td.role = 'composer'
         >>> td.role
@@ -885,7 +885,7 @@ class Contributor(object):
     name = property(_getName, _setName,
         doc = '''Returns the text name, or the first of many names entered. 
 
-        >>> from music21 import *
+        
         >>> td = metadata.Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
         >>> td.name
         'Chopin, Fryderyk'
@@ -903,7 +903,7 @@ class Contributor(object):
     names = property(_getNames, 
         doc = '''Returns all names in a list.
 
-        >>> from music21 import *
+        
         >>> td = metadata.Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
         >>> td.names
         ['Chopin, Fryderyk', 'Chopin, Frederick']
@@ -914,7 +914,7 @@ class Contributor(object):
         Calculate the age at death of the Contributor, 
         returning a datetime.timedelta object.
 
-        >>> from music21 import *
+        
         >>> a = metadata.Contributor(name='Beethoven, Ludwig van', role='composer', birth='1770/12/17', death='1827/3/26')
         >>> a.role
         'composer'
@@ -944,7 +944,7 @@ class Creator(Contributor):
 
     def __init__(self, *args, **keywords):
         '''
-        >>> from music21 import *
+        
         >>> td = metadata.Creator(role='composer', name='Chopin, Fryderyk')
         >>> td.role
         'composer'
@@ -1038,13 +1038,13 @@ class Metadata(base.Music21Object):
 
     def __init__(self, *args, **keywords):
         '''
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(title='Concerto in F')
         >>> md.title
         'Concerto in F'
         
         
-        >>> md = Metadata(otl='Concerto in F') # can use abbreviations
+        >>> md = metadata.Metadata(otl='Concerto in F') # can use abbreviations
         >>> md.title
         'Concerto in F'
         >>> md.setWorkId('otl', 'Rhapsody in Blue')
@@ -1133,7 +1133,7 @@ class Metadata(base.Music21Object):
     date = property(_getDate, _setDate, 
         doc = '''Get or set the date of this work as one of the following date objects: :class:`~music21.metadata.DateSingle`, :class:`~music21.metadata.DateRelative`, :class:`~music21.metadata.DateBetween`,  :class:`~music21.metadata.DateSelection`, 
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(title='Third Symphony', popularTitle='Eroica', composer='Beethoven, Ludwig van')
         >>> md.date = '2010'
         >>> md.date
@@ -1151,7 +1151,7 @@ class Metadata(base.Music21Object):
 
         Id abbreviations and strings: otl / title, otp / popularTitle, ota / alternativeTitle, opr / parentTitle, oac / actNumber, osc / sceneNumber, omv / movementNumber, omd / movementName, ops / opusNumber, onm / number, ovm / volume, ode / dedication, oco / commission, gtl / groupTitle, gaw / associatedWork, gco / collectionDesignation, txo / textOriginalLanguage, txl / textLanguage, ocy / countryOfComposition, opc / localeOfComposition.
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(title='Quartet')
         >>> md.title
         'Quartet'
@@ -1196,7 +1196,7 @@ class Metadata(base.Music21Object):
     title = property(_getTitle, _setTitle, 
         doc = '''Get the title of the work, or the next-matched title string available from a related parameter fields. 
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(title='Third Symphony')
         >>> md.title
         'Third Symphony'
@@ -1227,7 +1227,7 @@ class Metadata(base.Music21Object):
     alternativeTitle = property(_getAlternativeTitle, _setAlternativeTitle, 
         doc = '''Get or set the alternative title. 
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(popularTitle='Eroica')
         >>> md.alternativeTitle = 'Heroic Symphony'
         >>> md.alternativeTitle
@@ -1315,7 +1315,7 @@ class Metadata(base.Music21Object):
     def getContributorsByRole(self, value):
         '''Return a :class:`~music21.metadata.Contributor` if defined for a provided role. 
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(title='Third Symphony')
 
         >>> c = metadata.Contributor()
@@ -1355,7 +1355,7 @@ class Metadata(base.Music21Object):
     def addContributor(self, c):
         '''Assign a :class:`~music21.metadata.Contributor` object to this Metadata.
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(title='Third Symphony')
         >>> c = metadata.Contributor()
         >>> c.name = 'Beethoven, Ludwig van'
@@ -1401,7 +1401,7 @@ class Metadata(base.Music21Object):
 
         The composer attribute does not live in Metadata, but creates a :class:`~music21.metadata.Contributor` object in the Metadata object.
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(title='Third Symphony', popularTitle='Eroica', composer='Beethoven, Ludwig van')
         >>> md.composer
         'Beethoven, Ludwig van'
@@ -1414,7 +1414,7 @@ class Metadata(base.Music21Object):
     def search(self, query, field=None):
         '''Search one or all fields with a query, given either as a string or a regular expression match.
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata()
         >>> md.composer = 'Beethoven, Ludwig van'
         >>> md.title = 'Third Symphony'
@@ -1511,7 +1511,7 @@ class RichMetadata(Metadata):
     '''
     def __init__(self, *args, **keywords):
         '''
-        >>> from music21 import *
+        
         >>> rmd = metadata.RichMetadata(title='Concerto in F')
         >>> rmd.title
         'Concerto in F'
@@ -1544,7 +1544,7 @@ class RichMetadata(Metadata):
         '''Given another Metadata or RichMetadata object, combine
         all attributes and return a new object.
 
-        >>> from music21 import *
+        
         >>> md = metadata.Metadata(title='Concerto in F')
         >>> md.title
         'Concerto in F'
@@ -1673,7 +1673,7 @@ class MetadataBundle(object):
     def corpusPathToKey(self, fp, number=None):
         '''Given a file path or corpus path, return the meta-data path
     
-        >>> from music21 import *
+        
         >>> mb = metadata.MetadataBundle()
         >>> mb.corpusPathToKey('bach/bwv1007/prelude').endswith('bach_bwv1007_prelude')
         True
@@ -1715,7 +1715,7 @@ class MetadataBundle(object):
         printed to stderr giving an update on progress.
 
 
-        >>> from music21 import *
+        
         >>> mb = metadata.MetadataBundle()
         >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
         []
@@ -1841,7 +1841,7 @@ class MetadataBundle(object):
 
         The `pathList` parameter is a list of all file paths on the users local system. 
 
-        >>> from music21 import *
+        
         >>> mb = metadata.MetadataBundle()
         >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
         []
@@ -1919,7 +1919,7 @@ class MetadataBundle(object):
 
         Return pairs of file paths and work numbers, or None
 
-        >>> from music21 import *
+        
         >>> mb = metadata.MetadataBundle()
         >>> mb.addFromPaths(corpus.getWorkList('ciconia'))
         []

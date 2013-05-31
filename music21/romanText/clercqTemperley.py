@@ -103,8 +103,8 @@ class CTSong(object):
         | Ch2: V \| \| $VP\*3     % Fadeout
         | S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'''
         
-    >>> from music21 import *
-    >>> s = romanText.clercqTemperley.CTSong(exampleClercqTemperley)
+    
+    >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.exampleClercqTemperley)
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
     
     When you call the .toScore() method on the newly created CTSong object,
@@ -198,7 +198,7 @@ class CTSong(object):
     Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse
     Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |
     S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental
-    >>> s = romanText.clercqTemperley.CTSong(RockClockCT)
+    >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RockClockCT)
     >>> s.toScore().highestOffset
     374.0 
     >>> s.title
@@ -238,7 +238,7 @@ class CTSong(object):
     Fadeout: I . . V | I . . V | I . . V |
     Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
     S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
-    >>> ex3 = romanText.clercqTemperley.CTSong(RingFireCT)
+    >>> ex3 = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RingFireCT)
     >>> ex3.toScore().highestOffset
     265.0
     """
@@ -283,8 +283,8 @@ class CTSong(object):
     in the full string, with newline characters (\n) at the end of each line or by passing 
     in the text file as a string, and have python do the parsing
     
-    >>> from music21 import *
-    >>> s = romanText.clercqTemperley.CTSong(BlitzkriegBopCT)
+    
+    >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/BlitzkriegBop.txt') 
     ''')
    
@@ -316,8 +316,8 @@ class CTSong(object):
         this attribute searches first few lines of text file for title (a string preceded by a '%') 
         if found, sets title attribute to this string and returns this title)
 
-        >>> from music21 import *
-        >>> s = romanText.clercqTemperley.CTSong(BlitzkriegBopCT)
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> s.title
         'Blitzkrieg Bop'
         ''')
@@ -359,8 +359,8 @@ class CTSong(object):
             | Vr: I \| I \| %incomplete verse
             | S: [A] $Vr % Not quite finished!'''
 
-        >>> from music21 import *
-        >>> s = romanText.clercqTemperley.CTSong(textString)
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
         >>> s.comments
         [['A wonderful shaker melody'], ['Vr:', 'incomplete verse'], ['S:', 'Not quite finished!']]
         >>> s.appendComment('please append this comment to list')
@@ -393,8 +393,8 @@ class CTSong(object):
             | % A wonderful shaker melody
             | Vr: I \| I \| %incomplete verse
             | S: [A] $Vr % Not quite finished!'''
-        >>> from music21 import *
-        >>> s = romanText.clercqTemperley.CTSong(textString)
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
         >>> s.comments
         [['A wonderful shaker melody'], ['Vr:', 'incomplete verse'], ['S:', 'Not quite finished!']]
         
@@ -428,8 +428,8 @@ class CTSong(object):
         provided, this goes through text file and creates the rule object out of each line containing
         a LHS...NOT including the Song line
         
-        >>> from music21 import *
-        >>> s = romanText.clercqTemperley.CTSong(BlitzkriegBopCT)
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> len(s.rules)
         5
         >>> for rule in s.rules:
@@ -476,8 +476,8 @@ class CTSong(object):
         gets the initial, or 'home', time signature in a song by looking at the 'S' substring
         and returning the provided time signature. If not present, returns a default music21
         time signature of 4/4
-        >>> from music21 import *
-        >>> s = romanText.clercqTemperley.CTSong(BlitzkriegBopCT)
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> s.homeTimeSig
         <music21.meter.TimeSignature 4/4>
                  
@@ -520,8 +520,8 @@ class CTSong(object):
         the key signature in the first few characters in the song rule. A key signature in the song
         rule might look like this: S: [A] $In $Vr
         
-        >>> from music21 import *
-        >>> s = romanText.clercqTemperley.CTSong(BlitzkriegBopCT)
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> s.homeKeySig
         <music21.key.Key of A major>
         ''')
@@ -806,8 +806,8 @@ class CTSong(object):
         meter and time signature, so creation of CTRule objects typically occurs
         only from this method and directly from the clercqTemperly text.
         
-        >>> from music21 import *
-        >>> s = romanText.clercqTemperley.CTSong(BlitzkriegBopCT)
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> scoreObj = s.toScore()
         >>> scoreObj.highestOffset   
         380.0
@@ -1096,7 +1096,7 @@ class CTRule(object):
     musicText = property(_getMusicText, _setMusicText, doc= '''
         Gets just the music text of the CTRule, excluding the the left hand side and comments
         
-        >>> from music21 import *
+        
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')
         >>> s.text
         'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
@@ -1143,7 +1143,7 @@ class CTRule(object):
     comments = property(_getComments, _setComments, doc= '''
         Get or set the comments of a CTRule object. Functionality is identical to CTRule comments
 
-        >>> from music21 import *
+        
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')
         >>> s.comments
         [['In:', 'This is a comment']]
@@ -1170,7 +1170,7 @@ class CTRule(object):
         Get the LHS (Left Hand Side) of the CTRule. If not specified explicitly but CTtext present, searches
         first characters up until ':' for rule and returns string)
 
-        >>> from music21 import *
+        
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')
         >>> s.LHS
         'In'
@@ -1204,7 +1204,7 @@ class CTRule(object):
         
         Currently supported abbreviations: In: Introduction, Br: Bridge, Vr: Verse, S: Song, Fadeout: Fadeout
 
-        >>> from music21 import *
+        
         >>> s = romanText.clercqTemperley.CTRule('Vr2: $BP*3 I IV | I |')
         >>> s.sectionName
         'Verse2'
@@ -1236,7 +1236,7 @@ class CTRule(object):
         searches first characters of text file for a time signature (of the form [4/4] ) 
         if not found, returns default of 4/4
 
-        >>> from music21 import *
+        
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | ')
         >>> s.homeTimeSig
         <music21.meter.TimeSignature 4/4>
@@ -1271,7 +1271,7 @@ class CTRule(object):
         CTtextfile present, searches first characters of text file for a key signature 
         (of the form [D#] or [Cb] or [a] uppercase for major, lowercase for minor) if not found, returns default of C Major
 
-        >>> from music21 import *
+        
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | ')
         >>> s.homeKeySig
         <music21.key.Key of C major>

@@ -22,7 +22,7 @@ class Tie(object):
     '''
     Object added to notes that are tied to other notes. The `type` value is one of start, stop, or continue.
 
-    >>> from music21 import *
+    
     >>> note1 = note.Note()
     >>> note1.tie = tie.Tie("start")
     >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
@@ -58,7 +58,7 @@ class Tie(object):
     def __eq__(self, other):
         '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
 
-        >>> from music21 import *
+        
         >>> t1 = tie.Tie('start')
         >>> t2 = tie.Tie('start')
         >>> t3 = tie.Tie('end')
@@ -79,7 +79,7 @@ class Tie(object):
 
         '''
         Tests for object inequality. Needed for pitch comparisons.
-        >>> from music21 import *
+        
         >>> a = tie.Tie('start')
         >>> b = tie.Tie('end')
         >>> a != b

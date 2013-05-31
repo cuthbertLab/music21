@@ -139,12 +139,12 @@ _ALL_EXTENSIONS = (common.findInputExtension('abc') +
 def _translateExtensions(extList=None, expandExtensions=True):
     '''Utility to get default extensions, or, optionally, expand extensions to all known formats. 
 
-    >>> from music21 import *
+    
     >>> corpus.base._translateExtensions()
     ['.abc', '.ly', '.lily', '.mid', '.midi', '.xml', '.mxl', '.mx', '.md', '.musedata', '.zip', '.krn', '.rntxt', '.rntext', '.romantext', '.rtxt', '.nwctxt', '.nwc']
 
     >>> corpus.base._translateExtensions('.mid', False)
-    [u'.mid']
+    ['.mid']
     >>> corpus.base._translateExtensions('.mid', True)
     ['.mid', '.midi']
     '''
@@ -179,7 +179,7 @@ def getCorePaths(extList=None, expandExtensions=True):
     and related extensions, will replaced by all known input extensions. 
     This is convenient when an input format might match for multiple extensions.
 
-    >>> from music21 import *
+    
     
     >>> corpusFilePaths = corpus.getCorePaths()
     >>> len(corpusFilePaths) # the current number of paths; update when adding to corpus
@@ -206,7 +206,7 @@ def getCorePaths(extList=None, expandExtensions=True):
 def getVirtualPaths(extList=None, expandExtensions=True):
     '''Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions.
    
-    >>> from music21 import *
+    
     >>> len(corpus.getVirtualPaths()) > 6
     True
     '''
@@ -273,13 +273,13 @@ def addPath(fp):
     set the 'localCorpusPath' or 'localCorpusSettings' setting of 
     the :class:`~music21.environment.UserSettings` object. 
 
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW corpus.addPath('~/Documents')
 
     alternatively, add a directory permanently (see link above 
     for more details):
     
-    >>> from music21 import *
+    
     >>> #_DOCS_SHOW us = environment.UserSettings()
     >>> #_DOCS_SHOW us['localCorpusPath'] = 'd:/desktop/'
     
@@ -389,7 +389,7 @@ def getComposer(composerName, extList=None):
     
     Note that xml and mxl are treated equivalently.
 
-    >>> from music21 import *
+    
     >>> a = corpus.getComposer('beethoven')
     >>> len(a) > 10
     True
@@ -427,7 +427,7 @@ def getComposerDir(composerName):
     Given the name of a composer, get the path 
     to the top-level directory of that composer 
 
-    >>> from music21 import *
+    
     >>> import os
     >>> a = corpus.getComposerDir('beethoven')
     >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
@@ -487,7 +487,7 @@ def _noCorpus():
 noCorpus = property(_noCorpus, doc='''
     Get True or False if this is a noCorpus music21 distribution.
 
-    >>> from music21 import *
+    
     >>> corpus.noCorpus
     False
     ''')
@@ -502,7 +502,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
     
     If no matches are found, an empty list is returned.
 
-    >>> from music21 import *
+    
     >>> len(corpus.getWorkList('beethoven/opus18no1'))
     8
     >>> len(corpus.getWorkList('beethoven/opus18no1', 1))
@@ -629,7 +629,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
 def getVirtualWorkList(workName, movementNumber=None, extList=None):
     '''Given a work name, search all virtual works and return a list of URLs for any matches.
 
-    >>> from music21 import *
+    
     >>> corpus.getVirtualWorkList('bach/bwv1007/prelude')
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 
@@ -652,7 +652,7 @@ def getWorkReferences(sort=True):
 
     This is used in the generation of corpus documentation
 
-    >>> from music21 import *
+    
     >>> post = corpus.getWorkReferences()
     '''
     # from music21 import corpus; corpus.getWorkReferences()
@@ -786,7 +786,7 @@ def getWork(workName, movementNumber=None, extList=None):
     match, a single file path. If no matches are found 
     an Exception is raised. 
 
-    >>> from music21 import *
+    
     >>> import os
     >>> a = corpus.getWork('opus74no2', 4)
     >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.mxl']))
@@ -843,7 +843,7 @@ def parse(workName, movementNumber=None, number=None,
     Example, get a chorale by Bach.  Note that the source type does not need to be
     specified, nor does the name Bach even (since it's the only piece with the title BWV 66.6)
 
-    >>> from music21 import *
+    
     >>> bachChorale = corpus.parse('bwv66.6')
     >>> len(bachChorale.parts)
     4
@@ -1008,7 +1008,7 @@ def getBachChorales(extList='xml'):
     
     N.B. Look at the module corpus.chorales for many better ways to work with the chorales
 
-    >>> from music21 import *
+    
     >>> a = corpus.getBachChorales()
     >>> len(a) > 400
     True
@@ -1058,7 +1058,7 @@ def getHandelMessiah(extList='md'):
     '''
     Return a list of the filenames of all parts of Handel's Messiah.
 
-    >>> from music21 import *
+    
     >>> a = corpus.getHandelMessiah()
     >>> len(a)
     43
@@ -1107,7 +1107,7 @@ def getMonteverdiMadrigals(extList='xml'):
     '''
     Return a list of the filenames of all Monteverdi madrigals.
 
-    >>> from music21 import *
+    
     >>> a = corpus.getMonteverdiMadrigals()
     >>> len(a) > 40
     True
@@ -1140,7 +1140,7 @@ def getBeethovenStringQuartets(extList=None):
     '''
     Return a list of all Beethoven String Quartet filenames.
 
-    >>> from music21 import *
+    
     >>> a = corpus.getBeethovenStringQuartets()
     >>> len(a) > 10
     True

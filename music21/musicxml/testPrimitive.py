@@ -17655,7 +17655,7 @@ unicodeStrWithNonAscii,
 def get(contentRequest):
     '''Get test material by type of content
 
-    >>> a = get('lyrics')
+    >>> a = musicxml.testPrimitive.get('lyrics')
     '''
     if contentRequest in ['pitch']:
         return pitches01a

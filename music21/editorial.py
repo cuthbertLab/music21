@@ -36,7 +36,7 @@ def getObjectsWithEditorial(listToSearch, editorialStringToFind,
     but it may also be the dictionary key of editorial notes stored in the miscellaneous (misc) dictionary.
     For example, "isPassingTone" or "isNeighborTone"
     
-    >>> from music21 import *
+    
     >>> n1 = note.Note()
     >>> n1.editorial.misc['isPassingTone'] = True
     >>> n2 = note.Note()
@@ -76,7 +76,7 @@ class NoteEditorial(object):
     Standard ones are stored as attributes.  Non-standard/one-off effects are
     stored in the dict called "misc":
     
-    >>> from music21 import *
+    
     >>> a = editorial.NoteEditorial()
     >>> a.color = "blue"  # a standard editorial effect
     >>> a.misc['backgroundHighlight'] = 'yellow'  # non-standard.
@@ -136,7 +136,7 @@ class NoteEditorial(object):
         A method that returns a string containing the 
         lilypond output that comes before the note.
         
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.editorial.lilyStart()   
         u''
@@ -197,7 +197,7 @@ class Comment(object):
     '''
     an object that adds text above or below a note:
     
-    >>> from music21 import *
+    
     >>> n = note.Note()
     >>> n.editorial.comment.text = "hello"
     >>> n.editorial.comment.position = "above"

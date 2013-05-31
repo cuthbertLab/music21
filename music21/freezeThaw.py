@@ -155,7 +155,7 @@ class StreamFreezer(StreamFreezeThawBase):
     serialized file
 
     >>> from music21 import freezeThaw
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note('C4'), 8) 
     >>> temp = [s[n].transpose(n, inPlace=True) for n in range(len(s))]
@@ -237,7 +237,7 @@ class StreamFreezer(StreamFreezeThawBase):
         parts of this.
         
         >>> from music21 import freezeThaw
-        >>> from music21 import *
+        
 
         >>> a = stream.Stream()
         >>> n = note.Note()
@@ -303,8 +303,8 @@ class StreamFreezer(StreamFreezeThawBase):
         (el, offset or 'end').
         
         
-        >>> from music21 import *
-        >>> from music21 import *
+        
+        
         >>> s = stream.Measure()
         >>> n1 = note.Note("C#")
         >>> n2 = note.Note("E-")
@@ -378,7 +378,7 @@ class StreamFreezer(StreamFreezeThawBase):
         
         if hierarchyObject is None, uses self.stream.
 
-        >>> from music21 import *
+        
         >>> sc = stream.Score()
         >>> p1 = stream.Part()
         >>> p2 = stream.Part()
@@ -501,7 +501,7 @@ class StreamFreezer(StreamFreezeThawBase):
         '''Parse a passed-in write format
 
         >>> from music21 import freezeThaw
-        >>> from music21 import *
+        
         >>> sf = freezeThaw.StreamFreezer()
         >>> sf.parseWriteFmt(None)
         'pickle'
@@ -586,7 +586,7 @@ class StreamFreezer(StreamFreezeThawBase):
 #        utility function for debugging.  Finds all weakrefs in the hierarchy and returns
 #        a list of tuples of the weakref and the name of the attribute, and the object
 # 
-#        >>> from music21 import *
+#        
 #        >>> n = note.Note()
 #        >>> s = stream.Stream()
 #        >>> s2 = stream.Stream()
@@ -626,7 +626,7 @@ class StreamThawer(StreamFreezeThawBase):
     serialized file.
 
     >>> from music21 import freezeThaw
-    >>> from music21 import *
+    
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note('C4'), 8) 
     >>> temp = [s[n].transpose(n, inPlace=True) for n in range(len(s))]
@@ -669,7 +669,7 @@ class StreamThawer(StreamFreezeThawBase):
         If streamObj is None, runs it on the embedded stream
 
         >>> from music21 import freezeThaw
-        >>> from music21 import *
+        
         
         >>> a = stream.Stream()
         >>> n = note.Note()
@@ -725,7 +725,7 @@ class StreamThawer(StreamFreezeThawBase):
         and restore it to the ._elements and ._endElements lists
         in the proper locations:
         
-        >>> from music21 import *
+        
         >>> s = stream.Measure()
         >>> s._elements, s._endElements
         ([], [])
@@ -932,7 +932,7 @@ class JSONFreezeThawBase(object):
         A subclass that overrides this method will have access to all 
         modules necessary to create whatever objects necessary. 
 
-        >>> from music21 import *
+        
         >>> jss = freezeThaw.JSONFreezer()
         >>> n = jss.music21ObjectFromString('note.Note')
         >>> n
@@ -984,7 +984,7 @@ class JSONFreezeThawBase(object):
         for Music21Objects you can just do: ``obj.fullyQualifiedClasses[0]``, but
         this works on any object (such as Durations which aren't Music21Objects)
         
-        >>> from music21 import *
+        
         >>> d = duration.DurationUnit()
         >>> jsbase = freezeThaw.JSONFreezeThawBase()
         >>> jsbase.fullyQualifiedClassFromObject(d)
@@ -1007,7 +1007,7 @@ class JSONFreezer(JSONFreezeThawBase):
     Class that provides JSON output from an object (whether
     Music21Object or other).
     
-    >>> from music21 import *
+    
     >>> n = note.Note("C#4")
     >>> jsonF = freezeThaw.JSONFreezer(n)
     >>> jsonF.storedObject
@@ -1026,7 +1026,7 @@ class JSONFreezer(JSONFreezeThawBase):
         
         Returns a list of those data members
         
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> jss = freezeThaw.JSONFreezer(n)
         >>> jss.autoGatherAttributes()
@@ -1070,7 +1070,7 @@ class JSONFreezer(JSONFreezeThawBase):
         
         For an object which does not define this, just returns all the _underscore attributes:
         
-        >>> from music21 import *
+        
         
         >>> ed = editorial.NoteEditorial()
         >>> jsf = freezeThaw.JSONFreezer(ed)
@@ -1133,7 +1133,7 @@ class JSONFreezer(JSONFreezeThawBase):
         be frozen in a way that
         is stronger than just storing the repr of it.
         
-        >>> from music21 import *
+        
         >>> jsf = freezeThaw.JSONFreezer()
         >>> jsf.canBeFrozen(note.Note())
         True
@@ -1177,7 +1177,7 @@ class JSONFreezer(JSONFreezeThawBase):
         This method is recursively called as needed to store dictionaries 
         of component objects that are :class:`~music21.freezeThaw.JSONFreezer` subclasses.
 
-        >>> from music21 import *
+        
         >>> t = metadata.Text('my text')
         >>> t.language = 'en'
         >>> jsf = freezeThaw.JSONFreezer(t)
@@ -1268,7 +1268,7 @@ class JSONFreezer(JSONFreezeThawBase):
         r'''
         Prints out the json output for a given object:
         
-        >>> from music21 import *
+        
         >>> n = note.Note()
         >>> jsf = freezeThaw.JSONFreezer(n)
         >>> jsf.jsonPrint()
@@ -1430,7 +1430,7 @@ class JSONThawer(JSONFreezeThawBase):
         Set this object based on a JSON string 
         or instantiated dictionary representation.
 
-        >>> from music21 import *
+        
         >>> t = metadata.Text('my text')
         >>> t.language = 'en'
         >>> jsf = freezeThaw.JSONFreezer(t)

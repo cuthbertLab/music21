@@ -123,7 +123,7 @@ class ABCToken(object):
         '''
         removes ABC-style comments from a string:
         
-        >>> from music21 import *
+        
         >>> ao = abc.ABCToken()
         >>> ao.stripComment('asdf')
         'asdf'
@@ -173,7 +173,7 @@ class ABCMetadata(ABCToken):
         to have access to data.  Divides a token into
         .tag (a single capital letter or w) and .data representations.
         
-        >>> from music21 import *
+        
         >>> x = abc.ABCMetadata('T:tagData')
         >>> x.preParse()
         >>> x.tag
@@ -199,7 +199,7 @@ class ABCMetadata(ABCToken):
     def isReferenceNumber(self):
         '''Returns True if the tag is "X", False otherwise.
 
-        >>> from music21 import *
+        
         >>> x = abc.ABCMetadata('X:5')
         >>> x.preParse()
         >>> x.tag
@@ -264,7 +264,7 @@ class ABCMetadata(ABCToken):
         '''If there is a time signature representation available, 
         get a numerator, denominator and an abbreviation symbol. To get a music21 :class:`~music21.meter.TimeSignature` object, use the :meth:`~music21.abc.base.ABCMetadata.getTimeSignatureObject` method.
 
-        >>> from music21 import *
+        
         >>> am = abc.ABCMetadata('M:2/2')
         >>> am.preParse()
         >>> am.isMeter()
@@ -272,17 +272,17 @@ class ABCMetadata(ABCToken):
         >>> am._getTimeSignatureParameters()
         (2, 2, 'normal')
 
-        >>> am = ABCMetadata('M:C|')
+        >>> am = abc.ABCMetadata('M:C|')
         >>> am.preParse()
         >>> am._getTimeSignatureParameters()
         (2, 2, 'cut')
 
-        >>> am = ABCMetadata('M: none')
+        >>> am = abc.ABCMetadata('M: none')
         >>> am.preParse()
         >>> am._getTimeSignatureParameters() == None
         True
 
-        >>> am = ABCMetadata('M: FREI4/4')
+        >>> am = abc.ABCMetadata('M: FREI4/4')
         >>> am.preParse()
         >>> am._getTimeSignatureParameters()
         (4, 4, 'normal')
@@ -313,7 +313,7 @@ class ABCMetadata(ABCToken):
         Return a music21 :class:`~music21.meter.TimeSignature` 
         object for this metadata tag.
         
-        >>> from music21 import *
+        
         >>> am = abc.ABCMetadata('M:2/2')
         >>> am.preParse()
         >>> ts = am.getTimeSignatureObject()
@@ -336,7 +336,7 @@ class ABCMetadata(ABCToken):
         and translate sharps count compatible with m21, 
         returning the number of sharps and the mode.
 
-        >>> from music21 import *
+        
         >>> am = abc.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()
         >>> am._getKeySignatureParameters()
@@ -427,7 +427,7 @@ class ABCMetadata(ABCToken):
         Return a music21 :class:`~music21.key.KeySignature` 
         object for this metadata tag.
         
-        >>> from music21 import *
+        
         >>> am = abc.ABCMetadata('K:G')
         >>> am.preParse()
         >>> ks = am.getKeySignatureObject()
@@ -449,7 +449,7 @@ class ABCMetadata(ABCToken):
 
         Returns a two-element tuple of clefObj and transposition in semitones
 
-        >>> from music21 import *
+        
         >>> am = abc.ABCMetadata('K:Eb Lydian bass')
         >>> am.preParse()
         >>> am.getClefObject()
@@ -478,7 +478,7 @@ class ABCMetadata(ABCToken):
         '''
         Extract any tempo parameters stored in a tempo metadata token.
 
-        >>> from music21 import *
+        
         >>> am = abc.ABCMetadata('Q: "Allegro" 1/4=120')
         >>> am.preParse()
         >>> am.getMetronomeMarkObject()
@@ -562,7 +562,7 @@ class ABCMetadata(ABCToken):
         '''
         If there is a quarter length representation available, return it as a floating point value
 
-        >>> from music21 import *
+        
         >>> am = abc.ABCMetadata('L:1/2')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
@@ -636,7 +636,7 @@ class ABCBar(ABCToken):
         '''        
         Assign the bar-type based on the source string.
 
-        >>> from music21 import *
+        
 
         >>> ab = abc.ABCBar('|')
         >>> ab.parse()
@@ -710,7 +710,7 @@ class ABCBar(ABCToken):
     def isRegular(self):
         '''Return True if this is a regular, single, light bar line. 
 
-        >>> from music21 import *
+        
         >>> ab = abc.ABCBar('|')
         >>> ab.parse()
         >>> ab.isRegular()
@@ -725,7 +725,7 @@ class ABCBar(ABCToken):
         '''
         Return true if this defines a repeat bracket for an alternate ending
         
-        >>> from music21 import *
+        
         >>> ab = abc.ABCBar('[2')
         >>> ab.parse()
         >>> ab.isRepeat()
@@ -743,7 +743,7 @@ class ABCBar(ABCToken):
     def getBarObject(self):
         '''Return a music21 bar object
 
-        >>> from music21 import *
+        
         >>> ab = abc.ABCBar('|:')
         >>> ab.parse()
         >>> post = ab.getBarObject()
@@ -799,7 +799,7 @@ class ABCTuplet(ABCToken):
         Cannot be called until local meter context 
         is established.
 
-        >>> from music21 import *
+        
         >>> at = abc.ABCTuplet('(3')
         >>> at.updateRatio()
         >>> at.numberNotesActual, at.numberNotesNormal
@@ -1060,7 +1060,7 @@ class ABCBrokenRhythmMarker(ABCToken):
     def preParse(self):
         '''Called before context adjustments: need to have access to data
 
-        >>> from music21 import *
+        
         >>> abrm = abc.ABCBrokenRhythmMarker('>>>')
         >>> abrm.preParse()
         >>> abrm.data
@@ -1139,7 +1139,7 @@ class ABCNote(ABCToken):
         '''Split chord symbols from other string characteristics. 
         Return list of chord symbols and clean, remain chars
 
-        >>> from music21 import *
+        
         >>> an = abc.ABCNote()
         >>> an._splitChordSymbols('"C"e2')
         (['"C"'], 'e2')
@@ -1281,7 +1281,7 @@ class ABCNote(ABCToken):
     def _getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
         '''Called with parse(), after context processing, to calculate duration
 
-        >>> from music21 import *
+        
         >>> an = abc.ABCNote()
         >>> an.activeDefaultQuarterLength = .5
         >>> an._getQuarterLength('e2')
@@ -1498,7 +1498,7 @@ class ABCHandler(object):
         beginning at a particular index. 
         Returns charPrev, charThis, charNext, charNextNext.
 
-        >>> from music21 import *
+        
         >>> ah = abc.ABCHandler()
         >>> ah._getLinearContext('12345', 0)
         (None, '1', '2', '3')
@@ -1547,7 +1547,7 @@ class ABCHandler(object):
         '''
         Return index of next line break after character i.
 
-        >>> from music21 import *
+        
         >>> ah = abc.ABCHandler()
         >>> strSrc = 'de  we\\n wer bfg\\n'
         >>> ah._getNextLineBreak(strSrc, 0)
@@ -1574,7 +1574,7 @@ class ABCHandler(object):
         returns a list of tokens. If there is no change 
         necessary, the provided token will be returned in the list.
         
-        >>> from music21 import *
+        
         >>> abch = abc.base.ABCHandler()
         >>> abch.barlineTokenFilter('::')
         [<music21.abc.base.ABCBar ':|'>, <music21.abc.base.ABCBar '|:'>]
@@ -1615,7 +1615,7 @@ class ABCHandler(object):
         This may be called separately from process(), in the case 
         that pre/post parse processing is not needed. 
         
-        >>> from music21 import *
+        
         >>> abch = abc.base.ABCHandler()
         >>> abch._tokens
         []
@@ -2114,7 +2114,7 @@ class ABCHandler(object):
         
         Used in polyphonic metadata merge
         
-        >>> from music21 import *
+        
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n' 
         >>> ah1 = abc.ABCHandler()
         >>> junk = ah1.process(abcStr)
@@ -2149,14 +2149,14 @@ class ABCHandler(object):
         Return True if this token structure defines more than 1 reference number,
         usually implying multiple pieces encoded in one file.
 
-        >>> from music21 import *
+        
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abc.ABCHandler()
         >>> junk = ah.process(abcStr)
         >>> ah.definesReferenceNumbers() # only one returns False
         False 
 
-        >>> from music21 import *
+        
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||\\n'
         >>> abcStr += 'X:6\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abc.ABCHandler()
@@ -2185,7 +2185,7 @@ class ABCHandler(object):
         is used to access the music. If no reference numbers are defined, 
         the tune is available under the dictionary entry None. 
 
-        >>> from music21 import *
+        
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> abcStr += 'X:6\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abc.ABCHandler()
@@ -2254,7 +2254,7 @@ class ABCHandler(object):
         If tokens are processed, get the first 
         reference number defined.
 
-        >>> from music21 import *
+        
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abc.ABCHandler()
         >>> junk = ah.process(abcStr)
@@ -2274,7 +2274,7 @@ class ABCHandler(object):
         '''
         Returns True if this token structure defines Measures in a normal Measure form.  Otherwise False
 
-        >>> from music21 import *
+        
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||'
         >>> ah = abc.ABCHandler()
         >>> junk = ah.process(abcStr)
@@ -2310,7 +2310,7 @@ class ABCHandler(object):
 
         Each part is returned as a ABCHandler instance.
 
-        >>> from music21 import *
+        
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||'
         >>> ah = abc.ABCHandler()
         >>> junk = ah.process(abcStr)
@@ -2390,7 +2390,7 @@ class ABCHandler(object):
         each bar, return a list of two-element lists, each indicating 
         the start and positions of a measure.
 
-        >>> from music21 import *
+        
         >>> ah = abc.ABCHandler()
         >>> ah._buildMeasureBoundaryIndices([8, 12, 16], 20)
         [[0, 8], [8, 12], [12, 16], [16, 20]]
@@ -2550,7 +2550,7 @@ class ABCHandler(object):
         If tokens are processed, return True if ABCNote or 
         ABCChord classes are defined
 
-        >>> from music21 import *
+        
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n' 
         >>> ah1 = abc.ABCHandler()
         >>> junk = ah1.process(abcStr)

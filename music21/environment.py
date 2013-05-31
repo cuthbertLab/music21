@@ -49,7 +49,7 @@ class Settings(xmlnode.XMLNodeList):
     '''
     def __init__(self):
         '''
-        >>> a = Settings()
+        >>> a = environment.Settings()
         '''
         xmlnode.XMLNodeList.__init__(self)
         self._tag = 'settings' # assumed for now
@@ -66,7 +66,7 @@ class Preference(xmlnode.XMLNode):
     # TODO: Make private class because there's no docs and no public interface.
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = environment.Preference()
         '''
         xmlnode.XMLNode.__init__(self)
@@ -81,7 +81,7 @@ class LocalCorpusSettings(xmlnode.XMLNodeList):
     '''
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = environment.Preference()
         '''
         xmlnode.XMLNode.__init__(self)
@@ -95,7 +95,7 @@ class LocalCorpusPath(xmlnode.XMLNode):
     '''
     An xmlnode.XMLNode subclass representing a a list of environment preference
 
-    >>> from music21 import *
+    
     >>> lcs = environment.LocalCorpusSettings()
     >>> lcp = environment.LocalCorpusPath()
     >>> lcp.charData = 'testing'
@@ -109,7 +109,7 @@ class LocalCorpusPath(xmlnode.XMLNode):
     '''
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = environment.Preference()
         '''
         xmlnode.XMLNode.__init__(self)
@@ -123,7 +123,7 @@ class SettingsHandler(xml.sax.ContentHandler):
     '''
     An xml.sax.ContentHandler subclass holding settings
 
-    >>> from music21 import *
+    
     >>> sh = environment.SettingsHandler()
     '''
     #TODO: Make private class because there's no docs and no public interface.
@@ -589,7 +589,7 @@ class Environment(object):
     For more a user-friendly interface for creating and editing settings, see 
     the :class:`~music21.environment.UserSettings` object. 
 
-    >>> env = Environment(forcePlatform='darwin')
+    >>> env = environment.Environment(forcePlatform='darwin')
     >>> env['musicxmlPath'] = '/Applications/Finale Reader.app'
     >>> env['musicxmlPath']
     '/Applications/Finale Reader.app'
@@ -615,7 +615,7 @@ class Environment(object):
         the environment settings would look like on another 
         OS platform (e.g., win, nix, darwin).
 
-        >>> from music21 import *
+        
         >>> myEnv = environment.Environment()
         >>> post = myEnv['writeFormat']
         >>> #_DOCS_SHOW post
@@ -633,7 +633,7 @@ class Environment(object):
     def getKeysToPaths(self):
         ''' Get the keys that refer to file paths. 
 
-        >>> from music21 import *
+        
         >>> a = environment.Environment()
         >>> a.getKeysToPaths()
         ['lilypondPath', 'musicxmlPath', 'graphicsPath', 'vectorPath', 'pdfPath', 'midiPath', 'localCorpusPath']
@@ -643,7 +643,7 @@ class Environment(object):
     def getRefKeys(self):
         '''Get the raw keys stored in the internal reference dictionary. These are different than the keys() method in that the 'localCorpusPath' entry is not included.
 
-        >>> from music21 import *
+        
         >>> a = environment.Environment()
         >>> a.getRefKeys()
         ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
@@ -653,7 +653,7 @@ class Environment(object):
     def restoreDefaults(self):
         '''Restore only defaults for all parameters. Useful for testing. 
 
-        >>> from music21 import *
+        
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a.restoreDefaults()
@@ -669,7 +669,7 @@ class Environment(object):
         '''Dictionary-like setting. Changes are made only to local dictionary.
         Must call write() to make permanent
 
-        >>> from music21 import *
+        
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
@@ -696,7 +696,7 @@ class Environment(object):
     def keys(self):
         '''Return valid keys to get and set values for the Environment instance.
 
-        >>> from music21 import *
+        
         >>> e = environment.Environment()
         >>> e.keys()
         ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
@@ -827,7 +827,7 @@ class UserSettings(object):
 
     First, create an instance of UserSettings:
 
-    >>> from music21 import *
+    
     >>> us = environment.UserSettings()
 
     Second, view the available settings keys.
@@ -897,7 +897,7 @@ class UserSettings(object):
     def __setitem__(self, key, value):
         '''Dictionary-like setting. Changes are made and written to the user configuration file.
 
-        >>> from music21 import *
+        
         >>> us = environment.UserSettings()
         >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
         Traceback (most recent call last):
@@ -929,7 +929,7 @@ class UserSettings(object):
     def __repr__(self):
         '''Return a string representation. 
 
-        >>> from music21 import *
+        
         >>> us = environment.UserSettings()
         >>> post = repr(us) # location specific, cannot test
         '''
@@ -938,7 +938,7 @@ class UserSettings(object):
     def __str__(self):
         '''Return a string representation. 
 
-        >>> from music21 import *
+        
         >>> us = environment.UserSettings()
         >>> post = repr(us) # location specific, cannot test
         '''
@@ -984,7 +984,7 @@ def keys():
 def set(key, value): # okay to override set here: @ReservedAssignment
     '''Directly set a single UserSettings key, by providing a key and the appropriate value. This will create a user settings file if necessary.
 
-    >>> from music21 import *
+    
     >>> environment.keys()
     ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
     >>> environment.set('wer', 'asdf')
@@ -1002,7 +1002,7 @@ def set(key, value): # okay to override set here: @ReservedAssignment
 def get(key):
     '''Return the current setting of a UserSettings key. This will create a user settings file if necessary.
 
-    >>> from music21 import *
+    
     >>> environment.keys()
     ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
     >>> #_DOCS_SHOW environment.get('musicxmlPath')

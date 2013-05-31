@@ -15975,7 +15975,7 @@ ALL  = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1, binchoisMagni
 def get(contentRequest):
     '''Get test material by type of content
 
-    >>> a = get('lyrics')
+    >>> a = musicxml.testFiles.get('lyrics')
     '''
     if contentRequest in ['lyrics']:
         return chantQuemQueritis

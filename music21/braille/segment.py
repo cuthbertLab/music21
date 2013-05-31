@@ -679,7 +679,7 @@ def findSegments(music21Part, **partKeywords):
     
     >>> from music21.braille import test
     >>> example = test.example11_2()
-    >>> allSegments = findSegments(example, segmentBreaks = [(8, 3.0)])
+    >>> allSegments = braille.segment.findSegments(example, segmentBreaks = [(8, 3.0)])
     >>> allSegments[0]
     ---begin segment---
     <music21.braille.segment BrailleSegment>
@@ -1317,17 +1317,14 @@ def setAffinityCode(music21Object):
     together. However, the classSortOrder indicates that the TrebleClef should come first
     in the braille.
     
-    >>> from music21.braille import segment
-    >>> from music21 import note
-    >>> from music21 import clef
     >>> n1 = note.Note("D5")
-    >>> setAffinityCode(n1)
+    >>> braille.segment.setAffinityCode(n1)
     >>> n1.affinityCode
     9
     >>> n1.classSortOrder
     10
     >>> c1 = clef.TrebleClef()
-    >>> setAffinityCode(c1)
+    >>> braille.segment.setAffinityCode(c1)
     >>> c1.affinityCode
     9
     >>> c1.classSortOrder

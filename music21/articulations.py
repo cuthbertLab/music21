@@ -25,7 +25,7 @@ Fingering and other playing marks are found here.  Fermatas, trills, etc.
 are found in music21.expressions.
 
 
->>> from music21 import *
+
 >>> n1 = note.Note("D#4")
 >>> n1.articulations.append(articulations.Tenuto())
 >>> #_DOCS_SHOW n1.show()
@@ -42,7 +42,7 @@ A longer test showing the utility of the module:
 
 
 
->>> from music21 import *
+
 
 
 >>> s = stream.Stream()
@@ -114,7 +114,7 @@ class Articulation(base.Music21Object):
     '''
     Base class for all Articulation sub-classes. 
     
-    >>> from music21 import *
+    
     >>> x = articulations.Articulation()
     >>> x.placement = 'below'
     
@@ -134,7 +134,7 @@ class Articulation(base.Music21Object):
         Equality. Based only on the class name, 
         as other other attributes are independent of context and deployment.
 
-        >>> from music21 import *
+        
         >>> at1 = articulations.StrongAccent()
         >>> at2 = articulations.StrongAccent()
         >>> at1.placement = 'above'
@@ -176,7 +176,7 @@ class Articulation(base.Music21Object):
     def __ne__(self, other):
         '''Inequality. Needed for pitch comparisons.
 
-        >>> from music21 import *
+        
         >>> at1 = articulations.StrongAccent()
         >>> at2 = articulations.StrongAccent()
         >>> at3 = articulations.Accent()
@@ -204,7 +204,7 @@ class Articulation(base.Music21Object):
     volumeShift = property(_getVolumeShift, _setVolumeShift, doc='''
         Get or set the volumeShift of this Articulation. This value, between -1 and 1, that is used to shift the final Volume of the object it is attached to.
 
-        >>> from music21 import *
+        
         >>> at1 = articulations.StrongAccent()
         >>> at1.volumeShift > .1
         True
@@ -244,7 +244,7 @@ class TimbreArticulation(Articulation):
 class Accent(DynamicArticulation):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Accent()
         '''
         DynamicArticulation.__init__(self)
@@ -255,7 +255,7 @@ class Accent(DynamicArticulation):
 class StrongAccent(Accent):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.StrongAccent()
         '''
         Accent.__init__(self)
@@ -265,7 +265,7 @@ class StrongAccent(Accent):
 class Staccato(LengthArticulation):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Staccato()
         '''
         LengthArticulation.__init__(self)
@@ -278,7 +278,7 @@ class Staccatissimo(Staccato):
         A very short note (derived from staccato), usually
         represented as a wedge.
         
-        >>> from music21 import *
+        
         >>> a = articulations.Staccatissimo()
         '''
         Staccato.__init__(self)
@@ -290,7 +290,7 @@ class Spiccato(Staccato):
         '''
         A staccato note + accent in one
         
-        >>> from music21 import *
+        
         >>> a = articulations.Spiccato()
         '''
         Staccato.__init__(self)
@@ -300,7 +300,7 @@ class Spiccato(Staccato):
 class Tenuto(LengthArticulation):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Tenuto()
         '''
         LengthArticulation.__init__(self)
@@ -310,7 +310,7 @@ class Tenuto(LengthArticulation):
 class DetachedLegato(LengthArticulation):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.DetachedLegato()
         '''
         LengthArticulation.__init__(self)
@@ -325,7 +325,7 @@ class IndeterminantSlide(PitchArticulation):
 class Scoop(IndeterminantSlide):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Scoop()
         '''
         IndeterminantSlide.__init__(self)
@@ -334,7 +334,7 @@ class Scoop(IndeterminantSlide):
 class Plop(IndeterminantSlide):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Plop()
         '''
         IndeterminantSlide.__init__(self)
@@ -342,7 +342,7 @@ class Plop(IndeterminantSlide):
 class Doit(IndeterminantSlide):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Doit()
         '''
         IndeterminantSlide.__init__(self)
@@ -350,7 +350,7 @@ class Doit(IndeterminantSlide):
 class Falloff(IndeterminantSlide):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Falloff()
         '''
         IndeterminantSlide.__init__(self)
@@ -358,7 +358,7 @@ class Falloff(IndeterminantSlide):
 class BreathMark(LengthArticulation):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.BreathMark()
         '''
         LengthArticulation.__init__(self)
@@ -366,7 +366,7 @@ class BreathMark(LengthArticulation):
 class Caesura(Articulation):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Caesura()
         '''
         Articulation.__init__(self)
@@ -374,7 +374,7 @@ class Caesura(Articulation):
 class Stress(DynamicArticulation):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Stress()
         '''
         DynamicArticulation.__init__(self)
@@ -382,7 +382,7 @@ class Stress(DynamicArticulation):
 class Unstress(DynamicArticulation):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Unstress()
         '''
         DynamicArticulation.__init__(self)
@@ -401,7 +401,7 @@ class TechnicalIndication(Articulation):
 class Harmonic(TechnicalIndication):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Harmonic()
         '''
         TechnicalIndication.__init__(self)
@@ -409,7 +409,7 @@ class Harmonic(TechnicalIndication):
 class Bowing(TechnicalIndication):  
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.Bowing()
         '''
         TechnicalIndication.__init__(self)
@@ -419,7 +419,7 @@ class Bowing(TechnicalIndication):
 class UpBow(Bowing):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.UpBow()
         '''
         Bowing.__init__(self)
@@ -427,7 +427,7 @@ class UpBow(Bowing):
 class DownBow(Bowing):
     def __init__(self):
         '''
-        >>> from music21 import *
+        
         >>> a = articulations.DownBow()
         '''
         Bowing.__init__(self)

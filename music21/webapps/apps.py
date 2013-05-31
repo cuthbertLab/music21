@@ -28,7 +28,7 @@ def setupURLCorpusParseApp(agenda):
     Augments an agenda with the data and commands related to the URL Corpus Parse App.
     
     
-    >>> from music21 import *
+    
     >>> agenda = webapps.Agenda()
     >>> agenda.addData('measureEnd','4')
     >>> agenda.addData('workName',"'bwv7.7'")
@@ -77,7 +77,7 @@ def setupConverterApp(agenda):
     Example:
     http://ciconia.mit.edu/music21/webinterface?appName=converterApp&source="tinynotation:F4 A-  B- B c e f2"&output=vexflow
     
-    >>> from music21 import *
+    
     >>> agenda = webapps.Agenda()
     >>> agenda.addData('source','tinynotation:F4 A- B- B c e f2')
     >>> agenda.addData('output',"musicxml")

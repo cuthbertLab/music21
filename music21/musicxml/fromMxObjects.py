@@ -19,7 +19,7 @@ and fed into `mxScoreToScore` to make this work.
 import unittest
 import copy
 
-from music21.musicxml import base as musicxmlMod
+from music21.musicxml import base as musicxml
 
 from music21 import common
 from music21 import defaults
@@ -72,7 +72,7 @@ class XMLBarException(FromMxObjectsException):
 #     returns the spanner idLocal as a number from 1-6 since
 #     only 6 spanners of each type can be active at a time in musicxml
 # 
-#     >>> from music21 import *
+#     
 #     >>> s = stream.Score()
 #     >>> for i in range(10):
 #     ...    sp = spanner.Glissando()
@@ -113,7 +113,7 @@ def configureStaffGroupFromMxPartGroup(staffGroup, mxPartGroup):
 def mxCreditToTextBox(mxCredit):
     '''Convert a MusicXML credit to a music21 TextBox
 
-    >>> from music21 import *
+    
     >>> c = musicxml.Credit()
     >>> c.append(musicxml.CreditWords('testing'))
     >>> c.set('page', 2)
@@ -147,7 +147,7 @@ def mxCreditToTextBox(mxCredit):
 def mxTransposeToInterval(mxTranspose):
     '''Convert a MusicXML Transpose object to a music21 Interval object.
 
-    >>> from music21 import *
+    
     >>> t = musicxml.Transpose()
     >>> t.diatonic = -1
     >>> t.chromatic = -2
@@ -196,7 +196,7 @@ def mxTransposeToInterval(mxTranspose):
 def mxToTempoIndication(mxMetronome, mxWords=None):
     '''Given an mxMetronome, convert to either a TempoIndication subclass, either a tempo.MetronomeMark or tempo.MetricModulation.
 
-    >>> from music21 import *
+    
     >>> m = musicxml.Metronome()
     >>> bu = musicxml.BeatUnit('half')
     >>> pm = musicxml.PerMinute(125)
@@ -211,16 +211,16 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
 
     dActive = None
     for mxObj in mxMetronome.componentList:
-        if isinstance(mxObj, musicxmlMod.BeatUnit):
+        if isinstance(mxObj, musicxml.BeatUnit):
             durationType = musicXMLTypeToType(mxObj.charData)
             dActive = duration.Duration(type=durationType)
             durations.append(dActive)
-        if isinstance(mxObj, musicxmlMod.BeatUnitDot):
+        if isinstance(mxObj, musicxml.BeatUnitDot):
             if dActive is None:
                 raise FromMxObjectsException('encountered metronome components out of order')
             dActive.dots += 1 # add one dot each time these are encountered
         # should come last
-        if isinstance(mxObj, musicxmlMod.PerMinute):
+        if isinstance(mxObj, musicxml.PerMinute):
             #environLocal.printDebug(['found PerMinute', mxObj])
             # store as a number
             if mxObj.charData != '':
@@ -257,7 +257,7 @@ def mxToRepeat(mxBarline, inputM21=None):
     Given an mxBarline (not an mxRepeat object) with repeatObj as a parameter, 
     file the necessary parameters and return a bar.Repeat() object
 
-    >>> from music21 import *
+    
     >>> mxRepeat = musicxml.Repeat()
     >>> mxRepeat.set('direction', 'backward')
     >>> mxRepeat.get('times') == None
@@ -318,7 +318,7 @@ def mxToRepeat(mxBarline, inputM21=None):
 def mxToBarline(mxBarline, inputM21 = None):
     '''Given an mxBarline, fill the necessary parameters
 
-    >>> from music21 import *
+    
     >>> mxBarline = musicxml.Barline()
     >>> mxBarline.set('barStyle', 'light-light')
     >>> mxBarline.set('location', 'right')
@@ -370,7 +370,7 @@ def mxGraceToGrace(noteOrChord, mxGrace=None):
 
 def mxToAccidental(mxAccidental, inputM21Object = None):
     '''
-    >>> from music21 import *
+    
     >>> a = musicxml.Accidental()
     >>> a.set('content', 'half-flat')
     >>> a.get('content')
@@ -413,7 +413,7 @@ def mxToPitch(mxNote, inputM21=None):
     '''
     Given a MusicXML Note object, set this Pitch object to its values.
 
-    >>> from music21 import *
+    
     >>> b = musicxml.Pitch()
     >>> b.set('octave', 3)
     >>> b.set('step', 'E')
@@ -518,7 +518,7 @@ def mxToLyric(mxLyric, inputM21=None):
     
     Otherwise, a new `Lyric` object is created and returned.
     
-    >>> from music21 import *
+    
     >>> mxLyric = musicxml.Lyric()
     >>> mxLyric.set('text', 'word')
     >>> mxLyric.set('number', 4)
@@ -571,7 +571,7 @@ def musicXMLTypeToType(value):
     
     Only changes 'long' to 'longa'.
 
-    >>> from music21 import *
+    
     >>> musicxml.fromMxObjects.musicXMLTypeToType('long')
     'longa'
     >>> musicxml.fromMxObjects.musicXMLTypeToType('quarter')
@@ -594,7 +594,7 @@ def mxToDuration(mxNote, inputM21=None):
     Translate a `MusicXML` :class:`~music21.musicxml.Note` object 
     to a music21 :class:`~music21.duration.Duration` object.
 
-    >>> from music21 import *
+    
     >>> a = musicxml.Note()
     >>> a.setDefaults()
     >>> m = musicxml.Measure()
@@ -729,7 +729,7 @@ def mxToTuplet(mxNote, inputM21Object = None):
         #environLocal.printDebug(['got mxTuplet', mxTuplet])
 
         t.type = mxTuplet.get('type') 
-        t.bracket = musicxmlMod.yesNoToBoolean(mxTuplet.get('bracket'))
+        t.bracket = musicxml.yesNoToBoolean(mxTuplet.get('bracket'))
         #environLocal.printDebug(['got bracket', self.bracket])
 
         t.placement = mxTuplet.get('placement') 
@@ -747,13 +747,13 @@ def mxToTimeSignature(mxTimeList, inputM21=None):
     if inputM21 is None, create a new TimeSignature
     and return it.
 
-    >>> from music21 import *
+    
     >>> mxTime = musicxml.Time()
     >>> mxTime.setDefaults()
     >>> mxAttributes = musicxml.Attributes()
     >>> mxAttributes.timeList.append(mxTime)
     >>> ts = meter.TimeSignature()
-    >>> mxToTimeSignature(mxAttributes.timeList, ts)
+    >>> musicxml.fromMxObjects.mxToTimeSignature(mxAttributes.timeList, ts)
     >>> ts.numerator
     4
     '''
@@ -774,9 +774,9 @@ def mxToTimeSignature(mxTimeList, inputM21=None):
     n = []
     d = []
     for obj in mxTime.componentList:
-        if isinstance(obj, musicxmlMod.Beats):
+        if isinstance(obj, musicxml.Beats):
             n.append(obj.charData) # may be 3+2
-        if isinstance(obj, musicxmlMod.BeatType):
+        if isinstance(obj, musicxml.BeatType):
             d.append(obj.charData)
 
     #n = mxTime.get('beats')
@@ -802,7 +802,7 @@ def mxKeyListToKeySignature(mxKeyList, inputM21 = None):
     object and return it, or if inputM21 is None, change its
     attributes and return nothing.
 
-    >>> from music21 import *
+    
     >>> mxk = musicxml.Key()
     >>> mxk.set('fifths', 5)
     >>> ks = key.KeySignature()
@@ -846,7 +846,7 @@ def mxClefToClef(mxClefList, inputM21 = None):
     Given a MusicXML Clef object, return a music21 
     Clef object
 
-    >>> from music21 import *
+    
     >>> a = musicxml.Clef()   
     >>> a.set('sign', 'G')
     >>> a.set('line', 2)
@@ -904,7 +904,7 @@ def mxToDynamicList(mxDirection):
     '''
     Given an mxDirection, load instance
 
-    >>> from music21 import *
+    
     >>> mxDirection = musicxml.Direction()
     >>> mxDirectionType = musicxml.DirectionType()
     >>> mxDynamicMark = musicxml.DynamicMark('ff')
@@ -927,9 +927,9 @@ def mxToDynamicList(mxDirection):
     # need to test
     mxDynamics = None
     for mxObj in mxDirection:
-        if isinstance(mxObj, musicxmlMod.DirectionType):
+        if isinstance(mxObj, musicxml.DirectionType):
             for mxObjSub in mxObj:
-                if isinstance(mxObjSub, musicxmlMod.Dynamics):
+                if isinstance(mxObjSub, musicxml.Dynamics):
                     mxDynamics = mxObjSub
     if mxDynamics == None:
         raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, did not find a DynamicMark')
@@ -1024,7 +1024,7 @@ def mxToChordSymbol(mxHarmony):
     '''
     Converts an musicxml.base.Harmony() object to a harmony.ChordSymbol object
     
-    >>> from music21 import *
+    
     >>> mxHarmony = musicxml.Harmony()
     >>> mxKind = musicxml.Kind()
     >>> mxKind.charData = 'major-seventh'
@@ -1102,16 +1102,16 @@ def mxToChordSymbol(mxHarmony):
         hd = None
         for mxSub in mxDegree.componentList:
             # this is the assumed order of triples
-            if isinstance(mxSub, musicxmlMod.DegreeValue):
+            if isinstance(mxSub, musicxml.DegreeValue):
                 if hd is not None: # already set
                     ChordStepModifications.append(hd)
                     hd = None
                 if hd is None:
                     hd = harmony.ChordStepModification()
                 hd.degree = int(mxSub.charData)
-            elif isinstance(mxSub, musicxmlMod.DegreeAlter):
+            elif isinstance(mxSub, musicxml.DegreeAlter):
                 hd.interval = int(mxSub.charData)
-            elif isinstance(mxSub, musicxmlMod.DegreeType):
+            elif isinstance(mxSub, musicxml.DegreeType):
                 hd.modType = mxSub.charData
             else:
                 raise FromMxObjectsException('found unexpected object in degree tag: %s' % mxSub)
@@ -1380,7 +1380,7 @@ def mxFermataToFermata(mxFermata, inputM21 = None):
     and returns it.  Otherwise changes the current Fermata
     object and returns nothing.
     
-    >>> from music21 import *
+    
     >>> mxFermata = musicxml.Fermata()
     >>> mxFermata.set('type', 'inverted')
     >>> fermata = musicxml.fromMxObjects.mxFermataToFermata(mxFermata)
@@ -1407,7 +1407,7 @@ def mxTechnicalToArticulation(mxTechnicalMark, inputM21 = None):
 
     Create both a musicxml.ArticulationMark object and a conflicting music21 object:
             
-    >>> from music21 import *
+    
     >>> mxTechnicalMark = musicxml.TechnicalMark('up-bow')
     >>> mxTechnicalMark.set('placement', 'below')
     >>> a = articulations.DownBow()
@@ -1475,7 +1475,7 @@ def mxArticulationToArticulation(mxArticulationMark, inputM21 = None):
 
     Create both a musicxml.ArticulationMark object and a conflicting music21 object:
             
-    >>> from music21 import *
+    
     >>> mxArticulationMark = musicxml.ArticulationMark('accent')
     >>> mxArticulationMark.set('placement', 'below')
     >>> a = articulations.Tenuto()
@@ -1537,22 +1537,22 @@ def mxOrnamentToExpressionOrArticulation(mxOrnament):
     '''
     orn = None
     #environLocal.printDebug(['calling mxOrnamentToExpressionOrArticulation with', mxOrnament])
-    if isinstance(mxOrnament, musicxmlMod.TrillMark):
+    if isinstance(mxOrnament, musicxml.TrillMark):
         orn = expressions.Trill()
         orn.placement = mxOrnament.get('placement')
-    elif isinstance(mxOrnament, musicxmlMod.Mordent):
+    elif isinstance(mxOrnament, musicxml.Mordent):
         orn = expressions.Mordent()
-    elif isinstance(mxOrnament, musicxmlMod.InvertedMordent):
+    elif isinstance(mxOrnament, musicxml.InvertedMordent):
         orn = expressions.InvertedMordent()
 
-    elif isinstance(mxOrnament, musicxmlMod.Turn):
+    elif isinstance(mxOrnament, musicxml.Turn):
         orn = expressions.Turn()
-    elif isinstance(mxOrnament, musicxmlMod.InvertedTurn):
+    elif isinstance(mxOrnament, musicxml.InvertedTurn):
         orn = expressions.InvertedTurn()
 
-    elif isinstance(mxOrnament, musicxmlMod.Shake):
+    elif isinstance(mxOrnament, musicxml.Shake):
         orn = expressions.Shake()
-    elif isinstance(mxOrnament, musicxmlMod.Schleifer):
+    elif isinstance(mxOrnament, musicxml.Schleifer):
         orn = expressions.Schleifer()
 
     return orn # may be None
@@ -1567,7 +1567,7 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
     Given an a list of mxNotes, fill the necessary parameters
 
 
-    >>> from music21 import *
+    
     >>> a = musicxml.Note()
     >>> p = musicxml.Pitch()
     >>> p.set('step', 'A')
@@ -1589,7 +1589,7 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
     >>> c.pitches[0]
     <music21.pitch.Pitch A3>
 
-    >>> from music21 import *
+    
     >>> a = musicxml.Note()
     >>> a.setDefaults()
     >>> nh1 = musicxml.Notehead()
@@ -1693,7 +1693,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     
     Returns a `note.Note` object.
     
-    >>> from music21 import *
+    
     >>> mxNote = musicxml.Note()
     >>> mxNote.setDefaults()
     >>> mxMeasure = musicxml.Measure()
@@ -2079,17 +2079,17 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         # NOTE: tests have shown that using isinstance() here is much faster
         # than checking the .tag attribute.
         # check for backup and forward first
-        if isinstance(mxObj, musicxmlMod.Backup):
+        if isinstance(mxObj, musicxml.Backup):
             # resolve as quarterLength, subtract from measure offset
             #environLocal.printDebug(['found musicxl backup:', mxObj.duration])
             offsetMeasureNote -= float(mxObj.duration) / float(divisions)
             continue
-        elif isinstance(mxObj, musicxmlMod.Forward):
+        elif isinstance(mxObj, musicxml.Forward):
             # resolve as quarterLength, add to measure offset
             #environLocal.printDebug(['found musicxl forward:', mxObj.duration, 'divisions', divisions])
             offsetMeasureNote += float(mxObj.duration) / float(divisions)
             continue
-        elif isinstance(mxObj, musicxmlMod.Print):
+        elif isinstance(mxObj, musicxml.Print):
             # mxPrint objects may be found in a Measure's components
             # contain page or system layout information among others
             mxPrint = mxObj
@@ -2115,7 +2115,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     addPageLayout = False
             if not addPageLayout:
                 for layoutType in mxPrint.componentList:
-                    if isinstance(layoutType, musicxmlMod.PageLayout):
+                    if isinstance(layoutType, musicxml.PageLayout):
                         addPageLayout = True
                         break
             try:
@@ -2128,12 +2128,12 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 pass
             if not addSystemLayout:
                 for layoutType in mxPrint.componentList:
-                    if isinstance(layoutType, musicxmlMod.SystemLayout):
+                    if isinstance(layoutType, musicxml.SystemLayout):
                         addSystemLayout = True
                         break
 
             for layoutType in mxPrint.componentList:
-                if isinstance(layoutType, musicxmlMod.StaffLayout):
+                if isinstance(layoutType, musicxml.StaffLayout):
                     addStaffLayout = True
                     break
             
@@ -2163,10 +2163,10 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
 
         # <sound> tags may be found in the Measure, used to define tempo
-        elif isinstance(mxObj, musicxmlMod.Sound):
+        elif isinstance(mxObj, musicxml.Sound):
             pass
 
-        elif isinstance(mxObj, musicxmlMod.Barline):
+        elif isinstance(mxObj, musicxml.Barline):
             # repeat is a tag found in the barline object
             mxBarline = mxObj
             mxRepeatObj = mxBarline.get('repeatObj')
@@ -2218,9 +2218,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             else:
                 environLocal.printDebug(['not handling barline that is neither left nor right', barline, barline.location])
 
-        elif isinstance(mxObj, musicxmlMod.Note):
+        elif isinstance(mxObj, musicxml.Note):
             mxNote = mxObj
-            if isinstance(mxObjNext, musicxmlMod.Note):
+            if isinstance(mxObjNext, musicxml.Note):
                 mxNoteNext = mxObjNext
             else:
                 mxNoteNext = None
@@ -2350,7 +2350,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             offsetMeasureNote += offsetIncrement
 
         # mxDirections can be dynamics, repeat expressions, text expressions
-        elif isinstance(mxObj, musicxmlMod.Direction):
+        elif isinstance(mxObj, musicxml.Direction):
             offsetDirection = mxToOffset(mxObj, divisions)
             if mxObj.getDynamicMark() is not None:
                 # in rare cases there may be more than one dynamic in the same
@@ -2404,7 +2404,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         addToStaffReference(mxObj, te, staffReference)
                         m._insertCore(offsetMeasureNote + offsetDirection, te)
 
-        elif isinstance(mxObj, musicxmlMod.Harmony):
+        elif isinstance(mxObj, musicxml.Harmony):
             mxHarmony = mxObj
             h = mxToChordSymbol(mxHarmony)
             addToStaffReference(mxObj, h, staffReference)
@@ -2816,7 +2816,7 @@ def mxToBeam(mxBeam, inputM21 = None):
     '''
     given an mxBeam object return a :class:`~music21.beam.Beam` object
 
-    >>> from music21 import *
+    
     >>> mxBeam = musicxml.Beam()
     >>> mxBeam.set('charData', 'begin')
     >>> a = musicxml.fromMxObjects.mxToBeam(mxBeam)
@@ -2878,7 +2878,7 @@ def mxToBeam(mxBeam, inputM21 = None):
 def mxToBeams(mxBeamList, inputM21 = None):
     '''given a list of mxBeam objects, sets the beamsList
 
-    >>> from music21 import *
+    
     >>> a = beam.Beams()
     >>> a.fill(2, type='start')
     >>> mxBeamList = musicxml.toMxObjects.beamsToMx(a)
@@ -2905,7 +2905,7 @@ def mxPrintToPageLayout(mxPrint, inputM21 = None):
     Given an mxPrint object, set object data for 
     the print section of a layout.PageLayout object
 
-    >>> from music21 import *
+    
     >>> mxPrint = musicxml.Print()
     >>> mxPrint.set('new-page', 'yes')
     >>> mxPrint.set('page-number', 5)
@@ -2959,7 +2959,7 @@ def mxPrintToPageLayout(mxPrint, inputM21 = None):
 
     mxPageLayout = None # blank
     for x in mxPrint:
-        if isinstance(x, musicxmlMod.PageLayout):
+        if isinstance(x, musicxml.PageLayout):
             mxPageLayout = x
             break # find first and break
 
@@ -2991,7 +2991,7 @@ def mxPageLayoutToPageLayout(mxPageLayout, inputM21 = None):
 
     mxPageMargins = None
     for x in mxPageLayout:
-        if isinstance(x, musicxmlMod.PageMargins):
+        if isinstance(x, musicxml.PageMargins):
             mxPageMargins = x
 
     if mxPageMargins != None:
@@ -3018,7 +3018,7 @@ def mxPrintToSystemLayout(mxPrint, inputM21 = None):
     '''
     Given an mxPrint object, set object data
 
-    >>> from music21 import *
+    
     >>> mxPrint = musicxml.Print()
     >>> mxPrint.set('new-system', 'yes')
     >>> mxSystemLayout = musicxml.SystemLayout()
@@ -3053,7 +3053,7 @@ def mxPrintToSystemLayout(mxPrint, inputM21 = None):
     #mxSystemLayout = mxPrint.get('systemLayout')
     mxSystemLayout = None # blank
     for x in mxPrint:
-        if isinstance(x, musicxmlMod.SystemLayout):
+        if isinstance(x, musicxml.SystemLayout):
             mxSystemLayout = x
             break # find first and break
 
@@ -3077,7 +3077,7 @@ def mxSystemLayoutToSystemLayout(mxSystemLayout, inputM21 = None):
 
     mxSystemMargins = None
     for x in mxSystemLayout:
-        if isinstance(x, musicxmlMod.SystemMargins):
+        if isinstance(x, musicxml.SystemMargins):
             mxSystemMargins = x
             break
 
@@ -3110,7 +3110,7 @@ def mxPrintToStaffLayoutList(mxPrint, inputM21 = None):
     '''
     Given an mxPrint object, return a list of StaffLayout objects (may be empty)
 
-    >>> from music21 import *
+    
     >>> mxPrint = musicxml.Print()
     
     # this is a red-herring... does nothing here...
@@ -3131,7 +3131,7 @@ def mxPrintToStaffLayoutList(mxPrint, inputM21 = None):
     staffLayoutList = []
 
     for x in mxPrint:
-        if isinstance(x, musicxmlMod.StaffLayout):
+        if isinstance(x, musicxml.StaffLayout):
             sl = mxStaffLayoutToStaffLayout(x)
             staffLayoutList.append(sl)
     
@@ -3217,12 +3217,12 @@ def mxCreatorToContributor(mxCreator, inputM21 = None):
     '''
     Given an mxCreator, fill the necessary parameters of a Contributor.
 
-    >>> from music21 import *
+    
     >>> mxCreator = musicxml.Creator()
     >>> mxCreator.set('type', 'composer')
     >>> mxCreator.set('charData', 'Beethoven, Ludwig van')
 
-    >>> c = mxCreatorToContributor(mxCreator)
+    >>> c = musicxml.fromMxObjects.mxCreatorToContributor(mxCreator)
     >>> c
     <music21.metadata.Contributor object at 0x...>
     >>> c.role

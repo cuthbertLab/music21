@@ -52,7 +52,7 @@ def unbundleInstruments(streamIn, inPlace = False):
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.Unpitched` objects
     and moves their `.storedInstrument` attributes to a new Stream (unless inPlace = True)  
 
-    >>> from music21 import *
+    
     >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
     >>> up2 = note.Unpitched()
@@ -84,7 +84,7 @@ def unbundleInstruments(streamIn, inPlace = False):
 
 def bundleInstruments(streamIn, inPlace = False):
     '''
-    >>> from music21 import *
+    
     >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
     >>> upUnknownInstrument = note.Unpitched()
@@ -214,7 +214,7 @@ class Instrument(base.Music21Object):
 
         Currently only 16 channels are used.
 
-        >>> from music21 import *
+        
         >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11]
         >>> i = instrument.Violin()
         >>> i.autoAssignMidiChannel(used)
@@ -266,7 +266,7 @@ class KeyboardInstrument(Instrument):
 
 class Piano(KeyboardInstrument):   
     '''
-    >>> from music21 import *
+    
     >>> p = instrument.Piano()
     >>> p.instrumentName
     'Piano'
@@ -414,7 +414,7 @@ class StringInstrument(Instrument):
             highest.[*]
 
             
-            >>> from music21 import *
+            
             >>> vln1 = instrument.Violin()
             >>> [str(p) for p in vln1.stringPitches]
             ['G3', 'D4', 'A4', 'E5']
@@ -730,7 +730,7 @@ class Clarinet(WoodwindInstrument):
 
 class BassClarinet(Clarinet):
     '''
-    >>> from music21 import *
+    
     >>> bcl = instrument.BassClarinet()
     >>> bcl.instrumentName
     'Bass clarinet'
@@ -842,7 +842,7 @@ class BrassInstrument(Instrument):
 
 class Horn(BrassInstrument):
     '''
-    >>> from music21 import *
+    
     >>> hn = instrument.Horn()
     >>> hn.instrumentName
     'Horn'
@@ -945,7 +945,7 @@ class UnpitchedPercussion(Percussion):
     If the modifier is in the object's ._modifierToPercMapPitch dictionary
     then changing the modifier also changes the .percMapPitch for the object
     
-    >>> from music21 import *
+    
     >>> bd = instrument.BongoDrums()
     >>> bd.modifier
     'high'
@@ -1483,7 +1483,7 @@ def ensembleNameBySize(number):
     '''
     return the name of a generic ensemble with "number" players:
     
-    >>> from music21 import *
+    
     >>> instrument.ensembleNameBySize(4)
     'quartet'
     >>> instrument.ensembleNameBySize(1)
@@ -1503,7 +1503,7 @@ def instrumentFromMidiProgram(number):
     '''
     return the instrument with "number" as its assigned midi program:
     
-    >>> from music21 import *
+    
     >>> instrument.instrumentFromMidiProgram(0)
     <music21.instrument.Instrument Piano>
     >>> instrument.instrumentFromMidiProgram(21)

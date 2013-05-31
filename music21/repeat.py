@@ -42,7 +42,7 @@ class RepeatMark(object):
     
     The following demonstration shows how a user might see if a Stream has any repeats in it.
     
-    >>> from music21 import *
+    
     >>> class PartialRepeat(repeat.RepeatMark, base.Music21Object):
     ...    def __init__(self):
     ...        base.Music21Object.__init__(self)
@@ -183,7 +183,7 @@ class RepeatExpressionMarker(RepeatExpression):
 class Coda(RepeatExpressionMarker):
     '''The coda symbol, or the word coda, as placed in a score. 
 
-    >>> from music21 import *
+    
     >>> rm = repeat.Coda()
     '''
     # note that only Coda and Segno have non-text expression forms
@@ -202,7 +202,7 @@ class Coda(RepeatExpressionMarker):
 class Segno(RepeatExpressionMarker):
     '''The segno sign as placed in a score. 
 
-    >>> from music21 import *
+    
     >>> rm = repeat.Segno()
     >>> rm.useSymbol
     True
@@ -219,7 +219,7 @@ class Segno(RepeatExpressionMarker):
 class Fine(RepeatExpressionMarker):
     '''The fine word as placed in a score. 
 
-    >>> from music21 import *
+    
     >>> rm = repeat.Fine()
     '''
     def __init__(self):
@@ -276,7 +276,7 @@ class DaCapoAlFine(RepeatExpressionCommand):
     repeats encountered on the Da Capo repeat not 
     be repeated. 
 
-    >>> from music21 import *
+    
     >>> rm = repeat.DaCapoAlFine()
     '''
     def __init__(self, text=None):
@@ -299,7 +299,7 @@ class DaCapoAlCoda(RepeatExpressionCommand):
     indicating that any repeats encountered on the 
     Da Capo repeat not be repeated. 
 
-    >>> from music21 import *
+    
     >>> rm = repeat.DaCapoAlCoda() 
     '''
     def __init__(self, text=None):
@@ -316,7 +316,7 @@ class AlSegno(RepeatExpressionCommand):
     '''
     Jump to the sign. Presumably a forward jump, not a repeat.
 
-    >>> from music21 import *
+    
     >>> rm = repeat.AlSegno()
     '''
     def __init__(self, text=None):
@@ -335,7 +335,7 @@ class DalSegno(RepeatExpressionCommand):
     is False, indicating that any repeats encountered on 
     the Da Capo repeat not be repeated. 
 
-    >>> from music21 import *
+    
     >>> rm = repeat.DaCapoAlFine()
     '''
     def __init__(self, text=None):
@@ -354,7 +354,7 @@ class DalSegnoAlFine(RepeatExpressionCommand):
     that any repeats encountered on the Dal Segno repeat not 
     be repeated. 
 
-    >>> from music21 import *
+    
     >>> rm = repeat.DaCapoAlFine()
     '''
     def __init__(self, text=None):
@@ -374,7 +374,7 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
     `repeatAfterJump` is False, indicating that any repeats encountered 
     on the Da Segno repeat not be repeated. 
 
-    >>> from music21 import *
+    
     >>> rm = repeat.DaCapoAlCoda() 
     '''
     def __init__(self, text=None):
@@ -410,7 +410,7 @@ def insertRepeatEnding(s, start, end, endingNumber=1, inPlace=False):
 
     Example: create first and second endings over measures 4-6 and measures 11-13 of a chorale, respectively.
             
-    >>> from music21 import *
+    
     >>> c1 = corpus.parse('bwv10.7.mxl')
     >>> repeat.insertRepeatEnding(c1,  4,  6, 1, inPlace=True)
     >>> repeat.insertRepeatEnding(c1, 11, 13, 2, inPlace=True)
@@ -457,7 +457,7 @@ def insertRepeat(s, start, end, inPlace=False):
         bar specified by start and inserts an end-repeat at the bar specified
         by barEnd. Only alters the stream s if inPlace=True. 
         
-        >>> from music21 import *
+        
         >>> from copy import deepcopy
         >>> chorale1 = corpus.parse('bwv10.7.mxl')
         >>> s = repeat.insertRepeat(chorale1, 3, 6, inPlace=False)
@@ -522,7 +522,7 @@ def deleteMeasures(s, toDelete, inPlace=False):
         corresponding to a number in toDelete and then renumbers the remaining measures in the stream.
                 
         
-        >>> from music21 import *
+        
         >>> from copy import deepcopy
         >>> chorale1 = corpus.parse('bwv10.7.mxl')
         >>> s = deepcopy(chorale1)
@@ -659,7 +659,7 @@ class Expander(object):
     To use this object directly, call :meth:`~music21.repeat.Expander.process` on the
     score
     
-    >>> from music21 import *
+    
     >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
     >>> s.makeMeasures(inPlace = True)
     >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
@@ -811,7 +811,7 @@ class Expander(object):
         Inefficient, because the entire stream is expanded before making this call, rather than just seeing
         what needs to be expanded and returning that.
         
-        >>> from music21 import *
+        
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
         >>> s.makeMeasures(inPlace = True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
@@ -1047,7 +1047,7 @@ class Expander(object):
         This is used to handle when there are more than 
         one group of repeat brackets per Stream. 
 
-        >>> from music21 import *
+        
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
         >>> s.makeMeasures(inPlace = True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
@@ -1198,7 +1198,7 @@ class Expander(object):
 
         The provided Stream must be a Stream only of Measures. 
 
-        >>> from music21 import *
+        
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
         >>> s.makeMeasures(inPlace = True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
@@ -1302,7 +1302,7 @@ class Expander(object):
         If `returnExpansionOnly` is True, only the expanded portion is 
         returned, the rest of the Stream is not retained.
         
-        >>> from music21 import *
+        
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
         >>> s.makeMeasures(inPlace = True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
@@ -1624,7 +1624,7 @@ class Expander(object):
         stream of measures. This requires the provided stream 
         to only have measures. 
         
-        >>> from music21 import *
+        
         >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
         >>> s.makeMeasures(inPlace = True)
         >>> s.measure(3).append(repeat.Segno())
@@ -1830,7 +1830,7 @@ class RepeatFinder(object):
     
     Below is an example of calling simplify on a Bach chorale.
     
-    >>> from music21 import *
+    
     >>> chorale = corpus.parse('bwv117.4.mxl')
     >>> #_DOCS_SHOW chorale.show()
     
@@ -1875,7 +1875,7 @@ class RepeatFinder(object):
         
         Raises an exception if RepeatFinder's internal stream is too short (i.e. fewer than 3 measures long)
         
-        >>> from music21 import *
+        
         >>> noPickup = corpus.parse('bwv10.7.mxl')
         >>> repeat.RepeatFinder(noPickup).getQuarterLengthOfPickupMeasure()
         0.0
@@ -1928,7 +1928,7 @@ class RepeatFinder(object):
         Raises an exception if the internal stream is too short
         (i.e. fewer than 3 bars long).
         
-        >>> from music21 import *
+        
         >>> noPickup = corpus.parse('bwv10.7.mxl')
         >>> repeat.RepeatFinder(noPickup).hasPickup()
         False
@@ -1969,7 +1969,7 @@ class RepeatFinder(object):
         
         Measures are considered the same if the defaultHash maps them to two values which are equal under the '==' operator.
         
-        >>> from music21 import *
+        
         >>> chorales = corpus.getBachChorales()
         >>> chorale = corpus.parse('bwv154.3.mxl')
         >>> repeat.RepeatFinder(chorale).getMeasureSimilarityList()
@@ -2112,7 +2112,7 @@ class RepeatFinder(object):
                 
         For all tuples t1 and t2, it is guaranteed that we never have t1.l1 contains t2.l1 or t2.l2 contains t2.l2
                 
-        >>> from music21 import *
+        
         >>> mList = [[5, 6], [7], [8], [9], [11, 12], [6, 13], [], [], [], [], [], [12], [], []]
         >>> res1 = repeat.RepeatFinder()._getSimilarMeasureTuples(mList, False)
         >>> ([1, 2, 3, 4], [7, 8, 9, 10]) in res1
@@ -2222,7 +2222,7 @@ class RepeatFinder(object):
         i.e. if 4+ measures repeat themselves, this function returns a stream with a repeat sign instead
         of the second iteration of those measures.
 
-        >>> from music21 import *
+        
         >>> from copy import deepcopy
         >>> chorale1 = corpus.parse(corpus.getBachChorales()[1])
         >>> rf = repeat.RepeatFinder(chorale1)
@@ -2304,7 +2304,7 @@ class RepeatFinder(object):
         by barEnd. Operates on RepeatFinder's internal stream, but only alters this
         stream if inPlace=True.
         
-        >>> from music21 import *
+        
         >>> from copy import deepcopy
         >>> chorale1 = corpus.parse('bwv10.7.mxl')
         >>> s = repeat.RepeatFinder(chorale1).insertRepeat(3, 6, inPlace=False)
@@ -2373,7 +2373,7 @@ class RepeatFinder(object):
         from measures 4 to 6.
                 
         
-        >>> from music21 import *
+        
         >>> c1 = corpus.parse('bwv10.7.mxl')
         >>> repeat.RepeatFinder(c1).insertRepeatEnding( 4, 6, 1, True)
         >>> repeat.RepeatFinder(c1).insertRepeatEnding( 11, 13, 2, True)
@@ -2483,7 +2483,7 @@ class RepeatFinder(object):
         corresponding to a number in toDelete.  Renumbers the remaining measures in the stream.
                 
         
-        >>> from music21 import *
+        
         >>> from copy import deepcopy
         >>> chorale1 = corpus.parse('bwv10.7.mxl')
         >>> s = deepcopy(chorale1)
@@ -2592,7 +2592,7 @@ class RepeatFinder(object):
         In the below example, we have an 8-measure stream where the last four measures are identical to the
         first four.  
         
-        >>> from music21 import *
+        
         >>> s = stream.Stream()
         >>> notes = [note.Note('D'), note.Note('E-'), note.Note('C'), note.Note('B3'),
         ...           note.Note('D'), note.Note('E-'), note.Note('C'), note.Note('B3')]
@@ -2609,7 +2609,7 @@ class RepeatFinder(object):
         .. image:: images/repeat-RepeatFinderDSCH.*
             :width: 600
         
-        >>> s2 = RepeatFinder(s).simplify()
+        >>> s2 = repeat.RepeatFinder(s).simplify()
         >>> #_DOCS_SHOW s2.show()
         
         
@@ -2619,7 +2619,7 @@ class RepeatFinder(object):
         
         
         OMIT_FROM_DOCS 
-        >>> from music21 import *
+        
         >>> chorales = corpus.getBachChorales()
         >>> c1 = corpus.parse('bwv115.6.mxl')    #has a repeated section
         >>> c1simple = repeat.RepeatFinder(c1).simplify()
@@ -2789,7 +2789,7 @@ class RepeatFinder(object):
         Specifically, returns a list of tuples of the form (l1, l2) where l1 and l2 are lists
         of measure numbers such that measure l1[i] is the same as measure l2[i].
         
-        >>> from music21 import *
+        
         >>> chorale = corpus.parse('bwv117.4.mxl')
         >>> #_DOCS_SHOW chorale.show()
     
