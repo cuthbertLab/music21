@@ -220,7 +220,7 @@ def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeRev
         >>> pprint.pprint(scoreSim[64:68]) #doctest: +ELLIPSIS
         [(u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 3, 17, 0.0),
          (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 4, 22, 0.0),
-         (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.377...),
+         (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.45...),
          (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 1, 5, 0.339...)]
 
     Return tuple.
