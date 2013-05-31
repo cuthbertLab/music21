@@ -5592,7 +5592,7 @@ def mainTest(*testClasses):
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
         globs = importlib.import_module('music21').__dict__.copy()
-        optionflags = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE|doctest.REPORT_ONLY_FIRST_FAILURE)
+        optionflags = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
         s1 = doctest.DocTestSuite(
             '__main__',
             globs=globs,

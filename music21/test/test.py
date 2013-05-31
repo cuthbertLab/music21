@@ -162,7 +162,7 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
     None
     '''
     globs = importlib.import_module('music21').__dict__.copy()
-    docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE|doctest.REPORT_ONLY_FIRST_FAILURE)
+    docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
     # in case there are any tests here, get a suite to load up later
     s1 = doctest.DocTestSuite(
         __name__,

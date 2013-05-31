@@ -236,7 +236,7 @@ def runOneModuleWithoutImp(args):
     try:
         moduleName = modGath._getName(fp)
         globs = importlib.import_module('music21').__dict__.copy()
-        docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE|doctest.REPORT_ONLY_FIRST_FAILURE)
+        docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
         s1 = doctest.DocTestSuite(
             globs=globs,
             optionflags=docTestOptions,
