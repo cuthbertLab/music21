@@ -908,7 +908,7 @@ def parseWork(*arguments, **keywords):
     '''
     import warnings
     #raise DeprecationWarning('the corpus.parseWork() function is depcreciated: use corpus.parse()')
-    warnings.warn('the corpus.parseWork() function is depcreciated: use corpus.parse()', DeprecationWarning)
+    warnings.warn('the corpus.parseWork() function is deprecated: use corpus.parse()', DeprecationWarning)
     return parse(*arguments, **keywords)
 
 #-------------------------------------------------------------------------------
