@@ -23,7 +23,6 @@ building a new release.
 Run test/testDocumentation after this.
 '''
 import doctest
-import importlib
 import multiprocessing
 import os
 import sys
@@ -235,7 +234,7 @@ def runOneModuleWithoutImp(args):
     
     try:
         moduleName = modGath._getName(fp)
-        globs = importlib.import_module('music21').__dict__.copy()
+        globs = __import__('music21').__dict__.copy()
         docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
         s1 = doctest.DocTestSuite(
             globs=globs,
@@ -248,7 +247,7 @@ def runOneModuleWithoutImp(args):
         else:
             s1.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(moduleObject.Test))
         try:
-            globs = importlib.import_module('music21').__dict__.copy()
+            globs = __import__('music21').__dict__.copy()
             s3 = doctest.DocTestSuite(moduleObject,
                 globs=globs,
                 optionflags=docTestOptions,

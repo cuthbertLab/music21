@@ -49,7 +49,6 @@ VERSION_STR = "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
 import codecs
 import copy
 import doctest
-import importlib
 import sys
 import types
 import unittest
@@ -5591,7 +5590,7 @@ def mainTest(*testClasses):
     else: 
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        globs = importlib.import_module('music21').__dict__.copy()
+        globs = __import__('music21').__dict__.copy()
         optionflags = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
         s1 = doctest.DocTestSuite(
             '__main__',

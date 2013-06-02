@@ -15,13 +15,8 @@ Controller to run all module tests in the music21 folders.
 Runs great, but slowly on multiprocessor systems.
 '''
 
-
-
-import importlib
 import unittest, doctest
 import os, imp, sys
-
-
 
 from music21 import base
 from music21 import common
@@ -30,14 +25,11 @@ _MOD = 'test.py'
 environLocal = environment.Environment(_MOD)
 
 
-
-
 #-------------------------------------------------------------------------------
 class ModuleGather(object):
     r'''
     Utility class for gathering and importing all modules in the music21
     package. Puts them in self.modulePaths.
-    
     
     >>> from music21.test import test as testModule
     >>> mg = testModule.ModuleGather()
@@ -161,7 +153,7 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
     >>> print(None)
     None
     '''
-    globs = importlib.import_module('music21').__dict__.copy()
+    globs = __import__('music21').__dict__.copy()
     docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
     # in case there are any tests here, get a suite to load up later
     s1 = doctest.DocTestSuite(
@@ -205,7 +197,7 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(testCase)
             s1.addTests(s2)
         try:
-            globs = importlib.import_module('music21').__dict__.copy()
+            globs = __import__('music21').__dict__.copy()
             s3 = doctest.DocTestSuite(
                 module,
                 globs=globs,
