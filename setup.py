@@ -52,7 +52,7 @@ classifiers = [
 if __name__ == '__main__':
     setup(
         name='music21',
-        version=__version__
+        version=__version__,
         description=DESCRIPTION,
         long_description=DESCRIPTION_LONG,
         author='Michael Scott Cuthbert, the music21 project, others',
