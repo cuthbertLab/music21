@@ -766,7 +766,7 @@ def dynamicToMx(d):
 
     
     >>> a = dynamics.Dynamic('ppp')
-    >>> a.volumeScalar
+    >>> print '%.2f' % a.volumeScalar
     0.15
     >>> a._positionRelativeY = -10
     >>> b = musicxml.toMxObjects.dynamicToMx(a)
