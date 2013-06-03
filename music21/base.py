@@ -5592,13 +5592,19 @@ def mainTest(*testClasses):
     else: 
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        globs = __import__('music21').__dict__.copy()
         optionflags = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
-        s1 = doctest.DocTestSuite(
-            '__main__',
-            globs=globs,
-            optionflags=optionflags,
-            )
+        if 'moduleRelative' in sys.argv:
+            s1 = doctest.DocTestSuite(
+                '__main__',
+                optionflags=optionflags,
+                )
+        else:
+            globs = __import__('music21').__dict__.copy()
+            s1 = doctest.DocTestSuite(
+                '__main__',
+                globs=globs,
+                optionflags=optionflags,
+                )
 
     verbosity = 1
     if 'verbose' in testClasses or 'verbose' in sys.argv:
