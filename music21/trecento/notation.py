@@ -62,7 +62,8 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     For more information on mensural types, please see the documentation for :class:`music21.medren.generalMensuralNote`.
     If no mensural type is specified, it is assumed to be the same as the previous note. I.e., c(SB) B c d is a string of semibrevises. 
     
-    
+    >>> from music21 import *    
+ 
     >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)')
     >>> tTNN.note.pitch
     <music21.pitch.Pitch A4>

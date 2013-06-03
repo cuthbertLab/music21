@@ -1702,7 +1702,7 @@ class Pitch(base.Music21Object):
 
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20
-        >>> p._getPs()
+        >>> print '%.1f' % p._getPs()
         60.2
 
         

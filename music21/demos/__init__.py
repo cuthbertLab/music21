@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["eschbeg", "monteverdi"]
+__all__ = [
+    'eschbeg',
+    'monteverdi',
+    ]
 
 
 

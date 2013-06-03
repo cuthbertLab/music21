@@ -47,6 +47,7 @@ def md5OfCorpusFile(fileDir, scoreNumber=None):
     returns the md5 hash of the text file contents. the file must be the full
     name of the corpus file
     
+    >>> from music21.demos.bhadley.mrjobaws.awsutility import md5OfCorpusFile
     
     >>> a = md5OfCorpusFile('bach/bwv431.mxl')
     >>> a
@@ -102,6 +103,7 @@ def getStreamAndmd5(corpusFilepath):
     this is just a list of one tuple but if the file path contains an opus file, these
     are parsed into tuples with :meth:`music21.demos.bhadley.aws.unbundleOpus` and the list is returned
     
+    >>> from music21.demos.bhadley.mrjobaws.awsutility import getStreamAndmd5
     
     >>> #_DOCS_SHOW getStreamAndmd5('airdsAirs/book3.abc')[12:14] 
     [(<music21.stream.Score ...>, 'c1666c19d63fc0940f111008e2269f75.413'), (<music21.stream.Score ...>, 'c1666c19d63fc0940f111008e2269f75.414')]

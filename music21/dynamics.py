@@ -134,7 +134,7 @@ class Dynamic(base.Music21Object):
     >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
     >>> pp2.value
     'ppp'
-    >>> pp2.volumeScalar
+    >>> print '%.2f' % pp2.volumeScalar
     0.15
     
     Dynamics can be placed anywhere in a stream.

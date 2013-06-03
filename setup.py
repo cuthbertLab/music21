@@ -10,8 +10,15 @@
 # License:       LGPL
 #-------------------------------------------------------------------------------
 
+import os
 from setuptools import setup, find_packages
-import music21
+
+# Do not import music21 directly.
+# Instead, read the _version.py file and exec its contents. 
+path = os.path.join(os.path.dirname(__file__), 'music21', '_version.py')
+with open(path, 'r') as f:
+    lines = f.read()
+    exec(lines)
 
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis and Manipulation.'
 DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis
@@ -45,7 +52,7 @@ classifiers = [
 if __name__ == '__main__':
     setup(
         name='music21',
-        version=music21.VERSION_STR,
+        version=__version__
         description=DESCRIPTION,
         long_description=DESCRIPTION_LONG,
         author='Michael Scott Cuthbert, the music21 project, others',
@@ -53,7 +60,7 @@ if __name__ == '__main__':
         license='LGPL',
         url='http://code.google.com/p/music21',
         classifiers=classifiers,
-        download_url='http://music21.googlecode.com/files/music21-%s.tar.gz' % music21.VERSION_STR,
+        download_url='http://music21.googlecode.com/files/music21-%s.tar.gz' % __version__,
         packages=find_packages(exclude=['ez_setup']),
         include_package_data=True,
     )

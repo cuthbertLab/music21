@@ -820,7 +820,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
         >>> len(a._getWeights('minor'))
         12            
         >>> a._getWeights('major')
-        [16.8, 0.86, 12.95, 1.41, ...]
+        [16.8..., 0.8..., 12.9..., 1.4..., ...]
 
         '''
         weightType = weightType.lower()

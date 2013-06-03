@@ -1175,7 +1175,7 @@ def _diffscore(measureX, measureY):
     >>> m1.append([note.Note('e'), note.Note('f'), note.Note('g'), note.Note('a')])
     >>> m2.append([note.Note('e'), note.Note('f'), note.Note('g#'), note.Note('a')])
     >>> variant._diffscore(m1, m2)
-    0.4
+    0.4...
     
     '''
     hashes = getMeasureHashes([measureX, measureY])

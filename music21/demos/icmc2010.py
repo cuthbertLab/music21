@@ -82,7 +82,7 @@ def bergEx01(show=True):
 
 def showDots(show=True):
     
-    score = corpus.parseWork('bach/bwv281.xml') 
+    score = corpus.parse('bach/bwv281.xml') 
     partBass = score.getElementById('Bass')
     ts = partBass.flat.getElementsByClass(
          meter.TimeSignature)[0]
@@ -111,7 +111,7 @@ def findRaisedSevenths(show=True):
     import music21
     from music21 import corpus, meter, stream
 
-    score = corpus.parseWork('bach/bwv366.xml')  
+    score = corpus.parse('bach/bwv366.xml')  
     ts = score.flat.getElementsByClass(
         meter.TimeSignature)[0]
     #ts.beatSequence.partition(3)
@@ -141,7 +141,7 @@ def findRaisedSevenths(show=True):
 def oldAccent(show=True):
     from music21 import corpus, meter, articulations
     
-    score = corpus.parseWork('bach/bwv366.xml')
+    score = corpus.parse('bach/bwv366.xml')
     partBass = score.getElementById('Bass')
     
     ts = partBass.flat.getElementsByClass(meter.TimeSignature)[0]

@@ -42,8 +42,10 @@ under the module "base":
 
 #-------------------------------------------------------------------------------
 # string and tuple must be the same
-VERSION = (1, 5, 0)
-VERSION_STR = "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
+from _version import __version__, __version_info__
+VERSION = __version_info__
+VERSION_STR = __version__
+#VERSION_STR = "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
 #-------------------------------------------------------------------------------
 
 import codecs

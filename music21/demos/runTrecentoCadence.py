@@ -36,11 +36,15 @@ def countTimeSig():
 
 def sortByPMFC(work1, work2):
     '''
-    sort a work according to which one comes first in PMFC
+    Sort a work according to which one comes first in PMFC:
+
+    >>> from music21.demos.runTrecentoCadence import sortByPMFC
     
     >>> class Work(object):
     ...    def __init__(self, id):
     ...        self.id = id
+    ...
+
     >>> work1 = Work(1)
     >>> work1.pmfcVol = 5
     >>> work1.pmfcPageStart = 20
