@@ -3338,62 +3338,72 @@ class Stream(base.Music21Object):
         #environLocal.printDebug(['numberStart', numberStart, 'numberEnd', numberEnd])
 
         for i in range(numberStart, numberEnd+1):
-            match = None
+            matches = []
             # do not know if we have suffixes for the number
             for number, suffix in mapCooked:
                 # this will match regardless of suffix
                 # numbers may be strings still
                 if number == i:
-                    match = mapCooked[(number, suffix)]
-                    break
+                    matches.append(mapCooked[(number, suffix)])
             # numbers may not be contiguous
-            if match is None: # None found in this range
+            if len(matches) == 0: # None found in this range
                 continue 
+            # if not startOffset then let us make one
+            # this assumes measure are in offset order
+            # this may not always be the case
+            if startOffset is None:
+                # is m 2X before 2 or after? can't be sure, 
+                # so we get the min...
+                for mWithSameId in matches:
+                    for m in mWithSameId:
+                        thisOffset = m.getOffsetBySite(srcObj)
+                        if startOffset is None:
+                            startOffset = thisOffset # most common
+                            startMeasure = m 
+                        else: # suffixes -- should check priority!
+                            if thisOffset < startOffset:
+                                startOffset = thisOffset
+                                startMeasure = m 
+                #environLocal.printDebug(['startOffset', startOffset, 'startMeasure', startMeasure, 'm', m])
+
             # need to make offsets relative to this new Stream
-            for m in match:
-                #environLocal.printDebug(['startMeasure', startMeasure, 'm', m])
-                # this assumes measure are in offset order
-                # this may not always be the case
-                if startOffset is None: # only set on first
-                    startOffset = m.getOffsetBySite(srcObj)
-                    # store reference for collecting objects in src
-                    startMeasure = m
-                #environLocal.printDebug(['startOffset', startOffset, 'startMeasure', startMeasure])
-                # get offset before doing spanner updates; not sure why yet
-                oldOffset = m.getOffsetBySite(srcObj)
-                # create a new Measure container, but populate it 
-                # with the same elements
-
-                # using the same measure in the return obj
-                newOffset = oldOffset - startOffset
-                returnObj._insertCore(newOffset, m)
-            
-
-#                 mNew = Measure()
-#                 mNew.mergeAttributes(m)
-#                 # replace any spanner associations with this measure
-#                 if len(spannerBundle) > 0:
-#                     spannerBundle.replaceSpannedElement(m, mNew)
-#                 # active sites get mangled somewhere
-#                 m.restoreActiveSites()
-#                 # will only set on first time through
-#                 if startMeasureNew is None:
-#                     startMeasureNew = mNew
-# 
-#                 # transfer elements to the new measure; these are not copies
-#                 # this might contain voices and/or spanners
-#                 for e in m._elements:
-#                     mNew.insert(e) # NOTE: cannot use _insertCore here
-#                 for e in m._endElements:
-#                     #mNew.storeAtEnd(e)
-#                     mNew._storeAtEndCore(e)
-# 
-#                 # subtract the offset of the first measure
-#                 # this will be zero in the first usage
-#                 newOffset = oldOffset - startOffset
-#                 returnObj._insertCore(newOffset, mNew)
-#                 mNew._elementsChanged()
-#                 #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
+            for mWithSameId in matches:
+                for m in mWithSameId:
+                    # get offset before doing spanner updates; not sure why yet
+                    oldOffset = m.getOffsetBySite(srcObj)
+                    # create a new Measure container, but populate it 
+                    # with the same elements
+    
+                    # using the same measure in the return obj
+                    newOffset = oldOffset - startOffset
+                    returnObj._insertCore(newOffset, m)
+                
+    
+    #                 mNew = Measure()
+    #                 mNew.mergeAttributes(m)
+    #                 # replace any spanner associations with this measure
+    #                 if len(spannerBundle) > 0:
+    #                     spannerBundle.replaceSpannedElement(m, mNew)
+    #                 # active sites get mangled somewhere
+    #                 m.restoreActiveSites()
+    #                 # will only set on first time through
+    #                 if startMeasureNew is None:
+    #                     startMeasureNew = mNew
+    # 
+    #                 # transfer elements to the new measure; these are not copies
+    #                 # this might contain voices and/or spanners
+    #                 for e in m._elements:
+    #                     mNew.insert(e) # NOTE: cannot use _insertCore here
+    #                 for e in m._endElements:
+    #                     #mNew.storeAtEnd(e)
+    #                     mNew._storeAtEndCore(e)
+    # 
+    #                 # subtract the offset of the first measure
+    #                 # this will be zero in the first usage
+    #                 newOffset = oldOffset - startOffset
+    #                 returnObj._insertCore(newOffset, mNew)
+    #                 mNew._elementsChanged()
+    #                 #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
 
         # manipulate startMeasure to add desired context objects
         for className in collect:
