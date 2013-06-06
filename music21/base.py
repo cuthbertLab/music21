@@ -1538,7 +1538,7 @@ class Music21Object(object):
         >>> ec1.classSortOrder
         5
         ''',
-    'hideObjectOnPrint': 'if set to `True` will not print upon output (only used in MusicXML output at this point).',
+    'hideObjectOnPrint': 'if set to `True` will not print upon output (only used in MusicXML output at this point and Lilypond for notes, chords, and rests).',
     'xPosition': 'if set, defines the display x-position from the start of the container (in musicxml "tenths" by default)',
     }
 

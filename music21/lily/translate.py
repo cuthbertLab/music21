@@ -1108,16 +1108,24 @@ class LilypondConverter(object):
         read-only property that returns a string of the lilypond representation of
         a note (or via subclassing, rest or chord)
         
-        
-        >>> conv = lily.translate.LilypondConverter()
+        ::
+            >>> conv = lily.translate.LilypondConverter()
+    
+            >>> n0 = note.Note("D#5")
+            >>> n0.pitch.accidental.displayType = 'always'
+            >>> n0.pitch.accidental.displayStyle = 'parentheses'
+            >>> n0.editorial.color = 'blue'
+            >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
+            >>> print sm
+            \color "blue" dis'' ! ? 4
 
-        >>> n0 = note.Note("D#5")
-        >>> n0.pitch.accidental.displayType = 'always'
-        >>> n0.pitch.accidental.displayStyle = 'parentheses'
-        >>> n0.editorial.color = 'blue'
-        >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
-        >>> print sm
-        \color "blue" dis'' ! ? 4
+        Now make the note disappear...
+        
+        ::
+            >>> n0.hideObjectOnPrint = True
+            >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
+            >>> print sm
+            s 4
 
         '''
 
@@ -1125,7 +1133,7 @@ class LilypondConverter(object):
 
         simpleElementParts = []
         if noteOrRest.editorial is not None:
-            if noteOrRest.editorial.color:
+            if noteOrRest.editorial.color and noteOrRest.hideObjectOnPrint is not True:
                 simpleElementParts.append(noteOrRest.editorial.colorLilyStart())
         
         if 'Note' in c:
@@ -1247,23 +1255,34 @@ class LilypondConverter(object):
         >>> c1.pitches[2].accidental.displayType = 'always'
         >>> print conv.lySimpleMusicFromChord(c1)
          < cis, e' dis''  !  > 2.. 
+         
+        test hidden chord:
+        
+        >>> c1.hideObjectOnPrint = True
+        >>> print conv.lySimpleMusicFromChord(c1)
+        s 2..
         '''
         #self.appendBeamCode(chordObj)
-        self.appendStemCode(chordObj)
-
-        chordBodyElements = []
-        for p in chordObj.pitches:
-            chordBodyElementParts = []
-            lpPitch = self.lyPitchFromPitch(p)
-            chordBodyElementParts.append(lpPitch)
-            if p.accidental is not None:
-                if p.accidental.displayType == 'always':
-                    chordBodyElementParts.append('! ')
-                if p.accidental.displayStyle == 'parentheses':
-                    chordBodyElementParts.append('? ')
-            lpChordElement = lyo.LyChordBodyElement(parts = chordBodyElementParts)
-            chordBodyElements.append(lpChordElement)
-        lpChordBody = lyo.LyChordBody(chordBodyElements = chordBodyElements)
+        if chordObj.hideObjectOnPrint is not True:
+        
+            self.appendStemCode(chordObj)
+    
+            chordBodyElements = []
+            for p in chordObj.pitches:
+                chordBodyElementParts = []
+                lpPitch = self.lyPitchFromPitch(p)
+                chordBodyElementParts.append(lpPitch)
+                if p.accidental is not None:
+                    if p.accidental.displayType == 'always':
+                        chordBodyElementParts.append('! ')
+                    if p.accidental.displayStyle == 'parentheses':
+                        chordBodyElementParts.append('? ')
+                lpChordElement = lyo.LyChordBodyElement(parts = chordBodyElementParts)
+                chordBodyElements.append(lpChordElement)
+            lpChordBody = lyo.LyChordBody(chordBodyElements = chordBodyElements)
+        else:
+            lpChordBody = lyo.LyPitch('s ', '')
+        
         lpMultipliedDuration = self.lyMultipliedDurationFromDuration(chordObj.duration)
 
         postEvents = self.postEventsFromObject(chordObj)
