@@ -1899,7 +1899,7 @@ def addToStaffReference(mxObjectOrNumber, music21Object, staffReference):
     staffReference[key].append(music21Object)
 
 
-def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
+def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=None):
     '''
     Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object)
     into a music21 :class:`~music21.stream.Measure`.
@@ -1930,6 +1930,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         #environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
 
+    if lastMeasureInfo is not None:
+        lastMNum, lastMSuffix = lastMeasureInfo
+    else:
+        lastMNum, lastMSuffix = (None, None)
+
     mNumRaw = mxMeasure.get('number')
     if mNumRaw is None:
         mNum = None
@@ -1942,6 +1947,16 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     if mSuffix not in [None, '']:
         m.numberSuffix = mSuffix
 
+    # fix for Finale which calls unnumbered measures X1, X2, etc. which
+    # we convert to 1.X, 2.X, etc. without this...
+    if lastMNum is not None:
+        if m.numberSuffix == 'X' and m.number != lastMNum + 1:
+            newSuffix = m.numberSuffix + str(m.number)
+            if lastMSuffix is not None:
+                newSuffix = lastMSuffix + newSuffix
+            m.number = lastMNum
+            m.numberSuffix = newSuffix    
+    
     data = mxMeasure.get('width')
     if data != None: # may need to do a format/unit conversion?
         m.layoutWidth = data
@@ -2490,10 +2505,14 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     lastTransposition = None # may change at measure boundaries
     lastMeasureWasShort = False  # keep track of whether the last measure was short...
 
+    lastMeasureNumber = 0
+    lastMeasureSuffix = None
+
     for i, mxMeasure in enumerate(mxPart):
         # t here is transposition, if defined; otherwise it is None
         m, staffReference, t = mxToMeasure(mxMeasure,
-                               spannerBundle=spannerBundle)
+                               spannerBundle=spannerBundle,
+                               lastMeasureInfo=(lastMeasureNumber, lastMeasureSuffix))
         if t is not None:
             if lastTransposition is None and i == 0: # if this is the first
                 #environLocal.printDebug(['transposition', t])
@@ -2512,6 +2531,14 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
         # there will be one for each measure
         staffReferenceList.append(staffReference)
+
+        if m.number != lastMeasureNumber:
+            # we do this check so that we do not compound suffixes, i.e.:
+            # 23, 23.X1, 23.X1X2, 23.X1X2X3
+            # and instead just do:
+            # 23, 23.X1, 23.X2, etc.
+            lastMeasureNumber = m.number
+            lastMeasureSuffix = m.numberSuffix
 
         if m.timeSignature is not None:
             lastTimeSignature = m.timeSignature
