@@ -1129,13 +1129,17 @@ class LilypondConverter(object):
                 simpleElementParts.append(noteOrRest.editorial.colorLilyStart())
         
         if 'Note' in c:
-            lpPitch = self.lyPitchFromPitch(noteOrRest.pitch)
-            simpleElementParts.append(lpPitch)
-            if noteOrRest.pitch.accidental is not None:
-                if noteOrRest.pitch.accidental.displayType == 'always':
-                    simpleElementParts.append('! ')
-                if noteOrRest.pitch.accidental.displayStyle == 'parentheses':
-                    simpleElementParts.append('? ')
+            if noteOrRest.hideObjectOnPrint is not True:
+                lpPitch = self.lyPitchFromPitch(noteOrRest.pitch)
+                simpleElementParts.append(lpPitch)
+                if noteOrRest.pitch.accidental is not None:
+                    if noteOrRest.pitch.accidental.displayType == 'always':
+                        simpleElementParts.append('! ')
+                    if noteOrRest.pitch.accidental.displayStyle == 'parentheses':
+                        simpleElementParts.append('? ')
+            else:
+                simpleElementParts.append("s ")
+        
         elif "SpacerRest" in c:
             simpleElementParts.append("s ")
         elif 'Rest' in c:
