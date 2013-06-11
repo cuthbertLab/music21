@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import sys
+from music21 import common
 
 
 def runNBConvert(notebookFilePath):
@@ -36,9 +37,10 @@ def convertOneNotebook(notebookFilePath):
 
     imageFileDirectoryName = notebookFileNameWithoutExtension + '_files'
 
+    rstFileName = notebookFileNameWithoutExtension + '.rst'
     rstFilePath = os.path.join(
         notebookParentDirectoryPath,
-        notebookFileNameWithoutExtension + '.rst',
+        rstFileName,
         )
 
     with open(rstFilePath, 'r') as f:
@@ -71,9 +73,62 @@ def convertOneNotebook(notebookFilePath):
     with open(rstFilePath, 'w') as f:
         f.write('\n'.join(newLines))
 
+    return rstFileName, imageFileDirectoryName
+
+
+def convertAllNotebooks():
+    rstDirectoryPath = common.getBuildDocRstFilePath()
+    notebookDirectoryPath = os.path.join(
+        common.getBuildDocFilePath(),
+        'ipythonNotebooks',
+        )
+    for notebookFileName in [x for x in os.listdir(notebookDirectoryPath) \
+        if x.endswith('.ipynb')]:
+        notebookFilePath = os.path.join(notebookDirectoryPath, notebookFileName)
+        rstFileName, imageFileDirectoryName = convertOneNotebook(notebookFilePath)
+
+        oldRstFilePath = os.path.join(
+            notebookDirectoryPath, 
+            rstFileName,
+            )
+        newRstFilePath = os.path.join(
+            rstDirectoryPath, 
+            rstFileName,
+            )
+        os.rename(oldRstFilePath, newRstFilePath)
+
+        oldImageFileDirectoryPath = os.path.join(
+            notebookDirectoryPath,
+            imageFileDirectoryName,
+            )
+        # Remove all unnecessary *.text files.
+        for fileName in os.listdir(oldImageFileDirectoryPath):
+            if fileName.endswith('.text'):
+                filePath = os.path.join(
+                    oldImageFileDirectoryPath,
+                    fileName,
+                    )
+                os.remove(filePath)
+        newImageFileDirectoryPath = os.path.join(
+            rstDirectoryPath,
+            imageFileDirectoryName,
+            )
+        if not os.path.exists(newImageFileDirectoryPath):
+            os.rename(oldImageFileDirectoryPath, newImageFileDirectoryPath)
+        else:
+            for fileName in os.listdir(oldImageFileDirectoryPath):
+                oldFilePath = os.path.join(
+                    oldImageFileDirectoryPath,
+                    fileName,
+                    )
+                newFilePath = os.path.join(
+                    newImageFileDirectoryPath,
+                    fileName,
+                    )
+                os.rename(oldFilePath, newFilePath)
+            os.remove(oldImageFileDirectoryPath)
+
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        sys.exit(0)
-    notebookFilePath = os.path.abspath(sys.argv[1])
-    convertOneNotebook(notebookFilePath)
+    convertAllNotebooks()
+
