@@ -728,7 +728,6 @@ class MeterTerminal(object):
 
     def _setNumerator(self, value):
         '''
-        
         >>> a = meter.MeterTerminal('2/4')
         >>> a.duration.quarterLength
         2.0
@@ -2704,7 +2703,6 @@ class TimeSignature(base.Music21Object):
         returns a simple string representing the time signature ratio or
         sets a new one.  Cannot be used for very complex time signatures:
         
-        
         >>> threeFour = meter.TimeSignature('3/4')
         >>> threeFour.ratioString
         '3/4'
@@ -2943,7 +2941,8 @@ class TimeSignature(base.Music21Object):
                 pass
 
     def loadRatio(self, numerator, denominator, partitionRequest=None):
-        '''Convenience method
+        '''
+        Change the numerator and denominator for a given partition.
         '''
         value = '%s/%s' % (numerator, denominator)
         self.load(value, partitionRequest)
@@ -2989,10 +2988,17 @@ class TimeSignature(base.Music21Object):
     def _getNumerator(self):
         return self.beamSequence.numerator
 
-    numerator = property(_getNumerator, 
+    def _setNumerator(self, value):
+        denom = self.denominator
+        newRatioString = str(value) + '/' + str(denom)
+        self.resetValues(newRatioString)
+
+    numerator = property(_getNumerator, _setNumerator,
         doc = '''
         Return the numerator of the TimeSignature as a number.
-        To set the numerator, change beatCount.
+        
+        Can set the numerator for a simple TimeSignature. 
+        To set the numerator of a complex TimeSignature, change beatCount.
 
         (for complex TimeSignatures, note that this comes from the .beamSequence
         of the TimeSignature)
@@ -3001,6 +3007,10 @@ class TimeSignature(base.Music21Object):
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.numerator
         3
+        >>> ts.numerator = 5
+        >>> ts
+        <music21.meter.TimeSignature 5/4>
+
 
         In this case, the TimeSignature is silently being converted to 9/8
         to get a single digit numerator:
@@ -3013,9 +3023,15 @@ class TimeSignature(base.Music21Object):
     def _getDenominator(self):
         return self.beamSequence.denominator
 
-    denominator = property(_getDenominator,
+    def _setDenominator(self, value):
+        nummy = self.numerator
+        newRatioString = str(nummy) + '/' + str(value)
+        self.resetValues(newRatioString)
+
+
+    denominator = property(_getDenominator, _setDenominator,
         doc = '''
-        Return the denominator of the TimeSignature as a number
+        Return the denominator of the TimeSignature as a number or set it.
 
         (for complex TimeSignatures, note that this comes from the .beamSequence
         of the TimeSignature)
@@ -3024,8 +3040,12 @@ class TimeSignature(base.Music21Object):
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.denominator
         4
+        >>> ts.denominator = 8
+        >>> ts.ratioString
+        '3/8'
 
-        In this case, the TimeSignature is silently being converted to 9/8
+
+        In this folliwing case, the TimeSignature is silently being converted to 9/8
         to get a single digit denominator:
 
         >>> ts = meter.TimeSignature('2/4+5/8')

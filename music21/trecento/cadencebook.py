@@ -134,8 +134,8 @@ class TrecentoSheet(object):
         De mia farina
         >>> farina.incipit.parts[0].show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.note.Rest rest>
             {1.0} <music21.note.Rest rest>
             {2.0} <music21.note.Note C>
@@ -221,8 +221,8 @@ class GloriaSheet(TrecentoSheet):
     {0.0} <music21.metadata.Metadata object at 0x...>
     {0.0} <music21.stream.Part C>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
             {0.0} <music21.note.Note D>
@@ -230,8 +230,8 @@ class GloriaSheet(TrecentoSheet):
             {2.0} <music21.bar.Barline style=final>
     {0.0} <music21.stream.Part Ct>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.clef.BassClef>
+            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
             {0.0} <music21.note.Note F#>
@@ -241,8 +241,8 @@ class GloriaSheet(TrecentoSheet):
             {2.0} <music21.bar.Barline style=final>
     {0.0} <music21.stream.Part T>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.clef.BassClef>
+            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
             {0.0} <music21.note.Note D>

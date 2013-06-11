@@ -5190,8 +5190,8 @@ class Stream(base.Music21Object):
         >>> sMeasuresTwoFour = sSrc.makeMeasures()
         >>> sMeasuresTwoFour.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
@@ -5225,8 +5225,8 @@ class Stream(base.Music21Object):
         >>> sScr.makeMeasures(inPlace = True)
         >>> sScr.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.note.Note C>
         {3.0} <music21.stream.Measure 2 offset=3.0>
             {0.0} <music21.note.Note D>
@@ -5248,8 +5248,8 @@ class Stream(base.Music21Object):
         >>> dummy = partWithMeasures.makeTies(inPlace = True)
         >>> partWithMeasures.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.note.Note D#>
         {3.0} <music21.stream.Measure 2 offset=3.0>
             {0.0} <music21.note.Note D#>
@@ -5887,7 +5887,8 @@ class Stream(base.Music21Object):
                 duration.updateTupletType(durList)
             
         del mColl # remove Stream no longer needed
-        return returnObj
+        if inPlace is not True:
+            return returnObj
 
     def haveBeamsBeenMade(self):
         # could be called: hasAccidentalDisplayStatusSet
@@ -11638,7 +11639,8 @@ class Measure(Stream):
             # all that is needed is to remove the old clef
             # there is no new clef - suppresses the clef of a stream
             return
-        self.insert(0, clefObj)
+        self.insert(0.0, clefObj)
+        self._elementsChanged() # for some reason needed to make sure that sorting of Clef happens before TimeSignature
 
     clef = property(_getClef, _setClef, doc='''
         Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:

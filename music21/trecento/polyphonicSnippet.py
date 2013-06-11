@@ -237,8 +237,8 @@ class Incipit(PolyphonicSnippet):
         >>> ps.backPadLine(s2)
         >>> s2.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 1/4>
             {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 1/4>
             {0.0} <music21.note.Note C>
         {1.0} <music21.stream.Measure 2 offset=1.0>
             {0.0} <music21.note.Note C>
@@ -404,7 +404,7 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test) #, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

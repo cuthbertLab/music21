@@ -557,10 +557,7 @@ class LilypondConverter(object):
 
     def lyGroupedMusicListFromScoreWithParts(self, scoreIn, scoreInit = None):
         r'''
-        
-        
         More complex example showing how the score can be set up with ossia parts...
-        
         
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
@@ -574,14 +571,19 @@ class LilypondConverter(object):
            \new Staff  = Tenor { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
            \new Staff  = Bass { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
         <BLANKLINE>
-          \context Staff  = Soprano { \startStaff \partial 32*8 
+          \context Staff  = Soprano \with {
+              \autoBeamOff
+          }
+          { \startStaff \partial 32*8 
                 \clef "treble" 
                 \key fis \minor 
                 \time 4/4
+                \set stemRightBeamCount = #1
                 \once \override Stem #'direction = #DOWN 
-                cis'' 8  
+                cis'' 8 [ 
+                \set stemLeftBeamCount = #1
                 \once \override Stem #'direction = #DOWN 
-                b' 8  
+                b' 8 ]
                 \bar "|"  %{ end measure 0 %} 
                 \once \override Stem #'direction = #UP 
                 a' 4  
@@ -598,7 +600,10 @@ class LilypondConverter(object):
         } 
         <BLANKLINE>
         <BLANKLINE>
-        \context Staff  = Alto { \startStaff \partial 32*8 
+        \context Staff  = Alto \with  { 
+            \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
             \clef "treble"...
             \once \override Stem #'direction = #UP 
             e' 4  
@@ -647,7 +652,6 @@ class LilypondConverter(object):
         This is a little bit of a hack. This should be switched over to using a 
         prefixed context thing with \new Lyric = "id" \with { } {}
 
-        
         >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r4 e4_world')
         >>> s.makeMeasures(inPlace = True)
         >>> s.id = 'helloWorld'
@@ -699,7 +703,6 @@ class LilypondConverter(object):
         Uses self.inWord to keep track of whether or not we're in the middle of
         a word.
         
-        
         >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r2 e2 f2_world')
         >>> s.makeMeasures(inPlace = True)
         >>> lyrics = s.lyrics()[1]  # get first verse (yes, 1 = first, not 0!)
@@ -732,14 +735,15 @@ class LilypondConverter(object):
         elif el.text == '':
             text = ' _ '
         else:
+            text = '"' + el.text + '"'
             if el.syllabic == 'end':
-                text = el.text + '__'
+                text = text + '__'
                 inWord = False
             elif el.syllabic == 'begin' or el.syllabic == 'middle':
-                text = el.text + ' --'
+                text = text + ' --'
                 inWord = True
             else:
-                text = el.text
+                text = text
         
         self.inWord = inWord
         lpLyricElement = lyo.LyLyricElement(text)
@@ -749,7 +753,6 @@ class LilypondConverter(object):
         r'''
         returns a LySequentialMusic object from a stream
 
-        
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> lpc = lily.translate.LilypondConverter()
         >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(c)
@@ -782,7 +785,6 @@ class LilypondConverter(object):
         returns an LyPrefixCompositeMusic object from
         a stream (generally a part, but who knows...)
 
-        
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> c.staffLines = 4
         
@@ -792,6 +794,7 @@ class LilypondConverter(object):
         <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
         >>> print lyPrefixCompositeMusicOut
         \new Staff = ... \with {
+         \autoBeamOff 
          \override StaffSymbol #'line-count = #4
         }
         { \time 3/4
@@ -818,6 +821,8 @@ class LilypondConverter(object):
         else:
             newContext = contextType
             optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
+
+        contextModList.append(r"\autoBeamOff ")
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
             contextModList.append(r"\override StaffSymbol #'line-count = #%d" % streamIn.staffLines)
@@ -885,9 +890,15 @@ class LilypondConverter(object):
         >>> lpc.context = lpMusicList
         >>> lpc.appendObjectsToContextFromStream(m)
         >>> print lpc.context # internal spaces removed...
-          << \new Voice { c'' 1  
+          << \new Voice \with  { 
+                 \autoBeamOff 
+              } 
+              { c'' 1  
                   } 
-           \new Voice { cis'' 1  
+           \new Voice \with  { 
+                 \autoBeamOff 
+              } 
+              { cis'' 1  
                   } 
             >>        
         '''        
@@ -1080,7 +1091,7 @@ class LilypondConverter(object):
                     pass
 
         self.setContextForTupletStart(noteOrRest)
-        #self.appendBeamCode(noteOrRest)
+        self.appendBeamCode(noteOrRest)
         self.appendStemCode(noteOrRest)        
 
         lpSimpleMusic = self.lySimpleMusicFromNoteOrRest(noteOrRest)
@@ -1128,7 +1139,6 @@ class LilypondConverter(object):
             s 4
 
         '''
-
         c = noteOrRest.classes
 
         simpleElementParts = []
@@ -1156,9 +1166,15 @@ class LilypondConverter(object):
             else:
                 simpleElementParts.append("r ")
 
-
         lpMultipliedDuration = self.lyMultipliedDurationFromDuration(noteOrRest.duration)
         simpleElementParts.append(lpMultipliedDuration)
+
+        if 'NotRest' in c and noteOrRest.beams is not None and len(noteOrRest.beams) > 0:
+            if noteOrRest.beams.beamsList[0].type == 'start':
+                simpleElementParts.append("[ ")
+            elif noteOrRest.beams.beamsList[0].type == 'stop':
+                simpleElementParts.append("] ")  # no start-stop in music21...
+        
         simpleElement = lyo.LySimpleElement(parts = simpleElementParts)
 
         postEvents = self.postEventsFromObject(noteOrRest)
@@ -1173,7 +1189,6 @@ class LilypondConverter(object):
         Adds an LyEmbeddedScm object to the context's contents if the object's has a .beams
         attribute.
         
-        
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
@@ -1186,10 +1201,21 @@ class LilypondConverter(object):
 
         >>> lpc.appendBeamCode(n1)
         >>> print lpc.context.contents
-        [<music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>, <music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>]
+        [<music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>]
         >>> print lpc.context
-        \set stemLeftBeamCount = #0
         \set stemRightBeamCount = #2
+
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lpMusicList = lily.lilyObjects.LyMusicList()
+        >>> lpc.context = lpMusicList
+        >>> lpc.context.contents
+        []
+        >>> lpc.appendBeamCode(n2)
+        >>> print lpc.context.contents
+        [<music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>]
+        >>> print lpc.context
+        \set stemLeftBeamCount = #2
+
         '''
         leftBeams = 0
         rightBeams = 0
@@ -1208,14 +1234,17 @@ class LilypondConverter(object):
                             leftBeams += 1
                         else: # better wrong direction than none
                             rightBeams += 1
-            beamText = r'''\set stemLeftBeamCount = #%d''' % leftBeams
-            lpBeamScheme = lyo.LyEmbeddedScm(beamText)
-            self.context.contents.append(lpBeamScheme)
-            lpBeamScheme.setParent(self.context)
-            beamText = r'''\set stemRightBeamCount = #%d''' % rightBeams
-            lpBeamScheme = lyo.LyEmbeddedScm(beamText)
-            self.context.contents.append(lpBeamScheme)
-            lpBeamScheme.setParent(self.context)
+                if leftBeams > 0:
+                    beamText = r'''\set stemLeftBeamCount = #%d''' % leftBeams
+                    lpBeamScheme = lyo.LyEmbeddedScm(beamText)
+                    self.context.contents.append(lpBeamScheme)
+                    lpBeamScheme.setParent(self.context)
+
+                if rightBeams > 0:
+                    beamText = r'''\set stemRightBeamCount = #%d''' % rightBeams
+                    lpBeamScheme = lyo.LyEmbeddedScm(beamText)
+                    self.context.contents.append(lpBeamScheme)
+                    lpBeamScheme.setParent(self.context)
 
     def appendStemCode(self, noteOrChord):
         r'''
@@ -1262,7 +1291,7 @@ class LilypondConverter(object):
         >>> print conv.lySimpleMusicFromChord(c1)
         s 2..
         '''
-        #self.appendBeamCode(chordObj)
+        self.appendBeamCode(chordObj)
         if chordObj.hideObjectOnPrint is not True:
         
             self.appendStemCode(chordObj)
@@ -1293,7 +1322,7 @@ class LilypondConverter(object):
         evc = lyo.LyEventChord(noteChordElement = lpNoteChordElement)
         mlSM = lyo.LySimpleMusic(eventChord = evc)
         return mlSM
-
+        # TODO: Chord beaming...
         
     def postEventsFromObject(self, generalNote):
         '''

@@ -1516,10 +1516,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sMeasures), 1)
         self.assertEqual(len(sMeasures.getElementsByClass('Measure')), 1) # one measure
         self.assertEqual(len(sMeasures[0]), 3) 
-        # first is sig
-        self.assertEqual(str(sMeasures[0][0]), '<music21.meter.TimeSignature 4/4>') 
-        # second is clef
-        self.assertEqual(isinstance(sMeasures[0][1], clef.AltoClef), True)
+        # first is clef
+        self.assertEqual(isinstance(sMeasures[0][0], clef.AltoClef), True)
+        # second is sig
+        self.assertEqual(str(sMeasures[0][1]), '<music21.meter.TimeSignature 4/4>') 
         #environLocal.printDebug(['here', sMeasures[0][2]])
         #sMeasures.show('t')
         # the third element is a Note; we get it from flattening during

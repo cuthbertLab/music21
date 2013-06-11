@@ -995,8 +995,8 @@ def getRawSegments(music21Part, segmentBreaks=SEGMENT_SEGMENTBREAKS):
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
     >>> tn.show("text")
     {0.0} <music21.stream.Measure 1 offset=0.0>
-        {0.0} <music21.meter.TimeSignature 3/4>
         {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note C>
         {2.0} <music21.note.Note C>

@@ -2385,8 +2385,8 @@ class Music21Object(object):
         >>> s2 = s1.makeMeasures()
         >>> s2.show('t')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.clef.BassClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
