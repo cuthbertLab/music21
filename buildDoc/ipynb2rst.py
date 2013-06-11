@@ -37,7 +37,7 @@ def convertOneNotebook(notebookFilePath):
         if ipythonPromptPattern.match(currentLine) is not None:
             currentLineNumber += 2
             continue
-        # Correct the image path in each ReST image directives:
+        # Correct the image path in each ReST image directive:
         elif currentLine.startswith('.. image:: '):
             imageFileName = currentLine.partition('.. image:: ')[2]
             newImageDirective = '.. image:: {0}/{1}'.format(
