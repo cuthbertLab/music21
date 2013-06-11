@@ -4,11 +4,26 @@ import subprocess
 import sys
 
 
+def runNBConvert(notebookFilePath):
+    import music21
+    pathParts = music21.__path__ + [
+        'ext',
+        'nbconvert',
+        'nbconvert.py',
+        ]
+    nbconvertPath = os.path.join(*pathParts)
+    nbconvertCommand = '{executable} rst {notebook}'.format(
+        executable=os.path.relpath(nbconvertPath),
+        notebook=os.path.relpath(notebookFilePath),
+        )
+    print nbconvertCommand
+    subprocess.call(nbconvertCommand, shell=True)
+
+
 def convertOneNotebook(notebookFilePath):
     assert os.path.exists(notebookFilePath)
 
-    nbconvertCommand = "nbconvert.py rst {0}".format(notebookFilePath)
-    subprocess.call(nbconvertCommand, shell=True)
+    runNBConvert(notebookFilePath)
 
     notebookFileNameWithoutExtension = os.path.splitext(
         os.path.basename(notebookFilePath))[0]
