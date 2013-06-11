@@ -65,7 +65,7 @@ def convertOneNotebook(notebookFilePath):
                 )
             newLines.append(newImageDirective)
             currentLineNumber += 1
-        # Otherwise, just add the line:
+        # Otherwise, nothing special to do, just add the line to our results:
         else:
             newLines.append(currentLine)
             currentLineNumber += 1
@@ -84,7 +84,10 @@ def convertAllNotebooks():
         )
     for notebookFileName in [x for x in os.listdir(notebookDirectoryPath) \
         if x.endswith('.ipynb')]:
-        notebookFilePath = os.path.join(notebookDirectoryPath, notebookFileName)
+        notebookFilePath = os.path.join(
+            notebookDirectoryPath, 
+            notebookFileName,
+            )
         rstFileName, imageFileDirectoryName = convertOneNotebook(notebookFilePath)
 
         oldRstFilePath = os.path.join(
@@ -113,8 +116,10 @@ def convertAllNotebooks():
             rstDirectoryPath,
             imageFileDirectoryName,
             )
+        # Only move the image folder if it will not overwrite anything.
         if not os.path.exists(newImageFileDirectoryPath):
             os.rename(oldImageFileDirectoryPath, newImageFileDirectoryPath)
+        # Otherwise, copy its contents and delete the emptied folder.
         else:
             for fileName in os.listdir(oldImageFileDirectoryPath):
                 oldFilePath = os.path.join(
