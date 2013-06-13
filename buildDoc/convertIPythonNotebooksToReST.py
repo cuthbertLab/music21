@@ -9,6 +9,8 @@ from music21 import common
 
 def runNBConvert(notebookFilePath):
     import music21
+    runDirectoryPath = common.getBuildDocFilePath()
+    
     pathParts = music21.__path__ + [
         'ext',
         'nbconvert',
@@ -16,11 +18,11 @@ def runNBConvert(notebookFilePath):
         ]
     nbconvertPath = os.path.join(*pathParts)
     nbconvertCommand = '{executable} rst {notebook}'.format(
-        executable=os.path.relpath(nbconvertPath),
-        notebook=os.path.relpath(notebookFilePath),
+        executable=os.path.relpath(nbconvertPath, runDirectoryPath),
+        notebook=os.path.relpath(notebookFilePath, runDirectoryPath),
         )
     print nbconvertCommand
-    subprocess.call(nbconvertCommand, shell=True)
+    subprocess.call(nbconvertCommand, shell=True, cwd=runDirectoryPath)
 
 
 def convertOneNotebook(notebookFilePath):
@@ -47,6 +49,7 @@ def convertOneNotebook(notebookFilePath):
         oldLines = f.read().splitlines()
 
     ipythonPromptPattern = re.compile('^In\[\d+\]:')
+    mangledInternalRef = re.compile(r'\:(class|ref|func|meth)\:\`\`(.*?)\`\`')
 
     newLines = []
     currentLineNumber = 0
@@ -67,7 +70,11 @@ def convertOneNotebook(notebookFilePath):
             currentLineNumber += 1
         # Otherwise, nothing special to do, just add the line to our results:
         else:
-            newLines.append(currentLine)
+            # fix cases of inline :class:`~music21.stream.Stream` being converted by markdown to
+            # :class:``~music21.stream.Stream``
+            newCurrentLine = mangledInternalRef.sub(r':\1:`\2`', currentLine)
+
+            newLines.append(newCurrentLine)
             currentLineNumber += 1
 
     with open(rstFilePath, 'w') as f:
@@ -88,7 +95,12 @@ def convertAllNotebooks():
             notebookDirectoryPath, 
             notebookFileName,
             )
-        rstFileName, imageFileDirectoryName = convertOneNotebook(notebookFilePath)
+        try:
+            rstFileName, imageFileDirectoryName = convertOneNotebook(notebookFilePath)
+        except IOError as e:
+            print "Problem with converting notebook %s; skipped." % notebookFileName
+            print str(e)
+            continue
 
         oldRstFilePath = os.path.join(
             notebookDirectoryPath, 
@@ -131,9 +143,8 @@ def convertAllNotebooks():
                     fileName,
                     )
                 os.rename(oldFilePath, newFilePath)
-            os.remove(oldImageFileDirectoryPath)
+            os.rmdir(oldImageFileDirectoryPath)
 
 
 if __name__ == '__main__':
     convertAllNotebooks()
-

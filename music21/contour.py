@@ -70,9 +70,8 @@ class ContourFinder(object):
         >>> s = corpus.parse('bwv29.8')
         >>> #_DOCS_SHOW ContourFinder(s).plot('tonality')
         
-        .. image:: images/contour-brokenImage.*
-                :width: 600
-                
+        TODO: image here...
+        
         '''
         self.s = s # a stream.Score object
         self.sChords = None #lazy evaluation...

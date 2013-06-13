@@ -16,6 +16,7 @@ Music21 Documentation
    usersGuide_05_listsOfLists
    usersGuide_06_stream2
    usersGuide_07_chords
+   usersGuide_14_timeSignatures
    overviewStreams
    overviewFormats
    overviewPostTonal
@@ -172,5 +173,6 @@ Developer Reference
    documenting
    buildingDocumentation
    usingEclipse
+   installIPython
 
 

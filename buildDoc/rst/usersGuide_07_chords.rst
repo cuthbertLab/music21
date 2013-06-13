@@ -6,26 +6,25 @@ User's Guide, Chapter 7: Chords
 ===============================
 
 
-The most general way to create a ``Chord`` object is by passing in a
-list of pitch names you want in the chord
+Chords, as the name might suggest, are objects that combine multiple
+:class:`~music21.pitch.Pitch` objects on a single stem. They can be
+found in the :ref:`moduleChord` module. The most general way to create
+a :class:`~music21.chord.Chord` object is by passing in a list of
+pitch names you want in the chord:
 
 .. code:: python
 
     from music21 import *
-
-.. code:: python
-
     cMinor = chord.Chord(["C4","G4","E-5"])
 
 ``Note`` and ``Chord`` objects, since both are subclasses of the
-``GeneralNote`` object share many features in common:
+:class:`~music21.note.GeneralNote` object share many features in
+common:
 
 .. code:: python
 
     cMinor.duration.type = 'half'
-
-.. code:: python
-
+    
     cMinor.quarterLength
 
 
@@ -35,8 +34,7 @@ list of pitch names you want in the chord
 
 
 But since a ``Chord`` contains many pitches, it does not have a
-``.pitch`` attribute. Instead it has a ``.pitches`` attribute which
-returns a list of pitches in the Chord.
+``.pitch`` attribute:
 
 .. code:: python
 
@@ -46,10 +44,13 @@ returns a list of pitches in the Chord.
 
     ---------------------------------------------------------------------------
     AttributeError                            Traceback (most recent call last)
-    <ipython-input-6-682233136f94> in <module>()
+    <ipython-input-9-682233136f94> in <module>()
     ----> 1 cMinor.pitch
     
     AttributeError: 'Chord' object has no attribute 'pitch'
+Instead it has a :meth:`.pitches <music21.chord.Chord.pitches>`
+attribute which returns a List of pitches in the Chord.
+
 .. code:: python
 
     cMinor.pitches
@@ -63,7 +64,9 @@ returns a list of pitches in the Chord.
 Okay, but you already knew what pitches were in the ``Chord`` since you
 just created it! What else can you do with it?
 
-How about determining if it is a major or a minor triad?
+How about determining if it is a
+:meth:`major <music21.chord.Chord.isMajorTriad>` or a
+:meth:`minor <music21.chord.Chord.isMinorTriad>` triad?
 
 .. code:: python
 
@@ -136,7 +139,7 @@ With this chord, two other methods become important:
 You can find the third and fifth of the ``Chord`` with .third and
 .fifth. Note that these properties do not have ``()`` after them. This
 was a mistake in how we created ``music21`` and hopefully this will all
-be consistent soon:
+be fixed and consistent soon:
 
 .. code:: python
 
@@ -180,8 +183,9 @@ Displaying Chords
 -----------------
 
 
-We can display the ``Chord`` object just like any ``Note`` (Don't worry
-if this isn't working for you yet...we'll get this set up in Chapter 8)
+We can display the ``Chord`` object just like any
+:class:`~music21.note.Note` (Don't worry if this isn't working for you
+yet...we'll get this set up in Chapter 8)
 
 .. code:: python
 
@@ -200,7 +204,7 @@ if this isn't working for you yet...we'll get this set up in Chapter 8)
 
 
 These chords are a bit "spacey", so let's get ``c`` in
-``.closedPosition``:
+:meth:`~music21.chord.Chord.closedPosition`:
 
 .. code:: python
 
@@ -212,7 +216,7 @@ These chords are a bit "spacey", so let's get ``c`` in
 
 
 Notice that ``c`` is unchanged. The closed position chord is only
-cClosed:
+``cClosed``:
 
 .. code:: python
 
@@ -229,16 +233,14 @@ original is altered, we don't need to put ``x = ...`` in front of it
 .. code:: python
 
     cMajor.closedPosition(inPlace = True)
-
-.. code:: python
-
     cMajor.show()
 
 
 .. image:: usersGuide_07_chords_files/_fig_20.png
 
 
-We can get the common name of each of these Chords:
+We can get the :meth:`common name <music21.chord.Chord.commonName>` of
+each of these Chords:
 
 .. code:: python
 
@@ -336,7 +338,9 @@ not what you want:
 .. image:: usersGuide_07_chords_files/_fig_33.png
 
 
-That chord is in second inversion, or 64:
+Notice that because C sorts before F and A that the chord is in second
+inversion, or 64. We can figure out the inversion of a ``Chord`` like
+so:
 
 .. code:: python
 
@@ -372,7 +376,8 @@ might be interesting:
     'F-major triad'
 
 
-Like ``Note`` objects, we can put ``Chord`` objects inside Streams:
+Like ``Note`` objects, we can put ``Chord`` objects inside a
+:class:`~music21.strea.Stream`:
 
 .. code:: python
 
@@ -386,7 +391,8 @@ Like ``Note`` objects, we can put ``Chord`` objects inside Streams:
 .. image:: usersGuide_07_chords_files/_fig_38.png
 
 
-We can mix and match Notes, Rests, and Chords:
+We can mix and match ``Notes``, :class:`Rests <music21.note.Rest>`,
+and ``Chords``:
 
 .. code:: python
 
@@ -470,9 +476,6 @@ Well, it's almost unique: there is another chord with the same
 .. code:: python
 
     otherECChord = elliottCarterChord.getZRelation()
-
-.. code:: python
-
     otherECChord
 
 
@@ -545,9 +548,3 @@ automatically.
 
 Okay, so now you've learned the basics (and more!) of Notes and Chords,
 the next chapter will cover configuring MusicXML and writing files.
-
-.. code:: python
-
-    # ignore this...
-    from IPython.core.display import publish_html
-    publish_html('<style>.prompt {display: None;}</style>')

@@ -73,9 +73,12 @@ class RTToken(object):
     A multi-pass parsing procedure is likely necessary, as RomanText permits
     variety of groupings and markings.
 
-    >>> rtt = romanText.RTToken('||:')
-    >>> rtt
-    <RTToken '||:'>
+    ::
+    
+        >>> rtt = romanText.RTToken('||:')
+        >>> rtt
+        <RTToken '||:'>
+
     '''
     def __init__(self, src=u''):
         self.src = src # store source character sequence

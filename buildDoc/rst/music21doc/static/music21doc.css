@@ -338,3 +338,15 @@ div.versioninfo {
     line-height: 1.3em;
     font-size: 0.9em;
 }
+
+
+.highlight-python:not(.code) {
+    margin-top: -10px;
+    padding-top: 0px;
+}
+
+.highlight-python:not(.code) pre {
+    background-color: #FFFFf0;
+    border: 1px dashed #aaa;
+    color: #304030;
+}

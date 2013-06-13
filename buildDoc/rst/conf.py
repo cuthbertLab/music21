@@ -21,7 +21,7 @@ source_suffix = '.rst'
 master_doc = 'contents'
 
 try:
-    import rst2pdf
+    import rst2pdf # @UnusedImport
     extensions = ['rst2pdf.pdfbuilder']
 except ImportError:
     extensions = []
@@ -39,7 +39,7 @@ except ImportError:
 # General substitutions.
 project = 'music21'
 release = music21.VERSION_STR
-copyright = '2008-2013, Michael Scott Cuthbert and the music21 Project'
+copyright = '2008-2013, Michael Scott Cuthbert and the music21 Project' # @ReservedAssignment
 
 
 html_last_updated_fmt = '%b %d, %Y'
@@ -86,6 +86,6 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import music21
+    #import music21
     music21.mainTest(Test)
 

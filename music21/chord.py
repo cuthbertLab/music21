@@ -43,36 +43,39 @@ class Chord(note.NotRest):
 
     Create chords by passing a string of pitch names
 
-    
-    >>> dmaj = chord.Chord(["D","F#","A"])
-    >>> dmaj
-    <music21.chord.Chord D F# A>
+    ::
+
+        >>> dmaj = chord.Chord(["D","F#","A"])
+        >>> dmaj
+        <music21.chord.Chord D F# A>
 
     Pitch names can also include octaves:
 
-    >>> dmaj = chord.Chord(["D3","F#4","A5"])
-    >>> dmaj
-    <music21.chord.Chord D3 F#4 A5>
+    ::
 
-
+        >>> dmaj = chord.Chord(["D3","F#4","A5"])
+        >>> dmaj
+        <music21.chord.Chord D3 F#4 A5>
 
     Or you can combine already created Notes or Pitches:
 
+    ::
 
-    >>> Cnote = note.Note()
-    >>> Cnote.name = 'C'
-    >>> Enote = note.Note()
-    >>> Enote.name = 'E'
-    >>> Gnote = note.Note()
-    >>> Gnote.name = 'G'
+        >>> Cnote = note.Note()
+        >>> Cnote.name = 'C'
+        >>> Enote = note.Note()
+        >>> Enote.name = 'E'
+        >>> Gnote = note.Note()
+        >>> Gnote.name = 'G'
 
 
     And then create a chord with note objects:
 
+    ::
 
-    >>> cmaj = chord.Chord([Cnote, Enote, Gnote])
-    >>> cmaj # default octave of 4 is used for these notes, since octave was not specified
-    <music21.chord.Chord C4 E4 G4>
+        >>> cmaj = chord.Chord([Cnote, Enote, Gnote])
+        >>> cmaj # default octave of 4 is used for these notes, since octave was not specified
+        <music21.chord.Chord C4 E4 G4>
 
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
@@ -80,16 +83,20 @@ class Chord(note.NotRest):
 
 
     A chord can also be created from pitch class numbers:
-    
-    >>> c = chord.Chord([0, 2, 3, 5])
-    >>> c.pitches
-    [<music21.pitch.Pitch C>, <music21.pitch.Pitch D>, <music21.pitch.Pitch E->, <music21.pitch.Pitch F>]
+
+    ::
+
+        >>> c = chord.Chord([0, 2, 3, 5])
+        >>> c.pitches
+        [<music21.pitch.Pitch C>, <music21.pitch.Pitch D>, <music21.pitch.Pitch E->, <music21.pitch.Pitch F>]
     
     Or from MIDI numbers:
-    
-    >>> c = chord.Chord([72, 76, 79])
-    >>> c.pitches
-    [<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>]
+
+    ::
+
+        >>> c = chord.Chord([72, 76, 79])
+        >>> c.pitches
+        [<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>]
 
     OMIT_FROM_DOCS
 

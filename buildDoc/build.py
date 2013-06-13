@@ -1682,6 +1682,7 @@ class Documentation(RestructuredWriter):
                              'usersGuide_05_listsOfLists',
                              'usersGuide_06_stream2', 
                              'usersGuide_07_chords', 
+                             'usersGuide_14_timeSignatures', 
                              'overviewStreams',
                              'overviewFormats', 
                              'overviewPostTonal', 
@@ -1702,7 +1703,8 @@ class Documentation(RestructuredWriter):
                              ]
         self.chaptersDeveloper = ['documenting',
                                   'buildingDocumentation',
-                                  'usingEclipse' 
+                                  'usingEclipse',
+                                  'installIPython', 
                              ]
     
         self.chaptersModuleRef = [] # to be populated
