@@ -13,12 +13,13 @@
 # base -- the convention within music21 is that __init__ files contain:
 #    from base import *
 '''
-music21.base contains all the most low-level objects that also appear in
+`music21.base` is what you get in `music21` if you type ``import music21``. It 
+contains all the most low-level objects that also appear in
 the music21 module (i.e., music21.base.Music21Object is the same as
 music21.Music21Object).
 
-Music21 base classes for :class:`~music21.stream.Stream` objects and elements 
-contained within them. Additional objects for defining and manipulating 
+Music21 base classes for :class:`~music21.stream.Stream` objects and all elements 
+contained within them including Notes, etc.. Additional objects for defining and manipulating 
 elements are included.
 
 The namespace of this file, as all base.py files, is loaded into the package 
@@ -3011,9 +3012,8 @@ class Music21Object(object):
         >>> n1.activeSite is m1
         True
         
-        The most recently referenced `Stream` becomes an object's
-        `activeSite` and thus the place where `.offset` looks to
-        find its number.  
+        The most recently referenced `Stream` becomes an object's `activeSite` and 
+        thus the place where `.offset` looks to find its number.  
         
         >>> m2 = stream.Measure()
         >>> m2.insert(20.0, n1)
@@ -3023,8 +3023,8 @@ class Music21Object(object):
         >>> n1.activeSite is m2
         True
 
-        Notice though that `.offset` depends on the `.activeSite`
-        which is the most recently accessed/referenced Stream.
+        Notice though that `.offset` depends on the `.activeSite` which is the most 
+        recently accessed/referenced Stream.
         
         Here we will iterate over the `elements` in `m1` and we
         will see that the `.offset` of `n1` now is its offset in
@@ -3058,8 +3058,7 @@ class Music21Object(object):
         30.5
 
         After calling `getElementById` on `s1`, the
-        returned element's `offset` will be its offset
-        in `s1`.
+        returned element's `offset` will be its offset in `s1`.
 
         >>> n2 = s1.getElementById('hi')
         >>> n2 is n1
@@ -5593,7 +5592,7 @@ def mainTest(*testClasses):
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
         optionflags = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
-        if 'moduleRelative' in sys.argv:
+        if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv:
             s1 = doctest.DocTestSuite(
                 '__main__',
                 optionflags=optionflags,
@@ -5623,7 +5622,7 @@ def mainTest(*testClasses):
             runThisTest = sys.argv[1]    
 
     # -f, --failfast
-    if 'onlyDocTest' in sys.argv:
+    if 'onlyDocTest' in sys.argv or 'onlyDocTest' in testClasses:
         testClasses = [] # remove cases
     for t in testClasses:
         if not isinstance(t, basestring):
