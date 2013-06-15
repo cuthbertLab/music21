@@ -1,5 +1,11 @@
 {% extends "basic/layout.html" %}
 
+{% set script_files = script_files + ["_static/copybutton.js"] %}
+
+{%- block doctype -%}
+<!DOCTYPE html>
+{%- endblock -%}
+
 {# put the sidebar before the body #}
 {% block sidebar1 %}{{ sidebar() }}{% endblock %}
 {% block sidebar2 %}{% endblock %}
