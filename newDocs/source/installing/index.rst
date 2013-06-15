@@ -10,4 +10,3 @@ Installation
    installLinux
    installAdvanced
    installAdditional
-   tutorialFinaleMac

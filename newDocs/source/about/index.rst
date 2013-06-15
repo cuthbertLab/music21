@@ -8,5 +8,4 @@ About Music21
    quickStart
    examples
    applications
-   environment
    about
