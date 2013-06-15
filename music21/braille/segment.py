@@ -1554,8 +1554,8 @@ def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSigna
     newMeasures[1].timeSignature = ts
     newMeasures[0].mergeAttributes(music21Measure)
     newMeasures[1].mergeAttributes(music21Measure)
-    newMeasures[0].makeBeams()
-    newMeasures[1].makeBeams()
+    newMeasures[0].makeBeams(inPlace=True)
+    newMeasures[1].makeBeams(inPlace=True)
     prepareBeamedNotes(newMeasures[0])
     prepareBeamedNotes(newMeasures[1])
     newMeasures[0].remove(r0)

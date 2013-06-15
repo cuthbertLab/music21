@@ -3748,7 +3748,11 @@ class Stream(base.Music21Object):
 
     def _transposeByInstrument(self, reverse=False, inPlace=True, 
         transposeKeySignature=True):
-        '''If reverse is False, the transposition will happen in the direction opposite of what is specified by the Instrument
+        '''
+        If reverse is False, the transposition will happen in the direction 
+        opposite of what is specified by the Instrument.
+        
+        TODO: Fill out -- expose publically? inPlace should be False
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -3800,6 +3804,8 @@ class Stream(base.Music21Object):
         If not at sounding pitch, transpose all Pitch 
         elements to sounding pitch. The atSoundingPitch property 
         is used to determine if transposition is necessary. 
+        
+        TODO -- inPlace should be False
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -3826,6 +3832,8 @@ class Stream(base.Music21Object):
         If not at written pitch, transpose all Pitch elements to 
         written pitch. The atSoundingPitch property is used to 
         determine if transposition is necessary. 
+        
+        TODO: by default inPlace should be False
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -5504,7 +5512,6 @@ class Stream(base.Music21Object):
         this returns a modified deepcopy.
 
         
-        
         >>> a = stream.Stream()
         >>> a.insert(20, note.Note())
         >>> len(a)
@@ -5519,6 +5526,7 @@ class Stream(base.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: if inPlace == True, this should return None
+        TODO: default inPlace = False
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -5612,9 +5620,7 @@ class Stream(base.Music21Object):
     
         If `inPlace` is True, this is done in-place; 
         if `inPlace` is False, this returns a modified deep copy.
-
         
-                
         >>> d = stream.Stream()
         >>> n = note.Note()
         >>> n.quarterLength = 12
@@ -5624,6 +5630,8 @@ class Stream(base.Music21Object):
         >>> x = x.makeTies()
     
         OMIT_FROM_DOCS
+        TODO: inPlace should be False
+        TODO: inPlace = True should return None
         TODO: take a list of clases to act as filter on what elements are tied.
         
         configure ".previous" and ".next" attributes
@@ -5778,7 +5786,7 @@ class Stream(base.Music21Object):
             return None
 
 
-    def makeBeams(self, inPlace=True):
+    def makeBeams(self, inPlace=False):
         '''
         Return a new Measure, or Stream of Measures, with beams applied to all notes. 
         Measures with Voices will process voices independently. 
@@ -5790,17 +5798,18 @@ class Stream(base.Music21Object):
         if there is no beaming information in the piece (see `haveBeamsBeenMade`)
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+        *Before Version 1.6, `inPlace` default was `True`; now `False` like most `inPlace` options in music21`
+
 
         See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
 
-        
 
         >>> aMeasure = stream.Measure()
         >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
         >>> aNote = note.Note()
         >>> aNote.quarterLength = .25
         >>> aMeasure.repeatAppend(aNote,16)
-        >>> bMeasure = aMeasure.makeBeams()
+        >>> bMeasure = aMeasure.makeBeams(inPlace=False)
 
         >>> for i in range(0, 4):
         ...   print i, bMeasure.notes[i].beams
@@ -5811,8 +5820,6 @@ class Stream(base.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: inPlace=False does not work in many cases
-        TODO: inPlace=True should return nothing
-        TODO: inPlace default should be False
         '''
 
         #environLocal.printDebug(['calling Stream.makeBeams()'])
@@ -5912,6 +5919,9 @@ class Stream(base.Music21Object):
 
         Need to not only look at Notes, but components 
         within Notes, as these might contain additional tuplets.
+
+        TODO: inPlace default should become False -- like all inPlace arguments
+        TODO: if inPlace is True, return None
         '''
 
         if not inPlace: # make a copy
@@ -6038,6 +6048,8 @@ class Stream(base.Music21Object):
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
 
+        TODO: inPlace default should become False
+        TODOL if inPlace is True return None
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -6295,8 +6307,6 @@ class Stream(base.Music21Object):
         If `inPlace` is True, this is done in-place; if `inPlace` is 
         False, this returns a modified deep copy.
         
-        
-        
         >>> stream1 = stream.Stream()
         >>> n = note.QuarterNote()
         >>> n.duration.quarterLength
@@ -6326,6 +6336,10 @@ class Stream(base.Music21Object):
         41.0
         >>> stream2[-1].offset
         40.0
+        
+        
+        TODO: extendDuration inPlace should be False by default
+        TODO: if inPlace is True, return None
         '''
     
         if not inPlace: # make a copy
@@ -6364,7 +6378,6 @@ class Stream(base.Music21Object):
 
     def extendDurationAndGetBoundaries(self, objName, inPlace=True):
         '''Extend the Duration of elements specified by objName; then, collect a dictionary for every matched element of objName class, where the matched element is the value and the key is the start,end offset value.
-
         
         >>> s = stream.Stream()
         >>> s.insert(3, dynamics.Dynamic('mf'))
@@ -6372,6 +6385,9 @@ class Stream(base.Music21Object):
         >>> s.insert(12, dynamics.Dynamic('ff'))
         >>> s.extendDurationAndGetBoundaries('Dynamic')
         {(7.0, 12.0): <music21.dynamics.Dynamic f >, (3.0, 7.0): <music21.dynamics.Dynamic mf >, (12.0, 12.0): <music21.dynamics.Dynamic ff >}
+
+
+        TODO: only allow inPlace = True or delete or something, can't return two different things
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -8112,8 +8128,10 @@ class Stream(base.Music21Object):
 
         To shift all the elements in a Stream, see the 
         :meth:`~music21.stream.Stream.shiftElements` method. 
-        '''
 
+        TODO: inPlace by default should be False
+        TODO: if inPlace is True, return None
+        '''
         # if we have offsets at 0, 2, 4
         # we scale by 2, getting offsets at 0, 4, 8
 
@@ -8169,6 +8187,9 @@ class Stream(base.Music21Object):
         Scale all durations by a provided scalar. Offsets are not modified.
 
         To augment or diminish a Stream, see the :meth:`~music21.stream.Stream.augmentOrDiminish` method. 
+
+        TODO: inPlace default should be False
+        TODO: if inPlace is True, return None
         '''
         if not amountToScale > 0:
             raise StreamException('amountToScale must be greater than zero')
@@ -8289,6 +8310,8 @@ class Stream(base.Music21Object):
         
         
         TODO: test recurse and inPlace etc.
+        TODO: recurse should be off by default -- standard
+        
         '''
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
@@ -8388,6 +8411,8 @@ class Stream(base.Music21Object):
 
         If `target` == None, the entire Stream is processed. Otherwise, only the element 
         specified is manipulated. 
+        
+        TODO: return None if inPlace = True
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -8460,6 +8485,8 @@ class Stream(base.Music21Object):
         '''
         Slice all :class:`~music21.duration.Duration` objects on all Notes and Rests of this Stream. 
         Duration are sliced according to the approximate GCD found in all durations.
+    
+        TODO: return None if inPlace is True
         '''
         # when operating on a Stream, this should take all durations found and use the approximateGCD to get a min duration; then, call sliceByQuarterLengths
 
@@ -8507,6 +8534,8 @@ class Stream(base.Music21Object):
         >>> post = s.sliceAtOffsets([1, 2, 3], inPlace=True)
         >>> [(e.offset, e.quarterLength) for e in s]
         [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0)]
+
+        TODO: return None if inPlace is True
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -8580,6 +8609,8 @@ class Stream(base.Music21Object):
         '''
         Slice all elements in the Stream that have a Duration at 
         the offsets determined to be the beat from the local TimeSignature. 
+
+        TODO: return None if inPlace is True
         '''
 
         if not inPlace: # make a copy
@@ -9869,6 +9900,8 @@ class Stream(base.Music21Object):
         [<music21.pitch.Pitch C4>]
         >>> [str(n.pitch) for n in s.voices[1].notes]
         ['B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4']
+        
+        TODO: by default inPlace should be False
         '''
         # this method may not always 
         # produce the optimal voice assignment based on context (register
@@ -10057,6 +10090,8 @@ class Stream(base.Music21Object):
           elements in the parent Stream.
         * If `force` is True, even if there is more than one Voice left, 
           all voices will be flattened.
+          
+        TODO: by default inPlace should be False
         '''
         if len(self.voices) == 0:
             return None # do not make copy; return immediately
@@ -11920,6 +11955,7 @@ class Part(Stream):
         provides the management of passing pitches from 
         a past Measure to each new measure for processing. 
 
+        TODO: by defaul inPlace should be False
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -12203,6 +12239,8 @@ class Score(Stream):
         that can be summed to each concurrent duration. 
 
         Overrides method defined on Stream.
+        
+        TODO: by defaul inPlace should be False
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)

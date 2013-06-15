@@ -292,7 +292,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # call make beams for now; later, import beams
         #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:
-            p.makeBeams()
+            p.makeBeams(inPlace=True)
         except meter.MeterException as e:
             environLocal.warn("Error in beaming...ignoring: %s" % str(e))
 

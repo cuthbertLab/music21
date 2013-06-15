@@ -1832,9 +1832,10 @@ class Test(unittest.TestCase):
 
     def testPickleMidi(self):
         from music21 import converter
-        from music21 import midi
-        from music21 import common
-        a = common.getSourceFilePath() + os.sep + 'midi' + os.sep + 'testPrimitive' + os.sep + 'test03.mid'
+        a = os.path.join(common.getSourceFilePath(),
+                         'midi',
+                         'testPrimitive',
+                         'test03.mid')
 
         #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)

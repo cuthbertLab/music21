@@ -661,7 +661,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
                 n.lyric = 'Beat Division'
             n.duration = d
             m.append(n)
-        m = m.makeBeams()
+        m.makeBeams(inPlace=True)
         return m
 
     def prepareBeatSubDivision(ts):
@@ -674,7 +674,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
                 n.lyric = 'Beat Subdivision'
             n.duration = d
             m.append(n)
-        m = m.makeBeams()
+        m.makeBeams(inPlace=True)
         return m
 
     ex = stream.Stream()

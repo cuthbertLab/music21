@@ -16,7 +16,6 @@ Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
 import unittest
 import copy
-from music21 import clef
 from music21 import meter
 from music21 import stream
 from music21 import tie
@@ -324,8 +323,8 @@ class Test(unittest.TestCase):
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
-        #c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-        c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
+        #c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #c = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #c = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
@@ -333,6 +332,7 @@ class Test(unittest.TestCase):
         #c = corpus.parse('PMFC_12_13').measures(1, 40)
 
         # fix clef
+#         from music21 import clef
 #         startClefs = c.parts[1].getElementsByClass('Measure')[0].getElementsByClass('Clef')
 #         if len(startClefs):
 #             clef1 = startClefs[0]
@@ -345,7 +345,7 @@ class Test(unittest.TestCase):
         p = cr.multiPartReduction(c, maxChords = 3, closedPosition=True)
         #p = cr.multiPartReduction(c, closedPosition=True)
         c.insert(0, p)
-        #c.show()
+        c.show()
         
 
 #-------------------------------------------------------------------------------

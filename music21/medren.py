@@ -1778,10 +1778,10 @@ def scaleDurations(score, scalingNum = 1, inPlace = True, scaleUnlinked = True):
             el.loadRatio(newNum, newDem)
     
     for p in score.parts:
-        p.makeBeams()
+        p.makeBeams(inPlace=True)
     return score
 
-def transferTies(score, inPlace = True):
+def transferTies(score, inPlace=True):
     '''
     transfer the duration of tied notes (if possible) to the first note and fill the remaining places
     with invisible rests:

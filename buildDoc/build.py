@@ -1755,8 +1755,8 @@ class Documentation(RestructuredWriter):
         staticDir = self.dirStatic
         outputDir = self.dirRst
         for fileName in os.listdir(staticDir):
-            sourceFile = staticDir + os.sep + fileName
-            destinationFile = outputDir + os.sep + fileName
+            sourceFile = os.path.join(staticDir, fileName)
+            destinationFile = os.path.join(outputDir, fileName)
             if not fileName.endswith('.rst') and not fileName.endswith('.html'):
                 if not fileName.startswith('.svn'):
                     environLocal.warn('file %s is in staticDocs dir but is not an .rst or .html file' % (fileName))

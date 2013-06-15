@@ -28,7 +28,9 @@ def main(runOne=False):
     music21init = music21.__file__
     music21dir = os.path.dirname(music21init)
     music21basedir = os.path.dirname(music21dir)
-    builddocRstDir = music21basedir + os.sep + 'builddoc' + os.sep + 'staticDocs'
+    builddocRstDir = os.path.join(music21basedir,
+                                  'builddoc',
+                                  'staticDocs')
     
     totalTests = 0
     totalFailures = 0

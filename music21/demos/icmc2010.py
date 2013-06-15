@@ -11,10 +11,7 @@
 #-------------------------------------------------------------------------------
 
 
-import unittest, doctest
-
-import music21
-from music21 import *
+import unittest
 
 from copy import deepcopy
 
@@ -59,7 +56,7 @@ def bergEx01(show=True):
 =3
 *-
 '''
-
+    from music21 import humdrum, meter, stream
     score = humdrum.parseData(humdata).stream[0]
     if show:
         score.show()
@@ -73,7 +70,7 @@ def bergEx01(show=True):
 
     for thisMeasure in score.getElementsByClass(stream.Measure):
         thisMeasure.clef = deepcopy(ts)
-        thisMeasure.makeBeams()
+        thisMeasure.makeBeams(inPlace=True)
 
     if show:
         score.show()
@@ -81,7 +78,7 @@ def bergEx01(show=True):
 
 
 def showDots(show=True):
-    
+    from music21 import corpus, meter
     score = corpus.parse('bach/bwv281.xml') 
     partBass = score.getElementById('Bass')
     ts = partBass.flat.getElementsByClass(
@@ -108,8 +105,7 @@ def showDots(show=True):
 
 
 def findRaisedSevenths(show=True):
-    import music21
-    from music21 import corpus, meter, stream
+    from music21 import corpus, meter, stream, clef
 
     score = corpus.parse('bach/bwv366.xml')  
     ts = score.flat.getElementsByClass(
@@ -121,7 +117,7 @@ def findRaisedSevenths(show=True):
     for part in score.getElementsByClass(stream.Part):
         found.insert(count, 
             part.flat.getElementsByClass(
-            music21.clef.Clef)[0])
+            clef.Clef)[0])
         for i in range(len(part.getElementsByClass('Measure'))):
             m = part.getElementsByClass('Measure')[i]
             for n in m.notes:
@@ -192,7 +188,7 @@ class TestExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
+    import music21
     #bergEx01()
     music21.mainTest(Test)
 

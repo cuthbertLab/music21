@@ -660,9 +660,9 @@ class LilypondConverter(object):
         >>> lyNewLyrics = lpc.lyNewLyricsFromStream(s)
         >>> print lyNewLyrics
         \addlyrics { \set alignBelowContext = #"helloWorld"  
-           hel -- 
-           lo__ 
-           world 
+           "hel" -- 
+           "lo"__ 
+           "world" 
             } 
         '''
         lyricsDict = streamIn.lyrics(skipTies = True)
@@ -709,15 +709,15 @@ class LilypondConverter(object):
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[0])
-        <music21.lily.lilyObjects.LyLyricElement object "hel --">
+        <music21.lily.lilyObjects.LyLyricElement object ""hel" --">
         >>> lpc.inWord
         True
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[1])
-        <music21.lily.lilyObjects.LyLyricElement object "lo__">
+        <music21.lily.lilyObjects.LyLyricElement object ""lo"__">
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[2])
         <music21.lily.lilyObjects.LyLyricElement object " _ ">
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[3])
-        <music21.lily.lilyObjects.LyLyricElement object "world">
+        <music21.lily.lilyObjects.LyLyricElement object ""world">
         >>> lpc.inWord
         False
         '''

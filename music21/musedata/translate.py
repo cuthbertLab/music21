@@ -306,7 +306,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     if museDataPart.stage == 1:
         # cannot yet get stage 1 clef data
         p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
-        p.makeBeams()
+        p.makeBeams(inPlace=True)
         # will call overridden method on Part
         p.makeAccidentals()
     # assume that beams and clefs are defined in all stage 2

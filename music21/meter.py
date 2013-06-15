@@ -4517,7 +4517,7 @@ class Test(unittest.TestCase):
         m.repeatAppend(n, 6)
         match = [n.beatStr for n in m.notes]
         self.assertEqual(match, ['1', '2', '3', '4', '5', '6'])
-        m.makeBeams()
+        m.makeBeams(inPlace=True)
         #m.show()
 
         # try with extra creation args
