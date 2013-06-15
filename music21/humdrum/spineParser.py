@@ -2566,7 +2566,7 @@ class Test(unittest.TestCase):
         comments = []
         for c in p.flat.getElementsByClass('SpineComment'):
             comments.append(c.comment)
-        self.assertIn('spine comment', comments)
+        self.assertTrue('spine comment' in comments)
         #s.show('text')
     
 class TestExternal(unittest.TestCase):
