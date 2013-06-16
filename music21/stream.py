@@ -141,6 +141,7 @@ class Stream(base.Music21Object):
     3.0
     >>> for thisNote in s1.notes:
     ...     print thisNote.octave
+    ...
     4
     5
     
