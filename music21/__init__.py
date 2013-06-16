@@ -43,58 +43,97 @@ is compatible with music21.  The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
 
-
 # this defines what  is loaded when importing __all__
 # put these in alphabetical order FIRST dirs then modules
 # but: base must come first; in some cases other modules depend on 
 # definitions in base
 
-__all__ = ['base', 
-
-           # sub folders
-           'abc', 
-           # 'abj', # not full part of music21 and slow if abjad is included
-           'analysis', 
-           'audioSearch',
-           'braille', 
-           'capella', 'composition', 'counterpoint', 'corpus', 
-           'demos', 'doc',
-           'features', 'figuredBass', 
-           'humdrum',
-           'ipython21',
-           'languageExcerpts', 'lily', 
-           'midi', 'musedata', 'musicxml', 
-           'noteworthy',
-           'romanText', 
-           'scala', 'search',
-           'test', 'theoryAnalysis', 'trecento',
-           'vexflow',
-           'webapps', 
-           
-           # individual modules 
-           # KEEP ALPHABETICAL unless necessary for load reasons, if so
-           # put a note.  Keep one letter per line.
-           'articulations', 
-           'bar', 'beam', # base listed above...
-           'chant', 'chord', 'chordTables', 
-           'classCache', 'clef', 'common', 'configure', 'contour', 'converter',
-           'defaults', 'derivation', 'duration', 'dynamics',
-           'editorial', 'environment', 'exceptions21', 'expressions', 
-           'freezeThaw',
-           'graph', 
-           'harmony', 
-           'instrument', 'interval', 'intervalNetwork', 
-           'key', 
-           'layout',
-           'medren', 'metadata', 'meter', 
-           'note', 
-           'pitch', 
-           'ratios', 'repeat', 'roman',
-           'scale', 'serial', 'sieve', 'spanner', 'stream', 
-           'tempo', 'text', 'tie', 'tinyNotation', 
-           'variant', 'voiceLeading', 'volume',
-           'xmlnode',
-        ]
+__all__ = [
+    'base', 
+    # sub folders
+    'abc', 
+    # 'abj', # not full part of music21 and slow if abjad is included
+    'analysis', 
+    'audioSearch',
+    'braille', 
+    'capella',
+    'composition',
+    'counterpoint',
+    'corpus', 
+    'demos',
+    'doc',
+    'documentation',
+    'features',
+    'figuredBass', 
+    'humdrum',
+    'ipython21',
+    'languageExcerpts',
+    'lily', 
+    'midi',
+    'musedata',
+    'musicxml', 
+    'noteworthy',
+    'romanText', 
+    'scala', 'search',
+    'test',
+    'theoryAnalysis',
+    'trecento',
+    'vexflow',
+    'webapps', 
+    # individual modules 
+    # KEEP ALPHABETICAL unless necessary for load reasons, if so
+    # put a note.  Keep one letter per line.
+    'articulations', 
+    'bar',
+    # base listed above
+    'beam', 
+    'chant',
+    'chord',
+    'chordTables', 
+    'classCache',
+    'clef',
+    'common',
+    'configure',
+    'contour',
+    'converter',
+    'defaults',
+    'derivation',
+    'duration',
+    'dynamics',
+    'editorial',
+    'environment',
+    'exceptions21',
+    'expressions', 
+    'freezeThaw',
+    'graph', 
+    'harmony', 
+    'instrument',
+    'interval',
+    'intervalNetwork', 
+    'key', 
+    'layout',
+    'medren',
+    'metadata',
+    'meter', 
+    'note', 
+    'pitch', 
+    'ratios',
+    'repeat',
+    'roman',
+    'scale',
+    'serial',
+    'sieve',
+    'spanner',
+    'stream', 
+    'tempo',
+    'text', 
+    'tie',
+    'tinyNotation', 
+    'variant',
+    'voiceLeading',
+    'volume',
+    'xmlnode',
+    ]
 
 #__all__.reverse()
 #print __all__
