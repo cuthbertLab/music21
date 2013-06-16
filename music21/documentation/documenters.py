@@ -19,6 +19,10 @@ class ObjectDocumenter(object):
     Abstract base class for object documenting classes.
     '''
 
+    ### CLASS VARIABLES ###
+
+    __metaclass__ = abc.ABCMeta
+
     ### INITIALIZER ###
 
     def __init__(self, referent):
@@ -28,6 +32,12 @@ class ObjectDocumenter(object):
 
     @abc.abstractmethod
     def __repr__(self):
+        raise NotImplemented
+
+    ### PUBLIC METHODS ###
+
+    @abc.abstractmethod
+    def getCrossReference(referent):
         raise NotImplemented
 
     ### READ-ONLY PRIVATE PROPERTIES ###
@@ -49,6 +59,10 @@ class ObjectDocumenter(object):
     def referentPackagesystemPath(self):
         raise NotImplemented
 
+    @abc.abstractproperty
+    def rstFormat(self):
+        raise NotImplemented
+
 
 class FunctionDocumenter(ObjectDocumenter):
     '''
@@ -60,6 +74,13 @@ class FunctionDocumenter(ObjectDocumenter):
         >>> documenter = documentation.documenters.FunctionDocumenter(function)
         >>> documenter
         <music21.documentation.documenters.FunctionDocumenter: music21.common.almostEquals>
+
+    ::
+
+        >>> for line in documenter.rstFormat:
+        ...     line
+        ...
+        '.. autofunction:: music21.common.almostEquals'
 
     '''
 
@@ -77,6 +98,19 @@ class FunctionDocumenter(ObjectDocumenter):
             self.referentPackagesystemPath,
             )
 
+    ### PUBLIC METHODS ###
+
+    @staticmethod
+    def getCrossReference(referent):
+        assert isinstance(referent, types.FunctionType)
+        referentPath = '.'.join((
+            referent.__module__,
+            referent.__name__,
+            ))
+        return ':func:`~{0}`'.format(
+            referentPath,
+            )
+
     ### READ-ONLY PUBLIC PROPERTIES ###
 
     @property
@@ -85,6 +119,14 @@ class FunctionDocumenter(ObjectDocumenter):
             self.referent.__module__,
             self.referent.__name__,
             ))
+
+    @property
+    def rstFormat(self):
+        result = []
+        result.append('.. autofunction:: {0}'.format(
+            self.referentPackagesystemPath,
+            ))
+        return result
 
 
 class MemberDocumenter(ObjectDocumenter):
@@ -139,21 +181,60 @@ class MethodDocumenter(MemberDocumenter):
     '''
     A documenter for class methods.
     '''
-    pass
 
+    ### PUBLIC METHODS ###
 
-class PropertyDocumenter(MemberDocumenter):
-    '''
-    A documenter for (read/write) class properties.
-    '''
-    pass
+    @staticmethod
+    def getCrossReference(cls, name):
+        assert isinstance(cls, type)
+        referentPath = '.'.join((
+            cls.__module__,
+            cls.__name__,
+            name,
+            ))
+        return ':meth:`~{0}`'.format(
+            referentPath,
+            )
+
+    ### READ-ONLY PUBLIC PROPERTIES ###
+
+    @property
+    def rstFormat(self):
+        result = []
+        result.append('.. automethod:: {0}'.format(
+            self.referentPackagesystemPath,
+            ))
+        return result
 
 
 class AttributeDocumenter(MemberDocumenter):
     '''
-    A documenter for (read-only) class attributes.
+    A documenter for class attributes, both read/write and read-only.
     '''
-    pass
+
+    ### PUBLIC METHODS ###
+
+    @staticmethod
+    def getCrossReference(cls, name):
+        assert isinstance(cls, type)
+        referentPath = '.'.join((
+            cls.__module__,
+            cls.__name__,
+            name,
+            ))
+        return ':attr:`~{0}`'.format(
+            referentPath,
+            )
+
+    ### READ-ONLY PUBLIC PROPERTIES ###
+
+    @property
+    def rstFormat(self):
+        result = []
+        result.append('.. autoattribute:: {0}'.format(
+            self.referentPackagesystemPath,
+            ))
+        return result
 
 
 class ClassDocumenter(ObjectDocumenter):
@@ -204,7 +285,7 @@ class ClassDocumenter(ObjectDocumenter):
                 localMembers = methods
                 inheritedMembers = inheritedMethods
             elif attr.kind in ('property',) and attr.object.fset is not None:
-                documenterClass = PropertyDocumenter
+                documenterClass = AttributeDocumenter
                 localMembers = properties
                 inheritedMembers = inheritedProperties
             elif attr.kind in ('property',) and attr.object.fset is None:
@@ -257,6 +338,19 @@ class ClassDocumenter(ObjectDocumenter):
             referentPath,
             )
 
+    ### PUBLIC METHODS ###
+
+    @staticmethod
+    def getCrossReference(referent):
+        assert isinstance(referent, type)
+        referentPath = '.'.join((
+            referent.__module__,
+            referent.__name__,
+            ))
+        return ':class:`~{0}`'.format(
+            referentPath,
+            )
+
     ### READ-ONLY PUBLIC PROPERTIES ###
 
     @property
@@ -298,6 +392,14 @@ class ClassDocumenter(ObjectDocumenter):
             self.referent.__name__,
             ))
 
+    @property
+    def rstFormat(self):
+        result = []
+        result.append('.. autoclass:: {0}'.format(
+            self.referentPackagesystemPath,
+            ))
+        return result
+
 
 class ModuleDocumenter(ObjectDocumenter):
     '''
@@ -316,15 +418,26 @@ class ModuleDocumenter(ObjectDocumenter):
         ...     print reference, referent
         ...
         Key <music21.documentation.documenters.ClassDocumenter: music21.key.Key>
-        KeyException <music21.documentation.documenters.ClassDocumenter: music21.key.KeyException>
         KeySignature <music21.documentation.documenters.ClassDocumenter: music21.key.KeySignature>
-        KeySignatureException <music21.documentation.documenters.ClassDocumenter: music21.key.KeySignatureException>
         Test <music21.documentation.documenters.ClassDocumenter: music21.key.Test>
         convertKeyStringToMusic21KeyString <music21.documentation.documenters.FunctionDocumenter: music21.key.convertKeyStringToMusic21KeyString>
         pitchToSharps <music21.documentation.documenters.FunctionDocumenter: music21.key.pitchToSharps>
         sharpsToPitch <music21.documentation.documenters.FunctionDocumenter: music21.key.sharpsToPitch>
 
+    ::
+
+        >>> for line in documenter.rstFormat:
+        ...     line
+        ...
+        '.. automodule:: music21.key'
+
     '''
+
+    ### CLASS VARIABLES ###
+
+    _ignored_classes = frozenset((
+        BaseException,
+        ))
 
     ### INITIALIZER ###
     
@@ -333,7 +446,7 @@ class ModuleDocumenter(ObjectDocumenter):
         ObjectDocumenter.__init__(self, referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
-        self._order = getattr(self.referent, '_DOC_ORDER') or []
+        self._order = tuple(getattr(self.referent, '_DOC_ORDER')) or ()
 
     ### SPECIAL METHODS ###
 
@@ -343,6 +456,13 @@ class ModuleDocumenter(ObjectDocumenter):
             self.referentPackagesystemPath,
             )
 
+    ### PUBLIC METHODS ###
+
+    @staticmethod
+    def getCrossReference(referent):
+        assert isinstance(referent, types.ModuleType)
+        return ':mod:`~{0}`'.format(self.referent.__name__)
+
     ### PRIVATE METHODS ###
 
     def _examineModule(self):
@@ -350,6 +470,9 @@ class ModuleDocumenter(ObjectDocumenter):
         for name in dir(self.referent):
             named = getattr(self.referent, name)
             if isinstance(named, type):
+                if set(inspect.getmro(named)).intersection(
+                    self._ignored_classes):
+                    continue
                 namesMapping[name] = ClassDocumenter(named)
             elif isinstance(named, types.FunctionType):
                 namesMapping[name] = FunctionDocumenter(named)
@@ -362,10 +485,22 @@ class ModuleDocumenter(ObjectDocumenter):
         return self._namesMapping
 
     @property
+    def order(self):
+        return self._order
+
+    @property
     def referentPackagesystemPath(self):
         if isinstance(self.referent.__name__, tuple):
             return self.referent.__name__[0],
         return self.referent.__name__
+
+    @property
+    def rstFormat(self):
+        result = []
+        result.append('.. automodule:: {0}'.format(
+            self.referentPackagesystemPath,
+            ))
+        return result
 
 
 class CorpusDocumenter(object):
