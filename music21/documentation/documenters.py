@@ -45,6 +45,10 @@ class ObjectDocumenter(object):
     def referent(self):
         return self._referent
 
+    @abc.abstractproperty
+    def referentPackagesystemPath(self):
+        raise NotImplemented
+
 
 class FunctionDocumenter(ObjectDocumenter):
     '''
@@ -68,14 +72,19 @@ class FunctionDocumenter(ObjectDocumenter):
     ### SPECIAL METHODS ###
 
     def __repr__(self):
-        referentPath = '.'.join((
+        return '<{0}: {1}>'.format(
+            self._packagesystemPath,
+            self.referentPackagesystemPath,
+            )
+
+    ### READ-ONLY PUBLIC PROPERTIES ###
+
+    @property
+    def referentPackagesystemPath(self):
+        return '.'.join((
             self.referent.__module__,
             self.referent.__name__,
             ))
-        return '<{0}: {1}>'.format(
-            self._packagesystemPath,
-            referentPath,
-            )
 
 
 class MemberDocumenter(ObjectDocumenter):
@@ -116,6 +125,14 @@ class MemberDocumenter(ObjectDocumenter):
     @property
     def name(self):
         return self._name
+
+    @property
+    def referentPackagesystemPath(self):
+        return '.'.join((
+            self.definingClass.__module__,
+            self.definingClass.__name__,
+            self.name,
+            ))
 
 
 class MethodDocumenter(MemberDocumenter):
@@ -274,6 +291,13 @@ class ClassDocumenter(ObjectDocumenter):
     def properties(self):
         return self._properties
 
+    @property
+    def referentPackagesystemPath(self):
+        return '.'.join((
+            self.referent.__module__,
+            self.referent.__name__,
+            ))
+
 
 class ModuleDocumenter(ObjectDocumenter):
     '''
@@ -316,7 +340,7 @@ class ModuleDocumenter(ObjectDocumenter):
     def __repr__(self):
         return '<{0}: {1}>'.format(
             self._packagesystemPath,
-            self.referent.__name__,
+            self.referentPackagesystemPath,
             )
 
     ### PRIVATE METHODS ###
@@ -336,6 +360,12 @@ class ModuleDocumenter(ObjectDocumenter):
     @property
     def namesMapping(self):
         return self._namesMapping
+
+    @property
+    def referentPackagesystemPath(self):
+        if isinstance(self.referent.__name__, tuple):
+            return self.referent.__name__[0],
+        return self.referent.__name__
 
 
 class CorpusDocumenter(object):
