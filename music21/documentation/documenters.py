@@ -288,14 +288,8 @@ class ClassDocumenter(ObjectDocumenter):
 
     ### INITIALIZER ###
 
-    def __new__(cls, referent):
-        assert isinstance(referent, type)
-        if referent not in cls._identityMap:
-            instance = object.__new__(cls, referent)
-            cls._identityMap[referent] = instance
-        return cls._identityMap[referent]
-
     def __init__(self, referent):
+        assert isinstance(referent, type)
         ObjectDocumenter.__init__(self, referent) 
 
         self._docAttr = getattr(self.referent, '_DOC_ATTR', {})
@@ -314,6 +308,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         attrs = inspect.classify_class_attrs(self.referent)
         for attr in attrs:
+
             # Ignore definitions derived directly from object
             if attr.defining_class is object:
                 continue
@@ -345,30 +340,31 @@ class ClassDocumenter(ObjectDocumenter):
             if definingClass is self.referent:
                 localMembers.append(documenter)
             else:
-                definingClassDocumenter = type(self)(definingClass)
+                definingClassDocumenter = type(self).fromIdentityMap(definingClass)
                 if definingClassDocumenter not in inheritedMembers:
                     inheritedMembers[definingClassDocumenter] = []
                 inheritedMembers[definingClassDocumenter].append(documenter)
             
-            keyLambda = lambda x: x.memberName
+        keyLambda = lambda x: x.memberName
+        methods.sort(key=keyLambda)
+        attributes.sort(key=keyLambda)
+        properties.sort(key=keyLambda)
+        for documenters in inheritedMethods.itervalues():
+            documenters.sort(key=keyLambda)
+        for documenters in inheritedAttributes.itervalues():
+            documenters.sort(key=keyLambda)
+        for documenters in inheritedProperties.itervalues():
+            documenters.sort(key=keyLambda) 
 
-            methods.sort(key=keyLambda)
-            attributes.sort(key=keyLambda)
-            properties.sort(key=keyLambda)
-            for documenters in inheritedMethods.itervalues():
-                documenters.sort(key=keyLambda)
-            for documenters in inheritedAttributes.itervalues():
-                documenters.sort(key=keyLambda)
-            for documenters in inheritedProperties.itervalues():
-                documenters.sort(key=keyLambda) 
+        self._methods = methods
+        self._attributes = attributes
+        self._properties = properties
+        self._inheritedMethodsMapping = inheritedMethods
+        self._inheritedAttributeMapping = inheritedAttributes
+        self._inheritedPropertiesMapping = inheritedProperties
 
-            self._methods = methods
-            self._attributes = attributes
-            self._properties = properties
-            self._inheritedMethodsMapping = inheritedMethods
-            self._inheritedAttributeMapping = inheritedAttributes
-            self._inheritedPropertiesMapping = inheritedProperties
-
+        if self.referent not in self._identityMap:
+            self._identityMap[self.referent] = self 
  
     ### SPECIAL METHODS ###
 
@@ -384,6 +380,14 @@ class ClassDocumenter(ObjectDocumenter):
             self._packagesystemPath,
             referentPath,
             )
+
+    ### PUBLIC METHODS ###
+
+    @classmethod
+    def fromIdentityMap(cls, referent):
+        if referent in cls._identityMap:
+            return cls._identityMap[referent]
+        return cls(referent)
 
     ### READ-ONLY PUBLIC PROPERTIES ###
 
