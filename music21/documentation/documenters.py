@@ -282,6 +282,10 @@ class ClassDocumenter(ObjectDocumenter):
 
     '''
 
+    ### CLASS VARIABLES ###
+
+    _identityMap = {}
+
     ### INITIALIZER ###
 
     def __init__(self, referent):
@@ -311,7 +315,7 @@ class ClassDocumenter(ObjectDocumenter):
             elif attr.name.startswith('_'):
                 continue
             
-            defining_class = attr.defining_class
+            definingClass = attr.defining_class
             if attr.kind in ('class method', 'method'):
                 documenterClass = MethodDocumenter
                 localMembers = methods
@@ -330,14 +334,18 @@ class ClassDocumenter(ObjectDocumenter):
             documenter = documenterClass(
                     attr.object,
                     attr.name,
-                    attr.defining_class,
+                    definingClass,
                     )
-            if defining_class is self.referent:
+            if definingClass is self.referent:
                 localMembers.append(documenter)
             else:
-                if defining_class not in inheritedMembers:
-                    inheritedMembers[defining_class] = []
-                inheritedMembers[defining_class].append(documenter)
+                if definingClass not in self._identityMap:
+                    definingClassDocumenter = type(self)(definingClass)
+                    self._identityMap[definingClass] = definingClassDocumenter
+                definingClassDocumenter = self._identityMap[definingClass]
+                if definingClassDocumenter not in inheritedMembers:
+                    inheritedMembers[definingClassDocumenter] = []
+                inheritedMembers[definingClassDocumenter].append(documenter)
             
             keyLambda = lambda x: x.memberName
 
@@ -356,9 +364,15 @@ class ClassDocumenter(ObjectDocumenter):
             self._properties = properties
             self._inheritedMethodsMapping = inheritedMethods
             self._inheritedAttributeMapping = inheritedAttributes
-            self._inheritedPropertieMapping = inheritedProperties
+            self._inheritedPropertiesMapping = inheritedProperties
 
+            if self.referent not in self._identityMap:
+                self._identityMap[self.referent] = self
+ 
     ### SPECIAL METHODS ###
+
+    def __hash__(self):
+        return hash((type(self), self.referent))
 
     def __repr__(self):
         referentPath = '.'.join((
@@ -374,34 +388,253 @@ class ClassDocumenter(ObjectDocumenter):
 
     @property
     def attributes(self):
+        '''
+        The read-only attribute documenters for a documented class:
+
+        ::
+
+            >>> klass = stream.Stream
+            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> for attr in documenter.attributes:
+            ...     attr
+            ...
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beat>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.derivationChain>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.flat>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notes>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.offsetMap>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.rootDerivation>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.spannerBundle>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.variants>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.voices>
+
+        '''
         return self._attributes
 
     @property
     def docAttr(self):
+        '''
+        The music21 _DOC_ATTR definition for a documented class:
+
+        ::
+
+            >>> klass = stream.Stream
+            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> for key in sorted(documenter.docAttr.iterkeys()):
+            ...     key
+            ...
+            'autoSort'
+            'definesExplicitPageBreaks'
+            'definesExplicitSystemBreaks'
+            'flattenedRepresentationOf'
+            'isFlat'
+            'isSorted'
+
+        '''
         return self._docAttr
 
     @property
     def docOrder(self):
+        '''
+        The music21 _DOC_ORDER definition for a documented class:
+
+        ::
+
+            >>> klass = stream.Stream
+            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> for name in documenter.docOrder:
+            ...     name
+            ...
+            'append'
+            'insert'
+            'insertAndShift'
+            'notes'
+            'pitches'
+            'transpose'
+            'augmentOrDiminish'
+            'scaleOffsets'
+            'scaleDurations'
+
+        '''
         return self._docOrder
 
     @property
     def inheritedAttributeMapping(self):
+        '''
+        A mapping of parent class documenters and inherited attributes for a
+        documented class:
+
+        ::
+
+            >>> klass = stream.Measure
+            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> mapping = documenter.inheritedAttributeMapping
+            >>> sortBy = lambda x: x.referentPackagesystemPath
+            >>> for classDocumenter in sorted(mapping, key=sortBy):
+            ...     print '{0}:'.format(classDocumenter.referentPackagesystemPath)
+            ...     for attributeDocumenter in mapping[classDocumenter][:10]:
+            ...         print '- {0}'.format(attributeDocumenter.referentPackagesystemPath)
+            ...
+            music21.base.Music21Object:
+            - music21.base.Music21Object.classes
+            - music21.base.Music21Object.derivationHierarchy
+            - music21.base.Music21Object.fullyQualifiedClasses
+            - music21.base.Music21Object.isGrace
+            - music21.base.Music21Object.measureNumber
+            music21.stream.Stream:
+            - music21.stream.Stream.beat
+            - music21.stream.Stream.beatDuration
+            - music21.stream.Stream.beatStr
+            - music21.stream.Stream.beatStrength
+            - music21.stream.Stream.derivationChain
+            - music21.stream.Stream.flat
+            - music21.stream.Stream.highestOffset
+            - music21.stream.Stream.highestTime
+            - music21.stream.Stream.isGapless
+            - music21.stream.Stream.lowestOffset
+
+        '''
+
         return self._inheritedAttributeMapping
 
     @property
     def inheritedMethodsMapping(self):
+        '''
+        A mapping of parent class documenters and inherited attributes for a
+        documented class:
+
+        ::
+
+            >>> klass = stream.Measure
+            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> mapping = documenter.inheritedMethodsMapping
+            >>> sortBy = lambda x: x.referentPackagesystemPath
+            >>> for classDocumenter in sorted(mapping, key=sortBy):
+            ...     print '{0}:'.format(classDocumenter.referentPackagesystemPath)
+            ...     for attributeDocumenter in mapping[classDocumenter][:10]:
+            ...         print '- {0}'.format(attributeDocumenter.referentPackagesystemPath)
+            ...
+            music21.base.Music21Object:
+            - music21.base.Music21Object.addContext
+            - music21.base.Music21Object.addLocation
+            - music21.base.Music21Object.findAttributeInHierarchy
+            - music21.base.Music21Object.getAllContextsByClass
+            - music21.base.Music21Object.getContextAttr
+            - music21.base.Music21Object.getContextByClass
+            - music21.base.Music21Object.getOffsetBySite
+            - music21.base.Music21Object.getSiteIds
+            - music21.base.Music21Object.getSites
+            - music21.base.Music21Object.getSpannerSites
+            music21.stream.Stream:
+            - music21.stream.Stream.activateVariants
+            - music21.stream.Stream.addGroupForElements
+            - music21.stream.Stream.allPlayingWhileSounding
+            - music21.stream.Stream.analyze
+            - music21.stream.Stream.append
+            - music21.stream.Stream.attachIntervalsBetweenStreams
+            - music21.stream.Stream.attachMelodicIntervals
+            - music21.stream.Stream.attributeCount
+            - music21.stream.Stream.augmentOrDiminish
+            - music21.stream.Stream.beatAndMeasureFromOffset
+
+        '''
         return self._inheritedMethodsMapping
 
     @property
-    def inheritedPropertieMapping(self):
-        return self._inheritedPropertieMapping
+    def inheritedPropertiesMapping(self):
+        '''
+        A mapping of parent class documenters and inherited attributes for a
+        documented class:
+
+        ::
+
+            >>> klass = stream.Measure
+            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> mapping = documenter.inheritedPropertiesMapping
+            >>> sortBy = lambda x: x.referentPackagesystemPath
+            >>> for classDocumenter in sorted(mapping, key=sortBy):
+            ...     print '{0}:'.format(classDocumenter.referentPackagesystemPath)
+            ...     for attributeDocumenter in mapping[classDocumenter][:10]:
+            ...         print '- {0}'.format(attributeDocumenter.referentPackagesystemPath)
+            ...
+            music21.base.Music21Object:
+            - music21.base.Music21Object.activeSite
+            - music21.base.Music21Object.offset
+            - music21.base.Music21Object.priority
+            music21.stream.Stream:
+            - music21.stream.Stream.atSoundingPitch
+            - music21.stream.Stream.derivationMethod
+            - music21.stream.Stream.derivesFrom
+            - music21.stream.Stream.duration
+            - music21.stream.Stream.elements
+            - music21.stream.Stream.finalBarline
+            - music21.stream.Stream.metadata
+            - music21.stream.Stream.seconds
+
+        '''
+        return self._inheritedPropertiesMapping
 
     @property
     def methods(self):
+        '''
+        The method documenters for a documented class:
+
+        ::
+
+            >>> klass = stream.Stream
+            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> for method in documenter.methods[:10]:
+            ...     method
+            ... 
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.activateVariants>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.addGroupForElements>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.allPlayingWhileSounding>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.analyze>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.append>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attachIntervalsBetweenStreams>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attachMelodicIntervals>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attributeCount>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.augmentOrDiminish>
+            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.beatAndMeasureFromOffset>
+
+        ''' 
         return self._methods
 
     @property
     def properties(self):
+        '''
+        The read/write property documenters for a documented class:
+
+        ::
+
+            >>> klass = stream.Stream
+            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> for prop in documenter.properties:
+            ...     prop
+            ...
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.atSoundingPitch>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.derivationMethod>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.derivesFrom>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.duration>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.elements>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.metadata>
+            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
+
+        '''
         return self._properties
 
     @property
