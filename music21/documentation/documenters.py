@@ -34,12 +34,6 @@ class ObjectDocumenter(object):
     def __repr__(self):
         raise NotImplemented
 
-    ### PUBLIC METHODS ###
-
-    @abc.abstractmethod
-    def getCrossReference(referent):
-        raise NotImplemented
-
     ### READ-ONLY PRIVATE PROPERTIES ###
 
     @property
@@ -60,7 +54,18 @@ class ObjectDocumenter(object):
         raise NotImplemented
 
     @abc.abstractproperty
-    def rstFormat(self):
+    def rstAutodocDirectiveFormat(self):
+        raise NotImplemented
+
+    @property
+    def rstCrossReferenceString(self):
+        return ':{0}:`~{1}`'.format(
+            self.sphinxCrossReferenceRole,
+            self.referentPackagesystemPath,
+            )
+
+    @abc.abstractproperty
+    def sphinxCrossReferenceRole(self):
         raise NotImplemented
 
 
@@ -77,7 +82,12 @@ class FunctionDocumenter(ObjectDocumenter):
 
     ::
 
-        >>> for line in documenter.rstFormat:
+        >>> documenter.rstCrossReferenceString
+        ':func:`~music21.common.almostEquals`'
+
+    ::
+
+        >>> for line in documenter.rstAutodocDirectiveFormat:
         ...     line
         ...
         '.. autofunction:: music21.common.almostEquals'
@@ -98,19 +108,6 @@ class FunctionDocumenter(ObjectDocumenter):
             self.referentPackagesystemPath,
             )
 
-    ### PUBLIC METHODS ###
-
-    @staticmethod
-    def getCrossReference(referent):
-        assert isinstance(referent, types.FunctionType)
-        referentPath = '.'.join((
-            referent.__module__,
-            referent.__name__,
-            ))
-        return ':func:`~{0}`'.format(
-            referentPath,
-            )
-
     ### READ-ONLY PUBLIC PROPERTIES ###
 
     @property
@@ -121,12 +118,16 @@ class FunctionDocumenter(ObjectDocumenter):
             ))
 
     @property
-    def rstFormat(self):
+    def rstAutodocDirectiveFormat(self):
         result = []
         result.append('.. autofunction:: {0}'.format(
             self.referentPackagesystemPath,
             ))
         return result
+
+    @property
+    def sphinxCrossReferenceRole(self):
+        return 'func'
 
 
 class MemberDocumenter(ObjectDocumenter):
@@ -136,22 +137,19 @@ class MemberDocumenter(ObjectDocumenter):
 
     ### INITIALIZER ###
 
-    def __init__(self, referent, name, definingClass):
+    def __init__(self, referent, memberName, definingClass):
         assert isinstance(definingClass, type)
         ObjectDocumenter.__init__(self, referent)
-        self._name = name
+        self._memberName = memberName
         self._definingClass = definingClass
 
     ### SPECIAL METHODS ###
 
     def __repr__(self):
-        definingClassPath = '.'.join((
+        referentPath = '.'.join((
             self.definingClass.__module__,
             self.definingClass.__name__,
-            ))
-        referentPath = ':'.join((
-            definingClassPath,
-            self.name,
+            self.memberName,
             ))
         return '<{0}: {1}>'.format(
             self._packagesystemPath,
@@ -165,76 +163,98 @@ class MemberDocumenter(ObjectDocumenter):
         return self._definingClass
 
     @property
-    def name(self):
-        return self._name
+    def memberName(self):
+        return self._memberName
 
     @property
     def referentPackagesystemPath(self):
         return '.'.join((
             self.definingClass.__module__,
             self.definingClass.__name__,
-            self.name,
+            self.memberName,
             ))
 
 
 class MethodDocumenter(MemberDocumenter):
     '''
-    A documenter for class methods.
+    A documenter for class methods:
+
+    ::
+
+        >>> method = key.KeySignature.transpose
+        >>> documenter = documentation.documenters.MethodDocumenter(
+        ...     method, 'transpose', key.KeySignature)
+        >>> documenter
+        <music21.documentation.documenters.MethodDocumenter: music21.key.KeySignature.transpose>
+
+    ::
+
+        >>> documenter.rstCrossReferenceString
+        ':meth:`~music21.key.KeySignature.transpose`'
+
+    ::
+
+        >>> for line in documenter.rstAutodocDirectiveFormat:
+        ...     line
+        ...
+        '.. automethod:: music21.key.KeySignature.transpose'
+        
     '''
-
-    ### PUBLIC METHODS ###
-
-    @staticmethod
-    def getCrossReference(cls, name):
-        assert isinstance(cls, type)
-        referentPath = '.'.join((
-            cls.__module__,
-            cls.__name__,
-            name,
-            ))
-        return ':meth:`~{0}`'.format(
-            referentPath,
-            )
 
     ### READ-ONLY PUBLIC PROPERTIES ###
 
     @property
-    def rstFormat(self):
+    def rstAutodocDirectiveFormat(self):
         result = []
         result.append('.. automethod:: {0}'.format(
             self.referentPackagesystemPath,
             ))
         return result
 
+    @property
+    def sphinxCrossReferenceRole(self):
+        return 'meth'
+
 
 class AttributeDocumenter(MemberDocumenter):
     '''
-    A documenter for class attributes, both read/write and read-only.
+    A documenter for class attributes, both read/write and read-only:
+
+    ::
+
+        >>> attribute = key.KeySignature.mode
+        >>> documenter = documentation.documenters.AttributeDocumenter(
+        ...     attribute, 'mode', key.KeySignature)
+        >>> documenter
+        <music21.documentation.documenters.AttributeDocumenter: music21.key.KeySignature.mode>
+
+    ::
+
+        >>> documenter.rstCrossReferenceString
+        ':attr:`~music21.key.KeySignature.mode`'
+
+    ::
+
+        >>> for line in documenter.rstAutodocDirectiveFormat:
+        ...     line
+        ...
+        '.. autoattribute:: music21.key.KeySignature.mode'
+
     '''
-
-    ### PUBLIC METHODS ###
-
-    @staticmethod
-    def getCrossReference(cls, name):
-        assert isinstance(cls, type)
-        referentPath = '.'.join((
-            cls.__module__,
-            cls.__name__,
-            name,
-            ))
-        return ':attr:`~{0}`'.format(
-            referentPath,
-            )
 
     ### READ-ONLY PUBLIC PROPERTIES ###
 
     @property
-    def rstFormat(self):
+    def rstAutodocDirectiveFormat(self):
         result = []
         result.append('.. autoattribute:: {0}'.format(
             self.referentPackagesystemPath,
             ))
         return result
+
+    @property
+    def sphinxCrossReferenceRole(self):
+        return 'attr'
 
 
 class ClassDocumenter(ObjectDocumenter):
@@ -247,6 +267,18 @@ class ClassDocumenter(ObjectDocumenter):
         >>> documenter = documentation.documenters.ClassDocumenter(klass)
         >>> documenter
         <music21.documentation.documenters.ClassDocumenter: music21.stream.Stream>
+
+    ::
+
+        >>> documenter.rstCrossReferenceString
+        ':class:`~music21.stream.Stream`'
+
+    ::
+
+        >>> for line in documenter.rstAutodocDirectiveFormat:
+        ...     line
+        ...
+        '.. autoclass:: music21.stream.Stream'
 
     '''
 
@@ -307,7 +339,7 @@ class ClassDocumenter(ObjectDocumenter):
                     inheritedMembers[defining_class] = []
                 inheritedMembers[defining_class].append(documenter)
             
-            keyLambda = lambda x: x.name
+            keyLambda = lambda x: x.memberName
 
             methods.sort(key=keyLambda)
             attributes.sort(key=keyLambda)
@@ -335,19 +367,6 @@ class ClassDocumenter(ObjectDocumenter):
             ))
         return '<{0}: {1}>'.format(
             self._packagesystemPath,
-            referentPath,
-            )
-
-    ### PUBLIC METHODS ###
-
-    @staticmethod
-    def getCrossReference(referent):
-        assert isinstance(referent, type)
-        referentPath = '.'.join((
-            referent.__module__,
-            referent.__name__,
-            ))
-        return ':class:`~{0}`'.format(
             referentPath,
             )
 
@@ -393,12 +412,16 @@ class ClassDocumenter(ObjectDocumenter):
             ))
 
     @property
-    def rstFormat(self):
+    def rstAutodocDirectiveFormat(self):
         result = []
         result.append('.. autoclass:: {0}'.format(
             self.referentPackagesystemPath,
             ))
         return result
+
+    @property
+    def sphinxCrossReferenceRole(self):
+        return 'class'
 
 
 class ModuleDocumenter(ObjectDocumenter):
@@ -426,7 +449,12 @@ class ModuleDocumenter(ObjectDocumenter):
 
     ::
 
-        >>> for line in documenter.rstFormat:
+        >>> documenter.rstCrossReferenceString
+        ':mod:`~music21.key`'
+
+    ::
+
+        >>> for line in documenter.rstAutodocDirectiveFormat:
         ...     line
         ...
         '.. automodule:: music21.key'
@@ -446,7 +474,7 @@ class ModuleDocumenter(ObjectDocumenter):
         ObjectDocumenter.__init__(self, referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
-        self._order = tuple(getattr(self.referent, '_DOC_ORDER')) or ()
+        self._memberOrder = tuple(getattr(self.referent, '_DOC_ORDER')) or ()
 
     ### SPECIAL METHODS ###
 
@@ -455,13 +483,6 @@ class ModuleDocumenter(ObjectDocumenter):
             self._packagesystemPath,
             self.referentPackagesystemPath,
             )
-
-    ### PUBLIC METHODS ###
-
-    @staticmethod
-    def getCrossReference(referent):
-        assert isinstance(referent, types.ModuleType)
-        return ':mod:`~{0}`'.format(self.referent.__name__)
 
     ### PRIVATE METHODS ###
 
@@ -485,8 +506,8 @@ class ModuleDocumenter(ObjectDocumenter):
         return self._namesMapping
 
     @property
-    def order(self):
-        return self._order
+    def memberOrder(self):
+        return self._memberOrder
 
     @property
     def referentPackagesystemPath(self):
@@ -495,13 +516,17 @@ class ModuleDocumenter(ObjectDocumenter):
         return self.referent.__name__
 
     @property
-    def rstFormat(self):
+    def rstAutodocDirectiveFormat(self):
         result = []
         result.append('.. automodule:: {0}'.format(
             self.referentPackagesystemPath,
             ))
         return result
 
+    @property
+    def sphinxCrossReferenceRole(self):
+        return 'mod'
+    
 
 class CorpusDocumenter(object):
     '''A documenter for music21's corpus.'''
