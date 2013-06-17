@@ -76,9 +76,9 @@ class FunctionDocumenter(ObjectDocumenter):
     ::
 
         >>> function = common.almostEquals
-        >>> documenter = documentation.documenters.FunctionDocumenter(function)
+        >>> documenter = documentation.FunctionDocumenter(function)
         >>> documenter
-        <music21.documentation.documenters.FunctionDocumenter: music21.common.almostEquals>
+        <music21.documentation.library.documenters.FunctionDocumenter: music21.common.almostEquals>
 
     ::
 
@@ -182,10 +182,10 @@ class MethodDocumenter(MemberDocumenter):
     ::
 
         >>> method = key.KeySignature.transpose
-        >>> documenter = documentation.documenters.MethodDocumenter(
+        >>> documenter = documentation.MethodDocumenter(
         ...     method, 'transpose', key.KeySignature)
         >>> documenter
-        <music21.documentation.documenters.MethodDocumenter: music21.key.KeySignature.transpose>
+        <music21.documentation.library.documenters.MethodDocumenter: music21.key.KeySignature.transpose>
 
     ::
 
@@ -223,10 +223,10 @@ class AttributeDocumenter(MemberDocumenter):
     ::
 
         >>> attribute = key.KeySignature.mode
-        >>> documenter = documentation.documenters.AttributeDocumenter(
+        >>> documenter = documentation.AttributeDocumenter(
         ...     attribute, 'mode', key.KeySignature)
         >>> documenter
-        <music21.documentation.documenters.AttributeDocumenter: music21.key.KeySignature.mode>
+        <music21.documentation.library.documenters.AttributeDocumenter: music21.key.KeySignature.mode>
 
     ::
 
@@ -264,9 +264,9 @@ class ClassDocumenter(ObjectDocumenter):
     ::
 
         >>> klass = stream.Stream
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = documentation.ClassDocumenter(klass)
         >>> documenter
-        <music21.documentation.documenters.ClassDocumenter: music21.stream.Stream>
+        <music21.documentation.library.documenters.ClassDocumenter: music21.stream.Stream>
 
     ::
 
@@ -399,32 +399,32 @@ class ClassDocumenter(ObjectDocumenter):
         ::
 
             >>> klass = stream.Stream
-            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> documenter = documentation.ClassDocumenter(klass)
             >>> for attr in documenter.attributes:
             ...     attr
             ...
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beat>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.derivationChain>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.flat>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notes>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.offsetMap>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.rootDerivation>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.spannerBundle>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.variants>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.voices>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beat>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivationChain>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.flat>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notes>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.offsetMap>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.rootDerivation>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.spannerBundle>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.variants>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.voices>
 
         '''
         return self._attributes
@@ -437,7 +437,7 @@ class ClassDocumenter(ObjectDocumenter):
         ::
 
             >>> klass = stream.Stream
-            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> documenter = documentation.ClassDocumenter(klass)
             >>> for key in sorted(documenter.docAttr.iterkeys()):
             ...     key
             ...
@@ -459,7 +459,7 @@ class ClassDocumenter(ObjectDocumenter):
         ::
 
             >>> klass = stream.Stream
-            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> documenter = documentation.ClassDocumenter(klass)
             >>> for name in documenter.docOrder:
             ...     name
             ...
@@ -485,7 +485,7 @@ class ClassDocumenter(ObjectDocumenter):
         ::
 
             >>> klass = stream.Measure
-            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> documenter = documentation.ClassDocumenter(klass)
             >>> mapping = documenter.inheritedAttributeMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
@@ -524,7 +524,7 @@ class ClassDocumenter(ObjectDocumenter):
         ::
 
             >>> klass = stream.Measure
-            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> documenter = documentation.ClassDocumenter(klass)
             >>> mapping = documenter.inheritedMethodsMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
@@ -567,7 +567,7 @@ class ClassDocumenter(ObjectDocumenter):
         ::
 
             >>> klass = stream.Measure
-            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> documenter = documentation.ClassDocumenter(klass)
             >>> mapping = documenter.inheritedPropertiesMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
@@ -600,20 +600,20 @@ class ClassDocumenter(ObjectDocumenter):
         ::
 
             >>> klass = stream.Stream
-            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> documenter = documentation.ClassDocumenter(klass)
             >>> for method in documenter.methods[:10]:
             ...     method
             ... 
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.activateVariants>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.addGroupForElements>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.allPlayingWhileSounding>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.analyze>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.append>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attachIntervalsBetweenStreams>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attachMelodicIntervals>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attributeCount>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.augmentOrDiminish>
-            <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.beatAndMeasureFromOffset>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.activateVariants>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.addGroupForElements>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.allPlayingWhileSounding>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.analyze>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.append>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.attachIntervalsBetweenStreams>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.attachMelodicIntervals>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.attributeCount>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.augmentOrDiminish>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.beatAndMeasureFromOffset>
 
         ''' 
         return self._methods
@@ -626,18 +626,18 @@ class ClassDocumenter(ObjectDocumenter):
         ::
 
             >>> klass = stream.Stream
-            >>> documenter = documentation.documenters.ClassDocumenter(klass)
+            >>> documenter = documentation.ClassDocumenter(klass)
             >>> for prop in documenter.properties:
             ...     prop
             ...
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.atSoundingPitch>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.derivationMethod>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.derivesFrom>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.duration>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.elements>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.metadata>
-            <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.atSoundingPitch>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivationMethod>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivesFrom>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.duration>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.elements>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.metadata>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
 
         '''
         return self._properties
@@ -669,21 +669,21 @@ class ModuleDocumenter(ObjectDocumenter):
     ::
 
         >>> module = key
-        >>> documenter = documentation.documenters.ModuleDocumenter(module)
+        >>> documenter = documentation.ModuleDocumenter(module)
         >>> documenter
-        <music21.documentation.documenters.ModuleDocumenter: music21.key>
+        <music21.documentation.library.documenters.ModuleDocumenter: music21.key>
 
     ::
 
         >>> for reference, referent in sorted(documenter.namesMapping.iteritems()):
         ...     print reference, referent
         ...
-        Key <music21.documentation.documenters.ClassDocumenter: music21.key.Key>
-        KeySignature <music21.documentation.documenters.ClassDocumenter: music21.key.KeySignature>
-        Test <music21.documentation.documenters.ClassDocumenter: music21.key.Test>
-        convertKeyStringToMusic21KeyString <music21.documentation.documenters.FunctionDocumenter: music21.key.convertKeyStringToMusic21KeyString>
-        pitchToSharps <music21.documentation.documenters.FunctionDocumenter: music21.key.pitchToSharps>
-        sharpsToPitch <music21.documentation.documenters.FunctionDocumenter: music21.key.sharpsToPitch>
+        Key <music21.documentation.library.documenters.ClassDocumenter: music21.key.Key>
+        KeySignature <music21.documentation.library.documenters.ClassDocumenter: music21.key.KeySignature>
+        Test <music21.documentation.library.documenters.ClassDocumenter: music21.key.Test>
+        convertKeyStringToMusic21KeyString <music21.documentation.library.documenters.FunctionDocumenter: music21.key.convertKeyStringToMusic21KeyString>
+        pitchToSharps <music21.documentation.library.documenters.FunctionDocumenter: music21.key.pitchToSharps>
+        sharpsToPitch <music21.documentation.library.documenters.FunctionDocumenter: music21.key.sharpsToPitch>
 
     ::
 
