@@ -288,8 +288,14 @@ class ClassDocumenter(ObjectDocumenter):
 
     ### INITIALIZER ###
 
-    def __init__(self, referent):
+    def __new__(cls, referent):
         assert isinstance(referent, type)
+        if referent not in cls._identityMap:
+            instance = object.__new__(cls, referent)
+            cls._identityMap[referent] = instance
+        return cls._identityMap[referent]
+
+    def __init__(self, referent):
         ObjectDocumenter.__init__(self, referent) 
 
         self._docAttr = getattr(self.referent, '_DOC_ATTR', {})
@@ -339,10 +345,7 @@ class ClassDocumenter(ObjectDocumenter):
             if definingClass is self.referent:
                 localMembers.append(documenter)
             else:
-                if definingClass not in self._identityMap:
-                    definingClassDocumenter = type(self)(definingClass)
-                    self._identityMap[definingClass] = definingClassDocumenter
-                definingClassDocumenter = self._identityMap[definingClass]
+                definingClassDocumenter = type(self)(definingClass)
                 if definingClassDocumenter not in inheritedMembers:
                     inheritedMembers[definingClassDocumenter] = []
                 inheritedMembers[definingClassDocumenter].append(documenter)
@@ -366,8 +369,6 @@ class ClassDocumenter(ObjectDocumenter):
             self._inheritedAttributeMapping = inheritedAttributes
             self._inheritedPropertiesMapping = inheritedProperties
 
-            if self.referent not in self._identityMap:
-                self._identityMap[self.referent] = self
  
     ### SPECIAL METHODS ###
 
