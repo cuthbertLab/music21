@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import documenters
+from documenters import *
+from iterators import *
+from writers import *
 
