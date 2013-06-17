@@ -10,3 +10,10 @@
 #-------------------------------------------------------------------------------
 
 
+def processDocstring(app, what, name, obj, options, lines):
+    '''Process the ``lines`` of each docstring in place.'''
+    pass
+
+
+def setup(app):
+    app.connect('autodoc-process-docstring', processDocstring)
