@@ -5,12 +5,12 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 import abc
-
+import os
 
 class ReSTWriter(object):
     '''
@@ -29,7 +29,7 @@ class ReSTWriter(object):
 
     ### PUBLIC METHODS ###
 
-    def write(filePath, lines):
+    def write(filePath, lines): # @NoSelf
         '''
         Write ``lines`` to ``filePath``, only overwriting an existing file
         if the content differs.
