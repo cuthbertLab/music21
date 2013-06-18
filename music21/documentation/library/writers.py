@@ -9,4 +9,40 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
+import abc
+
+
+class ReSTWriter(object):
+    '''
+    Abstract base class for ReST writers.
+    '''
+
+    ### CLASS VARIABLES ###
+
+    __metaclass__ = abc.ABCMeta
+
+    ### SPECIAL METHODS ###
+
+    @abc.abstractmethod
+    def __call__(self):
+        raise NotImplemented
+
+
+class ModuleReferenceReSTWriter(ReSTWriter):
+    '''
+    Writes module reference ReST files, and their index ReST file.
+    '''
+    pass
+
+
+class CorpusReferenceReSTWriter(ReSTWriter):
+    '''
+    Write the corpus reference ReST file.
+    '''
+    pass
+
+
+if __name__ == '__main__':
+    import music21
+    music21.mainTest()
 
