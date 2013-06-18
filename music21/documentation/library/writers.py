@@ -27,6 +27,23 @@ class ReSTWriter(object):
     def __call__(self):
         raise NotImplemented
 
+    ### PUBLIC METHODS ###
+
+    def write(filePath, lines):
+        '''
+        Write ``lines`` to ``filePath``, only overwriting an existing file
+        if the content differs.
+        '''
+        if os.path.exists(filePath):
+            with open(filePath, 'r') as f:
+                oldLines = filePath.read().splitlines()
+            if lines != oldLines:
+                with open(filePath, 'w') as f:
+                    f.write('\n'.join(lines))
+        else:
+            with open(filePath, 'w') as f:
+                f.write('\n'.join(lines))
+
 
 class ModuleReferenceReSTWriter(ReSTWriter):
     '''
