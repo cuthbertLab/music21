@@ -6,14 +6,13 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 import os
 import re
 import subprocess
-import sys
 from music21 import common
 
 
@@ -155,6 +154,15 @@ def convertAllNotebooks():
                 os.rename(oldFilePath, newFilePath)
             os.rmdir(oldImageFileDirectoryPath)
 
+
+# N.B. to have this module work from Eclipse you will need to have "pandoc" installed
+#      and findable from the PATH (not PYTHONPATH) of Eclipse.  Eclipse in general
+#      runs with no PATH information from the user.  pandoc (at least on my Mac) installed
+#      into /usr/local/bin  which isn't in the default path.  I found that the easiest
+#      solution was to symlink it to /usr/bin where it can be found:
+#          cd /usr/bin
+#          sudo ln -s /usr/local/bin/pandoc .
+#
 
 if __name__ == '__main__':
     convertAllNotebooks()
