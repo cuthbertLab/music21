@@ -5,15 +5,6 @@ Installing Music21 in Windows
 ============================================
 
 
-Alternative Installation Methods
-----------------------------------------------
-
-The following instructions are for general users. If you are 
-an advanced user and have installed other Python packages before, 
-or want to use an EGG, SVN, PIP, or setuptools, you should read :ref:`installAdvanced`.
-
-
-
 Get Python
 -------------------------------
 
@@ -22,8 +13,7 @@ is written in and in which you will write your own programs that
 use music21.  
 
 Windows users should download and install Python version 2.7 and 
-*not* 3.0, 3.3, etc.  (If you have 2.6 already,
-that will work fine). 
+*not* 3.0, 3.3, etc. 
 
 To get Python 2.7 for Windows, go to http://www.python.org/download/ 
 and click on the "Windows installer" link.  It is probably the 
@@ -45,7 +35,7 @@ If you have already installed Python on your computer, launch IDLE (a Python int
 The first lines of text displayed will include a version number.  
 Make sure it begins with 2.6.0 or higher, but not 3.0 or 3.1, etc.
 
-If your version is too old, download a newer version as above.
+If your version is too old, download a newer version as above. You may want to upgrade to 2.7 even if you are on 2.6 already.
 
 
 Download music21
@@ -73,26 +63,19 @@ To test to see if music21 has been installed properly, go
 to the start menu and run (either by clicking "Run" in older
 Windows or by typing in the search box) IDLE.  Type 
 "`import music21`".  If your system waits for a few seconds and then
-displays "`>>>`" you've installed everything properly.  (If the system
+displays "`>>>`" and perhaps a warning about missing packages, then 
+you've installed everything properly.  (If the system
 cannot find `music21` then you may have more than one version of 
 Python on your system.  Try uninstalling all of them along with `music21`
 and then restarting from scratch).
 
 
 
-
 After Installation
 -------------------------------
 
-After a successful installation, you may proceed to :ref:`quickStart` to 
+After a successful installation, you may proceed to :ref:`usersGuide_01_Installing` to 
 begin using music21.
-
-You may need to install additional software to take advantage of some features of music21. For information on additional software you may need, see :ref:`installAdditional`.
-
-You may want to configure your Environment to support opening MusicXML files in Finale or adjusting other settings. To do so, see :ref:`environment`.
-
-
-
 
 
 
@@ -100,7 +83,9 @@ You may want to configure your Environment to support opening MusicXML files in 
 Installation Help
 -------------------------------
 
-If you have followed all the instructions and encounter problems, contact the music21 group for help:
+If you have followed all the instructions and still encounter problems, start over from scratch
+and try it again very carefully.  If you still have problems
+contact the music21 group and someone should be able to help:
 
 http://groups.google.com/group/music21list
 

@@ -822,7 +822,8 @@ class LilypondConverter(object):
             newContext = contextType
             optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
 
-        contextModList.append(r"\autoBeamOff ")
+        if streamIn.haveBeamsBeenMade() is True:
+            contextModList.append(r"\autoBeamOff ")
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
             contextModList.append(r"\override StaffSymbol #'line-count = #%d" % streamIn.staffLines)

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza 
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''Utility constants, dictionaries, functions, and objects used throughout music21.

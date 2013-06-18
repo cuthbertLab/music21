@@ -12700,7 +12700,9 @@ class Opus(Stream):
         formats besides explicit lily.x calls.
         '''
         if fmt is not None and 'lily' in fmt:
-            Stream.write(self, fmt, fp)
+            return Stream.write(self, fmt, fp)
+        elif common.runningUnderIPython():
+            return Stream.write(self, fmt, fp)
         else:
             for s in self.scores:
                 s.write(fmt=fmt, fp=fp)
@@ -12716,7 +12718,9 @@ class Opus(Stream):
         formats besides explicit lily.x calls.
         '''
         if fmt is not None and 'lily' in fmt:
-            Stream.show(self, fmt, app)
+            return Stream.show(self, fmt, app)
+        elif common.runningUnderIPython():
+            return Stream.show(self, fmt, app)
         else:
             for s in self.scores:
                 s.show(fmt=fmt, app=app)
