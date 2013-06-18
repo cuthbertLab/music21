@@ -1,10 +1,11 @@
-.. code:: python
-
-    %load_ext music21.ipython21.ipExtension
-
 User's Guide, Chapter 7: Chords
 ===============================
 
+
+.. code:: python
+
+    # ignore this
+    %load_ext music21.ipython21.ipExtension
 
 Chords, as the name might suggest, are objects that combine multiple
 :class:`~music21.pitch.Pitch` objects on a single stem. They can be
@@ -44,7 +45,7 @@ But since a ``Chord`` contains many pitches, it does not have a
 
     ---------------------------------------------------------------------------
     AttributeError                            Traceback (most recent call last)
-    <ipython-input-9-682233136f94> in <module>()
+    <ipython-input-4-682233136f94> in <module>()
     ----> 1 cMinor.pitch
     
     AttributeError: 'Chord' object has no attribute 'pitch'
@@ -239,6 +240,23 @@ original is altered, we don't need to put ``x = ...`` in front of it
 .. image:: usersGuide_07_chords_files/_fig_20.png
 
 
+There is also a method,
+:meth:`~music21.chord.Chord.semiClosedPosition` which acts like
+``.closedPosition`` except that if there is already a pitch at that step
+(i.e., D-flat and D-sharp are both step "D"), then the note is moved up
+an octave. This is useful for displaying complex, post tonal chords in
+the most compact form possible:
+
+.. code:: python
+
+    c1 = chord.Chord(['C4','E5','C#6','E-7', 'G8','C9','E#9'])
+    c2 = c1.semiClosedPosition()
+    c2.show()
+
+
+.. image:: usersGuide_07_chords_files/_fig_22.png
+
+
 We can get the :meth:`common name <music21.chord.Chord.commonName>` of
 each of these Chords:
 
@@ -280,7 +298,7 @@ American composer Elliott Carter liked a lot.
     elliottCarterChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_25.png
+.. image:: usersGuide_07_chords_files/_fig_27.png
 
 
 More ways of creating chords; Chords and Streams
@@ -300,7 +318,7 @@ a bunch of already created ``Note`` objects:
     dMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_27.png
+.. image:: usersGuide_07_chords_files/_fig_29.png
 
 
 Or we can pass a string with note names separated by spaces:
@@ -311,7 +329,7 @@ Or we can pass a string with note names separated by spaces:
     e7.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_29.png
+.. image:: usersGuide_07_chords_files/_fig_31.png
 
 
 The octaves are optional, especially if everything is within an octave:
@@ -322,7 +340,7 @@ The octaves are optional, especially if everything is within an octave:
     es.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_31.png
+.. image:: usersGuide_07_chords_files/_fig_33.png
 
 
 But you will definitely want them if a chord crosses the boundary of an
@@ -335,7 +353,7 @@ not what you want:
     fMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_33.png
+.. image:: usersGuide_07_chords_files/_fig_35.png
 
 
 Notice that because C sorts before F and A that the chord is in second
@@ -388,7 +406,7 @@ Like ``Note`` objects, we can put ``Chord`` objects inside a
     stream1.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_38.png
+.. image:: usersGuide_07_chords_files/_fig_40.png
 
 
 We can mix and match ``Notes``, :class:`Rests <music21.note.Rest>`,
@@ -408,7 +426,7 @@ and ``Chords``:
     stream2.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_40.png
+.. image:: usersGuide_07_chords_files/_fig_42.png
 
 
 Post-tonal chords (in brief)
@@ -492,7 +510,7 @@ accidental right here...it works fine in MusicXML...)
     otherECChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_47.png
+.. image:: usersGuide_07_chords_files/_fig_49.png
 
 
 .. code:: python
@@ -530,7 +548,7 @@ with the pitchClasses:
     oddChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_51.png
+.. image:: usersGuide_07_chords_files/_fig_53.png
 
 
 Though if you use pitchClasses above 11, then they are treated as MIDI
@@ -543,7 +561,7 @@ automatically.
     midiChordType.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_53.png
+.. image:: usersGuide_07_chords_files/_fig_55.png
 
 
 Okay, so now you've learned the basics (and more!) of Notes and Chords,

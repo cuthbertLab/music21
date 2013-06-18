@@ -10,15 +10,15 @@ Installing Music21 on GNU/Linux
 Alternative Installation Methods
 ----------------------------------------------
 
-The following instructions are for general users. If you are an advanced user and have installed other Python packages before, or want to use an EGG, SVN, PIP, or setuptools, you should read :ref:`installAdvanced`.
-
-
+The following instructions are for general users. If you are an advanced user 
+and have installed other Python packages before, or want to use an EGG, SVN, PIP, 
+or setuptools, you should read :ref:`installAdvanced`.
 
 
 Check Your Version of Python
 ----------------------------------------------
 
-Music21 requires Python 2.6 to run. Python 3 is not yet supported. 
+Music21 requires Python 2.6 to run. Python 2.7 is better. Python 3 is not yet supported. 
 
 To determine the Python version you have installed, open a shell 
 or terminal and enter the following command-line argument (where "$" is the prompt):
@@ -42,18 +42,6 @@ Download the most-recent music21 package from the following URL.
     http://code.google.com/p/music21/downloads/list
 
 Linux users should download the .tar.gz file. 
-
-
-
-
-The Installation Destination
-----------------------------------------------
-
-
-After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called 'site-packages'. The site-packages directory is located in different places depending on your system. To find where your site-packages directory is located, you can enter the following command in the Python interpreter:
-
-    >>> import distutils.sysconfig
-    >>> print(distutils.sysconfig.get_python_lib())  
 
 
 
@@ -83,7 +71,6 @@ searched for modules:
 
     >>> import sys
     >>> sys.path.append('/Users/ariza/Desktop/music21')  
-    >>>
 
 This can be done permanently by adding the music21 directory to the 
 Python PYTHONPATH environment variable. This is not necessary if 
@@ -93,37 +80,19 @@ the following link for more details:
 http://docs.python.org/using/cmdline.html#envvar-PYTHONPATH
 
 
-
-
-
 After Installation
 -------------------------------
 
-After a successful installation, you may proceed to :ref:`quickStart` to 
-begin using music21.
-
-You may need to install additional software to take advantage of some features of music21. For information on additional software you may need, see :ref:`installAdditional`.
-
-You may want to configure your Environment to support opening MusicXML files in MuseData or adjusting other settings. To do so, see :ref:`environment`.
-
-
-
+After a successful installation, you may proceed to :ref:`usersGuide_01_Installing` to 
+begin using `music21`.
 
 
 
 Installation Help
 -------------------------------
 
-If you have followed all the instructions and encounter problems, contact the music21 group for help:
+If you have followed all the instructions and still encounter problems, start over from scratch
+and try it again very carefully.  If you still have problems
+contact the music21 group and someone should be able to help:
 
 http://groups.google.com/group/music21list
-
-
-
-
-
-
-
-
-
-

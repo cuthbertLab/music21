@@ -4834,7 +4834,8 @@ class Stream(base.Music21Object):
         {4.0} <music21.chord.Chord D3 F#3 A3>
         {7.0} <music21.chord.Chord A D3 F#3 A3>
         
-        OMIT_FROM_DOCS
+        
+        Note that :class:`~music21.harmony.ChordSymbol` objects can also be chordified:
         
         >>> s = stream.Stream()
         >>> p2 = stream.Part()
@@ -4852,6 +4853,8 @@ class Stream(base.Music21Object):
         {4.0} <music21.chord.Chord D3 F#3 A3>
         {7.0} <music21.chord.Chord A D3 F#3 A3>
 
+
+        OMIT_FROM_DOCS
         
         Test that chordifying works on a single stream.
     

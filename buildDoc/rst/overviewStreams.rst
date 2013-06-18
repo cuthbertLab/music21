@@ -138,10 +138,7 @@ If you've setup your environment properly, then calling show with the
 'musicxml' 
 argument should open up Finale Reader, or Sibelius, or 
 MuseScore or some music notation
-software and display the notes below. (See :ref:`quickStart` for basic 
-configuration information; see :ref:`environment` for complete information 
-on configuring your :class:`~music21.environment.Environment`.)
-
+software and display the notes below.
 
 >>> s.show('musicxml')    
 
@@ -394,7 +391,10 @@ Accessing Scores, Parts, Measures, and Notes
 
 Streams provide a way to structure and position music21 objects both hierarchically and temporally. A Stream, or a Stream subclass such as :class:`~music21.stream.Measure`, can be placed within another Stream. 
 
-As shown in :ref:`quickStart`, a common arrangement of nested Streams is a :class:`~music21.stream.Score` Stream containing one or more :class:`~music21.stream.Part` Streams, each Part Stream in turn containing one or more :class:`~music21.stream.Measure` Streams. 
+A common arrangement of nested Streams is a 
+:class:`~music21.stream.Score` Stream containing one or more 
+:class:`~music21.stream.Part` Streams, each Part Stream in turn containing one 
+or more :class:`~music21.stream.Measure` Streams. 
 
 Such an arrangement of Stream objects is the common way musical scores are represented in music21. For example, importing a four-part chorale by J. S. Bach will provide a Score object with four Part Streams, each Part containing multiple Measure objects. Music21 comes with a :ref:`moduleCorpus.base` module that provides access to a large collection of scores, including all the Bach chorales. We can parse the score from the corpus with the :func:`~music21.corpus.base.parse` function. 
 
@@ -542,7 +542,7 @@ All :class:`~music21.base.Music21Object` subclasses, such as
 have attributes for :attr:`~music21.base.Music21Object.id` 
 and :attr:`~music21.base.Music21Object.group`. 
 
-As shown in :ref:`quickStart`, the `id` attribute is commonly used to 
+The `id` attribute is commonly used to 
 distinguish Part objects in a Score, but may have other applications. 
 The :meth:`~music21.stream.Stream.getElementById` method can be used 
 to access elements of a Stream by `id`. As an example, after examining 
