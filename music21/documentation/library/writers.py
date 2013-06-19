@@ -12,6 +12,7 @@
 import abc
 import os
 
+
 class ReSTWriter(object):
     '''
     Abstract base class for ReST writers.

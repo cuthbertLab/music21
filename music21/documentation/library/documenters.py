@@ -728,12 +728,16 @@ class ModuleDocumenter(ObjectDocumenter):
         namesMapping = {}
         for name in dir(self.referent):
             named = getattr(self.referent, name)
-            if isinstance(named, type):
+            if isinstance(named, (type, types.ClassType)):
                 if set(inspect.getmro(named)).intersection(
                     self._ignored_classes):
                     continue
+                if named.__module__ != self.referent.__name__:
+                    continue
                 namesMapping[name] = ClassDocumenter(named)
             elif isinstance(named, types.FunctionType):
+                if named.__module__ != self.referent.__name__:
+                    continue
                 namesMapping[name] = FunctionDocumenter(named)
         return namesMapping
 
