@@ -60,6 +60,16 @@ class CorpusReferenceReSTWriter(ReSTWriter):
     pass
 
 
+class IPythonNotebookReSTWriter(ReSTWriter):
+    '''
+    Converts IPython notebooks into ReST, and handles their associated image
+    files.
+
+    This class wraps the 3rd-party ``nbconvert`` Python script.
+    '''
+    pass
+
+
 if __name__ == '__main__':
     import music21
     music21.mainTest()
