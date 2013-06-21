@@ -38,7 +38,7 @@ environLocal = environment.Environment(_MOD)
 #Class variables
 
 '''
-Vexflow generateCode() and fromObject() methods currently accept these modes
+Vexflow generateCode() and fromObject() methods currently accept these modes.
 '''
 supportedDisplayModes = [
     'txt',
@@ -46,7 +46,7 @@ supportedDisplayModes = [
 ]
 
 '''
-Can call fromObject on the following types of music21 objects
+Can call fromObject on the following types of music21 objects.
 '''
 supportedMusic21Classes = [
     'Note',
@@ -116,8 +116,6 @@ validVexFlowArticulationsToMeanings = {
 
 #...not used.
 ValidVexFlowAccidentals = ['bb','b','n','#','##']
-
-
 
 
 #not used...
@@ -209,7 +207,6 @@ alterationToVexflowAccidental = {
 
 ticksPerQuarter = 4096
 
-
 '''
 Table going from the quarterLength attribute of a 
     :class:`music21.duration.Duration` object to a VexFlow duration code
@@ -292,18 +289,29 @@ htmlConclusion = r'''
 
 class UIDCounter(object):
     '''
-    generic counter object for keeping track of the number of objects used.
+    A generic counter object for keeping track of the number of objects used:
     
-    
-    >>> uidc = vexflow.UIDCounter(UIDStart = 20)
-    >>> uidc.UID
-    20
-    >>> uidc.readAndIncrement()
-    20
-    >>> uidc.readAndIncrement()
-    21
-    >>> uidc.UID
-    22
+    ::
+
+        >>> uidc = vexflow.UIDCounter(UIDStart = 20)
+        >>> uidc.UID
+        20
+
+    ::
+
+        >>> uidc.readAndIncrement()
+        20
+
+    ::
+
+        >>> uidc.readAndIncrement()
+        21
+
+    ::
+
+        >>> uidc.UID
+        22
+
     '''
     
     def __init__(self, UIDStart = 0):
@@ -317,18 +325,22 @@ class UIDCounter(object):
 
 def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultStavePosition[1]), staffWidth = str(defaultStaveWidth), staveName = 'stave'):
     '''
-	returns a string formated new VexFlow Stave.  
+	Returns a string formated new VexFlow Stave.  
 	
 	Arguments are strings representing the x and y position and the width.
 	
 	They are strings because a Javascript function can be used in lieu of the number.
 	
-	
-	>>> vexflow.staffString()
-	'var stave = new Vex.Flow.Stave(10,0,500);'
-	
-	>>> vexflow.staffString('(0 * (((($(window).width()-10) - (2*10))) / 4) + 10)', '((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20)))', '(((($(window).width()-10) - (2*10))) / 4)')
-	'var stave = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));'
+    ::
+
+        >>> vexflow.staffString()
+        'var stave = new Vex.Flow.Stave(10,0,500);'
+
+    ::	
+
+        >>> vexflow.staffString('(0 * (((($(window).width()-10) - (2*10))) / 4) + 10)', '((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20)))', '(((($(window).width()-10) - (2*10))) / 4)')
+        'var stave = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));'
+
 	'''
 
     defaultStaff = "".join(
@@ -345,11 +357,13 @@ def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultSta
 #-------------------------------------------------------------------------------
 #Exception classes
 
+
 class VexFlowUnsupportedException(exceptions21.Music21Exception):
     '''
     This feature or object is not supported by the VexFlow JavaScript library
     '''
     pass
+
 
 class Vexflow21UnsupportedException(exceptions21.Music21Exception):
     '''
@@ -357,7 +371,10 @@ class Vexflow21UnsupportedException(exceptions21.Music21Exception):
     '''
     pass
 
+
 #-------------------------------------------------------------------------------
+
+
 def fromObject(thisObject, mode='txt'):
     '''
     Attempts to translate an arbitrary Music21Object into vexflow
@@ -366,46 +383,70 @@ def fromObject(thisObject, mode='txt'):
 
     TODO: Unit Tests (one for each supportedMusic21Class)
 
+    ::
     
-    >>> print vexflow.fromObject(note.Note('C4'))
-    new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
+        >>> print vexflow.fromObject(note.Note('C4'))
+        new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
     
-    >>> print vexflow.fromObject(pitch.Pitch('C4'))
-    new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
+    ::
     
-    >>> print vexflow.fromObject(note.Rest())
-    new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})
+        >>> print vexflow.fromObject(pitch.Pitch('C4'))
+        new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
+    
+    ::
 
-    >>> print vexflow.fromObject(chord.Chord(['C4', 'E-4', 'G4']))
-    new Vex.Flow.StaveNote({keys: ["Cn/4", "Eb/4", "Gn/4"], duration: "q"})
+        >>> print vexflow.fromObject(note.Rest())
+        new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})
 
-    >>> bwv666 = corpus.parse('bwv66.6')
-    >>> soprano = bwv666.parts[0]
-    >>> measure1 = soprano.getElementsByClass('Measure')[0]
-    >>> trebleVoice = bwv666.partsToVoices()[1][1][0]
-    >>> bwv666
-    <music21.stream.Score ...>
-    >>> soprano
-    <music21.stream.Part Soprano>
-    >>> measure1
-    <music21.stream.Measure 0 offset=0.0>
-    >>> trebleVoice
-    <music21.stream.Voice 0>
+    ::
 
+        >>> print vexflow.fromObject(chord.Chord(['C4', 'E-4', 'G4']))
+        new Vex.Flow.StaveNote({keys: ["Cn/4", "Eb/4", "Gn/4"], duration: "q"})
 
-    >>> print vexflow.fromObject(measure1)
-    var music21Voice0 = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
-    var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
-    music21Voice0.addTickables(music21Voice0Notes);
+    ::
 
-    >>> print vexflow.fromObject(trebleVoice)
-    var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
-    var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["En/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
-    music21Voice0.addTickables(music21Voice0Notes);
+        >>> bwv666 = corpus.parse('bwv66.6')
+        >>> soprano = bwv666.parts[0]
+        >>> measure1 = soprano.getElementsByClass('Measure')[0]
+        >>> trebleVoice = bwv666.partsToVoices()[1][1][0]
+        >>> bwv666
+        <music21.stream.Score ...>
 
-    >>> #print vexflow.fromObject(soprano)
-    >>> #print vexflow.fromObject(bwv666)
-    >>> #print vexflow.fromObject(tinyNotation.TinyNotationStream("E4 r f# g=lastG b-8 a g c4~ c", "3/4"), mode='txt') 
+    ::
+
+        >>> soprano
+        <music21.stream.Part Soprano>
+
+    ::
+
+        >>> measure1
+        <music21.stream.Measure 0 offset=0.0>
+
+    ::
+
+        >>> trebleVoice
+        <music21.stream.Voice 0>
+
+    ::
+
+        >>> print vexflow.fromObject(measure1)
+        var music21Voice0 = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+        var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+        music21Voice0.addTickables(music21Voice0Notes);
+
+    ::
+
+        >>> print vexflow.fromObject(trebleVoice)
+        var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+        var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["En/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+        music21Voice0.addTickables(music21Voice0Notes);
+
+    ::
+
+        >>> #print vexflow.fromObject(soprano)
+        >>> #print vexflow.fromObject(bwv666)
+        >>> #print vexflow.fromObject(tinyNotation.TinyNotationStream("E4 r f# g=lastG b-8 a g c4~ c", "3/4"), mode='txt') 
+
     '''
     if 'Note' in thisObject.classes:
         return fromNote(thisObject, mode)
@@ -428,13 +469,15 @@ def fromObject(thisObject, mode='txt'):
     else:
         raise Vexflow21UnsupportedException, 'Unsupported object type: ' + str(thisObject)
 
+
 def fromScore(thisScore, mode='txt'):
     '''
     Parses a music21 score into VexFlow code
 
-    
-    >>> a = corpus.parse('bwv66.6')
-    >>> #print vexflow.fromScore(a, mode='txt') 
+    ::
+
+        >>> a = corpus.parse('bwv66.6')
+        >>> #print vexflow.fromScore(a, mode='txt') 
     
     '''
     if mode not in supportedDisplayModes:
@@ -442,16 +485,19 @@ def fromScore(thisScore, mode='txt'):
 
     return VexflowScore(thisScore.makeNotation(inPlace=False)).generateCode(mode)
 
+
 def fromStream(thisStream, mode='txt'):
     '''
     Parses a music21 stream into VexFlow code
 
     Checks if it has parts. If so, parses like a Score.
     Otherwise, just flattens it and parses it like a Part
-
     
-    >>> #print vexflow.fromStream(tinyNotation.TinyNotationStream('c8 d8 e-4 dd4 cc2'), mode='txt')
-    >>> #print vexflow.fromStream(tinyNotation.TinyNotationStream('C8 D8 E-4 d4 c2'), mode='txt')
+    ::
+
+        >>> #print vexflow.fromStream(tinyNotation.TinyNotationStream('c8 d8 e-4 dd4 cc2'), mode='txt')
+        >>> #print vexflow.fromStream(tinyNotation.TinyNotationStream('C8 D8 E-4 d4 c2'), mode='txt')
+
     '''
     if mode not in supportedDisplayModes:
         raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
@@ -463,105 +509,116 @@ def fromStream(thisStream, mode='txt'):
 
 def fromRest(thisRest, mode='txt'):
     '''
-    Parses a music21 rest into VexFlow code
+    Parses a music21 rest into VexFlow code:
 
-    
-    >>> a = note.Rest()
-    >>> print vexflow.fromRest(a, mode='txt')
-    new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})
+    :: 
 
-    >>> print vexflow.fromRest(a, mode='html')
-    <!DOCTYPE HTML>
-    <html>
-    <head>
-        <meta name='author' content='Music21' />
-        <script src='http://code.jquery.com/jquery-latest.js'></script>
-        <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
-    </head>
-    <body>
-        <canvas width="525" height="120" id='music21canvas'></canvas>
-        <script>
-            $(document).ready(function(){
-                var canvas = $('#music21canvas')[0];
-                var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-                var ctx = renderer.getContext();
-                var stave = new Vex.Flow.Stave(10,0,500);
-                stave.addClef('treble').setContext(ctx).draw();
-                var notes = [new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})];
-                var voice = new Vex.Flow.Voice({
-                    num_beats: 1.0,
-                    beat_value: 4,
-                    resolution: Vex.Flow.RESOLUTION
+        >>> a = note.Rest()
+        >>> print vexflow.fromRest(a, mode='txt')
+        new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})
+
+    ::
+
+        >>> print vexflow.fromRest(a, mode='html')
+        <!DOCTYPE HTML>
+        <html>
+        <head>
+            <meta name='author' content='Music21' />
+            <script src='http://code.jquery.com/jquery-latest.js'></script>
+            <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
+        </head>
+        <body>
+            <canvas width="525" height="120" id='music21canvas'></canvas>
+            <script>
+                $(document).ready(function(){
+                    var canvas = $('#music21canvas')[0];
+                    var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+                    var ctx = renderer.getContext();
+                    var stave = new Vex.Flow.Stave(10,0,500);
+                    stave.addClef('treble').setContext(ctx).draw();
+                    var notes = [new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})];
+                    var voice = new Vex.Flow.Voice({
+                        num_beats: 1.0,
+                        beat_value: 4,
+                        resolution: Vex.Flow.RESOLUTION
+                    });
+                    voice.addTickables(notes);
+                    var formatter = new Vex.Flow.Formatter()
+                    formatter.joinVoices([voice])
+                    formatter.format([voice], 500);
+                    voice.draw(ctx, stave);
                 });
-                voice.addTickables(notes);
-                var formatter = new Vex.Flow.Formatter()
-                formatter.joinVoices([voice])
-                formatter.format([voice], 500);
-                voice.draw(ctx, stave);
-            });
-    </script>
-    </body>
-    </html>
+        </script>
+        </body>
+        </html>
+
     '''
     if mode not in supportedDisplayModes:
         raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
     return VexflowRest(thisRest).generateCode(mode)
 
+
 def fromNote(thisNote, mode='txt'):
     '''
-    Parses a music21 note into VexFlow string code
-
+    Parses a music21 note into VexFlow string code:
     
-    >>> print vexflow.fromNote(note.Note('C4'), mode='txt')
-    new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
+    ::
+    
+        >>> print vexflow.fromNote(note.Note('C4'), mode='txt')
+        new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
 
-    See VexFlowNote.generateCode() for an example of mode='html'
+    See VexFlowNote.generateCode() for an example of mode='html'.
     '''
     if mode not in supportedDisplayModes:
         raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
     return VexflowNote(thisNote).generateCode(mode)
 
+
 def fromChord(thisChord, mode='txt'):
     '''
-    Parses a music21 chord into VexFlow code
+    Parses a music21 chord into VexFlow code:
 
-    
-    >>> a = chord.Chord(['C3', 'E-3', 'G3', 'C4'])
-    >>> print vexflow.fromChord(a, mode='txt')
-    new Vex.Flow.StaveNote({keys: ["Cn/3", "Eb/3", "Gn/3", "Cn/4"], duration: "q"})
+    ::
 
-    >>> print vexflow.fromChord(a, mode='html')
-    <!DOCTYPE HTML>
-    <html>
-    <head>
-        <meta name='author' content='Music21' />
-        <script src='http://code.jquery.com/jquery-latest.js'></script>
-        <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
-    </head>
-    <body>
-        <canvas width="525" height="120" id='music21canvas'></canvas>
-        <script>
-            $(document).ready(function(){
-                var canvas = $('#music21canvas')[0];
-                var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-                var ctx = renderer.getContext();
-                var stave = new Vex.Flow.Stave(10,0,500);
-                stave.addClef('treble').setContext(ctx).draw();
-                var notes = [new Vex.Flow.StaveNote({keys: ["Cn/3", "Eb/3", "Gn/3", "Cn/4"], duration: "q"})];
-                var voice = new Vex.Flow.Voice({
-                    num_beats: 1.0,
-                    beat_value: 4,
-                    resolution: Vex.Flow.RESOLUTION
+        >>> a = chord.Chord(['C3', 'E-3', 'G3', 'C4'])
+        >>> print vexflow.fromChord(a, mode='txt')
+        new Vex.Flow.StaveNote({keys: ["Cn/3", "Eb/3", "Gn/3", "Cn/4"], duration: "q"})
+
+    ::
+
+        >>> print vexflow.fromChord(a, mode='html')
+        <!DOCTYPE HTML>
+        <html>
+        <head>
+            <meta name='author' content='Music21' />
+            <script src='http://code.jquery.com/jquery-latest.js'></script>
+            <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
+        </head>
+        <body>
+            <canvas width="525" height="120" id='music21canvas'></canvas>
+            <script>
+                $(document).ready(function(){
+                    var canvas = $('#music21canvas')[0];
+                    var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+                    var ctx = renderer.getContext();
+                    var stave = new Vex.Flow.Stave(10,0,500);
+                    stave.addClef('treble').setContext(ctx).draw();
+                    var notes = [new Vex.Flow.StaveNote({keys: ["Cn/3", "Eb/3", "Gn/3", "Cn/4"], duration: "q"})];
+                    var voice = new Vex.Flow.Voice({
+                        num_beats: 1.0,
+                        beat_value: 4,
+                        resolution: Vex.Flow.RESOLUTION
+                    });
+                    voice.addTickables(notes);
+                    var formatter = new Vex.Flow.Formatter()
+                    formatter.joinVoices([voice])
+                    formatter.format([voice], 500);
+                    voice.draw(ctx, stave);
                 });
-                voice.addTickables(notes);
-                var formatter = new Vex.Flow.Formatter()
-                formatter.joinVoices([voice])
-                formatter.format([voice], 500);
-                voice.draw(ctx, stave);
-            });
-        </script>
-    </body>
-    </html>
+            </script>
+        </body>
+        </html>
+
     '''
     if mode not in supportedDisplayModes:
         raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
@@ -570,31 +627,38 @@ def fromChord(thisChord, mode='txt'):
 
 def fromPart(thisPart, mode='txt'):
     '''
-    Parses a music21 part into VexFlow code
+    Parses a music21 part into VexFlow code:
 
-    
-    >>> a = corpus.parse('bwv66.6').parts[1]
-    >>> textOut = vexflow.fromPart(a, mode='txt')
+    ::
+
+        >>> a = corpus.parse('bwv66.6').parts[1]
+        >>> textOut = vexflow.fromPart(a, mode='txt')
+
     '''
     if mode not in supportedDisplayModes:
         raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
     return VexflowPart(thisPart.makeNotation(inPlace=False)).generateCode(mode)
 
+
 def fromMeasure(thisMeasure, mode='txt'):
     r'''
-    Parses a music21 measure into VexFlow code
+    Parses a music21 measure into VexFlow code:
 
-    
-    >>> b = corpus.parse('bwv1.6.mxl')
-    >>> m = b.parts[0].measures(0,1)[2]
-    >>> d = vexflow.fromMeasure(m)
-    >>> print d
-    var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
-    var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
-    music21Voice0.addTickables(music21Voice0Notes);
+    ::
 
-    >>> c = vexflow.fromMeasure(m, 'html')
-    >>> assert(c.split('\n')[1] == '<html>') #_DOCS_HIDE
+        >>> b = corpus.parse('bwv1.6.mxl')
+        >>> m = b.parts[0].measures(0,1)[2]
+        >>> d = vexflow.fromMeasure(m)
+        >>> print d
+        var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+        var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+        music21Voice0.addTickables(music21Voice0Notes);
+
+    ::
+
+        >>> c = vexflow.fromMeasure(m, 'html')
+        >>> assert(c.split('\n')[1] == '<html>') #_DOCS_HIDE
+
     '''
 
     if mode not in supportedDisplayModes:
@@ -606,29 +670,43 @@ def fromMeasure(thisMeasure, mode='txt'):
 
 def vexflowClefFromClef(music21clef):
     '''
-    Given a music21 clef object, returns the vexflow clef
+    Given a music21 clef object, returns the vexflow clef:
 
-    
-    >>> vexflow.vexflowClefFromClef(clef.TrebleClef())
-    'treble'
+    :: 
 
-    >>> vexflow.vexflowClefFromClef(clef.BassClef())
-    'bass'
+        >>> vexflow.vexflowClefFromClef(clef.TrebleClef())
+        'treble'
 
-    >>> vexflow.vexflowClefFromClef(clef.TenorClef())
-    'tenor'
+    ::
 
-    >>> vexflow.vexflowClefFromClef(clef.AltoClef())
-    'alto'
+        >>> vexflow.vexflowClefFromClef(clef.BassClef())
+        'bass'
 
-    >>> vexflow.vexflowClefFromClef(clef.Treble8vbClef())
-    'bass'
+    ::
 
-    >>> vexflow.vexflowClefFromClef(clef.PercussionClef())
-    'percussion'
+        >>> vexflow.vexflowClefFromClef(clef.TenorClef())
+        'tenor'
 
-    >>> vexflow.vexflowClefFromClef(clef.GClef())
-    'treble'
+    ::
+
+        >>> vexflow.vexflowClefFromClef(clef.AltoClef())
+        'alto'
+
+    ::
+
+        >>> vexflow.vexflowClefFromClef(clef.Treble8vbClef())
+        'bass'
+
+    ::
+
+        >>> vexflow.vexflowClefFromClef(clef.PercussionClef())
+        'percussion'
+
+    ::
+
+        >>> vexflow.vexflowClefFromClef(clef.GClef())
+        'treble'
+
     '''
     if 'TenorClef' in music21clef.classes:
         return 'tenor'
@@ -647,15 +725,18 @@ def vexflowClefFromClef(music21clef):
             'following clefs: treble, bass, alto, tenor, percussion. ' +\
             'Cannot parse ', music21clef
 
+
 #-------------------------------------------------------------------------------
 # primitives...
 
+
 class VexflowObject(object):
     '''
-    A general class for all VexflowObjects to inherit from.  See specific
-    objects such as :class:`~music21.vexflow.base.VexflowNote`,
+    A general class for all VexflowObjects to inherit from.
+
+    See specific objects such as :class:`~music21.vexflow.base.VexflowNote`,
     :class:`~music21.vexflow.base.VexflowChord`, and 
-    :class:`~music21.vexflow.base.VexflowRest` for more details
+    :class:`~music21.vexflow.base.VexflowRest` for more details.
     '''
     def __init__(self, music21Object = None, clef=None):
         self.originalObject = music21Object
@@ -671,23 +752,28 @@ class VexflowObject(object):
 
     def getVoiceString(self, numBeats, voiceName = 'voice', currentIndentLevel=3):
         '''
-        returns a string creating a new Vex.Flow.Voice with the number of beats
-        at the current indentation level.
+        Returns a string creating a new Vex.Flow.Voice with the number of beats
+        at the current indentation level:
         
-        
-        >>> vo = vexflow.VexflowObject()
-        >>> print vo.getVoiceString(2.0).rstrip()
-                var voice = new Vex.Flow.Voice({
-                    num_beats: 2.0,
-                    beat_value: 4,
-                    resolution: Vex.Flow.RESOLUTION
-                });
-        >>> print vo.getVoiceString(3.0, voiceName='myVoice', currentIndentLevel = 0).rstrip()
-        var myVoice = new Vex.Flow.Voice({
-            num_beats: 3.0,
-            beat_value: 4,
-            resolution: Vex.Flow.RESOLUTION
-        });
+        :: 
+
+            >>> vo = vexflow.VexflowObject()
+            >>> print vo.getVoiceString(2.0).rstrip()
+                    var voice = new Vex.Flow.Voice({
+                        num_beats: 2.0,
+                        beat_value: 4,
+                        resolution: Vex.Flow.RESOLUTION
+                    });
+
+        ::
+
+            >>> print vo.getVoiceString(3.0, voiceName='myVoice', currentIndentLevel = 0).rstrip()
+            var myVoice = new Vex.Flow.Voice({
+                num_beats: 3.0,
+                beat_value: 4,
+                resolution: Vex.Flow.RESOLUTION
+            });
+
         '''
         indent = self.indent
         resultList = [
@@ -709,49 +795,53 @@ class VexflowObject(object):
 
     def generateCode(self, mode="txt"):
         '''
-        Returns the VexFlow code for a single note in the desired display mode
+        Returns the VexFlow code for a single note in the desired display mode.
 
         Currently supported modes are `txt` (returns the VexFlow code which can be used in conjunction with
         other VexFlow code) and `html` (returns standalone HTML code for displaying just this note.)
 
-        
-        >>> n = note.Note('C-')
-        >>> v = vexflow.VexflowNote(n)
-        >>> v.generateCode('txt')
-        'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
+        :: 
 
-        >>> print v.generateCode('html')
-        <!DOCTYPE HTML>
-        <html>
-        <head>
-            <meta name='author' content='Music21' />
-            <script src='http://code.jquery.com/jquery-latest.js'></script>
-            <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
-        </head>
-        <body>
-            <canvas width="525" height="120" id='music21canvas'></canvas>
-            <script>
-                $(document).ready(function(){
-                    var canvas = $('#music21canvas')[0];
-                    var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-                    var ctx = renderer.getContext();
-                    var stave = new Vex.Flow.Stave(10,0,500);
-                    stave.addClef('treble').setContext(ctx).draw();
-                    var notes = [new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})];
-                    var voice = new Vex.Flow.Voice({
-                        num_beats: 1.0,
-                        beat_value: 4,
-                        resolution: Vex.Flow.RESOLUTION
+            >>> n = note.Note('C-')
+            >>> v = vexflow.VexflowNote(n)
+            >>> v.generateCode('txt')
+            'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
+
+        ::
+
+            >>> print v.generateCode('html')
+            <!DOCTYPE HTML>
+            <html>
+            <head>
+                <meta name='author' content='Music21' />
+                <script src='http://code.jquery.com/jquery-latest.js'></script>
+                <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
+            </head>
+            <body>
+                <canvas width="525" height="120" id='music21canvas'></canvas>
+                <script>
+                    $(document).ready(function(){
+                        var canvas = $('#music21canvas')[0];
+                        var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+                        var ctx = renderer.getContext();
+                        var stave = new Vex.Flow.Stave(10,0,500);
+                        stave.addClef('treble').setContext(ctx).draw();
+                        var notes = [new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})];
+                        var voice = new Vex.Flow.Voice({
+                            num_beats: 1.0,
+                            beat_value: 4,
+                            resolution: Vex.Flow.RESOLUTION
+                        });
+                        voice.addTickables(notes);
+                        var formatter = new Vex.Flow.Formatter()
+                        formatter.joinVoices([voice])
+                        formatter.format([voice], 500);
+                        voice.draw(ctx, stave);
                     });
-                    voice.addTickables(notes);
-                    var formatter = new Vex.Flow.Formatter()
-                    formatter.joinVoices([voice])
-                    formatter.format([voice], 500);
-                    voice.draw(ctx, stave);
-                });
-            </script>
-        </body>
-        </html>
+                </script>
+            </body>
+            </html>
+
         '''
         if mode not in supportedDisplayModes:
             raise Vexflow21UnsupportedException, "VexFlow doesn't support this "\
@@ -787,16 +877,21 @@ class VexflowObject(object):
 
     def stemDirectionCode(self):
         '''
-        gets the Vexflow StemDirection String
+        Gets the Vexflow StemDirection String:
         
-        
-        >>> n = note.Note()
-        >>> vfn = vexflow.VexflowNote(n)
-        >>> vfn.stemDirectionCode()
-        ''
-        >>> n.stemDirection = 'up'
-        >>> vfn.stemDirectionCode()
-        'stem_direction: Vex.Flow.StaveNote.STEM_UP'
+        ::        
+
+            >>> n = note.Note()
+            >>> vfn = vexflow.VexflowNote(n)
+            >>> vfn.stemDirectionCode()
+            ''
+
+        ::
+    
+            >>> n.stemDirection = 'up'
+            >>> vfn.stemDirectionCode()
+            'stem_direction: Vex.Flow.StaveNote.STEM_UP'
+
         '''
         
         if self.originalObject.stemDirection == 'up':
@@ -807,10 +902,10 @@ class VexflowObject(object):
             return ''
         return 'stem_direction: ' + stemCode
         
-
     def setBeamStatus(self):
         '''
-        Set the beamStatus for a note by setting beamStart to True, beamStop to True, or neither
+        Set the beamStatus for a note by setting beamStart to True, beamStop
+        to True, or neither.
         '''
         if hasattr(self.originalObject, 'beams') is False:
             return
@@ -822,7 +917,8 @@ class VexflowObject(object):
 
     def setTieStatus(self):
         '''
-        Set the tieStatus for a note by setting tieStart to True, tieStop to True, or neither
+        Set the tieStatus for a note by setting tieStart to True, tieStop to 
+        True, or neither.
         '''
         if hasattr(self.originalObject, 'tie') is False:
             return
@@ -833,29 +929,33 @@ class VexflowObject(object):
 
     def dotCode(self):
         '''
-        generates VexFlow code for the number of dots in the object.
+        Generates VexFlow code for the number of dots in the object.
         
         Currently Vexflow's layout engine only supports single dotted notes however!
         
-        
-        >>> n = note.Note()
-        >>> n.duration.dots = 1
-        >>> vn = vexflow.VexflowNote(n)
-        >>> vn.dotCode()
-        '.addDotToAll()'
+        :: 
+
+            >>> n = note.Note()
+            >>> n.duration.dots = 1
+            >>> vn = vexflow.VexflowNote(n)
+            >>> vn.dotCode()
+            '.addDotToAll()'
+
         '''
         return '.addDotToAll()' * self.originalObject.duration.dots
 
     def fermataCode(self):
         '''
-        returns a string of Vexflow code if there is a fermata and '' if not
+        Returns a string of Vexflow code if there is a fermata and '' if not.
 
-        
-        >>> n = note.Note()
-        >>> n.expressions.append(expressions.Fermata())
-        >>> vn = vexflow.VexflowNote(n)
-        >>> vn.fermataCode()
-        '.addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3))'
+        :: 
+
+            >>> n = note.Note()
+            >>> n.expressions.append(expressions.Fermata())
+            >>> vn = vexflow.VexflowNote(n)
+            >>> vn.fermataCode()
+            '.addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3))'
+
         '''
         fermataString = ''
         for thisExpression in  self.originalObject.expressions:
@@ -866,11 +966,11 @@ class VexflowObject(object):
                 fermataString += '.addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3))' 
         return fermataString
 
-    def accidentalCode(self, pitch = None, index = 0):
+    def accidentalCode(self, pitch=None, index=0):
         '''
-        returns code to add an accidental to a Vex.Flow.Note or key
+        Returns code to add an accidental to a Vex.Flow.Note or key.
 
-        index refers to the pitch within a chord to be altered (0 for notes)
+        Index refers to the pitch within a chord to be altered (0 for notes).
         '''
         if pitch is None:
             try:
@@ -910,30 +1010,45 @@ class VexflowObject(object):
         separately, it might store information actual pitch, but that's
         weird since we're storing a position as if it's treble clef.
         
-        if usePitch is given then we use this pitch instead of self.originalObject,
+        If usePitch is given then we use this pitch instead of self.originalObject,
         which is needed for iterating through chord pitches
         
-        if clef is None then we look at self.clefContext for more information,
+        If clef is None then we look at self.clefContext for more information,
         otherwise treble is assumed.  Clef is a Vexflow clef name #TODO: CHANGE THIS!
         
-        
-        >>> vfn1 = vexflow.VexflowNote(note.Note('C4'))
-        >>> vfn1
-        <music21.vexflow.base.VexflowNote object at 0x...>
-        >>> vfn1.vexflowKey() #'treble')
-        'Cn/4'
-        >>> vfn2 = vexflow.VexflowNote(note.Note('C4'))
-        >>> vfn2.vexflowKey('bass')
-        'An/5'
-        
-        >>> c = chord.Chord(['C4','G#4','E-5'])
-        >>> vfc = vexflow.VexflowChord(c)
-        >>> vfc.vexflowKey('treble', c.pitches[0])
-        'Cn/4'
-        >>> vfc.vexflowKey('treble', c.pitches[1])
-        'G#/4'
-        >>> vfc.vexflowKey('treble', c.pitches[2])
-        'Eb/5'
+        ::
+            >>> vfn1 = vexflow.VexflowNote(note.Note('C4'))
+            >>> vfn1
+            <music21.vexflow.base.VexflowNote object at 0x...>
+
+        ::
+
+            >>> vfn1.vexflowKey() #'treble')
+            'Cn/4'
+
+        ::
+
+            >>> vfn2 = vexflow.VexflowNote(note.Note('C4'))
+            >>> vfn2.vexflowKey('bass')
+            'An/5'
+
+        ::
+            
+            >>> c = chord.Chord(['C4','G#4','E-5'])
+            >>> vfc = vexflow.VexflowChord(c)
+            >>> vfc.vexflowKey('treble', c.pitches[0])
+            'Cn/4'
+
+        ::
+
+            >>> vfc.vexflowKey('treble', c.pitches[1])
+            'G#/4'
+
+        ::
+
+            >>> vfc.vexflowKey('treble', c.pitches[2])
+            'Eb/5'
+
         '''
         if clef is None:
     #        if self.clefContext is not None:
@@ -979,16 +1094,21 @@ class VexflowObject(object):
 
     def vexflowDuration(self):
         '''
-        Given a music21 Note (or Pitch) object, returns the vexflow duration
+        Given a music21 Note (or Pitch) object, returns the vexflow duration.
     
-        
-        >>> n = note.Note()
-        >>> vfn = vexflow.VexflowNote(n)
-        >>> vfn.vexflowDuration()
-        'q'
-        >>> n.quarterLength = 0.75
-        >>> vfn.vexflowDuration()
-        '8d'
+        ::
+
+            >>> n = note.Note()
+            >>> vfn = vexflow.VexflowNote(n)
+            >>> vfn.vexflowDuration()
+            'q'
+
+        ::
+
+            >>> n.quarterLength = 0.75
+            >>> vfn.vexflowDuration()
+            '8d'
+
         '''
         m21Duration = self.originalObject.duration
     
@@ -1013,7 +1133,6 @@ class VexflowNote(VexflowObject):
     TODO: add setters/getters
 
     TODO: __str__
-
 
     ::
 
@@ -1045,16 +1164,16 @@ class VexflowNote(VexflowObject):
         >>> v.vexflowDuration()
         'hd'
 
+    ::
 
         >>> v.stemDirectionCode()
         'stem_direction: Vex.Flow.StaveNote.STEM_UP'
 
     ::
 
-            >>> v.vexflowCode()
+        >>> v.vexflowCode()
         'new Vex.Flow.StaveNote({keys: ["C##/4"], duration: "hd", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addDotToAll()'
 
-    Return VexFlow note instance.
     '''
 
     def __init__(self, music21note = None, clef=None):
@@ -1081,15 +1200,15 @@ class VexflowNote(VexflowObject):
         
         vexflowCode += '})'
 
-
         vexflowCode += self.accidentalCode()
         vexflowCode += self.fermataCode()        
         vexflowCode += self.dotCode()
         return vexflowCode
 
+
 class VexflowChord(VexflowObject):
     '''
-    A simultaneous grouping of notes
+    A simultaneous grouping of notes.
 
     TODO: __str__ should just call the str() method on the original notes
     TODO: Also store original notes as Chord object
@@ -1098,8 +1217,8 @@ class VexflowChord(VexflowObject):
 
     def __init__(self, music21Chord = None, clef=None):
         '''
-        notes must be an array_like grouping of either Music21 or VexFlow Notes
-        notes can instead be a music21.chord.Chord object
+        Notes must be an array_like grouping of either Music21 or VexFlow Notes.
+        Notes can instead be a music21.chord.Chord object.
         '''
 #        try:
 #            if 'Chord' not in notes.classes:
@@ -1120,8 +1239,7 @@ class VexflowChord(VexflowObject):
 
     def vexflowCode(self):
         '''
-        returns a string showing the vexflow code needed to display this chord in a browser
-
+        Returns a string showing the vexflow code needed to display this chord in a browser.
         '''
         
         #TODO tuplet: set the tuplet variables here
@@ -1153,8 +1271,9 @@ class VexflowChord(VexflowObject):
         
 class VexflowRest(VexflowObject):
     '''
-    Class for representing rests in VexFlow
+    Class for representing rests in VexFlow.
     '''
+
     def __init__(self, music21rest = None, clef=None):
         '''
         music21rest must be a :class:`music21.note.Rest` object.
@@ -1170,13 +1289,15 @@ class VexflowRest(VexflowObject):
 
     def vexflowCode(self):
         '''
-        Returns a string which is the generated the vexflow code needed to render this rest object
+        Returns a string which is the generated the vexflow code needed to render this rest object.
 
-        
-        >>> r = note.Rest()
-        >>> vr = vexflow.VexflowRest(r)
-        >>> vr.vexflowCode()
-        'new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})'
+        ::
+
+            >>> r = note.Rest()
+            >>> vr = vexflow.VexflowRest(r)
+            >>> vr.vexflowCode()
+            'new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})'
+
         '''
         vexflowCode = 'new Vex.Flow.StaveNote({'
         vexflowCode += 'keys: ["b/4"], '
@@ -1186,23 +1307,24 @@ class VexflowRest(VexflowObject):
         vexflowCode += self.dotCode()        
         return vexflowCode
 
+
 #--------------containers----------------------------------#
 #         from smallest to largest                         #
+
 
 class VexflowVoice(object):
     '''
     A Voice in VexFlow is a "lateral" grouping of notes in one measure
-        It's the equivalent to a :class:`~music21.stream.Measure`
+    It's the equivalent to a :class:`~music21.stream.Measure`.
 
     Requires either a :class:`~music21.stream.Measure` object or a 
-    :class:`~music21.stream.Voice` object
+    :class:`~music21.stream.Voice` object.
 
     If those objects aren't already flat, flattens them in the process. 
 
-    params is a dict containing various parameters to be passed to the 
+    `params` is a dict containing various parameters to be passed to the 
     voice object.  Most important is the UIDCounter parameter which keeps
-    track of the number of objects created
-
+    track of the number of objects created.
     '''
     
     def __init__(self, music21measure = None, params={}):
@@ -1310,16 +1432,18 @@ class VexflowVoice(object):
     def voiceCode(self):
         '''
         Creates the code to create a new voice object with the
-        name stored in `self.voiceName`.
+        name stored in ``self.voiceName``.
         
-        
-        >>> s = stream.Measure()
-        >>> s.append(note.Note('c4'))
-        >>> s.append(note.Note('d4'))
-        >>> vfv = vexflow.VexflowVoice(s)
-        >>> vfv.voiceName = 'myVoice'
-        >>> vfv.voiceCode()
-        'var myVoice = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});'
+        ::        
+
+            >>> s = stream.Measure()
+            >>> s.append(note.Note('c4'))
+            >>> s.append(note.Note('d4'))
+            >>> vfv = vexflow.VexflowVoice(s)
+            >>> vfv.voiceName = 'myVoice'
+            >>> vfv.voiceCode()
+            'var myVoice = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});'
+
         '''
         
         return ''.join(['var ',
@@ -1331,16 +1455,18 @@ class VexflowVoice(object):
 
     def vexflowObjects(self):
         '''
-        returns a list of all the notesAndRests in the originalMeasure
-        represented as VexflowObjects
+        Returns a list of all the ``notesAndRests`` in the ``originalMeasure``
+        represented as ``VexflowObjects``.
 
-        
-        >>> s = stream.Measure()
-        >>> s.append(note.Note('c4'))
-        >>> s.append(note.Note('d4'))
-        >>> vfv = vexflow.VexflowVoice(s)
-        >>> vfv.vexflowObjects()
-        [<music21.vexflow.base.VexflowNote object at 0x...>, <music21.vexflow.base.VexflowNote object at 0x...>]
+        ::
+ 
+            >>> s = stream.Measure()
+            >>> s.append(note.Note('c4'))
+            >>> s.append(note.Note('d4'))
+            >>> vfv = vexflow.VexflowVoice(s)
+            >>> vfv.vexflowObjects()
+            [<music21.vexflow.base.VexflowNote object at 0x...>, <music21.vexflow.base.VexflowNote object at 0x...>]
+
         '''
         if self._vexflowObjects is not None:
             return self._vexflowObjects
@@ -1361,17 +1487,19 @@ class VexflowVoice(object):
     
     def notesCode(self):
         '''
-        note the plural.  Generates an String that is a Javascript array
+        Note the plural. Generates an String that is a Javascript array
         of all the vexflow notes in a measure:
 
-        
-        >>> s = stream.Measure()
-        >>> s.append(note.Note('c4'))
-        >>> s.append(note.Note('d4'))
-        >>> vfv = vexflow.VexflowVoice(s)
-        >>> vfv.voiceName = 'myVoice'
-        >>> vfv.notesCode()
-        'var myVoiceNotes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "q"})];'
+        ::
+
+            >>> s = stream.Measure()
+            >>> s.append(note.Note('c4'))
+            >>> s.append(note.Note('d4'))
+            >>> vfv = vexflow.VexflowVoice(s)
+            >>> vfv.voiceName = 'myVoice'
+            >>> vfv.notesCode()
+            'var myVoiceNotes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "q"})];'
+
         '''
         notes = []
         for thisVexflowObj in self.vexflowObjects():
@@ -1384,16 +1512,18 @@ class VexflowVoice(object):
         '''
         Returns a string that generates the code necessary to display this voice.
 
-        
-        >>> s = stream.Measure()
-        >>> s.append(note.Note('c4'))
-        >>> s.append(note.Note('d4'))
-        >>> vfv = vexflow.VexflowVoice(s)
-        >>> vfv.voiceName = 'myVoice'
-        >>> print vfv.vexflowCode()
-        var myVoice = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
-        var myVoiceNotes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "q"})];
-        myVoice.addTickables(myVoiceNotes);
+        ::
+
+            >>> s = stream.Measure()
+            >>> s.append(note.Note('c4'))
+            >>> s.append(note.Note('d4'))
+            >>> vfv = vexflow.VexflowVoice(s)
+            >>> vfv.voiceName = 'myVoice'
+            >>> print vfv.vexflowCode()
+            var myVoice = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+            var myVoiceNotes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "q"})];
+            myVoice.addTickables(myVoiceNotes);
+
         '''
         return self.voiceCode() + '\n' + self.notesCode() + '\n' +\
             str(self.voiceName) + '.addTickables(' + str(self.voiceName) + \
@@ -1403,23 +1533,22 @@ class VexflowVoice(object):
         '''
         Beaming is a boolean value determining if the voice should be beamed
 
-        Note: So far only VexFlow's automatic beaming is supported
-            Cannot manually modify beams
+        .. note:: So far only VexFlow's automatic beaming is supported.
+                  We cannot manually modify beams.
         '''
         return self.params['beaming']
 
     def _beamCode(self, contextName = 'ctx', indentation=3):
         '''
-        Returns the preamble and the postamble code for the beams for this voice
+        Returns the preamble and the postamble code for the beams for this voice.
 
-        Returns it as an array containing the beam preamble and postamble
+        Returns it as an array containing the beam preamble and postamble.
 
-        Will return code even if it shouldn't be beamed
-            Check self.getBeaming() before applying this
+        Will return code even if it shouldn't be beamed.
+        Check self.getBeaming() before applying this.
         '''
         if self._beamPreamble is not None and self._beamPost is not None:
             return [self._beamPreamble, self._beamPost]
-
         
         baseBeamName = str(self.voiceName) + 'Beam'
         noteGroupName = str(self.voiceName) + 'Notes'
@@ -1436,7 +1565,6 @@ class VexflowVoice(object):
                     beamInfo = (beamStartIndex, index)
                     theseBeams.append(beamInfo)
                     beamStartIndex = None
-
 
         for index in range(len(theseBeams)):
             thisBeam = theseBeams[index]
@@ -1455,20 +1583,20 @@ class VexflowVoice(object):
     
     def createBeamCode(self, contextName = 'ctx', indentation=3):
         '''
-        returns the code to create beams for this staff.
+        Returns the code to create beams for this staff.
         '''
         return self._beamCode(contextName, indentation)[0]
 
     def drawBeamCode(self, contextName = 'ctx', indentation=3):
         '''
-        returns the code to draw beams on this staff.
+        Returns the code to draw beams on this staff.
         '''
         return self._beamCode(contextName, indentation)[1]
 
     
     def tieCode(self, contextName = 'ctx', indentation=3):
         '''
-        Returns the code for the ties for this voice
+        Returns the code for the ties for this voice.
 
         Returns it as a two-element tuple containing [0] a list of code
         for the completed ties within this voice,
@@ -1507,7 +1635,6 @@ class VexflowVoice(object):
             #Partial tie across the bar, beginning on this page
             theseTies += [(thisTieStart, None)]
 
-
         fullTies = []
         partialTies = []
 
@@ -1517,15 +1644,15 @@ class VexflowVoice(object):
                 #TODO: add support for multiple ties in a chord
                 thisTieName = baseTieName + str(index)
                 thisTieCode = ''.join([
-                    ('    '*indentation),
+                    ('    ' * indentation),
                     'var ',
                     thisTieName,
                     ' = new Vex.Flow.StaveTie({\n',
-                    ('    '*(indentation + 1)),
+                    ('    ' * (indentation + 1)),
                     'first_note: ',
                     noteGroupName,
                     '[' + str(tieStartIndex) + '],\n',
-                    ('    '*(indentation + 1)),
+                    ('    ' * (indentation + 1)),
                     'last_note: ',
                     noteGroupName,
                     '[' + str(tieEndIndex) + '],\n',
@@ -1536,7 +1663,7 @@ class VexflowVoice(object):
                     ('    ' * indentation),
                     '});',
                     '\n',
-                    ('    '*indentation),
+                    ('    ' * indentation),
                     thisTieName,
                     '.setContext(',
                     str(contextName),
@@ -1551,15 +1678,15 @@ class VexflowVoice(object):
         '''
         Beaming is a boolean value determining if the voice should be beamed
 
-        Note: So far only VexFlow's automatic beaming is supported
-            Cannot manually modify beams
+        .. note:: So far, only VexFlow's automatic beaming is supported.
+                  We cannot manually modify beams.
         '''
         self.params['beaming'] = beaming
 
     def generateCode(self, mode='txt'):
         '''
-        returns the vexflow code necessary to display this Voice in a browser
-            as a string
+        Returns the vexflow code necessary to display this Voice in a browser
+        as a string.
         '''
         if mode == 'txt':
             return self.vexflowCode()
@@ -1567,14 +1694,14 @@ class VexflowVoice(object):
             result = htmlPreamble + vexflowPreamble
             defaultStaff = staffString()
             result += "".join([
-                    "            ",
-                    defaultStaff,
-                    "\n",
-                    "            stave.addClef('",
-                    str(defaultStaveClef),
-                    "').setContext(ctx).draw();\n",
-                    "            ",
-                    self.vexflowCode()])
+                "            ",
+                defaultStaff,
+                "\n",
+                "            stave.addClef('",
+                str(defaultStaveClef),
+                "').setContext(ctx).draw();\n",
+                "            ",
+                self.vexflowCode()])
             result += self.createBeamCode('ctx') +\
                 "\n            var formatter = new Vex.Flow.Formatter()." +\
                 "joinVoices(["+str(self.voiceName)+"]).format([" + \
@@ -1584,16 +1711,17 @@ class VexflowVoice(object):
             result += htmlConclusion
             return result
 
+
 class VexflowStave(object):
     '''
     A "Stave"[sic] in VexFlow is the object for the graphic staff to be displayed.
     It usually represents a Measure that might have one or more Voices on it.
     
-    TODO: generateCode should take a VexflowContext object as a param
+    TODO: ``generateCode`` should take a ``VexflowContext`` object as a param
     '''
     def __init__(self, params={}):
         '''
-        params is a dictionary containing position, width, and other parameters to be passed to the stave object
+        ``params`` is a dictionary containing position, width, and other parameters to be passed to the stave object.
         '''
         self.params = params
         self.vexflowVoices = []
@@ -1646,7 +1774,7 @@ class VexflowStave(object):
     
     def formatterCode(self):
         '''
-        code for setting up a formatter to join voices
+        Code for setting up a formatter to join voices.
         '''
         if len(self.vexflowVoices) > 0:
             formatterCode = 'var ' + self.staveName + 'Formatter = ' +\
@@ -1661,8 +1789,7 @@ class VexflowStave(object):
         else:
             return ''
 
-    
-    def vexflowCode(self):      
+    def vexflowCode(self):
         # code for joining multiple voices (needed even if only one...
         
         return self.staveCode() + '\n' + self.formatterCode()
@@ -1672,8 +1799,7 @@ class VexflowStave(object):
     
     def getLineNum(self):
         '''
-        Tries to get the line number of this stave
-
+        Tries to get the line number of this stave.
         '''
         if 'lineNum' in self.params:
             return self.params['lineNum']
@@ -1683,9 +1809,9 @@ class VexflowStave(object):
     
     def beamCode(self, contextName, indentation=3):
         '''
-        Generates the code for beaming all of the voices on this stave
+        Generates the code for beaming all of the voices on this stave.
 
-        Returns an array containing the preamble and postamble
+        Returns an array containing the preamble and postamble.
         '''
         preamble = []
         postamble = []
@@ -1712,7 +1838,8 @@ class VexflowStave(object):
             
     def setVoices(self, theseVexflowVoices):
         '''
-        Replaces any existing voices attached to this Stave with theseVexflowVoices (a list of instances of VexflowVoice)
+        Replaces any existing voices attached to this ``Stave`` with
+        ``theseVexflowVoices`` (a list of instances of ``VexflowVoice``).
         '''
         if isinstance(theseVexflowVoices, list):
             self.vexflowVoices = theseVexflowVoices
@@ -1741,7 +1868,7 @@ class VexflowStave(object):
 
     def generateCode(self, mode='txt'):
         '''
-        Generates the vexflow code to display this staff in a browser
+        Generates the vexflow code to display this staff in a browser.
         '''
         if mode == 'txt':
             return self.vexflowCode()
@@ -1768,7 +1895,7 @@ class VexflowPart(object):
     '''
     A part is a wrapper for the vexflow code representing multiple measures
     of music that should go in the same musical staff (as opposed to
-    a vexflow Stave)
+    a vexflow Stave).
     '''
 
     def __init__(self, music21part, params={}):
@@ -1820,7 +1947,7 @@ class VexflowPart(object):
 
     def _computeParams(self):
         '''
-        Computes parameters necessary for placing the measures in the canvas
+        Computes parameters necessary for placing the measures in the canvas.
         '''
         self.lineWidth = '(' + str(self.params['canvasWidth']) + ' - (2*' + \
             str(self.params['canvasMargin']) + '))'
@@ -1838,7 +1965,7 @@ class VexflowPart(object):
     
     def _generateVexflowCode(self):
         '''
-        Generates the vexflow code to display this part
+        Generates the vexflow code to display this part.
         '''
         self.numMeasures = -1
         self.numSystems = 0
@@ -1933,9 +2060,9 @@ class VexflowPart(object):
 
     def beamCode(self, contextName, indentation=3):
         '''
-        Generates the code for beaming all of the staves in this part
+        Generates the code for beaming all of the staves in this part.
 
-        Returns as an array containing the preamble and postamble
+        Returns as an array containing the preamble and postamble.
         '''
         preamble = []
         postamble = []
@@ -1947,7 +2074,7 @@ class VexflowPart(object):
 
     def generateCode(self, mode='txt'):
         '''
-        generates the vexflow code necessary to display this part in a browser
+        Generates the vexflow code necessary to display this part in a browser.
         '''
         if mode=='txt':
             return self.vexflowCode
@@ -1971,7 +2098,7 @@ class VexflowPart(object):
 
 class VexflowScore(object):
     '''
-    Represents the code for multiple VexflowPart objects
+    Represents the code for multiple VexflowPart objects.
     '''
 
     def __init__(self, music21score, params={}):
@@ -1987,7 +2114,7 @@ class VexflowScore(object):
 
     def vexflowCode(self):
         '''
-        Generates the code necessary to display this score
+        Generates the code necessary to display this score.
         '''
         previousParams = {'numParts': self.numParts}
         if self.context != None:
@@ -2018,9 +2145,9 @@ class VexflowScore(object):
         vexflowCode += self.partsCode
         return vexflowCode
     
-    def generateCode(self, mode = 'txt'):
+    def generateCode(self, mode='txt'):
         '''
-        returns the vexflow code needed to render this object in a browser
+        Returns the vexflow code needed to render this object in a browser.
         '''
         if mode == 'txt':
             return self.vexflowCode()
@@ -2093,15 +2220,15 @@ class VexflowScore(object):
 
 class VexflowContext(object):
     '''
-    Contains information about the canvas, formatter, and renderer
+    Contains information about the canvas, formatter, and renderer.
     '''
 
     def __init__(self, params={}, canvasName = None):
         '''
-        `canvasName` is the name of the canvas within the html code.
+        ``canvasName`` is the name of the canvas within the html code.
         
-        `params` is a dictionary containing width, height, and other parameters
-        to be passed to the canvas object
+        ``params`` is a dictionary containing width, height, and other
+        parameters to be passed to the canvas object.
         '''
         self.params = params
         self.canvasHTML = ''
@@ -2135,17 +2262,16 @@ class VexflowContext(object):
 
     def generateHTML(self, applyAttributes=False):
         '''
-        Generates the HTML for the canvas and stores it in self.canvasHTML
+        Generates the HTML for the canvas and stores it in ``self.canvasHTML``.
 
-        (End users should use the getCanvasHTML() method)
+        .. note:: End users should use the ``getCanvasHTML()`` method.
 
-        If applyAttributes is True, then apply the attributes in the
+        If ``applyAttributes`` is True, then apply the attributes in the
             HTML code instead of in the Javascript
 
-        Note: There is no checking that the values aren't also set
-            in Javascript
+        .. note:: There is no checking that the values aren't also set
+                  in Javascript.
         '''
-
         self.canvasHTML = '<canvas '
 
         if applyAttributes:
@@ -2159,17 +2285,17 @@ class VexflowContext(object):
     def generateJS(self, applyAttributes=True):
         '''
         Generates the Javascript to set up the canvas for VexFlow and stores it
-            in self.canvasJSCode, self.rendererCode, and self.contextCode
+        in ``self.canvasJSCode``, ``self.rendererCode``, and 
+        ``self.contextCode``.
 
-        (End users should use the get methods)
+        .. note:: End users should use the get methods.
 
-        If applyAttributes is True, then apply the attributes in the Javascript
-            instead of the HTML.
+        If ``applyAttributes`` is True, then apply the attributes in the
+        Javascript instead of the HTML.
 
-        Note: applying the attributes in Javascript will overwrite any 
-            attributes set in the HTML
+        .. note:: Applying the attributes in Javascript will overwrite any 
+                  attributes set in the HTML.
         '''
-        
         self.canvasJSCode = 'var ' + self.canvasJSName + ' = $("#' + \
             self.canvasHTMLName + '")[0];'
 
@@ -2216,7 +2342,10 @@ class VexflowContext(object):
         self.params['width'] = width
         self.generateJS()
 
+
 #-------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
     def runTest(self):
         pass
@@ -2259,7 +2388,6 @@ class Test(unittest.TestCase):
         self.maxDiff = 30000
         self.assertMultiLineEqual(htmlOut, expectedOutput)
 
-    
     def testMeasureParts(self):
         self.maxDiff = 30000
         from music21 import corpus
