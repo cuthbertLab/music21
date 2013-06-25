@@ -5792,35 +5792,42 @@ class Stream(base.Music21Object):
 
     def makeBeams(self, inPlace=False):
         '''
-        Return a new Measure, or Stream of Measures, with beams applied to all notes. 
-        Measures with Voices will process voices independently. 
+        Return a new Measure, or Stream of Measures, with beams applied to all
+        notes. Measures with Voices will process voices independently. 
 
         In the process of making Beams, this method also updates tuplet types. 
-        This is destructive and thus changes an attribute of Durations in Notes.
+        This is destructive and thus changes an attribute of Durations in 
+        Notes.
 
-        Note that `makeBeams()` is automatically called in show('musicxml') and other formats
-        if there is no beaming information in the piece (see `haveBeamsBeenMade`)
+        Note that `makeBeams()` is automatically called in show('musicxml') and 
+        other formats if there is no beaming information in the piece (see 
+        `haveBeamsBeenMade`).
 
-        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
-        *Before Version 1.6, `inPlace` default was `True`; now `False` like most `inPlace` options in music21`
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, 
+        this returns a modified deep copy.
 
+        .. note: Before Version 1.6, `inPlace` default was `True`; now `False` 
+                 like most `inPlace` options in music21.
 
         See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
 
+        ::
 
-        >>> aMeasure = stream.Measure()
-        >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
-        >>> aNote = note.Note()
-        >>> aNote.quarterLength = .25
-        >>> aMeasure.repeatAppend(aNote,16)
-        >>> bMeasure = aMeasure.makeBeams(inPlace=False)
+            >>> aMeasure = stream.Measure()
+            >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
+            >>> aNote = note.Note()
+            >>> aNote.quarterLength = .25
+            >>> aMeasure.repeatAppend(aNote,16)
+            >>> bMeasure = aMeasure.makeBeams(inPlace=False)
 
-        >>> for i in range(0, 4):
-        ...   print i, bMeasure.notes[i].beams
-        0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
-        1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
-        2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
-        3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
+        ::
+
+            >>> for i in range(0, 4):
+            ...   print i, bMeasure.notes[i].beams
+            0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
+            1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
+            2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
+            3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
         OMIT_FROM_DOCS
         TODO: inPlace=False does not work in many cases
@@ -6436,19 +6443,23 @@ class Stream(base.Music21Object):
         for sequential notes with matching pitches. The `matchByPitch` option can 
         be used to use this technique. 
 
-        
+        ::
 
-        >>> a = stream.Stream()
-        >>> n = note.Note()
-        >>> n.quarterLength = 6
-        >>> a.append(n)
-        >>> m = a.makeMeasures()
-        >>> m.makeTies()
-        >>> len(m.flat.notes)
-        2
-        >>> m = m.stripTies()
-        >>> len(m.flat.notes)
-        1
+            >>> a = stream.Stream()
+            >>> n = note.Note()
+            >>> n.quarterLength = 6
+            >>> a.append(n)
+            >>> m = a.makeMeasures()
+            >>> m.makeTies()
+            >>> len(m.flat.notes)
+            2
+
+        ::
+
+            >>> m = m.stripTies()
+            >>> len(m.flat.notes)
+            1
+
         '''
         #environLocal.printDebug(['calling stripTies'])
         if not inPlace: # make a copy
@@ -9064,7 +9075,7 @@ class Stream(base.Music21Object):
         N.B. for chords, currently, only the first pitch is tested for unison.  
         this is a bug TODO: FIX
 
-        (**keywords is there so that other methods that pass along dicts to 
+        (\*\*kwargs is there so that other methods that pass along dicts to 
         findConsecutiveNotes don't have to remove 
         their own args; this method is used in melodicIntervals.)
         '''
