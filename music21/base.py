@@ -5564,11 +5564,13 @@ def mainTest(*testClasses):
     Takes as its arguments modules (or a string 'noDocTest' or 'verbose')
     and runs all of these modules through a unittest suite
     
-    unless 'noDocTest' is passed as a module, a docTest
-    is also performed on __main__.  Hence the name "mainTest"
+    Unless 'noDocTest' is passed as a module, a docTest
+    is also performed on `__main__`, hence the name "mainTest".
     
-    run example (put at end of your modules)
+    Run example (put at end of your modules):
     
+    ::
+
         import unittest
         class Test(unittest.TestCase):
             def testHello(self):
@@ -5578,6 +5580,7 @@ def mainTest(*testClasses):
         import music21
         if __name__ == '__main__':
             music21.mainTest(Test)
+
     '''
     #environLocal.printDebug(['mainTest()', testClasses])
 
