@@ -34,7 +34,7 @@ class ObjectDocumenter(object):
     def __repr__(self):
         raise NotImplemented
 
-    ### READ-ONLY PRIVATE PROPERTIES ###
+    ### PRIVATE PROPERTIES ###
 
     @property
     def _packagesystemPath(self):
@@ -43,7 +43,7 @@ class ObjectDocumenter(object):
             self.__class__.__name__,
             ))
 
-    ### READ-ONLY PUBLIC PROPERTIES ###
+    ### PUBLIC PROPERTIES ###
 
     @property
     def referent(self):
@@ -108,7 +108,7 @@ class FunctionDocumenter(ObjectDocumenter):
             self.referentPackagesystemPath,
             )
 
-    ### READ-ONLY PUBLIC PROPERTIES ###
+    ### PUBLIC PROPERTIES ###
 
     @property
     def referentPackagesystemPath(self):
@@ -156,7 +156,7 @@ class MemberDocumenter(ObjectDocumenter):
             referentPath,
             )
 
-    ### READ-ONLY PUBLIC PROPERTIES ###
+    ### PUBLIC PROPERTIES ###
 
     @property
     def definingClass(self):
@@ -201,7 +201,7 @@ class MethodDocumenter(MemberDocumenter):
         
     '''
 
-    ### READ-ONLY PUBLIC PROPERTIES ###
+    ### PUBLIC PROPERTIES ###
 
     @property
     def rstAutodocDirectiveFormat(self):
@@ -242,7 +242,7 @@ class AttributeDocumenter(MemberDocumenter):
 
     '''
 
-    ### READ-ONLY PUBLIC PROPERTIES ###
+    ### PUBLIC PROPERTIES ###
 
     @property
     def rstAutodocDirectiveFormat(self):
@@ -263,22 +263,23 @@ class ClassDocumenter(ObjectDocumenter):
 
     ::
 
-        >>> klass = stream.Stream
+        >>> klass = documentation.ClassDocumenter
         >>> documenter = documentation.ClassDocumenter(klass)
         >>> documenter
-        <music21.documentation.library.documenters.ClassDocumenter: music21.stream.Stream>
+        <music21.documentation.library.documenters.ClassDocumenter: music21.documentation.library.documenters.ClassDocumenter>
 
     ::
 
         >>> documenter.rstCrossReferenceString
-        ':class:`~music21.stream.Stream`'
+        ':class:`~music21.documentation.library.documenters.ClassDocumenter`'
+
 
     ::
 
         >>> for line in documenter.rstAutodocDirectiveFormat:
         ...     line
         ...
-        '.. autoclass:: music21.stream.Stream'
+        '.. autoclass:: music21.documentation.library.documenters.ClassDocumenter'
 
     '''
 
@@ -299,12 +300,12 @@ class ClassDocumenter(ObjectDocumenter):
         inheritedMethods = {}
 
         # Read/Write
-        properties = []
-        inheritedProperties = {}
+        readwriteProperties = []
+        inheritedReadwriteProperties = {}
 
         # Read-only
-        attributes = []
-        inheritedAttributes = {}
+        readonlyProperties = []
+        inheritedReadonlyProperties = {}
 
         attrs = inspect.classify_class_attrs(self.referent)
         for attr in attrs:
@@ -317,18 +318,18 @@ class ClassDocumenter(ObjectDocumenter):
                 continue
             
             definingClass = attr.defining_class
-            if attr.kind in ('class method', 'method'):
+            if attr.kind in ('class method', 'method', 'static method'):
                 documenterClass = MethodDocumenter
                 localMembers = methods
                 inheritedMembers = inheritedMethods
             elif attr.kind in ('property',) and attr.object.fset is not None:
                 documenterClass = AttributeDocumenter
-                localMembers = properties
-                inheritedMembers = inheritedProperties
+                localMembers = readwriteProperties
+                inheritedMembers = inheritedReadwriteProperties
             elif attr.kind in ('property',) and attr.object.fset is None:
                 documenterClass = AttributeDocumenter
-                localMembers = attributes
-                inheritedMembers = inheritedAttributes
+                localMembers = readonlyProperties
+                inheritedMembers = inheritedReadonlyProperties
             else:
                 continue
 
@@ -347,21 +348,21 @@ class ClassDocumenter(ObjectDocumenter):
             
         keyLambda = lambda x: x.memberName
         methods.sort(key=keyLambda)
-        attributes.sort(key=keyLambda)
-        properties.sort(key=keyLambda)
+        readonlyProperties.sort(key=keyLambda)
+        readwriteProperties.sort(key=keyLambda)
         for documenters in inheritedMethods.itervalues():
             documenters.sort(key=keyLambda)
-        for documenters in inheritedAttributes.itervalues():
+        for documenters in inheritedReadonlyProperties.itervalues():
             documenters.sort(key=keyLambda)
-        for documenters in inheritedProperties.itervalues():
+        for documenters in inheritedReadwriteProperties.itervalues():
             documenters.sort(key=keyLambda) 
 
         self._methods = methods
-        self._attributes = attributes
-        self._properties = properties
+        self._readonlyProperties = readonlyProperties
+        self._readwriteProperties = readwriteProperties
         self._inheritedMethodsMapping = inheritedMethods
-        self._inheritedAttributeMapping = inheritedAttributes
-        self._inheritedPropertiesMapping = inheritedProperties
+        self._inheritedReadonlyPropertiesMapping = inheritedReadonlyProperties
+        self._inheritedReadwritePropertiesMapping = inheritedReadwriteProperties
 
         if self.referent not in self._identityMap:
             self._identityMap[self.referent] = self 
@@ -389,45 +390,7 @@ class ClassDocumenter(ObjectDocumenter):
             return cls._identityMap[referent]
         return cls(referent)
 
-    ### READ-ONLY PUBLIC PROPERTIES ###
-
-    @property
-    def attributes(self):
-        '''
-        The read-only attribute documenters for a documented class:
-
-        ::
-
-            >>> klass = stream.Stream
-            >>> documenter = documentation.ClassDocumenter(klass)
-            >>> for attr in documenter.attributes:
-            ...     attr
-            ...
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beat>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivationChain>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.flat>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notes>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.offsetMap>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.rootDerivation>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.spannerBundle>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.variants>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.voices>
-
-        '''
-        return self._attributes
+    ### PUBLIC PROPERTIES ###
 
     @property
     def docAttr(self):
@@ -477,16 +440,16 @@ class ClassDocumenter(ObjectDocumenter):
         return self._docOrder
 
     @property
-    def inheritedAttributeMapping(self):
+    def inheritedReadonlyPropertiesMapping(self):
         '''
-        A mapping of parent class documenters and inherited attributes for a
-        documented class:
+        A mapping of parent class documenters and inherited read-only
+        properties for a documented class:
 
         ::
 
             >>> klass = stream.Measure
             >>> documenter = documentation.ClassDocumenter(klass)
-            >>> mapping = documenter.inheritedAttributeMapping
+            >>> mapping = documenter.inheritedReadonlyPropertiesMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
             ...     print '{0}:'.format(classDocumenter.referentPackagesystemPath)
@@ -513,7 +476,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         '''
 
-        return self._inheritedAttributeMapping
+        return self._inheritedReadonlyPropertiesMapping
 
     @property
     def inheritedMethodsMapping(self):
@@ -559,16 +522,16 @@ class ClassDocumenter(ObjectDocumenter):
         return self._inheritedMethodsMapping
 
     @property
-    def inheritedPropertiesMapping(self):
+    def inheritedReadwritePropertiesMapping(self):
         '''
-        A mapping of parent class documenters and inherited attributes for a
-        documented class:
+        A mapping of parent class documenters and inherited read/write
+        properties for a documented class:
 
         ::
 
             >>> klass = stream.Measure
             >>> documenter = documentation.ClassDocumenter(klass)
-            >>> mapping = documenter.inheritedPropertiesMapping
+            >>> mapping = documenter.inheritedReadwritePropertiesMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
             ...     print '{0}:'.format(classDocumenter.referentPackagesystemPath)
@@ -590,7 +553,7 @@ class ClassDocumenter(ObjectDocumenter):
             - music21.stream.Stream.seconds
 
         '''
-        return self._inheritedPropertiesMapping
+        return self._inheritedReadwritePropertiesMapping
 
     @property
     def methods(self):
@@ -619,7 +582,45 @@ class ClassDocumenter(ObjectDocumenter):
         return self._methods
 
     @property
-    def properties(self):
+    def readonlyProperties(self):
+        '''
+        The read-only property documenters for a documented class:
+
+        ::
+
+            >>> klass = stream.Stream
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> for attr in documenter.readonlyProperties:
+            ...     attr
+            ...
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beat>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivationChain>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.flat>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notes>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.offsetMap>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.rootDerivation>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.spannerBundle>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.variants>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.voices>
+
+        '''
+        return self._readonlyProperties
+
+    @property
+    def readwriteProperties(self):
         '''
         The read/write property documenters for a documented class:
 
@@ -627,7 +628,7 @@ class ClassDocumenter(ObjectDocumenter):
 
             >>> klass = stream.Stream
             >>> documenter = documentation.ClassDocumenter(klass)
-            >>> for prop in documenter.properties:
+            >>> for prop in documenter.readwriteProperties:
             ...     prop
             ...
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.atSoundingPitch>
@@ -640,7 +641,7 @@ class ClassDocumenter(ObjectDocumenter):
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
 
         '''
-        return self._properties
+        return self._readwriteProperties
 
     @property
     def referentPackagesystemPath(self):
@@ -741,7 +742,7 @@ class ModuleDocumenter(ObjectDocumenter):
                 namesMapping[name] = FunctionDocumenter(named)
         return namesMapping
 
-    ### READ-ONLY PUBLIC PROPERTIES ###
+    ### PUBLIC PROPERTIES ###
 
     @property
     def namesMapping(self):
