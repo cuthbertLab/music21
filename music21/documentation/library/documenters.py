@@ -73,7 +73,7 @@ class ObjectDocumenter(object):
 
     ### PUBLIC METHODS ###
 
-    def make_heading(self, text, heading_level):
+    def makeHeading(self, text, heading_level):
         assert isinstance(text, (str, unicode)) and len(text)
         assert heading_level in (1, 2)
         heading_characters = ['=', '-']
@@ -325,8 +325,22 @@ class ClassDocumenter(ObjectDocumenter):
         assert isinstance(referent, type)
         ObjectDocumenter.__init__(self, referent) 
 
+        self._baseClasses = tuple(
+            cls for cls in inspect.getmro(self.referent)[1:] \
+            if cls.__module__.startswith('music21'))
+        self._baseClassDocumenters = tuple(
+            type(self).fromIdentityMap(cls) for cls in self.baseClasses)
+
         self._docAttr = getattr(self.referent, '_DOC_ATTR', {})
         self._docOrder = getattr(self.referent, '_DOC_ORDER', [])
+
+        inheritedDocAttr = {}
+        for baseClass in self.baseClasses:
+            baseClassDocAttr = getattr(baseClass, '_DOC_ATTR', None)
+            if baseClassDocAttr is not None:
+                baseClassDocumenter = type(self).fromIdentityMap(baseClass)
+                inheritedDocAttr[baseClassDocumenter] = baseClassDocAttr
+        self._inheritedDocAttrMapping = inheritedDocAttr
 
         methods = []
         inheritedMethods = {}
@@ -392,6 +406,7 @@ class ClassDocumenter(ObjectDocumenter):
         self._methods = methods
         self._readonlyProperties = readonlyProperties
         self._readwriteProperties = readwriteProperties
+        self._inheritedDocAttrMapping = inheritedDocAttr
         self._inheritedMethodsMapping = inheritedMethods
         self._inheritedReadonlyPropertiesMapping = inheritedReadonlyProperties
         self._inheritedReadwritePropertiesMapping = inheritedReadwriteProperties
@@ -403,7 +418,7 @@ class ClassDocumenter(ObjectDocumenter):
 
     def __call__(self):
         result = []
-        result.extend(self.make_heading(self.referent.__name__, 2))
+        result.extend(self.makeHeading(self.referent.__name__, 2))
         result.extend(self.rstAutodocDirectiveFormat)
         result.extend(self.rstBasesFormat)
         result.extend(self.rstReadonlyPropertiesFormat)
@@ -427,6 +442,24 @@ class ClassDocumenter(ObjectDocumenter):
             referentPath,
             )
 
+    ### PRIVATE METHODS ###
+
+    def _formatInheritedMembersMapping(self, mapping, banner):
+        result = []
+        if not mapping:
+            return result
+        for classDocumenter in self.baseClassDocumenters:
+            if classDocumenter not in mapping:
+                continue
+            result.append(banner.format(classDocumenter.rstCrossReferenceString))
+            result.append('')
+            memberDocumenters = mapping[classDocumenter]
+            for memberDocumenter in memberDocumenters: 
+                result.append('- {0}'.format(
+                    memberDocumenter.rstCrossReferenceString))
+            result.append('')    
+        return result
+
     ### PUBLIC METHODS ###
 
     @classmethod
@@ -436,6 +469,14 @@ class ClassDocumenter(ObjectDocumenter):
         return cls(referent)
 
     ### PUBLIC PROPERTIES ###
+
+    @property
+    def baseClasses(self):
+        return self._baseClasses
+
+    @property
+    def baseClassDocumenters(self):
+        return self._baseClassDocumenters
 
     @property
     def docAttr(self):
@@ -483,6 +524,27 @@ class ClassDocumenter(ObjectDocumenter):
 
         '''
         return self._docOrder
+
+    @property
+    def inheritedDocAttrMapping(self):
+        '''
+        A mapping of parent class documenters and doc-attr attribute dicts
+        for a documented class:
+
+        ::
+
+            >>> klass = stream.Measure 
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> mapping = documenter.inheritedDocAttrMapping
+            >>> sortBy = lambda x: x.referentPackagesystemPath
+            >>> for classDocumenter in sorted(mapping, key=sortBy):
+            ...     classDocumenter
+            ...
+            <music21.documentation.library.documenters.ClassDocumenter: music21.base.Music21Object>
+            <music21.documentation.library.documenters.ClassDocumenter: music21.stream.Stream>
+
+        '''
+        return self._inheritedDocAttrMapping
 
     @property
     def inheritedReadonlyPropertiesMapping(self):
@@ -724,16 +786,18 @@ class ClassDocumenter(ObjectDocumenter):
 
         '''
         result = []
-        mro = [cls for cls in inspect.getmro(self.referent)[1:] \
-            if cls.__module__.startswith('music21')]
-        if mro:
+        if self.baseClasses:
             result.append('Inherits from:')
             result.append('')
-            for cls in mro:
-                documenter = type(self).fromIdentityMap(cls) 
-                result.append('- {0}'.format(documenter.rstCrossReferenceString))
+            for class_documenter in self.baseClassDocumenters:
+                result.append('- {0}'.format(
+                    class_documenter.rstCrossReferenceString))
             result.append('')
         return result
+
+    @property
+    def rstInheritedDocAttrFormat(self):
+        pass
 
     @property
     def rstInheritedMethodsFormat(self):
@@ -749,22 +813,14 @@ class ClassDocumenter(ObjectDocumenter):
             ...
             'Methods inherited from :class:`~music21.documentation.library.documenters.ObjectDocumenter`:'
             ''
-            '- :meth:`~music21.documentation.library.documenters.ObjectDocumenter.make_heading`'
+            '- :meth:`~music21.documentation.library.documenters.ObjectDocumenter.makeHeading`'
             ''
 
         '''
-        result = []
-        if self.inheritedMethodsMapping:
-            for class_documenter, member_documenters in \
-                self.inheritedMethodsMapping.iteritems():
-                result.append('Methods inherited from {0}:'.format(
-                    class_documenter.rstCrossReferenceString))
-                result.append('')
-                for member_documenter in member_documenters:
-                    result.append('- {0}'.format(
-                        member_documenter.rstCrossReferenceString))
-                result.append('')    
-        return result
+        mapping = self.inheritedMethodsMapping
+        banner = 'Methods inherited from {0}:'
+        return self._formatInheritedMembersMapping(mapping, banner)
+
 
     @property
     def rstInheritedReadonlyPropertiesFormat(self):
@@ -778,31 +834,22 @@ class ClassDocumenter(ObjectDocumenter):
             >>> for line in documenter.rstInheritedReadonlyPropertiesFormat:
             ...     line
             ...
-            'Methods inherited from :class:`~music21.documentation.library.documenters.MemberDocumenter`:'
+            'Read-only properties inherited from :class:`~music21.documentation.library.documenters.MemberDocumenter`:'
             ''
             '- :attr:`~music21.documentation.library.documenters.MemberDocumenter.definingClass`'
             '- :attr:`~music21.documentation.library.documenters.MemberDocumenter.memberName`'
             '- :attr:`~music21.documentation.library.documenters.MemberDocumenter.referentPackagesystemPath`'
             ''
-            'Methods inherited from :class:`~music21.documentation.library.documenters.ObjectDocumenter`:'
+            'Read-only properties inherited from :class:`~music21.documentation.library.documenters.ObjectDocumenter`:'
             ''
             '- :attr:`~music21.documentation.library.documenters.ObjectDocumenter.referent`'
             '- :attr:`~music21.documentation.library.documenters.ObjectDocumenter.rstCrossReferenceString`'
             ''
 
         '''
-        result = []
-        if self.inheritedMethodsMapping:
-            for class_documenter, member_documenters in \
-                self.inheritedReadonlyPropertiesMapping.iteritems():
-                result.append('Methods inherited from {0}:'.format(
-                    class_documenter.rstCrossReferenceString))
-                result.append('')
-                for member_documenter in member_documenters:
-                    result.append('- {0}'.format(
-                        member_documenter.rstCrossReferenceString))
-                result.append('')    
-        return result
+        mapping = self.inheritedReadonlyPropertiesMapping
+        banner = 'Read-only properties inherited from {0}:'
+        return self._formatInheritedMembersMapping(mapping, banner)
 
     @property
     def rstInheritedReadwritePropertiesFormat(self):
@@ -818,18 +865,9 @@ class ClassDocumenter(ObjectDocumenter):
             ...
 
         '''
-        result = []
-        if self.inheritedMethodsMapping:
-            for class_documenter, member_documenters in \
-                self.inheritedReadwritePropertiesMapping.iteritems():
-                result.append('Read/write properties inherited from {0}:'.format(
-                    class_documenter.rstCrossReferenceString))
-                result.append('')
-                for member_documenter in member_documenters:
-                    result.append('- {0}'.format(
-                        member_documenter.rstCrossReferenceString))
-                result.append('')    
-        return result
+        mapping = self.inheritedReadwritePropertiesMapping
+        banner = 'Read/write properties inherited from {0}:'
+        return self._formatInheritedMembersMapping(mapping, banner)
 
     @property
     def rstMethodsFormat(self):
@@ -874,9 +912,15 @@ class ClassDocumenter(ObjectDocumenter):
             ...
             ':class:`~music21.documentation.library.documenters.ClassDocumenter` *read-only properties*'
             ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.baseClassDocumenters'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.baseClasses'
+            ''
             '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.docAttr'
             ''
             '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.docOrder'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.inheritedDocAttrMapping'
             ''
             '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.inheritedMethodsMapping'
             ''
@@ -895,6 +939,8 @@ class ClassDocumenter(ObjectDocumenter):
             '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstAutodocDirectiveFormat'
             ''
             '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstBasesFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstInheritedDocAttrFormat'
             ''
             '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstInheritedMethodsFormat'
             ''
