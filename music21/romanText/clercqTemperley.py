@@ -67,9 +67,9 @@ S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
 '''
 def _convertTextFileToCTString(fileName):
     '''
-    called when a CTSong is created by passing a filename; opens the file
+    Called when a CTSong is created by passing a filename; opens the file
     and removes all blank lines, and adds in new line characters
-    returns pieceString that CTSong can parse
+    returns pieceString that CTSong can parse.
     '''
     fileOpened = open(fileName, 'r')
             
@@ -94,18 +94,22 @@ class CTSong(object):
     #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
     #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
 
-        | exampleClercqTemperley = '''
-        | % Brown-Eyed Girl
-        | VP: I \| IV \| I \| V \|
-        | In: $VP\*2
-        | Vr: $VP\*4 IV \| V \| I \| vi \| IV \| V \| I \| V \|       % Second part of verse could be called chorus
-        | Ch: V \| \| $VP\*2 I \|\*4 
-        | Ch2: V \| \| $VP\*3     % Fadeout
-        | S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'''
+    ::
+
+        >>> exampleClercqTemperley = '''
+        ... % Brown-Eyed Girl
+        ... VP: I \| IV \| I \| V \|
+        ... In: $VP\*2
+        ... Vr: $VP\*4 IV \| V \| I \| vi \| IV \| V \| I \| V \|       % Second part of verse could be called chorus
+        ... Ch: V \| \| $VP\*2 I \|\*4 
+        ... Ch2: V \| \| $VP\*3     % Fadeout
+        ... S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
+        ... '''
         
-    
-    >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.exampleClercqTemperley)
-    >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
+    ::
+
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.exampleClercqTemperley)
+        >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
     
     When you call the .toScore() method on the newly created CTSong object,
     the code extracts meaningful properties (such as title, text, comments,
@@ -117,34 +121,51 @@ class CTSong(object):
     will have labels (on the chord's lyric) for each roman numeral as well as for each 
     section in the song (LHS). In case of a recursive definition (a rule contains a reference
     to another rule), both labels are printed, with the deepest reference on the smallest lyric line.
+
+    ::
     
-    >>> #_DOCS_SHOW s.toScore().show()
+        >>> #_DOCS_SHOW s.toScore().show()
+        
+    .. image:: images/ClercqTemperleyExbrown-eyed_girl.png
+       :width: 500
     
-        .. image:: images/ClercqTemperleyExbrown-eyed_girl.png
-        :width: 500
-    
-    >>> assert(s.toScore().highestOffset == 444.0) #_DOCS_HIDE
-    >>> s.title
-    'Brown-Eyed Girl'
-    >>> s.homeTimeSig
-    <music21.meter.TimeSignature 4/4>
-    >>> s.homeKeySig
-    <music21.key.Key of G major>
-    >>> s.comments
-    [['Vr:', 'Second part of verse could be called chorus'], ['Ch2:', 'Fadeout']]
-    
+    ::
+
+        >>> assert(s.toScore().highestOffset == 444.0) #_DOCS_HIDE
+        >>> s.title
+        'Brown-Eyed Girl'
+
+    ::
+
+        >>> s.homeTimeSig
+        <music21.meter.TimeSignature 4/4>
+
+    ::
+
+        >>> s.homeKeySig
+        <music21.key.Key of G major>
+
+    ::
+
+        >>> s.comments
+        [['Vr:', 'Second part of verse could be called chorus'], ['Ch2:', 'Fadeout']]
+        
     Year is not defined as part of the clercq-temperley format, but it will be helpful
     to have it as a property. So let's assign a year to this song:
     
-    >>> s.year = 1967
-    >>> s.year
-    1967
+    ::
+
+        >>> s.year = 1967
+        >>> s.year
+        1967
     
     Upon calling toScore(), CTRule objects are also created. CTRule objects are
     the individual rules that make up the song object. For example,
     
-    >>> s.rules
-    [<music21.CTRule.CTRule text = VP: I | IV | I | V | , <music21.CTRule.CTRule text = In: $VP*2 , <music21.CTRule.CTRule text = Vr: $VP*4 IV | V | I | vi | IV | V | I | V |       % Second part of verse could be called chorus , <music21.CTRule.CTRule text = Ch: V | | $VP*2 I |*4  , <music21.CTRule.CTRule text = Ch2: V | | $VP*3     % Fadeout ]
+    ::
+
+        >>> s.rules
+        [<music21.CTRule.CTRule text = VP: I | IV | I | V | , <music21.CTRule.CTRule text = In: $VP*2 , <music21.CTRule.CTRule text = Vr: $VP*4 IV | V | I | vi | IV | V | I | V |       % Second part of verse could be called chorus , <music21.CTRule.CTRule text = Ch: V | | $VP*2 I |*4  , <music21.CTRule.CTRule text = Ch2: V | | $VP*3     % Fadeout ]
 
     The parser extracts meaningful properties to each rule, such as sectionName,
     home time signature of that rule, home key of that rule, and of course the individual
@@ -152,20 +173,35 @@ class CTSong(object):
 
     The following examples display the instantiated properties of the second rule (list indexes
     start at one) as created above.
-    >>> rule = s.rules[1]
-    >>> rule.text
-    'In: $VP*2'
-    >>> rule.sectionName
-    'Introduction'
-    >>> rule.homeTimeSig
-    <music21.meter.TimeSignature 4/4>
-    >>> rule.homeKeySig
-    <music21.key.Key of G major>
-    >>> #_DOCS_HIDE assert(rule.streamFromCTSong().highestOffset == 28.0)
-    >>> #_DOCS_SHOW rule.streamFromCTSong().show()
+
+    ::
+
+        >>> rule = s.rules[1]
+        >>> rule.text
+        'In: $VP*2'
+
+    ::
+
+        >>> rule.sectionName
+        'Introduction'
+
+    ::
+
+        >>> rule.homeTimeSig
+        <music21.meter.TimeSignature 4/4>
+
+    ::
+
+        >>> rule.homeKeySig
+        <music21.key.Key of G major>
+
+    ::
+
+        >>> #_DOCS_HIDE assert(rule.streamFromCTSong().highestOffset == 28.0)
+        >>> #_DOCS_SHOW rule.streamFromCTSong().show()
     
-        .. image:: images/ClercqTemperleyIntroduction.png
-        :width: 500
+    .. image:: images/ClercqTemperleyIntroduction.png
+       :width: 500
     
     With this object-oriented approach to parsing the clercq-temperley text file format, 
     we now have the ability to analyze a large corpus (200 files) of popular music
@@ -178,69 +214,117 @@ class CTSong(object):
     
     #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
     #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
-        | BlitzkriegBopCT = '''
-        | % Blitzkrieg Bop
-        | BP: I \| IV V \| %THIS IS A COMMENT
-        | In: $BP\*3 I IV \| I \| $BP\*3 I IV \| I \| R \|\*4 I \|\*4
-        | Vr: $BP\*3 I IV \| I \|
-        | Br: IV \| \| I \| IV I \| IV \| \| ii \| IV V \|
-        | Co: R \|\*4 I \|\*4
-        | S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'''
+
+    ::
+ 
+        >>> BlitzkriegBopCT = '''
+        ... % Blitzkrieg Bop
+        ... BP: I \| IV V \| %THIS IS A COMMENT
+        ... In: $BP\*3 I IV \| I \| $BP\*3 I IV \| I \| R \|\*4 I \|\*4
+        ... Vr: $BP\*3 I IV \| I \|
+        ... Br: IV \| \| I \| IV I \| IV \| \| ii \| IV V \|
+        ... Co: R \|\*4 I \|\*4
+        ... S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
+        ... '''
     
     OMIT_FROM_DOCS
     
     Another example using a different clercq temperley file
     
-    RockClockCT = 
-    % Rock Around the Clock
-    % just a general comment
-    In: I | | | | | | V | |
-    Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse
-    Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |
-    S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental
-    >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RockClockCT)
-    >>> s.toScore().highestOffset
-    374.0 
-    >>> s.title
-    'Rock Around the Clock'
-    >>> s.homeTimeSig
-    <music21.meter.TimeSignature 4/4>
-    >>> s.homeKeySig
-    <music21.key.Key of A major>
-    >>> s.comments
-    [['just a general comment'], ['Vr:', 'a comment on verse'], ['S:', '3rd and 6th verses are instrumental']]
-    >>> s.year = 1952
-    >>> s.year
-    1952
-    >>> s.rules
-    [<music21.CTRule.CTRule text = In: I | | | | | | V | | , <music21.CTRule.CTRule text = Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse , <music21.CTRule.CTRule text = Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I | ]
-    >>> rule = s.rules[0]
-    >>> rule.text
-    'In: I | | | | | | V | |'
-    >>> rule.sectionName
-    'Introduction'
-    >>> rule.homeTimeSig
-    <music21.meter.TimeSignature 4/4>
-    >>> rule.homeKeySig
-    <music21.key.Key of A major>
-    >>> rule.streamFromCTSong().highestOffset
-    28.0
+    ::
+
+        RockClockCT = 
+        % Rock Around the Clock
+        % just a general comment
+        In: I | | | | | | V | |
+        Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse
+        Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |
+        S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental
+
+    ::
+
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RockClockCT)
+        >>> s.toScore().highestOffset
+        374.0 
+
+    ::
+
+        >>> s.title
+        'Rock Around the Clock'
+
+    ::
+
+        >>> s.homeTimeSig
+        <music21.meter.TimeSignature 4/4>
+
+    ::
+
+        >>> s.homeKeySig
+        <music21.key.Key of A major>
+
+    ::
+
+        >>> s.comments
+        [['just a general comment'], ['Vr:', 'a comment on verse'], ['S:', '3rd and 6th verses are instrumental']]
+
+    ::
+
+        >>> s.year = 1952
+        >>> s.year
+        1952
+
+    ::
+
+        >>> s.rules
+        [<music21.CTRule.CTRule text = In: I | | | | | | V | | , <music21.CTRule.CTRule text = Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse , <music21.CTRule.CTRule text = Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I | ]
+
+    ::
+
+        >>> rule = s.rules[0]
+        >>> rule.text
+        'In: I | | | | | | V | |'
+
+    ::
+
+        >>> rule.sectionName
+        'Introduction'
+
+    ::
+
+        >>> rule.homeTimeSig
+        <music21.meter.TimeSignature 4/4>
+
+    ::
+
+        >>> rule.homeKeySig
+        <music21.key.Key of A major>
+
+    ::
+
+        >>> rule.streamFromCTSong().highestOffset
+        28.0
     
     one more example...the bane of this parser's existence...
+
+    ::
         
-    % Ring Of Fire
-    
-    In: [3/4] I . IV | [4/4] I | [3/4] . . V7 | [4/4] I |
-    Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |
-    Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | I . IV I | . . . IV | I | . . . V | I |
-                                              % Or (alternate barring) | [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |
-    Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       % Or the 2/4 measure could be one measure later
-    Fadeout: I . . V | I . . V | I . . V |
-    Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
-    S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
-    >>> ex3 = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RingFireCT)
-    >>> ex3.toScore().highestOffset
-    265.0
+        % Ring Of Fire
+        
+        In: [3/4] I . IV | [4/4] I | [3/4] . . V7 | [4/4] I |
+        Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |
+        Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | I . IV I | . . . IV | I | . . . V | I |
+                                                % Or (alternate barring) | [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |
+        Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       % Or the 2/4 measure could be one measure later
+        Fadeout: I . . V | I . . V | I . . V |
+        Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
+        S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
+
+    ::
+
+        >>> ex3 = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RingFireCT)
+        >>> ex3.toScore().highestOffset
+        265.0
+
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'appendComment', 'rules']
     _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined by the Clercq-Temperley format'}
@@ -263,6 +347,7 @@ class CTSong(object):
     
     def __repr__(self):
         return '<music21.CTSong.%s text = %s title=%s year=%s' % (self.__class__.__name__, self.text, self.title, self.year)
+
     #---------------------------------------------------------------------------
     
     def _setText(self, value):
@@ -278,15 +363,19 @@ class CTSong(object):
         return self._text
     
     text = property (_getText, _setText, doc = '''
-    Get the text of the CTSong. This is the full text of the Clercq-Temperley file. This
-    attribute is typically instantiated when the CTSong object is created, either by passing 
-    in the full string, with newline characters (\n) at the end of each line or by passing 
-    in the text file as a string, and have python do the parsing
-    
-    
+Get the text of the CTSong.
+
+This is the full text of the Clercq-Temperley file. This
+attribute is typically instantiated when the CTSong object is created, either by passing 
+in the full string, with newline characters (\n) at the end of each line or by passing 
+in the text file as a string, and have python do the parsing.
+
+:: 
+
     >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/BlitzkriegBop.txt') 
-    ''')
+
+''')
    
     
     def _setTitle(self, value):
