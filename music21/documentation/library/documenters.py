@@ -161,6 +161,11 @@ class MemberDocumenter(ObjectDocumenter):
 
     ### SPECIAL METHODS ###
 
+    def __call__(self):
+        result = []
+        result.extend(self.rstAutodocDirectiveFormat)
+        return result
+
     def __repr__(self):
         referentPath = '.'.join((
             self.definingClass.__module__,
@@ -302,6 +307,12 @@ class ClassDocumenter(ObjectDocumenter):
         '.. autoclass:: music21.documentation.library.documenters.ClassDocumenter'
         ''
 
+    Generate the ReST lines by calling the documenter:
+
+    ::
+
+        >>> restructedText = documenter()
+
     '''
 
     ### CLASS VARIABLES ###
@@ -395,9 +406,12 @@ class ClassDocumenter(ObjectDocumenter):
         result.extend(self.make_heading(self.referent.__name__, 2))
         result.extend(self.rstAutodocDirectiveFormat)
         result.extend(self.rstBasesFormat)
-        result.extend(self.rstReadOnlyPropertiesFormat)
+        result.extend(self.rstReadonlyPropertiesFormat)
+        result.extend(self.rstInheritedReadonlyPropertiesFormat)
         result.extend(self.rstReadwritePropertiesFormat)
+        result.extend(self.rstInheritedReadwritePropertiesFormat)
         result.extend(self.rstMethodsFormat)
+        result.extend(self.rstInheritedMethodsFormat)
         return result
 
     def __hash__(self):
@@ -692,28 +706,171 @@ class ClassDocumenter(ObjectDocumenter):
 
     @property
     def rstBasesFormat(self):
-        result = ['Inherits from:', '']
-        for base in inspect.getmro(self.referent)[1:]:
-            if not base.__module__.startswith('music21'):
-                continue
-            documenter = type(self).fromIdentityMap(base) 
-            result.append('- {0}'.format(documenter.rstCrossReferenceString))
-        result.append('')
+        '''
+        The ReST format for the bases from which the documented class
+        inherits:
+
+        ::
+
+            >>> klass = documentation.ClassDocumenter
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> for line in documenter.rstBasesFormat:
+            ...     line
+            ...
+            'Inherits from:'
+            ''
+            '- :class:`~music21.documentation.library.documenters.ObjectDocumenter`'
+            ''
+
+        '''
+        result = []
+        mro = [cls for cls in inspect.getmro(self.referent)[1:] \
+            if cls.__module__.startswith('music21')]
+        if mro:
+            result.append('Inherits from:')
+            result.append('')
+            for cls in mro:
+                documenter = type(self).fromIdentityMap(cls) 
+                result.append('- {0}'.format(documenter.rstCrossReferenceString))
+            result.append('')
+        return result
+
+    @property
+    def rstInheritedMethodsFormat(self):
+        result = []
+        if self.inheritedMethodsMapping:
+            pass
+        return result
+
+    @property
+    def rstInheritedReadonlyPropertiesFormat(self):
+        result = []
+        if self.inheritedReadonlyPropertiesMapping:
+            pass
+        return result
+
+    @property
+    def rstInheritedReadwritePropertiesFormat(self):
+        result = []
+        if self.inheritedReadwritePropertiesMapping:
+            pass
         return result
 
     @property
     def rstMethodsFormat(self):
+        '''
+        The ReST format for the documented class's methods:
+
+        ::
+
+            >>> klass = documentation.ClassDocumenter
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> for line in documenter.rstMethodsFormat:
+            ...     line
+            ...
+            ':class:`~music21.documentation.library.documenters.ClassDocumenter` *methods*'
+            ''
+            '.. automethod:: music21.documentation.library.documenters.ClassDocumenter.fromIdentityMap'
+            ''
+
+        '''
         result = []
+        if self.methods:
+            result.append('{0} *methods*'.format(
+                self.rstCrossReferenceString))
+            result.append('')
+            for documenter in self.methods: 
+                result.extend(documenter())
+            if result[-1] != '':
+                result.append('')
         return result
 
     @property
-    def rstReadOnlyPropertiesFormat(self):
+    def rstReadonlyPropertiesFormat(self):
+        '''
+        The ReST format for the documented class's read-only properties:
+
+        ::
+
+            >>> klass = documentation.ClassDocumenter
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> for line in documenter.rstReadonlyPropertiesFormat:
+            ...     line
+            ...
+            ':class:`~music21.documentation.library.documenters.ClassDocumenter` *read-only properties*'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.docAttr'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.docOrder'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.inheritedMethodsMapping'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.inheritedReadonlyPropertiesMapping'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.methods'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.readonlyProperties'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.readwriteProperties'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.referentPackagesystemPath'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstAutodocDirectiveFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstBasesFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstInheritedMethodsFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstInheritedReadonlyPropertiesFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstInheritedReadwritePropertiesFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstMethodsFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstReadonlyPropertiesFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.rstReadwritePropertiesFormat'
+            ''
+            '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.sphinxCrossReferenceRole'
+            ''
+
+        '''
         result = []
+        if self.readonlyProperties:
+            result.append('{0} *read-only properties*'.format(
+                self.rstCrossReferenceString))
+            result.append('')
+            for documenter in self.readonlyProperties:
+                result.extend(documenter())
+            if result[-1] != '':
+                result.append('')
         return result
 
     @property
     def rstReadwritePropertiesFormat(self):
+        '''
+        The ReST format for the documented class's read-only properties:
+
+        ::
+
+            >>> klass = documentation.ClassDocumenter
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> for line in documenter.rstReadwritePropertiesFormat:
+            ...     line
+            ...
+
+        '''
         result = []
+        if self.readwriteProperties:
+            result.append('{0} *read/write properties*'.format(
+                self.rstCrossReferenceString))
+            result.append('')
+            for documenter in self.readwriteProperties:
+                result.extend(documenter())
+            if result[-1] != '':
+                result.append('')
         return result
 
     @property
