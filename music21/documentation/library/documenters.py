@@ -1239,8 +1239,8 @@ class ModuleDocumenter(ObjectDocumenter):
 
             >>> module = stream
             >>> documenter = documentation.ModuleDocumenter(module)
-            >>> documenter.shortName
-            'stream'
+            >>> documenter.referenceName
+            'moduleStream'
 
         '''
         parts = self.referentPackagesystemPath.split('.')[1:]
