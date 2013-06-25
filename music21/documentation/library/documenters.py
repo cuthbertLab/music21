@@ -30,6 +30,9 @@ class ObjectDocumenter(object):
 
     ### SPECIAL METHODS ###
 
+    def __call__(self):
+        raise NotImplemented
+
     @abc.abstractmethod
     def __repr__(self):
         raise NotImplemented
@@ -68,6 +71,17 @@ class ObjectDocumenter(object):
     def sphinxCrossReferenceRole(self):
         raise NotImplemented
 
+    ### PUBLIC METHODS ###
+
+    def make_heading(self, text, heading_level):
+        assert isinstance(text, (str, unicode)) and len(text)
+        assert heading_level in (1, 2)
+        heading_characters = ['=', '-']
+        result = [text]
+        result.append(heading_characters[heading_level - 1] * len(text))
+        result.append('')
+        return result
+
 
 class FunctionDocumenter(ObjectDocumenter):
     '''
@@ -91,6 +105,7 @@ class FunctionDocumenter(ObjectDocumenter):
         ...     line
         ...
         '.. autofunction:: music21.common.almostEquals'
+        ''
 
     '''
 
@@ -123,6 +138,7 @@ class FunctionDocumenter(ObjectDocumenter):
         result.append('.. autofunction:: {0}'.format(
             self.referentPackagesystemPath,
             ))
+        result.append('')
         return result
 
     @property
@@ -198,6 +214,7 @@ class MethodDocumenter(MemberDocumenter):
         ...     line
         ...
         '.. automethod:: music21.key.KeySignature.transpose'
+        ''
         
     '''
 
@@ -209,6 +226,7 @@ class MethodDocumenter(MemberDocumenter):
         result.append('.. automethod:: {0}'.format(
             self.referentPackagesystemPath,
             ))
+        result.append('')
         return result
 
     @property
@@ -239,6 +257,7 @@ class AttributeDocumenter(MemberDocumenter):
         ...     line
         ...
         '.. autoattribute:: music21.key.KeySignature.mode'
+        ''
 
     '''
 
@@ -250,6 +269,7 @@ class AttributeDocumenter(MemberDocumenter):
         result.append('.. autoattribute:: {0}'.format(
             self.referentPackagesystemPath,
             ))
+        result.append('')
         return result
 
     @property
@@ -280,6 +300,7 @@ class ClassDocumenter(ObjectDocumenter):
         ...     line
         ...
         '.. autoclass:: music21.documentation.library.documenters.ClassDocumenter'
+        ''
 
     '''
 
@@ -368,6 +389,16 @@ class ClassDocumenter(ObjectDocumenter):
             self._identityMap[self.referent] = self 
  
     ### SPECIAL METHODS ###
+
+    def __call__(self):
+        result = []
+        result.extend(self.make_heading(self.referent.__name__, 2))
+        result.extend(self.rstAutodocDirectiveFormat)
+        result.extend(self.rstBasesFormat)
+        result.extend(self.rstReadOnlyPropertiesFormat)
+        result.extend(self.rstReadwritePropertiesFormat)
+        result.extend(self.rstMethodsFormat)
+        return result
 
     def __hash__(self):
         return hash((type(self), self.referent))
@@ -656,6 +687,33 @@ class ClassDocumenter(ObjectDocumenter):
         result.append('.. autoclass:: {0}'.format(
             self.referentPackagesystemPath,
             ))
+        result.append('')
+        return result
+
+    @property
+    def rstBasesFormat(self):
+        result = ['Inherits from:', '']
+        for base in inspect.getmro(self.referent)[1:]:
+            if not base.__module__.startswith('music21'):
+                continue
+            documenter = type(self).fromIdentityMap(base) 
+            result.append('- {0}'.format(documenter.rstCrossReferenceString))
+        result.append('')
+        return result
+
+    @property
+    def rstMethodsFormat(self):
+        result = []
+        return result
+
+    @property
+    def rstReadOnlyPropertiesFormat(self):
+        result = []
+        return result
+
+    @property
+    def rstReadwritePropertiesFormat(self):
+        result = []
         return result
 
     @property
@@ -697,6 +755,7 @@ class ModuleDocumenter(ObjectDocumenter):
         ...     line
         ...
         '.. automodule:: music21.key'
+        ''
 
     '''
 
@@ -764,6 +823,7 @@ class ModuleDocumenter(ObjectDocumenter):
         result.append('.. automodule:: {0}'.format(
             self.referentPackagesystemPath,
             ))
+        result.append('')
         return result
 
     @property
