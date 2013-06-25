@@ -1830,20 +1830,20 @@ class RepeatFinder(object):
     
     Below is an example of calling simplify on a Bach chorale.
     
-    
     >>> chorale = corpus.parse('bwv117.4.mxl')
     >>> #_DOCS_SHOW chorale.show()
     
     Only the first 8 bars are displayed
+
     .. image:: images/repeat-SimplifyExample_Chorale.*
-            :width: 600
+       :width: 600
             
     >>> #_DOCS_SHOW repeat.RepeatFinder(chorale).simplify().show()
     
     The same chorale as before, but simplified
     
     .. image:: images/repeat-SimplifyExample_ChoraleSimplified.*
-            :width: 600
+       :width: 600
     
     '''
     _DOC_ORDER = ['simplify', 'getMeasureSimilarityList', 'getSimilarMeasureGroups', 'getQuarterLengthOfPickupMeasure', 
@@ -1882,7 +1882,7 @@ class RepeatFinder(object):
         >>> #_DOCS_SHOW noPickup.parts[0].measures(0,5).show()
         
         .. image:: images/repeat-rf_noPickup.*
-            :width: 600
+           :width: 600
         
         >>> hasPickup = corpus.parse('bwv101.7.mxl')
         >>> repeat.RepeatFinder(hasPickup).getQuarterLengthOfPickupMeasure()
@@ -1890,7 +1890,7 @@ class RepeatFinder(object):
         >>> #_DOCS_SHOW hasPickup.parts[0].measures(0,2).show()
         
         .. image:: images/repeat-rf_hasPickup.*
-            :width: 600
+           :width: 600
             
         >>> tooShort = noPickup.parts[0].measures(1, 2)
         >>> repeat.RepeatFinder(tooShort).getQuarterLengthOfPickupMeasure()
@@ -1928,14 +1928,13 @@ class RepeatFinder(object):
         Raises an exception if the internal stream is too short
         (i.e. fewer than 3 bars long).
         
-        
         >>> noPickup = corpus.parse('bwv10.7.mxl')
         >>> repeat.RepeatFinder(noPickup).hasPickup()
         False
         >>> #_DOCS_SHOW noPickup.parts[0].measures(0,5).show()
         
         .. image:: images/repeat-rf_noPickup.*
-            :width: 600
+           :width: 600
             
         >>> hasPickup = corpus.parse('bwv101.7.mxl')
         >>> repeat.RepeatFinder(hasPickup).hasPickup()
@@ -1943,7 +1942,7 @@ class RepeatFinder(object):
         >>> #_DOCS_SHOW hasPickup.parts[0].measures(0,2).show()
         
         .. image:: images/repeat-rf_hasPickup.*
-            :width: 600
+           :width: 600
         
         _OMIT_FROM_DOCS_
         >>> repeat.RepeatFinder(noPickup.parts[0].measures(1, 2)).hasPickup()
@@ -1968,7 +1967,6 @@ class RepeatFinder(object):
         four measures repeat and the 4th, 8th, and 9th measures are the same.  
         
         Measures are considered the same if the defaultHash maps them to two values which are equal under the '==' operator.
-        
         
         >>> chorales = corpus.getBachChorales()
         >>> chorale = corpus.parse('bwv154.3.mxl')
@@ -1997,8 +1995,6 @@ class RepeatFinder(object):
         
         hashFunction = self.defaultHash
 
-            
-            
         s = self.s
             
         #Check for different parts and change mlist to a list of
@@ -2013,17 +2009,14 @@ class RepeatFinder(object):
             if len(mlists[i]) != len(mlists[i+1]):
                 raise UnequalPartsLengthException("Parts must each have the same number of measures.")
         
-        
         #Change mlist so each element of mlist is a list of hashed measuresg for each measure in a part.  
         #May look something like [['sdlkfj', 'ej2k', 'r9u3kj'...], ['fjk2', '23ijf9', ... ], ... ]
         for i in range(len(mlists)):
             mlists[i] = [hashFunction(mlists[i][j].notesAndRests) for j in range(len(mlists[i]))]
         
-        
         #mlists is now one list for the whole stream, containing a tuple with the hashed measure over each part,
         # i.e. mlists = [(part1_measure1_hash, part2_measure1_hash, ...), (part1_measure2_hash, part2_measure2_hash, ... ), ... ]
         mlists = zip(*mlists)
-        
         
         tempDict = {}   #maps the measure-hashes to the lowest examined measure number with that hash.   
         res = []
@@ -2031,7 +2024,6 @@ class RepeatFinder(object):
         #initialize res
         for i in range(len(mlists)):
             res.append([])
-        
         
         for i in range(len(mlists)-1, -1, -1):
             #mHash is a the concatenation of the measure i for each part.     
@@ -2049,7 +2041,6 @@ class RepeatFinder(object):
                 
         self._mList = res
         return res
-        
                   
     def _getSimiliarMeasuresHelper(self, measures, source, compare, resDict, useDict):
         '''
@@ -2060,7 +2051,6 @@ class RepeatFinder(object):
         ( sourceList=[source, source+1, source+2, ...], compareList=[compare, compare+1, compare+2, ...]), where
         measure sourceList[i] is the same as measure compareList[i] 
         
-          
         Inputs: 
         measures -  A list returned from getMeasureSimilarityList.  
         source   -  The measure number which you are considering 
@@ -2103,7 +2093,6 @@ class RepeatFinder(object):
         
         return res
     
-    
     def _getSimilarMeasureTuples(self, mList, hasPickup=False):
         '''
         Input is a list formatted as the output described in getMeasureSimilarityList().  
@@ -2112,7 +2101,6 @@ class RepeatFinder(object):
                 
         For all tuples t1 and t2, it is guaranteed that we never have t1.l1 contains t2.l1 or t2.l2 contains t2.l2
                 
-        
         >>> mList = [[5, 6], [7], [8], [9], [11, 12], [6, 13], [], [], [], [], [], [12], [], []]
         >>> res1 = repeat.RepeatFinder()._getSimilarMeasureTuples(mList, False)
         >>> ([1, 2, 3, 4], [7, 8, 9, 10]) in res1
@@ -2139,7 +2127,6 @@ class RepeatFinder(object):
         True
         >>> len(res2)
         3
-        
         
         >>> s = stream.Stream()
         >>> n1 = note.Note('C')
@@ -2189,9 +2176,7 @@ class RepeatFinder(object):
         >>> ([1],[5]) in res3
         True
         
-        
         '''        
-
         pickupCorrection = not hasPickup
         
         res = {}
@@ -2681,16 +2666,12 @@ class RepeatFinder(object):
         3
         >>> len(s2.flat.getElementsByClass(bar.Repeat))
         1
-        
-        
-        
         '''
         mList = self.getMeasureSimilarityList()
         mGroups = self._getSimilarMeasureTuples(mList, self.hasPickup())
         
         processed = {}
         
-                
         # Want to give priority first to the longest repeated sections, and then to the repeated sections that happen earlier.  
         # We sort the tuples of mGroups accordingly  
         def myComp(x,y):
@@ -2703,8 +2684,6 @@ class RepeatFinder(object):
             
         mGroups = sorted(mGroups, cmp=myComp)
         
-        
-        
         if inPlace:
             s = self.s
         else:
@@ -2713,12 +2692,10 @@ class RepeatFinder(object):
         if s is None:
             raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
         
-        
         repeatEndingBars = [] # (measureStart, measureOfFirstEnding, repeatSignMeasure)
         toDelete = []
         repeatBars = []  
         for mGroup in mGroups:
-            
             
             #make sure we haven't already processed these measures
             alreadyProcessed = False
@@ -2730,9 +2707,6 @@ class RepeatFinder(object):
                     break
             if alreadyProcessed:
                 continue
-            
-            
-            
                 
             distance = mGroup[1][0] - mGroup[0][-1] - 1
             maxAcceptableDistance = min(16, len(mGroup[0])/2.0 + 1)  #talk about this line more in documentation
@@ -2754,11 +2728,9 @@ class RepeatFinder(object):
             else:
                 continue
             
-            
             #only add the measure numbers to the list of processed measures if those measures were actually part of a repeat or repeat ending
             for mNum in measureNumbers:
                 processed[mNum] = True
-            
         
         for startingBar, firstEndingBar, repeatSignBar in repeatEndingBars:
             #print startingBar, firstEndingBar, repeatSignBar
@@ -2779,9 +2751,7 @@ class RepeatFinder(object):
             return
         else:
             return s
-        
-        
-    
+
     def getSimilarMeasureGroups(self, threshold=1):
         '''
         Returns a list of tuples containing information on repeated groups of measures.  
@@ -2789,19 +2759,24 @@ class RepeatFinder(object):
         Specifically, returns a list of tuples of the form (l1, l2) where l1 and l2 are lists
         of measure numbers such that measure l1[i] is the same as measure l2[i].
         
-        
-        >>> chorale = corpus.parse('bwv117.4.mxl')
-        >>> #_DOCS_SHOW chorale.show()
+        ::
+
+            >>> chorale = corpus.parse('bwv117.4.mxl')
+            >>> #_DOCS_SHOW chorale.show()
     
         Measures 1-3 are the same as measures 4-6.  
+
         .. image:: images/repeat-SimplifyExample_Chorale.*
-            :width: 600
+           :width: 600
         
-        >>> repeat.RepeatFinder(chorale).getSimilarMeasureGroups()
-        [([1, 2, 3], [5, 6, 7])]
+        ::
+
+            >>> repeat.RepeatFinder(chorale).getSimilarMeasureGroups()
+            [([1, 2, 3], [5, 6, 7])]
         
-        Notice that although measures 2-3 are the same as measures 6-7, we don't have ([2, 3], [6, 7]) in our result,
-        since ([1, 2, 3], [5, 6, 7]) already contains that information
+        Notice that although measures 2-3 are the same as measures 6-7, we
+        don't have ([2, 3], [6, 7]) in our result, since ([1, 2, 3], [5, 6, 7])
+        already contains that information.
         
         '''
         #see if we've already done this computation
@@ -2814,7 +2789,6 @@ class RepeatFinder(object):
         else:
             mGroups = self._mGroups
             
-        
         mGroups = [x for x in mGroups if len(x[0]) >= threshold]    #only want long enough measure groups
             
         #sort them giving first priority to larger groups, then to groups that occur earlier
@@ -2830,16 +2804,10 @@ class RepeatFinder(object):
         
         return mGroups
             
-        
-            
-        
-    
-    
-    
-
-
 
 #-------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
     
     def runTest(self):
