@@ -737,23 +737,98 @@ class ClassDocumenter(ObjectDocumenter):
 
     @property
     def rstInheritedMethodsFormat(self):
+        '''
+        The ReST format for inherited methods:
+
+        ::
+
+            >>> klass = documentation.MethodDocumenter
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> for line in documenter.rstInheritedMethodsFormat:
+            ...     line
+            ...
+            'Methods inherited from :class:`~music21.documentation.library.documenters.ObjectDocumenter`:'
+            ''
+            '- :meth:`~music21.documentation.library.documenters.ObjectDocumenter.make_heading`'
+            ''
+
+        '''
         result = []
         if self.inheritedMethodsMapping:
-            pass
+            for class_documenter, member_documenters in \
+                self.inheritedMethodsMapping.iteritems():
+                result.append('Methods inherited from {0}:'.format(
+                    class_documenter.rstCrossReferenceString))
+                result.append('')
+                for member_documenter in member_documenters:
+                    result.append('- {0}'.format(
+                        member_documenter.rstCrossReferenceString))
+                result.append('')    
         return result
 
     @property
     def rstInheritedReadonlyPropertiesFormat(self):
+        '''
+        The ReST format for inherited methods:
+
+        ::
+
+            >>> klass = documentation.MethodDocumenter
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> for line in documenter.rstInheritedReadonlyPropertiesFormat:
+            ...     line
+            ...
+            'Methods inherited from :class:`~music21.documentation.library.documenters.MemberDocumenter`:'
+            ''
+            '- :attr:`~music21.documentation.library.documenters.MemberDocumenter.definingClass`'
+            '- :attr:`~music21.documentation.library.documenters.MemberDocumenter.memberName`'
+            '- :attr:`~music21.documentation.library.documenters.MemberDocumenter.referentPackagesystemPath`'
+            ''
+            'Methods inherited from :class:`~music21.documentation.library.documenters.ObjectDocumenter`:'
+            ''
+            '- :attr:`~music21.documentation.library.documenters.ObjectDocumenter.referent`'
+            '- :attr:`~music21.documentation.library.documenters.ObjectDocumenter.rstCrossReferenceString`'
+            ''
+
+        '''
         result = []
-        if self.inheritedReadonlyPropertiesMapping:
-            pass
+        if self.inheritedMethodsMapping:
+            for class_documenter, member_documenters in \
+                self.inheritedReadonlyPropertiesMapping.iteritems():
+                result.append('Methods inherited from {0}:'.format(
+                    class_documenter.rstCrossReferenceString))
+                result.append('')
+                for member_documenter in member_documenters:
+                    result.append('- {0}'.format(
+                        member_documenter.rstCrossReferenceString))
+                result.append('')    
         return result
 
     @property
     def rstInheritedReadwritePropertiesFormat(self):
+        '''
+        The ReST format for inherited methods:
+
+        ::
+
+            >>> klass = documentation.MethodDocumenter
+            >>> documenter = documentation.ClassDocumenter(klass)
+            >>> for line in documenter.rstInheritedReadwritePropertiesFormat:
+            ...     line
+            ...
+
+        '''
         result = []
-        if self.inheritedReadwritePropertiesMapping:
-            pass
+        if self.inheritedMethodsMapping:
+            for class_documenter, member_documenters in \
+                self.inheritedReadwritePropertiesMapping.iteritems():
+                result.append('Read/write properties inherited from {0}:'.format(
+                    class_documenter.rstCrossReferenceString))
+                result.append('')
+                for member_documenter in member_documenters:
+                    result.append('- {0}'.format(
+                        member_documenter.rstCrossReferenceString))
+                result.append('')    
         return result
 
     @property
