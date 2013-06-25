@@ -165,7 +165,7 @@ class MemberDocumenter(ObjectDocumenter):
     ### INITIALIZER ###
 
     def __init__(self, referent, memberName, definingClass):
-        assert isinstance(definingClass, type)
+        assert isinstance(definingClass, (type, types.ClassType))
         ObjectDocumenter.__init__(self, referent)
         self._memberName = memberName
         self._definingClass = definingClass
@@ -333,7 +333,7 @@ class ClassDocumenter(ObjectDocumenter):
     ### INITIALIZER ###
 
     def __init__(self, referent):
-        assert isinstance(referent, type)
+        assert isinstance(referent, (type, types.ClassType)), repr(referent)
         ObjectDocumenter.__init__(self, referent) 
 
         self._baseClasses = tuple(
@@ -1227,12 +1227,12 @@ class ModuleDocumenter(ObjectDocumenter):
     @property
     def rstPageReferenceFormat(self):
         result = []
-        result.append('.. _module{0}:'.format(self.shortName.upper()))
+        result.append('.. _{0}:'.format(self.referenceName))
         result.append('')
         return result
 
     @property
-    def shortName(self):
+    def referenceName(self):
         '''The short name of the module:
 
         ::
@@ -1243,7 +1243,11 @@ class ModuleDocumenter(ObjectDocumenter):
             'stream'
 
         '''
-        return self.referentPackagesystemPath.split('.')[-1]
+        parts = self.referentPackagesystemPath.split('.')[1:]
+        parts = [part.capitalize() for part in parts]
+        parts = ['module'] + parts
+        return ''.join(parts)
+        
 
     @property
     def sphinxCrossReferenceRole(self):

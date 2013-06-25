@@ -11,5 +11,10 @@
 #-------------------------------------------------------------------------------
 
 
+def _main():
+    from music21 import documentation
+    documentation.ModuleReferenceReSTWriter()()
+
+
 if __name__ == '__main__':
-    main()
+    _main()

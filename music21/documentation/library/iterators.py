@@ -41,6 +41,7 @@ class ModuleIterator(object):
 
     _ignoredDirectoryNames = (
         'archive',
+        'base-archive',
         'demos',
         'doc',
         'ext',
@@ -50,6 +51,7 @@ class ModuleIterator(object):
 
     _ignoredFileNames = (
         'exceldiff.py',
+        'phrasing.py',
         'testFiles.py',
         )
 

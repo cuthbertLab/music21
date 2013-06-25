@@ -30,27 +30,69 @@ class ReSTWriter(object):
 
     ### PUBLIC METHODS ###
 
-    def write(filePath, lines): # @NoSelf
+    def write(self, filePath, rst): #
         '''
         Write ``lines`` to ``filePath``, only overwriting an existing file
         if the content differs.
         '''
+        shouldWrite = True
         if os.path.exists(filePath):
             with open(filePath, 'r') as f:
-                oldLines = filePath.read().splitlines()
-            if lines != oldLines:
-                with open(filePath, 'w') as f:
-                    f.write('\n'.join(lines))
-        else:
+                oldRst = f.read()
+            if rst == oldRst:
+                shouldWrite = False
+        if shouldWrite:
             with open(filePath, 'w') as f:
-                f.write('\n'.join(lines))
+                f.write(rst)
+            print 'WROTE   {0}'.format(os.path.relpath(filePath))
+        else:
+            print 'SKIPPED {0}'.format(os.path.relpath(filePath))
 
 
 class ModuleReferenceReSTWriter(ReSTWriter):
     '''
     Writes module reference ReST files, and their index ReST file.
     '''
-    pass
+
+    ### SPECIAL METHODS ###
+    
+    def __call__(self):
+        from music21 import documentation
+        moduleReferenceDirectoryPath = os.path.join(
+            documentation.__path__[0],
+            'source',
+            'moduleReference',
+            )
+        referenceNames = []
+        for module in [x for x in documentation.ModuleIterator()]:
+            moduleDocumenter = documentation.ModuleDocumenter(module)
+            rst = '\n'.join(moduleDocumenter())
+            referenceName = moduleDocumenter.referenceName
+            referenceNames.append(referenceName)
+            fileName = '{0}.rst'.format(referenceName)
+            filePath = os.path.join(
+                moduleReferenceDirectoryPath,
+                fileName,
+                )
+            self.write(filePath, rst)
+        
+        lines = []
+        lines.append('.. moduleReference:')
+        lines.append('')
+        lines.append('Module Reference')
+        lines.append('================')
+        lines.append('')
+        lines.append('.. toctree::')
+        lines.append('   :maxdepth: 1')
+        lines.append('')
+        for referenceName in referenceNames:
+            lines.append('   {0}'.format(referenceName))
+        rst = '\n'.join(lines)
+        indexFilePath = os.path.join(
+            moduleReferenceDirectoryPath,
+            'index.rst',
+            )
+        self.write(indexFilePath, rst)
 
 
 class CorpusReferenceReSTWriter(ReSTWriter):
