@@ -107,6 +107,12 @@ class FunctionDocumenter(ObjectDocumenter):
         '.. autofunction:: music21.common.almostEquals'
         ''
 
+    Call the documenter to generate its ReStructuredText format:
+
+    ::
+
+        >>> restructuredText = documenter()
+
     '''
 
     ### INITIALIZER ###
@@ -116,6 +122,11 @@ class FunctionDocumenter(ObjectDocumenter):
         ObjectDocumenter.__init__(self, referent)
 
     ### SPECIAL METHODS ###
+
+    def __call__(self):
+        result = []
+        result.extend(self.rstAutodocDirectiveFormat)
+        return result
 
     def __repr__(self):
         return '<{0}: {1}>'.format(
@@ -1055,7 +1066,7 @@ class ModuleDocumenter(ObjectDocumenter):
         ObjectDocumenter.__init__(self, referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
-        self._memberOrder = tuple(getattr(self.referent, '_DOC_ORDER')) or ()
+        self._memberOrder = tuple(self.referent.__dict__.get('_DOC_ORDER') or ())
 
     ### SPECIAL METHODS ###
 
@@ -1065,6 +1076,10 @@ class ModuleDocumenter(ObjectDocumenter):
         result.extend(self.makeHeading(self.referentPackagesystemPath, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstAutodocDirectiveFormat)
+        for functionDocumenter in self.functionDocumenters:
+            result.extend(functionDocumenter())
+        for classDocumenter in self.classDocumenters:
+            result.extend(classDocumenter())
         return result
 
     def __repr__(self):
@@ -1078,6 +1093,8 @@ class ModuleDocumenter(ObjectDocumenter):
     def _examineModule(self):
         namesMapping = {}
         for name in dir(self.referent):
+            if name.startswith('_'):
+                continue
             named = getattr(self.referent, name)
             if isinstance(named, (type, types.ClassType)):
                 if set(inspect.getmro(named)).intersection(
@@ -1093,6 +1110,87 @@ class ModuleDocumenter(ObjectDocumenter):
         return namesMapping
 
     ### PUBLIC PROPERTIES ###
+
+    @property
+    def classDocumenters(self):
+        '''
+        Return a list of class documenters for classes housed in the
+        module documenter's module object, taking into account any ordering
+        via the `_DOC_ORDER` module-level variable:
+
+        ::
+
+            >>> module = stream
+            >>> documenter = documentation.ModuleDocumenter(module)
+            >>> for classDocumenter in documenter.classDocumenters:
+            ...     print classDocumenter.referentPackagesystemPath
+            ...
+            music21.stream.Stream
+            music21.stream.Measure
+            music21.stream.Part
+            music21.stream.Score
+            music21.stream.Opus
+            music21.stream.PartStaff
+            music21.stream.SpannerStorage
+            music21.stream.StreamIterator
+            music21.stream.System
+            music21.stream.Test
+            music21.stream.VariantStorage
+            music21.stream.Voice
+
+        '''
+        result = []
+        classDocumenters = {}
+        for documenter in self.namesMapping.itervalues():
+            if isinstance(documenter, ClassDocumenter):
+                classDocumenters[documenter.referent] = documenter
+        for referent in self.memberOrder:
+            if referent in classDocumenters:
+                result.append(classDocumenters[referent])
+                del(classDocumenters[referent])
+        for documenter in sorted(classDocumenters.itervalues(),
+            key=lambda x: x.referentPackagesystemPath):
+            result.append(documenter)
+        return result
+
+    @property
+    def functionDocumenters(self):
+        '''
+        Return a list of class documenters for classes housed in the
+        module documenter's module object, taking into account any ordering
+        via the `_DOC_ORDER` module-level variable:
+
+        ::
+
+            >>> module = variant
+            >>> documenter = documentation.ModuleDocumenter(module)
+            >>> for functionDocumenter in documenter.functionDocumenters:
+            ...     print functionDocumenter.referentPackagesystemPath
+            ...
+            music21.variant.addVariant
+            music21.variant.getMeasureHashes
+            music21.variant.makeAllVariantsReplacements
+            music21.variant.mergePartAsOssia
+            music21.variant.mergeVariantMeasureStreams
+            music21.variant.mergeVariantScores
+            music21.variant.mergeVariants
+            music21.variant.mergeVariantsEqualDuration
+            music21.variant.refineVariant
+
+        '''
+        result = []
+        functionDocumenters = {}
+        for documenter in self.namesMapping.itervalues():
+            if isinstance(documenter, FunctionDocumenter):
+                functionDocumenters[documenter.referent] = documenter
+        for referent in self.memberOrder:
+            if referent in functionDocumenters:
+                result.append(functionDocumenters[referent])
+                del(functionDocumenters[referent])
+        for documenter in sorted(functionDocumenters.itervalues(),
+            key=lambda x: x.referentPackagesystemPath):
+            result.append(documenter)
+        return result
 
     @property
     def namesMapping(self):
@@ -1139,7 +1237,8 @@ class ModuleDocumenter(ObjectDocumenter):
 
         ::
 
-            >>> documenter = documentation.ModuleDocumenter(stream)
+            >>> module = stream
+            >>> documenter = documentation.ModuleDocumenter(module)
             >>> documenter.shortName
             'stream'
 
