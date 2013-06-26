@@ -1320,7 +1320,7 @@ class CorpusDocumenter(Documenter):
     @property
     def rstPageReferenceFormat(self):
         result = []
-        result.append('.. _referenceCorpus')
+        result.append('.. _referenceCorpus:')
         result.append('')
         return result
 
@@ -1370,7 +1370,6 @@ class CorpusDocumenter(Documenter):
             procedure = self.getRstVirtualWorkFileDictFormat
         for fileDict in workDict['files']:
             result.extend(procedure(fileDict))
-        result.append('')
         return result
 
     def getRstVirtualWorkFileDictFormat(self, fileDict):
@@ -1380,8 +1379,10 @@ class CorpusDocumenter(Documenter):
             unicode(fileDict['format']),
             unicode(fileDict['corpusPath']),
             ))
+        result.append('')
         result.append('  Source: {0}'.format(
             unicode(fileDict['url'])))
+        result.append('')
         return result
 
     def getRstWorkFileDictFormat(self, fileDict):
@@ -1396,6 +1397,7 @@ class CorpusDocumenter(Documenter):
             fileDict['format'],
             corpusPathWithoutSlashes,
             ))
+        result.append('')
         return result
 
 

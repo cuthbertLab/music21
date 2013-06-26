@@ -99,7 +99,23 @@ class CorpusReferenceReSTWriter(ReSTWriter):
     '''
     Write the corpus reference ReST file.
     '''
-    pass
+
+    ### SPECIAL METHODS ###
+
+    def __call__(self):
+        from music21 import documentation
+        systemReferenceDirectoryPath = os.path.join(
+            documentation.__path__[0],
+            'source',
+            'systemReference',
+            )
+        corpusReferenceFilePath = os.path.join(
+            systemReferenceDirectoryPath,
+            'referenceCorpus.rst',
+            )
+        lines = documentation.CorpusDocumenter()()
+        rst = '\n'.join(lines)
+        self.write(corpusReferenceFilePath, rst)
 
 
 class IPythonNotebookReSTWriter(ReSTWriter):
