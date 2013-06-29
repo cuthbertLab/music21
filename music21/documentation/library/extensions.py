@@ -11,8 +11,17 @@
 
 
 def processDocstring(app, what, name, obj, options, lines):
-    '''Process the ``lines`` of each docstring in place.'''
-    pass
+    '''Process the ``lines`` of each docstring, in place.'''
+    print
+    print 'WHAT ', what
+    print 'NAME ', name
+    print 'OBJ  ', obj
+    print 'OPTS ', options
+    print 'LINES', lines
+    for i, line in enumerate(lines):
+        if 'OMIT_FROM_DOCS' in line:
+            lines[i:] = []
+            break
 
 
 def setup(app):
