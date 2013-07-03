@@ -15,6 +15,7 @@ def _main():
     from music21 import documentation
     documentation.ModuleReferenceReSTWriter()()
     documentation.CorpusReferenceReSTWriter()()
+    documentation.IPythonNotebookReSTWriter()()
 
 
 if __name__ == '__main__':

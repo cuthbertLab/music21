@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import abc
+import json
 import os
 
 
@@ -125,8 +126,52 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
     This class wraps the 3rd-party ``nbconvert`` Python script.
     '''
-    pass
 
+    ### SPECIAL METHODS ###
+
+    def __call__(self):
+        pass
+
+        from music21 import documentation
+        ipythonNotebookFilePaths = [x for x in
+            documentation.IPythonNotebookIterator()()]
+        for ipythonNotebookFilePath in ipythonNotebookFilePaths:
+            with open(ipythonNotebookFilePath, 'r') as f:
+                contents = f.read()
+                contentsAsJson = json.loads(contents)
+            directoryPath, sep, baseName = ipythonNotebookFilePath.rpartition(
+                os.path.sep)
+            baseNameWithoutExtension = os.path.splitext(baseName)[0]
+            imageFilesDirectoryPath = os.path.join(
+                directoryPath,
+                '{0}_files'.format(baseNameWithoutExtension),
+                )
+            rstFilePath = os.path.join(
+                directoryPath,
+                '{0}.rst'.format(baseNameWithoutExtension),
+                )
+            lines, imageData = documentation.IPythonNotebookDocumenter(
+                contentsAsJson)()
+            rst = '\n'.join(lines)
+            self.write(rstFilePath, rst)
+            if not imageData:
+                continue
+            if not os.path.exists(imageFilesDirectoryPath):
+                os.mkdir(imageFilesDirectoryPath)
+            for imageFileName, imageFileData in imageData.iteritems():
+                imageFilePath = os.path.join(
+                    imageFilesDirectoryPath,
+                    imageFileName,
+                    )
+                shouldOverwriteImage = True
+                with open(imageFilePath, 'rb') as f:
+                    oldImageFileData = f.read()
+                    if oldImageFileData == imageFileData:
+                        shouldOverwriteImage = False
+                if shouldOverwriteImage:
+                    with open(imageFilePath, 'wb') as f:
+                        f.write(imageFileData)
+            
 
 if __name__ == '__main__':
     import music21

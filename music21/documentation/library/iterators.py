@@ -13,6 +13,32 @@ import os
 import types
 
 
+class IPythonNotebookIterator(object):
+    '''
+    Iterates over music21's documentation directory, yielding *.ipynb files.
+    '''
+
+    ### SPECIAL METHODS ###
+
+    def __call__(self):
+        import music21
+        rootFilesystemPath = music21.__path__[0]
+        documentationPath = os.path.join(
+            rootFilesystemPath,
+            'documentation',
+            'source',
+            )
+        for directoryPath, directoryNames, fileNames in os.walk(
+            documentationPath):
+            for fileName in fileNames:
+                if fileName.endswith('.ipynb'):
+                    filePath = os.path.join(
+                        directoryPath,
+                        fileName,
+                        )
+                    yield filePath
+        
+
 class ModuleIterator(object):
     '''
     Iterates over music21's packagesystem, yielding module objects:
