@@ -131,7 +131,6 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
     def __call__(self):
         pass
-
         from music21 import documentation
         ipythonNotebookFilePaths = [x for x in
             documentation.IPythonNotebookIterator()()]
