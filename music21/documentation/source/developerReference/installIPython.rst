@@ -157,6 +157,7 @@ SVG is much faster, but it doesn't work, sadly...
         496         self.height = height
 
     ValueError: Cannot embed the 'svg' image format
+
 Whole pieces will show properly also now that the extension module is
 loaded
 

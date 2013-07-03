@@ -12,17 +12,25 @@
 
 def processDocstring(app, what, name, obj, options, lines):
     '''Process the ``lines`` of each docstring, in place.'''
-    print
-    print 'WHAT ', what
-    print 'NAME ', name
-    print 'OBJ  ', obj
-    print 'OPTS ', options
-    print 'LINES', lines
+    #    print
+    #    print 'WHAT ', what
+    #    print 'NAME ', name
+    #    print 'OBJ  ', obj
+    #    print 'OPTS ', options
+    #    print 'LINES', lines
+    newLines = []
     for i, line in enumerate(lines):
-        if 'OMIT_FROM_DOCS' in line:
-            lines[i:] = []
+        if ' #_DOCS_SHOW ' in line:
+            newLines.append(line.replace(' #_DOCS_SHOW ', ' '))
+        elif '#_DOCS_HIDE' in line:
+            continue
+        elif 'OMIT_FROM_DOCS' in line:
             break
+        else:
+            newLines.append(line)
+    lines[:] = newLines
 
 
 def setup(app):
     app.connect('autodoc-process-docstring', processDocstring)
+    

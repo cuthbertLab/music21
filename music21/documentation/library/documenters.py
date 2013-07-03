@@ -13,6 +13,7 @@ import abc
 import inspect
 import re
 import types
+import unittest
 
 
 class Documenter(object):
@@ -1080,6 +1081,7 @@ class ModuleDocumenter(ObjectDocumenter):
 
     _ignored_classes = frozenset((
         BaseException,
+        unittest.TestCase,
         ))
 
     ### INITIALIZER ###
@@ -1126,7 +1128,8 @@ class ModuleDocumenter(ObjectDocumenter):
                 if named.__module__ != self.referent.__name__:
                     continue
                 namesMapping[name] = ClassDocumenter(named)
-            elif isinstance(named, types.FunctionType):
+            elif isinstance(named, types.FunctionType) \
+                and not isinstance(named, types.LambdaType):
                 if named.__module__ != self.referent.__name__:
                     continue
                 namesMapping[name] = FunctionDocumenter(named)
