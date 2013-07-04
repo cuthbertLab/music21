@@ -1423,6 +1423,7 @@ class IPythonNotebookDocumenter(Documenter):
     ### INITIALIZER ###
 
     def __init__(self, json):
+        self._ansiEscape = re.compile(r'\x1b[^m]*m')
         self._imageData = {}
         self._json = json
 
@@ -1438,6 +1439,10 @@ class IPythonNotebookDocumenter(Documenter):
         return '<{0} ...>'.format(self._packagesystemPath)
 
     ### PUBLIC PROPERTIES ###
+
+    @property
+    def ansiEscape(self):
+        return self._ansiEscape
 
     @property
     def imageData(self):
@@ -1465,7 +1470,7 @@ class IPythonNotebookDocumenter(Documenter):
 
     def handleCodeCell(self, cell):
         result = []
-
+        #self.ansiEscape.sub('', sometext)
         return result
 
     def handleMarkdownCell(self, cell):
