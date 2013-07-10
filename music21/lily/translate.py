@@ -794,7 +794,6 @@ class LilypondConverter(object):
         <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
         >>> print lyPrefixCompositeMusicOut
         \new Staff = ... \with {
-         \autoBeamOff 
          \override StaffSymbol #'line-count = #4
         }
         { \time 3/4
@@ -891,15 +890,9 @@ class LilypondConverter(object):
         >>> lpc.context = lpMusicList
         >>> lpc.appendObjectsToContextFromStream(m)
         >>> print lpc.context # internal spaces removed...
-          << \new Voice \with  { 
-                 \autoBeamOff 
-              } 
-              { c'' 1  
+          << \new Voice { c'' 1  
                   } 
-           \new Voice \with  { 
-                 \autoBeamOff 
-              } 
-              { cis'' 1  
+           \new Voice { cis'' 1  
                   } 
             >>        
         '''        

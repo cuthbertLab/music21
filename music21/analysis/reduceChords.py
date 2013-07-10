@@ -321,7 +321,7 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
-    def testTrecentoMadrigal(self):
+    def xtestTrecentoMadrigal(self):
         from music21 import corpus
         c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
         #c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)

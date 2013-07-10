@@ -3732,9 +3732,15 @@ class Stream(base.Music21Object):
                                 value)
 
     atSoundingPitch = property(_getAtSoundingPitch, _setAtSoundingPitch, doc='''
-        Get or set the atSoundingPith status. Valid values are True, False, and 'unknown'.
-
+        Get or set the atSoundingPitch status, that is whether the 
+        score is at concert pitch or may have transposing instruments
+        that will not sound as notated. 
         
+        Valid values are True, False, and 'unknown'.
+        
+        Note that setting "atSoundingPitch" does not actually transpose the notes. See
+        `toSoundingPitch()` for that information.
+                
         >>> s = stream.Stream()
         >>> s.atSoundingPitch = True
         >>> s.atSoundingPitch = False
@@ -3751,7 +3757,9 @@ class Stream(base.Music21Object):
         transposeKeySignature=True):
         '''
         If reverse is False, the transposition will happen in the direction 
-        opposite of what is specified by the Instrument.
+        opposite of what is specified by the Instrument. for instance,
+        for changing a concert score to a transposed score or for 
+        extracting parts.
         
         TODO: Fill out -- expose publically? inPlace should be False
         '''

@@ -3055,8 +3055,6 @@ class Chord(note.NotRest):
         '''
         Add lyrics to the chord that show the distance of each note from
         the bass.  By default we show only the generic interval:
-
-
         
         >>> c1 = chord.Chord(['C2','E2','G2','C3'])
         >>> c2 = c1.annotateIntervals(inPlace = False)
@@ -3065,10 +3063,8 @@ class Chord(note.NotRest):
         >>> [l.text for l in c2.lyrics]
         ['8', '5', '3']
 
-
         The `stripSpecifiers` parameter can be used to show only the intervals size (3, 5, etc)
         or the complete interval specification (m3, P5, etc.)
-
 
         >>> c3 = c1.annotateIntervals(inPlace = False, stripSpecifiers = False)
         >>> c3.lyrics
@@ -3094,9 +3090,6 @@ class Chord(note.NotRest):
         ['m3', 'm6', 'm3']
 
 
-
-
-
         >>> c = chord.Chord(['c4', 'd-4', 'g4'])
         >>> c.annotateIntervals()
         >>> [l.text for l in c.lyrics]
@@ -3111,9 +3104,8 @@ class Chord(note.NotRest):
         >>> c.annotateIntervals(stripSpecifiers=False)
         >>> [l.text for l in c.lyrics]
         ['P5', 'dd2']
-
-
-
+        
+        ## TODO -- decide, should inPlace be False like others?
         '''
         # make a copy of self for reducing pitches, but attach to self
         c = copy.deepcopy(self)
@@ -3123,9 +3115,7 @@ class Chord(note.NotRest):
         if sortPitches:
             c = c.sortAscending()
         #environLocal.printDebug(['annotateIntervals()', c.pitches])
-        for j in range(len(c.pitches) - 1, 0, -1): # only go to zero 
-            if j == 0:
-                continue # first is lowest
+        for j in range(len(c.pitches) - 1, 0, -1): # only go to one; zero never used
             p = c.pitches[j]
             i = interval.Interval(c.pitches[0], p)
             if stripSpecifiers is False:

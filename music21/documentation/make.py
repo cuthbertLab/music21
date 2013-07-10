@@ -66,8 +66,8 @@ def _main(buildFormat):
 
 
 if __name__ == '__main__':
-    if not 1 < len(sys.argv):
-        raise Exception('Please provide an build format for Sphinx.')
-    # TODO: support cleaning all auto-generated files via a "clean" option
-    buildFormat = sys.argv[1]
+    if len(sys.argv) > 1:
+        buildFormat = sys.argv[1]
+    else:
+        buildFormat = 'html'
     _main(buildFormat)

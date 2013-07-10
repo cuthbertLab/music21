@@ -8,15 +8,17 @@ Music21 Documentation
 .. toctree::
    :maxdepth: 2
 
-   what
-   quickStart
+   usersGuide_00_introduction
+   usersGuide_01_installing
    usersGuide_02_notes
    usersGuide_03_pitches
    usersGuide_04_stream1
    usersGuide_05_listsOfLists
    usersGuide_06_stream2
    usersGuide_07_chords
+   usersGuide_09_chordify
    usersGuide_14_timeSignatures
+   usersGuide_99_Table_of_Contents
    overviewStreams
    overviewFormats
    overviewPostTonal
@@ -29,6 +31,8 @@ Music21 Documentation
    installAdvanced
    installAdditional
    tutorialFinaleMac
+   what
+   quickStart
    about
    applications
    environment

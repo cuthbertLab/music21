@@ -89,6 +89,59 @@ def simple3():
             s.append(thisMeasure)
     s.show('lily.png')
 
+def displayChopinRhythms():
+    import copy
+    
+    defaultPitch = music21.pitch.Pitch("C3")      
+    
+    #  semiFlat lets me get all Measures no matter where they reside in the tree structure
+    measureStream = converter.parse(testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
+    rhythmicHash = {} #common.DefaultHash(default = list, callDefault = True )
+
+    def lsort(keyname):
+        return len(rhythmicHash[keyname])
+
+    for thisMeasure in measureStream:
+        if not common.almostEquals(thisMeasure.duration.quarterLength, 3.0):
+            continue
+        notes = thisMeasure.flat.notesAndRests  # n.b. won't work any more because of voices...
+        if len(notes) == 0:
+            continue  # should not happen...
+        rhythmicStream = stream.Measure()
+        
+        offsetString = "" ## comma separated string of offsets 
+        for thisNote in notes:
+            rhythmNote = copy.deepcopy(thisNote)
+            if rhythmNote.isNote:
+                rhythmNote.pitch = copy.deepcopy(defaultPitch)
+            elif rhythmNote.isChord:
+                rhythmNote          = note.Note()
+                rhythmNote.pitch    = copy.deepcopy(defaultPitch)
+                rhythmNote.duration = copy.deepcopy(thisNote.duration)
+                            
+            if not rhythmNote.isRest:
+                offsetString += str(rhythmNote.offset) + ", "
+            
+            rhythmicStream.append(rhythmNote)
+            
+        notes[0].lyric = str(thisMeasure.number)
+        if len(rhythmicHash[offsetString]) == 0: # if it is our first encounter with the rhythm, add the rhythm alone in blue
+            for thisNote in rhythmicStream:
+                thisNote.color = "blue"
+            rhythmicHash[offsetString].append(rhythmicStream)
+        #thisMeasure.flat.notesAndRests[0].editorial.comment.text = str(thisMeasure.number)
+        rhythmicHash[offsetString].append(thisMeasure)
+
+    s = stream.Part()
+    s.insert(0, meter.TimeSignature('3/4')) # this should be made more flexible.
+    
+    for thisRhythmProfile in sorted(rhythmicHash, key=lsort, reverse=True):
+        for thisMeasure in rhythmicHash[thisRhythmProfile]:
+            thisMeasure.insert(0, thisMeasure.bestClef())
+            s.append(thisMeasure)
+    s.show('lily.png')
+
+
 def simple4a(show=True):
     '''
     find at least 5 questions that are difficult to solve in Humdrum which are simple in music21; (one which just uses Python)
@@ -480,8 +533,8 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
-    music21.mainTest(Test)
+    simple3()
+    #music21.mainTest(Test)
     #music21.mainTest(TestExternal)
 
 

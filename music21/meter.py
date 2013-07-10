@@ -2250,8 +2250,6 @@ class MeterSequence(MeterTerminal):
         '''
         Given an offset in quarterLengths (0.0 through self.duration.quarterLength), return
         the index of the active MeterTerminal or MeterSequence
-
-        
         
         >>> a = meter.MeterSequence('4/4')
         >>> a.offsetToIndex(.5)
@@ -2263,6 +2261,8 @@ class MeterSequence(MeterTerminal):
         0
         >>> a.offsetToIndex(3.5)
         3
+
+
         >>> a.partition([1,2,1])
         >>> len(a)
         3
@@ -2273,11 +2273,16 @@ class MeterSequence(MeterTerminal):
         
         
         >>> a = meter.MeterSequence('4/4')
-        >>> a.offsetToIndex(5)
+        >>> a.offsetToIndex(5.0)
         Traceback (most recent call last):
-        ...
-        MeterException: cannot access from qLenPos 5 where total duration is 4.0
+        MeterException: cannot access from qLenPos 5.0 where total duration is 4.0
 
+
+        Negative numbers also raise an exception:
+
+        >>> a.offsetToIndex(-0.5)
+        Traceback (most recent call last):
+        MeterException: cannot access from qLenPos -0.5 where total duration is 4.0
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException('cannot access from qLenPos %s where total duration is %s' % (qLenPos, self.duration.quarterLength))
@@ -2365,7 +2370,8 @@ class MeterSequence(MeterTerminal):
 
 
     def offsetToSpan(self, qLenPos, permitMeterModulus=False):
-        '''Given a lenPos, return the span of the active region.
+        '''
+        Given a qLenPos, return the span of the active region.
         Only applies to the top most level of partitions
 
         If `permitMeterModulus` is True, quarter length positions 
@@ -2383,6 +2389,12 @@ class MeterSequence(MeterTerminal):
         
         >>> a.offsetToSpan(4.5, permitMeterModulus=True)
         (1.0, 2.0)
+        
+        Make sure it works for tuplets even with so-so rounding:
+        
+        >>> a.offsetToSpan(4.33333336, permitMeterModulus=True)
+        (1.0, 2.0)
+        
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             if not permitMeterModulus:
@@ -2395,7 +2407,10 @@ class MeterSequence(MeterTerminal):
         
         iMatch = self.offsetToIndex(qLenPos)
         pos = 0
+        start = None
+        end = None
         for i in range(len(self)):
+            #print i, iMatch, self[i]
             if i == iMatch:
                 start = pos
                 end = pos + self[i].duration.quarterLength

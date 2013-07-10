@@ -1365,7 +1365,7 @@ class Test(unittest.TestCase):
         r1 = RomanNumeral('bbVI6')
         self.assertEqual(r1.figuresWritten, "6")
         self.assertEqual(r1.scaleOffset.chromatic.semitones, -2)
-        self.assertEqual(r1.scaleOffset.diatonic.niceName, "Doubly-Augmented Unison")
+        self.assertEqual(r1.scaleOffset.diatonic.directedNiceName, "Descending Doubly-Diminished Unison")
 
         cM = scale.MajorScale('C')
         unused_r2 = RomanNumeral('ii', cM)

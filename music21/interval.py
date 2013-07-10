@@ -718,7 +718,6 @@ class GenericInterval(base.Music21Object):
     def reverse(self):
         '''Returns a new GenericInterval object that is inverted. 
 
-        
         >>> aInterval = interval.GenericInterval('Third')
         >>> aInterval.reverse()
         <music21.interval.GenericInterval -3>
@@ -729,10 +728,8 @@ class GenericInterval(base.Music21Object):
         >>> aInterval.reverse()
         <music21.interval.GenericInterval 13>
         
-        
         Unisons invert to unisons
-        
-        
+                
         >>> aInterval = interval.GenericInterval(1)
         >>> aInterval.reverse()
         <music21.interval.GenericInterval 1>
@@ -772,9 +769,10 @@ class DiatonicInterval(base.Music21Object):
     '''
     A class representing a diatonic interval. Two required arguments are a string `specifier` 
     (such as perfect, major, or minor) and `generic`, either an int of an interval size (such as 2, 2nd, or second)
-    or a :class:`~music21.interval.GenericInterval` object. 
+    or a :class:`~music21.interval.GenericInterval` object.
 
-    Two DiatonicIntervals are the same if their GenericIntervals are the same and their specifiers are the same.
+    Two DiatonicIntervals are the same if their GenericIntervals are the same and their specifiers are the same and they should be
+    if their directions are the same, but this is not checked yet.    
     '''
     _DOC_ATTR = {
     'name': 'The name of the interval in abbreviated form without direction.',
@@ -832,6 +830,31 @@ class DiatonicInterval(base.Music21Object):
         >>> aInterval.isStep
         True
 
+
+        >>> augAscending = interval.DiatonicInterval('augmented', 1)
+        >>> augAscending
+        <music21.interval.DiatonicInterval A1>
+        >>> augAscending.isDiatonicStep
+        False
+        >>> augAscending.isStep  # TODO: should this be True???
+        False
+        >>> augAscending.directedNiceName
+        'Ascending Augmented Unison'
+        
+        Diatonic interval is ascending, but generic is oblique:
+        
+        >>> augAscending.direction == interval.ASCENDING
+        True
+        >>> augAscending.generic.direction == interval.ASCENDING
+        False
+
+        >>> dimDescending = augAscending.reverse()
+        >>> dimDescending
+        <music21.interval.DiatonicInterval d1>
+        >>> dimDescending.directedNiceName
+        'Descending Diminished Unison'
+        >>> dimDescending.direction == interval.DESCENDING
+        True
         '''
         base.Music21Object.__init__(self)
 
@@ -847,6 +870,16 @@ class DiatonicInterval(base.Music21Object):
         # translate strings, if provided, to integers
         # specifier here is the index number in the prefixSpecs list
         self.specifier, unused_specifierStr = convertSpecifier(specifier)
+        if self.generic.undirected != 1 or specifier == PERFECT:
+            self.direction = self.generic.direction
+        else: # assume in the absence of other evidence, that augmented unisons are ascending and dim are descending 
+            if perfSpecifiers.index(self.specifier) <= perfSpecifiers.index(DIMINISHED):
+                self.direction = DESCENDING
+            else:
+                self.direction = ASCENDING
+        diatonicDirectionNiceName = directionTerms[self.direction]
+
+
         if self.specifier is not None:
             self.name = (prefixSpecs[self.specifier] +
                         str(self.generic.undirected))
@@ -863,16 +896,14 @@ class DiatonicInterval(base.Music21Object):
 
             self.directedName = (prefixSpecs[self.specifier] +
                                  str(self.generic.directed))
-            self.directedNiceName = (directionTerms[self.generic.direction] + 
+            self.directedNiceName = (diatonicDirectionNiceName + 
                                     " " + self.niceName)
             self.directedSimpleName = (prefixSpecs[self.specifier] +
                                      str(self.generic.simpleDirected))
             self.directedSemiSimpleName = (prefixSpecs[self.specifier] +
                                  str(self.generic.semiSimpleDirected))
-            self.directedSimpleNiceName = (directionTerms[
-                self.generic.direction] + " " + self.simpleNiceName)
-            self.directedSemiSimpleNiceName = (directionTerms[
-                self.generic.direction] + " " + self.semiSimpleNiceName)
+            self.directedSimpleNiceName = (diatonicDirectionNiceName + " " + self.simpleNiceName)
+            self.directedSemiSimpleNiceName = (diatonicDirectionNiceName + " " + self.semiSimpleNiceName)
 
             self.specificName = niceSpecNames[self.specifier]
             self.prefectable = self.generic.perfectable
@@ -899,7 +930,7 @@ class DiatonicInterval(base.Music21Object):
 
             self.mod7inversion = self.invertedOrderedSpecifier + str(
                                  self.generic.mod7inversion)
-            if self.generic.direction == DESCENDING:
+            if self.direction == DESCENDING:
                 self.mod7 = self.mod7inversion
             else:
                 self.mod7 = self.simpleName
@@ -923,6 +954,7 @@ class DiatonicInterval(base.Music21Object):
         >>> d == e
         True
         
+        TODO: Direction should also have to be the same...
         '''
         if other is None:
             return False
@@ -933,6 +965,10 @@ class DiatonicInterval(base.Music21Object):
 
         if other == None:
             return False
+        
+        ## untested...
+        #if self.direction != other.direction:
+        #    return False
         if self.generic == other.generic and self.specifier == other.specifier:
             return True
         else:
@@ -942,7 +978,6 @@ class DiatonicInterval(base.Music21Object):
     def reverse(self):
         '''
         Return a :class:`~music21.interval.DiatonicInterval` that is an inversion of this Interval.
-
         
         >>> aInterval = interval.DiatonicInterval('major', 3)
         >>> aInterval.reverse().directedName
@@ -951,11 +986,32 @@ class DiatonicInterval(base.Music21Object):
         >>> aInterval = interval.DiatonicInterval('augmented', 5)
         >>> aInterval.reverse().directedName
         'A-5'
+
+        (Ascending) Augmented Unisons reverse to (Descending) Diminished Unisons and vice-versa
+
+        >>> aInterval = interval.DiatonicInterval('augmented', 1)
+        >>> aInterval.direction
+        1
+        >>> aInterval.directedName
+        'A1'
+        >>> dimUnison = aInterval.reverse()
+        >>> dimUnison.directedName
+        'd1'
+        >>> dimUnison.directedNiceName
+        'Descending Diminished Unison'
         '''
         # self.invertedOrderedSpecifier gives a complement, not an inversion?
-        return DiatonicInterval(self.specifier, 
-                                self.generic.reverse())
-
+        if self.generic.directed == 1:
+            perfectPoint = perfSpecifiers.index(PERFECT)
+            specifierPoint = perfSpecifiers.index(self.specifier)
+            offsetFromPerfect = specifierPoint - perfectPoint
+            reversedOffsetFromPerfect = -1 * offsetFromPerfect
+            newSpecifierIndex = reversedOffsetFromPerfect + perfectPoint
+            newSpecifier = perfSpecifiers[newSpecifierIndex]
+            return DiatonicInterval(newSpecifier, 1)
+        else:
+            return DiatonicInterval(self.specifier,
+                                    self.generic.reverse())
 
     def getChromatic(self):
         '''
@@ -1151,9 +1207,6 @@ class ChromaticInterval(base.Music21Object):
         except for for interval of 6 which returns a diminished fifth, not
         augmented fourth.
 
-        
-        
-
         >>> aInterval = interval.ChromaticInterval(5)
         >>> aInterval.getDiatonic()
         <music21.interval.DiatonicInterval P4>
@@ -1328,8 +1381,6 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     '''
     Given a :class:`~music21.interval.GenericInterval` and 
     a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...).
-    
-    
 
     >>> aInterval = interval.GenericInterval('seventh')
     >>> bInterval = interval.ChromaticInterval(11)
@@ -1353,6 +1404,8 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
         gInt.direction != OBLIQUE and cInt.direction != OBLIQUE):
         # intervals like d2 and dd2 etc. (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
         theseSemis = -1 * cInt.undirected
+    elif gInt.undirected == 1:
+        theseSemis = cInt.directed # matters for unison
     else:
         # all normal intervals
         theseSemis  = cInt.undirected
@@ -2244,6 +2297,8 @@ def notesToInterval(n1, n2 = None):
     
     Works equally well with :class:`~music21.pitch.Pitch` objects.
 
+
+    N.B.: DEPRECATED.  Use: inverval.Interval(noteStart=aNote, noteEnd=bNote) instead.
     
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g5')
@@ -2309,7 +2364,6 @@ def add(intervalList):
     
     (Currently not particularly efficient for large lists...)
     
-    
     >>> A2 = interval.Interval('A2')
     >>> P5 = interval.Interval('P5')
     
@@ -2341,7 +2395,6 @@ def subtract(intervalList):
     Starts with the first interval and subtracts the 
     following intervals from it:
     
-    
     >>> interval.subtract(["P5","M3"])
     <music21.interval.Interval m3>
     >>> interval.subtract(["P4","d3"])
@@ -2357,20 +2410,30 @@ def subtract(intervalList):
     >>> interval.subtract(["A1","P1"])
     <music21.interval.Interval A1>
     
+    >>> interval.subtract(["P8","P1"])
+    <music21.interval.Interval P8>
+    >>> interval.subtract(["P8","d2"])
+    <music21.interval.Interval A7>
+    >>> interval.subtract(["P8","A1"])
+    <music21.interval.Interval d8>
+
+    
     >>> a = interval.subtract(["P5","A5"])
     >>> a.niceName
-    'Augmented Unison'
+    'Diminished Unison'
+    >>> a.directedNiceName
+    'Descending Diminished Unison'
     >>> a.chromatic.semitones
-    -1
+    -1    
     
-    TODO: BUG: should be Descending Augmented Unison, currently giving Oblique Augmented Unison ! AARGH
+    TODO: BUG: should be Descending Diminished Unison, currently giving Oblique Augmented Unison ! AARGH
     '''
     from music21 import pitch
     if len(intervalList) == 0:
         raise IntervalException("Cannot add an empty set of intervals")
     
-    n1 = pitch.Pitch()
-    n2 = pitch.Pitch()
+    n1 = pitch.Pitch("C4")
+    n2 = pitch.Pitch("C4")
     for i,intI in enumerate(intervalList):
         if i == 0:
             n2 = transposePitch(n2, intI)
@@ -2380,6 +2443,7 @@ def subtract(intervalList):
             else:
                 intervalObj = intI
             n2 = transposePitch(n2, intervalObj.reverse())
+    #print n1.nameWithOctave, n2.nameWithOctave
     return Interval(noteStart=n1, noteEnd=n2)
 
 #-------------------------------------------------------------------------------
@@ -2726,7 +2790,7 @@ class Test(unittest.TestCase):
 
 
 
-    def intervalMicrotonesB(self):
+    def testIntervalMicrotonesB(self):
         from music21 import interval, note
         i = interval.notesToInterval(note.Note('c4'), note.Note('c#4'))
         self.assertEqual(str(i), '<music21.interval.Interval A1>')
@@ -2734,8 +2798,13 @@ class Test(unittest.TestCase):
         i = interval.notesToInterval(note.Note('c4'), note.Note('c~4'))
         self.assertEqual(str(i), '<music21.interval.Interval A1 (-50c)>')
 
-
-
+    def testDescendingAugmentedUnison(self):
+        from music21 import interval, note
+        ns = note.Note("C4")
+        ne = note.Note("C-4")
+        i = interval.Interval(noteStart=ns, noteEnd=ne)
+        directedNiceName = i.directedNiceName
+        self.assertEqual(directedNiceName, "Descending Diminished Unison")
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
