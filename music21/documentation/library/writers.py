@@ -86,7 +86,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
         lines.append('.. toctree::')
         lines.append('   :maxdepth: 1')
         lines.append('')
-        for referenceName in referenceNames:
+        for referenceName in sorted(referenceNames):
             lines.append('   {0}'.format(referenceName))
         rst = '\n'.join(lines)
         indexFilePath = os.path.join(
