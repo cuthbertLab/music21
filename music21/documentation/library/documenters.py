@@ -457,6 +457,8 @@ class ClassDocumenter(ObjectDocumenter):
         result.extend(self.rstInheritedReadwritePropertiesFormat)
         result.extend(self.rstMethodsFormat)
         result.extend(self.rstInheritedMethodsFormat)
+        result.extend(self.rstDocAttrFormat)
+        result.extend(self.rstInheritedDocAttrFormat)
         return result
 
     def __hash__(self):
@@ -827,8 +829,40 @@ class ClassDocumenter(ObjectDocumenter):
         return result
 
     @property
+    def rstDocAttrFormat(self):
+        result = []
+        if self.docAttr:
+            banner = '{0} instance variables:'.format(
+                self.rstCrossReferenceString)
+            result.extend((banner, ''))
+            for attrName, attrDescription in sorted(self.docAttr.items()):
+                path = '{0}.{1}'.format(
+                    self.referentPackagesystemPath.split('.')[-1],
+                    attrName,
+                    )
+                directive = '.. attribute:: {0}'.format(path)
+                result.extend((directive, ''))
+                for line in attrDescription.split('\n'):
+                    result.append('\t{0}'.format(line))
+                result.append('')
+        return result
+
+    @property
     def rstInheritedDocAttrFormat(self):
-        pass
+        result = []
+        for baseDocumenter in self.baseClassDocumenters:
+            if baseDocumenter in self.inheritedDocAttrMapping:
+                attrs = self.inheritedDocAttrMapping[baseDocumenter]
+                banner = 'Instance variables inherited from {0}:'.format(
+                    baseDocumenter.rstCrossReferenceString)
+                result.extend((banner, ''))
+                for attr in attrs:
+                    result.append('- :attr:`~{0}.{1}`'.format(
+                        baseDocumenter.referentPackagesystemPath,
+                        attr,
+                        ))
+                result.append('')
+        return result
 
     @property
     def rstInheritedMethodsFormat(self):
