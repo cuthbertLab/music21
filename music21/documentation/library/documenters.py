@@ -486,9 +486,11 @@ class ClassDocumenter(ObjectDocumenter):
             result.append(banner.format(classDocumenter.rstCrossReferenceString))
             result.append('')
             memberDocumenters = mapping[classDocumenter]
-            for memberDocumenter in memberDocumenters: 
-                result.append('- {0}'.format(
+            for memberDocumenter in memberDocumenters[:-1]:
+                result.append('\t{0},'.format(
                     memberDocumenter.rstCrossReferenceString))
+            result.append('\t{0}'.format(
+                memberDocumenters[-1].rstCrossReferenceString))
             result.append('')    
         return result
 
@@ -852,15 +854,23 @@ class ClassDocumenter(ObjectDocumenter):
         result = []
         for baseDocumenter in self.baseClassDocumenters:
             if baseDocumenter in self.inheritedDocAttrMapping:
-                attrs = self.inheritedDocAttrMapping[baseDocumenter]
+                attrNames = self.inheritedDocAttrMapping[baseDocumenter].keys()
+                if not attrNames:
+                    continue
                 banner = 'Instance variables inherited from {0}:'.format(
                     baseDocumenter.rstCrossReferenceString)
                 result.extend((banner, ''))
-                for attr in attrs:
-                    result.append('- :attr:`~{0}.{1}`'.format(
+                formatString = '\t:attr:`~{0}.{1}`'
+                formatStringWithComma = '{0},'.format(formatString)
+                for attrName in attrNames[:-1]:
+                    result.append(formatStringWithComma.format(
                         baseDocumenter.referentPackagesystemPath,
-                        attr,
+                        attrName,
                         ))
+                result.append(formatString.format(
+                    baseDocumenter.referentPackagesystemPath,
+                    attrNames[-1],
+                    ))
                 result.append('')
         return result
 
