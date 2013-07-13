@@ -56,10 +56,10 @@ class Documenter(object):
 
     ### PUBLIC METHODS ###
 
-    def makeHeading(self, text, heading_level):
+    @staticmethod
+    def makeHeading(text, heading_level):
         assert isinstance(text, (str, unicode)) and len(text)
-        assert heading_level in (1, 2)
-        heading_characters = ['=', '-']
+        heading_characters = ['=', '-', '^', '"']
         result = [text]
         result.append(heading_characters[heading_level - 1] * len(text))
         result.append('')
@@ -452,13 +452,9 @@ class ClassDocumenter(ObjectDocumenter):
         result.extend(self.rstAutodocDirectiveFormat)
         result.extend(self.rstBasesFormat)
         result.extend(self.rstReadonlyPropertiesFormat)
-        result.extend(self.rstInheritedReadonlyPropertiesFormat)
         result.extend(self.rstReadwritePropertiesFormat)
-        result.extend(self.rstInheritedReadwritePropertiesFormat)
         result.extend(self.rstMethodsFormat)
-        result.extend(self.rstInheritedMethodsFormat)
         result.extend(self.rstDocAttrFormat)
-        result.extend(self.rstInheritedDocAttrFormat)
         return result
 
     def __hash__(self):
@@ -822,8 +818,8 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         result = []
         if self.baseClasses:
-            result.append('Inherits from:')
-            result.append('')
+            banner = '{0} bases'.format(self.rstCrossReferenceString)
+            result.extend(self.makeHeading(banner, 3))
             for class_documenter in self.baseClassDocumenters:
                 result.append('- {0}'.format(
                     class_documenter.rstCrossReferenceString))
@@ -834,9 +830,6 @@ class ClassDocumenter(ObjectDocumenter):
     def rstDocAttrFormat(self):
         result = []
         if self.docAttr:
-            banner = '{0} instance variables:'.format(
-                self.rstCrossReferenceString)
-            result.extend((banner, ''))
             for attrName, attrDescription in sorted(self.docAttr.items()):
                 path = '{0}.{1}'.format(
                     self.referentPackagesystemPath.split('.')[-1],
@@ -845,8 +838,13 @@ class ClassDocumenter(ObjectDocumenter):
                 directive = '.. attribute:: {0}'.format(path)
                 result.extend((directive, ''))
                 for line in attrDescription.split('\n'):
-                    result.append('\t{0}'.format(line))
+                    result.append('\t{0}'.format(line.strip()))
                 result.append('')
+        result.extend(self.rstInheritedDocAttrFormat)
+        if result:
+            banner = '{0} instance variables'.format(
+                self.rstCrossReferenceString)
+            result = self.makeHeading(banner, 3) + result
         return result
 
     @property
@@ -968,13 +966,14 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         result = []
         if self.methods:
-            result.append('{0} *methods*'.format(
-                self.rstCrossReferenceString))
-            result.append('')
             for documenter in self.methods: 
                 result.extend(documenter())
             if result[-1] != '':
                 result.append('')
+        result.extend(self.rstInheritedMethodsFormat)
+        if result:
+            banner = '{0} methods'.format(self.rstCrossReferenceString)
+            result = self.makeHeading(banner, 3) + result
         return result
 
     @property
@@ -1039,13 +1038,15 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         result = []
         if self.readonlyProperties:
-            result.append('{0} *read-only properties*'.format(
-                self.rstCrossReferenceString))
-            result.append('')
             for documenter in self.readonlyProperties:
                 result.extend(documenter())
             if result[-1] != '':
                 result.append('')
+        result.extend(self.rstInheritedReadonlyPropertiesFormat)
+        if result:
+            banner = '{0} read-only properties'.format(
+                self.rstCrossReferenceString)
+            result = self.makeHeading(banner, 3) + result
         return result
 
     @property
@@ -1064,13 +1065,15 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         result = []
         if self.readwriteProperties:
-            result.append('{0} *read/write properties*'.format(
-                self.rstCrossReferenceString))
-            result.append('')
             for documenter in self.readwriteProperties:
                 result.extend(documenter())
             if result[-1] != '':
                 result.append('')
+        result.extend(self.rstInheritedReadwritePropertiesFormat)
+        if result:
+            banner = '{0} read/write properties'.format(
+                self.rstCrossReferenceString)
+            result = self.makeHeading(banner, 3) + result
         return result
 
     @property
