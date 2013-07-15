@@ -12,6 +12,8 @@
 import abc
 import json
 import os
+import re
+import subprocess
 
 
 class ReSTWriter(object):
@@ -130,47 +132,143 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     ### SPECIAL METHODS ###
 
     def __call__(self):
-        pass
         from music21 import documentation
         ipythonNotebookFilePaths = [x for x in
             documentation.IPythonNotebookIterator()()]
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
-            with open(ipythonNotebookFilePath, 'r') as f:
-                contents = f.read()
-                contentsAsJson = json.loads(contents)
-            directoryPath, sep, baseName = ipythonNotebookFilePath.rpartition(
-                os.path.sep)
-            baseNameWithoutExtension = os.path.splitext(baseName)[0]
-            imageFilesDirectoryPath = os.path.join(
-                directoryPath,
-                '{0}_files'.format(baseNameWithoutExtension),
-                )
-            rstFilePath = os.path.join(
-                directoryPath,
-                '{0}.rst'.format(baseNameWithoutExtension),
-                )
-            lines, imageData = documentation.IPythonNotebookDocumenter(
-                contentsAsJson)()
-            rst = '\n'.join(lines)
-            self.write(rstFilePath, rst)
-            if not imageData:
+            print 
+            self._convertOneNotebook(ipythonNotebookFilePath)
+            self._cleanupNotebookAssets(ipythonNotebookFilePath)
+            print 'WROTE   {0}'.format(os.path.relpath(
+                ipythonNotebookFilePath))
+
+    ### PRIVATE METHODS ###
+
+    def _cleanupNotebookAssets(self, ipythonNotebookFilePath):
+        notebookFileNameWithoutExtension = os.path.splitext(
+            os.path.basename(ipythonNotebookFilePath))[0]
+        notebookParentDirectoryPath = os.path.abspath(
+            os.path.dirname(ipythonNotebookFilePath),
+            )
+        imageFileDirectoryName = notebookFileNameWithoutExtension + '_files' 
+        imageFileDirectoryPath = os.path.join(
+            notebookParentDirectoryPath,
+            imageFileDirectoryName,
+            )
+        for fileName in os.listdir(imageFileDirectoryPath):
+            if fileName.endswith('.text'):
+                filePath = os.path.join(
+                    imageFileDirectoryPath,
+                    fileName,
+                    )
+                os.remove(filePath)
+
+    def _convertOneNotebook(self, ipythonNotebookFilePath):
+        assert os.path.exists(ipythonNotebookFilePath)
+        self._runNBConvert(ipythonNotebookFilePath)
+        notebookFileNameWithoutExtension = os.path.splitext(
+            os.path.basename(ipythonNotebookFilePath))[0]
+        notebookParentDirectoryPath = os.path.abspath(
+            os.path.dirname(ipythonNotebookFilePath),
+            )
+        imageFileDirectoryName = notebookFileNameWithoutExtension + '_files'
+        rstFileName = notebookFileNameWithoutExtension + '.rst'
+        rstFilePath = os.path.join(
+            notebookParentDirectoryPath,
+            rstFileName,
+            )
+        with open(rstFilePath, 'r') as f:
+            oldLines = f.read().splitlines()
+        ipythonPromptPattern = re.compile('^In\[\d+\]:')
+        mangledInternalReference = re.compile(
+            r'\:(class|ref|func|meth)\:\`\`(.*?)\`\`')
+        newLines = []
+        currentLineNumber = 0
+        while currentLineNumber < len(oldLines):
+            currentLine = oldLines[currentLineNumber]
+            # Remove all IPython prompts and the blank line that follows:
+            if ipythonPromptPattern.match(currentLine) is not None:
+                currentLineNumber += 2
                 continue
-            if not os.path.exists(imageFilesDirectoryPath):
-                os.mkdir(imageFilesDirectoryPath)
-            for imageFileName, imageFileData in imageData.iteritems():
-                imageFilePath = os.path.join(
-                    imageFilesDirectoryPath,
+            # Correct the image path in each ReST image directive:
+            elif currentLine.startswith('.. image:: '):
+                imageFileName = currentLine.partition('.. image:: ')[2]
+                newImageDirective = '.. image:: {0}/{1}'.format(
+                    imageFileDirectoryName,
                     imageFileName,
                     )
-                shouldOverwriteImage = True
-                with open(imageFilePath, 'rb') as f:
-                    oldImageFileData = f.read()
-                    if oldImageFileData == imageFileData:
-                        shouldOverwriteImage = False
-                if shouldOverwriteImage:
-                    with open(imageFilePath, 'wb') as f:
-                        f.write(imageFileData)
-            
+                newLines.append(newImageDirective)
+                currentLineNumber += 1
+            # Otherwise, nothing special to do, just add the line to our results:
+            else:
+                # fix cases of inline :class:`~music21.stream.Stream` being
+                # converted by markdown to :class:``~music21.stream.Stream``
+                newCurrentLine = mangledInternalReference.sub(
+                    r':\1:`\2`', 
+                    currentLine
+                    )
+                newLines.append(newCurrentLine)
+                currentLineNumber += 1
+        with open(rstFilePath, 'w') as f:
+            f.write('\n'.join(newLines))
+
+    def _runNBConvert(self, ipythonNotebookFilePath):
+        import music21
+        from music21 import common
+        #runDirectoryPath = common.getBuildDocFilePath()
+        pathParts = music21.__path__ + [
+            'ext',
+            'nbconvert',
+            'nbconvert.py',
+            ]
+        nbconvertPath = os.path.join(*pathParts)
+        nbconvertCommand = '{executable} rst {notebook}'.format(
+            #executable=os.path.relpath(nbconvertPath, runDirectoryPath),
+            #notebook=os.path.relpath(ipythonNotebookFilePath, runDirectoryPath),
+            executable=os.path.relpath(nbconvertPath),
+            notebook=os.path.relpath(ipythonNotebookFilePath),
+            )
+        #print nbconvertCommand
+        #subprocess.call(nbconvertCommand, shell=True, cwd=runDirectoryPath)
+        subprocess.call(nbconvertCommand, shell=True)
+
+    def _processNotebook(self, ipythonNotebookFilePath):
+        with open(ipythonNotebookFilePath, 'r') as f:
+            contents = f.read()
+            contentsAsJson = json.loads(contents)
+        directoryPath, sep, baseName = ipythonNotebookFilePath.rpartition(
+            os.path.sep)
+        baseNameWithoutExtension = os.path.splitext(baseName)[0]
+        imageFilesDirectoryPath = os.path.join(
+            directoryPath,
+            '{0}_files'.format(baseNameWithoutExtension),
+            )
+        rstFilePath = os.path.join(
+            directoryPath,
+            '{0}.rst'.format(baseNameWithoutExtension),
+            )
+        lines, imageData = documentation.IPythonNotebookDocumenter(
+            contentsAsJson)()
+        rst = '\n'.join(lines)
+        self.write(rstFilePath, rst)
+        if not imageData:
+            return
+        if not os.path.exists(imageFilesDirectoryPath):
+            os.mkdir(imageFilesDirectoryPath)
+        for imageFileName, imageFileData in imageData.iteritems():
+            imageFilePath = os.path.join(
+                imageFilesDirectoryPath,
+                imageFileName,
+                )
+            shouldOverwriteImage = True
+            with open(imageFilePath, 'rb') as f:
+                oldImageFileData = f.read()
+                if oldImageFileData == imageFileData:
+                    shouldOverwriteImage = False
+            if shouldOverwriteImage:
+                with open(imageFilePath, 'wb') as f:
+                    f.write(imageFileData)
+        
 
 if __name__ == '__main__':
     import music21
