@@ -103,7 +103,7 @@ display it on the screen but not in your browser:
 
 .. parsed-literal::
 
-    u'/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T/music21/tmppKgApcly.png'
+    u'/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T/music21/tmpXpcJUYly.png'
 
 
 Instead do this:
@@ -146,7 +146,7 @@ SVG is much faster, but it doesn't work, sadly...
 
     ---------------------------------------------------------------------------
     ValueError                                Traceback (most recent call last)
-    <ipython-input-9-a78ad09b705c> in <module>()
+    <ipython-input-8-a78ad09b705c> in <module>()
     ----> 1 Image(filename=c.write('lily.svg'))
     
     /Library/Python/2.7/site-packages/ipython-0.14.dev-py2.7.egg/IPython/core/display.pyc in __init__(self, data, url, filename, format, embed, width, height)
@@ -157,6 +157,7 @@ SVG is much faster, but it doesn't work, sadly...
         496         self.height = height
 
     ValueError: Cannot embed the 'svg' image format
+
 Whole pieces will show properly also now that the extension module is
 loaded
 

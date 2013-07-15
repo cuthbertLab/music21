@@ -159,89 +159,26 @@ After the Configuration Assistant is complete, you can close the window when
 it says "[process terminated]".
 
 
-Testing to make sure everything went well.
------------------------------------------------------
-We'll just see if music21 worked for you.
-
-Open up the Mac Terminal (under Applications/Utilities/Terminal. You might want
-to drag it to the dock.  You'll use it often. In the terminal window
-type "python" (without the quotes).  Then type (omitting the >>> part):
-
-    >>> from music21 import *
-
-You'll probably get a few warnings that you're missing some optional modules.  That's okay.
-If you get a warning that "no module named music21" then something probably went wrong above.
-Try going step-by-step through the instructions above one more time, making sure not to skip
-anything.  99% of installation errors come from skipping a step above.  If you still have a
-problem, search for "installation problem music21" or "installation problem mac python module"
-and see if anything looks familiar.  If all else fails, contact the music21list Google Group 
-which might be able to help.
-
-If you didn't have a problem, which is nearly always the case, then music21 has worked for you.
-Test that you can get a score from the corpus by typing this command:
-
-    >>> s = corpus.parse('bach/bwv65.2.xml')
-    
-Now `s` represents an entire score of a chorale by J.S. Bach.  Type "`s.analyze('key')`" to see 
-what music21's best guess as to its key is.  There's lots more that you can do as we'll see
-later.  But there's one more thing to test.  Let's see if you can get music notation (assuming
-you installed a MusicXML reader above).  
-
-Type "`s.show()`" or if you want to be more precise, "`s.show('musicxml')`"
-    
-Assuming your installation and configuration went as expected, 
-your MusicXML reader should launch and display the chorale, looking something
-like what we see here:
-
-.. image:: images/macScreenShow.*
-    :width: 650
-
 After Installation
 -------------------------------
 
 CONGRATS! You're done with installing.  You can delete the `music21-1.3.0.tar.gz` file
 and `music21-1.3.0` folder from your desktop now.  
 
-After a successful installation, you may proceed to :ref:`quickStart` to 
+Open up the Mac Terminal (under Applications/Utilities/Terminal). You might want
+to drag it to the dock.  You'll use it often.
+
+After a successful installation, you may proceed to :ref:`usersGuide_01_Installing` to 
 begin using music21.
 
-You may need to install additional software to take advantage of some features 
-of music21. For information on additional software you may need, see :ref:`installAdditional`.
-
-You may want to configure your Environment to support opening MusicXML 
-files with a different Reader. A tutorial for this is provided here: :ref:`tutorialFinaleMac`.
-
-To configure all settings in music21 directly, see :ref:`environment`.
 
 
 Installation Help
 -------------------------------
 
-If you have followed all the instructions and encounter problems, contact the music21 group for help:
+If you have followed all the instructions and still encounter problems, start over from scratch
+and try it again very carefully.  If you still have problems
+contact the music21 group and someone should be able to help:
 
 http://groups.google.com/group/music21list
 
-
-The Installation Destination
-----------------------------------------------
-
-After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called 'site-packages'. The site-packages directory is located in different places depending on your platform. To find where your site-packages directory is located, you can enter the following command in the Python interpreter:
-
-    >>> import distutils.sysconfig
-    >>> print(distutils.sysconfig.get_python_lib())  
-
-In Terminal, this looks like this:
-
-.. image:: images/macScreenSitePackages.*
-    :width: 650
-
-
-Alternative Installation Methods
-----------------------------------------------
-
-The preceding instructions are for general users. 
-
-If you are an advanced user and have installed other Python packages before, 
-or want to use an EGG, SVN, PIP, or setuptools, you should read :ref:`installAdvanced`.
-If you have experience working with the command line, the instructions given 
-for GNU/Linux users will work the same for Mac users. See :ref:`installLinux`.

@@ -6,24 +6,39 @@
 Overview: Post-Tonal Tools
 =============================================
 
-The music21 toolkit features many tools for analyzing and creating music within a post-tonal context. A :class:`~music21.chord.Chord` can be identified as a Forte class, a list of pitch classes can be used to create a 12-tone matrix, and many other analytical tools are available. 
+The music21 toolkit features many tools for analyzing and creating music 
+within a post-tonal context. A :class:`~music21.chord.Chord` can be identified as 
+a Forte class, a list of pitch classes can be used to create a 12-tone matrix, and 
+many other analytical tools are available. 
 
-This overview will illustrate key features of music21's post tonal tools. For complete documentation on post-tonal tools, see the many methods in :class:`~music21.chord.Chord` as well as the objects in :ref:`moduleSerial`, such as :class:`~music21.serial.TwelveToneMatrix`, :class:`~music21.serial.TwelveToneRow`, and the many twelve tone rows defined in :attr:`~music21.serial.vienneseRows`.
+This overview will illustrate key features of music21's post tonal tools. For 
+complete documentation on post-tonal tools, see the many methods 
+in :class:`~music21.chord.Chord` as well as the objects in :ref:`moduleSerial`, such 
+as :class:`~music21.serial.TwelveToneMatrix`, :class:`~music21.serial.TwelveToneRow`, and 
+the many twelve tone rows defined in :attr:`~music21.serial.vienneseRows`.
 
 
 Pitches as Pitch Classes
 --------------------------
 
-Any music21 :class:`~music21.pitch.Pitch`, or a  :class:`~music21.note.Note` containing Pitch, can be expressed as pitch class integers using the :attr:`~music21.pitch.Pitch.pitchClass` and :attr:`~music21.pitch.Pitch.pitchClassString` properties. 
+Any music21 :class:`~music21.pitch.Pitch`, or a  :class:`~music21.note.Note` containing 
+Pitch, can be expressed as pitch class integers using the :attr:`~music21.pitch.Pitch.pitchClass` 
+and :attr:`~music21.pitch.Pitch.pitchClassString` properties. 
 
-In the following example, the :func:`~music21.corpus.base.parseWork` function is used to create a :class:`~music21.stream.Score` object. The :attr:`~music21.base.Music21Object.id` attribute of each contained :class:`~music21.stream.Part` is presented in a list. 
+In the following example, the :func:`~music21.corpus.base.parseWork` function is used to 
+create a :class:`~music21.stream.Score` object. The :attr:`~music21.base.Music21Object.id` 
+attribute of each contained :class:`~music21.stream.Part` is presented in a list. 
 
 >>> from music21 import corpus
 >>> aScore = corpus.parseWork('beethoven/opus59no2', 3)
 >>> [e.id for e in aScore.parts]
 [u'Violin I.', u'Violin II.', u'Viola.', u'Violoncello.']
 
-We can view the fourth and fifth measures of the violin Part by obtaining the Part from the Stream with :meth:`~music21.stream.Stream.getElementById` method. Next, we can extract the desired measures with the :meth:`~music21.stream.Stream.measures` method. Calling the :meth:`~music21.stream.Stream.show` method will, assuming correct setup of your environment, open a display of the extracted measures. (See :ref:`quickStart` for basic configuration information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
+We can view the fourth and fifth measures of the violin Part by obtaining the Part from the 
+Stream with :meth:`~music21.stream.Stream.getElementById` method. Next, we can extract the 
+desired measures with the :meth:`~music21.stream.Stream.measures` method. Calling the 
+:meth:`~music21.stream.Stream.show` method will, assuming correct setup of your environment, 
+open a display of the extracted measures.
 
 >>> vlnPart = aScore.getElementById('Violin I.')
 >>> mRange = vlnPart.measures(4,7)
@@ -32,14 +47,21 @@ We can view the fourth and fifth measures of the violin Part by obtaining the Pa
 .. image:: images/overviewPostTonal-01.*
     :width: 600
 
-If we want to gather all :class:`~music21.pitch.Pitch` objects from this measure range, we can use the :attr:`~music21.stream.Stream.pitches` property. This returns a list of all Pitch objects. All pitch objects have :attr:`~music21.pitch.Pitch.pitchClass`  and :attr:`~music21.pitch.Pitch.pitchClassStr` properties, providing either integer or string representations, respectively.
+If we want to gather all :class:`~music21.pitch.Pitch` objects from this measure range, we 
+can use the :attr:`~music21.stream.Stream.pitches` property. This returns a list of all 
+Pitch objects. All pitch objects have :attr:`~music21.pitch.Pitch.pitchClass` 
+and :attr:`~music21.pitch.Pitch.pitchClassStr` properties, providing either integer or 
+string representations, respectively.
 
 >>> [str(p) for p in mRange.pitches]
 ['A4', 'F#4', 'G4', 'G4', 'B4', 'E5', 'G5', 'G5', 'G5', 'C#6', 'E6', 'E6', 'E6', 'G6', 'C#5']
 >>> [p.pitchClass for p in mRange.pitches]
 [9, 6, 7, 7, 11, 4, 7, 7, 7, 1, 4, 4, 4, 7, 1]
 
-If we want to label the notes in our measure range with the Note's pitch class representation, we can iterate over the notes and assign the pitch class representation to the Note's lyric. This is a common way to annotate Note and Chord objects in music21. The results can be displayed with the show() method.
+If we want to label the notes in our measure range with the Note's pitch class representation, 
+we can iterate over the notes and assign the pitch class representation to the Note's lyric.
+This is a common way to annotate Note and Chord objects in music21. The results can be 
+displayed with the show() method.
 
 >>> for n in mRange.flat.notesAndRests:
 ...     if not n.isRest:
@@ -55,9 +77,12 @@ If we want to label the notes in our measure range with the Note's pitch class r
 Chords as Forte Set Classes
 ----------------------------
 
-Any music21 Chord can be interpreted as a Forte set class. Additional, a wide variety of analytical features, derived from the Forte set class, are available as methods of the chord. 
+Any music21 Chord can be interpreted as a Forte set class. Additional, a wide variety of 
+analytical features, derived from the Forte set class, are available as methods of the chord. 
 
-For an example, lets create a sequence of generated aggregate-completing trichords stored on a Stream. That is, we will construct chords with pitch classes, drawing them from a list of all pitch classes. These pitches will be supplied to a Chord object and stored on a Stream.
+For an example, lets create a sequence of generated aggregate-completing trichords stored 
+on a Stream. That is, we will construct chords with pitch classes, drawing them from a list 
+of all pitch classes. These pitches will be supplied to a Chord object and stored on a Stream.
 
 >>> from music21 import stream, chord
 >>> aStream = stream.Stream()
@@ -71,7 +96,9 @@ For an example, lets create a sequence of generated aggregate-completing trichor
 .. image:: images/overviewPostTonal-03.*
     :width: 600
 
-These Chords, like all Chords in music21, can be interpreted as Forte set classes. The Chord object offers numerous methods that retrieve data from the set class representation of the Chord. The following is just a sampling of some of the many relevant methods. 
+These Chords, like all Chords in music21, can be interpreted as Forte set classes. The 
+Chord object offers numerous methods that retrieve data from the set class representation
+ of the Chord. The following is just a sampling of some of the many relevant methods. 
 
 
 >>> for c in aStream: print(c.orderedPitchClassesString)
@@ -112,7 +139,8 @@ These Chords, like all Chords in music21, can be interpreted as Forte set classe
 [2, 1, 0, 0, 0, 0]
 
 
-To annotate the Chords stored on the Stream with their Forte name, we can iterate over the Stream and assign the Forte name to each Chord's `lyric` attribute.
+To annotate the Chords stored on the Stream with their Forte name, we can iterate over the 
+Stream and assign the Forte name to each Chord's `lyric` attribute.
 
 >>> for c in aStream:
 ...     c.lyric = c.forteClass
@@ -128,9 +156,13 @@ To annotate the Chords stored on the Stream with their Forte name, we can iterat
 Creating and Processing Twelve-Tone Matrices
 ---------------------------------------------
 
-The music21 :ref:`moduleSerial` module provides a Stream-based representation of a 12-Tone row, as well as the ability to view these rows as a matrix. Additionally, numerous 12-tone rows from works are available as classes. 
+The music21 :ref:`moduleSerial` module provides a Stream-based representation of a 
+12-Tone row, as well as the ability to view these rows as a matrix. Additionally, 
+numerous 12-tone rows from works are available as classes. 
 
-For example, we can create an instance of the row from Alban Berg's *Violin Concerto*, use the show() method to display its contents as text, and then create and print a :class:`~music21.serial.TwelveToneMatrix` object. 
+For example, we can create an instance of the row from Alban Berg's *Violin Concerto*, 
+use the show() method to display its contents as text, and then create and print 
+a :class:`~music21.serial.TwelveToneMatrix` object. 
 
 >>> from music21 import *
 
@@ -165,7 +197,11 @@ For example, we can create an instance of the row from Alban Berg's *Violin Conc
   2  5  9  1  4  7  B  3  6  8  A  0
 <BLANKLINE>
 
-We might divide this row into trichords, present each of those trichords as Chords, and label the resulting pitch classes and Forte set class. As shown above, we can set the `lyric` attribute to assign a single line of text. If we need to assign multiple lines of text, the Note and Chord method :meth:`~music21.note.GeneralNote.addLyric` can be used to add successive lines.
+We might divide this row into trichords, present each of those trichords as Chords, 
+and label the resulting pitch classes and Forte set class. As shown above, we can set 
+the `lyric` attribute to assign a single line of text. If we need to assign multiple 
+lines of text, the Note and Chord method :meth:`~music21.note.GeneralNote.addLyric` can 
+be used to add successive lines.
 
 
 >>> bStream = stream.Stream()

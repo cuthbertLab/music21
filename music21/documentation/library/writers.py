@@ -136,7 +136,6 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         ipythonNotebookFilePaths = [x for x in
             documentation.IPythonNotebookIterator()()]
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
-            print 
             self._convertOneNotebook(ipythonNotebookFilePath)
             self._cleanupNotebookAssets(ipythonNotebookFilePath)
             print 'WROTE   {0}'.format(os.path.relpath(
@@ -209,9 +208,29 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                     )
                 newLines.append(newCurrentLine)
                 currentLineNumber += 1
-        with open(rstFilePath, 'w') as f:
-            f.write('\n'.join(newLines))
+        
+        # Guarantee a blank line after literal blocks.
+        lines = [newLines[0]]
+        for i, pair in enumerate(self._iterateSequencePairwise(newLines)):
+            first, second = pair
+            if len(first.strip()) \
+                and first[0].isspace() \
+                and len(second.strip()) \
+                and not second[0].isspace():
+                lines.append('')
+            lines.append(second)
 
+        with open(rstFilePath, 'w') as f:
+            f.write('\n'.join(lines))
+
+    def _iterateSequencePairwise(self, sequence):
+        prev = None
+        for x in sequence:
+            cur = x
+            if prev is not None:
+                yield prev, cur
+            prev = cur
+            
     def _runNBConvert(self, ipythonNotebookFilePath):
         import music21
         from music21 import common
