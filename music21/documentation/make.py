@@ -19,7 +19,7 @@ try:
 except ImportError:
     raise ImportError("Sphinx is required to build documentation; download from http://sphinx-doc.org")
 
-def _main(buildFormat):
+def _main(target):
     from music21 import documentation
     documentationDirectoryPath = documentation.__path__[0]
     sourceDirectoryPath = os.path.join(
@@ -52,14 +52,14 @@ def _main(buildFormat):
     documentation.CorpusReferenceReSTWriter()()
     documentation.IPythonNotebookReSTWriter()()
     sphinxOptions = ['sphinx']
-    sphinxOptions.extend(('-b', buildFormat))
+    sphinxOptions.extend(('-b', target))
     sphinxOptions.extend(('-d', doctreesDirectoryPath))
     sphinxOptions.append(sourceDirectoryPath)
-    sphinxOptions.append(buildDirectories[buildFormat])
+    sphinxOptions.append(buildDirectories[target])
     sphinx.main(sphinxOptions)
-    if buildFormat == 'html':
+    if target == 'html':
         launchPath = os.path.join(
-            buildDirectories[buildFormat],
+            buildDirectories[target],
             'index.html',
             )
         # TODO: test launching on Windows; what is the path like there?
@@ -70,7 +70,7 @@ def _main(buildFormat):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        buildFormat = sys.argv[1]
+        target = sys.argv[1]
     else:
-        buildFormat = 'html'
-    _main(buildFormat)
+        target = 'html'
+    _main(target)
