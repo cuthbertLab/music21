@@ -1883,7 +1883,10 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                     offsetMeasureNote += obj.quarterLength
                     objList = noteToMxNotes(obj, spannerBundle=spannerBundle)
                     for sub in objList:
-                        sub.voice = voiceId # the voice id is the voice number
+                        try:
+                            sub.voice = voiceId + 1 # the voice id is the voice number # musescore -- add one
+                        except TypeError:
+                            sub.voice = voiceId
                     mxMeasure.componentList += objList
                 elif 'ChordSymbol' in classes:
                     if obj.writeAsChord:
@@ -1897,7 +1900,11 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                     offsetMeasureNote += obj.quarterLength
                     objList = chordToMx(obj, spannerBundle=spannerBundle)
                     for sub in objList:
-                        sub.voice = voiceId # the voice id is the voice number
+                        try:
+                            sub.voice = voiceId + 1 # the voice id is the voice number
+                        except TypeError:
+                            sub.voice = voiceId
+
                     mxMeasure.componentList += objList
                 elif 'GeneralNote' in classes:
                     offsetMeasureNote += obj.quarterLength
@@ -1911,7 +1918,11 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                         environLocal.warn("skipping Unpitched object")
                     # need to set voice for each contained mx object
                     for sub in objList:
-                        sub.voice = voiceId # the voice id is the voice number
+                        try:
+                            sub.voice = voiceId + 1 # the voice id is the voice number
+                        except TypeError:
+                            sub.voice = voiceId
+
                     mxMeasure.componentList += objList
             # create backup object configured to duration of accumulated
             # notes, meaning that we always return to the start of the measure
