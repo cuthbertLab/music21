@@ -76,13 +76,16 @@ def _main(target):
         sphinxOptions.extend(('-d', doctreesDirectoryPath))
         sphinxOptions.append(sourceDirectoryPath)
         sphinxOptions.append(buildDirectories[target])
-        sphinx.main(sphinxOptions)
+        # sphinx.main() returns 0 on success, 1 on failure.
+        # If the docs fail to build, we should not try to open a web browser.
+        if sphinx.main(sphinxOptions):
+            return
         if target == 'html':
             launchPath = os.path.join(
                 buildDirectories[target],
                 'index.html',
                 )
-            # TODO: test launching on Windows; what is the path like there?
+            # TODO: Test launching web browsers under Windows.
             if launchPath.startswith('/'):
                 launchPath = 'file://' + launchPath
             webbrowser.open(launchPath)

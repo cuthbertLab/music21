@@ -65,6 +65,10 @@ class Documenter(object):
         result.append('')
         return result
 
+    @staticmethod
+    def makeRubric(text):
+        return ['.. rubric:: {}'.format(text), '']
+
 
 class ObjectDocumenter(Documenter):
     '''
@@ -482,11 +486,12 @@ class ClassDocumenter(ObjectDocumenter):
             result.append(banner.format(classDocumenter.rstCrossReferenceString))
             result.append('')
             memberDocumenters = mapping[classDocumenter]
-            for memberDocumenter in memberDocumenters[:-1]:
-                result.append('\t{0},'.format(
+            result.append('.. hlist::')
+            result.append('   :columns: 3')
+            result.append('')
+            for memberDocumenter in memberDocumenters:
+                result.append('   - {0}'.format(
                     memberDocumenter.rstCrossReferenceString))
-            result.append('\t{0}'.format(
-                memberDocumenters[-1].rstCrossReferenceString))
             result.append('')    
         return result
 
@@ -820,7 +825,8 @@ class ClassDocumenter(ObjectDocumenter):
         result = []
         if self.baseClasses:
             banner = '{0} bases'.format(self.rstCrossReferenceString)
-            result.extend(self.makeHeading(banner, 3))
+            result.extend(self.makeRubric(banner))
+            #result.extend(self.makeHeading(banner, 3))
             for class_documenter in self.baseClassDocumenters:
                 result.append('- {0}'.format(
                     class_documenter.rstCrossReferenceString))
@@ -845,7 +851,8 @@ class ClassDocumenter(ObjectDocumenter):
         if result:
             banner = '{0} instance variables'.format(
                 self.rstCrossReferenceString)
-            result = self.makeHeading(banner, 3) + result
+            result = self.makeRubric(banner) + result
+            #result = self.makeHeading(banner, 3) + result
         return result
 
     @property
@@ -859,17 +866,15 @@ class ClassDocumenter(ObjectDocumenter):
                 banner = 'Instance variables inherited from {0}:'.format(
                     baseDocumenter.rstCrossReferenceString)
                 result.extend((banner, ''))
-                formatString = '\t:attr:`~{0}.{1}`'
-                formatStringWithComma = '{0},'.format(formatString)
-                for attrName in attrNames[:-1]:
-                    result.append(formatStringWithComma.format(
+                result.append('.. hlist::')
+                result.append('   :columns: 3')
+                result.append('')
+                formatString = '   - :attr:`~{0}.{1}`'
+                for attrName in attrNames:
+                    result.append(formatString.format(
                         baseDocumenter.referentPackagesystemPath,
                         attrName,
                         ))
-                result.append(formatString.format(
-                    baseDocumenter.referentPackagesystemPath,
-                    attrNames[-1],
-                    ))
                 result.append('')
         return result
 
@@ -979,7 +984,8 @@ class ClassDocumenter(ObjectDocumenter):
         result.extend(self.rstInheritedMethodsFormat)
         if result:
             banner = '{0} methods'.format(self.rstCrossReferenceString)
-            result = self.makeHeading(banner, 3) + result
+            #result = self.makeHeading(banner, 3) + result
+            result = self.makeRubric(banner) + result
         return result
 
     @property
@@ -1064,7 +1070,7 @@ class ClassDocumenter(ObjectDocumenter):
         if result:
             banner = '{0} read-only properties'.format(
                 self.rstCrossReferenceString)
-            result = self.makeHeading(banner, 3) + result
+            result = self.makeRubric(banner) + result
         return result
 
     @property
@@ -1091,7 +1097,7 @@ class ClassDocumenter(ObjectDocumenter):
         if result:
             banner = '{0} read/write properties'.format(
                 self.rstCrossReferenceString)
-            result = self.makeHeading(banner, 3) + result
+            result = self.makeRubric(banner) + result
         return result
 
     @property
