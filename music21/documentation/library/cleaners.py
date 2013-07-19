@@ -38,6 +38,22 @@ class Cleaner(object):
             os.remove(filePath)
 
 
+class CorpusReferenceCleaner(Cleaner):
+    '''
+    Cleans the corpus reference rst file.
+    '''
+
+    ### SPECIAL METHODS ###
+
+    def __call__(self):
+        corpusReferencePath = os.path.join(
+            self.documentationSourcePath,
+            'systemReference',
+            'referenceCorpus.rst',
+            )
+        self.removeFile(corpusReferencePath)
+
+
 class IPythonNotebookCleaner(Cleaner):
     '''
     Cleans rst files generated from IPython notebooks.
@@ -77,7 +93,14 @@ class ModuleReferenceCleaner(Cleaner):
                     moduleReferencePath,
                     fileName,
                     )
-                self.removeFile(filePath)
+            elif fileName == 'index.rst':
+                filePath = os.path.join(
+                    moduleReferencePath,
+                    'index.rst',
+                    )
+            else:
+                continue
+            self.removeFile(filePath)
 
 
 if __name__ == '__main__':
