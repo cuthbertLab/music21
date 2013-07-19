@@ -10,6 +10,9 @@
 #-------------------------------------------------------------------------------
 
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
+
 def processDocstring(app, what, name, obj, options, lines):
     '''Process the ``lines`` of each docstring, in place.'''
     #    print

@@ -814,8 +814,7 @@ class ClassDocumenter(ObjectDocumenter):
             >>> for line in documenter.rstBasesFormat:
             ...     line
             ...
-            ':class:`~music21.documentation.library.documenters.ClassDocumenter` bases'
-            '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+            '.. rubric:: :class:`~music21.documentation.library.documenters.ClassDocumenter` bases'
             ''
             '- :class:`~music21.documentation.library.documenters.ObjectDocumenter`'
             '- :class:`~music21.documentation.library.documenters.Documenter`'
@@ -892,7 +891,11 @@ class ClassDocumenter(ObjectDocumenter):
             ...
             'Methods inherited from :class:`~music21.documentation.library.documenters.Documenter`:'
             ''
-            '\t:meth:`~music21.documentation.library.documenters.Documenter.makeHeading`'
+            '.. hlist::'
+            '   :columns: 3'
+            ''
+            '   - :meth:`~music21.documentation.library.documenters.Documenter.makeHeading`'
+            '   - :meth:`~music21.documentation.library.documenters.Documenter.makeRubric`'
             ''
 
         '''
@@ -915,18 +918,27 @@ class ClassDocumenter(ObjectDocumenter):
             ...
             'Read-only properties inherited from :class:`~music21.documentation.library.documenters.MemberDocumenter`:'
             ''
-            '\t:attr:`~music21.documentation.library.documenters.MemberDocumenter.definingClass`,'
-            '\t:attr:`~music21.documentation.library.documenters.MemberDocumenter.memberName`,'
-            '\t:attr:`~music21.documentation.library.documenters.MemberDocumenter.referentPackagesystemPath`'
+            '.. hlist::'
+            '   :columns: 3'
+            ''
+            '   - :attr:`~music21.documentation.library.documenters.MemberDocumenter.definingClass`'
+            '   - :attr:`~music21.documentation.library.documenters.MemberDocumenter.memberName`'
+            '   - :attr:`~music21.documentation.library.documenters.MemberDocumenter.referentPackagesystemPath`'
             ''
             'Read-only properties inherited from :class:`~music21.documentation.library.documenters.ObjectDocumenter`:'
             ''
-            '\t:attr:`~music21.documentation.library.documenters.ObjectDocumenter.referent`,'
-            '\t:attr:`~music21.documentation.library.documenters.ObjectDocumenter.rstCrossReferenceString`'
+            '.. hlist::'
+            '   :columns: 3'
+            ''
+            '   - :attr:`~music21.documentation.library.documenters.ObjectDocumenter.referent`'
+            '   - :attr:`~music21.documentation.library.documenters.ObjectDocumenter.rstCrossReferenceString`'
             ''
             'Read-only properties inherited from :class:`~music21.documentation.library.documenters.Documenter`:'
             ''
-            '\t:attr:`~music21.documentation.library.documenters.Documenter.rstEditingWarningFormat`'
+            '.. hlist::'
+            '   :columns: 3'
+            ''
+            '   - :attr:`~music21.documentation.library.documenters.Documenter.rstEditingWarningFormat`'
             ''
             
         '''
@@ -964,16 +976,19 @@ class ClassDocumenter(ObjectDocumenter):
             >>> for line in documenter.rstMethodsFormat:
             ...     line
             ...
-            ':class:`~music21.documentation.library.documenters.ClassDocumenter` methods'
-            '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+            '.. rubric:: :class:`~music21.documentation.library.documenters.ClassDocumenter` methods'
             ''
             '.. automethod:: music21.documentation.library.documenters.ClassDocumenter.fromIdentityMap'
             ''
             'Methods inherited from :class:`~music21.documentation.library.documenters.Documenter`:'
             ''
-            '\t:meth:`~music21.documentation.library.documenters.Documenter.makeHeading`'
+            '.. hlist::'
+            '   :columns: 3'
             ''
-
+            '   - :meth:`~music21.documentation.library.documenters.Documenter.makeHeading`'
+            '   - :meth:`~music21.documentation.library.documenters.Documenter.makeRubric`'
+            ''
+        
         '''
         result = []
         if self.methods:
@@ -1000,8 +1015,7 @@ class ClassDocumenter(ObjectDocumenter):
             >>> for line in documenter.rstReadonlyPropertiesFormat:
             ...     line
             ...
-            ':class:`~music21.documentation.library.documenters.ClassDocumenter` read-only properties'
-            '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+            '.. rubric:: :class:`~music21.documentation.library.documenters.ClassDocumenter` read-only properties'
             ''
             '.. autoattribute:: music21.documentation.library.documenters.ClassDocumenter.baseClassDocumenters'
             ''
@@ -1051,14 +1065,20 @@ class ClassDocumenter(ObjectDocumenter):
             ''
             'Read-only properties inherited from :class:`~music21.documentation.library.documenters.ObjectDocumenter`:'
             ''
-            '\t:attr:`~music21.documentation.library.documenters.ObjectDocumenter.referent`,'
-            '\t:attr:`~music21.documentation.library.documenters.ObjectDocumenter.rstCrossReferenceString`'
+            '.. hlist::'
+            '   :columns: 3'
+            ''
+            '   - :attr:`~music21.documentation.library.documenters.ObjectDocumenter.referent`'
+            '   - :attr:`~music21.documentation.library.documenters.ObjectDocumenter.rstCrossReferenceString`'
             ''
             'Read-only properties inherited from :class:`~music21.documentation.library.documenters.Documenter`:'
             ''
-            '\t:attr:`~music21.documentation.library.documenters.Documenter.rstEditingWarningFormat`'
+            '.. hlist::'
+            '   :columns: 3'
             ''
-
+            '   - :attr:`~music21.documentation.library.documenters.Documenter.rstEditingWarningFormat`'
+            ''
+        
         '''
         result = []
         if self.readonlyProperties:

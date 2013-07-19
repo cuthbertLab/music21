@@ -13,7 +13,21 @@ import os
 import types
 
 
-class IPythonNotebookIterator(object):
+class Iterator(object):
+
+    ### INITIALIZER ###
+
+    def __init__(self, verbose=True):
+        self._verbose = verbose
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def verbose(self):
+        return self._verbose
+
+
+class IPythonNotebookIterator(Iterator):
     '''
     Iterates over music21's documentation directory, yielding .ipynb files.
     '''
@@ -39,13 +53,13 @@ class IPythonNotebookIterator(object):
                     yield filePath
         
 
-class ModuleIterator(object):
+class ModuleIterator(Iterator):
     '''
     Iterates over music21's packagesystem, yielding module objects:
 
     ::
 
-        >>> iterator = documentation.ModuleIterator()
+        >>> iterator = documentation.ModuleIterator(verbose=False)
         >>> modules = [x for x in iterator]
         >>> for module in modules[:8]:
         ...     module.__name__
@@ -113,8 +127,9 @@ class ModuleIterator(object):
                     if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE', False):
                         # Skip examining any other file or directory below
                         # this directory.
-                        print '\tIGNORED {0}/*'.format(
-                            os.path.relpath(directoryPath))
+                        if self.verbose:
+                            print '\tIGNORED {0}/*'.format(
+                                os.path.relpath(directoryPath))
                         directoryNames[:] = []
                         continue
                 except:
@@ -133,8 +148,9 @@ class ModuleIterator(object):
                         module = __import__(packagesystemPath, fromlist=['*'])
                         if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE',
                             False):
-                            print '\tIGNORED {0}'.format(
-                                os.path.relpath(filePath))
+                            if self.verbose:
+                                print '\tIGNORED {0}'.format(
+                                    os.path.relpath(filePath))
                             continue
                         yield module
                     except:
@@ -142,13 +158,15 @@ class ModuleIterator(object):
         raise StopIteration
 
 
-class CodebaseIterator(object):
+class CodebaseIterator(Iterator):
     '''
     Iterate over music21's packagesystem, yielding all classes and functions.
     '''
 
+    ### SPECIAL METHODS ###
+
     def __iter__(self):
-        for module in ModuleIterator():
+        for module in ModuleIterator(verbose=self.verbose):
             for name in dir(module):
                 if name.startswith('_'):
                     continue
@@ -160,13 +178,13 @@ class CodebaseIterator(object):
         raise StopIteration
 
 
-class ClassIterator(object):
+class ClassIterator(Iterator):
     '''
     Iterates over music21's packagesystem, yielding all classes discovered:
 
     ::
 
-        >>> iterator = documentation.ClassIterator()
+        >>> iterator = documentation.ClassIterator(verbose=False)
         >>> classes = [x for x in iterator]
         >>> for cls in classes[:10]:
         ...     cls
@@ -187,19 +205,19 @@ class ClassIterator(object):
     ### SPECIAL METHODS ###
 
     def __iter__(self):
-        for x in CodebaseIterator():
+        for x in CodebaseIterator(verbose=self.verbose):
             if isinstance(x, (type, types.ClassType)):
                 yield x
         raise StopIteration
 
 
-class FunctionIterator(object):
+class FunctionIterator(Iterator):
     '''
     Iterates over music21's packagesystem, yielding all functions discovered:
 
     ::
 
-        >>> iterator = documentation.FunctionIterator()
+        >>> iterator = documentation.FunctionIterator(verbose=False)
         >>> functions = [x for x in iterator]
         >>> for function in functions[:10]:
         ...     function.__module__, function.__name__
@@ -220,7 +238,7 @@ class FunctionIterator(object):
     ### SPECIAL METHODS ###
 
     def __iter__(self):
-        for x in CodebaseIterator():
+        for x in CodebaseIterator(verbose=self.verbose):
             if isinstance(x, types.FunctionType):
                 yield x
         raise StopIteration
