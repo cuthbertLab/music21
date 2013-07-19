@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         convertIPythonNotebooksToReST.py
-# Purpose:      music21 documentation IPython notebook to ReST converter
+# Name:         documentation/make.py
+# Purpose:      music21 documentation script, v. 2.0
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
@@ -11,10 +11,13 @@
 #-------------------------------------------------------------------------------
 
 import os
-import sphinx
 import sys
 import webbrowser
 
+try:
+    import sphinx
+except ImportError:
+    raise ImportError("Sphinx is required to build documentation; download from http://sphinx-doc.org")
 
 def _main(buildFormat):
     from music21 import documentation

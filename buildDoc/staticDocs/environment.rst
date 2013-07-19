@@ -88,10 +88,10 @@ Setting the `writeFormat` key will set the default output format of all calls to
 Setting the `directoryScratch` key will determine where the file is written. If this setting is not made, the file will be written in a system-specified scratch directory. While useful, such temporary files and directories may be buried deeply in your file system.
 
 
-`parseURL()` and `parseWork()` Functions and 'autoDownload'
+`parseURL()` and `parse()` Functions and 'autoDownload'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`~music21.converter.parseURL` function, as well as the :func:`~music21.corpus.base.parseWork` function, offer the ability to download a files directly directly from the internet.
+The :func:`~music21.converter.parseURL` function, as well as the :func:`~music21.corpus.base.parse` function, offer the ability to download a files directly directly from the internet.
 
 Users may configure the 'autoDownload' key to determine whether downloading is attempted automatically without prompting the user ('allow'), whether the user is asked first before attempting a download ('ask'), or whether downloading is prohibited ('deny').
 

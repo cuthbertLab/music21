@@ -28,7 +28,7 @@ class IPythonNotebookIterator(object):
             'documentation',
             'source',
             )
-        for directoryPath, directoryNames, fileNames in os.walk(
+        for directoryPath, unused_directoryNames, fileNames in os.walk(
             documentationPath):
             for fileName in fileNames:
                 if fileName.endswith('.ipynb'):
@@ -47,7 +47,7 @@ class ModuleIterator(object):
 
         >>> iterator = documentation.ModuleIterator()
         >>> modules = [x for x in iterator]
-        >>> for module in modules[:10]:
+        >>> for module in modules[:8]:
         ...     module.__name__
         ...
         'music21.articulations'
@@ -56,8 +56,6 @@ class ModuleIterator(object):
         'music21.beam'
         'music21.chant'
         'music21.chord'
-        'music21.chordTables'
-        'music21.classCache'
         'music21.clef'
         'music21.common'
 
@@ -76,9 +74,13 @@ class ModuleIterator(object):
 
     _ignoredFileNames = (
         'base-archive.py',
+        'chordTables.py',
+        'classCache.py',
+        'configure.py',
         'exceldiff.py',
         'phrasing.py',
         'testFiles.py',
+        'xmlnode.py',
         )
 
     ### SPECIAL METHODS ###
@@ -96,8 +98,8 @@ class ModuleIterator(object):
                 directoryNames.remove(directoryName)
             for fileName in fileNames:
                 if fileName not in self._ignoredFileNames and \
-                    not fileName.startswith('_') and \
-                    fileName.endswith('.py'):
+                        not fileName.startswith('_') and \
+                        fileName.endswith('.py'):
                     filePath = os.path.join(directoryPath, fileName)
                     strippedPath = filePath.partition(rootFilesystemPath)[2]
                     pathParts = os.path.splitext(strippedPath)[0].split(
@@ -180,10 +182,10 @@ class FunctionIterator(object):
         ('music21.chant', 'fromStream')
         ('music21.chord', 'fromForteClass')
         ('music21.chord', 'fromIntervalVector')
-        ('music21.chordTables', 'addressToCommonNames')
-        ('music21.chordTables', 'addressToForteName')
-        ('music21.chordTables', 'addressToIntervalVector')
-        ('music21.chordTables', 'addressToNormalForm')
+        ('music21.clef', 'clefFromString')
+        ('music21.common', 'almostEquals')
+        ('music21.common', 'almostEquals')
+        ('music21.common', 'approximateGCD')
 
     '''
     

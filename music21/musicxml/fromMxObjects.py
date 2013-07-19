@@ -2008,7 +2008,13 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                 if mxStaffDetails._attr['number'] is not None:
                     for stl in staffLayoutObjects:
                         if stl.staffNumber == int(mxStaffDetails._attr['number']):
-                            stl.staffSize = float(mxStaffDetails.staffSize)
+                            try:
+                                stl.staffSize = float(mxStaffDetails.staffSize)
+                            except TypeError:
+                                if mxStaffDetails.staffSize is None:
+                                    pass
+                                else:
+                                    raise TypeError("Incorrect number for mxStaffDetails.staffSize: %s", mxStaffDetails.staffSize)
                             foundMatch = True
                             break
                 else:

@@ -9,7 +9,7 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-import abc
+import abc  # n.b. -- abstract base class, not music21.abc
 import inspect
 import re
 import types

@@ -11,7 +11,8 @@ Music21 is an open-source toolkit for Computer-aided musicology.  It is licensed
 About the Authors
 -----------------------
 
-**Michael Cuthbert**, the creator of music21, is Homer A. Burnell Associate Professor of Music at M.I.T.  
+**Michael Cuthbert**, the creator of music21, is Homer A. Burnell Career Development Professor
+and Associate Professor of Music at M.I.T.  
 He received his A.B. *summa cum laude*, A.M. and Ph.D. degrees from Harvard University.   
 Cuthbert spent 2004-05 at the American Academy as a Rome Prize winner in Medieval Studies,
 2009-10 as Fellow at Harvard's Villa I Tatti Center for Italian Renaissance Studies 
@@ -143,21 +144,22 @@ Licensing and Copyright
 The music21 Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright (c) 2010, the music21 Project (Michael Scott Cuthbert, Principal Investigator).  Music21 code (excluding content encoded in the corpus) is free and open-source software, licensed under the Lesser GNU Public License (LGPL).
+Music21 is Copyright (c) 2010-13, Michael Scott Cuthbert and the music21 Project.  Music21 code (excluding content encoded in the corpus) is 
+free and open-source software, licensed under the Lesser GNU Public License (LGPL).
 The complete license is included as music21/license.txt and can be found at the following URL:
 
   http://www.gnu.org/copyleft/lesser.html
 
 While you're legally bound by the rules above, in a nutshell here's what the LGPL means: 
 You can download music21 for free, give a copy of it to your friends, make your great discovery about Buxtehude
-or Britney with it and owe us nothing.  (Though [sniff, sniff] I'd think a footnote of thanks to music21 in your 
+or Beyonce with it and owe us nothing.  (Though [sniff, sniff] I'd think a footnote of thanks to music21 in your 
 eventual publication or on your website would be a pretty nice thing to do, no?  the authors also enjoy a nice scotch,
 if you're feeling really generous).  You can even make money off of music21 by making your own projects that use it.
 
 But there are some responsibilities you have: if you alter music21 itself, you must release it under the LGPL
 license itself (note that we're bound by the same responsibility!) -- meaning your version must also be free and 
-open source.  You can link to music21 in your own proprietary closed-source code.  
-So if you want to make money off of a great closed-source software notation package that uses music21, go ahead! But 
+open source.  You can link to music21 in your own proprietary closed-source code,
+so if you want to make money off of a great closed-source software notation package that uses music21, go ahead! But 
 the version of music21 distributed with your software must be editable by users.  So if you use music21 to provide
 sound for a closed-source demonstration, I should be able to hack the version of music21 used by your demo to change 
 the base tuning, etc.  In sum: linking to music21 in closed-source applications = good.  embedding/altering music21 
@@ -167,18 +169,12 @@ itself in closed-source apps = illegal.
 The music21 Corpus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The LGPL music21 software is distributed with a corpus of encoded compositions which are distributed with the permission of the encoders (and, where needed, the composers or arrangers) and where permitted under United States copyright law. Some encodings included in the corpus may not be used for commercial uses or have other restrictions: please see the licenses embedded in individual compositions or directories for more details.   
+The LGPL music21 software is distributed with a corpus of encoded compositions which are distributed 
+with the permission of the encoders (and, where needed, the composers or arrangers) and where permitted 
+under United States copyright law. Some encodings included in the corpus may not be used for commercial uses 
+or have other restrictions: please see the licenses embedded in individual compositions or directories for more details.   
 
-To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright in the United States and/or are licensed for non-commercial use. These works, along with any works linked to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in error regarding one or more works please contact Michael Cuthbert at the address provided on the contact page.
-
-
-
-
-
-
-
-
-
-
-
-
+To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright 
+in the United States and/or are licensed for non-commercial use. These works, along with any works linked 
+to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in 
+error regarding one or more works please contact Michael Cuthbert at the address provided on the contact page.

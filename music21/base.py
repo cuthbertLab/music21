@@ -5567,6 +5567,9 @@ def mainTest(*testClasses):
     Unless 'noDocTest' is passed as a module, a docTest
     is also performed on `__main__`, hence the name "mainTest".
     
+    If 'moduleRelative' (a string) is passed as a module, then
+    global variables are preserved.
+    
     Run example (put at end of your modules):
     
     ::
