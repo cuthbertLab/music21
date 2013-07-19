@@ -47,9 +47,9 @@ class ReSTWriter(object):
         if shouldWrite:
             with open(filePath, 'w') as f:
                 f.write(rst)
-            print 'WROTE   {0}'.format(os.path.relpath(filePath))
+            print '\tWROTE   {0}'.format(os.path.relpath(filePath))
         else:
-            print 'SKIPPED {0}'.format(os.path.relpath(filePath))
+            print '\tSKIPPED {0}'.format(os.path.relpath(filePath))
 
 
 class ModuleReferenceReSTWriter(ReSTWriter):
@@ -138,7 +138,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
             self._convertOneNotebook(ipythonNotebookFilePath)
             self._cleanupNotebookAssets(ipythonNotebookFilePath)
-            print 'WROTE   {0}'.format(os.path.relpath(
+            print '\tWROTE   {0}'.format(os.path.relpath(
                 ipythonNotebookFilePath))
 
     ### PRIVATE METHODS ###

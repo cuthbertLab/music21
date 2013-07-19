@@ -10,6 +10,7 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 # Group elements that are beamed together...
 

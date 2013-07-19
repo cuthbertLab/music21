@@ -18,6 +18,7 @@ from music21 import environment
 _MOD = 'abc.testFiles.py'
 environLocal = environment.Environment(_MOD)
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 # http://abcnotation.com/tunePage?a=www.folkwiki.se/pub/cache/_Fyrareprisarn_0bf5b5/0001

@@ -8,6 +8,7 @@
 
 import unittest
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 chantQuemQueritis = """<?xml version="1.0" standalone="no"?>

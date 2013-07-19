@@ -37,6 +37,7 @@ from music21 import exceptions21
 _MOD = "configure.py"
 environLocal = environment.Environment(_MOD)
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else

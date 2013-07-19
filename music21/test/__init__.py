@@ -4,6 +4,8 @@ __all__ = ["test", "testDocumentation", "testExternal", "testPerformance", "time
 
 import testStream
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
 #------------------------------------------------------------------------------
 # eof
 

@@ -21,6 +21,7 @@ from music21 import environment
 _MOD = "chordTables.py"
 environLocal = environment.Environment(_MOD)
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 class ChordTablesException(exceptions21.Music21Exception):

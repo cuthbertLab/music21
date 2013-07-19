@@ -17,6 +17,7 @@ from music21 import environment
 _MOD = 'musedata.testFiles.py'
 environLocal = environment.Environment(_MOD)
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 # http://www.musedata.org/cgi-bin/mddata?composer=bach&edition=bg&genre=cant&work=0005&format=stage2&movement=03

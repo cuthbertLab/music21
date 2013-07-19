@@ -15,7 +15,7 @@ import types
 
 class IPythonNotebookIterator(object):
     '''
-    Iterates over music21's documentation directory, yielding *.ipynb files.
+    Iterates over music21's documentation directory, yielding .ipynb files.
     '''
 
     ### SPECIAL METHODS ###
@@ -73,14 +73,21 @@ class ModuleIterator(object):
         )
 
     _ignoredFileNames = (
+    
+        # These modules will crash the module iterator if imported:
+
         'base-archive.py',
-        'chordTables.py',
-        'classCache.py',
-        'configure.py',
         'exceldiff.py',
-        'phrasing.py',
-        'testFiles.py',
-        'xmlnode.py',
+
+        # These modules are now handled by the _DOC_IGNORE_MODULE_OR_PACKAGE
+        # flag:
+        
+        #'chordTables.py',
+        #'classCache.py',
+        #'configure.py',
+        #'phrasing.py',
+        #'testFiles.py',
+        #'xmlnode.py',
         )
 
     ### SPECIAL METHODS ###
@@ -96,18 +103,39 @@ class ModuleIterator(object):
                     directoryNamesToRemove.append(directoryName)
             for directoryName in directoryNamesToRemove:
                 directoryNames.remove(directoryName)
+            if '__init__.py' in fileNames:
+                strippedPath = directoryPath.partition(rootFilesystemPath)[2]
+                pathParts = [x for x in strippedPath.split(os.path.sep) if x]
+                pathParts.insert(0, 'music21')
+                packagesystemPath = '.'.join(pathParts)
+                try:
+                    module = __import__(packagesystemPath, fromlist=['*'])
+                    if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE', False):
+                        # Skip examining any other file or directory below
+                        # this directory.
+                        print '\tIGNORED {0}/*'.format(
+                            os.path.relpath(directoryPath))
+                        directoryNames[:] = []
+                        continue
+                except:
+                    pass
             for fileName in fileNames:
                 if fileName not in self._ignoredFileNames and \
                         not fileName.startswith('_') and \
                         fileName.endswith('.py'):
                     filePath = os.path.join(directoryPath, fileName)
                     strippedPath = filePath.partition(rootFilesystemPath)[2]
-                    pathParts = os.path.splitext(strippedPath)[0].split(
-                        os.path.sep)[1:]
+                    pathParts = [x for x in os.path.splitext(
+                        strippedPath)[0].split(os.path.sep)[1:] if x]
                     pathParts = ['music21'] + pathParts
                     packagesystemPath = '.'.join(pathParts)
                     try:
                         module = __import__(packagesystemPath, fromlist=['*'])
+                        if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE',
+                            False):
+                            print '\tIGNORED {0}'.format(
+                                os.path.relpath(filePath))
+                            continue
                         yield module
                     except:
                         pass

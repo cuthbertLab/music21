@@ -13,6 +13,7 @@
 '''
 import unittest
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 monteverdi_3_13 = """

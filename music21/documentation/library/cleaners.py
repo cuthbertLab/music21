@@ -34,7 +34,7 @@ class Cleaner(object):
 
     def removeFile(self, filePath):
         if os.path.exists(filePath):
-            print 'CLEANING:', filePath
+            print '\tCLEANED {0}'.format(os.path.relpath(filePath))
             os.remove(filePath)
 
 

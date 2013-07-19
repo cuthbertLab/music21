@@ -26,6 +26,8 @@ from music21 import environment
 _MOD = "classCache.py"  
 environLocal = environment.Environment(_MOD)
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
 class ClassCacheException(exceptions21.Music21Exception):
     pass
 

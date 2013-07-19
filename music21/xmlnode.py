@@ -26,6 +26,8 @@ from music21 import exceptions21
 
 _MOD = 'xmlnode.py'
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
 # these module-level dictionaries cache used xml name conversion
 # store converted names for reuse
 _cacheNameFromXml = {}
