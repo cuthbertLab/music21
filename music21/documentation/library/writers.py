@@ -192,11 +192,14 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             # Correct the image path in each ReST image directive:
             elif currentLine.startswith('.. image:: '):
                 imageFileName = currentLine.partition('.. image:: ')[2]
-                newImageDirective = '.. image:: {0}/{1}'.format(
-                    imageFileDirectoryName,
-                    imageFileName,
-                    )
-                newLines.append(newImageDirective)
+                if '/' not in currentLine:
+                    newImageDirective = '.. image:: {0}/{1}'.format(
+                        imageFileDirectoryName,
+                        imageFileName,
+                        )
+                    newLines.append(newImageDirective)
+                else:
+                    newLines.append(currentLine)
                 currentLineNumber += 1
             # Otherwise, nothing special to do, just add the line to our results:
             else:
