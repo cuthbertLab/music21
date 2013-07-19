@@ -1187,8 +1187,10 @@ class ModuleDocumenter(ObjectDocumenter):
         result.extend(self.makeHeading(self.referentPackagesystemPath, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstAutodocDirectiveFormat)
-        for functionDocumenter in self.functionDocumenters:
-            result.extend(functionDocumenter())
+        if self.functionDocumenters:
+            result.extend(self.makeHeading('Functions', 2))
+            for functionDocumenter in self.functionDocumenters:
+                result.extend(functionDocumenter())
         for classDocumenter in self.classDocumenters:
             result.extend(classDocumenter())
         return result
