@@ -20,14 +20,14 @@ anaconda distribution of python...
     Downloading/unpacking music21
       Downloading music21-1.5.0.tar.gz (29.6MB): 29.6MB downloaded
       Running setup.py egg_info for package music21
-        
+
         warning: no files found matching '*.pdf' anywhere in distribution
         no previously-included directories found matching 'dist'
         no previously-included directories found matching 'buildDoc'
         no previously-included directories found matching 'obsolete'
     Installing collected packages: music21
       Running setup.py install for music21
-        
+
         warning: no files found matching '*.pdf' anywhere in distribution
         no previously-included directories found matching 'dist'
         no previously-included directories found matching 'buildDoc'

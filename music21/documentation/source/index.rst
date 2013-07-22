@@ -4,27 +4,27 @@ Music21 Documentation
 =====================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    about/index
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    overview/index
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    installing/index
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    usersGuide/index
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    tutorials/index
 
@@ -34,12 +34,12 @@ Music21 Documentation
    systemReference/index
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    moduleReference/index
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    developerReference/index
 
