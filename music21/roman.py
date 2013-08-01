@@ -95,8 +95,8 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is omitted,
     the root of the chord is considered the key (if the chord has a major third, it's major;
-    otherwise it's minor).
-    
+    otherwise it's minor):
+
     ::
 
         >>> rn = roman.romanNumeralFromChord(chord.Chord(['E-3','C4','G-6']), key.Key('g#'))
@@ -164,6 +164,8 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
         >>> rn8 = roman.romanNumeralFromChord(chord.Chord(['A#4','C#5','E#5']), key.Key('c'))
         >>> rn8
         <music21.roman.RomanNumeral #vi in c minor>
+
+    OMIT_FROM_DOCS
 
 #    >>> rn9 = roman.romanNumeralFromChord(chord.Chord(['C4','E5','G5', 'C#6', 'C7', 'C#8']), key.Key('C'))
 #    >>> rn9
@@ -586,7 +588,6 @@ class RomanNumeral(harmony.Harmony):
         ['D5', 'F#5', 'A5']
     
     TODO: this should give a minor chord soon.
-    
 
     ::
     
@@ -798,7 +799,7 @@ class RomanNumeral(harmony.Harmony):
 
     OMIT_FROM_DOCS
 
-    Things that were giving us trouble
+    Things that were giving us trouble:
 
     ::
 
@@ -846,15 +847,18 @@ class RomanNumeral(harmony.Harmony):
         >>> r = roman.RomanNumeral('vio', em)
         >>> [str(p) for p in r.pitches]
         ['C#5', 'E5', 'G5']
-        '''
+    
+    '''
 
-    frontFlat = re.compile('^(b+)')
-    frontFlatAlt = re.compile('^(\-+)')
-    frontSharp = re.compile('^(\#+)')
-    romanNumerals = re.compile('(i?v?i*)', re.IGNORECASE)
-    secondarySlash = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
-    omitNotes = re.compile('\[no([1-9])no([1-9])\]')
-    omitNote = re.compile('\[no([1-9])\]')
+    _frontFlatRegex = re.compile('^(b+)')
+    _frontFlatAltRegex = re.compile('^(\-+)')
+    _frontSharpRegex = re.compile('^(\#+)')
+    _romanNumeralsRegex = \
+        re.compile('(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N|Fr|Ger|It|Sw)')
+    #_romanNumeralsRegex = re.compile('(i?v?i*)', re.IGNORECASE)
+    _secondarySlashRegex = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
+    _omitNotesRegex = re.compile('\[no([1-9])no([1-9])\]')
+    _omitNoteRegex = re.compile('\[no([1-9])\]')
     
     _DOC_ATTR = {
                  'scaleCardinality': 'probably you should not need to change this, but stores how many notes are in the scale; defaults to 7 for diatonic, obviously',
@@ -973,7 +977,7 @@ class RomanNumeral(harmony.Harmony):
         else:
             useScale = self.impliedScale
 
-        hasSecondary = self.secondarySlash.match(self._figure)
+        hasSecondary = self._secondarySlashRegex.match(self._figure)
         
         if hasSecondary:
             primaryFigure = hasSecondary.group(1)
@@ -997,15 +1001,15 @@ class RomanNumeral(harmony.Harmony):
             self.primaryFigure = workingFigure 
 
         ## TODO -- make a while...
-        omit = self.omitNotes.search(workingFigure)
+        omit = self._omitNotesRegex.search(workingFigure)
         if omit:
             omit = [int(omit.group(1)), int(omit.group(2))]
-            workingFigure = self.omitNotes.sub('', workingFigure)
+            workingFigure = self._omitNotesRegex.sub('', workingFigure)
         else:
-            omit = self.omitNote.search(workingFigure)
+            omit = self._omitNoteRegex.search(workingFigure)
             if omit:
                 omit = [int(omit.group(1))]
-                workingFigure = self.omitNote.sub('', workingFigure)
+                workingFigure = self._omitNoteRegex.sub('', workingFigure)
             else:
                 omit = []
         
@@ -1016,30 +1020,30 @@ class RomanNumeral(harmony.Harmony):
         workingFigure = re.sub('^N', 'bII', workingFigure)
         
         frontAlterationString = "" # the b in bVI, or the # in #vii
-        if self.frontFlat.match(workingFigure):
-            fm = self.frontFlat.match(workingFigure)
+        if self._frontFlatRegex.match(workingFigure):
+            fm = self._frontFlatRegex.match(workingFigure)
             flatAlteration = len(fm.group(1))
             transposeInterval = interval.intervalFromGenericAndChromatic(
                 interval.GenericInterval(1), 
                 interval.ChromaticInterval(-1 * flatAlteration))
             scaleAlter = pitch.Accidental(-1 * flatAlteration)
-            workingFigure = self.frontFlat.sub('', workingFigure)
+            workingFigure = self._frontFlatRegex.sub('', workingFigure)
             frontAlterationString = fm.group(0)
-        elif self.frontFlatAlt.match(workingFigure):
-            fm = self.frontFlatAlt.match(workingFigure)
+        elif self._frontFlatAltRegex.match(workingFigure):
+            fm = self._frontFlatAltRegex.match(workingFigure)
             flatAlteration = len(fm.group(1))
             transposeInterval = interval.intervalFromGenericAndChromatic(
                 interval.GenericInterval(1), interval.ChromaticInterval(-1 * flatAlteration))
             scaleAlter = pitch.Accidental(-1 * flatAlteration)
-            workingFigure = self.frontFlatAlt.sub('', workingFigure)
+            workingFigure = self._frontFlatAltRegex.sub('', workingFigure)
             frontAlterationString = fm.group(0)
-        elif self.frontSharp.match(workingFigure):
-            sm = self.frontSharp.match(workingFigure)
+        elif self._frontSharpRegex.match(workingFigure):
+            sm = self._frontSharpRegex.match(workingFigure)
             sharpAlteration = len(sm.group(1))
             transposeInterval = interval.intervalFromGenericAndChromatic(
                 interval.GenericInterval(1), interval.ChromaticInterval(1 * sharpAlteration))
             scaleAlter = pitch.Accidental(sharpAlteration)
-            workingFigure = self.frontSharp.sub('', workingFigure)
+            workingFigure = self._frontSharpRegex.sub('', workingFigure)
             frontAlterationString = sm.group(0)
         else: 
             transposeInterval = None
@@ -1049,13 +1053,13 @@ class RomanNumeral(harmony.Harmony):
         self.frontAlterationTransposeInterval = transposeInterval
         self.frontAlterationAccidental = scaleAlter
         romanNumeralAlone = ""
-        if not self.romanNumerals.match(workingFigure):
+        if not self._romanNumeralsRegex.match(workingFigure):
             raise RomanException("No roman numeral found in %s " % (workingFigure))
         else:
-            rm = self.romanNumerals.match(workingFigure)
+            rm = self._romanNumeralsRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)
             self.scaleDegree = common.fromRoman(romanNumeralAlone)
-            workingFigure = self.romanNumerals.sub('', workingFigure)
+            workingFigure = self._romanNumeralsRegex.sub('', workingFigure)
             self.romanNumeralAlone = romanNumeralAlone
  
         workingFigure = self._setImpliedQualityFromString(workingFigure)
