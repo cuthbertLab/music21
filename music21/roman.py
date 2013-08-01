@@ -848,6 +848,14 @@ class RomanNumeral(harmony.Harmony):
         >>> [str(p) for p in r.pitches]
         ['C#5', 'E5', 'G5']
     
+    We can omit an arbitrary number of steps:
+
+    ::
+
+        >>> r = roman.RomanNumeral('Vd7[no3no5no7]', key.Key('C'))
+        >>> [str(pitch) for pitch in r.pitches]
+        ['G4']
+
     '''
 
     _frontFlatRegex = re.compile('^(b+)')
@@ -857,8 +865,9 @@ class RomanNumeral(harmony.Harmony):
         re.compile('(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N|Fr|Ger|It|Sw)')
     #_romanNumeralsRegex = re.compile('(i?v?i*)', re.IGNORECASE)
     _secondarySlashRegex = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
-    _omitNotesRegex = re.compile('\[no([1-9])no([1-9])\]')
-    _omitNoteRegex = re.compile('\[no([1-9])\]')
+    _omittedStepsRegex = re.compile('(\[(no[1-9])+\])')
+    #_omitNotesRegex = re.compile('\[no([1-9])no([1-9])\]')
+    #_omitNoteRegex = re.compile('\[no([1-9])\]')
     
     _DOC_ATTR = {
                  'scaleCardinality': 'probably you should not need to change this, but stores how many notes are in the scale; defaults to 7 for diatonic, obviously',
@@ -967,7 +976,7 @@ class RomanNumeral(harmony.Harmony):
 
     def _parseFigure(self):
         '''
-        Parse the .figure object in its component parts.
+        Parse the .figure object into its component parts.
         '''
         if not common.isStr(self._figure):
             raise RomanException('got a non-string figure: %r', self._figure)
@@ -1001,24 +1010,27 @@ class RomanNumeral(harmony.Harmony):
             self.primaryFigure = workingFigure 
 
         ## TODO -- make a while...
-        omit = self._omitNotesRegex.search(workingFigure)
-        if omit:
-            omit = [int(omit.group(1)), int(omit.group(2))]
-            workingFigure = self._omitNotesRegex.sub('', workingFigure)
-        else:
-            omit = self._omitNoteRegex.search(workingFigure)
-            if omit:
-                omit = [int(omit.group(1))]
-                workingFigure = self._omitNoteRegex.sub('', workingFigure)
-            else:
-                omit = []
-        
-        self.omittedSteps = omit
+        omittedSteps = []
+        match = self._omittedStepsRegex.search(workingFigure)
+        if match:
+            omittedSteps = [int(x) for x in match.group()[1:-1].split('no')
+                if x]
+            workingFigure = self._omittedStepsRegex.sub('', workingFigure)
+#        match = self._omitNotesRegex.search(workingFigure)
+#        if match:
+#            omittedSteps = [int(match.group(1)), int(match.group(2))]
+#            workingFigure = self._omitNotesRegex.sub('', workingFigure)
+#        else:
+#            match = self._omitNoteRegex.search(workingFigure)
+#            if match:
+#                omittedSteps = [int(match.group(1))]
+#                workingFigure = self._omitNoteRegex.sub('', workingFigure)
+        self.omittedSteps = omittedSteps
         
         flatAlteration = 0
         sharpAlteration = 0
         workingFigure = re.sub('^N', 'bII', workingFigure)
-        
+         
         frontAlterationString = "" # the b in bVI, or the # in #vii
         if self._frontFlatRegex.match(workingFigure):
             fm = self._frontFlatRegex.match(workingFigure)
@@ -1058,21 +1070,26 @@ class RomanNumeral(harmony.Harmony):
         else:
             rm = self._romanNumeralsRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)
-            self.scaleDegree = common.fromRoman(romanNumeralAlone)
+            if romanNumeralAlone in ('Fr', 'Ger', 'It', 'Sw'):
+                self.scaleDegree = 6
+            else:
+                self.scaleDegree = common.fromRoman(romanNumeralAlone)
             workingFigure = self._romanNumeralsRegex.sub('', workingFigure)
             self.romanNumeralAlone = romanNumeralAlone
  
         workingFigure = self._setImpliedQualityFromString(workingFigure)
     
         # make vii always #vii and vi always #vi
-        if self.frontAlterationString == "" and hasattr(useScale, 'mode') and \
-             useScale.mode == 'minor' and self.caseMatters == True:
+        if self.frontAlterationString == "" \
+            and hasattr(useScale, 'mode') \
+            and useScale.mode == 'minor' \
+            and self.caseMatters == True:
             if self.scaleDegree == 6 and \
-                  (self.impliedQuality == 'minor' or self.impliedQuality =='diminished' or self.impliedQuality == 'half-diminished'):
+                (self.impliedQuality == 'minor' or self.impliedQuality =='diminished' or self.impliedQuality == 'half-diminished'):
                 self.frontAlterationTransposeInterval = interval.Interval('A1')
                 self.frontAlterationAccidental = pitch.Accidental(1)
             elif self.scaleDegree == 7 and \
-                  (self.impliedQuality == 'minor' or self.impliedQuality =='diminished' or self.impliedQuality == 'half-diminished'):
+                (self.impliedQuality == 'minor' or self.impliedQuality =='diminished' or self.impliedQuality == 'half-diminished'):
                 self.frontAlterationTransposeInterval = interval.Interval('A1')
                 self.frontAlterationAccidental = pitch.Accidental(1)
                 if self.impliedQuality == 'minor':
