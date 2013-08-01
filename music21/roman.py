@@ -189,7 +189,7 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     else:
         isMajorThird = False
 
-    if isMajorThird is True:
+    if isMajorThird:
         rootkeyObj = key.Key(root.name, mode='major')
     else:
         rootkeyObj = key.Key(root.name.lower(), mode='minor')
@@ -203,7 +203,7 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     elif fifthType == 8:
         fifthName = '+'
     else:
-        fifthName = ""
+        fifthName = ''
 
     (stepNumber, alter, rootAlterationString, unused) = figureTupletSolo(root, keyObj, keyObj.tonic)
 
@@ -231,15 +231,15 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
         alteredKeyObj = key.Key(transposeInterval.transposePitch(keyObj.tonic), rootkeyObj.mode)
     
     stepRoman = common.toRoman(stepNumber)
-    if isMajorThird is True:
+    if isMajorThird:
         pass
-    elif isMajorThird is False:
+    elif not isMajorThird:
         stepRoman = stepRoman.lower()
     inversionString = figureFromChordAndKey(chordObj, alteredKeyObj)
 
     if len(inversionString) > 0 and inversionString[0] == 'o':
         if fifthName == 'o':  # don't call viio7, viioo7.
-            fifthName = ""
+            fifthName = ''
     #print (inversionString, fifthName)
     rnString = rootAlterationString + stepRoman + fifthName + inversionString
     try:
@@ -308,7 +308,7 @@ def figureTupletSolo(pitchObj, keyObj, bass):
     thisInterval = interval.notesToInterval(bass, pitchObj)
     aboveBass = thisInterval.diatonic.generic.mod7
     if scaleAccidental is None:
-        rootAlterationString = ""
+        rootAlterationString = ''
         alterDiff = 0.0
     else:
         alterDiff = scaleAccidental.alter
@@ -318,7 +318,7 @@ def figureTupletSolo(pitchObj, keyObj, bass):
         elif alter > 0:
             rootAlterationString = "#" * alter
         else:
-            rootAlterationString = ""
+            rootAlterationString = ''
 
     appendTuple = (aboveBass, alterDiff, rootAlterationString, pitchObj)
     return appendTuple
@@ -400,7 +400,7 @@ def figureFromChordAndKey(chordObj, keyObj=None):
         if diatonicIntervalNum != 1 and pitchObj is third:
             if chordObj.isMajorTriad() or chordObj.isMinorTriad():
                 alterStr = '' #alterStr[1:]
-            elif chordObj.isMinorTriad() is True and alter > 0:
+            elif chordObj.isMinorTriad() and alter > 0:
                 alterStr = '' #alterStr[1:]
         elif diatonicIntervalNum != 1 and pitchObj is fifth:
             if chordObj.isDiminishedTriad() or chordObj.isAugmentedTriad() or \
@@ -861,13 +861,10 @@ class RomanNumeral(harmony.Harmony):
     _frontFlatRegex = re.compile('^(b+)')
     _frontFlatAltRegex = re.compile('^(\-+)')
     _frontSharpRegex = re.compile('^(\#+)')
-    _romanNumeralsRegex = \
+    _romanNumeralAloneRegex = \
         re.compile('(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N|Fr|Ger|It|Sw)')
-    #_romanNumeralsRegex = re.compile('(i?v?i*)', re.IGNORECASE)
     _secondarySlashRegex = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
     _omittedStepsRegex = re.compile('(\[(no[1-9])+\])')
-    #_omitNotesRegex = re.compile('\[no([1-9])no([1-9])\]')
-    #_omitNoteRegex = re.compile('\[no([1-9])\]')
     
     _DOC_ATTR = {
                  'scaleCardinality': 'probably you should not need to change this, but stores how many notes are in the scale; defaults to 7 for diatonic, obviously',
@@ -915,7 +912,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         if self.secondaryRomanNumeralKey  is not None:
             useScale = self.secondaryRomanNumeralKey 
-        elif self.useImpliedScale is False:
+        elif not self.useImpliedScale:
             useScale = self._scale
         else:
             useScale = self.impliedScale
@@ -979,19 +976,23 @@ class RomanNumeral(harmony.Harmony):
         Parse the .figure object into its component parts.
         '''
         if not common.isStr(self._figure):
-            raise RomanException('got a non-string figure: %r', self._figure)
+            raise RomanException('got a non-string figure: {!r}'.format(
+                self._figure))
 
-        if self.useImpliedScale is False:
+        if not self.useImpliedScale:
             useScale = self._scale
         else:
             useScale = self.impliedScale
 
         hasSecondary = self._secondarySlashRegex.match(self._figure)
-        
         if hasSecondary:
             primaryFigure = hasSecondary.group(1)
             secondaryFigure = hasSecondary.group(2)
-            secRoman = RomanNumeral(secondaryFigure, useScale, self.caseMatters)
+            secRoman = RomanNumeral(
+                secondaryFigure, 
+                useScale, 
+                self.caseMatters,
+                )
             self.secondaryRomanNumeral = secRoman
             if secRoman.quality == 'minor':
                 secondaryMode = 'minor'
@@ -1001,37 +1002,30 @@ class RomanNumeral(harmony.Harmony):
                 secondaryMode = 'minor'
             else:
                 secondaryMode = 'major'
-            self.secondaryRomanNumeralKey  = key.Key(secRoman.root().name, secondaryMode)
+            self.secondaryRomanNumeralKey = key.Key(
+                secRoman.root().name, 
+                secondaryMode,
+                )
             useScale = self.secondaryRomanNumeralKey 
             workingFigure = primaryFigure
-            self.primaryFigure = primaryFigure
         else:
             workingFigure = self._figure
-            self.primaryFigure = workingFigure 
+        self.primaryFigure = workingFigure 
 
-        ## TODO -- make a while...
         omittedSteps = []
         match = self._omittedStepsRegex.search(workingFigure)
         if match:
             omittedSteps = [int(x) for x in match.group()[1:-1].split('no')
                 if x]
             workingFigure = self._omittedStepsRegex.sub('', workingFigure)
-#        match = self._omitNotesRegex.search(workingFigure)
-#        if match:
-#            omittedSteps = [int(match.group(1)), int(match.group(2))]
-#            workingFigure = self._omitNotesRegex.sub('', workingFigure)
-#        else:
-#            match = self._omitNoteRegex.search(workingFigure)
-#            if match:
-#                omittedSteps = [int(match.group(1))]
-#                workingFigure = self._omitNoteRegex.sub('', workingFigure)
         self.omittedSteps = omittedSteps
+
+        # Replace Neapolitan indication.
+        workingFigure = re.sub('^N', 'bII', workingFigure)
         
         flatAlteration = 0
         sharpAlteration = 0
-        workingFigure = re.sub('^N', 'bII', workingFigure)
-         
-        frontAlterationString = "" # the b in bVI, or the # in #vii
+        frontAlterationString = '' # the b in bVI, or the # in #vii
         if self._frontFlatRegex.match(workingFigure):
             fm = self._frontFlatRegex.match(workingFigure)
             flatAlteration = len(fm.group(1))
@@ -1060,36 +1054,36 @@ class RomanNumeral(harmony.Harmony):
         else: 
             transposeInterval = None
             scaleAlter = None
-       
         self.frontAlterationString = frontAlterationString
         self.frontAlterationTransposeInterval = transposeInterval
         self.frontAlterationAccidental = scaleAlter
-        romanNumeralAlone = ""
-        if not self._romanNumeralsRegex.match(workingFigure):
-            raise RomanException("No roman numeral found in %s " % (workingFigure))
+
+        romanNumeralAlone = ''
+        if not self._romanNumeralAloneRegex.match(workingFigure):
+            raise RomanException('No roman numeral found in {}'.format(
+                workingFigure))
         else:
-            rm = self._romanNumeralsRegex.match(workingFigure)
+            rm = self._romanNumeralAloneRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)
             if romanNumeralAlone in ('Fr', 'Ger', 'It', 'Sw'):
                 self.scaleDegree = 6
             else:
                 self.scaleDegree = common.fromRoman(romanNumeralAlone)
-            workingFigure = self._romanNumeralsRegex.sub('', workingFigure)
+            workingFigure = self._romanNumeralAloneRegex.sub('', workingFigure)
             self.romanNumeralAlone = romanNumeralAlone
  
         workingFigure = self._setImpliedQualityFromString(workingFigure)
     
-        # make vii always #vii and vi always #vi
-        if self.frontAlterationString == "" \
-            and hasattr(useScale, 'mode') \
-            and useScale.mode == 'minor' \
-            and self.caseMatters == True:
-            if self.scaleDegree == 6 and \
-                (self.impliedQuality == 'minor' or self.impliedQuality =='diminished' or self.impliedQuality == 'half-diminished'):
+        # Make vii always #vii and vi always #vi.
+        if self.frontAlterationString == '' \
+            and getattr(useScale, 'mode', None) == 'minor' \
+            and self.caseMatters:
+            if self.scaleDegree == 6 and self.impliedQuality in (
+                'minor', 'diminished', 'half-diminished'):
                 self.frontAlterationTransposeInterval = interval.Interval('A1')
                 self.frontAlterationAccidental = pitch.Accidental(1)
-            elif self.scaleDegree == 7 and \
-                (self.impliedQuality == 'minor' or self.impliedQuality =='diminished' or self.impliedQuality == 'half-diminished'):
+            if self.scaleDegree == 7 and self.impliedQuality in (
+                'minor', 'diminished', 'half-diminished'):
                 self.frontAlterationTransposeInterval = interval.Interval('A1')
                 self.frontAlterationAccidental = pitch.Accidental(1)
                 if self.impliedQuality == 'minor':
@@ -1100,7 +1094,8 @@ class RomanNumeral(harmony.Harmony):
         self.figuresNotationObj = fbNotation.Notation(shfig)
 
     def _setImpliedQualityFromString(self, workingFigure):
-        impliedQuality = '' # major, minor, augmented, or diminished (and half-diminished for 7ths)
+        # major, minor, augmented, or diminished (and half-diminished for 7ths)
+        impliedQuality = ''
         impliedQualitySymbol = ''
         if workingFigure.startswith('o'):
             workingFigure = workingFigure[1:]
@@ -1115,7 +1110,7 @@ class RomanNumeral(harmony.Harmony):
             impliedQuality = 'augmented'
             impliedQualitySymbol = '+'
         elif workingFigure.endswith('d7'):
-            ## this one is different
+            # this one is different
             workingFigure = workingFigure[:-2] + '7'
             impliedQuality = 'dominant-seventh'
             impliedQualitySymbol = '(dom7)'        
@@ -1164,9 +1159,9 @@ class RomanNumeral(harmony.Harmony):
                 continue
             if thisSemis != thisCorrect:
                 faultyPitch = self.getChordStep(thisChordStep)
-                if faultyPitch == None:
+                if faultyPitch is None:
                     raise RomanException("this is very odd...")
-                if faultyPitch.accidental == None:
+                if faultyPitch.accidental is None:
                     faultyPitch.accidental = pitch.Accidental(thisCorrect - thisSemis)
                 else:
                     acc = faultyPitch.accidental
@@ -1197,7 +1192,7 @@ class RomanNumeral(harmony.Harmony):
     
     def _setFigure(self, newFigure):
         self._figure = newFigure
-        if self._parsingComplete is True:
+        if self._parsingComplete:
             self._parseFigure()
             self._updatePitches()
 
@@ -1219,7 +1214,7 @@ class RomanNumeral(harmony.Harmony):
         tonic = self.key.tonic
         if hasattr(tonic, 'name'):
             tonic = tonic.name
-        mode = ""
+        mode = ''
         if hasattr(self.key, 'mode'):
             mode = " " + self.key.mode
         elif self.key.__class__.__name__ == 'MajorScale':
@@ -1277,9 +1272,9 @@ class RomanNumeral(harmony.Harmony):
 
         self._scale = keyOrScale
         if keyOrScale is None or (hasattr(keyOrScale, "isConcrete") and 
-            keyOrScale.isConcrete == False):
+            not keyOrScale.isConcrete):
             self.useImpliedScale = True
-            if self._scale != None:
+            if self._scale is not None:
                 self.impliedScale = self._scale.derive(1, 'C')
             else:
                 self.impliedScale = scale.MajorScale('C')
@@ -1287,7 +1282,7 @@ class RomanNumeral(harmony.Harmony):
             self.useImpliedScale = False        
         # need to permit object creation with no arguments, thus
         # self._figure can be None
-        if self._parsingComplete == True:
+        if self._parsingComplete:
             self._updatePitches()
         #environLocal.printDebug(['Roman.setKeyOrScale:', 'called w/ scale', self.key, 'figure', self.figure, 'pitches', self.pitches])
 
@@ -1361,7 +1356,7 @@ class RomanNumeral(harmony.Harmony):
     def _setScaleDegreeWithAlteration(self, scaleDegree, alteration):
         self.scaleDegree = scaleDegree
         self.frontAlterationAccidental = alteration
-        if self._parsingComplete is True:
+        if self._parsingComplete:
             self._updatePitches()
     
     scaleDegreeWithAlteration = property(_getScaleDegreeWithAlteration, _setScaleDegreeWithAlteration, doc='''
