@@ -28,22 +28,23 @@ def getDirBuildHtml():
     dirBuildHtml = os.path.join(dirBuild, 'html')
     return dirBuildHtml
 
-
-# this needs to be on level higher then the level of the source
-DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc'
-
-print('provide user name (not password):')
-user = getpass.getpass()
-
-
-src = getDirBuildHtml()
-
-
-# -r flag makes this recursive
-cmdStr = 'scp -r %s %s@%s' % (src, user, DST_MIT)
-print(cmdStr)
-
-os.system(cmdStr)
-
-
-
+if __name__ == '__main__':
+    
+    # this needs to be on level higher then the level of the source
+    DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc'
+    
+    print('provide user name (not password):')
+    user = getpass.getpass()
+    
+    
+    src = getDirBuildHtml()
+    
+    
+    # -r flag makes this recursive
+    cmdStr = 'scp -r %s %s@%s' % (src, user, DST_MIT)
+    print(cmdStr)
+    
+    os.system(cmdStr)
+    
+    
+    
