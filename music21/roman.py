@@ -858,19 +858,17 @@ class RomanNumeral(harmony.Harmony):
 
     '''
 
-    _frontFlatRegex = re.compile('^(b+)')
-    _frontFlatAltRegex = re.compile('^(\-+)')
-    _frontSharpRegex = re.compile('^(\#+)')
+    _alterationRegex = re.compile('^(b+|\-+|\#+)')
     _romanNumeralAloneRegex = \
         re.compile('(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N|Fr|Ger|It|Sw)')
     _secondarySlashRegex = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
     _omittedStepsRegex = re.compile('(\[(no[1-9])+\])')
     
     _DOC_ATTR = {
-                 'scaleCardinality': 'probably you should not need to change this, but stores how many notes are in the scale; defaults to 7 for diatonic, obviously',
-                 'caseMatters': 'boolean to determine whether the case (upper or lowercase) of the figure determines whether it is major or minor.  Defaults to True; not everything has been tested with False yet',
-                 'pivotChord': 'default None: if not None, stores another interpretation of the same RN in a different key; stores a RomanNumeral object'
-                 }
+        'scaleCardinality': 'probably you should not need to change this, but stores how many notes are in the scale; defaults to 7 for diatonic, obviously',
+        'caseMatters': 'boolean to determine whether the case (upper or lowercase) of the figure determines whether it is major or minor.  Defaults to True; not everything has been tested with False yet',
+        'pivotChord': 'default None: if not None, stores another interpretation of the same RN in a different key; stores a RomanNumeral object'
+        }
 
     def __init__(self, figure=None, keyOrScale=None, caseMatters = True):
         self.primaryFigure = None
@@ -984,26 +982,26 @@ class RomanNumeral(harmony.Harmony):
         else:
             useScale = self.impliedScale
 
-        hasSecondary = self._secondarySlashRegex.match(self._figure)
-        if hasSecondary:
-            primaryFigure = hasSecondary.group(1)
-            secondaryFigure = hasSecondary.group(2)
-            secRoman = RomanNumeral(
+        match = self._secondarySlashRegex.match(self._figure)
+        if match:
+            primaryFigure = match.group(1)
+            secondaryFigure = match.group(2)
+            secondaryRomanNumeral = RomanNumeral(
                 secondaryFigure, 
                 useScale, 
                 self.caseMatters,
                 )
-            self.secondaryRomanNumeral = secRoman
-            if secRoman.quality == 'minor':
+            self.secondaryRomanNumeral = secondaryRomanNumeral
+            if secondaryRomanNumeral.quality == 'minor':
                 secondaryMode = 'minor'
-            elif secRoman.quality == 'major':
+            elif secondaryRomanNumeral.quality == 'major':
                 secondaryMode = 'major'
-            elif secRoman.semitonesFromChordStep(3) == 3:
+            elif secondaryRomanNumeral.semitonesFromChordStep(3) == 3:
                 secondaryMode = 'minor'
             else:
                 secondaryMode = 'major'
             self.secondaryRomanNumeralKey = key.Key(
-                secRoman.root().name, 
+                secondaryRomanNumeral.root().name, 
                 secondaryMode,
                 )
             useScale = self.secondaryRomanNumeralKey 
@@ -1023,40 +1021,27 @@ class RomanNumeral(harmony.Harmony):
         # Replace Neapolitan indication.
         workingFigure = re.sub('^N', 'bII', workingFigure)
         
-        flatAlteration = 0
-        sharpAlteration = 0
         frontAlterationString = '' # the b in bVI, or the # in #vii
-        if self._frontFlatRegex.match(workingFigure):
-            fm = self._frontFlatRegex.match(workingFigure)
-            flatAlteration = len(fm.group(1))
-            transposeInterval = interval.intervalFromGenericAndChromatic(
-                interval.GenericInterval(1), 
-                interval.ChromaticInterval(-1 * flatAlteration))
-            scaleAlter = pitch.Accidental(-1 * flatAlteration)
-            workingFigure = self._frontFlatRegex.sub('', workingFigure)
-            frontAlterationString = fm.group(0)
-        elif self._frontFlatAltRegex.match(workingFigure):
-            fm = self._frontFlatAltRegex.match(workingFigure)
-            flatAlteration = len(fm.group(1))
-            transposeInterval = interval.intervalFromGenericAndChromatic(
-                interval.GenericInterval(1), interval.ChromaticInterval(-1 * flatAlteration))
-            scaleAlter = pitch.Accidental(-1 * flatAlteration)
-            workingFigure = self._frontFlatAltRegex.sub('', workingFigure)
-            frontAlterationString = fm.group(0)
-        elif self._frontSharpRegex.match(workingFigure):
-            sm = self._frontSharpRegex.match(workingFigure)
-            sharpAlteration = len(sm.group(1))
-            transposeInterval = interval.intervalFromGenericAndChromatic(
-                interval.GenericInterval(1), interval.ChromaticInterval(1 * sharpAlteration))
-            scaleAlter = pitch.Accidental(sharpAlteration)
-            workingFigure = self._frontSharpRegex.sub('', workingFigure)
-            frontAlterationString = sm.group(0)
-        else: 
-            transposeInterval = None
-            scaleAlter = None
+        frontAlterationTransposeInterval = None
+        frontAlterationAccidental = None
+        match = self._alterationRegex.match(workingFigure)
+        if match:
+            group = match.group()
+            alteration = len(group)
+            if group[0] in ('b', '-'):
+                alteration *= -1
+            frontAlterationTransposeInterval = \
+                interval.intervalFromGenericAndChromatic(
+                interval.GenericInterval(1),
+                interval.ChromaticInterval(alteration),
+                )
+            frontAlterationAccidental = pitch.Accidental(alteration)
+            frontAlterationString = group
+            workingFigure = self._alterationRegex.sub('', workingFigure)
         self.frontAlterationString = frontAlterationString
-        self.frontAlterationTransposeInterval = transposeInterval
-        self.frontAlterationAccidental = scaleAlter
+        self.frontAlterationTransposeInterval = \
+            frontAlterationTransposeInterval
+        self.frontAlterationAccidental = frontAlterationAccidental
 
         romanNumeralAlone = ''
         if not self._romanNumeralAloneRegex.match(workingFigure):
