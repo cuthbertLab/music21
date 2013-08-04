@@ -45,7 +45,6 @@ def offsetToMidi(o):
     
     Returns an int.
     
-    
     >>> print defaults.ticksPerQuarter
     1024
     >>> midi.translate.offsetToMidi(20.5)
@@ -59,14 +58,13 @@ def durationToMidi(d):
     
     Depends on *defaults.ticksPerQuarter*, Returns an int.
     
-    
     >>> n = note.Note()
     >>> n.duration.type = 'half'
     >>> midi.translate.durationToMidi(n.duration)
     2048
     
     >>> d = duration.Duration()
-    >>> dReference = midi.translate.midiToDuration(1024, inputM21DurationObject=d)
+    >>> dReference = midi.translate.midiToDuration(1024, inputM21DurationObject = d)
     >>> dReference is d
     True
     >>> d.type
@@ -89,7 +87,6 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     than the default.ticksPerQuarter (1024) is used in this file.  And
     it can take a :class:`~music21.duration.Duration` object to modify, specified
     as *inputM21DurationObject*
-    
     
     
     >>> d = midi.translate.midiToDuration(1024)
@@ -137,8 +134,6 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     d._componentsNeedUpdating = True
     d._quarterLengthNeedsUpdating = False
     return d
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -230,7 +225,6 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     It is assumed, but not checked, that midiEvent2 is an appropriate Note_Off command.  Thus, only
     three elements are really needed.
 
-
     The `inputM21` parameter can be a Note or None; in the case of None, a Note object is created.
     In either case it returns a Note (N.B.: this will change soon so that None will be returned
     if `inputM21` is given.  This will match the behavior of other translate objects).
@@ -240,8 +234,6 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
 
     In this example, we start a NOTE_ON event at offset 1.0 that lasts for 2.0 quarter notes until we
     send a zero-velocity NOTE_ON (=NOTE_OFF) event for the same pitch.
-
-    
 
     >>> mt = midi.MidiTrack(1)
     >>> dt1 = midi.DeltaTime(mt)
@@ -333,7 +325,6 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     
     The `channel` can be specified, otherwise channel 1 is assumed.
 
-    
     >>> n1 = note.Note('C#4')
     >>> eventList = midi.translate.noteToMidiEvents(n1)
     >>> eventList
@@ -411,7 +402,6 @@ def noteToMidiFile(inputM21):
     Converts a single Music21 Note to an entire :class:`~music21.midi.base.MidiFile` object
     with one track, on channel 1.
 
-    
     >>> n1 = note.Note('C4')
     >>> n1.quarterLength = 6
     >>> mf = midi.translate.noteToMidiFile(n1)
@@ -447,7 +437,6 @@ def noteToMidiFile(inputM21):
     return mf
 
 
-
 #-------------------------------------------------------------------------------
 # Chords
 # TODO: add velocity reading and writing
@@ -459,8 +448,6 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     for details.
     
     All DeltaTime objects except the first are ignored.
-    
-
     
     >>> mt = midi.MidiTrack(1)
 
@@ -479,7 +466,6 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> me2.type = "NOTE_ON"
     >>> me2.pitch = 46
     >>> me2.velocity = 94
-
 
     >>> dt3 = midi.DeltaTime(mt)
     >>> dt3.time = 2048
@@ -566,7 +552,6 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     
     See noteToMidiEvents above for more details.
 
-    
     >>> c = chord.Chord(['c3','g#4', 'b5'])
     >>> c.volume = volume.Volume(velocity=90)
     >>> c.volume.velocityIsRelative = False
@@ -656,7 +641,6 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     return eventList 
 
 
-
 def chordToMidiFile(inputM21): 
     '''
     Similar to `noteToMidiFile`, translates a Chord to a 
@@ -677,7 +661,6 @@ def chordToMidiFile(inputM21):
     mf.tracks = [mt]
     mf.ticksPerQuarterNote = defaults.ticksPerQuarter
     return mf
-
 
 
 #-------------------------------------------------------------------------------
@@ -704,15 +687,26 @@ def instrumentToMidiEvents(inputM21, includeDeltaTime=True,
     return events
 
 
-
 #-------------------------------------------------------------------------------
 # Meta events
 
+def midiEventsToInstrument(eventList):
+    '''
+    Convert a single MIDI event into a music21 Instrument object.
+    '''
+    if not common.isListLike(eventList):
+        event = eventList
+    else: # get the second event; first is delta time
+        event = eventList[1]
+
+    from music21 import instrument
+    i = instrument.instrumentFromMidiProgram(event.data)
+    return i
+    
 def midiEventsToTimeSignature(eventList):
     '''
     Convert a single MIDI event into a music21 TimeSignature object.
 
-    
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = "TIME_SIGNATURE"
@@ -771,7 +765,6 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
 
     Returns a two-element list
 
-    
     >>> ts = meter.TimeSignature('5/4')
     >>> eventList = midi.translate.timeSignatureToMidiEvents(ts)
     >>> eventList[0]
@@ -808,7 +801,6 @@ def midiEventsToKeySignature(eventList):
     '''
     Convert a single MIDI event into a :class:`~music21.key.KeySignature` object.
 
-    
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = "KEY_SIGNATURE"
@@ -869,7 +861,6 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     where the first is an empty DeltaTime (unless includeDeltaTime is False) and the second
     is a KEY_SIGNATURE :class:`~music21.midi.base.MidiEvent`
 
-    
     >>> ks = key.KeySignature(2)
     >>> ks
     <music21.key.KeySignature of 2 sharps>
@@ -930,7 +921,6 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     r'''
     Given any TempoIndication, convert it to a MIDI tempo indication. 
 
-    
     >>> mm = tempo.MetronomeMark(number=90)
     >>> events = midi.translate.tempoToMidiEvents(mm)
     >>> events[0]
@@ -1228,7 +1218,6 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
                     obj=None, lastInstrument=None)
                 post.append(pgmChangePacket)
 
-
         else: # use the existing channel
             ch = p['midiEvent'].channel
             # always set corresponding event to the same channel
@@ -1274,7 +1263,6 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
     #environLocal.printDebug(['foundChannels', foundChannels])
     #environLocal.printDebug(['usedTracks', usedTracks])
 
-
     # post processing of entire packet collection
     # for all used channels, create a zero pitch bend at time zero
     #for ch in foundChannels:
@@ -1302,7 +1290,6 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
 
     #post = packets
     return post
-
 
 
 def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
@@ -1374,13 +1361,11 @@ def packetsToMidiTrack(packets, trackId=1, channels=None):
     return mt
 
 
-
 def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     inputM21=None):
     '''
     Note that quantization takes place in stream.py since it's useful not just for MIDI.
 
-    
     >>> import os
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
     >>> mf = midi.MidiFile()
@@ -1490,7 +1475,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 # TODO import instrument object
                 pass
             elif e.type == 'PROGRAM_CHANGE':
-                pass
+                metaEvents.append([t, midiEventsToInstrument(e)])
             elif e.type == 'MIDI_PORT':
                 pass
             else:
@@ -1848,7 +1833,6 @@ def streamToMidiFile(inputM21):
     '''
     Converts a Stream hierarchy into a :class:`~music21.midi.base.MidiFile` object.
     
-    
     >>> s = stream.Stream()
     >>> n = note.Note('g#')
     >>> n.quarterLength = .5
@@ -1890,7 +1874,6 @@ def midiFilePathToStream(filePath, inputM21=None):
     return a :class:`~music21.stream.Score` object (or if inputM21 is passed in,
     use that object instead).
     
-    
     >>> import os #_DOCS_HIDE
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid') #_DOCS_HIDE
     >>> #_DOCS_SHOW fp = '/Users/test/music21/midi/testPrimitive/test05.mid'
@@ -1922,7 +1905,6 @@ def midiFileToStream(mf, inputM21=None):
     
     The `inputM21` object can specify an existing Stream (or Stream subclass) to fill.
 
-    
     >>> import os
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
     >>> mf = midi.MidiFile()
@@ -1957,7 +1939,6 @@ def midiFileToStream(mf, inputM21=None):
     return s
 
 
-
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
@@ -1975,12 +1956,10 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(eventList[0], midiModule.DeltaTime), True)
         self.assertEqual(isinstance(eventList[2], midiModule.DeltaTime), True)
 
-
         # translate eventList back to a note
         n2 = midiEventsToNote(eventList)
         self.assertEqual(n2.pitch.nameWithOctave, 'A4')
         self.assertEqual(n2.quarterLength, 2.0)
-
 
     def testTimeSignature(self):
         from music21 import note, stream, meter
@@ -2007,10 +1986,6 @@ class Test(unittest.TestCase):
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=5120, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
         self.assertEqual(str(mtAlt.events), match)
 
-
-
-
-
     def testKeySignature(self):
         from music21 import note, stream, meter, key
         n = note.Note()
@@ -2032,8 +2007,6 @@ class Test(unittest.TestCase):
 
         #s.show('midi')
         unused_mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature'))[0]
-
-
 
     def testAnacrusisTiming(self):
 
@@ -2059,7 +2032,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(mta.events[:10]), match)
 
-
         # try streams to midi tracks
         # get just the soprano part
         soprano = s.parts['soprano']
@@ -2070,8 +2042,6 @@ class Test(unittest.TestCase):
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>]"""
 
         self.assertEqual(str(mtList[0].events[:12]), match)
-
-
 
     def testMidiProgramChangeA(self):
         from music21 import stream, instrument, note
@@ -2096,7 +2066,6 @@ class Test(unittest.TestCase):
         #p1.show()
         #s.show('midi')
 
-
     def testMidiProgramChangeB(self):
 
         from music21 import stream, instrument, note, scale
@@ -2120,8 +2089,6 @@ class Test(unittest.TestCase):
 
         #s.show('midi')
 
-
-
     def testOverlappedEventsA(self):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
@@ -2133,7 +2100,6 @@ class Test(unittest.TestCase):
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=65, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=58, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=54, velocity=90>, <MidiEvent DeltaTime, t=1024, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=58, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
 
         self.assertEqual(str(mtList[0].events[-20:]), match)
-
 
     def testOverlappedEventsB(self):
         from music21 import stream, scale, note
@@ -2272,8 +2238,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[1].getChannels(),  [1, 2])
 
-
-
     def testMicrotonalOutputC(self):
         # test instrument assignments
         from music21 import instrument, stream, note
@@ -2301,7 +2265,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[1].getChannels(),  [2])
         self.assertEqual(mts[2].getChannels(),  [3])
         self.assertEqual(mts[3].getChannels(),  [4])
-
 
     def testMicrotonalOutputD(self):
         # test instrument assignments with microtones
@@ -2340,7 +2303,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[3].getProgramChanges(),  [73])
 
         #s.show('midi')
-
 
     def testMicrotonalOutputE(self):
 
@@ -2429,8 +2391,6 @@ class Test(unittest.TestCase):
 
         #post.show('midi', app='Logic Express')
 
-
-
     def testMidiTempoImportA(self):
         import os
         from music21 import converter
@@ -2463,7 +2423,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 180.0)        
 
-
     def testMidiTempoImportB(self):
         import os
         from music21 import converter
@@ -2481,8 +2440,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].getElementsByClass('MetronomeMark')), 4)
         self.assertEqual(len(s.parts[1].getElementsByClass('MetronomeMark')), 0)
         self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 0)
-
-
 
     def testMidiExportConductorA(self):
         '''Testing exporting conductor data to midi
@@ -2524,7 +2481,6 @@ class Test(unittest.TestCase):
         mtsRepr = repr(mts)
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 5)
 
-
     def testMidiExportConductorC(self):
         from music21 import tempo, note, stream
         minTempo = 60
@@ -2539,8 +2495,6 @@ class Test(unittest.TestCase):
         mts = streamHierarchyToMidiTracks(s)
         mtsRepr = repr(mts)
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 100)
-
-
 
     def testMidiExportVelocityA(self):
         from music21 import note, stream
@@ -2604,7 +2558,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mtsRepr.count('velocity=102') > 2, True)
         #s.show('midi')
 
-
     def testImportTruncationProblemA(self):
         import os
         from music21 import converter
@@ -2626,7 +2579,6 @@ class Test(unittest.TestCase):
 
         #s.show('t')
         #s.show('midi')
-
 
     def testImportChordVoiceA(self):
         # looking at cases where notes appear to be chord but 
@@ -2651,7 +2603,6 @@ class Test(unittest.TestCase):
         # three chords will be created, as well as two voices
         self.assertEqual(len(s.flat.getElementsByClass('Chord')), 3)
         self.assertEqual(len(s.parts[0].voices), 2)
-
 
     def testImportChordsA(self):
         import os
