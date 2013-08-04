@@ -1843,6 +1843,8 @@ def streamToMidiFile(inputM21):
     >>> len(mf.tracks[0].events)
     22
     
+    From here, you can call mf.writestr() to get the actual file info. 
+    
     >>> sc = scale.PhrygianScale('g')
     >>> s = stream.Stream()
     >>> x=[s.append(note.Note(sc.pitchFromDegree(i % 11), quarterLength=.25)) for i in range(60)]
