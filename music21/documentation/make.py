@@ -115,7 +115,7 @@ def _main(target):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        target = sys.argv[1]
+        target = sys.argv[1]   # to rebuild everything run "make.py clean"
     else:
         target = 'html'
     _main(target)
