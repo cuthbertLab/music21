@@ -940,6 +940,7 @@ class Ambitus(DiscreteAnalysis):
 
         This public method may be used by other classes. 
 
+        ignores ChordSymbol objects...
         
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
@@ -966,7 +967,7 @@ class Ambitus(DiscreteAnalysis):
         for n in ssfn:
             #environLocal.printDebug([n])
             pitches = []
-            if 'Chord' in n.classes:
+            if 'Chord' in n.classes and 'ChordSymbol' not in n.classes:
                 pitches = n.pitches
             elif 'Note' in n.classes:
                 pitches = [n.pitch]
@@ -1417,7 +1418,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testFiles
         # use a musicxml test file with independently confirmed results
-        s = converter.parse(testFiles.edgefield82b)
+        s = converter.parse(testFiles.edgefield82b) # @UndefinedVariable
 
         p = KrumhanslSchmuckler()
         k = p.getSolution(s)
