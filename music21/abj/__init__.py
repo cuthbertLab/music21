@@ -7,3 +7,5 @@ package
 '''
 
 from translate import *
+
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
