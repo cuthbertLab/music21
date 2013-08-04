@@ -938,7 +938,7 @@ class MetricModulation(TempoIndication):
             mm = self._oldMetronome.getMaintainedNumberWithReferent(value)
         else:
             # create a new metronome mark with a referent, but not w/ a value
-            mm = tempo.MetronomeMark(referent=value)
+            mm = MetronomeMark(referent=value)
             #raise MetricModulationException('cannot set old MetronomeMark from provided value.')
         self._newMetronome = mm
 
