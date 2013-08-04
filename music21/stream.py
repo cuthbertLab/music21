@@ -439,18 +439,16 @@ class Stream(base.Music21Object):
 
     def _getElements(self):
         '''
-        Combines the two storage lists, _elements and _endElements, such that they appear as a single list. 
+        Combines the two storage lists, _elements and _endElements, such that 
+        they appear as a single list. 
         '''
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
-
         if 'elements' not in self._cache or self._cache["elements"] is None:
             # this list concatenation may take time; thus, only do when
             # _elementsChanged has been called
             self._cache["elements"] = self._elements + self._endElements
-        return self._cache["elements"]
-
-        #return self._elements + self._endElements
+        return tuple(self._cache["elements"])
    
     def _setElements(self, value):
         '''
@@ -458,23 +456,21 @@ class Stream(base.Music21Object):
         '''
         if (not common.isListLike(value) and hasattr(value, 'isStream') and 
             value.isStream):
-            self._elements = value._elements
+            self._elements = list(value._elements)
             for e in self._elements:
                 e.sites.add(self, e.getOffsetBySite(value))
                 e.activeSite = self
-
             self._endElements = value._endElements
             for e in self._endElements:
                 e.sites.add(self, e.getOffsetBySite(value))
                 e.activeSite = self
-            self._elementsChanged()
         else:
             # replace the complete elements list
-            self._elements = value
+            self._elements = list(value)
             for e in self._elements:
                 e.sites.add(self, e.offset)
                 e.activeSite = self
-            self._elementsChanged()
+        self._elementsChanged()
         return value
         
     elements = property(_getElements, _setElements, 
@@ -489,25 +485,36 @@ class Stream(base.Music21Object):
         from that Stream. This has the advantage of transferring 
         offset correctly and geting _endElements. 
 
-        
-        >>> a = stream.Stream()
-        >>> a.repeatInsert(note.Note("C"), range(10))
-        >>> b = stream.Stream()
-        >>> b.repeatInsert(note.Note("C"), range(10))
-        >>> b.offset = 6
-        >>> c = stream.Stream()
-        >>> c.repeatInsert(note.Note("C"), range(10))
-        >>> c.offset = 12
-        >>> b.insert(c)
-        >>> b.isFlat
-        False
-        >>> a.isFlat
-        True
-        >>> a.elements = b # assigning from a Stream
-        >>> a.isFlat
-        False
-        >>> len(a.flat.notes) == len(b.flat.notes) == 20
-        True
+        ::
+
+            >>> a = stream.Stream()
+            >>> a.repeatInsert(note.Note("C"), range(10))
+            >>> b = stream.Stream()
+            >>> b.repeatInsert(note.Note("C"), range(10))
+            >>> b.offset = 6
+            >>> c = stream.Stream()
+            >>> c.repeatInsert(note.Note("C"), range(10))
+            >>> c.offset = 12
+            >>> b.insert(c)
+            >>> b.isFlat
+            False
+
+        ::
+
+            >>> a.isFlat
+            True
+
+        ::
+
+            >>> a.elements = b # assigning from a Stream
+            >>> a.isFlat
+            False
+
+        ::
+
+            >>> len(a.flat.notes) == len(b.flat.notes) == 20
+            True
+
         ''')
 
     def __setitem__(self, key, value):
@@ -6971,7 +6978,6 @@ class Stream(base.Music21Object):
         sNew.flattenedRepresentationOf = sf.flattenedRepresentationOf
         return sNew
 
-
     def _getFlat(self):
         if 'flat' not in self._cache or self._cache['flat'] is None:
             if 'semiFlat' in self._cache and self._cache['semiFlat'] is not None:
@@ -6994,56 +7000,70 @@ class Stream(base.Music21Object):
         Here is a simple example of the usefulness of .flat.  We
         will create a Score with two Parts in it, each with two Notes:
                 
-        
+        ::
 
-        >>> sc = stream.Score()
-        >>> p1 = stream.Part()
-        >>> p1.id = 'part1'
-        >>> n1 = note.Note('C4')
-        >>> n2 = note.Note('D4')
-        >>> p1.append(n1)
-        >>> p1.append(n2)
+            >>> sc = stream.Score()
+            >>> p1 = stream.Part()
+            >>> p1.id = 'part1'
+            >>> n1 = note.Note('C4')
+            >>> n2 = note.Note('D4')
+            >>> p1.append(n1)
+            >>> p1.append(n2)
         
-        >>> p2 = stream.Part()
-        >>> p2.id = 'part2'
-        >>> n3 = note.Note('E4')
-        >>> n4 = note.Note('F4')
-        >>> p2.append(n3)
-        >>> p2.append(n4)
+        ::
 
-        >>> sc.insert(0, p1)
-        >>> sc.insert(0, p2)
-        
+            >>> p2 = stream.Part()
+            >>> p2.id = 'part2'
+            >>> n3 = note.Note('E4')
+            >>> n4 = note.Note('F4')
+            >>> p2.append(n3)
+            >>> p2.append(n4)
+
+        ::
+
+            >>> sc.insert(0, p1)
+            >>> sc.insert(0, p2)
         
         When we look at sc, we will see only the two parts:
         
-        >>> sc.elements
-        [<music21.stream.Part part1>, <music21.stream.Part part2>]
+        ::
+
+            >>> sc.elements
+            (<music21.stream.Part part1>, <music21.stream.Part part2>)
         
-        we can get at the notes by using the indices of the
+        We can get at the notes by using the indices of the
         stream to get the parts and then looking at the .elements
         there:
         
-        >>> sc[0].elements
-        [<music21.note.Note C>, <music21.note.Note D>]
-        >>> sc.getElementById('part2').elements
-        [<music21.note.Note E>, <music21.note.Note F>]
+        ::
+
+            >>> sc[0].elements
+            (<music21.note.Note C>, <music21.note.Note D>)
+
+        ::
+
+            >>> sc.getElementById('part2').elements
+            (<music21.note.Note E>, <music21.note.Note F>)
         
-        but if we want to get all the notes, the easiest way
+        ...but if we want to get all the notes, the easiest way
         is via calling .flat on sc and looking at the elements
         there:
         
-        >>> sc.flat.elements
-        [<music21.note.Note C>, <music21.note.Note E>, <music21.note.Note D>, <music21.note.Note F>]
+        ::
+
+            >>> sc.flat.elements
+            (<music21.note.Note C>, <music21.note.Note E>, <music21.note.Note D>, <music21.note.Note F>)
         
         Flattening a stream is a great way to get at all the notes in
         a larger piece.  For instance if we load a four-part
         Bach chorale into music21 from the integrated corpus, it
         will appear at first that there are no notes in the piece:
         
-        >>> bwv66 = corpus.parse('bach/bwv66.6')
-        >>> len(bwv66.notes)
-        0
+        ::
+
+            >>> bwv66 = corpus.parse('bach/bwv66.6')
+            >>> len(bwv66.notes)
+            0
         
         This is because all the notes in the piece lie within :class:`music21.stream.Measure`
         objects and those measures lie within :class:`music21.stream.Part`
@@ -7052,9 +7072,11 @@ class Stream(base.Music21Object):
         all the notes in the piece with .flat.notes and then use the
         length of that Stream to count notes:
         
-        >>> bwv66flat = bwv66.flat
-        >>> len(bwv66flat.notes)
-        165
+        ::
+
+            >>> bwv66flat = bwv66.flat
+            >>> len(bwv66flat.notes)
+            165
         
         If you look back to our simple example of four notes above,
         you can see that the E (the first note in part2) comes before the D 
@@ -7062,54 +7084,98 @@ class Stream(base.Music21Object):
         is automatically sorted like all streams are by default.  The
         next example shows how to change this behavior.
         
-        >>> s = stream.Stream()
-        >>> s.autoSort = False
-        >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
-        >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
-        >>> s.isSorted
-        False
-        >>> g = ""
-        >>> for myElement in s:
-        ...    g += "%s: %s; " % (myElement.offset, myElement.name)
-        >>> g
-        '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; '
-        >>> y = s.sorted
-        >>> y.isSorted
-        True
-        >>> g = ""
-        >>> for myElement in y:
-        ...    g += "%s: %s; " % (myElement.offset, myElement.name)
-        >>> g
-        '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
+        ::
 
-        >>> q = stream.Stream()
-        >>> for i in range(5):
-        ...   p = stream.Stream()
-        ...   p.repeatInsert(base.Music21Object(), range(5))
-        ...   q.insert(i * 10, p) 
-        >>> len(q)
-        5
-        >>> qf = q.flat
-        >>> len(qf)        
-        25
-        >>> qf[24].offset
-        44.0
+            >>> s = stream.Stream()
+            >>> s.autoSort = False
+            >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
+            >>> s.repeatInsert(note.Note("D-"), [1, 3, 5])
+            >>> s.isSorted
+            False
+
+        ::
+
+            >>> g = ""
+            >>> for myElement in s:
+            ...    g += "%s: %s; " % (myElement.offset, myElement.name)
+            ...
+
+        ::
+
+            >>> g
+            '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; '
+
+        ::
+
+            >>> y = s.sorted
+            >>> y.isSorted
+            True
+
+        ::
+
+            >>> g = ""
+            >>> for myElement in y:
+            ...    g += "%s: %s; " % (myElement.offset, myElement.name)
+            ...
+
+        ::
+
+            >>> g
+            '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
+
+        ::
+
+            >>> q = stream.Stream()
+            >>> for i in range(5):
+            ...     p = stream.Stream()
+            ...     p.repeatInsert(base.Music21Object(), range(5))
+            ...     q.insert(i * 10, p) 
+            ...
+
+        ::
+
+            >>> len(q)
+            5
+
+        ::
+
+            >>> qf = q.flat
+            >>> len(qf)        
+            25
+
+        ::
+
+            >>> qf[24].offset
+            44.0
 
         OMIT_FROM_DOCS
-        >>> r = stream.Stream()
-        >>> for j in range(5):
-        ...   q = stream.Stream()
-        ...   for i in range(5):
-        ...      p = stream.Stream()
-        ...      p.repeatInsert(base.Music21Object(), range(5))
-        ...      q.insert(i * 10, p) 
-        ...   r.insert(j * 100, q)
-        >>> len(r)
-        5
-        >>> len(r.flat)
-        125
-        >>> r.flat[124].offset
-        444.0
+
+        ::
+
+            >>> r = stream.Stream()
+            >>> for j in range(5):
+            ...   q = stream.Stream()
+            ...   for i in range(5):
+            ...      p = stream.Stream()
+            ...      p.repeatInsert(base.Music21Object(), range(5))
+            ...      q.insert(i * 10, p) 
+            ...   r.insert(j * 100, q)
+
+        ::
+
+            >>> len(r)
+            5
+
+        ::
+
+            >>> len(r.flat)
+            125
+
+        ::
+
+            >>> r.flat[124].offset
+            444.0
+
         ''')
 
 
@@ -7146,7 +7212,7 @@ class Stream(base.Music21Object):
         >>> s.insert(0, p2)
         >>> sf = s.semiFlat
         >>> sf.elements
-        [<music21.stream.Part part1>, <music21.note.Note C>, <music21.stream.Part part2>, <music21.note.Note D>]
+        (<music21.stream.Part part1>, <music21.note.Note C>, <music21.stream.Part part2>, <music21.note.Note D>)
         >>> sf[0]
         <music21.stream.Part part1>
         >>> sf[1]

@@ -21,50 +21,71 @@ from music21 import stream
 
 class PolyphonicSnippet(stream.Score):
     '''
-    a polyphonic snippet is a little Score-ette that represents an incipit or a cadence or something of that sort of a piece
+    A polyphonic snippet is a little Score-ette that represents an incipit or a 
+    cadence or something of that sort of a piece
     
-    it is initialized with the contents of five excel cells -- the first three represent the notation of the 
-    cantus, tenor, and contratenor, respectively.  the fourth is the cadence type (optional), the fifth
-    is the time signature if not the same as the time signature of the parentPiece.
+    It is initialized with the contents of five excel cells -- the first three 
+    represent the notation of the cantus, tenor, and contratenor, respectively.  
     
+    The fourth is the cadence type (optional), the fifth is the time signature 
+    if not the same as the time signature of the parentPiece.
+    
+    ::
 
-    
-    >>> cantus = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
-    >>> tenor = trecento.trecentoCadence.TrecentoCadenceStream("F1. f2. e4. d", '6/8')
-    >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = trecento.cadencebook.BallataSheet().makeWork(3))
-    >>> ps.elements
-    [<music21.metadata.Metadata object at 0x...>, <music21.stream.Part C>, <music21.stream.Part T>]
-    >>> ps.elements[1] is cantus
-    True
-    >>> ps.elements[1].classes
-    ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'object']
-    >>> #_DOCS_SHOW ps.show()
-    
-    
-    
+        >>> cantus = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
+        >>> tenor = trecento.trecentoCadence.TrecentoCadenceStream("F1. f2. e4. d", '6/8')
+        >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = trecento.cadencebook.BallataSheet().makeWork(3))
+        >>> ps.elements
+        (<music21.metadata.Metadata object at 0x...>, <music21.stream.Part C>, <music21.stream.Part T>)
+
+    ::
+
+        >>> ps.elements[1] is cantus
+        True
+
+    ::
+
+        >>> ps.elements[1].classes
+        ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'object']
+
+    ::
+
+        >>> #_DOCS_SHOW ps.show()
+        
     .. image:: images/trecento-polyphonicSnippet1.*
             :width: 450
 
-    
-    
     OMIT_FROM_DOCS
     
-    >>> dummy = trecento.polyphonicSnippet.PolyphonicSnippet()
-    >>> dummy.elements
-    []
-    >>> dumClass = dummy.__class__
-    >>> dumClass
-    <class 'music21.trecento.polyphonicSnippet.PolyphonicSnippet'>
-    >>> dumdum = dumClass()
-    >>> dumdum.__class__
-    <class 'music21.trecento.polyphonicSnippet.PolyphonicSnippet'>
-    >>> ps2 = ps.__class__()
-    >>> ps2.elements
-    []
+    ::
+
+        >>> dummy = trecento.polyphonicSnippet.PolyphonicSnippet()
+        >>> dummy.elements
+        ()
+
+    ::
+
+        >>> dumClass = dummy.__class__
+        >>> dumClass
+        <class 'music21.trecento.polyphonicSnippet.PolyphonicSnippet'>
+
+    ::
+
+        >>> dumdum = dumClass()
+        >>> dumdum.__class__
+        <class 'music21.trecento.polyphonicSnippet.PolyphonicSnippet'>
+
+    ::
+
+        >>> ps2 = ps.__class__()
+        >>> ps2.elements
+        ()
     
-    >>> dummy2 = trecento.polyphonicSnippet.Incipit()
-    >>> dummy2.elements
-    []
+    ::
+
+        >>> dummy2 = trecento.polyphonicSnippet.Incipit()
+        >>> dummy2.elements
+        ()
     
     '''
     snippetName = ""

@@ -37,19 +37,24 @@ class TheoryResult(object):
         self.currentColor = color
 
 class VLQTheoryResult(TheoryResult):
-    _DOC_ATTR = {'vlq': 'The actual :class:`~music21.voiceLeading.VoiceLeadingQuartet` \
-    object associated with this theory result object'}
+    _DOC_ATTR = {
+        'vlq': 'The actual :class:`~music21.voiceLeading.VoiceLeadingQuartet` object associated with this theory result object',
+        }
     def __init__(self, vlq):
         TheoryResult.__init__(self)
         self.vlq = vlq
         
-    def color(self, color='red', noteList = [1,2,3,4]):
+    def color(self, color='red', noteList = (1, 2, 3, 4)):
         '''
         Color the notes in the vlq as specified by noteList, which is a list 
         of numbers 1-4 corresponding to the vlq map: 
-        [ 1  2
-          3  4  ] 
-        default is to color all notes
+
+        ::
+
+            [ 1  2
+              3  4  ] 
+
+        Default is to color all notes
         '''
         self.currentColor = color
         if 1 in noteList:
@@ -83,13 +88,23 @@ class VLQTheoryResult(TheoryResult):
             (miscKey in self.vlq.v2n1.editorial.misc and self.vlq.v2n1.editorial.misc[miscKey] == editorialValue) or \
             (miscKey in self.vlq.v2n2.editorial.misc and self.vlq.v2n2.editorial.misc[miscKey] == editorialValue)
 
-    def markNoteEditorial(self, editorialDictKey, editorialValue, editorialMarkList=[1,2,3,4]):        
+    def markNoteEditorial(self, 
+        editorialDictKey, 
+        editorialValue,
+        editorialMarkList=(1, 2, 3, 4)):
         '''
-        mark each note as specified in editorialMarkList with the editorialValue in editorial.misc[editorialDictKey]
-        editorialMarkList is a list with the notenumber in the voiceleadingquartet to mark.
-        [ 1  2
-          3  4  ]
-        default is to mark all four notes with the editorial
+        Mark each note as specified in editorialMarkList with the 
+        editorialValue in `Editorial.misc[editorialDictKey]`.
+        
+        `editorialMarkList` is a list with the notenumber in the 
+        voiceleadingquartet to mark.
+
+        ::
+
+            [ 1  2
+              3  4  ]
+
+        Default is to mark all four notes with the editorial.
         '''
 
         if 1 in editorialMarkList:

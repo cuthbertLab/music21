@@ -44,103 +44,132 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     
     1. Note names are: a,b,c,d,e,f,g. r indicates a rest, and p indicates a punctus.
     
-    
     2. Note octaves are specified as follows:
-        CC to BB = from C below bass clef to second-line B in bass clef
-        C to B = from bass clef C to B below middle C.
-        c  to b = from middle C to the middle of treble clef
-        c' to b' = from C in treble clef to B above treble clef (make sure you’re NOT putting in smart quotes)
+
+       CC to BB = from C below bass clef to second-line B in bass clef
+       C to B = from bass clef C to B below middle C.
+       c  to b = from middle C to the middle of treble clef
+       c' to b' = from C in treble clef to B above treble clef (make sure you’re NOT putting in smart quotes)
+
     In 14th c. music, C to B and c to b will be most common
     
-    
     3. Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
-    If the accidental is above the staff (i.e., editorial), enclose it in parentheses: (#), etc.  Make sure that flats in the key signatures are explicitly specified.  
+       If the accidental is above the staff (i.e., editorial), enclose it in 
+       parentheses: (#), etc.  Make sure that flats in the key signatures are 
+       explicitly specified.  
     
     
     4. The syntax structure for a mensural note is as follows: pitch(mensuralType)[stems]{flags}
-    A mensuralType may be any of Mx for maxima, L for longa, B for brevis, SB for semibrevis, M for minima, or SM for semimina. 
-    For more information on mensural types, please see the documentation for :class:`music21.medren.generalMensuralNote`.
-    If no mensural type is specified, it is assumed to be the same as the previous note. I.e., c(SB) B c d is a string of semibrevises. 
+       A mensuralType may be any of Mx for maxima, L for longa, B for brevis, SB for semibrevis, M for minima, or SM for semimina. 
+       For more information on mensural types, please see the documentation for :class:`music21.medren.generalMensuralNote`.
+       If no mensural type is specified, it is assumed to be the same as the previous note. I.e., c(SB) B c d is a string of semibrevises. 
     
-    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)')
-    >>> tTNN.note.pitch
-    <music21.pitch.Pitch A4>
-    >>> tTNN.note.mensuralType
-    'minima'
+    ::
+
+        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)')
+        >>> tTNN.note.pitch
+        <music21.pitch.Pitch A4>
+
+    ::
+
+        >>> tTNN.note.mensuralType
+        'minima'
     
     An additional stem may be added by specifying direction: S for a sidestem, D for a downstem, and an empty string to reset. 
     For example, adding [D] to a note string would add a downstem to that note. Stems must still follow the rules outlined in :meth:`music21.medren.MensuralNote.setStem()`.
     
-    
-    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SB)[S]')
-    >>> tTNN.note.getStems()
-    ['side']
-    >>> 
-    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)[D]')
-    >>> tTNN.note.getStems()
-    ['up', 'down']
+    ::
+
+        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SB)[S]')
+        >>> tTNN.note.getStems()
+        ['side']
+
+    ::
+
+        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)[D]')
+        >>> tTNN.note.getStems()
+        ['up', 'down']
     
     A flag may be added by specifying direction of stem and orientation of flag. Valid directions are U for up, D for down, and an empty string to reset (sidestems cannot have flags).
     Valid orietations are L for left, R for right, and an empty string to reset. For example, adding {DL} to a note string would add a left flag to that note's downstem.
     Flags must still follow the rules outlined in :meth:`music21.medren.MensuralNote.setFlag()`.
     
-    
-    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM){UL}')
-    >>> tTNN.note.getStems()
-    ['up']
-    >>> tTNN.note.getFlags()
-    {'up': 'left'}
+    ::
+
+        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM){UL}')
+        >>> tTNN.note.getStems()
+        ['up']
+
+    ::
+
+        >>> tTNN.note.getFlags()
+        {'up': 'left'}
     
     Multiple flags may be added by placing a space between direction-orientation pairs, as shown in the following complex example:
     
-    
-    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM)[D]{UL DR}')
-    >>> tTNN.note.getStems()
-    ['up', 'down']
-    >>> tTNN.note.getFlags()
-    {'down': 'right', 'up': 'left'}
-    
+    ::
+
+        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM)[D]{UL DR}')
+        >>> tTNN.note.getStems()
+        ['up', 'down']
+
+    ::
+
+        >>> tTNN.note.getFlags()
+        {'down': 'right', 'up': 'left'}
     
     5. It is also possible to create ligatures using the TinyTrecentoNotationNote class. Put all notes in a ligature within < and > symbols.
     
-    
-    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f g a g f >')
-    >>> tTNN.note 
-    <music21.medren.Ligature...>
+    ::
+
+        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f g a g f >')
+        >>> tTNN.note 
+        <music21.medren.Ligature...>
     
     The notes within a ligature have the syntax pitch*notehead*[stems](maxima). Valid notehead shapes are s for square and o for oblique. Valid stem directions are U for up and D for down, and valid orientations are L for left and R for right.
     To set a note of a ligature as a maxima, append (Mx) to the note string. To set a note of a ligature as reversed, append a forward slash to the note string.
     Note, ligatures must follow the rules outlined by :class:`music21.medren.Ligature`.
     Examples:
     
-    >>> from music21 import*
-    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f a[DL]/>')
-    >>> tTNN.note.getStem(1)
-    ('down', 'left')
-    >>> tTNN.note.isReversed(1)
-    True
-    >>>
-    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f*o* g a[UR] g f(Mx)>')
-    >>> print [n.mensuralType for n in tTNN.note.notes]
-    ['longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
-    >>> tTNN.note.getNoteheadShape(1)
-    'oblique'
-    
+    ::
+
+        >>> from music21 import*
+        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f a[DL]/>')
+        >>> tTNN.note.getStem(1)
+        ('down', 'left')
+
+    ::
+
+        >>> tTNN.note.isReversed(1)
+        True
+
+    ::
+
+        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f*o* g a[UR] g f(Mx)>')
+        >>> print [n.mensuralType for n in tTNN.note.notes]
+        ['longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
+
+    ::
+
+        >>> tTNN.note.getNoteheadShape(1)
+        'oblique'
     
     6. Separate objects in a TinyNotationStream by spaces. To add a mensural clef to the stream, add $, followed by the clef type (F or C) to the string. If the clef line on the staff is non-standard, include that after the type.
     For example, $F2 would indicate an F-clef on the second line of the staff. To add a divisione to a tiny notation stream, simply include the divisione abbreviation in the string. For example, .p. would indicate senaria perfecta.
     
-    
-    >>> tTNS = trecento.notation.TinyTrecentoNotationStream('$C3 .p. c(SB) d e p d(B) <e d c>')
-    >>> tTNS.show('text')
-    {0.0} <music21.clef.MensuralClef>
-    {0.0} <music21.trecento.notation.Divisione .p.>
-    {0.0} <music21.medren.MensuralNote semibrevis C>
-    {0.0} <music21.medren.MensuralNote semibrevis D>
-    {0.0} <music21.medren.MensuralNote semibrevis E>
-    {0.0} <music21.trecento.notation.Punctus...>
-    {0.0} <music21.medren.MensuralNote brevis D>
-    {0.0} <music21.medren.Ligature...>
+    ::
+
+        >>> tTNS = trecento.notation.TinyTrecentoNotationStream('$C3 .p. c(SB) d e p d(B) <e d c>')
+        >>> tTNS.show('text')
+        {0.0} <music21.clef.MensuralClef>
+        {0.0} <music21.trecento.notation.Divisione .p.>
+        {0.0} <music21.medren.MensuralNote semibrevis C>
+        {0.0} <music21.medren.MensuralNote semibrevis D>
+        {0.0} <music21.medren.MensuralNote semibrevis E>
+        {0.0} <music21.trecento.notation.Punctus...>
+        {0.0} <music21.medren.MensuralNote brevis D>
+        {0.0} <music21.medren.Ligature...>
+
     '''
     regularExpressions = {'CLEF': '(\$[A-Z]\d?)',
                           'DIVISIONE': '(\.[a-z]\.)'}
@@ -645,11 +674,20 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
 
 class TranslateBrevisLength(object):
     '''
-    The class :class:`music21.trecento.notation.TranslateBrevisLength` takes a divisione sign and a list comprising one brevis length's worth of mensural or trecento objects as arguments.
-    The method :meth:`music21.trecento.notation.TranslateBrevisLength.getKnownLengths` takes no arguments, and returns a list of floats corresponding to the length (in minima) of each object in the list.
-    Currently, this class is used only to improve the efficiency of :attr:`music21.medren.GeneralMensuralNote.duration`.
+    The class :class:`music21.trecento.notation.TranslateBrevisLength` takes a 
+    divisione sign and a list comprising one brevis length's worth of mensural 
+    or trecento objects as arguments.
     
-    This acts a helper class to improve the efficiency of :class:`music21.trecento.notation.convertBrevisLength`.
+    The method 
+    :meth:`music21.trecento.notation.TranslateBrevisLength.getKnownLengths` 
+    takes no arguments, and returns a list of floats corresponding to the 
+    length (in minima) of each object in the list.
+
+    Currently, this class is used only to improve the efficiency of 
+    :attr:`music21.medren.GeneralMensuralNote.duration`.
+    
+    This acts a helper class to improve the efficiency of 
+    :class:`music21.trecento.notation.convertBrevisLength`.
 
 #    >>> names = ['SM', 'SM', 'SM', 'SM', 'SB', 'SB', 'SB', 'SB', 'SB', 'SM', 'SM', 'SM']
 #    >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -661,6 +699,7 @@ class TranslateBrevisLength(object):
 #    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
 #    >>> TBL.getKnownLengths()
 #    [0.5, 0.5, 0.5, 0.5, 4.0, 4.0, 4.0, 4.0, 4.0, 0.666..., 0.666..., 0.666...]
+
     '''
     
     def __init__(self, divisione = None, BL = [], pDS = False):
@@ -695,26 +734,32 @@ class TranslateBrevisLength(object):
         return self.knownLengthsList
     
     def getBreveStrength(self, lengths):
-        ''':meth:`TranslateBrevisLength._evaluateBL takes divisione, a brevis 
+        '''
+        :meth:`TranslateBrevisLength._evaluateBL` takes divisione, a brevis 
         length's worth of mensural or trecento objects in a list, and a list of lengths 
         corresponding to each of those objects as arguments.
-        This method returns the ``strength'' of the list based on those lengths. 
-        A ``strong'' list has longer notes on its stronger beats. Only valid for Trecento notation.
-        
+
+        This method returns the *strength* of the list based on those lengths. 
+        A *strong* list has longer notes on its stronger beats. Only valid for Trecento notation.
         
         In this example, we test two possible interpretations for the same measure
         and see that the second is more logical.  Note that the strength itself is meaningless
         except when compared to other possible lengths for the same notes.
         
-        
-        >>> div = trecento.notation.Divisione('.n.')
-        >>> names = ['SB', 'M', 'M', 'M', 'SB']
-        >>> BL = [medren.MensuralNote('A', n) for n in names]
-        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-        >>> TBL.getBreveStrength([2.0, 1.0, 1.0, 1.0, 4.0])
-        2.0555...
-        >>> TBL.getBreveStrength([3.0, 1.0, 1.0, 1.0, 3.0])
-        2.8333...
+        ::
+
+            >>> div = trecento.notation.Divisione('.n.')
+            >>> names = ['SB', 'M', 'M', 'M', 'SB']
+            >>> BL = [medren.MensuralNote('A', n) for n in names]
+            >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+            >>> TBL.getBreveStrength([2.0, 1.0, 1.0, 1.0, 4.0])
+            2.0555...
+
+        ::
+
+            >>> TBL.getBreveStrength([3.0, 1.0, 1.0, 1.0, 3.0])
+            2.8333...
+
         '''
         div = self.div
         BL = self.brevisLength
@@ -777,21 +822,22 @@ class TranslateBrevisLength(object):
         Gets all possible length combinations. Returns the lengths combination of the "strongest" list, 
         along with the remaining length. 
         
-        lengths =    list of lengths to be updated
-        change_tup = tuple, each element is the sub-list of self.brevisLength to be changed.  
-        num_tup =    tuple, each element is an integer, the maximum number of elements in the corresponding list
-                     list of change_tup that can be changed
-        diff_tup =   tuple, each element is the amount by which to change the elements of the corresponding list in change_tup.
-        lenRem =     input of the remaining SM in the measure. Gets updated and returned.
-        shrinkable_indices = tuple of indices of elements able to take up slack (i.e. ending SB, or downstem SB)
+        :param lengths: list of lengths to be updated
+        :param change_tup: tuple, each element is the sub-list of self.brevisLength to be changed.  
+        :param num_tup: tuple, each element is an integer, the maximum number of elements in the corresponding list of change_tup that can be changed
+        :param diff_tup: tuple, each element is the amount by which to change the elements of the corresponding list in change_tup.
+        :param lenRem: input of the remaining SM in the measure. Gets updated and returned.
+        :param shrinkable_indices: tuple of indices of elements able to take up slack (i.e. ending SB, or downstem SB)
         
-        
-        >>> div = trecento.notation.Divisione('.n.')
-        >>> names = ['SB', 'M', 'M', 'M', 'SB']
-        >>> BL = [medren.MensuralNote('A', n) for n in names]
-        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)     
-        >>> TBL.determineStrongestMeasureLengths([2.0, 1.0, 1.0, 1.0, 4.0], ([0],), (1,), (1.0,), 0.0, shrinkable_indices = (-1,))
-        ([3.0, 1.0, 1.0, 1.0, 3.0], 0.0)
+        ::
+
+            >>> div = trecento.notation.Divisione('.n.')
+            >>> names = ['SB', 'M', 'M', 'M', 'SB']
+            >>> BL = [medren.MensuralNote('A', n) for n in names]
+            >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)     
+            >>> TBL.determineStrongestMeasureLengths([2.0, 1.0, 1.0, 1.0, 4.0], ([0],), (1,), (1.0,), 0.0, shrinkable_indices = (-1,))
+            ([3.0, 1.0, 1.0, 1.0, 3.0], 0.0)
+
         '''
         
         if not (len(change_tup) == len(num_tup)) and (len(change_tup) == len(diff_tup)):
