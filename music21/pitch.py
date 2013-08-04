@@ -4048,22 +4048,26 @@ class Pitch(base.Music21Object):
                 self.accidental.displayStatus = True
                 
     def getStringHarmonic(self, chordIn):
-        '''Given a chord, determines whether the chord constitutes a string harmonic and then
-        returns a new chord with the proper sounding pitch added.
+        '''
+        Given a chord, determines whether the chord constitutes a string 
+        harmonic and then returns a new chord with the proper sounding pitch 
+        added.
 
-        
-        >>> n1 = note.Note('d3')
-        >>> n2 = note.Note('g3')
-        >>> n2.notehead = 'diamond'
-        >>> n2.noteheadFill = 'no'
-        >>> p1 = pitch.Pitch('d3')
-        >>> harmChord = chord.Chord([n1, n2])
-        >>> harmChord.quarterLength = 1
-        >>> newChord = p1.getStringHarmonic(harmChord)
-        >>> newChord.quarterLength = 1
-        >>> pitchList = newChord.pitches
-        >>> pitchList
-        [<music21.pitch.Pitch D3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch D5>]
+        ::
+
+            >>> n1 = note.Note('d3')
+            >>> n2 = note.Note('g3')
+            >>> n2.notehead = 'diamond'
+            >>> n2.noteheadFill = 'no'
+            >>> p1 = pitch.Pitch('d3')
+            >>> harmChord = chord.Chord([n1, n2])
+            >>> harmChord.quarterLength = 1
+            >>> newChord = p1.getStringHarmonic(harmChord)
+            >>> newChord.quarterLength = 1
+            >>> pitchList = newChord.pitches
+            >>> pitchList
+            (<music21.pitch.Pitch D3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch D5>)
+
         '''
         #Takes in a chord, finds the interval between the notes
         from music21 import note, chord

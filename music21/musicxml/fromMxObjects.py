@@ -1022,39 +1022,61 @@ def mxToRepeatExpression(mxDirection):
 
 def mxToChordSymbol(mxHarmony):
     '''
-    Converts an musicxml.base.Harmony() object to a harmony.ChordSymbol object
+    Convert a musicxml.base.Harmony() object to a harmony.ChordSymbol object:
     
-    
-    >>> mxHarmony = musicxml.Harmony()
-    >>> mxKind = musicxml.Kind()
-    >>> mxKind.charData = 'major-seventh'
-    >>> mxHarmony.kindObj = mxKind
-    >>> mxRoot = musicxml.Root()
-    >>> mxRoot.set('root-step', 'D')
-    >>> mxRoot.set('root-alter', '-1')
-    >>> mxHarmony.rootObj = mxRoot
-    >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
-    >>> cs
-    <music21.harmony.ChordSymbol D-maj7>
-    >>> cs.figure
-    'D-maj7'
-    >>> cs.pitches
-    [<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch C4>]
-    >>> cs.root()
-    <music21.pitch.Pitch D-3>
+    ::
+
+        >>> mxHarmony = musicxml.Harmony()
+        >>> mxKind = musicxml.Kind()
+        >>> mxKind.charData = 'major-seventh'
+        >>> mxHarmony.kindObj = mxKind
+        >>> mxRoot = musicxml.Root()
+        >>> mxRoot.set('root-step', 'D')
+        >>> mxRoot.set('root-alter', '-1')
+        >>> mxHarmony.rootObj = mxRoot
+        >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+        >>> cs
+        <music21.harmony.ChordSymbol D-maj7>
+
+    ::
+
+        >>> cs.figure
+        'D-maj7'
+
+    ::
+
+        >>> cs.pitches
+        (<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch C4>)
+
+    ::
+
+        >>> cs.root()
+        <music21.pitch.Pitch D-3>
     
     TODO: this is very classically-oriented.  Make it more Jazz/Rock like.
     
-    >>> mxKind.charData = 'major-sixth'
-    >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
-    >>> cs
-    <music21.harmony.ChordSymbol D-6>
-    >>> cs.figure
-    'D-6'
-    >>> cs.pitches
-    [<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch B-3>]
-    >>> cs.root()
-    <music21.pitch.Pitch D-3>  
+    ::
+
+        >>> mxKind.charData = 'major-sixth'
+        >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+        >>> cs
+        <music21.harmony.ChordSymbol D-6>
+
+    ::
+
+        >>> cs.figure
+        'D-6'
+
+    ::
+
+        >>> cs.pitches
+        (<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch B-3>)
+
+    ::
+
+        >>> cs.root()
+        <music21.pitch.Pitch D-3>  
+
     '''
     
     #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])

@@ -313,13 +313,13 @@ class Harmony(chord.Chord):
 
                 >>> r1 = roman.RomanNumeral('V')
                 >>> r1.pitches
-                [<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>]
+                (<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>)
 
             ::
 
                 >>> r1.key = key.Key('A')
                 >>> r1.pitches
-                [<music21.pitch.Pitch E5>, <music21.pitch.Pitch G#5>, <music21.pitch.Pitch B5>]
+                (<music21.pitch.Pitch E5>, <music21.pitch.Pitch G#5>, <music21.pitch.Pitch B5>)
             
             Changing the key for a ChordSymbol object does nothing, since it's
             not dependent on key:
@@ -648,12 +648,12 @@ def addNewChordSymbol(chordTypeName, fbNotationString, AbbreviationList):
     ::
 
         >>> harmony.ChordSymbol('Cbeth').pitches
-        [<music21.pitch.Pitch C3>, <music21.pitch.Pitch D#3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch A-3>]
+        (<music21.pitch.Pitch C3>, <music21.pitch.Pitch D#3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch A-3>)
 
     ::
 
         >>> harmony.ChordSymbol('C-beth').pitches
-        [<music21.pitch.Pitch C-3>, <music21.pitch.Pitch D3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch A--3>]
+        (<music21.pitch.Pitch C-3>, <music21.pitch.Pitch D3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch A--3>)
     
     OMIT_FROM_DOCS
     
@@ -1514,22 +1514,22 @@ class ChordSymbol(Harmony):
     ::
 
         >>> harmony.ChordSymbol('Am').pitches
-        [<music21.pitch.Pitch A2>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>]
+        (<music21.pitch.Pitch A2>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>)
 
     ::
 
         >>> harmony.ChordSymbol('A-m').pitches
-        [<music21.pitch.Pitch A-2>, <music21.pitch.Pitch C-3>, <music21.pitch.Pitch E-3>]
+        (<music21.pitch.Pitch A-2>, <music21.pitch.Pitch C-3>, <music21.pitch.Pitch E-3>)
 
     ::
 
         >>> harmony.ChordSymbol('A-m').pitches
-        [<music21.pitch.Pitch A-2>, <music21.pitch.Pitch C-3>, <music21.pitch.Pitch E-3>]
+        (<music21.pitch.Pitch A-2>, <music21.pitch.Pitch C-3>, <music21.pitch.Pitch E-3>)
 
     ::
 
         >>> harmony.ChordSymbol('F-dim7').pitches
-        [<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>]
+        (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
     
     Thanks to David Bolton for catching the bugs tested below:
 
@@ -1655,6 +1655,7 @@ class ChordSymbol(Harmony):
         '''
         from music21 import scale
 
+        pitches = list(pitches)
         ChordStepModifications = self.chordStepModifications
         if ChordStepModifications is None:
             return pitches
@@ -1745,7 +1746,7 @@ class ChordSymbol(Harmony):
                         '''
                 if pitchFound == False:
                     raise ChordStepModificationException('Degree not in specified chord: %s' % hD.degree)
-        return pitches
+        return tuple(pitches)
 
     def _getKindFromShortHand(self, sH):
         originalsH = sH
@@ -2011,7 +2012,7 @@ class ChordSymbol(Harmony):
                 if p.diatonicNoteNum < self._bass.diatonicNoteNum:
                     p.octave = p.octave + 1
 
-        pitches = self._adjustPitchesForChordStepModifications(pitches)
+        pitches = list(self._adjustPitchesForChordStepModifications(pitches))
 
         while self._hasPitchAboveC4(pitches) :
             i = -1
@@ -2071,14 +2072,26 @@ class ChordSymbol(Harmony):
         ::
 
             >>> h1 = harmony.ChordSymbol('C7 b9')
-            >>> h1.pitches
-            [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch B-3>, <music21.pitch.Pitch D-4>]
+            >>> for x in h1.pitches:
+            ...     x
+            ...
+            <music21.pitch.Pitch C3>
+            <music21.pitch.Pitch E3>
+            <music21.pitch.Pitch G3>
+            <music21.pitch.Pitch B-3>
+            <music21.pitch.Pitch D-4>
 
         ::
 
             >>> h2 = harmony.ChordSymbol('C/B- add 2')
-            >>> h2.pitches
-            [<music21.pitch.Pitch B-2>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch D3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
+            >>> for x in h2.pitches:
+            ...     x
+            ...
+            <music21.pitch.Pitch B-2>
+            <music21.pitch.Pitch C3>
+            <music21.pitch.Pitch D3>
+            <music21.pitch.Pitch E3>
+            <music21.pitch.Pitch G3>
 
         OMIT_FROM_DOCS
 
@@ -2108,7 +2121,7 @@ class ChordSymbol(Harmony):
         ::
 
             >>> cs.pitches
-            [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch B-3>, <music21.pitch.Pitch D-4>]
+            (<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch B-3>, <music21.pitch.Pitch D-4>)
         
         ::
 
@@ -2139,7 +2152,7 @@ class ChordSymbol(Harmony):
         ::
 
             >>> cs.pitches
-            [<music21.pitch.Pitch B-2>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch D3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
+            (<music21.pitch.Pitch B-2>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch D3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>)
 
         '''
         if self.chordStepModifications or self.chordKind: #there is no hope to determine the chord from pitches
@@ -2356,7 +2369,8 @@ class Test(unittest.TestCase):
         from music21 import harmony
         cs = harmony.ChordSymbol('Cm')
         self.assertEqual(str(cs), '<music21.harmony.ChordSymbol Cm>')
-        self.assertEqual(str(cs.pitches), '[<music21.pitch.Pitch C3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch G3>]')
+        self.assertEqual(str(cs.pitches), 
+            '(<music21.pitch.Pitch C3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch G3>)')
         self.assertEqual(str(cs.bass()), 'C3')
         self.assertEqual(cs.isConsonant(), True)
 

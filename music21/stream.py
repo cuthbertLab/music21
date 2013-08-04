@@ -1562,7 +1562,7 @@ class Stream(base.Music21Object):
             if 'Chord' in target.classes:
                 # if a chord, make it into a chord   
                 if 'Note' in noteOrChord.classes:
-                    pitches = target.pitches + [noteOrChord.pitch]
+                    pitches = target.pitches + (noteOrChord.pitch,)
                     components = [c for c in target] + [noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
                     pitches = target.pitches + noteOrChord.pitches
@@ -4798,83 +4798,88 @@ class Stream(base.Music21Object):
         more transpositions will be transposed to sounding pitch before chordification. 
         True by default. 
 
+        ::
 
-        
-        >>> s = stream.Score()
-        >>> p1 = stream.Part()
-        >>> p1.id = 'part1'
-        >>> p1.insert(4, note.Note("C#4"))
-        >>> p1.insert(5.3, note.Rest())
-        >>> p2 = stream.Part()
-        >>> p2.id = 'part2'
-        >>> p2.insert(2.12, note.HalfNote("D-4"))
-        >>> p2.insert(5.5, note.Rest())
-        >>> s.insert(0, p1)
-        >>> s.insert(0, p2)
-        >>> cc = s.chordify()
-        >>> cc.show('text')
-        {0.0} <music21.note.Rest rest>
-        {2.12} <music21.chord.Chord D-4>
-        {4.0} <music21.chord.Chord C#4 D-4>
-        {4.12} <music21.chord.Chord C#4>
-        {5.0} <music21.note.Rest rest>
+            >>> s = stream.Score()
+            >>> p1 = stream.Part()
+            >>> p1.id = 'part1'
+            >>> p1.insert(4, note.Note("C#4"))
+            >>> p1.insert(5.3, note.Rest())
+            >>> p2 = stream.Part()
+            >>> p2.id = 'part2'
+            >>> p2.insert(2.12, note.HalfNote("D-4"))
+            >>> p2.insert(5.5, note.Rest())
+            >>> s.insert(0, p1)
+            >>> s.insert(0, p2)
+            >>> cc = s.chordify()
+            >>> cc.show('text')
+            {0.0} <music21.note.Rest rest>
+            {2.12} <music21.chord.Chord D-4>
+            {4.0} <music21.chord.Chord C#4 D-4>
+            {4.12} <music21.chord.Chord C#4>
+            {5.0} <music21.note.Rest rest>
         
         Here's how addPartIdAsGroup works:
         
-        >>> cc2 = s.chordify(addPartIdAsGroup=True)
-        >>> csharpDflatChord = cc2[2]
-        >>> for p in csharpDflatChord.pitches:
-        ...     print p, p.groups
-        C#4 ['part1']
-        D-4 ['part2'] 
+        ::
 
-        >>> s = stream.Stream()
-        >>> p1 = stream.Part()
-        >>> p1.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
-        >>> p1.insert(2, note.Note('C'))
-        >>> p1.insert(4, harmony.ChordSymbol('D', quarterLength = 4.0))
-        >>> p1.insert(7, note.Note('A'))
-        >>> s.insert(0,p1)
-        >>> s.chordify().show('text')
-        {0.0} <music21.chord.Chord C3 E-3 G3>
-        {2.0} <music21.chord.Chord C C3 E-3 G3>
-        {3.0} <music21.chord.Chord C3 E-3 G3>
-        {4.0} <music21.chord.Chord D3 F#3 A3>
-        {7.0} <music21.chord.Chord A D3 F#3 A3>
-        
+            >>> cc2 = s.chordify(addPartIdAsGroup=True)
+            >>> csharpDflatChord = cc2[2]
+            >>> for p in csharpDflatChord.pitches:
+            ...     print p, p.groups
+            C#4 ['part1']
+            D-4 ['part2'] 
+
+        ::
+
+            >>> s = stream.Stream()
+            >>> p1 = stream.Part()
+            >>> p1.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
+            >>> p1.insert(2, note.Note('C'))
+            >>> p1.insert(4, harmony.ChordSymbol('D', quarterLength = 4.0))
+            >>> p1.insert(7, note.Note('A'))
+            >>> s.insert(0,p1)
+            >>> s.chordify().show('text')
+            {0.0} <music21.chord.Chord C3 E-3 G3>
+            {2.0} <music21.chord.Chord C C3 E-3 G3>
+            {3.0} <music21.chord.Chord C3 E-3 G3>
+            {4.0} <music21.chord.Chord D3 F#3 A3>
+            {7.0} <music21.chord.Chord A D3 F#3 A3>
         
         Note that :class:`~music21.harmony.ChordSymbol` objects can also be chordified:
         
-        >>> s = stream.Stream()
-        >>> p2 = stream.Part()
-        >>> p1 = stream.Part()
-        >>> p2.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
-        >>> p1.insert(2, note.Note('C'))
-        >>> p2.insert(4, harmony.ChordSymbol('D', quarterLength = 4.0))
-        >>> p1.insert(7, note.Note('A'))
-        >>> s.insert(0,p1)
-        >>> s.insert(0,p2)
-        >>> s.chordify().show('text')
-        {0.0} <music21.chord.Chord C3 E-3 G3>
-        {2.0} <music21.chord.Chord C C3 E-3 G3>
-        {3.0} <music21.chord.Chord C3 E-3 G3>
-        {4.0} <music21.chord.Chord D3 F#3 A3>
-        {7.0} <music21.chord.Chord A D3 F#3 A3>
+        ::
 
+            >>> s = stream.Stream()
+            >>> p2 = stream.Part()
+            >>> p1 = stream.Part()
+            >>> p2.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
+            >>> p1.insert(2, note.Note('C'))
+            >>> p2.insert(4, harmony.ChordSymbol('D', quarterLength = 4.0))
+            >>> p1.insert(7, note.Note('A'))
+            >>> s.insert(0,p1)
+            >>> s.insert(0,p2)
+            >>> s.chordify().show('text')
+            {0.0} <music21.chord.Chord C3 E-3 G3>
+            {2.0} <music21.chord.Chord C C3 E-3 G3>
+            {3.0} <music21.chord.Chord C3 E-3 G3>
+            {4.0} <music21.chord.Chord D3 F#3 A3>
+            {7.0} <music21.chord.Chord A D3 F#3 A3>
 
         OMIT_FROM_DOCS
         
         Test that chordifying works on a single stream.
     
-        >>> f2 = stream.Score()
-        >>> f2.insert(0, metadata.Metadata())
-        >>> f2.insert(0, note.Note('C4'))
-        >>> f2.insert(0, note.Note('D#4'))
-        >>> c = f2.chordify()
-        >>> cn = c.notes
-        >>> cn[0].pitches
-        [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D#4>]
+        ::
 
+            >>> f2 = stream.Score()
+            >>> f2.insert(0, metadata.Metadata())
+            >>> f2.insert(0, note.Note('C4'))
+            >>> f2.insert(0, note.Note('D#4'))
+            >>> c = f2.chordify()
+            >>> cn = c.notes
+            >>> cn[0].pitches
+            (<music21.pitch.Pitch C4>, <music21.pitch.Pitch D#4>)
         
         '''
         # TODO: need to handle flat Streams contained in a Stream   
@@ -9112,7 +9117,8 @@ class Stream(base.Music21Object):
                         returnList.append(None)
                         lastWasNone = True
                 if hasattr(e, "pitch"):
-                    if (skipUnisons is False or isinstance(lastPitch, list) or
+                    #if (skipUnisons is False or isinstance(lastPitch, list) or
+                    if (skipUnisons is False or isinstance(lastPitch, tuple) or
                         lastPitch is None or 
                         e.pitch.pitchClass != lastPitch.pitchClass or 
                         (skipOctaves is False and e.pitch.ps != lastPitch.ps)):

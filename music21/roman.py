@@ -453,7 +453,7 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     ::
 
         >>> rn.pitches
-        [<music21.pitch.Pitch E-3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch G-6>]
+        (<music21.pitch.Pitch E-3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch G-6>)
 
     ::
     
@@ -642,7 +642,7 @@ class RomanNumeral(harmony.Harmony):
     ::
     
         >>> V.pitches # default key-- C Major
-        [<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>]
+        (<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>)
         
     # TODO: document better! what is inherited from Chord and what is new here...
         
@@ -665,7 +665,7 @@ class RomanNumeral(harmony.Harmony):
     ::
     
         >>> neapolitan.pitches  # default octaves
-        [<music21.pitch.Pitch F#4>, <music21.pitch.Pitch A4>, <music21.pitch.Pitch D5>]
+        (<music21.pitch.Pitch F#4>, <music21.pitch.Pitch A4>, <music21.pitch.Pitch D5>)
 
     ::
     
@@ -779,25 +779,25 @@ class RomanNumeral(harmony.Harmony):
 
         >>> lessObviousDiminished = roman.RomanNumeral('vio', scale.MajorScale('c'))
         >>> lessObviousDiminished.pitches
-        [<music21.pitch.Pitch A4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch E-5>]
+        (<music21.pitch.Pitch A4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch E-5>)
 
     ::
 
         >>> diminished7th = roman.RomanNumeral('vio7', scale.MajorScale('c'))
         >>> diminished7th.pitches
-        [<music21.pitch.Pitch A4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch E-5>, <music21.pitch.Pitch G-5>]
+        (<music21.pitch.Pitch A4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch E-5>, <music21.pitch.Pitch G-5>)
     
     ::
 
         >>> diminished7th1stInv = roman.RomanNumeral('vio65', scale.MajorScale('c'))
         >>> diminished7th1stInv.pitches
-        [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>, <music21.pitch.Pitch G-4>, <music21.pitch.Pitch A4>]
+        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>, <music21.pitch.Pitch G-4>, <music21.pitch.Pitch A4>)
     
     ::
 
         >>> halfDim7th2ndInv = roman.RomanNumeral('iv/o43', scale.MajorScale('F'))
         >>> halfDim7th2ndInv.pitches
-        [<music21.pitch.Pitch F-4>, <music21.pitch.Pitch A-4>, <music21.pitch.Pitch B-4>, <music21.pitch.Pitch D-5>]
+        (<music21.pitch.Pitch F-4>, <music21.pitch.Pitch A-4>, <music21.pitch.Pitch B-4>, <music21.pitch.Pitch D-5>)
 
     ::
 
@@ -829,7 +829,7 @@ class RomanNumeral(harmony.Harmony):
 
         >>> openFifth = roman.RomanNumeral('V[no3]', key.Key('F'))
         >>> openFifth.pitches
-        [<music21.pitch.Pitch C5>, <music21.pitch.Pitch G5>]
+        (<music21.pitch.Pitch C5>, <music21.pitch.Pitch G5>)
 
     Some theoretical traditions express a viio7 as a V9 chord with omitted root.
     Music21 allows that:
@@ -1144,7 +1144,7 @@ class RomanNumeral(harmony.Harmony):
 
         romanNumeralAlone = ''
         if not self._romanNumeralAloneRegex.match(workingFigure):
-            raise RomanException('No roman numeral found in {}'.format(
+            raise RomanException('No roman numeral found in {!r}'.format(
                 workingFigure))
         else:
             rm = self._romanNumeralAloneRegex.match(workingFigure)
@@ -1730,7 +1730,7 @@ class Test(unittest.TestCase):
         k = key.Key('f#')  # 3-sharps minor
         rn = roman.RomanNumeral('V', k)
         self.assertEqual(str(rn.key), 'f# minor')
-        self.assertEqual(str(rn.pitches), '[<music21.pitch.Pitch C#5>, <music21.pitch.Pitch E#5>, <music21.pitch.Pitch G#5>]')
+        self.assertEqual(str(rn.pitches), '(<music21.pitch.Pitch C#5>, <music21.pitch.Pitch E#5>, <music21.pitch.Pitch G#5>)')
         self.assertEqual(str(rn.scaleDegrees), '[(5, None), (7, <accidental sharp>), (2, None)]')
                 
     def testNeapolitanAndHalfDiminished(self):

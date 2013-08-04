@@ -34,23 +34,26 @@ class simplifyEnharmonic:
     pass
 
 def L(c, raiseException=False):
-    
     '''
-    L is a function that takes a major or minor triad and returns a chord that is the L transformation. L transforms a chord to its Leading-Tone exchange. 
+    L is a function that takes a major or minor triad and returns a chord that 
+    is the L transformation. L transforms a chord to its Leading-Tone exchange. 
     
     Example 1: A C major chord, under P, will return an E minor chord
     
+    ::
+
+        >>> c1 = chord.Chord("C4 E4 G4")
+        >>> c2 = analysis.neoRiemannian.L(c1)
+        >>> c2.pitches
+        (<music21.pitch.Pitch B3>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>)
     
-    >>> c1 = chord.Chord("C4 E4 G4")
-    >>> c2 = analysis.neoRiemannian.L(c1)
-    >>> c2.pitches
-    [<music21.pitch.Pitch B3>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>]
-    
-    >>> try:
-    ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = analysis.neoRiemannian.L(c3, raiseException=True)
-    ... except analysis.neoRiemannian.LRPException:
-    ...     pass
+    ::
+
+        >>> try:
+        ...     c3 = chord.Chord("C4 D4 E4")
+        ...     c4 = analysis.neoRiemannian.L(c3, raiseException=True)
+        ... except analysis.neoRiemannian.LRPException:
+        ...     pass
     
     '''
     if c.isMajorTriad() == True:
@@ -66,24 +69,30 @@ def L(c, raiseException=False):
 
     return LRP_transform(c, transposeInterval, changingPitch)
     
+    
 def P(c, raiseException=False):
     '''
-    P is a function that takes a major or minor triad and returns a chord that is the P transformation. P transforms a chord to its parallel, 
-    i.e. to the chord of the same diatonic name but opposite model.
+    P is a function that takes a major or minor triad and returns a chord that 
+    is the P transformation. P transforms a chord to its parallel, i.e. to the 
+    chord of the same diatonic name but opposite model.
     
     Example 1: A C major chord, under P, will return an C minor chord
     
+    ::
+
+        >>> c2 = chord.Chord("C4 E4 G4")
+        >>> c3 = analysis.neoRiemannian.P(c2)
+        >>> c3.pitches
+        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>, <music21.pitch.Pitch G4>)
     
-    >>> c2 = chord.Chord("C4 E4 G4")
-    >>> c3 = analysis.neoRiemannian.P(c2)
-    >>> c3.pitches
-    [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>, <music21.pitch.Pitch G4>]
-    
-    >>> try:
-    ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = analysis.neoRiemannian.P(c3, raiseException=True)
-    ... except analysis.neoRiemannian.LRPException:
-    ...     pass
+    ::
+
+        >>> try:
+        ...     c3 = chord.Chord("C4 D4 E4")
+        ...     c4 = analysis.neoRiemannian.P(c3, raiseException=True)
+        ... except analysis.neoRiemannian.LRPException:
+        ...     pass
+
     '''
     if c.isMajorTriad() == True:
         transposeInterval = "-A1"
@@ -95,27 +104,31 @@ def P(c, raiseException=False):
         if raiseException is True:
             raise LRPException('Cannot perform P on this chord: not a Major or Minor triad')
         return c
-
     return LRP_transform(c, transposeInterval, changingPitch)
     
+
 def R(c, raiseException=False):
     '''
-    R is a function that takes a major or minor triad and returns a chord that is the R transformation. R transforms a chord to its relative, 
-    i.e. if major, to its relative minor and if minor, to its relative major.
+    R is a function that takes a major or minor triad and returns a chord that 
+    is the R transformation. R transforms a chord to its relative, i.e. if 
+    major, to its relative minor and if minor, to its relative major.
     
     Example 1: A C major chord, under R, will return an A minor chord
     
-    
-    >>> c1 = chord.Chord("C4 E4 G4")
-    >>> c2 = analysis.neoRiemannian.R(c1)
-    >>> c2.pitches
-    [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch A4>]
-    
-    >>> try:
-    ...     c3 = chord.Chord("C4 D4 E4")
-    ...     c4 = analysis.neoRiemannian.R(c3, raiseException=True)
-    ... except analysis.neoRiemannian.LRPException:
-    ...     pass
+    ::
+
+        >>> c1 = chord.Chord("C4 E4 G4")
+        >>> c2 = analysis.neoRiemannian.R(c1)
+        >>> c2.pitches
+        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch A4>) 
+
+    ::
+
+        >>> try:
+        ...     c3 = chord.Chord("C4 D4 E4")
+        ...     c4 = analysis.neoRiemannian.R(c3, raiseException=True)
+        ... except analysis.neoRiemannian.LRPException:
+        ...     pass
     
     '''
     if c.isMajorTriad() == True:
@@ -140,7 +153,6 @@ def LRP_transform(c, transposeInterval, changingPitch):
     return chord.Chord(newChord.pitches)
 
 def LRP_combinations(c, transformationString, raiseException = False, leftOrdered = False, simplifyEnharmonic = False):
-    
     '''
     LRP_combinations is a function that takes a major or minor triad and a transformationString
     and returns a transformed triad, using the L, R, and P transformations. Certain combinations, such
@@ -157,16 +169,20 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
     if simplifyEnharmonic= True, the resulting chord will be simplified to notes with at most 1 flat
     or 1 sharp, in their most common form. 
     
+    ::
+
+        >>> c1 = chord.Chord("C4 E4 G4")
+        >>> c2 = analysis.neoRiemannian.LRP_combinations(c1, 'LP')
+        >>> c2
+        <music21.chord.Chord B3 E4 G#4>
     
-    >>> c1 = chord.Chord("C4 E4 G4")
-    >>> c2 = analysis.neoRiemannian.LRP_combinations(c1, 'LP')
-    >>> c2
-    <music21.chord.Chord B3 E4 G#4>
-    
-    >>> c3 = chord.Chord("C4 E4 G4 C5 E5")
-    >>> c4 = analysis.neoRiemannian.LRP_combinations(c3, 'RLP')
-    >>> c4
-    <music21.chord.Chord C4 F4 A-4 C5 F5>
+    ::
+
+        >>> c3 = chord.Chord("C4 E4 G4 C5 E5")
+        >>> c4 = analysis.neoRiemannian.LRP_combinations(c3, 'RLP')
+        >>> c4
+        <music21.chord.Chord C4 F4 A-4 C5 F5>
+
     '''
     
 #    >>> c5 = chord.Chord("B4 D#5 F#5")

@@ -94,7 +94,7 @@ class Chord(note.NotRest):
 
         >>> c = chord.Chord([0, 2, 3, 5])
         >>> c.pitches
-        [<music21.pitch.Pitch C>, <music21.pitch.Pitch D>, <music21.pitch.Pitch E->, <music21.pitch.Pitch F>]
+        (<music21.pitch.Pitch C>, <music21.pitch.Pitch D>, <music21.pitch.Pitch E->, <music21.pitch.Pitch F>)
     
     Or from MIDI numbers:
 
@@ -102,7 +102,7 @@ class Chord(note.NotRest):
 
         >>> c = chord.Chord([72, 76, 79])
         >>> c.pitches
-        [<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>]
+        (<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>)
 
     OMIT_FROM_DOCS
 
@@ -112,12 +112,24 @@ class Chord(note.NotRest):
 
         >>> dmaj.duration
         <music21.duration.Duration 1.0>
+
+    ::
+
         >>> cmaj.pitches[0] is Cnote.pitch
         True
+
+    ::
+
         >>> Cnote.duration
         <music21.duration.Duration 1.0>
+
+    ::
+
         >>> cmaj.duration
         <music21.duration.Duration 1.0>
+
+    ::
+
         >>> cmaj.duration is Cnote.duration
         True
 
@@ -2588,7 +2600,7 @@ class Chord(note.NotRest):
             >>> c3 = chord.Chord([p1, p2])
             >>> c3.removeRedundantPitches(inPlace=True)
             >>> c3.pitches
-            [<music21.pitch.Pitch B-1>]
+            (<music21.pitch.Pitch B-1>,)
 
         The first pitch survives:
 
@@ -2619,14 +2631,14 @@ class Chord(note.NotRest):
             >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
             >>> c1.removeRedundantPitchClasses(inPlace=True)
             >>> c1.pitches
-            [<music21.pitch.Pitch C2>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E3>]
+            (<music21.pitch.Pitch C2>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E3>)
 
         ::
 
             >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
             >>> c2.removeRedundantPitchClasses(inPlace=True)
             >>> c2.pitches
-            [<music21.pitch.Pitch C5>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E3>]
+            (<music21.pitch.Pitch C5>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E3>)
 
         '''
         return self._removePitchByRedundantAttribute('pitchClass',
@@ -3085,8 +3097,9 @@ class Chord(note.NotRest):
         '''
         newChord = copy.deepcopy(self)
         tempChordNotes = newChord.pitches
-        tempChordNotes.sort(cmp=lambda x, y: cmp(x.ps, y.ps))
-        newChord.pitches = tempChordNotes
+        pitches = sorted(newChord.pitches,
+            cmp=lambda x, y: cmp(x.ps, y.ps))
+        newChord.pitches = pitches
         return newChord
 
     def sortDiatonicAscending(self, inPlace=False):
@@ -3112,18 +3125,15 @@ class Chord(note.NotRest):
             <music21.chord.Chord C4 E4 G4>
 
         '''
-
         if inPlace:
             returnObj = self
         else:
             returnObj = copy.deepcopy(self)
-
-        altered = returnObj.pitches
-        altered.sort(cmp=lambda x, y: cmp(x.diatonicNoteNum, y.diatonicNoteNum)
-                     or cmp(x.ps, y.ps))
+        pitches = sorted(returnObj.pitches,
+            cmp=lambda x, y: cmp(x.diatonicNoteNum, y.diatonicNoteNum)
+                or cmp(x.ps, y.ps))
         # must re-assign altered list, as a new list is created
-        returnObj.pitches = altered
-
+        returnObj.pitches = pitches
         return returnObj
 
     def sortFrequencyAscending(self):
@@ -3133,9 +3143,9 @@ class Chord(note.NotRest):
         but below it in (most) just intonation types.
         '''
         newChord = copy.deepcopy(self)
-        tempChordNotes = newChord.pitches
-        tempChordNotes.sort(cmp=lambda x, y: cmp(x.frequency, y.frequency))
-        newChord.pitches = tempChordNotes
+        pitches = sorted(newChord.pitches,
+            cmp=lambda x, y: cmp(x.frequency, y.frequency))
+        newChord.pitches = pitches
         return newChord
         
     def transpose(self, value, inPlace=False):
@@ -3193,7 +3203,6 @@ class Chord(note.NotRest):
 #             # we are either operating on self or a copy; always use inPlace
 #             p.transpose(intervalObj, inPlace=True)
 #             #pitches.append(intervalObj.transposePitch(p))
-
         if not inPlace:
             return post
         else:
@@ -3760,7 +3769,7 @@ class Chord(note.NotRest):
 
                 >>> c = chord.Chord(["C4", "E4", "G#4"])
                 >>> c.pitches
-                [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G#4>]
+                (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G#4>)
 
             ::
 
@@ -3772,7 +3781,7 @@ class Chord(note.NotRest):
                 >>> d = chord.Chord()
                 >>> d.pitches = c.pitches
                 >>> d.pitches
-                [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G#4>]
+                (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G#4>)
 
             ::
 
@@ -3802,10 +3811,8 @@ class Chord(note.NotRest):
             A better way to do this needs to be found.
             '''
             self._chordTablesAddressNeedsUpdating = True
-            post = [d.pitch for d in self._components]
-            #post = [d['pitch'] for d in self._components]
-            #return self._components
-            return post
+            pitches = tuple(component.pitch for component in self._components)
+            return pitches
         def fset(self, value):
             #if value != [d['pitch'] for d in self._components]:
             if value != [d.pitch for d in self._components]:
@@ -3960,7 +3967,7 @@ class Chord(note.NotRest):
         ::
 
             >>> rn.pitches
-            [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch E#5>, <music21.pitch.Pitch G#5>]
+            (<music21.pitch.Pitch C#5>, <music21.pitch.Pitch E#5>, <music21.pitch.Pitch G#5>)
 
         ::
 
@@ -3971,7 +3978,7 @@ class Chord(note.NotRest):
 
             >>> rn2 = roman.RomanNumeral('N6', k)
             >>> rn2.pitches
-            [<music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch G5>]
+            (<music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch G5>)
 
         ::
 

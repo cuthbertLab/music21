@@ -2178,7 +2178,7 @@ class Test(unittest.TestCase):
         m34 = s.parts[0].getElementsByClass('Measure')[33]
         c = m34.getElementsByClass('Chord')
         # assuming not showing accidental b/c of key
-        self.assertEqual(str(c[1].pitches), '[<music21.pitch.Pitch B-4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch F5>]')
+        self.assertEqual(str(c[1].pitches), '(<music21.pitch.Pitch B-4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch F5>)')
         # because of key
         self.assertEqual(str(c[1].pitches[0].accidental.displayStatus), 'False')
 
@@ -2186,7 +2186,7 @@ class Test(unittest.TestCase):
         m74 = s.parts[0].getElementsByClass('Measure')[73]
         c = m74.getElementsByClass('Chord')
         # has correct pitches but natural not showing on C
-        self.assertEqual(str(c[0].pitches), '[<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>]')
+        self.assertEqual(str(c[0].pitches), '(<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>)')
         self.assertEqual(str(c[0].pitches[0].accidental), 'None')
 
     def testMakeAccidentalsC(self):
@@ -4704,9 +4704,9 @@ class Test(unittest.TestCase):
             'Rest')), 2)
 
         self.assertEqual(str(scoreChordify.getElementsByClass(
-            'Chord')[0].pitches), '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch D3>]')
+            'Chord')[0].pitches), '(<music21.pitch.Pitch D2>, <music21.pitch.Pitch D3>)')
         self.assertEqual(str(scoreChordify.getElementsByClass(
-            'Chord')[1].pitches), '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch D#3>]')
+            'Chord')[1].pitches), '(<music21.pitch.Pitch D2>, <music21.pitch.Pitch D#3>)')
 
 
     def testChordifyA(self):
@@ -4724,7 +4724,7 @@ class Test(unittest.TestCase):
         post = s.chordify()
         self.assertEqual(len(post.getElementsByClass('Chord')), 12)
         self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches), 
-            '[<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>]')
+            '(<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>)')
 
 
         p1 = stream.Part()
@@ -4741,7 +4741,7 @@ class Test(unittest.TestCase):
         post = s.chordify()
         self.assertEqual(len(post.getElementsByClass('Chord')), 2)
         self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches), 
-            '[<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>]')
+            '(<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>)')
         #post.show()
 
         #s.show()
