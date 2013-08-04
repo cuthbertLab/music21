@@ -33,6 +33,7 @@ fileExtensions = {
     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
+    'musicxml.png' : {'input': ['png'], 'output': 'png'},
     'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
     'tinynotation' : {'input': ['tntxt', 'tinynotation'], 'output': 'tntxt'},
      # note: this is setting .zip as default mapping to musedata
@@ -78,8 +79,8 @@ DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png']
-VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png']
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png', 'musicxml.png']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png', 'musicxml.png']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 
@@ -145,11 +146,13 @@ def findFormat(fmt):
     >>> common.findFormat('capx')
     ('capella', '.capx')
     >>> common.findFormat('png')
-    ('png', '.png')
+    ('musicxml.png', '.png')
     >>> common.findFormat('ipython')
     ('ipython', '.png')
     >>> common.findFormat('ipython.png')
     ('ipython', '.png')
+    >>> common.findFormat('musicxml.png')
+    ('musicxml.png', '.png')
     
 
     Works the same whether you have a leading dot or not:
