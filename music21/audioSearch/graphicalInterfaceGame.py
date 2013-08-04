@@ -11,6 +11,7 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 from music21.audioSearch.base import * #@UnusedWildImport
 from music21.audioSearch import repetitionGame

@@ -13,6 +13,7 @@
 '''
 
 '''
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 from music21 import corpus
 from music21 import converter
