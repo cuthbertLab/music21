@@ -402,26 +402,24 @@ div.viewcode-block:target {
     border-bottom: 1px solid #eee;
     }
 
-tt.attribute {
-    color: #fff;
-    font-size: 0.75em;
-    margin: 0 1em 0 0;
-    padding: 0.5em;
+.highlight-python.ipython-result {
+    margin-top: -10px;
+    padding-top: 0px;
     }
 
-tt.abstract {
-    background-color: #666;
-    }
-
-tt.classmethod {
-    background-color: #c96;
-    }
-
-tt.staticmethod {
-    background-color: #69c;
-    }
-
-div.abjad-book pre {
-    background-color: #380000;
-    color: #93A1A1;
+.highlight-python.ipython-result pre {
+    background-color: #FFFFf0;
+    /*border: 1px dashed #aaa;*/
+    color: #304030;
+    font-family: 'Source Code Pro', monospace;
+    font-style: normal;
+    font-size: 0.9em;
+    letter-spacing: 0.015em;
+    line-height: 120%;
+    padding: 0.7em;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
     }

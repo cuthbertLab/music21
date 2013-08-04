@@ -20,14 +20,14 @@ anaconda distribution of python...
     Downloading/unpacking music21
       Downloading music21-1.5.0.tar.gz (29.6MB): 29.6MB downloaded
       Running setup.py egg_info for package music21
-
+        
         warning: no files found matching '*.pdf' anywhere in distribution
         no previously-included directories found matching 'dist'
         no previously-included directories found matching 'buildDoc'
         no previously-included directories found matching 'obsolete'
     Installing collected packages: music21
       Running setup.py install for music21
-
+        
         warning: no files found matching '*.pdf' anywhere in distribution
         no previously-included directories found matching 'dist'
         no previously-included directories found matching 'buildDoc'
@@ -70,6 +70,7 @@ Now in the webbrowser you can type commands such as the ones below:
 
 
 .. parsed-literal::
+   :class: ipython-result
 
     True
 
@@ -89,6 +90,7 @@ MusicXML reader locally...
 
 
 .. parsed-literal::
+   :class: ipython-result
 
     <music21.ipython21.objects.IPythonPNGObject at 0x10ee7c410>
 
@@ -102,6 +104,7 @@ display it on the screen but not in your browser:
 
 
 .. parsed-literal::
+   :class: ipython-result
 
     u'/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T/music21/tmpXpcJUYly.png'
 
