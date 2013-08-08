@@ -3256,15 +3256,20 @@ class Music21Object(object):
         if fileFormat is None:
             raise Music21ObjectException('bad format (%s) provided to write()' % fmt)
 
+        if fileFormat == 'musicxml.png':
+            ext = '.xml' # temporary change
+
         if fp is None:
             fp = environLocal.getTempFile(ext)
 
-        if fileFormat in ['text', 'textline', 'musicxml', 'vexflow', 'vexflow.html']:        
+        if fileFormat in ['text', 'textline', 'musicxml', 'musicxml.png', 'vexflow', 'vexflow.html']:        
             if fileFormat == 'text':
                 dataStr = self._reprText()
             elif fileFormat == 'textline':
                 dataStr = self._reprTextLine()
-            elif fileFormat == 'musicxml':
+                
+            # musicxml, musicxml.png, etc.
+            elif fileFormat.startswith('musicxml'):
                 from music21.musicxml import m21ToString
                 dataStr = m21ToString.fromMusic21Object(self)
             elif fileFormat.startswith('vexflow'):
@@ -3274,6 +3279,34 @@ class Music21Object(object):
             f = open(fp, 'w')
             f.write(dataStr)
             f.close()
+            
+            if fileFormat == 'musicxml.png':
+                # HACK
+                import os
+                musescoreFile = environLocal['musescoreDirectPNGPath']
+                if musescoreFile == "":
+                    raise Music21Exception("To create PNG files directly from MusicXML you need to download MuseScore")
+                elif not os.path.exists(musescoreFile):
+                    raise Music21Exception("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescoreFile)
+                
+                fpOut = fp[0:len(fp) - 3]
+                fpOut += "png"
+                musescoreRun = musescoreFile + " " + fp + " -o " + fpOut
+                if 'dpi' in keywords:
+                    musescoreRun += " -r " + str(keywords['dpi'])
+                if common.runningUnderIPython():
+                    musescoreRun += " -r 72"
+
+                storedStrErr = sys.stderr
+                import StringIO
+                fileLikeOpen = StringIO.StringIO()
+                sys.stderr = fileLikeOpen
+                os.system(musescoreRun)
+                fileLikeOpen.close()
+                sys.stderr = storedStrErr
+                
+                fp = fpOut[0:len(fpOut) - 4] + "-1.png"
+                
             return fp
 
         elif fileFormat in ['braille', 'lily', 'lilypond']:
@@ -3362,7 +3395,7 @@ class Music21Object(object):
         fmt argument or, if not provided, the format set in the user's Environment 
 
         Valid formats include (but are not limited to)::
-            xml (musicxml)
+            musicxml
             text
             midi
             lily (or lilypond)
@@ -3371,6 +3404,7 @@ class Music21Object(object):
             lily.svg
             braille
             vexflow
+            musicxml.png
 
         N.B. score.write('lily') returns a bare lilypond file,
         score.show('lily') runs it through lilypond and displays it as a png.
@@ -3431,6 +3465,15 @@ class Music21Object(object):
         elif fmt in ['musicxml', 'midi']: # a format that writes a file
             returnedFilePath = self.write(fileFormat)
             environLocal.launch(fileFormat, returnedFilePath, app=app)
+        elif fmt in ['musicxml.png']:
+            returnedFilePath = self.write(fileFormat)
+            if common.runningUnderIPython():
+                from music21.ipython21 import objects as ipythonObjects
+                ipo = ipythonObjects.IPythonPNGObject(returnedFilePath)
+                return ipo
+            else:
+                environLocal.launch(fileFormat, returnedFilePath, app=app)
+                
 
         elif fmt == 'braille':
             returnedFilePath = self.write(fileFormat)

@@ -190,6 +190,7 @@ class _EnvironmentCore(object):
         self._keysToPaths.append('pdfPath')
         self._keysToPaths.append('midiPath')
         self._keysToPaths.append('localCorpusPath')
+        self._keysToPaths.append('musescoreDirectPNGPath')
 
         # defines all valid keys in ref
         self._loadDefaults(forcePlatform=forcePlatform) 
@@ -211,12 +212,15 @@ class _EnvironmentCore(object):
         self._ref['lilypondVersion'] = None # version of lilypond
         self._ref['lilypondFormat'] = 'pdf' 
         self._ref['lilypondBackend'] = 'ps' 
-        # path to a MusicXML reader: default, will find "Finale Reader"
+        # path to a MusicXML reader: default, will find "Finale Notepad"
         self._ref['musicxmlPath'] = None 
         self._ref['midiPath'] = None # path to a midi reader
         self._ref['graphicsPath'] = None # path to a graphics viewer
         self._ref['vectorPath'] = None # path to a vector graphics viewer
         self._ref['pdfPath'] = None # path to a pdf viewer
+
+        # path to MuseScore (if not the musicxmlPath...) for direct creation of PNG from MusicXML
+        self._ref['musescoreDirectPNGPath'] = None
         self._ref['showFormat'] = 'musicxml' 
         self._ref['writeFormat'] = 'musicxml' 
         self._ref['autoDownload'] = 'ask' 
@@ -243,14 +247,15 @@ class _EnvironmentCore(object):
         elif platform ==  'darwin':
             for name, value in [
             ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-            ('musicxmlPath', '/Applications/Finale Reader.app'),
+            ('musicxmlPath', '/Applications/Finale Notepad 2012.app'),
             ('graphicsPath', '/Applications/Preview.app'),
             ('vectorPath', '/Applications/Preview.app'),
             ('pdfPath', '/Applications/Preview.app'),
             ('midiPath', '/Applications/QuickTime Player.app'),
-
+            ('musescoreDirectPNGPath', '/Applications/MuseScore.app/Contents/MacOS/mscore'),
                 ]:
                 self.__setitem__(name, value) # use for key checking
+            
 
     def restoreDefaults(self):
         self._ref = {}
@@ -636,7 +641,7 @@ class Environment(object):
         
         >>> a = environment.Environment()
         >>> a.getKeysToPaths()
-        ['lilypondPath', 'musicxmlPath', 'graphicsPath', 'vectorPath', 'pdfPath', 'midiPath', 'localCorpusPath']
+        ['lilypondPath', 'musicxmlPath', 'graphicsPath', 'vectorPath', 'pdfPath', 'midiPath', 'localCorpusPath', 'musescoreDirectPNGPath']
         '''
         return _environStorage['instance'].getKeysToPaths()
 
@@ -646,7 +651,7 @@ class Environment(object):
         
         >>> a = environment.Environment()
         >>> a.getRefKeys()
-        ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+        ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'musescoreDirectPNGPath', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
         '''
         return _environStorage['instance'].getRefKeys()
 
@@ -699,7 +704,7 @@ class Environment(object):
         
         >>> e = environment.Environment()
         >>> e.keys()
-        ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
+        ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'musescoreDirectPNGPath', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
 
         '''
         return _environStorage['instance'].keys()
@@ -833,7 +838,7 @@ class UserSettings(object):
     Second, view the available settings keys.
 
     >>> us.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'musescoreDirectPNGPath', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
 
     Third, after finding the desired setting, supply the 
     new value as a Python dictionary key value pair. Setting 
@@ -986,7 +991,7 @@ def set(key, value): # okay to override set here: @ReservedAssignment
 
     
     >>> environment.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'musescoreDirectPNGPath', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
     >>> environment.set('wer', 'asdf')
     Traceback (most recent call last):
     EnvironmentException: no preference: wer
@@ -1004,7 +1009,7 @@ def get(key):
 
     
     >>> environment.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'musescoreDirectPNGPath', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
     >>> #_DOCS_SHOW environment.get('musicxmlPath')
     '/Applications/Finale Reader.app'
     '''
@@ -1055,6 +1060,7 @@ class Test(unittest.TestCase):
         env = Environment(forcePlatform='darwin')
         match = _environStorage['instance']._toSettings(
             _environStorage['instance']._ref).xmlStr()
+        self.maxDiff = None
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <preference name="lilypondBackend" value="ps"/>
@@ -1064,17 +1070,18 @@ class Test(unittest.TestCase):
   <preference name="warnings" value="1"/>
   <preference name="showFormat" value="musicxml"/>
   <localCorpusSettings/>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
   <preference name="vectorPath" value="/Applications/Preview.app"/>
   <preference name="writeFormat" value="musicxml"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
   <preference name="directoryScratch"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="debug" value="0"/>
-  <preference name="musicxmlPath" value="/Applications/Finale Reader.app"/>
+  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
   <preference name="autoDownload" value="ask"/>
   <preference name="midiPath" value="/Applications/QuickTime Player.app"/>
 </settings>
-""",  match)
+""".split('\n'),  match.split('\n'))
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = ['a', 'b', 'c']
@@ -1093,17 +1100,18 @@ class Test(unittest.TestCase):
     <localCorpusPath>b</localCorpusPath>
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
   <preference name="vectorPath" value="/Applications/Preview.app"/>
   <preference name="writeFormat" value="musicxml"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
   <preference name="directoryScratch"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="debug" value="0"/>
-  <preference name="musicxmlPath" value="/Applications/Finale Reader.app"/>
+  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
   <preference name="autoDownload" value="ask"/>
   <preference name="midiPath" value="/Applications/QuickTime Player.app"/>
 </settings>
-""",  match)
+""".split('\n'),  match.split('\n'))
 
 
     def testFromSettings(self):
@@ -1135,17 +1143,18 @@ class Test(unittest.TestCase):
     <localCorpusPath>y</localCorpusPath>
     <localCorpusPath>z</localCorpusPath>
   </localCorpusSettings>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
   <preference name="vectorPath" value="/Applications/Preview.app"/>
   <preference name="writeFormat" value="musicxml"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
   <preference name="directoryScratch"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="debug" value="0"/>
-  <preference name="musicxmlPath" value="/Applications/Finale Reader.app"/>
+  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
   <preference name="autoDownload" value="ask"/>
   <preference name="midiPath" value="w"/>
 </settings>
-""",  match)
+""".split(),  match.split())
 
 
     def testEnvironmentA(self):
