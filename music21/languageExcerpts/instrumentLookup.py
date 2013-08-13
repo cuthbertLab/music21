@@ -8,6 +8,9 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
+
 abbreviationToBestName = \
 {u'a sax': u'alto saxophone',
  u'a.': u'alto',

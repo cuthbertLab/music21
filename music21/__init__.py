@@ -61,7 +61,6 @@ __all__ = [
     'counterpoint',
     'corpus', 
     'demos',
-    'doc',
     'documentation',
     'features',
     'figuredBass', 

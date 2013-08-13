@@ -92,7 +92,7 @@ MusicXML reader locally...
 .. parsed-literal::
    :class: ipython-result
 
-    <music21.ipython21.objects.IPythonPNGObject at 0x10ee7c410>
+    <music21.ipython21.objects.IPythonPNGObject at 0x10906ae10>
 
 
 Nor does just generating a lilypond PNG work as you'd like -- this will
@@ -106,7 +106,7 @@ display it on the screen but not in your browser:
 .. parsed-literal::
    :class: ipython-result
 
-    u'/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T/music21/tmpXpcJUYly.png'
+    u'/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T/music21/tmpI7k6xFly.png'
 
 
 Instead do this:
@@ -149,7 +149,7 @@ SVG is much faster, but it doesn't work, sadly...
 
     ---------------------------------------------------------------------------
     ValueError                                Traceback (most recent call last)
-    <ipython-input-8-a78ad09b705c> in <module>()
+    <ipython-input-9-a78ad09b705c> in <module>()
     ----> 1 Image(filename=c.write('lily.svg'))
     
     /Library/Python/2.7/site-packages/ipython-0.14.dev-py2.7.egg/IPython/core/display.pyc in __init__(self, data, url, filename, format, embed, width, height)

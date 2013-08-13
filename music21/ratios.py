@@ -10,6 +10,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
+
 import math
 import unittest
 from decimal import Decimal

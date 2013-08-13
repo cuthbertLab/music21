@@ -60,7 +60,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
     ### SPECIAL METHODS ###
     
     def __call__(self):
-        from music21 import documentation
+        from music21 import documentation # @UnresolvedImport
         moduleReferenceDirectoryPath = os.path.join(
             documentation.__path__[0],
             'source',
@@ -109,7 +109,7 @@ class CorpusReferenceReSTWriter(ReSTWriter):
     ### SPECIAL METHODS ###
 
     def __call__(self):
-        from music21 import documentation
+        from music21 import documentation # @UnresolvedImport
         systemReferenceDirectoryPath = os.path.join(
             documentation.__path__[0],
             'source',
@@ -135,7 +135,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     ### SPECIAL METHODS ###
 
     def __call__(self):
-        from music21 import documentation
+        from music21 import documentation # @UnresolvedImport
         ipythonNotebookFilePaths = [x for x in
             documentation.IPythonNotebookIterator()()]
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
@@ -240,15 +240,18 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             prev = cur
             
     def _runNBConvert(self, ipythonNotebookFilePath):
-        import music21
+#         import music21
         from music21 import common
         #runDirectoryPath = common.getBuildDocFilePath()
-        pathParts = music21.__path__ + [
-            'ext',
-            'nbconvert',
-            'nbconvert.py',
-            ]
-        nbconvertPath = os.path.join(*pathParts)
+        nbconvertPath = os.path.join(os.path.dirname(common.getSourceFilePath()), 
+                                     'ext', 'nbconvert', 'nbconvert.py')
+        #print nbconvertPath
+#         pathParts = os.path.dirname(getSourceFilePath())music21.__path__ + [
+#             'ext',
+#             'nbconvert',
+#             'nbconvert.py',
+#             ]
+#         nbconvertPath = os.path.join(*pathParts)
         nbconvertCommand = '{executable} rst {notebook}'.format(
             #executable=os.path.relpath(nbconvertPath, runDirectoryPath),
             #notebook=os.path.relpath(ipythonNotebookFilePath, runDirectoryPath),
@@ -260,6 +263,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         subprocess.call(nbconvertCommand, shell=True)
 
     def _processNotebook(self, ipythonNotebookFilePath):
+        from music21 import documentation # @UnresolvedImport
         with open(ipythonNotebookFilePath, 'r') as f:
             contents = f.read()
             contentsAsJson = json.loads(contents)

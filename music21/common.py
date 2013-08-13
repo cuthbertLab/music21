@@ -1460,7 +1460,8 @@ def dirPartitioned(obj, skipLeading=['__']):
 # tools for setup.py
 def getSourceFilePath():
     '''
-    Get the music21 directory that contains source files. This is not the same as the outermost package development directory. 
+    Get the music21 directory that contains source files. This is not the same as the 
+    outermost package development directory. 
     '''
     import music21
     fpMusic21 = music21.__path__[0] # list, get first item
@@ -1500,7 +1501,6 @@ def getTestDocsFilePath():
 
 def getMetadataCacheFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache. 
-
     
     >>> fp = common.getMetadataCacheFilePath()
     >>> fp.endswith('corpus/metadataCache') or fp.endswith(r'corpus\metadataCache')

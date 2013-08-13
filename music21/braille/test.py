@@ -8,6 +8,9 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
+
 from music21 import articulations, bar, chord, clef, dynamics, \
     expressions, key, meter, note, pitch, spanner, stream, tempo, tinyNotation
 import unittest

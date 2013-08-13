@@ -7,6 +7,7 @@
 #
 # License:      LGPL
 #-------------------------------------------------------------------------------
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 import unittest

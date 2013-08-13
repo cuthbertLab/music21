@@ -40,7 +40,7 @@ Currently supported targets include:
 
 
 def _main(target):
-    from music21 import documentation
+    from music21 import documentation # @UnresolvedImport
     documentationDirectoryPath = documentation.__path__[0]
     sourceDirectoryPath = os.path.join(
         documentationDirectoryPath,

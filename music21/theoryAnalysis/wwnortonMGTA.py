@@ -9,6 +9,8 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
 import music21
 
 from music21 import converter

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0 obj="<mus...">
   {0.0} <music21.humdrum.MiscTandem **kern humdrum control>

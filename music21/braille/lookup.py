@@ -8,6 +8,9 @@
 # License:      LGPL, see license.txt
 #-----------------------------------------------------------------------------------
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
+
 c = {'128th':   u'\u2819',
      '64th':    u'\u2839',
      '32nd':    u'\u281d',
