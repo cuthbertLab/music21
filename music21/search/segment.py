@@ -183,20 +183,26 @@ def loadScoreDict(fp):
         scoreDict = json.load(fh)
     return scoreDict
 
-def getDifflibOrPyLev(seq2 = None, junk=None):
+def getDifflibOrPyLev(seq2 = None, junk=None, forceDifflib = False):
     '''
     returns either a difflib.SequenceMatcher or pyLevenshtein StringMatcher.StringMatcher
     object depending on what is installed.
+    
+    If forceDifflib is True then use difflib even if pyLevenshtein is installed:
     '''
-    try:
-        import StringMatcher as pyLevenshtein 
-        smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
-    except ImportError:
+    
+    if forceDifflib is True:
         smObject = difflib.SequenceMatcher(junk, '', seq2)
+    else:
+        try:
+            import StringMatcher as pyLevenshtein 
+            smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
+        except ImportError:
+            smObject = difflib.SequenceMatcher(junk, '', seq2)
     
     return smObject
 
-def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeReverse = False):
+def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeReverse = False, forceDifflib = False):
     r'''Find the level of similarity between each pair of segments in a scoreDict.
     
     This takes twice as long as it should because it does not cache the pairwise similarity.
@@ -206,7 +212,8 @@ def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeRev
         >>> fps = corpus.search('bwv19')
         >>> fpsNamesOnly = [x[0] for x in fps]
         >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
-        >>> scoreSim = search.segment.scoreSimilarity(scoreDict)
+        >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib = True) #_DOCS_HIDE
+        >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
         >>> len(scoreSim)
         671
     
@@ -220,7 +227,7 @@ def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeRev
         >>> pprint.pprint(scoreSim[64:68])
         [(u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 3, 17, 0.0),
          (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 4, 22, 0.0),
-         (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.45...),
+         (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.377...),
          (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 1, 5, 0.339...)]
 
     Return tuple.
@@ -240,7 +247,7 @@ def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeRev
                 if len(thisSegment) < minimumLength:
                     continue
                 thisMeasureNumber = thisScore[pNum]['measureList'][segmentNumber]
-                dl = getDifflibOrPyLev(thisSegment)
+                dl = getDifflibOrPyLev(thisSegment, forceDifflib = forceDifflib)
                 #dl = difflib.SequenceMatcher(None, '', thisSegment)
                 for thatScoreNumber in range(scoreIndex, totalScores):
                     thatScoreKey = scoreDictKeys[thatScoreNumber]

@@ -267,7 +267,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         with open(ipythonNotebookFilePath, 'r') as f:
             contents = f.read()
             contentsAsJson = json.loads(contents)
-        directoryPath, sep, baseName = ipythonNotebookFilePath.rpartition(
+        directoryPath, unused_sep, baseName = ipythonNotebookFilePath.rpartition(
             os.path.sep)
         baseNameWithoutExtension = os.path.splitext(baseName)[0]
         imageFilesDirectoryPath = os.path.join(
