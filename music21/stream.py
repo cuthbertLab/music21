@@ -4234,7 +4234,7 @@ class Stream(base.Music21Object):
     #--------------------------------------------------------------------------
     # offset manipulation
 
-    def shiftElements(self, offset, classFilterList=None):
+    def shiftElements(self, offset, startOffset=None, endOffset=None, classFilterList=None):
         '''
         Add the given offset value to every offset of 
         the objects found in the Stream. Objects that are 
@@ -4242,7 +4242,10 @@ class Stream(base.Music21Object):
         .storeAtEnd() (such as right barlines) are
         not affected.
 
-        
+        If startOffset is given then all elements before 
+        that offset will be shifted.  If endOffset is given
+        then all elements at or after this offset will be
+        shifted
 
         >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(0,10))
@@ -4252,9 +4255,46 @@ class Stream(base.Music21Object):
         >>> a.shiftElements(-10)
         >>> a.lowestOffset
         20.0
+
+        Use shiftElements to move elements after a change in
+        duration:
+
+        >>> st2 = stream.Stream()
+        >>> st2.insert(0, note.Note('D4', type='whole'))
+        >>> st2.repeatInsert(note.Note('C4'), range(4, 8))
+        >>> st2.show('text')
+        {0.0} <music21.note.Note D>
+        {4.0} <music21.note.Note C>
+        {5.0} <music21.note.Note C>
+        {6.0} <music21.note.Note C>
+        {7.0} <music21.note.Note C>
+
+        Now make the first note a dotted whole note and shift the rest by two quarters...
+
+        >>> firstNote = st2[0]
+        >>> firstNoteOldQL = firstNote.quarterLength
+        >>> firstNote.duration.dots = 1
+        >>> firstNoteNewQL = firstNote.quarterLength
+        >>> shiftAmount = firstNoteNewQL - firstNoteOldQL
+        >>> shiftAmount
+        2.0
+        
+        >>> st2.shiftElements(shiftAmount, startOffset=4.0)
+        >>> st2.show('text')
+        {0.0} <music21.note.Note D>
+        {6.0} <music21.note.Note C>
+        {7.0} <music21.note.Note C>
+        {8.0} <music21.note.Note C>
+        {9.0} <music21.note.Note C>        
         '''
         # only want _elements, do not want _endElements
         for e in self._elements:
+            
+            if startOffset is not None and e.getOffsetBySite(self) < startOffset:
+                continue
+            if endOffset is not None and e.getOffsetBySite(self) >= endOffset:
+                continue
+            
             match = False
             if classFilterList != None:
                 for className in classFilterList:
