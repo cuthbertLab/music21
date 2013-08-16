@@ -33,14 +33,13 @@ from music21 import converter
 from music21 import exceptions21
 from music21 import metadata
 from music21.corpus import virtual
-from music21.corpus.metadataCache import metadataCache
 
 from music21 import environment
 _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
 
-# a list of metadataCache's can reside in this module-level storage; this 
+# a list of metadata's can reside in this module-level storage; this 
 # data is loaded on demand. 
 _METADATA_BUNDLES = {'core':None, 'virtual':None, 'local':None}
 
@@ -335,7 +334,7 @@ def _updateMetadataBundle():
 
     Note that this updates the in-memory cached metdata bundles 
     not the disk caches (that's MUCH slower!) to do that run
-    corpus.metadataCache.metadataCache.py
+    corpus.metadata.metadata.py
     '''
     for d, f in (('core', getCorePaths), ('virtual', getVirtualPaths),
                  ('local', getLocalPaths)):
@@ -352,7 +351,7 @@ def cacheMetadata(domainList=['local']):
     for domain in domainList:
         # remove any cached values
         _METADATA_BUNDLES[domain] = None
-    metadataCache.cacheMetadata(domainList)        
+    metadata.cacheMetadata(domainList)        
 
 def search(query, field=None, domain=['core', 'virtual', 'local'],     
     extList=None):

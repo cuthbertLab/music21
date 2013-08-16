@@ -2088,40 +2088,10 @@ class MetadataBundle(object):
                 self.name)
         return fp
 
-    def corpusPathToKey(self, fp, number=None):
-        '''Given a file path or corpus path, return the meta-data path
-    
-        
-        >>> mb = metadata.MetadataBundle()
-        >>> mb.corpusPathToKey('bach/bwv1007/prelude').endswith('bach_bwv1007_prelude')
-        True
-        >>> mb.corpusPathToKey('/beethoven/opus59no1/movement1.xml').endswith('beethoven_opus59no1_movement1_xml')
-        True
-        '''
-        if 'corpus' in fp and 'music21' in fp:
-            cp = fp.split('corpus')[-1] # get fp after corpus
-        else:
-            cp = fp
-    
-        if cp.startswith(os.sep):
-            cp = cp[1:]
-    
-        cp = cp.replace('/', '_')
-        cp = cp.replace(os.sep, '_')
-        cp = cp.replace('.', '_')
-    
-        # append name to metadata path
-        if number == None:
-            return cp
-        else:
-            # append work number
-            return cp+'_%s' % number
-    
-    
+    ### PUBLIC METHODS ###
 
     def addFromPaths(self, pathList, printDebugAfter=0, useCorpus=False):
         '''
-
         Parse and store metadata from numerous files.
 
         If any files cannot be loaded, their file paths will be collected in a
@@ -2214,19 +2184,35 @@ class MetadataBundle(object):
 
         return fpError
 
-    def write(self):
-        '''
-        Write the JSON storage of all Metadata or 
-        RichMetadata contained in this object. 
-
-        TODO: Test!
-        '''
-        fp = self._getFilePath()
-        environLocal.printDebug(['MetadataBundle: writing:', fp])
+    def corpusPathToKey(self, fp, number=None):
+        '''Given a file path or corpus path, return the meta-data path
+    
         
-        jsf = freezeThaw.JSONFreezer(self)
-        return jsf.jsonWrite(fp)
-
+        >>> mb = metadata.MetadataBundle()
+        >>> mb.corpusPathToKey('bach/bwv1007/prelude').endswith('bach_bwv1007_prelude')
+        True
+        >>> mb.corpusPathToKey('/beethoven/opus59no1/movement1.xml').endswith('beethoven_opus59no1_movement1_xml')
+        True
+        '''
+        if 'corpus' in fp and 'music21' in fp:
+            cp = fp.split('corpus')[-1] # get fp after corpus
+        else:
+            cp = fp
+    
+        if cp.startswith(os.sep):
+            cp = cp[1:]
+    
+        cp = cp.replace('/', '_')
+        cp = cp.replace(os.sep, '_')
+        cp = cp.replace('.', '_')
+    
+        # append name to metadata path
+        if number == None:
+            return cp
+        else:
+            # append work number
+            return cp+'_%s' % number
+    
     def read(self, fp=None):
         '''
         Load self from the file path suggested by the name 
@@ -2251,6 +2237,70 @@ class MetadataBundle(object):
             'md items:', 
             len(self.storage)
             ])
+
+    def search(self, query, field=None, extList=None):
+        '''
+        Perform search, on all stored metadata, permit 
+        regular expression matching. 
+
+        Return pairs of file paths and work numbers, or None
+
+        ::
+
+            >>> mb = metadata.MetadataBundle()
+            >>> mb.addFromPaths(corpus.getWorkList('ciconia'))
+            []
+
+        ::
+
+            >>> mb.updateAccessPaths(corpus.getWorkList('ciconia'))
+            >>> post = mb.search('cicon', 'composer')
+            >>> len(post[0])
+            2
+
+        ::
+
+            >>> post = mb.search('cicon', 'composer', extList=['.krn'])
+            >>> len(post) # no files in this format
+            0
+
+        ::
+
+            >>> post = mb.search('cicon', 'composer', extList=['.xml'])
+            >>> len(post)  # shouldn't this be 11?
+            1   
+
+        '''
+        post = []
+        for key in self.storage:
+            md = self.storage[key]
+#            if md.title is not None and 'Renmin' in md.title: # test -- china/chinese/etc.
+#                print key
+#                print "\n"
+#                print self.storage[key]
+            match, unused_fieldPost = md.search(query, field)
+            if match:
+                # returns a pair of file path, work number
+                if md.number != "" and md.number is not None:
+                    number = int(md.number)
+                else:
+                    number = md.number
+                try:
+                    result = (self._accessPaths[key], number)
+                    include = False
+                    if extList != None:
+                        for ext in extList:
+                            if result[0].endswith(ext) or\
+                                (ext.endswith('xml') and (result[0].endswith('mxl') or result[0].endswith('mx'))):
+                                include = True
+                                break
+                    else:
+                        include = True
+                    if include and result not in post:
+                        post.append(result)  
+                except KeyError:
+                    pass # in metadata cache, but no longer in filesystem
+        return post
 
     def updateAccessPaths(self, pathList):
         r'''
@@ -2352,69 +2402,136 @@ class MetadataBundle(object):
         #environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
         #return post
 
-    def search(self, query, field=None, extList=None):
+    def write(self):
         '''
-        Perform search, on all stored metadata, permit 
-        regular expression matching. 
+        Write the JSON storage of all Metadata or 
+        RichMetadata contained in this object. 
 
-        Return pairs of file paths and work numbers, or None
-
-        ::
-
-            >>> mb = metadata.MetadataBundle()
-            >>> mb.addFromPaths(corpus.getWorkList('ciconia'))
-            []
-
-        ::
-
-            >>> mb.updateAccessPaths(corpus.getWorkList('ciconia'))
-            >>> post = mb.search('cicon', 'composer')
-            >>> len(post[0])
-            2
-
-        ::
-
-            >>> post = mb.search('cicon', 'composer', extList=['.krn'])
-            >>> len(post) # no files in this format
-            0
-
-        ::
-
-            >>> post = mb.search('cicon', 'composer', extList=['.xml'])
-            >>> len(post)  # shouldn't this be 11?
-            1   
-
+        TODO: Test!
         '''
-        post = []
-        for key in self.storage:
-            md = self.storage[key]
-#            if md.title is not None and 'Renmin' in md.title: # test -- china/chinese/etc.
-#                print key
-#                print "\n"
-#                print self.storage[key]
-            match, unused_fieldPost = md.search(query, field)
-            if match:
-                # returns a pair of file path, work number
-                if md.number != "" and md.number is not None:
-                    number = int(md.number)
-                else:
-                    number = md.number
-                try:
-                    result = (self._accessPaths[key], number)
-                    include = False
-                    if extList != None:
-                        for ext in extList:
-                            if result[0].endswith(ext) or\
-                                (ext.endswith('xml') and (result[0].endswith('mxl') or result[0].endswith('mx'))):
-                                include = True
-                                break
-                    else:
-                        include = True
-                    if include and result not in post:
-                        post.append(result)  
-                except KeyError:
-                    pass # in metadata cache, but no longer in filesystem
-        return post
+        fp = self._getFilePath()
+        environLocal.printDebug(['MetadataBundle: writing:', fp])
+        
+        jsf = freezeThaw.JSONFreezer(self)
+        return jsf.jsonWrite(fp)
+
+
+#-------------------------------------------------------------------------------
+
+
+class MetadataCacheException(exceptions21.Music21Exception):
+    pass
+
+
+def cacheMetadata(domains=('local', 'core', 'virtual')): 
+    '''
+    The core cache is all locally-stored corpus files. 
+    '''
+    from music21 import corpus, metadata
+
+    if not common.isListLike(domains):
+        domains = (domains,)
+
+    timer = common.Timer()
+    timer.start()
+
+    # store list of file paths that caused an error
+    filePathErrors = []
+
+    # the core cache is based on local files stored in music21
+    # virtual is on-line
+    for domain in domains:
+        # the domain passed here becomes the name of the bundle
+        # determines the file name of the json bundle
+        metadataBundle = metadata.MetadataBundle(domain)
+        if domain == 'virtual':
+            getPaths = corpus.getVirtualPaths
+        elif domain == 'core':
+            getPaths = corpus.getCorePaths
+        elif domain == 'local':
+            getPaths = corpus.getLocalPaths  
+        else:
+            raise MetadataCacheException('invalid domain provided: {0}'.format(
+                domain))
+        paths = getPaths()
+        environLocal.warn(
+            'metadata cache: starting processing of paths: {0}'.format(
+                len(paths)))
+        #metadataBundle.addFromPaths(paths[-3:])
+        # returns any paths that failed to load
+        filePathErrors += metadataBundle.addFromPaths(
+            paths, printDebugAfter=1) 
+        #print metadataBundle.storage
+        metadataBundle.write() # will use a default file path based on domain
+        environLocal.warn(
+            'cache: writing time: {0} md items: {1}'.format(
+                timer, len(metadataBundle.storage)))
+        del metadataBundle
+
+    environLocal.warn('cache: final writing time: {0}'.format(timer))
+    for filePath in filePathErrors:
+        environLocal.warn('path failed to parse: {0}'.format(filePath))
+
+
+def cacheCoreMetadataMultiprocess(ipythonMod=None, stopAfter=None): 
+    '''
+    The core cache is all locally-stored corpus files. 
+    '''
+    from music21 import corpus, metadata
+
+    timer = common.Timer()
+    timer.start()
+
+    # store list of file paths that caused an error
+    #fpError = []
+
+    metadataBundle = metadata.MetadataBundle('core')
+
+    pathsFull = corpus.getCorePaths()
+    pathsShort = []
+    lenCorpusPath = len(common.getCorpusFilePath())
+    
+    for i, path in enumerate(pathsFull):
+        pathsShort.append(path[lenCorpusPath:])
+        if stopAfter is not None and i >= stopAfter:
+            break
+    
+    environLocal.warn(
+        'metadata cache: starting processing of paths: {0}'.format(
+            len(pathsShort)))
+    
+    #metadataBundle.addFromPaths(paths[-3:])
+    # returns any paths that failed to load
+    for i in range(0, len(pathsShort), 100):
+        maxI = min(i+100, len(pathsShort))
+        pathsChunk = pathsShort[i:maxI]
+        environLocal.warn(
+            'Starting multiprocessing with chunk {0}, first is {1}'.format(
+                i, pathsChunk[0]))
+        allKeys = ipythonMod.map_async(
+            cacheCoreMetadataMultiprocessHelper, pathsChunk)
+        for key in keys:
+            for subkey in key:
+                metadataBundle.storage[subkey[0]] = subkey[1]
+    
+    #print metadataBundle.storage
+    metadataBundle.write() # will use a default file path based on domain
+
+    environLocal.warn(
+        'cache: writing time: {0} md items: {1}'.format(
+            timer, len(metadataBundle.storage)))
+    del metadataBundle
+
+
+def cacheCoreMetadataMultiprocessHelper(filePath=None):
+    from music21 import metadata
+    metadataBundle = metadata.MetadataBundle('core')
+    unused_fpError = metadataBundle.addFromPaths(
+        [filePath], printDebugAfter=1, useCorpus=True) 
+    result = []
+    for key in metadataBundle.storage:
+        result.append((key, metadataBundle.storage[key]))
+    return result
 
 
 #-------------------------------------------------------------------------------
