@@ -1,36 +1,45 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         duration.py
-# Purpose:      music21 classes for representing score and work meta-data
+# Name:         duration.py Purpose:      music21 classes for representing
+# score and work meta-data
 #
-# Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+# Authors:      Christopher Ariza Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
+# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
+# Project License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-'''Classes and functions for creating and processing metadata associated with scores, works, and fragments, such as titles, movements, authors, publishers, and regions.
+'''Classes and functions for creating and processing metadata associated with
+scores, works, and fragments, such as titles, movements, authors, publishers,
+and regions.
 
-The :class:`~music21.metadata.Metadata` object is the main public interface to metadata components. A Metadata object can be added to a Stream and used to set common score attributes, such as title and composer. A Metadata object found at offset zero can be accessed through a Stream's :attr:`~music21.stream.Stream.metadata` property. 
+The :class:`~music21.metadata.Metadata` object is the main public interface to
+metadata components. A Metadata object can be added to a Stream and used to set
+common score attributes, such as title and composer. A Metadata object found at
+offset zero can be accessed through a Stream's
+:attr:`~music21.stream.Stream.metadata` property. 
 
-The following example creates a :class:`~music21.stream.Stream` object, adds a :class:`~music21.note.Note` object, and configures and adds the :attr:`~music21.metadata.Metadata.title` and :attr:`~music21.metadata.Metadata.composer` properties of a Metadata object. 
+The following example creates a :class:`~music21.stream.Stream` object, adds a
+:class:`~music21.note.Note` object, and configures and adds the
+:attr:`~music21.metadata.Metadata.title` and
+:attr:`~music21.metadata.Metadata.composer` properties of a Metadata object. 
 
+::
 
->>> s = stream.Stream()
->>> s.append(note.Note())
->>> s.insert(metadata.Metadata())
->>> s.metadata.title = 'title'
->>> s.metadata.composer = 'composer'
->>> #_DOCS_SHOW s.show()
+    >>> s = stream.Stream()
+    >>> s.append(note.Note())
+    >>> s.insert(metadata.Metadata())
+    >>> s.metadata.title = 'title'
+    >>> s.metadata.composer = 'composer'
+    >>> #_DOCS_SHOW s.show()
 
 .. image:: images/moduleMetadata-01.*
     :width: 600
 
 '''
+
 import unittest
 import datetime
 import os
-#import inspect
 import re
 
 from music21 import base
@@ -43,29 +52,33 @@ from music21 import environment
 _MOD = "metadata.py"
 environLocal = environment.Environment(_MOD)
 
-
-
 #-------------------------------------------------------------------------------
+
 class MetadataException(exceptions21.Music21Exception):
     pass
-
 
 #-------------------------------------------------------------------------------
 # utility dictionaries and conversion functions; used by objects defined in this
 # module
 
 # error can be designated with either symbol in string date representations
+
 APPROXIMATE = ['~', 'x']
 UNCERTAIN = ['?', 'z']
 
 def errorToSymbol(value):
     '''Convert an error string (appoximate, uncertain) into a symbol.
 
-    
-    >>> metadata.errorToSymbol('approximate')
-    '~'
-    >>> metadata.errorToSymbol('uncertain')
-    '?'
+    ::
+
+        >>> metadata.errorToSymbol('approximate')
+        '~'
+
+    ::
+
+        >>> metadata.errorToSymbol('uncertain')
+        '?'
+
     '''
     if value.lower() in APPROXIMATE + ['approximate']:
         return APPROXIMATE[0]
@@ -85,6 +98,7 @@ roleAbbreviationsDict = {
     'lor' : 'orchestrator',
     'trn' : 'translator',
     }
+
 # !!!COM: Composer's name.
 # !!!COA: Attributed composer.
 # !!!COS: Suspected composer.
@@ -100,16 +114,26 @@ roleAbbreviationsDict = {
 ROLE_ABBREVIATIONS = roleAbbreviationsDict.keys()
 ROLES = roleAbbreviationsDict.values()
 
+
 def abbreviationToRole(value):
     '''Get ROLE_ABBREVIATIONS as string-like attributes, used for Contributors. 
 
-    
-    >>> metadata.abbreviationToRole('com')
-    'composer'
-    >>> metadata.abbreviationToRole('lib')
-    'librettist'
-    >>> for id in metadata.ROLE_ABBREVIATIONS: 
-    ...    post = metadata.abbreviationToRole(id)
+    ::
+
+        >>> metadata.abbreviationToRole('com')
+        'composer'
+
+    ::
+
+        >>> metadata.abbreviationToRole('lib')
+        'librettist'
+
+    ::
+
+        >>> for id in metadata.ROLE_ABBREVIATIONS: 
+        ...    post = metadata.abbreviationToRole(id)
+        ...
+
     '''
     value = value.lower()
     if value in roleAbbreviationsDict:
@@ -121,11 +145,17 @@ def abbreviationToRole(value):
 def roleToAbbreviation(value):
     '''Get a role id from a string representation.
 
-    
-    >>> metadata.roleToAbbreviation('composer')
-    'com'
-    >>> for n in metadata.ROLES:
-    ...     post = metadata.roleToAbbreviation(n)
+    ::
+
+        >>> metadata.roleToAbbreviation('composer')
+        'com'
+
+    ::
+
+        >>> for n in metadata.ROLES:
+        ...     post = metadata.roleToAbbreviation(n)
+        ...
+
     '''
     # note: probably not the fastest way to do this
     for role_id in ROLE_ABBREVIATIONS:
@@ -188,17 +218,25 @@ for key, value in workIdAbbreviationDict.items():
 # !!!OCY: Country of composition. 
 # !!!OPC: City, town or village of composition. 
 
+
 WORK_ID_ABBREVIATIONS = workIdAbbreviationDict.keys()
 WORK_IDS = workIdAbbreviationDict.values()
+
 
 def abbreviationToWorkId(value):
     '''Get work id abbreviations.
 
-    
-    >>> metadata.abbreviationToWorkId('otl')
-    'title'
-    >>> for id in metadata.WORK_ID_ABBREVIATIONS: 
-    ...    post = metadata.abbreviationToWorkId(id)
+    ::
+
+        >>> metadata.abbreviationToWorkId('otl')
+        'title'
+
+    ::
+
+        >>> for id in metadata.WORK_ID_ABBREVIATIONS: 
+        ...    post = metadata.abbreviationToWorkId(id)
+        ...
+
     '''
     value = value.lower()
     if value in workIdAbbreviationDict:
@@ -209,11 +247,17 @@ def abbreviationToWorkId(value):
 def workIdToAbbreviation(value):
     '''Get a work abbreviation from a string representation.
 
-    
-    >>> metadata.workIdToAbbreviation('localeOfComposition')
-    'opc'
-    >>> for n in metadata.WORK_IDS:
-    ...     post = metadata.workIdToAbbreviation(n)
+    ::
+
+        >>> metadata.workIdToAbbreviation('localeOfComposition')
+        'opc'
+
+    ::
+
+        >>> for n in metadata.WORK_IDS:
+        ...     post = metadata.workIdToAbbreviation(n)
+        ...
+
     '''
     # NOTE: this is a performance critical function
     try:
@@ -229,28 +273,26 @@ def workIdToAbbreviation(value):
     raise MetadataException('no such work id: %s' % value)
 
 
-
-
-
-
-
-
-
 #-------------------------------------------------------------------------------
-class Text(object):
+
+
+class Text(object): 
     '''
-    One unit of text data: a title, a name, or some other text data. 
-    Store the string and a language name or code. This object can be used 
-    and/or subclassed for a variety for of text storage.
-    '''
-    def __init__(self, data='', language=None):
-        '''
-        
-        
+    One unit of text data: a title, a name, or some other text data. Store the 
+    string and a language name or code. This object can be used and/or 
+    subclassed for a variety for of text storage.
+
+    ::
+
         >>> td = metadata.Text('concerto in d', 'en')
         >>> str(td)
         'concerto in d'
-        '''
+
+    '''
+
+    ### INITIALIZER ###
+
+    def __init__(self, data='', language=None):
         if isinstance(data, Text): # if this is a Text obj, get data
             # accessing private attributes here; not desirable
             self._data = data._data
@@ -258,6 +300,8 @@ class Text(object):
         else:            
             self._data = data
             self._language = language
+
+    ### SPECIAL METHODS ###
 
     def __str__(self):
         #print type(self._data)
@@ -267,73 +311,100 @@ class Text(object):
         else:
             return str(self._data)
 
-    def _setLanguage(self, value):
-        self._language = value
+    ### PUBLIC PROPERTIES ###
 
-    def _getLanguage(self):
-        return self._language
+    @apply
+    def language():
+        def fget(self):
+            '''Set the language of the Text stored within.
+            
+            ::
 
-    language = property(_getLanguage, _setLanguage, 
-        doc = '''Set the language of the Text stored within.
+                >>> t = metadata.Text('my text')
+                >>> t.language = 'en'
+                >>> t.language  
+                'en'
 
-        
-        >>> t = metadata.Text('my text')
-        >>> t.language = 'en'
-        >>> t.language  
-        'en'
-        ''')
+            '''
+            return self._language
+        def fset(self, value):
+            self._language = value
+        return property(**locals())
+
+    ### PUBLIC METHODS ###
 
     def getNormalizedArticle(self):
         '''Return a string representation with normalized articles.
-
         
-        >>> td = metadata.Text('Ale is Dear, The', 'en')
-        >>> str(td)
-        'Ale is Dear, The'
-        >>> td.getNormalizedArticle()
-        'The Ale is Dear'
+        ::
 
-        >>> td.language = 'de'
-        >>> td.getNormalizedArticle()
-        'Ale is Dear, The'
+            >>> td = metadata.Text('Ale is Dear, The', 'en')
+            >>> str(td)
+            'Ale is Dear, The'
+
+        ::
+
+            >>> td.getNormalizedArticle()
+            'The Ale is Dear'
+
+        ::
+
+            >>> td.language = 'de'
+            >>> td.getNormalizedArticle()
+            'Ale is Dear, The'
+
         '''
         return text.prependArticle(self.__str__(), self._language)
 
 
-
-
 #-------------------------------------------------------------------------------
+
+
 class Date(object):
-    '''A single date value, specified by year, month, day, hour, minute, and second. Note that this class has been created, instead of using Python's datetime, to provide greater flexibility for processing unconventional dates, ancient dates, dates with error, and date ranges. 
-
-    The :attr:`~music21.metadata.Date.datetime` property can be used to retrieve a datetime object when necessary.
-
-    Additionally, each value can be specified as `uncertain` or `approximate`; if None, assumed to be certain.
-
-    Data objects are fundamental components of :class:`~music21.metadata.DateSingle` and related subclasses that represent single dates and date ranges. 
-
     '''
-    def __init__(self, *args, **keywords):
-        '''
-        
+    A single date value, specified by year, month, day, hour, minute, and
+    second. Note that this class has been created, instead of using Python's
+    datetime, to provide greater flexibility for processing unconventional
+    dates, ancient dates, dates with error, and date ranges. 
+
+    The :attr:`~music21.metadata.Date.datetime` property can be used to
+    retrieve a datetime object when necessary.
+
+    Additionally, each value can be specified as `uncertain` or `approximate`;
+    if None, assumed to be certain.
+
+    Data objects are fundamental components of
+    :class:`~music21.metadata.DateSingle` and related subclasses that represent
+    single dates and date ranges. 
+
+    ::
+
         >>> a = metadata.Date(year=1843, yearError='approximate')
         >>> a.year
         1843
+
+    ::
+
         >>> a.yearError
         'approximate'
+
+    ::
 
         >>> a = metadata.Date(year='1843?')
         >>> a.yearError
         'uncertain'
 
-        '''
+    '''
+    
+    ### INITIALIZER ###
+
+    def __init__(self, *args, **keywords):
         self.year = None
         self.month = None
         self.day = None
         self.hour = None
         self.minute = None
         self.second = None
-
         # error: can be 'approximate', 'uncertain'
         # None is assumed to be certain
         self.yearError = None
@@ -342,12 +413,10 @@ class Date(object):
         self.hourError = None
         self.minuteError = None
         self.secondError = None
-
         self.attrNames = ['year', 'month', 'day', 'hour', 'minute', 'second']
         # format strings for data components
-        self.attrStrFormat = ['%04.i', '%02.i', '%02.i', 
-                              '%02.i', '%02.i', '%006.2f']
-
+        self.attrStrFormat = [
+            '%04.i', '%02.i', '%02.i', '%02.i', '%02.i', '%006.2f']
         # set any keywords supplied
         for attr in self.attrNames:
             if attr in keywords:
@@ -360,17 +429,64 @@ class Date(object):
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
 
-    def _stripError(self, value):
-        '''Strip error symbols from a numerical value. Return cleaned source and sym. Only one error symbol is expected per string.
+    ### SPECIAL METHODS ###
+    
+    def __str__(self):
+        '''
+        Return a string representation, including error if defined. 
 
-        
-        >>> d = metadata.Date()
-        >>> d._stripError('1247~')
-        ('1247', 'approximate')
-        >>> d._stripError('234.43?')
-        ('234.43', 'uncertain')
-        >>> d._stripError('234.43')
-        ('234.43', None)
+        ::
+
+            >>> d = metadata.Date()
+            >>> d.loadStr('3030?/12~/?4')
+            >>> str(d)
+            '3030?/12~/04?'
+
+        '''
+        # datetime.strftime("%Y.%m.%d")
+        # cannot use this, as it does not support dates lower than 1900!
+        msg = []
+        if self.hour == None and self.minute == None and self.second == None:
+            breakIndex = 3 # index
+        for i in range(len(self.attrNames)):
+            if i >= breakIndex:
+                break
+            attr = self.attrNames[i]
+            value = getattr(self, attr)
+            error = getattr(self, attr+'Error')
+            if value == None:
+                msg.append('--')
+            else:
+                fmt = self.attrStrFormat[i]
+                if error != None:
+                    sub = fmt % value + errorToSymbol(error)
+                else:
+                    sub = fmt % value
+                msg.append(sub)
+        return '/'.join(msg)
+
+    ### PRIVATE METHODS ###
+
+    def _stripError(self, value):
+        '''
+        Strip error symbols from a numerical value. Return cleaned source and
+        sym. Only one error symbol is expected per string.
+
+        ::
+
+            >>> d = metadata.Date()
+            >>> d._stripError('1247~')
+            ('1247', 'approximate')
+
+        ::
+
+            >>> d._stripError('234.43?')
+            ('234.43', 'uncertain')
+
+        ::
+
+            >>> d._stripError('234.43')
+            ('234.43', None)
 
         '''
         if common.isNum(value): # if a number, let pass
@@ -392,136 +508,48 @@ class Date(object):
             dateStr = dateStr.replace(found, '')
             return dateStr, 'uncertain'
 
-    def _getHasTime(self):
-        if self.hour != None or self.minute != None or self.second != None:
-            return True
+    ### PUBLIC METHODS ###
+
+    def load(self, value):
+        '''
+        Load values by string, datetime object, or Date object:
+        
+        ::
+
+            >>> a = metadata.Date(year=1843, month=3, day=3)
+            >>> b = metadata.Date()
+            >>> b.load(a)
+            >>> b.year
+            1843
+
+        '''
+        if isinstance(value, datetime.datetime):
+            self.loadDatetime(value)
+        elif common.isStr(value):
+            self.loadStr(value)
+        elif isinstance(value, Date):
+            self.loadOther(value)
         else:
-            return False
-       
-    hasTime = property(_getHasTime, 
-        doc = '''Return True if any time elements are defined.
-
-        
-        >>> a = metadata.Date(year=1843, month=3, day=3)
-        >>> a.hasTime
-        False
-        >>> b = metadata.Date(year=1843, month=3, day=3, minute=3)
-        >>> b.hasTime
-        True
-        ''')
-
-    def _getHasError(self):
-        for attr in self.attrNames:
-            if getattr(self, attr+'Error') != None:
-                return True
-        return False
-       
-    hasError = property(_getHasError, 
-        doc = '''Return True if any data points have error defined. 
-
-        
-        >>> a = metadata.Date(year=1843, month=3, day=3, dayError='approximate')
-        >>> a.hasError
-        True
-        >>> b = metadata.Date(year=1843, month=3, day=3, minute=3)
-        >>> b.hasError
-        False
-        ''')
-
-    def __str__(self):
-        '''Return a string representation, including error if defined. 
-
-        
-        >>> d = metadata.Date()
-        >>> d.loadStr('3030?/12~/?4')
-        >>> str(d)
-        '3030?/12~/04?'
-        '''
-        # datetime.strftime("%Y.%m.%d")
-        # cannot use this, as it does not support dates lower than 1900!
-        msg = []
-
-        if self.hour == None and self.minute == None and self.second == None:
-            breakIndex = 3 # index
-
-        for i in range(len(self.attrNames)):
-            if i >= breakIndex:
-                break
-            attr = self.attrNames[i]
-            value = getattr(self, attr)
-            error = getattr(self, attr+'Error')
-            if value == None:
-                msg.append('--')
-            else:
-                fmt = self.attrStrFormat[i]
-                if error != None:
-                    sub = fmt % value + errorToSymbol(error)
-                else:
-                    sub = fmt % value
-                msg.append(sub)
-
-        return '/'.join(msg)
-
-
-    def loadStr(self, dateStr):
-        '''Load a string date representation.
-        
-        Assume year/month/day/hour:minute:second
-
-        
-        >>> d = metadata.Date()
-        >>> d.loadStr('3030?/12~/?4')
-        >>> d.month, d.monthError
-        (12, 'approximate')
-        >>> d.year, d.yearError
-        (3030, 'uncertain')
-        >>> d.month, d.monthError
-        (12, 'approximate')
-        >>> d.day, d.dayError
-        (4, 'uncertain')
-
-        >>> d = metadata.Date()
-        >>> d.loadStr('1834/12/4/4:50:32')
-        >>> d.minute, d.second
-        (50, 32)
-
-        '''
-        post = []
-        postError = []
-
-        dateStr = dateStr.replace(':', '/')
-        dateStr = dateStr.replace(' ', '')
-
-        for chunk in dateStr.split('/'):
-            value, error = self._stripError(chunk)
-            post.append(value) 
-            postError.append(error)
-
-        # as error is stripped, we can now convert to numbers
-        if len(post) > 0 and post[0] != '':
-            post = [int(x) for x in post]
-
-        # assume in order in post list
-        for i in range(len(self.attrNames)):
-            if len(post) > i: # only assign for those specified
-                setattr(self, self.attrNames[i], post[i])
-                if postError[i] != None:
-                    setattr(self, self.attrNames[i]+'Error', postError[i])            
-
+            raise MetadataException('cannot load data: %s' % value)    
 
     def loadDatetime(self, dt):
-        '''Load time data from a datetime object.
+        '''
+        Load time data from a datetime object:
 
+        ::
+
+            >>> import datetime
+            >>> dt = datetime.datetime(2005, 02, 01)
+            >>> dt
+            datetime.datetime(2005, 2, 1, 0, 0)
         
-        >>> import datetime
-        >>> dt = datetime.datetime(2005, 02, 01)
-        >>> dt
-        datetime.datetime(2005, 2, 1, 0, 0)
-        
-        >>> m21mdDate = metadata.Date()
-        >>> m21mdDate.loadDatetime(dt)
-        >>> str(m21mdDate)
-        '2005/02/01'
+        ::
+
+            >>> m21mdDate = metadata.Date()
+            >>> m21mdDate.loadDatetime(dt)
+            >>> str(m21mdDate)
+            '2005/02/01'
+
         '''
         for attr in self.attrNames:
             if hasattr(dt, attr):
@@ -531,58 +559,108 @@ class Date(object):
                     setattr(self, attr, value)
 
     def loadOther(self, other):
-        '''Load values based on another Date object:
-
+        '''
+        Load values based on another Date object:
         
-        >>> a = metadata.Date(year=1843, month=3, day=3)
-        >>> b = metadata.Date()
-        >>> b.loadOther(a)
-        >>> b.year
-        1843
+        ::
+
+            >>> a = metadata.Date(year=1843, month=3, day=3)
+            >>> b = metadata.Date()
+            >>> b.loadOther(a)
+            >>> b.year
+            1843
+
         '''
         for attr in self.attrNames:
             if getattr(other, attr) != None:
                 setattr(self, attr, getattr(other, attr))
 
-    def load(self, value):
-        '''Load values by string, datetime object, or Date object.
-
+    def loadStr(self, dateStr):
+        '''Load a string date representation.
         
-        >>> a = metadata.Date(year=1843, month=3, day=3)
-        >>> b = metadata.Date()
-        >>> b.load(a)
-        >>> b.year
-        1843
+        Assume `year/month/day/hour:minute:second`:
+
+        ::
+
+            >>> d = metadata.Date()
+            >>> d.loadStr('3030?/12~/?4')
+            >>> d.month, d.monthError
+            (12, 'approximate')
+
+        ::
+
+            >>> d.year, d.yearError
+            (3030, 'uncertain')
+
+        ::
+
+            >>> d.month, d.monthError
+            (12, 'approximate')
+
+        ::
+
+            >>> d.day, d.dayError
+            (4, 'uncertain')
+
+        ::
+
+            >>> d = metadata.Date()
+            >>> d.loadStr('1834/12/4/4:50:32')
+            >>> d.minute, d.second
+            (50, 32)
+
         '''
+        post = []
+        postError = []
+        dateStr = dateStr.replace(':', '/')
+        dateStr = dateStr.replace(' ', '')
+        for chunk in dateStr.split('/'):
+            value, error = self._stripError(chunk)
+            post.append(value) 
+            postError.append(error)
+        # as error is stripped, we can now convert to numbers
+        if len(post) > 0 and post[0] != '':
+            post = [int(x) for x in post]
+        # assume in order in post list
+        for i in range(len(self.attrNames)):
+            if len(post) > i: # only assign for those specified
+                setattr(self, self.attrNames[i], post[i])
+                if postError[i] != None:
+                    setattr(self, self.attrNames[i]+'Error', postError[i])            
 
-        if isinstance(value, datetime.datetime):
-            self.loadDatetime(value)
-        elif common.isStr(value):
-            self.loadStr(value)
-        elif isinstance(value, Date):
-            self.loadOther(value)
-        else:
-            raise MetadataException('cannot load data: %s' % value)    
-    
-    def _getDatetime(self):
-        '''Get a datetime object from a metadata.Date() object
+    ### PUBLIC PROPERTIES ###
 
+    @property
+    def datetime(self):
+        '''
+        Get a datetime object from a metadata.Date() object
         
-        >>> a = metadata.Date(year=1843, month=3, day=3)
-        >>> str(a)
-        '1843/03/03'
-        >>> a.datetime
-        datetime.datetime(1843, 3, 3, 0, 0)
+        ::
+
+            >>> a = metadata.Date(year=1843, month=3, day=3)
+            >>> str(a)
+            '1843/03/03'
+
+        ::
+
+            >>> a.datetime
+            datetime.datetime(1843, 3, 3, 0, 0)
 
         Lack of a required date element raises an exception:
 
-        >>> a = metadata.Date(year=1843, month=3)
-        >>> str(a)
-        '1843/03/--'
-        >>> a.datetime
-        Traceback (most recent call last):
-        ...
-        TypeError: Required argument 'day' (pos 3) not found
+        ::
+
+            >>> a = metadata.Date(year=1843, month=3)
+            >>> str(a)
+            '1843/03/--'
+
+        ::
+
+            >>> a.datetime
+            Traceback (most recent call last):
+            ...
+            TypeError: Required argument 'day' (pos 3) not found
+
         '''
         post = []
         # order here is order for datetime
@@ -595,46 +673,119 @@ class Date(object):
             post.append(int(value))
         return datetime.datetime(*post)
 
-    datetime = property(_getDatetime)
+    @property
+    def hasTime(self):
+        '''
+        Return True if any time elements are defined:
+        
+        ::
 
+            >>> a = metadata.Date(year=1843, month=3, day=3)
+            >>> a.hasTime
+            False
+
+        ::
+
+            >>> b = metadata.Date(year=1843, month=3, day=3, minute=3)
+            >>> b.hasTime
+            True
+
+        '''
+        if self.hour != None or self.minute != None or self.second != None:
+            return True
+        else:
+            return False
+
+    @property
+    def hasError(self):
+        '''
+        Return True if any data points have error defined:
+        
+        ::
+
+            >>> a = metadata.Date(
+            ...     year=1843, 
+            ...     month=3, 
+            ...     day=3, 
+            ...     dayError='approximate',
+            ...     )
+            >>> a.hasError
+            True
+
+        ::
+
+            >>> b = metadata.Date(
+            ...     year=1843, 
+            ...     month=3, 
+            ...     day=3, 
+            ...     minute=3,
+            ...     )
+            >>> b.hasError
+            False
+            
+        '''
+        for attr in self.attrNames:
+            if getattr(self, attr+'Error') != None:
+                return True
+        return False
 
 
 #-------------------------------------------------------------------------------
+
+
 class DateSingle(object):
-    '''Store a date, either as certain, approximate, or uncertain relevance.
-
-    The relevance attribute is limited within each DateSingle subclass depending on 
-    the design of the class. Alternative relevance types should be configured as other DateSingle subclasses. 
     '''
-    isSingle = True
+    Store a date, either as certain, approximate, or uncertain relevance.
 
-    def __init__(self, data='', relevance='certain'):
-        '''
-        
+    The relevance attribute is limited within each DateSingle subclass
+    depending on the design of the class. Alternative relevance types should be
+    configured as other DateSingle subclasses. 
+    
+    ::
         >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
         >>> str(dd)
         '2009/12/31'
+
+    ::
+
         >>> dd.relevance
         'approximate'
+
+    ::
 
         >>> dd = metadata.DateSingle('1805/3/12', 'uncertain')
         >>> str(dd)
         '1805/03/12'
-        '''
+
+    '''
+
+    ### CLASS VARIABLES ###
+
+    isSingle = True
+
+    ### INITIALIZER ###
+
+    def __init__(self, data='', relevance='certain'):
         self._data = [] # store a list of one or more Date objects
         self._relevance = None # managed by property
-
         # not yet implemented
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
         self._dataError = [] # store a list of one or more strings
-
         self._prepareData(data)
         self.relevance = relevance # will use property
     
+    ### SPECIAL METHODS ###
+
+    def __str__(self):
+        return str(self._data[0]) # always the first
+
+    ### PRIVATE METHODS ###
+
     def _prepareData(self, data):
-        '''Assume a string is supplied as argument
+        '''
+        Assume a string is supplied as argument
         '''
         # here, using a list to store one object; this provides more 
         # compatability  w/ other formats
@@ -642,88 +793,134 @@ class DateSingle(object):
         self._data.append(Date())
         self._data[0].load(data)
 
-    def _setRelevance(self, value):
-        if value in ['certain', 'approximate', 'uncertain']:
-            self._relevance = value
-            self._dataError = []
-            self._dataError.append(value) # only here is dataError the same as relevance
-        else:
-            raise MetadataException('relevance value is not supported by this object: %s' % value)
+    ### PUBLIC PROPERTIES ###
 
-    def _getRelevance(self):
-        return self._relevance
-
-    relevance = property(_getRelevance, _setRelevance)
-
-    def __str__(self):
-        return str(self._data[0]) # always the first
-
-    def _getDatetime(self):
-        '''Get a datetime object.
-
+    @property
+    def datetime(self):
+        '''
+        Get a datetime object.
         
-        >>> a = metadata.DateSingle('1843/03/03')
-        >>> str(a)
-        '1843/03/03'
-        >>> a.datetime
-        datetime.datetime(1843, 3, 3, 0, 0)
+        ::
 
-        >>> a = metadata.DateSingle('1843/03')
-        >>> str(a)
-        '1843/03/--'
+            >>> a = metadata.DateSingle('1843/03/03')
+            >>> str(a)
+            '1843/03/03'
+
+        ::
+
+            >>> a.datetime
+            datetime.datetime(1843, 3, 3, 0, 0)
+
+        ::
+
+            >>> a = metadata.DateSingle('1843/03')
+            >>> str(a)
+            '1843/03/--'
+
         '''
         # get from stored Date object
         return self._data[0].datetime
 
-    datetime = property(_getDatetime)
+    @apply
+    def relevance():
+        def fget(self):
+            return self._relevance
+        def fset(self, value):
+            if value in ['certain', 'approximate', 'uncertain']:
+                self._relevance = value
+                self._dataError = []
+                # only here is dataError the same as relevance 
+                self._dataError.append(value)
+            else:
+                raise MetadataException(
+                    'relevance value is not supported by this object: {}'.format(value))
+        return property(**locals())
+
+
+#-------------------------------------------------------------------------------
 
 
 class DateRelative(DateSingle):
-    '''Store a relative date, sometime prior or sometime after
     '''
-    isSingle = True
+    Store a relative date, sometime prior or sometime after.
 
-    def __init__(self, data='', relevance='after'):
-        '''
-        
+    ::
+
         >>> dd = metadata.DateRelative('2009/12/31', 'prior')
         >>> str(dd)
         '2009/12/31'
 
+    ::
+
         >>> dd = metadata.DateRelative('2009/12/31', 'certain')
         Traceback (most recent call last):
         MetadataException: relevance value is not supported by this object: certain
-        '''
+
+    '''
+
+    ### CLASS VARIABLES ###
+
+    isSingle = True
+
+    ### INITIALIZER ###
+
+    def __init__(self, data='', relevance='after'):
         DateSingle.__init__(self, data, relevance)
 
+    ### PUBLIC PROPERTIES ###
 
-    def _setRelevance(self, value):
-        if value in ['prior', 'after']:
-            self._relevance = value
-        else:
-            raise MetadataException('relevance value is not supported by this object: %s' % value)
+    @apply
+    def relevance():
+        def fget(self):
+            return self._relevance
+        def fset(self, value):
+            if value in ['prior', 'after']:
+                self._relevance = value
+            else:
+                raise MetadataException(
+                    'relevance value is not supported by this object: {0}'.format(value))
+        return property(**locals())
 
-    relevance = property(DateSingle._getRelevance, _setRelevance)
+
+#-------------------------------------------------------------------------------
 
 
 class DateBetween(DateSingle):
-    '''Store a relative date, sometime between two dates
     '''
-    isSingle = False
+    Store a relative date, sometime between two dates:
 
+    ::
 
-    def __init__(self, data=[], relevance='between'):
-        '''
-        
         >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'])
         >>> str(dd)
         '2009/12/31 to 2010/01/28'
 
+    ::
+
         >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'], 'certain')
         Traceback (most recent call last):
         MetadataException: relevance value is not supported by this object: certain
-        '''
+
+    '''
+
+    ### CLASS VARIABLES ###
+
+    isSingle = False
+
+    ### INITIALIZER ###
+
+    def __init__(self, data=[], relevance='between'):
         DateSingle.__init__(self, data, relevance)
+
+    ### SPECIAL METHODS ###
+
+    def __str__(self):
+        msg = []
+        for d in self._data:
+            msg.append(str(d))
+        return ' to '.join(msg)
+
+    ### PRIVATE METHODS ###
 
     def _prepareData(self, data):
         '''Assume a list of dates as strings is supplied as argument
@@ -737,43 +934,64 @@ class DateBetween(DateSingle):
             # can look at Date and determine overall error
             self._dataError.append(None)
 
+    ### PUBLIC PROPERTIES ###
+
+    @apply
+    def relevance():
+        def fget(self):
+            return self._relevance
+        def fset(self, value):
+            if value in ['between']:
+                self._relevance = value
+            else:
+                raise MetadataException('relevance value is not supported by this object: {0}'.format(value))
+        return property(**locals())
+
+#-------------------------------------------------------------------------------
+
+
+class DateSelection(DateSingle):
+    '''
+
+    Store a selection of dates, or a collection of dates that might all be
+    possible
+
+    ::
+
+        >>> dd = metadata.DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')
+        >>> str(dd)
+        '2009/12/31 or 2010/01/28 or 1894/01/28'
+
+    ::
+
+        >>> dd = metadata.DateSelection(['2009/12/31', '2010/1/28'], 'certain')
+        Traceback (most recent call last):
+        MetadataException: relevance value is not supported by this object: certain
+
+    '''
+
+    ### CLASS VARIABLES ###
+
+    isSingle = False
+
+    ### INITIALIZER ###
+
+    def __init__(self, data='', relevance='or'):
+        DateSingle.__init__(self, data, relevance)
+
+    ### SPECIAL METHODS ###
 
     def __str__(self):
         msg = []
         for d in self._data:
             msg.append(str(d))
-        return ' to '.join(msg)
+        return ' or '.join(msg)
 
-    def _setRelevance(self, value):
-        if value in ['between']:
-            self._relevance = value
-        else:
-            raise MetadataException('relevance value is not supported by this object: %s' % value)
-
-    relevance = property(DateSingle._getRelevance, _setRelevance)
-
-
-
-class DateSelection(DateSingle):
-    '''Store a selection of dates, or a collection of dates that might all be possible
-    '''
-    isSingle = False
-
-    def __init__(self, data='', relevance='or'):
-        '''
-        
-        >>> dd = metadata.DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')
-        >>> str(dd)
-        '2009/12/31 or 2010/01/28 or 1894/01/28'
-
-        >>> dd = metadata.DateSelection(['2009/12/31', '2010/1/28'], 'certain')
-        Traceback (most recent call last):
-        MetadataException: relevance value is not supported by this object: certain
-        '''
-        DateSingle.__init__(self, data, relevance)
+    ### PRIVATE METHODS ###
 
     def _prepareData(self, data):
-        '''Assume a list of dates as strings is supplied as argument
+        '''
+        Assume a list of dates as strings is supplied as argument.
         '''
         self._data = []
         self._dataError = []
@@ -784,50 +1002,58 @@ class DateSelection(DateSingle):
             # can look at Date and determine overall error
             self._dataError.append(None)
 
-    def __str__(self):
-        msg = []
-        for d in self._data:
-            msg.append(str(d))
-        return ' or '.join(msg)
+    ### PUBLIC PROPERTIES ###
 
-    def _setRelevance(self, value):
-        if value in ['or']:
-            self._relevance = value
-        else:
-            raise MetadataException('relevance value is not supported by this object: %s' % value)
-
-    relevance = property(DateSingle._getRelevance, _setRelevance)
-
-
-
+    @apply
+    def relevance():
+        def fget(self):
+            return self._relevance
+        def fset(self, value):
+            if value in ['or']:
+                self._relevance = value
+            else:
+                raise MetadataException('relevance value is not supported by this object: {0}'.format(value))
+        return property(**locals())
 
 
 #-------------------------------------------------------------------------------
-class Contributor(object):
-    '''A person that contributed to a work. Can be a composer, lyricist, 
-    arranger, or other type of contributor. 
-    In MusicXML, these are "creator" elements.  
-    '''
-    relevance = 'contributor'
 
-    def __init__(self, *args, **keywords ):
-        '''
-        
+
+class Contributor(object):
+    '''
+    A person that contributed to a work. Can be a composer, lyricist, arranger,
+    or other type of contributor.  In MusicXML, these are "creator" elements.
+
+    ::
+
         >>> td = metadata.Contributor(role='composer', name='Chopin, Fryderyk')
         >>> td.role
         'composer'
+
+    ::
+
         >>> td.name
         'Chopin, Fryderyk'
+
+    ::
+
         >>> td.relevance
         'contributor'
 
-        '''
+    '''
+
+    ### CLASS VARIABLES ###
+
+    relevance = 'contributor'
+
+    ### INITIALIZER ###
+
+    def __init__(self, *args, **keywords ):
         if 'role' in keywords:
             # stored in self._role
             self.role = keywords['role'] # validated with property
         else:
             self.role = None
-
         # a list of Text objects to support various spellings or 
         # language translatiions
         self._names = []
@@ -836,10 +1062,8 @@ class Contributor(object):
         if 'names' in keywords: # many
             for n in keywords['names']:
                 self._names.append(Text(n))
-
         # store the nationality, if known
         self._nationality = []
-
         # store birth and death of contributor, if known
         self._dateRange = [None, None]
         if 'birth' in keywords:
@@ -847,83 +1071,39 @@ class Contributor(object):
         if 'death' in keywords:
             self._dateRange[1] = DateSingle(keywords['death'])
 
-    def _getRole(self):
-        return self._role
-
-    def _setRole(self, value):
-        if value == None or value in ROLES:
-            self._role = value
-        elif value in ROLE_ABBREVIATIONS:
-            self._role = roleAbbreviationsDict[value]
-        else:
-            raise MetadataException('role value is not supported by this object: %s' % value)
-
-    role = property(_getRole, _setRole, 
-        doc = '''
-        The role is what part this Contributor plays in the work. 
-        Both full roll strings and roll abbreviations may be used.
-
-        
-        >>> td = metadata.Contributor()
-        >>> td.role = 'composer'
-        >>> td.role
-        'composer'
-        >>> td.role = 'lor'
-        >>> td.role
-        'orchestrator'
-        ''')
-
-    def _setName(self, value):
-        # return first name
-        self._names = [] # reset
-        self._names.append(Text(value))
-
-    def _getName(self):
-        # return first name
-        return str(self._names[0])
-
-    name = property(_getName, _setName,
-        doc = '''Returns the text name, or the first of many names entered. 
-
-        
-        >>> td = metadata.Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
-        >>> td.name
-        'Chopin, Fryderyk'
-        >>> td.names
-        ['Chopin, Fryderyk', 'Chopin, Frederick']
-        ''')
-
-    def _getNames(self):
-        # return first name
-        msg = []
-        for n in self._names:
-            msg.append(str(n))
-        return msg
-
-    names = property(_getNames, 
-        doc = '''Returns all names in a list.
-
-        
-        >>> td = metadata.Contributor(role='composer', names=['Chopin, Fryderyk', 'Chopin, Frederick'])
-        >>> td.names
-        ['Chopin, Fryderyk', 'Chopin, Frederick']
-        ''')
+    ### PUBLIC METHODS ###
 
     def age(self):
         '''
-        Calculate the age at death of the Contributor, 
-        returning a datetime.timedelta object.
-
+        Calculate the age at death of the Contributor, returning a
+        datetime.timedelta object.
         
-        >>> a = metadata.Contributor(name='Beethoven, Ludwig van', role='composer', birth='1770/12/17', death='1827/3/26')
-        >>> a.role
-        'composer'
-        >>> a.age()
-        datetime.timedelta(20552)
-        >>> str(a.age())
-        '20552 days, 0:00:00'
-        >>> a.age().days / 365
-        56
+        ::
+
+            >>> a = metadata.Contributor(
+            ...     name='Beethoven, Ludwig van', 
+            ...     role='composer', 
+            ...     birth='1770/12/17', 
+            ...     death='1827/3/26',
+            ...     )
+            >>> a.role
+            'composer'
+
+        ::
+
+            >>> a.age()
+            datetime.timedelta(20552)
+
+        ::
+
+            >>> str(a.age())
+            '20552 days, 0:00:00'
+
+        ::
+
+            >>> a.age().days / 365
+            56
+
         '''
         if self._dateRange[0] != None and self._dateRange[1] != None:
             b = self._dateRange[0].datetime
@@ -932,40 +1112,141 @@ class Contributor(object):
         else:
             return None
 
-class Creator(Contributor):
-    '''
-    A person that created a work. Can be a composer, 
-    lyricist, arranger, or other type of contributor. 
-    
-    In MusicXML, these are "creator" elements.
-    '''
+    ### PUBLIC PROPERTIES ###
 
-    relevance = 'creator'
+    @apply
+    def name():
+        def fget(self):
+            '''
+            Returns the text name, or the first of many names entered. 
 
-    def __init__(self, *args, **keywords):
+            ::
+
+                >>> td = metadata.Contributor(
+                ...     role='composer', 
+                ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
+                ...     )
+                >>> td.name
+                'Chopin, Fryderyk'
+
+            ::
+
+                >>> td.names
+                ['Chopin, Fryderyk', 'Chopin, Frederick']
+
+            '''
+            # return first name
+            return str(self._names[0])
+        def fset(self, value):
+            # return first name
+            self._names = [] # reset
+            self._names.append(Text(value))
+        return property(**locals())
+
+    @property
+    def names(self):
         '''
-        
-        >>> td = metadata.Creator(role='composer', name='Chopin, Fryderyk')
-        >>> td.role
-        'composer'
-        >>> td.name
-        'Chopin, Fryderyk'
-        >>> td.relevance
-        'creator'
+        Returns all names in a list.
+
+        ::
+
+            >>> td = metadata.Contributor(
+            ...     role='composer', 
+            ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
+            ...     )
+            >>> td.names
+            ['Chopin, Fryderyk', 'Chopin, Frederick']
+
         '''
-        Contributor.__init__(self, *args, **keywords)
+        # return first name
+        msg = []
+        for n in self._names:
+            msg.append(str(n))
+        return msg
 
+    @apply
+    def role():
+        def fget(self):
+            '''
+            The role is what part this Contributor plays in the work.  Both
+            full roll strings and roll abbreviations may be used.
 
+            ::
+
+                >>> td = metadata.Contributor()
+                >>> td.role = 'composer'
+                >>> td.role
+                'composer'
+
+            ::
+
+                >>> td.role = 'lor'
+                >>> td.role
+                'orchestrator'
+
+            '''
+            return self._role
+        def fset(self, value):
+            if value == None or value in ROLES:
+                self._role = value
+            elif value in ROLE_ABBREVIATIONS:
+                self._role = roleAbbreviationsDict[value]
+            else:
+                raise MetadataException('role value is not supported by this object: %s' % value)
+        return property(**locals())
 
 
 #-------------------------------------------------------------------------------
+
+
+class Creator(Contributor):
+    '''
+
+    A person that created a work. Can be a composer, lyricist, arranger, or
+    other type of contributor. 
+    
+    In MusicXML, these are "creator" elements.
+    
+    ::
+
+        >>> td = metadata.Creator(role='composer', name='Chopin, Fryderyk')
+        >>> td.role
+        'composer'
+
+    ::
+
+        >>> td.name
+        'Chopin, Fryderyk'
+
+    ::
+
+        >>> td.relevance
+        'creator'
+
+    '''
+
+    ### CLASS VARIABLES ###
+
+    relevance = 'creator'
+
+    ### INITIALIZER ###
+
+    def __init__(self, *args, **keywords):
+        Contributor.__init__(self, *args, **keywords)
+
+
+#-------------------------------------------------------------------------------
+
+
 # as these have Date and Text fields, these need to be specialized objects
 
 class Imprint(object):
-    '''An object representation of imprint, or publication.
+    '''
+    An object representation of imprint, or publication.
     '''
     def __init__(self, *args, **keywords ):
         pass
+
 # !!!PUB: Publication status. 
 # !!!PPR: First publisher. 
 # !!!PDT: Date first published. 
@@ -977,12 +1258,13 @@ class Imprint(object):
 # !!!SML: Manuscript location. 
 # !!!SMA: Acknowledgement of manuscript access.
 
-
 class Copyright(object):
-    '''An object representation of copyright.
+    '''
+    An object representation of copyright.
     '''
     def __init__(self, *args, **keywords ):
         pass
+
 # !!!YEP: Publisher of electronic edition. 
 # !!!YEC: Date and owner of electronic copyright. 
 # !!!YER: Date electronic edition released.
@@ -1022,37 +1304,52 @@ class Copyright(object):
 #     'ocy' : 'countryOfComposition',
 #     'opc' : 'localeOfComposition', # origin in abc
 
+
 class Metadata(base.Music21Object):
-    '''Metadata represent data for a work or fragment, 
-    including title, composer, dates, and other relevant information.
-
-    Metadata is a :class:`~music21.base.Music21Object` subclass, 
-    meaing that it can be positioned on a Stream by offset and 
-    have a :class:`~music21.duration.Duration`.
-
-    In many cases, each Stream will have a single Metadata 
-    object at the zero offset position. 
     '''
+    
+    Metadata represent data for a work or fragment, including title, composer,
+    dates, and other relevant information.
 
-    classSortOrder = -10 
+    Metadata is a :class:`~music21.base.Music21Object` subclass, meaing that it
+    can be positioned on a Stream by offset and have a
+    :class:`~music21.duration.Duration`.
 
-    def __init__(self, *args, **keywords):
-        '''
-        
+    In many cases, each Stream will have a single Metadata object at the zero
+    offset position.
+
+    ::
+
         >>> md = metadata.Metadata(title='Concerto in F')
         >>> md.title
         'Concerto in F'
-        
-        
+    
+    ::
+
         >>> md = metadata.Metadata(otl='Concerto in F') # can use abbreviations
         >>> md.title
         'Concerto in F'
+
+    ::
+
         >>> md.setWorkId('otl', 'Rhapsody in Blue')
         >>> md.otl
         'Rhapsody in Blue'
+
+    ::
+
         >>> md.title
         'Rhapsody in Blue'
-        '''
+
+    '''
+
+    ### CLASS VARIABLES ###
+
+    classSortOrder = -10 
+
+    ### INITIALIZER ###
+
+    def __init__(self, *args, **keywords):
         base.Music21Object.__init__(self)
 
         # a list of Contributor objects
@@ -1090,8 +1387,19 @@ class Metadata(base.Music21Object):
         # used for the search() methods to determine what attributes
         # are made available by default; add more as properties/import 
         # exists
-        self._searchAttributes = ['date', 'title', 'alternativeTitle', 'movementNumber', 'movementName', 'number', 'opusNumber', 'composer', 'localeOfComposition']
+        self._searchAttributes = [
+            'date', 
+            'title', 
+            'alternativeTitle', 
+            'movementNumber', 
+            'movementName', 
+            'number', 
+            'opusNumber', 
+            'composer', 
+            'localeOfComposition',
+            ]
 
+    ### SPECIAL METHODS ###
 
     def __getattr__(self, name):
         '''Utility attribute access for attributes that do not yet have property definitions. 
@@ -1112,55 +1420,225 @@ class Metadata(base.Music21Object):
         # always return string representation for now
         return str(post)
 
-#         if isinstance(post, Text):
-#             return str(post)
-#         elif isinstance(post, Date):
-#             return str(post)
+    ### PUBLIC METHODS ###
 
-    #---------------------------------------------------------------------------
-    # property access to things that are not stored in the work ids
+    def addContributor(self, c):
+        '''
+        Assign a :class:`~music21.metadata.Contributor` object to this
+        Metadata.
 
-    def _getDate(self):
-        return str(self._date)
+        ::
 
-    def _setDate(self, value):
-        if isinstance(value, DateSingle): # all inherit date single
-            self._date = value
+            >>> md = metadata.Metadata(title='Third Symphony')
+            >>> c = metadata.Contributor()
+            >>> c.name = 'Beethoven, Ludwig van'
+            >>> c.role = 'composer'
+            >>> md.addContributor(c)
+            >>> md.composer
+            'Beethoven, Ludwig van'
+
+        ::
+
+            >>> md.composer = 'frank'
+            >>> md.composers
+            ['Beethoven, Ludwig van', 'frank']
+
+        '''
+        if not isinstance(c, Contributor):
+            raise MetadataException('supplied object is not a Contributor: %s' % c)
+        self._contributors.append(c)
+
+    def getContributorsByRole(self, value):
+        '''
+        Return a :class:`~music21.metadata.Contributor` if defined for a
+        provided role. 
+        
+        ::
+
+            >>> md = metadata.Metadata(title='Third Symphony')
+
+        ::
+
+            >>> c = metadata.Contributor()
+            >>> c.name = 'Beethoven, Ludwig van'
+            >>> c.role = 'composer'
+            >>> md.addContributor(c)
+            >>> cList = md.getContributorsByRole('composer')
+            >>> cList[0].name
+            'Beethoven, Ludwig van'
+        
+        Some musicxml files have contributors with no role defined.  To get
+        these contributors, search for getContributorsByRole(None).  N.B. upon
+        output to MusicXML, music21 gives these contributors the generic role
+        of "creator"
+        
+        ::
+
+            >>> c2 = metadata.Contributor()
+            >>> c2.name = 'Beth Hadley'
+            >>> md.addContributor(c2)
+            >>> noRoleList = md.getContributorsByRole(None)
+            >>> len(noRoleList)
+            1
+
+        ::
+
+            >>> noRoleList[0].role
+            >>> noRoleList[0].name
+            'Beth Hadley'
+        
+        '''
+        post = [] # there may be more than one per role
+        for c in self._contributors:
+            if c.role == value:
+                post.append(c)
+        if len(post) > 0:
+            return post 
         else:
-            ds = DateSingle(value) # assume date single; could be other sublcass
-            self._date = ds
+            return None
 
-    date = property(_getDate, _setDate, 
-        doc = '''Get or set the date of this work as one of the following date objects: :class:`~music21.metadata.DateSingle`, :class:`~music21.metadata.DateRelative`, :class:`~music21.metadata.DateBetween`,  :class:`~music21.metadata.DateSelection`, 
+    def search(self, query, field=None):
+        '''
+        Search one or all fields with a query, given either as a string or a
+        regular expression match.
 
+        ::
+
+            >>> md = metadata.Metadata()
+            >>> md.composer = 'Beethoven, Ludwig van'
+            >>> md.title = 'Third Symphony'
+
+        ::
+
+            >>> md.search('beethoven', 'composer')
+            (True, 'composer')
         
-        >>> md = metadata.Metadata(title='Third Symphony', popularTitle='Eroica', composer='Beethoven, Ludwig van')
-        >>> md.date = '2010'
-        >>> md.date
-        '2010/--/--'
+        ::
 
-        >>> md.date = metadata.DateBetween(['2009/12/31', '2010/1/28'])
-        >>> md.date
-        '2009/12/31 to 2010/01/28'
-        ''')
+            >>> md.search('beethoven', 'compose')
+            (True, 'composer')
 
+        ::
 
-    #---------------------------------------------------------------------------
+            >>> md.search('frank', 'composer')
+            (False, None)
+
+        ::
+
+            >>> md.search('frank')
+            (False, None)
+
+        ::
+
+            >>> md.search('third')
+            (True, 'title')
+
+        ::
+
+            >>> md.search('third', 'composer')
+            (False, None)
+
+        ::
+
+            >>> md.search('third', 'title')
+            (True, 'title')
+
+        ::
+
+            >>> md.search('third|fourth')
+            (True, 'title')
+
+        ::
+
+            >>> md.search('thove(.*)')
+            (True, 'composer')
+
+        '''
+        valueFieldPairs = []
+        if field != None:
+            match = False
+            try:
+                value = getattr(self, field)
+                valueFieldPairs.append((value, field))
+                match = True
+            except AttributeError:
+                pass
+            if not match:
+                for f in self._searchAttributes:
+                    #environLocal.printDebug(['comparing fields:', f, field])
+                    # look for partial match in all fields
+                    if field.lower() in f.lower():
+                        value = getattr(self, f)
+                        valueFieldPairs.append((value, f))
+                        match = True
+                        break
+            # if cannot find a match for any field, return 
+            if not match:
+                return False, None
+        else: # get all fields
+            for f in self._searchAttributes:
+                value = getattr(self, f)
+                valueFieldPairs.append((value, f))
+        # for now, make all queries strings
+        # ultimately, can look for regular expressions by checking for
+        # .search
+        useRegex = False
+        if hasattr(query, 'search'):
+            useRegex = True
+            reQuery = query # already compiled
+        # look for regex characters
+        elif common.isStr(query) and \
+            any(character in query for character in '*.|+?{}'):
+            useRegex = True
+            reQuery = re.compile(query, flags=re.I) 
+        if useRegex:
+            for v, f in valueFieldPairs:
+                # re.I makes case insensitive
+                match = reQuery.search(str(v))
+                if match is not None:
+                    return True, f
+        else:
+            query = str(query)
+            for v, f in valueFieldPairs:
+                if common.isStr(v):
+                    if query.lower() in v.lower():
+                        return True, f
+                elif query == v: 
+                    return True, f
+        return False, None
+            
     def setWorkId(self, idStr, value):
-        '''Directly set a workd id, given either as a full string name or as a three character abbreviation. The following work id abbreviations and their full id string are given as follows. In many cases the Metadata object support properties for convenient access to these work ids. 
+        '''
+        Directly set a workd id, given either as a full string name or as a
+        three character abbreviation. The following work id abbreviations and
+        their full id string are given as follows. In many cases the Metadata
+        object support properties for convenient access to these work ids. 
 
-        Id abbreviations and strings: otl / title, otp / popularTitle, ota / alternativeTitle, opr / parentTitle, oac / actNumber, osc / sceneNumber, omv / movementNumber, omd / movementName, ops / opusNumber, onm / number, ovm / volume, ode / dedication, oco / commission, gtl / groupTitle, gaw / associatedWork, gco / collectionDesignation, txo / textOriginalLanguage, txl / textLanguage, ocy / countryOfComposition, opc / localeOfComposition.
-
+        Id abbreviations and strings: otl / title, otp / popularTitle, ota /
+        alternativeTitle, opr / parentTitle, oac / actNumber, osc /
+        sceneNumber, omv / movementNumber, omd / movementName, ops /
+        opusNumber, onm / number, ovm / volume, ode / dedication, oco /
+        commission, gtl / groupTitle, gaw / associatedWork, gco /
+        collectionDesignation, txo / textOriginalLanguage, txl / textLanguage,
+        ocy / countryOfComposition, opc / localeOfComposition.
         
-        >>> md = metadata.Metadata(title='Quartet')
-        >>> md.title
-        'Quartet'
-        >>> md.setWorkId('otl', 'Trio')
-        >>> md.title
-        'Trio'
-        >>> md.setWorkId('sdf', None)
-        Traceback (most recent call last):
-        MetadataException: no work id available with id: sdf
+        ::
+
+            >>> md = metadata.Metadata(title='Quartet')
+            >>> md.title
+            'Quartet'
+
+        ::
+
+            >>> md.setWorkId('otl', 'Trio')
+            >>> md.title
+            'Trio'
+
+        ::
+
+            >>> md.setWorkId('sdf', None)
+            Traceback (most recent call last):
+            MetadataException: no work id available with id: sdf
 
         '''
         idStr = idStr.lower()
@@ -1179,385 +1657,308 @@ class Metadata(base.Music21Object):
         if not match:
             raise MetadataException('no work id available with id: %s' % idStr)
 
-    #---------------------------------------------------------------------------
-    def _getTitle(self):
-        searchId = ['title', 'popularTitle', 'alternativeTitle', 'movementName']
-        post = None
-        for key in searchId:
-            post = self._workIds[key]
-            if post != None: # get first matched
-                # get a string from this Text object
-                # get with normalized articles
-                return self._workIds[key].getNormalizedArticle()
+    ### PUBLIC PROPERTIES ###
 
-    def _setTitle(self, value):
-        self._workIds['title'] = Text(value)
+    @apply
+    def alternativeTitle():
+        def fget(self):
+            '''
+            Get or set the alternative title. 
+            
+            ::
 
-    title = property(_getTitle, _setTitle, 
-        doc = '''Get the title of the work, or the next-matched title string available from a related parameter fields. 
+                >>> md = metadata.Metadata(popularTitle='Eroica')
+                >>> md.alternativeTitle = 'Heroic Symphony'
+                >>> md.alternativeTitle
+                'Heroic Symphony'
 
-        
-        >>> md = metadata.Metadata(title='Third Symphony')
-        >>> md.title
-        'Third Symphony'
-        
-        >>> md = metadata.Metadata(popularTitle='Eroica')
-        >>> md.title
-        'Eroica'
-        
-        >>> md = metadata.Metadata(title='Third Symphony', popularTitle='Eroica')
-        >>> md.title
-        'Third Symphony'
-        >>> md.popularTitle
-        'Eroica'
-        >>> md.otp
-        'Eroica'
-        ''')
+            '''
+            post = self._workIds['alternativeTitle']
+            if post == None:
+                return None
+            return str(self._workIds['alternativeTitle'])
+        def fset(self, value):
+            self._workIds['alternativeTitle'] = Text(value)
+        return property(**locals())
 
+    @apply
+    def composer():
+        def fget(self):
+            '''
+            Get or set the composer of this work. More than one composer may be
+            specified.
 
-    def _getAlternativeTitle(self):
-        post = self._workIds['alternativeTitle']
-        if post == None:
-            return None
-        return str(self._workIds['alternativeTitle'])
+            The composer attribute does not live in Metadata, but creates a
+            :class:`~music21.metadata.Contributor` object in the Metadata
+            object.
+            
+            ::
 
-    def _setAlternativeTitle(self, value):
-        self._workIds['alternativeTitle'] = Text(value)
+                >>> md = metadata.Metadata(
+                ...     title='Third Symphony',
+                ...     popularTitle='Eroica', 
+                ...     composer='Beethoven, Ludwig van',
+                ...     )
+                >>> md.composer
+                'Beethoven, Ludwig van'
 
-    alternativeTitle = property(_getAlternativeTitle, _setAlternativeTitle, 
-        doc = '''Get or set the alternative title. 
+            '''
+            post = self.getContributorsByRole('composer')
+            if post == None:
+                return None
+            # get just the name of the first composer
+            return str(post[0].name)
+        def fset(self, value):
+            c = Contributor()
+            c.name = value
+            c.role = 'composer'
+            self._contributors.append(c)
+        return property(**locals())
 
-        
-        >>> md = metadata.Metadata(popularTitle='Eroica')
-        >>> md.alternativeTitle = 'Heroic Symphony'
-        >>> md.alternativeTitle
-        'Heroic Symphony'
-
-        ''')
-
-
-    def _getMovementNumber(self):
-        post = self._workIds['movementNumber']
-        if post == None:
-            return None
-        return str(self._workIds['movementNumber'])
-
-    def _setMovementNumber(self, value):
-        self._workIds['movementNumber'] = Text(value)
-
-    movementNumber = property(_getMovementNumber, _setMovementNumber, 
-        doc = '''Get or set the movement number. 
-        ''')
-
-
-    def _getMovementName(self):
-        post = self._workIds['movementName']
-        if post == None:
-            return None
-        return str(self._workIds['movementName'])
-
-    def _setMovementName(self, value):
-        self._workIds['movementName'] = Text(value)
-
-    movementName = property(_getMovementName, _setMovementName, 
-        doc = '''Get or set the movement title. 
-        ''')
-
-
-    def _getNumber(self):
-        post = self._workIds['number']
-        if post == None:
-            return None
-        return str(self._workIds['number'])
-
-    def _setNumber(self, value):
-        self._workIds['number'] = Text(value)
-
-    number = property(_getNumber, _setNumber, 
-        doc = '''Get or set the number of the work.  
-        ''')
-
-
-    def _getOpusNumber(self):
-        post = self._workIds['opusNumber']
-        if post == None:
-            return None
-        return str(self._workIds['opusNumber'])
-
-    def _setOpusNumber(self, value):
-        self._workIds['opusNumber'] = Text(value)
-
-    opusNumber = property(_getOpusNumber, _setOpusNumber, 
-        doc = '''Get or set the opus number. 
-        ''')
-
-
-
-    def _getLocaleOfComposition(self):
-        post = self._workIds['localeOfComposition']
-        if post == None:
-            return None
-        return str(self._workIds['localeOfComposition'])
-
-    def _setLocaleOfComposition(self, value):
-        self._workIds['localeOfComposition'] = Text(value)
-
-    localeOfComposition = property(_getLocaleOfComposition, 
-                                 _setLocaleOfComposition, 
-        doc = '''Get or set the locale of composition, or origin, of the work. 
-        ''')
-
-
-
-
-    #---------------------------------------------------------------------------
-    # provide direct access to common Contributor roles
-    def getContributorsByRole(self, value):
-        '''Return a :class:`~music21.metadata.Contributor` if defined for a provided role. 
-
-        
-        >>> md = metadata.Metadata(title='Third Symphony')
-
-        >>> c = metadata.Contributor()
-        >>> c.name = 'Beethoven, Ludwig van'
-        >>> c.role = 'composer'
-        >>> md.addContributor(c)
-        >>> cList = md.getContributorsByRole('composer')
-        >>> cList[0].name
-        'Beethoven, Ludwig van'
-        
-        
-        Some musicxml files have contributors with no role defined.
-        To get these contributors, search for getContributorsByRole(None).
-        N.B. upon output to MusicXML, music21 gives these contributors
-        the generic role of "creator"
-        
-        >>> c2 = metadata.Contributor()
-        >>> c2.name = 'Beth Hadley'
-        >>> md.addContributor(c2)
-        >>> noRoleList = md.getContributorsByRole(None)
-        >>> len(noRoleList)
-        1
-        >>> noRoleList[0].role
-        >>> noRoleList[0].name
-        'Beth Hadley'
-        
+    @property
+    def composers(self):
         '''
-        post = [] # there may be more than one per role
-        for c in self._contributors:
-            if c.role == value:
-                post.append(c)
-        if len(post) > 0:
-            return post 
-        else:
-            return None
-
-    def addContributor(self, c):
-        '''Assign a :class:`~music21.metadata.Contributor` object to this Metadata.
-
-        
-        >>> md = metadata.Metadata(title='Third Symphony')
-        >>> c = metadata.Contributor()
-        >>> c.name = 'Beethoven, Ludwig van'
-        >>> c.role = 'composer'
-        >>> md.addContributor(c)
-        >>> md.composer
-        'Beethoven, Ludwig van'
-        >>> md.composer = 'frank'
-        >>> md.composers
-        ['Beethoven, Ludwig van', 'frank']
+        Get a list of all :class:`~music21.metadata.Contributor` objects
+        defined as composer of this work.
         '''
-        if not isinstance(c, Contributor):
-            raise MetadataException('supplied object is not a Contributor: %s' % c)
-        self._contributors.append(c)
-
-
-    def _getComposers(self):
         post = self.getContributorsByRole('composer')
         if post == None:
             return None
         # get just the name of the first composer
         return [x.name for x in post]
 
-    composers = property(_getComposers,  
-        doc = '''Get a list of all :class:`~music21.metadata.Contributor` objects defined as composer of this work.
-        ''')
-
-    def _getComposer(self):
-        post = self.getContributorsByRole('composer')
-        if post == None:
-            return None
-        # get just the name of the first composer
-        return str(post[0].name)
-
-    def _setComposer(self, value):
-        c = Contributor()
-        c.name = value
-        c.role = 'composer'
-        self._contributors.append(c)
-
-    composer = property(_getComposer, _setComposer, 
-        doc = '''Get or set the composer of this work. More than one composer may be specified.
-
-        The composer attribute does not live in Metadata, but creates a :class:`~music21.metadata.Contributor` object in the Metadata object.
-
-        
-        >>> md = metadata.Metadata(title='Third Symphony', popularTitle='Eroica', composer='Beethoven, Ludwig van')
-        >>> md.composer
-        'Beethoven, Ludwig van'
-        ''')
-
-
-
-    #---------------------------------------------------------------------------
-    # searching and matching
-    def search(self, query, field=None):
-        '''Search one or all fields with a query, given either as a string or a regular expression match.
-
-        
-        >>> md = metadata.Metadata()
-        >>> md.composer = 'Beethoven, Ludwig van'
-        >>> md.title = 'Third Symphony'
-
-        >>> md.search('beethoven', 'composer')
-        (True, 'composer')
-        >>> md.search('beethoven', 'compose')
-        (True, 'composer')
-        >>> md.search('frank', 'composer')
-        (False, None)
-        >>> md.search('frank')
-        (False, None)
-
-        >>> md.search('third')
-        (True, 'title')
-        >>> md.search('third', 'composer')
-        (False, None)
-        >>> md.search('third', 'title')
-        (True, 'title')
-
-        >>> md.search('third|fourth')
-        (True, 'title')
-        >>> md.search('thove(.*)')
-        (True, 'composer')
-
-        '''
-        valueFieldPairs = []
-
-        if field != None:
-            match = False
-            try:
-                value = getattr(self, field)
-                valueFieldPairs.append((value, field))
-                match = True
-            except AttributeError:
-                pass
-
-            if not match:
-                for f in self._searchAttributes:
-                    #environLocal.printDebug(['comparing fields:', f, field])
-                    # look for partial match in all fields
-                    if field.lower() in f.lower():
-                        value = getattr(self, f)
-                        valueFieldPairs.append((value, f))
-                        match = True
-                        break
-            # if cannot find a match for any field, return 
-            if not match:
-                return False, None
-
-        else: # get all fields
-            for f in self._searchAttributes:
-                value = getattr(self, f)
-                valueFieldPairs.append((value, f))
-
-        # for now, make all queries strings
-        # ultimately, can look for regular expressions by checking for
-        # .search
-        useRegex = False
-        if hasattr(query, 'search'):
-            useRegex = True
-            reQuery = query # already compiled
-        # look for regex characters
-        elif common.isStr(query) and ('*' in query or '.' in query or '|' in query or '+' in query or '?' in query or '{' in query or '}' in query):
-            useRegex = True
-            reQuery = re.compile(query, flags=re.I) 
-
-        if useRegex:
-            for v, f in valueFieldPairs:
-                # re.I makes case insensitive
-                match = reQuery.search(str(v))
-                if match is not None:
-                    return True, f
-        else:
-            query = str(query)
-            for v, f in valueFieldPairs:
-                if common.isStr(v):
-                    if query.lower() in v.lower():
-                        return True, f
-                elif query == v: 
-                    return True, f
-                
-        return False, None
+    @apply
+    def date():
+        def fget(self):
+            '''
+            Get or set the date of this work as one of the following date objects:
+            :class:`~music21.metadata.DateSingle`,
+            :class:`~music21.metadata.DateRelative`,
+            :class:`~music21.metadata.DateBetween`,
+            :class:`~music21.metadata.DateSelection`, 
             
+            ::
 
+                >>> md = metadata.Metadata(
+                ...     title='Third Symphony', 
+                ...     popularTitle='Eroica', 
+                ...     composer='Beethoven, Ludwig van',
+                ...     )
+                >>> md.date = '2010'
+                >>> md.date
+                '2010/--/--'
+
+            ::
+
+                >>> md.date = metadata.DateBetween(['2009/12/31', '2010/1/28'])
+                >>> md.date
+                '2009/12/31 to 2010/01/28'
+
+            '''
+            return str(self._date)
+        def fset(self, value):
+            if isinstance(value, DateSingle): # all inherit date single
+                self._date = value
+            else:
+                ds = DateSingle(value) # assume date single; could be other sublcass
+                self._date = ds
+        return property(**locals())
+
+    @apply
+    def localeOfComposition():
+        def fget(self):
+            '''
+            Get or set the locale of composition, or origin, of the work. 
+            '''
+            post = self._workIds['localeOfComposition']
+            if post == None:
+                return None
+            return str(self._workIds['localeOfComposition'])
+        def fset(self, value):
+            self._workIds['localeOfComposition'] = Text(value)
+        return property(**locals())
+
+    @apply
+    def movementName():
+        def fget(self):
+            '''
+            Get or set the movement title. 
+            '''
+            post = self._workIds['movementName']
+            if post == None:
+                return None
+            return str(self._workIds['movementName'])
+        def fset(self, value):
+            self._workIds['movementName'] = Text(value)
+        return property(**locals())
+
+    @apply
+    def movementNumber():
+        def fget(self):
+            '''
+            Get or set the movement number. 
+            '''
+            post = self._workIds['movementNumber']
+            if post == None:
+                return None
+            return str(self._workIds['movementNumber'])
+        def fset(self, value):
+            self._workIds['movementNumber'] = Text(value)
+        return property(**locals())
+
+    @apply
+    def number():
+        def fget(self):
+            '''
+            Get or set the number of the work.  
+            '''
+            post = self._workIds['number']
+            if post == None:
+                return None
+            return str(self._workIds['number'])
+        def fset(self, value):
+            self._workIds['number'] = Text(value)
+        return property(**locals())
+
+    @apply
+    def opusNumber():
+        def fget(self):
+            '''
+            Get or set the opus number. 
+            '''
+            post = self._workIds['opusNumber']
+            if post == None:
+                return None
+            return str(self._workIds['opusNumber'])
+        def fset(self, value):
+            self._workIds['opusNumber'] = Text(value)
+        return property(**locals())
+
+    @apply
+    def title():
+        def fget(self):
+            '''
+            Get the title of the work, or the next-matched title string
+            available from a related parameter fields. 
+
+            ::
+
+                >>> md = metadata.Metadata(title='Third Symphony')
+                >>> md.title
+                'Third Symphony'
+            
+            ::
+
+                >>> md = metadata.Metadata(popularTitle='Eroica')
+                >>> md.title
+                'Eroica'
+            
+            ::
+
+                >>> md = metadata.Metadata(
+                ...     title='Third Symphony', 
+                ...     popularTitle='Eroica',
+                ...     )
+                >>> md.title
+                'Third Symphony'
+
+            ::
+
+                >>> md.popularTitle
+                'Eroica'
+
+            ::
+
+                >>> md.otp
+                'Eroica'
+
+            '''
+            searchId = ['title', 'popularTitle', 'alternativeTitle', 'movementName']
+            post = None
+            for key in searchId:
+                post = self._workIds[key]
+                if post != None: # get first matched
+                    # get a string from this Text object
+                    # get with normalized articles
+                    return self._workIds[key].getNormalizedArticle()
+        def fset(self, value):
+            self._workIds['title'] = Text(value)
+        return property(**locals())
 
 
 #-------------------------------------------------------------------------------
+
+
 class RichMetadata(Metadata):
-    '''RichMetadata adds to Metadata information about the contents of the Score 
-    it is attached to. TimeSignature, KeySignature and related analytical is stored. 
-    RichMetadata are generally only created in the process of creating stored 
-    JSON metadata. 
     '''
-    def __init__(self, *args, **keywords):
-        '''
-        
+
+    RichMetadata adds to Metadata information about the contents of the Score
+    it is attached to. TimeSignature, KeySignature and related analytical is
+    stored.  RichMetadata are generally only created in the process of creating
+    stored JSON metadata. 
+
+    ::
+
         >>> rmd = metadata.RichMetadata(title='Concerto in F')
         >>> rmd.title
         'Concerto in F'
+
+    ::
+
         >>> rmd.keySignatureFirst = key.KeySignature(-1)
         >>> 'keySignatureFirst' in rmd._searchAttributes
         True
-        '''
-        Metadata.__init__(self, *args, **keywords)
 
+    '''
+
+    ### INITIALIZER ###
+
+    def __init__(self, *args, **keywords):
+        Metadata.__init__(self, *args, **keywords)
+        self.ambitus = None
         self.keySignatureFirst = None
         self.keySignatures = []
-        self.timeSignatureFirst = None
-        self.timeSignatures = []
-        self.tempoFirst = None
-        self.tempos = []
-
-        self.ambitus = None
+        self.noteCount = None
         self.pitchHighest = None
         self.pitchLowest = None
-
-        self.noteCount = None
         self.quarterLength = None
-
+        self.tempoFirst = None
+        self.tempos = []
+        self.timeSignatureFirst = None
+        self.timeSignatures = []
         # append to existing search attributes from Metdata
-        self._searchAttributes += ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest', 'noteCount', 'quarterLength'] 
+        self._searchAttributes += [
+            'keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 
+            'pitchLowest', 'noteCount', 'quarterLength',
+            ]
 
+    ### PUBLIC METHODS ###
 
-    #---------------------------------------------------------------------------
     def merge(self, other, favorSelf=False):
-        '''Given another Metadata or RichMetadata object, combine
+        '''
+        Given another Metadata or RichMetadata object, combine
         all attributes and return a new object.
 
-        
-        >>> md = metadata.Metadata(title='Concerto in F')
-        >>> md.title
-        'Concerto in F'
-        >>> rmd = metadata.RichMetadata()
-        >>> rmd.merge(md)
-        >>> rmd.title
-        'Concerto in F'
+        ::
+
+            >>> md = metadata.Metadata(title='Concerto in F')
+            >>> md.title
+            'Concerto in F'
+
+        ::
+
+            >>> rmd = metadata.RichMetadata()
+            >>> rmd.merge(md)
+            >>> rmd.title
+            'Concerto in F'
+
         '''
         # specifically name attributes to copy, as do not want to get all
         # Metadata is a m21 object
-        localNames = ['_contributors', '_date', '_urls', '_imprint',
-                      '_copyright', '_workIds']
-
+        localNames = [
+            '_contributors', '_date', '_urls', '_imprint', '_copyright', 
+            '_workIds',
+            ]
         environLocal.printDebug(['RichMetadata: calling merge()'])
         for name in localNames: 
             localValue = getattr(self, name)
@@ -1574,9 +1975,9 @@ class RichMetadata(Metadata):
                 except AttributeError:
                     pass
 
-
     def update(self, streamObj):
-        '''Given a Stream object, update attributes with stored objects. 
+        '''
+        Given a Stream object, update attributes with stored objects. 
         '''
         environLocal.printDebug(['RichMetadata: update(): start'])
         
@@ -1597,7 +1998,6 @@ class RichMetadata(Metadata):
 
         # get flat sorted stream
         flat = streamObj.flat.sorted
-
 
         tsStream = flat.getElementsByClass('TimeSignature')
         if len(tsStream) > 0:
@@ -1638,38 +2038,56 @@ class RichMetadata(Metadata):
 #         self.ambitus = analysisObj.getSolution(streamObj)
 
 
-
-
-
 #-------------------------------------------------------------------------------
+
+
 class MetadataBundle(object):
     '''
-    An object that provides access to, searches within, 
-    and stores and loads multiple Metadata objects.
+    An object that provides access to, searches within, and stores and loads
+    multiple Metadata objects.
 
-    Additionally, multiple MetadataBundles can be merged for 
-    additional processing.  See corpus.metadata.metadataCache
-    for the module that builds these.
+    Additionally, multiple MetadataBundles can be merged for additional
+    processing.  See corpus.metadata.metadataCache for the module that builds
+    these.
     '''
+    
+    ### CLASS VARIABLES ###
+
     _DOC_ATTR = {
-        'storage': 'A dictionary containing the Metadata objects that have been parsed.  Keys are strings',
-        'name': 'The name of the type of MetadataBundle being made, can be "default", "corpus", or "virtual".  Possibly also "local".'
+        'storage': 'A dictionary containing the Metadata objects that have '
+            'been parsed.  Keys are strings',
+        'name': 'The name of the type of MetadataBundle being made, can be '
+            '"default", "corpus", or "virtual".  Possibly also "local".'
         }
     
+    ### INITIALIZER ###
+
     def __init__(self, name='default'):
         # all keys are strings, all value are Metadata
         # there is apparently a performance boost for using all-string keys
         self.storage = {}
-        
         # name is used to write storage file and access this bundle from multiple # bundles
         self.name = name
-
         # need to store local abs file path of each component
         # this will need to be refreshed after loading json data
         # keys are the same for self.storage
         self._accessPaths = {}
 
-    #---------------------------------------------------------------------------
+    ### PRIVATE METHODS ###
+
+    def _getFilePath(self):
+        if self.name in ['virtual', 'core']:
+            fp = os.path.join(common.getMetadataCacheFilePath(), 
+                self.name + '.json')
+        elif self.name == 'local':
+            # write in temporary dir
+            fp = os.path.join(environLocal.getRootTempDir(), 
+                self.name + '.json')
+        else:
+            raise MetadataException('unknown metadata name passed: %s' % 
+                self.name)
+        return fp
+
     def corpusPathToKey(self, fp, number=None):
         '''Given a file path or corpus path, return the meta-data path
     
@@ -1701,26 +2119,32 @@ class MetadataBundle(object):
     
     
 
-    def addFromPaths(self, pathList, printDebugAfter = 0, useCorpus=False):
-        '''Parse and store metadata from numerous files.
+    def addFromPaths(self, pathList, printDebugAfter=0, useCorpus=False):
+        '''
 
-        If any files cannot be loaded, their file paths 
-        will be collected in a list that is returned
+        Parse and store metadata from numerous files.
 
-        Returns a list of file paths with errors and stores
-        the extracted metadata in `self.storage`.
+        If any files cannot be loaded, their file paths will be collected in a
+        list that is returned.
+
+        Returns a list of file paths with errors and stores the extracted
+        metadata in `self.storage`.
         
-        if `printDebugAfter` is set to an int, say 100, then
-        after every 100 files are parsed a message will be
-        printed to stderr giving an update on progress.
-
-
+        If `printDebugAfter` is set to an int, say 100, then after every 100
+        files are parsed a message will be printed to stderr giving an update
+        on progress.
         
-        >>> mb = metadata.MetadataBundle()
-        >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
-        []
-        >>> len(mb.storage)
-        1
+        ::
+
+            >>> metadataBundle = metadata.MetadataBundle()
+            >>> metadataBundle.addFromPaths(corpus.getWorkList('bwv66.6'))
+            []
+
+        ::
+
+            >>> len(metadataBundle.storage)
+            1
+
         '''
         import gc # get a garbage collector
         fpError = [] # store errors
@@ -1790,20 +2214,6 @@ class MetadataBundle(object):
 
         return fpError
 
-    def _getFilePath(self):
-        if self.name in ['virtual', 'core']:
-            fp = os.path.join(common.getMetadataCacheFilePath(), 
-                self.name + '.json')
-        elif self.name == 'local':
-            # write in temporary dir
-            fp = os.path.join(environLocal.getRootTempDir(), 
-                self.name + '.json')
-        else:
-            raise MetadataException('unknown metadata name passed: %s' % 
-                self.name)
-        return fp
-
-
     def write(self):
         '''
         Write the JSON storage of all Metadata or 
@@ -1822,10 +2232,8 @@ class MetadataBundle(object):
         Load self from the file path suggested by the name 
         of this MetadataBundle.
         
-        if fp is None (typical), run self._getFilePath()
+        If fp is None (typical), run self._getFilePath().
         '''
-        
-        
         t = common.Timer()
         t.start()
         if fp is None:
@@ -1836,72 +2244,98 @@ class MetadataBundle(object):
 
         jst = freezeThaw.JSONThawer(self)
         jst.jsonRead(fp)
-        environLocal.printDebug(['MetadataBundle: loading time:', self.name, t, 'md items:', len(self.storage)])
-
+        environLocal.printDebug([
+            'MetadataBundle: loading time:', 
+            self.name, 
+            t, 
+            'md items:', 
+            len(self.storage)
+            ])
 
     def updateAccessPaths(self, pathList):
         r'''
-        For each stored Metatadata object, create an entry in the dictionary ._accessPaths 
-        where each key is a simple version of the corpus name of the file and the value is
-        the complete, local file path that returns this.
 
-        Uses :meth:`~music21.metadata.MetadataBundle.corpusPathToKey` to generate the keys
+        For each stored Metatadata object, create an entry in the dictionary
+        ._accessPaths where each key is a simple version of the corpus name of
+        the file and the value is the complete, local file path that returns
+        this.
 
-        The `pathList` parameter is a list of all file paths on the users local system. 
+        Uses :meth:`~music21.metadata.MetadataBundle.corpusPathToKey` to
+        generate the keys
 
+        The `pathList` parameter is a list of all file paths on the users local
+        system. 
         
-        >>> mb = metadata.MetadataBundle()
-        >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
-        []
-        >>> len(mb._accessPaths)
-        0
+        ::
+
+            >>> mb = metadata.MetadataBundle()
+            >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
+            []
+
+        ::
+
+            >>> len(mb._accessPaths)
+            0
         
-        >>> mb.updateAccessPaths(corpus.getWorkList('bwv66.6'))
-        >>> len(mb._accessPaths)
-        1
-        >>> #_DOCS_SHOW print mb._accessPaths
-        >>> print r"{u'bach_bwv66_6_mxl': u'D:\\eclipse_dev\\music21base\\music21\\corpus\\bach\\bwv66.6.mxl'}" #_DOCS_HIDE
-        {u'bach_bwv66_6_mxl': u'D:\\eclipse_dev\\music21base\\music21\\corpus\\bach\\bwv66.6.mxl'}
+        ::
+
+            >>> mb.updateAccessPaths(corpus.getWorkList('bwv66.6'))
+            >>> len(mb._accessPaths)
+            1
+
+        ::
+
+            >>> #_DOCS_SHOW print mb._accessPaths
+            >>> print r"{u'bach_bwv66_6_mxl': u'D:\\eclipse_dev\\music21base\\music21\\corpus\\bach\\bwv66.6.mxl'}" #_DOCS_HIDE
+            {u'bach_bwv66_6_mxl': u'D:\\eclipse_dev\\music21base\\music21\\corpus\\bach\\bwv66.6.mxl'}
         
-        A slower (but not too slow test) that should do much more. This is
-        what corpus._updateMetadataBundle() does.  Notice that many of 
-        our files contain multiple scores, so while there are 2,300 files,
-        there are over 13,000 scores.
+        A slower (but not too slow test) that should do much more. This is what
+        corpus._updateMetadataBundle() does.  Notice that many of our files
+        contain multiple scores, so while there are 2,300 files, there are over
+        13,000 scores.
         
-        >>> coreCorpusPaths = corpus.getCorePaths()
-        >>> #_DOCS_SHOW len(coreCorpusPaths)
-        >>> if len(coreCorpusPaths) > 2200: print '2300' #_DOCS_HIDE
-        2300
-        >>> mdCoreBundle = metadata.MetadataBundle('core')
-        >>> mdCoreBundle.read()
-        >>> len(mdCoreBundle._accessPaths)
-        0
-        >>> mdCoreBundle.updateAccessPaths(coreCorpusPaths)
-        >>> #_DOCS_SHOW len(mdCoreBundle._accessPaths)
-        >>> if len(mdCoreBundle._accessPaths) > 13000: print '13564' #_DOCS_HIDE
-        13564
+        ::
+
+            >>> coreCorpusPaths = corpus.getCorePaths()
+            >>> #_DOCS_SHOW len(coreCorpusPaths)
+            >>> if len(coreCorpusPaths) > 2200: print '2300' #_DOCS_HIDE
+            2300
+
+        ::
+
+            >>> mdCoreBundle = metadata.MetadataBundle('core')
+            >>> mdCoreBundle.read()
+            >>> len(mdCoreBundle._accessPaths)
+            0
+
+        ::
+
+            >>> mdCoreBundle.updateAccessPaths(coreCorpusPaths)
+            >>> #_DOCS_SHOW len(mdCoreBundle._accessPaths)
+            >>> if len(mdCoreBundle._accessPaths) > 13000: print '13564' #_DOCS_HIDE
+            13564
         
         Note that some scores inside an Opus file may have a number in the key
         that is not present in the path:
         
-        >>> #_DOCS_SHOW mdCoreBundle._accessPaths['essenFolksong_han1_abc_1']
-        >>> print r"u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'" #_DOCS_HIDE
-        u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'
+        ::
+
+            >>> #_DOCS_SHOW mdCoreBundle._accessPaths['essenFolksong_han1_abc_1']
+            >>> print r"u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'" #_DOCS_HIDE
+            u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'
+
         '''
         # always clear first
         self._accessPaths = {}
         # create a copy to manipulate
         keyOptions = self.storage.keys()
-
         for fp in pathList:
-    
             # this key may not be valid if it points to an Opus work that
             # has multiple numbers; thus, need to get a stub that can be 
             # used for conversion
             cp = self.corpusPathToKey(fp)
             # a version of the path that may not have a work number
             cpStub = '_'.join(cp.split('_')[:-1]) # get all but last underscore
-    
             match = False
             try:
                 # MSC: Don't remove this following line: it seems to be important for some reason...
@@ -1910,13 +2344,11 @@ class MetadataBundle(object):
                 match = True
             except KeyError:
                 pass
-
             if not match:
                 # see if there is work id alternative
                 for candidate in keyOptions:
                     if candidate.startswith(cpStub):
                         self._accessPaths[candidate] = fp
-    
         #environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
         #return post
 
@@ -1927,20 +2359,30 @@ class MetadataBundle(object):
 
         Return pairs of file paths and work numbers, or None
 
-        
-        >>> mb = metadata.MetadataBundle()
-        >>> mb.addFromPaths(corpus.getWorkList('ciconia'))
-        []
-        >>> mb.updateAccessPaths(corpus.getWorkList('ciconia'))
-        >>> post = mb.search('cicon', 'composer')
-        >>> len(post[0])
-        2
-        >>> post = mb.search('cicon', 'composer', extList=['.krn'])
-        >>> len(post) # no files in this format
-        0
-        >>> post = mb.search('cicon', 'composer', extList=['.xml'])
-        >>> len(post)  # shouldn't this be 11?
-        1   
+        ::
+
+            >>> mb = metadata.MetadataBundle()
+            >>> mb.addFromPaths(corpus.getWorkList('ciconia'))
+            []
+
+        ::
+
+            >>> mb.updateAccessPaths(corpus.getWorkList('ciconia'))
+            >>> post = mb.search('cicon', 'composer')
+            >>> len(post[0])
+            2
+
+        ::
+
+            >>> post = mb.search('cicon', 'composer', extList=['.krn'])
+            >>> len(post) # no files in this format
+            0
+
+        ::
+
+            >>> post = mb.search('cicon', 'composer', extList=['.xml'])
+            >>> len(post)  # shouldn't this be 11?
+            1   
 
         '''
         post = []
@@ -1950,7 +2392,6 @@ class MetadataBundle(object):
 #                print key
 #                print "\n"
 #                print self.storage[key]
-            
             match, unused_fieldPost = md.search(query, field)
             if match:
                 # returns a pair of file path, work number
@@ -1976,14 +2417,13 @@ class MetadataBundle(object):
         return post
 
 
-
 #-------------------------------------------------------------------------------
+
 
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
 
     def testMetadataLoadCorpus(self):
         from music21.musicxml import xmlHandler
@@ -2002,12 +2442,10 @@ class Test(unittest.TestCase):
         # get contributors directly from Metadata interface
         self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
 
-
         d.read(mTF.binchoisMagnificat) # @UndefinedVariable
         mxScore = d.score # get the mx score directly
         md = fromMxObjects.mxScoreToMetadata(mxScore)
         self.assertEqual(md.composer, 'Gilles Binchois')
-
 
     def testJSONSerialization(self):
         from music21 import metadata
@@ -2040,7 +2478,6 @@ class Test(unittest.TestCase):
         self.assertEqual(cNew.name, 'Gilles Binchois')
         self.assertEqual(cNew.relevance, 'contributor')
 
-
         # test creator
         c1 = metadata.Creator(role='composer', name='Gilles Binchois')
         self.assertEqual(c1.role, 'composer')
@@ -2052,7 +2489,6 @@ class Test(unittest.TestCase):
         self.assertEqual(cNew.role, 'composer')
         self.assertEqual(cNew.name, 'Gilles Binchois')
         self.assertEqual(cNew.relevance, 'creator')
-
 
         # test single date object
         d1 = metadata.Date(year=1843, yearError='approximate')
@@ -2090,7 +2526,6 @@ class Test(unittest.TestCase):
         self.assertEqual(dsNew._dataError, ['approximate'])
         self.assertEqual(str(dsNew), '2009/12/31')
 
-
         # test sublcasses of DateSingle
         ds = metadata.DateRelative('2001/12/31', 'prior')   
         self.assertEqual(str(ds), '2001/12/31')
@@ -2106,8 +2541,6 @@ class Test(unittest.TestCase):
         self.assertEqual(dsNew._relevance, 'prior')
         self.assertEqual(dsNew._dataError, [])
         self.assertEqual(str(dsNew), '2001/12/31')
-
-
 
         db = metadata.DateBetween(['2009/12/31', '2010/1/28'])   
         self.assertEqual(str(db), '2009/12/31 to 2010/01/28')
@@ -2125,8 +2558,6 @@ class Test(unittest.TestCase):
         self.assertEqual(dbNew._dataError, [None, None])
         self.assertEqual(str(dbNew), '2009/12/31 to 2010/01/28')
 
- 
-
         ds = metadata.DateSelection(['2009/12/31', '2010/1/28', '1894/1/28'], 'or')   
         self.assertEqual(str(ds), '2009/12/31 or 2010/01/28 or 1894/01/28')
         self.assertEqual(ds.relevance, 'or')
@@ -2143,9 +2574,6 @@ class Test(unittest.TestCase):
         self.assertEqual(dsNew._dataError, [None, None, None])
         self.assertEqual(str(dsNew), '2009/12/31 or 2010/01/28 or 1894/01/28')
 
-
-
-
     def testJSONSerializationMetadata(self):
         from music21.musicxml import xmlHandler
         from music21.musicxml import fromMxObjects
@@ -2158,7 +2586,6 @@ class Test(unittest.TestCase):
 
         #md.jsonPrint()
 
-
         mdNew = metadata.Metadata()
         
         jsonStr = freezeThaw.JSONFreezer(md).json
@@ -2168,7 +2595,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mdNew.composer, 'Frank')
 
         self.assertEqual(mdNew.title, 'Concerto in F')
-
 
         # test getting meta data from an imported source
 
@@ -2196,8 +2622,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mdNew.title, 'Quintet for Clarinet and Strings')
         self.assertEqual(mdNew.number, 'K. 581')
         self.assertEqual(mdNew.composer, 'Wolfgang Amadeus Mozart')
-
-
 
     def testLoadRichMetadata(self):
         from music21 import corpus
@@ -2232,7 +2656,6 @@ class Test(unittest.TestCase):
 #         self.assertEqual(rmd.pitchHighest, 65)
 #         self.assertEqual(str(rmd.ambitus), '<music21.interval.Interval m7>')
 
-
         s = corpus.parse('bwv66.6')
         rmd = metadata.RichMetadata()
         rmd.merge(s.metadata)
@@ -2260,15 +2683,12 @@ class Test(unittest.TestCase):
 
         self.assertEqual(rmd.localeOfComposition, 'Asien, Ostasien, China, Sichuan')
 
-
-
     def testMetadataSearch(self):
         from music21 import corpus
         s = corpus.parse('ciconia')
         self.assertEqual(s.metadata.search('quod', 'title'), (True, 'title'))
         self.assertEqual(s.metadata.search('qu.d', 'title'), (True, 'title'))
         self.assertEqual(s.metadata.search(re.compile('(.*)canon(.*)')), (True, 'title'))
-
 
     def testRichMetadataA(self):
         from music21 import corpus, metadata
@@ -2288,9 +2708,19 @@ class Test(unittest.TestCase):
 
 
 #-------------------------------------------------------------------------------
-_DOC_ORDER = [Metadata, Text, Date, 
-            DateSingle, DateRelative, DateBetween, DateSelection, 
-            Contributor]
+            
+
+_DOC_ORDER = (
+    Metadata, 
+    Text, 
+    Date, 
+    DateSingle, 
+    DateRelative, 
+    DateBetween, 
+    DateSelection, 
+    Contributor,
+    )
+
 
 if __name__ == "__main__":
     import music21
