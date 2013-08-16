@@ -39,7 +39,9 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
 import unittest
 import datetime
+import multiprocessing
 import os
+import pickle
 import re
 
 from music21 import base
@@ -2436,7 +2438,7 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
     timer.start()
 
     # store list of file paths that caused an error
-    filePathErrors = []
+    failingFilePaths = []
 
     # the core cache is based on local files stored in music21
     # virtual is on-line
@@ -2459,7 +2461,7 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
                 len(paths)))
         #metadataBundle.addFromPaths(paths[-3:])
         # returns any paths that failed to load
-        filePathErrors += metadataBundle.addFromPaths(
+        failingFilePaths += metadataBundle.addFromPaths(
             paths, printDebugAfter=1) 
         #print metadataBundle.storage
         metadataBundle.write() # will use a default file path based on domain
@@ -2469,8 +2471,8 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
         del metadataBundle
 
     environLocal.warn('cache: final writing time: {0}'.format(timer))
-    for filePath in filePathErrors:
-        environLocal.warn('path failed to parse: {0}'.format(filePath))
+    for failingFilePath in failingFilePaths:
+        environLocal.warn('path failed to parse: {0}'.format(failingFilePath))
 
 
 def cacheCoreMetadataMultiprocess(ipythonMod=None, stopAfter=None): 
@@ -2533,6 +2535,72 @@ def cacheCoreMetadataMultiprocessHelper(filePath=None):
         result.append((key, metadataBundle.storage[key]))
     return result
 
+
+class MetadataCachingJob(object):
+    
+    ### INITIALIZER ###
+
+    def __init__(self, filePath):
+        self.filePath = filePath
+        self.metadata = None
+
+    ### SPECIAL METHODS ###
+
+    def __call__(self):
+        # collect metadata on corpus object located at self.filePath
+        pass
+
+
+class WorkerProcessHandler(object):
+
+    ### SPECIAL METHODS ###
+
+    def __call__(self, jobs):
+        finished_jobs = []
+        job_queue = multiprocessing.JoinableQueue()
+        result_queue = multiprocessing.Queue()
+        workers = [WorkerProcess(job_queue, result_queue)
+            for i in range(multiprocessing.cpu_count() * 2)]
+        for worker in workers:
+            worker.start( )
+        for job in jobs:
+            job_queue.put(pickle.dumps(job, protocol=0))
+        for i in xrange(len(jobs)):
+            finished_jobs.append(pickle.loads(result_queue.get()))
+        for worker in workers:
+            job_queue.put(None)
+        job_queue.join()
+        result_queue.close()
+        job_queue.close()
+        for worker in workers:
+             worker.join()
+        return finished_jobs
+
+
+class WorkerProcess(multiprocessing.Process):
+    
+    ### INITIALIZER ###
+
+    def __init__(self, job_queue, result_queue):
+        multiprocessing.Process.__init__(self)
+        self.job_queue = job_queue
+        self.result_queue = result_queue
+        
+    ### PUBLIC METHODS ###
+
+    def run(self):
+        proc_name = self.name
+        while True:
+            job = self.job_queue.get()
+            # "Poison Pill" causes worker shutdown:
+            if job is None:
+                self.job_queue.task_done()
+                break
+            job = pickle.loads(job)
+            job()
+            self.job_queue.task_done()
+            self.result_queue.put(pickle.dumps(job, protocol=0))
+        return
 
 #-------------------------------------------------------------------------------
 
