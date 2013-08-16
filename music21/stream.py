@@ -4763,7 +4763,7 @@ class Stream(base.Music21Object):
                     tempComponents = []
                     for n in subNotes:
                         if n.isChord:  # TODO: this code should be the same as before: combine.
-                            cSub = n._components
+                            cSub = n._notes
                         else:
                             cSub = [n]
                             

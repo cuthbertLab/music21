@@ -3579,10 +3579,10 @@ class Music21Object(object):
         
         >>> g = chord.Chord(['C4', 'E4', 'G4'])
         >>> g.duration.quarterLength = 3.0
-        >>> g._components[1].tie = tie.Tie('start')
+        >>> g._notes[1].tie = tie.Tie('start')
         >>> h, i = g.splitAtQuarterLength(2.0)
         >>> for j in range(0,3):
-        ...   print (h._components[j].tie, i._components[j].tie)
+        ...   print (h._notes[j].tie, i._notes[j].tie)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
         (<music21.tie.Tie start>, <music21.tie.Tie continue>)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
@@ -3671,9 +3671,9 @@ class Music21Object(object):
             eRemain.tie = tie.Tie(forceEndTieType)
 
         elif addTies and 'Chord' in e.classes:
-            for i in range(len(e._components)):
-                component = e._components[i]
-                remainComponent = eRemain._components[i]
+            for i in range(len(e._notes)):
+                component = e._notes[i]
+                remainComponent = eRemain._notes[i]
                 forceEndTieType = 'stop'
                 if component.tie != None:
                     # the last tie of what was formally a start should

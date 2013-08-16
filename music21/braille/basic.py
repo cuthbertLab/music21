@@ -952,10 +952,10 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave = True):
             elif isinstance(brailleElement, chord.Chord):
                 currentChord = brailleElement
                 try:
-                    allNotes = sorted(currentChord._components, key=lambda n: n.pitch)
+                    allNotes = sorted(currentChord._notes, key=lambda n: n.pitch)
                 except AttributeError:
                     raise BrailleBasicException("If you're getting this exception,\
-                    the '_components' attribute for a music21 Chord probably\
+                    the '_notes' attribute for a music21 Chord probably\
                     became 'notes'. If that's the case, change it and life will be great.")
                 if brailleElementGrouping.descendingChords:
                     currentNote = allNotes[-1]

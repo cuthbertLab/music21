@@ -501,7 +501,7 @@ class CapellaImporter(object):
     def noteFromHead(self, headElement):
         ''' 
         return a :class:`~music21.note.Note` object from a <head> element.  This will become
-        part of Chord._components if there are multiple, but in any case, it needs to be a Note
+        part of Chord._notes if there are multiple, but in any case, it needs to be a Note
         not a Pitch for now, because it could have Tie information
 
         
