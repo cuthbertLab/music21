@@ -2077,16 +2077,16 @@ class MetadataBundle(object):
 
     def _getFilePath(self):
         if self.name in ['virtual', 'core']:
-            fp = os.path.join(common.getMetadataCacheFilePath(), 
+            filePath = os.path.join(common.getMetadataCacheFilePath(), 
                 self.name + '.json')
         elif self.name == 'local':
             # write in temporary dir
-            fp = os.path.join(environLocal.getRootTempDir(), 
+            filePath = os.path.join(environLocal.getRootTempDir(), 
                 self.name + '.json')
         else:
             raise MetadataException('unknown metadata name passed: %s' % 
                 self.name)
-        return fp
+        return filePath
 
     ### PUBLIC METHODS ###
 
@@ -2117,27 +2117,27 @@ class MetadataBundle(object):
 
         '''
         import gc # get a garbage collector
-        fpError = [] # store errors
+        filePathError = [] # store errors
 
         # converter imports modules that import metadata
         from music21 import converter, corpus
         
         numberConverted = 0
-        for fp in pathList:
-            environLocal.printDebug(['updateMetadataCache: examining:', fp])
+        for filePath in pathList:
+            environLocal.printDebug(['updateMetadataCache: examining:', filePath])
             if printDebugAfter > 0 and numberConverted % printDebugAfter == 0 and numberConverted > 0:
                 environLocal.warn("updated %d files, %d to go; total errors: %d ... last file %s" %
-                                  (numberConverted, len(pathList) - numberConverted, len(fpError), fp))
+                                  (numberConverted, len(pathList) - numberConverted, len(filePathError), filePath))
             numberConverted += 1
-            cp = self.corpusPathToKey(fp)
+            cp = self.corpusPathToKey(filePath)
             try:
                 if useCorpus is False:
-                    post = converter.parse(fp, forceSource=True)
+                    post = converter.parse(filePath, forceSource=True)
                 else:
-                    post = corpus.parse(fp, forceSource=True)
+                    post = corpus.parse(filePath, forceSource=True)
             except:
-                environLocal.warn('parse failed: %s' % fp)
-                fpError.append(fp)
+                environLocal.warn('parse failed: %s' % filePath)
+                filePathError.append(filePath)
                 continue
 
             if 'Opus' in post.classes:
@@ -2153,17 +2153,17 @@ class MetadataBundle(object):
                             rmd.merge(md)
                             rmd.update(s) # update based on Stream
                             if md.number == None:
-                                environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', fp])
+                                environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', filePath])
                             else:
                                 # update path to include work number
-                                cp = self.corpusPathToKey(fp, number=md.number)
+                                cp = self.corpusPathToKey(filePath, number=md.number)
                                 environLocal.printDebug(['addFromPaths: storing:', cp])
                                 self.storage[cp] = rmd
                         except Exception as e:
-                            environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored: %s" % (scoreNumber, fp, str(e)))
+                            environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored: %s" % (scoreNumber, filePath, str(e)))
                         del s # for memory conservation
                 except Exception as e:
-                    environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored: %s" % (scoreNumber, fp, str(e)))
+                    environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored: %s" % (scoreNumber, filePath, str(e)))
 
             else:
                 try:
@@ -2176,15 +2176,15 @@ class MetadataBundle(object):
                     environLocal.printDebug(['updateMetadataCache: storing:', cp])
                     self.storage[cp] = rmd
                 except Exception as e:
-                    environLocal.warn("Had a problem with extracting metadata for %s, piece ignored" % (fp))
+                    environLocal.warn("Had a problem with extracting metadata for %s, piece ignored" % (filePath))
     
             # explicitly delete the imported object for memory conservation
             del post
             gc.collect()
 
-        return fpError
+        return filePathError
 
-    def corpusPathToKey(self, fp, number=None):
+    def corpusPathToKey(self, filePath, number=None):
         '''Given a file path or corpus path, return the meta-data path
     
         
@@ -2194,10 +2194,10 @@ class MetadataBundle(object):
         >>> mb.corpusPathToKey('/beethoven/opus59no1/movement1.xml').endswith('beethoven_opus59no1_movement1_xml')
         True
         '''
-        if 'corpus' in fp and 'music21' in fp:
-            cp = fp.split('corpus')[-1] # get fp after corpus
+        if 'corpus' in filePath and 'music21' in filePath:
+            cp = filePath.split('corpus')[-1] # get filePath after corpus
         else:
-            cp = fp
+            cp = filePath
     
         if cp.startswith(os.sep):
             cp = cp[1:]
@@ -2213,23 +2213,23 @@ class MetadataBundle(object):
             # append work number
             return cp+'_%s' % number
     
-    def read(self, fp=None):
+    def read(self, filePath=None):
         '''
         Load self from the file path suggested by the name 
         of this MetadataBundle.
         
-        If fp is None (typical), run self._getFilePath().
+        If filePath is None (typical), run self._getFilePath().
         '''
         t = common.Timer()
         t.start()
-        if fp is None:
-            fp = self._getFilePath()
-        if not os.path.exists(fp):
+        if filePath is None:
+            filePath = self._getFilePath()
+        if not os.path.exists(filePath):
             environLocal.warn('no metadata found for: %s; try building cache with corpus.cacheMetadata("%s")' % (self.name, self.name))
             return
 
         jst = freezeThaw.JSONThawer(self)
-        jst.jsonRead(fp)
+        jst.jsonRead(filePath)
         environLocal.printDebug([
             'MetadataBundle: loading time:', 
             self.name, 
@@ -2379,18 +2379,18 @@ class MetadataBundle(object):
         self._accessPaths = {}
         # create a copy to manipulate
         keyOptions = self.storage.keys()
-        for fp in pathList:
+        for filePath in pathList:
             # this key may not be valid if it points to an Opus work that
             # has multiple numbers; thus, need to get a stub that can be 
             # used for conversion
-            cp = self.corpusPathToKey(fp)
+            cp = self.corpusPathToKey(filePath)
             # a version of the path that may not have a work number
             cpStub = '_'.join(cp.split('_')[:-1]) # get all but last underscore
             match = False
             try:
                 # MSC: Don't remove this following line: it seems to be important for some reason...
                 md = self.storage[cp] # @UnusedVariable
-                self._accessPaths[cp] = fp
+                self._accessPaths[cp] = filePath
                 match = True
             except KeyError:
                 pass
@@ -2398,7 +2398,7 @@ class MetadataBundle(object):
                 # see if there is work id alternative
                 for candidate in keyOptions:
                     if candidate.startswith(cpStub):
-                        self._accessPaths[candidate] = fp
+                        self._accessPaths[candidate] = filePath
         #environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
         #return post
 
@@ -2409,11 +2409,11 @@ class MetadataBundle(object):
 
         TODO: Test!
         '''
-        fp = self._getFilePath()
-        environLocal.printDebug(['MetadataBundle: writing:', fp])
+        filePath = self._getFilePath()
+        environLocal.printDebug(['MetadataBundle: writing:', filePath])
         
         jsf = freezeThaw.JSONFreezer(self)
-        return jsf.jsonWrite(fp)
+        return jsf.jsonWrite(filePath)
 
 
 #-------------------------------------------------------------------------------
@@ -2483,7 +2483,7 @@ def cacheCoreMetadataMultiprocess(ipythonMod=None, stopAfter=None):
     timer.start()
 
     # store list of file paths that caused an error
-    #fpError = []
+    #filePathError = []
 
     metadataBundle = metadata.MetadataBundle('core')
 
@@ -2526,7 +2526,7 @@ def cacheCoreMetadataMultiprocess(ipythonMod=None, stopAfter=None):
 def cacheCoreMetadataMultiprocessHelper(filePath=None):
     from music21 import metadata
     metadataBundle = metadata.MetadataBundle('core')
-    unused_fpError = metadataBundle.addFromPaths(
+    unused_filePathError = metadataBundle.addFromPaths(
         [filePath], printDebugAfter=1, useCorpus=True) 
     result = []
     for key in metadataBundle.storage:
