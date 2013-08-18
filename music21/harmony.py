@@ -136,7 +136,7 @@ class Harmony(chord.Chord):
         >>> h = harmony.ChordSymbol()
         >>> h.root('B-3')
         >>> h.bass('D')
-        >>> h.inversion(1)
+        >>> h.inversion(1, transposeOnSet=False)
         >>> h.addChordStepModification(harmony.ChordStepModification('add', 4))
         >>> h
         <music21.harmony.ChordSymbol B-/D add 4>
@@ -240,7 +240,7 @@ class Harmony(chord.Chord):
                 else:
                     self.bass(keywords[kw])
             elif kw == 'inversion':
-                self.inversion(int(keywords[kw]))
+                self.inversion(int(keywords[kw]), transposeOnSet=False)
             elif kw == 'duration' or kw == 'quarterLength':
                 self.duration = duration.Duration(keywords[kw])
             else:
@@ -249,7 +249,7 @@ class Harmony(chord.Chord):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def figure():
+    def figure(): # @NoSelf
         def fget(self):
             '''
             Get or set the figure of the harmony object. The figure is the 
@@ -297,10 +297,10 @@ class Harmony(chord.Chord):
         return property(**locals())
 
     @apply
-    def key():
+    def key(): # @NoSelf
         def fget(self):
             '''
-            Gets or rets the current Key (or Scale object) associated with this 
+            Gets or sets the current Key (or Scale object) associated with this 
             Harmony object.
             
             For a given RomanNumeral object. Each sub-classed harmony object 
@@ -346,7 +346,7 @@ class Harmony(chord.Chord):
         return property(**locals())
 
     @apply
-    def romanNumeral():
+    def romanNumeral(): # @NoSelf
         # TODO: move this attribute to roman class which inherits from harmony.Harmony objects
         def fget(self):
             '''
@@ -386,7 +386,7 @@ class Harmony(chord.Chord):
         return property(**locals())
 
     @apply
-    def writeAsChord():
+    def writeAsChord(): # @NoSelf
         def fget(self):
             '''
             Boolean attribute of all harmony objects that specifies how this 
@@ -532,7 +532,7 @@ class ChordStepModification(object):
     ### PUBLIC PROPERTIES ###
     
     @apply
-    def degree():
+    def degree(): # @NoSelf
         def fget(self):
             '''
             ::
@@ -559,7 +559,7 @@ class ChordStepModification(object):
         return property(**locals())
 
     @apply
-    def interval():
+    def interval(): # @NoSelf
         def fget(self):
             '''
             Get or set the alteration of this degree as a 
@@ -601,7 +601,7 @@ class ChordStepModification(object):
         return property(**locals())
 
     @apply
-    def modType():
+    def modType(): # @NoSelf
         def fget(self):
             '''
             Get or set the ChordStepModification modification type, where 
@@ -1138,6 +1138,8 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         >>> harmony.changeAbbreviationFor('major', '')
 
     '''
+    if len(inChord.pitches) == 0:
+        return ''
 
     try:
         inChord.root()
@@ -1570,6 +1572,23 @@ class ChordSymbol(Harmony):
         >>> [[str(c.name) for c in c.pitches] for c in s.flat.getElementsByClass(harmony.ChordSymbol)[0:5]]
         [['F', 'A', 'C'], ['B-', 'D', 'F'], ['F', 'A', 'C'], ['C', 'E', 'G'], ['F', 'A', 'C']]
 
+
+    Test creating an empty chordSymbol:
+    
+    ::
+        >>> cs = harmony.ChordSymbol()
+        >>> cs
+        <music21.harmony.ChordSymbol >
+        >>> cs.root('E-')
+        >>> cs.bass('B-')
+        >>> cs.inversion(2, transposeOnSet = False)  # important: we are not asking for transposition, merely specifying the inversion
+        >>> cs.romanNumeral = 'I64'
+        >>> cs.chordKind = 'major'
+        >>> cs.chordKindStr = 'M'
+        >>> cs
+        <music21.harmony.ChordSymbol E-/B->
+
+
     '''
 
     ### INITIALIZER ###
@@ -1991,7 +2010,7 @@ class ChordSymbol(Harmony):
                 self._bass.octave = 2 #arbitrary octave, must be below root, which was arbitrarily chosen as 3 above
                 pitches.append(self._bass)
         else:
-            self.inversion(None)
+            self.inversion(None, transposeOnSet = False)
             inversionNum = None
         if inversionNum != None:
             index = -1
@@ -2421,6 +2440,17 @@ class Test(unittest.TestCase):
             vector = totHarmonicMotionFraction
 
         self.assertEqual(len(vector), 12)
+
+
+    def testChordKindSetting(self):
+        cs = ChordSymbol()
+        cs.root('E-')
+        cs.bass('B-')
+        cs.inversion(2, transposeOnSet = False)
+        cs.romanNumeral = 'I64'
+        cs.chordKind = 'major'
+        cs.chordKindStr = 'M'
+        self.assertEqual(repr(cs), '<music21.harmony.ChordSymbol E-/B->')
 
 
 class TestExternal(unittest.TestCase):

@@ -65,12 +65,21 @@ class StreamIterator(object):
 
     Note that this iterator automatically sets the active site of 
     returned elements to the the source Stream. 
+    
+    Sets:
+    
+    * StreamIterator.srcStream -- the Stream iterated over
+    * StreamIterator.index -- current index item
+    * StreamIterator.streamLength -- the len() of srcStream
+    * StreamIterator.srcStreamElements -- srcStream.elements
+    * StreamIterator.cleanupOnStop -- should the StreamIterator delete the reference to srcStream and srcStreamElements before stopping? default True
     '''
     def __init__(self, srcStream):
         self.srcStream = srcStream
         self.index = 0
         self.streamLength = len(self.srcStream)
         self.srcStreamElements = self.srcStream.elements
+        self.cleanupOnStop = True
 
     def __iter__(self):
         return self
@@ -79,8 +88,9 @@ class StreamIterator(object):
         # calling .elements here will sort if autoSort = True
         # thus, this does not need to sort or check autoSort status
         if self.index >= self.streamLength:
-            del self.srcStream
-            del self.srcStreamElements
+            if self.cleanupOnStop is not False:
+                del self.srcStream
+                del self.srcStreamElements
             raise StopIteration
         #environLocal.printDebug(['self.srcStream', self.srcStream, self.index, 'len(self.srcStream)', len(self.srcStream), 'len(self._endElements)', len(self.srcStream._endElements), 'len(self.srcStream._elements)', len(self.srcStream._elements), 'len(self.srcStream.elements)', len(self.srcStream.elements)])
         try:
@@ -93,6 +103,11 @@ class StreamIterator(object):
         self.index += 1
         return post
 
+    def __getitem__(self, key):
+        '''
+        if you are in the iterator, you should still be able to request other items...uses self.srcStream.__getitem__
+        '''
+        self.srcStream.__getitem__(key)
 
 #-------------------------------------------------------------------------------
 

@@ -1111,7 +1111,7 @@ def mxToChordSymbol(mxHarmony):
 
     mxInversion = mxHarmony.get('inversion')
     if mxInversion is not None:
-        cs.inversion(int(mxInversion)) # must be an int
+        cs.inversion(int(mxInversion), transposeOnSet=False) # must be an int
 
     mxFunction = mxHarmony.get('function')
     if mxFunction is not None:

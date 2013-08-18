@@ -779,6 +779,7 @@ class Chord(note.NotRest):
                 self._bass = newbass
             self._inversion = None # reset inversion if root changes
         elif (self._bass is None) and (find):
+            # TODO: stop caching basses
             self._bass = self._findBass()
             return self._bass
         else:
@@ -1578,7 +1579,7 @@ class Chord(note.NotRest):
                 return thisInterval
         return None
 
-    def inversion(self, newInversion=None, find=True, testRoot=None):
+    def inversion(self, newInversion=None, find=True, testRoot=None, transposeOnSet=True):
         '''
         Returns an integer representing which inversion (if any) the chord is in. Chord
         does not have to be complete, but determines the inversion by looking at the relationship
@@ -1592,9 +1593,28 @@ class Chord(note.NotRest):
 
         ::
 
+            >>> a = chord.Chord(['g4', 'b4', 'd5', 'f5'])
+            >>> a.inversion()
+            0
+            >>> a.inversion(1)
+            >>> a
+            <music21.chord.Chord B4 D5 F5 G5>
+            >>> a.inversion(1)    
+            
+
+            With implicit octaves, D becomes the bass (since octaves start on C):
+
             >>> a = chord.Chord(['g', 'b', 'd', 'f'])
             >>> a.inversion()
             2
+            
+            Note that in inverting a chord with implicit octaves, some
+            pitches will gain octave designations, but not necessarily all of them:
+            
+            >>> a.inversion(1)
+            >>> a
+            <music21.chord.Chord B D5 F5 G5>
+
 
         ::
 
@@ -1610,14 +1630,14 @@ class Chord(note.NotRest):
 
         ::
 
-            >>> DSeventh3rdInversion = chord.Chord(['C', 'B'])
+            >>> DSeventh3rdInversion = chord.Chord(['C4', 'B4'])
             >>> DSeventh3rdInversion.bass(pitch.Pitch('B4'))
             >>> DSeventh3rdInversion.inversion()
             3
 
         ::
 
-            >>> GNinth4thInversion = chord.Chord(['G', 'B', 'D', 'F', 'A'])
+            >>> GNinth4thInversion = chord.Chord(['G4', 'B4', 'D5', 'F5', 'A4'])
             >>> GNinth4thInversion.bass(pitch.Pitch('A4'))
             >>> GNinth4thInversion.inversion()
             4
@@ -1628,6 +1648,19 @@ class Chord(note.NotRest):
             >>> BbEleventh5thInversion.bass(pitch.Pitch('E-4'))
             >>> BbEleventh5thInversion.inversion()
             5
+
+
+        ::
+
+            >>> GMajRepeats = chord.Chord(['G4','B5','G6','B6','D7'])
+            >>> GMajRepeats.inversion(2)
+            >>> GMajRepeats
+            <music21.chord.Chord D7 G7 B7 G8 B8>
+            
+            >>> GMajRepeats.inversion(3)
+            Traceback (most recent call last):
+            ChordException: Could not invert chord...inversion may not exist
+
         
         If testRoot is True then that temporary root is used instead of self.root()
         '''
@@ -1637,14 +1670,43 @@ class Chord(note.NotRest):
         else:
             rootPitch = self.root()
         
-        if newInversion:
-            if common.isNum(newInversion):
-                self._inversion = newInversion
-            else:
+        if newInversion is not None:
+            if not common.isNum(newInversion):
                 try:
-                    self._inversion = int(newInversion)
+                    newInversion = int(newInversion)
                 except:
                     raise ChordException("Inversion must be an integer")
+            if transposeOnSet is False:
+                self._inversion = newInversion
+            else:
+                numberOfRunsBeforeCrashing = len(self.pitches) + 2 # could have set bass or root externally
+                soughtInversion = newInversion
+                
+                self._inversion = None
+                currentInversion = self.inversion(find=True)
+                while currentInversion != soughtInversion and numberOfRunsBeforeCrashing > 0:                    
+                    currentMaxMidi = max(self.pitches).ps
+                    tempBassPitch = self.bass()
+                    while tempBassPitch.ps < currentMaxMidi:
+                        try:
+                            tempBassPitch.octave += 1  # will this work with implicit octave chords???
+                        except TypeError:
+                            tempBassPitch.octave = tempBassPitch.implicitOctave + 1
+                    
+                    # housekeeping for next loop tests
+                    self._inversion = None
+                    self._bass = None
+                    self._root = None
+                    currentInversion = self.inversion(find=True)
+                    numberOfRunsBeforeCrashing -= 1
+                if numberOfRunsBeforeCrashing == 0:
+                    raise ChordException("Could not invert chord...inversion may not exist")
+                else:
+                    self.sortAscending(inPlace=True)
+                return
+                
+                
+                
         elif self._inversion is None and find is True:
             try:
                 if rootPitch == None or self.bass() == None:
@@ -1675,6 +1737,7 @@ class Chord(note.NotRest):
                 inv = 5
             else:
                 inv = None #no longer raise an exception if not normal inversion
+            # is this cache worth it? or more trouble than it's worth...
             self._inversion = inv
             return inv
         else:
@@ -2711,7 +2774,7 @@ class Chord(note.NotRest):
                 self._root = newroot
             self._inversion = None # reset inversion if root changes
         elif (self._root is None) and find:
-            self._root = self.findRoot()
+            self._root = self.findRoot() 
             return self._root
         else:
             return self._root
@@ -3096,7 +3159,7 @@ class Chord(note.NotRest):
         Same as sortAscending but notes are sorted by midi number, so F## sorts above G-.
         '''
         newChord = copy.deepcopy(self)
-        tempChordNotes = newChord.pitches
+        #tempChordNotes = newChord.pitches
         pitches = sorted(newChord.pitches,
             cmp=lambda x, y: cmp(x.ps, y.ps))
         newChord.pitches = pitches
@@ -3231,7 +3294,7 @@ class Chord(note.NotRest):
         return self._chordTablesAddress
 
     @apply
-    def color():
+    def color(): # @NoSelf
         def fget(self):
             '''
             Get or set the Note color.
@@ -3301,7 +3364,7 @@ class Chord(note.NotRest):
             return ctn[0]
 
     @apply
-    def duration():
+    def duration(): # @NoSelf
         def fget(self):
             '''Get and set the duration of this Chord as a Duration object.
             
@@ -3693,7 +3756,7 @@ class Chord(note.NotRest):
         return pcGroup
 
     @apply
-    def pitchNames():
+    def pitchNames(): # @NoSelf
         def fget(self):
             '''
             Return a list of Pitch names from each 
@@ -3760,7 +3823,7 @@ class Chord(note.NotRest):
         return '%s-%s' % (root, nameStr)
 
     @apply
-    def pitches():
+    def pitches(): # @NoSelf
         def fget(self):
             '''
             Get or set a list of all Pitch objects in this Chord.
@@ -4081,7 +4144,7 @@ class Chord(note.NotRest):
         return self.getChordStep(3)
 
     @apply
-    def tie():
+    def tie(): # @NoSelf
         def fget(self):
             '''
             Get or set a single tie based on all the ties in this Chord.
@@ -4117,7 +4180,7 @@ class Chord(note.NotRest):
         return property(**locals())
 
     @apply
-    def volume():
+    def volume(): # @NoSelf
         def fget(self):
             '''
             Get or set the :class:`~music21.volume.Volume` object for this 
@@ -4898,7 +4961,7 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.quality, 'minor')
 
     def testVolumePerPitchA(self):
-        from music21 import chord, volume
+        from music21 import chord
         c = chord.Chord(['c4', 'd-4', 'g4'])
         v1 = volume.Volume(velocity=111)
         v2 = volume.Volume(velocity=98)
@@ -4972,7 +5035,7 @@ class Test(unittest.TestCase):
             s.append(cNew)
 
     def testVolumePerPitchD(self):
-        from music21 import chord, volume
+        from music21 import chord
         c = chord.Chord(['f-3', 'g3', 'b-3'])
         #set a single velocity
         c.volume.velocity = 121

@@ -887,11 +887,12 @@ def segnoToMx(rm):
 
 def chordSymbolToMx(cs):
     '''
-    
+    Convert a ChordSymbol object to an mxHarmony object.
+       
     >>> cs = harmony.ChordSymbol()
     >>> cs.root('E-')
     >>> cs.bass('B-')
-    >>> cs.inversion(2)
+    >>> cs.inversion(2, transposeOnSet = False)
     >>> cs.romanNumeral = 'I64'
     >>> cs.chordKind = 'major'
     >>> cs.chordKindStr = 'M'
@@ -900,13 +901,13 @@ def chordSymbolToMx(cs):
     >>> mxHarmony = musicxml.toMxObjects.chordSymbolToMx(cs)
     >>> mxHarmony
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1>>
-
+ 
     >>> hd = harmony.ChordStepModification()
     >>> hd.type = 'alter'
     >>> hd.interval = -1
     >>> hd.degree = 3
     >>> cs.addChordStepModification(hd)
-
+ 
     >>> mxHarmony = musicxml.toMxObjects.chordSymbolToMx(cs)
     >>> mxHarmony
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1> <degree <degree-value charData=3> <degree-alter charData=-1> <degree-type charData=alter>>>

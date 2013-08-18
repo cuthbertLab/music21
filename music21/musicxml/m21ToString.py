@@ -851,7 +851,7 @@ spirit</words>
         h = harmony.ChordSymbol()
         h.root('E-')
         h.bass('B-')
-        h.inversion(2)
+        h.inversion(2, transposeOnSet = False)
         #h.romanNumeral = 'I64'
         h.chordKind = 'major'
         h.chordKindStr = 'M'

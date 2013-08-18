@@ -41,7 +41,7 @@ def translateMonophonicPartToSegments(inputStream, segmentLengths = 30, overlap 
     overlap of `overlap` using the algorithm of `algorithm`. Returns two lists, a list of segments, and
     a list of measure numbers that match the segments.
     
-    
+    >>> from music21 import *
     >>> luca = corpus.parse('luca/gloria')
     >>> lucaCantus = luca.parts[0]
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)

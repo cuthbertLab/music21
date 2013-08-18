@@ -1836,7 +1836,10 @@ class PlotStream(object):
         return None
 
     def process(self):
-        '''This will process all data, as well as call the done() method. What happens when the done() is called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph).
+        '''This will process all data, as well as call the done() method. 
+        What happens when the done() is called is determined by the the keyword argument `doneAction`; 
+        options are 'show' (display immediately), 'write' (write the file to a supplied file path), 
+        and None (do processing but do not write or show a graph).
 
         Subclass dependent data extracted is stored in the self.data attribute. 
         '''
@@ -2405,7 +2408,10 @@ class PlotMultiStream(object):
         '''
         This will process all data, as well as call 
         the done() method. What happens when the done() is 
-        called is determined by the the keyword argument `doneAction`; options are 'show' (display immediately), 'write' (write the file to a supplied file path), and None (do processing but do not write or show a graph).
+        called is determined by the the keyword argument `doneAction`; 
+        options are 'show' (display immediately), 
+        'write' (write the file to a supplied file path), 
+        and None (do processing but do not write or show a graph).
 
         Subclass dependent data extracted is stored in the self.data attribute. 
         '''

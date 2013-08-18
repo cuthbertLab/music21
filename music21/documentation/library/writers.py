@@ -139,10 +139,14 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         ipythonNotebookFilePaths = [x for x in
             documentation.IPythonNotebookIterator()()]
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
-            self._convertOneNotebook(ipythonNotebookFilePath)
-            self._cleanupNotebookAssets(ipythonNotebookFilePath)
-            print '\tWROTE   {0}'.format(os.path.relpath(
-                ipythonNotebookFilePath))
+            nbConvertReturnCode = self._convertOneNotebook(ipythonNotebookFilePath)
+            if nbConvertReturnCode is True:
+                self._cleanupNotebookAssets(ipythonNotebookFilePath)
+                print '\tWROTE   {0}'.format(os.path.relpath(
+                    ipythonNotebookFilePath))
+            else:
+                print '\tSKIPPED {0}'.format(os.path.relpath(
+                    ipythonNotebookFilePath))
 
     ### PRIVATE METHODS ###
 
@@ -166,8 +170,16 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 os.remove(filePath)
 
     def _convertOneNotebook(self, ipythonNotebookFilePath):
+        '''
+        converts one .ipynb file to .rst using nbconvert.
+        
+        returns True if IPythonNotebook was converted.
+        returns False if IPythonNotebook's converted .rst file is newer than the .ipynb file.
+        
+        sends AssertionError if ipythonNotebookFilePath does not exist.
+        '''
+        
         assert os.path.exists(ipythonNotebookFilePath)
-        self._runNBConvert(ipythonNotebookFilePath)
         notebookFileNameWithoutExtension = os.path.splitext(
             os.path.basename(ipythonNotebookFilePath))[0]
         notebookParentDirectoryPath = os.path.abspath(
@@ -179,6 +191,13 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             notebookParentDirectoryPath,
             rstFileName,
             )
+
+
+        if os.path.exists(rstFilePath):
+            if os.path.getmtime(rstFilePath) > os.path.getmtime(ipythonNotebookFilePath):
+                return False
+
+        self._runNBConvert(ipythonNotebookFilePath)
         with open(rstFilePath, 'r') as f:
             oldLines = f.read().splitlines()
         ipythonPromptPattern = re.compile('^In\[\d+\]:')
@@ -230,6 +249,8 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
         with open(rstFilePath, 'w') as f:
             f.write('\n'.join(lines))
+
+        return True
 
     def _iterateSequencePairwise(self, sequence):
         prev = None

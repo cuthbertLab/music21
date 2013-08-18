@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import os
-import types
+#import types
 
 
 class Cleaner(object):
