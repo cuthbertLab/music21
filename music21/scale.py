@@ -688,7 +688,13 @@ class AbstractDiatonicScale(AbstractScale):
         # reference: http://cnx.org/content/m11633/latest/
         # most diatonic scales will start with this collection
         srcList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        if mode in ['dorian']:
+        if mode in [None, 'major', 'ionian']: # c to C
+            intervalList = srcList
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 1
+            self.relativeMinorDegree = 6
+        elif mode in ['dorian']:
             intervalList = srcList[1:] + srcList[:1] # d to d
             self.tonicDegree = 1
             self.dominantDegree = 5
@@ -712,6 +718,18 @@ class AbstractDiatonicScale(AbstractScale):
             self.dominantDegree = 5
             self.relativeMajorDegree = 4
             self.relativeMinorDegree = 2
+        elif mode in ['aeolian', 'minor']:
+            intervalList = srcList[5:] + srcList[:5] # a to A
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 3
+            self.relativeMinorDegree = 1
+        elif mode in ['locrian']:
+            intervalList = srcList[6:] + srcList[:6] # b to B
+            self.tonicDegree = 1
+            self.dominantDegree = 5
+            self.relativeMajorDegree = 2
+            self.relativeMinorDegree = 7
         elif mode in ['hypodorian']:
             intervalList = srcList[5:] + srcList[:5] # a to a
             self.tonicDegree = 4
@@ -736,36 +754,12 @@ class AbstractDiatonicScale(AbstractScale):
             self.dominantDegree = 7
             self.relativeMajorDegree = 7
             self.relativeMinorDegree = 5
-        elif mode in ['aeolian', 'minor']:
-            intervalList = srcList[5:] + srcList[:5] # a to A
-            self.tonicDegree = 1
-            self.dominantDegree = 5
-            self.relativeMajorDegree = 3
-            self.relativeMinorDegree = 1
-        elif mode in [None, 'major', 'ionian']: # c to C
-            intervalList = srcList
-            self.tonicDegree = 1
-            self.dominantDegree = 5
-            self.relativeMajorDegree = 1
-            self.relativeMinorDegree = 6
-        elif mode in ['locrian']:
-            intervalList = srcList[6:] + srcList[:6] # b to B
-            self.tonicDegree = 1
-            self.dominantDegree = 5
-            self.relativeMajorDegree = 2
-            self.relativeMinorDegree = 7
         elif mode in ['hypoaeolian']:
             intervalList = srcList[2:] + srcList[:2] # e to e
             self.tonicDegree = 4
             self.dominantDegree = 6
             self.relativeMajorDegree = 6
             self.relativeMinorDegree = 4
-        elif mode in ['hupomixolydian']:
-            intervalList = srcList[3:] + srcList[:3] 
-            self.tonicDegree = 4
-            self.dominantDegree = 7
-            self.relativeMajorDegree = 5
-            self.relativeMinorDegree = 3
         elif mode in ['hypolocrian']:
             intervalList = srcList[3:] + srcList[:3] # f to f
             self.tonicDegree = 4
