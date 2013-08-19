@@ -2440,22 +2440,22 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
     # store list of file paths that caused an error
     failingFilePaths = []
 
+    domainGetPathsProcedures = {
+       'core': corpus.getCorePaths,
+       'local': corpus.getLocalPaths,
+       'virtual': corpus.getVirtualPaths,
+       }
+
     # the core cache is based on local files stored in music21
     # virtual is on-line
     for domain in domains:
         # the domain passed here becomes the name of the bundle
         # determines the file name of the json bundle
         metadataBundle = metadata.MetadataBundle(domain)
-        if domain == 'virtual':
-            getPaths = corpus.getVirtualPaths
-        elif domain == 'core':
-            getPaths = corpus.getCorePaths
-        elif domain == 'local':
-            getPaths = corpus.getLocalPaths  
-        else:
+        if domain not in domainGetPathsProcedures:
             raise MetadataCacheException('invalid domain provided: {0}'.format(
                 domain))
-        paths = getPaths()
+        paths = domainGetPathsProcedures[domain]()
         environLocal.warn(
             'metadata cache: starting processing of paths: {0}'.format(
                 len(paths)))
