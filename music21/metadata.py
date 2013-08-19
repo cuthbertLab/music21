@@ -2126,62 +2126,87 @@ class MetadataBundle(object):
         
         numberConverted = 0
         for filePath in pathList:
-            environLocal.printDebug(['updateMetadataCache: examining:', filePath])
-            if printDebugAfter > 0 and numberConverted % printDebugAfter == 0 and numberConverted > 0:
-                environLocal.warn("updated %d files, %d to go; total errors: %d ... last file %s" %
-                                  (numberConverted, len(pathList) - numberConverted, len(filePathError), filePath))
+            environLocal.printDebug(
+                'updateMetadataCache: examining: {0}'.format(filePath))
+            if 0 < printDebugAfter \
+                and numberConverted % printDebugAfter == 0 \
+                and 0 < numberConverted:
+                environLocal.warn('updated {0} files, {1} to go; '
+                    'total errors: {2} ... last file {3}'.format(
+                        numberConverted, 
+                        len(pathList) - numberConverted, 
+                        len(filePathError), 
+                        filePath))
             numberConverted += 1
-            cp = self.corpusPathToKey(filePath)
             try:
                 if useCorpus is False:
-                    post = converter.parse(filePath, forceSource=True)
+                    parsedObject = converter.parse(filePath, forceSource=True)
                 else:
-                    post = corpus.parse(filePath, forceSource=True)
+                    parsedObject = corpus.parse(filePath, forceSource=True)
             except:
                 environLocal.warn('parse failed: %s' % filePath)
                 filePathError.append(filePath)
                 continue
 
-            if 'Opus' in post.classes:
+            if 'Opus' in parsedObject.classes:
                 # need to get scores from each opus?
                 # problem here is that each sub-work has metadata, but there
                 # is only a single source file
                 try:
-                    for scoreNumber, s in enumerate(post.scores):
+                    for scoreNumber, s in enumerate(parsedObject.scores):
                         try:
-                            md = s.metadata
-                            # updgrade md to rmd
-                            rmd = RichMetadata()
-                            rmd.merge(md)
-                            rmd.update(s) # update based on Stream
-                            if md.number == None:
-                                environLocal.printDebug(['addFromPaths: got Opus that contains Streams that do not have work numbers:', filePath])
+                            metadata = s.metadata
+                            # updgrade metadata to richMetadata
+                            richMetadata = RichMetadata()
+                            richMetadata.merge(metadata)
+                            richMetadata.update(s) # update based on Stream
+                            if metadata.number == None:
+                                environLocal.printDebug(
+                                    'addFromPaths: got Opus that contains '
+                                    'Streams that do not have work numbers: '
+                                    '{0}'.format(filePath))
                             else:
                                 # update path to include work number
-                                cp = self.corpusPathToKey(filePath, number=md.number)
-                                environLocal.printDebug(['addFromPaths: storing:', cp])
-                                self.storage[cp] = rmd
+                                corpusPath = self.corpusPathToKey(
+                                    filePath, 
+                                    number=metadata.number,
+                                    )
+                                environLocal.printDebug(
+                                    'addFromPaths: storing: {0}'.format(
+                                        corpusPath))
+                                self.storage[corpusPath] = richMetadata
                         except Exception as e:
-                            environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored: %s" % (scoreNumber, filePath, str(e)))
+                            environLocal.warn(
+                                'Had a problem with extracting metadata '
+                                'for score {0} in {1}, whole opus ignored: '
+                                '{2}'.format(
+                                    scoreNumber, filePath, str(e)))
                         del s # for memory conservation
                 except Exception as e:
-                    environLocal.warn("Had a problem with extracting metadata for score %d in %s, whole opus ignored: %s" % (scoreNumber, filePath, str(e)))
+                    environLocal.warn(
+                        'Had a problem with extracting metadata for score {0} '
+                        'in {1}, whole opus ignored: {2}'.format(
+                            scoreNumber, filePath, str(e)))
 
             else:
                 try:
-                    md = post.metadata
-                    if md is None:
+                    corpusPath = self.corpusPathToKey(filePath)
+                    metadata = parsedObject.metadata
+                    if metadata is None:
                         continue    
-                    rmd = RichMetadata()
-                    rmd.merge(md)
-                    rmd.update(post) # update based on Stream
-                    environLocal.printDebug(['updateMetadataCache: storing:', cp])
-                    self.storage[cp] = rmd
+                    richMetadata = RichMetadata()
+                    richMetadata.merge(metadata)
+                    richMetadata.update(parsedObject) # update based on Stream
+                    environLocal.printDebug(
+                        'updateMetadataCache: storing: {0}'.format(
+                            corpusPath))
+                    self.storage[corpusPath] = richMetadata
                 except Exception as e:
-                    environLocal.warn("Had a problem with extracting metadata for %s, piece ignored" % (filePath))
+                    environLocal.warn('Had a problem with extracting metadata '
+                    'for {0}, piece ignored'.format(filePath))
     
             # explicitly delete the imported object for memory conservation
-            del post
+            del parsedObject
             gc.collect()
 
         return filePathError
