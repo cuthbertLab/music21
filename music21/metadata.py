@@ -2147,19 +2147,19 @@ class MetadataBundle(object):
                 environLocal.warn('parse failed: %s' % filePath)
                 filePathError.append(filePath)
                 continue
-
+            results = []
             if 'Opus' in parsedObject.classes:
                 # need to get scores from each opus?
                 # problem here is that each sub-work has metadata, but there
                 # is only a single source file
                 try:
-                    for scoreNumber, s in enumerate(parsedObject.scores):
+                    for scoreNumber, score in enumerate(parsedObject.scores):
                         try:
-                            metadata = s.metadata
+                            metadata = score.metadata
                             # updgrade metadata to richMetadata
                             richMetadata = RichMetadata()
                             richMetadata.merge(metadata)
-                            richMetadata.update(s) # update based on Stream
+                            richMetadata.update(score) # update based on Stream
                             if metadata.number == None:
                                 environLocal.printDebug(
                                     'addFromPaths: got Opus that contains '
@@ -2174,19 +2174,20 @@ class MetadataBundle(object):
                                 environLocal.printDebug(
                                     'addFromPaths: storing: {0}'.format(
                                         corpusPath))
-                                self.storage[corpusPath] = richMetadata
-                        except Exception as e:
+                                result = (corpusPath, richMetadata)
+                                results.append(result)
+                        except Exception as exception:
                             environLocal.warn(
                                 'Had a problem with extracting metadata '
                                 'for score {0} in {1}, whole opus ignored: '
                                 '{2}'.format(
-                                    scoreNumber, filePath, str(e)))
+                                    scoreNumber, filePath, str(exception)))
                         del s # for memory conservation
-                except Exception as e:
+                except Exception as exception:
                     environLocal.warn(
                         'Had a problem with extracting metadata for score {0} '
                         'in {1}, whole opus ignored: {2}'.format(
-                            scoreNumber, filePath, str(e)))
+                            scoreNumber, filePath, str(exception)))
 
             else:
                 try:
@@ -2200,18 +2201,23 @@ class MetadataBundle(object):
                     environLocal.printDebug(
                         'updateMetadataCache: storing: {0}'.format(
                             corpusPath))
-                    self.storage[corpusPath] = richMetadata
-                except Exception as e:
+                    result = (corpusPath, richMetadata)
+                    results.append(result)
+                except Exception as exception:
                     environLocal.warn('Had a problem with extracting metadata '
                     'for {0}, piece ignored'.format(filePath))
-    
+
             # explicitly delete the imported object for memory conservation
             del parsedObject
             gc.collect()
 
+            for corpusPath, richMetadata in results:
+                self.storage[corpusPath] = richMetadata
+
         return filePathError
 
-    def corpusPathToKey(self, filePath, number=None):
+    @staticmethod
+    def corpusPathToKey(filePath, number=None):
         '''Given a file path or corpus path, return the meta-data path
     
         
@@ -2562,18 +2568,116 @@ def cacheCoreMetadataMultiprocessHelper(filePath=None):
 
 
 class MetadataCachingJob(object):
+    '''
+    Parses one corpus path, and attempts to extract metadata from it.
+    '''
     
     ### INITIALIZER ###
 
-    def __init__(self, filePath):
+    def __init__(self, filePath, jobNumber=0, useCorpus=False):
         self.filePath = filePath
-        self.metadata = None
+        self.filePathErrors = []
+        self.jobNumber = int(jobNumber)
+        self.results = []
+        self.useCorpus = bool(useCorpus)
 
     ### SPECIAL METHODS ###
 
     def __call__(self):
-        # collect metadata on corpus object located at self.filePath
-        pass
+        self.results = []
+        parsedObject = self._parseFilePath()
+        if parsedObject is not None:
+            if 'Opus' in parsedObject.classes:
+                self._parseOpus(parsedObject)
+            else:
+                self._parseNonOpus(parsedObject)
+        del parsedObject
+        gc.collect()
+
+    ### PRIVATE METHODS ###
+
+    def _parseFilePath(self):
+        parsedObject = None
+        try:
+            if self.useCorpus is False:
+                parsedObject = converter.parse(
+                    self.filePath, forceSource=True)
+            else:
+                parsedObject = corpus.parse(
+                    self.filePath, forceSource=True)
+        except:
+            environLocal.warn('parse failed: {0}'.format(self.filePath))
+            self.filePathError.append(self.filePath)
+        return parsedObject
+
+    def _parseNonOpus(self, parsedObject):
+        try:
+            corpusPath = MetadataBundle.corpusPathToKey(self.filePath)
+            metadata = parsedObject.metadata
+            if metadata is None:
+                return
+            richMetadata = RichMetadata()
+            richMetadata.merge(metadata)
+            richMetadata.update(parsedObject) # update based on Stream
+            environLocal.printDebug(
+                'updateMetadataCache: storing: {0}'.format(corpusPath))
+            result = (corpusPath, richMetadata)
+            self.results.append(result)
+        except Exception as exception:
+            environLocal.warn('Had a problem with extracting metadata '
+            'for {0}, piece ignored'.format(self.filePath))
+
+    def _parseOpus(self, parsedObject):
+        # need to get scores from each opus?
+        # problem here is that each sub-work has metadata, but there
+        # is only a single source file
+        try:
+            for scoreNumber, score in enumerate(parsedObject.scores):
+                self._parseOpusScore(score, scoreNumber)
+                del score # for memory conservation
+        except Exception as exception:
+            environLocal.warn(
+                'Had a problem with extracting metadata for score {0} '
+                'in {1}, whole opus ignored: {2}'.format(
+                    scoreNumber, self.filePath, str(exception)))
+
+    def _parseOpusScore(self, score, scoreNumber):
+        try:
+            metadata = score.metadata
+            # updgrade metadata to richMetadata
+            richMetadata = RichMetadata()
+            richMetadata.merge(metadata)
+            richMetadata.update(score) # update based on Stream
+            if metadata.number == None:
+                environLocal.printDebug(
+                    'addFromPaths: got Opus that contains '
+                    'Streams that do not have work numbers: '
+                    '{0}'.format(self.filePath))
+            else:
+                # update path to include work number
+                corpusPath = MetadataBundle.corpusPathToKey(
+                    self.filePath, 
+                    number=metadata.number,
+                    )
+                environLocal.printDebug(
+                    'addFromPaths: storing: {0}'.format(
+                        corpusPath))
+                result = (corpusPath, richMetadata)
+                self.results.append(result)
+        except Exception as exception:
+            environLocal.warn(
+                'Had a problem with extracting metadata '
+                'for score {0} in {1}, whole opus ignored: '
+                '{2}'.format(
+                    scoreNumber, self.filePath, str(exception)))
+
+    ### PUBLIC METHODS ###
+
+    def getErrors(self):
+        return tuple(self.filePathErrors)
+
+    def getResult(self):
+        return tuple(self.results)
 
 
 class WorkerProcessHandler(object):
