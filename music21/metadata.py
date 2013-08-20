@@ -2118,103 +2118,29 @@ class MetadataBundle(object):
             1
 
         '''
-        import gc # get a garbage collector
-        filePathError = [] # store errors
-
-        # converter imports modules that import metadata
-        from music21 import converter, corpus
-        
-        numberConverted = 0
+        filePathErrors = []
+        currentJobNumber = 0
         for filePath in pathList:
             environLocal.printDebug(
                 'updateMetadataCache: examining: {0}'.format(filePath))
-            if 0 < printDebugAfter \
-                and numberConverted % printDebugAfter == 0 \
-                and 0 < numberConverted:
-                environLocal.warn('updated {0} files, {1} to go; '
-                    'total errors: {2} ... last file {3}'.format(
-                        numberConverted, 
-                        len(pathList) - numberConverted, 
-                        len(filePathError), 
-                        filePath))
-            numberConverted += 1
-            try:
-                if useCorpus is False:
-                    parsedObject = converter.parse(filePath, forceSource=True)
-                else:
-                    parsedObject = corpus.parse(filePath, forceSource=True)
-            except:
-                environLocal.warn('parse failed: %s' % filePath)
-                filePathError.append(filePath)
-                continue
-            results = []
-            if 'Opus' in parsedObject.classes:
-                # need to get scores from each opus?
-                # problem here is that each sub-work has metadata, but there
-                # is only a single source file
-                try:
-                    for scoreNumber, score in enumerate(parsedObject.scores):
-                        try:
-                            metadata = score.metadata
-                            # updgrade metadata to richMetadata
-                            richMetadata = RichMetadata()
-                            richMetadata.merge(metadata)
-                            richMetadata.update(score) # update based on Stream
-                            if metadata.number == None:
-                                environLocal.printDebug(
-                                    'addFromPaths: got Opus that contains '
-                                    'Streams that do not have work numbers: '
-                                    '{0}'.format(filePath))
-                            else:
-                                # update path to include work number
-                                corpusPath = self.corpusPathToKey(
-                                    filePath, 
-                                    number=metadata.number,
-                                    )
-                                environLocal.printDebug(
-                                    'addFromPaths: storing: {0}'.format(
-                                        corpusPath))
-                                result = (corpusPath, richMetadata)
-                                results.append(result)
-                        except Exception as exception:
-                            environLocal.warn(
-                                'Had a problem with extracting metadata '
-                                'for score {0} in {1}, whole opus ignored: '
-                                '{2}'.format(
-                                    scoreNumber, filePath, str(exception)))
-                        del s # for memory conservation
-                except Exception as exception:
-                    environLocal.warn(
-                        'Had a problem with extracting metadata for score {0} '
-                        'in {1}, whole opus ignored: {2}'.format(
-                            scoreNumber, filePath, str(exception)))
-
-            else:
-                try:
-                    corpusPath = self.corpusPathToKey(filePath)
-                    metadata = parsedObject.metadata
-                    if metadata is None:
-                        continue    
-                    richMetadata = RichMetadata()
-                    richMetadata.merge(metadata)
-                    richMetadata.update(parsedObject) # update based on Stream
-                    environLocal.printDebug(
-                        'updateMetadataCache: storing: {0}'.format(
-                            corpusPath))
-                    result = (corpusPath, richMetadata)
-                    results.append(result)
-                except Exception as exception:
-                    environLocal.warn('Had a problem with extracting metadata '
-                    'for {0}, piece ignored'.format(filePath))
-
-            # explicitly delete the imported object for memory conservation
-            del parsedObject
-            gc.collect()
-
+            currentJobNumber += 1
+            job = MetadataCachingJob(
+                filePath, 
+                jobNumber=currentJobNumber,
+                useCorpus=useCorpus,
+                )
+            results = job()
             for corpusPath, richMetadata in results:
                 self.storage[corpusPath] = richMetadata
-
-        return filePathError
+            else:
+                filePathErrors.extend(job.getErrors())    
+            environLocal.warn('updated {0} files, {1} to go; '
+                'total errors: {2} ... last file {3}'.format(
+                    currentJobNumber, 
+                    len(pathList) - currentJobNumber, 
+                    len(filePathErrors), 
+                    filePath))
+        return filePathErrors
 
     @staticmethod
     def corpusPathToKey(filePath, number=None):
@@ -2604,6 +2530,7 @@ class MetadataCachingJob(object):
                 self._parseNonOpus(parsedObject)
         del parsedObject
         gc.collect()
+        return self.getResults()
 
     ### PRIVATE METHODS ###
 
@@ -2699,6 +2626,7 @@ class WorkerProcessHandler(object):
     ### SPECIAL METHODS ###
 
     def __call__(self, jobs):
+        remaining_jobs = len(jobs)
         finished_jobs = []
         job_queue = multiprocessing.JoinableQueue()
         result_queue = multiprocessing.Queue()
@@ -2709,7 +2637,9 @@ class WorkerProcessHandler(object):
         for job in jobs:
             job_queue.put(pickle.dumps(job, protocol=0))
         for i in xrange(len(jobs)):
-            finished_jobs.append(pickle.loads(result_queue.get()))
+            finished_jobs = pickle.loads(result_queue.get())
+            finished_jobs.append(finished_job)
+            remaining_jobs -= 1
         for worker in workers:
             job_queue.put(None)
         job_queue.join()
