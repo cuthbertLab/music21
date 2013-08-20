@@ -2569,12 +2569,22 @@ def cacheCoreMetadataMultiprocessHelper(filePath=None):
 
 class MetadataCachingJob(object):
     '''
-    Parses one corpus path, and attempts to extract metadata from it.
+    Parses one corpus path, and attempts to extract metadata from it:
+
+    ::
+
+        >>> job = metadata.MetadataCachingJob(
+        ...     'bach/bwv66.6',
+        ...     useCorpus=True,
+        ...     )
+        >>> job()
+        >>> results = job.getResults()
+
     '''
     
     ### INITIALIZER ###
 
-    def __init__(self, filePath, jobNumber=0, useCorpus=False):
+    def __init__(self, filePath, jobNumber=0, useCorpus=True):
         self.filePath = filePath
         self.filePathErrors = []
         self.jobNumber = int(jobNumber)
@@ -2584,6 +2594,7 @@ class MetadataCachingJob(object):
     ### SPECIAL METHODS ###
 
     def __call__(self):
+        import gc
         self.results = []
         parsedObject = self._parseFilePath()
         if parsedObject is not None:
@@ -2597,6 +2608,8 @@ class MetadataCachingJob(object):
     ### PRIVATE METHODS ###
 
     def _parseFilePath(self):
+        from music21 import converter
+        from music21 import corpus
         parsedObject = None
         try:
             if self.useCorpus is False:
@@ -2605,9 +2618,10 @@ class MetadataCachingJob(object):
             else:
                 parsedObject = corpus.parse(
                     self.filePath, forceSource=True)
-        except:
-            environLocal.warn('parse failed: {0}'.format(self.filePath))
-            self.filePathError.append(self.filePath)
+        except Exception, e:
+            environLocal.warn('parse failed: {0}, {1}'.format(
+                self.filePath, str(e)))
+            self.filePathErrors.append(self.filePath)
         return parsedObject
 
     def _parseNonOpus(self, parsedObject):
@@ -2676,7 +2690,7 @@ class MetadataCachingJob(object):
     def getErrors(self):
         return tuple(self.filePathErrors)
 
-    def getResult(self):
+    def getResults(self):
         return tuple(self.results)
 
 
