@@ -2119,6 +2119,8 @@ class MetadataBundle(object):
 
         '''
         jobs = []
+        accumulatedResults = []
+        accumulatedErrors = []
         for jobNumber, filePath in enumerate(pathList, 1):
             job = MetadataCachingJob(
                 filePath, 
@@ -2127,10 +2129,17 @@ class MetadataBundle(object):
                 )
             jobs.append(job)
         #results, filePathErrors = JobProcessor.process_serial(jobs)
-        results, filePathErrors = JobProcessor.process_parallel(jobs)
-        for corpusPath, richMetadata in results:
-            self.storage[corpusPath] = richMetadata
-        return filePathErrors
+        #results, filePathErrors = JobProcessor.process_parallel(jobs)
+        currentIteration = 0
+        for results, errors in JobProcessor.process_parallel(jobs):
+            currentIteration += 1
+            accumulatedResults.extend(results)
+            accumulatedErrors.extend(errors)
+            for corpusPath, richMetadata in results:
+                self.storage[corpusPath] = richMetadata
+            if (currentIteration % 50) == 0:
+                self.write()
+        return accumulatedErrors
 
     @staticmethod
     def corpusPathToKey(filePath, number=None):
@@ -2366,7 +2375,7 @@ class MetadataBundle(object):
         TODO: Test!
         '''
         filePath = self._getFilePath()
-        environLocal.printDebug(['MetadataBundle: writing:', filePath])
+        environLocal.warn(['MetadataBundle: writing:', filePath])
         
         jsf = freezeThaw.JSONFreezer(self)
         return jsf.jsonWrite(filePath)
@@ -2640,8 +2649,8 @@ class JobProcessor(object):
                 job_queue.put(pickle.dumps(job, protocol=0))
             for i in xrange(len(jobs)):
                 job = pickle.loads(result_queue.get())
-                results.extend(job.getResults())
-                filePathErrors.extend(job.getErrors())
+                results = job.getResults()
+                errors = job.getErrors()
                 remainingJobs -= 1
                 JobProcessor.report(
                     len(jobs),
@@ -2649,6 +2658,7 @@ class JobProcessor(object):
                     job.filePath,
                     len(filePathErrors),
                     )
+                yield results, errors
         for worker in workers:
             job_queue.put(None)
         job_queue.join()
@@ -2656,7 +2666,8 @@ class JobProcessor(object):
         job_queue.close()
         for worker in workers:
              worker.join()
-        return results, filePathErrors
+        raise StopIteration
+        # return results, filePathErrors
 
     @staticmethod
     def process_serial(jobs):
@@ -2672,7 +2683,9 @@ class JobProcessor(object):
                 job.filePath,
                 len(filePathErrors),
                 )
-        return results, filePathErrors 
+            yield results, errors
+        raise StopIteration
+        #return results, filePathErrors 
 
     @staticmethod
     def report(totalJobs, remainingJobs, filePath, filePathErrorCount):
