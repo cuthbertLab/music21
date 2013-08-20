@@ -2118,40 +2118,37 @@ class MetadataBundle(object):
             1
 
         '''
-        filePathErrors = []
-        currentJobNumber = 0
-        for filePath in pathList:
-            environLocal.printDebug(
-                'updateMetadataCache: examining: {0}'.format(filePath))
-            currentJobNumber += 1
+        jobs = []
+        for jobNumber, filePath in enumerate(pathList, 1):
             job = MetadataCachingJob(
                 filePath, 
-                jobNumber=currentJobNumber,
+                jobNumber=jobNumber,
                 useCorpus=useCorpus,
                 )
-            results = job()
-            for corpusPath, richMetadata in results:
-                self.storage[corpusPath] = richMetadata
-            else:
-                filePathErrors.extend(job.getErrors())    
-            environLocal.warn('updated {0} files, {1} to go; '
-                'total errors: {2} ... last file {3}'.format(
-                    currentJobNumber, 
-                    len(pathList) - currentJobNumber, 
-                    len(filePathErrors), 
-                    filePath))
+            jobs.append(job)
+        #results, filePathErrors = JobProcessor.process_serial(jobs)
+        results, filePathErrors = JobProcessor.process_parallel(jobs)
+        for corpusPath, richMetadata in results:
+            self.storage[corpusPath] = richMetadata
         return filePathErrors
 
     @staticmethod
     def corpusPathToKey(filePath, number=None):
         '''Given a file path or corpus path, return the meta-data path
     
-        
-        >>> mb = metadata.MetadataBundle()
-        >>> mb.corpusPathToKey('bach/bwv1007/prelude').endswith('bach_bwv1007_prelude')
-        True
-        >>> mb.corpusPathToKey('/beethoven/opus59no1/movement1.xml').endswith('beethoven_opus59no1_movement1_xml')
-        True
+        ::
+
+            >>> mb = metadata.MetadataBundle()
+            >>> mb.corpusPathToKey('bach/bwv1007/prelude'
+            ...     ).endswith('bach_bwv1007_prelude')
+            True
+
+        ::
+
+            >>> mb.corpusPathToKey('/beethoven/opus59no1/movement1.xml'
+            ...     ).endswith('beethoven_opus59no1_movement1_xml')
+            True
+
         '''
         if 'corpus' in filePath and 'music21' in filePath:
             cp = filePath.split('corpus')[-1] # get filePath after corpus
@@ -2427,7 +2424,7 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
                 timer, len(metadataBundle.storage)))
         del metadataBundle
 
-    environLocal.warn('cache: final writing time: {0}'.format(timer))
+    environLocal.warn('cache: final writing time: {0} seconds'.format(timer))
     for failingFilePath in failingFilePaths:
         environLocal.warn('path failed to parse: {0}'.format(failingFilePath))
 
@@ -2530,7 +2527,7 @@ class MetadataCachingJob(object):
                 self._parseNonOpus(parsedObject)
         del parsedObject
         gc.collect()
-        return self.getResults()
+        return self.getResults(), self.getErrors()
 
     ### PRIVATE METHODS ###
 
@@ -2621,25 +2618,37 @@ class MetadataCachingJob(object):
         return tuple(self.results)
 
 
-class WorkerProcessHandler(object):
+class JobProcessor(object):
 
-    ### SPECIAL METHODS ###
+    ### PUBLIC METHODS ###
 
-    def __call__(self, jobs):
-        remaining_jobs = len(jobs)
-        finished_jobs = []
+    @staticmethod
+    def process_parallel(jobs, processCount=None):
+        processCount = processCount or multiprocessing.cpu_count() * 2
+        assert 0 < processCount
+        remainingJobs = len(jobs)
+        results = []
+        filePathErrors = []
         job_queue = multiprocessing.JoinableQueue()
         result_queue = multiprocessing.Queue()
-        workers = [WorkerProcess(job_queue, result_queue)
-            for i in range(multiprocessing.cpu_count() * 2)]
+        workers = [WorkerProcess(job_queue, result_queue) 
+            for i in range(processCount)]
         for worker in workers:
-            worker.start( )
-        for job in jobs:
-            job_queue.put(pickle.dumps(job, protocol=0))
-        for i in xrange(len(jobs)):
-            finished_jobs = pickle.loads(result_queue.get())
-            finished_jobs.append(finished_job)
-            remaining_jobs -= 1
+            worker.start()
+        if jobs:
+            for job in jobs:
+                job_queue.put(pickle.dumps(job, protocol=0))
+            for i in xrange(len(jobs)):
+                job = pickle.loads(result_queue.get())
+                results.extend(job.getResults())
+                filePathErrors.extend(job.getErrors())
+                remainingJobs -= 1
+                JobProcessor.report(
+                    len(jobs),
+                    remainingJobs,
+                    job.filePath,
+                    len(filePathErrors),
+                    )
         for worker in workers:
             job_queue.put(None)
         job_queue.join()
@@ -2647,8 +2656,34 @@ class WorkerProcessHandler(object):
         job_queue.close()
         for worker in workers:
              worker.join()
-        return finished_jobs
+        return results, filePathErrors
 
+    @staticmethod
+    def process_serial(jobs):
+        remainingJobs = len(jobs)
+        results = []
+        filePathErrors = []
+        for i, job in enumerate(jobs):
+            results, errors = job()
+            remainingJobs -= 1
+            JobProcessor.report(
+                len(jobs),
+                remainingJobs,
+                job.filePath,
+                len(filePathErrors),
+                )
+        return results, filePathErrors 
+
+    @staticmethod
+    def report(totalJobs, remainingJobs, filePath, filePathErrorCount):
+        message = 'updated {0} of {1} files; ' \
+            'total errors: {2} ... last file: {3}'.format(
+                totalJobs - remainingJobs,
+                totalJobs,
+                filePathErrorCount,
+                filePath,
+                )
+        environLocal.warn(message)
 
 class WorkerProcess(multiprocessing.Process):
     
