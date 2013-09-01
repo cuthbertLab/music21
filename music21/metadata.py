@@ -2203,7 +2203,7 @@ class MetadataBundle(object):
             len(self.storage)
             ])
 
-    def search(self, query, field=None, extList=None):
+    def search(self, query, field=None, fileExtensions=None):
         '''
         Perform search, on all stored metadata, permit 
         regular expression matching. 
@@ -2225,47 +2225,46 @@ class MetadataBundle(object):
 
         ::
 
-            >>> post = mb.search('cicon', 'composer', extList=['.krn'])
+            >>> post = mb.search('cicon', 'composer', fileExtensions=['.krn'])
             >>> len(post) # no files in this format
             0
 
         ::
 
-            >>> post = mb.search('cicon', 'composer', extList=['.xml'])
+            >>> post = mb.search('cicon', 'composer', fileExtensions=['.xml'])
             >>> len(post)  # shouldn't this be 11?
             1   
 
         '''
-        post = []
+        results = []
         for key in self.storage:
-            md = self.storage[key]
-#            if md.title is not None and 'Renmin' in md.title: # test -- china/chinese/etc.
-#                print key
-#                print "\n"
-#                print self.storage[key]
-            match, unused_fieldPost = md.search(query, field)
+            metadata = self.storage[key]
+            match, unused_fieldPost = metadata.search(query, field)
             if match:
                 # returns a pair of file path, work number
-                if md.number != "" and md.number is not None:
-                    number = int(md.number)
+                if metadata.number != '' and metadata.number is not None:
+                    number = int(metadata.number)
                 else:
-                    number = md.number
+                    number = metadata.number
                 try:
                     result = (self._accessPaths[key], number)
                     include = False
-                    if extList != None:
-                        for ext in extList:
-                            if result[0].endswith(ext) or\
-                                (ext.endswith('xml') and (result[0].endswith('mxl') or result[0].endswith('mx'))):
+                    if fileExtensions is not None:
+                        for fileExtension in fileExtensions:
+                            if result[0].endswith(fileExtension):
+                                include = True
+                                break
+                            elif fileExtension.endswith('xml') and \
+                                result[0].endswith(('mxl', 'mx')):
                                 include = True
                                 break
                     else:
                         include = True
-                    if include and result not in post:
-                        post.append(result)  
+                    if include and result not in results:
+                        results.append(result)  
                 except KeyError:
                     pass # in metadata cache, but no longer in filesystem
-        return post
+        return results
 
     def updateAccessPaths(self, pathList):
         r'''
@@ -2510,6 +2509,7 @@ class MetadataCachingJob(object):
         ...     useCorpus=True,
         ...     )
         >>> job()
+        ((('bach_bwv66_6', <music21.metadata.RichMetadata object at ...>),), ())
         >>> results = job.getResults()
 
     '''
@@ -2633,8 +2633,9 @@ class JobProcessor(object):
 
     @staticmethod
     def process_parallel(jobs, processCount=None):
-        processCount = processCount or multiprocessing.cpu_count() * 2
-        assert 0 < processCount
+        processCount = processCount or multiprocessing.cpu_count() - 1
+        if processCount < 1:
+            processCount = 1
         remainingJobs = len(jobs)
         results = []
         filePathErrors = []
