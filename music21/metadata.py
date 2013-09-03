@@ -37,12 +37,13 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
 '''
 
-import unittest
 import datetime
 import multiprocessing
 import os
 import pickle
 import re
+import traceback
+import unittest
 
 from music21 import base
 from music21 import common
@@ -2043,6 +2044,69 @@ class RichMetadata(Metadata):
 #-------------------------------------------------------------------------------
 
 
+class MetadataEntry(object):
+    
+    ### INITIALIZER ###
+    
+    def __init__(self, 
+        accessPath=None,
+        corpusPath=None, 
+        number=None, 
+        richMetadata=None, 
+        ):
+        self._accessPath = accessPath
+        self._corpusPath = corpusPath
+        self._number = number
+        self._richMetadata = richMetadata
+
+    ### SPECIAL METHODS ###
+
+    def __getnewargs__(self):
+        return (
+            self.accessPath,
+            self.corpusPath,
+            self.richMetadata,
+            self.number,
+            )
+
+    def __repr__(self):
+        corpusPath = self.corpusPath
+        if self.number is not None:
+            corpusPath = '{0} [{1}]'.format(corpusPath, self.number)
+        return '<{0}.{1}: {2}>'.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            corpusPath,
+            )
+
+    ### PUBLIC METHODS ###
+
+    def search(self, query, field=None):
+        return self.richMetadata.search(query, field)
+
+    ### PUBLIC PROPERTIES ###
+
+    @apply
+    def accessPath():
+        def fget(self):
+            return self._accessPath
+        def fset(self, expr):
+            self._accessPath = expr
+        return property(**locals())
+
+    @property
+    def corpusPath(self):
+        return self._corpusPath
+
+    @property
+    def richMetadata(self):
+        return self._richMetadata
+
+    @property
+    def number(self):
+        return self._number
+
+
 class MetadataBundle(object):
     '''
     An object that provides access to, searches within, and stores and loads
@@ -2075,6 +2139,14 @@ class MetadataBundle(object):
         # keys are the same for self.storage
         self._accessPaths = {}
 
+    ### SPECIAL METHODS ###
+
+    def __getitem__(self, i):
+        return self.storage.values()[i]
+
+    def __len__(self):
+        return len(self.storage)
+
     ### PRIVATE METHODS ###
 
     def _getFilePath(self):
@@ -2092,7 +2164,13 @@ class MetadataBundle(object):
 
     ### PUBLIC METHODS ###
 
-    def addFromPaths(self, pathList, printDebugAfter=0, useCorpus=False):
+    def addFromPaths(
+        self, 
+        pathList, 
+        printDebugAfter=0, 
+        useCorpus=False,
+        useMultiprocessing=True,
+        ):
         '''
         Parse and store metadata from numerous files.
 
@@ -2131,14 +2209,20 @@ class MetadataBundle(object):
         #results, filePathErrors = JobProcessor.process_serial(jobs)
         #results, filePathErrors = JobProcessor.process_parallel(jobs)
         currentIteration = 0
-        for results, errors in JobProcessor.process_parallel(jobs):
+        if useMultiprocessing:
+            jobProcessor = JobProcessor.process_parallel
+        else:
+            jobProcessor = JobProcessor.process_serial
+        for results, errors in jobProcessor(jobs):
             currentIteration += 1
             accumulatedResults.extend(results)
             accumulatedErrors.extend(errors)
-            for corpusPath, richMetadata in results:
-                self.storage[corpusPath] = richMetadata
+            for metadataEntry in results:
+                self.storage[metadataEntry.corpusPath] = metadataEntry
+                #self.storage[corpusPath] = richMetadata
             if (currentIteration % 50) == 0:
                 self.write()
+        self.write()
         return accumulatedErrors
 
     @staticmethod
@@ -2205,66 +2289,73 @@ class MetadataBundle(object):
 
     def search(self, query, field=None, fileExtensions=None):
         '''
-        Perform search, on all stored metadata, permit 
-        regular expression matching. 
-
-        Return pairs of file paths and work numbers, or None
+        Perform search, on all stored metadata, permit regular expression 
+        matching. 
 
         ::
 
-            >>> mb = metadata.MetadataBundle()
-            >>> mb.addFromPaths(corpus.getWorkList('ciconia'))
+            >>> workList = corpus.getWorkList('ciconia')
+            >>> metadataBundle = metadata.MetadataBundle()
+            >>> metadataBundle.addFromPaths(workList)
             []
 
         ::
 
-            >>> mb.updateAccessPaths(corpus.getWorkList('ciconia'))
-            >>> post = mb.search('cicon', 'composer')
-            >>> len(post[0])
-            2
+            >>> updateCount = metadataBundle.updateAccessPaths(workList)
+            >>> searchResult = metadataBundle.search('cicon', 'composer')
+            >>> searchResult
+            <music21.metadata.MetadataBundle object at 0x...>
 
         ::
 
-            >>> post = mb.search('cicon', 'composer', fileExtensions=['.krn'])
-            >>> len(post) # no files in this format
+            >>> len(searchResult)
+            1
+
+        ::
+
+            >>> searchResult[0]
+            <music21.metadata.MetadataEntry: ciconia_quod_jactatur_xml>
+
+        ::
+
+            >>> searchResult = metadataBundle.search('cicon', 'composer', 
+            ...     fileExtensions=['.krn'])
+            >>> len(searchResult) # no files in this format
             0
 
         ::
 
-            >>> post = mb.search('cicon', 'composer', fileExtensions=['.xml'])
-            >>> len(post)  # shouldn't this be 11?
+            >>> searchResult = metadataBundle.search('cicon', 'composer', 
+            ...     fileExtensions=['.xml'])
+            >>> len(searchResult)  # shouldn't this be 11?
             1   
 
         '''
-        results = []
+        newMetadataBundle = MetadataBundle()
         for key in self.storage:
-            metadata = self.storage[key]
-            match, unused_fieldPost = metadata.search(query, field)
-            if match:
-                # returns a pair of file path, work number
-                if metadata.number != '' and metadata.number is not None:
-                    number = int(metadata.number)
+            metadataEntry = self.storage[key]
+            if metadataEntry.search(query, field)[0]:
+                if metadataEntry.number:
+                    number = int(metadataEntry.number)
                 else:
-                    number = metadata.number
-                try:
-                    result = (self._accessPaths[key], number)
-                    include = False
-                    if fileExtensions is not None:
-                        for fileExtension in fileExtensions:
-                            if result[0].endswith(fileExtension):
-                                include = True
-                                break
-                            elif fileExtension.endswith('xml') and \
-                                result[0].endswith(('mxl', 'mx')):
-                                include = True
-                                break
-                    else:
-                        include = True
-                    if include and result not in results:
-                        results.append(result)  
-                except KeyError:
-                    pass # in metadata cache, but no longer in filesystem
-        return results
+                    number = metadataEntry.number
+                if metadataEntry.accessPath is None:
+                    continue
+                include = False
+                if fileExtensions is not None:
+                    for fileExtension in fileExtensions:
+                        if metadataEntry.accessPath.endswith(fileExtension):
+                            include = True
+                            break
+                        elif fileExtension.endswith('xml') and \
+                            metadataEntry.accessPath.endswith(('mxl', 'mx')):
+                            include = True
+                            break
+                else:
+                    include = True
+                if include and key not in newMetadataBundle.storage:
+                    newMetadataBundle.storage[key] = metadataEntry
+        return newMetadataBundle
 
     def updateAccessPaths(self, pathList):
         r'''
@@ -2288,13 +2379,7 @@ class MetadataBundle(object):
 
         ::
 
-            >>> len(mb._accessPaths)
-            0
-        
-        ::
-
             >>> mb.updateAccessPaths(corpus.getWorkList('bwv66.6'))
-            >>> len(mb._accessPaths)
             1
 
         ::
@@ -2319,15 +2404,13 @@ class MetadataBundle(object):
 
             >>> mdCoreBundle = metadata.MetadataBundle('core')
             >>> mdCoreBundle.read()
-            >>> len(mdCoreBundle._accessPaths)
-            0
 
         ::
 
-            >>> mdCoreBundle.updateAccessPaths(coreCorpusPaths)
-            >>> #_DOCS_SHOW len(mdCoreBundle._accessPaths)
-            >>> if len(mdCoreBundle._accessPaths) > 13000: print '13564' #_DOCS_HIDE
-            13564
+            >>> updateCount = mdCoreBundle.updateAccessPaths(coreCorpusPaths)
+            >>> #_DOCS_SHOW updateCount
+            >>> if updateCount > 13000: print '14158' #_DOCS_HIDE
+            14158
         
         Note that some scores inside an Opus file may have a number in the key
         that is not present in the path:
@@ -2340,29 +2423,40 @@ class MetadataBundle(object):
 
         '''
         # always clear first
-        self._accessPaths = {}
         # create a copy to manipulate
-        keyOptions = self.storage.keys()
+        for metadataEntry in self.storage.viewvalues():
+            metadataEntry.accessPath = None
+        updateCount = 0
         for filePath in pathList:
             # this key may not be valid if it points to an Opus work that
             # has multiple numbers; thus, need to get a stub that can be 
             # used for conversion
-            cp = self.corpusPathToKey(filePath)
+            corpusPath = self.corpusPathToKey(filePath)
             # a version of the path that may not have a work number
-            cpStub = '_'.join(cp.split('_')[:-1]) # get all but last underscore
-            match = False
-            try:
-                # MSC: Don't remove this following line: it seems to be important for some reason...
-                md = self.storage[cp] # @UnusedVariable
-                self._accessPaths[cp] = filePath
-                match = True
-            except KeyError:
-                pass
-            if not match:
-                # see if there is work id alternative
-                for candidate in keyOptions:
-                    if candidate.startswith(cpStub):
-                        self._accessPaths[candidate] = filePath
+            if corpusPath in self.storage:
+                self.storage[corpusPath].accessPath = filePath
+                updateCount += 1
+            else:
+                # get all but last underscore
+                corpusPathStub = '_'.join(corpusPath.split('_')[:-1]) 
+                for key in self.storage.viewkeys():
+                    if key.startswith(corpusPathStub):
+                        self.storage[key].accessPath = filePath
+                        updateCount += 1
+        return updateCount
+#            match = False
+#            try:
+#                # MSC: Don't remove this following line: it seems to be important for some reason...
+#                md = self.storage[cp] # @UnusedVariable
+#                self._accessPaths[cp] = filePath
+#                match = True
+#            except KeyError:
+#                pass
+#            if not match:
+#                # see if there is work id alternative
+#                for candidate in keyOptions:
+#                    if candidate.startswith(cpStub):
+#                        self._accessPaths[candidate] = filePath
         #environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
         #return post
 
@@ -2373,11 +2467,11 @@ class MetadataBundle(object):
 
         TODO: Test!
         '''
-        filePath = self._getFilePath()
-        environLocal.warn(['MetadataBundle: writing:', filePath])
-        
-        jsf = freezeThaw.JSONFreezer(self)
-        return jsf.jsonWrite(filePath)
+        if self.name != 'default':
+            filePath = self._getFilePath()
+            environLocal.warn(['MetadataBundle: writing:', filePath])
+            jsf = freezeThaw.JSONFreezer(self)
+            return jsf.jsonWrite(filePath)
 
 
 #-------------------------------------------------------------------------------
@@ -2421,12 +2515,9 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
         environLocal.warn(
             'metadata cache: starting processing of paths: {0}'.format(
                 len(paths)))
-        #metadataBundle.addFromPaths(paths[-3:])
         # returns any paths that failed to load
         failingFilePaths += metadataBundle.addFromPaths(
             paths, printDebugAfter=1) 
-        #print metadataBundle.storage
-        metadataBundle.write() # will use a default file path based on domain
         environLocal.warn(
             'cache: writing time: {0} md items: {1}'.format(
                 timer, len(metadataBundle.storage)))
@@ -2435,67 +2526,6 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
     environLocal.warn('cache: final writing time: {0} seconds'.format(timer))
     for failingFilePath in failingFilePaths:
         environLocal.warn('path failed to parse: {0}'.format(failingFilePath))
-
-
-def cacheCoreMetadataMultiprocess(ipythonMod=None, stopAfter=None): 
-    '''
-    The core cache is all locally-stored corpus files. 
-    '''
-    from music21 import corpus, metadata
-
-    timer = common.Timer()
-    timer.start()
-
-    # store list of file paths that caused an error
-    #filePathError = []
-
-    metadataBundle = metadata.MetadataBundle('core')
-
-    pathsFull = corpus.getCorePaths()
-    pathsShort = []
-    lenCorpusPath = len(common.getCorpusFilePath())
-    
-    for i, path in enumerate(pathsFull):
-        pathsShort.append(path[lenCorpusPath:])
-        if stopAfter is not None and i >= stopAfter:
-            break
-    
-    environLocal.warn(
-        'metadata cache: starting processing of paths: {0}'.format(
-            len(pathsShort)))
-    
-    #metadataBundle.addFromPaths(paths[-3:])
-    # returns any paths that failed to load
-    for i in range(0, len(pathsShort), 100):
-        maxI = min(i+100, len(pathsShort))
-        pathsChunk = pathsShort[i:maxI]
-        environLocal.warn(
-            'Starting multiprocessing with chunk {0}, first is {1}'.format(
-                i, pathsChunk[0]))
-        allKeys = ipythonMod.map_async(
-            cacheCoreMetadataMultiprocessHelper, pathsChunk)
-        for key in keys:
-            for subkey in key:
-                metadataBundle.storage[subkey[0]] = subkey[1]
-    
-    #print metadataBundle.storage
-    metadataBundle.write() # will use a default file path based on domain
-
-    environLocal.warn(
-        'cache: writing time: {0} md items: {1}'.format(
-            timer, len(metadataBundle.storage)))
-    del metadataBundle
-
-
-def cacheCoreMetadataMultiprocessHelper(filePath=None):
-    from music21 import metadata
-    metadataBundle = metadata.MetadataBundle('core')
-    unused_filePathError = metadataBundle.addFromPaths(
-        [filePath], printDebugAfter=1, useCorpus=True) 
-    result = []
-    for key in metadataBundle.storage:
-        result.append((key, metadataBundle.storage[key]))
-    return result
 
 
 class MetadataCachingJob(object):
@@ -2509,7 +2539,7 @@ class MetadataCachingJob(object):
         ...     useCorpus=True,
         ...     )
         >>> job()
-        ((('bach_bwv66_6', <music21.metadata.RichMetadata object at ...>),), ())
+        ((<music21.metadata.MetadataEntry: bach_bwv66_6>,), ())
         >>> results = job.getResults()
 
     '''
@@ -2568,11 +2598,15 @@ class MetadataCachingJob(object):
             richMetadata.update(parsedObject) # update based on Stream
             environLocal.printDebug(
                 'updateMetadataCache: storing: {0}'.format(corpusPath))
-            result = (corpusPath, richMetadata)
-            self.results.append(result)
+            metadataEntry = MetadataEntry(
+                corpusPath=corpusPath,
+                richMetadata=richMetadata,
+                )
+            self.results.append(metadataEntry)
         except Exception as exception:
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
+            traceback.print_exc()
 
     def _parseOpus(self, parsedObject):
         # need to get scores from each opus?
@@ -2587,6 +2621,7 @@ class MetadataCachingJob(object):
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
                     scoreNumber, self.filePath, str(exception)))
+            traceback.print_exc()
 
     def _parseOpusScore(self, score, scoreNumber):
         try:
@@ -2595,7 +2630,7 @@ class MetadataCachingJob(object):
             richMetadata = RichMetadata()
             richMetadata.merge(metadata)
             richMetadata.update(score) # update based on Stream
-            if metadata.number == None:
+            if metadata.number is None:
                 environLocal.printDebug(
                     'addFromPaths: got Opus that contains '
                     'Streams that do not have work numbers: '
@@ -2609,14 +2644,19 @@ class MetadataCachingJob(object):
                 environLocal.printDebug(
                     'addFromPaths: storing: {0}'.format(
                         corpusPath))
-                result = (corpusPath, richMetadata)
-                self.results.append(result)
+                metadataEntry = MetadataEntry(
+                    corpusPath=corpusPath,
+                    number=scoreNumber,
+                    richMetadata=richMetadata,
+                    )
+                self.results.append(metadataEntry)
         except Exception as exception:
             environLocal.warn(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '
                 '{2}'.format(
                     scoreNumber, self.filePath, str(exception)))
+            traceback.print_exc()
 
     ### PUBLIC METHODS ###
 
@@ -2699,6 +2739,7 @@ class JobProcessor(object):
                 )
         environLocal.warn(message)
 
+
 class WorkerProcess(multiprocessing.Process):
     
     ### INITIALIZER ###
@@ -2723,6 +2764,7 @@ class WorkerProcess(multiprocessing.Process):
             self.job_queue.task_done()
             self.result_queue.put(pickle.dumps(job, protocol=0))
         return
+
 
 #-------------------------------------------------------------------------------
 

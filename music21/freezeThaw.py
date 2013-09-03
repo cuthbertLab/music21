@@ -890,26 +890,72 @@ class JSONFreezeThawBase(object):
     # __AUTO_GATHER__ : place all autoGatherAttributes here
     # __INHERIT__ : place all attributes from the inherited class here # NOT YET!
     storedClassAttributes = {
-        'music21.beam.Beam': ['type', 'direction', 'independentAngle', 'number'],
-        'music21.beam.Beams': ['beamsList', 'feathered'],
-        'music21.duration.DurationUnit': ['__AUTO_GATHER__'],
-        'music21.duration.Duration': ['__AUTO_GATHER__'],
-        'music21.editorial.NoteEditorial': ['color', 'misc', 'comment'],
-        'music21.editorial.Comment': ['__AUTO_GATHER__'],
-        'music21.key.KeySignature': ['sharps', 'mode', '_alteredPitches'],
-        'music21.metadata.Contributor': ['_role', 'relevance', '_names', '_dateRange'],
-        'music21.metadata.Date': ['year', 'month', 'day', 'hour', 'minute', 'second',
-                                  'yearError', 'monthError', 'dayError', 'hourError', 'minuteError', 'secondError'],
-        'music21.metadata.DateSingle': ['_relevance',  '_dataError', '_data'],
-        'music21.metadata.Metadata': ['_date', '_imprint', '_copyright', '_workIds', '_urls', '_contributors'],
-        'music21.metadata.MetadataBundle': ['storage', 'name'],
-        'music21.metadata.RichMetadata': ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest', 'noteCount', 'quarterLength', '__INHERIT__'],
-        'music21.metadata.Text': ['_data', '_language'],
-        'music21.meter.TimeSignature': ['ratioString'],
-        'music21.note.Lyric': ['text', 'syllabic', 'number', 'identifier'],
-        'music21.note.GeneralNote': ['__AUTO_GATHER__', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie'],
-        'music21.note.NotRest': ['__INHERIT__', '_notehead', '_noteheadFill', '_noteheadParenthesis', '_stemDirection', '_volume'],
-        'music21.note.Note': ['__INHERIT__', 'pitch', 'beams'],
+        'music21.beam.Beam': [
+            'type', 'direction', 'independentAngle', 'number',
+            ],
+        'music21.beam.Beams': [
+            'beamsList', 'feathered',
+            ],
+        'music21.duration.DurationUnit': [
+            '__AUTO_GATHER__',
+            ],
+        'music21.duration.Duration': [
+            '__AUTO_GATHER__',
+            ],
+        'music21.editorial.NoteEditorial': [
+            'color', 'misc', 'comment',
+            ],
+        'music21.editorial.Comment': [
+            '__AUTO_GATHER__',
+            ],
+        'music21.key.KeySignature': [
+            'sharps', 'mode', '_alteredPitches',
+            ],
+        'music21.metadata.Contributor': [
+            '_role', 'relevance', '_names', '_dateRange',
+            ],
+        'music21.metadata.Date': [
+            'year', 'month', 'day', 'hour', 'minute', 'second',
+            'yearError', 'monthError', 'dayError', 'hourError', 'minuteError', 
+            'secondError',
+            ],
+        'music21.metadata.DateSingle': [
+            '_relevance',  '_dataError', '_data',
+            ],
+        'music21.metadata.Metadata': [
+            '_date', '_imprint', '_copyright', '_workIds', '_urls', 
+            '_contributors',
+            ],
+        'music21.metadata.MetadataBundle': [
+            'storage', 'name',
+            ],
+        'music21.metadata.MetadataEntry': [
+            '_accessPath', '_corpusPath', '_number', '_richMetadata', 
+            ],
+        'music21.metadata.RichMetadata': [
+            'keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 
+            'pitchLowest', 'noteCount', 'quarterLength', '__INHERIT__',
+            ],
+        'music21.metadata.Text': [
+            '_data', '_language',
+            ],
+        'music21.meter.TimeSignature': [
+            'ratioString',
+            ],
+        'music21.note.Lyric': [
+            'text', 'syllabic', 'number', 'identifier',
+            ],
+        'music21.note.GeneralNote': [
+            '__AUTO_GATHER__', 'lyrics', 'expressions', 'articulations', 
+            'editorial', 'tie',
+            ],
+        'music21.note.NotRest': [
+            '__INHERIT__', '_notehead', '_noteheadFill', 
+            '_noteheadParenthesis', '_stemDirection', '_volume',
+            ],
+        'music21.note.Note': [
+            '__INHERIT__', 'pitch', 'beams',
+            ],
         }
 
     postClassCreateCall = {
@@ -1384,13 +1430,13 @@ class JSONFreezer(JSONFreezeThawBase):
         File extension should be .json. File is opened 
         and closed within this method call. 
         '''
-        f = codecs.open(fp, mode='w', encoding='utf-8')
-        if formatOutput is False:
-            f.write(json.dumps(self.getJSONDict(includeVersion=True)))
-        else:
-            f.write(json.dumps(self.getJSONDict(includeVersion=True), 
-                                  sort_keys=True, indent=2))
-        f.close()
+        with codecs.open(fp, mode='w', encoding='utf-8') as f:
+            jsonDict = self.getJSONDict(includeVersion=True)
+            if formatOutput is False:
+                jsonString = json.dumps(jsonDict)
+            else:
+                jsonString = json.dumps(jsonDict, sort_keys=True, indent=2)
+            f.write(jsonString)
 
 class JSONThawer(JSONFreezeThawBase):
     '''
