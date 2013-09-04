@@ -2052,13 +2052,13 @@ class MetadataEntry(object):
     def __init__(self, 
         accessPath=None,
         cacheTime=None,
-        corpusPath=None, 
+        filePath=None, 
         number=None, 
         richMetadata=None, 
         ):
         self._accessPath = accessPath
         self._cacheTime = cacheTime
-        self._corpusPath = corpusPath
+        self._filePath = filePath
         self._number = number
         self._richMetadata = richMetadata
 
@@ -2068,22 +2068,23 @@ class MetadataEntry(object):
         return (
             self.accessPath,
             self.cacheTime,
-            self.corpusPath,
+            self.filePath,
             self.richMetadata,
             self.number,
             )
 
     def __repr__(self):
-        corpusPath = self.corpusPath
-        if self.number is not None:
-            corpusPath = '{0} [{1}]'.format(corpusPath, self.number)
         return '<{0}.{1}: {2}>'.format(
             self.__class__.__module__,
             self.__class__.__name__,
-            corpusPath,
+            self.corpusPath,
             )
 
     ### PUBLIC METHODS ###
+
+    def parse(self):
+        from music21 import corpus
+        return corpus.parse(self.filePath)
 
     def search(self, query, field=None):
         return self.richMetadata.search(query, field)
@@ -2104,7 +2105,11 @@ class MetadataEntry(object):
 
     @property
     def corpusPath(self):
-        return self._corpusPath
+        return MetadataBundle.corpusPathToKey(self.filePath, self.number)
+
+    @property
+    def filePath(self):
+        return self._filePath
 
     @property
     def richMetadata(self):
@@ -2194,7 +2199,10 @@ class MetadataBundle(object):
         ::
 
             >>> metadataBundle = metadata.MetadataBundle()
-            >>> metadataBundle.addFromPaths(corpus.getWorkList('bwv66.6'))
+            >>> metadataBundle.addFromPaths(
+            ...     corpus.getWorkList('bwv66.6'),
+            ...     useMultiprocessing=False,
+            ...     )
             []
 
         ::
@@ -2325,7 +2333,10 @@ class MetadataBundle(object):
 
             >>> workList = corpus.getWorkList('ciconia')
             >>> metadataBundle = metadata.MetadataBundle()
-            >>> metadataBundle.addFromPaths(workList)
+            >>> metadataBundle.addFromPaths(
+            ...     workList,
+            ...     useMultiprocessing=False,
+            ...     )
             []
 
         ::
@@ -2363,6 +2374,9 @@ class MetadataBundle(object):
         newMetadataBundle = MetadataBundle()
         for key in self.storage:
             metadataEntry = self.storage[key]
+            # ignore stub entries
+            if metadataEntry.richMetadata is None:
+                continue
             if metadataEntry.search(query, field)[0]:
                 if metadataEntry.number:
                     number = int(metadataEntry.number)
@@ -2403,7 +2417,10 @@ class MetadataBundle(object):
         ::
 
             >>> mb = metadata.MetadataBundle()
-            >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
+            >>> mb.addFromPaths(
+            ...     corpus.getWorkList('bwv66.6'),
+            ...     useMultiprocessing=False,
+            ...     )
             []
 
         ::
@@ -2438,7 +2455,7 @@ class MetadataBundle(object):
 
             >>> updateCount = mdCoreBundle.updateAccessPaths(coreCorpusPaths)
             >>> #_DOCS_SHOW updateCount
-            >>> if updateCount > 13000: print '14158' #_DOCS_HIDE
+            >>> if updateCount > 10000: print '14158' #_DOCS_HIDE
             14158
         
         Note that some scores inside an Opus file may have a number in the key
@@ -2455,6 +2472,7 @@ class MetadataBundle(object):
         # create a copy to manipulate
         for metadataEntry in self.storage.viewvalues():
             metadataEntry.accessPath = None
+        keys = self.storage.keys()
         updateCount = 0
         for filePath in pathList:
             # this key may not be valid if it points to an Opus work that
@@ -2462,32 +2480,18 @@ class MetadataBundle(object):
             # used for conversion
             corpusPath = self.corpusPathToKey(filePath)
             # a version of the path that may not have a work number
-            if corpusPath in self.storage:
+            if corpusPath in keys:
                 self.storage[corpusPath].accessPath = filePath
                 updateCount += 1
-            else:
+                keys.remove(corpusPath) 
                 # get all but last underscore
                 corpusPathStub = '_'.join(corpusPath.split('_')[:-1]) 
-                for key in self.storage.viewkeys():
+                for key in keys:
                     if key.startswith(corpusPathStub):
                         self.storage[key].accessPath = filePath
                         updateCount += 1
+                        keys.remove(key)
         return updateCount
-#            match = False
-#            try:
-#                # MSC: Don't remove this following line: it seems to be important for some reason...
-#                md = self.storage[cp] # @UnusedVariable
-#                self._accessPaths[cp] = filePath
-#                match = True
-#            except KeyError:
-#                pass
-#            if not match:
-#                # see if there is work id alternative
-#                for candidate in keyOptions:
-#                    if candidate.startswith(cpStub):
-#                        self._accessPaths[candidate] = filePath
-        #environLocal.printDebug(['metadata grouping time:', t, 'md bundles found:', len(post)])
-        #return post
 
     def write(self):
         '''
@@ -2622,18 +2626,27 @@ class MetadataCachingJob(object):
         try:
             corpusPath = MetadataBundle.corpusPathToKey(self.filePath)
             metadata = parsedObject.metadata
-            if metadata is None:
-                return
-            richMetadata = RichMetadata()
-            richMetadata.merge(metadata)
-            richMetadata.update(parsedObject) # update based on Stream
-            environLocal.printDebug(
-                'updateMetadataCache: storing: {0}'.format(corpusPath))
-            metadataEntry = MetadataEntry(
-                cacheTime=time.time(),
-                corpusPath=corpusPath,
-                richMetadata=richMetadata,
-                )
+            if metadata is not None:
+                richMetadata = RichMetadata()
+                richMetadata.merge(metadata)
+                richMetadata.update(parsedObject) # update based on Stream
+                environLocal.printDebug(
+                    'updateMetadataCache: storing: {0}'.format(corpusPath))
+                metadataEntry = MetadataEntry(
+                    cacheTime=time.time(),
+                    filePath=self.filePath,
+                    richMetadata=richMetadata,
+                    )
+            else:
+                environLocal.warn(
+                    'addFromPaths: got stream without metadata, '
+                    'creating stub: {0}'.format(
+                        os.path.relpath(self.filePath)))
+                metadataEntry = MetadataEntry(
+                    cacheTime=time.time(),
+                    filePath=self.filePath,
+                    richMetadata=None,
+                    )
             self.results.append(metadataEntry)
         except Exception as exception:
             environLocal.warn('Had a problem with extracting metadata '
@@ -2661,7 +2674,7 @@ class MetadataCachingJob(object):
             corpusPath = MetadataBundle.corpusPathToKey(self.filePath)
             metadataEntry = MetadataEntry(
                 cacheTime=time.time(),
-                corpusPath=corpusPath,
+                filePath=self.filePath,
                 richMetadata=None,
                 )
             self.results.append(metadataEntry)
@@ -2674,7 +2687,7 @@ class MetadataCachingJob(object):
             richMetadata.merge(metadata)
             richMetadata.update(score) # update based on Stream
             if metadata is None or metadata.number is None:
-                environLocal.printDebug(
+                environLocal.warn(
                     'addFromPaths: got Opus that contains '
                     'Streams that do not have work numbers: '
                     '{0}'.format(self.filePath))
@@ -2689,7 +2702,7 @@ class MetadataCachingJob(object):
                         corpusPath))
                 metadataEntry = MetadataEntry(
                     cacheTime=time.time(),
-                    corpusPath=corpusPath,
+                    filePath=self.filePath,
                     number=scoreNumber,
                     richMetadata=richMetadata,
                     )
@@ -2779,7 +2792,7 @@ class JobProcessor(object):
                 totalJobs - remainingJobs,
                 totalJobs,
                 filePathErrorCount,
-                filePath,
+                os.path.relpath(filePath),
                 )
         environLocal.warn(message)
 

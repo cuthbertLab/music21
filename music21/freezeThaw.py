@@ -930,7 +930,8 @@ class JSONFreezeThawBase(object):
             'storage', 'name',
             ],
         'music21.metadata.MetadataEntry': [
-            '_accessPath', '_corpusPath', '_number', '_richMetadata', 
+            '_accessPath', '_cacheTime', '_filePath', '_number',
+            '_richMetadata',
             ],
         'music21.metadata.RichMetadata': [
             'keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 
