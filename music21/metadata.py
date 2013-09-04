@@ -42,6 +42,7 @@ import multiprocessing
 import os
 import pickle
 import re
+import time
 import traceback
 import unittest
 
@@ -2050,11 +2051,13 @@ class MetadataEntry(object):
     
     def __init__(self, 
         accessPath=None,
+        cacheTime=None,
         corpusPath=None, 
         number=None, 
         richMetadata=None, 
         ):
         self._accessPath = accessPath
+        self._cacheTime = cacheTime
         self._corpusPath = corpusPath
         self._number = number
         self._richMetadata = richMetadata
@@ -2064,6 +2067,7 @@ class MetadataEntry(object):
     def __getnewargs__(self):
         return (
             self.accessPath,
+            self.cacheTime,
             self.corpusPath,
             self.richMetadata,
             self.number,
@@ -2093,6 +2097,10 @@ class MetadataEntry(object):
         def fset(self, expr):
             self._accessPath = expr
         return property(**locals())
+
+    @property
+    def cacheTime(self):
+        return self._cacheTime
 
     @property
     def corpusPath(self):
@@ -2149,7 +2157,9 @@ class MetadataBundle(object):
 
     ### PRIVATE METHODS ###
 
-    def _getFilePath(self):
+    @property
+    def filePath(self):
+        filePath = None
         if self.name in ['virtual', 'core']:
             filePath = os.path.join(common.getMetadataCacheFilePath(), 
                 self.name + '.json')
@@ -2157,9 +2167,6 @@ class MetadataBundle(object):
             # write in temporary dir
             filePath = os.path.join(environLocal.getRootTempDir(), 
                 self.name + '.json')
-        else:
-            raise MetadataException('unknown metadata name passed: %s' % 
-                self.name)
         return filePath
 
     ### PUBLIC METHODS ###
@@ -2196,18 +2203,40 @@ class MetadataBundle(object):
             1
 
         '''
+        import time
         jobs = []
         accumulatedResults = []
         accumulatedErrors = []
-        for jobNumber, filePath in enumerate(pathList, 1):
+        if self.filePath is not None and os.path.exists(self.filePath):
+            metadataBundleModificationTime = os.path.getctime(self.filePath)
+        else:
+            metadataBundleModificationTime = time.time()
+        environLocal.warn([
+            'MetadataBundle Modification Time: {0}'.format(
+                metadataBundleModificationTime)
+            ])
+        currentJobNumber = 0
+        for filePath in pathList:
+            key = self.corpusPathToKey(filePath)
+            if key in self.storage:
+                metadataEntry = self.storage[key]  
+                filePathModificationTime = os.path.getctime(filePath)
+                if filePathModificationTime < metadataBundleModificationTime:
+                    environLocal.warn([
+                        'Skipping job: {0}; already in cache.'.format(
+                            os.path.relpath(filePath)),
+                        ])
+                    continue
+            environLocal.warn([
+                'Preparing job: {0}'.format(os.path.relpath(filePath)),
+                ])
+            currentJobNumber += 1
             job = MetadataCachingJob(
                 filePath, 
-                jobNumber=jobNumber,
+                jobNumber=currentJobNumber,
                 useCorpus=useCorpus,
                 )
             jobs.append(job)
-        #results, filePathErrors = JobProcessor.process_serial(jobs)
-        #results, filePathErrors = JobProcessor.process_parallel(jobs)
         currentIteration = 0
         if useMultiprocessing:
             jobProcessor = JobProcessor.process_parallel
@@ -2267,12 +2296,12 @@ class MetadataBundle(object):
         Load self from the file path suggested by the name 
         of this MetadataBundle.
         
-        If filePath is None (typical), run self._getFilePath().
+        If filePath is None (typical), run self.filePath.
         '''
         t = common.Timer()
         t.start()
         if filePath is None:
-            filePath = self._getFilePath()
+            filePath = self.filePath
         if not os.path.exists(filePath):
             environLocal.warn('no metadata found for: %s; try building cache with corpus.cacheMetadata("%s")' % (self.name, self.name))
             return
@@ -2467,8 +2496,8 @@ class MetadataBundle(object):
 
         TODO: Test!
         '''
-        if self.name != 'default':
-            filePath = self._getFilePath()
+        if self.filePath is not None:
+            filePath = self.filePath
             environLocal.warn(['MetadataBundle: writing:', filePath])
             jsf = freezeThaw.JSONFreezer(self)
             return jsf.jsonWrite(filePath)
@@ -2511,6 +2540,8 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
         if domain not in domainGetPathsProcedures:
             raise MetadataCacheException('invalid domain provided: {0}'.format(
                 domain))
+        if os.path.exists(metadataBundle.filePath):
+            metadataBundle.read()
         paths = domainGetPathsProcedures[domain]()
         environLocal.warn(
             'metadata cache: starting processing of paths: {0}'.format(
@@ -2599,6 +2630,7 @@ class MetadataCachingJob(object):
             environLocal.printDebug(
                 'updateMetadataCache: storing: {0}'.format(corpusPath))
             metadataEntry = MetadataEntry(
+                cacheTime=time.time(),
                 corpusPath=corpusPath,
                 richMetadata=richMetadata,
                 )
@@ -2622,6 +2654,17 @@ class MetadataCachingJob(object):
                 'in {1}, whole opus ignored: {2}'.format(
                     scoreNumber, self.filePath, str(exception)))
             traceback.print_exc()
+        else:
+            # Create a dummy metadata entry, representing the entire opus.
+            # This lets the metadata bundle know it has already processed this
+            # entire opus on the next cache update.
+            corpusPath = MetadataBundle.corpusPathToKey(self.filePath)
+            metadataEntry = MetadataEntry(
+                cacheTime=time.time(),
+                corpusPath=corpusPath,
+                richMetadata=None,
+                )
+            self.results.append(metadataEntry)
 
     def _parseOpusScore(self, score, scoreNumber):
         try:
@@ -2630,7 +2673,7 @@ class MetadataCachingJob(object):
             richMetadata = RichMetadata()
             richMetadata.merge(metadata)
             richMetadata.update(score) # update based on Stream
-            if metadata.number is None:
+            if metadata is None or metadata.number is None:
                 environLocal.printDebug(
                     'addFromPaths: got Opus that contains '
                     'Streams that do not have work numbers: '
@@ -2645,6 +2688,7 @@ class MetadataCachingJob(object):
                     'addFromPaths: storing: {0}'.format(
                         corpusPath))
                 metadataEntry = MetadataEntry(
+                    cacheTime=time.time(),
                     corpusPath=corpusPath,
                     number=scoreNumber,
                     richMetadata=richMetadata,
