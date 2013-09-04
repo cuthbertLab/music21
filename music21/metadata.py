@@ -2211,7 +2211,9 @@ class MetadataBundle(object):
             1
 
         '''
+        import music21
         import time
+        music21Path = music21.__path__[0]
         jobs = []
         accumulatedResults = []
         accumulatedErrors = []
@@ -2239,8 +2241,13 @@ class MetadataBundle(object):
                 'Preparing job: {0}'.format(os.path.relpath(filePath)),
                 ])
             currentJobNumber += 1
+            if filePath.startswith(music21Path):
+                filePath = os.path.join(
+                    'music21',
+                    os.path.relpath(filePath, music21Path),
+                    )
             job = MetadataCachingJob(
-                filePath, 
+                filePath,
                 jobNumber=currentJobNumber,
                 useCorpus=useCorpus,
                 )
@@ -2299,6 +2306,10 @@ class MetadataBundle(object):
             # append work number
             return cp+'_%s' % number
     
+    def delete(self):
+        if self.filePath is not None:
+            os.remove(self.filePath)
+
     def read(self, filePath=None):
         '''
         Load self from the file path suggested by the name 
@@ -2468,29 +2479,34 @@ class MetadataBundle(object):
             u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'
 
         '''
+        import music21
+        music21Path = music21.__path__[0]
         # always clear first
         # create a copy to manipulate
         for metadataEntry in self.storage.viewvalues():
             metadataEntry.accessPath = None
-        keys = self.storage.keys()
         updateCount = 0
         for filePath in pathList:
             # this key may not be valid if it points to an Opus work that
             # has multiple numbers; thus, need to get a stub that can be 
             # used for conversion
             corpusPath = self.corpusPathToKey(filePath)
+            accessPath = filePath
+            if accessPath.startswith(music21Path):
+                accessPath = os.path.join(
+                    'music21',
+                    os.path.relpath(filePath, music21Path),
+                    )
             # a version of the path that may not have a work number
-            if corpusPath in keys:
-                self.storage[corpusPath].accessPath = filePath
+            if corpusPath in self.storage:
+                self.storage[corpusPath].accessPath = accessPath
                 updateCount += 1
-                keys.remove(corpusPath) 
                 # get all but last underscore
                 corpusPathStub = '_'.join(corpusPath.split('_')[:-1]) 
-                for key in keys:
+                for key in self.storage.viewkeys():
                     if key.startswith(corpusPathStub):
-                        self.storage[key].accessPath = filePath
+                        self.storage[key].accessPath = accessPath
                         updateCount += 1
-                        keys.remove(key)
         return updateCount
 
     def write(self):
