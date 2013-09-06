@@ -2178,7 +2178,7 @@ class MetadataBundle(object):
 
     def addFromPaths(
         self, 
-        pathList, 
+        paths, 
         printDebugAfter=0, 
         useCorpus=False,
         useMultiprocessing=True,
@@ -2226,7 +2226,7 @@ class MetadataBundle(object):
                 metadataBundleModificationTime)
             ])
         currentJobNumber = 0
-        for filePath in pathList:
+        for filePath in paths:
             key = self.corpusPathToKey(filePath)
             if key in self.storage:
                 metadataEntry = self.storage[key]  
@@ -2266,6 +2266,7 @@ class MetadataBundle(object):
                 #self.storage[corpusPath] = richMetadata
             if (currentIteration % 50) == 0:
                 self.write()
+        self.updateAccessPaths(paths)
         self.write()
         return accumulatedErrors
 
@@ -2309,6 +2310,7 @@ class MetadataBundle(object):
     def delete(self):
         if self.filePath is not None:
             os.remove(self.filePath)
+        return self
 
     def read(self, filePath=None):
         '''
@@ -2317,23 +2319,23 @@ class MetadataBundle(object):
         
         If filePath is None (typical), run self.filePath.
         '''
-        t = common.Timer()
-        t.start()
+        timer = common.Timer()
+        timer.start()
         if filePath is None:
             filePath = self.filePath
         if not os.path.exists(filePath):
             environLocal.warn('no metadata found for: %s; try building cache with corpus.cacheMetadata("%s")' % (self.name, self.name))
             return
-
         jst = freezeThaw.JSONThawer(self)
         jst.jsonRead(filePath)
         environLocal.printDebug([
             'MetadataBundle: loading time:', 
             self.name, 
-            t, 
+            timer, 
             'md items:', 
             len(self.storage)
             ])
+        return self
 
     def search(self, query, field=None, fileExtensions=None):
         '''
@@ -2521,6 +2523,7 @@ class MetadataBundle(object):
             environLocal.warn(['MetadataBundle: writing:', filePath])
             jsf = freezeThaw.JSONFreezer(self)
             return jsf.jsonWrite(filePath)
+        return self
 
 
 #-------------------------------------------------------------------------------
