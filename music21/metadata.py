@@ -318,7 +318,7 @@ class Text(object):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def language():
+    def language(): # @NoSelf
         def fget(self):
             '''Set the language of the Text stored within.
             
@@ -826,7 +826,7 @@ class DateSingle(object):
         return self._data[0].datetime
 
     @apply
-    def relevance():
+    def relevance(): # @NoSelf
         def fget(self):
             return self._relevance
         def fset(self, value):
@@ -874,7 +874,7 @@ class DateRelative(DateSingle):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def relevance():
+    def relevance():  # @NoSelf
         def fget(self):
             return self._relevance
         def fset(self, value):
@@ -941,7 +941,7 @@ class DateBetween(DateSingle):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def relevance():
+    def relevance():  # @NoSelf
         def fget(self):
             return self._relevance
         def fset(self, value):
@@ -1009,7 +1009,7 @@ class DateSelection(DateSingle):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def relevance():
+    def relevance():  # @NoSelf
         def fget(self):
             return self._relevance
         def fset(self, value):
@@ -1119,7 +1119,7 @@ class Contributor(object):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def name():
+    def name(): # @NoSelf
         def fget(self):
             '''
             Returns the text name, or the first of many names entered. 
@@ -1169,7 +1169,7 @@ class Contributor(object):
         return msg
 
     @apply
-    def role():
+    def role():  # @NoSelf
         def fget(self):
             '''
             The role is what part this Contributor plays in the work.  Both
@@ -1664,7 +1664,7 @@ class Metadata(base.Music21Object):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def alternativeTitle():
+    def alternativeTitle(): # @NoSelf
         def fget(self):
             '''
             Get or set the alternative title. 
@@ -1686,7 +1686,7 @@ class Metadata(base.Music21Object):
         return property(**locals())
 
     @apply
-    def composer():
+    def composer(): # @NoSelf
         def fget(self):
             '''
             Get or set the composer of this work. More than one composer may be
@@ -1732,7 +1732,7 @@ class Metadata(base.Music21Object):
         return [x.name for x in post]
 
     @apply
-    def date():
+    def date(): # @NoSelf
         def fget(self):
             '''
             Get or set the date of this work as one of the following date objects:
@@ -1769,7 +1769,7 @@ class Metadata(base.Music21Object):
         return property(**locals())
 
     @apply
-    def localeOfComposition():
+    def localeOfComposition():  # @NoSelf
         def fget(self):
             '''
             Get or set the locale of composition, or origin, of the work. 
@@ -1783,10 +1783,13 @@ class Metadata(base.Music21Object):
         return property(**locals())
 
     @apply
-    def movementName():
+    def movementName(): # @NoSelf
         def fget(self):
             '''
             Get or set the movement title. 
+            
+            Note that a number of pieces from various MusicXML datasets have the piece title as the movement title.
+            For instance, the Bach Chorales, since they are technically movements of larger cantatas.
             '''
             post = self._workIds['movementName']
             if post == None:
@@ -1797,7 +1800,7 @@ class Metadata(base.Music21Object):
         return property(**locals())
 
     @apply
-    def movementNumber():
+    def movementNumber(): # @NoSelf
         def fget(self):
             '''
             Get or set the movement number. 
@@ -1811,10 +1814,12 @@ class Metadata(base.Music21Object):
         return property(**locals())
 
     @apply
-    def number():
+    def number(): # @NoSelf
         def fget(self):
             '''
             Get or set the number of the work.  
+            
+            TODO: Explain what this means...
             '''
             post = self._workIds['number']
             if post == None:
@@ -1825,7 +1830,7 @@ class Metadata(base.Music21Object):
         return property(**locals())
 
     @apply
-    def opusNumber():
+    def opusNumber(): # @NoSelf
         def fget(self):
             '''
             Get or set the opus number. 
@@ -1839,7 +1844,7 @@ class Metadata(base.Music21Object):
         return property(**locals())
 
     @apply
-    def title():
+    def title(): # @NoSelf
         def fget(self):
             '''
             Get the title of the work, or the next-matched title string
@@ -2084,7 +2089,10 @@ class MetadataEntry(object):
 
     def parse(self):
         from music21 import corpus
-        return corpus.parse(self.filePath)
+        if self.number is not None:
+            return corpus.parse(self.filePath, number=self.number)
+        else:
+            return corpus.parse(self.filePath)
 
     def search(self, query, field=None):
         return self.richMetadata.search(query, field)
@@ -2092,7 +2100,7 @@ class MetadataEntry(object):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def accessPath():
+    def accessPath(): # @NoSelf
         def fget(self):
             return self._accessPath
         def fset(self, expr):
@@ -2212,7 +2220,6 @@ class MetadataBundle(object):
 
         '''
         import music21
-        import time
         music21Path = music21.__path__[0]
         jobs = []
         accumulatedResults = []
@@ -2391,10 +2398,14 @@ class MetadataBundle(object):
             if metadataEntry.richMetadata is None:
                 continue
             if metadataEntry.search(query, field)[0]:
-                if metadataEntry.number:
-                    number = int(metadataEntry.number)
-                else:
-                    number = metadataEntry.number
+## Unusued
+#                 if metadataEntry.number:
+#                     try:
+#                         number = int(metadataEntry.number)
+#                     except:
+#                         number = None
+#                 else:
+#                     number = metadataEntry.number
                 if metadataEntry.accessPath is None:
                     continue
                 include = False
@@ -2667,7 +2678,7 @@ class MetadataCachingJob(object):
                     richMetadata=None,
                     )
             self.results.append(metadataEntry)
-        except Exception as exception:
+        except Exception as e: # @UnusedVariable
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
             traceback.print_exc()
@@ -2690,7 +2701,7 @@ class MetadataCachingJob(object):
             # Create a dummy metadata entry, representing the entire opus.
             # This lets the metadata bundle know it has already processed this
             # entire opus on the next cache update.
-            corpusPath = MetadataBundle.corpusPathToKey(self.filePath)
+            unused_corpusPath = MetadataBundle.corpusPathToKey(self.filePath)
             metadataEntry = MetadataEntry(
                 cacheTime=time.time(),
                 filePath=self.filePath,
@@ -2782,7 +2793,7 @@ class JobProcessor(object):
         result_queue.close()
         job_queue.close()
         for worker in workers:
-             worker.join()
+            worker.join()
         raise StopIteration
         # return results, filePathErrors
 
@@ -2828,7 +2839,7 @@ class WorkerProcess(multiprocessing.Process):
     ### PUBLIC METHODS ###
 
     def run(self):
-        proc_name = self.name
+        proc_name = self.name # @UnusedVariable
         while True:
             job = self.job_queue.get()
             # "Poison Pill" causes worker shutdown:
