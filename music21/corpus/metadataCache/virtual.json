@@ -2,243 +2,115 @@
   "__attr__": {
     "name": "virtual", 
     "storage": {
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_bach_cello&file=bwv1007-01_krn&f=xml": {
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_bach_cello&file=bwv1007-01_krn&f=kern": {
         "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-73c69954b59e5b98278400657b88503a.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of 1 sharp>", 
-          "noteCount": 656, 
-          "quarterLength": 168.0, 
-          "timeSignatureFirst": "4/4"
+          "_accessPath": "http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=kern", 
+          "_cacheTime": 1378651358.238787, 
+          "_filePath": "http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=kern"
         }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
+        "__class__": "music21.metadata.MetadataEntry"
       }, 
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_pachelbel&file=canon_krn&f=xml": {
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=osu_classical_bach_inventions&file=inven02_krn&f=kern": {
         "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-caa4768738c4d8813ce3f78b682572b8.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of 2 sharps>", 
-          "noteCount": 2331, 
-          "quarterLength": 228.0, 
-          "timeSignatureFirst": "4/4"
+          "_accessPath": "http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven02.krn&f=kern", 
+          "_cacheTime": 1378651358.45093, 
+          "_filePath": "http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven02.krn&f=kern"
         }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_schubert_piano_d0576&file=d0576-06_krn&f=xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-43f075dbbe4328402234e85dc71d6332.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of 3 sharps>", 
-          "noteCount": 148, 
-          "quarterLength": 34.0, 
-          "timeSignatureFirst": "2/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=osu_classical_bach_inventions&file=inven01_krn&f=xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-355cf399875d46b3ea75a6086d9e1caf.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
-          "noteCount": 484, 
-          "quarterLength": 88.0, 
-          "timeSignatureFirst": "4/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=osu_classical_bach_inventions&file=inven02_krn&f=xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-75a4d45be4c266a1f7d9d6491e33ca5a.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of 3 flats>", 
-          "noteCount": 670, 
-          "quarterLength": 108.0, 
-          "timeSignatureFirst": "4/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=users_craig_classical_schubert_piano_d0576&file=d0576-02_krn&f=xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-7a4081e06d963e526a925e5671704e90.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
-          "noteCount": 173, 
-          "quarterLength": 32.0, 
-          "timeSignatureFirst": "2/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=users_craig_classical_schubert_piano_d0576&file=d0576-03_krn&f=xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-a5574e2fdd8974f6eac9998f724bccfe.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
-          "noteCount": 249, 
-          "quarterLength": 32.0, 
-          "timeSignatureFirst": "2/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=users_craig_classical_schubert_piano_d0576&file=d0576-04_krn&f=xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-09037b882cbace8c89188abc2de880b1.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
-          "noteCount": 194, 
-          "quarterLength": 34.0, 
-          "timeSignatureFirst": "2/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
+        "__class__": "music21.metadata.MetadataEntry"
       }, 
       "http:__static_wikifonia_org_1164_musicxml_mxl": {
         "__attr__": {
-          "_contributors": [
-            {
-              "__attr__": {
-                "_dateRange": [
-                  null, 
-                  null
-                ], 
-                "_names": [
-                  {
-                    "__attr__": {
-                      "_data": "John Coltrane"
-                    }, 
-                    "__class__": "<class 'music21.metadata.Text'>"
-                  }
-                ], 
-                "_role": "composer", 
-                "relevance": "contributor"
+          "_accessPath": "http://static.wikifonia.org/1164/musicxml.mxl", 
+          "_cacheTime": 1378651360.402733, 
+          "_filePath": "http://static.wikifonia.org/1164/musicxml.mxl", 
+          "_richMetadata": {
+            "__attr__": {
+              "_contributors": [
+                {
+                  "__attr__": {
+                    "_dateRange": [
+                      null, 
+                      null
+                    ], 
+                    "_names": [
+                      {
+                        "__attr__": {
+                          "_data": "John Coltrane"
+                        }, 
+                        "__class__": "music21.metadata.Text"
+                      }
+                    ], 
+                    "_role": "composer", 
+                    "relevance": "contributor"
+                  }, 
+                  "__class__": "music21.metadata.Contributor"
+                }, 
+                {
+                  "__attr__": {
+                    "_dateRange": [
+                      null, 
+                      null
+                    ], 
+                    "_names": [
+                      {
+                        "__attr__": {
+                          "_data": ""
+                        }, 
+                        "__class__": "music21.metadata.Text"
+                      }
+                    ], 
+                    "relevance": "contributor"
+                  }, 
+                  "__class__": "music21.metadata.Contributor"
+                }
+              ], 
+              "_urls": [], 
+              "_workIds": {
+                "movementName": {
+                  "__attr__": {
+                    "_data": "Giant Steps"
+                  }, 
+                  "__class__": "music21.metadata.Text"
+                }, 
+                "movementNumber": {
+                  "__attr__": {
+                    "_data": ""
+                  }, 
+                  "__class__": "music21.metadata.Text"
+                }, 
+                "number": {
+                  "__attr__": {
+                    "_data": ""
+                  }, 
+                  "__class__": "music21.metadata.Text"
+                }, 
+                "opusNumber": {
+                  "__attr__": {}, 
+                  "__class__": "music21.metadata.Text"
+                }, 
+                "title": {
+                  "__attr__": {
+                    "_data": ""
+                  }, 
+                  "__class__": "music21.metadata.Text"
+                }
               }, 
-              "__class__": "<class 'music21.metadata.Contributor'>"
+              "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats, mode major>", 
+              "noteCount": 67, 
+              "quarterLength": 72.0, 
+              "timeSignatureFirst": "4/4"
             }, 
-            {
-              "__attr__": {
-                "_dateRange": [
-                  null, 
-                  null
-                ], 
-                "_names": [
-                  {
-                    "__attr__": {
-                      "_data": ""
-                    }, 
-                    "__class__": "<class 'music21.metadata.Text'>"
-                  }
-                ], 
-                "relevance": "contributor"
-              }, 
-              "__class__": "<class 'music21.metadata.Contributor'>"
-            }
-          ], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "Giant Steps"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }, 
-            "movementNumber": {
-              "__attr__": {
-                "_data": ""
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }, 
-            "number": {
-              "__attr__": {
-                "_data": ""
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }, 
-            "opusNumber": {
-              "__attr__": {}, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }, 
-            "title": {
-              "__attr__": {
-                "_data": ""
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats, mode major>", 
-          "noteCount": 67, 
-          "quarterLength": 72.0, 
-          "timeSignatureFirst": "4/4"
+            "__class__": "music21.metadata.RichMetadata"
+          }
         }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
+        "__class__": "music21.metadata.MetadataEntry"
       }
     }
   }, 
-  "__class__": "<class 'music21.metadata.MetadataBundle'>", 
+  "__class__": "music21.metadata.MetadataBundle", 
   "__version__": [
     1, 
-    3, 
+    6, 
     0
   ]
 }
