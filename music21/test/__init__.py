@@ -1,6 +1,16 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["test", "testDocumentation", "testExternal", "testPerformance", "timeGraphs", "testStream"]
+from music21.test.dedent import dedent
+
+__all__ = [
+    'dedent',
+    'test', 
+    'testDocumentation', 
+    'testExternal', 
+    'testPerformance', 
+    'timeGraphs', 
+    'testStream',
+    ]
 
 import testStream
 
