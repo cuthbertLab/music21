@@ -2319,6 +2319,18 @@ class MetadataBundle(object):
             os.remove(self.filePath)
         return self
 
+    @classmethod
+    def fromCoreCorpus(cls):
+        return cls('core').read()
+
+    @classmethod
+    def fromLocalCorpus(cls):
+        return cls('local').read()
+
+    @classmethod
+    def fromVirtualCorpus(cls):
+        return cls('virtual').read()
+
     def read(self, filePath=None):
         '''
         Load self from the file path suggested by the name 
@@ -2398,16 +2410,6 @@ class MetadataBundle(object):
             if metadataEntry.richMetadata is None:
                 continue
             if metadataEntry.search(query, field)[0]:
-## Unusued
-#                 if metadataEntry.number:
-#                     try:
-#                         number = int(metadataEntry.number)
-#                     except:
-#                         number = None
-#                 else:
-#                     number = metadataEntry.number
-                if metadataEntry.accessPath is None:
-                    continue
                 include = False
                 if fileExtensions is not None:
                     for fileExtension in fileExtensions:
@@ -2678,7 +2680,7 @@ class MetadataCachingJob(object):
                     richMetadata=None,
                     )
             self.results.append(metadataEntry)
-        except Exception as e: # @UnusedVariable
+        except Exception:
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
             traceback.print_exc()
@@ -2701,7 +2703,6 @@ class MetadataCachingJob(object):
             # Create a dummy metadata entry, representing the entire opus.
             # This lets the metadata bundle know it has already processed this
             # entire opus on the next cache update.
-            unused_corpusPath = MetadataBundle.corpusPathToKey(self.filePath)
             metadataEntry = MetadataEntry(
                 cacheTime=time.time(),
                 filePath=self.filePath,
@@ -2795,7 +2796,6 @@ class JobProcessor(object):
         for worker in workers:
             worker.join()
         raise StopIteration
-        # return results, filePathErrors
 
     @staticmethod
     def process_serial(jobs):
@@ -2813,7 +2813,6 @@ class JobProcessor(object):
                 )
             yield results, errors
         raise StopIteration
-        #return results, filePathErrors 
 
     @staticmethod
     def report(totalJobs, remainingJobs, filePath, filePathErrorCount):
@@ -2839,7 +2838,6 @@ class WorkerProcess(multiprocessing.Process):
     ### PUBLIC METHODS ###
 
     def run(self):
-        proc_name = self.name # @UnusedVariable
         while True:
             job = self.job_queue.get()
             # "Poison Pill" causes worker shutdown:
