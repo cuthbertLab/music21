@@ -59,12 +59,15 @@ with complex nesting structures like music21 creates.  For instance:
 >>> l = [blah, blah]
 >>> l[0] is l[1]
 True
+
 >>> d = jsp.encode(l)
 >>> print d
 [{"hello": "there"}, {"hello": "there"}]
+
 >>> e = jsp.decode(d)
 >>> e
 [{u'hello': u'there'}, {u'hello': u'there'}]
+
 >>> e[0] is e[1]
 False
     
@@ -80,6 +83,7 @@ Pretty ugly, eh? but it works!
 >>> g = pickle.loads(f)
 >>> g
 [{'hello': 'there'}, {'hello': 'there'}]
+
 >>> g[0] is g[1]
 True
 
@@ -911,15 +915,15 @@ class JSONFreezeThawBase(object):
         'music21.key.KeySignature': [
             'sharps', 'mode', '_alteredPitches',
             ],
-        'music21.metadata.Contributor': [
+        'music21.metadata.primitives.Contributor': [
             '_role', 'relevance', '_names', '_dateRange',
             ],
-        'music21.metadata.Date': [
+        'music21.metadata.primitives.Date': [
             'year', 'month', 'day', 'hour', 'minute', 'second',
             'yearError', 'monthError', 'dayError', 'hourError', 'minuteError', 
             'secondError',
             ],
-        'music21.metadata.DateSingle': [
+        'music21.metadata.primitives.DateSingle': [
             '_relevance',  '_dataError', '_data',
             ],
         'music21.metadata.Metadata': [
@@ -937,7 +941,7 @@ class JSONFreezeThawBase(object):
             'keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 
             'pitchLowest', 'noteCount', 'quarterLength', '__INHERIT__',
             ],
-        'music21.metadata.Text': [
+        'music21.metadata.primitives.Text': [
             '_data', '_language',
             ],
         'music21.meter.TimeSignature': [
@@ -1230,7 +1234,7 @@ class JSONFreezer(JSONFreezeThawBase):
         >>> jsf = freezeThaw.JSONFreezer(t)
         >>> jsdict = jsf.getJSONDict()
         >>> jsdict['__class__']
-        'music21.metadata.Text'
+        'music21.metadata.primitives.Text'
         >>> jsdict['__attr__']['_language']
         'en'
         '''

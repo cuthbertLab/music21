@@ -21,3 +21,6 @@ class Music21Exception(Exception):
 # should be renamed:
 class GroupException(Music21Exception):
     pass
+
+class MetadataException(Music21Exception):
+    pass

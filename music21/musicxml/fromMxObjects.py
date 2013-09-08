@@ -3279,7 +3279,7 @@ def mxCreatorToContributor(mxCreator, inputM21 = None):
 
     >>> c = musicxml.fromMxObjects.mxCreatorToContributor(mxCreator)
     >>> c
-    <music21.metadata.Contributor object at 0x...>
+    <music21.metadata.primitives.Contributor object at 0x...>
     >>> c.role
     'composer'
     >>> c.name
@@ -3291,7 +3291,8 @@ def mxCreatorToContributor(mxCreator, inputM21 = None):
         c = inputM21
     
     mxCreatorType = mxCreator.get('type')
-    if mxCreatorType != None and mxCreatorType in metadata.ROLES:
+    if mxCreatorType != None and \
+        mxCreatorType in metadata.Contributor.roleNames:
         c.role = mxCreatorType
     else: # roles are not defined in musicxml
         pass

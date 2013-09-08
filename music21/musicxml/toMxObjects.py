@@ -2793,7 +2793,7 @@ def contributorToMxCreator(contribObj):
     >>> md.composer = 'frank'
     >>> contrib = md._contributors[0]
     >>> contrib
-    <music21.metadata.Contributor object at 0x...>
+    <music21.metadata.primitives.Contributor object at 0x...>
     >>> mxCreator = musicxml.toMxObjects.contributorToMxCreator(contrib)
     >>> mxCreator.get('charData')
     'frank'
