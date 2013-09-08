@@ -35,26 +35,46 @@ import math
 import json
 import difflib
 
-def translateMonophonicPartToSegments(inputStream, segmentLengths = 30, overlap = 12, algorithm = searchBase.translateStreamToStringNoRhythm): #translateStreamToString):
-    '''
-    translates a monophonic part with measures to a set of segments of length `segmentLengths` with
-    overlap of `overlap` using the algorithm of `algorithm`. Returns two lists, a list of segments, and
-    a list of measure numbers that match the segments.
-    
-    >>> from music21 import *
-    >>> luca = corpus.parse('luca/gloria')
-    >>> lucaCantus = luca.parts[0]
-    >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)
-    >>> segments[0:2]
-    ['HJHEAAEHHCE@JHGECA@A>@A><A@AAE', '@A>@A><A@AAEEECGHJHGH@CAE@FECA']
-    >>> measureLists[0:3]
-    [1, 7, 14]
 
-    >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus, algorithm=search.translateDiatonicStreamToString)
-    >>> segments[0:2]
-    ['CRJOMTHCQNALRQPAGFEFDLFDCFEMOO', 'EFDLFDCFEMOOONPJDCBJSNTHLBOGFE']
-    >>> measureLists[0:3]
-    [1, 7, 14]
+def translateMonophonicPartToSegments(
+    inputStream,
+    segmentLengths=30,
+    overlap=12,
+    algorithm=searchBase.translateStreamToStringNoRhythm,
+    ):
+    '''
+    Translates a monophonic part with measures to a set of segments of length
+    `segmentLengths` with overlap of `overlap` using the algorithm of
+    `algorithm`. Returns two lists, a list of segments, and a list of measure
+    numbers that match the segments.
+    
+    ::
+
+        >>> from music21 import *
+        >>> luca = corpus.parse('luca/gloria')
+        >>> lucaCantus = luca.parts[0]
+        >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)
+        >>> segments[0:2]
+        ['HJHEAAEHHCE@JHGECA@A>@A><A@AAE', '@A>@A><A@AAEEECGHJHGH@CAE@FECA']
+
+    ::
+
+        >>> measureLists[0:3]
+        [1, 7, 14]
+
+    ::
+
+        >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(
+        ...     lucaCantus, 
+        ...     algorithm=search.translateDiatonicStreamToString)
+        >>> segments[0:2]
+        ['CRJOMTHCQNALRQPAGFEFDLFDCFEMOO', 'EFDLFDCFEMOOONPJDCBJSNTHLBOGFE']
+
+    ::
+
+        >>> measureLists[0:3]
+        [1, 7, 14]
+
     '''
     segmentList = []
     measureSegmentList = []
@@ -130,67 +150,93 @@ def indexScoreParts(scoreFile, *args, **kwds):
         indexedList.append({'segmentList': segmentList, 'measureList': measureList})
     return indexedList
 
-def indexScoreFilePaths(scoreFilePaths, giveUpdates = False, *args, **kwds):
+
+def indexScoreFilePaths(
+    scoreFilePaths,
+    giveUpdates=False,
+    *args,
+    **kwds
+    ):
     '''
-    returns a dictionary of the lists from indexScoreParts for each score in 
+    Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
     
+    ::
+
+        >>> searchResults = corpus.search('bwv19')
+        >>> fpsNamesOnly = [searchResult.filePath
+        ...     for searchResult in searchResults]
+        >>> len(fpsNamesOnly)
+        9
+
+    ::
+
+        >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
+        >>> len(scoreDict['bwv190.7.mxl'])
+        4
+
+    ::
+
+        >>> scoreDict['bwv190.7.mxl'][0]['measureList']
+        [0, 5, 11, 17, 22, 27]
+
+    ::
+
+        >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
+        'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
     
-    >>> fps = corpus.search('bwv19')
-    >>> fpsNamesOnly = [x[0] for x in fps]
-    >>> len(fpsNamesOnly)
-    9
-    >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
-    >>> len(scoreDict['bwv190.7.mxl'])
-    4
-    >>> scoreDict['bwv190.7.mxl'][0]['measureList']
-    [0, 5, 11, 17, 22, 27]
-    >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
-    'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
     '''
     scoreDict = {}
     scoreIndex = 0
     totalScores = len(scoreFilePaths)
-    for fp in scoreFilePaths:
-        shortfp = fp.split(os.sep)[-1]
+    for filePath in scoreFilePaths:
+        shortfp = filePath.split(os.sep)[-1]
         if giveUpdates is True:
-            print "Indexing %s (%d/%d)" % (shortfp, scoreIndex, totalScores)
-            scoreIndex += 1
-        try: 
-            scoreObj = converter.parse(fp)
+            print "Indexing %s (%d/%d)" % (
+                shortfp, scoreIndex, totalScores)
+        scoreIndex += 1
+        try:
+            scoreObj = converter.parse(filePath)
             scoreDict[shortfp] = indexScoreParts(scoreObj, *args, **kwds)
         except:
-            print "Failed on parse for: %s" % fp
+            print "Failed on parse for: %s" % filePath
     return scoreDict
 
-def saveScoreDict(scoreDict, fp = None):
-    '''
-    save the score dict from indexScoreFilePaths as a .json file for quickly reloading
 
-    returns the filepath (assumes you'll probably be using a temporary file)
+def saveScoreDict(scoreDict, filePath=None):
     '''
-    if fp is None:
-        fp = environLocal.getTempFile('.json')
-    with open(fp, 'wb') as fh:
-        json.dump(scoreDict, fh)
-    return fp
+    Save the score dict from indexScoreFilePaths as a .json file for quickly
+    reloading
 
-def loadScoreDict(fp):
+    Returns the filepath (assumes you'll probably be using a temporary file)
     '''
-    load the scoreDictionary from fp
+    if filePath is None:
+        filePath = environLocal.getTempFile('.json')
+    with open(filePath, 'wb') as f:
+        json.dump(scoreDict, f)
+    return filePath
+
+
+def loadScoreDict(filePath):
     '''
-    with open(fp) as fh:
-        scoreDict = json.load(fh)
+    Load the scoreDictionary from filePath
+    '''
+    with open(filePath) as f:
+        scoreDict = json.load(f)
     return scoreDict
 
-def getDifflibOrPyLev(seq2 = None, junk=None, forceDifflib = False):
+
+def getDifflibOrPyLev(
+    seq2=None, 
+    junk=None, 
+    forceDifflib=False,
+    ):
     '''
-    returns either a difflib.SequenceMatcher or pyLevenshtein StringMatcher.StringMatcher
-    object depending on what is installed.
+    Returns either a difflib.SequenceMatcher or pyLevenshtein
+    StringMatcher.StringMatcher object depending on what is installed.
     
     If forceDifflib is True then use difflib even if pyLevenshtein is installed:
     '''
-    
     if forceDifflib is True:
         smObject = difflib.SequenceMatcher(junk, '', seq2)
     else:
@@ -199,20 +245,30 @@ def getDifflibOrPyLev(seq2 = None, junk=None, forceDifflib = False):
             smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
         except ImportError:
             smObject = difflib.SequenceMatcher(junk, '', seq2)
-    
     return smObject
 
-def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeReverse = False, forceDifflib = False):
-    r'''Find the level of similarity between each pair of segments in a scoreDict.
+
+def scoreSimilarity(
+    scoreDict, 
+    minimumLength=20, 
+    giveUpdates=False, 
+    includeReverse=False,
+    forceDifflib=False,
+    ):
+    r'''
+    Find the level of similarity between each pair of segments in a scoreDict.
     
-    This takes twice as long as it should because it does not cache the pairwise similarity.
+    This takes twice as long as it should because it does not cache the
+    pairwise similarity.
     
     ::
  
-        >>> fps = corpus.search('bwv19')
-        >>> fpsNamesOnly = [x[0] for x in fps]
-        >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
-        >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib = True) #_DOCS_HIDE
+        >>> filePaths = []
+        >>> filePaths.append(corpus.search('bwv197.5.mxl')[0].filePath)
+        >>> filePaths.append(corpus.search('bwv190.7.mxl')[0].filePath)
+        >>> filePaths.append(corpus.search('bwv197.10.mxl')[0].filePath)
+        >>> scoreDict = search.segment.indexScoreFilePaths(filePaths)
+        >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib=True) #_DOCS_HIDE
         >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
         >>> len(scoreSim)
         671
@@ -223,12 +279,13 @@ def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeRev
     
     ::
 
-        >>> import pprint
-        >>> pprint.pprint(scoreSim[64:68])
-        [(u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 3, 17, 0.0),
-         (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 4, 22, 0.0),
-         (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.377...),
-         (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 1, 5, 0.339...)]
+        >>> for result in scoreSim[64:68]:
+        ...     result
+        ...
+        (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 3, 17, 0.0)
+        (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 4, 22, 0.0)
+        (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.377...)
+        (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 1, 5, 0.339...)
 
     Return tuple.
     '''
@@ -252,23 +309,37 @@ def scoreSimilarity(scoreDict, minimumLength=20, giveUpdates = False, includeRev
                 for thatScoreNumber in range(scoreIndex, totalScores):
                     thatScoreKey = scoreDictKeys[thatScoreNumber]
                     thatScore = scoreDict[thatScoreKey]
-                    #print "scorekey ", thisScoreNumber, thatScoreNumber, thatScoreKey, thatScore
-
                     for pNum2 in range(len(thatScore)):
                         for thatSegmentNumber, thatSegment in enumerate(thatScore[pNum2]['segmentList']):
                             if len(thatSegment) < minimumLength:
                                 continue
-                            #print thisScoreKey, pNum, thisSegment, segmentNumber, thisMeasureNumber
-
                             dl.set_seq1(thatSegment)
                             ratio = dl.ratio()
-                            #print ratio
                             thatMeasureNumber = thatScore[pNum2]['measureList'][thatSegmentNumber]
-                            #print thatScoreKey, pNum2, thatSegment, thatSegmentNumber, thatMeasureNumber
-                            similarityTuple = (thisScoreKey, pNum, segmentNumber, thisMeasureNumber, thatScoreKey, pNum2, thatSegmentNumber, thatMeasureNumber, ratio)
+                            similarityTuple = (
+                                thisScoreKey, 
+                                pNum, 
+                                segmentNumber, 
+                                thisMeasureNumber, 
+                                thatScoreKey, 
+                                pNum2, 
+                                thatSegmentNumber, 
+                                thatMeasureNumber, 
+                                ratio,
+                                )
                             similarityScores.append(similarityTuple)
                             if includeReverse is True:
-                                similarityTupleReversed = (thatScoreKey, pNum2, thatSegmentNumber, thatMeasureNumber, thisScoreKey, pNum, segmentNumber, thisMeasureNumber, ratio)
+                                similarityTupleReversed = (
+                                    thatScoreKey, 
+                                    pNum2, 
+                                    thatSegmentNumber, 
+                                    thatMeasureNumber, 
+                                    thisScoreKey, 
+                                    pNum, 
+                                    segmentNumber, 
+                                    thisMeasureNumber, 
+                                    ratio,
+                                    )
                                 similarityScores.append(similarityTupleReversed)
 
     #import pprint

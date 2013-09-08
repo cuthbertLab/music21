@@ -2452,7 +2452,7 @@ class MetadataBundle(object):
         ::
 
             >>> mb.updateAccessPaths(corpus.getWorkList('bwv66.6'))
-            1
+            2
 
         ::
 
@@ -2476,6 +2476,7 @@ class MetadataBundle(object):
 
             >>> mdCoreBundle = metadata.MetadataBundle('core')
             >>> mdCoreBundle.read()
+            <music21.metadata.MetadataBundle object at 0x...>
 
         ::
 

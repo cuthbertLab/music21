@@ -1209,7 +1209,7 @@ class Test(unittest.TestCase):
 
     def testBarlineRepeat(self):
         from music21 import corpus
-        fp = corpus.getWork('opus18no1/movement3', extList=['.xml'])
+        fp = corpus.getWork('opus18no1/movement3', fileExtensions=('.xml'))
         d = Document()
         
         # Compressed MXL file instead of regular XML file. Extract XML file.
@@ -1232,7 +1232,7 @@ class Test(unittest.TestCase):
                         self.assertEqual(c.repeatObj.get('direction'), 'backward')
                         self.assertEqual(c.repeatObj.get('times'), None)
                         #print c.repeatObj.direction
-        unused_s = corpus.parse('opus18no1/movement3', extList=['.xml'])
+        unused_s = corpus.parse('opus18no1/movement3', fileExtensions=('.xml'))
         os.remove('movement3.xml')
 
     def testUnicodeCharsA(self):

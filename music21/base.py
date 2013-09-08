@@ -4725,8 +4725,6 @@ class Test(unittest.TestCase):
         # the copied activeSite has been deepcopied, and cannot now be accessed
         # this fails! post[-1].getOffsetBySite(a)
 
-
-
     def testSites(self):
         from music21 import note, stream, corpus, clef
 
@@ -4744,13 +4742,14 @@ class Test(unittest.TestCase):
         self.assertEqual(n.lyric, '34')
 
 
-        violin1 = corpus.parse("beethoven/opus18no1", 
-                                3, extList='xml').getElementById("Violin I")
+        violin1 = corpus.parse(
+            "beethoven/opus18no1", 
+            3,
+            fileExtensions='xml',
+            ).getElementById("Violin I")
         lastNote = violin1.flat.notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)
-
-
 
     def testSitesSearch(self):
         from music21 import note, stream, clef
@@ -4799,8 +4798,6 @@ class Test(unittest.TestCase):
         post = n2.getContextByClass(clef.BassClef)
         self.assertEqual(isinstance(post, clef.BassClef), True)
 
-
-
     def testSitesMeasures(self):
         '''Can a measure determine the last Clef used?
         '''
@@ -4842,9 +4839,6 @@ class Test(unittest.TestCase):
         post = newStream[0].getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.TrebleClef), True)
 
-        
-
-
     def testSitesClef(self):
         from music21 import note, stream, clef
         s1 = stream.Stream()
@@ -4857,15 +4851,12 @@ class Test(unittest.TestCase):
         pre = s1.getElementAtOrBefore(0, [clef.Clef])
         self.assertEqual(isinstance(pre, clef.AltoClef), True)
 
-
         # we should be able to find a clef from the lower-level stream
         post = s2.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         post = s2.getClefs(clef.Clef)
         self.assertEqual(isinstance(post[0], clef.AltoClef), True)
-
-
 
     def testSitesPitch(self):
         # TODO: this form does not yet work
@@ -4878,7 +4869,6 @@ class Test(unittest.TestCase):
         #pitchMeasure = n.pitch.getContextAttr('number')
         #n.pitch.setContextAttr('lyric', pitchMeasure)
         #self.assertEqual(n.lyric, 34)
-
 
     def testBeatAccess(self):
         '''Test getting beat data from various Music21Objects.
@@ -4945,7 +4935,6 @@ class Test(unittest.TestCase):
             post.append(n.beatDuration)
         self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None] )
 
-
     def testGetBeatStrengthA(self):
         from music21 import stream, note, meter
 
@@ -4963,12 +4952,10 @@ class Test(unittest.TestCase):
         s.repeatAppend(n, 12)
         match = [s.notes[i].beatStrength for i in range(12)]        
         self.assertEqual([1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25], match)
-        
 
     def testMeaureNumberAccess(self):
         '''Test getting measure numebr data from various Music21Objects.
         '''
-
         from music21 import corpus, stream, note
         
         s = corpus.parse('bach/bwv66.6.xml')
@@ -4982,7 +4969,6 @@ class Test(unittest.TestCase):
             match.append(n.measureNumber)
         self.assertEqual(match, [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9] )
         
-        
         # create a note and put it in different measures
         m1 = stream.Measure()
         m1.number = 3
@@ -4994,8 +4980,6 @@ class Test(unittest.TestCase):
         self.assertEqual(n.measureNumber, 3) 
         m2.append(n)
         self.assertEqual(n.measureNumber, 74)
-
-
 
     def testPickupMeauresBuilt(self):
         from music21 import stream, meter, note
