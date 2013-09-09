@@ -1137,7 +1137,7 @@ class Iterator(object):
         >>> riemenschneider1.show('text')
         {0.0} <music21.text.TextBox "BWV 269">
         {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
+        {0.0} <music21.metadata.base.Metadata object at ...>
         {0.0} <music21.stream.Part Soprano>
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -1155,7 +1155,7 @@ class Iterator(object):
         >>> riemenschneider371.show('text')
         {0.0} <music21.text.TextBox "BWV 278">
         {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
+        {0.0} <music21.metadata.base.Metadata object at ...>
         {0.0} <music21.stream.Part Soprano>
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -1180,7 +1180,7 @@ class Iterator(object):
         >>> christlag.show('text')
         {0.0} <music21.text.TextBox "BWV 278">
         {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
+        {0.0} <music21.metadata.base.Metadata object at ...>
         {0.0} <music21.stream.Part Soprano>
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -1198,7 +1198,7 @@ class Iterator(object):
         >>> ausmeines.show('text')
         {0.0} <music21.text.TextBox "BWV 269">
         {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
+        {0.0} <music21.metadata.base.Metadata object at ...>
         {0.0} <music21.stream.Part Soprano>
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>

@@ -686,7 +686,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     >>> noteList = [n('C#4'), n('D5'), n('B4'), n('F#5'), n('C5'), note.Rest()]
     >>> s,lengthPart = audioSearch.notesAndDurationsToStream(noteList, durationList)
     >>> s.show('text')
-    {0.0} <music21.metadata.Metadata object at ...>
+    {0.0} <music21.metadata.base.Metadata object at ...>
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.note.Note C#>
         {1.0} <music21.note.Note D>

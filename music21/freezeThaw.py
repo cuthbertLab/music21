@@ -926,18 +926,18 @@ class JSONFreezeThawBase(object):
         'music21.metadata.primitives.DateSingle': [
             '_relevance',  '_dataError', '_data',
             ],
-        'music21.metadata.Metadata': [
+        'music21.metadata.base.Metadata': [
             '_date', '_imprint', '_copyright', '_workIds', '_urls', 
             '_contributors',
             ],
-        'music21.metadata.MetadataBundle': [
+        'music21.metadata.bundles.MetadataBundle': [
             'storage', 'name',
             ],
-        'music21.metadata.MetadataEntry': [
+        'music21.metadata.bundles.MetadataEntry': [
             '_accessPath', '_cacheTime', '_filePath', '_number',
             '_richMetadata',
             ],
-        'music21.metadata.RichMetadata': [
+        'music21.metadata.base.RichMetadata': [
             'keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 
             'pitchLowest', 'noteCount', 'quarterLength', '__INHERIT__',
             ],
@@ -1299,21 +1299,32 @@ class JSONFreezer(JSONFreezeThawBase):
         src['__attr__'] = flatData
         return src
 
-    def _getJSON(self):
+    @property
+    def json(self):
         '''
+        Get string JSON data for this object.
+        
+        This method is only available if a JSONFreezer subclass object has been
+        customized and configured by overriding the following methods:
+        :meth:`~music21.freezeThaw.JSONFreezer.jsonAttributes`,
+        :meth:`~music21.freezeThaw.JSONFreezer.music21ObjectFromString`.
+
         Return the dictionary returned by self.getJSONDict() as a JSON string.
         '''
         # when called from json property, include version number;
         # this should mean that only the outermost object has a version number
-        return json.dumps(self.getJSONDict(includeVersion=True))
-                
-    json = property(_getJSON, 
-        doc = '''
-        Get string JSON data for this object. This method is only available if a 
-        JSONFreezer subclass object has been customized and configured by overriding 
-        the following methods: :meth:`~music21.freezeThaw.JSONFreezer.jsonAttributes`, 
-        :meth:`~music21.freezeThaw.JSONFreezer.music21ObjectFromString`.
-        ''')
+        return json.dumps(
+            self.getJSONDict(includeVersion=True),
+            sort_keys=True,
+            )
+
+    @property
+    def prettyJson(self):
+        return json.dumps(
+            self.getJSONDict(includeVersion=True), 
+            sort_keys=True, 
+            indent=4,
+            )
 
     def jsonPrint(self):
         r'''
@@ -1424,8 +1435,11 @@ class JSONFreezer(JSONFreezeThawBase):
           ]
         }
         '''
-        print(json.dumps(self.getJSONDict(includeVersion=True), 
-            sort_keys=True, indent=2))
+        print(json.dumps(
+            self.getJSONDict(includeVersion=True), 
+            sort_keys=True,
+            indent=2,
+            ))
 
     def jsonWrite(self, fp, formatOutput=True):
         '''
@@ -1438,9 +1452,16 @@ class JSONFreezer(JSONFreezeThawBase):
         with codecs.open(fp, mode='w', encoding='utf-8') as f:
             jsonDict = self.getJSONDict(includeVersion=True)
             if formatOutput is False:
-                jsonString = json.dumps(jsonDict)
+                jsonString = json.dumps(
+                    jsonDict,
+                    sort_keys,
+                    )
             else:
-                jsonString = json.dumps(jsonDict, sort_keys=True, indent=2)
+                jsonString = json.dumps(
+                    jsonDict, 
+                    sort_keys=True,
+                    indent=2,
+                    )
             f.write(jsonString)
 
 class JSONThawer(JSONFreezeThawBase):

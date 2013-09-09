@@ -103,7 +103,7 @@ class MetadataCachingJob(object):
         ...     useCorpus=True,
         ...     )
         >>> job()
-        ((<music21.metadata.MetadataEntry: bach_bwv66_6>,), ())
+        ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
         >>> results = job.getResults()
 
     '''

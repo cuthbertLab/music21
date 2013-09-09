@@ -36,7 +36,7 @@ class PolyphonicSnippet(stream.Score):
         >>> tenor = trecento.trecentoCadence.TrecentoCadenceStream("F1. f2. e4. d", '6/8')
         >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = trecento.cadencebook.BallataSheet().makeWork(3))
         >>> ps.elements
-        (<music21.metadata.Metadata object at 0x...>, <music21.stream.Part C>, <music21.stream.Part T>)
+        (<music21.metadata.base.Metadata object at 0x...>, <music21.stream.Part C>, <music21.stream.Part T>)
 
     ::
 

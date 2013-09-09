@@ -170,7 +170,7 @@ def metadataToString(music21Metadata):
     >>> from music21 import corpus
     >>> corelli = corpus.parse("corelli")
     >>> corelli[0].__class__
-    <class 'music21.metadata.Metadata'>
+    <class 'music21.metadata.base.Metadata'>
     >>> print translate.metadataToString(corelli[0])
     Title: Church Sonatas, Op. 3: Sonata I 
     Movement Name: [Movement 1]

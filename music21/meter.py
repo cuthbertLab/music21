@@ -4491,16 +4491,29 @@ class Test(unittest.TestCase):
     def testJSONStorage(self):
         from music21 import meter
         from music21 import freezeThaw
+        from music21 import test
          
         ts = meter.TimeSignature('3/4')
-        jsonStr = freezeThaw.JSONFreezer(ts).json
-         
-        # cannot test to json str as __class__ is different based on context 
-        versionStr = str(list(base.VERSION))
-        self.assertEqual(jsonStr, '{"__attr__": {"ratioString": "3/4"}, "__version__": ' + versionStr +', "__class__": "music21.meter.TimeSignature"}')
+        freezer = freezeThaw.JSONFreezer(ts)
+        self.assertMultiLineEqual(
+            freezeThaw.JSONFreezer(ts).prettyJson,
+            test.dedent('''
+                {
+                    "__attr__": {
+                        "ratioString": "3/4"
+                    }, 
+                    "__class__": "music21.meter.TimeSignature", 
+                    "__version__": [
+                        ''' + str(base.VERSION[0]) + ''', 
+                        ''' + str(base.VERSION[1]) + ''', 
+                        ''' + str(base.VERSION[2]) + '''
+                    ]
+                }
+                ''',
+                ))
  
         tsNew = meter.TimeSignature()
-        freezeThaw.JSONThawer(tsNew).json = jsonStr 
+        freezeThaw.JSONThawer(tsNew).json = freezer.json
         self.assertEqual(tsNew.ratioString, '3/4')
 
 
