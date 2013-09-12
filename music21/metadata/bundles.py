@@ -121,6 +121,31 @@ class MetadataBundle(object):
     ### SPECIAL METHODS ###
 
     def __and__(self, metadataBundle):
+        r'''Compute set-wise `and` of two metadata bundles:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> tripleMeterBundle = coreBundle.search('3/4')
+            >>> tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+        ::
+
+            >>> bachBundle & tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {4 entries}>
+
+        Emit new metadata bundle.
+        '''
         return self._apply_set_operation(
             metadataBundle,
             '__and__',
@@ -158,6 +183,31 @@ class MetadataBundle(object):
         return self != expr
 
     def __or__(self, metadataBundle):
+        r'''Compute set-wise `or` of two metadata bundles:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> beethovenBundle
+            <music21.metadata.bundles.MetadataBundle {16 entries}>
+
+        ::
+
+            >>> bachBundle | beethovenBundle
+            <music21.metadata.bundles.MetadataBundle {37 entries}>
+
+        Emit new metadata bundle.
+        '''
         return self._apply_set_operation(
             metadataBundle, 
             '__or__',
@@ -177,12 +227,62 @@ class MetadataBundle(object):
             )
 
     def __sub__(self, metadataBundle):
+        r'''Compute set-wise `subtraction` of two metadata bundles:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> tripleMeterBundle = coreBundle.search('3/4') 
+            >>> tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+        ::
+
+            >>> bachBundle - tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {17 entries}>
+
+        Emit new metadata bundle.
+        '''
         return self._apply_set_operation(
             metadataBundle, 
             '__sub__',
             )
 
     def __xor__(self, metadataBundle):
+        r'''Compute set-wise `exclusive or` of two metadata bundles:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> tripleMeterBundle = coreBundle.search('3/4') 
+            >>> tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+        ::
+
+            >>> bachBundle ^ tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {2025 entries}>
+
+        Emit new metadata bundle.
+        '''
         return self._apply_set_operation(
             metadataBundle, 
             '__xor__',
@@ -382,15 +482,72 @@ class MetadataBundle(object):
 
     @classmethod
     def fromCoreCorpus(cls):
-        return cls('core').read()
+        r'''Return a metadata bundle for the core corpus.
+        
+        Read from disk and cache it in memory if the bundle doesn't already
+        exist, otherwise pull from memory:
+
+        ::
+
+            >>> coreCorpusA = metadata.MetadataBundle.fromCoreCorpus()
+            >>> coreCorpusB = metadata.MetadataBundle.fromCoreCorpus()
+            >>> coreCorpusA is coreCorpusB
+            True
+        
+        '''
+        from music21.corpus.base import _METADATA_BUNDLES
+        domain = 'core'
+        if domain in _METADATA_BUNDLES and _METADATA_BUNDLES[domain]:
+            return _METADATA_BUNDLES[domain]
+        bundle = cls(domain).read()
+        _METADATA_BUNDLES[domain] = bundle
+        return bundle
 
     @classmethod
     def fromLocalCorpus(cls):
-        return cls('local').read()
+        r'''Return a metadata bundle for the local corpus.
+        
+        Read from disk and cache it in memory if the bundle doesn't already
+        exist, otherwise pull from memory:
+
+        ::
+
+            >>> localCorpusA = metadata.MetadataBundle.fromLocalCorpus()
+            >>> localCorpusB = metadata.MetadataBundle.fromLocalCorpus()
+            >>> localCorpusA is localCorpusB
+            True
+        
+        '''
+        from music21.corpus.base import _METADATA_BUNDLES
+        domain = 'local'
+        if domain in _METADATA_BUNDLES and _METADATA_BUNDLES[domain]:
+            return _METADATA_BUNDLES[domain]
+        bundle = cls(domain).read()
+        _METADATA_BUNDLES[domain] = bundle
+        return bundle
 
     @classmethod
     def fromVirtualCorpus(cls):
-        return cls('virtual').read()
+        r'''Return a metadata bundle for the virtual corpus.
+        
+        Read from disk and cache it in memory if the bundle doesn't already
+        exist, otherwise pull from memory:
+
+        ::
+
+            >>> virtualCorpusA = metadata.MetadataBundle.fromVirtualCorpus()
+            >>> virtualCorpusB = metadata.MetadataBundle.fromVirtualCorpus()
+            >>> virtualCorpusA is virtualCorpusB
+            True
+        
+        '''
+        from music21.corpus.base import _METADATA_BUNDLES
+        domain = 'virtual'
+        if domain in _METADATA_BUNDLES and _METADATA_BUNDLES[domain]:
+            return _METADATA_BUNDLES[domain]
+        bundle = cls(domain).read()
+        _METADATA_BUNDLES[domain] = bundle
+        return bundle
 
     def intersection(self, metadataBundle):
         return self._apply_set_operation(
