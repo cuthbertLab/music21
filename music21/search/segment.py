@@ -164,7 +164,7 @@ def indexScoreFilePaths(
     ::
 
         >>> searchResults = corpus.search('bwv19')
-        >>> fpsNamesOnly = [searchResult.filePath
+        >>> fpsNamesOnly = [searchResult.sourcePath
         ...     for searchResult in searchResults]
         >>> len(fpsNamesOnly)
         9
@@ -264,9 +264,9 @@ def scoreSimilarity(
     ::
  
         >>> filePaths = []
-        >>> filePaths.append(corpus.search('bwv197.5.mxl')[0].filePath)
-        >>> filePaths.append(corpus.search('bwv190.7.mxl')[0].filePath)
-        >>> filePaths.append(corpus.search('bwv197.10.mxl')[0].filePath)
+        >>> filePaths.append(corpus.search('bwv197.5.mxl')[0].sourcePath)
+        >>> filePaths.append(corpus.search('bwv190.7.mxl')[0].sourcePath)
+        >>> filePaths.append(corpus.search('bwv197.10.mxl')[0].sourcePath)
         >>> scoreDict = search.segment.indexScoreFilePaths(filePaths)
         >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib=True) #_DOCS_HIDE
         >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)

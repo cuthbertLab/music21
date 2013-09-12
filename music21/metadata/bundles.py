@@ -37,26 +37,20 @@ class MetadataEntry(object):
     ### INITIALIZER ###
     
     def __init__(self, 
-        accessPath=None,
-        cacheTime=None,
-        filePath=None, 
+        sourcePath=None, 
         number=None, 
-        richMetadata=None, 
+        metadataPayload=None, 
         ):
-        self._accessPath = accessPath
-        self._cacheTime = cacheTime
-        self._filePath = filePath
+        self._sourcePath = sourcePath
         self._number = number
-        self._richMetadata = richMetadata
+        self._metadataPayload = metadataPayload
 
     ### SPECIAL METHODS ###
 
     def __getnewargs__(self):
         return (
-            self.accessPath,
-            self.cacheTime,
-            self.filePath,
-            self.richMetadata,
+            self.sourcePath,
+            self.metadataPayload,
             self.number,
             )
 
@@ -72,38 +66,26 @@ class MetadataEntry(object):
     def parse(self):
         from music21 import corpus
         if self.number is not None:
-            return corpus.parse(self.filePath, number=self.number)
+            return corpus.parse(self.sourcePath, number=self.number)
         else:
-            return corpus.parse(self.filePath)
+            return corpus.parse(self.sourcePath)
 
     def search(self, query, field=None):
-        return self.richMetadata.search(query, field)
+        return self.metadataPayload.search(query, field)
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def accessPath(): # @NoSelf
-        def fget(self):
-            return self._accessPath
-        def fset(self, expr):
-            self._accessPath = expr
-        return property(**locals())
-
-    @property
-    def cacheTime(self):
-        return self._cacheTime
-
     @property
     def corpusPath(self):
-        return MetadataBundle.corpusPathToKey(self.filePath, self.number)
+        return MetadataBundle.corpusPathToKey(self.sourcePath, self.number)
 
     @property
-    def filePath(self):
-        return self._filePath
+    def sourcePath(self):
+        return self._sourcePath
 
     @property
-    def richMetadata(self):
-        return self._richMetadata
+    def metadataPayload(self):
+        return self._metadataPayload
 
     @property
     def number(self):
@@ -126,39 +108,132 @@ class MetadataBundle(object):
     ### CLASS VARIABLES ###
 
     _DOC_ATTR = {
-        'storage': 'A dictionary containing the Metadata objects that have '
-            'been parsed.  Keys are strings',
         'name': 'The name of the type of MetadataBundle being made, can be '
-            '"default", "corpus", or "virtual".  Possibly also "local".'
+            'None, "core", "local" or "virtual".'
         }
     
     ### INITIALIZER ###
 
-    def __init__(self, name='default'):
-        # all keys are strings, all value are Metadata
-        # there is apparently a performance boost for using all-string keys
-        self.storage = {}
-        # name is used to write storage file and access this bundle from multiple # bundles
+    def __init__(self, name=None):
+        self._metadataEntries = {}
         self.name = name
-        # need to store local abs file path of each component
-        # this will need to be refreshed after loading json data
-        # keys are the same for self.storage
-        self._accessPaths = {}
 
     ### SPECIAL METHODS ###
 
+    def __and__(self, metadataBundle):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        resultKeys = selfKeys.__and__(otherKeys)
+        resultBundle = type(self)()
+        for key in resultKeys:
+            if key in self._metadataEntries:
+                metadataEntry = self._metadataEntries[key]
+            else:
+                metadataEntry = metadataBundle._metadataEntries[key]
+            resultBundle._metadataEntries[key] = metadataEntry
+        return resultBundle
+
+    def __eq__(self, expr):
+        if type(self) == type(other):
+            if self._metadataEntries == other._metadataEntries:
+                return True
+        return False
+
+    def __ge__(self, metadataBundle):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        return selfKeys.__ge__(otherKeys)
+
     def __getitem__(self, i):
-        return self.storage.values()[i]
+        return self._metadataEntries.values()[i]
+
+    def __gt__(self, metadataBundle):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        return selfKeys.__gt__(otherKeys)
+
+    def __le__(self, metadataBundle):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        return selfKeys.__le__(otherKeys)
 
     def __len__(self):
-        return len(self.storage)
+        return len(self._metadataEntries)
+    
+    def __lt__(self, metadataBundle):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        return selfKeys.__lt__(otherKeys)
+
+    def __ne__(self, expr):
+        return self != expr
+
+    def __or__(self, metadataBundle):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        resultKeys = selfKeys.__and__(otherKeys)
+        resultBundle = type(self)()
+        for key in resultKeys:
+            if key in self._metadataEntries:
+                metadataEntry = self._metadataEntries[key]
+            else:
+                metadataEntry = metadataBundle._metadataEntries[key]
+            resultBundle._metadataEntries[key] = metadataEntry
+        return resultBundle
+
+    def __repr__(self):
+        if len(self) == 1:
+            status = '{1 entry}'
+        else:
+            status = '{{{0} entries}}'.format(len(self))
+        if self.name is not None:
+            status = '{0!r}: '.format(self.name) + status
+        return '<{0}.{1} {2}>'.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            status,
+            )
+
+    def __sub__(self, metadataBundle):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        resultKeys = selfKeys.__and__(otherKeys)
+        resultBundle = type(self)()
+        for key in resultKeys:
+            if key in self._metadataEntries:
+                metadataEntry = self._metadataEntries[key]
+            else:
+                metadataEntry = metadataBundle._metadataEntries[key]
+            resultBundle._metadataEntries[key] = metadataEntry
+        return resultBundle
+
+    def __xor__(self, metadataBundle):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        resultKeys = selfKeys.__and__(otherKeys)
+        resultBundle = type(self)()
+        for key in resultKeys:
+            if key in self._metadataEntries:
+                metadataEntry = self._metadataEntries[key]
+            else:
+                metadataEntry = metadataBundle._metadataEntries[key]
+            resultBundle._metadataEntries[key] = metadataEntry
+        return resultBundle
 
     ### PRIVATE METHODS ###
 
     @property
     def filePath(self):
         filePath = None
-        if self.name in ['virtual', 'core']:
+        if self.name in ('virtual', 'core'):
             filePath = os.path.join(common.getMetadataCacheFilePath(), 
                 self.name + '.json')
         elif self.name == 'local':
@@ -183,7 +258,7 @@ class MetadataBundle(object):
         list that is returned.
 
         Returns a list of file paths with errors and stores the extracted
-        metadata in `self.storage`.
+        metadata in `self._metadataEntries`.
         
         If `printDebugAfter` is set to an int, say 100, then after every 100
         files are parsed a message will be printed to stderr giving an update
@@ -201,7 +276,7 @@ class MetadataBundle(object):
 
         ::
 
-            >>> len(metadataBundle.storage)
+            >>> len(metadataBundle._metadataEntries)
             1
 
         '''
@@ -222,8 +297,8 @@ class MetadataBundle(object):
         currentJobNumber = 0
         for filePath in paths:
             key = self.corpusPathToKey(filePath)
-            if key in self.storage:
-                metadataEntry = self.storage[key]  
+            if key in self._metadataEntries:
+                metadataEntry = self._metadataEntries[key]  
                 filePathModificationTime = os.path.getctime(filePath)
                 if filePathModificationTime < metadataBundleModificationTime:
                     environLocal.warn([
@@ -263,13 +338,16 @@ class MetadataBundle(object):
             accumulatedResults.extend(results)
             accumulatedErrors.extend(errors)
             for metadataEntry in results:
-                self.storage[metadataEntry.corpusPath] = metadataEntry
-                #self.storage[corpusPath] = richMetadata
+                self._metadataEntries[metadataEntry.corpusPath] = metadataEntry
+                #self._metadataEntries[corpusPath] = richMetadata
             if (currentIteration % 50) == 0:
                 self.write()
-        self.updateAccessPaths(paths)
+        self.validate()
         self.write()
         return accumulatedErrors
+
+    def clear(self):
+        self._metadataEntries.clear()
 
     @staticmethod
     def corpusPathToKey(filePath, number=None):
@@ -347,7 +425,7 @@ class MetadataBundle(object):
             self.name, 
             timer, 
             'md items:', 
-            len(self.storage)
+            len(self._metadataEntries)
             ])
         return self
 
@@ -369,10 +447,9 @@ class MetadataBundle(object):
 
         ::
 
-            >>> updateCount = metadataBundle.updateAccessPaths(workList)
             >>> searchResult = metadataBundle.search('cicon', 'composer')
             >>> searchResult
-            <music21.metadata.bundles.MetadataBundle object at 0x...>
+            <music21.metadata.bundles.MetadataBundle {1 entry}>
 
         ::
 
@@ -400,131 +477,68 @@ class MetadataBundle(object):
 
         '''
         newMetadataBundle = MetadataBundle()
-        for key in self.storage:
-            metadataEntry = self.storage[key]
+        for key in self._metadataEntries:
+            metadataEntry = self._metadataEntries[key]
             # ignore stub entries
-            if metadataEntry.richMetadata is None:
+            if metadataEntry.metadataPayload is None:
                 continue
             if metadataEntry.search(query, field)[0]:
                 include = False
                 if fileExtensions is not None:
                     for fileExtension in fileExtensions:
-                        if metadataEntry.accessPath.endswith(fileExtension):
+                        if metadataEntry.sourcePath.endswith(fileExtension):
                             include = True
                             break
                         elif fileExtension.endswith('xml') and \
-                            metadataEntry.accessPath.endswith(('mxl', 'mx')):
+                            metadataEntry.sourcePath.endswith(('mxl', 'mx')):
                             include = True
                             break
                 else:
                     include = True
-                if include and key not in newMetadataBundle.storage:
-                    newMetadataBundle.storage[key] = metadataEntry
+                if include and key not in newMetadataBundle._metadataEntries:
+                    newMetadataBundle._metadataEntries[key] = metadataEntry
         return newMetadataBundle
 
-    def updateAccessPaths(self, pathList):
-        r'''
+    def validate(self):
+        from music21 import corpus
+        timer = common.Timer()
+        timer.start()
+        environLocal.warn(['MetadataBundle: validating...'])
+        invalidatedKeys = []
+        validatedPaths = set()
+        corpusPrefix = os.path.join('music21', 'corpus')
+        for key, metadataEntry in self._metadataEntries.iteritems():
+            #print 'KEY:', key, metadataEntry, len(validatedPaths), \
+            #    len(invalidatedKeys)
 
-        For each stored Metatadata object, create an entry in the dictionary
-        ._accessPaths where each key is a simple version of the corpus name of
-        the file and the value is the complete, local file path that returns
-        this.
-
-        Uses :meth:`~music21.metadata.MetadataBundle.corpusPathToKey` to
-        generate the keys
-
-        The `pathList` parameter is a list of all file paths on the users local
-        system. 
-        
-        ::
-
-            >>> mb = metadata.MetadataBundle()
-            >>> mb.addFromPaths(
-            ...     corpus.getWorkList('bwv66.6'),
-            ...     useCorpus=True,
-            ...     useMultiprocessing=False,
-            ...     )
-            []
-
-        ::
-
-            >>> mb.updateAccessPaths(corpus.getWorkList('bwv66.6'))
-            2
-
-        ::
-
-            >>> #_DOCS_SHOW print mb._accessPaths
-            >>> print r"{u'bach_bwv66_6_mxl': u'D:\\eclipse_dev\\music21base\\music21\\corpus\\bach\\bwv66.6.mxl'}" #_DOCS_HIDE
-            {u'bach_bwv66_6_mxl': u'D:\\eclipse_dev\\music21base\\music21\\corpus\\bach\\bwv66.6.mxl'}
-        
-        A slower (but not too slow test) that should do much more. This is what
-        corpus._updateMetadataBundle() does.  Notice that many of our files
-        contain multiple scores, so while there are 2,300 files, there are over
-        13,000 scores.
-        
-        ::
-
-            >>> coreCorpusPaths = corpus.getCorePaths()
-            >>> #_DOCS_SHOW len(coreCorpusPaths)
-            >>> if len(coreCorpusPaths) > 2200: print '2300' #_DOCS_HIDE
-            2300
-
-        ::
-
-            >>> mdCoreBundle = metadata.MetadataBundle('core')
-            >>> mdCoreBundle.read()
-            <music21.metadata.bundles.MetadataBundle object at 0x...>
-
-        ::
-
-            >>> updateCount = mdCoreBundle.updateAccessPaths(coreCorpusPaths)
-            >>> #_DOCS_SHOW updateCount
-            >>> if updateCount > 10000: print '14158' #_DOCS_HIDE
-            14158
-        
-        Note that some scores inside an Opus file may have a number in the key
-        that is not present in the path:
-        
-        ::
-
-            >>> #_DOCS_SHOW mdCoreBundle._accessPaths['essenFolksong_han1_abc_1']
-            >>> print r"u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'" #_DOCS_HIDE
-            u'D:\\eclipse_dev\\music21base\\music21\\corpus\\essenFolksong\\han1.abc'
-
-        '''
-        import music21
-        music21Path = music21.__path__[0]
-        # always clear first
-        # create a copy to manipulate
-        for metadataEntry in self.storage.viewvalues():
-            metadataEntry.accessPath = None
-        updateCount = 0
-        for filePath in pathList:
-            # this key may not be valid if it points to an Opus work that
-            # has multiple numbers; thus, need to get a stub that can be 
-            # used for conversion
-            corpusPath = self.corpusPathToKey(filePath)
-            accessPath = filePath
-            if accessPath.startswith(music21Path):
-                accessPath = os.path.join(
-                    'music21',
-                    os.path.relpath(filePath, music21Path),
-                    )
-            # a version of the path that may not have a work number
-            if corpusPath in self.storage:
-                self.storage[corpusPath].accessPath = accessPath
-                updateCount += 1
-                # get all but last underscore
-                corpusPathStub = '_'.join(corpusPath.split('_')[:-1]) 
-                for key in self.storage.viewkeys():
-                    if key.startswith(corpusPathStub):
-                        self.storage[key].accessPath = accessPath
-                        updateCount += 1
-        return updateCount
+            # MetadataEntries for core corpus items use a relative path as
+            # their source path, always starting with 'music21/corpus'.
+            sourcePath = metadataEntry.sourcePath
+            if sourcePath in validatedPaths:
+                continue
+            if sourcePath.startswith(corpusPrefix):
+                sourcePath = os.path.join(
+                    common.getCorpusFilePath(),
+                    os.path.relpath(
+                        sourcePath,
+                        corpusPrefix,
+                        ))
+            if sourcePath.startswith('http:') or os.path.exists(sourcePath):
+                validatedPaths.add(metadataEntry.sourcePath)
+            else:
+                invalidatedKeys.append(key)
+        for key in invalidatedKeys:
+            print key
+            del(self._metadataEntries[key])
+        environLocal.warn(
+            'MetadataBundle: finished validating in {0} seconds.'.format(
+                timer),
+            )
+        return len(invalidatedKeys)
 
     def write(self):
         '''
-        Write the JSON storage of all Metadata or 
+        Write the JSON _metadataEntries of all Metadata or 
         RichMetadata contained in this object. 
 
         TODO: Test!

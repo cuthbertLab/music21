@@ -397,8 +397,7 @@ def _updateMetadataBundle():
             paths = proc()
             _METADATA_BUNDLES[domain] = metadata.MetadataBundle(domain)
             _METADATA_BUNDLES[domain].read()
-            # must update access paths for the files found on this system
-            _METADATA_BUNDLES[domain].updateAccessPaths(paths)
+            _METADATA_BUNDLES[domain].validate()
 
 
 def cacheMetadata(domainList=('local')):
@@ -1501,7 +1500,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, key
         searchResults = corpus.search('Taiwan', 'locale')
         self.assertEqual(len(searchResults), 27)
-        pathInfo = sorted((searchResult.filePath, searchResult.number) 
+        pathInfo = sorted((searchResult.sourcePath, searchResult.number) 
             for searchResult in searchResults)
         self.assertEqual(pathInfo, [
             (u'music21/corpus/essenFolksong/han1.abc', 268),
@@ -1582,7 +1581,7 @@ class Test(unittest.TestCase):
         searchResults = corpus.search('coltrane', 'composer')
         self.assertEqual(len(searchResults) > 0, True)
         # returns items in pairs: url and work number
-        self.assertEqual(searchResults[0].filePath,
+        self.assertEqual(searchResults[0].sourcePath,
             'http://static.wikifonia.org/1164/musicxml.mxl')
 
     def testGetWorkList(self):

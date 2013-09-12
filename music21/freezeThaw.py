@@ -931,11 +931,10 @@ class JSONFreezeThawBase(object):
             '_contributors',
             ],
         'music21.metadata.bundles.MetadataBundle': [
-            'storage', 'name',
+            '_metadataEntries', 'name',
             ],
         'music21.metadata.bundles.MetadataEntry': [
-            '_accessPath', '_cacheTime', '_filePath', '_number',
-            '_richMetadata',
+            '_sourcePath', '_number', '_metadataPayload',
             ],
         'music21.metadata.base.RichMetadata': [
             'keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 
@@ -967,10 +966,13 @@ class JSONFreezeThawBase(object):
         #'music21.meter.TimeSignature': ('ratioChanged',),                   
         }
     
-    def __init__(self, storedObject = None):
+    def __init__(self, storedObject=None):
         self.storedObject = storedObject
         if storedObject is not None:
-            self.className = storedObject.__class__.__module__ + '.' + storedObject.__class__.__name__
+            self.className = '.'.join((
+                storedObject.__class__.__module__,
+                storedObject.__class__.__name__,
+                ))
         else:
             self.className = None
 

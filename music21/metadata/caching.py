@@ -163,21 +163,19 @@ class MetadataCachingJob(object):
                 environLocal.printDebug(
                     'updateMetadataCache: storing: {0}'.format(corpusPath))
                 metadataEntry = metadata.MetadataEntry(
-                    cacheTime=time.time(),
-                    filePath=self.filePath,
-                    richMetadata=richMetadata,
+                    sourcePath=self.filePath,
+                    metadataPayload=richMetadata,
                     )
+                self.results.append(metadataEntry)
             else:
                 environLocal.warn(
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
                         os.path.relpath(self.filePath)))
-                metadataEntry = metadata.MetadataEntry(
-                    cacheTime=time.time(),
-                    filePath=self.filePath,
-                    richMetadata=None,
-                    )
-            self.results.append(metadataEntry)
+                #metadataEntry = metadata.MetadataEntry(
+                #    sourcePath=self.filePath,
+                #    metadataPayload=None,
+                #    )
         except Exception:
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
@@ -202,12 +200,12 @@ class MetadataCachingJob(object):
             # Create a dummy metadata entry, representing the entire opus.
             # This lets the metadata bundle know it has already processed this
             # entire opus on the next cache update.
-            metadataEntry = metadata.MetadataEntry(
-                cacheTime=time.time(),
-                filePath=self.filePath,
-                richMetadata=None,
-                )
-            self.results.append(metadataEntry)
+            #metadataEntry = metadata.MetadataEntry(
+            #    sourcePath=self.filePath,
+            #    metadataPayload=None,
+            #    )
+            #self.results.append(metadataEntry)
+            pass
 
     def _parseOpusScore(self, score, scoreNumber):
         from music21 import metadata
@@ -231,10 +229,9 @@ class MetadataCachingJob(object):
                     'addFromPaths: storing: {0}'.format(
                         corpusPath))
                 metadataEntry = metadata.MetadataEntry(
-                    cacheTime=time.time(),
-                    filePath=self.filePath,
+                    sourcePath=self.filePath,
                     number=scoreNumber,
-                    richMetadata=richMetadata,
+                    metadataPayload=richMetadata,
                     )
                 self.results.append(metadataEntry)
         except Exception as exception:
@@ -342,6 +339,15 @@ class WorkerProcess(multiprocessing.Process):
             self.job_queue.task_done()
             self.result_queue.put(pickle.dumps(job, protocol=0))
         return
+
+
+#------------------------------------------------------------------------------
+
+
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
 
 
 #------------------------------------------------------------------------------
