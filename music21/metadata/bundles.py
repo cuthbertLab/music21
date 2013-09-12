@@ -121,18 +121,10 @@ class MetadataBundle(object):
     ### SPECIAL METHODS ###
 
     def __and__(self, metadataBundle):
-        assert isinstance(metadataBundle, type(self))
-        selfKeys = set(self._metadataEntries.keys())
-        otherKeys = set(metadataBundle._metadataEntries.keys())
-        resultKeys = selfKeys.__and__(otherKeys)
-        resultBundle = type(self)()
-        for key in resultKeys:
-            if key in self._metadataEntries:
-                metadataEntry = self._metadataEntries[key]
-            else:
-                metadataEntry = metadataBundle._metadataEntries[key]
-            resultBundle._metadataEntries[key] = metadataEntry
-        return resultBundle
+        return self._apply_set_operation(
+            metadataBundle,
+            '__and__',
+            )
 
     def __eq__(self, expr):
         if type(self) == type(other):
@@ -141,21 +133,16 @@ class MetadataBundle(object):
         return False
 
     def __ge__(self, metadataBundle):
-        assert isinstance(metadataBundle, type(self))
-        selfKeys = set(self._metadataEntries.keys())
-        otherKeys = set(metadataBundle._metadataEntries.keys())
-        return selfKeys.__ge__(otherKeys)
+        return self._apply_set_predicate(metadataBundle, '__ge__')
 
     def __getitem__(self, i):
         return self._metadataEntries.values()[i]
 
     def __gt__(self, metadataBundle):
-        assert isinstance(metadataBundle, type(self))
-        selfKeys = set(self._metadataEntries.keys())
-        otherKeys = set(metadataBundle._metadataEntries.keys())
-        return selfKeys.__gt__(otherKeys)
+        return self._apply_set_predicate(metadataBundle, '__gt__')
 
     def __le__(self, metadataBundle):
+        return self._apply_set_predicate(metadataBundle, '__le__')
         assert isinstance(metadataBundle, type(self))
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
@@ -165,27 +152,16 @@ class MetadataBundle(object):
         return len(self._metadataEntries)
     
     def __lt__(self, metadataBundle):
-        assert isinstance(metadataBundle, type(self))
-        selfKeys = set(self._metadataEntries.keys())
-        otherKeys = set(metadataBundle._metadataEntries.keys())
-        return selfKeys.__lt__(otherKeys)
+        return self._apply_set_predicate(metadataBundle, '__lt__')
 
     def __ne__(self, expr):
         return self != expr
 
     def __or__(self, metadataBundle):
-        assert isinstance(metadataBundle, type(self))
-        selfKeys = set(self._metadataEntries.keys())
-        otherKeys = set(metadataBundle._metadataEntries.keys())
-        resultKeys = selfKeys.__and__(otherKeys)
-        resultBundle = type(self)()
-        for key in resultKeys:
-            if key in self._metadataEntries:
-                metadataEntry = self._metadataEntries[key]
-            else:
-                metadataEntry = metadataBundle._metadataEntries[key]
-            resultBundle._metadataEntries[key] = metadataEntry
-        return resultBundle
+        return self._apply_set_operation(
+            metadataBundle, 
+            '__or__',
+            )
 
     def __repr__(self):
         if len(self) == 1:
@@ -201,24 +177,24 @@ class MetadataBundle(object):
             )
 
     def __sub__(self, metadataBundle):
-        assert isinstance(metadataBundle, type(self))
-        selfKeys = set(self._metadataEntries.keys())
-        otherKeys = set(metadataBundle._metadataEntries.keys())
-        resultKeys = selfKeys.__and__(otherKeys)
-        resultBundle = type(self)()
-        for key in resultKeys:
-            if key in self._metadataEntries:
-                metadataEntry = self._metadataEntries[key]
-            else:
-                metadataEntry = metadataBundle._metadataEntries[key]
-            resultBundle._metadataEntries[key] = metadataEntry
-        return resultBundle
+        return self._apply_set_operation(
+            metadataBundle, 
+            '__sub__',
+            )
 
     def __xor__(self, metadataBundle):
+        return self._apply_set_operation(
+            metadataBundle, 
+            '__xor__',
+            )
+
+    ### PRIVATE METHODS ###
+
+    def _apply_set_operation(self, metadataBundle, operator):
         assert isinstance(metadataBundle, type(self))
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
-        resultKeys = selfKeys.__and__(otherKeys)
+        resultKeys = getattr(selfKeys, operator)(otherKeys)
         resultBundle = type(self)()
         for key in resultKeys:
             if key in self._metadataEntries:
@@ -228,7 +204,13 @@ class MetadataBundle(object):
             resultBundle._metadataEntries[key] = metadataEntry
         return resultBundle
 
-    ### PRIVATE METHODS ###
+    def _apply_set_predicate(self, metadataBundle, predicate):
+        assert isinstance(metadataBundle, type(self))
+        selfKeys = set(self._metadataEntries.keys())
+        otherKeys = set(metadataBundle._metadataEntries.keys())
+        return getattr(selfKeys, predicate)(otherKeys)
+
+    ### PUBLIC PROPERTIES ###
 
     @property
     def filePath(self):
@@ -349,6 +331,12 @@ class MetadataBundle(object):
     def clear(self):
         self._metadataEntries.clear()
 
+    def difference(self, metadataBundle):
+        return self._apply_set_operation(
+            metadataBundle, 
+            'difference',
+            )
+
     @staticmethod
     def corpusPathToKey(filePath, number=None):
         '''Given a file path or corpus path, return the meta-data path
@@ -403,6 +391,21 @@ class MetadataBundle(object):
     @classmethod
     def fromVirtualCorpus(cls):
         return cls('virtual').read()
+
+    def intersection(self, metadataBundle):
+        return self._apply_set_operation(
+            metadataBundle, 
+            'intersection',
+            )
+
+    def isdisjoint(self, metadataBundle):
+        return self._apply_set_predicate(metadataBundle, 'isdisjoint')
+
+    def issubset(self, metadataBundle):
+        return self._apply_set_predicate(metadataBundle, 'issubset')
+
+    def issuperset(self, metadataBundle):
+        return self._apply_set_predicate(metadataBundle, 'issuperset')
 
     def read(self, filePath=None):
         '''
@@ -498,6 +501,18 @@ class MetadataBundle(object):
                 if include and key not in newMetadataBundle._metadataEntries:
                     newMetadataBundle._metadataEntries[key] = metadataEntry
         return newMetadataBundle
+
+    def symmetric_difference(self, metadataBundle):
+        return self._apply_set_operation(
+            metadataBundle, 
+            'symmetric_difference',
+            )
+
+    def union(self, metadataBundle):
+        return self._apply_set_operation(
+            metadataBundle,
+            'union',
+            )
 
     def validate(self):
         from music21 import corpus
