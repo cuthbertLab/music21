@@ -105,18 +105,12 @@ class MetadataBundle(object):
     these.
     '''
     
-    ### CLASS VARIABLES ###
-
-    _DOC_ATTR = {
-        'name': 'The name of the type of MetadataBundle being made, can be '
-            'None, "core", "local" or "virtual".'
-        }
-    
     ### INITIALIZER ###
 
     def __init__(self, name=None):
         self._metadataEntries = {}
-        self.name = name
+        assert name in ('core', 'local', 'virtual', None)
+        self._name = name
 
     ### SPECIAL METHODS ###
 
@@ -130,7 +124,10 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', 
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -193,13 +190,19 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', 
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
         ::
 
-            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> beethovenBundle = coreBundle.search(
+            ...     'beethoven', 
+            ...     field='composer',
+            ...     )
             >>> beethovenBundle
             <music21.metadata.bundles.MetadataBundle {16 entries}>
 
@@ -238,7 +241,10 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', 
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -270,7 +276,10 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', 
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -318,6 +327,10 @@ class MetadataBundle(object):
 
     @property
     def filePath(self):
+        r'''
+        The filesystem name of the cached metadata bundle, if the metadata
+        bundle's name is not None.
+        '''
         filePath = None
         if self.name in ('virtual', 'core'):
             filePath = os.path.join(common.getMetadataCacheFilePath(), 
@@ -327,6 +340,35 @@ class MetadataBundle(object):
             filePath = os.path.join(environLocal.getRootTempDir(), 
                 self.name + '.json')
         return filePath
+
+    @apply
+    def name():
+        def fget(self):
+            r'''
+            The name of the metadata bundle.
+
+            Can be 'core', 'local', 'virtual' or None.
+
+            The names 'core', 'local' and 'virtual refer to the core, local and
+            virtual corpuses respectively:
+
+            ::
+
+                >>> metadata.MetadataBundle().name is None
+                True
+
+            ::
+                
+                >>> metadata.MetadataBundle.fromCoreCorpus().name
+                u'core'
+
+            Return string or None.
+            '''
+            return self._name
+        def fset(self, expr):
+            assert expr in ('core', 'local', 'virtual', None)
+            self._name = expr
+        return property(**locals())
 
     ### PUBLIC METHODS ###
 
@@ -433,6 +475,27 @@ class MetadataBundle(object):
         return accumulatedErrors
 
     def clear(self):
+        r'''
+        Clear all keys in a metadata bundle:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+            >>> bachBundle = coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> bachBundle.clear()
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {0 entries}>
+
+        Return none.
+        '''
         self._metadataEntries.clear()
 
     @staticmethod
@@ -442,14 +505,14 @@ class MetadataBundle(object):
         ::
 
             >>> mb = metadata.MetadataBundle()
-            >>> mb.corpusPathToKey('bach/bwv1007/prelude'
-            ...     ).endswith('bach_bwv1007_prelude')
+            >>> key = mb.corpusPathToKey('bach/bwv1007/prelude')
+            >>> key.endswith('bach_bwv1007_prelude')
             True
 
         ::
 
-            >>> mb.corpusPathToKey('/beethoven/opus59no1/movement1.xml'
-            ...     ).endswith('beethoven_opus59no1_movement1_xml')
+            >>> key = mb.corpusPathToKey('/beethoven/opus59no1/movement1.xml')
+            >>> key.endswith('beethoven_opus59no1_movement1_xml')
             True
 
         '''
@@ -473,6 +536,13 @@ class MetadataBundle(object):
             return cp+'_%s' % number
     
     def delete(self):
+        r'''
+        Delete the filesystem cache of a named metadata bundle.
+
+        Does not delete the in-memory metadata bundle.
+
+        Return none.
+        '''
         if self.filePath is not None:
             if os.path.exists(self.filePath):
                 os.remove(self.filePath)
@@ -488,7 +558,10 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', 
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -592,7 +665,10 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -625,13 +701,19 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
         ::
 
-            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> beethovenBundle = coreBundle.search(
+            ...     'beethoven',
+            ...     field='composer',
+            ...     )
             >>> beethovenBundle
             <music21.metadata.bundles.MetadataBundle {16 entries}>
 
@@ -666,7 +748,10 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', 
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -701,7 +786,10 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', 
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -768,7 +856,10 @@ class MetadataBundle(object):
 
         ::
 
-            >>> searchResult = metadataBundle.search('cicon', 'composer')
+            >>> searchResult = metadataBundle.search(
+            ...     'cicon', 
+            ...     field='composer'
+            ...     )
             >>> searchResult
             <music21.metadata.bundles.MetadataBundle {1 entry}>
 
@@ -784,16 +875,22 @@ class MetadataBundle(object):
 
         ::
 
-            >>> searchResult = metadataBundle.search('cicon', 'composer', 
-            ...     fileExtensions=['.krn'])
+            >>> searchResult = metadataBundle.search(
+            ...     'cicon',
+            ...     field='composer', 
+            ...     fileExtensions=('.krn',),
+            ...     )
             >>> len(searchResult) # no files in this format
             0
 
         ::
 
-            >>> searchResult = metadataBundle.search('cicon', 'composer', 
-            ...     fileExtensions=['.xml'])
-            >>> len(searchResult)  # shouldn't this be 11?
+            >>> searchResult = metadataBundle.search(
+            ...     'cicon',
+            ...     field='composer', 
+            ...     fileExtensions=('.xml'),
+            ...     )
+            >>> len(searchResult) # shouldn't this be 11?
             1   
 
         '''
@@ -830,7 +927,9 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -862,13 +961,19 @@ class MetadataBundle(object):
 
         ::
 
-            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach', 
+            ...     field='composer',
+            ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
         ::
 
-            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> beethovenBundle = coreBundle.search(
+            ...     'beethoven', 
+            ...     field='composer',
+            ...     )
             >>> beethovenBundle
             <music21.metadata.bundles.MetadataBundle {16 entries}>
 
@@ -885,6 +990,13 @@ class MetadataBundle(object):
             )
 
     def validate(self):
+        r'''
+        Validate each metadata entry in a metadata bundle.
+
+        If the entry represents a non-virtual corpus asset, test that its
+        source path is locatable on disk.  If not, remove the metadata entry
+        from the metadata bundle.
+        '''
         from music21 import corpus
         timer = common.Timer()
         timer.start()
@@ -893,9 +1005,6 @@ class MetadataBundle(object):
         validatedPaths = set()
         corpusPrefix = os.path.join('music21', 'corpus')
         for key, metadataEntry in self._metadataEntries.iteritems():
-            #print 'KEY:', key, metadataEntry, len(validatedPaths), \
-            #    len(invalidatedKeys)
-
             # MetadataEntries for core corpus items use a relative path as
             # their source path, always starting with 'music21/corpus'.
             sourcePath = metadataEntry.sourcePath
@@ -915,16 +1024,15 @@ class MetadataBundle(object):
         for key in invalidatedKeys:
             print key
             del(self._metadataEntries[key])
-        environLocal.warn(
-            'MetadataBundle: finished validating in {0} seconds.'.format(
-                timer),
-            )
+        message = 'MetadataBundle: finished validating in {0} seconds.'.format(
+            timer)
+        environLocal.warn(message)
         return len(invalidatedKeys)
 
     def write(self):
         r'''
-        Write the JSON _metadataEntries of all Metadata or 
-        RichMetadata contained in this object. 
+        Write the JSON _metadataEntries of all Metadata or RichMetadata 
+        contained in this object. 
 
         TODO: Test!
         '''
