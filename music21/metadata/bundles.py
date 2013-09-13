@@ -96,7 +96,7 @@ class MetadataEntry(object):
 
 
 class MetadataBundle(object):
-    '''
+    r'''
     An object that provides access to, searches within, and stores and loads
     multiple Metadata objects.
 
@@ -121,7 +121,8 @@ class MetadataBundle(object):
     ### SPECIAL METHODS ###
 
     def __and__(self, metadataBundle):
-        r'''Compute set-wise `and` of two metadata bundles:
+        r'''
+        Compute the set-wise `and` of two metadata bundles:
 
         ::
 
@@ -183,7 +184,8 @@ class MetadataBundle(object):
         return self != expr
 
     def __or__(self, metadataBundle):
-        r'''Compute set-wise `or` of two metadata bundles:
+        r'''
+        Compute the set-wise `or` of two metadata bundles:
 
         ::
 
@@ -227,7 +229,8 @@ class MetadataBundle(object):
             )
 
     def __sub__(self, metadataBundle):
-        r'''Compute set-wise `subtraction` of two metadata bundles:
+        r'''
+        Compute the set-wise `subtraction` of two metadata bundles:
 
         ::
 
@@ -258,7 +261,8 @@ class MetadataBundle(object):
             )
 
     def __xor__(self, metadataBundle):
-        r'''Compute set-wise `exclusive or` of two metadata bundles:
+        r'''
+        Compute the set-wise `exclusive or` of two metadata bundles:
 
         ::
 
@@ -431,12 +435,6 @@ class MetadataBundle(object):
     def clear(self):
         self._metadataEntries.clear()
 
-    def difference(self, metadataBundle):
-        return self._apply_set_operation(
-            metadataBundle, 
-            'difference',
-            )
-
     @staticmethod
     def corpusPathToKey(filePath, number=None):
         '''Given a file path or corpus path, return the meta-data path
@@ -480,9 +478,42 @@ class MetadataBundle(object):
                 os.remove(self.filePath)
         return self
 
+    def difference(self, metadataBundle):
+        r'''
+        Compute the set-wise difference of two metadata bundles:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> tripleMeterBundle = coreBundle.search('3/4')
+            >>> tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+        ::
+
+            >>> bachBundle.difference(tripleMeterBundle)
+            <music21.metadata.bundles.MetadataBundle {17 entries}>
+
+        Emit new metadata bundle.
+        '''
+        return self._apply_set_operation(
+            metadataBundle, 
+            'difference',
+            )
+
     @classmethod
     def fromCoreCorpus(cls):
-        r'''Return a metadata bundle for the core corpus.
+        r'''
+        Return a metadata bundle for the core corpus.
         
         Read from disk and cache it in memory if the bundle doesn't already
         exist, otherwise pull from memory:
@@ -505,7 +536,8 @@ class MetadataBundle(object):
 
     @classmethod
     def fromLocalCorpus(cls):
-        r'''Return a metadata bundle for the local corpus.
+        r'''
+        Return a metadata bundle for the local corpus.
         
         Read from disk and cache it in memory if the bundle doesn't already
         exist, otherwise pull from memory:
@@ -528,7 +560,8 @@ class MetadataBundle(object):
 
     @classmethod
     def fromVirtualCorpus(cls):
-        r'''Return a metadata bundle for the virtual corpus.
+        r'''
+        Return a metadata bundle for the virtual corpus.
         
         Read from disk and cache it in memory if the bundle doesn't already
         exist, otherwise pull from memory:
@@ -550,22 +583,150 @@ class MetadataBundle(object):
         return bundle
 
     def intersection(self, metadataBundle):
+        r'''
+        Compute the set-wise intersection of two metadata bundles:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> tripleMeterBundle = coreBundle.search('3/4')
+            >>> tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+        ::
+
+            >>> bachBundle.intersection(tripleMeterBundle)
+            <music21.metadata.bundles.MetadataBundle {4 entries}>
+
+        Emit new metadata bundle.
+        '''
         return self._apply_set_operation(
             metadataBundle, 
             'intersection',
             )
 
     def isdisjoint(self, metadataBundle):
+        r'''
+        True if the set of keys in one metadata bundle are disjoint with
+        the set of keys in another:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> beethovenBundle
+            <music21.metadata.bundles.MetadataBundle {16 entries}>
+
+        ::
+
+            >>> bachBundle.isdisjoint(beethovenBundle)
+            True
+
+        ::
+
+            >>> tripleMeterBundle = coreBundle.search('3/4')
+            >>> tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+        ::
+
+            >>> bachBundle.isdisjoint(tripleMeterBundle)
+            False
+
+        Return boolean.
+        '''
         return self._apply_set_predicate(metadataBundle, 'isdisjoint')
 
     def issubset(self, metadataBundle):
+        r'''
+        True if the set of keys in one metadata bundle are a subset of
+        the keys in another:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> tripleMeterBachBundle = bachBundle.search('3/4')
+            >>> tripleMeterBachBundle
+            <music21.metadata.bundles.MetadataBundle {4 entries}>
+
+        ::
+
+            >>> tripleMeterBachBundle.issubset(bachBundle)
+            True
+
+        ::
+
+            >>> bachBundle.issubset(tripleMeterBachBundle)
+            False
+
+        Return boolean.
+        '''
         return self._apply_set_predicate(metadataBundle, 'issubset')
 
     def issuperset(self, metadataBundle):
+        r'''
+        True if the set of keys in one metadata bundle are a superset of
+        the keys in another:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> tripleMeterBachBundle = bachBundle.search('3/4')
+            >>> tripleMeterBachBundle
+            <music21.metadata.bundles.MetadataBundle {4 entries}>
+
+        ::
+
+            >>> tripleMeterBachBundle.issuperset(bachBundle)
+            False
+
+        ::
+
+            >>> bachBundle.issuperset(tripleMeterBachBundle)
+            True
+
+        Return boolean.
+        '''
         return self._apply_set_predicate(metadataBundle, 'issuperset')
 
     def read(self, filePath=None):
-        '''
+        r'''
         Load self from the file path suggested by the name 
         of this MetadataBundle.
         
@@ -590,7 +751,7 @@ class MetadataBundle(object):
         return self
 
     def search(self, query, field=None, fileExtensions=None):
-        '''
+        r'''
         Perform search, on all stored metadata, permit regular expression 
         matching. 
 
@@ -660,12 +821,64 @@ class MetadataBundle(object):
         return newMetadataBundle
 
     def symmetric_difference(self, metadataBundle):
+        r'''
+        Compute the set-wise symmetric differnce of two metadata bundles:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> tripleMeterBundle = coreBundle.search('3/4')
+            >>> tripleMeterBundle
+            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+        ::
+
+            >>> bachBundle.symmetric_difference(tripleMeterBundle)
+            <music21.metadata.bundles.MetadataBundle {2025 entries}>
+
+        Emit new metadata bundle.
+        '''
         return self._apply_set_operation(
             metadataBundle, 
             'symmetric_difference',
             )
 
     def union(self, metadataBundle):
+        r'''
+        Compute the set-wise union of two metadata bundles:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+
+        ::
+
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> bachBundle
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> beethovenBundle
+            <music21.metadata.bundles.MetadataBundle {16 entries}>
+
+        ::
+
+            >>> bachBundle.union(beethovenBundle)
+            <music21.metadata.bundles.MetadataBundle {37 entries}>
+
+        Emit new metadata bundle.
+        '''
         return self._apply_set_operation(
             metadataBundle,
             'union',
@@ -709,7 +922,7 @@ class MetadataBundle(object):
         return len(invalidatedKeys)
 
     def write(self):
-        '''
+        r'''
         Write the JSON _metadataEntries of all Metadata or 
         RichMetadata contained in this object. 
 
