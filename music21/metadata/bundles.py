@@ -1066,10 +1066,31 @@ class MetadataBundle(object):
 
     def write(self, filePath=None):
         r'''
-        Write the JSON _metadataEntries of all Metadata or RichMetadata 
-        contained in this object. 
+        Write the metadata bundle to disk as a JSON file.
 
-        TODO: Test!
+        If `filePath` is None, use `self.filePath`.
+       
+        Returns the metadata bundle.
+
+        ::
+
+            >>> bachBundle = metadata.MetadataBundle.fromCoreCorpus().search(
+            ...     'bach', 'composer')
+            >>> bachBundle.filePath is None
+            True
+
+        ::
+
+            >>> import os
+            >>> import tempfile
+            >>> tempFilePath = tempfile.mkstemp()[1]
+            >>> bachBundle.write(filePath=tempFilePath) 
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> os.remove(tempFilePath)
+
         '''
         filePath = filePath or self.filePath
         if self.filePath is not None:
