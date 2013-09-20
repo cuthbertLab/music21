@@ -314,7 +314,7 @@ def corpusMelodicIntervalSearchBrief(show=False):
         for metadataEntry in corpus.search(region, 'locale'):
             workCount += 1
             score = converter.parse(
-                metadataEntry.filePath,
+                metadataEntry.sourcePath,
                 number=metadataEntry.number,
                 )
             intervalDict = melodicIntervalDiversity.countMelodicIntervals(
