@@ -80,16 +80,16 @@ class MetadataEntry(object):
         return MetadataBundle.corpusPathToKey(self.sourcePath, self.number)
 
     @property
-    def sourcePath(self):
-        return self._sourcePath
-
-    @property
     def metadataPayload(self):
         return self._metadataPayload
 
     @property
     def number(self):
         return self._number
+
+    @property
+    def sourcePath(self):
+        return self._sourcePath
 
 
 #------------------------------------------------------------------------------
@@ -150,8 +150,31 @@ class MetadataBundle(object):
             )
 
     def __eq__(self, expr):
-        if type(self) == type(other):
-            if self._metadataEntries == other._metadataEntries:
+        '''
+        True if `expr` is of the same type, and contains an identical set of
+        entries, otherwise false:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> bachBundle == beethovenBundle
+            False
+
+        ::
+
+            >>> bachBundle == coreBundle.search('bach', 'composer')
+            True
+
+        ::
+
+            >>> bachBundle == 'foo'
+            False
+
+        '''
+        if type(self) == type(expr):
+            if self._metadataEntries == expr._metadataEntries:
                 return True
         return False
 
@@ -454,20 +477,18 @@ class MetadataBundle(object):
             jobProcessor = metadata.JobProcessor.process_parallel
         else:
             jobProcessor = metadata.JobProcessor.process_serial
-        for results, errors, lastJobFilePath, remainingJobs in jobProcessor(
-            jobs):
+        for result in jobProcessor(jobs):
             metadata.JobProcessor.report(
                 len(jobs),
-                remainingJobs,
-                lastJobFilePath,
+                result['remainingJobs'],
+                result['filePath'],
                 len(accumulatedErrors),
                 )
             currentIteration += 1
-            accumulatedResults.extend(results)
-            accumulatedErrors.extend(errors)
-            for metadataEntry in results:
+            accumulatedResults.extend(result['metadataEntries'])
+            accumulatedErrors.extend(result['errors'])
+            for metadataEntry in result['metadataEntries']:
                 self._metadataEntries[metadataEntry.corpusPath] = metadataEntry
-                #self._metadataEntries[corpusPath] = richMetadata
             if (currentIteration % 50) == 0:
                 self.write()
         self.validate()
@@ -517,23 +538,23 @@ class MetadataBundle(object):
 
         '''
         if 'corpus' in filePath and 'music21' in filePath:
-            cp = filePath.split('corpus')[-1] # get filePath after corpus
+            corpusPath = filePath.split('corpus')[-1] # get filePath after corpus
         else:
-            cp = filePath
+            corpusPath = filePath
     
-        if cp.startswith(os.sep):
-            cp = cp[1:]
+        if corpusPath.startswith(os.sep):
+            corpusPath = corpusPath[1:]
     
-        cp = cp.replace('/', '_')
-        cp = cp.replace(os.sep, '_')
-        cp = cp.replace('.', '_')
+        corpusPath = corpusPath.replace('/', '_')
+        corpusPath = corpusPath.replace(os.sep, '_')
+        corpusPath = corpusPath.replace('.', '_')
     
         # append name to metadata path
         if number == None:
-            return cp
+            return corpusPath
         else:
             # append work number
-            return cp+'_%s' % number
+            return corpusPath+'_%s' % number
     
     def delete(self):
         r'''
@@ -815,18 +836,32 @@ class MetadataBundle(object):
 
     def read(self, filePath=None):
         r'''
-        Load self from the file path suggested by the name 
-        of this MetadataBundle.
+        Load cached metadata from the file path suggested by the name of this 
+        MetadataBundle ('core', 'local', or 'virtual').
         
-        If filePath is None (typical), run self.filePath.
+        If a specific filepath is given with the `filePath` keyword, attempt to
+        load cached metadata from the file at that location.
+
+        If `filePath` is None, and `self.filePath` is also None, do nothing.
+
+        ::
+
+            >>> anonymousBundle = metadata.MetadataBundle().read()
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle('core').read()
+
         '''
         timer = common.Timer()
         timer.start()
         if filePath is None:
             filePath = self.filePath
-        if not os.path.exists(filePath):
-            environLocal.warn('no metadata found for: %s; try building cache with corpus.cacheMetadata("%s")' % (self.name, self.name))
-            return
+        if filePath is None or not os.path.exists(filePath):
+            environLocal.warn('no metadata found for: {0!r}; '
+            'try building cache with corpus.cacheMetadata({1!r})'.format(
+                self.name, self.name))
+            return self
         jst = freezeThaw.JSONThawer(self)
         jst.jsonRead(filePath)
         environLocal.printDebug([
@@ -1029,13 +1064,14 @@ class MetadataBundle(object):
         environLocal.warn(message)
         return len(invalidatedKeys)
 
-    def write(self):
+    def write(self, filePath=None):
         r'''
         Write the JSON _metadataEntries of all Metadata or RichMetadata 
         contained in this object. 
 
         TODO: Test!
         '''
+        filePath = filePath or self.filePath
         if self.filePath is not None:
             filePath = self.filePath
             environLocal.warn(['MetadataBundle: writing:', filePath])

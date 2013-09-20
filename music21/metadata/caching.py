@@ -19,6 +19,7 @@ import time
 import traceback
 import unittest
 
+from music21 import common
 from music21 import exceptions21
 
 
@@ -41,7 +42,12 @@ class MetadataCacheException(exceptions21.Music21Exception):
 
 def cacheMetadata(domains=('local', 'core', 'virtual')): 
     '''
-    The core cache is all locally-stored corpus files. 
+    Cache metadata from corpuses in `domains` as local cache files:
+
+    ::
+
+        >>> metadata.cacheMetadata('core')
+
     '''
     from music21 import corpus
     from music21 import metadata
@@ -81,7 +87,7 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
             paths, printDebugAfter=1) 
         environLocal.warn(
             'cache: writing time: {0} md items: {1}'.format(
-                timer, len(metadataBundle.storage)))
+                timer, len(metadataBundle)))
         del metadataBundle
 
     environLocal.warn('cache: final writing time: {0} seconds'.format(timer))
@@ -105,6 +111,7 @@ class MetadataCachingJob(object):
         >>> job()
         ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
         >>> results = job.getResults()
+        >>> errors = job.getErrors()
 
     '''
     
@@ -255,6 +262,37 @@ class MetadataCachingJob(object):
 
 
 class JobProcessor(object):
+    '''
+    Processes metadata-caching jobs, either serially (e.g. single-threaded) or
+    in parallel, as a generator.
+
+    Yields a dictionary of:
+    
+    * MetadataEntry instances
+    * failed file paths
+    * the last processed file path
+    * the number of remaining jobs
+
+    ::
+
+        >>> jobs = []
+        >>> for corpusPath in corpus.getMonteverdiMadrigals()[:5]:
+        ...     job = metadata.MetadataCachingJob(
+        ...         corpusPath,
+        ...         useCorpus=True,
+        ...         )
+        ...     jobs.append(job)
+        >>> jobGenerator = metadata.JobProcessor.process_serial(jobs)
+        >>> for result in jobGenerator:
+        ...     print result['metadataEntries'], result['remainingJobs']
+        ...
+        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_1_mxl>,) 4
+        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_2_mxl>,) 3
+        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_3_mxl>,) 2
+        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_4_mxl>,) 1
+        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_5_mxl>,) 0
+
+    '''
 
     ### PUBLIC METHODS ###
 
@@ -280,7 +318,12 @@ class JobProcessor(object):
                 results = job.getResults()
                 errors = job.getErrors()
                 remainingJobs -= 1
-                yield results, errors, job.filePath, remainingJobs
+                yield {
+                    'metadataEntries': results, 
+                    'errors': errors, 
+                    'filePath': job.filePath, 
+                    'remainingJobs': remainingJobs,
+                    }
         for worker in workers:
             job_queue.put(None)
         job_queue.join()
@@ -298,7 +341,12 @@ class JobProcessor(object):
         for i, job in enumerate(jobs):
             results, errors = job()
             remainingJobs -= 1
-            yield results, errors, job.filePath, remainingJobs
+            yield {
+                'metadataEntries': results, 
+                'errors': errors, 
+                'filePath': job.filePath, 
+                'remainingJobs': remainingJobs,
+                }
         raise StopIteration
 
     @staticmethod
@@ -317,6 +365,10 @@ class JobProcessor(object):
 
 
 class WorkerProcess(multiprocessing.Process):
+    '''
+    A worker process for use by the multithreaded metadata-caching job
+    processor.
+    '''
     
     ### INITIALIZER ###
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         primitives.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 # Project License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 import datetime
@@ -34,7 +34,7 @@ class Date(object):
     A single date value, specified by year, month, day, hour, minute, and
     second. Note that this class has been created, instead of using Python's
     datetime, to provide greater flexibility for processing unconventional
-    dates, ancient dates, dates with error, and date ranges. 
+    dates, ancient dates, dates with error, and date ranges.
 
     The :attr:`~music21.metadata.Date.datetime` property can be used to
     retrieve a datetime object when necessary.
@@ -44,7 +44,7 @@ class Date(object):
 
     Data objects are fundamental components of
     :class:`~music21.metadata.DateSingle` and related subclasses that represent
-    single dates and date ranges. 
+    single dates and date ranges.
 
     ::
 
@@ -64,7 +64,7 @@ class Date(object):
         'uncertain'
 
     '''
-    
+
     ### CLASS VARIABLES ###
 
     approximateSymbols = ['~', 'x']
@@ -98,17 +98,17 @@ class Date(object):
                 value, error = self._stripError(keywords[attr])
                 setattr(self, attr, value)
                 if error != None:
-                    setattr(self, attr+'Error', error)            
+                    setattr(self, attr + 'Error', error)
         for attr in self.attrNames:
             attr = attr + 'Error'
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
 
     ### SPECIAL METHODS ###
-    
+
     def __str__(self):
         r'''
-        Return a string representation, including error if defined. 
+        Return a string representation, including error if defined.
 
         ::
 
@@ -122,13 +122,13 @@ class Date(object):
         # cannot use this, as it does not support dates lower than 1900!
         msg = []
         if self.hour == None and self.minute == None and self.second == None:
-            breakIndex = 3 # index
+            breakIndex = 3  # index
         for i in range(len(self.attrNames)):
             if i >= breakIndex:
                 break
             attr = self.attrNames[i]
             value = getattr(self, attr)
-            error = getattr(self, attr+'Error')
+            error = getattr(self, attr + 'Error')
             if value == None:
                 msg.append('--')
             else:
@@ -164,7 +164,7 @@ class Date(object):
             ('234.43', None)
 
         '''
-        if common.isNum(value): # if a number, let pass
+        if common.isNum(value):  # if a number, let pass
             return value, None
         else:
             dateStr = value
@@ -188,7 +188,7 @@ class Date(object):
     @staticmethod
     def errorToSymbol(value):
         r'''
-        Convert an error string (appoximate, uncertain) into a symbol.
+        Convert an error string (approximate, uncertain) into a symbol.
 
         ::
 
@@ -209,7 +209,7 @@ class Date(object):
     def load(self, value):
         r'''
         Load values by string, datetime object, or Date object:
-        
+
         ::
 
             >>> a = metadata.Date(year=1843, month=3, day=3)
@@ -226,7 +226,7 @@ class Date(object):
         elif isinstance(value, Date):
             self.loadOther(value)
         else:
-            raise exceptions21.MetadataException('Cannot load data: %s' % value)    
+            raise exceptions21.MetadataException('Cannot load data: %s' % value)
 
     def loadDatetime(self, dt):
         r'''
@@ -238,7 +238,7 @@ class Date(object):
             >>> dt = datetime.datetime(2005, 02, 01)
             >>> dt
             datetime.datetime(2005, 2, 1, 0, 0)
-        
+
         ::
 
             >>> m21mdDate = metadata.Date()
@@ -257,7 +257,7 @@ class Date(object):
     def loadOther(self, other):
         r'''
         Load values based on another Date object:
-        
+
         ::
 
             >>> a = metadata.Date(year=1843, month=3, day=3)
@@ -274,7 +274,7 @@ class Date(object):
     def loadStr(self, dateStr):
         r'''
         Load a string date representation.
-        
+
         Assume `year/month/day/hour:minute:second`:
 
         ::
@@ -313,17 +313,17 @@ class Date(object):
         dateStr = dateStr.replace(' ', '')
         for chunk in dateStr.split('/'):
             value, error = self._stripError(chunk)
-            post.append(value) 
+            post.append(value)
             postError.append(error)
         # as error is stripped, we can now convert to numbers
         if len(post) > 0 and post[0] != '':
             post = [int(x) for x in post]
         # assume in order in post list
         for i in range(len(self.attrNames)):
-            if len(post) > i: # only assign for those specified
+            if len(post) > i:  # only assign for those specified
                 setattr(self, self.attrNames[i], post[i])
                 if postError[i] != None:
-                    setattr(self, self.attrNames[i]+'Error', postError[i])            
+                    setattr(self, self.attrNames[i] + 'Error', postError[i])
 
     ### PUBLIC PROPERTIES ###
 
@@ -331,7 +331,7 @@ class Date(object):
     def datetime(self):
         r'''
         Get a datetime object from a metadata.Date() object
-        
+
         ::
 
             >>> a = metadata.Date(year=1843, month=3, day=3)
@@ -361,7 +361,7 @@ class Date(object):
         '''
         post = []
         # order here is order for datetime
-        # TODO: need defaults for incomplete times. 
+        # TODO: need defaults for incomplete times.
         for attr in self.attrNames:
             # need to be integers
             value = getattr(self, attr)
@@ -374,7 +374,7 @@ class Date(object):
     def hasTime(self):
         r'''
         Return True if any time elements are defined:
-        
+
         ::
 
             >>> a = metadata.Date(year=1843, month=3, day=3)
@@ -397,13 +397,13 @@ class Date(object):
     def hasError(self):
         r'''
         Return True if any data points have error defined:
-        
+
         ::
 
             >>> a = metadata.Date(
-            ...     year=1843, 
-            ...     month=3, 
-            ...     day=3, 
+            ...     year=1843,
+            ...     month=3,
+            ...     day=3,
             ...     dayError='approximate',
             ...     )
             >>> a.hasError
@@ -412,17 +412,17 @@ class Date(object):
         ::
 
             >>> b = metadata.Date(
-            ...     year=1843, 
-            ...     month=3, 
-            ...     day=3, 
+            ...     year=1843,
+            ...     month=3,
+            ...     day=3,
             ...     minute=3,
             ...     )
             >>> b.hasError
             False
-            
+
         '''
         for attr in self.attrNames:
-            if getattr(self, attr+'Error') != None:
+            if getattr(self, attr + 'Error') != None:
                 return True
         return False
 
@@ -436,8 +436,8 @@ class DateSingle(object):
 
     The relevance attribute is limited within each DateSingle subclass
     depending on the design of the class. Alternative relevance types should be
-    configured as other DateSingle subclasses. 
-    
+    configured as other DateSingle subclasses.
+
     ::
         >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
         >>> str(dd)
@@ -463,20 +463,20 @@ class DateSingle(object):
     ### INITIALIZER ###
 
     def __init__(self, data='', relevance='certain'):
-        self._data = [] # store a list of one or more Date objects
-        self._relevance = None # managed by property
+        self._data = []  # store a list of one or more Date objects
+        self._relevance = None  # managed by property
         # not yet implemented
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataError = [] # store a list of one or more strings
+        self._dataError = []  # store a list of one or more strings
         self._prepareData(data)
-        self.relevance = relevance # will use property
-    
+        self.relevance = relevance  # will use property
+
     ### SPECIAL METHODS ###
 
     def __str__(self):
-        return str(self._data[0]) # always the first
+        return str(self._data[0])  # always the first
 
     ### PRIVATE METHODS ###
 
@@ -484,9 +484,9 @@ class DateSingle(object):
         r'''
         Assume a string is supplied as argument
         '''
-        # here, using a list to store one object; this provides more 
+        # here, using a list to store one object; this provides more
         # compatability  w/ other formats
-        self._data = [] # clear list
+        self._data = []  # clear list
         self._data.append(Date())
         self._data[0].load(data)
 
@@ -496,7 +496,7 @@ class DateSingle(object):
     def datetime(self):
         r'''
         Get a datetime object.
-        
+
         ::
 
             >>> a = metadata.DateSingle('1843/03/03')
@@ -519,19 +519,21 @@ class DateSingle(object):
         return self._data[0].datetime
 
     @apply
-    def relevance(): # @NoSelf
+    def relevance():  # @NoSelf
         def fget(self):
             return self._relevance
+
         def fset(self, value):
             if value in ['certain', 'approximate', 'uncertain']:
                 self._relevance = value
                 self._dataError = []
-                # only here is dataError the same as relevance 
+                # only here is dataError the same as relevance
                 self._dataError.append(value)
             else:
                 raise exceptions21.MetadataException(
                     'Relevance value is not supported by this object: '
                     '{0!r}'.format(value))
+
         return property(**locals())
 
 
@@ -629,14 +631,14 @@ class DateBetween(DateSingle):
         for part in data:
             d = Date()
             d.load(part)
-            self._data.append(d) # a list of Date objects
+            self._data.append(d)  # a list of Date objects
             # can look at Date and determine overall error
             self._dataError.append(None)
 
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def relevance(): # @NoSelf
+    def relevance():  # @NoSelf
         def fget(self):
             return self._relevance
         def fset(self, value):
@@ -698,7 +700,7 @@ class DateSelection(DateSingle):
         for part in data:
             d = Date()
             d.load(part)
-            self._data.append(d) # a lost of Date objects
+            self._data.append(d)  # a lost of Date objects
             # can look at Date and determine overall error
             self._dataError.append(None)
 
@@ -708,22 +710,24 @@ class DateSelection(DateSingle):
     def relevance():  # @NoSelf
         def fget(self):
             return self._relevance
+
         def fset(self, value):
             if value not in ['or']:
                 raise exceptions21.MetadataException(
                     'Relevance value is not supported by this object: '
                     '{0!r}'.format(value))
             self._relevance = value
+
         return property(**locals())
 
 
 #------------------------------------------------------------------------------
 
 
-class Text(object): 
+class Text(object):
     r'''
-    One unit of text data: a title, a name, or some other text data. Store the 
-    string and a language name or code. This object can be used and/or 
+    One unit of text data: a title, a name, or some other text data. Store the
+    string and a language name or code. This object can be used and/or
     subclassed for a variety for of text storage.
 
     ::
@@ -737,18 +741,18 @@ class Text(object):
     ### INITIALIZER ###
 
     def __init__(self, data='', language=None):
-        if isinstance(data, Text): # if this is a Text obj, get data
+        if isinstance(data, type(self)):  # if this is a Text obj, get data
             # accessing private attributes here; not desirable
             self._data = data._data
             self._language = data._language
-        else:            
+        else:
             self._data = data
             self._language = language
 
     ### SPECIAL METHODS ###
 
     def __str__(self):
-        #print type(self._data)
+        # print type(self._data)
         if isinstance(self._data, unicode):
             # not sure if this should be wrapped in in str() call
             return self._data.encode('utf-8')
@@ -758,22 +762,24 @@ class Text(object):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def language(): # @NoSelf
+    def language():  # @NoSelf
         def fget(self):
             r'''
             Set the language of the Text stored within.
-            
+
             ::
 
                 >>> t = metadata.Text('my text')
                 >>> t.language = 'en'
-                >>> t.language  
+                >>> t.language
                 'en'
 
             '''
             return self._language
+
         def fset(self, value):
             self._language = value
+
         return property(**locals())
 
     ### PUBLIC METHODS ###
@@ -781,7 +787,7 @@ class Text(object):
     def getNormalizedArticle(self):
         r'''
         Return a string representation with normalized articles.
-        
+
         ::
 
             >>> td = metadata.Text('Ale is Dear, The', 'en')
@@ -837,25 +843,25 @@ class Contributor(object):
     # !!!COM: Composer's name.
     # !!!COA: Attributed composer.
     # !!!COS: Suspected composer.
-    # !!!COL: Composer abbreviated, alias, 
+    # !!!COL: Composer abbreviated, alias,
     # !!!COC: Composer(s) corporate name.
-    # !!!LYR: Lyricist. 
-    # !!!LIB: Librettist. 
-    # !!!LAR: Arranger. 
-    # !!!LOR: Orchestrator. 
-    # !!!TRN: Translator of text. 
+    # !!!LYR: Lyricist.
+    # !!!LIB: Librettist.
+    # !!!LAR: Arranger.
+    # !!!LOR: Orchestrator.
+    # !!!TRN: Translator of text.
 
     roleAbbreviationsDict = {
-        'com' : 'composer',
-        'coa' : 'attributedComposer',
-        'cos' : 'suspectedComposer',
-        'col' : 'composerAlias',
-        'coc' : 'composerCorporate',
-        'lyr' : 'lyricist',
-        'lib' : 'librettist',
-        'lar' : 'arranger',
-        'lor' : 'orchestrator',
-        'trn' : 'translator',
+        'com': 'composer',
+        'coa': 'attributedComposer',
+        'cos': 'suspectedComposer',
+        'col': 'composerAlias',
+        'coc': 'composerCorporate',
+        'lyr': 'lyricist',
+        'lib': 'librettist',
+        'lar': 'arranger',
+        'lor': 'orchestrator',
+        'trn': 'translator',
         }
 
     roleAbbreviations = roleAbbreviationsDict.keys()
@@ -864,18 +870,18 @@ class Contributor(object):
 
     ### INITIALIZER ###
 
-    def __init__(self, *args, **keywords ):
+    def __init__(self, *args, **keywords):
         if 'role' in keywords:
             # stored in self._role
-            self.role = keywords['role'] # validated with property
+            self.role = keywords['role']  # validated with property
         else:
             self.role = None
-        # a list of Text objects to support various spellings or 
+        # a list of Text objects to support various spellings or
         # language translatiions
         self._names = []
-        if 'name' in keywords: # a single
+        if 'name' in keywords:  # a single
             self._names.append(Text(keywords['name']))
-        if 'names' in keywords: # many
+        if 'names' in keywords:  # many
             for n in keywords['names']:
                 self._names.append(Text(n))
         # store the nationality, if known
@@ -893,13 +899,13 @@ class Contributor(object):
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
-        
+
         ::
 
             >>> a = metadata.Contributor(
-            ...     name='Beethoven, Ludwig van', 
-            ...     role='composer', 
-            ...     birth='1770/12/17', 
+            ...     name='Beethoven, Ludwig van',
+            ...     role='composer',
+            ...     birth='1770/12/17',
             ...     death='1827/3/26',
             ...     )
             >>> a.role
@@ -924,22 +930,22 @@ class Contributor(object):
         if self._dateRange[0] != None and self._dateRange[1] != None:
             b = self._dateRange[0].datetime
             d = self._dateRange[1].datetime
-            return d-b
+            return d - b
         else:
             return None
 
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def name(): # @NoSelf
+    def name():  # @NoSelf
         def fget(self):
             r'''
-            Returns the text name, or the first of many names entered. 
+            Returns the text name, or the first of many names entered.
 
             ::
 
                 >>> td = metadata.Contributor(
-                ...     role='composer', 
+                ...     role='composer',
                 ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
                 ...     )
                 >>> td.name
@@ -953,10 +959,12 @@ class Contributor(object):
             '''
             # return first name
             return str(self._names[0])
+
         def fset(self, value):
             # return first name
-            self._names = [] # reset
+            self._names = []  # reset
             self._names.append(Text(value))
+
         return property(**locals())
 
     @property
@@ -967,7 +975,7 @@ class Contributor(object):
         ::
 
             >>> td = metadata.Contributor(
-            ...     role='composer', 
+            ...     role='composer',
             ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
             ...     )
             >>> td.names
@@ -1058,10 +1066,10 @@ class Contributor(object):
 class Creator(Contributor):
     r'''
     A person that created a work. Can be a composer, lyricist, arranger, or
-    other type of contributor. 
-    
+    other type of contributor.
+
     In MusicXML, these are "creator" elements.
-    
+
     ::
 
         >>> td = metadata.Creator(role='composer', name='Chopin, Fryderyk')
@@ -1097,18 +1105,18 @@ class Imprint(object):
     r'''
     An object representation of imprint, or publication.
     '''
-    def __init__(self, *args, **keywords ):
+    def __init__(self, *args, **keywords):
         pass
 
-# !!!PUB: Publication status. 
-# !!!PPR: First publisher. 
-# !!!PDT: Date first published. 
-# !!!PPP: Place first published. 
-# !!!PC#: Publisher's catalogue number. 
+# !!!PUB: Publication status.
+# !!!PPR: First publisher.
+# !!!PDT: Date first published.
+# !!!PPP: Place first published.
+# !!!PC#: Publisher's catalogue number.
 # !!!SCT: Scholarly catalogue abbreviation and number. E.g. BWV 551
 # !!!SCA: Scholarly catalogue (unabbreviated) name. E.g.Koechel 117.
-# !!!SMS: Manuscript source name. 
-# !!!SML: Manuscript location. 
+# !!!SMS: Manuscript source name.
+# !!!SML: Manuscript location.
 # !!!SMA: Acknowledgement of manuscript access.
 
 
@@ -1119,18 +1127,18 @@ class Copyright(object):
     r'''
     An object representation of copyright.
     '''
-    def __init__(self, *args, **keywords ):
+    def __init__(self, *args, **keywords):
         pass
 
-# !!!YEP: Publisher of electronic edition. 
-# !!!YEC: Date and owner of electronic copyright. 
+# !!!YEP: Publisher of electronic edition.
+# !!!YEC: Date and owner of electronic copyright.
 # !!!YER: Date electronic edition released.
-# !!!YEM: Copyright message. 
-# !!!YEN: Country of copyright. 
-# !!!YOR: Original document. 
-# !!!YOO: Original document owner. 
+# !!!YEM: Copyright message.
+# !!!YEN: Country of copyright.
+# !!!YOR: Original document.
+# !!!YOO: Original document owner.
 # !!!YOY: Original copyright year.
-# !!!YOE: Original editor. 
+# !!!YOE: Original editor.
 
 #------------------------------------------------------------------------------
 # supported work ids and abbreviations
@@ -1140,23 +1148,23 @@ class Copyright(object):
 #     'ota' : 'alternativeTitle',
 #     'opr' : 'parentTitle',
 #     'oac' : 'actNumber',
-# 
+#
 #     'osc' : 'sceneNumber',
 #     'omv' : 'movementNumber',
 #     'omd' : 'movementName',
 #     'ops' : 'opusNumber',
 #     'onm' : 'number',
-# 
+#
 #     'ovm' : 'volume',
 #     'ode' : 'dedication',
 #     'oco' : 'commission',
 #     'gtl' : 'groupTitle',
 #     'gaw' : 'associatedWork',
-# 
+#
 #     'gco' : 'collectionDesignation',
 #     'txo' : 'textOriginalLanguage',
 #     'txl' : 'textLanguage',
-# 
+#
 #     'ocy' : 'countryOfComposition',
 #     'opc' : 'localeOfComposition', # origin in abc
 
@@ -1174,13 +1182,13 @@ class Test(unittest.TestCase):
         from music21 import metadata
         import json
 
-        text = metadata.Text('my text')
+        text = metadata.primitives.Text('my text')
         text.language = 'en'
         jsf = freezeThaw.JSONFreezer(text)
         jsonDict = json.loads(jsf.json)
         self.assertEqual(jsonDict['__attr__'].keys(), [u'_language', u'_data'])
 
-        textNew = metadata.Text()
+        textNew = metadata.primitives.Text()
         jst = freezeThaw.JSONThawer(textNew)
         jst.json = jsf.json
 
@@ -1192,14 +1200,14 @@ class Test(unittest.TestCase):
         from music21 import metadata
         import json
 
-        contributor = metadata.Contributor(
-            role='composer', 
+        contributor = metadata.primitives.Contributor(
+            role='composer',
             name='Gilles Binchois',
             )
         self.assertEqual(contributor.role, 'composer')
         self.assertEqual(contributor.relevance, 'contributor')
         jsonStr = freezeThaw.JSONFreezer(contributor).json
-        contributorNew = metadata.Contributor()
+        contributorNew = metadata.primitives.Contributor()
         freezeThaw.JSONThawer(contributorNew).json = jsonStr
         self.assertEqual(contributorNew.role, 'composer')
         self.assertEqual(contributorNew.name, 'Gilles Binchois')
@@ -1208,14 +1216,16 @@ class Test(unittest.TestCase):
     def testCreator(self):
         from music21 import freezeThaw
         from music21 import metadata
-        import json
 
-        creator = metadata.Creator(role='composer', name='Gilles Binchois')
+        creator = metadata.primitives.Creator(
+            role='composer', 
+            name='Gilles Binchois',
+            )
         self.assertEqual(creator.role, 'composer')
         self.assertEqual(creator.relevance, 'creator')
 
         jsonStr = freezeThaw.JSONFreezer(creator).json
-        creatorNew = metadata.Contributor()
+        creatorNew = metadata.primitives.Contributor()
         freezeThaw.JSONThawer(creatorNew).json = jsonStr
         self.assertEqual(creatorNew.role, 'composer')
         self.assertEqual(creatorNew.name, 'Gilles Binchois')
@@ -1224,12 +1234,11 @@ class Test(unittest.TestCase):
     def testDate(self):
         from music21 import freezeThaw
         from music21 import metadata
-        import json
 
-        date1 = metadata.Date(year=1843, yearError='approximate')
-        date2 = metadata.Date(year='1843?')
-        
-        dateNew = metadata.Date()
+        date1 = metadata.primitives.Date(year=1843, yearError='approximate')
+        date2 = metadata.primitives.Date(year='1843?')
+
+        dateNew = metadata.primitives.Date()
 
         jsonStr = freezeThaw.JSONFreezer(date1).json
         freezeThaw.JSONThawer(dateNew).json = jsonStr
@@ -1237,7 +1246,7 @@ class Test(unittest.TestCase):
         self.assertEqual(dateNew.year, 1843)
         self.assertEqual(dateNew.yearError, 'approximate')
 
-        dateNew = metadata.Date()
+        dateNew = metadata.primitives.Date()
 
         jsonStr = freezeThaw.JSONFreezer(date2).json
         freezeThaw.JSONThawer(dateNew).json = jsonStr
@@ -1248,13 +1257,12 @@ class Test(unittest.TestCase):
     def testDateSingle(self):
         from music21 import freezeThaw
         from music21 import metadata
-        import json
 
-        dateSingle = metadata.DateSingle('2009/12/31', 'approximate')   
+        dateSingle = metadata.primitives.DateSingle('2009/12/31', 'approximate')
         self.assertEqual(str(dateSingle), '2009/12/31')
         self.assertEqual(len(dateSingle._data), 1)
 
-        dateSingleNew = metadata.DateSingle()
+        dateSingleNew = metadata.primitives.DateSingle()
         self.assertEqual(len(dateSingleNew._data), 1)
 
         jsonStr = freezeThaw.JSONFreezer(dateSingle).json
@@ -1268,14 +1276,13 @@ class Test(unittest.TestCase):
     def testDateRelative(self):
         from music21 import freezeThaw
         from music21 import metadata
-        import json
 
-        dateRelative = metadata.DateRelative('2001/12/31', 'prior')   
+        dateRelative = metadata.primitives.DateRelative('2001/12/31', 'prior')
         self.assertEqual(str(dateRelative), '2001/12/31')
         self.assertEqual(dateRelative.relevance, 'prior')
         self.assertEqual(len(dateRelative._data), 1)
 
-        dateSingleNew = metadata.DateSingle()
+        dateSingleNew = metadata.primitives.DateSingle()
 
         jsonStr = freezeThaw.JSONFreezer(dateRelative).json
         freezeThaw.JSONThawer(dateSingleNew).json = jsonStr
@@ -1288,15 +1295,15 @@ class Test(unittest.TestCase):
     def testDateBetween(self):
         from music21 import freezeThaw
         from music21 import metadata
-        import json
 
-        dateBetween = metadata.DateBetween(['2009/12/31', '2010/1/28'])   
+        dateBetween = metadata.primitives.DateBetween(
+            ('2009/12/31', '2010/1/28'))
         self.assertEqual(str(dateBetween), '2009/12/31 to 2010/01/28')
         self.assertEqual(dateBetween.relevance, 'between')
         self.assertEqual(dateBetween._dataError, [None, None])
         self.assertEqual(len(dateBetween._data), 2)
 
-        dateBetweenNew = metadata.DateBetween()
+        dateBetweenNew = metadata.primitives.DateBetween()
 
         jsonStr = freezeThaw.JSONFreezer(dateBetween).json
         freezeThaw.JSONThawer(dateBetweenNew).json = jsonStr
@@ -1309,23 +1316,22 @@ class Test(unittest.TestCase):
     def testDateSelection(self):
         from music21 import freezeThaw
         from music21 import metadata
-        import json
 
-        dateSelection = metadata.DateSelection(
+        dateSelection = metadata.primitives.DateSelection(
             ['2009/12/31', '2010/1/28', '1894/1/28'],
             'or',
             )
-        self.assertEqual(str(dateSelection), 
+        self.assertEqual(str(dateSelection),
             '2009/12/31 or 2010/01/28 or 1894/01/28')
         self.assertEqual(dateSelection.relevance, 'or')
         self.assertEqual(dateSelection._dataError, [None, None, None])
         self.assertEqual(len(dateSelection._data), 3)
 
-        dateSelectionNew = metadata.DateSelection()
+        dateSelectionNew = metadata.primitives.DateSelection()
 
         jsonStr = freezeThaw.JSONFreezer(dateSelection).json
         freezeThaw.JSONThawer(dateSelectionNew).json = jsonStr
-        
+
         self.assertEqual(len(dateSelectionNew._data), 3)
         self.assertEqual(dateSelectionNew._relevance, 'or')
         self.assertEqual(dateSelectionNew._dataError, [None, None, None])
@@ -1337,12 +1343,12 @@ class Test(unittest.TestCase):
 
 
 _DOC_ORDER = (
-    Text, 
-    Date, 
-    DateSingle, 
-    DateRelative, 
-    DateBetween, 
-    DateSelection, 
+    Text,
+    Date,
+    DateSingle,
+    DateRelative,
+    DateBetween,
+    DateSelection,
     Contributor,
     )
 
@@ -1350,11 +1356,11 @@ __all__ = [
     'Contributor',
     'Copyright',
     'Creator',
-    'Date', 
+    'Date',
     'DateBetween',
-    'DateRelative', 
+    'DateRelative',
     'DateSelection',
-    'DateSingle', 
+    'DateSingle',
     'Imprint',
     'Text',
     ]
