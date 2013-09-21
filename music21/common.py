@@ -1528,15 +1528,15 @@ def getCorpusContentDirs():
     'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina', 'ryansMammoth', 
     'schoenberg', 'schumann', 'schumann_clara', 'theoryExercises', 'trecento', 'verdi']
     '''
-    dirName = getCorpusFilePath()
-    post = []
+    directoryName = getCorpusFilePath()
+    result = []
     # dirs to exclude; all files will be retained
     exclude = ['__init__.py', 'base.py', 'metadataCache', 'virtual.py', 'chorales.py'] 
-    for fn in os.listdir(dirName):
-        if fn not in exclude:
-            if not fn.endswith('.pyc') and not fn.startswith('.'):
-                post.append(fn)
-    return post
+    for filename in os.listdir(directoryName):
+        if filename not in exclude:
+            if not filename.endswith('.pyc') and not filename.startswith('.'):
+                result.append(filename)
+    return sorted(result)
 
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',

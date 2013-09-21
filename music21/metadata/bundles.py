@@ -398,7 +398,6 @@ class MetadataBundle(object):
     def addFromPaths(
         self, 
         paths, 
-        printDebugAfter=0, 
         useCorpus=False,
         useMultiprocessing=True,
         ):
@@ -410,10 +409,6 @@ class MetadataBundle(object):
 
         Returns a list of file paths with errors and stores the extracted
         metadata in `self._metadataEntries`.
-        
-        If `printDebugAfter` is set to an int, say 100, then after every 100
-        files are parsed a message will be printed to stderr giving an update
-        on progress.
         
         ::
 

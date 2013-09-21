@@ -40,13 +40,19 @@ class MetadataCacheException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 
 
-def cacheMetadata(domains=('local', 'core', 'virtual')): 
+def cacheMetadata(
+    domains=('local', 'core', 'virtual'),
+    useMultiprocessing=True,
+    ):
     '''
     Cache metadata from corpuses in `domains` as local cache files:
 
     ::
 
-        >>> metadata.cacheMetadata('core')
+        >>> metadata.cacheMetadata(
+        ...     domains='core', 
+        ...     useMultiprocessing=False,
+        ...     )
 
     '''
     from music21 import corpus
@@ -84,7 +90,9 @@ def cacheMetadata(domains=('local', 'core', 'virtual')):
                 len(paths)))
         # returns any paths that failed to load
         failingFilePaths += metadataBundle.addFromPaths(
-            paths, printDebugAfter=1) 
+            paths,
+            useMultiprocessing=useMultiprocessing,
+            )
         environLocal.warn(
             'cache: writing time: {0} md items: {1}'.format(
                 timer, len(metadataBundle)))
@@ -356,7 +364,7 @@ class JobProcessor(object):
                 totalJobs - remainingJobs,
                 totalJobs,
                 filePathErrorCount,
-                os.path.relpath(filePath),
+                filePath,
                 )
         environLocal.warn(message)
 

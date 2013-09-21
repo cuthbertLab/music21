@@ -61,17 +61,17 @@ class ModuleIterator(Iterator):
 
         >>> iterator = documentation.ModuleIterator(verbose=False)
         >>> modules = [x for x in iterator]
-        >>> for module in modules[:8]:
+        >>> for module in sorted(modules, key=lambda x: x.__name__)[:8]:
         ...     module.__name__
         ...
-        'music21.articulations'
-        'music21.bar'
-        'music21.base'
-        'music21.beam'
-        'music21.chant'
-        'music21.chord'
-        'music21.clef'
-        'music21.common'
+        'music21.abc.base'
+        'music21.abc.translate'
+        'music21.analysis.correlate'
+        'music21.analysis.discrete'
+        'music21.analysis.metrical'
+        'music21.analysis.neoRiemannian'
+        'music21.analysis.patel'
+        'music21.analysis.reduceChords'
 
     '''
 
@@ -219,19 +219,20 @@ class FunctionIterator(Iterator):
 
         >>> iterator = documentation.FunctionIterator(verbose=False)
         >>> functions = [x for x in iterator]
-        >>> for function in functions[:10]:
+        >>> for function in sorted(functions,
+        ...     key=lambda x: (x.__module__, x.__name__))[:10]:
         ...     function.__module__, function.__name__
         ... 
-        ('music21.bar', 'standardizeBarStyle')
-        ('music21.bar', 'styleToMusicXMLBarStyle')
-        ('music21.base', 'mainTest')
-        ('music21.chant', 'fromStream')
-        ('music21.chord', 'fromForteClass')
-        ('music21.chord', 'fromIntervalVector')
-        ('music21.clef', 'clefFromString')
-        ('music21.common', 'almostEquals')
-        ('music21.common', 'almostEquals')
-        ('music21.common', 'approximateGCD')
+        ('music21.abc.base', 'mergeLeadingMetaData')
+        ('music21.abc.translate', 'abcToStreamOpus')
+        ('music21.abc.translate', 'abcToStreamPart')
+        ('music21.abc.translate', 'abcToStreamScore')
+        ('music21.abc.translate', 'reBar')
+        ('music21.analysis.discrete', 'analyzeStream')
+        ('music21.analysis.metrical', 'labelBeatDepth')
+        ('music21.analysis.metrical', 'thomassenMelodicAccent')
+        ('music21.analysis.neoRiemannian', 'L')
+        ('music21.analysis.neoRiemannian', 'LRP_combinations')
 
     '''
     

@@ -66,7 +66,7 @@ True
 
 >>> e = jsp.decode(d)
 >>> e
-[{u'hello': u'there'}, {u'hello': u'there'}]
+[{'hello': 'there'}, {'hello': 'there'}]
 
 >>> e[0] is e[1]
 False
