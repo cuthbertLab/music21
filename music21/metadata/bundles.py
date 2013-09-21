@@ -33,6 +33,43 @@ environLocal = environment.Environment(os.path.basename(__file__))
 
 
 class MetadataEntry(object):
+    '''
+    An entry in a metadata bundle.
+
+    The metadata entry holds information about the source of the metadata,
+    and can be parsed to reconstitute the score object the metadata was 
+    derived from:
+
+    ::
+
+        >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+        >>> metadataEntry = coreBundle.search('bwv66.6')[0]
+        >>> metadataEntry
+        <music21.metadata.bundles.MetadataEntry: bach_bwv66_6_mxl>
+
+    The source path of the metadata entry refers to the file path at which its
+    score file is found:
+
+    ::
+
+        >>> metadataEntry.sourcePath
+        u'music21/corpus/bach/bwv66.6.mxl'
+
+    The metadata payload contains its metadata object:
+
+    ::
+
+        >>> metadataEntry.metadataPayload
+        <music21.metadata.base.RichMetadata object at 0x...>
+
+    And the metadata entry can be parsed:
+
+    ::
+
+        >>> metadataEntry.parse()
+        <music21.stream.Score ...>
+
+    '''
     
     ### INITIALIZER ###
     
@@ -179,25 +216,245 @@ class MetadataBundle(object):
         return False
 
     def __ge__(self, metadataBundle):
+        '''
+        True when one metadata bundle is either a superset or an identical set 
+        to another bundle:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+
+        ::
+
+            >>> bachBundle >= bachBundle
+            True
+
+        ::
+
+            >>> bachBundle >= beethovenBundle
+            False
+
+        ::
+
+            >>> bachBundle >= coreBundle
+            False
+
+        ::
+
+            >>> beethovenBundle >= bachBundle
+            False
+
+        ::
+
+            >>> beethovenBundle >= beethovenBundle
+            True
+
+        ::
+
+            >>> beethovenBundle >= coreBundle
+            False
+
+        ::
+
+            >>> coreBundle >= bachBundle
+            True
+
+        ::
+            >>> coreBundle >= beethovenBundle
+            True
+
+        ::
+
+            >>> coreBundle >= coreBundle
+            True
+
+        Return boolean.
+        '''
         return self._apply_set_predicate(metadataBundle, '__ge__')
 
     def __getitem__(self, i):
         return self._metadataEntries.values()[i]
 
     def __gt__(self, metadataBundle):
+        '''
+        True when one metadata bundle is either a subset or an identical set to
+        another bundle:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+
+        ::
+
+            >>> bachBundle > bachBundle
+            False
+
+        ::
+
+            >>> bachBundle > beethovenBundle
+            False
+
+        ::
+
+            >>> bachBundle > coreBundle
+            False
+
+        ::
+
+            >>> beethovenBundle > bachBundle
+            False
+
+        ::
+
+            >>> beethovenBundle > beethovenBundle
+            False
+
+        ::
+
+            >>> beethovenBundle > coreBundle
+            False
+
+        ::
+
+            >>> coreBundle > bachBundle
+            True
+
+        ::
+            >>> coreBundle > beethovenBundle
+            True
+
+        ::
+
+            >>> coreBundle > coreBundle
+            False
+
+
+        Return boolean.
+        '''
         return self._apply_set_predicate(metadataBundle, '__gt__')
 
     def __le__(self, metadataBundle):
+        '''
+        True when one metadata bundle is either a subset or an identical set to
+        another bundle:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+
+        ::
+
+            >>> bachBundle <= bachBundle
+            True
+
+        ::
+
+            >>> bachBundle <= beethovenBundle
+            False
+
+        ::
+
+            >>> bachBundle <= coreBundle
+            True
+
+        ::
+
+            >>> beethovenBundle <= bachBundle
+            False
+
+        ::
+
+            >>> beethovenBundle <= beethovenBundle
+            True
+
+        ::
+
+            >>> beethovenBundle <= coreBundle
+            True
+
+        ::
+
+            >>> coreBundle <= bachBundle
+            False
+
+        ::
+            >>> coreBundle <= beethovenBundle
+            False
+
+        ::
+
+            >>> coreBundle <= coreBundle
+            True
+
+        Return boolean.
+        '''
         return self._apply_set_predicate(metadataBundle, '__le__')
-        assert isinstance(metadataBundle, type(self))
-        selfKeys = set(self._metadataEntries.keys())
-        otherKeys = set(metadataBundle._metadataEntries.keys())
-        return selfKeys.__le__(otherKeys)
 
     def __len__(self):
         return len(self._metadataEntries)
     
     def __lt__(self, metadataBundle):
+        '''
+        True when one metadata bundle is a subset of another bundle:
+
+        ::
+
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+            >>> bachBundle = coreBundle.search('bach', 'composer')
+            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+
+        ::
+
+            >>> bachBundle < bachBundle
+            False
+
+        ::
+
+            >>> bachBundle < beethovenBundle
+            False
+
+        ::
+
+            >>> bachBundle < coreBundle
+            True
+
+        ::
+
+            >>> beethovenBundle < bachBundle
+            False
+
+        ::
+
+            >>> beethovenBundle < beethovenBundle
+            False
+
+        ::
+
+            >>> beethovenBundle < coreBundle
+            True
+
+        ::
+
+            >>> coreBundle < bachBundle
+            False
+
+        ::
+            >>> coreBundle < beethovenBundle
+            False
+
+        ::
+
+            >>> coreBundle < coreBundle
+            False
+
+        Return boolean.
+        '''
         return self._apply_set_predicate(metadataBundle, '__lt__')
 
     def __ne__(self, expr):
