@@ -641,7 +641,8 @@ class MetadataBundle(object):
         '''
         from music21.corpus.base import _METADATA_BUNDLES
         domain = 'local'
-        if domain in _METADATA_BUNDLES and _METADATA_BUNDLES[domain]:
+        if domain in _METADATA_BUNDLES and \
+            _METADATA_BUNDLES[domain] is not None:
             return _METADATA_BUNDLES[domain]
         bundle = cls(domain).read()
         _METADATA_BUNDLES[domain] = bundle

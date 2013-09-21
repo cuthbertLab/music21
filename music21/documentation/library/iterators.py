@@ -185,20 +185,21 @@ class ClassIterator(Iterator):
     ::
 
         >>> iterator = documentation.ClassIterator(verbose=False)
-        >>> classes = [x for x in iterator]
+        >>> classes = sorted([x for x in iterator],
+        ...     key=lambda x: (x.__module__, x.__name__))
         >>> for cls in classes[:10]:
         ...     cls
         ... 
-        <class 'music21.articulations.Accent'>
-        <class 'music21.articulations.Articulation'>
-        <class 'music21.articulations.ArticulationException'>
-        <class 'music21.articulations.Bowing'>
-        <class 'music21.articulations.BrassIndication'>
-        <class 'music21.articulations.BreathMark'>
-        <class 'music21.articulations.Caesura'>
-        <class 'music21.articulations.DetachedLegato'>
-        <class 'music21.articulations.Doit'>
-        <class 'music21.articulations.DoubleTongue'>
+        <class 'music21.abc.base.ABCAccent'>
+        <class 'music21.abc.base.ABCBar'>
+        <class 'music21.abc.base.ABCBrokenRhythmMarker'>
+        <class 'music21.abc.base.ABCChord'>
+        <class 'music21.abc.base.ABCCrescStart'>
+        <class 'music21.abc.base.ABCDimStart'>
+        <class 'music21.abc.base.ABCDownbow'>
+        <class 'music21.abc.base.ABCFile'>
+        <class 'music21.abc.base.ABCFileException'>
+        <class 'music21.abc.base.ABCGraceStart'>
 
     '''
 
