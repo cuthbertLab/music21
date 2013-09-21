@@ -9,21 +9,36 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
+import abc
 import os
 import types
 
+from music21 import common
+
 
 class Iterator(object):
+    '''
+    Abstract base class for documentation iterators.
+    '''
 
     ### INITIALIZER ###
 
     def __init__(self, verbose=True):
         self._verbose = verbose
 
+    ### SPECIAL METHODS ###
+
+    @abc.abstractmethod
+    def __iter__(self):
+        raise NotImplementedError
+
     ### PUBLIC PROPERTIES ###
 
     @property
     def verbose(self):
+        '''
+        If true, print extra information.
+        '''
         return self._verbose
 
 
@@ -34,7 +49,7 @@ class IPythonNotebookIterator(Iterator):
 
     ### SPECIAL METHODS ###
 
-    def __call__(self):
+    def __iter__(self):
         import music21
         rootFilesystemPath = music21.__path__[0]
         documentationPath = os.path.join(
@@ -42,8 +57,8 @@ class IPythonNotebookIterator(Iterator):
             'documentation',
             'source',
             )
-        for directoryPath, unused_directoryNames, fileNames in os.walk(
-            documentationPath):
+        for pathParts in os.walk(documentationPath):
+            directoryPath, fileNames = pathParts[0], pathParts[2]
             for fileName in fileNames:
                 if fileName.endswith('.ipynb'):
                     filePath = os.path.join(
@@ -87,21 +102,8 @@ class ModuleIterator(Iterator):
         )
 
     _ignoredFileNames = (
-    
-        # These modules will crash the module iterator if imported:
-
         'base-archive.py',
         'exceldiff.py',
-
-        # These modules are now handled by the _DOC_IGNORE_MODULE_OR_PACKAGE
-        # flag:
-        
-        #'chordTables.py',
-        #'classCache.py',
-        #'configure.py',
-        #'phrasing.py',
-        #'testFiles.py',
-        #'xmlnode.py',
         )
 
     ### SPECIAL METHODS ###
@@ -129,10 +131,10 @@ class ModuleIterator(Iterator):
                         # this directory.
                         if self.verbose:
                             print '\tIGNORED {0}/*'.format(
-                                os.path.relpath(directoryPath))
+                                common.relativepath(directoryPath))
                         directoryNames[:] = []
                         continue
-                except:
+                except ImportError:
                     pass
             for fileName in fileNames:
                 if fileName not in self._ignoredFileNames and \
@@ -150,10 +152,10 @@ class ModuleIterator(Iterator):
                             False):
                             if self.verbose:
                                 print '\tIGNORED {0}'.format(
-                                    os.path.relpath(filePath))
+                                    common.relativepath(filePath))
                             continue
                         yield module
-                    except:
+                    except ImportError:
                         pass
         raise StopIteration
 

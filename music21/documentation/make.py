@@ -104,7 +104,7 @@ def _main(target):
                 name,
                 )
             shutil.rmtree(path)
-            print '\tCLEANED {0}'.format(os.path.relpath(path))
+            print '\tCLEANED {0}'.format(common.relativepath(path))
     elif target == 'help':
         _print_usage()
     else:

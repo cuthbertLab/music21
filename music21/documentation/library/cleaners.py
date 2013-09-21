@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import os
-#import types
+from music21 import common
 
 
 class Cleaner(object):
@@ -34,7 +34,7 @@ class Cleaner(object):
 
     def removeFile(self, filePath):
         if os.path.exists(filePath):
-            print '\tCLEANED {0}'.format(os.path.relpath(filePath))
+            print '\tCLEANED {0}'.format(common.relativepath(filePath))
             os.remove(filePath)
 
 

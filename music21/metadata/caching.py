@@ -186,7 +186,7 @@ class MetadataCachingJob(object):
                 environLocal.warn(
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
-                        os.path.relpath(self.filePath)))
+                        common.relativepath(self.filePath)))
                 #metadataEntry = metadata.MetadataEntry(
                 #    sourcePath=self.filePath,
                 #    metadataPayload=None,

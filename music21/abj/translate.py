@@ -39,15 +39,15 @@ if abjad is not None:
             raise ImportError('This version of abjad is not compatible with music21, please upgrade')
             abjad = None
     except:
-#        try:
+        try:
             # abjad 2.5...
             from abjad.tools import configurationtools #@UnresolvedImport
             xstr = configurationtools.get_abjad_version_string()
             abjadVersion = float(xstr)
             # this version is good enough no matter what, so it's fine...
-#        except:
-#            raise ImportError('This version of abjad is not compatible with music21, please upgrade')
-#            abjad = None
+        except:
+            raise ImportError('This version of abjad is not compatible with music21, please upgrade')
+            abjad = None
 
 
 

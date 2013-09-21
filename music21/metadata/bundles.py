@@ -706,17 +706,17 @@ class MetadataBundle(object):
                 if filePathModificationTime < metadataBundleModificationTime:
                     environLocal.warn([
                         'Skipping job: {0}; already in cache.'.format(
-                            os.path.relpath(filePath)),
+                            common.relativepath(filePath)),
                         ])
                     continue
             environLocal.warn([
-                'Preparing job: {0}'.format(os.path.relpath(filePath)),
+                'Preparing job: {0}'.format(common.relativepath(filePath)),
                 ])
             currentJobNumber += 1
             if filePath.startswith(music21Path):
                 filePath = os.path.join(
                     'music21',
-                    os.path.relpath(filePath, music21Path),
+                    common.relativepath(filePath, music21Path),
                     )
             job = metadata.MetadataCachingJob(
                 filePath,
@@ -1301,7 +1301,7 @@ class MetadataBundle(object):
             if sourcePath.startswith(corpusPrefix):
                 sourcePath = os.path.join(
                     common.getCorpusFilePath(),
-                    os.path.relpath(
+                    common.relativepath(
                         sourcePath,
                         corpusPrefix,
                         ))

@@ -1518,7 +1518,7 @@ class IPythonNotebookDocumenter(Documenter):
 
         >>> import json
         >>> notebookPath = [x for x in
-        ...     documentation.IPythonNotebookIterator()()][0]
+        ...     documentation.IPythonNotebookIterator()][0]
         >>> with open(notebookPath, 'r') as f:
         ...     contents = json.loads(f.read())
         ...

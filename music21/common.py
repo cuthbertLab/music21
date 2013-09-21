@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         common.py
 # Purpose:      Basic Utilties
@@ -1903,6 +1903,21 @@ def runningUnderIPython():
         return True
     else:
         return False
+
+
+def relativepath(path, start='.'):
+    '''
+    A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
+    under Windows, otherwise returns the relative path of `path`.
+
+    This avoids problems under Windows when the current working directory is
+    on a different drive letter from `path`.
+    '''
+    import platform
+    import os
+    if platform == 'Windows':
+        return path
+    return os.path.relpath(path, start)
 
 
 #-------------------------------------------------------------------------------

@@ -15,6 +15,8 @@ import os
 import re
 import subprocess
 
+from music21 import common
+
 
 class ReSTWriter(object):
     '''
@@ -47,9 +49,9 @@ class ReSTWriter(object):
         if shouldWrite:
             with open(filePath, 'w') as f:
                 f.write(rst)
-            print '\tWROTE   {0}'.format(os.path.relpath(filePath))
+            print '\tWROTE   {0}'.format(common.relativepath(filePath))
         else:
-            print '\tSKIPPED {0}'.format(os.path.relpath(filePath))
+            print '\tSKIPPED {0}'.format(common.relativepath(filePath))
 
 
 class ModuleReferenceReSTWriter(ReSTWriter):
@@ -137,15 +139,15 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     def __call__(self):
         from music21 import documentation # @UnresolvedImport
         ipythonNotebookFilePaths = [x for x in
-            documentation.IPythonNotebookIterator()()]
+            documentation.IPythonNotebookIterator()]
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
             nbConvertReturnCode = self._convertOneNotebook(ipythonNotebookFilePath)
             if nbConvertReturnCode is True:
                 self._cleanupNotebookAssets(ipythonNotebookFilePath)
-                print '\tWROTE   {0}'.format(os.path.relpath(
+                print '\tWROTE   {0}'.format(common.relativepath(
                     ipythonNotebookFilePath))
             else:
-                print '\tSKIPPED {0}'.format(os.path.relpath(
+                print '\tSKIPPED {0}'.format(common.relativepath(
                     ipythonNotebookFilePath))
 
     ### PRIVATE METHODS ###
@@ -274,10 +276,10 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 #             ]
 #         nbconvertPath = os.path.join(*pathParts)
         nbconvertCommand = '{executable} rst {notebook}'.format(
-            #executable=os.path.relpath(nbconvertPath, runDirectoryPath),
-            #notebook=os.path.relpath(ipythonNotebookFilePath, runDirectoryPath),
-            executable=os.path.relpath(nbconvertPath),
-            notebook=os.path.relpath(ipythonNotebookFilePath),
+            #executable=common.relativepath(nbconvertPath, runDirectoryPath),
+            #notebook=common.relativepath(ipythonNotebookFilePath, runDirectoryPath),
+            executable=common.relativepath(nbconvertPath),
+            notebook=common.relativepath(ipythonNotebookFilePath),
             )
         #print nbconvertCommand
         #subprocess.call(nbconvertCommand, shell=True, cwd=runDirectoryPath)

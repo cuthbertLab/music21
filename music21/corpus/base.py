@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         corpus/base.py
 # Purpose:      Access to the corpus collection
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and 
+#               the music21 Project
 # License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 '''
 The music21 corpus includes a collection of freely distributable 
@@ -40,7 +41,11 @@ environLocal = environment.Environment(_MOD)
 
 # a list of metadata's can reside in this module-level storage; this 
 # data is loaded on demand. 
-_METADATA_BUNDLES = {'core':None, 'virtual':None, 'local':None}
+_METADATA_BUNDLES = {
+    'core': None, 
+    'local': None,
+    'virtual': None, 
+    }
 
 # update and access through property to make clear
 # that this is a corpus distribution or a no-corpus distribution
@@ -75,7 +80,8 @@ for name in dir(virtual): # look over virtual module
     className = getattr(virtual, name)
     if callable(className):
         obj = className()
-        if isinstance(obj, virtual.VirtualWork) and obj.corpusPath != None: # @UndefinedVariable
+        if isinstance(obj, virtual.VirtualWork) and \
+            obj.corpusPath != None: # @UndefinedVariable
             VIRTUAL.append(obj)
 
 
@@ -91,7 +97,7 @@ class CorpusException(exceptions21.Music21Exception):
 
 def _findPaths(rootDirectoryPath, fileExtensions):
     '''
-    Given a root fp file path, recursively search all contained paths for
+    Given a root filePath file path, recursively search all contained paths for
     files in `rootFilePath` matching any of the file extensions in 
     `fileExtensions`.
     
@@ -101,12 +107,15 @@ def _findPaths(rootDirectoryPath, fileExtensions):
     '''
     # can replace extension matching with a regex    
     #escape extension dots (if there) for regex
-    #fileExtensions = ["\\%s" % ex for ex in fileExtensions if ex.startswith('.')]
+    #fileExtensions = ["\\%s" % ex for ex in fileExtensions 
+    #    if ex.startswith('.')]
     #extRe = re.compile('.*(%s)' % '|'.join(fileExtensions))
 
     matched = []
     # walk each top-level dir
-    rootDirectoryPath = unicode(rootDirectoryPath) # force rootDirectoryPath to be unicode so that dir names are properly resolved...
+    # force rootDirectoryPath to be unicode so that dir names are properly
+    # resolved...
+    rootDirectoryPath = unicode(rootDirectoryPath) 
     for rootDirectory, directoryNames, filenames in os.walk(rootDirectoryPath):
         if '.svn' in directoryNames:
             # removing in place will stop recursion into these dirs
@@ -251,8 +260,10 @@ def getVirtualPaths(fileExtensions=None, expandExtensions=True):
         True
 
     '''
-    fileExtensions = _translateExtensions(fileExtensions=fileExtensions,
-                expandExtensions=expandExtensions)
+    fileExtensions = _translateExtensions(
+        fileExtensions=fileExtensions,
+        expandExtensions=expandExtensions,
+        )
     paths = []
     for obj in VIRTUAL:
         if obj.corpusPath != None:
@@ -330,13 +341,17 @@ def addPath(filePath):
     Restart music21 after adding paths.
     '''
     if filePath is None or not os.path.exists(filePath):
-        raise CorpusException("an invalid file path has been provided: %s" % filePath)
+        raise CorpusException(
+            'an invalid file path has been provided: {0!r}'.format(filePath))
     if filePath in _pathsLocalTemp:
-        raise CorpusException("the provided path has already been added: %s" % filePath)
+        raise CorpusException(
+            'the provided path has already been added: {0!r}'.format(filePath))
     if filePath in environLocal['localCorpusSettings']:
-        raise CorpusException("the provided path is already incldued in the Environment localCorpusSettings: %s" % filePath)
+        raise CorpusException(
+            'the provided path is already incldued in the Environment '
+            'localCorpusSettings: {0!r}'.format(filePath))
 
-    _pathsLocalTemp.append(fp)
+    _pathsLocalTemp.append(filePath)
     # delete all local keys in the cache
     for key in _pathsCache:
         if key[0] == 'local':
@@ -388,19 +403,17 @@ def _updateMetadataBundle():
     Note that this updates the in-memory cached metdata bundles not the disk
     caches (that's MUCH slower!) to do that run corpus.metadata.metadata.py
     '''
-    for domain, proc in (
-        ('core', getCorePaths), 
-        ('virtual', getVirtualPaths),
-        ('local', getLocalPaths),
-        ):
+    for domain in ('core', 'local', 'virtual'):
         if _METADATA_BUNDLES[domain] is None:
-            paths = proc()
             _METADATA_BUNDLES[domain] = metadata.MetadataBundle(domain)
             _METADATA_BUNDLES[domain].read()
             _METADATA_BUNDLES[domain].validate()
 
 
 def cacheMetadata(domainList=('local')):
+    '''
+    Rebuild the metadata cache.
+    '''
     if not common.isListLike(domainList):
         domainList = [domainList]
     for domain in domainList:
@@ -675,9 +688,7 @@ def getWorkList(workName, movementNumber=None, fileExtensions=None):
                 # look for direct matches first
                 for movementStr in movementStrList:
                     #if movementStr.lower() in filePath.lower():
-                    #environLocal.printDebug(['filenameWithoutExtension comparing', movementStr, filenameWithoutExtension])
                     if filenameWithoutExtension.lower() == movementStr.lower():
-                        #environLocal.printDebug(['matched filenameWithoutExtension', filePath])
                         movementResults.append(filePath)     
                         searchPartialMatch = False           
             # if we have one direct match, all other matches must 
@@ -892,7 +903,7 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
             workName = os.path.sep.join(workName)
         if workName.endswith(".xml"): # might be compressed MXL file
             newWorkName = workName[0:len(workName)-4] + ".mxl"
-            return getWork(newWorkName,movementNumber,fileExtensions)
+            return getWork(newWorkName, movementNumber,fileExtensions)
         results = getVirtualWorkList(workName, movementNumber, fileExtensions)
     if len(results) == 1:
         return results[0]
@@ -962,7 +973,8 @@ def parse(
         if common.isListLike(workName):
             workName = os.path.sep.join(workName)
         if workName.endswith(".xml"):
-            newWorkName = os.path.splitext(workName)[0] + ".mxl" # might be compressed MXL file
+            # might be compressed MXL file
+            newWorkName = os.path.splitext(workName)[0] + ".mxl" 
             try:
                 return parse(
                     newWorkName, 
@@ -974,12 +986,17 @@ def parse(
             except CorpusException:
                 # avoids having the name come back with .mxl instead of .xmlrle
                 raise CorpusException("Could not find an xml or mxl work that met this criterion: %s" % workName)
-        workList = getVirtualWorkList(workName, movementNumber, fileExtensions)    
+        workList = getVirtualWorkList(
+            workName, 
+            movementNumber, 
+            fileExtensions,
+            )
 
     if len(workList) == 1:
         filePath = workList[0]
     elif not len(workList):
-        raise CorpusException("Could not find a work that met this criterion: %s" % workName)
+        raise CorpusException(
+            "Could not find a work that met this criterion: %s" % workName)
     else: # greater than zero:
         filePath = workList[0] # get first
     #return converter.parse(filePath, forceSource=forceSource, number=number)
@@ -992,28 +1009,33 @@ def parse(
     return streamObject
 
 
-def _addCorpusFilepath(streamObj, filepath):   
+def _addCorpusFilepath(streamObj, filePath):   
     # metadata attribute added to store the file path, for use later in identifying the score
     #if streamObj.metadata == None:
     #    streamObj.insert(metadata.Metadata())
-    cfp = common.getCorpusFilePath()
-    lenCFP = len(cfp) + len(os.sep)
-    if filepath.startswith(cfp):
-        fp2 = filepath[lenCFP:]
+    corpusFilePath = common.getCorpusFilePath()
+    lenCFP = len(corpusFilePath) + len(os.sep)
+    if filePath.startswith(corpusFilePath):
+        fp2 = filePath[lenCFP:]
         ### corpus fix for windows
         dirsEtc = fp2.split(os.sep)
         fp3 = '/'.join(dirsEtc)
         streamObj.corpusFilepath = fp3
     else:
-        streamObj.corpusFilepath = filepath
+        streamObj.corpusFilepath = filePath
 
 
 def parseWork(*arguments, **keywords):
-    '''This function exists for backwards compatibility. All calls should use :func:`~music21.corpus.parse` instead.
+    '''
+    This function exists for backwards compatibility.
+    
+    All calls should use :func:`~music21.corpus.parse` instead.
     '''
     import warnings
-    #raise DeprecationWarning('the corpus.parseWork() function is depcreciated: use corpus.parse()')
-    warnings.warn('the corpus.parseWork() function is deprecated: use corpus.parse()', DeprecationWarning)
+    warnings.warn(
+        'the corpus.parseWork() function is deprecated: use corpus.parse()', 
+        DeprecationWarning,
+        )
     return parse(*arguments, **keywords)
 
 
@@ -1027,7 +1049,7 @@ def compressAllXMLFiles(deleteOriginal = False):
     If the musicXML files are compressed, the originals are deleted from the system.
     '''
     environLocal.warn("Compressing musicXML files...")
-    for filename in music21.corpus.paths:
+    for filename in getPaths(fileExtensions=('.xml',)):
         compressXML(filename, deleteOriginal=deleteOriginal)
     environLocal.warn(
         'Compression complete. '
@@ -1045,12 +1067,14 @@ def compressXML(filename, deleteOriginal=False):
     If deleteOriginal is set to True, the original musicXML file is deleted
     from the system.
     '''
-    if not filename.endswith(".xml"):
+    if not filename.endswith('.xml'):
         return # not a musicXML file
     environLocal.warn("Updating file: {0}".format(filename))
     filenameList = filename.split(os.path.sep)
-    archivedName = filenameList.pop() # find the archive name (name w/out filepath)
-    filenameList.append(archivedName[0:len(archivedName)-4] + ".mxl") # new archive name
+    # find the archive name (name w/out filepath)
+    archivedName = filenameList.pop() 
+    # new archive name
+    filenameList.append(archivedName[0:len(archivedName)-4] + ".mxl") 
     newFilename = os.path.sep.join(filenameList) # new filename
     # contents of container.xml file in META-INF folder
     container = '<?xml version="1.0" encoding="UTF-8"?>\n\
@@ -1068,7 +1092,8 @@ def compressXML(filename, deleteOriginal=False):
         ) as myZip:
         myZip.write(filename = filename, archivedName = archivedName)
         myZip.writestr(
-            zinfo_or_archivedName='META-INF{0}container.xml'.format(os.path.sep),
+            zinfo_or_archivedName='META-INF{0}container.xml'.format(
+                os.path.sep),
             bytes=container,
             )
     # Delete uncompressed xml file from system
@@ -1090,10 +1115,9 @@ def uncompressMXL(filename, deleteOriginal=False):
     environLocal.warn("Updating file: {0}".format(filename))
     filenames = filename.split(os.path.sep)
     archivedName = filenames.pop() # find the archive name (name w/out filepath)
-    unarchivedName = archivedName[0:len(archivedName)-4] + ".xml"
+
+    unarchivedName = os.path.splitext(archivedName)[0] + '.xml'
     extractPath = os.path.sep.join(filenames)
-    filenames.append(unarchivedName) # new archive name
-    unused_newFilename = os.path.sep.join(filenames) # new filename
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(
         filename, 
@@ -1448,8 +1472,8 @@ class Test(unittest.TestCase):
     def testBachKeys(self):
         from music21 import key
         keyObjs = []
-        for fp in getComposer('bach')[23:28]: # get 5 in the middle
-            s = parse(fp)
+        for filePath in getComposer('bach')[23:28]: # get 5 in the middle
+            s = parse(filePath)
             # get keys from first part
             keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
             keyObj = keyStream[0]
@@ -1487,17 +1511,17 @@ class Test(unittest.TestCase):
         self.assertEqual(len(fpCollection) >= 1, True)
 
     def testSearch01(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('china', 'locale')
         self.assertEqual(len(searchResults) > 1200, True)
         
     def testSearch02(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('Sichuan', 'locale')
         self.assertEqual(len(searchResults), 47)
         
     def testSearch03(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('Taiwan', 'locale')
         self.assertEqual(len(searchResults), 27)
         pathInfo = sorted((searchResult.sourcePath, searchResult.number) 
@@ -1533,34 +1557,34 @@ class Test(unittest.TestCase):
             ])
 
     def testSearch04(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('Sichuan|Taiwan', 'locale')
         self.assertEqual(len(searchResults), 74)
 
     def testSearch05(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('bach')
         self.assertEqual(len(searchResults) > 120, True)
 
     def testSearch06(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('haydn', 'composer')
         self.assertEqual(len(searchResults), 0)
         searchResults = corpus.search('haydn|beethoven', 'composer')
         self.assertEqual(len(searchResults) >= 16, True)
 
     def testSearch07(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('canon')
         self.assertEqual(len(searchResults) >= 1, True)
 
     def testSearch08(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('3/8', 'timeSignature')
         self.assertEqual(len(searchResults) > 360, True)
 
     def testSearch09(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('3/.', 'timeSignature')
         self.assertEqual(len(searchResults) >= 2200 , True)
 
@@ -1571,12 +1595,12 @@ class Test(unittest.TestCase):
         self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
 
     def testSearch11(self):
-        from music21 import corpus, key
+        from music21 import corpus
         searchResults = corpus.search('mode phry(.*)', 'keySignature')
         self.assertEqual(len(searchResults) >= 9, True)
 
     def testSearch12(self):
-        from music21 import corpus, key
+        from music21 import corpus
         # searching virtual entries
         searchResults = corpus.search('coltrane', 'composer')
         self.assertEqual(len(searchResults) > 0, True)
@@ -1586,8 +1610,9 @@ class Test(unittest.TestCase):
 
     def testGetWorkList(self):
         self.assertEqual(len(getPaths('.md')) >= 38, True)
-        self.assertEqual(len(getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')), 1)
-        self.assertEqual(len(getWorkList('handel/hwv56', (1,1), '.md')), 1)
+        self.assertEqual(
+            len(getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')), 1)
+        self.assertEqual(len(getWorkList('handel/hwv56', (1, 1), '.md')), 1)
         self.assertEqual(len(getWorkList('handel/hwv56', '1-01', '.md')), 1)
         self.assertEqual(len(getWorkList('bach/artOfFugue_bwv1080')), 21)
         self.assertEqual(len(getWorkList('bach/artOfFugue_bwv1080', 1)), 1)
@@ -1613,25 +1638,34 @@ class Test(unittest.TestCase):
 
     def testWTCImport01(self):
         from music21 import corpus
-        s = corpus.parse('bach/bwv846', 1)
-        self.assertEqual(s.metadata.title, 'WTC I: Prelude and Fugue in C major')
-        self.assertEqual(s.metadata.movementNumber, '1')
+        score = corpus.parse('bach/bwv846', 1)
+        self.assertEqual(
+            score.metadata.title, 
+            'WTC I: Prelude and Fugue in C major',
+            )
+        self.assertEqual(score.metadata.movementNumber, '1')
 
     def testWTCImport02(self):
         from music21 import corpus
-        s = corpus.parse('bach/bwv846', 2)
-        self.assertEqual(s.metadata.movementName, 'Fugue  I. ')
-        self.assertEqual(s.metadata.movementNumber, '2')
+        score = corpus.parse('bach/bwv846', 2)
+        self.assertEqual(score.metadata.movementName, 'Fugue  I. ')
+        self.assertEqual(score.metadata.movementNumber, '2')
 
     def testWTCImport03(self):
         from music21 import corpus
-        s = corpus.parse('bach/bwv862', 1)
-        self.assertEqual(s.metadata.title, 'WTC I: Prelude and Fugue in A flat major')
+        score = corpus.parse('bach/bwv862', 1)
+        self.assertEqual(
+            score.metadata.title, 
+            'WTC I: Prelude and Fugue in A flat major',
+            )
 
     def testWTCImport04(self):
         from music21 import corpus
-        s = corpus.parse('bach/bwv888', 1)
-        self.assertEqual(s.metadata.title, 'WTC II: Prelude and Fugue in A major')
+        score = corpus.parse('bach/bwv888', 1)
+        self.assertEqual(
+            score.metadata.title, 
+            'WTC II: Prelude and Fugue in A major',
+            )
         #s.show()
 
 #     def testWorkReferences(self):
