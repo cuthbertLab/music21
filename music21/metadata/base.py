@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         base.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -7,9 +7,9 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
-#               Project 
+#               Project
 # License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 import os
@@ -46,10 +46,11 @@ class Metadata(base.Music21Object):
 
     ::
 
+        >>> from music21 import metadata
         >>> md = metadata.Metadata(title='Concerto in F')
         >>> md.title
         'Concerto in F'
-    
+
     ::
 
         >>> md = metadata.Metadata(otl='Concerto in F') # can use abbreviations
@@ -71,58 +72,54 @@ class Metadata(base.Music21Object):
 
     ### CLASS VARIABLES ###
 
-    classSortOrder = -10 
+    classSortOrder = -10
 
-    # !!!OTL: Title. 
+    # !!!OTL: Title.
     # !!!OTP: Popular Title.
     # !!!OTA: Alternative title.
-    # !!!OPR: Title of larger (or parent) work 
+    # !!!OPR: Title of larger (or parent) work
     # !!!OAC: Act number.
     # !!!OSC: Scene number.
     # !!!OMV: Movement number.
-    # !!!OMD: Movement designation or movement name. 
-    # !!!OPS: Opus number. 
+    # !!!OMD: Movement designation or movement name.
+    # !!!OPS: Opus number.
     # !!!ONM: Number.
     # !!!OVM: Volume.
-    # !!!ODE: Dedication. 
+    # !!!ODE: Dedication.
     # !!!OCO: Commission
-    # !!!GTL: Group Title. 
-    # !!!GAW: Associated Work. 
-    # !!!GCO: Collection designation. 
-    # !!!TXO: Original language of vocal/choral text. 
-    # !!!TXL: Language of the encoded vocal/choral text. 
-    # !!!OCY: Country of composition. 
-    # !!!OPC: City, town or village of composition. 
+    # !!!GTL: Group Title.
+    # !!!GAW: Associated Work.
+    # !!!GCO: Collection designation.
+    # !!!TXO: Original language of vocal/choral text.
+    # !!!TXL: Language of the encoded vocal/choral text.
+    # !!!OCY: Country of composition.
+    # !!!OPC: City, town or village of composition.
 
     workIdAbbreviationDict = {
-        'otl' : 'title',
-        'otp' : 'popularTitle',
-        'ota' : 'alternativeTitle',
-        'opr' : 'parentTitle',
-        'oac' : 'actNumber',
-
-        'osc' : 'sceneNumber',
-        'omv' : 'movementNumber',
-        'omd' : 'movementName',
-        'ops' : 'opusNumber',
-        'onm' : 'number',
-
-        'ovm' : 'volume',
-        'ode' : 'dedication',
-        'oco' : 'commission',
-        'gtl' : 'groupTitle',
-        'gaw' : 'associatedWork',
-
-        'gco' : 'collectionDesignation',
-        'txo' : 'textOriginalLanguage',
-        'txl' : 'textLanguage',
-
-        'ocy' : 'countryOfComposition',
-        'opc' : 'localeOfComposition', # origin in abc
+        'gaw': 'associatedWork',
+        'gco': 'collectionDesignation',
+        'gtl': 'groupTitle',
+        'oac': 'actNumber',
+        'oco': 'commission',
+        'ocy': 'countryOfComposition',
+        'ode': 'dedication',
+        'omd': 'movementName',
+        'omv': 'movementNumber',
+        'onm': 'number',
+        'opc': 'localeOfComposition',  # origin in abc
+        'opr': 'parentTitle',
+        'ops': 'opusNumber',
+        'osc': 'sceneNumber',
+        'ota': 'alternativeTitle',
+        'otl': 'title',
+        'otp': 'popularTitle',
+        'ovm': 'volume',
+        'txl': 'textLanguage',
+        'txo': 'textOriginalLanguage',
         }
 
     workIdLookupDict = {}
-    for key, value in workIdAbbreviationDict.items(): 
+    for key, value in workIdAbbreviationDict.items():
         workIdLookupDict[value.lower()] = key
 
     ### INITIALIZER ###
@@ -157,25 +154,25 @@ class Metadata(base.Music21Object):
             else:
                 self._workIds[workId] = None
 
-        # search for any keywords that match attributes 
+        # search for any keywords that match attributes
         # these are for direct Contributor access, must have defined
         # properties
         for attr in ['composer', 'date', 'title']:
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
-        
+
         # used for the search() methods to determine what attributes
-        # are made available by default; add more as properties/import 
+        # are made available by default; add more as properties/import
         # exists
         self._searchAttributes = [
-            'date', 
-            'title', 
-            'alternativeTitle', 
-            'movementNumber', 
-            'movementName', 
-            'number', 
-            'opusNumber', 
-            'composer', 
+            'date',
+            'title',
+            'alternativeTitle',
+            'movementNumber',
+            'movementName',
+            'number',
+            'opusNumber',
+            'composer',
             'localeOfComposition',
             ]
 
@@ -184,17 +181,17 @@ class Metadata(base.Music21Object):
     def __getattr__(self, name):
         r'''
         Utility attribute access for attributes that do not yet have property
-        definitions. 
+        definitions.
         '''
         match = None
         for abbreviation, workId in self.workIdAbbreviationDict.iteritems():
         #for id in WORK_IDS:
             #abbreviation = workIdToAbbreviation(id)
             if name == workId:
-                match = workId 
+                match = workId
                 break
             elif name == abbreviation:
-                match = workId 
+                match = workId
                 break
         if match is None:
             raise AttributeError('object has no attribute: %s' % name)
@@ -210,6 +207,7 @@ class Metadata(base.Music21Object):
 
         ::
 
+            >>> from music21 import metadata
             >>> metadata.Metadata.abbreviationToWorkId('otl')
             'title'
 
@@ -233,6 +231,7 @@ class Metadata(base.Music21Object):
 
         ::
 
+            >>> from music21 import metadata
             >>> md = metadata.Metadata(title='Third Symphony')
             >>> c = metadata.Contributor()
             >>> c.name = 'Beethoven, Ludwig van'
@@ -257,10 +256,11 @@ class Metadata(base.Music21Object):
     def getContributorsByRole(self, value):
         r'''
         Return a :class:`~music21.metadata.Contributor` if defined for a
-        provided role. 
-        
+        provided role.
+
         ::
 
+            >>> from music21 import metadata
             >>> md = metadata.Metadata(title='Third Symphony')
 
         ::
@@ -272,12 +272,12 @@ class Metadata(base.Music21Object):
             >>> cList = md.getContributorsByRole('composer')
             >>> cList[0].name
             'Beethoven, Ludwig van'
-        
+
         Some musicxml files have contributors with no role defined.  To get
         these contributors, search for getContributorsByRole(None).  N.B. upon
         output to MusicXML, music21 gives these contributors the generic role
         of "creator"
-        
+
         ::
 
             >>> c2 = metadata.Contributor()
@@ -292,14 +292,14 @@ class Metadata(base.Music21Object):
             >>> noRoleList[0].role
             >>> noRoleList[0].name
             'Beth Hadley'
-        
+
         '''
-        result = [] # there may be more than one per role
+        result = []  # there may be more than one per role
         for c in self._contributors:
             if c.role == value:
                 result.append(c)
         if len(result) > 0:
-            return result 
+            return result
         else:
             return None
 
@@ -310,6 +310,7 @@ class Metadata(base.Music21Object):
 
         ::
 
+            >>> from music21 import metadata
             >>> md = metadata.Metadata()
             >>> md.composer = 'Beethoven, Ludwig van'
             >>> md.title = 'Third Symphony'
@@ -318,7 +319,7 @@ class Metadata(base.Music21Object):
 
             >>> md.search('beethoven', 'composer')
             (True, 'composer')
-        
+
         ::
 
             >>> md.search('beethoven', 'compose')
@@ -361,7 +362,7 @@ class Metadata(base.Music21Object):
 
         '''
         valueFieldPairs = []
-        if field != None:
+        if field is not None:
             match = False
             try:
                 value = getattr(self, field)
@@ -378,10 +379,10 @@ class Metadata(base.Music21Object):
                         valueFieldPairs.append((value, searchAttribute))
                         match = True
                         break
-            # if cannot find a match for any field, return 
+            # if cannot find a match for any field, return
             if not match:
                 return False, None
-        else: # get all fields
+        else:  # get all fields
             for field in self._searchAttributes:
                 value = getattr(self, field)
                 valueFieldPairs.append((value, field))
@@ -391,12 +392,12 @@ class Metadata(base.Music21Object):
         useRegex = False
         if hasattr(query, 'search'):
             useRegex = True
-            reQuery = query # already compiled
+            reQuery = query  # already compiled
         # look for regex characters
         elif common.isStr(query) and \
             any(character in query for character in '*.|+?{}'):
             useRegex = True
-            reQuery = re.compile(query, flags=re.I) 
+            reQuery = re.compile(query, flags=re.I)
         if useRegex:
             for value, field in valueFieldPairs:
                 # re.I makes case insensitive
@@ -409,16 +410,16 @@ class Metadata(base.Music21Object):
                 if common.isStr(value):
                     if query.lower() in value.lower():
                         return True, field
-                elif query == value: 
+                elif query == value:
                     return True, field
         return False, None
-            
+
     def setWorkId(self, idStr, value):
         r'''
         Directly set a workd id, given either as a full string name or as a
         three character abbreviation. The following work id abbreviations and
         their full id string are given as follows. In many cases the Metadata
-        object support properties for convenient access to these work ids. 
+        object support properties for convenient access to these work ids.
 
         Id abbreviations and strings: otl / title, otp / popularTitle, ota /
         alternativeTitle, opr / parentTitle, oac / actNumber, osc /
@@ -427,9 +428,10 @@ class Metadata(base.Music21Object):
         commission, gtl / groupTitle, gaw / associatedWork, gco /
         collectionDesignation, txo / textOriginalLanguage, txl / textLanguage,
         ocy / countryOfComposition, opc / localeOfComposition.
-        
+
         ::
 
+            >>> from music21 import metadata
             >>> md = metadata.Metadata(title='Quartet')
             >>> md.title
             'Quartet'
@@ -471,6 +473,7 @@ class Metadata(base.Music21Object):
 
         ::
 
+            >>> from music21 import metadata
             >>> metadata.Metadata.workIdToAbbreviation('localeOfComposition')
             'opc'
 
@@ -484,13 +487,14 @@ class Metadata(base.Music21Object):
         # NOTE: this is a performance critical function
         try:
             # try direct access, where keys are already lower case
-            return Metadata.workIdLookupDict[value] 
+            return Metadata.workIdLookupDict[value]
         except KeyError:
             pass
 
         # slow approach
         for workId in Metadata.workIdAbbreviationDict.keys():
-            if value.lower() == Metadata.workIdAbbreviationDict[workId].lower():
+            if value.lower() == \
+                Metadata.workIdAbbreviationDict[workId].lower():
                 return workId
         raise exceptions21.MetadataException(
             'no such work id: %s' % value)
@@ -498,13 +502,14 @@ class Metadata(base.Music21Object):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def alternativeTitle(): # @NoSelf
+    def alternativeTitle():  # @NoSelf
         def fget(self):
             r'''
-            Get or set the alternative title. 
-            
+            Get or set the alternative title.
+
             ::
 
+                >>> from music21 import metadata
                 >>> md = metadata.Metadata(popularTitle='Eroica')
                 >>> md.alternativeTitle = 'Heroic Symphony'
                 >>> md.alternativeTitle
@@ -514,13 +519,15 @@ class Metadata(base.Music21Object):
             result = self._workIds['alternativeTitle']
             if result is not None:
                 return str(result)
+
         def fset(self, value):
             from music21 import metadata
             self._workIds['alternativeTitle'] = metadata.Text(value)
+
         return property(**locals())
 
     @apply
-    def composer(): # @NoSelf
+    def composer():  # @NoSelf
         def fget(self):
             r'''
             Get or set the composer of this work. More than one composer may be
@@ -529,12 +536,13 @@ class Metadata(base.Music21Object):
             The composer attribute does not live in Metadata, but creates a
             :class:`~music21.metadata.Contributor` object in the Metadata
             object.
-            
+
             ::
 
+                >>> from music21 import metadata
                 >>> md = metadata.Metadata(
                 ...     title='Third Symphony',
-                ...     popularTitle='Eroica', 
+                ...     popularTitle='Eroica',
                 ...     composer='Beethoven, Ludwig van',
                 ...     )
                 >>> md.composer
@@ -545,12 +553,14 @@ class Metadata(base.Music21Object):
             if result is not None:
                 # get just the name of the first composer
                 return str(result[0].name)
+
         def fset(self, value):
             from music21 import metadata
             c = metadata.Contributor()
             c.name = value
             c.role = 'composer'
             self._contributors.append(c)
+
         return property(**locals())
 
     @property
@@ -565,20 +575,23 @@ class Metadata(base.Music21Object):
             return [x.name for x in result]
 
     @apply
-    def date(): # @NoSelf
+    def date():  # @NoSelf
         def fget(self):
             r'''
-            Get or set the date of this work as one of the following date objects:
+            Get or set the date of this work as one of the following date
+            objects:
+
             :class:`~music21.metadata.DateSingle`,
             :class:`~music21.metadata.DateRelative`,
             :class:`~music21.metadata.DateBetween`,
-            :class:`~music21.metadata.DateSelection`, 
-            
+            :class:`~music21.metadata.DateSelection`,
+
             ::
 
+                >>> from music21 import metadata
                 >>> md = metadata.Metadata(
-                ...     title='Third Symphony', 
-                ...     popularTitle='Eroica', 
+                ...     title='Third Symphony',
+                ...     popularTitle='Eroica',
                 ...     composer='Beethoven, Ludwig van',
                 ...     )
                 >>> md.date = '2010'
@@ -593,113 +606,130 @@ class Metadata(base.Music21Object):
 
             '''
             return str(self._date)
+
         def fset(self, value):
             from music21 import metadata
-            if isinstance(value, metadata.DateSingle): # all inherit date single
+            # all inherit date single
+            if isinstance(value, metadata.DateSingle):
                 self._date = value
             else:
-                ds = metadata.DateSingle(value) # assume date single; could be other sublcass
+                # assume date single; could be other sublcass
+                ds = metadata.DateSingle(value)
                 self._date = ds
+
         return property(**locals())
 
     @apply
     def localeOfComposition():  # @NoSelf
         def fget(self):
             r'''
-            Get or set the locale of composition, or origin, of the work. 
+            Get or set the locale of composition, or origin, of the work.
             '''
             result = self._workIds['localeOfComposition']
             if result is not None:
                 return str(result)
+
         def fset(self, value):
             from music21 import metadata
             self._workIds['localeOfComposition'] = metadata.Text(value)
+
         return property(**locals())
 
     @apply
-    def movementName(): # @NoSelf
+    def movementName():  # @NoSelf
         def fget(self):
             r'''
-            Get or set the movement title. 
-            
-            Note that a number of pieces from various MusicXML datasets have the piece title as the movement title.
-            For instance, the Bach Chorales, since they are technically movements of larger cantatas.
+            Get or set the movement title.
+
+            Note that a number of pieces from various MusicXML datasets have
+            the piece title as the movement title. For instance, the Bach
+            Chorales, since they are technically movements of larger cantatas.
+
             '''
             result = self._workIds['movementName']
             if result is not None:
                 return str(result)
+
         def fset(self, value):
             from music21 import metadata
             self._workIds['movementName'] = metadata.Text(value)
+
         return property(**locals())
 
     @apply
-    def movementNumber(): # @NoSelf
+    def movementNumber():  # @NoSelf
         def fget(self):
             r'''
-            Get or set the movement number. 
+            Get or set the movement number.
             '''
             result = self._workIds['movementNumber']
             if result is not None:
                 return str(result)
+
         def fset(self, value):
             from music21 import metadata
             self._workIds['movementNumber'] = metadata.Text(value)
+
         return property(**locals())
 
     @apply
-    def number(): # @NoSelf
+    def number():  # @NoSelf
         def fget(self):
             r'''
-            Get or set the number of the work.  
-            
+            Get or set the number of the work.
+
             TODO: Explain what this means...
             '''
             result = self._workIds['number']
             if result is not None:
                 return str(result)
+
         def fset(self, value):
             from music21 import metadata
             self._workIds['number'] = metadata.Text(value)
+
         return property(**locals())
 
     @apply
-    def opusNumber(): # @NoSelf
+    def opusNumber():  # @NoSelf
         def fget(self):
             r'''
-            Get or set the opus number. 
+            Get or set the opus number.
             '''
             result = self._workIds['opusNumber']
             if result is not None:
                 return str(result)
+
         def fset(self, value):
             from music21 import metadata
             self._workIds['opusNumber'] = metadata.Text(value)
+
         return property(**locals())
 
     @apply
-    def title(): # @NoSelf
+    def title():  # @NoSelf
         def fget(self):
             r'''
             Get the title of the work, or the next-matched title string
-            available from a related parameter fields. 
+            available from a related parameter fields.
 
             ::
 
+                >>> from music21 import metadata
                 >>> md = metadata.Metadata(title='Third Symphony')
                 >>> md.title
                 'Third Symphony'
-            
+
             ::
 
                 >>> md = metadata.Metadata(popularTitle='Eroica')
                 >>> md.title
                 'Eroica'
-            
+
             ::
 
                 >>> md = metadata.Metadata(
-                ...     title='Third Symphony', 
+                ...     title='Third Symphony',
                 ...     popularTitle='Eroica',
                 ...     )
                 >>> md.title
@@ -717,25 +747,27 @@ class Metadata(base.Music21Object):
 
             '''
             searchId = (
-                'title', 
-                'popularTitle', 
-                'alternativeTitle', 
+                'title',
+                'popularTitle',
+                'alternativeTitle',
                 'movementName',
                 )
             result = None
             for key in searchId:
                 result = self._workIds[key]
-                if result is not None: # get first matched
+                if result is not None:  # get first matched
                     # get a string from this Text object
                     # get with normalized articles
                     return self._workIds[key].getNormalizedArticle()
+
         def fset(self, value):
             from music21 import metadata
             self._workIds['title'] = metadata.Text(value)
+
         return property(**locals())
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 class RichMetadata(Metadata):
@@ -743,16 +775,18 @@ class RichMetadata(Metadata):
     RichMetadata adds to Metadata information about the contents of the Score
     it is attached to. TimeSignature, KeySignature and related analytical is
     stored.  RichMetadata are generally only created in the process of creating
-    stored JSON metadata. 
+    stored JSON metadata.
 
     ::
 
+        >>> from music21 import metadata
         >>> richMetadata = metadata.RichMetadata(title='Concerto in F')
         >>> richMetadata.title
         'Concerto in F'
 
     ::
 
+        >>> from music21 import key
         >>> richMetadata.keySignatureFirst = key.KeySignature(-1)
         >>> 'keySignatureFirst' in richMetadata._searchAttributes
         True
@@ -776,15 +810,15 @@ class RichMetadata(Metadata):
         self.timeSignatures = []
         # append to existing search attributes from Metdata
         self._searchAttributes += [
-            'keySignatureFirst', 
+            'keySignatureFirst',
             'keySignatures',
-            'noteCount', 
-            'pitchHighest', 
-            'pitchLowest', 
+            'noteCount',
+            'pitchHighest',
+            'pitchLowest',
             'quarterLength',
             'tempoFirst',
             'tempos',
-            'timeSignatureFirst', 
+            'timeSignatureFirst',
             'timeSignatures',
             ]
 
@@ -797,6 +831,7 @@ class RichMetadata(Metadata):
 
         ::
 
+            >>> from music21 import metadata
             >>> md = metadata.Metadata(title='Concerto in F')
             >>> md.title
             'Concerto in F'
@@ -812,15 +847,15 @@ class RichMetadata(Metadata):
         # specifically name attributes to copy, as do not want to get all
         # Metadata is a m21 object
         localNames = [
-            '_contributors', '_date', '_urls', '_imprint', '_copyright', 
+            '_contributors', '_date', '_urls', '_imprint', '_copyright',
             '_workIds',
             ]
         environLocal.printDebug(['RichMetadata: calling merge()'])
-        for name in localNames: 
+        for name in localNames:
             localValue = getattr(self, name)
             # if not set, and favoring self, then only then set
             # this will not work on dictionaries
-            if localValue != None and favorSelf:
+            if localValue is not None and favorSelf:
                 continue
             else:
                 try:
@@ -833,40 +868,43 @@ class RichMetadata(Metadata):
 
     def update(self, streamObj):
         r'''
-        Given a Stream object, update attributes with stored objects. 
+        Given a Stream object, update attributes with stored objects.
         '''
-        from music21 import chord
-        from music21 import note
+        from music21 import key
+        from music21 import meter
+        from music21 import tempo
 
         environLocal.printDebug(['RichMetadata: update(): start'])
-        
-        flat = streamObj.flat.sorted
 
-        self.timeSignatureFirst = None
-        self.timeSignatures = []
-        timeSignatureStream = flat.getElementsByClass('TimeSignature')
-        for timeSignature in timeSignatureStream:
-            ratioString = timeSignature.ratioString
-            if ratioString not in self.timeSignatures:
-                self.timeSignatures.append(ratioString)
-        if len(timeSignatureStream):
-            self.timeSignatureFirst = self.timeSignatures[0]
+        flat = streamObj.flat.sorted
 
         self.keySignatureFirst = None
         self.keySignatures = []
-        keySignatureStream = flat.getElementsByClass('KeySignature')
-        for keySignature in keySignatureStream:
-            if str(keySignature) not in self.keySignatures:
-                self.keySignatures.append(str(keySignature))
-        if len(self.keySignatures):
-            self.keySignatureFirst = self.keySignatures[0]
-
         self.tempoFirst = None
         self.tempos = []
-        tempoIndicationStream = flat.getElementsByClass('TempoIndication')
-        for tempoIndication in tempoIndicationStream:
-            if str(tempoIndication) not in self.tempos:
-                self.tempos.append(str(tempoIndication))
+        self.timeSignatureFirst = None
+        self.timeSignatures = []
+
+        # We combine element searching into a single loop to prevent
+        # multiple traversals of the flattened stream.
+        for element in flat:
+            if isinstance(element, meter.TimeSignature):
+                ratioString = element.ratioString
+                if ratioString not in self.timeSignatures:
+                    self.timeSignatures.append(ratioString)
+            elif isinstance(element, key.KeySignature):
+                keySignatureString = str(element)
+                if keySignatureString not in self.keySignatures:
+                    self.keySignatures.append(keySignatureString)
+            elif isinstance(element, tempo.TempoIndication):
+                tempoIndicationString = str(element)
+                if tempoIndicationString not in self.tempos:
+                    self.tempos.append(tempoIndicationString)
+
+        if len(self.timeSignatures):
+            self.timeSignatureFirst = self.timeSignatures[0]
+        if len(self.keySignatures):
+            self.keySignatureFirst = self.keySignatures[0]
         if len(self.tempos):
             self.tempoFirst = self.tempos[0]
 
@@ -880,7 +918,7 @@ class RichMetadata(Metadata):
 #                if self.pitchHighest is None:
 #                    self.pitchHighest = pitch
 #                if self.pitchLowest is None:
-#                    self.pitchLowest = pitch 
+#                    self.pitchLowest = pitch
 #                if pitch.ps < self.pitchLowest.ps:
 #                    self.pitchLowest = pitch
 #                elif self.pitchHighest.ps < pitch.ps:
@@ -891,22 +929,22 @@ class RichMetadata(Metadata):
         self.noteCount = len(flat.notesAndRests)
         self.quarterLength = flat.highestTime
 
-# commenting out temporarily due to memory error     
+# commenting out temporarily due to memory error
 # with corpus/beethoven/opus132.xml
 #         # must be a method-level import
-   
+
 #         environLocal.printDebug(
 #             ['RichMetadata: update(): calling discrete.Ambitus(streamObj)'])
-# 
+#
         from music21.analysis import discrete
         self.ambitus = None
         self.pitchHighest = None
         self.pitchLowest = None
-        analysisObject = discrete.Ambitus(streamObj)    
+        analysisObject = discrete.Ambitus(streamObj)
         psRange = analysisObject.getPitchSpan(streamObj)
-        if psRange is not None: # may be none if no pitches are stored
+        if psRange is not None:  # may be none if no pitches are stored
             # presently, these are numbers; convert to pitches later
-            self.pitchLowest = str(psRange[0]) 
+            self.pitchLowest = str(psRange[0])
             self.pitchHighest = str(psRange[1])
         self.ambitus = analysisObject.getSolution(streamObj)
 
@@ -928,8 +966,8 @@ class Test(unittest.TestCase):
         from music21.musicxml import fromMxObjects
 
         document = xmlHandler.Document()
-        document.read(mTF.mozartTrioK581Excerpt) #@UndefinedVariable
-        mxScore = document.score # get the mx score directly
+        document.read(mTF.mozartTrioK581Excerpt)  # @UndefinedVariable
+        mxScore = document.score  # get the mx score directly
         md = fromMxObjects.mxScoreToMetadata(mxScore)
 
         self.assertEqual(md.movementNumber, '3')
@@ -940,8 +978,8 @@ class Test(unittest.TestCase):
         # get contributors directly from Metadata interface
         self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
 
-        document.read(mTF.binchoisMagnificat) # @UndefinedVariable
-        mxScore = document.score # get the mx score directly
+        document.read(mTF.binchoisMagnificat)  # @UndefinedVariable
+        mxScore = document.score  # get the mx score directly
         md = fromMxObjects.mxScoreToMetadata(mxScore)
         self.assertEqual(md.composer, 'Gilles Binchois')
 
@@ -952,8 +990,8 @@ class Test(unittest.TestCase):
         from music21 import metadata
 
         md = metadata.Metadata(
-            title='Concerto in F', 
-            date='2010', 
+            title='Concerto in F',
+            date='2010',
             composer='Frank',
             )
         #environLocal.printDebug([str(md.json)])
@@ -962,7 +1000,7 @@ class Test(unittest.TestCase):
         #md.jsonPrint()
 
         mdNew = metadata.Metadata()
-        
+
         jsonString = freezeThaw.JSONFreezer(md).json
         freezeThaw.JSONThawer(mdNew).json = jsonString
 
@@ -974,8 +1012,8 @@ class Test(unittest.TestCase):
         # test getting meta data from an imported source
 
         d = xmlHandler.Document()
-        d.read(testFiles.mozartTrioK581Excerpt) # @UndefinedVariable
-        mxScore = d.score # get the mx score directly
+        d.read(testFiles.mozartTrioK581Excerpt)  # @UndefinedVariable
+        mxScore = d.score  # get the mx score directly
 
         md = fromMxObjects.mxScoreToMetadata(mxScore)
 
@@ -1015,7 +1053,7 @@ class Test(unittest.TestCase):
         richMetadata.update(score)
 
         self.assertEqual(
-            richMetadata.keySignatureFirst, 
+            richMetadata.keySignatureFirst,
             '<music21.key.KeySignature of 1 flat, mode major>',
             )
 
@@ -1025,12 +1063,12 @@ class Test(unittest.TestCase):
 
         jsonString = freezeThaw.JSONFreezer(richMetadata).json
         freezeThaw.JSONThawer(rmdNew).json = jsonString
-        
+
         self.assertEqual(rmdNew.composer, 'Johannes Ciconia')
 
         self.assertEqual(str(rmdNew.timeSignatureFirst), '2/4')
         self.assertEqual(
-            str(rmdNew.keySignatureFirst), 
+            str(rmdNew.keySignatureFirst),
             '<music21.key.KeySignature of 1 flat, mode major>',
             )
 
@@ -1040,7 +1078,7 @@ class Test(unittest.TestCase):
 
         richMetadata.update(score)
         self.assertEqual(
-            str(richMetadata.keySignatureFirst), 
+            str(richMetadata.keySignatureFirst),
             '<music21.key.KeySignature of 3 sharps, mode minor>',
             )
         self.assertEqual(str(richMetadata.timeSignatureFirst), '4/4')
@@ -1050,7 +1088,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(rmdNew.timeSignatureFirst), '4/4')
         self.assertEqual(
-            str(rmdNew.keySignatureFirst), 
+            str(rmdNew.keySignatureFirst),
             '<music21.key.KeySignature of 3 sharps, mode minor>',
             )
 
@@ -1069,20 +1107,20 @@ class Test(unittest.TestCase):
         richMetadata.merge(score.metadata)
         richMetadata.update(score)
 
-        self.assertEqual(richMetadata.localeOfComposition, 
+        self.assertEqual(richMetadata.localeOfComposition,
             'Asien, Ostasien, China, Sichuan')
 
     def testMetadataSearch(self):
         from music21 import corpus
         score = corpus.base.parse('ciconia')
         self.assertEqual(
-            score.metadata.search('quod', 'title'), 
+            score.metadata.search('quod', 'title'),
             (True, 'title'))
         self.assertEqual(
-            score.metadata.search('qu.d', 'title'), 
+            score.metadata.search('qu.d', 'title'),
             (True, 'title'))
         self.assertEqual(
-            score.metadata.search(re.compile('(.*)canon(.*)')), 
+            score.metadata.search(re.compile('(.*)canon(.*)')),
             (True, 'title'))
 
     def testRichMetadata02(self):
@@ -1110,10 +1148,25 @@ class Test(unittest.TestCase):
                                 "__class__": "music21.metadata.primitives.Text"
                             }
                         }, 
+                        "ambitus": {
+                            "__attr__": {
+                                "_priority": 0
+                            }, 
+                            "__class__": "music21.interval.Interval"
+                        }, 
                         "keySignatureFirst": "<music21.key.KeySignature of 3 sharps, mode minor>", 
+                        "keySignatures": [
+                            "<music21.key.KeySignature of 3 sharps, mode minor>"
+                        ], 
                         "noteCount": 165, 
+                        "pitchHighest": "E5", 
+                        "pitchLowest": "F#2", 
                         "quarterLength": 36.0, 
-                        "timeSignatureFirst": "4/4"
+                        "tempos": [], 
+                        "timeSignatureFirst": "4/4", 
+                        "timeSignatures": [
+                            "4/4"
+                        ]
                     }, 
                     "__class__": "music21.metadata.base.RichMetadata", 
                     "__version__": [

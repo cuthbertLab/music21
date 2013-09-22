@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         caching.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -7,15 +7,14 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
-#               Project 
+#               Project
 # License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 import multiprocessing
 import os
 import pickle
-import time
 import traceback
 import unittest
 
@@ -49,8 +48,9 @@ def cacheMetadata(
 
     ::
 
+        >>> from music21 import metadata
         >>> metadata.cacheMetadata(
-        ...     domains='core', 
+        ...     domains='core',
         ...     useMultiprocessing=False,
         ...     )
 
@@ -112,6 +112,7 @@ class MetadataCachingJob(object):
 
     ::
 
+        >>> from music21 import metadata
         >>> job = metadata.MetadataCachingJob(
         ...     'bach/bwv66.6',
         ...     useCorpus=True,
@@ -122,7 +123,7 @@ class MetadataCachingJob(object):
         >>> errors = job.getErrors()
 
     '''
-    
+
     ### INITIALIZER ###
 
     def __init__(self, filePath, jobNumber=0, useCorpus=True):
@@ -175,7 +176,7 @@ class MetadataCachingJob(object):
             if parsedObject.metadata is not None:
                 richMetadata = metadata.RichMetadata()
                 richMetadata.merge(parsedObject.metadata)
-                richMetadata.update(parsedObject) # update based on Stream
+                richMetadata.update(parsedObject)  # update based on Stream
                 environLocal.printDebug(
                     'updateMetadataCache: storing: {0}'.format(corpusPath))
                 metadataEntry = metadata.MetadataEntry(
@@ -206,7 +207,7 @@ class MetadataCachingJob(object):
         try:
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self._parseOpusScore(score, scoreNumber)
-                del score # for memory conservation
+                del score  # for memory conservation
         except Exception as exception:
             environLocal.warn(
                 'Had a problem with extracting metadata for score {0} '
@@ -228,7 +229,7 @@ class MetadataCachingJob(object):
             # updgrade metadata to richMetadata
             richMetadata = metadata.RichMetadata()
             richMetadata.merge(score.metadata)
-            richMetadata.update(score) # update based on Stream
+            richMetadata.update(score)  # update based on Stream
             if score.metadata is None or score.metadata.number is None:
                 environLocal.warn(
                     'addFromPaths: got Opus that contains '
@@ -237,7 +238,7 @@ class MetadataCachingJob(object):
             else:
                 # update path to include work number
                 corpusPath = metadata.MetadataBundle.corpusPathToKey(
-                    self.filePath, 
+                    self.filePath,
                     number=score.metadata.number,
                     )
                 environLocal.printDebug(
@@ -275,7 +276,7 @@ class JobProcessor(object):
     in parallel, as a generator.
 
     Yields a dictionary of:
-    
+
     * MetadataEntry instances
     * failed file paths
     * the last processed file path
@@ -283,6 +284,7 @@ class JobProcessor(object):
 
     ::
 
+        >>> from music21 import corpus, metadata
         >>> jobs = []
         >>> for corpusPath in corpus.getMonteverdiMadrigals()[:5]:
         ...     job = metadata.MetadataCachingJob(
@@ -292,44 +294,68 @@ class JobProcessor(object):
         ...     jobs.append(job)
         >>> jobGenerator = metadata.JobProcessor.process_serial(jobs)
         >>> for result in jobGenerator:
-        ...     print result['metadataEntries'], result['remainingJobs']
+        ...     print result['remainingJobs']
         ...
-        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_1_mxl>,) 4
-        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_2_mxl>,) 3
-        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_3_mxl>,) 2
-        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_4_mxl>,) 1
-        (<music21.metadata.bundles.MetadataEntry: monteverdi_madrigal_3_5_mxl>,) 0
+        4
+        3
+        2
+        1
+        0
 
     '''
+
+    ### PRIVATE METHODS ###
+
+    @staticmethod
+    def _report(totalJobs, remainingJobs, filePath, filePathErrorCount):
+        '''
+        Report on the current job status.
+        '''
+        message = 'updated {0} of {1} files; ' \
+            'total errors: {2} ... last file: {3}'.format(
+                totalJobs - remainingJobs,
+                totalJobs,
+                filePathErrorCount,
+                filePath,
+                )
+        environLocal.warn(message)
 
     ### PUBLIC METHODS ###
 
     @staticmethod
     def process_parallel(jobs, processCount=None):
+        '''
+        Process jobs in parallel, with `processCount` processes.
+
+        If `processCount` is none, use 1 fewer process than the number of
+        available cores.
+        '''
         processCount = processCount or multiprocessing.cpu_count() - 1
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
+        environLocal.warn(
+            'Processing {0} jobs in parallel, with {1} processes.'.format(
+                remainingJobs, processCount))
         results = []
-        filePathErrors = []
         job_queue = multiprocessing.JoinableQueue()
         result_queue = multiprocessing.Queue()
-        workers = [WorkerProcess(job_queue, result_queue) 
-            for i in range(processCount)]
+        workers = [WorkerProcess(job_queue, result_queue)
+            for _ in range(processCount)]
         for worker in workers:
             worker.start()
         if jobs:
             for job in jobs:
                 job_queue.put(pickle.dumps(job, protocol=0))
-            for i in xrange(len(jobs)):
+            for _ in xrange(len(jobs)):
                 job = pickle.loads(result_queue.get())
                 results = job.getResults()
                 errors = job.getErrors()
                 remainingJobs -= 1
                 yield {
-                    'metadataEntries': results, 
-                    'errors': errors, 
-                    'filePath': job.filePath, 
+                    'metadataEntries': results,
+                    'errors': errors,
+                    'filePath': job.filePath,
                     'remainingJobs': remainingJobs,
                     }
         for worker in workers:
@@ -343,30 +369,21 @@ class JobProcessor(object):
 
     @staticmethod
     def process_serial(jobs):
+        '''
+        Process jobs serially.
+        '''
         remainingJobs = len(jobs)
         results = []
-        filePathErrors = []
-        for i, job in enumerate(jobs):
+        for job in jobs:
             results, errors = job()
             remainingJobs -= 1
             yield {
-                'metadataEntries': results, 
-                'errors': errors, 
-                'filePath': job.filePath, 
+                'metadataEntries': results,
+                'errors': errors,
+                'filePath': job.filePath,
                 'remainingJobs': remainingJobs,
                 }
         raise StopIteration
-
-    @staticmethod
-    def report(totalJobs, remainingJobs, filePath, filePathErrorCount):
-        message = 'updated {0} of {1} files; ' \
-            'total errors: {2} ... last file: {3}'.format(
-                totalJobs - remainingJobs,
-                totalJobs,
-                filePathErrorCount,
-                filePath,
-                )
-        environLocal.warn(message)
 
 
 #------------------------------------------------------------------------------
@@ -377,14 +394,14 @@ class WorkerProcess(multiprocessing.Process):
     A worker process for use by the multithreaded metadata-caching job
     processor.
     '''
-    
+
     ### INITIALIZER ###
 
     def __init__(self, job_queue, result_queue):
         multiprocessing.Process.__init__(self)
         self.job_queue = job_queue
         self.result_queue = result_queue
-        
+
     ### PUBLIC METHODS ###
 
     def run(self):

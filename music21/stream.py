@@ -2373,7 +2373,6 @@ class Stream(base.Music21Object):
         or more classes in the `classFilterList`. A single class 
         can also used for the `classFilterList` parameter instead of a List.
         
-        
         >>> a = stream.Score()
         >>> a.repeatInsert(note.Rest(), range(10))
         >>> for x in range(4):

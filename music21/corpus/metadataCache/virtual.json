@@ -21,12 +21,25 @@
                   "__class__": "music21.metadata.primitives.Text"
                 }
               }, 
+              "ambitus": {
+                "__attr__": {
+                  "_priority": 0
+                }, 
+                "__class__": "music21.interval.Interval"
+              }, 
               "keySignatureFirst": "<music21.key.KeySignature of 1 sharp>", 
+              "keySignatures": [
+                "<music21.key.KeySignature of 1 sharp>"
+              ], 
               "noteCount": 697, 
               "pitchHighest": "G4", 
               "pitchLowest": "C2", 
               "quarterLength": 332.0, 
-              "timeSignatureFirst": "4/4"
+              "tempos": [], 
+              "timeSignatureFirst": "4/4", 
+              "timeSignatures": [
+                "4/4"
+              ]
             }, 
             "__class__": "music21.metadata.base.RichMetadata"
           }, 
@@ -48,12 +61,25 @@
                   "__class__": "music21.metadata.primitives.Text"
                 }
               }, 
+              "ambitus": {
+                "__attr__": {
+                  "_priority": 0
+                }, 
+                "__class__": "music21.interval.Interval"
+              }, 
               "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats, mode major>", 
+              "keySignatures": [
+                "<music21.key.KeySignature of no sharps or flats, mode major>"
+              ], 
               "noteCount": 526, 
               "pitchHighest": "C6", 
               "pitchLowest": "C2", 
               "quarterLength": 172.0, 
-              "timeSignatureFirst": "4/4"
+              "tempos": [], 
+              "timeSignatureFirst": "4/4", 
+              "timeSignatures": [
+                "4/4"
+              ]
             }, 
             "__class__": "music21.metadata.base.RichMetadata"
           }, 
@@ -141,12 +167,25 @@
                   "__class__": "music21.metadata.primitives.Text"
                 }
               }, 
+              "ambitus": {
+                "__attr__": {
+                  "_priority": 0
+                }, 
+                "__class__": "music21.interval.Interval"
+              }, 
               "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats, mode major>", 
+              "keySignatures": [
+                "<music21.key.KeySignature of no sharps or flats, mode major>"
+              ], 
               "noteCount": 67, 
               "pitchHighest": "B-5", 
               "pitchLowest": "D#4", 
               "quarterLength": 72.0, 
-              "timeSignatureFirst": "4/4"
+              "tempos": [], 
+              "timeSignatureFirst": "4/4", 
+              "timeSignatures": [
+                "4/4"
+              ]
             }, 
             "__class__": "music21.metadata.base.RichMetadata"
           }, 
