@@ -701,13 +701,11 @@ class MetadataBundle(object):
         skippedJobsCount = 0
         for path in paths:
             key = self.corpusPathToKey(path)
-            if key in self._metadataEntries:
-                metadataEntry = self._metadataEntries[key]  
-                if not path.startswith('http://'):
-                    pathModificationTime = os.path.getctime(path)
-                    if pathModificationTime < metadataBundleModificationTime:
-                        skippedJobsCount += 1
-                        continue
+            if key in self._metadataEntries and not path.startswith('http://'):
+                pathModificationTime = os.path.getctime(path)
+                if pathModificationTime < metadataBundleModificationTime:
+                    skippedJobsCount += 1
+                    continue
             #environLocal.warn([
             #    'Preparing job: {0}'.format(common.relativepath(path)),
             #    ])
@@ -1127,6 +1125,38 @@ class MetadataBundle(object):
             ])
         return self
 
+    def rebuild(self, useMultiprocessing=True):
+        r'''
+        Rebuild a named bundle from scratch.
+
+        If a bundle is associated with one of music21's corpuses, delete any
+        metadata cache on disk, clear the bundle's contents and reload in all
+        files from that associated corpus.
+
+        Return the metadata bundle.
+
+        ::
+
+            >>> localBundle = metadata.MetadataBundle.fromLocalCorpus()
+            >>> localBundle = localBundle.rebuild(useMultiprocessing=False)
+
+        '''
+        from music21 import corpus
+        if self.filePath is None:
+            return self
+        self.clear()
+        self.delete()
+        pathProcedures = {
+            'core': corpus.getCorePaths,
+            'local': corpus.getLocalPaths,
+            'virtual': corpus.getVirtualPaths,
+            }
+        self.addFromPaths(
+            pathProcedures[self.name](),
+            useMultiprocessing=useMultiprocessing,
+            )
+        return self
+
     def search(self, query, field=None, fileExtensions=None):
         r'''
         Perform search, on all stored metadata, permit regular expression 
@@ -1179,7 +1209,7 @@ class MetadataBundle(object):
             ...     field='composer', 
             ...     fileExtensions=('.xml'),
             ...     )
-            >>> len(searchResult) # shouldn't this be 11?
+            >>> len(searchResult)
             1   
 
         '''

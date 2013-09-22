@@ -776,8 +776,16 @@ class RichMetadata(Metadata):
         self.timeSignatures = []
         # append to existing search attributes from Metdata
         self._searchAttributes += [
-            'keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 
-            'pitchLowest', 'noteCount', 'quarterLength',
+            'keySignatureFirst', 
+            'keySignatures',
+            'noteCount', 
+            'pitchHighest', 
+            'pitchLowest', 
+            'quarterLength',
+            'tempoFirst',
+            'tempos',
+            'timeSignatureFirst', 
+            'timeSignatures',
             ]
 
     ### PUBLIC METHODS ###
@@ -827,44 +835,58 @@ class RichMetadata(Metadata):
         r'''
         Given a Stream object, update attributes with stored objects. 
         '''
+        from music21 import chord
+        from music21 import note
+
         environLocal.printDebug(['RichMetadata: update(): start'])
         
-        # clear all old values
-        self.keySignatureFirst = None
-        #self.keySignatures = []
-        self.timeSignatureFirst = None
-        #self.timeSignatures = []
-        self.tempoFirst = None
-        #self.tempos = []
-
-        self.noteCount = None
-        self.quarterLength = None
-
-        self.ambitus = None
-        self.pitchHighest = None
-        self.pitchLowest = None
-
-        # get flat sorted stream
         flat = streamObj.flat.sorted
 
-        tsStream = flat.getElementsByClass('TimeSignature')
-        if len(tsStream) > 0:
-            # just store the string representation  
-            # re-instantiating TimeSignature objects is expensive
-            self.timeSignatureFirst = tsStream[0].ratioString
-        
-        # this presently does not work properly b/c ts comparisons are not
-        # built-in; need to add __eq__ methods to MeterTerminal
-#         for ts in tsStream:
-#             if ts not in self.timeSignatures:
-#                 self.timeSignatures.append(ts)
+        self.timeSignatureFirst = None
+        self.timeSignatures = []
+        timeSignatureStream = flat.getElementsByClass('TimeSignature')
+        for timeSignature in timeSignatureStream:
+            ratioString = timeSignature.ratioString
+            if ratioString not in self.timeSignatures:
+                self.timeSignatures.append(ratioString)
+        if len(timeSignatureStream):
+            self.timeSignatureFirst = self.timeSignatures[0]
 
-        ksStream = flat.getElementsByClass('KeySignature')
-        if len(ksStream) > 0:
-            self.keySignatureFirst = str(ksStream[0])
-#         for ks in ksStream:
-#             if ks not in self.keySignatures:
-#                 self.keySignatures.append(ts)
+        self.keySignatureFirst = None
+        self.keySignatures = []
+        keySignatureStream = flat.getElementsByClass('KeySignature')
+        for keySignature in keySignatureStream:
+            if str(keySignature) not in self.keySignatures:
+                self.keySignatures.append(str(keySignature))
+        if len(self.keySignatures):
+            self.keySignatureFirst = self.keySignatures[0]
+
+        self.tempoFirst = None
+        self.tempos = []
+        tempoIndicationStream = flat.getElementsByClass('TempoIndication')
+        for tempoIndication in tempoIndicationStream:
+            if str(tempoIndication) not in self.tempos:
+                self.tempos.append(str(tempoIndication))
+        if len(self.tempos):
+            self.tempoFirst = self.tempos[0]
+
+#        for element in flat:
+#            pitches = ()
+#            if isinstance(element, note.Note):
+#                pitches = (element.pitch,)
+#            elif isinstance(element, chord.Chord):
+#                pitches = element.pitches
+#            for pitch in pitches:
+#                if self.pitchHighest is None:
+#                    self.pitchHighest = pitch
+#                if self.pitchLowest is None:
+#                    self.pitchLowest = pitch 
+#                if pitch.ps < self.pitchLowest.ps:
+#                    self.pitchLowest = pitch
+#                elif self.pitchHighest.ps < pitch.ps:
+#                    self.pitchHighest = pitch
+#        self.pitchLowest = str(self.pitchLowest)
+#        self.pitchHighest = str(self.pitchHighest)
 
         self.noteCount = len(flat.notesAndRests)
         self.quarterLength = flat.highestTime
@@ -872,19 +894,21 @@ class RichMetadata(Metadata):
 # commenting out temporarily due to memory error     
 # with corpus/beethoven/opus132.xml
 #         # must be a method-level import
-#         from music21.analysis import discrete
    
 #         environLocal.printDebug(
 #             ['RichMetadata: update(): calling discrete.Ambitus(streamObj)'])
 # 
-#         analysisObj = discrete.Ambitus(streamObj)    
-#         psRange = analysisObj.getPitchSpan(streamObj)
-#         if psRange != None: # may be none if no pitches are stored
-#             # presently, these are numbers; convert to pitches later
-#             self.pitchLowest = str(psRange[0]) 
-#             self.pitchHighest = str(psRange[1])
-# 
-#         self.ambitus = analysisObj.getSolution(streamObj)
+        from music21.analysis import discrete
+        self.ambitus = None
+        self.pitchHighest = None
+        self.pitchLowest = None
+        analysisObject = discrete.Ambitus(streamObj)    
+        psRange = analysisObject.getPitchSpan(streamObj)
+        if psRange is not None: # may be none if no pitches are stored
+            # presently, these are numbers; convert to pitches later
+            self.pitchLowest = str(psRange[0]) 
+            self.pitchHighest = str(psRange[1])
+        self.ambitus = analysisObject.getSolution(streamObj)
 
 
 #------------------------------------------------------------------------------

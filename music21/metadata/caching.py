@@ -67,30 +67,30 @@ def cacheMetadata(
     # store list of file paths that caused an error
     failingFilePaths = []
 
-    domainGetPathsProcedures = {
-       'core': corpus.getCorePaths,
-       'local': corpus.getLocalPaths,
-       'virtual': corpus.getVirtualPaths,
-       }
-
     # the core cache is based on local files stored in music21
     # virtual is on-line
     for domain in domains:
-        # the domain passed here becomes the name of the bundle
-        # determines the file name of the json bundle
-        metadataBundle = metadata.MetadataBundle(domain)
-        if domain not in domainGetPathsProcedures:
+        if domain == 'core':
+            metadataBundle = metadata.MetadataBundle.fromCoreCorpus()
+            paths = corpus.getCorePaths()
+            useCorpus = True
+        elif domain == 'local':
+            metadataBundle = metadata.MetadataBundle.fromLocalCorpus()
+            paths = corpus.getLocalPaths()
+            useCorpus = False
+        elif domain == 'virtual':
+            metadataBundle = metadata.MetadataBundle.fromVirtualCorpus()
+            paths = corpus.getVirtualPaths()
+            useCorpus = False
+        else:
             raise MetadataCacheException('invalid domain provided: {0}'.format(
                 domain))
-        if os.path.exists(metadataBundle.filePath):
-            metadataBundle.read()
-        paths = domainGetPathsProcedures[domain]()
         environLocal.warn(
             'metadata cache: starting processing of paths: {0}'.format(
                 len(paths)))
-        # returns any paths that failed to load
         failingFilePaths += metadataBundle.addFromPaths(
             paths,
+            useCorpus=useCorpus,
             useMultiprocessing=useMultiprocessing,
             )
         environLocal.warn(
@@ -163,6 +163,7 @@ class MetadataCachingJob(object):
         except Exception, e:
             environLocal.warn('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
+            traceback.print_exc()
             self.filePathErrors.append(self.filePath)
         return parsedObject
 
@@ -187,10 +188,11 @@ class MetadataCachingJob(object):
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
                         common.relativepath(self.filePath)))
-                #metadataEntry = metadata.MetadataEntry(
-                #    sourcePath=self.filePath,
-                #    metadataPayload=None,
-                #    )
+                metadataEntry = metadata.MetadataEntry(
+                    sourcePath=self.filePath,
+                    metadataPayload=None,
+                    )
+                self.results.append(metadataEntry)
         except Exception:
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
@@ -211,16 +213,14 @@ class MetadataCachingJob(object):
                 'in {1}, whole opus ignored: {2}'.format(
                     scoreNumber, self.filePath, str(exception)))
             traceback.print_exc()
-        else:
-            # Create a dummy metadata entry, representing the entire opus.
-            # This lets the metadata bundle know it has already processed this
-            # entire opus on the next cache update.
-            #metadataEntry = metadata.MetadataEntry(
-            #    sourcePath=self.filePath,
-            #    metadataPayload=None,
-            #    )
-            #self.results.append(metadataEntry)
-            pass
+        # Create a dummy metadata entry, representing the entire opus.
+        # This lets the metadata bundle know it has already processed this
+        # entire opus on the next cache update.
+        metadataEntry = metadata.MetadataEntry(
+            sourcePath=self.filePath,
+            metadataPayload=None,
+            )
+        self.results.append(metadataEntry)
 
     def _parseOpusScore(self, score, scoreNumber):
         from music21 import metadata
