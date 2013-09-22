@@ -464,6 +464,7 @@ def reBar(music21Part, inPlace=True):
     {1.5} <music21.note.Note G>
     {2.0} <music21.note.Note E>
     {2.5} <music21.note.Note G>
+    
     >>> music21Part2.measure(2).show("text")
     {0.0} <music21.meter.TimeSignature 1/8>
     {0.0} <music21.note.Note E>

@@ -80,8 +80,7 @@ for name in dir(virtual): # look over virtual module
     className = getattr(virtual, name)
     if callable(className):
         obj = className()
-        if isinstance(obj, virtual.VirtualWork) and \
-            obj.corpusPath != None: # @UndefinedVariable
+        if isinstance(obj, virtual.VirtualWork) and obj.corpusPath != None: # @UndefinedVariable
             VIRTUAL.append(obj)
 
 

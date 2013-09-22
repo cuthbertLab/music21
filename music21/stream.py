@@ -2069,7 +2069,7 @@ class Stream(base.Music21Object):
 
         # use quarterLength as start time
         targets = sLeft.getElementsByOffset(quarterLength, sLeft.highestTime,     
-            includeEndBoundary=True, mustFinishInSpan=False, 
+            includeEndBoundary=True, mustFinishInSpan=False, includeElementsThatEndAtStart=False,
             mustBeginInSpan=False)
     
         targetSplit = []

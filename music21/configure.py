@@ -50,7 +50,7 @@ reMuseScoreApp = re.compile('MuseScore.app')
 urlMusic21 = 'http://mit.edu/music21'
 urlFinaleReader = 'http://www.finalemusic.com/Reader'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://mit.edu/music21/doc/html/quickStart.html'
+urlGettingStarted = 'http://mit.edu/music21/doc/about/quickStart.html'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
@@ -1070,7 +1070,7 @@ class AskAutoDownload(SelectFromList):
         ' ',
         'In addition to the corpus distributed with music21, other pieces are not included in this distribution, but are indexed as links to other web sites where they can be downloaded (the "virtual corpus"). If you would like, music21 can help your computer automatically resolve these links and bring them to your hard drive for analysis. See corpus/virtual.py for a list of sites that music21 might index.',
         ' ',
-        'To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright in the United States and/or are licensed for non-commercial use. These works, along with any works linked to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in error regarding one or more works please contact Michael Cuthbert at the address provided on http://mit.edu/music21/doc/html/about.html.',
+        'To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright in the United States and/or are licensed for non-commercial use. These works, along with any works linked to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in error regarding one or more works please contact Michael Cuthbert at cuthbert@mit.edu.',
         ' ',
         'Would you like to:'
         ]

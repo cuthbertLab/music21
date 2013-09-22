@@ -804,8 +804,6 @@ class Note(NotRest):
         Tests Equality. See docs under Note above
         (since __eq__'s docs don't display)
         
-
-        
         >>> n1 = note.Note()
         >>> n1.pitch.name = 'G#'
         >>> n2 = note.Note()
@@ -840,7 +838,6 @@ class Note(NotRest):
 
     def __ne__(self, other):
         '''Inequality. 
-
         
         >>> n1 = note.Note()
         >>> n1.pitch.name = 'G#'
@@ -858,6 +855,33 @@ class Note(NotRest):
         '''
         return not self.__eq__(other)
 
+    def __lt__(self, other):
+        '''
+        __lt__, __gt__, __le__, __ge__ all use a pitch comparison
+
+        >>> highE = note.Note("E5")
+        >>> lowF = note.Note("F2")
+        >>> otherHighE = note.Note("E5")
+        
+        >>> highE > lowF
+        True
+        >>> highE < lowF
+        False
+        >>> highE >= otherHighE
+        True
+        >>> highE <= otherHighE
+        True
+        '''
+        return self.pitch < other.pitch
+    
+    def __gt__(self, other):
+        return self.pitch > other.pitch
+
+    def __le__(self, other):
+        return self.pitch <= other.pitch
+    
+    def __ge__(self, other):
+        return self.pitch >= other.pitch
 
 
     #---------------------------------------------------------------------------

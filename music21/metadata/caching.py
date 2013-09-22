@@ -55,6 +55,7 @@ def cacheMetadata(
         ...     )
 
     '''
+    from music21 import common
     from music21 import corpus
     from music21 import metadata
 
@@ -200,7 +201,6 @@ class MetadataCachingJob(object):
             traceback.print_exc()
 
     def _parseOpus(self, parsedObject):
-        from music21 import metadata
         # need to get scores from each opus?
         # problem here is that each sub-work has metadata, but there
         # is only a single source file

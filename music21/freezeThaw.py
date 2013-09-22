@@ -55,7 +55,7 @@ object structures when decoded, so it can't really be used
 with complex nesting structures like music21 creates.  For instance:
 
 >>> from music21.ext import jsonpickle as jsp
->>> blah = {'hello': 'there'}
+>>> blah = {u'hello': u'there'}
 >>> l = [blah, blah]
 >>> l[0] is l[1]
 True
@@ -66,7 +66,7 @@ True
 
 >>> e = jsp.decode(d)
 >>> e
-[{'hello': 'there'}, {'hello': 'there'}]
+[{u'hello': u'there'}, {u'hello': u'there'}]
 
 >>> e[0] is e[1]
 False
@@ -76,13 +76,13 @@ However, pickle works fine, so we use that by default:
 >>> import pickle
 >>> f = pickle.dumps(l)
 >>> f
-"(lp0\n(dp1\nS'hello'\np2\nS'there'\np3\nsag1\na."
+'(lp0\n(dp1\nVhello\np2\nVthere\np3\nsag1\na.'
 
 Pretty ugly, eh? but it works!
 
 >>> g = pickle.loads(f)
 >>> g
-[{'hello': 'there'}, {'hello': 'there'}]
+[{u'hello': u'there'}, {u'hello': u'there'}]
 
 >>> g[0] is g[1]
 True

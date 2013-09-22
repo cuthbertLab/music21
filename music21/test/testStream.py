@@ -1116,6 +1116,23 @@ class Test(unittest.TestCase):
         # lesser notes
         self.assertEqual(len(p4Notes.notesAndRests), 10)
     
+    def testGetElementsByOffsetZeroLength(self):
+        '''
+        Testing multiple zero-length elements with mustBeginInSpan:
+        '''
+        
+        c = clef.TrebleClef()
+        ts = meter.TimeSignature('4/4')
+        ks = key.KeySignature(2)
+        s = Stream()
+        s.insert(0.0, c)
+        s.insert(0.0, ts)
+        s.insert(0.0, ks)
+        l1 = len(s.getElementsByOffset(0.0, mustBeginInSpan=True))
+        l2 = len(s.getElementsByOffset(0.0, mustBeginInSpan=False))
+        self.assertEqual(l1, 3)
+        self.assertEqual(l2, 3)
+        
 
     def testStripTiesScore(self):
         '''Test stripTies using the Score method
@@ -1218,8 +1235,6 @@ class Test(unittest.TestCase):
     #         stream2.trimPlayingWhileSounding(n12)
     #    assert trimPlayingWhileSounding[0] == n22
     #    assert trimPlayingWhileSounding[1].duration.quarterLength == 3.5
-
-
 
     def testMeasureRange(self):
         from music21 import corpus
@@ -4631,7 +4646,7 @@ class Test(unittest.TestCase):
 
     def testChordifyImported(self):
         from music21 import corpus
-        s = corpus.parse('gloria')
+        s = corpus.parse('luca/gloria')
         #s.show()
         post = s.measures(0, 20, gatherSpanners=False)
         # somehow, this is doubling measures

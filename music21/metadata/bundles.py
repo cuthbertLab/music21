@@ -186,7 +186,7 @@ class MetadataBundle(object):
             '__and__',
             )
 
-    def __eq__(self, expr):
+    def __eq__(self, other):
         '''
         True if `expr` is of the same type, and contains an identical set of
         entries, otherwise false:
@@ -211,8 +211,8 @@ class MetadataBundle(object):
             False
 
         '''
-        if type(self) == type(expr):
-            if self._metadataEntries == expr._metadataEntries:
+        if type(self) == type(other):
+            if self._metadataEntries == other._metadataEntries:
                 return True
         return False
 
@@ -630,7 +630,7 @@ class MetadataBundle(object):
         return filePath
 
     @apply
-    def name():
+    def name(): # @NoSelf
         def fget(self):
             r'''
             The name of the metadata bundle.

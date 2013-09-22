@@ -21,5 +21,5 @@ distributed with music21 by his permission.
 The original ABC files can be found here:
 http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html
 
-
+We thank both of these scholars for their generous contribution to this project.
 

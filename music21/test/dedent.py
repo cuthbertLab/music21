@@ -5,7 +5,7 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 
+# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 
 #               Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
@@ -21,7 +21,6 @@ def dedent(string):
     for indentWidth, character in enumerate(splitLines[0]):
         if character != ' ':
             break
-    tabString = 4 * ' '
     massagedLines = []
     for splitLine in splitLines:
         massagedLine = splitLine[indentWidth:]

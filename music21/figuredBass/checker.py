@@ -174,7 +174,7 @@ def correlateHarmonies(currentMapping, music21Part):
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
         notesInRange = music21Part.flat.getElementsByClass('GeneralNote').getElementsByOffset(initOffset, offsetEnd=endTime, \
-                        includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=False)
+                        includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=False, includeElementsThatEndAtStart=False)
         allNotesSoFar = currentMapping[offsets]
         for music21GeneralNote in notesInRange:
             newInitOffset = initOffset

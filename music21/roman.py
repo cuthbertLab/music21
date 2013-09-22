@@ -1294,7 +1294,7 @@ class RomanNumeral(harmony.Harmony):
             return self.frontAlterationAccidental.modifier + self.romanNumeralAlone
 
     @apply
-    def figure():
+    def figure():  # @NoSelf
         def fget(self):
             '''
             Gets or sets the entire figure (the whole enchilada).
@@ -1340,7 +1340,7 @@ class RomanNumeral(harmony.Harmony):
         return '%s in %s%s' % (self.figure, tonic, mode)
 
     @apply
-    def key():
+    def key():  # @NoSelf
         def fget(self):
             '''
             Gets or Sets the current Key (or Scale object) for a given RomanNumeral object.
@@ -1462,7 +1462,7 @@ class RomanNumeral(harmony.Harmony):
 #        
 
     @apply
-    def scaleDegreeWithAlteration():
+    def scaleDegreeWithAlteration():  # @NoSelf
         def fget(self):
             '''
             Returns or sets a two element tuple of the scale degree and the 
@@ -1525,7 +1525,7 @@ class RomanNumeral(harmony.Harmony):
         return bassSD
 
     @apply 
-    def functionalityScore():
+    def functionalityScore(): # @NoSelf
         def fget(self):
             '''
             Return or set a number from 1 to 100 representing the relative 

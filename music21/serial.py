@@ -75,7 +75,7 @@ class TwelveToneMatrix(stream.Stream):
 
     def __repr__(self):
         if len(self.elements) > 0:
-            if isinstance(ToneRow, self.elements[0]):
+            if isinstance(self.elements[0], ToneRow):
                 return '<music21.serial.TwelveToneMatrix for [%s]>' % self.elements[0]
             else:
                 return stream.Stream.__repr__(self)

@@ -1014,6 +1014,11 @@ def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=No
     >>> c = corpus.parse('bach/bwv66.6')
     >>> n1 = c.flat.getElementsByClass(note.Note)[0]
     >>> voiceLeading.getVerticalSliceFromObject(n1, c)
+    <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.clef.TrebleClef>, <music21.instrument.Instrument P1: Soprano: Instrument 1>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C#>], 1: [<music21.clef.TrebleClef>, <music21.instrument.Instrument P2: Alto: Instrument 2>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note E>], 2: [<music21.clef.BassClef>, <music21.instrument.Instrument P3: Tenor: Instrument 3>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>], 3: [<music21.clef.BassClef>, <music21.instrument.Instrument P4: Bass: Instrument 4>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>]}  
+
+    for getting things at the beginning of scores, probably better to use a classFilterList:
+
+    >>> voiceLeading.getVerticalSliceFromObject(n1, c, classFilterList = [note.Note, chord.Chord, note.Rest])
     <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.note.Note C#>], 1: [<music21.note.Note E>], 2: [<music21.note.Note A>], 3: [<music21.note.Note A>]}  
     '''
     offsetOfObject =  music21Obj.getOffsetBySite(scoreObjectIsFrom.flat)
@@ -1025,7 +1030,7 @@ def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=No
             if partNum in contentDict:
                 contentDict[partNum].append(el)
             else:
-                contentDict[partNum] = el
+                contentDict[partNum] = [el]
     return VerticalSlice(contentDict)
 
 

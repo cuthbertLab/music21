@@ -1238,9 +1238,8 @@ class Pitch(base.Music21Object):
         return not self.__eq__(other)
 
     def __lt__(self, other):
-        '''Do not accept enharmonic equivalence. Based entirely on pitch space 
+        '''Accepts enharmonic equivalence. Based entirely on pitch space 
         representation.
-        
         
         >>> a = pitch.Pitch('c4')
         >>> b = pitch.Pitch('c#4')
@@ -1253,23 +1252,35 @@ class Pitch(base.Music21Object):
             return False
 
     def __le__(self, other):
-        '''Less than or equal.  Based on the accidentals' alter function.
-
+        '''
+        Less than or equal.  Based on the accidentals' alter function.
+        Note that to be equal enharmonics must be the same. So two pitches can
+        be neither lt or gt and not equal to each other!
         
         >>> a = pitch.Pitch('d4')
         >>> b = pitch.Pitch('d8')
         >>> c = pitch.Pitch('d4')
-        >>> a >= b
+        >>> b <= a
         False
-        >>> a >= c
+        >>> a <= b
         True
+        >>> a <= c
+        True
+        
+        >>> d = pitch.Pitch('c##4')
+        >>> c >= d
+        False
+        >>> c <= d
+        False
+        
+        Do not rely on this behavior -- it may be changed in a future version
+        to create a total ordering.
         '''
         return self.__lt__(other) or self.__eq__(other)
 
     def __gt__(self, other):
-        '''Do not accept enharmonic equivialance. Based entirely on pitch space 
+        '''Accepts enharmonic equivalance. Based entirely on pitch space 
         representation.
-        
         
         >>> a = pitch.Pitch('d4')
         >>> b = pitch.Pitch('d8')
@@ -1282,7 +1293,10 @@ class Pitch(base.Music21Object):
             return False
 
     def __ge__(self, other):
-        '''Greater than or equal.  Based on the accidentals' alter function.
+        '''
+        Greater than or equal.  Based on the accidentals' alter function.
+        Note that to be equal enharmonics must be the same. So two pitches can
+        be neither lt or gt and not equal to each other!
 
         
         >>> a = pitch.Pitch('d4')
@@ -1290,8 +1304,21 @@ class Pitch(base.Music21Object):
         >>> c = pitch.Pitch('d4')
         >>> a >= b
         False
+        >>> b >= a
+        True
         >>> a >= c
         True
+        >>> c >= a
+        True
+        
+        >>> d = pitch.Pitch('c##4')
+        >>> c >= d
+        False
+        >>> c <= d
+        False
+        
+        Do not rely on this behavior -- it may be changed in a future version
+        to create a total ordering.        
         '''
         return self.__gt__(other) or self.__eq__(other)
 

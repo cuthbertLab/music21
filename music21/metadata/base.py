@@ -1042,7 +1042,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         from music21 import metadata
 
-        score = corpus.base.parse('jactatur')
+        score = corpus.parse('jactatur')
         self.assertEqual(score.metadata.composer, 'Johannes Ciconia')
 
         richMetadata = metadata.RichMetadata()
@@ -1072,7 +1072,7 @@ class Test(unittest.TestCase):
             '<music21.key.KeySignature of 1 flat, mode major>',
             )
 
-        score = corpus.base.parse('bwv66.6')
+        score = corpus.parse('bwv66.6')
         richMetadata = metadata.RichMetadata()
         richMetadata.merge(score.metadata)
 
@@ -1096,7 +1096,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         from music21 import metadata
 
-        opus = corpus.base.parse('essenFolksong/teste')
+        opus = corpus.parse('essenFolksong/teste')
         self.assertEqual(len(opus), 8)
 
         score = opus.getScoreByNumber(4)
@@ -1112,7 +1112,7 @@ class Test(unittest.TestCase):
 
     def testMetadataSearch(self):
         from music21 import corpus
-        score = corpus.base.parse('ciconia')
+        score = corpus.parse('ciconia')
         self.assertEqual(
             score.metadata.search('quod', 'title'),
             (True, 'title'))
@@ -1127,7 +1127,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         from music21 import metadata
         from music21 import test
-        score = corpus.base.parse('bwv66.6')
+        score = corpus.parse('bwv66.6')
         richMetadata = metadata.RichMetadata()
         richMetadata.merge(score.metadata)
         richMetadata.update(score)

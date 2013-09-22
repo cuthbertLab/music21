@@ -202,7 +202,7 @@ def indexScoreFilePaths(
         scoreIndex += 1
         try:
             if filePath.startswith('music21/corpus'):
-                scoreObj = corpus.parse(filePath)
+                scoreObj = corpus.parse(filePath) # @UndefinedVariable
             else:
                 scoreObj = converter.parse(filePath)
             scoreDict[shortfp] = indexScoreParts(scoreObj, *args, **kwds)
