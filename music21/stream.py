@@ -503,7 +503,10 @@ class Stream(base.Music21Object):
    
     def _setElements(self, value):
         '''
-        TODO: this should be removed, as this is a bad way to add elements, as locations are not set properly. 
+        TODO: this should be tested thoroughly, as this is a bad way to add elements, 
+        as locations are not necessarily set properly. 
+        
+        Removing the elements from the current Stream seems necessary.
         '''
         if (not common.isListLike(value) and hasattr(value, 'isStream') and 
             value.isStream):
@@ -541,10 +544,10 @@ class Stream(base.Music21Object):
             >>> a = stream.Stream()
             >>> a.repeatInsert(note.Note("C"), range(10))
             >>> b = stream.Stream()
-            >>> b.repeatInsert(note.Note("C"), range(10))
+            >>> b.repeatInsert(note.Note("D"), range(10))
             >>> b.offset = 6
             >>> c = stream.Stream()
-            >>> c.repeatInsert(note.Note("C"), range(10))
+            >>> c.repeatInsert(note.Note("E"), range(10))
             >>> c.offset = 12
             >>> b.insert(c)
             >>> b.isFlat
@@ -2786,7 +2789,7 @@ class Stream(base.Music21Object):
 
     def getElementsByOffset(self, offsetStart, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False, 
-                    mustBeginInSpan=True, classList=None ):
+                    mustBeginInSpan=True, includeElementsThatEndAtStart = True, classList=None ):
         '''
         Returns a Stream containing all Music21Objects that 
         are found at a certain offset or within a certain 
@@ -2818,7 +2821,7 @@ class Stream(base.Music21Object):
         mustFinishInSpan is set to True is probably NOT what you want to do
         unless you want to find things like clefs at the end of the region
         to display as courtesy clefs.
-        
+                
         The `mustBeginInSpan` option determines whether notes or other
         objects that do not begin in the region but are still sounding
         at the beginning of the region are excluded.  The default is 
@@ -2828,6 +2831,11 @@ class Stream(base.Music21Object):
         mustBeginInSpan = True) but it would be found by
         getElementsByOffset(3.0, 3.5, mustBeginInSpan = False)
         
+        Setting includeElementsThatEndAtStart to False is useful for zeroLength
+        searches that set mustBeginInSpan == False to not catch notes that were
+        playing before the search but that end just before the end of the search type.
+        See the code for allPlayingWhileSounding for a demonstration.
+
         This chart, and the examples below, demonstrate the various
         features of getElementsByOffset.  It is one of the most complex
         methods of music21 but also one of the most powerful, so it
@@ -2894,9 +2902,31 @@ class Stream(base.Music21Object):
         >>> c = b.flat.getElementsByOffset(2,6.9)
         >>> len(c)
         10
+        
+        
+        Testing multiple zero-length elements with mustBeginInSpan:
+        
+        >>> c = clef.TrebleClef()
+        >>> ts = meter.TimeSignature('4/4')
+        >>> ks = key.KeySignature(2)
+        >>> s = stream.Stream()
+        >>> s.insert(0.0, c)
+        >>> s.insert(0.0, ts)
+        >>> s.insert(0.0, ks)
+        >>> len(s.getElementsByOffset(0.0, mustBeginInSpan=True))
+        3
+        >>> len(s.getElementsByOffset(0.0, mustBeginInSpan=False))
+        3
+        
         '''
         if offsetEnd is None:
             offsetEnd = offsetStart
+            zeroLengthSearch = True
+        else:
+            if offsetEnd > offsetStart:
+                zeroLengthSearch = False
+            else:
+                zeroLengthSearch = True
         
         found = self.__class__()
         found.derivesFrom = self
@@ -2907,63 +2937,63 @@ class Stream(base.Music21Object):
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
-            match = False
             offset = e.getOffsetBySite(self)
-            # if sorted, optimize by breaking after exceeding offsetEnd
-            if self.isSorted:
-                if offset > offsetEnd:
-                    break
-                # if offset of this element is lt, the target - the dur of e        
-                # it is not  a match
-                if offset < (offsetStart - e.duration.quarterLength):
-                    continue
             dur = e.duration
-            if not mustFinishInSpan:
-                eEnd = offset
+            offset = common.cleanupFloat(offset)
+
+            if offset > offsetEnd:  # anything that ends after the span is definitely out
+                if self.isSorted:
+                    # if sorted, optimize by breaking after exceeding offsetEnd
+                    # eventually we could do a binary search to speed up...
+                    break
+                else:
+                    continue
+
+            elementEnd = common.cleanupFloat(offset + dur.quarterLength)
+            if dur.quarterLength == 0:
+                elementIsZeroLength = True
             else:
-                eEnd = offset + dur.quarterLength
-            eEnd = common.cleanupFloat(eEnd)
-    
-            if not mustBeginInSpan:
-                eStart = offset + dur.quarterLength
-            else:
-                eStart = offset
-            eStart = common.cleanupFloat(eStart)
+                elementIsZeroLength = False
+            
+            if elementEnd < offsetStart:  # anything that finishes before the span ends is definitely out
+                continue
 
-            match = False
-
-            # alternate version that uses common based comparison
-            # not yet seen as necessary (but incurring a performance hit so
-            # not yet used
-
-#             if (includeEndBoundary is True and mustBeginInSpan is True and 
-#                 common.greaterThanOrEqual(eStart, offsetStart) and common.lessThanOrEqual(eEnd, offsetEnd)):
-#                     match = True
-#             elif (includeEndBoundary is True and mustBeginInSpan is False and
-#                 eStart > offsetStart and common.lessThanOrEqual(eEnd, offsetEnd)):
-#                     match = True
-#             elif (includeEndBoundary is False and mustBeginInSpan is True and 
-#                 common.greaterThanOrEqual(eStart, offsetStart) and eEnd < offsetEnd):
-#                     match = True
-#             elif (includeEndBoundary is False and mustBeginInSpan is False and
-#                 eStart > offsetStart and eEnd < offsetEnd):
-#                     match = True
-
-            if includeEndBoundary is True and mustBeginInSpan is True and \
-                eStart >= offsetStart and eEnd <= offsetEnd:
-                    match = True
-            elif includeEndBoundary is True and mustBeginInSpan is False and \
-                eStart > offsetStart and eEnd <= offsetEnd:
-                    match = True
-            elif includeEndBoundary is False and mustBeginInSpan is True and \
-                eStart >= offsetStart and eEnd < offsetEnd:
-                    match = True
-            elif includeEndBoundary is False and mustBeginInSpan is False and \
-                eStart > offsetStart and eEnd < offsetEnd:
-                    match = True
-
-            if match:
+            # all the simple cases done! Now need to filter out those that are border cases depending on settings
+            
+            if zeroLengthSearch is True and elementIsZeroLength is True:
+                # zero Length Searches -- include all zeroLengthElements
                 found._insertCore(offset, e)
+                continue
+                
+            
+            if mustFinishInSpan is True:
+                if elementEnd > offsetEnd:
+                    continue
+                if includeEndBoundary is False:
+                    # we include the end boundary if the search is zeroLength -- otherwise nothing can be retrieved
+                    if elementEnd == offsetEnd:
+                        continue
+                    
+            if mustBeginInSpan is True:
+                if offset < offsetStart:
+                    continue
+                if includeEndBoundary is False:
+                    if offset >= offsetEnd:
+                        # >= is unnecessary, should just be ==, but better safe than sorry
+                        continue
+            
+            if mustBeginInSpan is False:
+                if elementIsZeroLength is False:
+                    if elementEnd == offsetEnd and zeroLengthSearch is True:
+                        continue
+            if includeEndBoundary is False:
+                if offset >= offsetEnd:
+                    continue
+                
+            if includeElementsThatEndAtStart is False and elementEnd == offsetStart:
+                continue
+                
+            found._insertCore(offset, e)
 
         found._elementsChanged()
         return found
@@ -6553,6 +6583,9 @@ class Stream(base.Music21Object):
         for sequential notes with matching pitches. The `matchByPitch` option can 
         be used to use this technique. 
 
+        Note that inPlace=True on a Stream with substream currently has buggy behavior.  Use inPlace=False for now.
+        TODO: Fix this.
+
         ::
 
             >>> a = stream.Stream()
@@ -9995,7 +10028,7 @@ class Stream(base.Music21Object):
         As above, elStream is an optional Stream to look up el's offset in.
         
         The method always returns a Stream, but it might be an empty Stream.
-        
+               
         OMIT_FROM_DOCS
         TODO: write: requireClass:
         Takes as an optional parameter "requireClass".  If this parameter 
@@ -10014,8 +10047,12 @@ class Stream(base.Music21Object):
             elOffset = el.getOffsetBySite(elStream)
         else:
             elOffset = el.offset
+        elEnd = elOffset + el.quarterLength
         
-        otherElements = self.getElementsByOffset(elOffset, elOffset + el.quarterLength, mustBeginInSpan = False)
+        if elEnd != elOffset: # i.e. not zero length
+            otherElements = self.getElementsByOffset(elOffset, elEnd, mustBeginInSpan = False, includeEndBoundary=False, includeElementsThatEndAtStart=False)
+        else:
+            otherElements = self.getElementsByOffset(elOffset, mustBeginInSpan = False)
     
         otherElements.offset = elOffset
         otherElements.quarterLength = el.quarterLength
