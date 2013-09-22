@@ -25,6 +25,7 @@ Speed notes:
 
 '''
 from music21 import converter
+from music21 import corpus
 from music21 import environment
 from music21.search import base as searchBase
 
@@ -145,9 +146,13 @@ def indexScoreParts(scoreFile, *args, **kwds):
     '''
     scoreFileParts = scoreFile.parts
     indexedList = []
-    for p in scoreFileParts:
-        segmentList, measureList = translateMonophonicPartToSegments(p, *args, **kwds)
-        indexedList.append({'segmentList': segmentList, 'measureList': measureList})
+    for part in scoreFileParts:
+        segmentList, measureList = translateMonophonicPartToSegments(
+            part, *args, **kwds)
+        indexedList.append({
+            'segmentList': segmentList, 
+            'measureList': measureList,
+            })
     return indexedList
 
 
@@ -164,8 +169,8 @@ def indexScoreFilePaths(
     ::
 
         >>> searchResults = corpus.search('bwv19')
-        >>> fpsNamesOnly = [searchResult.sourcePath
-        ...     for searchResult in searchResults]
+        >>> fpsNamesOnly = sorted([searchResult.sourcePath
+        ...     for searchResult in searchResults])
         >>> len(fpsNamesOnly)
         9
 
@@ -196,7 +201,10 @@ def indexScoreFilePaths(
                 shortfp, scoreIndex, totalScores)
         scoreIndex += 1
         try:
-            scoreObj = converter.parse(filePath)
+            if filePath.startswith('music21/corpus'):
+                scoreObj = corpus.parse(filePath)
+            else:
+                scoreObj = converter.parse(filePath)
             scoreDict[shortfp] = indexScoreParts(scoreObj, *args, **kwds)
         except:
             print "Failed on parse for: %s" % filePath
@@ -298,7 +306,8 @@ def scoreSimilarity(
         thisScore = scoreDict[thisScoreKey]
         scoreIndex += 1 
         if giveUpdates is True:
-            print "Comparing %s (%d/%d)" % (thisScoreKey, scoreIndex, totalScores)
+            print "Comparing {0} ({1}/{2})".format(
+                thisScoreKey, scoreIndex, totalScores)
         for pNum in range(len(thisScore)):
             for segmentNumber, thisSegment in enumerate(thisScore[pNum]['segmentList']):
                 if len(thisSegment) < minimumLength:

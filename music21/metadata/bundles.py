@@ -698,33 +698,34 @@ class MetadataBundle(object):
                 metadataBundleModificationTime)
             ])
         currentJobNumber = 0
-        for filePath in paths:
-            key = self.corpusPathToKey(filePath)
+        skippedJobsCount = 0
+        for path in paths:
+            key = self.corpusPathToKey(path)
             if key in self._metadataEntries:
                 metadataEntry = self._metadataEntries[key]  
-                filePathModificationTime = os.path.getctime(filePath)
-                if filePathModificationTime < metadataBundleModificationTime:
-                    environLocal.warn([
-                        'Skipping job: {0}; already in cache.'.format(
-                            common.relativepath(filePath)),
-                        ])
-                    continue
-            environLocal.warn([
-                'Preparing job: {0}'.format(common.relativepath(filePath)),
-                ])
+                if not path.startswith('http://'):
+                    pathModificationTime = os.path.getctime(path)
+                    if pathModificationTime < metadataBundleModificationTime:
+                        skippedJobsCount += 1
+                        continue
+            #environLocal.warn([
+            #    'Preparing job: {0}'.format(common.relativepath(path)),
+            #    ])
             currentJobNumber += 1
-            if filePath.startswith(music21Path):
-                filePath = os.path.join(
+            if path.startswith(music21Path):
+                path = os.path.join(
                     'music21',
-                    common.relativepath(filePath, music21Path),
+                    common.relativepath(path, music21Path),
                     )
             job = metadata.MetadataCachingJob(
-                filePath,
+                path,
                 jobNumber=currentJobNumber,
                 useCorpus=useCorpus,
                 )
             jobs.append(job)
         currentIteration = 0
+        environLocal.warn('Skipped {0} sources already in cache.'.format(
+            skippedJobsCount))
         if useMultiprocessing:
             jobProcessor = metadata.JobProcessor.process_parallel
         else:
