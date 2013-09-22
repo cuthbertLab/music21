@@ -313,7 +313,7 @@ def corpusMelodicIntervalSearchBrief(show=False):
         seventhCount = 0
         for metadataEntry in corpus.search(region, 'locale'):
             workCount += 1
-            score = converter.parse(
+            score = corpus.parse(
                 metadataEntry.sourcePath,
                 number=metadataEntry.number,
                 )

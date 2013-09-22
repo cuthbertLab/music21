@@ -701,7 +701,7 @@ class MetadataBundle(object):
         skippedJobsCount = 0
         for path in paths:
             key = self.corpusPathToKey(path)
-            if key in self._metadataEntries and not path.startswith('http://'):
+            if key in self._metadataEntries and not key.startswith('http'):
                 pathModificationTime = os.path.getctime(path)
                 if pathModificationTime < metadataBundleModificationTime:
                     skippedJobsCount += 1
