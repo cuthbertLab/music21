@@ -3588,7 +3588,7 @@ class Test(unittest.TestCase):
         self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
 
     def testExpandRepeatExpressionC(self):
-        import stream, note
+        from music21 import stream, note
 
         # da capo al fine
         m1 = stream.Measure()
@@ -3644,8 +3644,7 @@ class Test(unittest.TestCase):
         self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
 
     def testExpandRepeatExpressionE(self):
-        import stream, note
-        from music21 import repeat
+        from music21 import repeat, stream, note
         # dal segno simple
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)

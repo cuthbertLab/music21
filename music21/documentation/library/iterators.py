@@ -66,7 +66,7 @@ class IPythonNotebookIterator(Iterator):
                         fileName,
                         )
                     yield filePath
-        
+
 
 class ModuleIterator(Iterator):
     '''
@@ -79,14 +79,14 @@ class ModuleIterator(Iterator):
         >>> for module in sorted(modules, key=lambda x: x.__name__)[:8]:
         ...     module.__name__
         ...
-        'music21.abc.base'
+        'music21.__init__'
+        'music21.abc.__init__'
         'music21.abc.translate'
+        'music21.analysis.__init__'
         'music21.analysis.correlate'
         'music21.analysis.discrete'
         'music21.analysis.metrical'
         'music21.analysis.neoRiemannian'
-        'music21.analysis.patel'
-        'music21.analysis.reduceChords'
 
     '''
 
@@ -112,7 +112,7 @@ class ModuleIterator(Iterator):
         import music21
         rootFilesystemPath = music21.__path__[0]
         for directoryPath, directoryNames, fileNames in os.walk(
-            rootFilesystemPath): 
+            rootFilesystemPath):
             directoryNamesToRemove = []
             for directoryName in directoryNames:
                 if directoryName in self._ignoredDirectoryNames:
@@ -194,17 +194,17 @@ class ClassIterator(Iterator):
         ...     key=lambda x: (x.__module__, x.__name__))
         >>> for cls in classes[:10]:
         ...     cls
-        ... 
-        <class 'music21.abc.base.ABCAccent'>
-        <class 'music21.abc.base.ABCBar'>
-        <class 'music21.abc.base.ABCBrokenRhythmMarker'>
-        <class 'music21.abc.base.ABCChord'>
-        <class 'music21.abc.base.ABCCrescStart'>
-        <class 'music21.abc.base.ABCDimStart'>
-        <class 'music21.abc.base.ABCDownbow'>
-        <class 'music21.abc.base.ABCFile'>
-        <class 'music21.abc.base.ABCFileException'>
-        <class 'music21.abc.base.ABCGraceStart'>
+        ...
+        <class 'music21.abc.__init__.ABCAccent'>
+        <class 'music21.abc.__init__.ABCBar'>
+        <class 'music21.abc.__init__.ABCBrokenRhythmMarker'>
+        <class 'music21.abc.__init__.ABCChord'>
+        <class 'music21.abc.__init__.ABCCrescStart'>
+        <class 'music21.abc.__init__.ABCDimStart'>
+        <class 'music21.abc.__init__.ABCDownbow'>
+        <class 'music21.abc.__init__.ABCFile'>
+        <class 'music21.abc.__init__.ABCFileException'>
+        <class 'music21.abc.__init__.ABCGraceStart'>
 
     '''
 
@@ -223,13 +223,14 @@ class FunctionIterator(Iterator):
 
     ::
 
+        >>> from music21 import documentation
         >>> iterator = documentation.FunctionIterator(verbose=False)
         >>> functions = [x for x in iterator]
         >>> for function in sorted(functions,
         ...     key=lambda x: (x.__module__, x.__name__))[:10]:
         ...     function.__module__, function.__name__
-        ... 
-        ('music21.abc.base', 'mergeLeadingMetaData')
+        ...
+        ('music21.abc.__init__', 'mergeLeadingMetaData')
         ('music21.abc.translate', 'abcToStreamOpus')
         ('music21.abc.translate', 'abcToStreamPart')
         ('music21.abc.translate', 'abcToStreamScore')
@@ -241,7 +242,7 @@ class FunctionIterator(Iterator):
         ('music21.analysis.neoRiemannian', 'LRP_combinations')
 
     '''
-    
+
     ### SPECIAL METHODS ###
 
     def __iter__(self):
