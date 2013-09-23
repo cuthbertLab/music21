@@ -2125,9 +2125,9 @@ class ChordSymbol(Harmony):
             >>> mxRoot.set('root-step', 'C')
             >>> mxHarmony.rootObj = mxRoot
             >>> mxDegree = musicxml.mxObjects.Degree()
-            >>> val = musicxml.DegreeValue()
+            >>> val = musicxml.mxObjects.DegreeValue()
             >>> val.charData = 9
-            >>> alt = musicxml.DegreeAlter()
+            >>> alt = musicxml.mxObjects.DegreeAlter()
             >>> alt.charData = -1
             >>> modType = musicxml.mxObjects.DegreeType()
             >>> modType.charData = 'add'
@@ -2156,9 +2156,9 @@ class ChordSymbol(Harmony):
             >>> mxBass.set('bass-alter', -1)
             >>> mxHarmony.bassObj = mxBass
             >>> mxDegree = musicxml.mxObjects.Degree()
-            >>> val = musicxml.DegreeValue()
+            >>> val = musicxml.mxObjects.DegreeValue()
             >>> val.charData = 2
-            >>> alt = musicxml.DegreeAlter()
+            >>> alt = musicxml.mxObjects.DegreeAlter()
             >>> alt.charData = 0
             >>> modType = musicxml.mxObjects.DegreeType()
             >>> modType.charData = 'add'

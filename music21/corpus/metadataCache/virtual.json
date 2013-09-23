@@ -213,46 +213,6 @@
         }, 
         "__class__": "music21.metadata.bundles.MetadataEntry"
       }, 
-      "http:__kern_ccarh_org_cgi-bin_ksdata?l=users_craig_classical_schubert_piano_d0576&file=d0576-02_krn&f=xml": {
-        "__attr__": {
-          "_metadataPayload": {
-            "__attr__": {
-              "_contributors": [], 
-              "_urls": [], 
-              "_workIds": {
-                "movementName": {
-                  "__attr__": {
-                    "_data": "m21-7a4081e06d963e526a925e5671704e90.xml"
-                  }, 
-                  "__class__": "music21.metadata.primitives.Text"
-                }
-              }, 
-              "ambitus": {
-                "__attr__": {
-                  "_priority": 0
-                }, 
-                "__class__": "music21.interval.Interval"
-              }, 
-              "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
-              "keySignatures": [
-                "<music21.key.KeySignature of no sharps or flats>"
-              ], 
-              "noteCount": 199, 
-              "pitchHighest": "C7", 
-              "pitchLowest": "A2", 
-              "quarterLength": 60.0, 
-              "tempos": [], 
-              "timeSignatureFirst": "2/4", 
-              "timeSignatures": [
-                "2/4"
-              ]
-            }, 
-            "__class__": "music21.metadata.RichMetadata"
-          }, 
-          "_sourcePath": "http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-02.krn&f=xml"
-        }, 
-        "__class__": "music21.metadata.bundles.MetadataEntry"
-      }, 
       "http:__static_wikifonia_org_1164_musicxml_mxl": {
         "__attr__": {
           "_metadataPayload": {

@@ -17,7 +17,6 @@ import os
 #from time import time
 
 from music21 import scale
-from music21.audioSearch import base as audioSearchBase
 from music21 import environment
 _MOD = 'audioSearch/transcriber.py'
 environLocal = environment.Environment(_MOD)
@@ -45,6 +44,8 @@ def runTranscribe(show=True, plot=True, useMic=True,
     used as the filename.  If set to anything else then it will use that as the
     filename. 
     '''
+    from music21 import audioSearch as audioSearchBase
+
     if useScale is None:
         useScale = scale.ChromaticScale('C4')
     #beginning - recording or not
@@ -113,6 +114,8 @@ def monophonicStreamFromFile(fileName, useScale=None):
     {6.75} <music21.note.Note C>
     ...
     '''
+    from music21 import audioSearch as audioSearchBase
+
     freqFromAQList = audioSearchBase.getFrequenciesFromAudioFile(waveFilename=fileName)
         
     detectedPitchesFreq = audioSearchBase.detectPitchFrequencies(freqFromAQList, useScale)

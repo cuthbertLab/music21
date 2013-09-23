@@ -141,7 +141,13 @@ def slashMixedToFraction(valueSrc):
             n, d, unused_tempoIndication = fraction
             pre.append([n, d])
         else: # its just a numerator
-            pre.append([int(part), None])
+            try:
+                pre.append([int(part), None])
+            except ValueError:
+                raise exceptions21.Music21Exception('Cannot parse this file -- this error often comes ' 
+                  'up if the musicxml pickled file is out of date after a change in musicxml/__init__.py . '
+                  'Clear your temp directory of .p files and try again...')
+                
     # when encountering a missing denominator, find the fist defined
     # and apply to all previous
     for i in range(len(pre)):
