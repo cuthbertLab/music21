@@ -10,10 +10,9 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-_all_ = ['base', 'm21ToString', 'toMxObjects', 'fromMxObjects', 'xmlHandler']
+_all_ = ['mxObjects', 'm21ToString', 'toMxObjects', 'fromMxObjects', 'xmlHandler']
 
-from music21.musicxml.base import *
-
+import mxObjects
 import m21ToString
 import toMxObjects
 import fromMxObjects

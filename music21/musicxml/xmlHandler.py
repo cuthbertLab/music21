@@ -12,7 +12,7 @@
 '''
 Converts musicxml xml text to the intermediate mxObjects format.
 '''
-from music21.musicxml import base as musicxmlMod
+from music21.musicxml import mxObjects as musicxmlMod
 
 import sys
 

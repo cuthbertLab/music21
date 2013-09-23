@@ -60,7 +60,7 @@ from music21 import tinyNotation
 
 from music21.capella import fromCapellaXML
 
-from music21.musedata import base as musedataModule
+from music21 import musedata as musedataModule
 from music21.musedata import translate as musedataTranslate
 
 from music21.musicxml import xmlHandler as musicxmlHandler

@@ -19,7 +19,6 @@ import unittest
 import math
 import copy
 
-from music21.midi import base as midiModule
 from music21 import defaults
 from music21 import common
 
@@ -146,6 +145,7 @@ def _getStartEvents(mt=None, channel=1, instrumentObj=None):
 
     A MidiTrack reference can be provided via the `mt` parameter.
     '''
+    from music21 import midi as midiModule
     events = []
     if instrumentObj is None or instrumentObj.bestName() is None:
         partName = ''
@@ -178,6 +178,8 @@ def getEndEvents(mt=None, channel=1):
     '''
     Returns a list of midi.MidiEvent objects found at the end of a track.
     '''
+    from music21 import midi as midiModule
+
     events = []
 
     dt = midiModule.DeltaTime(mt, channel=channel)
@@ -341,6 +343,8 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     >>> eventList2
     [<MidiEvent NOTE_ON, t=None, track=None, channel=9, pitch=61, velocity=90>, <MidiEvent NOTE_OFF, t=None, track=None, channel=9, pitch=61, velocity=0>]
     '''
+    from music21 import midi as midiModule
+
     n = inputM21
 
     mt = None # use a midi track set to None
@@ -422,6 +426,8 @@ def noteToMidiFile(inputM21):
     >>> mf.tracks[0].events
     [<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=6144, track=1, channel=1>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=60, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]
     '''
+    from music21 import midi as midiModule
+    
     n = inputM21
     mt = midiModule.MidiTrack(1)
     mt.events += _getStartEvents(mt)
@@ -559,6 +565,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     >>> eventList
     [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=48, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=68, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=83, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=48, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=68, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=83, velocity=0>]
     '''
+    from music21 import midi as midiModule
     mt = None # midi track 
     eventList = []
     c = inputM21
@@ -646,6 +653,8 @@ def chordToMidiFile(inputM21):
     Similar to `noteToMidiFile`, translates a Chord to a 
     fully-formed MidiFile object.
     '''
+    from music21 import midi as midiModule
+    
     # this can be consolidated with noteToMidiFile
     c = inputM21
 
@@ -671,6 +680,8 @@ def instrumentToMidiEvents(inputM21, includeDeltaTime=True,
     
     TODO: DOCS and TESTS
     '''
+    from music21 import midi as midiModule
+
     inst = inputM21
     mt = midiTrack # midi track 
     events = []
@@ -744,6 +755,7 @@ def midiEventsToTimeSignature(eventList):
     # chunks in a Type 2 file) before any non-zero delta time events. If one 
     # is not specified 4/4, 24, 8 should be assumed.
     from music21 import meter
+    from music21 import midi as midiModule
 
     if not common.isListLike(eventList):
         event = eventList
@@ -772,6 +784,8 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     >>> eventList[1]
     <MidiEvent TIME_SIGNATURE, t=None, track=None, channel=1, data='\\x05\\x02\\x18\\x08'>
     '''
+    from music21 import midi as midiModule
+
     mt = None # use a midi track set to None
     eventList = []
     if includeDeltaTime:
@@ -830,6 +844,7 @@ def midiEventsToKeySignature(eventList):
     # the number of flats. A value of 0 for the scale specifies a major key 
     # and a value of 1 specifies a minor key.
     from music21 import key
+    from music21 import midi as midiModule
 
     if not common.isListLike(eventList):
         event = eventList
@@ -876,6 +891,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     >>> eventList[0]
     <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\xfb\\x01'>
     '''
+    from music21 import midi as midiModule
     mt = None # use a midi track set to None
     eventList = []
     if includeDeltaTime:
@@ -903,6 +919,7 @@ def midiEventsToTempo(eventList):
 
     TODO: Need Tests
     '''
+    from music21 import midi as midiModule
     from music21 import tempo
 
     if not common.isListLike(eventList):
@@ -927,7 +944,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     <MidiEvent DeltaTime, t=0, track=None, channel=None>
     >>> events[1]
     <MidiEvent SET_TEMPO, t=None, track=None, channel=1, data='\n,+'>    
-    >>> microSecondsPerQuarterNote = midi.base.getNumber(events[1].data, len(events[1].data))[0]
+    >>> microSecondsPerQuarterNote = midi.getNumber(events[1].data, len(events[1].data))[0]
     >>> microSecondsPerQuarterNote
     666667
     
@@ -940,6 +957,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     >>> midi.translate.midiEventsToTempo(events)
     <music21.tempo.MetronomeMark maestoso Quarter=90.0>
     '''
+    from music21 import midi as midiModule
     mt = None # use a midi track set to None
     eventList = []
     if includeDeltaTime:
@@ -1104,6 +1122,8 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
     `channelsDynamic` should be a list.
     `initChannelForTrack` should be a dictionary.
     '''
+    from music21 import midi as midiModule
+
     if channelForInstrument is None:
         channelForInstrument = {}
     if channelsDyanmic is None:
@@ -1307,6 +1327,8 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
     a matching track id. this can be used to filter out events 
     associated with a track. 
     '''
+    from music21 import midi as midiModule
+
     #environLocal.printDebug(['_packetsToEvents', 'got packets:', len(packetsSrc)])
     # add delta times
     # first, collect only the packets for this track id
@@ -1349,6 +1371,8 @@ def packetsToMidiTrack(packets, trackId=1, channels=None):
 
     Use _streamToPackets to convert the Stream to the packets
     '''
+    from music21 import midi as midiModule
+
     primaryChannel = 1
     mt = midiModule.MidiTrack(trackId)
     # update based on primary ch   
@@ -1643,6 +1667,8 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
     2. we make a list of all instruments that are being used in the piece.
 
     '''
+    from music21 import midi as midiModule
+
     # makes a deepcopy
     s = _prepareStreamForMidi(inputM21)
 
@@ -1853,6 +1879,8 @@ def streamToMidiFile(inputM21):
     >>> #_DOCS_SHOW mf.write()
     >>> #_DOCS_SHOW mf.close()  
     '''
+    from music21 import midi as midiModule
+
     s = inputM21
     midiTracks = streamHierarchyToMidiTracks(s)
 
@@ -1883,6 +1911,7 @@ def midiFilePathToStream(filePath, inputM21=None):
     >>> streamScore
     <music21.stream.Score ...>
     '''
+    from music21 import midi as midiModule
     mf = midiModule.MidiFile()
     mf.open(filePath)
     mf.read()
@@ -1893,6 +1922,7 @@ def midiStringToStream(strData, inputM21):
     '''
     Convert a string of binary midi data to a Music21 stream.Score object.
     '''
+    from music21 import midi as midiModule
     
     mf = midiModule.MidiFile()
     # do not need to call open or close on MidiFile instance
@@ -1948,6 +1978,7 @@ class Test(unittest.TestCase):
         pass
 
     def testNote(self):
+        from music21 import midi as midiModule
 
         from music21 import note
         n1 = note.Note('A4')

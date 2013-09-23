@@ -125,7 +125,7 @@ class Tag(object):
         '''
         
 
-        >>> t = musicxml.Tag('note')
+        >>> t = musicxml.mxObjects.Tag('note')
         >>> t.start()
         >>> t.start() # catch double starts
         Traceback (most recent call last):
@@ -181,7 +181,7 @@ class TagLib(object):
     def __init__(self):
         '''
         
-        >>> tl = musicxml.TagLib()
+        >>> tl = musicxml.mxObjects.TagLib()
         >>> tl['voice'].tag
         'voice'
         >>> tl['voice'].status # open or closed
@@ -440,7 +440,7 @@ class TagLib(object):
         Get the class or name, or None if none defined.
 
         
-        >>> tl = musicxml.TagLib()
+        >>> tl = musicxml.mxObjects.TagLib()
         >>> tl.getClassName('voice')
 
         '''
@@ -548,7 +548,7 @@ class MusicXMLElement(xmlnode.XMLNode):
 
         
 
-        >>> a = musicxml.MusicXMLElement()
+        >>> a = musicxml.mxObjects.MusicXMLElement()
         >>> a._convertNameToXml('groupAbbreviation')
         'group-abbreviation'
         >>> a._convertNameToXml('midiUnpitched')
@@ -558,7 +558,7 @@ class MusicXMLElement(xmlnode.XMLNode):
         >>> a._convertNameToXml('group-name-display')
         'group-name-display'
 
-        >>> a = musicxml.MusicXMLElement()
+        >>> a = musicxml.mxObjects.MusicXMLElement()
         >>> a._convertNameFromXml('group-abbreviation')
         'groupAbbreviation'
         >>> a._convertNameFromXml('midi-unpitched')
@@ -570,7 +570,7 @@ class MusicXMLElement(xmlnode.XMLNode):
         >>> a._convertNameFromXml('group-name-display')
         'groupNameDisplay'
 
-        >>> a = musicxml.MusicXMLElement()
+        >>> a = musicxml.mxObjects.MusicXMLElement()
         >>> len(a._publicAttributes())
         3
         >>> print(a._publicAttributes())
@@ -636,9 +636,9 @@ class MusicXMLElementList(MusicXMLElement):
         attributes not on component list that are not 'added' with this method.
 
         
-        >>> a = musicxml.MusicXMLElementList()
+        >>> a = musicxml.mxObjects.MusicXMLElementList()
         >>> a.componentList.append(1)
-        >>> b = musicxml.MusicXMLElementList()
+        >>> b = musicxml.mxObjects.MusicXMLElementList()
         >>> b.componentList.append(2)
         >>> c = a + b
         >>> c.componentList
@@ -663,14 +663,14 @@ class Score(MusicXMLElementList):
         '''
                 
         
-        >>> a = musicxml.Score()
+        >>> a = musicxml.mxObjects.Score()
         >>> a.tag
         'score-partwise'
         >>> a.setDefaults()
-        >>> b = musicxml.Identification()
+        >>> b = musicxml.mxObjects.Identification()
         >>> b.setDefaults()
         >>> a.set('identification', b)
-        >>> c = musicxml.Score()
+        >>> c = musicxml.mxObjects.Score()
         >>> d = c.merge(a)
         '''
         MusicXMLElementList.__init__(self)
@@ -788,7 +788,7 @@ class Score(MusicXMLElementList):
         '''Get an instrument, as defined in a ScorePart object, from a Score. 
 
         
-        >>> a = musicxml.Score()
+        >>> a = musicxml.mxObjects.Score()
         >>> a.setDefaults()
         >>> a.getScorePart('P3') == None
         True
@@ -822,7 +822,7 @@ class Score(MusicXMLElementList):
         >>> c = b.score.getPart(b.score.partIdToNameDict().keys()[0])
         >>> c
         <part id=P1 <measure width=983 number=1 <print <system-layout...
-        >>> isinstance(c, musicxml.Part)
+        >>> isinstance(c, musicxml.mxObjects.Part)
         True
         >>> isinstance(c, stream.Part)
         False
@@ -860,7 +860,7 @@ class Work(MusicXMLElement):
     def __init__(self):
         '''
         
-        >>> a = musicxml.Work()
+        >>> a = musicxml.mxObjects.Work()
         >>> a.tag
         'work'
         '''
@@ -886,7 +886,7 @@ class Identification(MusicXMLElement):
     def __init__(self):
         '''
         
-        >>> a = musicxml.Identification()
+        >>> a = musicxml.mxObjects.Identification()
         >>> a.tag
         'identification'
         '''
@@ -921,7 +921,7 @@ class Creator(MusicXMLElement):
     def __init__(self):
         '''
         
-        >>> a = musicxml.Creator()
+        >>> a = musicxml.mxObjects.Creator()
         >>> a.tag
         'creator'
         '''
@@ -943,11 +943,11 @@ class Credit(MusicXMLElementList):
     def __init__(self):
         '''
         
-        >>> a = musicxml.Credit()
+        >>> a = musicxml.mxObjects.Credit()
         >>> a.tag
         'credit'
         >>> a.setDefaults()
-        >>> b = musicxml.CreditWords('testing')
+        >>> b = musicxml.mxObjects.CreditWords('testing')
         >>> a.append(b)
         >>> print a
         <credit page=1 <credit-words charData=testing>>
@@ -972,7 +972,7 @@ class CreditWords(MusicXMLElement):
     def __init__(self, charData=None):
         '''
         
-        >>> a = musicxml.CreditWords()
+        >>> a = musicxml.mxObjects.CreditWords()
         >>> a.tag
         'credit-words'
         '''
@@ -1599,10 +1599,10 @@ class Direction(MusicXMLElementList):
         '''Search this direction and determine if it contains a dynamic mark, return, otherwise, return None
 
         
-        >>> a = musicxml.Direction()
-        >>> b = musicxml.DirectionType()
-        >>> c = musicxml.Dynamics()
-        >>> d = musicxml.DynamicMark('f')
+        >>> a = musicxml.mxObjects.Direction()
+        >>> b = musicxml.mxObjects.DirectionType()
+        >>> c = musicxml.mxObjects.Dynamics()
+        >>> d = musicxml.mxObjects.DynamicMark('f')
         >>> c.append(d)
         >>> b.append(c)
         >>> a.append(b)
@@ -1637,9 +1637,9 @@ class Direction(MusicXMLElementList):
         '''Search this direction and determine if it contains a dynamic mark.
 
         
-        >>> a = musicxml.Direction()
-        >>> b = musicxml.DirectionType()
-        >>> c = musicxml.Metronome()
+        >>> a = musicxml.mxObjects.Direction()
+        >>> b = musicxml.mxObjects.DirectionType()
+        >>> c = musicxml.mxObjects.Metronome()
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getMetronome() is not None
@@ -1654,9 +1654,9 @@ class Direction(MusicXMLElementList):
         '''Search this direction and determine if it contains a dynamic mark.
 
         
-        >>> a = musicxml.Direction()
-        >>> b = musicxml.DirectionType()
-        >>> c = musicxml.Wedge('crescendo')
+        >>> a = musicxml.mxObjects.Direction()
+        >>> b = musicxml.mxObjects.DirectionType()
+        >>> c = musicxml.mxObjects.Wedge('crescendo')
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getWedge() is not None
@@ -1671,9 +1671,9 @@ class Direction(MusicXMLElementList):
         '''Search this direction and determine if it contains a Words entity.
 
         
-        >>> a = musicxml.Direction()
-        >>> b = musicxml.DirectionType()
-        >>> c = musicxml.Words('crescendo')
+        >>> a = musicxml.mxObjects.Direction()
+        >>> b = musicxml.mxObjects.DirectionType()
+        >>> c = musicxml.mxObjects.Words('crescendo')
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getWords() == [c]
@@ -1690,9 +1690,9 @@ class Direction(MusicXMLElementList):
         '''Search this direction and determine if it contains a coda mark.
 
         
-        >>> a = musicxml.Direction()
-        >>> b = musicxml.DirectionType()
-        >>> c = musicxml.Coda()
+        >>> a = musicxml.mxObjects.Direction()
+        >>> b = musicxml.mxObjects.DirectionType()
+        >>> c = musicxml.mxObjects.Coda()
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getCoda() is not None
@@ -1707,9 +1707,9 @@ class Direction(MusicXMLElementList):
         '''Search this direction and determine if it contains a segno mark.
 
         
-        >>> a = musicxml.Direction()
-        >>> b = musicxml.DirectionType()
-        >>> c = musicxml.Segno()
+        >>> a = musicxml.mxObjects.Direction()
+        >>> b = musicxml.mxObjects.DirectionType()
+        >>> c = musicxml.mxObjects.Segno()
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getSegno() is not None
@@ -1724,9 +1724,9 @@ class Direction(MusicXMLElementList):
         '''Search this direction and determine if it contains a segno mark.
 
         
-        >>> a = musicxml.Direction()
-        >>> b = musicxml.DirectionType()
-        >>> c = musicxml.Bracket()
+        >>> a = musicxml.mxObjects.Direction()
+        >>> b = musicxml.mxObjects.DirectionType()
+        >>> c = musicxml.mxObjects.Bracket()
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getBracket() is not None
@@ -1741,9 +1741,9 @@ class Direction(MusicXMLElementList):
         '''Search this direction and determine if it contains a segno mark.
 
         
-        >>> a = musicxml.Direction()
-        >>> b = musicxml.DirectionType()
-        >>> c = musicxml.Dashes()
+        >>> a = musicxml.mxObjects.Direction()
+        >>> b = musicxml.mxObjects.DirectionType()
+        >>> c = musicxml.mxObjects.Dashes()
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getDashes() is not None
@@ -1811,8 +1811,8 @@ class Metronome(MusicXMLElementList):
     '''A direction type used to store tempo indications, consisting of a <beat-unit> tag (a duration) as well as a <per-unit> tag (a number). Also used to store metric modulations. 
 
     
-    >>> m = musicxml.Metronome()
-    >>> bu1 = musicxml.BeatUnit('half')
+    >>> m = musicxml.mxObjects.Metronome()
+    >>> bu1 = musicxml.mxObjects.BeatUnit('half')
     >>> m.append(bu1)
     >>> m.isMetricModulation()
     False
@@ -1837,9 +1837,9 @@ class Metronome(MusicXMLElementList):
         '''Return True if this Metronome defines a metric modulation. If there are more than on <beat-unit> tag, than this is True
 
         
-        >>> m = musicxml.Metronome()
-        >>> bu1 = musicxml.BeatUnit('half')
-        >>> bu2 = musicxml.BeatUnit('quarter')
+        >>> m = musicxml.mxObjects.Metronome()
+        >>> bu1 = musicxml.mxObjects.BeatUnit('half')
+        >>> bu2 = musicxml.mxObjects.BeatUnit('quarter')
         >>> m.append(bu1)
         >>> m.append(bu2)
         >>> m.isMetricModulation()
@@ -2265,9 +2265,9 @@ class Notations(MusicXMLElementList):
         There can be more than one.
 
         
-        >>> g1 = musicxml.Glissando()
-        >>> g2 = musicxml.Glissando()
-        >>> n = musicxml.Notations()
+        >>> g1 = musicxml.mxObjects.Glissando()
+        >>> g2 = musicxml.mxObjects.Glissando()
+        >>> n = musicxml.mxObjects.Notations()
         >>> n.append(g1)
         >>> n.append(g2)
         >>> n.getGlissandi()
@@ -2283,9 +2283,9 @@ class Notations(MusicXMLElementList):
         '''Get one or more wavy line objects Stored in Ornaments
 
         
-        >>> wl = musicxml.WavyLine()
-        >>> o = musicxml.Ornaments()
-        >>> n = musicxml.Notations()
+        >>> wl = musicxml.mxObjects.WavyLine()
+        >>> o = musicxml.mxObjects.Ornaments()
+        >>> n = musicxml.mxObjects.Notations()
         >>> o.append(wl)
         >>> n.append(o)
         >>> n.getWavyLines()
@@ -2304,9 +2304,9 @@ class Notations(MusicXMLElementList):
         '''Get one or more tremolo line objects Stored in Ornaments
 
         
-        >>> t = musicxml.Tremolo()
-        >>> o = musicxml.Ornaments()
-        >>> n = musicxml.Notations()
+        >>> t = musicxml.mxObjects.Tremolo()
+        >>> o = musicxml.mxObjects.Ornaments()
+        >>> n = musicxml.mxObjects.Notations()
         >>> o.append(t)
         >>> n.append(o)
         >>> n.getTremolos()
@@ -2427,7 +2427,7 @@ class Grace(MusicXMLElement):
 class Wedge(MusicXMLElement):
     '''
     
-    >>> w = musicxml.Wedge()
+    >>> w = musicxml.mxObjects.Wedge()
     >>> w.tag
     'wedge'
     '''
@@ -2448,7 +2448,7 @@ class Wedge(MusicXMLElement):
 class OctaveShift(MusicXMLElement):
     '''
     
-    >>> os = musicxml.OctaveShift()
+    >>> os = musicxml.mxObjects.OctaveShift()
     >>> os.tag
     'octave-shift'
     '''
@@ -2465,7 +2465,7 @@ class OctaveShift(MusicXMLElement):
 class Bracket(MusicXMLElement):
     '''
     
-    >>> b = musicxml.Bracket()
+    >>> b = musicxml.mxObjects.Bracket()
     >>> b.tag
     'bracket'
     '''
@@ -2490,7 +2490,7 @@ class WavyLine(MusicXMLElement):
     '''A wavy line that extends across many notes or measures.
 
     
-    >>> wl = musicxml.WavyLine()
+    >>> wl = musicxml.mxObjects.WavyLine()
     >>> wl.tag
     'wavy-line'
     '''
@@ -2509,7 +2509,7 @@ class WavyLine(MusicXMLElement):
 class Glissando(MusicXMLElement):
     '''
     
-    >>> g = musicxml.Glissando()
+    >>> g = musicxml.mxObjects.Glissando()
     >>> g.tag
     'glissando'
     '''
@@ -2527,7 +2527,7 @@ class Glissando(MusicXMLElement):
 class Dashes(MusicXMLElement):
     '''
     
-    >>> d = musicxml.Dashes()
+    >>> d = musicxml.mxObjects.Dashes()
     >>> d.tag
     'dashes'
     '''

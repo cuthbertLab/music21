@@ -24,7 +24,6 @@ module's :func:`~music21.converter.parse` function.
 
 import copy
 import unittest
-
 from music21 import environment
 from music21 import exceptions21
 from music21 import meter

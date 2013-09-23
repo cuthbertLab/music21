@@ -154,7 +154,7 @@ def _translateExtensions(fileExtensions=None, expandExtensions=True):
 
     ::
 
-        >>> for extension in corpus.base._translateExtensions():
+        >>> for extension in corpus._translateExtensions():
         ...     extension
         ...
         '.abc'
@@ -178,12 +178,12 @@ def _translateExtensions(fileExtensions=None, expandExtensions=True):
 
     ::
 
-        >>> corpus.base._translateExtensions('.mid', False)
+        >>> corpus._translateExtensions('.mid', False)
         ['.mid']
 
     ::
 
-        >>> corpus.base._translateExtensions('.mid', True)
+        >>> corpus._translateExtensions('.mid', True)
         ['.mid', '.midi']
 
     '''
@@ -1450,232 +1450,6 @@ def getBeethovenStringQuartets(fileExtensions=None):
 #-------------------------------------------------------------------------------
 
 
-class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
-    def testGetPaths(self):
-        for known in ['haydn/opus74no2/movement4.mxl',
-            'beethoven/opus18no3.mxl',
-            'beethoven/opus59no1/movement2.mxl',
-            'mozart/k80/movement4.mxl',
-            'schumann/opus41no1/movement5.mxl',
-            ]:
-            a = getWork(known)
-            # make sure it is not an empty list
-            self.assertNotEqual(len(a), 0)
-            workSlashes = re.sub(r'\\', '/', a)
-            self.assertEqual(workSlashes.endswith(known), True)
-
-    def testBachKeys(self):
-        from music21 import key
-        keyObjs = []
-        for filePath in getComposer('bach')[23:28]: # get 5 in the middle
-            s = parse(filePath)
-            # get keys from first part
-            keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
-            keyObj = keyStream[0]
-            keyObjs.append(keyObj)
-            #environLocal.printDebug([keyObj])
-        self.assertEqual(len(keyObjs), 5)
-
-    def testEssenImport(self):
-        # can get a single file just by file name
-        filePath = getWork('altdeu10')
-        self.assertTrue(filePath.endswith('essenFolksong/altdeu10.abc') or
-            filePath.endswith(r'essenFolksong\altdeu10.abc'))
-        filePathCollection = getComposer('essenFolksong')
-        self.assertEqual(len(filePathCollection), 31)
-        filePathCollection = getComposer('essenFolksong', ['abc'])
-        self.assertEqual(len(filePathCollection), 31)
-
-    def testDesPrezImport(self):
-        # can get a single file just by file name
-        filePath = getWork('fortunaDunGranTempo')
-        filePath = re.sub(r'\\', '/', filePath)
-        self.assertEqual(filePath.endswith(
-            'josquin/fortunaDunGranTempo.abc'), True)
-        filePathCollection = getComposer('josquin')
-        self.assertEqual(len(filePathCollection) >= 8, True)
-        filePathCollection = getComposer('josquin', ['abc'])
-        self.assertEqual(len(filePathCollection) >= 8, True)
-
-    def testHandelImport(self):
-        # can get a single file just by file name
-        unused_fp = getWork('hwv56/movement1-01')#
-        fpCollection = getComposer('handel')
-        self.assertEqual(len(fpCollection) >= 1, True)
-        fpCollection = getComposer('handel', ['md'])
-        self.assertEqual(len(fpCollection) >= 1, True)
-
-    def testSearch01(self):
-        from music21 import corpus
-        searchResults = corpus.search('china', 'locale')
-        self.assertEqual(len(searchResults) > 1200, True)
-
-    def testSearch02(self):
-        from music21 import corpus
-        searchResults = corpus.search('Sichuan', 'locale')
-        self.assertEqual(len(searchResults), 47)
-
-    def testSearch03(self):
-        from music21 import corpus
-        searchResults = corpus.search('Taiwan', 'locale')
-        self.assertEqual(len(searchResults), 27)
-        pathInfo = sorted((searchResult.sourcePath, searchResult.number)
-            for searchResult in searchResults)
-        self.assertEqual(pathInfo, [
-            (u'music21/corpus/essenFolksong/han1.abc', 268),
-            (u'music21/corpus/essenFolksong/han1.abc', 269),
-            (u'music21/corpus/essenFolksong/han1.abc', 270),
-            (u'music21/corpus/essenFolksong/han1.abc', 271),
-            (u'music21/corpus/essenFolksong/han1.abc', 272),
-            (u'music21/corpus/essenFolksong/han1.abc', 273),
-            (u'music21/corpus/essenFolksong/han1.abc', 334),
-            (u'music21/corpus/essenFolksong/han1.abc', 527),
-            (u'music21/corpus/essenFolksong/han1.abc', 528),
-            (u'music21/corpus/essenFolksong/han1.abc', 529),
-            (u'music21/corpus/essenFolksong/han2.abc', 203),
-            (u'music21/corpus/essenFolksong/han2.abc', 204),
-            (u'music21/corpus/essenFolksong/han2.abc', 205),
-            (u'music21/corpus/essenFolksong/han2.abc', 206),
-            (u'music21/corpus/essenFolksong/han2.abc', 207),
-            (u'music21/corpus/essenFolksong/han2.abc', 208),
-            (u'music21/corpus/essenFolksong/han2.abc', 209),
-            (u'music21/corpus/essenFolksong/han2.abc', 210),
-            (u'music21/corpus/essenFolksong/han2.abc', 211),
-            (u'music21/corpus/essenFolksong/han2.abc', 212),
-            (u'music21/corpus/essenFolksong/han2.abc', 213),
-            (u'music21/corpus/essenFolksong/han2.abc', 214),
-            (u'music21/corpus/essenFolksong/han2.abc', 215),
-            (u'music21/corpus/essenFolksong/han2.abc', 216),
-            (u'music21/corpus/essenFolksong/han2.abc', 217),
-            (u'music21/corpus/essenFolksong/han2.abc', 218),
-            (u'music21/corpus/essenFolksong/han2.abc', 219),
-            ])
-
-    def testSearch04(self):
-        from music21 import corpus
-        searchResults = corpus.search('Sichuan|Taiwan', 'locale')
-        self.assertEqual(len(searchResults), 74)
-
-    def testSearch05(self):
-        from music21 import corpus
-        searchResults = corpus.search('bach')
-        self.assertEqual(len(searchResults) > 120, True)
-
-    def testSearch06(self):
-        from music21 import corpus
-        searchResults = corpus.search('haydn', 'composer')
-        self.assertEqual(len(searchResults), 0)
-        searchResults = corpus.search('haydn|beethoven', 'composer')
-        self.assertEqual(len(searchResults) >= 16, True)
-
-    def testSearch07(self):
-        from music21 import corpus
-        searchResults = corpus.search('canon')
-        self.assertEqual(len(searchResults) >= 1, True)
-
-    def testSearch08(self):
-        from music21 import corpus
-        searchResults = corpus.search('3/8', 'timeSignature')
-        self.assertEqual(len(searchResults) > 360, True)
-
-    def testSearch09(self):
-        from music21 import corpus
-        searchResults = corpus.search('3/.', 'timeSignature')
-        self.assertEqual(len(searchResults) >= 2200 , True)
-
-    def testSearch10(self):
-        from music21 import corpus, key
-        ks = key.KeySignature(3, 'major')
-        searchResults = corpus.search(str(ks), 'keySignature')
-        self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
-
-    def testSearch11(self):
-        from music21 import corpus
-        searchResults = corpus.search('mode phry(.*)', 'keySignature')
-        self.assertEqual(len(searchResults) >= 9, True)
-
-    def testSearch12(self):
-        from music21 import corpus
-        # searching virtual entries
-        searchResults = corpus.search('coltrane', 'composer')
-        self.assertEqual(len(searchResults) > 0, True)
-        # returns items in pairs: url and work number
-        self.assertEqual(searchResults[0].sourcePath,
-            'http://static.wikifonia.org/1164/musicxml.mxl')
-
-    def testGetWorkList(self):
-        self.assertEqual(len(getPaths('.md')) >= 38, True)
-        self.assertEqual(
-            len(getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')), 1)
-        self.assertEqual(len(getWorkList('handel/hwv56', (1, 1), '.md')), 1)
-        self.assertEqual(len(getWorkList('handel/hwv56', '1-01', '.md')), 1)
-        self.assertEqual(len(getWorkList('bach/artOfFugue_bwv1080')), 21)
-        self.assertEqual(len(getWorkList('bach/artOfFugue_bwv1080', 1)), 1)
-
-        # there are two versions of this file
-        self.assertEqual(len(getWorkList('beethoven/opus18no1', 1)), 2)
-
-        # if specify movement
-        for bwv in [
-            'bwv846', 'bwv847', 'bwv848', 'bwv849', 'bwv850', 'bwv851',
-            'bwv852', 'bwv853', 'bwv854', 'bwv855', 'bwv856', 'bwv857',
-            'bwv858', 'bwv859', 'bwv860', 'bwv861', 'bwv862', 'bwv863',
-            'bwv864', 'bwv865', 'bwv866', 'bwv867', 'bwv868', 'bwv869',
-            'bwv870', 'bwv871', 'bwv872', 'bwv873', 'bwv874', 'bwv875',
-            'bwv876', 'bwv877', 'bwv878', 'bwv879', 'bwv880', 'bwv881',
-            'bwv882', 'bwv883', 'bwv884', 'bwv885', 'bwv886', 'bwv887',
-            'bwv888', 'bwv889', 'bwv890', 'bwv891', 'bwv892', 'bwv893',
-            ]:
-            #print bwv
-            self.assertEqual(len(getWorkList(bwv)), 2)
-            self.assertEqual(len(getWorkList(bwv, 1)), 1)
-            self.assertEqual(len(getWorkList(bwv, 2)), 1)
-
-    def testWTCImport01(self):
-        from music21 import corpus
-        score = corpus.parse('bach/bwv846', 1)
-        self.assertEqual(
-            score.metadata.title,
-            'WTC I: Prelude and Fugue in C major',
-            )
-        self.assertEqual(score.metadata.movementNumber, '1')
-
-    def testWTCImport02(self):
-        from music21 import corpus
-        score = corpus.parse('bach/bwv846', 2)
-        self.assertEqual(score.metadata.movementName, 'Fugue  I. ')
-        self.assertEqual(score.metadata.movementNumber, '2')
-
-    def testWTCImport03(self):
-        from music21 import corpus
-        score = corpus.parse('bach/bwv862', 1)
-        self.assertEqual(
-            score.metadata.title,
-            'WTC I: Prelude and Fugue in A flat major',
-            )
-
-    def testWTCImport04(self):
-        from music21 import corpus
-        score = corpus.parse('bach/bwv888', 1)
-        self.assertEqual(
-            score.metadata.title,
-            'WTC II: Prelude and Fugue in A major',
-            )
-        #s.show()
-
-#     def testWorkReferences(self):
-#         from music21 import corpus
-#         s = corpus.getWorkReferences()
-#
-#         # presenly 19 top level lists
-#         self.assertEqual(len(s)>=19, True)
-#         self.assertEqual(len(s[0].keys()), 4)
-
-
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, getWork]
@@ -1683,7 +1457,7 @@ _DOC_ORDER = [parse, getWork]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest()
 
 
 #------------------------------------------------------------------------------
