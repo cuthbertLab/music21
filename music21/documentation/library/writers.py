@@ -60,7 +60,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
     '''
 
     ### SPECIAL METHODS ###
-    
+
     def __call__(self):
         from music21 import documentation # @UnresolvedImport
         moduleReferenceDirectoryPath = os.path.join(
@@ -71,6 +71,9 @@ class ModuleReferenceReSTWriter(ReSTWriter):
         referenceNames = []
         for module in [x for x in documentation.ModuleIterator()]:
             moduleDocumenter = documentation.ModuleDocumenter(module)
+            if not moduleDocumenter.classDocumenters \
+                and not moduleDocumenter.functionDocumenters:
+                continue
             rst = '\n'.join(moduleDocumenter())
             referenceName = moduleDocumenter.referenceName
             referenceNames.append(referenceName)
@@ -80,7 +83,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
                 fileName,
                 )
             self.write(filePath, rst)
-        
+
         lines = []
         lines.append('.. moduleReference:')
         lines.append('')
@@ -158,7 +161,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         notebookParentDirectoryPath = os.path.abspath(
             os.path.dirname(ipythonNotebookFilePath),
             )
-        imageFileDirectoryName = notebookFileNameWithoutExtension + '_files' 
+        imageFileDirectoryName = notebookFileNameWithoutExtension + '_files'
         imageFileDirectoryPath = os.path.join(
             notebookParentDirectoryPath,
             imageFileDirectoryName,
@@ -174,13 +177,13 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     def _convertOneNotebook(self, ipythonNotebookFilePath):
         '''
         converts one .ipynb file to .rst using nbconvert.
-        
+
         returns True if IPythonNotebook was converted.
         returns False if IPythonNotebook's converted .rst file is newer than the .ipynb file.
-        
+
         sends AssertionError if ipythonNotebookFilePath does not exist.
         '''
-        
+
         assert os.path.exists(ipythonNotebookFilePath)
         notebookFileNameWithoutExtension = os.path.splitext(
             os.path.basename(ipythonNotebookFilePath))[0]
@@ -230,12 +233,12 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 # fix cases of inline :class:`~music21.stream.Stream` being
                 # converted by markdown to :class:``~music21.stream.Stream``
                 newCurrentLine = mangledInternalReference.sub(
-                    r':\1:`\2`', 
+                    r':\1:`\2`',
                     currentLine
                     )
                 newLines.append(newCurrentLine)
                 currentLineNumber += 1
-        
+
         # Guarantee a blank line after literal blocks.
         lines = [newLines[0]]
         for i, pair in enumerate(self._iterateSequencePairwise(newLines)):
@@ -261,12 +264,12 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             if prev is not None:
                 yield prev, cur
             prev = cur
-            
+
     def _runNBConvert(self, ipythonNotebookFilePath):
 #         import music21
         from music21 import common
         #runDirectoryPath = common.getBuildDocFilePath()
-        nbconvertPath = os.path.join(os.path.dirname(common.getSourceFilePath()), 
+        nbconvertPath = os.path.join(os.path.dirname(common.getSourceFilePath()),
                                      'ext', 'nbconvert', 'nbconvert.py')
         #print nbconvertPath
 #         pathParts = os.path.dirname(getSourceFilePath())music21.__path__ + [
@@ -319,7 +322,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             if shouldOverwriteImage:
                 with open(imageFilePath, 'wb') as f:
                     f.write(imageFileData)
-        
+
 
 if __name__ == '__main__':
     import music21

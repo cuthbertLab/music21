@@ -12,14 +12,14 @@
 #-------------------------------------------------------------------------------
 '''
 music21.converter contains tools for loading music from various file formats,
-whether from disk, from the web, or from text, into 
+whether from disk, from the web, or from text, into
 music21.stream.:class:`~music21.stream.Score` objects (or
-other similar stream objects).  
+other similar stream objects).
 
 
-The most powerful and easy to use tool is the :func:`~music21.converter.parse` 
-function. Simply provide a filename, URL, or text string and, if the format 
-is supported, a :class:`~music21.stream.Score` will be returned. 
+The most powerful and easy to use tool is the :func:`~music21.converter.parse`
+function. Simply provide a filename, URL, or text string and, if the format
+is supported, a :class:`~music21.stream.Score` will be returned.
 
 
 This is the most general public interface for all formats.  Programmers
@@ -51,14 +51,12 @@ import zipfile
 # import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
 
+from music21 import abc
 from music21 import exceptions21
 from music21 import common
 from music21 import humdrum
 from music21 import stream
 from music21 import tinyNotation
-
-from music21.abc import base as abcModule
-from music21.abc import translate as abcTranslate
 
 from music21.capella import fromCapellaXML
 
@@ -104,7 +102,7 @@ class ArchiveManager(object):
     # http://www.recordare.com/xml/compressed-mxl.html
 
     def __init__(self, fp, archiveType='zip'):
-        '''Only archive type supported now is zip. 
+        '''Only archive type supported now is zip.
         '''
         self.fp = fp
         self.archiveType = archiveType
@@ -129,7 +127,7 @@ class ArchiveManager(object):
 
 
     def getNames(self):
-        '''Return a list of all names contained in this archive. 
+        '''Return a list of all names contained in this archive.
         '''
         post = []
         if self.archiveType == 'zip':
@@ -141,9 +139,9 @@ class ArchiveManager(object):
 
 
     def getData(self, name=None, dataFormat='musicxml' ):
-        '''Return data from the archive by name. If no name is given, a default may be available. 
+        '''Return data from the archive by name. If no name is given, a default may be available.
 
-        For 'musedata' format this will be a list of strings. For 'musicxml' this will be a single string. 
+        For 'musedata' format this will be a list of strings. For 'musicxml' this will be a single string.
         '''
         if self.archiveType == 'zip':
             f = zipfile.ZipFile(self.fp, 'r')
@@ -156,13 +154,13 @@ class ArchiveManager(object):
                 for subFp in f.namelist():
                     # the name musicXML.xml is often used, or get top level
                     # xml file
-                    if 'META-INF' in subFp: 
+                    if 'META-INF' in subFp:
                         continue
                     if subFp.endswith('.xml'):
                         post = f.read(subFp)
                         break
 
-            elif name == None and dataFormat == 'musedata': 
+            elif name == None and dataFormat == 'musedata':
                 # this might concatenate all parts into a single string
                 # or, return a list of strings
                 # alternative, a different method might return one at a time
@@ -173,16 +171,16 @@ class ArchiveManager(object):
                 for subFp in mdd.getPaths():
                     component = f.open(subFp, 'rU')
                     lines = component.readlines()
-                    #environLocal.printDebug(['subFp', subFp, len(lines)]) 
-                    post.append(''.join(lines))    
-                    
+                    #environLocal.printDebug(['subFp', subFp, len(lines)])
+                    post.append(''.join(lines))
+
                     # note: the following methods do not properly employ
                     # universal new lines; this is a python problem:
                     # http://bugs.python.org/issue6759
-                    #post.append(component.read())    
-                    #post.append(f.read(subFp, 'U'))    
+                    #post.append(component.read())
+                    #post.append(f.read(subFp, 'U'))
                     #msg.append('\n/END\n')
-    
+
             f.close()
         else:
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
@@ -192,11 +190,11 @@ class ArchiveManager(object):
 
 #-------------------------------------------------------------------------------
 class PickleFilter(object):
-    '''Before opening a file path, this class can check if there is an up 
-    to date version pickled and stored in the scratch directory. 
+    '''Before opening a file path, this class can check if there is an up
+    to date version pickled and stored in the scratch directory.
 
-    If the user has not specified a scratch directory, a pickle path will 
-    not be created. 
+    If the user has not specified a scratch directory, a pickle path will
+    not be created.
     '''
     def __init__(self, fp, forceSource=False):
         '''Provide a file path to check if there is pickled version.
@@ -226,7 +224,7 @@ class PickleFilter(object):
                 raise PickleFilterException('cannot access source file when only given a file path to a pickled file.')
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
-            fpPickle = None                    
+            fpPickle = None
         elif fpScratch == None or self.forceSource:
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
@@ -249,7 +247,7 @@ class PickleFilter(object):
 
 
 #-------------------------------------------------------------------------------
-# Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property. 
+# Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property.
 
 
 #-------------------------------------------------------------------------------
@@ -270,7 +268,7 @@ class ConverterHumdrum(object):
         '''
         self.data = humdrum.parseData(humdrumString)
         #self.data.stream.makeNotation()
-        
+
         self.stream = self.data.stream
         return self.data
 
@@ -320,18 +318,18 @@ class ConverterNoteworthy(object):
     Simple class wrapper for parsing NoteworthyComposer data provided in a file or in a string.
 
     Gets data with the file format .nwctxt
-        
+
     Users should not need this routine.  The basic format is
-    
-    
+
+
     >>> import os #_DOCS_HIDE
     >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
-    >>> paertPath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE 
+    >>> paertPath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
     >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
     >>> paertStream = converter.parse(paertPath)
     >>> len(paertStream.parts)
     4
-    
+
     For developers: see the documentation for :meth:`parseData` and :meth:`parseFile`
     to see the low-level usage.
     '''
@@ -358,15 +356,15 @@ class ConverterNoteworthy(object):
     def parseFile(self, fp, number=None):
         '''
         Open Noteworthy data (as nwctxt) from a file path.
-        
-        
+
+
         >>> import os #_DOCS_HIDE
         >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
         >>> filePath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
-        >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt') 
+        >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
         >>> c = converter.ConverterNoteworthy()
         >>> c.parseFile(filePath)
-        >>> #_DOCS_SHOW c.stream.show()        
+        >>> #_DOCS_SHOW c.stream.show()
         '''
         self.stream = noteworthyTranslate.NoteworthyTranslator().parseFile(fp)
 
@@ -376,8 +374,8 @@ class ConverterNoteworthyBinary(object):
     Simple class wrapper for parsing NoteworthyComposer binary data provided in a file or in a string.
 
     Gets data with the file format .nwc
-        
-    Users should not need this routine.  Call converter.parse directly    
+
+    Users should not need this routine.  Call converter.parse directly
     '''
 
     def __init__(self):
@@ -446,7 +444,7 @@ class ConverterMusicXML(object):
 
         pfObj = PickleFilter(fp, self.forceSource)
         # fpDst here is the file path to load, which may or may not be
-        # a pickled file 
+        # a pickled file
         fpDst, writePickle, fpPickle = pfObj.status() # get status
 
         formatSrc = common.findFormatFile(fp)
@@ -469,7 +467,7 @@ class ConverterMusicXML(object):
                 else:
                     raise ConverterException(msg)
             # check if this pickle is up to date
-            if (hasattr(c.score, 'm21Version') and 
+            if (hasattr(c.score, 'm21Version') and
                 c.score.m21Version >= musicxmlHandler.musicxmlMod.VERSION_MINIMUM):
                 pass
                 #environLocal.printDebug(['pickled file version is compatible', c.score.m21Version])
@@ -504,7 +502,7 @@ class ConverterMusicXML(object):
         # manually insert file name as a title if no titles are defined
         if self._mxScore.get('movementTitle') == None:
             mxWork = self._mxScore.get('workObj')
-            if mxWork == None or mxWork.get('workTitle') == None: 
+            if mxWork == None or mxWork.get('workTitle') == None:
                 junk, fn = os.path.split(fp)
                 # set as movement title
                 self._mxScore.set('movementTitle', fn)
@@ -534,7 +532,7 @@ class ConverterMidi(object):
     def parseData(self, strData, number=None):
         '''
         Get MIDI data from a binary string representation.
-        
+
         Calls midi.translate.midiStringToStream.
         '''
         from music21.midi import translate as midiTranslate
@@ -569,33 +567,33 @@ class ConverterABC(object):
 
     def parseData(self, strData, number=None):
         '''
-        Get ABC data, as token list, from a string representation. 
-        If more than one work is defined in the ABC data, a  
-        :class:`~music21.stream.Opus` object will be returned; 
+        Get ABC data, as token list, from a string representation.
+        If more than one work is defined in the ABC data, a
+        :class:`~music21.stream.Opus` object will be returned;
         otherwise, a :class:`~music21.stream.Score` is returned.
         '''
-        af = abcModule.ABCFile()
-        # do not need to call open or close 
+        af = abc.ABCFile()
+        # do not need to call open or close
         abcHandler = af.readstr(strData, number=number)
         # set to stream
         if abcHandler.definesReferenceNumbers():
             # this creates an Opus object, not a Score object
-            self._stream = abcTranslate.abcToStreamOpus(abcHandler,
+            self._stream = abc.translate.abcToStreamOpus(abcHandler,
                 number=number)
         else: # just one work
-            abcTranslate.abcToStreamScore(abcHandler, self._stream)
+            abc.translate.abcToStreamScore(abcHandler, self._stream)
 
     def parseFile(self, fp, number=None):
         '''Get MIDI data from a file path. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
 
-        If `number` is provided, and this ABC file defines multiple works with a X: tag, just the specified work will be returned. 
+        If `number` is provided, and this ABC file defines multiple works with a X: tag, just the specified work will be returned.
         '''
         #environLocal.printDebug(['ConverterABC.parseFile: got number', number])
 
-        af = abcModule.ABCFile()
+        af = abc.ABCFile()
         af.open(fp)
         # returns a handler instance of parse tokens
-        abcHandler = af.read(number=number) 
+        abcHandler = af.read(number=number)
         af.close()
 
         # only create opus if multiple ref numbers
@@ -603,11 +601,11 @@ class ConverterABC(object):
         if abcHandler.definesReferenceNumbers():
             # this creates a Score or Opus object, depending on if a number
             # is given
-            self._stream = abcTranslate.abcToStreamOpus(abcHandler,
+            self._stream = abc.translate.abcToStreamOpus(abcHandler,
                            number=number)
         # just get a single work
-        else: 
-            abcTranslate.abcToStreamScore(abcHandler, self._stream)
+        else:
+            abc.translate.abcToStreamScore(abcHandler, self._stream)
 
     def _getStream(self):
         return self._stream
@@ -627,7 +625,7 @@ class ConverterRomanText(object):
         '''
         '''
         rtf = romanTextModule.RTFile()
-        rtHandler = rtf.readstr(strData) 
+        rtHandler = rtf.readstr(strData)
         if rtHandler.definesMovements():
             # this re-defines Score as an Opus
             self._stream = romanTextTranslate.romanTextToStreamOpus(rtHandler)
@@ -640,7 +638,7 @@ class ConverterRomanText(object):
         rtf = romanTextModule.RTFile()
         rtf.open(fp)
         # returns a handler instance of parse tokens
-        rtHandler = rtf.read() 
+        rtHandler = rtf.read()
         rtf.close()
         romanTextTranslate.romanTextToStreamScore(rtHandler, self._stream)
 
@@ -662,7 +660,7 @@ class ConverterCapella(object):
     def parseData(self, strData, number=None):
         '''
         parse a data stream of uncompessed capella xml
-        
+
         N.B. for web parsing, it gets more complex.
         '''
         ci = fromCapellaXML.CapellaImporter()
@@ -693,7 +691,7 @@ class ConverterMuseData(object):
         self._stream = stream.Score()
 
     def parseData(self, strData, number=None):
-        '''Get musedata from a string representation. 
+        '''Get musedata from a string representation.
 
         '''
         if common.isStr(strData):
@@ -723,13 +721,13 @@ class ConverterMuseData(object):
             # get data will return all data from the zip as a single string
             for partStr in af.getData(dataFormat='musedata'):
                 #environLocal.printDebug(['partStr', len(partStr)])
-                mdw.addString(partStr)            
+                mdw.addString(partStr)
         else:
             if os.path.isdir(fp):
                 mdd = musedataModule.MuseDataDirectory(fp)
                 fpList = mdd.getPaths()
             elif not common.isListLike(fp):
-                fpList = [fp]            
+                fpList = [fp]
             else:
                 fpList = fp
 
@@ -748,7 +746,7 @@ class ConverterMuseData(object):
 #-------------------------------------------------------------------------------
 class Converter(object):
     '''
-    A class used for converting all supported data formats into music21 objects. 
+    A class used for converting all supported data formats into music21 objects.
 
     Not a subclass, but a wrapper for different converter objects based on format.
     '''
@@ -761,8 +759,8 @@ class Converter(object):
         # this WILL change in the future
         if format is None:
             raise ConverterException('Did not find a format from the source file')
-        
-        if format in ['musicxml', 'pickle']: 
+
+        if format in ['musicxml', 'pickle']:
             self._converter = ConverterMusicXML(forceSource=forceSource)
         elif format == 'midi':
             self._converter = ConverterMidi()
@@ -780,7 +778,7 @@ class Converter(object):
             self._converter = ConverterNoteworthyBinary()
         elif format == 'capella':
             self._converter = ConverterCapella()
-        
+
         elif format == 'text': # based on extension
             # presently, all text files are treated as roman text
             # may need to handle various text formats
@@ -798,11 +796,11 @@ class Converter(object):
     def parseFile(self, fp, number=None, format=None, forceSource=False): # @ReservedAssignment
         '''
         Given a file path, parse and store a music21 Stream.
-        
-        
-        If format is None then look up the format from the file 
+
+
+        If format is None then look up the format from the file
         extension using `common.findFormatFile`.
-        
+
         '''
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
@@ -810,7 +808,7 @@ class Converter(object):
         useFormat = format
 
         if useFormat is None:
-            # if the file path is to a directory, assume it is a collection of 
+            # if the file path is to a directory, assume it is a collection of
             # musedata parts
             if os.path.isdir(fp):
                 useFormat = 'musedata'
@@ -821,7 +819,7 @@ class Converter(object):
         self._setConverter(useFormat, forceSource=forceSource)
         self._converter.parseFile(fp, number=number)
         self.stream.filePath = fp
-        self.stream.fileNumber = number        
+        self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
 
     def parseData(self, dataStr, number=None, format=None, forceSource=False): # @ReservedAssignment
@@ -834,13 +832,13 @@ class Converter(object):
 #         if type(dataStr) == unicode:
 #             environLocal.printDebug(['Converter.parseData: got a unicode string'])
 
-        # get from data in string if not specified        
+        # get from data in string if not specified
         if useFormat is None: # its a string
             dataStr = dataStr.lstrip()
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
             if useFormat is not None:
-                pass  
+                pass
             elif dataStr.startswith('<?xml') or dataStr.startswith('musicxml:'):
                 useFormat = 'musicxml'
             elif dataStr.startswith('MThd') or dataStr.startswith('midi:'):
@@ -849,7 +847,7 @@ class Converter(object):
                 useFormat = 'humdrum'
             elif dataStr.lower().startswith('tinynotation:'):
                 useFormat = 'tinyNotation'
-            
+
             # assume MuseData must define a meter and a key
             elif 'WK#:' in dataStr and 'measure' in dataStr:
                 useFormat = 'musedata'
@@ -865,27 +863,27 @@ class Converter(object):
 
 
     def parseURL(self, url, format=None, number=None): # @ReservedAssignment
-        '''Given a url, download and parse the file 
+        '''Given a url, download and parse the file
         into a music21 Stream stored in the `stream`
         property of the converter object.
 
-        Note that this checks the user Environment 
-        `autoDownlaad` setting before downloading. 
-        
+        Note that this checks the user Environment
+        `autoDownlaad` setting before downloading.
+
         As a convenience method, links to Wikifonia main
         page for a piece are redirected to the musicxml
         (n.b., it is up to you to determine if any piece
         on Wikifonia is in or out of copyright in your
         juristiction).
-        
-        
+
+
         Demonstration of rewrite ability for URLs.
         Actual URL is http://static.wikifonia.org/4391/musicxml.xml
         but the URL below is what's shown on the browser, so either
         is accepted.
-        
-        
-        
+
+
+
         >>> #_DOCS_SHOW jeanieLightBrownURL = 'http://www.wikifonia.org/node/4391'
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
@@ -929,13 +927,13 @@ class Converter(object):
 
         # update format based on downloaded fp
         if format is None: # if not provided as an argument
-            useFormat = common.findFormatFile(fp) 
+            useFormat = common.findFormatFile(fp)
         else:
             useFormat = format
         self._setConverter(useFormat, forceSource=False)
         self._converter.parseFile(fp, number=number)
         self.stream.filePath = fp
-        self.stream.fileNumber = number        
+        self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
 
 
@@ -945,22 +943,22 @@ class Converter(object):
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.
-        
+
         Else, return (None, dataStr) where dataStr is the original untouched.
-        
+
         Not case sensitive.
-        
-        
+
+
         >>> c = converter.Converter()
         >>> c.formatFromHeader('tinynotation: C4 E2')
         ('tinyNotation', 'C4 E2')
-        
+
         >>> c.formatFromHeader('C4 E2')
         (None, 'C4 E2')
         '''
-        
+
         dataStrStartLower = dataStr[:20].lower()
-            
+
         foundFormat = None
         for possibleFormat in self.validHeaderFormats:
             if dataStrStartLower.startswith(possibleFormat.lower() + ':'):
@@ -969,7 +967,7 @@ class Converter(object):
                 dataStr = dataStr.lstrip()
                 break
         return (foundFormat, dataStr)
-            
+
 
 
     #---------------------------------------------------------------------------
@@ -978,8 +976,8 @@ class Converter(object):
     def _getStream(self):
         '''All converters have to have a stream property or attribute.
         '''
-        return self._converter.stream 
-        # not _stream: please don't look in other objects' private variables; 
+        return self._converter.stream
+        # not _stream: please don't look in other objects' private variables;
         #              humdrum worked differently.
 
     stream = property(_getStream)
@@ -1006,7 +1004,7 @@ def parseData(dataStr, number=None, format=None): # @ReservedAssignment
     return v.stream
 
 def parseURL(url, number=None, format=None, forceSource=False): # @ReservedAssignment
-    '''Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow". 
+    '''Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow".
     '''
     v = Converter()
     v.parseURL(url, format=format)
@@ -1014,39 +1012,39 @@ def parseURL(url, number=None, format=None, forceSource=False): # @ReservedAssig
 
 def parse(value, *args, **keywords):
     '''
-    Given a file path, encoded data in a Python string, 
-    or a URL, attempt to parse the item into a Stream. 
-    Note: URL downloading will not happen automatically unless 
-    the user has set their Environment "autoDownload" 
-    preference to "allow". 
+    Given a file path, encoded data in a Python string,
+    or a URL, attempt to parse the item into a Stream.
+    Note: URL downloading will not happen automatically unless
+    the user has set their Environment "autoDownload"
+    preference to "allow".
 
 
-    Keywords can include `number` which specifies a piece number 
+    Keywords can include `number` which specifies a piece number
     in a file of multipiece file.
-    
-    
-    `format` specifies the format to parse the line of text or the file as.    
-    
-    A string of text is first checked to see if it is a 
+
+
+    `format` specifies the format to parse the line of text or the file as.
+
+    A string of text is first checked to see if it is a
     filename that exists on disk.  If not it is searched
     to see if it looks like a URL.  If not it is processed
-    as data.  
+    as data.
 
-    
+
     The data is normally interpreted as a line of TinyNotation
     with the first argument being the time signature:
-    
+
 
     TODO: SHOW FILE
-    TODO: SHOW URL 
-    
+    TODO: SHOW URL
 
 
-    
+
+
     >>> s = converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c")
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 3/4>
-    
+
     >>> s2 = converter.parse("E8 f# g#' G f g# g G#", "2/4")
     >>> s2.show('text')
     {0.0} <music21.meter.TimeSignature 2/4>
@@ -1058,31 +1056,31 @@ def parse(value, *args, **keywords):
     {2.5} <music21.note.Note G#>
     {3.0} <music21.note.Note G>
     {3.5} <music21.note.Note G#>
-    
+
     '''
 
     #environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
         forceSource = keywords['forceSource']
-    else:   
+    else:
         forceSource = False
 
     # see if a work number is defined; for multi-work collections
     if 'number' in keywords:
         number = keywords['number']
-    else:   
+    else:
         number = None
 
     if 'format' in keywords:
         m21Format = keywords['format']
-    else:   
+    else:
         m21Format = None
 
-    if (common.isListLike(value) and len(value) == 2 and 
+    if (common.isListLike(value) and len(value) == 2 and
         value[1] == None and os.path.exists(value[0])):
         # comes from corpus.search
         return parseFile(value[0], format=m21Format)
-    elif (common.isListLike(value) and len(value) == 2 and 
+    elif (common.isListLike(value) and len(value) == 2 and
         isinstance(value[1], int) and os.path.exists(value[0])):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format).getScoreByNumber(value[1])
@@ -1095,7 +1093,7 @@ def parse(value, *args, **keywords):
         return parseData(value, number=number, format=m21Format)
     elif os.path.exists(value):
         return parseFile(value, number=number, format=m21Format, forceSource=forceSource)
-    elif (value.startswith('http://') or value.startswith('https://')): 
+    elif (value.startswith('http://') or value.startswith('https://')):
         # its a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format, forceSource=forceSource)
     else:
@@ -1106,16 +1104,16 @@ def parse(value, *args, **keywords):
 def freeze(streamObj, fmt=None, fp=None):
     '''Given a StreamObject and a file path, serialize and store the Stream to a file.
 
-    This function is based on the :class:`~music21.converter.StreamFreezer` object. 
+    This function is based on the :class:`~music21.converter.StreamFreezer` object.
 
-    The serialization format is defined by the `fmt` argument; 'pickle' (the default) is only one 
+    The serialization format is defined by the `fmt` argument; 'pickle' (the default) is only one
     presently supported.  'json' or 'jsonnative' will be used once jsonpickle is good enough.
 
     If no file path is given, a temporary file is used.
 
     The file path is returned.
-    
-    
+
+
     >>> c = converter.parse('c4 d e f', '4/4')
     >>> c.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -1144,9 +1142,9 @@ def freeze(streamObj, fmt=None, fp=None):
 
 def thaw(fp):
     '''Given a file path of a serialized Stream, defrost the file into a Stream.
-    
-    This function is based on the :class:`~music21.converter.StreamFreezer` object. 
-    
+
+    This function is based on the :class:`~music21.converter.StreamFreezer` object.
+
     See the documentation for :meth:`~music21.converter.freeze` for demos.
     '''
     from music21 import freezeThaw
@@ -1157,17 +1155,17 @@ def thaw(fp):
 
 def freezeStr(streamObj, fmt=None):
     '''
-    Given a StreamObject 
+    Given a StreamObject
     serialize and return a serialization string.
 
-    This function is based on the 
-    :class:`~music21.converter.StreamFreezer` object. 
+    This function is based on the
+    :class:`~music21.converter.StreamFreezer` object.
 
-    The serialization format is defined by 
-    the `fmt` argument; 'pickle' (the default), 
+    The serialization format is defined by
+    the `fmt` argument; 'pickle' (the default),
     is the only one presently supported.
 
-    
+
     >>> c = converter.parse('c4 d e f', '4/4')
     >>> c.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -1195,7 +1193,7 @@ def thawStr(strData):
     '''
     Given a serialization string, defrost into a Stream.
 
-    This function is based on the :class:`~music21.converter.StreamFreezer` object. 
+    This function is based on the :class:`~music21.converter.StreamFreezer` object.
     '''
     from music21 import freezeThaw
     v = freezeThaw.StreamThawer()
@@ -1304,7 +1302,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(b), 27)
         c = a.getElementsByClass(note.Note)
         self.assertEqual(len(c), 53)
-        
+
         # two starts and two stops == 2!
         d = a.getElementsByClass(dynamics.DynamicWedge)
         self.assertEqual(len(d), 2)
@@ -1337,7 +1335,7 @@ class Test(unittest.TestCase):
         b = a.getElementsByClass(note.Note)
 
 
-        
+
         mxString = testPrimitive.rhythmDurations03a
         a = parse(mxString)
         #a.show('t')
@@ -1351,7 +1349,7 @@ class Test(unittest.TestCase):
         # print a.recurseRepr()
 
 
-        
+
         # print a.recurseRepr()
 
         # get the third movement
@@ -1361,7 +1359,7 @@ class Test(unittest.TestCase):
 #         b = a.getElementsByClass(dynamics.Dynamic)
 #         # 110 dynamics
 #         self.assertEqual(len(b), 110)
-# 
+#
 #         c = a.getElementsByClass(note.Note)
 #         # over 1000 notes
 #         self.assertEqual(len(c), 1289)
@@ -1427,7 +1425,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMXClefTimeCorpus(self):
-    
+
         from music21 import corpus, clef, meter
         a = corpus.parse('luca')
 
@@ -1478,7 +1476,7 @@ class Test(unittest.TestCase):
         from music21 import note
         from music21.musicxml import testPrimitive
         from music21.musicxml import m21ToString
-        
+
         mxString = testPrimitive.articulations01
         a = parse(mxString)
         part = a.parts[0]
@@ -1486,9 +1484,9 @@ class Test(unittest.TestCase):
         notes = part.flat.getElementsByClass(note.Note)
         self.assertEqual(len(notes), 4)
         post = []
-        match = ["<class 'music21.articulations.Staccatissimo'>", 
-        "<class 'music21.articulations.Accent'>", 
-        "<class 'music21.articulations.Staccato'>", 
+        match = ["<class 'music21.articulations.Staccatissimo'>",
+        "<class 'music21.articulations.Accent'>",
+        "<class 'music21.articulations.Staccato'>",
         "<class 'music21.articulations.Tenuto'>"]
         for i in range(len(notes)):
             post.append(str(notes[i].articulations[0].__class__))
@@ -1496,7 +1494,7 @@ class Test(unittest.TestCase):
 
         # try to go the other way
         post = m21ToString.fromMusic21Object(a)
-        #a.show()        
+        #a.show()
 
     def testConversionMXKey(self):
         from music21 import key
@@ -1532,7 +1530,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(barlineList), 11)
 
     def testConversionXMLayout(self):
-        
+
         from music21.musicxml import testPrimitive
         from music21 import stream, layout
 
@@ -1549,7 +1547,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMXTies(self):
-        
+
         from music21.musicxml import testPrimitive
         from music21 import clef
 
@@ -1608,7 +1606,7 @@ class Test(unittest.TestCase):
         f = open(fp, 'rb')
         data = f.read()
         f.close()
-        
+
         c.parseData(data)
 
         # try module-leve; function
@@ -1667,7 +1665,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
         self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
 
-       
+
 
 
         # this sample has dynamic changes in key signature
@@ -1711,7 +1709,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionABCOpus(self):
-        
+
         from music21.abc import testFiles
         from music21 import corpus
         from music21 import stream
@@ -1752,7 +1750,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMusedata(self):
-        
+
         from music21.musedata import testFiles
 
         cmd = ConverterMuseData()
@@ -1782,7 +1780,7 @@ class Test(unittest.TestCase):
         self.assertEqual(af.archiveType, 'zip')
         self.assertEqual(af.isArchive(), True)
         # if this is a musicxml file, there will only be single file; we
-        # can cal get datat to get this 
+        # can cal get datat to get this
         post = af.getData()
         self.assertEqual(post[:38], '<?xml version="1.0" encoding="UTF-8"?>')
         self.assertEqual(af.getNames(), ['musicXML.xml', 'META-INF/', 'META-INF/container.xml'])
@@ -1804,7 +1802,7 @@ class Test(unittest.TestCase):
         # can add a list of strings from getData
         #mdw.addString(af.getData(dataFormat='musedata'))
         #self.assertEqual(len(mdw.files), 4)
-# 
+#
 #         mdpList = mdw.getParts()
 #         self.assertEqual(len(mdpList), 4)
 
