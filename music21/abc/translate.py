@@ -12,7 +12,7 @@
 #-------------------------------------------------------------------------------
 '''
 Functions for translating music21 objects and 
-:class:`~music21.abc.base.ABCHandler` instances. 
+:class:`~music21.abc.ABCHandler` instances. 
 Mostly, these functions are for advanced, low level usage. 
 For basic importing of ABC files from a file or URL to a 
 :class:`~music21.stream.Stream`, use the music21 converter 
