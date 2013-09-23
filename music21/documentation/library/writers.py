@@ -276,12 +276,9 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 #             ]
 #         nbconvertPath = os.path.join(*pathParts)
         nbconvertCommand = '{executable} rst {notebook}'.format(
-            #executable=common.relativepath(nbconvertPath, runDirectoryPath),
-            #notebook=common.relativepath(ipythonNotebookFilePath, runDirectoryPath),
-            executable=common.relativepath(nbconvertPath),
-            notebook=common.relativepath(ipythonNotebookFilePath),
+            executable=nbconvertPath,
+            notebook=ipythonNotebookFilePath,
             )
-        #print nbconvertCommand
         #subprocess.call(nbconvertCommand, shell=True, cwd=runDirectoryPath)
         subprocess.call(nbconvertCommand, shell=True)
 

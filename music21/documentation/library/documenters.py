@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 import abc  # n.b. -- abstract base class, not music21.abc
 import inspect
@@ -112,6 +112,7 @@ class FunctionDocumenter(ObjectDocumenter):
 
     ::
 
+        >>> from music21 import common, documentation
         >>> function = common.almostEquals
         >>> documenter = documentation.FunctionDocumenter(function)
         >>> documenter
@@ -169,8 +170,10 @@ class FunctionDocumenter(ObjectDocumenter):
     @property
     def rstAutodocDirectiveFormat(self):
         result = []
+        referentPackagesystemPath = self.referentPackagesystemPath.replace(
+            '.__init__', '')
         result.append('.. autofunction:: {0}'.format(
-            self.referentPackagesystemPath,
+            referentPackagesystemPath,
             ))
         result.append('')
         return result
@@ -236,6 +239,7 @@ class MethodDocumenter(MemberDocumenter):
 
     ::
 
+        >>> from music21 import documentation, key
         >>> method = key.KeySignature.transpose
         >>> documenter = documentation.MethodDocumenter(
         ...     method, 'transpose', key.KeySignature)
@@ -254,7 +258,7 @@ class MethodDocumenter(MemberDocumenter):
         ...
         '.. automethod:: music21.key.KeySignature.transpose'
         ''
-        
+
     '''
 
     ### PUBLIC PROPERTIES ###
@@ -279,6 +283,7 @@ class AttributeDocumenter(MemberDocumenter):
 
     ::
 
+        >>> from music21 import documentation, key
         >>> attribute = key.KeySignature.mode
         >>> documenter = documentation.AttributeDocumenter(
         ...     attribute, 'mode', key.KeySignature)
@@ -322,6 +327,7 @@ class ClassDocumenter(ObjectDocumenter):
 
     ::
 
+        >>> from music21 import documentation
         >>> klass = documentation.ClassDocumenter
         >>> documenter = documentation.ClassDocumenter(klass)
         >>> documenter
@@ -357,10 +363,10 @@ class ClassDocumenter(ObjectDocumenter):
 
     def __init__(self, referent):
         assert isinstance(referent, (type, types.ClassType)), repr(referent)
-        ObjectDocumenter.__init__(self, referent) 
+        ObjectDocumenter.__init__(self, referent)
 
         self._baseClasses = tuple(
-            cls for cls in inspect.getmro(self.referent)[1:] \
+            cls for cls in inspect.getmro(self.referent)[1:]
             if cls.__module__.startswith('music21'))
         self._baseClassDocumenters = tuple(
             type(self).fromIdentityMap(cls) for cls in self.baseClasses)
@@ -396,7 +402,7 @@ class ClassDocumenter(ObjectDocumenter):
             # Ignore private members ('_') and special members ('__')
             elif attr.name.startswith('_'):
                 continue
-            
+
             definingClass = attr.defining_class
             if attr.kind in ('class method', 'method', 'static method'):
                 documenterClass = MethodDocumenter
@@ -414,18 +420,19 @@ class ClassDocumenter(ObjectDocumenter):
                 continue
 
             documenter = documenterClass(
-                    attr.object,
-                    attr.name,
-                    definingClass,
-                    )
+                attr.object,
+                attr.name,
+                definingClass,
+                )
             if definingClass is self.referent:
                 localMembers.append(documenter)
             else:
-                definingClassDocumenter = type(self).fromIdentityMap(definingClass)
+                definingClassDocumenter = type(self).fromIdentityMap(
+                    definingClass)
                 if definingClassDocumenter not in inheritedMembers:
                     inheritedMembers[definingClassDocumenter] = []
                 inheritedMembers[definingClassDocumenter].append(documenter)
-            
+
         keyLambda = lambda x: x.memberName
         methods.sort(key=keyLambda)
         readonlyProperties.sort(key=keyLambda)
@@ -435,7 +442,7 @@ class ClassDocumenter(ObjectDocumenter):
         for documenters in inheritedReadonlyProperties.itervalues():
             documenters.sort(key=keyLambda)
         for documenters in inheritedReadwriteProperties.itervalues():
-            documenters.sort(key=keyLambda) 
+            documenters.sort(key=keyLambda)
 
         self._methods = methods
         self._readonlyProperties = readonlyProperties
@@ -443,11 +450,12 @@ class ClassDocumenter(ObjectDocumenter):
         self._inheritedDocAttrMapping = inheritedDocAttr
         self._inheritedMethodsMapping = inheritedMethods
         self._inheritedReadonlyPropertiesMapping = inheritedReadonlyProperties
-        self._inheritedReadwritePropertiesMapping = inheritedReadwriteProperties
+        self._inheritedReadwritePropertiesMapping = \
+            inheritedReadwriteProperties
 
         if self.referent not in self._identityMap:
-            self._identityMap[self.referent] = self 
- 
+            self._identityMap[self.referent] = self
+
     ### SPECIAL METHODS ###
 
     def __call__(self):
@@ -483,7 +491,8 @@ class ClassDocumenter(ObjectDocumenter):
         for classDocumenter in self.baseClassDocumenters:
             if classDocumenter not in mapping:
                 continue
-            result.append(banner.format(classDocumenter.rstCrossReferenceString))
+            result.append(banner.format(
+                classDocumenter.rstCrossReferenceString))
             result.append('')
             memberDocumenters = mapping[classDocumenter]
             result.append('.. hlist::')
@@ -492,7 +501,7 @@ class ClassDocumenter(ObjectDocumenter):
             for memberDocumenter in memberDocumenters:
                 result.append('   - {0}'.format(
                     memberDocumenter.rstCrossReferenceString))
-            result.append('')    
+            result.append('')
         return result
 
     ### PUBLIC METHODS ###
@@ -520,6 +529,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, stream
             >>> klass = stream.Stream
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for key in sorted(documenter.docAttr.iterkeys()):
@@ -542,6 +552,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, stream
             >>> klass = stream.Stream
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for name in documenter.docOrder:
@@ -568,7 +579,8 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
-            >>> klass = stream.Measure 
+            >>> from music21 import documentation, stream
+            >>> klass = stream.Measure
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> mapping = documenter.inheritedDocAttrMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
@@ -589,14 +601,17 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, stream
             >>> klass = stream.Measure
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> mapping = documenter.inheritedReadonlyPropertiesMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
-            ...     print '{0}:'.format(classDocumenter.referentPackagesystemPath)
+            ...     print '{0}:'.format(
+            ...         classDocumenter.referentPackagesystemPath)
             ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-            ...         print '- {0}'.format(attributeDocumenter.referentPackagesystemPath)
+            ...         print '- {0}'.format(
+            ...             attributeDocumenter.referentPackagesystemPath)
             ...
             music21.base.Music21Object:
             - music21.base.Music21Object.classes
@@ -628,14 +643,17 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, stream
             >>> klass = stream.Measure
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> mapping = documenter.inheritedMethodsMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
-            ...     print '{0}:'.format(classDocumenter.referentPackagesystemPath)
+            ...     print '{0}:'.format(
+            ...         classDocumenter.referentPackagesystemPath)
             ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-            ...         print '- {0}'.format(attributeDocumenter.referentPackagesystemPath)
+            ...         print '- {0}'.format(
+            ...             attributeDocumenter.referentPackagesystemPath)
             ...
             music21.base.Music21Object:
             - music21.base.Music21Object.addContext
@@ -671,6 +689,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, stream
             >>> klass = stream.Measure
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> mapping = documenter.inheritedReadwritePropertiesMapping
@@ -704,11 +723,12 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, stream
             >>> klass = stream.Stream
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for method in documenter.methods[:10]:
             ...     method
-            ... 
+            ...
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.activateVariants>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.addGroupForElements>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.allPlayingWhileSounding>
@@ -720,7 +740,7 @@ class ClassDocumenter(ObjectDocumenter):
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.augmentOrDiminish>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.beatAndMeasureFromOffset>
 
-        ''' 
+        '''
         return self._methods
 
     @property
@@ -730,6 +750,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, stream
             >>> klass = stream.Stream
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for attr in documenter.readonlyProperties:
@@ -768,6 +789,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, stream
             >>> klass = stream.Stream
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for prop in documenter.readwriteProperties:
@@ -795,8 +817,10 @@ class ClassDocumenter(ObjectDocumenter):
     @property
     def rstAutodocDirectiveFormat(self):
         result = []
+        referentPackagesystemPath = self.referentPackagesystemPath.replace(
+            '.__init__', '')
         result.append('.. autoclass:: {0}'.format(
-            self.referentPackagesystemPath,
+            referentPackagesystemPath,
             ))
         result.append('')
         return result
@@ -809,6 +833,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation
             >>> klass = documentation.ClassDocumenter
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for line in documenter.rstBasesFormat:
@@ -884,6 +909,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation
             >>> klass = documentation.MethodDocumenter
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for line in documenter.rstInheritedMethodsFormat:
@@ -911,6 +937,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation
             >>> klass = documentation.MethodDocumenter
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for line in documenter.rstInheritedReadonlyPropertiesFormat:
@@ -940,7 +967,7 @@ class ClassDocumenter(ObjectDocumenter):
             ''
             '   - :attr:`~music21.documentation.library.documenters.Documenter.rstEditingWarningFormat`'
             ''
-            
+
         '''
         mapping = self.inheritedReadonlyPropertiesMapping
         banner = 'Read-only properties inherited from {0}:'
@@ -953,6 +980,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation
             >>> klass = documentation.MethodDocumenter
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for line in documenter.rstInheritedReadwritePropertiesFormat:
@@ -971,6 +999,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation
             >>> klass = documentation.ClassDocumenter
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for line in documenter.rstMethodsFormat:
@@ -988,11 +1017,11 @@ class ClassDocumenter(ObjectDocumenter):
             '   - :meth:`~music21.documentation.library.documenters.Documenter.makeHeading`'
             '   - :meth:`~music21.documentation.library.documenters.Documenter.makeRubric`'
             ''
-        
+
         '''
         result = []
         if self.methods:
-            for documenter in self.methods: 
+            for documenter in self.methods:
                 result.extend(documenter())
             if result[-1] != '':
                 result.append('')
@@ -1010,6 +1039,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation
             >>> klass = documentation.ClassDocumenter
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for line in documenter.rstReadonlyPropertiesFormat:
@@ -1078,7 +1108,7 @@ class ClassDocumenter(ObjectDocumenter):
             ''
             '   - :attr:`~music21.documentation.library.documenters.Documenter.rstEditingWarningFormat`'
             ''
-        
+
         '''
         result = []
         if self.readonlyProperties:
@@ -1100,6 +1130,7 @@ class ClassDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation
             >>> klass = documentation.ClassDocumenter
             >>> documenter = documentation.ClassDocumenter(klass)
             >>> for line in documenter.rstReadwritePropertiesFormat:
@@ -1131,13 +1162,15 @@ class ModuleDocumenter(ObjectDocumenter):
 
     ::
 
+        >>> from music21 import documentation, serial
         >>> documenter = documentation.ModuleDocumenter(serial)
         >>> documenter
         <music21.documentation.library.documenters.ModuleDocumenter: music21.serial>
 
     ::
 
-        >>> for reference, referent in sorted(documenter.namesMapping.iteritems()):
+        >>> for reference, referent in sorted(
+        ...     documenter.namesMapping.iteritems()):
         ...     print reference, referent
         ...
         ContiguousSegmentOfNotes <music21.documentation.library.documenters.ClassDocumenter: music21.serial.ContiguousSegmentOfNotes>
@@ -1161,7 +1194,7 @@ class ModuleDocumenter(ObjectDocumenter):
         labelTransposedSegments <music21.documentation.library.documenters.FunctionDocumenter: music21.serial.labelTransposedSegments>
         pcToToneRow <music21.documentation.library.documenters.FunctionDocumenter: music21.serial.pcToToneRow>
         rowToMatrix <music21.documentation.library.documenters.FunctionDocumenter: music21.serial.rowToMatrix>
-    
+
     ::
 
         >>> documenter.rstCrossReferenceString
@@ -1191,20 +1224,23 @@ class ModuleDocumenter(ObjectDocumenter):
         ))
 
     ### INITIALIZER ###
-    
-    def __init__(self, referent): 
+
+    def __init__(self, referent):
         assert isinstance(referent, types.ModuleType)
         ObjectDocumenter.__init__(self, referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
-        self._memberOrder = tuple(self.referent.__dict__.get('_DOC_ORDER') or ())
+        self._memberOrder = tuple(
+            self.referent.__dict__.get('_DOC_ORDER') or ())
 
     ### SPECIAL METHODS ###
 
     def __call__(self):
         result = []
         result.extend(self.rstPageReferenceFormat)
-        result.extend(self.makeHeading(self.referentPackagesystemPath, 1))
+        referentPackagesystemPath = self.referentPackagesystemPath.replace(
+            '.__init__', '')
+        result.extend(self.makeHeading(referentPackagesystemPath, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstAutodocDirectiveFormat)
         if self.functionDocumenters:
@@ -1254,6 +1290,7 @@ class ModuleDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, serial
             >>> module = serial
             >>> documenter = documentation.ModuleDocumenter(module)
             >>> for classDocumenter in documenter.classDocumenters:
@@ -1288,6 +1325,7 @@ class ModuleDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, serial
             >>> module = serial
             >>> documenter = documentation.ModuleDocumenter(module)
             >>> for functionDocumenter in documenter.functionDocumenters:
@@ -1361,35 +1399,38 @@ class ModuleDocumenter(ObjectDocumenter):
 
         ::
 
+            >>> from music21 import documentation, serial
             >>> module = serial
             >>> documenter = documentation.ModuleDocumenter(module)
             >>> documenter.referenceName
             'moduleSerial'
 
         '''
-        parts = self.referentPackagesystemPath.split('.')[1:]
+        referentPackagesystemPath = self.referentPackagesystemPath.replace(
+            '.__init__', '')
+        parts = referentPackagesystemPath.split('.')[1:]
         parts = [part.capitalize() for part in parts]
         parts = ['module'] + parts
         return ''.join(parts)
-        
 
     @property
     def sphinxCrossReferenceRole(self):
         return 'mod'
-    
+
 
 class CorpusDocumenter(Documenter):
     '''A documenter for music21's corpus:
 
     ::
 
+        >>> from music21 import documentation
         >>> documenter = documentation.CorpusDocumenter()
         >>> restructuredText = documenter()
 
     '''
 
     ### SPECIAL METHODS ###
-    
+
     def __call__(self):
         from music21 import corpus
         result = []
@@ -1397,7 +1438,7 @@ class CorpusDocumenter(Documenter):
         result.extend(self.makeHeading(self.headingText, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstCorpusIntroductionFormat)
-        for composerDict in corpus.getWorkReferences(sort=True):  
+        for composerDict in corpus.getWorkReferences(sort=True):
             result.extend(self.getRstComposerDictFormat(composerDict))
         return result
 
@@ -1450,7 +1491,8 @@ class CorpusDocumenter(Documenter):
             result.extend(self.getRstComposerWorksFormat(workDict))
         return result
 
-    def getRstComposerIntroductionFormat(self, composerName, composerDirectory):
+    def getRstComposerIntroductionFormat(
+        self, composerName, composerDirectory):
         result = []
         result.append('To get all works by {0}, the'.format(composerName))
         result.append(':meth:`~music21.corpus.base.getComposer` function can')
@@ -1472,7 +1514,7 @@ class CorpusDocumenter(Documenter):
         workTitle = unicode(workDict['title'])
         worksAreVirtual = workDict['virtual']
         if worksAreVirtual:
-            workTitle += ' (*virtual*)' 
+            workTitle += ' (*virtual*)'
         result.append(workTitle)
         result.append('')
         procedure = self.getRstWorkFileDictFormat
@@ -1517,15 +1559,16 @@ class IPythonNotebookDocumenter(Documenter):
     ::
 
         >>> import json
+        >>> from music21 import documentation
         >>> notebookPath = [x for x in
         ...     documentation.IPythonNotebookIterator()][0]
         >>> with open(notebookPath, 'r') as f:
         ...     contents = json.loads(f.read())
         ...
-        >>> documenter = documentation.IPythonNotebookDocumenter(contents) 
+        >>> documenter = documentation.IPythonNotebookDocumenter(contents)
         >>> restructuredText = documenter()
 
-    ''' 
+    '''
 
     ### INITIALIZER ###
 
@@ -1555,7 +1598,7 @@ class IPythonNotebookDocumenter(Documenter):
     def imageData(self):
         return self._imageData
 
-    @property 
+    @property
     def json(self):
         return self._json
 

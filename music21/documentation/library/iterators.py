@@ -137,26 +137,29 @@ class ModuleIterator(Iterator):
                 except ImportError:
                     pass
             for fileName in fileNames:
-                if fileName not in self._ignoredFileNames and \
-                        not fileName.startswith('_') and \
-                        fileName.endswith('.py'):
-                    filePath = os.path.join(directoryPath, fileName)
-                    strippedPath = filePath.partition(rootFilesystemPath)[2]
-                    pathParts = [x for x in os.path.splitext(
-                        strippedPath)[0].split(os.path.sep)[1:] if x]
-                    pathParts = ['music21'] + pathParts
-                    packagesystemPath = '.'.join(pathParts)
-                    try:
-                        module = __import__(packagesystemPath, fromlist=['*'])
-                        if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE',
-                            False):
-                            if self.verbose:
-                                print '\tIGNORED {0}'.format(
-                                    common.relativepath(filePath))
-                            continue
-                        yield module
-                    except ImportError:
-                        pass
+                if fileName in self._ignoredFileNames:
+                    continue
+                if not fileName.endswith('.py'):
+                    continue
+                if fileName.startswith('_') and not fileName.startswith('__'):
+                    continue
+                filePath = os.path.join(directoryPath, fileName)
+                strippedPath = filePath.partition(rootFilesystemPath)[2]
+                pathParts = [x for x in os.path.splitext(
+                    strippedPath)[0].split(os.path.sep)[1:] if x]
+                pathParts = ['music21'] + pathParts
+                packagesystemPath = '.'.join(pathParts)
+                try:
+                    module = __import__(packagesystemPath, fromlist=['*'])
+                    if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE',
+                        False):
+                        if self.verbose:
+                            print '\tIGNORED {0}'.format(
+                                common.relativepath(filePath))
+                        continue
+                    yield module
+                except ImportError:
+                    pass
         raise StopIteration
 
 

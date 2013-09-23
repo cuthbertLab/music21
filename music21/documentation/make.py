@@ -16,6 +16,8 @@ import shutil
 import sys
 import webbrowser
 
+from music21 import common
+
 try:
     import sphinx
 except ImportError:
