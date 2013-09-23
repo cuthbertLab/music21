@@ -125,7 +125,6 @@ from music21 import base
 from music21 import exceptions21
 from music21 import common
 from music21 import bar
-from music21.romanText import base as romanTextModule
 
 from music21 import environment
 _MOD = 'romanText.translate.py'
@@ -256,6 +255,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     Given a romanText handler or string, return or fill a Score Stream.
     '''
     # accept a string directly; mostly for testing
+    from music21 import romanText as romanTextModule
+
     if common.isStr(rtHandler):
         rtf = romanTextModule.RTFile()
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
@@ -759,6 +760,8 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
     Return either a Score object, or, if a multi-movement work is defined, an
     Opus object.
     '''
+    from music21 import romanText as romanTextModule
+
     from music21 import stream
     if common.isStr(rtHandler):
         rtf = romanTextModule.RTFile()

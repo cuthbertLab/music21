@@ -27,7 +27,6 @@ Speed notes:
 from music21 import converter
 from music21 import corpus
 from music21 import environment
-from music21.search import base as searchBase
 
 _MOD = 'search.segment.py'
 environLocal = environment.Environment(_MOD)
@@ -39,9 +38,9 @@ import difflib
 
 def translateMonophonicPartToSegments(
     inputStream,
-    segmentLengths=30,
-    overlap=12,
-    algorithm=searchBase.translateStreamToStringNoRhythm,
+    segmentLengths = 30,
+    overlap = 12,
+    algorithm = None,
     ):
     '''
     Translates a monophonic part with measures to a set of segments of length
@@ -49,6 +48,8 @@ def translateMonophonicPartToSegments(
     `algorithm`. Returns two lists, a list of segments, and a list of measure
     numbers that match the segments.
     
+    If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
+    is used
     ::
 
         >>> from music21 import *
@@ -77,6 +78,10 @@ def translateMonophonicPartToSegments(
         [1, 7, 14]
 
     '''
+    from music21 import search
+    if algorithm is None:
+        algorithm = search.translateStreamToStringNoRhythm
+    
     segmentList = []
     measureSegmentList = []
     measureList = []
@@ -85,7 +90,7 @@ def translateMonophonicPartToSegments(
     previousTuple = (False, False, None) # lastRest, lastTied, lastQL
     for m in inputStream.getElementsByClass('Measure'):
         mNotes = m.flat.getElementsByClass('Note')
-        if algorithm == searchBase.translateDiatonicStreamToString:
+        if algorithm == search.translateDiatonicStreamToString:
             algorithmOutput, previousTuple = algorithm(mNotes, previousTuple[0], previousTuple[1], previousTuple[2], returnLastTuple=True)
         else: # not all algorithms can take two streams...
             algorithmOutput = algorithm(mNotes) 

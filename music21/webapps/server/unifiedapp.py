@@ -22,13 +22,6 @@ Further down the conf file, give the webserver access to this directory:
 The mod_wsgi handler will call the application function below with the request
 content in the environ variable.
 '''
-
-from music21 import webapps
-from music21 import corpus
-from music21 import common
-
-from os import path
-
 import cgi
 
 

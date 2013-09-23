@@ -46,7 +46,7 @@ not that large at all.
 
 
 
-We thought about implementating JSON serialization using the freely distributable `jsonpickle`
+We thought about implementing JSON serialization using the freely distributable `jsonpickle`
 module found in `music21.ext.jsonpickle`.  See that folder's "license.txt" for
 copyright information.
 
@@ -66,7 +66,7 @@ True
 
 >>> e = jsp.decode(d)
 >>> e
-[{'hello': 'there'}, {'hello': 'there'}]
+[{u'hello': u'there'}, {u'hello': u'there'}]
 
 >>> e[0] is e[1]
 False
@@ -1468,7 +1468,7 @@ class JSONFreezer(JSONFreezeThawBase):
             if formatOutput is False:
                 jsonString = json.dumps(
                     jsonDict,
-                    sort_keys,
+                    sort_keys=False,
                     )
             else:
                 jsonString = json.dumps(

@@ -78,8 +78,6 @@ from music21 import environment
 _MOD = 'music21.noteworthy.translate'
 environLocal = environment.Environment(_MOD)
 
-from music21.noteworthy import base as noteworthyModule
-
 import unittest
 
 
@@ -219,7 +217,8 @@ class NoteworthyTranslator(object):
             Whole,Dotted,Slur
         
         '''
-        dictionaries = noteworthyModule.dictionaries
+        from music21 import noteworthy
+        dictionaries = noteworthy.dictionaries
 
         parts = durationInfo.split(',')
         lengthnote = parts[0]
@@ -313,8 +312,8 @@ class NoteworthyTranslator(object):
         >>> pList
         [<music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>, <music21.pitch.Pitch B3>]
         '''
-
-        #dictionaries = noteworthyModule.dictionaries
+        #from music21 import noteworthy
+        #dictionaries = noteworthy.dictionaries
         pos = posInfo.rstrip('^') # remove any tie
 ### What does this do???            
         pos = pos.rstrip('x')
@@ -383,7 +382,8 @@ class NoteworthyTranslator(object):
         >>> (step, octave)
         ('G', 3)
         '''
-        dictionaries = noteworthyModule.dictionaries
+        from music21 import noteworthy
+        dictionaries = noteworthy.dictionaries
 
         octave = 4
         currentClef = self.currentClef                

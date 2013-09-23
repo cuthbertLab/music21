@@ -758,11 +758,12 @@ class NWCObject(object):
                   tempoVariation, dynamicVariation, performance, text, restChordMember]
 
 if __name__ == '__main__':
-    fp = '/Users/cuthbert/Desktop/395.nwc'
-    fp = 'http://www.cpdl.org/brianrussell/358.nwc'
-    from music21 import converter
-    s = converter.parse(fp)
-    s.show()
+    pass
+    #fp = '/Users/cuthbert/Desktop/395.nwc'
+    #fp = 'http://www.cpdl.org/brianrussell/358.nwc'
+    #from music21 import converter
+    #s = converter.parse(fp)
+    #s.show()
     
     # nwc = NWCConverter()
     #s = nwc.parseFile(fp)

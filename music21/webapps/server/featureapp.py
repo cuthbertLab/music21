@@ -54,7 +54,7 @@ extractorTypeNames = [
 def music21ModWSGIFeatureApplication(environ, start_response):
     '''
     Music21 webapp to demonstrate processing of a zip file containing scores.
-    Will be moved and integrated into base.py upon developing a standardized URL format
+    Will be moved and integrated into __init__.py upon developing a standardized URL format
     as application that can perform variety of commands on user-uploaded files
     '''
     status = '200 OK'

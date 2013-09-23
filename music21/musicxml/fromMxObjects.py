@@ -3905,7 +3905,6 @@ class Test(unittest.TestCase):
 
 
     def testBarException(self):
-        from music21 import musicxml
         mxBarline = musicxml.Barline()
         mxBarline.set('barStyle', 'light-heavy')
         #Rasing the BarException

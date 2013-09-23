@@ -68,7 +68,7 @@ from music21.musedata import translate as musedataTranslate
 from music21.musicxml import xmlHandler as musicxmlHandler
 
 
-from music21.romanText import base as romanTextModule
+from music21 import romanText as romanTextModule
 from music21.romanText import translate as romanTextTranslate
 
 from music21.noteworthy import binaryTranslate as noteworthyBinary # @UnresolvedImport

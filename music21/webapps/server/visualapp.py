@@ -31,8 +31,6 @@ See docs for music21.webapps for specifications about the JSON string structure
 #sys.path.insert(0, '/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/')
 #sys.path.insert(0, '/Library/Python/2.7/site-packages/')
 
-
-from music21 import webapps
 from music21 import note
 
 
@@ -45,13 +43,13 @@ def music21ModWSGIVisualApplication(environ, start_response):
     '''
     status = '200 OK'
 
-    pathInfo = environ['PATH_INFO'] # Contents of path after mount point of wsgi app but before question mark
+    #pathInfo = environ['PATH_INFO'] # Contents of path after mount point of wsgi app but before question mark
     queryString = environ['QUERY_STRING'] # Contents of URL after question mark    
     
     documentRoot = environ['DOCUMENT_ROOT']
     
         
-    outputStr = ""
+    #outputStr = ""
         
     noteName = queryString
 
@@ -74,7 +72,7 @@ def music21ModWSGIVisualApplication(environ, start_response):
     
     #p = graph.PlotHorizontalBarPitchClassOffset(sc,doneAction=None)
     #p.write('/Library/WebServer/Documents/OutputFiles/graph.jpg')
-    templateStr = tempPath
+    #templateStr = tempPath
     
     
     templateStr = imageEmbedTemplate(tempPath,'/music21/OutputFiles/out.jpg')

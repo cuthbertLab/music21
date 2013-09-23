@@ -47,6 +47,86 @@
         }, 
         "__class__": "music21.metadata.bundles.MetadataEntry"
       }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_pachelbel&file=canon_krn&f=xml": {
+        "__attr__": {
+          "_metadataPayload": {
+            "__attr__": {
+              "_contributors": [], 
+              "_urls": [], 
+              "_workIds": {
+                "movementName": {
+                  "__attr__": {
+                    "_data": "m21-caa4768738c4d8813ce3f78b682572b8.xml"
+                  }, 
+                  "__class__": "music21.metadata.primitives.Text"
+                }
+              }, 
+              "ambitus": {
+                "__attr__": {
+                  "_priority": 0
+                }, 
+                "__class__": "music21.interval.Interval"
+              }, 
+              "keySignatureFirst": "<music21.key.KeySignature of 2 sharps, mode major>", 
+              "keySignatures": [
+                "<music21.key.KeySignature of 2 sharps, mode major>"
+              ], 
+              "noteCount": 2595, 
+              "pitchHighest": "D6", 
+              "pitchLowest": "D2", 
+              "quarterLength": 452.0, 
+              "tempos": [], 
+              "timeSignatureFirst": "4/4", 
+              "timeSignatures": [
+                "4/4"
+              ]
+            }, 
+            "__class__": "music21.metadata.base.RichMetadata"
+          }, 
+          "_sourcePath": "http://kern.ccarh.org/cgi-bin/ksdata?l=cc/pachelbel&file=canon.krn&f=xml"
+        }, 
+        "__class__": "music21.metadata.bundles.MetadataEntry"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_schubert_piano_d0576&file=d0576-06_krn&f=xml": {
+        "__attr__": {
+          "_metadataPayload": {
+            "__attr__": {
+              "_contributors": [], 
+              "_urls": [], 
+              "_workIds": {
+                "movementName": {
+                  "__attr__": {
+                    "_data": "m21-43f075dbbe4328402234e85dc71d6332.xml"
+                  }, 
+                  "__class__": "music21.metadata.primitives.Text"
+                }
+              }, 
+              "ambitus": {
+                "__attr__": {
+                  "_priority": 0
+                }, 
+                "__class__": "music21.interval.Interval"
+              }, 
+              "keySignatureFirst": "<music21.key.KeySignature of 3 sharps, mode minor>", 
+              "keySignatures": [
+                "<music21.key.KeySignature of 3 sharps, mode minor>"
+              ], 
+              "noteCount": 166, 
+              "pitchHighest": "A5", 
+              "pitchLowest": "C#2", 
+              "quarterLength": 56.0, 
+              "tempos": [], 
+              "timeSignatureFirst": "2/4", 
+              "timeSignatures": [
+                "2/4"
+              ]
+            }, 
+            "__class__": "music21.metadata.base.RichMetadata"
+          }, 
+          "_sourcePath": "http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml"
+        }, 
+        "__class__": "music21.metadata.bundles.MetadataEntry"
+      }, 
       "http:__kern_ccarh_org_cgi-bin_ksdata?l=osu_classical_bach_inventions&file=inven01_krn&f=xml": {
         "__attr__": {
           "_metadataPayload": {
@@ -90,6 +170,86 @@
       "http:__kern_ccarh_org_cgi-bin_ksdata?l=osu_classical_bach_inventions&file=inven02_krn&f=kern": {
         "__attr__": {
           "_sourcePath": "http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven02.krn&f=kern"
+        }, 
+        "__class__": "music21.metadata.bundles.MetadataEntry"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=osu_classical_bach_inventions&file=inven02_krn&f=xml": {
+        "__attr__": {
+          "_metadataPayload": {
+            "__attr__": {
+              "_contributors": [], 
+              "_urls": [], 
+              "_workIds": {
+                "movementName": {
+                  "__attr__": {
+                    "_data": "m21-75a4d45be4c266a1f7d9d6491e33ca5a.xml"
+                  }, 
+                  "__class__": "music21.metadata.primitives.Text"
+                }
+              }, 
+              "ambitus": {
+                "__attr__": {
+                  "_priority": 0
+                }, 
+                "__class__": "music21.interval.Interval"
+              }, 
+              "keySignatureFirst": "<music21.key.KeySignature of 3 flats, mode minor>", 
+              "keySignatures": [
+                "<music21.key.KeySignature of 3 flats, mode minor>"
+              ], 
+              "noteCount": 722, 
+              "pitchHighest": "C6", 
+              "pitchLowest": "C2", 
+              "quarterLength": 212.0, 
+              "tempos": [], 
+              "timeSignatureFirst": "4/4", 
+              "timeSignatures": [
+                "4/4"
+              ]
+            }, 
+            "__class__": "music21.metadata.base.RichMetadata"
+          }, 
+          "_sourcePath": "http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven02.krn&f=xml"
+        }, 
+        "__class__": "music21.metadata.bundles.MetadataEntry"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=users_craig_classical_schubert_piano_d0576&file=d0576-02_krn&f=xml": {
+        "__attr__": {
+          "_metadataPayload": {
+            "__attr__": {
+              "_contributors": [], 
+              "_urls": [], 
+              "_workIds": {
+                "movementName": {
+                  "__attr__": {
+                    "_data": "m21-7a4081e06d963e526a925e5671704e90.xml"
+                  }, 
+                  "__class__": "music21.metadata.primitives.Text"
+                }
+              }, 
+              "ambitus": {
+                "__attr__": {
+                  "_priority": 0
+                }, 
+                "__class__": "music21.interval.Interval"
+              }, 
+              "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
+              "keySignatures": [
+                "<music21.key.KeySignature of no sharps or flats>"
+              ], 
+              "noteCount": 199, 
+              "pitchHighest": "C7", 
+              "pitchLowest": "A2", 
+              "quarterLength": 60.0, 
+              "tempos": [], 
+              "timeSignatureFirst": "2/4", 
+              "timeSignatures": [
+                "2/4"
+              ]
+            }, 
+            "__class__": "music21.metadata.base.RichMetadata"
+          }, 
+          "_sourcePath": "http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-02.krn&f=xml"
         }, 
         "__class__": "music21.metadata.bundles.MetadataEntry"
       }, 

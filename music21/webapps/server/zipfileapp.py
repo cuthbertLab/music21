@@ -26,9 +26,6 @@ To use the application, send a POST request to WEBSERVER:/music21interface
 where the contents of the POST is a POST from a form containing a zip file.
 
 '''
-
-from music21 import webapps
-
 from music21 import common
 from music21 import converter
 from music21 import note
@@ -38,13 +35,12 @@ import zipfile
 import cgi
 import StringIO
 import re
-import time
 #
 
 def music21ModWSGIZipFileApplication(environ, start_response):
     '''
     Music21 webapp to demonstrate processing of a zip file containing scores.
-    Will be moved and integrated into base.py upon developing a standardized URL format
+    Will be moved and integrated into __init__.py upon developing a standardized URL format
     as application that can perform variety of commands on user-uploaded files
     '''
     status = '200 OK'
@@ -58,7 +54,7 @@ def music21ModWSGIZipFileApplication(environ, start_response):
     uploadedFile = formFields['file1'].file
     filename = formFields['file1'].filename
     
-    [name, extension]= filename.rsplit('.',1)
+    [name, unused_extension]= filename.rsplit('.',1)
     
     outputFileName = name + "-"+command.split('/')[1]+"-results.zip"
     
@@ -104,7 +100,7 @@ application = music21ModWSGIZipFileApplication
 def performFunction(sc, command):
     '''
     Function that determines what command to perform on the score and returns the resulting score.
-    Currently is a lookup table based on the URL, but will be improved and incorporated into webapps/base.py
+    Currently is a lookup table based on the URL, but will be improved and incorporated into webapps/__init__.py
     as it changes to allow for more standard music21 functions 
     '''
     commandParts = command.split("/")
@@ -114,7 +110,7 @@ def performFunction(sc, command):
     
     elif commandParts[1] == "allCMajor":
         key = sc.analyze('key')
-        (p, mode) = key.pitchAndMode
+        (p, unused_mode) = key.pitchAndMode
         intv = interval.Interval(note.Note(p),note.Note('C'))
         
         for ks in sc.flat.getElementsByClass('KeySignature'):
@@ -133,8 +129,8 @@ def performFunction(sc, command):
     
     elif commandParts[1] == "scaleDegrees":
         key = sc.analyze('key')
-        rootPitch = key.pitchAndMode[0]
-        rootNote = note.Note(rootPitch)
+        #rootPitch = key.pitchAndMode[0]
+        #rootNote = note.Note(rootPitch)
         
         for n in sc.flat.getElementsByClass('Note'):
             sd = key.getScaleDegreeFromPitch(n)

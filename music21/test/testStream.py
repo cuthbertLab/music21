@@ -14,8 +14,6 @@ import random
 import unittest
 import copy
 
-import music21 # needed to do fully-qualified isinstance name checking
-
 from music21.stream import Stream
 from music21.stream import Voice
 from music21.stream import Measure
@@ -289,6 +287,8 @@ class Test(unittest.TestCase):
         pass            
     
     def testAdd(self):
+        import music21 # needed to do fully-qualified isinstance name checking
+
         a = Stream()
         for dummy in range(5):
             a.insert(0, music21.Music21Object())
@@ -671,6 +671,7 @@ class Test(unittest.TestCase):
         Part and Measure do not match, and instead music21.stream.Part has to be 
         employed instead. 
         '''
+        import music21.stream # needed to do fully-qualified isinstance name checking
 
         from music21 import corpus, converter
         a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
@@ -928,6 +929,8 @@ class Test(unittest.TestCase):
     def testElements(self):
         '''Test basic Elements wrapping non music21 objects
         '''
+        import music21 # needed to do fully-qualified isinstance name checking
+        
         a = Stream()
         a.insert(50, music21.Music21Object())
         self.assertEqual(len(a), 1)
@@ -1579,7 +1582,7 @@ class Test(unittest.TestCase):
         # this returns the proper dictionary entry
         #environLocal.printDebug(
         #    ['s1Flat.sites._definedContexts[id(s1)', s1Flat.sites._definedContexts[id(s2)]])
-        # we can extract out the same refernce
+        # we can extract out the same reference
         unused_s2Out = s1Flat.sites.getById(id(s2))
 
         # this works
@@ -7322,6 +7325,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 
