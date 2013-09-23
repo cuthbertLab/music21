@@ -1383,7 +1383,7 @@ class MetadataBundle(object):
             del(self._metadataEntries[key])
         message = 'MetadataBundle: finished validating in {0} seconds.'.format(
             timer)
-        environLocal.warn(message)
+        environLocal.printDebug(message)
         return len(invalidatedKeys)
 
     def write(self, filePath=None):
