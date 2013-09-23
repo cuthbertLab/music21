@@ -52,7 +52,6 @@ __all__ = [
     'base', 
     # sub folders
     'abc', 
-    # 'abj', # not full part of music21 and slow if abjad is included
     'analysis', 
     'audioSearch',
     'braille', 
