@@ -1368,8 +1368,9 @@ class RomanNumeral(harmony.Harmony):
 
         for j in range(numberNotes):
             i = numberNotes - j - 1
-            thisSD = bassScaleDegree + self.figuresNotationObj.numbers[i] - 1
-            newPitch = useScale.pitchFromDegree(thisSD,
+            thisscaleDegree = bassScaleDegree + \
+                self.figuresNotationObj.numbers[i] - 1
+            newPitch = useScale.pitchFromDegree(thisscaleDegree,
                 direction=scale.DIRECTION_ASCENDING)
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(
                 newPitch.name)
