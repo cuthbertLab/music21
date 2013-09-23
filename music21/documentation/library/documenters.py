@@ -1495,7 +1495,7 @@ class CorpusDocumenter(Documenter):
         self, composerName, composerDirectory):
         result = []
         result.append('To get all works by {0}, the'.format(composerName))
-        result.append(':meth:`~music21.corpus.base.getComposer` function can')
+        result.append(':meth:`~music21.corpus.getComposer` function can')
         result.append('be used to get all file paths.')
         result.append('')
         result.append('For example:')

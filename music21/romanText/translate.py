@@ -23,7 +23,7 @@ and other objects out of an rntxt file by running this:
 
 >>> monteverdi = corpus.parse('monteverdi/madrigal.3.1.rntxt')
 >>> monteverdi.show('text')
-{0.0} <music21.metadata.base.Metadata object at 0x...>
+{0.0} <music21.metadata.Metadata object at 0x...>
 {0.0} <music21.stream.Part ...>
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.key.KeySignature of 1 flat>

@@ -165,7 +165,7 @@ This example creates a chordal reduction of a polyphonic work and then searches 
 Pitch and Duration Transformations
 ------------------------------------------------
 
-This example creates a mensural canon from the Soprano part of a Bach chorale. The procedure extracts the :class:`~music21.note.Note` objects from the parsed :class:`~music21.stream.Score` object, using the :func:`~music21.corpus.base.parse` function and the :meth:`~music21.stream.Stream.getElementById` method. Then, a new part Stream is created by first scaling the timing and duration of events with the :meth:`~music21.stream.Stream.augmentOrDiminish` method and then transposing the pitches with the :meth:`~music21.stream.Stream.transpose` method. The modified Stream is then inserted into another Stream and displayed with the :meth:`~music21.base.Music21Object.show` method.
+This example creates a mensural canon from the Soprano part of a Bach chorale. The procedure extracts the :class:`~music21.note.Note` objects from the parsed :class:`~music21.stream.Score` object, using the :func:`~music21.corpus.parse` function and the :meth:`~music21.stream.Stream.getElementById` method. Then, a new part Stream is created by first scaling the timing and duration of events with the :meth:`~music21.stream.Stream.augmentOrDiminish` method and then transposing the pitches with the :meth:`~music21.stream.Stream.transpose` method. The modified Stream is then inserted into another Stream and displayed with the :meth:`~music21.base.Music21Object.show` method.
 
 
 >>> from music21 import *

@@ -926,7 +926,7 @@ class JSONFreezeThawBase(object):
         'music21.metadata.primitives.DateSingle': [
             '_relevance',  '_dataError', '_data',
             ],
-        'music21.metadata.base.Metadata': [
+        'music21.metadata.Metadata': [
             '_date', '_imprint', '_copyright', '_workIds', '_urls',
             '_contributors',
             ],
@@ -936,7 +936,7 @@ class JSONFreezeThawBase(object):
         'music21.metadata.bundles.MetadataEntry': [
             '_sourcePath', '_number', '_metadataPayload',
             ],
-        'music21.metadata.base.RichMetadata': [
+        'music21.metadata.RichMetadata': [
             '__INHERIT__',
             'ambitus',
             'keySignatures',

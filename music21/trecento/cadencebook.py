@@ -218,7 +218,7 @@ class GloriaSheet(TrecentoSheet):
     >>> gloriaNo20 = cadenceSpreadSheet.makeWork(20)
     >>> incipit = gloriaNo20.incipit
     >>> incipit.show('text')
-    {0.0} <music21.metadata.base.Metadata object at 0x...>
+    {0.0} <music21.metadata.Metadata object at 0x...>
     {0.0} <music21.stream.Part C>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>

@@ -1044,7 +1044,7 @@ def parseWork(*arguments, **keywords):
 
 def compressAllXMLFiles(deleteOriginal = False):
     '''
-    Takes all filenames in corpus.paths and runs :meth:`music21.corpus.base.compressXML` on each.
+    Takes all filenames in corpus.paths and runs :meth:`music21.corpus.compressXML` on each.
     If the musicXML files are compressed, the originals are deleted from the system.
     '''
     environLocal.warn("Compressing musicXML files...")

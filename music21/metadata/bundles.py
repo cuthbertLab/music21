@@ -60,7 +60,7 @@ class MetadataEntry(object):
     ::
 
         >>> metadataEntry.metadataPayload
-        <music21.metadata.base.RichMetadata object at 0x...>
+        <music21.metadata.RichMetadata object at 0x...>
 
     And the metadata entry can be parsed:
 
@@ -887,7 +887,7 @@ class MetadataBundle(object):
             True
 
         '''
-        from music21.corpus.base import _METADATA_BUNDLES
+        from music21.corpus import _METADATA_BUNDLES
         domain = 'core'
         if domain in _METADATA_BUNDLES and _METADATA_BUNDLES[domain]:
             return _METADATA_BUNDLES[domain]
@@ -912,7 +912,7 @@ class MetadataBundle(object):
             True
 
         '''
-        from music21.corpus.base import _METADATA_BUNDLES
+        from music21.corpus import _METADATA_BUNDLES
         domain = 'local'
         if domain in _METADATA_BUNDLES and \
             _METADATA_BUNDLES[domain] is not None:
@@ -938,7 +938,7 @@ class MetadataBundle(object):
             True
 
         '''
-        from music21.corpus.base import _METADATA_BUNDLES
+        from music21.corpus import _METADATA_BUNDLES
         domain = 'virtual'
         if domain in _METADATA_BUNDLES and _METADATA_BUNDLES[domain]:
             return _METADATA_BUNDLES[domain]

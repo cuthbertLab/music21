@@ -23,7 +23,7 @@ Any music21 :class:`~music21.pitch.Pitch`, or a  :class:`~music21.note.Note` con
 Pitch, can be expressed as pitch class integers using the :attr:`~music21.pitch.Pitch.pitchClass` 
 and :attr:`~music21.pitch.Pitch.pitchClassString` properties. 
 
-In the following example, the :func:`~music21.corpus.base.parseWork` function is used to 
+In the following example, the :func:`~music21.corpus.parseWork` function is used to 
 create a :class:`~music21.stream.Score` object. The :attr:`~music21.base.Music21Object.id` 
 attribute of each contained :class:`~music21.stream.Part` is presented in a list. 
 

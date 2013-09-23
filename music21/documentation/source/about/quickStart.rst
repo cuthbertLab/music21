@@ -37,7 +37,7 @@ installation is correctly configured by trying to import a music21 module.
 A module is a Python file that offers reusable resources. 
 These are all found inside the music21 package, so often we will 
 import a module (or all of them) from music21. To import the 
-:mod:`music21.corpus.base` module 
+:mod:`music21.corpus` module 
 from music21, enter the following command.
 
 >>> from music21 import corpus
@@ -65,9 +65,9 @@ Examining a Score
 
 Once music21 is installed, opening and examining a score and it elements is a good first step. Music21 comes with a corpus, a large collection freely distributable music stored in the MusicXML and humdrum formats. These files can be found in the music21/corpus directory. However, tools are provided for easy, direct access.
 
-To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus.base` module. (To see a complete listing of works in the corpus, see :ref:`referenceCorpus`.) We imported this module above, but here, lets import all music21 modules with the catch-all import statement `from music21 import *`. We will often use this import statement to quickly import all modules for easy access. 
+To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus` module. (To see a complete listing of works in the corpus, see :ref:`referenceCorpus`.) We imported this module above, but here, lets import all music21 modules with the catch-all import statement `from music21 import *`. We will often use this import statement to quickly import all modules for easy access. 
 
-We will the use the :func:`~music21.corpus.base.parseWork` method to translate the file (a MusicXML or humdrum file) into music21 objects.
+We will the use the :func:`~music21.corpus.parseWork` method to translate the file (a MusicXML or humdrum file) into music21 objects.
 
 >>> from music21 import *
 >>> sBach = corpus.parse('bach/bwv7.7')
