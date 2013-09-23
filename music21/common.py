@@ -1525,13 +1525,13 @@ def getCorpusContentDirs():
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach', 'demos', 'essenFolksong', 'handel', 'haydn', 
-    'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina', 'ryansMammoth', 
+    'josquin', 'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina', 'ryansMammoth', 
     'schoenberg', 'schumann', 'schumann_clara', 'theoryExercises', 'trecento', 'verdi']
     '''
     directoryName = getCorpusFilePath()
     result = []
     # dirs to exclude; all files will be retained
-    exclude = ['__init__.py', 'base.py', 'metadataCache', 'virtual.py', 'chorales.py'] 
+    exclude = ['__init__.py', 'base.py', 'metadataCache', 'virtual.py', 'chorales.py','license.txt','testCorpus.py'] 
     for filename in os.listdir(directoryName):
         if filename not in exclude:
             if not filename.endswith('.pyc') and not filename.startswith('.'):

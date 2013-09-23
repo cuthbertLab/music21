@@ -19,7 +19,7 @@ import xml.dom.minidom
 
 
 # cannot import environment because environment reads/writes XML
-import doctest, unittest
+import unittest
 import re
 from music21 import common
 from music21 import exceptions21
@@ -77,7 +77,6 @@ class XMLNodeException(exceptions21.Music21Exception):
 class XMLNode(object):
     def __init__(self):
         '''
-        
         >>> a = xmlnode.XMLNode()
         >>> a.set('charData', 'test')
         '''
@@ -138,10 +137,10 @@ class XMLNode(object):
         >>> a = xmlnode.XMLNode()
         >>> a.hasAttrs()
         False
-        >>> a = musicxml.Pitch()
+        >>> a = musicxml.mxObjects.Pitch()
         >>> a.hasAttrs()
         False
-        >>> a = musicxml.Beam()
+        >>> a = musicxml.mxObjects.Beam()
         >>> a.hasAttrs()
         True
         '''
@@ -660,12 +659,8 @@ _DOC_ORDER = [XMLNode, XMLNodeList]
 
 
 if __name__ == "__main__":
-    s1 = doctest.DocTestSuite(__name__)
-    s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)
-    s1.addTests(s2)
-    runner = unittest.TextTestRunner()
-    runner.run(s1)  
-
+    import music21
+    music21.mainTest(Test)
 #------------------------------------------------------------------------------
 # eof
 

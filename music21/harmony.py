@@ -2117,19 +2117,19 @@ class ChordSymbol(Harmony):
         ::
 
             >>> from music21 import musicxml
-            >>> mxHarmony = musicxml.Harmony()
-            >>> mxKind = musicxml.Kind()
+            >>> mxHarmony = musicxml.mxObjects.Harmony()
+            >>> mxKind = musicxml.mxObjects.Kind()
             >>> mxKind.charData = 'dominant'
             >>> mxHarmony.kindObj = mxKind
-            >>> mxRoot = musicxml.Root()
+            >>> mxRoot = musicxml.mxObjects.Root()
             >>> mxRoot.set('root-step', 'C')
             >>> mxHarmony.rootObj = mxRoot
-            >>> mxDegree = musicxml.Degree()
+            >>> mxDegree = musicxml.mxObjects.Degree()
             >>> val = musicxml.DegreeValue()
             >>> val.charData = 9
             >>> alt = musicxml.DegreeAlter()
             >>> alt.charData = -1
-            >>> modType = musicxml.DegreeType()
+            >>> modType = musicxml.mxObjects.DegreeType()
             >>> modType.charData = 'add'
             >>> mxDegree.componentList = [val,alt,modType]
             >>> mxHarmony.degreeObj = mxDegree
@@ -2144,23 +2144,23 @@ class ChordSymbol(Harmony):
         
         ::
 
-            >>> mxHarmony = musicxml.Harmony()
-            >>> mxKind = musicxml.Kind()
+            >>> mxHarmony = musicxml.mxObjects.Harmony()
+            >>> mxKind = musicxml.mxObjects.Kind()
             >>> mxKind.charData = 'major'
             >>> mxHarmony.kindObj = mxKind
-            >>> mxRoot = musicxml.Root()
+            >>> mxRoot = musicxml.mxObjects.Root()
             >>> mxRoot.set('root-step', 'C')
             >>> mxHarmony.rootObj = mxRoot
-            >>> mxBass = musicxml.Bass()
+            >>> mxBass = musicxml.mxObjects.Bass()
             >>> mxBass.set('bass-step', 'B')
             >>> mxBass.set('bass-alter', -1)
             >>> mxHarmony.bassObj = mxBass
-            >>> mxDegree = musicxml.Degree()
+            >>> mxDegree = musicxml.mxObjects.Degree()
             >>> val = musicxml.DegreeValue()
             >>> val.charData = 2
             >>> alt = musicxml.DegreeAlter()
             >>> alt.charData = 0
-            >>> modType = musicxml.DegreeType()
+            >>> modType = musicxml.mxObjects.DegreeType()
             >>> modType.charData = 'add'
             >>> mxDegree.componentList = [val,alt,modType]
             >>> mxHarmony.degreeObj = mxDegree

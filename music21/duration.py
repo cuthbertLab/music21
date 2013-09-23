@@ -3359,9 +3359,9 @@ class Test(unittest.TestCase):
     def testMxLoading(self):
         from music21.musicxml import fromMxObjects
         from music21 import musicxml
-        a = musicxml.Note()
+        a = musicxml.mxObjects.Note()
         a.setDefaults()
-        m = musicxml.Measure()
+        m = musicxml.mxObjects.Measure()
         m.setDefaults()
         a.external['measure'] = m # assign measure for divisions ref
         a.external['divisions'] = m.external['divisions']

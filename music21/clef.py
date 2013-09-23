@@ -540,7 +540,7 @@ class Test(unittest.TestCase):
         ]
 
         for params, className in src:
-            mxClef = musicxmlMod.Clef()
+            mxClef = musicxmlMod.mxObjects.Clef()
             mxClef.set('sign', params[0])
             mxClef.set('line', params[1])
             mxClef.set('octaveChange', params[2])
