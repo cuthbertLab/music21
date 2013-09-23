@@ -17,6 +17,7 @@ import time
 import unittest
 
 from music21 import common
+from music21 import exceptions21
 from music21 import freezeThaw
 
 
@@ -718,9 +719,6 @@ class MetadataBundle(object):
                 if pathModificationTime < metadataBundleModificationTime:
                     skippedJobsCount += 1
                     continue
-            #environLocal.warn([
-            #    'Preparing job: {0}'.format(common.relativepath(path)),
-            #    ])
             currentJobNumber += 1
             if path.startswith(music21Path):
                 path = os.path.join(
@@ -1123,19 +1121,28 @@ class MetadataBundle(object):
         ::
 
             >>> from music21 import metadata
-            >>> anonymousBundle = metadata.MetadataBundle().read()
+            >>> coreBundle = metadata.MetadataBundle('core').read()
+
+        If a metadata is unnamed, and no file path is specified, an exception
+        will be thrown:
 
         ::
 
-            >>> coreBundle = metadata.MetadataBundle('core').read()
+            >>> anonymousBundle = metadata.MetadataBundle().read()
+            Traceback (most recent call last):
+            MetadataException: Unnamed MetadataBundles have no default file path to read from.
 
         '''
         timer = common.Timer()
         timer.start()
         if filePath is None:
             filePath = self.filePath
-        if filePath is None or not os.path.exists(filePath):
-            environLocal.warn('no metadata found for: {0!r}; '
+        if filePath is None and self.name is None:
+            raise exceptions21.MetadataException(
+                'Unnamed MetadataBundles have no default file path to read '
+                'from.')
+        if not os.path.exists(filePath):
+            environLocal.printDebug('no metadata found for: {0!r}; '
                 'try building cache with corpus.cacheMetadata({1!r})'.format(
                     self.name, self.name))
             return self
@@ -1163,8 +1170,8 @@ class MetadataBundle(object):
         ::
 
             >>> from music21 import metadata
-            >>> localBundle = metadata.MetadataBundle.fromLocalCorpus()
-            >>> localBundle = localBundle.rebuild(useMultiprocessing=False)
+            >>> virtualBundle = metadata.MetadataBundle.fromVirtualCorpus()
+            >>> virtualBundle = virtualBundle.rebuild(useMultiprocessing=False)
 
         '''
         from music21 import corpus
@@ -1350,7 +1357,7 @@ class MetadataBundle(object):
         '''
         timer = common.Timer()
         timer.start()
-        environLocal.warn(['MetadataBundle: validating...'])
+        environLocal.printDebug(['MetadataBundle: validating...'])
         invalidatedKeys = []
         validatedPaths = set()
         corpusPrefix = os.path.join('music21', 'corpus')

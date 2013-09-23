@@ -1138,40 +1138,40 @@ class Test(unittest.TestCase):
             test.dedent('''
                 {
                     "__attr__": {
-                        "_contributors": [], 
-                        "_urls": [], 
+                        "_contributors": [],
+                        "_urls": [],
                         "_workIds": {
                             "movementName": {
                                 "__attr__": {
                                     "_data": "bwv66.6.mxl"
-                                }, 
+                                },
                                 "__class__": "music21.metadata.primitives.Text"
                             }
-                        }, 
+                        },
                         "ambitus": {
                             "__attr__": {
                                 "_priority": 0
-                            }, 
+                            },
                             "__class__": "music21.interval.Interval"
-                        }, 
-                        "keySignatureFirst": "<music21.key.KeySignature of 3 sharps, mode minor>", 
+                        },
+                        "keySignatureFirst": "<music21.key.KeySignature of 3 sharps, mode minor>",
                         "keySignatures": [
                             "<music21.key.KeySignature of 3 sharps, mode minor>"
-                        ], 
-                        "noteCount": 165, 
-                        "pitchHighest": "E5", 
-                        "pitchLowest": "F#2", 
-                        "quarterLength": 36.0, 
-                        "tempos": [], 
-                        "timeSignatureFirst": "4/4", 
+                        ],
+                        "noteCount": 165,
+                        "pitchHighest": "E5",
+                        "pitchLowest": "F#2",
+                        "quarterLength": 36.0,
+                        "tempos": [],
+                        "timeSignatureFirst": "4/4",
                         "timeSignatures": [
                             "4/4"
                         ]
-                    }, 
-                    "__class__": "music21.metadata.base.RichMetadata", 
+                    },
+                    "__class__": "music21.metadata.base.RichMetadata",
                     "__version__": [
-                        ''' + str(base.VERSION[0]) + ''', 
-                        ''' + str(base.VERSION[1]) + ''', 
+                        ''' + str(base.VERSION[0]) + ''',
+                        ''' + str(base.VERSION[1]) + ''',
                         ''' + str(base.VERSION[2]) + '''
                     ]
                 }

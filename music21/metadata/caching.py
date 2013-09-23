@@ -55,7 +55,6 @@ def cacheMetadata(
         ...     )
 
     '''
-    from music21 import common
     from music21 import corpus
     from music21 import metadata
 
@@ -99,9 +98,11 @@ def cacheMetadata(
                 timer, len(metadataBundle)))
         del metadataBundle
 
-    environLocal.warn('cache: final writing time: {0} seconds'.format(timer))
+    environLocal.warn('cache: final writing time: {0} seconds'.format(
+        timer))
     for failingFilePath in failingFilePaths:
-        environLocal.warn('path failed to parse: {0}'.format(failingFilePath))
+        environLocal.warn('path failed to parse: {0}'.format(
+            failingFilePath))
 
 
 #------------------------------------------------------------------------------
@@ -163,9 +164,9 @@ class MetadataCachingJob(object):
                 parsedObject = corpus.parse(
                     self.filePath, forceSource=True)
         except Exception, e:
-            environLocal.warn('parse failed: {0}, {1}'.format(
+            environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
-            traceback.print_exc()
+            environLocal.printDebug(traceback.format_exc())
             self.filePathErrors.append(self.filePath)
         return parsedObject
 
@@ -178,7 +179,7 @@ class MetadataCachingJob(object):
                 richMetadata = metadata.RichMetadata()
                 richMetadata.merge(parsedObject.metadata)
                 richMetadata.update(parsedObject)  # update based on Stream
-                environLocal.printDebug(
+                environLocal.warn(
                     'updateMetadataCache: storing: {0}'.format(corpusPath))
                 metadataEntry = metadata.MetadataEntry(
                     sourcePath=self.filePath,
@@ -196,11 +197,12 @@ class MetadataCachingJob(object):
                     )
                 self.results.append(metadataEntry)
         except Exception:
-            environLocal.warn('Had a problem with extracting metadata '
+            environLocal.printDebug('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
-            traceback.print_exc()
+            environLocal.printDebug(traceback.format_exc())
 
     def _parseOpus(self, parsedObject):
+        from music21 import metadata
         # need to get scores from each opus?
         # problem here is that each sub-work has metadata, but there
         # is only a single source file
@@ -209,11 +211,11 @@ class MetadataCachingJob(object):
                 self._parseOpusScore(score, scoreNumber)
                 del score  # for memory conservation
         except Exception as exception:
-            environLocal.warn(
+            environLocal.printDebug(
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
                     scoreNumber, self.filePath, str(exception)))
-            traceback.print_exc()
+            environLocal.printDebug(traceback.format_exc())
         # Create a dummy metadata entry, representing the entire opus.
         # This lets the metadata bundle know it has already processed this
         # entire opus on the next cache update.
@@ -231,7 +233,7 @@ class MetadataCachingJob(object):
             richMetadata.merge(score.metadata)
             richMetadata.update(score)  # update based on Stream
             if score.metadata is None or score.metadata.number is None:
-                environLocal.warn(
+                environLocal.printDebug(
                     'addFromPaths: got Opus that contains '
                     'Streams that do not have work numbers: '
                     '{0}'.format(self.filePath))
@@ -241,7 +243,7 @@ class MetadataCachingJob(object):
                     self.filePath,
                     number=score.metadata.number,
                     )
-                environLocal.printDebug(
+                environLocal.warn(
                     'addFromPaths: storing: {0}'.format(
                         corpusPath))
                 metadataEntry = metadata.MetadataEntry(
@@ -251,12 +253,12 @@ class MetadataCachingJob(object):
                     )
                 self.results.append(metadataEntry)
         except Exception as exception:
-            environLocal.warn(
+            environLocal.printDebug(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '
                 '{2}'.format(
                     scoreNumber, self.filePath, str(exception)))
-            traceback.print_exc()
+            environLocal.printDebug(traceback.format_exc())
 
     ### PUBLIC METHODS ###
 
