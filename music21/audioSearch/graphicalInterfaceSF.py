@@ -34,7 +34,7 @@ from music21 import environment
 _MOD = 'audioSearch/graphicalInterfaceSF.py'
 environLocal = environment.Environment(_MOD)
 
-from music21.audioSearch.base import * #@UnusedWildImport
+from music21.audioSearch import * #@UnusedWildImport
 #from music21.audioSearch import recording
 from music21.audioSearch import scoreFollower
  

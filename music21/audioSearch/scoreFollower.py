@@ -18,9 +18,6 @@ import unittest
 
 from music21 import scale
 from music21 import search
-from music21 import audioSearch as audioSearchBase
-#from music21.audioSearch import base as audioSearchBase
-#from music21.audioSearch.base import *
 
 from music21 import environment
 _MOD = 'audioSearch/transcriber.py'
@@ -107,8 +104,10 @@ class ScoreFollower(object):
         False
         >>> print ScF.lastNotePosition
         10
+
         '''
-        
+        from music21 import audioSearch
+
 #        print "WE STAY AT:",
 #        print self.lastNotePosition, len(self.scoreNotesOnly),
 #        print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),
@@ -118,24 +117,24 @@ class ScoreFollower(object):
 
         environLocal.printDebug("repeat transcription starting")
         if self.useMic == True:
-            freqFromAQList = audioSearchBase.getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
+            freqFromAQList = audioSearch.getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
         else:
-            freqFromAQList, self.waveFile, self.currentSample = audioSearchBase.getFrequenciesFromPartialAudioFile(self.waveFile, length=self.seconds_recording, startSample=self.currentSample)
+            freqFromAQList, self.waveFile, self.currentSample = audioSearch.getFrequenciesFromPartialAudioFile(self.waveFile, length=self.seconds_recording, startSample=self.currentSample)
             if self.totalFile == 0:
                 self.totalFile = self.waveFile.getnframes()
         
         environLocal.printDebug("got Frequencies from Microphone")
 
         time_start = time()
-        detectedPitchesFreq = audioSearchBase.detectPitchFrequencies(freqFromAQList, self.useScale)
-        detectedPitchesFreq = audioSearchBase.smoothFrequencies(detectedPitchesFreq)
-        (detectedPitchObjects, unused_listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
-        (notesList, durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
+        detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, self.useScale)
+        detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
+        (detectedPitchObjects, unused_listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
+        (notesList, durationList) = audioSearch.joinConsecutiveIdenticalPitches(detectedPitchObjects)
         self.silencePeriodDetection(notesList)
         environLocal.printDebug("made it to here...")
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
         #print "1"
-        transcribedScore, self.qle = audioSearchBase.notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=self.qle) 
+        transcribedScore, self.qle = audioSearch.notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=self.qle) 
         #print "2"
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition)
         #print "3"
@@ -150,7 +149,7 @@ class ScoreFollower(object):
 
         if self.useMic == False: # reading from the disc (only for TESTS)
             # skip ahead the processing time.
-            freqFromAQList, junk, self.currentSample = audioSearchBase.getFrequenciesFromPartialAudioFile(self.waveFile, length=self.processing_time, startSample=self.currentSample)
+            freqFromAQList, junk, self.currentSample = audioSearch.getFrequenciesFromPartialAudioFile(self.waveFile, length=self.processing_time, startSample=self.currentSample)
            
         if self.lastNotePosition > len(self.scoreNotesOnly):
             #print "finishedPerforming"
@@ -465,7 +464,7 @@ class ScoreFollower(object):
             environLocal.printDebug("LAST PART OF THE SCORE")
             
         #lastCountdown = self.countdown
-        position, self.countdown = audioSearchBase.decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, self.countdown, self.firstNotePage, self.lastNotePage)
+        position, self.countdown = audioSearch.decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, self.countdown, self.firstNotePage, self.lastNotePage)
         
         totalLength = 0    
         number = int(listOfParts[position].id)
