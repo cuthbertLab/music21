@@ -2,6 +2,7 @@ import re
 import unittest
 from music21 import freezeThaw
 
+
 class Test(unittest.TestCase):
 
     # When `maxDiff` is None, `assertMultiLineEqual()` provides better errors.
@@ -174,6 +175,7 @@ class Test(unittest.TestCase):
             (True, 'title'))
 
     def testRichMetadata02(self):
+        from music21 import VERSION
         from music21 import corpus
         from music21 import metadata
         from music21 import test
@@ -220,9 +222,9 @@ class Test(unittest.TestCase):
                     },
                     "__class__": "music21.metadata.RichMetadata",
                     "__version__": [
-                        ''' + str(music21.VERSION[0]) + ''',
-                        ''' + str(music21.VERSION[1]) + ''',
-                        ''' + str(music21.VERSION[2]) + '''
+                        ''' + str(VERSION[0]) + ''',
+                        ''' + str(VERSION[1]) + ''',
+                        ''' + str(VERSION[2]) + '''
                     ]
                 }
                 ''',
@@ -233,4 +235,3 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test, 'noDocTest')
-
