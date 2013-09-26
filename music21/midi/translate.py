@@ -711,7 +711,10 @@ def midiEventsToInstrument(eventList):
         event = eventList[1]
 
     from music21 import instrument
-    i = instrument.instrumentFromMidiProgram(event.data)
+    try:
+        i = instrument.instrumentFromMidiProgram(event.data)
+    except instrument.InstrumentException:
+        i = instrument.Instrument()
     return i
     
 def midiEventsToTimeSignature(eventList):
