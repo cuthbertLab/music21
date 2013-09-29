@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 
+# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
@@ -15,6 +15,9 @@
 
 import copy
 import unittest
+
+from music21 import common
+from music21 import note
 
 
 #------------------------------------------------------------------------------
@@ -461,6 +464,147 @@ def makeMeasures(
         for e in post.sorted:
             # may need to handle spanners; already have s as site
             s.insert(e.getOffsetBySite(post), e)
+
+
+def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
+    timeRangeFromBarDuration=False, inPlace=True):
+    '''
+    Given a Stream with an offset not equal to zero,
+    fill with one Rest preeceding this offset.
+    This can be called on any Stream,
+    a Measure alone, or a Measure that contains
+    Voices.
+
+    If `refStreamOrTimeRange` is provided as a Stream, this
+    Stream is used to get min and max offsets. If a list is provided,
+    the list assumed to provide minimum and maximum offsets. Rests will
+    be added to fill all time defined within refStream.
+
+    If `fillGaps` is True, this will create rests in any
+    time regions that have no active elements.
+
+    If `timeRangeFromBarDuration` is True, and the calling Stream
+    is a Measure with a TimeSignature, the time range will be determined
+    based on the .barDuration property.
+
+    If `inPlace` is True, this is done in-place; if `inPlace` is False,
+    this returns a modified deepcopy.
+
+    ::
+
+        >>> from music21 import note
+        >>> from music21 import stream
+
+    ::
+
+        >>> a = stream.Stream()
+        >>> a.insert(20, note.Note())
+        >>> len(a)
+        1
+
+    ::
+
+        >>> a.lowestOffset
+        20.0
+
+    ::
+
+        >>> b = a.makeRests()
+        >>> len(b)
+        2
+
+    ::
+
+        >>> b.lowestOffset
+        0.0
+
+    OMIT_FROM_DOCS
+    TODO: if inPlace == True, this should return None
+    TODO: default inPlace = False
+    '''
+    from music21 import stream
+
+    if not inPlace:  # make a copy
+        returnObj = copy.deepcopy(s)
+    else:
+        returnObj = s
+
+    #environLocal.printDebug([
+    #    'makeRests(): object lowestOffset, highestTime', oLow, oHigh])
+    if refStreamOrTimeRange is None:  # use local
+        oLowTarget = 0
+        if timeRangeFromBarDuration and returnObj.isMeasure:
+            # NOTE: this will raise an exception if no meter can be found
+            oHighTarget = returnObj.barDuration.quarterLength
+        else:
+            oHighTarget = returnObj.highestTime
+    elif isinstance(refStreamOrTimeRange, stream.Stream):
+        oLowTarget = refStreamOrTimeRange.lowestOffset
+        oHighTarget = refStreamOrTimeRange.highestTime
+        #environLocal.printDebug([
+        #    'refStream used in makeRests', oLowTarget, oHighTarget,
+        #    len(refStreamOrTimeRange)])
+    # treat as a list
+    elif common.isListLike(refStreamOrTimeRange):
+        oLowTarget = min(refStreamOrTimeRange)
+        oHighTarget = max(refStreamOrTimeRange)
+        #environLocal.printDebug([
+        #    'offsets used in makeRests', oLowTarget, oHighTarget,
+        #    len(refStreamOrTimeRange)])
+    if returnObj.hasVoices():
+        bundle = returnObj.voices
+    else:
+        bundle = [returnObj]
+
+    for v in bundle:
+        v._elementsChanged()  # required to get correct offset times
+        oLow = v.lowestOffset
+        oHigh = v.highestTime
+
+        # create rest from start to end
+        qLen = oLow - oLowTarget
+        if qLen > 0:
+            r = note.Rest()
+            r.duration.quarterLength = qLen
+            #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
+            # place at oLowTarget to reach to oLow
+            v._insertCore(oLowTarget, r)
+
+        # create rest from end to highest
+        qLen = oHighTarget - oHigh
+        #environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
+        if qLen > 0:
+            r = note.Rest()
+            r.duration.quarterLength = qLen
+            # place at oHigh to reach to oHighTarget
+            v._insertCore(oHigh, r)
+        v._elementsChanged()  # must update otherwise might add double r
+
+        if fillGaps:
+            gapStream = v.findGaps()
+            if gapStream is not None:
+                for e in gapStream:
+                    r = note.Rest()
+                    r.duration.quarterLength = e.duration.quarterLength
+                    v._insertCore(e.offset, r)
+        v._elementsChanged()
+        #environLocal.printDebug(['post makeRests show()', v])
+        # NOTE: this sorting has been found to be necessary, as otherwise
+        # the resulting Stream is not sorted and does not get sorted in
+        # preparing musicxml output
+        if v.autoSort:
+            v.sort()
+
+    # with auto sort no longer necessary.
+
+    #returnObj.elements = returnObj.sorted.elements
+    #s.isSorted = False
+    # changes elements
+#         returnObj._elementsChanged()
+#         if returnObj.autoSort:
+#             returnObj.sort()
+
+    return returnObj
 
 
 def realizeOrnaments(s):

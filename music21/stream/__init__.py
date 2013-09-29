@@ -5470,83 +5470,13 @@ class Stream(base.Music21Object):
         TODO: if inPlace == True, this should return None
         TODO: default inPlace = False
         '''
-        if not inPlace: # make a copy
-            returnObj = copy.deepcopy(self)
-        else:
-            returnObj = self
-
-        #environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
-        if refStreamOrTimeRange is None: # use local
-            oLowTarget = 0
-            if timeRangeFromBarDuration and returnObj.isMeasure:
-                # NOTE: this will raise an exception if no meter can be found
-                oHighTarget = returnObj.barDuration.quarterLength
-            else:
-                oHighTarget = returnObj.highestTime
-        elif isinstance(refStreamOrTimeRange, Stream):
-            oLowTarget = refStreamOrTimeRange.lowestOffset
-            oHighTarget = refStreamOrTimeRange.highestTime
-            #environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
-        # treat as a list
-        elif common.isListLike(refStreamOrTimeRange):
-            oLowTarget = min(refStreamOrTimeRange)
-            oHighTarget = max(refStreamOrTimeRange)
-            #environLocal.printDebug(['offsets used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
-        if returnObj.hasVoices():
-            bundle = returnObj.voices
-        else:
-            bundle = [returnObj]
-
-        for v in bundle:
-            v._elementsChanged() # required to get correct offset times
-            oLow = v.lowestOffset
-            oHigh = v.highestTime
-
-            # create rest from start to end
-            qLen = oLow - oLowTarget
-            if qLen > 0:
-                r = note.Rest()
-                r.duration.quarterLength = qLen
-                #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
-                # place at oLowTarget to reach to oLow
-                v._insertCore(oLowTarget, r)
-
-            # create rest from end to highest
-            qLen = oHighTarget - oHigh
-            #environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
-            if qLen > 0:
-                r = note.Rest()
-                r.duration.quarterLength = qLen
-                # place at oHigh to reach to oHighTarget
-                v._insertCore(oHigh, r)
-            v._elementsChanged() # must update otherwise might add double r
-
-            if fillGaps:
-                gapStream = v.findGaps()
-                if gapStream != None:
-                    for e in gapStream:
-                        r = note.Rest()
-                        r.duration.quarterLength = e.duration.quarterLength
-                        v._insertCore(e.offset, r)
-            v._elementsChanged()
-            #environLocal.printDebug(['post makeRests show()', v])
-            # NOTE: this sorting has been found to be necessary, as otherwise
-            # the resulting Stream is not sorted and does not get sorted in
-            # preparing musicxml output
-            if v.autoSort:
-                v.sort()
-
-        # with auto sort no longer necessary.
-
-        #returnObj.elements = returnObj.sorted.elements
-        #self.isSorted = False
-        # changes elements
-#         returnObj._elementsChanged()
-#         if returnObj.autoSort:
-#             returnObj.sort()
-
-        return returnObj
-
+        return makeNotation.makeRests(
+            self,
+            refStreamOrTimeRange=refStreamOrTimeRange,
+            fillGaps=fillGaps,
+            timeRangeFromBarDuration=timeRangeFromBarDuration,
+            inPlace=inPlace,
+            )
 
     def makeTies(self, meterStream=None, inPlace=True,
         displayTiedAccidentals=False):
@@ -5555,10 +5485,10 @@ class Stream(base.Music21Object):
         Stream. If the elements duration extends beyond the measure's boundary,
         create a tied entity, placing the split Note in the next Measure.
 
-        Note that this method assumes that there is appropriate space
-        in the next Measure: this will not shift Note objects, but instead allocate
-        them evenly over barlines. Generally, makeMeasures is called prior
-        to calling this method.
+        Note that this method assumes that there is appropriate space in the
+        next Measure: this will not shift Note objects, but instead allocate
+        them evenly over barlines. Generally, makeMeasures is called prior to
+        calling this method.
 
         If `inPlace` is True, this is done in-place;
         if `inPlace` is False, this returns a modified deep copy.
@@ -5580,7 +5510,7 @@ class Stream(base.Music21Object):
         '''
         #environLocal.printDebug(['calling Stream.makeTies()'])
 
-        if not inPlace: # make a copy
+        if not inPlace:  # make a copy
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
@@ -5592,7 +5522,9 @@ class Stream(base.Music21Object):
         if len(measureStream) == 0:
             raise StreamException('cannot process a stream without measures')
 
-        #environLocal.printDebug(['makeTies() processing measureStream, length', measureStream, len(measureStream)])
+        #environLocal.printDebug([
+        #    'makeTies() processing measureStream, length', measureStream, 
+        #    len(measureStream)])
 
         # may need to look in activeSite if no time signatures are found
         # presently searchContext is False to save time
