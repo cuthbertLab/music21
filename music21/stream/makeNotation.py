@@ -17,10 +17,155 @@ import copy
 import unittest
 
 from music21 import common
+from music21 import defaults
+from music21 import duration
+from music21 import environment
+from music21 import meter
 from music21 import note
+
+environLocal = environment.Environment(__file__)
 
 
 #------------------------------------------------------------------------------
+
+
+def makeBeams(s, inPlace=False):
+    '''
+    Return a new Measure, or Stream of Measures, with beams applied to all
+    notes. Measures with Voices will process voices independently.
+
+    In the process of making Beams, this method also updates tuplet types.
+    This is destructive and thus changes an attribute of Durations in
+    Notes.
+
+    Note that `makeBeams()` is automatically called in show('musicxml') and
+    other formats if there is no beaming information in the piece (see
+    `haveBeamsBeenMade`).
+
+    If `inPlace` is True, this is done in-place; if `inPlace` is False,
+    this returns a modified deep copy.
+
+    .. note: Before Version 1.6, `inPlace` default was `True`; now `False`
+             like most `inPlace` options in music21.
+
+    See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
+
+    ::
+
+        >>> from music21 import meter
+        >>> from music21 import stream
+
+    ::
+
+        >>> aMeasure = stream.Measure()
+        >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
+        >>> aNote = note.Note()
+        >>> aNote.quarterLength = .25
+        >>> aMeasure.repeatAppend(aNote,16)
+        >>> bMeasure = aMeasure.makeBeams(inPlace=False)
+
+    ::
+
+        >>> for i in range(0, 4):
+        ...   print i, bMeasure.notes[i].beams
+        0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
+        1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
+        2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
+        3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
+
+    OMIT_FROM_DOCS
+    TODO: inPlace=False does not work in many cases
+    '''
+    from music21 import stream
+
+    #environLocal.printDebug(['calling Stream.makeBeams()'])
+    if not inPlace:  # make a copy
+        returnObj = copy.deepcopy(s)
+    else:
+        returnObj = s
+
+    #if s.isClass(Measure):
+    if 'Measure' in s.classes:
+    #if s.isClassOrSubclass('Measure'):
+        mColl = []  # store a list of measures for processing
+        mColl.append(returnObj)
+    elif len(s.getElementsByClass('Measure')) > 0:
+        mColl = returnObj.getElementsByClass('Measure')  # a stream of measures
+    else:
+        raise stream.StreamException(
+            'cannot process a stream that neither is a Measure nor has '
+            'Measures')
+
+    lastTimeSignature = None
+
+    for m in mColl:
+        # this means that the first of a stream of time signatures will
+        # be used
+        if m.timeSignature is not None:
+            lastTimeSignature = m.timeSignature
+        if lastTimeSignature is None:
+            #environLocal.printDebug([
+            #    'makeBeams(): lastTimeSignature is None: cannot process'])
+            raise stream.StreamException(
+                'cannot proces beams in a Measure without a time signature')
+        noteGroups = []
+        if m.hasVoices():
+            for v in m.voices:
+                noteGroups.append(v.notesAndRests)
+        else:
+            noteGroups.append(m.notesAndRests)
+
+        #environLocal.printDebug([
+        #    'noteGroups', noteGroups, 'len(noteGroups[0])',
+        #    len(noteGroups[0])])
+
+        for noteStream in noteGroups:
+            if len(noteStream) <= 1:
+                continue  # nothing to beam
+            durList = []
+            for n in noteStream:
+                durList.append(n.duration)
+            #environLocal.printDebug([
+            #    'beaming with ts', lastTimeSignature, 'measure', m, durList,
+            #    noteStream[0], noteStream[1]])
+
+            # error check; call before sending to time signature, as, if this
+            # fails, it represents a problem that happens before time signature
+            # processing
+            durSum = sum([d.quarterLength for d in durList])
+            barQL = lastTimeSignature.barDuration.quarterLength
+
+            if not common.almostEquals(durSum, barQL) and durSum > barQL:
+                #environLocal.printDebug([
+                #    'attempting makeBeams with a bar that contains durations
+                #    that sum greater than bar duration (%s > %s)' %
+                #    (durSum, barQL)])
+                continue
+            # getBeams can take a list of Durations; however, this cannot
+            # distinguish a Note from a Rest; thus, we can submit a flat
+            # stream of note or note-like entities; will return
+            # the same list of beam objects
+
+            offset = 0.0
+            if m.paddingLeft != 0.0:
+                offset = m.paddingLeft
+            elif (noteStream.highestTime <
+                lastTimeSignature.barDuration.quarterLength):
+                offset = (lastTimeSignature.barDuration.quarterLength -
+                    noteStream.highestTime)
+            beamsList = lastTimeSignature.getBeams(
+                noteStream, measureStartOffset=offset)
+
+            for i in range(len(noteStream)):
+                # this may try to assign a beam to a Rest
+                noteStream[i].beams = beamsList[i]
+            # apply tuple types in place; this modifies the durations
+            # in dur list
+            duration.updateTupletType(durList)
+
+    del mColl  # remove Stream no longer needed
+    if inPlace is not True:
+        return returnObj
 
 
 def makeMeasures(
@@ -218,7 +363,6 @@ def makeMeasures(
         ['hi', None, None]
 
     '''
-    from music21 import meter
     from music21 import spanner
     from music21 import stream
 
@@ -605,6 +749,211 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
 #             returnObj.sort()
 
     return returnObj
+
+
+def makeTies(
+    s,
+    meterStream=None,
+    inPlace=True,
+    displayTiedAccidentals=False,
+    ):
+    '''
+    Given a stream containing measures, examine each element in the
+    Stream. If the elements duration extends beyond the measure's boundary,
+    create a tied entity, placing the split Note in the next Measure.
+
+    Note that this method assumes that there is appropriate space in the
+    next Measure: this will not shift Note objects, but instead allocate
+    them evenly over barlines. Generally, makeMeasures is called prior to
+    calling this method.
+
+    If `inPlace` is True, this is done in-place;
+    if `inPlace` is False, this returns a modified deep copy.
+
+    ::
+
+        >>> from music21 import stream
+
+    ::
+
+        >>> d = stream.Stream()
+        >>> n = note.Note()
+        >>> n.quarterLength = 12
+        >>> d.repeatAppend(n, 10)
+        >>> d.repeatInsert(n, [x+.5 for x in range(10)])
+        >>> x = d.makeMeasures()
+        >>> x = x.makeTies()
+
+    OMIT_FROM_DOCS
+    TODO: inPlace should be False
+    TODO: inPlace = True should return None
+    TODO: take a list of clases to act as filter on what elements are tied.
+
+    configure ".previous" and ".next" attributes
+    '''
+    from music21 import stream
+
+    #environLocal.printDebug(['calling Stream.makeTies()'])
+
+    if not inPlace:  # make a copy
+        returnObj = copy.deepcopy(s)
+    else:
+        returnObj = s
+    if len(returnObj) == 0:
+        raise stream.StreamException('cannot process an empty stream')
+
+    # get measures from this stream
+    measureStream = returnObj.getElementsByClass('Measure')
+    if len(measureStream) == 0:
+        raise stream.StreamException(
+            'cannot process a stream without measures')
+
+    #environLocal.printDebug([
+    #    'makeTies() processing measureStream, length', measureStream,
+    #    len(measureStream)])
+
+    # may need to look in activeSite if no time signatures are found
+    # presently searchContext is False to save time
+    if meterStream is None:
+        meterStream = returnObj.getTimeSignatures(sortByCreationTime=True,
+                        searchContext=False)
+
+    mCount = 0
+    lastTimeSignature = None
+    while True:
+        # update measureStream on each iteration,
+        # as new measure may have been added to the returnObj stream
+        measureStream = returnObj.getElementsByClass('Measure')
+        if mCount >= len(measureStream):
+            break  # reached the end of all measures available or added
+        # get the current measure to look for notes that need ties
+        m = measureStream[mCount]
+        if m.timeSignature is not None:
+            lastTimeSignature = m.timeSignature
+
+        # get next measure; we may not need it, but have it ready
+        if mCount + 1 < len(measureStream):
+            mNext = measureStream[mCount + 1]
+            mNextAdd = False  # already present; do not append
+        else:  # create a new measure
+            mNext = stream.Measure()
+            # set offset to last offset plus total length
+            moffset = m.getOffsetBySite(measureStream)
+            if lastTimeSignature is not None:
+                mNext.offset = (moffset +
+                                lastTimeSignature.barDuration.quarterLength)
+            else:
+                mNext.offset = moffset
+            if len(meterStream) == 0:  # in case no meters are defined
+                ts = meter.TimeSignature()
+                ts.load('%s/%s' % (defaults.meterNumerator,
+                    defaults.meterDenominatorBeatType))
+            else:  # get the last encountered meter
+                ts = meterStream.getElementAtOrBefore(mNext.offset)
+            # only copy and assign if not the same as the last
+            if lastTimeSignature is not None \
+                and not lastTimeSignature.ratioEqual(ts):
+                mNext.timeSignature = copy.deepcopy(ts)
+            # increment measure number
+            mNext.number = m.number + 1
+            mNextAdd = True  # new measure, needs to be appended
+
+        if mNext.hasVoices():
+            mNextHasVoices = True
+        else:
+            mNextHasVoices = False
+
+        #environLocal.printDebug([
+        #    'makeTies() dealing with measure', m, 'mNextAdd', mNextAdd])
+        # for each measure, go through each element and see if its
+        # duraton fits in the bar that contains it
+
+        # if there are voices, we must look at voice id values to only
+        # connect ties to components in the same voice, assuming there
+        # are voices in the next measure
+        try:
+            mEnd = lastTimeSignature.barDuration.quarterLength
+        except AttributeError:
+            ts = m.getContextByClass('TimeSignature')
+            if ts is not None:
+                lastTimeSignature = ts
+                mEnd = lastTimeSignature.barDuration.quarterLength
+            else:
+                mEnd = 4.0  # Default
+        if m.hasVoices():
+            bundle = m.voices
+            mHasVoices = True
+        else:
+            bundle = [m]
+            mHasVoices = False
+        # bundle components may be voices, or just a measure
+        for v in bundle:
+            for e in v:
+                #environLocal.printDebug([
+                #    'Stream.makeTies() iterating over elements in measure',
+                #    m, e])
+                #if hasattr(e, 'duration') and e.duration is not None:
+                if e.duration is not None:
+                    # check to see if duration is within Measure
+                    eOffset = e.getOffsetBySite(v)
+                    eEnd = eOffset + e.duration.quarterLength
+                    # assume end can be at boundary of end of measure
+                    overshot = eEnd - mEnd
+                    # only process if overshot is greater than a minimum
+                    # 1/64 is 0.015625
+                    if overshot > .001:
+                        if eOffset >= mEnd:
+                            raise stream.StreamException(
+                                'element (%s) has offset %s within a measure '
+                                'that ends at offset %s' % (e, eOffset, mEnd))
+
+                        qLenBegin = mEnd - eOffset
+                        e, eRemain = e.splitAtQuarterLength(qLenBegin,
+                            retainOrigin=True,
+                            displayTiedAccidentals=displayTiedAccidentals)
+
+                        # manage bridging voices
+                        if mNextHasVoices:
+                            if mHasVoices:  # try to match voice id
+                                dst = mNext.voices[v.id]
+                            # src does not have voice, but dst does
+                            else:  # place in top-most voice
+                                dst = mNext.voices[0]
+                        else:
+                            # mNext has no voices but this one does
+                            if mHasVoices:
+                                # internalize all components in a voice
+                                mNext.internalize(container=stream.Voice)
+                                # place in first voice
+                                dst = mNext.voices[0]
+                            else:  # no voices in either
+                                dst = mNext
+
+                        #eRemain.activeSite = mNext
+                        # manually set activeSite
+                        # cannot use _insertCore here
+                        dst.insert(0, eRemain)
+
+                        # we are not sure that this element fits
+                        # completely in the next measure, thus, need to
+                        # continue processing each measure
+                        if mNextAdd:
+                            #environLocal.printDebug([
+                            #    'makeTies() inserting mNext into returnObj',
+                            #    mNext])
+                            returnObj.insert(mNext.offset, mNext)
+                    elif overshot > 0:
+                        environLocal.printDebug([
+                            'makeTies() found and skipping extremely small '
+                            'overshot into next measure', overshot])
+        mCount += 1
+    del measureStream  # clean up unused streams
+    # changes elements
+    returnObj._elementsChanged()
+    if not inPlace:
+        return returnObj
+    else:
+        return None
 
 
 def makeTupletBrackets(s, inPlace=True):
