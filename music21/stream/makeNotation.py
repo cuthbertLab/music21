@@ -1,34 +1,528 @@
-def realizeOrnaments(s):        
+# -*- coding: utf-8 -*-
+#------------------------------------------------------------------------------
+# Name:         stream.py
+# Purpose:      base classes for dealing with groups of positioned objects
+#
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#               Evan Lynch
+#
+# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 
+#               Project
+# License:      LGPL, see license.txt
+#------------------------------------------------------------------------------
+
+
+import copy
+import unittest
+
+
+#------------------------------------------------------------------------------
+
+
+def makeMeasures(
+    s,
+    meterStream=None,
+    refStreamOrTimeRange=None,
+    searchContext=False,
+    innerBarline=None,
+    finalBarline='final',
+    bestClef=False,
+    inPlace=False,
+    ):
+    '''
+    Takes a stream and places all of its elements into
+    measures (:class:`~music21.stream.Measure` objects)
+    based on the :class:`~music21.meter.TimeSignature` objects
+    placed within
+    the stream. If no TimeSignatures are found in the
+    stream, a default of 4/4 is used.
+
+    If `inPlace` is True, the original Stream is modified and lost
+    if `inPlace` is False, this returns a modified deep copy.
+
+    Many advanced features are available:
+
+    (1) If a `meterStream` is given, the TimeSignatures in this
+    stream are used instead of any found in the Stream.
+    Alternatively, a single TimeSignature object
+    can be provided in lieu of the stream. This feature lets you
+    test out how a group of notes might be interpreted as measures
+    in a number of different metrical schemes.
+
+    (2) If `refStreamOrTimeRange` is provided, this Stream or List
+    is used to give the span that you want to make measures for
+    necessary to fill empty rests at the ends or beginnings of
+    Streams, etc.  Say for instance you'd like to make a complete
+    score from a short ossia section, then you might use another
+    Part from the Score as a `refStreamOrTimeRange` to make sure
+    that the appropriate measures of rests are added at either side.
+
+    (3) If `innerBarline` is not None, the specified Barline object
+    or string-specification of Barline style will be used to create
+    Barline objects between every created Measure. The default is None.
+
+    (4) If `finalBarline` is not None, the specified Barline object or
+    string-specification of Barline style will be used to create a Barline
+    objects at the end of the last Measure. The default is 'final'.
+
+    The `searchContext` parameter determines whether or not context
+    searches are used to find Clef and other notation objects.
+
+    Here is a simple example of makeMeasures:
+
+    A single measure of 4/4 is created by from a Stream
+    containing only three quarter notes:
+
+    ::
+
+        >>> from music21 import articulations
+        >>> from music21 import clef
+        >>> from music21 import meter
+        >>> from music21 import note
+        >>> from music21 import stream
+
+    ::
+
+        >>> sSrc = stream.Stream()
+        >>> sSrc.append(note.QuarterNote('C4'))
+        >>> sSrc.append(note.QuarterNote('D4'))
+        >>> sSrc.append(note.QuarterNote('E4'))
+        >>> sMeasures = sSrc.makeMeasures()
+        >>> sMeasures.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.bar.Barline style=final>
+
+    Notice that the last measure is incomplete -- makeMeasures
+    does not fill up incomplete measures.
+
+    We can also check that the measure created has
+    the correct TimeSignature:
+
+    ::
+
+        >>> sMeasures[0].timeSignature
+        <music21.meter.TimeSignature 4/4>
+
+    Now let's redo this work in 2/4 by putting a TimeSignature
+    of 2/4 at the beginning of the stream and rerunning
+    makeMeasures. Now we will have two measures, each with
+    correct measure numbers:
+
+    ::
+
+        >>> sSrc.insert(0.0, meter.TimeSignature('2/4'))
+        >>> sMeasuresTwoFour = sSrc.makeMeasures()
+        >>> sMeasuresTwoFour.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note E>
+            {1.0} <music21.bar.Barline style=final>
+
+    Let us put 10 quarter notes in a Part.
+
+    After we run makeMeasures, we will have
+    3 measures of 4/4 in a new Part object. This experiment
+    demonstrates that running makeMeasures does not
+    change the type of Stream you are using:
+
+    ::
+
+        >>> sSrc = stream.Part()
+        >>> n = note.Note('E-4')
+        >>> n.quarterLength = 1
+        >>> sSrc.repeatAppend(n, 10)
+        >>> sMeasures = sSrc.makeMeasures()
+        >>> len(sMeasures.getElementsByClass('Measure'))
+        3
+        >>> sMeasures.__class__.__name__
+        'Part'
+
+    Demonstrate what makeMeasures will do with inPlace == True:
+
+    ::
+
+        >>> sScr = stream.Stream()
+        >>> sScr.insert(0, clef.TrebleClef())
+        >>> sScr.insert(0, meter.TimeSignature('3/4'))
+        >>> sScr.append(note.Note('C4', quarterLength = 3.0))
+        >>> sScr.append(note.Note('D4', quarterLength = 3.0))
+        >>> sScr.makeMeasures(inPlace = True)
+        >>> sScr.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note C>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.note.Note D>
+            {3.0} <music21.bar.Barline style=final>
+
+    If after running makeMeasures you run makeTies, it will also split
+    long notes into smaller notes with ties.  Lyrics and articulations
+    are attached to the first note.  Expressions (fermatas,
+    etc.) will soon be attached to the last note but this is not yet done:
+
+    ::
+
+        >>> p1 = stream.Part()
+        >>> p1.append(meter.TimeSignature('3/4'))
+        >>> longNote = note.Note("D#4")
+        >>> longNote.quarterLength = 7.5
+        >>> longNote.articulations = [articulations.Staccato()]
+        >>> longNote.lyric = "hi"
+        >>> p1.append(longNote)
+        >>> partWithMeasures = p1.makeMeasures()
+        >>> dummy = partWithMeasures.makeTies(inPlace = True)
+        >>> partWithMeasures.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note D#>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.note.Note D#>
+        {6.0} <music21.stream.Measure 3 offset=6.0>
+            {0.0} <music21.note.Note D#>
+            {1.5} <music21.bar.Barline style=final>
+
+    ::
+
+        >>> allNotes = partWithMeasures.flat.notes
+        >>> allNotes[0].articulations
+        [<music21.articulations.Staccato>]
+
+    ::
+
+        >>> allNotes[1].articulations
+        []
+
+    ::
+
+        >>> allNotes[2].articulations
+        []
+
+    ::
+
+        >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
+        ['hi', None, None]
+
+    '''
+    from music21 import meter
+    from music21 import spanner
+    from music21 import stream
+
+    #environLocal.printDebug(['calling Stream.makeMeasures()'])
+
+    # the srcObj shold not be modified or chagned
+    # removed element copying below and now making a deepcopy of entire stream
+    # must take a flat representation, as we need to be able to
+    # position components, and sub-streams might hide elements that
+    # should be contained
+
+    if s.hasVoices():
+        #environLocal.printDebug(['make measures found voices'])
+        # cannot make flat here, as this would destroy stream partitions
+        srcObj = copy.deepcopy(s.sorted)
+        voiceCount = len(srcObj.voices)
+    else:
+        #environLocal.printDebug(['make measures found no voices'])
+        # take flat and sorted version
+        srcObj = copy.deepcopy(s.flat.sorted)
+        voiceCount = 0
+
+    #environLocal.printDebug([
+    #    'Stream.makeMeasures(): passed in meterStream', meterStream,
+    #    meterStream[0]])
+
+    # may need to look in activeSite if no time signatures are found
+    if meterStream is None:
+        # get from this Stream, or search the contexts
+        meterStream = srcObj.flat.getTimeSignatures(returnDefault=True,
+                        searchContext=False,
+                        sortByCreationTime=False)
+        #environLocal.printDebug([
+        #    'Stream.makeMeasures(): found meterStream', meterStream[0]])
+    # if meterStream is a TimeSignature, use it
+    elif isinstance(meterStream, meter.TimeSignature):
+        ts = meterStream
+        meterStream = stream.Stream()
+        meterStream.insert(0, ts)
+
+    #assert len(meterStream), 1
+
+    #environLocal.printDebug([
+    #    'makeMeasures(): meterStream', 'meterStream[0]', meterStream[0],
+    #    'meterStream[0].offset',  meterStream[0].offset,
+    #    'meterStream.elements[0].activeSite',
+    #    meterStream.elements[0].activeSite])
+
+    # need a SpannerBundle to store any found spanners and place
+    # at the part level
+    spannerBundleAccum = spanner.SpannerBundle()
+
+    # get a clef for the entire stream; this will use bestClef
+    # presently, this only gets the first clef
+    # may need to store a clefStream and access changes in clefs
+    # as is done with meterStream
+    clefStream = srcObj.getClefs(searchActiveSite=True,
+                    searchContext=searchContext,
+                    returnDefault=True)
+    clefObj = clefStream[0]
+
+    #environLocal.printDebug([
+    #    'makeMeasures(): first clef found after copying and flattening',
+    #    clefObj])
+
+    # for each element in stream, need to find max and min offset
+    # assume that flat/sorted options will be set before procesing
+    # list of start, start+dur, element
+    offsetMap = srcObj.offsetMap
+    #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
+    #offsetMap.sort() not necessary; just get min and max
+    if len(offsetMap) > 0:
+        oMax = max([x['endTime'] for x in offsetMap])
+    else:
+        oMax = 0
+
+    # if a ref stream is provided, get highest time from there
+    # only if it is greater thant the highest time yet encountered
+    if refStreamOrTimeRange is not None:
+        if isinstance(refStreamOrTimeRange, stream.Stream):
+            refStreamHighestTime = refStreamOrTimeRange.highestTime
+        else:  # assume its a list
+            refStreamHighestTime = max(refStreamOrTimeRange)
+        if refStreamHighestTime > oMax:
+            oMax = refStreamHighestTime
+
+    # create a stream of measures to contain the offsets range defined
+    # create as many measures as needed to fit in oMax
+    post = s.__class__()
+    post.derivesFrom = s
+    post.derivationMethod = 'makeMeasures'
+
+    o = 0.0  # initial position of first measure is assumed to be zero
+    measureCount = 0
+    lastTimeSignature = None
+    while True:
+        m = stream.Measure()
+        m.number = measureCount + 1
+        #environLocal.printDebug([
+        #    'handling measure', m, m.number, 'current offset value', o,
+        #    meterStream._reprTextLine()])
+        # get active time signature at this offset
+        # make a copy and it to the meter
+        thisTimeSignature = meterStream.getElementAtOrBefore(o)
+        #environLocal.printDebug([
+        #    'm.number', m.number, 'meterStream.getElementAtOrBefore(o)',
+        #    meterStream.getElementAtOrBefore(o), 'lastTimeSignature',
+        #    lastTimeSignature, 'thisTimeSignature', thisTimeSignature ])
+
+        if thisTimeSignature is None and lastTimeSignature is None:
+            raise stream.StreamException(
+                'failed to find TimeSignature in meterStream; '
+                'cannot process Measures')
+        if thisTimeSignature is not lastTimeSignature \
+            and thisTimeSignature is not None:
+            lastTimeSignature = thisTimeSignature
+            # this seems redundant
+            #lastTimeSignature = meterStream.getElementAtOrBefore(o)
+            m.timeSignature = copy.deepcopy(thisTimeSignature)
+            #environLocal.printDebug(['assigned time sig', m.timeSignature])
+
+        # only add a clef for the first measure when automatically
+        # creating Measures; this clef is from getClefs, called above
+        if measureCount == 0:
+            m.clef = clefObj
+            #environLocal.printDebug(
+            #    ['assigned clef to measure', measureCount, m.clef])
+
+        # add voices if necessary (voiceCount > 0)
+        for voiceIndex in range(voiceCount):
+            v = stream.Voice()
+            v.id = voiceIndex  # id is voice index, starting at 0
+            m._insertCore(0, v)
+
+        # avoid an infinite loop
+        if thisTimeSignature.barDuration.quarterLength == 0:
+            raise stream.StreamException(
+                'time signature {0!r} has no duration'.format(
+                    thisTimeSignature))
+        post._insertCore(o, m)  # insert measure
+        # increment by meter length
+        o += thisTimeSignature.barDuration.quarterLength
+        if o >= oMax:  # may be zero
+            break  # if length of this measure exceedes last offset
+        else:
+            measureCount += 1
+
+    # populate measures with elements
+    for ob in offsetMap:
+        start, end, e, voiceIndex = (
+            ob['offset'],
+            ob['endTime'],
+            ob['element'],
+            ob['voiceIndex'],
+            )
+
+        #environLocal.printDebug(['makeMeasures()', start, end, e, voiceIndex])
+        # iterate through all measures, finding a measure that
+        # can contain this element
+
+        # collect all spanners and move to outer Stream
+        if e.isSpanner:
+            spannerBundleAccum.append(e)
+            continue
+
+        match = False
+        lastTimeSignature = None
+        for i in range(len(post)):
+            m = post[i]
+            if m.timeSignature is not None:
+                lastTimeSignature = m.timeSignature
+            # get start and end offsets for each measure
+            # seems like should be able to use m.duration.quarterLengths
+            mStart = m.getOffsetBySite(post)
+            mEnd = mStart + lastTimeSignature.barDuration.quarterLength
+            # if elements start fits within this measure, break and use
+            # offset cannot start on end
+            if start >= mStart and start < mEnd:
+                match = True
+                #environLocal.printDebug([
+                #    'found measure match', i, mStart, mEnd, start, end, e])
+                break
+        if not match:
+            raise stream.StreamException(
+                'cannot place element %s with start/end %s/%s '
+                'within any measures' % (e, start, end))
+
+        # find offset in the temporal context of this measure
+        # i is the index of the measure that this element starts at
+        # mStart, mEnd are correct
+        oNew = start - mStart  # remove measure offset from element offset
+
+        # insert element at this offset in the measure
+        # not copying elements here!
+
+        # in the case of a Clef, and possibly other measure attributes,
+        # the element may have already been placed in this measure
+        # we need to only exclude elements that are placed in the special
+        # first position
+        if m.clef is e:
+            continue
+        # do not accept another time signature at the zero position: this
+        # is handled above
+        if oNew == 0 and 'TimeSignature' in e.classes:
+            continue
+
+        #environLocal.printDebug(['makeMeasures()', 'inserting', oNew, e])
+        # NOTE: cannot use _insertCore here for some reason
+        if voiceIndex is None:
+            m.insert(oNew, e)
+        else:  # insert into voice specified by the voice index
+            m.voices[voiceIndex].insert(oNew, e)
+
+    # add found spanners to higher-level; could insert at zero
+    for sp in spannerBundleAccum:
+        post.append(sp)
+
+    post._elementsChanged()
+
+    # clean up temporary streams to avoid extra site accumulation
+    del srcObj
+    del clefStream
+
+    # set barlines if necessary
+    lastIndex = len(post.getElementsByClass('Measure')) - 1
+    for i, m in enumerate(post.getElementsByClass('Measure')):
+        if i != lastIndex:
+            if innerBarline not in ['regular', None]:
+                m.rightBarline = innerBarline
+        else:
+            if finalBarline not in ['regular', None]:
+                m.rightBarline = finalBarline
+        if bestClef:
+            m.clef = m.bestClef()  # may need flat for voices
+
+    if not inPlace:
+        return post  # returns a new stream populated w/ new measure streams
+    else:  # clear the stored elements list of this Stream and repopulate
+        # with Measures created above
+        s._elements = []
+        s._endElements = []
+        s._elementsChanged()
+        for e in post.sorted:
+            # may need to handle spanners; already have s as site
+            s.insert(e.getOffsetBySite(post), e)
+
+
+def realizeOrnaments(s):
     '''
     Realize all ornaments on a stream
 
     Creates a new stream that contains all realized ornaments in addition
     to other elements in the original stream.
-    
-    
-    >>> s1 = stream.Stream()
-    >>> m1 = stream.Measure()
-    >>> m1.timeSignature = meter.TimeSignature("4/4")
-    >>> n1 = note.WholeNote("C4")
-    >>> n1.expressions.append(expressions.Mordent())
-    >>> m1.append(n1)
-    >>> m2 = stream.Measure()
-    >>> n2 = note.WholeNote("D4")
-    >>> m2.append(n2)
-    >>> s1.append(m1)
-    >>> s1.append(m2)
-    >>> s1.recurse()
-    [<music21.stream.Stream ...>, <music21.stream.Measure 0 offset=0.0>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C>, <music21.stream.Measure 0 offset=4.0>, <music21.note.Note D>]
-    >>> s2 = s1.realizeOrnaments()
-    >>> s2.recurse()
-    [<music21.stream.Stream ...>, <music21.stream.Measure 0 offset=0.0>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C>, <music21.note.Note B>, <music21.note.Note C>, <music21.stream.Measure 0 offset=4.0>, <music21.note.Note D>] 
+
+    ::
+
+        >>> from music21 import expressions
+        >>> from music21 import meter
+        >>> from music21 import note
+        >>> from music21 import stream
+
+    ::
+
+        >>> s1 = stream.Stream()
+        >>> m1 = stream.Measure()
+        >>> m1.timeSignature = meter.TimeSignature("4/4")
+        >>> n1 = note.WholeNote("C4")
+        >>> n1.expressions.append(expressions.Mordent())
+        >>> m1.append(n1)
+        >>> m2 = stream.Measure()
+        >>> n2 = note.WholeNote("D4")
+        >>> m2.append(n2)
+        >>> s1.append(m1)
+        >>> s1.append(m2)
+        >>> for x in s1.recurse():
+        ...     x
+        ...
+        <music21.stream.Stream ...>
+        <music21.stream.Measure 0 offset=0.0>
+        <music21.meter.TimeSignature 4/4>
+        <music21.note.Note C>
+        <music21.stream.Measure 0 offset=4.0>
+        <music21.note.Note D>
+
+    ::
+
+        >>> s2 = s1.realizeOrnaments()
+        >>> for x in s2.recurse():
+        ...     x
+        ...
+        <music21.stream.Stream ...>
+        <music21.stream.Measure 0 offset=0.0>
+        <music21.meter.TimeSignature 4/4>
+        <music21.note.Note C>
+        <music21.note.Note B>
+        <music21.note.Note C>
+        <music21.stream.Measure 0 offset=4.0>
+        <music21.note.Note D>
+
     '''
     newStream = s.__class__()
     newStream.offset = s.offset
-    
-    # IF this streamObj contains more streams (ie, a Part that contains multiple measures)
-    recurse = s.recurse(streamsOnly = True)
-    
+
+    # If this streamObj contains more streams (i.e., a Part that contains
+    # multiple measures):
+    recurse = s.recurse(streamsOnly=True)
+
     if len(recurse) > 1:
         i = 0
         for innerStream in recurse:
@@ -40,13 +534,35 @@ def realizeOrnaments(s):
             if hasattr(element, "expressions"):
                 realized = False
                 for exp in element.expressions:
-                    if hasattr(exp, "realize"): 
+                    if hasattr(exp, "realize"):
                         newNotes = exp.realize(element)
                         realized = True
-                        for n in newNotes: newStream.append(n)
+                        for n in newNotes:
+                            newStream.append(n)
                 if not realized:
                     newStream.append(element)
             else:
                 newStream.append(element)
-    
+
     return newStream
+
+
+#------------------------------------------------------------------------------
+
+
+class Test(unittest.TestCase):
+    '''
+    Note: all Stream tests are found in test/testStream.py
+    '''
+
+    def runTest(self):
+        pass
+
+
+#------------------------------------------------------------------------------
+
+
+if __name__ == "__main__":
+    import music21
+    music21.mainTest(Test)
+
