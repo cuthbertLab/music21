@@ -49,6 +49,7 @@ from music21 import tempo
 from music21 import environment
 
 import makeNotation
+import streamStatus
 
 _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
@@ -255,6 +256,8 @@ class Stream(base.Music21Object):
 
     def __init__(self, givenElements=None, *args, **keywords):
         base.Music21Object.__init__(self)
+
+        self._streamStatus = streamStatus.StreamStatus(self)
 
         # self._elements stores Music21Object objects.
         self._elements = []
@@ -2523,16 +2526,12 @@ class Stream(base.Music21Object):
             found._elementsChanged()
         return found
 
-
-
     def getElementsNotOfClass(self, classFilterList, returnStreamSubClass = True):
         '''
         Return a list of all Elements that do not
         match the one or more classes in the `classFilterList`.
 
         In lieu of a list, a single class can be used as the `classFilterList` parameter.
-
-
 
         >>> a = stream.Stream()
         >>> a.repeatInsert(note.Rest(), range(10))
@@ -2587,10 +2586,8 @@ class Stream(base.Music21Object):
         found.isSorted = self.isSorted
         return found
 
-
     def getElementsByGroup(self, groupFilterList):
         '''
-
 
         >>> n1 = note.Note("C")
         >>> n1.groups.append('trombone')
@@ -2678,15 +2675,12 @@ class Stream(base.Music21Object):
 #                post[groupName] += 1
 #        return post
 
-
     def getOffsetByElement(self, obj):
         '''
         Given an object, return the offset of that object in the context of
         this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure.
 
         If the object is not found in the Stream, None is returned.
-
-
 
         >>> n1 = note.Note('A')
         >>> n2 = note.Note('B')
@@ -5331,7 +5325,6 @@ class Stream(base.Music21Object):
             displayTiedAccidentals=displayTiedAccidentals,
             )
 
-
     def makeBeams(self, inPlace=False):
         '''
         Calls :ref:`~music21.stream.makeNotation.makeBeams`.
@@ -5349,10 +5342,7 @@ class Stream(base.Music21Object):
         has not been run. If any Beams exist, this method
         returns True, regardless of if makeBeams has actually been run.
         '''
-        for n in self.flat.notes:
-            if n.beams is not None and len(n.beams.beamsList) > 0:
-                return True
-        return False
+        return self._streamStatus.haveBeamsBeenMade()
 
     def makeTupletBrackets(self, inPlace=True):
         '''
@@ -5498,11 +5488,7 @@ class Stream(base.Music21Object):
         other than None, this method returns True, regardless
         of if makeAccidentals has actually been run.
         '''
-        for p in self.pitches:
-            if p.accidental is not None:
-                if p.accidental.displayStatus is not None:
-                    return True
-        return False
+        return self._streamStatus.haveAccidentalsBeenMade()
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False, bestClef=False, **subroutineKeywords):
@@ -6679,7 +6665,6 @@ class Stream(base.Music21Object):
         else:
             raise StreamException('no such direction: %s' % direction)
 
-
     def restoreActiveSites(self):
         '''
         Restore all active sites for all elements from this Stream downward.
@@ -6687,7 +6672,6 @@ class Stream(base.Music21Object):
         for dummy in self._yieldElementsDownward(streamsOnly=False,
             restoreActiveSites=True):
             pass
-
 
     def makeImmutable(self):
         '''
@@ -9343,7 +9327,6 @@ class Stream(base.Music21Object):
         if not inPlace:
             return returnObj
         return None
-
 
     def internalize(self, container=None,
                     classFilterList=['GeneralNote']):

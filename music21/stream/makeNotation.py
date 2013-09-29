@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         stream.py
-# Purpose:      base classes for dealing with groups of positioned objects
+# Name:         makeNotation.py
+# Purpose:      functionality for manipulating streams
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
