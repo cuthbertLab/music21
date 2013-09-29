@@ -55,11 +55,14 @@ environLocal = environment.Environment(_MOD)
 
 #------------------------------------------------------------------------------
 
+
 class StreamException(exceptions21.Music21Exception):
     pass
 
 
 #------------------------------------------------------------------------------
+
+
 class StreamIterator(object):
     '''
     An Iterator object used to handle getting items from Streams.
@@ -75,7 +78,10 @@ class StreamIterator(object):
     * StreamIterator.index -- current index item
     * StreamIterator.streamLength -- the len() of srcStream
     * StreamIterator.srcStreamElements -- srcStream.elements
-    * StreamIterator.cleanupOnStop -- should the StreamIterator delete the reference to srcStream and srcStreamElements before stopping? default True
+    * StreamIterator.cleanupOnStop -- should the StreamIterator delete the
+      reference to srcStream and srcStreamElements before stopping? default
+      True
+
     '''
     def __init__(self, srcStream):
         self.srcStream = srcStream
@@ -148,7 +154,9 @@ class StreamIterator(object):
         '''
         return self.srcStream.__getitem__(key)
 
+
 #------------------------------------------------------------------------------
+
 
 class Stream(base.Music21Object):
     '''
@@ -5266,157 +5274,18 @@ class Stream(base.Music21Object):
         >>> om[2]['voiceIndex']
     ''')
 
-    def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
-        searchContext=False, innerBarline=None, finalBarline='final', bestClef=False, inPlace=False):
+    def makeMeasures(
+        self,
+        meterStream=None,
+        refStreamOrTimeRange=None,
+        searchContext=False,
+        innerBarline=None,
+        finalBarline='final',
+        bestClef=False,
+        inPlace=False,
+        ):
         '''
-        Takes a stream and places all of its elements into
-        measures (:class:`~music21.stream.Measure` objects)
-        based on the :class:`~music21.meter.TimeSignature` objects
-        placed within
-        the stream. If no TimeSignatures are found in the
-        stream, a default of 4/4 is used.
-
-        If `inPlace` is True, the original Stream is modified and lost
-        if `inPlace` is False, this returns a modified deep copy.
-
-        Many advanced features are available:
-
-        (1) If a `meterStream` is given, the TimeSignatures in this
-        stream are used instead of any found in the Stream.
-        Alternatively, a single TimeSignature object
-        can be provided in lieu of the stream. This feature lets you
-        test out how a group of notes might be interpreted as measures
-        in a number of different metrical schemes.
-
-        (2) If `refStreamOrTimeRange` is provided, this Stream or List
-        is used to give the span that you want to make measures for
-        necessary to fill empty rests at the ends or beginnings of
-        Streams, etc.  Say for instance you'd like to make a complete
-        score from a short ossia section, then you might use another
-        Part from the Score as a `refStreamOrTimeRange` to make sure
-        that the appropriate measures of rests are added at either side.
-
-        (3) If `innerBarline` is not None, the specified Barline object
-        or string-specification of Barline style will be used to create
-        Barline objects between every created Measure. The default is None.
-
-        (4) If `finalBarline` is not None, the specified Barline object or
-        string-specification of Barline style will be used to create a Barline
-        objects at the end of the last Measure. The default is 'final'.
-
-        The `searchContext` parameter determines whether or not context
-        searches are used to find Clef and other notation objects.
-
-        Here is a simple example of makeMeasures:
-
-        A single measure of 4/4 is created by from a Stream
-        containing only three quarter notes:
-
-
-        >>> sSrc = stream.Stream()
-        >>> sSrc.append(note.QuarterNote('C4'))
-        >>> sSrc.append(note.QuarterNote('D4'))
-        >>> sSrc.append(note.QuarterNote('E4'))
-        >>> sMeasures = sSrc.makeMeasures()
-        >>> sMeasures.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.note.Note C>
-            {1.0} <music21.note.Note D>
-            {2.0} <music21.note.Note E>
-            {3.0} <music21.bar.Barline style=final>
-
-        Notice that the last measure is incomplete -- makeMeasures
-        does not fill up incomplete measures.
-
-        We can also check that the measure created has
-        the correct TimeSignature:
-
-        >>> sMeasures[0].timeSignature
-        <music21.meter.TimeSignature 4/4>
-
-        Now let's redo this work in 2/4 by putting a TimeSignature
-        of 2/4 at the beginning of the stream and rerunning
-        makeMeasures. Now we will have two measures, each with
-        correct measure numbers:
-
-        >>> sSrc.insert(0.0, meter.TimeSignature('2/4'))
-        >>> sMeasuresTwoFour = sSrc.makeMeasures()
-        >>> sMeasuresTwoFour.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 2/4>
-            {0.0} <music21.note.Note C>
-            {1.0} <music21.note.Note D>
-        {2.0} <music21.stream.Measure 2 offset=2.0>
-            {0.0} <music21.note.Note E>
-            {1.0} <music21.bar.Barline style=final>
-
-        Let us put 10 quarter notes in a Part.
-
-        After we run makeMeasures, we will have
-        3 measures of 4/4 in a new Part object. This experiment
-        demonstrates that running makeMeasures does not
-        change the type of Stream you are using:
-
-        >>> sSrc = stream.Part()
-        >>> n = note.Note('E-4')
-        >>> n.quarterLength = 1
-        >>> sSrc.repeatAppend(n, 10)
-        >>> sMeasures = sSrc.makeMeasures()
-        >>> len(sMeasures.getElementsByClass('Measure'))
-        3
-        >>> sMeasures.__class__.__name__
-        'Part'
-
-        Demonstrate what makeMeasures will do with inPlace == True:
-
-        >>> sScr = stream.Stream()
-        >>> sScr.insert(0, clef.TrebleClef())
-        >>> sScr.insert(0, meter.TimeSignature('3/4'))
-        >>> sScr.append(note.Note('C4', quarterLength = 3.0))
-        >>> sScr.append(note.Note('D4', quarterLength = 3.0))
-        >>> sScr.makeMeasures(inPlace = True)
-        >>> sScr.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 3/4>
-            {0.0} <music21.note.Note C>
-        {3.0} <music21.stream.Measure 2 offset=3.0>
-            {0.0} <music21.note.Note D>
-            {3.0} <music21.bar.Barline style=final>
-
-        If after running makeMeasures you run makeTies, it will also split
-        long notes into smaller notes with ties.  Lyrics and articulations
-        are attached to the first note.  Expressions (fermatas,
-        etc.) will soon be attached to the last note but this is not yet done:
-
-        >>> p1 = stream.Part()
-        >>> p1.append(meter.TimeSignature('3/4'))
-        >>> longNote = note.Note("D#4")
-        >>> longNote.quarterLength = 7.5
-        >>> longNote.articulations = [articulations.Staccato()]
-        >>> longNote.lyric = "hi"
-        >>> p1.append(longNote)
-        >>> partWithMeasures = p1.makeMeasures()
-        >>> dummy = partWithMeasures.makeTies(inPlace = True)
-        >>> partWithMeasures.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 3/4>
-            {0.0} <music21.note.Note D#>
-        {3.0} <music21.stream.Measure 2 offset=3.0>
-            {0.0} <music21.note.Note D#>
-        {6.0} <music21.stream.Measure 3 offset=6.0>
-            {0.0} <music21.note.Note D#>
-            {1.5} <music21.bar.Barline style=final>
-
-        >>> allNotes = partWithMeasures.flat.notes
-        >>> [allNotes[0].articulations, allNotes[1].articulations, allNotes[2].articulations]
-        [[<music21.articulations.Staccato>], [], []]
-        >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
-        ['hi', None, None]
+        Calls :ref:`~music21.stream.makeNotation.makeMeasures`.
         '''
         return makeNotation.makeMeasures(
             self,
@@ -5429,46 +5298,15 @@ class Stream(base.Music21Object):
             inPlace=inPlace,
             )
 
-    def makeRests(self, refStreamOrTimeRange=None, fillGaps=False,
-        timeRangeFromBarDuration=False, inPlace=True):
+    def makeRests(
+        self,
+        refStreamOrTimeRange=None,
+        fillGaps=False,
+        timeRangeFromBarDuration=False,
+        inPlace=True,
+        ):
         '''
-        Given a Stream with an offset not equal to zero,
-        fill with one Rest preeceding this offset.
-        This can be called on any Stream,
-        a Measure alone, or a Measure that contains
-        Voices.
-
-        If `refStreamOrTimeRange` is provided as a Stream, this
-        Stream is used to get min and max offsets. If a list is provided,
-        the list assumed to provide minimum and maximum offsets. Rests will
-        be added to fill all time defined within refStream.
-
-        If `fillGaps` is True, this will create rests in any
-        time regions that have no active elements.
-
-        If `timeRangeFromBarDuration` is True, and the calling Stream
-        is a Measure with a TimeSignature, the time range will be determined
-        based on the .barDuration property.
-
-        If `inPlace` is True, this is done in-place; if `inPlace` is False,
-        this returns a modified deepcopy.
-
-
-        >>> a = stream.Stream()
-        >>> a.insert(20, note.Note())
-        >>> len(a)
-        1
-        >>> a.lowestOffset
-        20.0
-        >>> b = a.makeRests()
-        >>> len(b)
-        2
-        >>> b.lowestOffset
-        0.0
-
-        OMIT_FROM_DOCS
-        TODO: if inPlace == True, this should return None
-        TODO: default inPlace = False
+        Calls :ref:`~music21.stream.makeNotation.makeRests`.
         '''
         return makeNotation.makeRests(
             self,
@@ -5523,7 +5361,7 @@ class Stream(base.Music21Object):
             raise StreamException('cannot process a stream without measures')
 
         #environLocal.printDebug([
-        #    'makeTies() processing measureStream, length', measureStream, 
+        #    'makeTies() processing measureStream, length', measureStream,
         #    len(measureStream)])
 
         # may need to look in activeSite if no time signatures are found
@@ -5791,97 +5629,14 @@ class Stream(base.Music21Object):
                 return True
         return False
 
-
     def makeTupletBrackets(self, inPlace=True):
         '''
-        Given a Stream of mixed durations, the first and
-        last tuplet of any group of tuplets must be designated
-        as the start and end.
-
-        Need to not only look at Notes, but components
-        within Notes, as these might contain additional tuplets.
-
-        TODO: inPlace default should become False -- like all inPlace arguments
-        TODO: if inPlace is True, return None
+        Calls :ref:`~music21.stream.makeNotation.makeTupletBrackets`.
         '''
-
-        if not inPlace: # make a copy
-            returnObj = copy.deepcopy(self)
-        else:
-            returnObj = self
-
-        isOpen = False
-        tupletCount = 0
-        lastTuplet = None
-
-        # only want to look at notes
-        notes = returnObj.notesAndRests
-        durList = []
-        for e in notes:
-            for d in e.duration.components:
-                durList.append(d)
-
-        eCount = len(durList)
-
-        #environLocal.printDebug(['calling makeTupletBrackets, lenght of notes:', eCount])
-
-        for i in range(eCount):
-            e = durList[i]
-            if e is not None:
-                if e.tuplets is None:
-                    continue
-                tContainer = e.tuplets
-                #environLocal.printDebug(['makeTupletBrackets', tContainer])
-                if len(tContainer) == 0:
-                    t = None
-                else:
-                    t = tContainer[0] # get first?
-
-                # end case: this Note does not have a tuplet
-                if t is None:
-                    if isOpen == True: # at the end of a tuplet span
-                        isOpen = False
-                        # now have a non-tuplet, but the tuplet span was only
-                        # one tuplet long; do not place a bracket
-                        if tupletCount == 1:
-                            lastTuplet.type = 'startStop'
-                            lastTuplet.bracket = False
-                        else:
-                            lastTuplet.type = 'stop'
-                    tupletCount = 0
-                else: # have a tuplet
-                    tupletCount += 1
-                    # store this as the last tupelt
-                    lastTuplet = t
-
-                    #environLocal.printDebug(['makeTupletBrackets', e, 'existing typlet type', t.type, 'bracket', t.bracket, 'tuplet count:', tupletCount])
-
-                    # already open bracket
-                    if isOpen:
-                        # end case: this is the last element and its a tuplet
-                        # since this is an open bracket, we know we have more
-                        # than one tuplet in this span
-                        if i == eCount - 1:
-                            t.type = 'stop'
-                        # if this the middle of a span, do nothing
-                        else:
-                            pass
-                    else: # need to open
-                        isOpen = True
-                        # if this is the last event in this Stream
-                        # do not create bracket
-                        if i == eCount - 1:
-                            t.type = 'startStop'
-                            t.bracket = False
-                        # normal start of tuplet span
-                        else:
-                            t.type = 'start'
-
-#                 if t is not None:
-#                     environLocal.printDebug(['makeTupletBrackets', e, 'final type', t.type, 'bracket', t.bracket])
-
-        return returnObj
-
+        return makeNotation.makeTupletBrackets(
+            self,
+            inPlace=inPlace,
+            )
 
     def makeAccidentals(self, pitchPast=None, pitchPastMeasure=None,
         useKeySignature=True,  alteredPitches=None,
@@ -6122,11 +5877,9 @@ class Stream(base.Music21Object):
 
         return returnStream
 
-
-
     def realizeOrnaments(self):
         '''
-        calls :ref:`~music21.stream.makeNotation.realizeOrnaments`
+        Calls :ref:`~music21.stream.makeNotation.realizeOrnaments`.
         '''
         return makeNotation.realizeOrnaments(self)
 
@@ -9970,8 +9723,6 @@ class Stream(base.Music21Object):
                 p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
         return s
 
-
-
     def explode(self):
         '''
         Create a multi-part extraction from a single polyphonic Part.
@@ -9982,7 +9733,6 @@ class Stream(base.Music21Object):
         extraction.
         '''
         return self.voicesToParts()
-
 
     def flattenUnnecessaryVoices(self, force=False, inPlace=True):
         '''
@@ -10149,9 +9899,6 @@ class Stream(base.Music21Object):
 
         return returnLists
 
-
-
-
     #---------------------------------------------------------------------------
     # Variant control
 
@@ -10215,7 +9962,6 @@ class Stream(base.Music21Object):
         replacement region of comparable class. If matchBySpan is False,
         elements will be swapped in when a match is found between an element
         in the variant and an element in the replcement region of the string.
-
 
         >>> s = converter.parse("d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
         >>> s.makeMeasures(inPlace = True)
@@ -10863,7 +10609,6 @@ class Stream(base.Music21Object):
                 if c in classList:
                     classList.remove(c)
 
-
         if isRemove is True:
             shiftDur = 0.0
             listSorted = sorted(listOffsetDurExemption, key=lambda target: target[0])
@@ -11013,7 +10758,6 @@ class Stream(base.Music21Object):
                     if m.number >= k:
                         m.number = m.number + shift
             previousBoundary = k
-
 
     def showVariantAsOssialikePart(self, containedPart, variantGroups, inPlace = False):
         '''
@@ -11189,7 +10933,10 @@ class Stream(base.Music21Object):
         #for v in forDeletion:
         #    self.remove(v)
 
+
 #------------------------------------------------------------------------------
+
+
 class Voice(Stream):
     '''
     A Stream subclass for declaring that all the music in the
@@ -11204,6 +10951,8 @@ class Voice(Stream):
 
 
 #------------------------------------------------------------------------------
+
+
 class Measure(Stream):
     '''
     A representation of a Measure organized as a Stream.
@@ -11285,7 +11034,7 @@ class Measure(Stream):
         return "<music21.stream.%s %s offset=%s>" % \
             (self.__class__.__name__, self.measureNumberWithSuffix(), self.offset)
 
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     def mergeAttributes(self, other):
         '''
         Given another Measure, configure all non-element attributes of this
@@ -11308,7 +11057,7 @@ class Measure(Stream):
         self.numberSuffix = other.numberSuffix
         self.layoutWidth = other.layoutWidth
 
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     def makeNotation(self, inPlace=False):
         '''
         This method calls a sequence of Stream methods on this
@@ -12558,7 +12307,6 @@ class Opus(Stream):
 
         ''')
 
-
     def mergeScores(self):
         '''
         Some Opus objects represent numerous scores
@@ -12717,7 +12465,7 @@ class VariantStorage(Stream):
 #             e = copy.deepcopy(e)
 #             e.duration = e.duration.getGraceDuration()
 #             #environLocal.printDebug([
-#             #    'appending GraceStream, before calling base class', 
+#             #    'appending GraceStream, before calling base class',
 #             #    e.quarterLength, e.duration.quarterLength])
 #             othersEdited.append(e)
 #

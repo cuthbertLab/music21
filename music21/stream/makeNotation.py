@@ -150,7 +150,7 @@ def makeMeasures(
         >>> sMeasures.__class__.__name__
         'Part'
 
-    Demonstrate what makeMeasures will do with inPlace == True:
+    Demonstrate what makeMeasures will do with inPlace is True:
 
     ::
 
@@ -519,7 +519,7 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
         0.0
 
     OMIT_FROM_DOCS
-    TODO: if inPlace == True, this should return None
+    TODO: if inPlace is True, this should return None
     TODO: default inPlace = False
     '''
     from music21 import stream
@@ -603,6 +603,101 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
 #         returnObj._elementsChanged()
 #         if returnObj.autoSort:
 #             returnObj.sort()
+
+    return returnObj
+
+
+def makeTupletBrackets(s, inPlace=True):
+    '''
+    Given a Stream of mixed durations, the first and last tuplet of any group
+    of tuplets must be designated as the start and end.
+
+    Need to not only look at Notes, but components within Notes, as these might
+    contain additional tuplets.
+
+    TODO: inPlace default should become False -- like all inPlace arguments
+    TODO: if inPlace is True, return None
+    '''
+
+    if not inPlace:  # make a copy
+        returnObj = copy.deepcopy(s)
+    else:
+        returnObj = s
+
+    isOpen = False
+    tupletCount = 0
+    lastTuplet = None
+
+    # only want to look at notes
+    notes = returnObj.notesAndRests
+    durList = []
+    for e in notes:
+        for d in e.duration.components:
+            durList.append(d)
+
+    eCount = len(durList)
+
+    #environLocal.printDebug([
+    #    'calling makeTupletBrackets, lenght of notes:', eCount])
+
+    for i in range(eCount):
+        e = durList[i]
+        if e is not None:
+            if e.tuplets is None:
+                continue
+            tContainer = e.tuplets
+            #environLocal.printDebug(['makeTupletBrackets', tContainer])
+            if len(tContainer) == 0:
+                t = None
+            else:
+                t = tContainer[0]  # get first?
+
+            # end case: this Note does not have a tuplet
+            if t is None:
+                if isOpen is True:  # at the end of a tuplet span
+                    isOpen = False
+                    # now have a non-tuplet, but the tuplet span was only
+                    # one tuplet long; do not place a bracket
+                    if tupletCount == 1:
+                        lastTuplet.type = 'startStop'
+                        lastTuplet.bracket = False
+                    else:
+                        lastTuplet.type = 'stop'
+                tupletCount = 0
+            else:  # have a tuplet
+                tupletCount += 1
+                # store this as the last tupelt
+                lastTuplet = t
+
+                #environLocal.printDebug([
+                #    'makeTupletBrackets', e, 'existing typlet type', t.type,
+                #    'bracket', t.bracket, 'tuplet count:', tupletCount])
+
+                # already open bracket
+                if isOpen:
+                    # end case: this is the last element and its a tuplet
+                    # since this is an open bracket, we know we have more
+                    # than one tuplet in this span
+                    if i == eCount - 1:
+                        t.type = 'stop'
+                    # if this the middle of a span, do nothing
+                    else:
+                        pass
+                else:  # need to open
+                    isOpen = True
+                    # if this is the last event in this Stream
+                    # do not create bracket
+                    if i == eCount - 1:
+                        t.type = 'startStop'
+                        t.bracket = False
+                    # normal start of tuplet span
+                    else:
+                        t.type = 'start'
+
+#                 if t is not None:
+#                     environLocal.printDebug([
+#                         'makeTupletBrackets', e, 'final type', t.type,
+#                         'bracket', t.bracket])
 
     return returnObj
 
