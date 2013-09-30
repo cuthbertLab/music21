@@ -1027,6 +1027,10 @@ class LilypondConverter(object):
             lyObject = lyo.LyEmbeddedScm(r'\break')
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
+        elif "PageLayout" in c:
+            lyObject = lyo.LyEmbeddedScm(r'\pageBreak')
+            currentMusicList.append(lyObject)
+            lyObject.setParent(contextObject)
         else:
             lyObject = None
 
