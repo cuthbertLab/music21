@@ -35,6 +35,8 @@ from music21 import metadata
 from music21.corpus import chorales
 from music21.corpus import virtual
 
+import corpora
+
 from music21 import environment
 _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
@@ -46,6 +48,8 @@ _METADATA_BUNDLES = {
     'local': None,
     'virtual': None,
     }
+
+#------------------------------------------------------------------------------
 
 # update and access through property to make clear
 # that this is a corpus distribution or a no-corpus distribution
@@ -84,14 +88,14 @@ for name in dir(virtual): # look over virtual module
             VIRTUAL.append(obj)
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 class CorpusException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 def _findPaths(rootDirectoryPath, fileExtensions):
@@ -198,7 +202,7 @@ def _translateExtensions(fileExtensions=None, expandExtensions=True):
         return expandedExtensions
     return fileExtensions
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # core routines for getting file paths
 
 # module-level cache; only higher-level functions cache results
@@ -386,7 +390,7 @@ def getPaths(
     return paths
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # metadata routines
 
 
@@ -452,7 +456,7 @@ def search(
     return searchResults
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 def getComposer(composerName, fileExtensions=None):
@@ -567,7 +571,7 @@ def noCorpus():
     return _NO_CORPUS
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 def getWorkList(workName, movementNumber=None, fileExtensions=None):
@@ -738,7 +742,7 @@ def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
     return []
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 def getWorkReferences(sort=True):
@@ -861,7 +865,7 @@ def getWorkReferences(sort=True):
     return results
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 def getWork(workName, movementNumber=None, fileExtensions=None):
@@ -960,52 +964,13 @@ def parse(
         u'bach/bwv66.6.mxl'
 
     '''
-    if workName in [None, '']:
-        raise CorpusException('a work name must be provided as an argument')
-
-    if not common.isListLike(fileExtensions):
-        fileExtensions = [fileExtensions]
-
-    workList = getWorkList(workName, movementNumber, fileExtensions)
-    #environLocal.printDebug(['result of getWorkList()', post])
-    if not workList:
-        if common.isListLike(workName):
-            workName = os.path.sep.join(workName)
-        if workName.endswith(".xml"):
-            # might be compressed MXL file
-            newWorkName = os.path.splitext(workName)[0] + ".mxl"
-            try:
-                return parse(
-                    newWorkName,
-                    movementNumber,
-                    number,
-                    fileExtensions,
-                    forceSource,
-                    )
-            except CorpusException:
-                # avoids having the name come back with .mxl instead of .xmlrle
-                raise CorpusException("Could not find an xml or mxl work that met this criterion: %s" % workName)
-        workList = getVirtualWorkList(
-            workName,
-            movementNumber,
-            fileExtensions,
-            )
-
-    if len(workList) == 1:
-        filePath = workList[0]
-    elif not len(workList):
-        raise CorpusException(
-            "Could not find a work that met this criterion: %s" % workName)
-    else: # greater than zero:
-        filePath = workList[0] # get first
-    #return converter.parse(filePath, forceSource=forceSource, number=number)
-    streamObject = converter.parse(
-        filePath,
-        forceSource=forceSource,
+    return corpora.Corpus.parse(
+        workName,
+        movementNumber=movementNumber,
         number=number,
+        fileExtensions=fileExtensions,
+        forceSource=forceSource,
         )
-    _addCorpusFilepath(streamObject, filePath)
-    return streamObject
 
 
 def _addCorpusFilepath(streamObj, filePath):
@@ -1038,7 +1003,7 @@ def parseWork(*arguments, **keywords):
     return parse(*arguments, **keywords)
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # compression
 
 
@@ -1129,7 +1094,7 @@ def uncompressMXL(filename, deleteOriginal=False):
         os.remove(filename)
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # libraries
 
 
@@ -1447,11 +1412,10 @@ def getBeethovenStringQuartets(fileExtensions=None):
     return candidates
 
 
-#-------------------------------------------------------------------------------
-
-
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # define presented order in documentation
+
+
 _DOC_ORDER = [parse, getWork]
 
 
@@ -1462,4 +1426,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-

@@ -4,7 +4,7 @@
 # Purpose:      Basic Utilties
 #
 # Authors:      Michael Scott Cuthbert
-#               Christopher Ariza 
+#               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
@@ -91,8 +91,8 @@ def getMissingImportStr(modNameList):
     '''
     Given a list of missing module names, returns a nicely-formatted message to the user
     that gives instructions on how to expand music21 with optional packages.
-    
-    
+
+
     >>> common.getMissingImportStr(['matplotlib'])
     'Certain music21 functions might need the optional package matplotlib; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html'
     >>> common.getMissingImportStr(['matplotlib', 'numpy'])
@@ -109,12 +109,12 @@ def getMissingImportStr(modNameList):
 #-------------------------------------------------------------------------------
 def findFormat(fmt):
     '''
-    Given a format defined either by a format name or 
+    Given a format defined either by a format name or
     an extension, return the format name as well as the output exensions.
 
-    Note that .mxl and .mx are only considered MusicXML input formats. 
+    Note that .mxl and .mx are only considered MusicXML input formats.
 
-    
+
     >>> common.findFormat('mx')
     ('musicxml', '.xml')
     >>> common.findFormat('.mxl')
@@ -153,22 +153,22 @@ def findFormat(fmt):
     ('ipython', '.png')
     >>> common.findFormat('musicxml.png')
     ('musicxml.png', '.png')
-    
+
 
     Works the same whether you have a leading dot or not:
-    
+
 
     >>> common.findFormat('md')
     ('musedata', '.md')
     >>> common.findFormat('.md')
     ('musedata', '.md')
-    
-    
+
+
     If you give something we can't deal with, returns a Tuple of None, None:
-    
+
     >>> common.findFormat('wpd')
     (None, None)
-    
+
     '''
     # make lower case, as some lilypond processing used upper case
     fmt = fmt.lower().strip()
@@ -184,7 +184,7 @@ def findFormat(fmt):
 def findInputExtension(fmt):
     '''Given an input format, find and return all possible input extensions.
 
-    
+
     >>> a = common.findInputExtension('musicxml')
     >>> a
     ['.xml', '.mxl', '.mx']
@@ -210,18 +210,18 @@ def findInputExtension(fmt):
 def findFormatFile(fp):
     '''Given a file path (relative or absolute) return the format
 
-    
+
     >>> common.findFormatFile('test.xml')
     'musicxml'
     >>> common.findFormatFile('long/file/path/test-2009.03.02.xml')
     'musicxml'
     >>> common.findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
     'musicxml'
-    
+
     Windows drive + pickle
     >>> common.findFormatFile('d:/long/file/path/test.p')
     'pickle'
-    
+
     On a windows networked filesystem
     >>> common.findFormatFile('\\\\long\\file\\path\\test.krn')
     'humdrum'
@@ -233,7 +233,7 @@ def findFormatFile(fp):
 def findFormatExtFile(fp):
     '''Given a file path (relative or absolute) find format and extension used (not the output extension)
 
-    
+
     >>> common.findFormatExtFile('test.mx')
     ('musicxml', '.mx')
     >>> common.findFormatExtFile('long/file/path/test-2009.03.02.xml')
@@ -246,11 +246,11 @@ def findFormatExtFile(fp):
 
     >>> common.findFormatExtFile('test')
     (None, None)
-    
+
     Windows drive + pickle
     >>> common.findFormatExtFile('d:/long/file/path/test.p')
     ('pickle', '.p')
-    
+
     On a windows networked filesystem
     >>> common.findFormatExtFile('\\\\long\\file\\path\\test.krn')
     ('humdrum', '.krn')
@@ -265,7 +265,7 @@ def findFormatExtFile(fp):
 def findFormatExtURL(url):
     '''Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
 
-    
+
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
     >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
@@ -307,13 +307,13 @@ def findFormatExtURL(url):
         fileFormat, unused_junk = findFormat(ext)
         return fileFormat, ext
     else:
-        return None, None    
+        return None, None
 
 def basicallyEqual(a, b):
     '''
     returns true if a and b are equal except for whitespace differences
 
-    
+
     >>> a = " hello there "
     >>> b = "hello there"
     >>> c = " bye there "
@@ -326,7 +326,7 @@ def basicallyEqual(a, b):
     b = WHITESPACE.sub('', b)
     a = LINEFEED.sub('', a)
     b = LINEFEED.sub('', b)
-    if (a == b): 
+    if (a == b):
         return True
     else: return False
 
@@ -337,17 +337,17 @@ def cleanupFloat(floatNum, maxDenominator=1000):
     Cleans up a floating point number by converting
     it to a fractions.Fraction object limited to
     a denominator of maxDenominator
-    
-    
+
+
     >>> common.cleanupFloat(0.33333327824)
     0.333333333333...
-    
+
     >>> common.cleanupFloat(0.142857)
     0.1428571428571...
 
     >>> common.cleanupFloat(1.5)
     1.5
-    
+
     '''
     # this form only works w/ python2.7
     #f = fractions.Fraction(floatNum).limit_denominator(maxDenominator)
@@ -359,9 +359,9 @@ def cleanupFloat(floatNum, maxDenominator=1000):
 
 
 def roundToHalfInteger(num):
-    '''Given a floating-point number, round to the nearest half-integer.  
+    '''Given a floating-point number, round to the nearest half-integer.
 
-    
+
     >>> common.roundToHalfInteger(1.2)
     1
     >>> common.roundToHalfInteger(1.35)
@@ -385,20 +385,20 @@ def roundToHalfInteger(num):
 def almostEquals(x, y = 0.0, grain=1e-7):
     '''
     The following four routines work for comparisons between floats that are normally inconsistent.
-    
+
     almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other
 
 
     >>> from music21 import common
     >>> common.almostEquals(1.000000001, 1)
-    True 
+    True
     >>> common.almostEquals(1.001, 1)
     False
     >>> common.almostEquals(1.001, 1, grain=0.1)
     True
-    
+
     '''
-    if abs(x - y) < grain: 
+    if abs(x - y) < grain:
         return True
     return False
 
@@ -406,10 +406,10 @@ almostEqual = almostEquals
 
 
 def nearestCommonFraction(x, grain=1e-2):
-    '''Given a value that suggests a floating point fraction, like .33, 
+    '''Given a value that suggests a floating point fraction, like .33,
     return a float that provides greater specification, such as .333333333
-        
-    
+
+
     >>> common.nearestCommonFraction(.333) == 1/3.
     True
     >>> common.nearestCommonFraction(.33) == 1/3.
@@ -424,7 +424,7 @@ def nearestCommonFraction(x, grain=1e-2):
     if isStr(x):
         x = float(x)
 
-    values = [1/3., 2/3., 
+    values = [1/3., 2/3.,
               1/6., 5/6.]
     for v in values:
         if almostEquals(x, v, grain=grain):
@@ -436,7 +436,7 @@ def greaterThan(x, y = 0.0, grain=1e-7):
     '''
     greaterThan returns True if x is greater than and not almostEquals y
 
-    
+
     >>> common.greaterThan(5, 4)
     True
     >>> common.greaterThan(5.05, 5.02)
@@ -446,7 +446,7 @@ def greaterThan(x, y = 0.0, grain=1e-7):
     >>> common.greaterThan(5.000000000006, 5.000000000005)
     False
     '''
-    if x < y or almostEquals(x, y, grain): 
+    if x < y or almostEquals(x, y, grain):
         return False
     return True
 
@@ -454,7 +454,7 @@ def greaterThanOrEqual(x, y=0.0, grain=1e-7):
     '''
     greaterThan returns True if x is greater than or almostEquals y
     '''
-    if x > y or almostEquals(x, y, grain): 
+    if x > y or almostEquals(x, y, grain):
         return True
     return False
 
@@ -463,7 +463,7 @@ def lessThan(x, y = 0.0, grain=1e-7):
     '''
     lessThan -- returns True if x is less than and not almostEquals y
 
-    
+
     >>> common.lessThan(5, 4)
     False
     >>> common.lessThan(5.2, 5.5)
@@ -476,16 +476,16 @@ def lessThan(x, y = 0.0, grain=1e-7):
     False
 
     '''
-    if x > y or almostEquals(x, y, grain): 
+    if x > y or almostEquals(x, y, grain):
         return False
-    return True    
+    return True
 
 
 def lessThanOrEqual(x, y = 0.0, grain=1e-7):
     '''
     lessThan -- returns True if x is less than and not almostEquals y
 
-    
+
     >>> common.lessThanOrEqual(4, 4)
     True
     >>> common.lessThanOrEqual(5.2, 5.5)
@@ -496,18 +496,18 @@ def lessThanOrEqual(x, y = 0.0, grain=1e-7):
     True
 
     '''
-    if x < y or almostEquals(x, y, grain): 
+    if x < y or almostEquals(x, y, grain):
         return True
-    return False    
+    return False
 
-    
+
 def isPowerOfTwo(n):
-    ''' 
+    '''
     returns True if argument is either a power of 2 or a reciprocal
     of a power of 2. Uses almostEquals so that a float whose reminder after
     taking a log is nearly zero is still True
 
-    
+
     >>> common.isPowerOfTwo(3)
     False
     >>> common.isPowerOfTwo(18)
@@ -526,24 +526,24 @@ def isPowerOfTwo(n):
 
     if n <= 0:
         return False
-    
+
     (remainder, unused_throwAway) = math.modf(math.log(n, 2))
-    if (almostEquals(remainder, 0.0)): 
+    if (almostEquals(remainder, 0.0)):
         return True
-    else: 
+    else:
         return False
 
 
 def nearestMultiple(n, unit):
-    '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as the difference (error) to 
+    '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as the difference (error) to
     seven significant digits.
 
-    
+
     >>> print common.nearestMultiple(.25, .25)
     (0.25, 0.0)
     >>> print common.nearestMultiple(.35, .25)
     (0.25, 0.1...)
-    
+
     Note that this one also has an error of .1 but it's a positive error off of 0.5
     >>> print common.nearestMultiple(.4, .25)
     (0.5, 0.1...)
@@ -573,7 +573,7 @@ def nearestMultiple(n, unit):
     if n < 0:
         raise Exception('cannot find nearest multiple for a value less than the unit: %s, %s' % (n, unit))
 
-    mult = math.floor(n / float(unit)) # can start with the floor 
+    mult = math.floor(n / float(unit)) # can start with the floor
     halfUnit = unit / 2.0
 
     matchLow = unit * mult
@@ -588,12 +588,12 @@ def nearestMultiple(n, unit):
         return matchLow, round(n - matchLow, 7)
     elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7)
-       
+
 
 def standardDeviation(coll, bassel=False):
     '''Given a collection of values, return the standard deviation.
 
-    
+
     >>> common.standardDeviation([2,4,4,4,5,5,7,9])
     2.0
     >>> common.standardDeviation([600, 470, 170, 430, 300])
@@ -616,7 +616,7 @@ def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
     IMPROVE: when 2.6 is everywhere: add numbers class.
 
-    
+
     >>> common.isNum(3.0)
     True
     >>> common.isNum(3)
@@ -631,21 +631,21 @@ def isNum(usrData):
     except:
         return False
 
-#     if (isinstance(usrData, int) or 
-#         isinstance(usrData, float) or 
+#     if (isinstance(usrData, int) or
+#         isinstance(usrData, float) or
 #         isinstance(usrData, long) or
 #         isinstance(usrData, decimal.Decimal)):
 #         return True
 #     else:
-#         return False        
+#         return False
 
 def contiguousList(inputListOrTuple):
     '''
     returns bool True or False if a list containing ints contains only contiguous (increasing) values
-    
+
     requires the list to be sorted first
-    
-    
+
+
     >>> l = [3, 4, 5, 6]
     >>> common.contiguousList(l)
     True
@@ -667,12 +667,12 @@ def contiguousList(inputListOrTuple):
         if newVal != currentMaxVal + 1:
             return False
         currentMaxVal += 1
-    return True 
+    return True
 
 def isStr(usrData):
     """Check of usrData is some form of string, including unicode.
 
-    
+
     >>> common.isStr(3)
     False
     >>> common.isStr('sharp')
@@ -681,18 +681,18 @@ def isStr(usrData):
     True
     """
     if isinstance(usrData, basestring):
-#     if (isinstance(usrData, str) or 
+#     if (isinstance(usrData, str) or
 #         isinstance(usrData, unicode)):
         return True
     else:
-        return False                
+        return False
 
 
 def isListLike(usrData):
     """
     Returns True if is a List or a Set or a Tuple
 
-    
+
     >>> common.isListLike([])
     True
     >>> common.isListLike('sharp')
@@ -703,18 +703,18 @@ def isListLike(usrData):
     False
     """
     #TODO: add immutable sets and pre 2.6 set support
-    if (isinstance(usrData, list) or 
+    if (isinstance(usrData, list) or
         isinstance(usrData, tuple) or
         isinstance(usrData, set)):
         return True
     else:
-        return False            
+        return False
 
 def isIterable(usrData):
     """
     Returns True if is the object can be iter'd over
 
-    
+
     >>> common.isIterable([5, 10])
     True
     >>> common.isIterable('sharp')
@@ -732,8 +732,8 @@ def isIterable(usrData):
 
 def toUnicode(usrStr):
     '''Convert this tring to a uncode string; if already a unicode string, do nothing.
-        
-    
+
+
     >>> common.toUnicode('test')
     u'test'
     >>> common.toUnicode(u'test')
@@ -750,7 +750,7 @@ def toUnicode(usrStr):
 def classToClassStr(classObj):
     '''Convert a class object to a class string.
 
-    
+
     >>> common.classToClassStr(note.Note)
     'Note'
     >>> common.classToClassStr(chord.Chord)
@@ -762,7 +762,7 @@ def classToClassStr(classObj):
 def getNumFromStr(usrStr, numbers='0123456789'):
     '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
 
-    
+
     >>> common.getNumFromStr('23a')
     ('23', 'a')
     >>> common.getNumFromStr('23a954sdfwer')
@@ -784,7 +784,7 @@ def getNumFromStr(usrStr, numbers='0123456789'):
 def numToIntOrFloat(value):
     '''Given a number, return an integer if it is very close to an integer, otherwise, return a float.
 
-    
+
     >>> common.numToIntOrFloat(1.0)
     1
     >>> common.numToIntOrFloat(1.00003)
@@ -806,7 +806,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
 
     If replaceUnderscore is True (default) then underscores also become spaces (but without the _)
 
-    
+
     >>> common.spaceCamelCase('thisIsATest')
     'this Is A Test'
     >>> common.spaceCamelCase('ThisIsATest')
@@ -839,13 +839,13 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
         else:
             isNum = False
 
-        if isNum and not firstNum and not lastIsNum: 
+        if isNum and not firstNum and not lastIsNum:
             firstNum = True
         else:
             firstNum = False
 
         # for chars
-        if not isNum and not firstChar and lastIsNum: 
+        if not isNum and not firstChar and lastIsNum:
             firstChar = True
         else:
             firstChar = False
@@ -869,24 +869,24 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
 
 def getPlatform():
     '''
-    Return the name of the platform, where platforms are divided 
+    Return the name of the platform, where platforms are divided
     between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants).
     '''
-    # possible os.name values: 'posix', 'nt', 'mac', 'os2', 'ce', 
+    # possible os.name values: 'posix', 'nt', 'mac', 'os2', 'ce',
     # 'java', 'riscos'.
     if os.name in ['nt'] or sys.platform.startswith('win'):
         return 'win'
     elif sys.platform in ['darwin']:
-        return 'darwin' # 
+        return 'darwin' #
     elif os.name == 'posix': # catch all other nix platforms
-        return 'nix'  
+        return 'nix'
 
 
 def dotMultiplier(dots):
     '''
     dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots
-    
-    
+
+
     >>> common.dotMultiplier(1)
     1.5
     >>> common.dotMultiplier(2)
@@ -909,14 +909,14 @@ def decimalToTuplet(decNum):
 
     returns (numerator, denominator)
 
-    
+
     >>> common.decimalToTuplet(1.5)
     (3, 2)
     >>> common.decimalToTuplet(1.25)
     (5, 4)
-    
+
     If decNum is < 1, the denominator will be greater than the numerator:
-    
+
     >>> common.decimalToTuplet(.8)
     (4, 5)
 
@@ -925,8 +925,8 @@ def decimalToTuplet(decNum):
     >>> common.decimalToTuplet(-.02)
     Traceback (most recent call last):
     ZeroDivisionError: number must be greater than zero
-    
-    
+
+
     '''
 
     def findSimpleFraction(working):
@@ -956,7 +956,7 @@ def decimalToTuplet(decNum):
     gcd = euclidGCD(int(jy), int(iy))
     jy = jy/gcd
     iy = iy/gcd
-    
+
     if flipNumerator is False:
         return (int(jy), int(iy))
     else:
@@ -968,23 +968,23 @@ def decimalToTuplet(decNum):
 def unitNormalizeProportion(values):
     """Normalize values within the unit interval, where max is determined by the sum of the series.
 
-    
+
     >>> common.unitNormalizeProportion([0,3,4])
     [0.0, 0.42857142857142855, 0.5714285714285714]
     >>> common.unitNormalizeProportion([1,1,1])
     [0.3333333..., 0.333333..., 0.333333...]
-    
-    
+
+
     On 32-bit computers this number is inexact.  On 64-bit it works fine.
-    
-    
+
+
     #>>> common.unitNormalizeProportion([.2, .6, .2])
     #[0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
     """
     # note: negative values should be shifted to positive region first
     summation = 0
     for x in values:
-        if x < 0: 
+        if x < 0:
             raise ValueError('value members must be positive')
         summation += x
     unit = [] # weights on the unit interval; sum == 1
@@ -995,7 +995,7 @@ def unitNormalizeProportion(values):
 def unitBoundaryProportion(series):
     """Take a series of parts with an implied sum, and create unit-interval boundaries proportional to the series components.
 
-    
+
     >>> common.unitBoundaryProportion([1,1,2])
     [(0, 0.25), (0.25, 0.5), (0.5, 1.0)]
     >>> common.unitBoundaryProportion([8,1,1])
@@ -1006,22 +1006,22 @@ def unitBoundaryProportion(series):
     summation = 0
     for i in range(len(unit)):
         if i != len(unit) - 1: # not last
-            bounds.append((summation, summation + unit[i])) 
+            bounds.append((summation, summation + unit[i]))
             summation += unit[i]
         else: # last, avoid rounding errors
-            bounds.append((summation, 1.0))            
+            bounds.append((summation, 1.0))
     return bounds
 
 
 def weightedSelection(values, weights, randomGenerator=None):
     '''
-    Given a list of values and an equal-sized list of weights, 
+    Given a list of values and an equal-sized list of weights,
     return a randomly selected value using the weight.
 
-    Example: sum -1 and 1 for 100 values; should be 
+    Example: sum -1 and 1 for 100 values; should be
     around 0 or at least between -30 and 30
 
-    
+
     >>> -30 < sum([common.weightedSelection([-1, 1], [1,1]) for x in range(100)]) < 30
     True
     '''
@@ -1041,7 +1041,7 @@ def weightedSelection(values, weights, randomGenerator=None):
 def euclidGCD(a, b):
     '''use Euclid\'s algorithm to find the GCD of a and b
 
-    
+
     >>> common.euclidGCD(2,4)
     2
     >>> common.euclidGCD(20,8)
@@ -1053,12 +1053,12 @@ def euclidGCD(a, b):
         return a
     else:
         return euclidGCD(b, a % b)
-    
+
 
 def approximateGCD(values, grain=1e-4):
-    '''Given a list of values, find the lowest common divisor of floating point values. 
+    '''Given a list of values, find the lowest common divisor of floating point values.
 
-    
+
     >>> common.approximateGCD([2.5,10, .25])
     0.25
     >>> common.approximateGCD([2.5,10])
@@ -1127,13 +1127,13 @@ def approximateGCD(values, grain=1e-4):
 def _lcm(a, b):
     """find lowest common multiple of a,b"""
     # // forcers integer style division (no remainder)
-    return abs(a*b) / euclidGCD(a,b) 
+    return abs(a*b) / euclidGCD(a,b)
 
 def lcm(filterList):
     '''
     Find the least common multiple of a list of values
-    
-    
+
+
     >>> common.lcm([3,4,5])
     60
     >>> common.lcm([3,4])
@@ -1143,7 +1143,7 @@ def lcm(filterList):
     >>> common.lcm([3,6])
     6
     '''
-    # derived from 
+    # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
     lcmVal = 1
     for i in range(len(filterList)):
@@ -1154,7 +1154,7 @@ def lcm(filterList):
 def groupContiguousIntegers(src):
     '''Given a list of integers, group contiguous values into sub lists
 
-    
+
     >>> common.groupContiguousIntegers([3, 5, 6])
     [[3], [5, 6]]
     >>> common.groupContiguousIntegers([3, 4, 6])
@@ -1185,7 +1185,7 @@ def groupContiguousIntegers(src):
         # if not contiguous
             post.append(group)
             group = []
-        # second to last elements; handle separately 
+        # second to last elements; handle separately
         if i == len(src)-2:
             # need to handle next elements
             group.append(eNext)
@@ -1198,17 +1198,17 @@ def groupContiguousIntegers(src):
 
 def fromRoman(num):
     '''
-    
+
     Convert a Roman numeral (upper or lower) to an int
 
     http://code.activestate.com/recipes/81611-roman-numerals/
-    
-    
+
+
     >>> common.fromRoman('ii')
     2
     >>> common.fromRoman('vii')
     7
-    
+
     Works with both IIII and IV forms:
     >>> common.fromRoman('MCCCCLXXXIX')
     1489
@@ -1222,7 +1222,7 @@ def fromRoman(num):
     99
 
     But things like this are never seen, and thus cause an error:
-    
+
     >>> common.fromRoman('vx')
     Traceback (most recent call last):
     Music21CommonException: input contains an invalid subtraction element: vx
@@ -1250,7 +1250,7 @@ def fromRoman(num):
             pass
         places.append(value)
     summation = 0
-    for n in places: 
+    for n in places:
         summation += n
     return summation
     # Easiest test for validity...
@@ -1258,13 +1258,13 @@ def fromRoman(num):
     #   return sum
     #else:
     #   raise ValueError, 'input is not a valid roman numeral: %s' % input
-    
+
 def toRoman(num):
     '''
-    
+
     Convert a number from 1 to 3999 to a roman numeral
-    
-    
+
+
     >>> common.toRoman(2)
     'II'
     >>> common.toRoman(7)
@@ -1279,7 +1279,7 @@ def toRoman(num):
     if type(num) != type(1):
         raise TypeError("expected integer, got %s" % type(num))
     if not 0 < num < 4000:
-        raise ValueError, "Argument must be between 1 and 3999"   
+        raise ValueError, "Argument must be between 1 and 3999"
     ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
     nums = ('M',  'CM', 'D', 'CD','C', 'XC','L','XL','X','IX','V','IV','I')
     result = ""
@@ -1327,15 +1327,15 @@ def ordinalAbbreviation(value, plural=False):
 
 def stripAddresses(textString, replacement = "ADDRESS"):
     '''
-    Function that changes all memory addresses in the given 
+    Function that changes all memory addresses in the given
     textString with (replacement).  This is useful for testing
     that a function gives an expected result even if the result
     contains references to memory locations.  So for instance:
 
-    
+
     >>> common.stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
     '{0.0} <music21.clef.TrebleClef object at ADDRESS>'
-    
+
     while this is left alone:
 
     >>> common.stripAddresses("{0.0} <music21.humdrum.MiscTandem *>I humdrum control>")
@@ -1344,9 +1344,9 @@ def stripAddresses(textString, replacement = "ADDRESS"):
     ADDRESS = re.compile('0x[0-9A-F]+')
     return ADDRESS.sub(replacement, textString)
 
-    
+
 def sortModules(moduleList):
-    '''Sort a lost of imported module names such that most recently modified is 
+    '''Sort a lost of imported module names such that most recently modified is
     first'''
     sort = []
     for mod in moduleList:
@@ -1365,7 +1365,7 @@ def sortFilesRecent(fileList):
     '''Given two files, sort by most recent. Return only the file
     paths.
 
-    
+
     >>> import os
     >>> a = os.listdir(os.curdir)
     >>> b = common.sortFilesRecent(a)
@@ -1376,21 +1376,21 @@ def sortFilesRecent(fileList):
         sort.append([lastmod, fp])
     sort.sort()
     sort.reverse()
-    # just return 
-    return [y for dummy, y in sort] 
+    # just return
+    return [y for dummy, y in sort]
 
 
 def getMd5(value=None):
     '''Return a string from an md5 haslib
-    
-    
+
+
     >>> common.getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6'
     '''
     if value == None:
         value = str(time.time()) + str(random.random())
     m = hashlib.md5()
-    m.update(value)    
+    m.update(value)
     return m.hexdigest()
 
 
@@ -1398,7 +1398,7 @@ def formatStr(msg, *arguments, **keywords):
     '''Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
-    
+
     >>> a = common.formatStr('test', '1', 2, 3)
     >>> print a
     test 1 2 3
@@ -1421,7 +1421,7 @@ def formatStr(msg, *arguments, **keywords):
 def dirPartitioned(obj, skipLeading=['__']):
     '''Given an object, return three lists of names: methods, attributes, and properties.
 
-    Note that if a name/attribute is dynamically created by a property it 
+    Note that if a name/attribute is dynamically created by a property it
     cannot be found until that attribute is created.
 
     TODO: this cannot properly partiton properties from methods
@@ -1460,8 +1460,8 @@ def dirPartitioned(obj, skipLeading=['__']):
 # tools for setup.py
 def getSourceFilePath():
     '''
-    Get the music21 directory that contains source files. This is not the same as the 
-    outermost package development directory. 
+    Get the music21 directory that contains source files. This is not the same as the
+    outermost package development directory.
     '''
     import music21
     fpMusic21 = music21.__path__[0] # list, get first item
@@ -1500,8 +1500,8 @@ def getTestDocsFilePath():
     raise Exception('no such path exists: %s' % post)
 
 def getMetadataCacheFilePath():
-    '''Get the stored music21 directory that contains the corpus metadata cache. 
-    
+    '''Get the stored music21 directory that contains the corpus metadata cache.
+
     >>> fp = common.getMetadataCacheFilePath()
     >>> fp.endswith('corpus/metadataCache') or fp.endswith(r'corpus\metadataCache')
     True
@@ -1509,9 +1509,9 @@ def getMetadataCacheFilePath():
     return os.path.join(getSourceFilePath(), 'corpus', 'metadataCache')
 
 def getCorpusFilePath():
-    '''Get the stored music21 directory that contains the corpus metadata cache. 
+    '''Get the stored music21 directory that contains the corpus metadata cache.
 
-    
+
     >>> fp = common.getCorpusFilePath()
     >>> fp.endswith('music21/corpus') or fp.endswith(r'music21\corpus')
     True
@@ -1521,17 +1521,27 @@ def getCorpusFilePath():
 def getCorpusContentDirs():
     '''Get all dirs that are found in the corpus that contain content; that is, exclude dirst that have code or other resoures.
 
-    
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
-    ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach', 'demos', 'essenFolksong', 'handel', 'haydn', 
-    'josquin', 'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina', 'ryansMammoth', 
-    'schoenberg', 'schumann', 'schumann_clara', 'theoryExercises', 'trecento', 'verdi']
+    ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach',
+    'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
+    'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
+    'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
+    'theoryExercises', 'trecento', 'verdi']
     '''
     directoryName = getCorpusFilePath()
     result = []
     # dirs to exclude; all files will be retained
-    exclude = ['__init__.py', 'base.py', 'metadataCache', 'virtual.py', 'chorales.py','license.txt','testCorpus.py'] 
+    exclude = [
+        '__init__.py',
+        'base.py',
+        'chorales.py',
+        'corpora.py',
+        'license.txt',
+        'metadataCache',
+        'testCorpus.py',
+        'virtual.py',
+        ]
     for filename in os.listdir(directoryName):
         if filename not in exclude:
             if not filename.endswith('.pyc') and not filename.startswith('.'):
@@ -1542,12 +1552,12 @@ def getCorpusContentDirs():
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
      packageOnly=True):
     '''Manually get all directories in the music21 package, including the top level directory. This is used in setup.py.
-    
-    If `relative` is True, relative paths will be returned. 
 
-    If `remapSep` is set to anything other than None, the path separator will be replaced. 
+    If `relative` is True, relative paths will be returned.
 
-    If `packageOnly` is true, only directories with __init__.py files are colllected. 
+    If `remapSep` is set to anything other than None, the path separator will be replaced.
+
+    If `packageOnly` is true, only directories with __init__.py files are colllected.
     '''
     if fpMusic21 == None:
         import music21
@@ -1583,13 +1593,13 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
 
 
 def getPackageData():
-    '''Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types. 
+    '''Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types.
     '''
     # include these extensions for all directories, even if they are not normally there.
     # also need to update writeManifestTemplate() in setup.py when adding
     # new file extensions
-    ext = ['txt', 'xml', 'krn', 'mxl', 'pdf', 'html', 
-           'css', 'js', 'png', 'tiff', 'jpg', 'xls', 'mid', 'abc', 'json', 'md', 
+    ext = ['txt', 'xml', 'krn', 'mxl', 'pdf', 'html',
+           'css', 'js', 'png', 'tiff', 'jpg', 'xls', 'mid', 'abc', 'json', 'md',
            'zip', 'rntxt', 'command', 'scl', 'nwc', 'nwctxt', 'wav']
 
     # need all dirs, not just packages, and relative to music21
@@ -1612,7 +1622,7 @@ def getPackageData():
 
 #-------------------------------------------------------------------------------
 
-    
+
 '''The following are a set of objects with more relaxed behaviors for quicker writing.
 
 Most of these objects behave more like perl; for Python converts.
@@ -1624,24 +1634,24 @@ Advantage is coding time and fewer type errors while coding.
 '''
 
 class DefaultHash(dict):
-    '''A replacement for dictionaries that behave a bit more like perl hashes.  
-    No more KeyErrors. The difference between DefaultHash and defaultdict is that the 
-    Dict values come first in the definition and that default can be set to 
+    '''A replacement for dictionaries that behave a bit more like perl hashes.
+    No more KeyErrors. The difference between DefaultHash and defaultdict is that the
+    Dict values come first in the definition and that default can be set to
     None (which it is) or to any object.
-    
+
     If you want a factory that makes hashes with a particular different default, use:
-    
+
         falsehash = lambda h = None: common.DefaultHash(h, default = False)
         a = falsehash({"A": falsehash(), "B": falsehash()})
         print(a["A"]["hi"]) # returns False
-    
+
     there's probably a way to use this to create a data structure
     of arbitrary dimensionality, though it escapes this author.
 
     if callDefault is True then the default is called:
-    
+
         common.DefaultHash(default = list, callDefault = True)
-        
+
     will create a new List for each element
     '''
     def __init__(self, dictIn = None, default=None, callDefault=False):
@@ -1651,9 +1661,9 @@ class DefaultHash(dict):
             dict.__init__(self)
         self.default = default
         self.callDefault = callDefault
-    
+
     def __getitem__(self, key):
-        # NOTE: this is perforamnce critical method and should be as fast as 
+        # NOTE: this is perforamnce critical method and should be as fast as
         # possible
         try:
             return dict.__getitem__(self, key)
@@ -1678,8 +1688,8 @@ class DefaultHash(dict):
 
 class defList(list):
     '''A replacement for lists that behave a bit more like perl arrays. No more ListErrors.
-        '''    
-    
+        '''
+
     def __init__(self, value = None, default = None, callDefault = False):
         if value:
             list.__init__(self, value)
@@ -1697,7 +1707,7 @@ class defList(list):
             else:
                 list.__setitem__(self, item, self.default())
                 return list.__getitem__(self, item)
-    
+
     def __setitem__(self, item, value):
         try:
             return list.__setitem__(self, item, value)
@@ -1716,7 +1726,7 @@ def pitchList(pitchList):
     '''
     utility method that replicates the previous behavior of lists of pitches
 
-    
+
 
     '''
     return '[' + ', '.join([x.nameWithOctave for x in pitchList]) + ']'
@@ -1745,11 +1755,11 @@ def wrapWeakref(referent):
 def unwrapWeakref(referent):
     '''
     Utility function that gets an object that might be an object itself
-    or a weak reference to an object.  It returns obj() if it's a weakref 
+    or a weak reference to an object.  It returns obj() if it's a weakref
     and obj if it's not.
-    
-    
-    >>> class Mock(object): 
+
+
+    >>> class Mock(object):
     ...     pass
     >>> a1 = Mock()
     >>> a2 = Mock()
@@ -1767,13 +1777,13 @@ def unwrapWeakref(referent):
         return referent()
     else:
         return referent
-    
+
 
 def isWeakref(referent):
     '''Test if an object is a weakref
 
-    
-    >>> class Mock(object): 
+
+    >>> class Mock(object):
     ...     pass
     >>> a1 = Mock()
     >>> a2 = Mock()
@@ -1837,15 +1847,15 @@ xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
 def stripAccents(inputString):
     '''
     removes accents from unicode strings.
-    
-    
+
+
     >>> s = u'tr\u00e8s vite'
     >>> u'\u00e8' in s
     True
     >>> common.stripAccents(s)
     u'tres vite'
     '''
-    #if isinstance(inputString, unicode):        
+    #if isinstance(inputString, unicode):
     r = ''
     for i in inputString:
         if ord(i) in xlateAccents:
@@ -1864,10 +1874,10 @@ def normalizeFilename(name):
     or spaces and
     normalize it so that it is POSIX compliant (except for the limit
     on length).
-    
+
     Takes in a string or unicode string and returns a normal string.
 
-    
+
     >>> common.normalizeFilename(u'03-Niccolò all\\'lessandra.not really.xml')
     '03-Niccolo_all_lessandra_not_really.xml'
     '''
@@ -1881,7 +1891,7 @@ def normalizeFilename(name):
 
     if isinstance(name, str):
         name = unicode(name)
-            
+
     name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
     name = re.sub('[^\w-]', '_', name).strip()
     if extension is not None:
@@ -1892,9 +1902,9 @@ def normalizeFilename(name):
 def runningUnderIPython():
     '''
     return bool if we are running under iPython Notebook (not iPython)
-    
+
     (no tests, since will be different)
-    
+
     This post:
     http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
     says not to do this, but really, I can't think of another way to have different output as default.
@@ -1925,7 +1935,7 @@ _singletonCounter = {}
 _singletonCounter['value'] = 0
 
 class SingletonCounter(object):
-    '''A simple counter that can produce unique numbers regardless of how many instances exist. 
+    '''A simple counter that can produce unique numbers regardless of how many instances exist.
     '''
     def __init__(self):
         pass
@@ -1939,8 +1949,8 @@ class SingletonCounter(object):
 
 #-------------------------------------------------------------------------------
 class Iterator(object):
-    '''A simple Iterator object used to handle iteration of Streams and other 
-    list-like objects. 
+    '''A simple Iterator object used to handle iteration of Streams and other
+    list-like objects.
     '''
     def __init__(self, data):
         self.data = data
@@ -1961,7 +1971,7 @@ class Iterator(object):
 #-------------------------------------------------------------------------------
 class Timer(object):
     """An object for timing."""
-        
+
     def __init__(self):
         # start on init
         self._tStart = time.time()
@@ -1973,7 +1983,7 @@ class Timer(object):
         self._tStart = time.time()
         self._tStop = None # show that a new run has started so __call__ works
         self._tDif = 0
-    
+
     def stop(self):
         self._tStop = time.time()
         self._tDif = self._tStop - self._tStart
@@ -1991,7 +2001,7 @@ class Timer(object):
             t = time.time() - self._tStart
         else:
             t = self._tDif
-        return t 
+        return t
 
     def __str__(self):
         if self._tStop == None: # if not stoped yet
@@ -2019,7 +2029,7 @@ class TestMock(object):
         from music21 import environment
         _MOD = 'music21.common.TestMock'
         self._environLocal = environment.Environment(_MOD)
-       
+
 
     def method1(self):
         return 3
@@ -2032,10 +2042,10 @@ class TestMock(object):
 
     def _set1(self, value):
         self.attr3 = value
- 
+
     def __deepcopy__(self, memo=None):
         # None is the empty memp default
-        #self._environLocal.printDebug(['__deepcopy__ called, got memo', 
+        #self._environLocal.printDebug(['__deepcopy__ called, got memo',
         #                              self, memo])
         new = self.__class__()
         for name in self.__dict__:
@@ -2058,7 +2068,7 @@ class TestMock(object):
 
 
 class Test(unittest.TestCase):
-    '''Tests not requiring file output. 
+    '''Tests not requiring file output.
     '''
 
     def runTest(self):
@@ -2093,7 +2103,7 @@ class Test(unittest.TestCase):
 
         # we cannot use insepct.isdatadescriptor to find properties
         self.assertEqual(inspect.isdatadescriptor(a.property1), False)
-        
+
 
         unused_methods, attributes, unused_properties = dirPartitioned(a)
         self.assertEqual(('attr1' in attributes), True)
@@ -2123,14 +2133,14 @@ class Test(unittest.TestCase):
         self.assertNotEqual(a.attr2, c.attr2)
         self.assertEqual(a.attr1, a.attr2)
         self.assertEqual(c.attr1, c.attr2)
-        
+
 
     def testWeightedSelection(self):
 
         #from music21 import environment
         #_MOD = "common.py"
         #environLocal = environment.Environment(_MOD)
-        
+
 
         # test equal selection
         for j in range(10):
@@ -2186,7 +2196,7 @@ if __name__ == "__main__":
 #        s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)
 #        s1.addTests(s2)
 #        runner = unittest.TextTestRunner()
-#        runner.run(s1)  
+#        runner.run(s1)
 
     elif len(sys.argv) > 1:
         t = Test()

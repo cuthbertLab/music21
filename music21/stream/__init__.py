@@ -244,20 +244,39 @@ class Stream(base.Music21Object):
         'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'isSorted': 'Boolean describing whether the Stream is sorted or not.',
-    'autoSort': 'Boolean describing whether the Stream is automatically sorted by offset whenever necessary.',
-
-    'isFlat': 'Boolean describing whether this Stream contains embedded sub-Streams or Stream subclasses (not flat).',
-
-    'flattenedRepresentationOf': 'When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here.',
-    'definesExplicitSystemBreaks': 'Boolean that says whether all system breaks in the piece are explicitly defined.  Only used on musicxml output (maps to the musicxml <supports attribute="new-system"> tag) and only if this is the outermost Stream being shown',
-    'definesExplicitPageBreaks': 'Boolean that says whether all page breaks in the piece are explicitly defined.  Only used on musicxml output (maps to the musicxml <supports attribute="new-page"> tag) and only if this is the outermost Stream being shown',
-    }
+        'isSorted': '''
+            Boolean describing whether the Stream is sorted or not.
+            ''',
+        'autoSort': '''
+            Boolean describing whether the Stream is automatically sorted by
+            offset whenever necessary.
+            ''',
+        'isFlat': '''
+            Boolean describing whether this Stream contains embedded
+            sub-Streams or Stream subclasses (not flat).
+            ''',
+        'flattenedRepresentationOf': '''
+            When this flat Stream is derived from another non-flat stream, a
+            reference to the source Stream is stored here.
+            ''',
+        'definesExplicitSystemBreaks': '''
+            Boolean that says whether all system breaks in the piece are
+            explicitly defined.  Only used on musicxml output (maps to the
+            musicxml <supports attribute="new-system"> tag) and only if this is
+            the outermost Stream being shown
+            ''',
+        'definesExplicitPageBreaks': '''
+            Boolean that says whether all page breaks in the piece are
+            explicitly defined.  Only used on musicxml output (maps to the
+            musicxml <supports attribute="new-page"> tag) and only if this is
+            the outermost Stream being shown
+            ''',
+        }
 
     def __init__(self, givenElements=None, *args, **keywords):
         base.Music21Object.__init__(self)
 
-        self._streamStatus = streamStatus.StreamStatus(self)
+        #self._streamStatus = streamStatus.StreamStatus(self)
 
         # self._elements stores Music21Object objects.
         self._elements = []
@@ -5342,7 +5361,7 @@ class Stream(base.Music21Object):
         has not been run. If any Beams exist, this method
         returns True, regardless of if makeBeams has actually been run.
         '''
-        return self._streamStatus.haveBeamsBeenMade()
+        return streamStatus.StreamStatus(self).haveBeamsBeenMade()
 
     def makeTupletBrackets(self, inPlace=True):
         '''
@@ -5488,7 +5507,7 @@ class Stream(base.Music21Object):
         other than None, this method returns True, regardless
         of if makeAccidentals has actually been run.
         '''
-        return self._streamStatus.haveAccidentalsBeenMade()
+        return streamStatus.StreamStatus(self).haveAccidentalsBeenMade()
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False, bestClef=False, **subroutineKeywords):
