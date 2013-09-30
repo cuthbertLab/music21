@@ -958,7 +958,6 @@ class LilypondConverter(object):
         ### treat complex duration objects as multiple objects
         c = thisObject.classes
 
-        
         if 'Stream' not in c and thisObject.duration.type == 'complex':
             thisObjectSplit = thisObject.splitAtDurations()
             for subComponent in thisObjectSplit:
@@ -1023,7 +1022,11 @@ class LilypondConverter(object):
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
         elif "Variant" in c:
-            self.appendContextFromVariant(thisObject, coloredVariants = self.coloredVariants)
+            self.appendContextFromVariant(thisObject, coloredVariants=self.coloredVariants)
+        elif "SystemLayout" in c:
+            lyObject = lyo.LyEmbeddedScm(r'\break')
+            currentMusicList.append(lyObject)
+            lyObject.setParent(contextObject)
         else:
             lyObject = None
 
