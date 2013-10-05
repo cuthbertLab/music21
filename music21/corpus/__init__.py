@@ -33,9 +33,8 @@ from music21 import converter
 from music21 import exceptions21
 from music21 import metadata
 from music21.corpus import chorales
+from music21.corpus import corpora
 from music21.corpus import virtual
-
-import corpora
 
 from music21 import environment
 _MOD = "corpus.base.py"
@@ -43,11 +42,6 @@ environLocal = environment.Environment(_MOD)
 
 # a list of metadata's can reside in this module-level storage; this
 # data is loaded on demand.
-_METADATA_BUNDLES = {
-    'core': None,
-    'local': None,
-    'virtual': None,
-    }
 
 #------------------------------------------------------------------------------
 
@@ -211,6 +205,7 @@ _pathsCache = {}
 # Environment
 _pathsLocalTemp = []
 
+
 def getCorePaths(fileExtensions=None, expandExtensions=True):
     '''
     Get all paths in the corpus that match a known extension, or an extenion
@@ -224,8 +219,9 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
 
     ::
 
+        >>> from music21 import corpus
         >>> corpusFilePaths = corpus.getCorePaths()
-        >>> len(corpusFilePaths) # the current number of paths; update when adding to corpus
+        >>> len(corpusFilePaths)
         3045
 
     ::
@@ -241,15 +237,10 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
         True
 
     '''
-    fileExtensions = _translateExtensions(fileExtensions=fileExtensions,
-                expandExtensions=expandExtensions)
-    cacheKey = ('core', tuple(fileExtensions))
-    # not cached, fetch and reset
-    if cacheKey not in _pathsCache:
-        _pathsCache[cacheKey] = _findPaths(
-            common.getCorpusFilePath(), fileExtensions)
-    return _pathsCache[cacheKey]
-
+    return corpora.CoreCorpus().getPaths(
+        fileExtensions=fileExtensions,
+        expandExtensions=expandExtensions,
+        )
 
 def getVirtualPaths(fileExtensions=None, expandExtensions=True):
     '''
@@ -259,24 +250,15 @@ def getVirtualPaths(fileExtensions=None, expandExtensions=True):
 
     ::
 
+        >>> from music21 import corpus
         >>> len(corpus.getVirtualPaths()) > 6
         True
 
     '''
-    fileExtensions = _translateExtensions(
+    return corpora.VirtualCorpus().getPaths(
         fileExtensions=fileExtensions,
         expandExtensions=expandExtensions,
         )
-    paths = []
-    for obj in VIRTUAL:
-        if obj.corpusPath != None:
-            for ext in fileExtensions:
-                #environLocal.printDebug([obj.corpusPath, ext])
-                result = obj.getUrlByExt(ext)
-                for part in result:
-                    if part not in paths:
-                        paths.append(part)
-    return paths
 
 
 def getLocalPaths(fileExtensions=None, expandExtensions=True):
@@ -288,27 +270,10 @@ def getLocalPaths(fileExtensions=None, expandExtensions=True):
     :func:`~music21.corpus.addPath` function, these paths are also returned
     with this method.
     '''
-    fileExtensions = _translateExtensions(fileExtensions=fileExtensions,
-                expandExtensions=expandExtensions)
-    cacheKey = ('local', tuple(fileExtensions))
-    # not cached, fetch and reset
-    if cacheKey not in _pathsCache:
-        # check paths before trying to search
-        candidatePaths = environLocal['localCorpusSettings']
-        validPaths = []
-        for filePath in candidatePaths + _pathsLocalTemp:
-            if not os.path.isdir(filePath):
-                environLocal.warn(
-                'invalid path set as localCorpusSetting: %s' % filePath)
-            else:
-                validPaths.append(filePath)
-        # append successive matches into one list
-        matched = []
-        for filePath in validPaths:
-            #environLocal.printDebug(['finding paths in:', filePath])
-            matched += _findPaths(filePath, fileExtensions)
-        _pathsCache[cacheKey] = matched
-    return _pathsCache[cacheKey]
+    return corpora.LocalCorpus().getPaths(
+        fileExtensions=fileExtensions,
+        expandExtensions=expandExtensions,
+        )
 
 
 def addPath(filePath):
@@ -334,7 +299,6 @@ def addPath(filePath):
 
     Alternatively, add a directory permanently (see link above
     for more details):
-
 
     ::
 
@@ -378,7 +342,7 @@ def getPaths(
             expandExtensions=expandExtensions,
             )
     if 'core' in domain:
-        paths += getCorePaths(
+        paths += corpora.CoreCorpus().getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
@@ -406,11 +370,9 @@ def _updateMetadataBundle():
     Note that this updates the in-memory cached metdata bundles not the disk
     caches (that's MUCH slower!) to do that run corpus.metadata.metadata.py
     '''
-    for domain in ('core', 'local', 'virtual'):
-        if _METADATA_BUNDLES[domain] is None:
-            _METADATA_BUNDLES[domain] = metadata.MetadataBundle(domain)
-            _METADATA_BUNDLES[domain].read()
-            _METADATA_BUNDLES[domain].validate()
+    corpora.CoreCorpus().updateMetadataBundle()
+    corpora.LocalCorpus().updateMetadataBundle()
+    corpora.VirtualCorpus().updateMetadataBundle()
 
 
 def cacheMetadata(domainList=('local')):
@@ -421,7 +383,7 @@ def cacheMetadata(domainList=('local')):
         domainList = [domainList]
     for domain in domainList:
         # remove any cached values
-        _METADATA_BUNDLES[domain] = None
+        corpora.Corpus._metadataBundles[domain] = None
     metadata.cacheMetadata(domainList)
 
 
@@ -443,17 +405,12 @@ def search(
     performance penalty during metadata loading.
     '''
     searchResults = []
-    _updateMetadataBundle()
-    if 'core' in domain:
-        searchResults += _METADATA_BUNDLES['core'].search(
-            query, field, fileExtensions)
-    if 'virtual' in domain:
-        searchResults += _METADATA_BUNDLES['virtual'].search(
-            query, field, fileExtensions)
-    if 'local' in domain:
-        searchResults += _METADATA_BUNDLES['local'].search(
-            query, field, fileExtensions)
-    return searchResults
+    return corpora.Corpus.search(
+        query,
+        field=field,
+        domain=domain,
+        fileExtensions=fileExtensions,
+        )
 
 
 #------------------------------------------------------------------------------
@@ -563,13 +520,7 @@ def noCorpus():
         False
 
     '''
-    if _NO_CORPUS is None:
-        if getComposerDir('bach') is None:
-            _NO_CORPUS = True
-        else:
-            _NO_CORPUS = False
-    return _NO_CORPUS
-
+    return corpora.CoreCorpus.noCorpus
 
 #------------------------------------------------------------------------------
 
@@ -880,15 +831,18 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
 
     ::
 
+        >>> from music21 import corpus
         >>> import os
         >>> a = corpus.getWork('opus74no2', 4)
-        >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.mxl']))
+        >>> a.endswith(os.path.sep.join([
+        ...     'haydn', 'opus74no2', 'movement4.mxl']))
         True
 
     ::
 
         >>> a = corpus.getWork(['haydn', 'opus74no2', 'movement4.xml'])
-        >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.mxl']))
+        >>> a.endswith(os.path.sep.join([
+        ...     'haydn', 'opus74no2', 'movement4.mxl']))
         True
 
     ::
@@ -904,17 +858,16 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     if len(results) == 0:
         if common.isListLike(workName):
             workName = os.path.sep.join(workName)
-        if workName.endswith(".xml"): # might be compressed MXL file
-            newWorkName = workName[0:len(workName)-4] + ".mxl"
-            return getWork(newWorkName, movementNumber,fileExtensions)
+        if workName.endswith(".xml"):  # might be compressed MXL file
+            newWorkName = workName[0:len(workName) - 4] + ".mxl"
+            return getWork(newWorkName, movementNumber, fileExtensions)
         results = getVirtualWorkList(workName, movementNumber, fileExtensions)
     if len(results) == 1:
         return results[0]
     elif len(results) == 0:
         raise CorpusException(
             'Could not find a file/url that met these criteria')
-    else: # return a list
-        return results
+    return results
 
 
 def parse(

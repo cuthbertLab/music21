@@ -34,8 +34,8 @@ _MOD = 'lily.translate2012.py'
 environLocal = environment.Environment(_MOD)
 
 
-try: 
-    # optional imports for PIL 
+try:
+    # optional imports for PIL
     from PIL import Image
     from PIL import ImageOps
     noPIL = False
@@ -63,8 +63,8 @@ def makeLettersOnlyId(inputString):
     '''
     Takes an id and makes it purely letters by substituting
     letters for all other characters.
-    
-    
+
+
     >>> print lily.translate.makeLettersOnlyId('rainbow123@@dfas')
     rainbowxyzmmdfas
     '''
@@ -85,12 +85,12 @@ class LilypondConverter(object):
     '''.lstrip()
     colorDef = \
     r'''
-    color = #(define-music-function (parser location color) (string?) #{ 
-        \once \override NoteHead #'color = #(x11-color $color) 
+    color = #(define-music-function (parser location color) (string?) #{
+        \once \override NoteHead #'color = #(x11-color $color)
         \once \override Stem #'color = #(x11-color $color)
         \once \override Rest #'color = #(x11-color $color)
         \once \override Beam #'color = #(x11-color $color)
-     #})    
+     #})
     '''.lstrip()
     simplePaperDefinitionScm  = r'''
     \paper { #(define dump-extents #t)
@@ -112,7 +112,7 @@ class LilypondConverter(object):
     bookHeader = r'''
     \include "lilypond-book-preamble.ly"
     '''.lstrip()
- 
+
     accidentalConvert = {"double-sharp": u"isis",
                          "double-flat": u"eses",
                          "one-and-a-half-sharp": u"isih",
@@ -122,7 +122,7 @@ class LilypondConverter(object):
                          "half-sharp": u"ih",
                          "half-flat": u"eh",
                          }
-    
+
     barlineDict = {'regular': '|',
                    'dotted': ':',
                    'dashed': 'dashed',
@@ -138,7 +138,7 @@ class LilypondConverter(object):
                    #'short': '', # no lilypond support??
                    'none': '',
                    }
-    
+
     def __init__(self):
         self.topLevelObject = lyo.LyLilypondTop()
         self.setupTools()
@@ -169,9 +169,9 @@ class LilypondConverter(object):
         self.versionString = self.topLevelObject.backslash + "version " + self.topLevelObject.quoteString(str(self.majorVersion) + '.' + str(self.minorVersion))
         self.versionScheme = lyo.LyEmbeddedScm(self.versionString)
         self.headerScheme  = lyo.LyEmbeddedScm(self.bookHeader)
-        
+
         self.backend  = 'ps'
-        
+
         if self.majorVersion >= 2:
             if self.minorVersion >= 11:
                 self.backendString = '-dbackend='
@@ -180,12 +180,12 @@ class LilypondConverter(object):
         else:
             self.backendString = '--backend='
         # I had a note that said 2.12 and > should use 'self.backendString = '--formats=' ' but doesn't seem true
-        
-    
+
+
     def newContext(self, newContext):
         self.storedContexts.append(self.context)
         self.context = newContext
-        
+
     def restoreContext(self):
         try:
             self.context = self.storedContexts.pop()
@@ -193,25 +193,25 @@ class LilypondConverter(object):
             self.context = self.topLevelObject
 
 
-    #------------ Set a complete Lilypond Tree from a music21 object ----------#     
+    #------------ Set a complete Lilypond Tree from a music21 object ----------#
     def textFromMusic21Object(self, m21ObjectIn):
         r'''
         get a proper lilypond text file for writing from a music21 object
 
-        
+
         >>> n = note.Note()
         >>> print lily.translate.LilypondConverter().textFromMusic21Object(n)
-        \version "2.13" 
+        \version "2.13"
         \include "lilypond-book-preamble.ly"
-        color = #(define-music-function (parser location color) (string?) #{ 
-                \once \override NoteHead #'color = #(x11-color $color) 
+        color = #(define-music-function (parser location color) (string?) #{
+                \once \override NoteHead #'color = #(x11-color $color)
                 \once \override Stem #'color = #(x11-color $color)
                 \once \override Rest #'color = #(x11-color $color)
                 \once \override Beam #'color = #(x11-color $color)
              #})
-        \header { } 
+        \header { }
         \score  {
-              << \new Staff  = ... { c' 4  
+              << \new Staff  = ... { c' 4
                       }
                 >>
           }
@@ -222,12 +222,12 @@ class LilypondConverter(object):
         s = str(self.topLevelObject)
         s = re.sub(r'\s*\n\s*\n', '\n', s).strip()
         return s
-    
+
     def loadFromMusic21Object(self, m21ObjectIn):
         r'''
         Create a Lilypond object hierarchy in self.topLevelObject from an
         arbitrary music21 object.
-        
+
         TODO: Add tests...
         TODO: Add test for TinyNotationStream...
         '''
@@ -238,7 +238,7 @@ class LilypondConverter(object):
                 ## has variants so we need to make a deepcopy...
                 m21ObjectIn = variant.makeAllVariantsReplacements(m21ObjectIn, recurse = True)
                 m21ObjectIn.makeVariantBlocks()
-        
+
         if ('Stream' not in c) or ('Measure' in c) or ('Voice' in c):
             scoreObj = stream.Score()
             partObj = stream.Part()
@@ -259,23 +259,23 @@ class LilypondConverter(object):
             scoreObj.insert(0, m21ObjectIn)
             self.loadObjectFromScore(scoreObj, makeNotation = False)
             #raise LilyTranslateException("Unknown stream type %s." % (m21ObjectIn.__class__))
-            
-    
+
+
     def loadObjectFromOpus(self, opusIn = None, makeNotation = True):
         r'''
         creates a filled topLevelObject (lily.lilyObjects.LyLilypondTop)
         whose string representation accurately reflects all the Score objects
         in this Opus object.
 
-        
+
         >>> #_DOCS_SHOW fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
         >>> #_DOCS_SHOW lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW lpc.loadObjectFromOpus(fifeOpus, makeNotation = False)
         >>> #_DOCS_SHOW lpc.showPDF()
         '''
         contents = []
-        lpVersionScheme = self.versionScheme        
-        lpHeaderScheme = self.headerScheme        
+        lpVersionScheme = self.versionScheme
+        lpHeaderScheme = self.headerScheme
         lpColorScheme = lyo.LyEmbeddedScm(self.colorDef)
         contents.append(lpVersionScheme)
         contents.append(lpHeaderScheme)
@@ -284,7 +284,7 @@ class LilypondConverter(object):
         for thisScore in opusIn.scores:
             if makeNotation is True:
                 thisScore = thisScore.makeNotation(inPlace = False)
-        
+
             lpHeader = lyo.LyLilypondHeader()
             lpScoreBlock = self.lyScoreBlockFromScore(thisScore)
             if thisScore.metadata is not None:
@@ -292,7 +292,7 @@ class LilypondConverter(object):
 
             contents.append(lpHeader)
             contents.append(lpScoreBlock)
-        
+
         lpOutputDefHead = lyo.LyOutputDefHead(defType = 'paper')
         lpOutputDefBody = lyo.LyOutputDefBody(outputDefHead = lpOutputDefHead)
         lpOutputDef = lyo.LyOutputDef(outputDefBody = lpOutputDefBody)
@@ -301,17 +301,17 @@ class LilypondConverter(object):
         lpLayout = lyo.LyLayout()
 
         contents.append(lpLayout)
-        
+
         self.context.contents = contents
 
-    
+
     def loadObjectFromScore(self, scoreIn = None, makeNotation = True):
         r'''
-        
+
         creates a filled topLevelObject (lily.lilyObjects.LyLilypondTop)
         whose string representation accurately reflects this Score object.
-        
-        
+
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
         >>> b = lily.translate._getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
@@ -320,21 +320,21 @@ class LilypondConverter(object):
         '''
         if makeNotation is True:
             scoreIn = scoreIn.makeNotation(inPlace = False)
-        
-        lpVersionScheme = self.versionScheme        
+
+        lpVersionScheme = self.versionScheme
         lpHeaderScheme = self.headerScheme
         lpColorScheme = lyo.LyEmbeddedScm(self.colorDef)
         lpHeader = lyo.LyLilypondHeader()
 
         # here's the heavy work...
         lpScoreBlock = self.lyScoreBlockFromScore(scoreIn)
-        
+
         lpOutputDefHead = lyo.LyOutputDefHead(defType = 'paper')
         lpOutputDefBody = lyo.LyOutputDefBody(outputDefHead = lpOutputDefHead)
         lpOutputDef = lyo.LyOutputDef(outputDefBody = lpOutputDefBody)
         lpLayout = lyo.LyLayout()
         contents = [lpVersionScheme, lpHeaderScheme, lpColorScheme, lpHeader, lpScoreBlock, lpOutputDef, lpLayout]
-        
+
         if scoreIn.metadata is not None:
             self.setHeaderFromMetadata(scoreIn.metadata, lpHeader = lpHeader)
 
@@ -343,7 +343,7 @@ class LilypondConverter(object):
 
     #------- return Lily objects or append to the current context -----------#
     def lyScoreBlockFromScore(self, scoreIn):
-        
+
         lpCompositeMusic = lyo.LyCompositeMusic()
         self.newContext(lpCompositeMusic)
 
@@ -360,12 +360,12 @@ class LilypondConverter(object):
             # treat as a part...
             lpPrefixCompositeMusic = self.lyPrefixCompositeMusicFromStream(scoreIn)
             lpCompositeMusic.prefixCompositeMusic = lpPrefixCompositeMusic
-        
+
         lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
         lpScoreBody = lyo.LyScoreBody(music = lpMusic)
         lpScoreBlock = lyo.LyScoreBlock(scoreBody = lpScoreBody)
         self.restoreContext()
-        
+
         return lpScoreBlock
 
     def lyPartsAndOssiaInitFromScore(self, scoreIn):
@@ -373,12 +373,12 @@ class LilypondConverter(object):
         Takes in a score and returns a block that starts each part context and variant context
         with an identifier and {\stopStaff s1*n} (or s, whatever is needed for the duration)
         where n is the number of measures in the score.
-        
-        
+
+
         >>> import copy
-        
+
         Set up score:
-        
+
         >>> s = stream.Score()
         >>> p1,p2 = stream.Part(), stream.Part()
         >>> p1.insert(0, meter.TimeSignature('4/4'))
@@ -392,18 +392,18 @@ class LilypondConverter(object):
         ...    n = note.WholeNote('D4')
         ...    m.append(n)
         ...    p1.append(m)
-        ...    p2.append(copy.deepcopy(m)) 
+        ...    p2.append(copy.deepcopy(m))
         >>> p1.id = 'pa'
         >>> p2.id = 'pb'
         >>> s.append(p1)
         >>> s.append(p2)
-        
+
         Run method
-        
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> print lpc.lyPartsAndOssiaInitFromScore(s)
-        \new Staff  = pa { \stopStaff s1 s1 s1 s1 } 
-        \new Staff  = londonpa 
+        \new Staff  = pa { \stopStaff s1 s1 s1 s1 }
+        \new Staff  = londonpa
                     \with {
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pa"
@@ -416,8 +416,8 @@ class LilypondConverter(object):
                           \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
-                 { \stopStaff s1 s1 s1 s1 } 
-        \new Staff  = romepa 
+                 { \stopStaff s1 s1 s1 s1 }
+        \new Staff  = romepa
                     \with {
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pa"
@@ -430,9 +430,9 @@ class LilypondConverter(object):
                           \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
-                 { \stopStaff s1 s1 s1 s1 } 
-        \new Staff  = pb { \stopStaff s1 s1 s1 s1 } 
-        \new Staff  = londonpb 
+                 { \stopStaff s1 s1 s1 s1 }
+        \new Staff  = pb { \stopStaff s1 s1 s1 s1 }
+        \new Staff  = londonpb
                     \with {
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pb"
@@ -445,8 +445,8 @@ class LilypondConverter(object):
                           \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
-                 { \stopStaff s1 s1 s1 s1 } 
-        \new Staff  = romepb 
+                 { \stopStaff s1 s1 s1 s1 }
+        \new Staff  = romepb
                     \with {
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pb"
@@ -459,7 +459,7 @@ class LilypondConverter(object):
                           \override OctavateEight #'transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
-                 { \stopStaff s1 s1 s1 s1 } 
+                 { \stopStaff s1 s1 s1 s1 }
         '''
         lpMusicList = lyo.LyMusicList()
 
@@ -474,8 +474,8 @@ class LilypondConverter(object):
                                                             optionalId = partId,
                                                             simpleString = 'Staff',
                                                             music = lpMusic % spacerDuration)
-            musicList.append(lpPrefixCompositeMusicPart)  
-            
+            musicList.append(lpPrefixCompositeMusicPart)
+
             variantsAddedForPart = []
             for v in p.variants:
                 variantName = v.groups[0]
@@ -499,20 +499,20 @@ class LilypondConverter(object):
                                       r"\override OctavateEight #'transparent = ##t",
                                       r'\consists "Default_bar_line_engraver"',
                                       ]
-                    optionalContextMod = lyo.LyContextModification(contextModList)                    
-                    lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod 
+                    optionalContextMod = lyo.LyContextModification(contextModList)
+                    lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
                     musicList.append(lpPrefixCompositeMusicVariant)
 
         lpMusicList.contents = musicList
 
         return lpMusicList
 
-    
+
     def getLySpacersFromStream(self, streamIn, measuresOnly = True):
         '''
         Creates a series of Spacer objects for the measures in a Stream Part.
-              
-        
+
+
         >>> m1 = stream.Measure(converter.parse("a2.", "3/4"))
         >>> m2 = stream.Measure(converter.parse("b2.", "3/4"))
         >>> m3 = stream.Measure(converter.parse("a1", "4/4"))
@@ -558,7 +558,7 @@ class LilypondConverter(object):
     def lyGroupedMusicListFromScoreWithParts(self, scoreIn, scoreInit = None):
         r'''
         More complex example showing how the score can be set up with ossia parts...
-        
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
         >>> b = lily.translate._getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
@@ -566,62 +566,62 @@ class LilypondConverter(object):
         >>> lpGroupedMusicList = lpc.lyGroupedMusicListFromScoreWithParts(b, scoreInit = lpPartsAndOssiaInit)
         >>> print lpGroupedMusicList
         <BLANKLINE>
-         << \new Staff  = Soprano { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
-           \new Staff  = Alto { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
-           \new Staff  = Tenor { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
-           \new Staff  = Bass { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+         << \new Staff  = Soprano { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+           \new Staff  = Alto { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+           \new Staff  = Tenor { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+           \new Staff  = Bass { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
         <BLANKLINE>
           \context Staff  = Soprano \with {
               \autoBeamOff
           }
-          { \startStaff \partial 32*8 
-                \clef "treble" 
-                \key fis \minor 
+          { \startStaff \partial 32*8
+                \clef "treble"
+                \key fis \minor
                 \time 4/4
                 \set stemRightBeamCount = #1
-                \once \override Stem #'direction = #DOWN 
-                cis'' 8 [ 
+                \once \override Stem #'direction = #DOWN
+                cis'' 8 [
                 \set stemLeftBeamCount = #1
-                \once \override Stem #'direction = #DOWN 
+                \once \override Stem #'direction = #DOWN
                 b' 8 ]
-                \bar "|"  %{ end measure 0 %} 
-                \once \override Stem #'direction = #UP 
-                a' 4  
-                \once \override Stem #'direction = #DOWN 
-                b' 4  
-                \once \override Stem #'direction = #DOWN 
-                cis'' 4  \fermata  
-                \once \override Stem #'direction = #DOWN 
-                e'' 4  
-                \bar "|"  %{ end measure 1 %} 
-                \once \override Stem #'direction = #DOWN 
-                cis'' 4  
+                \bar "|"  %{ end measure 0 %}
+                \once \override Stem #'direction = #UP
+                a' 4
+                \once \override Stem #'direction = #DOWN
+                b' 4
+                \once \override Stem #'direction = #DOWN
+                cis'' 4  \fermata
+                \once \override Stem #'direction = #DOWN
+                e'' 4
+                \bar "|"  %{ end measure 1 %}
+                \once \override Stem #'direction = #DOWN
+                cis'' 4
                 ...
-        } 
+        }
         <BLANKLINE>
         <BLANKLINE>
-        \context Staff  = Alto \with  { 
-            \autoBeamOff 
-         } 
-         { \startStaff \partial 32*8 
+        \context Staff  = Alto \with  {
+            \autoBeamOff
+         }
+         { \startStaff \partial 32*8
             \clef "treble"...
-            \once \override Stem #'direction = #UP 
-            e' 4  
-            \bar "|"  %{ end measure 0 %} 
-            \once \override Stem #'direction = #UP 
-            fis' 4  
-            \once \override Stem #'direction = #UP 
-            e' 4  
+            \once \override Stem #'direction = #UP
+            e' 4
+            \bar "|"  %{ end measure 0 %}
+            \once \override Stem #'direction = #UP
+            fis' 4
+            \once \override Stem #'direction = #UP
+            e' 4
         ...
-        } 
+        }
         <BLANKLINE>
         <BLANKLINE>
         >>
         <BLANKLINE>
         '''
-        
+
         compositeMusicList = []
-        
+
         lpGroupedMusicList = lyo.LyGroupedMusicList()
         lpSimultaneousMusic = lyo.LySimultaneousMusic()
         lpMusicList = lyo.LyMusicList()
@@ -629,8 +629,8 @@ class LilypondConverter(object):
         lpGroupedMusicList.simultaneousMusic = lpSimultaneousMusic
 
         self.newContext(lpMusicList)
-        
-        
+
+
         if scoreInit is None:
             for p in scoreIn.parts:
                 compositeMusicList.append(self.lyPrefixCompositeMusicFromStream(p))
@@ -641,15 +641,15 @@ class LilypondConverter(object):
 
         self.restoreContext()
         lpMusicList.contents = compositeMusicList
-        
+
         return lpGroupedMusicList
 
-    
+
     def lyNewLyricsFromStream(self, streamIn, streamId = None, alignment = 'alignBelowContext' ):
         r'''
         returns a LyNewLyrics object
-        
-        This is a little bit of a hack. This should be switched over to using a 
+
+        This is a little bit of a hack. This should be switched over to using a
         prefixed context thing with \new Lyric = "id" \with { } {}
 
         >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r4 e4_world')
@@ -659,17 +659,17 @@ class LilypondConverter(object):
         >>> lpc = lily.translate.LilypondConverter()
         >>> lyNewLyrics = lpc.lyNewLyricsFromStream(s)
         >>> print lyNewLyrics
-        \addlyrics { \set alignBelowContext = #"helloWorld"  
-           "hel" -- 
-           "lo"__ 
-           "world" 
-            } 
+        \addlyrics { \set alignBelowContext = #"helloWorld"
+           "hel" --
+           "lo"__
+           "world"
+            }
         '''
         lyricsDict = streamIn.lyrics(skipTies = True)
-        
+
         if streamId is None:
             streamId = makeLettersOnlyId(streamIn.id)
-        
+
         streamId = "#"+ lyo.LyObject().quoteString(streamId)
 
         lpGroupedMusicLists = []
@@ -686,11 +686,11 @@ class LilypondConverter(object):
             self.inWord = False
 
             lpLyricList = lyo.LyMusicList(lyricList)
-            
+
             lpSequentialMusic = lyo.LySequentialMusic(musicList = lpLyricList)
             lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
             lpGroupedMusicLists.append(lpGroupedMusicList)
-        
+
         lpNewLyrics = lyo.LyNewLyrics(groupedMusicLists = lpGroupedMusicLists)
 
         return lpNewLyrics
@@ -699,10 +699,10 @@ class LilypondConverter(object):
         '''
         Returns a :class:`~music21.lily.lilyObjects.LyLyricElement` object
         from a :class:`~music21.note.Lyric` object.
-        
+
         Uses self.inWord to keep track of whether or not we're in the middle of
         a word.
-        
+
         >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r2 e2 f2_world')
         >>> s.makeMeasures(inPlace = True)
         >>> lyrics = s.lyrics()[1]  # get first verse (yes, 1 = first, not 0!)
@@ -721,12 +721,12 @@ class LilypondConverter(object):
         >>> lpc.inWord
         False
         '''
-        
+
         if hasattr(self, 'inWord'):
             inWord = self.inWord
         else:
             inWord = False
-        
+
         el = m21Lyric
         if el is None and inWord:
             text = ' _ '
@@ -744,7 +744,7 @@ class LilypondConverter(object):
                 inWord = True
             else:
                 text = text
-        
+
         self.inWord = inWord
         lpLyricElement = lyo.LyLyricElement(text)
         return lpLyricElement
@@ -760,23 +760,23 @@ class LilypondConverter(object):
         <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
         >>> print lySequentialMusicOut
         { \time 3/4
-         c 4  
-         d 4  
-         e 4  
-         f 2.  
-        } 
+         c 4
+         d 4
+         e 4
+         f 2.
+        }
         '''
         musicList = []
 
         lpMusicList = lyo.LyMusicList(contents = musicList)
         lpSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList, beforeMatter = beforeMatter)
-        self.newContext(lpMusicList)    
+        self.newContext(lpMusicList)
         self.appendObjectsToContextFromStream(streamIn)
-                    
+
         lyObject = self.closeMeasure()
         if lyObject is not None:
-            musicList.append(lyObject)    
-        
+            musicList.append(lyObject)
+
         self.restoreContext()
         return lpSequentialMusic
 
@@ -787,27 +787,27 @@ class LilypondConverter(object):
 
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> c.staffLines = 4
-        
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> lyPrefixCompositeMusicOut = lpc.lyPrefixCompositeMusicFromStream(c, contextType='Staff')
-        >>> lyPrefixCompositeMusicOut 
+        >>> lyPrefixCompositeMusicOut
         <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
         >>> print lyPrefixCompositeMusicOut
         \new Staff = ... \with {
          \override StaffSymbol #'line-count = #4
         }
         { \time 3/4
-           c 4  
-           d 4  
-           e 4  
-           f 2.  
-          } 
+           c 4
+           d 4
+           e 4
+           f 2.
+          }
         '''
         compositeMusicType = type
-        
+
         optionalId = None
         contextModList = []
-        
+
         c = streamIn.classes
         if contextType is None:
             if 'Part' in c:
@@ -829,7 +829,7 @@ class LilypondConverter(object):
             if streamIn.staffLines % 2 == 0: # even stafflines need a change...
                 pass
 
-        
+
         lpNewLyrics = self.lyNewLyricsFromStream(streamIn, streamId = makeLettersOnlyId(streamIn.id))
 
         lpSequentialMusic = self.lySequentialMusicFromStream(streamIn, beforeMatter = beforeMatter)
@@ -844,12 +844,12 @@ class LilypondConverter(object):
             contextMod = lyo.LyContextModification(contextModList)
         else:
             contextMod = None
-        
+
         lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = compositeMusicType,
                                                             optionalId = optionalId,
                                                             simpleString = newContext,
                                                             optionalContextMod = contextMod,
-                                                            music = lpMusic)    
+                                                            music = lpMusic)
         return lpPrefixCompositeMusic
 
 
@@ -858,10 +858,10 @@ class LilypondConverter(object):
         takes a Stream and appends all the elements in it to the current
         context's .contents list, and deals with creating Voices in it. It also deals with
         variants in it.
-        
+
         (should eventually replace the main Score parts finding tools)
-        
-        
+
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
@@ -873,9 +873,9 @@ class LilypondConverter(object):
         [<music21.lily.lilyObjects.LyEmbeddedScm...>, <music21.lily.lilyObjects.LySimpleMusic...>, <music21.lily.lilyObjects.LySimpleMusic...>, <music21.lily.lilyObjects.LySimpleMusic...]
         >>> print lpc.context
         \time 3/4
-        c' 4  
-        des' 4  
-        eis' 4  
+        c' 4
+        des' 4
+        eis' 4
         <BLANKLINE>
 
 
@@ -890,12 +890,12 @@ class LilypondConverter(object):
         >>> lpc.context = lpMusicList
         >>> lpc.appendObjectsToContextFromStream(m)
         >>> print lpc.context # internal spaces removed...
-          << \new Voice { c'' 1  
-                  } 
-           \new Voice { cis'' 1  
-                  } 
-            >>        
-        '''        
+          << \new Voice { c'' 1
+                  }
+           \new Voice { cis'' 1
+                  }
+            >>
+        '''
         for groupedElements in streamObject.groupElementsByOffset():
             #print groupedElements
 
@@ -916,7 +916,7 @@ class LilypondConverter(object):
                     else:
                         el.activeSite = streamObject
                         otherList.append(el)
-                
+
                 if len(variantList) > 0:
                     for v in variantList:
                         v.activeSite = streamObject
@@ -934,9 +934,9 @@ class LilypondConverter(object):
                         if voice not in self.doNotOutput:
                             lpPrefixCompositeMusic = self.lyPrefixCompositeMusicFromStream(voice)
                             musicList2.append(lpPrefixCompositeMusic)
-                    
+
                     lp2MusicList.contents = musicList2
-                    
+
                     contextObject = self.context
                     currentMusicList = contextObject.contents
                     currentMusicList.append(lp2GroupedMusicList)
@@ -945,7 +945,7 @@ class LilypondConverter(object):
                 if len(otherList) > 0:
                     for el in otherList:
                         self.appendM21ObjectToContext(el)
-    
+
 
     def appendM21ObjectToContext(self, thisObject):
         '''
@@ -954,7 +954,7 @@ class LilypondConverter(object):
         '''
         if thisObject in self.doNotOutput:
             return
-        
+
         ### treat complex duration objects as multiple objects
         c = thisObject.classes
 
@@ -970,13 +970,13 @@ class LilypondConverter(object):
             currentMusicList = contextObject.contents
         else:
             raise LilyTranslateException("Cannot get a currentMusicList from contextObject %r" % contextObject)
-            
-        
+
+
         if hasattr(thisObject, 'startTransparency') and thisObject.startTransparency is True:
             # old hack, replace with the better "hidden" attribute
             lyScheme = lyo.LyEmbeddedScm(self.transparencyStartScheme)
             currentMusicList.append(lyScheme)
-            
+
         lyObject = None
         if "Measure" in c:
             ## lilypond does not put groups around measures...
@@ -993,7 +993,7 @@ class LilypondConverter(object):
                 padObj.setParent(contextObject)
 
             ## here we go!
-            self.appendObjectsToContextFromStream(thisObject)            
+            self.appendObjectsToContextFromStream(thisObject)
             self.currentMeasure = thisObject
 
         elif "Stream" in c:
@@ -1037,22 +1037,22 @@ class LilypondConverter(object):
         if hasattr(thisObject, 'stopTransparency') and thisObject.stopTransparency is True:
             # old hack, replace with the better "hidden" attribute
             lyScheme = lyo.LyEmbeddedScm(self.transparencyStopScheme)
-            currentMusicList.append(lyScheme)        
+            currentMusicList.append(lyScheme)
 
 
     def appendContextFromNoteOrRest(self, noteOrRest):
         r'''
         appends lySimpleMusicFromNoteOrRest to the
         current context.
-        
-        
+
+
         >>> n = note.Note("C#4")
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
-        >>> lpc.context = lpMusicList 
+        >>> lpc.context = lpMusicList
         >>> lpc.appendContextFromNoteOrRest(n)
         >>> print lpMusicList
-        cis' 4  
+        cis' 4
         <BLANKLINE>
 
 
@@ -1064,22 +1064,22 @@ class LilypondConverter(object):
         >>> n4 = note.Note("F4")
         >>> n4.duration.quarterLength = 0.3333333333333
         >>> n4.duration.tuplets[0].type = 'stop'
-        
+
         >>> n5 = note.Note("F#4")
-        
+
         >>> lpc.appendContextFromNoteOrRest(n2)
         >>> lpc.appendContextFromNoteOrRest(n3)
         >>> lpc.appendContextFromNoteOrRest(n4)
-        >>> lpc.appendContextFromNoteOrRest(n5)        
-        
+        >>> lpc.appendContextFromNoteOrRest(n5)
+
         >>> print lpc.context
-        cis' 4  
-        \times 2/3 { dis' 8  
-           e' 8  
-           f' 8  
-            } 
+        cis' 4
+        \times 2/3 { dis' 8
+           e' 8
+           f' 8
+            }
         <BLANKLINE>
-        fis' 4  
+        fis' 4
         <BLANKLINE>
 
         '''
@@ -1093,36 +1093,36 @@ class LilypondConverter(object):
 
         self.setContextForTupletStart(noteOrRest)
         self.appendBeamCode(noteOrRest)
-        self.appendStemCode(noteOrRest)        
+        self.appendStemCode(noteOrRest)
 
         lpSimpleMusic = self.lySimpleMusicFromNoteOrRest(noteOrRest)
         self.context.contents.append(lpSimpleMusic)
         lpSimpleMusic.setParent(self.context)
         self.setContextForTupletStop(noteOrRest)
 
-    
+
     def lySimpleMusicFromNoteOrRest(self, noteOrRest):
         r'''
         returns a lilyObjects.LySimpleMusic object for the generalNote containing...
-        
+
             LyEventChord   containing
             LySimpleChordElements containing
             LySimpleElement containing
             LyPitch  AND
             LyMultipliedDuration containing:
-            
+
                 LyMultipliedDuration containing
                 LyStenoDuration
-        
-        does not check for tuplets.  That's in 
+
+        does not check for tuplets.  That's in
         appendContextFromNoteOrRest
-        
+
         read-only property that returns a string of the lilypond representation of
         a note (or via subclassing, rest or chord)
-        
+
         ::
             >>> conv = lily.translate.LilypondConverter()
-    
+
             >>> n0 = note.Note("D#5")
             >>> n0.pitch.accidental.displayType = 'always'
             >>> n0.pitch.accidental.displayStyle = 'parentheses'
@@ -1132,7 +1132,7 @@ class LilypondConverter(object):
             \color "blue" dis'' ! ? 4
 
         Now make the note disappear...
-        
+
         ::
             >>> n0.hideObjectOnPrint = True
             >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
@@ -1146,7 +1146,7 @@ class LilypondConverter(object):
         if noteOrRest.editorial is not None:
             if noteOrRest.editorial.color and noteOrRest.hideObjectOnPrint is not True:
                 simpleElementParts.append(noteOrRest.editorial.colorLilyStart())
-        
+
         if 'Note' in c:
             if noteOrRest.hideObjectOnPrint is not True:
                 lpPitch = self.lyPitchFromPitch(noteOrRest.pitch)
@@ -1158,7 +1158,7 @@ class LilypondConverter(object):
                         simpleElementParts.append('? ')
             else:
                 simpleElementParts.append("s ")
-        
+
         elif "SpacerRest" in c:
             simpleElementParts.append("s ")
         elif 'Rest' in c:
@@ -1175,21 +1175,21 @@ class LilypondConverter(object):
                 simpleElementParts.append("[ ")
             elif noteOrRest.beams.beamsList[0].type == 'stop':
                 simpleElementParts.append("] ")  # no start-stop in music21...
-        
+
         simpleElement = lyo.LySimpleElement(parts = simpleElementParts)
 
         postEvents = self.postEventsFromObject(noteOrRest)
-        
+
         evc = lyo.LyEventChord(simpleElement, postEvents = postEvents)
         mlSM = lyo.LySimpleMusic(eventChord = evc)
-        
+
         return mlSM
 
     def appendBeamCode(self, noteOrChord):
         r'''
         Adds an LyEmbeddedScm object to the context's contents if the object's has a .beams
         attribute.
-        
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
@@ -1251,8 +1251,8 @@ class LilypondConverter(object):
         r'''
         Adds an LyEmbeddedScm object to the context's contents if the object's stem direction
         is set (currrently, only "up" and "down" are supported).
-        
-        
+
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
@@ -1277,26 +1277,26 @@ class LilypondConverter(object):
 
     def lySimpleMusicFromChord(self, chordObj):
         '''
-        
-        
+
+
         >>> conv = lily.translate.LilypondConverter()
         >>> c1 = chord.Chord(["C#2", "E4", "D#5"])
         >>> c1.quarterLength = 3.5
         >>> c1.pitches[2].accidental.displayType = 'always'
         >>> print conv.lySimpleMusicFromChord(c1)
-         < cis, e' dis''  !  > 2.. 
-         
+         < cis, e' dis''  !  > 2..
+
         test hidden chord:
-        
+
         >>> c1.hideObjectOnPrint = True
         >>> print conv.lySimpleMusicFromChord(c1)
         s 2..
         '''
         self.appendBeamCode(chordObj)
         if chordObj.hideObjectOnPrint is not True:
-        
+
             self.appendStemCode(chordObj)
-    
+
             chordBodyElements = []
             for p in chordObj.pitches:
                 chordBodyElementParts = []
@@ -1312,7 +1312,7 @@ class LilypondConverter(object):
             lpChordBody = lyo.LyChordBody(chordBodyElements = chordBodyElements)
         else:
             lpChordBody = lyo.LyPitch('s ', '')
-        
+
         lpMultipliedDuration = self.lyMultipliedDurationFromDuration(chordObj.duration)
 
         postEvents = self.postEventsFromObject(chordObj)
@@ -1324,19 +1324,19 @@ class LilypondConverter(object):
         mlSM = lyo.LySimpleMusic(eventChord = evc)
         return mlSM
         # TODO: Chord beaming...
-        
+
     def postEventsFromObject(self, generalNote):
         '''
         attaches events that apply to notes and chords (and some other things) equally
         '''
-        
+
         postEvents = []
 
-        # remove this hack once lyrics work 
+        # remove this hack once lyrics work
         #if generalNote.lyric is not None: # hack that uses markup...
         #    postEvents.append(r'_\markup { "' + generalNote.lyric + '" }\n ')
         # consider this hack removed. Yeah!
-        
+
         if (hasattr(generalNote, 'tie') and generalNote.tie is not None):
             if (generalNote.tie.type != "stop"):
                 postEvents.append("~ ")
@@ -1345,7 +1345,7 @@ class LilypondConverter(object):
         if (hasattr(generalNote, 'expressions') and generalNote.expressions):
             for thisExpression in generalNote.expressions:
                 if 'Fermata' in thisExpression.classes:
-                    postEvents.append(r'\fermata ')        
+                    postEvents.append(r'\fermata ')
         return postEvents
 
     def lyPitchFromPitch(self, pitch):
@@ -1353,7 +1353,7 @@ class LilypondConverter(object):
         converts a music21.pitch.Pitch object to a lily.lilyObjects.LyPitch
         object.
         '''
-        
+
         baseName = self.baseNameFromPitch(pitch)
         octaveModChars = self.octaveCharactersFromPitch(pitch)
         lyPitch = lyo.LyPitch(baseName, octaveModChars)
@@ -1364,20 +1364,20 @@ class LilypondConverter(object):
         returns a string of the base name (including accidental)
         for a music21 pitch
         '''
-        
+
         baseName = pitch.step.lower()
         if pitch.accidental is not None:
             if pitch.accidental.name in self.accidentalConvert:
                 baseName += self.accidentalConvert[pitch.accidental.name]
         return baseName
-        
-    
+
+
     def octaveCharactersFromPitch(self, pitch):
         '''
         returns a string of single-quotes or commas or "" representing
         the octave of a :class:`~music21.pitch.Pitch` object
         '''
-        
+
         spio = pitch.implicitOctave
         if (spio < 3):
             correctedOctave = 3 - spio
@@ -1385,43 +1385,43 @@ class LilypondConverter(object):
         else:
             correctedOctave = spio - 3
             octaveModChars  = u'\'' * correctedOctave # C4 = c', C5 = c''  etc.
-        return octaveModChars        
+        return octaveModChars
 
-    def lyMultipliedDurationFromDuration(self, durationObj):        
+    def lyMultipliedDurationFromDuration(self, durationObj):
         r'''
         take a simple Duration (that is one with one DurationUnit
         object and return a LyMultipliedDuration object:
-        
-        
+
+
         >>> d = duration.Duration(3)
         >>> lpc = lily.translate.LilypondConverter()
         >>> lyMultipliedDuration = lpc.lyMultipliedDurationFromDuration(d)
         >>> str(lyMultipliedDuration)
         '2. '
-        
+
         >>> str(lpc.lyMultipliedDurationFromDuration(duration.Duration(8.0)))
         '\\breve '
-        
+
         Does not work with complex durations:
-        
+
         >>> d = duration.Duration(5.0)
         >>> str(lpc.lyMultipliedDurationFromDuration(d))
         Traceback (most recent call last):
         LilyTranslateException: DurationException for durationObject <music21.duration.Duration 5.0>: Could not determine durationNumber from None
 
         Instead split by components:
-        
+
         >>> components = d.components
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
-        
-        
+
+
         try:
             number_type = duration.convertTypeToNumber(durationObj.type) # module call
         except duration.DurationException as de:
             raise LilyTranslateException("DurationException for durationObject %s: %s" % (durationObj, de))
-        
+
         if number_type < 1:
             if number_type == 0.5:
                 number_type = r'\breve'
@@ -1430,28 +1430,28 @@ class LilypondConverter(object):
             else:
                 # no support for maxima...
                 number_type = int(number_type * 16)
-        
+
         try:
             stenoDuration = lyo.LyStenoDuration(number_type, int(durationObj.dots))
             multipliedDuration = lyo.LyMultipliedDuration(stenoDuration)
         except duration.DurationException as de:
             raise LilyTranslateException("DurationException: Cannot translate durationObject %s: %s" % (durationObj, de))
         return multipliedDuration
-    
+
     def lyEmbeddedScmFromClef(self, clefObj):
         r'''
         converts a Clef object to a
         lilyObjects.LyEmbeddedScm object
-        
-        
+
+
         >>> tc = clef.TrebleClef()
         >>> conv = lily.translate.LilypondConverter()
         >>> lpEmbeddedScm = conv.lyEmbeddedScmFromClef(tc)
-        >>> print lpEmbeddedScm 
-        \clef "treble" 
-        
+        >>> print lpEmbeddedScm
+        \clef "treble"
+
         '''
-        
+
         c = clefObj.classes
         if 'Treble8vbClef' in c:
             lilyName = 'treble_8'
@@ -1467,8 +1467,8 @@ class LilypondConverter(object):
             lilyName = 'soprano'
         else:
             environLocal.printDebug('got a clef that lilypond does not know what to do with: %s' % clefObj)
-            lilyName = ""        
-        
+            lilyName = ""
+
         lpEmbeddedScm = lyo.LyEmbeddedScm()
         clefScheme = lpEmbeddedScm.backslash + 'clef ' + lpEmbeddedScm.quoteString(lilyName) + lpEmbeddedScm.newlineIndent
         lpEmbeddedScm.content = clefScheme
@@ -1479,20 +1479,20 @@ class LilypondConverter(object):
         converts a Key or KeySignature object
         to a lilyObjects.LyEmbeddedScm object
 
-        
+
         >>> d = key.KeySignature(-1)
         >>> d.mode = 'minor'
         >>> conv = lily.translate.LilypondConverter()
         >>> lpEmbeddedScm = conv.lyEmbeddedScmFromKeySignature(d)
         >>> print lpEmbeddedScm
         \key d \minor
-        
+
         Major is assumed:
-        
+
         >>> fsharp = key.KeySignature(6)
         >>> print conv.lyEmbeddedScmFromKeySignature(fsharp)
         \key fis \major
-        
+
         '''
         (p, m) = keyObj.pitchAndMode
         if m is None:
@@ -1506,10 +1506,10 @@ class LilypondConverter(object):
 
     def lyEmbeddedScmFromTimeSignature(self, ts):
         r'''
-        convert a :class:`~music21.meter.TimeSignature` object 
+        convert a :class:`~music21.meter.TimeSignature` object
         to a lilyObjects.LyEmbeddedScm object
 
-        
+
         >>> ts = meter.TimeSignature('3/4')
         >>> conv = lily.translate.LilypondConverter()
         >>> print conv.lyEmbeddedScmFromTimeSignature(ts)
@@ -1525,23 +1525,23 @@ class LilypondConverter(object):
         '''
         if the inObj has tuplets then we set a new context
         for the tuplets and anything up till a tuplet stop.
-        
+
         Note that a broken tuplet (a la Michael Gordon)
         will not work.
-        
+
         If there are no tuplets, this routine does
         nothing.  If there are tuplets and they have type start then
         it returns an lpMusicList object, which is the new context
-        
+
         For now, no nested tuplets.  They're an
         easy extension, but there's too much
-        else missing to do it now...        
+        else missing to do it now...
         '''
         if inObj.duration.tuplets is None or len(inObj.duration.tuplets) == 0:
             return None
         elif inObj.duration.tuplets[0].type == 'start':
             numerator = str(int(inObj.duration.tuplets[0].tupletNormal[0]))
-            denominator = str(int(inObj.duration.tuplets[0].tupletActual[0]))            
+            denominator = str(int(inObj.duration.tuplets[0].tupletActual[0]))
             lpMusicList = self.setContextForTimeFraction(numerator, denominator)
             return lpMusicList
         else:
@@ -1551,12 +1551,12 @@ class LilypondConverter(object):
         '''
         Explicitly starts a new context for scaled music (tuplets, etc.)
         for the given numerator and denominator (either an int or a string or unicode)
-        
+
         Returns an lpMusicList object contained in an lpSequentialMusic object
         in an lpPrefixCompositeMusic object which sets the times object to a particular
         fraction.
-        
-        
+
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpc.context
         <music21.lily.lilyObjects.LyLilypondTop object at 0x...>
@@ -1588,13 +1588,13 @@ class LilypondConverter(object):
         #lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
         #lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList)
         #lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
-        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='times', 
+        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='times',
                                                             fraction = fraction,
                                                             music = lpSequentialMusic)
         currentContents = self.context.contents
         if currentContents is None:
             raise LilyTranslateException("Cannot find contents for self.context: %r " % self.context)
-        
+
         currentContents.append(lpPrefixCompositeMusic)
         lpPrefixCompositeMusic.setParent(self.context)
         self.newContext(lpMusicList)
@@ -1615,7 +1615,7 @@ class LilypondConverter(object):
         '''
         '''
         musicList = []
-        
+
         if isinstance(variantObjectOrList, variant.Variant):
             variantObject = variantObjectOrList
             replacedElements = variantObject.replacedElements(activeSite)
@@ -1623,7 +1623,7 @@ class LilypondConverter(object):
             lpSequentialMusicStandard = self.lySequentialMusicFromStream(replacedElements)
             musicList.append(lpPrefixCompositeMusicVariant)
             musicList.append(lpSequentialMusicStandard)
-        
+
         elif type(variantObjectOrList) is list:
             longestReplacementLength = -1
             variantDict = {}
@@ -1636,7 +1636,7 @@ class LilypondConverter(object):
                     variantDict[variantName].append(variantObject)
                 else:
                     variantDict[variantName] = [variantObject]
-            
+
 
             for key in variantDict:
                 variantList = variantDict[key]
@@ -1648,34 +1648,34 @@ class LilypondConverter(object):
                 else:
                     lpPrefixCompositeMusicVariant, replacedElements = self.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite, coloredVariants = coloredVariants)
                     musicList.append(lpPrefixCompositeMusicVariant)
-                
+
                 if longestReplacementLength < replacedElements.duration.quarterLength:
                     longestReplacementLength = replacedElements.duration.quarterLength
                     longestReplacedElements = replacedElements
-                
+
             lpSequentialMusicStandard = self.lySequentialMusicFromStream(longestReplacedElements)
-            
+
             musicList.append(lpSequentialMusicStandard)
             for el in longestReplacedElements:
                 self.doNotOutput.append(el)
-        
+
         lp2MusicList = lyo.LyMusicList()
         lp2MusicList.contents = musicList
         lp2SimultaneousMusic = lyo.LySimultaneousMusic()
         lp2SimultaneousMusic.musicList = lp2MusicList
         lp2GroupedMusicList = lyo.LyGroupedMusicList()
         lp2GroupedMusicList.simultaneousMusic = lp2SimultaneousMusic
-        
+
         contextObject = self.context
         currentMusicList = contextObject.contents
         currentMusicList.append(lp2GroupedMusicList)
         lp2GroupedMusicList.setParent(self.context)
 
-    
+
     def lyPrefixCompositeMusicFromRelatedVariants(self, variantList, activeSite = None, coloredVariants = False):
         r'''
 
-        
+
         >>> s1 = converter.parse("a4 a a a  a1", "4/4")
         >>> s2 = converter.parse("b4 b b b", "4/4")
         >>> s3 = converter.parse("c4 c c c", "4/4")
@@ -1706,7 +1706,7 @@ class LilypondConverter(object):
         >>> v3.replacementDuration = 4.0
         >>> v3.append(sp3)
         >>> for el in s3:
-        ...     v3.append(el) 
+        ...     v3.append(el)
 
         >>> v4 = variant.Variant()
         >>> sp4 = note.SpacerRest()
@@ -1725,50 +1725,50 @@ class LilypondConverter(object):
         >>> lpc = lily.translate.LilypondConverter()
 
         >>> print lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0]
-        \new Staff  = london... { { \times 1/2 {\startStaff \clef "treble" 
-              \clef "treble" 
-              a' 4  
-              a' 4  
-              a' 4  
-              a' 4  
-              | %{ end measure 1 %} 
-              a' 1  
-              | %{ end measure 2 %} 
+        \new Staff  = london... { { \times 1/2 {\startStaff \clef "treble"
+              \clef "treble"
+              a' 4
+              a' 4
+              a' 4
+              a' 4
+              | %{ end measure 1 %}
+              a' 1
+              | %{ end measure 2 %}
                \stopStaff}
-               } 
+               }
         <BLANKLINE>
-          {\startStaff \clef "treble" 
-            b' 4  
-            b' 4  
-            b' 4  
-            b' 4  
-            | %{ end measure 1 %} 
+          {\startStaff \clef "treble"
+            b' 4
+            b' 4
+            b' 4
+            b' 4
+            | %{ end measure 1 %}
              \stopStaff}
         <BLANKLINE>
-          {\startStaff \clef "treble" 
-            c' 4  
-            c' 4  
-            c' 4  
-            c' 4  
-            | %{ end measure 1 %} 
+          {\startStaff \clef "treble"
+            c' 4
+            c' 4
+            c' 4
+            c' 4
+            | %{ end measure 1 %}
              \stopStaff}
         <BLANKLINE>
-          s 1  
-          {\startStaff \clef "treble" 
-            d' 4  
-            d' 4  
-            d' 4  
-            d' 4  
-            | %{ end measure 1 %} 
+          s 1
+          {\startStaff \clef "treble"
+            d' 4
+            d' 4
+            d' 4
+            d' 4
+            | %{ end measure 1 %}
              \stopStaff}
         <BLANKLINE>
-           } 
+           }
         <BLANKLINE>
 
         '''
-        
+
         # Order List
-        
+
         def findOffsetOfFirstNonSpacerElement(inputStream):
             for el in inputStream:
                 if "SpacerRest" in el.classes:
@@ -1778,7 +1778,7 @@ class LilypondConverter(object):
 
         variantList.sort(key = lambda v: findOffsetOfFirstNonSpacerElement(v._stream))
 
-        
+
         # Stuff that can be done on the first element only (clef, new/old, id, color)
         replacedElements = variantList[0].replacedElements(activeSite)
         replacedElementsClef = replacedElements[0].getContextByClass('Clef')
@@ -1801,13 +1801,13 @@ class LilypondConverter(object):
         if coloredVariants is True:
             color = self.variantColors[self.addedVariants.index(variantName) % 6]
 
-        
+
 
         #######################
 
         musicList = []
         highestOffsetSoFar = 0.0
-        
+
         self.variantMode = True
 
         for v in variantList:
@@ -1851,7 +1851,7 @@ class LilypondConverter(object):
                 numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
                 fraction = str(numerator) + '/' + str(denominator)
                 lpOssiaMusicVariantPreFraction = self.lyOssiaMusicFromVariant(vStripped)
-                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
+                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times',
                                                             fraction = fraction,
                                                             music = lpOssiaMusicVariantPreFraction)
 
@@ -1884,7 +1884,7 @@ class LilypondConverter(object):
                                                             optionalId = variantId,
                                                             simpleString = "Staff",
                                                             music = lpInternalSequentialMusic)
-                
+
 
         #optionalContextMod = r'''
         #\with {
@@ -1896,7 +1896,7 @@ class LilypondConverter(object):
         #      \override TupletBracket #'bracket-visibility = ##f
         #      \override TupletNumber #'stencil = ##f
         #      \override Clef #'transparent = ##t
-        #    } 
+        #    }
         #    ''' % containerId #\override BarLine #'transparent = ##t is the best way of fixing #the barlines that I have come up with.
 #
         #lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
@@ -1908,8 +1908,8 @@ class LilypondConverter(object):
 
     def lyPrefixCompositeMusicFromVariant(self, variantObject, replacedElements, coloredVariants = False):
         r'''
-        
-        
+
+
         >>> pstream = converter.parse("a4 b c d   e4 f g a", "4/4")
         >>> pstream.makeMeasures(inPlace = True)
         >>> p = stream.Part(pstream)
@@ -1923,15 +1923,15 @@ class LilypondConverter(object):
         >>> replacedElements = v.replacedElements()
         >>> lpPrefixCompositeMusicVariant = lpc.lyPrefixCompositeMusicFromVariant(v, replacedElements)
         >>> print lpPrefixCompositeMusicVariant
-        \new Staff  = londonpx { {\startStaff \clef "treble" 
-            \clef "treble" 
-            a' 4.  
-            b' 8  
-            c' 4  
-            d' 4  
-            | %{ end measure 1 %} 
+        \new Staff  = londonpx { {\startStaff \clef "treble"
+            \clef "treble"
+            a' 4.
+            b' 8
+            c' 4
+            d' 4
+            | %{ end measure 1 %}
              \stopStaff}
-           } 
+           }
 
         >>> replacedElements.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1944,7 +1944,7 @@ class LilypondConverter(object):
 
         >>> print lpc.addedVariants
         ['london']
-        
+
         '''
         replacedElementsClef = replacedElements[0].getContextByClass('Clef')
 
@@ -1974,7 +1974,7 @@ class LilypondConverter(object):
             for n in variantObject._stream.flat.notesAndRests:
                 n.editorial.color = color
 
-        
+
 
         musicList = []
 
@@ -1993,23 +1993,23 @@ class LilypondConverter(object):
 
         replacedElementsLength = variantObject.replacementDuration
         variantLength = variantObject.containedHighestTime - spacerDur
-        
+
         self.variantMode = True
         if variantLength != replacedElementsLength:
             numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
             fraction = str(numerator) + '/' + str(denominator)
-            lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
+            lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times',
                                                         fraction = fraction,
                                                         music = lpOssiaMusicVariant)
             lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
-            musicList.append(lpInternalSequentialMusic)  
+            musicList.append(lpInternalSequentialMusic)
         else:
             musicList.append(lpOssiaMusicVariant)
-        
+
 
         lpMusicList = lyo.LyMusicList(musicList)
         lpOssiaMusicVariantWithSpacer = lyo.LySequentialMusic(musicList = lpMusicList )
-        
+
         if newVariant is True:
             lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
                                                         optionalId = variantId,
@@ -2031,7 +2031,7 @@ class LilypondConverter(object):
 #      \override TupletBracket #'bracket-visibility = ##f
 #      \override TupletNumber #'stencil = ##f
 #      \override Clef #'transparent = ##t
-#    } 
+#    }
 #    ''' % containerId #\override BarLine #'transparent = ##t is the best way of fixing the #barlines that I have come up with.
 #
 #        lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
@@ -2056,12 +2056,12 @@ class LilypondConverter(object):
         #currentMusicList.append(lp2GroupedMusicList)
         #lp2GroupedMusicList.setParent(self.context)
 
-        
+
     def lyOssiaMusicFromVariant(self, variantIn):
         r'''
         returns a LyOssiaMusic object from a stream
 
-        
+
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> v = variant.Variant(c)
         >>> lpc = lily.translate.LilypondConverter()
@@ -2070,29 +2070,29 @@ class LilypondConverter(object):
         <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
         >>> print lySequentialMusicOut
         { \time 3/4
-         c 4  
-         d 4  
-         e 4  
-         f 2.  
-        } 
+         c 4
+         d 4
+         e 4
+         f 2.
+        }
         '''
         musicList = []
 
         lpMusicList = lyo.LyMusicList(contents = musicList)
         lpOssiaMusic = lyo.LyOssiaMusic(musicList = lpMusicList)
-        self.newContext(lpMusicList)    
-        
+        self.newContext(lpMusicList)
+
         self.variantMode = True
         self.appendObjectsToContextFromStream(variantIn._stream)
-                    
+
         lyObject = self.closeMeasure()
         if lyObject is not None:
-            musicList.append(lyObject)    
-        
+            musicList.append(lyObject)
+
         self.restoreContext()
 
         self.variantMode = False
-        
+
         return lpOssiaMusic
 
     def setHeaderFromMetadata(self, metadataObject = None, lpHeader = None):
@@ -2100,33 +2100,33 @@ class LilypondConverter(object):
         Returns a lilypond.lilyObjects.LyLilypondHeader object
         set with data from the metadata object
 
-        
+
         >>> md = metadata.Metadata()
         >>> md.title = 'My Title'
         >>> md.alternativeTitle = 'My "sub"-title'
-        
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpHeader = lpc.setHeaderFromMetadata(md)
         >>> print lpHeader
-        \header { title = "My Title"   
-        subtitle = "My \"sub\"-title"   
-        } 
+        \header { title = "My Title"
+        subtitle = "My \"sub\"-title"
+        }
         '''
-        
+
         if lpHeader is None:
-            lpHeader = lyo.LyLilypondHeader() 
+            lpHeader = lyo.LyLilypondHeader()
 
         if lpHeader.lilypondHeaderBody is None:
             lpHeaderBody = lyo.LyLilypondHeaderBody()
             lpHeader.lilypondHeaderBody = lpHeaderBody
         else:
             lpHeaderBody = lpHeader.lilypondHeaderBody
-    
+
         lpHeaderBodyAssignments = lpHeaderBody.assignments
-        
+
         if metadataObject is not None:
-            if metadataObject.title is not None:          
-                lyTitleAssignment = lyo.LyAssignment(assignmentId = "title", 
+            if metadataObject.title is not None:
+                lyTitleAssignment = lyo.LyAssignment(assignmentId = "title",
                                                  identifierInit = lyo.LyIdentifierInit(string = metadataObject.title))
                 lpHeaderBodyAssignments.append(lyTitleAssignment)
                 lyTitleAssignment.setParent(lpHeaderBody)
@@ -2135,17 +2135,17 @@ class LilypondConverter(object):
                                                     identifierInit = lyo.LyIdentifierInit(string = metadataObject.alternativeTitle))
                 lpHeaderBodyAssignments.append(lySubtitleAssignment)
                 lyTitleAssignment.setParent(lpHeaderBody)
-        
+
         lpHeaderBody.assignments = lpHeaderBodyAssignments
         return lpHeader
 
     def closeMeasure(self, barChecksOnly = False):
         r'''
         return a LyObject or None for the end of the previous Measure
-        
+
         uses self.currentMeasure
-        
-        
+
+
         >>> lpc = lily.translate.LilypondConverter()
         >>> m = stream.Measure()
         >>> m.number = 2
@@ -2155,7 +2155,7 @@ class LilypondConverter(object):
         >>> lpc.currentMeasure is None
         True
         >>> print lyObj
-        \bar "||"  %{ end measure 2 %} 
+        \bar "||"  %{ end measure 2 %}
         '''
         m = self.currentMeasure
         self.currentMeasure = None
@@ -2165,7 +2165,7 @@ class LilypondConverter(object):
         #    return None
         #elif m.rightBarline.style == 'regular':
         #    return None
-        
+
         if self.variantMode is True:
             barChecksOnly = True
 
@@ -2177,11 +2177,11 @@ class LilypondConverter(object):
             barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString("|")
         else:
             barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString(self.barlineDict[m.rightBarline.style])
-        
+
         if m.number is not None:
             barString += lpBarline.comment("end measure %d" % m.number)
 
-        
+
         lpBarline.content = barString
         return lpBarline
 
@@ -2192,11 +2192,11 @@ class LilypondConverter(object):
         notes are left in the measure, for a quarter note, write "4"
         for an eighth, write "8", but for 3 eighths, write "8*3" !
         so we will measure in 32nd notes always... won't work for tuplets
-        of course. 
+        of course.
 
         returns a scheme object or None if not needed
 
-        
+
         >>> m = stream.Measure()
         >>> m.append(meter.TimeSignature('3/4'))
         >>> m.paddingLeft = 2.0
@@ -2213,66 +2213,66 @@ class LilypondConverter(object):
             barLength = 4.0
         else:
             ts = tses[0]
-            barLength = ts.barDuration.quarterLength 
+            barLength = ts.barDuration.quarterLength
         remainingQL = barLength - pL
         if remainingQL <= 0:
             raise LilyTranslateException('your first pickup measure is non-existent!')
         remaining32s = int(remainingQL * 8)
         lyObject = lyo.LyEmbeddedScm()
-        schemeStr = lyObject.backslash + 'partial 32*' + str(remaining32s) + ' ' 
+        schemeStr = lyObject.backslash + 'partial 32*' + str(remaining32s) + ' '
         lyObject.content = schemeStr
         return lyObject
 
-    #--------------display and converter routines ---------------------#        
+    #--------------display and converter routines ---------------------#
     def writeLyFile(self, ext = '', fp = None):
         '''
         writes the contents of the self.topLevelObject to a file.
-        
+
         The extension should be ly.  If fp is None then a named temporary
         file is created by environment.getTempFile.
-        
+
         '''
-        
+
         if fp is None:
             fp = environLocal.getTempFile(ext)
-        
+
         self.tempName = fp
 
         with open(self.tempName, 'w') as f:
             f.write(str(self.topLevelObject).encode('utf-8'))
 
         return self.tempName
-    
+
     def runThroughLily(self, format = None, backend = None, fileName = None, skipWriting = False): #@ReservedAssignment
         '''
         creates a .ly file from self.topLevelObject via .writeLyFile
         then runs the file through Lilypond.
-        
+
         Returns the full path of the file produced by lilypond including the format extension.
-        
+
         If skipWriting is True and a fileName is given then it will run that file through lilypond instead
-        
+
         '''
-        
+
         if fileName is None:
             fileName = self.writeLyFile(ext = 'ly')
         else:
             if skipWriting is False:
                 fileName = self.writeLyFile(ext = 'ly', fp = fileName)
-            
-        
-        lilyCommand = '"' + self.LILYEXEC + '" ' 
+
+
+        lilyCommand = '"' + self.LILYEXEC + '" '
         if format is not None:
             lilyCommand += "-f " + format + " "
         if backend is not None:
             lilyCommand += self.backendString + backend + " "
         lilyCommand += "-o " + fileName + " " + fileName
-        
+
         try:
-            os.system(lilyCommand)    
+            os.system(lilyCommand)
         except:
             raise
-        
+
         try:
             os.remove(fileName + ".eps")
         except:
@@ -2288,7 +2288,7 @@ class LilypondConverter(object):
 
     def createPDF(self, fileName=None):
         '''
-        create a PDF file from self.topLevelObject and return the filepath of the file.        
+        create a PDF file from self.topLevelObject and return the filepath of the file.
 
         most users will just call stream.write('lily.pdf') on a stream.
         '''
@@ -2299,7 +2299,7 @@ class LilypondConverter(object):
     def showPDF(self):
         '''
         create a SVG file from self.topLevelObject, show it with your pdf reader (often Adobe Acrobat/Adobe Reader or Apple Preview)
-        and return the filepath of the file.        
+        and return the filepath of the file.
 
         most users will just call stream.Stream.show('lily.pdf') on a stream.
         '''
@@ -2314,10 +2314,10 @@ class LilypondConverter(object):
             else:
                 command = ''
             os.system(command)
-    
+
     def createPNG(self, fileName=None):
         '''
-        create a PNG file from self.topLevelObject and return the filepath of the file.        
+        create a PNG file from self.topLevelObject and return the filepath of the file.
 
         most users will just call stream.write('lily.png') on a stream.
 
@@ -2332,7 +2332,7 @@ class LilypondConverter(object):
             except:
                 pass # no big deal probably...
         return lilyFile
-        
+
 
 #                if os.name == 'nt':
 #                    format = 'png'
@@ -2341,7 +2341,7 @@ class LilypondConverter(object):
 #                    format = 'jpeg'
 #                else: # default for all other platforms
 #                    format = 'png'
-#                
+#
 #                if lilyImage2.mode == "I;16":
 #                # @PIL88 @PIL101
 #                # "I;16" isn't an 'official' mode, but we still want to
@@ -2356,13 +2356,13 @@ class LilypondConverter(object):
 #                return file
 #            except:
 #                raise
-                
+
     def showPNG(self):
         '''
         Take the object, run it through LilyPond, and then show it as a PNG file.
         On Windows, the PNG file will not be deleted, so you  will need to clean out
         TEMP every once in a while.
-        
+
         Most users will just want to call stream.Stream.show('lily.png') instead.
         '''
         try:
@@ -2371,12 +2371,12 @@ class LilypondConverter(object):
             raise LilyTranslateException("Problems creating PNG file: (" + str(e) + ")")
         environLocal.launch('png', lilyFile)
         #self.showImageDirect(lilyFile)
-        
+
         return lilyFile
-        
+
     def createSVG(self, fileName = None):
         '''
-        create an SVG file from self.topLevelObject and return the filepath of the file.        
+        create an SVG file from self.topLevelObject and return the filepath of the file.
 
         most users will just call stream.Stream.write('lily.svg') on a stream.
         '''
@@ -2386,14 +2386,14 @@ class LilypondConverter(object):
     def showSVG(self, fileName = None):
         '''
         create a SVG file from self.topLevelObject, show it with your svg reader (often Internet Explorer on PC)
-        and return the filepath of the file.        
+        and return the filepath of the file.
 
         most users will just call stream.Stream.show('lily.png') on a stream.
         '''
         lilyFile = self.createSVG(fileName)
         environLocal.launch('svg', lilyFile)
         return lilyFile
-        
+
 
 class LilyTranslateException(exceptions21.Music21Exception):
     pass
@@ -2430,7 +2430,7 @@ class TestExternal(unittest.TestCase):
     def xtestConvertNote(self):
         n = note.Note("C5")
         n.show('lily.png')
-    
+
     def xtestConvertChorale(self):
         b = _getCachedCorpusFile('bach/bwv66.6')
         for n in b.flat:
@@ -2453,7 +2453,7 @@ class TestExternal(unittest.TestCase):
         s = stream.Score()
         s.append(p)
         s.show('lily.png')
-    
+
     def testJosquin(self):
         from music21 import converter
         j = converter.parse('http://jrp.ccarh.org/cgi-bin/josquin?a=parallel&f=Jos2308-Ave_maris_stella', format='humdrum')
@@ -2469,7 +2469,7 @@ class TestExternal(unittest.TestCase):
         p2 = stream.Part()
         p2.append(note.WholeNote("B4"))
         p2.staffLines = 7
-        s.insert(0, p2)        
+        s.insert(0, p2)
         s.show('lily.png')
 
 
@@ -2478,7 +2478,7 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
     #music21.mainTest(TestExternal, 'noDocTest')
-    
+
 #------------------------------------------------------------------------------
 # eof
 
