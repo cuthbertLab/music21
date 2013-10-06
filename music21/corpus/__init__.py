@@ -496,17 +496,7 @@ def getComposerDir(composerName):
         True
 
     '''
-    match = None
-    #for moduleName in MODULES:
-    for moduleName in sorted(os.listdir(common.getCorpusFilePath())):
-        candidate = moduleName
-        if composerName.lower() not in candidate.lower():
-            continue
-        directory = os.path.join(common.getCorpusFilePath(), moduleName)
-        if directory.lower().endswith(composerName.lower()):
-            match = directory
-            break
-    return match
+    return corpora.CoreCorpus().getComposerDirectoryPath(composerName)
 
 
 @property
@@ -581,91 +571,11 @@ def getWorkList(workName, movementNumber=None, fileExtensions=None):
         1
 
     '''
-    if not common.isListLike(fileExtensions):
-        fileExtensions = [fileExtensions]
-    paths = getPaths(fileExtensions)
-    results = []
-    # permit workName to be a list of paths/branches
-    if common.isListLike(workName):
-        workName = os.path.sep.join(workName)
-    # replace with os-dependent separators
-    workSlashes = workName.replace('/', os.path.sep)
-    #environLocal.printDebug(['getWorkList(): searching for workName or workSlashses', workName, workSlashes])
-    # find all matches for the work name
-    # TODO: this should match by path component, not just
-    # substring
-    for path in paths:
-        if workName.lower() in path.lower():
-            results.append(path)
-        elif workSlashes.lower() in path.lower():
-            results.append(path)
-    #environLocal.printDebug(['getWorkList(): results', results])
-    if len(results) > 0:
-        # more than one matched...use more stringent criterion:
-        # must have a slash before the name
-        previousPost = results
-        results = []
-        longName = os.sep + workSlashes.lower()
-        for path in previousPost:
-            if longName in path.lower():
-                results.append(path)
-
-        if len(results) == 0:
-            results = previousPost
-    movementResults = []
-    if movementNumber is not None and len(results) > 0:
-        # store one ore more possible mappings of movement number
-        movementStrList = []
-        # see if this is a pair
-        if common.isListLike(movementNumber):
-            movementStrList.append(''.join([str(x) for x in movementNumber]))
-            movementStrList.append('-'.join([str(x) for x in movementNumber]))
-            movementStrList.append('movement' + '-'.join([str(x)
-                for x in movementNumber]))
-            movementStrList.append('movement' + '-0'.join([str(x)
-                for x in movementNumber]))
-        else:
-            movementStrList += [
-                '0%s' % str(movementNumber),
-                '%s' % str(movementNumber),
-                'movement%s' % str(movementNumber),
-                ]
-        #environLocal.printDebug(['movementStrList', movementStrList])
-        for filePath in results:
-            unused_directory, filename = os.path.split(filePath)
-            if '.' in filename:
-                filenameWithoutExtension = filename.split('.')[0]
-            else:
-                filenameWithoutExtension = None
-            searchPartialMatch = True
-            if filenameWithoutExtension != None:
-                # look for direct matches first
-                for movementStr in movementStrList:
-                    #if movementStr.lower() in filePath.lower():
-                    if filenameWithoutExtension.lower() == movementStr.lower():
-                        movementResults.append(filePath)
-                        searchPartialMatch = False
-            # if we have one direct match, all other matches must
-            # be direct. this will match multiple files with different
-            # file extensions
-            if len(movementResults) > 0:
-                continue
-            if searchPartialMatch:
-                #environLocal.printDebug(['searching partial match'])
-                for movementStr in movementStrList:
-                    #if movementStr.lower() in filePath.lower():
-                    if filename.startswith(movementStr.lower()):
-                        movementResults.append(filePath)
-        if len(movementResults) == 0:
-            pass # return an empty list
-    else:
-        movementResults = results
-    #environLocal.printDebug(['movementResults', movementResults])
-    movementResults.sort() # sort here, a shorter list
-    if len(movementResults) == 0:
-        return []
-    else:
-        return movementResults
+    return corpora.CoreCorpus().getWorkList(
+        workName,
+        movementNumber=movementNumber,
+        fileExtensions=fileExtensions,
+        )
 
 
 def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
@@ -676,6 +586,7 @@ def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
 
     ::
 
+        >>> from music21 import corpus
         >>> corpus.getVirtualWorkList('bach/bwv1007/prelude')
         ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 
@@ -1099,124 +1010,11 @@ def getBachChorales(fileExtensions='xml'):
         u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
 
     '''
-    names = (
-        'bwv1.6.mxl', 'bwv10.7.mxl', 'bwv101.7.mxl', 'bwv102.7.mxl',
-        'bwv103.6.mxl', 'bwv104.6.mxl', 'bwv108.6.mxl', 'bwv11.6.mxl',
-        'bwv110.7.mxl', 'bwv111.6.mxl', 'bwv112.5-sc.mxl', 'bwv112.5.mxl',
-        'bwv113.8.mxl', 'bwv114.7.mxl', 'bwv115.6.mxl', 'bwv116.6.mxl',
-        'bwv117.4.mxl', 'bwv119.9.mxl', 'bwv12.7.mxl', 'bwv120.6.mxl',
-        'bwv120.8-a.mxl', 'bwv121.6.mxl', 'bwv122.6.mxl', 'bwv123.6.mxl',
-        'bwv124.6.mxl', 'bwv125.6.mxl', 'bwv126.6.mxl', 'bwv127.5.mxl',
-        'bwv128.5.mxl', 'bwv13.6.mxl', 'bwv130.6.mxl', 'bwv133.6.mxl',
-        'bwv135.6.mxl', 'bwv136.6.mxl', 'bwv137.5.mxl', 'bwv139.6.mxl',
-        'bwv14.5.mxl', 'bwv140.7.mxl', 'bwv144.3.mxl', 'bwv144.6.mxl',
-        'bwv145-a.mxl', 'bwv145.5.mxl', 'bwv146.8.mxl', 'bwv148.6.mxl',
-        'bwv149.7.mxl', 'bwv151.5.mxl', 'bwv153.1.mxl', 'bwv153.5.mxl',
-        'bwv153.9.mxl', 'bwv154.3.mxl', 'bwv154.8.mxl', 'bwv155.5.mxl',
-        'bwv156.6.mxl', 'bwv157.5.mxl', 'bwv158.4.mxl', 'bwv159.5.mxl',
-        'bwv16.6.mxl', 'bwv161.6.mxl', 'bwv162.6-lpz.mxl', 'bwv164.6.mxl',
-        'bwv165.6.mxl', 'bwv166.6.mxl', 'bwv168.6.mxl', 'bwv169.7.mxl',
-        'bwv17.7.mxl', 'bwv171.6.mxl', 'bwv172.6.mxl', 'bwv174.5.mxl',
-        'bwv175.7.mxl', 'bwv176.6.mxl', 'bwv177.5.mxl', 'bwv178.7.mxl',
-        'bwv179.6.mxl', 'bwv18.5-lz.mxl', 'bwv18.5-w.mxl', 'bwv180.7.mxl',
-        'bwv183.5.mxl', 'bwv184.5.mxl', 'bwv185.6.mxl', 'bwv187.7.mxl',
-        'bwv188.6.mxl', 'bwv19.7.mxl', 'bwv190.7-inst.mxl', 'bwv190.7.mxl',
-        'bwv194.12.mxl', 'bwv194.6.mxl', 'bwv195.6.mxl', 'bwv197.10.mxl',
-        'bwv197.5.mxl', 'bwv197.7-a.mxl', 'bwv2.6.mxl', 'bwv20.11.mxl',
-        'bwv20.7.mxl', 'bwv226.2.mxl', 'bwv227.1.mxl', 'bwv227.11.mxl',
-        'bwv227.3.mxl', 'bwv227.7.mxl', 'bwv229.2.mxl', 'bwv244.10.mxl',
-        'bwv244.15.mxl', 'bwv244.17.mxl', 'bwv244.25.mxl', 'bwv244.29-a.mxl',
-        'bwv244.3.mxl', 'bwv244.32.mxl', 'bwv244.37.mxl', 'bwv244.40.mxl',
-        'bwv244.44.mxl', 'bwv244.46.mxl', 'bwv244.54.mxl', 'bwv244.62.mxl',
-        'bwv245.11.mxl', 'bwv245.14.mxl', 'bwv245.15.mxl', 'bwv245.17.mxl',
-        'bwv245.22.mxl', 'bwv245.26.mxl', 'bwv245.28.mxl', 'bwv245.3.mxl',
-        'bwv245.37.mxl', 'bwv245.40.mxl', 'bwv245.5.mxl', 'bwv248.12-2.mxl',
-        'bwv248.17.mxl', 'bwv248.23-2.mxl', 'bwv248.23-s.mxl', 'bwv248.28.mxl',
-        'bwv248.33-3.mxl', 'bwv248.35-3.mxl', 'bwv248.35-3c.mxl',
-        'bwv248.42-4.mxl', 'bwv248.42-s.mxl', 'bwv248.46-5.mxl',
-        'bwv248.5.mxl', 'bwv248.53-5.mxl', 'bwv248.59-6.mxl',
-        'bwv248.64-6.mxl', 'bwv248.64-s.mxl', 'bwv248.9-1.mxl',
-        'bwv248.9-s.mxl', 'bwv25.6.mxl', 'bwv250.mxl', 'bwv251.mxl',
-        'bwv252.mxl', 'bwv253.mxl', 'bwv254.mxl', 'bwv255.mxl', 'bwv256.mxl',
-        'bwv257.mxl', 'bwv258.mxl', 'bwv259.mxl', 'bwv26.6.mxl', 'bwv260.mxl',
-        'bwv261.mxl', 'bwv262.mxl', 'bwv263.mxl', 'bwv264.mxl', 'bwv265.mxl',
-        'bwv266.mxl', 'bwv267.mxl', 'bwv268.mxl', 'bwv269.mxl', 'bwv27.6.mxl',
-        'bwv270.mxl', 'bwv271.mxl', 'bwv272.mxl', 'bwv273.mxl', 'bwv276.mxl',
-        'bwv277.krn', 'bwv277.mxl', 'bwv278.mxl', 'bwv279.mxl', 'bwv28.6.mxl',
-        'bwv280.mxl', 'bwv281.krn', 'bwv281.mxl', 'bwv282.mxl', 'bwv283.mxl',
-        'bwv284.mxl', 'bwv285.mxl', 'bwv286.mxl', 'bwv287.mxl', 'bwv288.mxl',
-        'bwv289.mxl', 'bwv29.8.mxl', 'bwv290.mxl', 'bwv291.mxl', 'bwv292.mxl',
-        'bwv293.mxl', 'bwv294.mxl', 'bwv295.mxl', 'bwv296.mxl', 'bwv297.mxl',
-        'bwv298.mxl', 'bwv299.mxl', 'bwv3.6.mxl', 'bwv30.6.mxl', 'bwv300.mxl',
-        'bwv301.mxl', 'bwv302.mxl', 'bwv303.mxl', 'bwv304.mxl', 'bwv305.mxl',
-        'bwv306.mxl', 'bwv307.mxl', 'bwv308.mxl', 'bwv309.mxl', 'bwv31.9.mxl',
-        'bwv310.mxl', 'bwv311.mxl', 'bwv312.mxl', 'bwv313.mxl', 'bwv314.mxl',
-        'bwv315.mxl', 'bwv316.mxl', 'bwv317.mxl', 'bwv318.mxl', 'bwv319.mxl',
-        'bwv32.6.mxl', 'bwv320.mxl', 'bwv321.mxl', 'bwv322.mxl', 'bwv323.mxl',
-        'bwv324.mxl', 'bwv325.mxl', 'bwv326.mxl', 'bwv327.mxl', 'bwv328.mxl',
-        'bwv329.mxl', 'bwv33.6.mxl', 'bwv330.mxl', 'bwv331.mxl', 'bwv332.mxl',
-        'bwv333.mxl', 'bwv334.mxl', 'bwv335.mxl', 'bwv336.mxl', 'bwv337.mxl',
-        'bwv338.mxl', 'bwv339.mxl', 'bwv340.mxl', 'bwv341.mxl', 'bwv342.mxl',
-        'bwv343.mxl', 'bwv344.mxl', 'bwv345.mxl', 'bwv346.mxl', 'bwv347.mxl',
-        'bwv348.mxl', 'bwv349.mxl', 'bwv350.mxl', 'bwv351.mxl', 'bwv352.mxl',
-        'bwv353.mxl', 'bwv354.mxl', 'bwv355.mxl', 'bwv356.mxl', 'bwv357.mxl',
-        'bwv358.mxl', 'bwv359.mxl', 'bwv36.4-2.mxl', 'bwv36.8-2.mxl',
-        'bwv360.mxl', 'bwv361.mxl', 'bwv362.mxl', 'bwv363.mxl', 'bwv364.mxl',
-        'bwv365.mxl', 'bwv366.krn', 'bwv366.mxl', 'bwv367.mxl', 'bwv368.mxl',
-        'bwv369.mxl', 'bwv37.6.mxl', 'bwv370.mxl', 'bwv371.mxl', 'bwv372.mxl',
-        'bwv373.mxl', 'bwv374.mxl', 'bwv375.mxl', 'bwv376.mxl', 'bwv377.mxl',
-        'bwv378.mxl', 'bwv379.mxl', 'bwv38.6.mxl', 'bwv380.mxl', 'bwv381.mxl',
-        'bwv382.mxl', 'bwv383.mxl', 'bwv384.mxl', 'bwv385.mxl', 'bwv386.mxl',
-        'bwv387.mxl', 'bwv388.mxl', 'bwv389.mxl', 'bwv39.7.mxl', 'bwv390.mxl',
-        'bwv391.mxl', 'bwv392.mxl', 'bwv393.mxl', 'bwv394.mxl', 'bwv395.mxl',
-        'bwv396.mxl', 'bwv397.mxl', 'bwv398.mxl', 'bwv399.mxl', 'bwv4.8.mxl',
-        'bwv40.3.mxl', 'bwv40.6.mxl', 'bwv40.8.mxl', 'bwv400.mxl',
-        'bwv401.mxl', 'bwv402.mxl', 'bwv403.mxl', 'bwv404.mxl', 'bwv405.mxl',
-        'bwv406.mxl', 'bwv407.mxl', 'bwv408.mxl', 'bwv41.6.mxl', 'bwv410.mxl',
-        'bwv411.mxl', 'bwv412.mxl', 'bwv413.mxl', 'bwv414.mxl', 'bwv415.mxl',
-        'bwv416.mxl', 'bwv417.mxl', 'bwv418.mxl', 'bwv419.mxl', 'bwv42.7.mxl',
-        'bwv420.mxl', 'bwv421.mxl', 'bwv422.mxl', 'bwv423.mxl', 'bwv424.mxl',
-        'bwv425.mxl', 'bwv426.mxl', 'bwv427.mxl', 'bwv428.mxl', 'bwv429.mxl',
-        'bwv43.11.mxl', 'bwv430.mxl', 'bwv431.mxl', 'bwv432.mxl', 'bwv433.mxl',
-        'bwv434.mxl', 'bwv435.mxl', 'bwv436.mxl', 'bwv437.mxl', 'bwv438.mxl',
-        'bwv44.7.mxl', 'bwv45.7.mxl', 'bwv47.5.mxl', 'bwv48.3.mxl',
-        'bwv48.7.mxl', 'bwv5.7.mxl', 'bwv52.6.mxl', 'bwv55.5.mxl',
-        'bwv56.5.mxl', 'bwv57.8.mxl', 'bwv59.3.mxl', 'bwv6.6.mxl',
-        'bwv60.5.mxl', 'bwv64.2.mxl', 'bwv64.4.mxl', 'bwv64.8.mxl',
-        'bwv65.2.mxl', 'bwv65.7.mxl', 'bwv66.6.mxl', 'bwv67.4.mxl',
-        'bwv67.7.mxl', 'bwv69.6-a.mxl', 'bwv69.6.mxl', 'bwv7.7.mxl',
-        'bwv70.11.mxl', 'bwv70.7.mxl', 'bwv72.6.mxl', 'bwv73.5.mxl',
-        'bwv74.8.mxl', 'bwv77.6.mxl', 'bwv78.7.mxl', 'bwv79.3.mxl',
-        'bwv79.6.mxl', 'bwv8.6.mxl', 'bwv80.8.mxl', 'bwv81.7.mxl',
-        'bwv83.5.mxl', 'bwv84.5.mxl', 'bwv85.6.mxl', 'bwv86.6.mxl',
-        'bwv87.7.mxl', 'bwv88.7.mxl', 'bwv89.6.mxl', 'bwv9.7.mxl',
-        'bwv90.5.mxl', 'bwv91.6.mxl', 'bwv92.9.mxl', 'bwv93.7.mxl',
-        'bwv94.8.mxl', 'bwv95.7.mxl', 'bwv96.6.mxl', 'bwv97.9.mxl',
-        'bwv99.6.mxl',
+    return corpora.CoreCorpus().getBachChorales(
+        fileExtensions=fileExtensions,
         )
-    composerDirectory = getComposerDir('bach')
-    results = []
-    if composerDirectory is None:  # case where we have no corpus
-        return results
-    paths = getPaths(fileExtensions)
-    for filename in names:
-        candidate = os.path.join(composerDirectory, filename)
-        if candidate not in paths:  # it may not match extensions
-            if not os.path.exists(candidate):  # it does not exist at all
-                filename2 = filename.replace('mxl', 'xml')
-                candidate2 = os.path.join(composerDirectory, filename2)
-                if candidate2 in paths:
-                    results.append(candidate2)
-                else:
-                    environLocal.printDebug([
-                        'corpus missing expected file path',
-                        candidate,
-                        ])
-        else:
-            results.append(candidate)
-    return results
 
-bachChorales = property(getBachChorales)
+#bachChorales = property(getBachChorales)
 
 
 def getHandelMessiah(fileExtensions='md'):
@@ -1232,39 +1030,9 @@ def getHandelMessiah(fileExtensions='md'):
         43
 
     '''
-    names = (
-        'movement1-01.md', 'movement1-02.md', 'movement1-03.md',
-        'movement1-04.md', 'movement1-05.md', 'movement1-07.md',
-        'movement1-08.md', 'movement1-09.md', 'movement1-10.md',
-        'movement1-11.md', 'movement1-12.md', 'movement1-13.md',
-        'movement1-15.md', 'movement1-17.md', 'movement1-18.md',
-        'movement1-19.md', 'movement1-23.md', 'movement2-01.md',
-        'movement2-03.md', 'movement2-03.md', 'movement2-04.md',
-        'movement2-05.md', 'movement2-06.md', 'movement2-07.md',
-        'movement2-08.md', 'movement2-09.md', 'movement2-10.md',
-        'movement2-11.md', 'movement2-12.md', 'movement2-13.md',
-        'movement2-15.md', 'movement2-18.md', 'movement2-19.md',
-        'movement2-21.md', 'movement3-01.md', 'movement3-02.md',
-        'movement3-03.md', 'movement3-04.md', 'movement3-05.md',
-        'movement3-07.md', 'movement3-08.md', 'movement3-09.md',
-        'movement3-10.md',
+    return corpora.CoreCorpus().getHandelMessiah(
+        fileExtensions=fileExtensions,
         )
-    composerDirectory = getComposerDir('handel')
-    results = []
-    if composerDirectory is None:
-        return results
-    paths = getPaths(fileExtensions)
-    for filename in names:
-        candidate = os.path.join(composerDirectory, 'hwv56', filename)
-        if candidate not in paths:  # it may not match extensions
-            if not os.path.exists(candidate):  # it does not exist at all
-                environLocal.printDebug([
-                    'corpus missing expected file path',
-                    candidate,
-                    ])
-        else:
-            results.append(candidate)
-    return results
 
 
 def getMonteverdiMadrigals(fileExtensions='xml'):
