@@ -214,34 +214,52 @@ class SettingsHandler(xml.sax.ContentHandler):
     ### INITIALIZER ###
 
     def __init__(self, tagLib=None):
-        self.localCorpusSettings = LocalCorpusSettings()
-        self.localCorporaSettings = LocalCorporaSettings()
-        # create directly, not in sax parsing; this is just a shortcut
-        self._settings = Settings()
-        self._charData = ''
+        self._characters = ''
+        self._objectStack = []
+        self._settings = None
 
     ### PUBLIC METHODS ###
 
-    def characters(self, charData):
-        self._charData += charData
+    def characters(self, characters):
+        self._characters += characters
 
     def endElement(self, name):
-        if name == 'localCorpusPath':
-            lcp = LocalCorpusPath()
-            lcp.charData = self._charData
-            self._charData = ''  # must clear after reading in
-            self.localCorpusSettings.append(lcp)
+        currentObject = self._objectStack.pop()
+        if isinstance(currentObject, Preference):
+            self._objectStack[-1].append(currentObject)
+        elif isinstance(currentObject, LocalCorpusPath):
+            currentObject.charData = self._characters.strip()
+            self._objectStack[-1].append(currentObject)
+        elif isinstance(currentObject, LocalCorporaSettings):
+            currentObject.componentList.sort(
+                key=lambda x: (x.__class__.__name__, x._attr.get('name')))
+            self._objectStack[-1].append(currentObject)
+        elif isinstance(currentObject, LocalCorpusSettings):
+            currentObject.componentList.sort(
+                key=lambda x: (x.__class__.__name__, x._attr.get('name')))
+            self._objectStack[-1].append(currentObject)
+        elif isinstance(currentObject, Settings):
+            currentObject.componentList.sort(
+                key=lambda x: (x.__class__.__name__, x._attr.get('name')))
+            self._settings = currentObject
 
     def getSettings(self):
-        # only called after processing; can add local corpus settings
-        self._settings.append(self.localCorpusSettings)
         return self._settings
 
     def startElement(self, name, attrs):
+        self._characters = ''
         if name == 'preference':
             slot = Preference()
             slot.loadAttrs(attrs)
-            self._settings.append(slot)
+        elif name == 'localCorporaSettings':
+            slot = LocalCorporaSettings()
+        elif name == 'localCorpusSettings':
+            slot = LocalCorpusSettings(name=attrs.get('name', None))
+        elif name == 'localCorpusPath':
+            slot = LocalCorpusPath()
+        elif name == 'settings':
+            slot = Settings()
+        self._objectStack.append(slot)
 
 
 #------------------------------------------------------------------------------
@@ -394,6 +412,14 @@ class _EnvironmentCore(object):
                     # validate paths on load
                     fpCandidate = lcp.charData.strip()
                     ref['localCorpusSettings'].append(fpCandidate)
+            elif isinstance(slot, LocalCorporaSettings):
+                ref['localCorporaSettings'] = {}
+                for localCorpusSettings in slot:
+                    name = localCorpusSettings._attr['name']
+                    ref['localCorporaSettings'][name] = []
+                    for localCorpusPath in localCorpusSettings:
+                        fpCandidate = localCorpusPath.charData.strip()
+                        ref['localCorporaSettings'][name].append(fpCandidate)
             else:
                 name = slot.get('name')
                 value = slot.get('value')
@@ -485,21 +511,22 @@ class _EnvironmentCore(object):
         Convert a ref dictionary to a Settings object.
         '''
         settings = Settings()
-        for key, value in ref.iteritems():
+        for key, value in sorted(ref.items()):
             if key == 'localCorpusSettings':
                 localCorpusSettings = LocalCorpusSettings()
-                for filePath in value:
+                for filePath in sorted(value):
                     localCorpusPath = LocalCorpusPath(path=filePath)
                     localCorpusSettings.append(localCorpusPath)
                 settings.append(localCorpusSettings)
             elif key == 'localCorporaSettings':
                 localCorporaSettings = LocalCorporaSettings()
-                for name, paths in value.iteritems():
+                for name, paths in sorted(value.items()):
                     localCorpusSettings = LocalCorpusSettings(name=name)
-                    for path in paths:
+                    for path in sorted(paths):
                         localCorpusPath = LocalCorpusPath(path=path)
                         localCorpusSettings.append(localCorpusPath)
                     localCorporaSettings.append(localCorpusSettings)
+                settings.append(localCorporaSettings)
             else:
                 slot = Preference()
                 slot.set('name', key)
@@ -672,7 +699,7 @@ class _EnvironmentCore(object):
         saxparser.setFeature(xml.sax.handler.feature_namespaces, 0)
         h = SettingsHandler()
         saxparser.setContentHandler(h)
-        with open(filePath, 'r') as f:  # file i/o might be done outside of loop
+        with open(filePath, 'r') as f:
             saxparser.parse(f)
         # load from XML into dictionary
         # updates self._ref in place
@@ -687,7 +714,7 @@ class _EnvironmentCore(object):
             filePath = self.getSettingsPath()
         # need to use __getitem__ here b/c need to covnert debug value
         # to an integer
-        directory, unused_fn = os.path.split(filePath)
+        directory = os.path.split(filePath)[0]
         if filePath is None or not os.path.exists(directory):
             raise EnvironmentException('bad file path: %s' % filePath)
         settings = self._toSettings(self._ref)
@@ -1000,6 +1027,7 @@ class Environment(object):
 
         ::
 
+            >>> from music21 import environment
             >>> a = environment.Environment()
             >>> a['debug'] = 1
             >>> a.restoreDefaults()
@@ -1178,7 +1206,7 @@ class UserSettings(object):
                     'attempting to set a path that does not exist: {}'.format(
                         value))
         # when setting a local corpus setting, if not a list, append
-        elif key in ['localCorpusSettings']:
+        elif key == 'localCorpusSettings':
             if not common.isListLike(value):
                 raise UserSettingsException(
                     'localCorpusSettings must be provided as a list.')
@@ -1383,53 +1411,62 @@ class Test(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
-  <preference name="lilypondBackend" value="ps"/>
-  <preference name="pdfPath" value="/Applications/Preview.app"/>
-  <preference name="lilypondVersion"/>
-  <preference name="graphicsPath" value="/Applications/Preview.app"/>
-  <preference name="warnings" value="1"/>
-  <preference name="showFormat" value="musicxml"/>
-  <localCorpusSettings/>
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
-  <preference name="vectorPath" value="/Applications/Preview.app"/>
-  <preference name="writeFormat" value="musicxml"/>
-  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
-  <preference name="directoryScratch"/>
-  <preference name="lilypondFormat" value="pdf"/>
-  <preference name="debug" value="0"/>
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
   <preference name="autoDownload" value="ask"/>
+  <preference name="debug" value="0"/>
+  <preference name="directoryScratch"/>
+  <preference name="graphicsPath" value="/Applications/Preview.app"/>
+  <preference name="lilypondBackend" value="ps"/>
+  <preference name="lilypondFormat" value="pdf"/>
+  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
+  <preference name="lilypondVersion"/>
+  <localCorporaSettings/>
+  <localCorpusSettings/>
   <preference name="midiPath" value="/Applications/QuickTime Player.app"/>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
+  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
+  <preference name="pdfPath" value="/Applications/Preview.app"/>
+  <preference name="showFormat" value="musicxml"/>
+  <preference name="vectorPath" value="/Applications/Preview.app"/>
+  <preference name="warnings" value="1"/>
+  <preference name="writeFormat" value="musicxml"/>
 </settings>
 """.split('\n'), match.split('\n'))
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = ['a', 'b', 'c']
+        env['localCorporaSettings']['foo'] = ['bar', 'baz', 'quux']
         match = _environStorage['instance']._toSettings(
             _environStorage['instance']._ref).xmlStr()
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
-  <preference name="lilypondBackend" value="ps"/>
-  <preference name="pdfPath" value="/Applications/Preview.app"/>
-  <preference name="lilypondVersion"/>
+  <preference name="autoDownload" value="ask"/>
+  <preference name="debug" value="0"/>
+  <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
-  <preference name="warnings" value="1"/>
-  <preference name="showFormat" value="musicxml"/>
+  <preference name="lilypondBackend" value="ps"/>
+  <preference name="lilypondFormat" value="pdf"/>
+  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
+  <preference name="lilypondVersion"/>
+  <localCorporaSettings>
+    <localCorpusSettings name="foo">
+      <localCorpusPath>bar</localCorpusPath>
+      <localCorpusPath>baz</localCorpusPath>
+      <localCorpusPath>quux</localCorpusPath>
+    </localCorpusSettings>
+  </localCorporaSettings>
   <localCorpusSettings>
     <localCorpusPath>a</localCorpusPath>
     <localCorpusPath>b</localCorpusPath>
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
-  <preference name="vectorPath" value="/Applications/Preview.app"/>
-  <preference name="writeFormat" value="musicxml"/>
-  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
-  <preference name="directoryScratch"/>
-  <preference name="lilypondFormat" value="pdf"/>
-  <preference name="debug" value="0"/>
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
-  <preference name="autoDownload" value="ask"/>
   <preference name="midiPath" value="/Applications/QuickTime Player.app"/>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
+  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
+  <preference name="pdfPath" value="/Applications/Preview.app"/>
+  <preference name="showFormat" value="musicxml"/>
+  <preference name="vectorPath" value="/Applications/Preview.app"/>
+  <preference name="warnings" value="1"/>
+  <preference name="writeFormat" value="musicxml"/>
 </settings>
 """.split('\n'), match.split('\n'))
 
@@ -1451,27 +1488,28 @@ class Test(unittest.TestCase):
             _environStorage['instance']._ref).xmlStr()
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
-  <preference name="lilypondBackend" value="ps"/>
-  <preference name="pdfPath" value="/Applications/Preview.app"/>
-  <preference name="lilypondVersion"/>
+  <preference name="autoDownload" value="ask"/>
+  <preference name="debug" value="0"/>
+  <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
-  <preference name="warnings" value="1"/>
-  <preference name="showFormat" value="musicxml"/>
+  <preference name="lilypondBackend" value="ps"/>
+  <preference name="lilypondFormat" value="pdf"/>
+  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
+  <preference name="lilypondVersion"/>
+  <localCorporaSettings/>
   <localCorpusSettings>
     <localCorpusPath>x</localCorpusPath>
     <localCorpusPath>y</localCorpusPath>
     <localCorpusPath>z</localCorpusPath>
   </localCorpusSettings>
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
-  <preference name="vectorPath" value="/Applications/Preview.app"/>
-  <preference name="writeFormat" value="musicxml"/>
-  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
-  <preference name="directoryScratch"/>
-  <preference name="lilypondFormat" value="pdf"/>
-  <preference name="debug" value="0"/>
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
-  <preference name="autoDownload" value="ask"/>
   <preference name="midiPath" value="w"/>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
+  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
+  <preference name="pdfPath" value="/Applications/Preview.app"/>
+  <preference name="showFormat" value="musicxml"/>
+  <preference name="vectorPath" value="/Applications/Preview.app"/>
+  <preference name="warnings" value="1"/>
+  <preference name="writeFormat" value="musicxml"/>
 </settings>
 """.split(), match.split())
 
