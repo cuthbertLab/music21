@@ -887,12 +887,13 @@ class MetadataBundle(object):
             True
 
         '''
-        from music21.corpus import _METADATA_BUNDLES
+        from music21.corpus import corpora
         domain = 'core'
-        if domain in _METADATA_BUNDLES and _METADATA_BUNDLES[domain]:
-            return _METADATA_BUNDLES[domain]
+        if domain in corpora.Corpus._metadataBundles \
+            and corpora.Corpus._metadataBundles[domain]:
+            return corpora.Corpus._metadataBundles[domain]
         bundle = cls(domain).read()
-        _METADATA_BUNDLES[domain] = bundle
+        corpora.Corpus._metadataBundles[domain] = bundle
         return bundle
 
     @classmethod
@@ -912,13 +913,13 @@ class MetadataBundle(object):
             True
 
         '''
-        from music21.corpus import _METADATA_BUNDLES
+        from music21.corpus import corpora
         domain = 'local'
-        if domain in _METADATA_BUNDLES and \
-            _METADATA_BUNDLES[domain] is not None:
-            return _METADATA_BUNDLES[domain]
+        if domain in corpora.Corpus._metadataBundles and \
+            corpora.Corpus._metadataBundles[domain] is not None:
+            return corpora.Corpus._metadataBundles[domain]
         bundle = cls(domain).read()
-        _METADATA_BUNDLES[domain] = bundle
+        corpora.Corpus._metadataBundles[domain] = bundle
         return bundle
 
     @classmethod
@@ -938,12 +939,13 @@ class MetadataBundle(object):
             True
 
         '''
-        from music21.corpus import _METADATA_BUNDLES
+        from music21.corpus import corpora
         domain = 'virtual'
-        if domain in _METADATA_BUNDLES and _METADATA_BUNDLES[domain]:
-            return _METADATA_BUNDLES[domain]
+        if domain in corpora.Corpus._metadataBundles and \
+            corpora.Corpus._metadataBundles[domain]:
+            return corpora.Corpus._metadataBundles[domain]
         bundle = cls(domain).read()
-        _METADATA_BUNDLES[domain] = bundle
+        corpora.Corpus._metadataBundles[domain] = bundle
         return bundle
 
     def intersection(self, metadataBundle):
