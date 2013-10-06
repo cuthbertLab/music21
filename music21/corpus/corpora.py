@@ -390,6 +390,57 @@ class CoreCorpus(Corpus):
                 results.append(candidate)
         return candidates
 
+    def getMonteverdiMadrigals(
+        self,
+        fileExtensions='xml',
+        ):
+        '''
+        Return a list of the filenames of all Monteverdi madrigals.
+
+        ::
+
+            >>> from music21.corpus import corpora
+            >>> coreCorpus = corpora.CoreCorpus()
+            >>> a = coreCorpus.getMonteverdiMadrigals()
+            >>> len(a) > 40
+            True
+
+        '''
+        results = []
+        names = (
+            'madrigal.3.1.mxl', 'madrigal.3.2.mxl', 'madrigal.3.3.mxl',
+            'madrigal.3.4.mxl', 'madrigal.3.5.mxl', 'madrigal.3.6.mxl',
+            'madrigal.3.7.mxl', 'madrigal.3.8.mxl', 'madrigal.3.9.mxl',
+            'madrigal.3.10.mxl', 'madrigal.3.11.mxl', 'madrigal.3.12.mxl',
+            'madrigal.3.13.mxl', 'madrigal.3.14.mxl', 'madrigal.3.15.mxl',
+            'madrigal.3.16.mxl', 'madrigal.3.17.mxl', 'madrigal.3.18.mxl',
+            'madrigal.3.19.mxl', 'madrigal.3.20.mxl', 'madrigal.4.1.mxl',
+            'madrigal.4.2.mxl', 'madrigal.4.3.mxl', 'madrigal.4.4.mxl',
+            'madrigal.4.5.mxl', 'madrigal.4.6.mxl', 'madrigal.4.7.mxl',
+            'madrigal.4.8.mxl', 'madrigal.4.9.mxl', 'madrigal.4.10.mxl',
+            'madrigal.4.11.mxl', 'madrigal.4.12.mxl', 'madrigal.4.13.mxl',
+            'madrigal.4.14.mxl', 'madrigal.4.15.mxl', 'madrigal.4.16.mxl',
+            'madrigal.4.17.mxl', 'madrigal.4.18.mxl', 'madrigal.4.19.mxl',
+            'madrigal.4.20.mxl', 'madrigal.5.1.mxl', 'madrigal.5.2.mxl',
+            'madrigal.5.3.mxl', 'madrigal.5.5.mxl', 'madrigal.5.5.mxl',
+            'madrigal.5.6.mxl', 'madrigal.5.7.mxl', 'madrigal.5.8.mxl',
+            )
+        composerDirectory = self.getComposerDir('monteverdi')
+        if composerDirectory is None:
+            return results
+        paths = self.getPaths(fileExtensions)
+        for filename in names:
+            candidate = os.path.join(composerDirectory, filename)
+            if candidate not in paths:
+                if not os.path.exists(candidate):
+                    environLocal.printDebug([
+                        'corpus missing expected file path',
+                        candidate,
+                        ])
+            else:
+                results.append(candidate)
+        return results
+
     def getPaths(
         self,
         fileExtensions=None,
