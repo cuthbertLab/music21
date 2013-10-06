@@ -47,39 +47,12 @@ environLocal = environment.Environment(_MOD)
 
 # update and access through property to make clear
 # that this is a corpus distribution or a no-corpus distribution
-_NO_CORPUS = False
 
 # store all composers in the corpus (not virtual)
 # as two element tuples of path name, full name
-COMPOSERS = [
-    ('airdsAirs', 'Aird\'s Airs'),
-    ('bach', 'Johann Sebastian Bach'),
-    ('beethoven', 'Ludwig van Beethoven'),
-    ('cpebach', 'C.P.E. Bach'),
-    ('ciconia', 'Johannes Ciconia'),
-    ('essenFolksong', 'Essen Folksong Collection'),
-    ('handel', 'George Frideric Handel'),
-    ('haydn', 'Joseph Haydn'),
-    ('josquin', 'Josquin des Prez'),
-    ('luca', 'D. Luca'),
-    ('miscFolk', "Miscellaneous Folk"),
-    ('monteverdi', "Claudio Monteverdi"),
-    ('mozart', 'Wolfgang Amadeus Mozart'),
-    ('oneills1850', 'Oneill\'s 1850'),
-    ('ryansMammoth', 'Ryan\'s Mammoth Collection'),
-    ('schoenberg', 'Arnold Schoenberg'),
-    ('schumann', 'Robert Schumann'),
-    ]
 
 # instantiate an instance of each virtual work object in a module
 # level constant; this object contains meta data about the work
-VIRTUAL = []
-for name in dir(virtual): # look over virtual module
-    className = getattr(virtual, name)
-    if callable(className):
-        obj = className()
-        if isinstance(obj, virtual.VirtualWork) and obj.corpusPath != None: # @UndefinedVariable
-            VIRTUAL.append(obj)
 
 
 #------------------------------------------------------------------------------
@@ -229,18 +202,18 @@ def getPaths(
     paths with one function.
     '''
     paths = []
-    if 'local' in domain:
-        paths += getLocalPaths(
-            fileExtensions=fileExtensions,
-            expandExtensions=expandExtensions,
-            )
     if 'core' in domain:
         paths += corpora.CoreCorpus().getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
+    if 'local' in domain:
+        paths += corpora.LocalCorpus().getPaths(
+            fileExtensions=fileExtensions,
+            expandExtensions=expandExtensions,
+            )
     if 'virtual' in domain:
-        paths += getVirtualPaths(
+        paths += corpora.VirtualCorpus().getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
@@ -320,6 +293,7 @@ def getComposer(composerName, fileExtensions=None):
 
     ::
 
+        >>> from music21 import corpus
         >>> a = corpus.getComposer('beethoven')
         >>> len(a) > 10
         True
@@ -343,25 +317,10 @@ def getComposer(composerName, fileExtensions=None):
         True
 
     '''
-    paths = getPaths(fileExtensions)
-    results = []
-    for path in paths:
-        # iterate through path components; cannot match entire string
-        # composer name may be at any level
-        stubs = path.split(os.sep)
-        for stub in stubs:
-            # need to remove extension if found
-            if composerName.lower() == stub.lower():
-                results.append(path)
-                break
-            # get all but the last dot group
-            # this is done for file names that function like composer names
-            elif '.' in stub and \
-                '.'.join(stub.split('.')[:-1]).lower() == composerName.lower():
-                results.append(path)
-                break
-    results.sort()
-    return results
+    return corpora.CoreCorpus().getComposer(
+        composerName,
+        fileExtensions=fileExtensions,
+        )
 
 
 def getComposerDir(composerName):
@@ -372,6 +331,7 @@ def getComposerDir(composerName):
     ::
 
         >>> import os
+        >>> from music21 import corpus
         >>> a = corpus.getComposerDir('beethoven')
         >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
         True
@@ -399,6 +359,7 @@ def noCorpus():
 
     ::
 
+        >>> from music21 import corpus
         >>> corpus.noCorpus
         False
 
@@ -417,6 +378,7 @@ def getWorkList(workName, movementNumber=None, fileExtensions=None):
 
     ::
 
+        >>> from music21 import corpus
         >>> len(corpus.getWorkList('beethoven/opus18no1'))
         8
 
@@ -489,12 +451,11 @@ def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
         []
 
     '''
-    if not common.isListLike(fileExtensions):
-        fileExtensions = [fileExtensions]
-    for obj in VIRTUAL:
-        if obj.corpusPath != None and workName.lower() in obj.corpusPath.lower():
-            return obj.getUrlByExt(fileExtensions)
-    return []
+    return corpora.VirtualCorpus().getWorkList(
+        workName,
+        movementNumber=movementNumber,
+        fileExtensions=fileExtensions,
+        )
 
 
 #------------------------------------------------------------------------------
@@ -511,6 +472,7 @@ def getWorkReferences(sort=True):
 
     ::
 
+        >>> from music21 import corpus
         >>> post = corpus.getWorkReferences()
 
     '''
@@ -574,7 +536,7 @@ def getWorkReferences(sort=True):
             # add this path
         results.append(ref)
     # get each VirtualWork object
-    for vw in VIRTUAL:
+    for vw in corpora.VirtualCorpus._virtual_works:
         composerDir = vw.corpusPath.split('/')[0]
         match = False
         for ref in results:
@@ -640,8 +602,8 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
 
     ::
 
-        >>> from music21 import corpus
         >>> import os
+        >>> from music21 import corpus
         >>> a = corpus.getWork('opus74no2', 4)
         >>> a.endswith(os.path.sep.join([
         ...     'haydn', 'opus74no2', 'movement4.mxl']))

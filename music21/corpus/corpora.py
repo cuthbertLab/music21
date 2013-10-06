@@ -16,6 +16,7 @@ import os
 
 from music21 import common
 from music21 import converter
+from music21.corpus import virtual
 
 from music21 import environment
 environLocal = environment.Environment(__file__)
@@ -546,6 +547,67 @@ class CoreCorpus(Corpus):
                 results.append(candidate)
         return candidates
 
+    def getComposer(
+        self,
+        composerName,
+        fileExtensions=None,
+        ):
+        '''
+        Return all filenames in the corpus that match a composer's or a
+        collection's name. An `fileExtensions`, if provided, defines which
+        extensions are returned. An `fileExtensions` of None (default) returns
+        all extensions.
+
+        Note that xml and mxl are treated equivalently.
+
+        ::
+
+            >>> from music21.corpus import corpora
+            >>> coreCorpus = corpora.CoreCorpus()
+            >>> a = coreCorpus.getComposer('beethoven')
+            >>> len(a) > 10
+            True
+
+        ::
+
+            >>> a = coreCorpus.getComposer('mozart')
+            >>> len(a) > 10
+            True
+
+        ::
+
+            >>> a = coreCorpus.getComposer('bach', 'krn')
+            >>> len(a) < 10
+            True
+
+        ::
+
+            >>> a = coreCorpus.getComposer('bach', 'xml')
+            >>> len(a) > 10
+            True
+
+        '''
+        paths = self.getPaths(fileExtensions)
+        results = []
+        for path in paths:
+            # iterate through path components; cannot match entire string
+            # composer name may be at any level
+            stubs = path.split(os.sep)
+            for stub in stubs:
+                # need to remove extension if found
+                if composerName.lower() == stub.lower():
+                    results.append(path)
+                    break
+                # get all but the last dot group
+                # this is done for file names that function like composer names
+                elif '.' in stub:
+                    newStub = '.'.join(stub.split('.')[:-1]).lower()
+                    if newStub == composerName.lower():
+                        results.append(path)
+                        break
+        results.sort()
+        return results
+
     def getComposerDirectoryPath(
         self,
         composerName,
@@ -973,6 +1035,19 @@ class LocalCorpus(Corpus):
 
 class VirtualCorpus(Corpus):
 
+    ### CLASS VARIABLES ###
+
+    _virtual_works = []
+    for name in dir(virtual):
+        className = getattr(virtual, name)
+        if callable(className):
+            obj = className()
+            if isinstance(obj, virtual.VirtualWork) and \
+                obj.corpusPath is not None:
+                _virtual_works.append(obj)
+
+    ### PUBLIC METHODS ###
+
     def getPaths(
         self,
         fileExtensions=None,
@@ -990,13 +1065,12 @@ class VirtualCorpus(Corpus):
             True
 
         '''
-        from music21 import corpus
         fileExtensions = self._translateExtensions(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
         paths = []
-        for obj in corpus.VIRTUAL:
+        for obj in self._virtual_works:
             if obj.corpusPath is not None:
                 for fileExtension in fileExtensions:
                     results = obj.getUrlByExt(fileExtension)
@@ -1004,6 +1078,37 @@ class VirtualCorpus(Corpus):
                         if result not in paths:
                             paths.append(result)
         return paths
+
+    def getWorkList(
+        self,
+        workName,
+        movementNumber=None,
+        fileExtensions=None,
+        ):
+        '''
+        Given a work name, search all virtual works and return a list of URLs
+        for any matches.
+
+        ::
+
+            >>> from music21.corpus import corpora
+            >>> virtualCorpus = corpora.VirtualCorpus()
+            >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
+            ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
+
+        ::
+
+            >>> virtualCorpus.getWorkList('junk')
+            []
+
+        '''
+        if not common.isListLike(fileExtensions):
+            fileExtensions = [fileExtensions]
+        for obj in VirtualCorpus._virtual_works:
+            if obj.corpusPath is not None and \
+                workName.lower() in obj.corpusPath.lower():
+                return obj.getUrlByExt(fileExtensions)
+        return []
 
     def updateMetadataBundle(self):
         from music21 import metadata
