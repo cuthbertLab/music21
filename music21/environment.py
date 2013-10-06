@@ -215,6 +215,7 @@ class SettingsHandler(xml.sax.ContentHandler):
 
     def __init__(self, tagLib=None):
         self.localCorpusSettings = LocalCorpusSettings()
+        self.localCorporaSettings = LocalCorporaSettings()
         # create directly, not in sax parsing; this is just a shortcut
         self._settings = Settings()
         self._charData = ''
@@ -267,7 +268,7 @@ class _EnvironmentCore(object):
 
     def __init__(self, forcePlatform=None):
         # only create one
-        #sys.stderr.write('creating singelton _EnvironmentCore\n')
+        #sys.stderr.write('creating singleton _EnvironmentCore\n')
         self._ref = {}
         # define all settings that are paths
         # store names of all values that are keys; check for validity
@@ -452,6 +453,7 @@ class _EnvironmentCore(object):
 
         # store a list of strings
         self._ref['localCorpusSettings'] = []
+        self._ref['localCorporaSettings'] = {}
 
         if forcePlatform is None:
             platform = common.getPlatform()
@@ -479,21 +481,29 @@ class _EnvironmentCore(object):
                 self.__setitem__(name, value)  # use for key checking
 
     def _toSettings(self, ref):
-        '''Convert a ref dictionary to a Settings object
+        '''
+        Convert a ref dictionary to a Settings object.
         '''
         settings = Settings()
-        for key, item in ref.items():
+        for key, value in ref.iteritems():
             if key == 'localCorpusSettings':
-                lcs = LocalCorpusSettings()
-                for fp in item:
-                    lcp = LocalCorpusPath()
-                    lcp.charData = fp
-                    lcs.append(lcp)
-                settings.append(lcs)
+                localCorpusSettings = LocalCorpusSettings()
+                for filePath in value:
+                    localCorpusPath = LocalCorpusPath(path=filePath)
+                    localCorpusSettings.append(localCorpusPath)
+                settings.append(localCorpusSettings)
+            elif key == 'localCorporaSettings':
+                localCorporaSettings = LocalCorporaSettings()
+                for name, paths in value.iteritems():
+                    localCorpusSettings = LocalCorpusSettings(name=name)
+                    for path in paths:
+                        localCorpusPath = LocalCorpusPath(path=path)
+                        localCorpusSettings.append(localCorpusPath)
+                    localCorporaSettings.append(localCorpusSettings)
             else:
                 slot = Preference()
                 slot.set('name', key)
-                slot.set('value', item)
+                slot.set('value', value)
                 settings.append(slot)
         return settings
 
@@ -569,14 +579,15 @@ class _EnvironmentCore(object):
         rootDir = self.getRootTempDir()
 
         if common.getPlatform() != 'win':
-            fd, fp = tempfile.mkstemp(dir=rootDir, suffix=suffix)
-            if isinstance(fd, int):
+            fileDescriptor, filePath = tempfile.mkstemp(
+                dir=rootDir, suffix=suffix)
+            if isinstance(fileDescriptor, int):
                 # on MacOS, fd returns an int, like 3, when this is called
                 # in some context (specifically, programmatically in a
-                # TestExternal class. the fp is still valid and works
+                # TestExternal class. the filePath is still valid and works
                 pass
             else:
-                fd.close()
+                fileDescriptor.close()
         else:  # win
             if sys.hexversion < 0x02030000:
                 raise EnvironmentException(
@@ -584,15 +595,15 @@ class _EnvironmentCore(object):
                     'files!')
             else:
                 tf = tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix)
-                fp = tf.name
+                filePath = tf.name
                 tf.close()
-        #self.printDebug([_MOD, 'temporary file:', fp])
-        return fp
+        #self.printDebug([_MOD, 'temporary file:', filePath])
+        return filePath
 
     def keys(self):
         return self._ref.keys() + ['localCorpusPath']
 
-    def launch(self, fmt, fp, options='', app=None):
+    def launch(self, fmt, filePath, options='', app=None):
         # see common.fileExtensions for format names
         m21Format, unused_ext = common.findFormat(fmt)
         if m21Format == 'lilypond':
@@ -610,16 +621,17 @@ class _EnvironmentCore(object):
         elif m21Format == 'vexflow':
             try:
                 import webbrowser
-                if fp.find('\\') != -1:
+                if filePath.find('\\') != -1:
                     pass
                 else:
-                    if fp.startswith('/'):
-                        fp = 'file://' + fp
+                    if filePath.startswith('/'):
+                        filePath = 'file://' + filePath
 
-                webbrowser.open(fp)
+                webbrowser.open(filePath)
                 return
             except:
-                print "Cannot open webbrowser, sorry.  go to file://%s" % fp
+                print 'Cannot open webbrowser, sorry. Go to file://{}'.format(
+                    filePath)
         else:
             environmentKey = None
             fpApp = None
@@ -638,21 +650,21 @@ class _EnvironmentCore(object):
         if platform == 'win' and fpApp is None:
             # no need to specify application here:
             # windows starts the program based on the file extension
-            cmd = 'start %s' % (fp)
+            cmd = 'start %s' % (filePath)
         elif platform == 'win':  # note extra set of quotes!
-            cmd = '""%s" %s "%s""' % (fpApp, options, fp)
+            cmd = '""%s" %s "%s""' % (fpApp, options, filePath)
         elif platform == 'darwin' and fpApp is None:
-            cmd = 'open %s %s' % (options, fp)
+            cmd = 'open %s %s' % (options, filePath)
         elif platform == 'darwin':
-            cmd = 'open -a"%s" %s %s' % (fpApp, options, fp)
+            cmd = 'open -a"%s" %s %s' % (fpApp, options, filePath)
         elif platform == 'nix':
-            cmd = '%s %s %s' % (fpApp, options, fp)
+            cmd = '%s %s %s' % (fpApp, options, filePath)
         os.system(cmd)
 
-    def read(self, fp=None):
-        if fp is None:
-            fp = self.getSettingsPath()
-        if not os.path.exists(fp):
+    def read(self, filePath=None):
+        if filePath is None:
+            filePath = self.getSettingsPath()
+        if not os.path.exists(filePath):
             return None  # do nothing if no file exists
         saxparser = xml.sax.make_parser()
         saxparser.setFeature(xml.sax.handler.feature_external_ges, 0)
@@ -660,7 +672,7 @@ class _EnvironmentCore(object):
         saxparser.setFeature(xml.sax.handler.feature_namespaces, 0)
         h = SettingsHandler()
         saxparser.setContentHandler(h)
-        with open(fp, 'r') as f:  # file i/o might be done outside of loop
+        with open(filePath, 'r') as f:  # file i/o might be done outside of loop
             saxparser.parse(f)
         # load from XML into dictionary
         # updates self._ref in place
@@ -670,16 +682,16 @@ class _EnvironmentCore(object):
         self._ref = {}
         self._loadDefaults()  # defines all valid keys in ref
 
-    def write(self, fp=None):
-        if fp is None:
-            fp = self.getSettingsPath()
+    def write(self, filePath=None):
+        if filePath is None:
+            filePath = self.getSettingsPath()
         # need to use __getitem__ here b/c need to covnert debug value
         # to an integer
-        directory, unused_fn = os.path.split(fp)
-        if fp is None or not os.path.exists(directory):
-            raise EnvironmentException('bad file path: %s' % fp)
+        directory, unused_fn = os.path.split(filePath)
+        if filePath is None or not os.path.exists(directory):
+            raise EnvironmentException('bad file path: %s' % filePath)
         settings = self._toSettings(self._ref)
-        with open(fp, 'w') as f:
+        with open(filePath, 'w') as f:
             f.write(settings.xmlStr())
 
 
@@ -873,6 +885,7 @@ class Environment(object):
             'lilypondFormat'
             'lilypondPath'
             'lilypondVersion'
+            'localCorporaSettings'
             'localCorpusSettings'
             'midiPath'
             'musescoreDirectPNGPath'
@@ -906,9 +919,9 @@ class Environment(object):
         Return a file path to a temporary file with the specified suffix (file
         extension).
         '''
-        fp = _environStorage['instance'].getTempFile(suffix=suffix)
-        self.printDebug([_MOD, 'temporary file:', fp])
-        return fp
+        filePath = _environStorage['instance'].getTempFile(suffix=suffix)
+        self.printDebug([_MOD, 'temporary file:', filePath])
+        return filePath
 
     def keys(self):
         '''
@@ -927,6 +940,7 @@ class Environment(object):
         'lilypondFormat'
         'lilypondPath'
         'lilypondVersion'
+        'localCorporaSettings'
         'localCorpusPath'
         'localCorpusSettings'
         'midiPath'
@@ -941,7 +955,7 @@ class Environment(object):
         '''
         return _environStorage['instance'].keys()
 
-    def launch(self, fmt, fp, options='', app=None):
+    def launch(self, fmt, filePath, options='', app=None):
         '''
         Opens a file with an either default or user-specified applications.
 
@@ -953,7 +967,7 @@ class Environment(object):
 
         TODO: Switch to module subprocess to prevent hanging.
         '''
-        return _environStorage['instance'].launch(fmt, fp,
+        return _environStorage['instance'].launch(fmt, filePath,
                 options=options, app=app)
 
     def printDebug(self, msg, statusLevel=common.DEBUG_USER, debugFormat=None):
@@ -971,14 +985,14 @@ class Environment(object):
             msg = common.formatStr(*msg, format=debugFormat)
             sys.stderr.write(msg)
 
-    def read(self, fp=None):
+    def read(self, filePath=None):
         '''
         Load an XML preference file if and only if the file is available
         and has been written in the past. This means that no preference file
         will ever be written unless manually done so. If no preference file
         exists, the method returns None.
         '''
-        return _environStorage['instance'].read(fp=fp)
+        return _environStorage['instance'].read(filePath=filePath)
 
     def restoreDefaults(self):
         '''
@@ -1012,13 +1026,13 @@ class Environment(object):
         msg = common.formatStr(*msg)
         sys.stderr.write(msg)
 
-    def write(self, fp=None):
+    def write(self, filePath=None):
         '''
         Write an XML preference file. This must be manually called to store
         any changes made to the object and access preferences later.
-        If `fp` is None, the default storage location will be used.
+        If `filePath` is None, the default storage location will be used.
         '''
-        return _environStorage['instance'].write(fp=fp)
+        return _environStorage['instance'].write(filePath=filePath)
 
 
 #------------------------------------------------------------------------------
@@ -1051,6 +1065,7 @@ class UserSettings(object):
         'lilypondFormat'
         'lilypondPath'
         'lilypondVersion'
+        'localCorporaSettings'
         'localCorpusPath'
         'localCorpusSettings'
         'midiPath'
@@ -1249,6 +1264,7 @@ def set(key, value):  # okay to override set here: @ReservedAssignment
         'lilypondFormat'
         'lilypondPath'
         'lilypondVersion'
+        'localCorporaSettings'
         'localCorpusPath'
         'localCorpusSettings'
         'midiPath'
@@ -1299,6 +1315,7 @@ def get(key):
         'lilypondFormat'
         'lilypondPath'
         'lilypondVersion'
+        'localCorporaSettings'
         'localCorpusPath'
         'localCorpusSettings'
         'midiPath'
