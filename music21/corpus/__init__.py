@@ -90,117 +90,11 @@ class CorpusException(exceptions21.Music21Exception):
 
 
 #------------------------------------------------------------------------------
-
-
-def _findPaths(rootDirectoryPath, fileExtensions):
-    '''
-    Given a root filePath file path, recursively search all contained paths for
-    files in `rootFilePath` matching any of the file extensions in
-    `fileExtensions`.
-
-    The `fileExtensions` is a list of file file extensions.
-
-    NB: we've tried optimizing with `fnmatch` but it does not save any time.
-    '''
-    # can replace extension matching with a regex
-    #escape extension dots (if there) for regex
-    #fileExtensions = ["\\%s" % ex for ex in fileExtensions
-    #    if ex.startswith('.')]
-    #extRe = re.compile('.*(%s)' % '|'.join(fileExtensions))
-
-    matched = []
-    # walk each top-level dir
-    # force rootDirectoryPath to be unicode so that dir names are properly
-    # resolved...
-    rootDirectoryPath = unicode(rootDirectoryPath)
-    for rootDirectory, directoryNames, filenames in os.walk(rootDirectoryPath):
-        if '.svn' in directoryNames:
-            # removing in place will stop recursion into these dirs
-            directoryNames.remove('.svn')
-        for filename in filenames:
-            try:
-                if filename.startswith('.'):
-                    continue
-            except UnicodeDecodeError as error:
-                raise CorpusException(
-                    'Incorrect filename in corpus path: {}: {!r}'.format(
-                        filename, error))
-            for extension in fileExtensions:
-                if filename.endswith(extension):
-                    matched.append(os.path.join(rootDirectory, filename))
-                    break # just break out of outer loop
-    return matched
-
-# cached once; default extensions for all corpus entires;
-# returned by _translateExtensions() function below
-_ALL_EXTENSIONS = (
-    common.findInputExtension('abc') +
-    common.findInputExtension('lily') +
-    common.findInputExtension('midi') +
-    common.findInputExtension('musicxml') +
-    common.findInputExtension('musedata') +
-    common.findInputExtension('humdrum') +
-    common.findInputExtension('romantext') +
-    common.findInputExtension('noteworthytext') +
-    common.findInputExtension('noteworthy')
-    )
-
-def _translateExtensions(fileExtensions=None, expandExtensions=True):
-    '''
-    Utility to get default extensions, or, optionally, expand extensions to all
-    known formats.
-
-    ::
-
-        >>> for extension in corpus._translateExtensions():
-        ...     extension
-        ...
-        '.abc'
-        '.ly'
-        '.lily'
-        '.mid'
-        '.midi'
-        '.xml'
-        '.mxl'
-        '.mx'
-        '.md'
-        '.musedata'
-        '.zip'
-        '.krn'
-        '.rntxt'
-        '.rntext'
-        '.romantext'
-        '.rtxt'
-        '.nwctxt'
-        '.nwc'
-
-    ::
-
-        >>> corpus._translateExtensions('.mid', False)
-        ['.mid']
-
-    ::
-
-        >>> corpus._translateExtensions('.mid', True)
-        ['.mid', '.midi']
-
-    '''
-    if not common.isListLike(fileExtensions):
-        fileExtensions = [fileExtensions]
-    if fileExtensions == [None]:
-        fileExtensions = _ALL_EXTENSIONS # already expended
-    elif expandExtensions:
-        expandedExtensions = []
-        for extension in fileExtensions:
-            expandedExtensions += common.findInputExtension(extension)
-        return expandedExtensions
-    return fileExtensions
-
-#------------------------------------------------------------------------------
 # core routines for getting file paths
 
 # module-level cache; only higher-level functions cache results
 _pathsCache = {}
+
 # store temporary local paths added by a user in a session and not stored in
 # Environment
 _pathsLocalTemp = []
@@ -259,7 +153,6 @@ def getVirtualPaths(fileExtensions=None, expandExtensions=True):
         fileExtensions=fileExtensions,
         expandExtensions=expandExtensions,
         )
-
 
 def getLocalPaths(fileExtensions=None, expandExtensions=True):
     '''
