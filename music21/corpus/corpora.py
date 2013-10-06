@@ -156,14 +156,17 @@ class Corpus(object):
     @staticmethod
     def _updateAllMetadataBundles():
         CoreCorpus().updateMetadataBundle()
-        LocalCorpus().updateMetadataBundle()
         VirtualCorpus().updateMetadataBundle()
+        for name in LocalCorpus.listLocalCorporaNames():
+            LocalCorpus(name).updateMetadataBundle()
+
+    ### PRIVATE PROPERTIES ###
+
+    @abc.abstractproperty
+    def _cacheName(self):
+        raise NotImplementedError
 
     ### PUBLIC METHODS ###
-
-    @abc.abstractmethod
-    def updateMetadataBundle(self):
-        raise NotImplementedError
 
     @staticmethod
     def fromName(name):
@@ -310,7 +313,7 @@ class Corpus(object):
     def search(
         query,
         field=None,
-        domain=('core', 'virtual', 'local'),
+        domain=None,
         fileExtensions=None,
         ):
         '''
@@ -327,12 +330,25 @@ class Corpus(object):
         Corpus._updateAllMetadataBundles()
         searchResults = []
         if domain is None:
-            domain = ('core', 'virtual', 'local')
+            domain = []
+            domain.append(CoreCorpus()._cacheName)
+            domain.append(VirtualCorpus()._cacheName)
+            for name in LocalCorpus.listLocalCorporaNames():
+                domain.append(LocalCorpus(name)._cacheName)
         for name in domain:
             if name in Corpus._metadataBundles:
                 searchResults += Corpus._metadataBundles[name].search(
                     query, field, fileExtensions)
         return searchResults
+
+    def updateMetadataBundle(self):
+        from music21 import metadata
+        domain = self._cacheName
+        if Corpus._metadataBundles[domain] is None:
+            metadataBundle = metadata.MetadataBundle(domain)
+            metadataBundle.read()
+            metadataBundle.validate()
+            Corpus._metadataBundles[domain] = metadataBundle
 
     ### PUBLIC PROPERTIES ###
 
@@ -369,6 +385,12 @@ class CoreCorpus(Corpus):
         )
 
     _noCorpus = False
+
+    ### PRIVATE PROPERTIES ###
+
+    @property
+    def _cacheName(self):
+        return 'core'
 
     ### PUBLIC METHODS ###
 
@@ -978,15 +1000,6 @@ class CoreCorpus(Corpus):
             movementResults = results
         return sorted(movementResults)
 
-    def updateMetadataBundle(self):
-        from music21 import metadata
-        domain = 'core'
-        if Corpus._metadataBundles[domain] is None:
-            metadataBundle = metadata.MetadataBundle(domain)
-            metadataBundle.read()
-            metadataBundle.validate()
-            Corpus._metadataBundles[domain] = metadataBundle
-
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -1213,6 +1226,12 @@ class VirtualCorpus(Corpus):
             if isinstance(obj, virtual.VirtualWork) and \
                 obj.corpusPath is not None:
                 _virtual_works.append(obj)
+
+    ### PRIVATE PROPERTIES ###
+
+    @property
+    def _cacheName(self):
+        return 'virtual'
 
     ### PUBLIC METHODS ###
 

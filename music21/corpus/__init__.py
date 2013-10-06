@@ -237,9 +237,7 @@ def _updateMetadataBundle():
     Note that this updates the in-memory cached metdata bundles not the disk
     caches (that's MUCH slower!) to do that run corpus.metadata.metadata.py
     '''
-    corpora.CoreCorpus().updateMetadataBundle()
-    corpora.LocalCorpus().updateMetadataBundle()
-    corpora.VirtualCorpus().updateMetadataBundle()
+    corpora.Corpus._updateAllMetadataBundles()
 
 
 def cacheMetadata(domainList=('local')):
