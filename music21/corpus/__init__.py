@@ -713,11 +713,11 @@ def getWorkReferences(sort=True):
     # from music21 import corpus; corpus.getWorkReferences()
     # TODO: update this to use metadata
     results = []
-    for composerDirectory, composer in COMPOSERS:
+    for composerDirectory, composer in corpora.CoreCorpus._composers:
         ref = {}
         ref['composer'] = composer
         ref['composerDir'] = composerDirectory
-        ref['works'] = {} # store by keys of name/dirname
+        ref['works'] = {}  # store by keys of name/dirname
         works = getComposer(composerDirectory)
         for path in works:
             # split by the composer dir to get relative path
@@ -731,12 +731,14 @@ def getWorkReferences(sort=True):
             # or a top-level name
             m21Format, ext = common.findFormatExtFile(fileComponents[-1])
             if ext is None:
-                #environLocal.printDebug(['file that does not seem to have an extension', ext, path])
+                #environLocal.printDebug([
+                #    'file that does not seem to have an extension',
+                #    ext, path])
                 continue
             # if not a file w/ ext, we will get None for format
-            if m21Format == None:
+            if m21Format is None:
                 workStub = fileComponents[0]
-            else: # remove the extension
+            else:  # remove the extension
                 workStub = fileComponents[0].replace(ext, '')
             # create list location if not already added
             if workStub not in ref['works']:
@@ -752,7 +754,7 @@ def getWorkReferences(sort=True):
             fileDict['ext'] = ext
             # all path parts after corpus
             fileDict['corpusPath'] = os.path.join(composerDirectory, fileStub)
-            fileDict['fileName'] = fileComponents[-1] # all after
+            fileDict['fileName'] = fileComponents[-1]  # all after
             title = None
             # this works but takes a long time!
 #             if format == 'musicxml':
@@ -776,14 +778,14 @@ def getWorkReferences(sort=True):
             if (ref['composer'] == vw.composer or
                 composerDir == ref['composerDir']):
                 match = True
-                break # use this ref
-        if not match: # new composers, create a new ref
+                break  # use this ref
+        if not match:  # new composers, create a new ref
             ref = {}
             ref['composer'] = vw.composer
             ref['composerDir'] = composerDir
-            ref['works'] = {} # store by keys of name/dirname
+            ref['works'] = {}  # store by keys of name/dirname
         # work stub should be everything other than top-level
-        workStub = vw.corpusPath.replace(composerDir+'/', '')
+        workStub = vw.corpusPath.replace(composerDir + '/', '')
         ref['works'][workStub] = {}
         ref['works'][workStub]['virtual'] = True
         ref['works'][workStub]['files'] = []
@@ -798,7 +800,7 @@ def getWorkReferences(sort=True):
             fileDict['title'] = vw.title
             fileDict['url'] = url
             ref['works'][workStub]['files'].append(fileDict)
-        if not match: # not found already, need to add
+        if not match:  # not found already, need to add
             results.append(ref)
     if sort:
         sortGroup = []
@@ -806,7 +808,10 @@ def getWorkReferences(sort=True):
             sortGroupSub = []
             for workStub in ref['works']:
                 # add title first for sorting
-                sortGroupSub.append([ref['works'][workStub]['title'], workStub])
+                sortGroupSub.append([
+                    ref['works'][workStub]['title'],
+                    workStub,
+                    ])
             sortGroupSub.sort()
             ref['sortedWorkKeys'] = [y for unused_x, y in sortGroupSub]
             # prepare this sort group
@@ -904,6 +909,7 @@ def parse(
 
     ::
 
+        >>> from music21 import corpus
         >>> bachChorale = corpus.parse('bwv66.6')
         >>> len(bachChorale.parts)
         4
@@ -927,7 +933,8 @@ def parse(
 
 
 def _addCorpusFilepath(streamObj, filePath):
-    # metadata attribute added to store the file path, for use later in identifying the score
+    # metadata attribute added to store the file path,
+    # for use later in identifying the score
     #if streamObj.metadata == None:
     #    streamObj.insert(metadata.Metadata())
     corpusFilePath = common.getCorpusFilePath()
@@ -960,10 +967,11 @@ def parseWork(*arguments, **keywords):
 # compression
 
 
-def compressAllXMLFiles(deleteOriginal = False):
+def compressAllXMLFiles(deleteOriginal=False):
     '''
-    Takes all filenames in corpus.paths and runs :meth:`music21.corpus.compressXML` on each.
-    If the musicXML files are compressed, the originals are deleted from the system.
+    Takes all filenames in corpus.paths and runs
+    :meth:`music21.corpus.compressXML` on each.  If the musicXML files are
+    compressed, the originals are deleted from the system.
     '''
     environLocal.warn("Compressing musicXML files...")
     for filename in getPaths(fileExtensions=('.xml',)):
@@ -985,14 +993,14 @@ def compressXML(filename, deleteOriginal=False):
     from the system.
     '''
     if not filename.endswith('.xml'):
-        return # not a musicXML file
+        return  # not a musicXML file
     environLocal.warn("Updating file: {0}".format(filename))
     filenameList = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)
     archivedName = filenameList.pop()
     # new archive name
-    filenameList.append(archivedName[0:len(archivedName)-4] + ".mxl")
-    newFilename = os.path.sep.join(filenameList) # new filename
+    filenameList.append(archivedName[0:len(archivedName) - 4] + ".mxl")
+    newFilename = os.path.sep.join(filenameList)  # new filename
     # contents of container.xml file in META-INF folder
     container = '<?xml version="1.0" encoding="UTF-8"?>\n\
 <container>\n\
@@ -1007,7 +1015,7 @@ def compressXML(filename, deleteOriginal=False):
         'w',
         compression=zipfile.ZIP_DEFLATED,
         ) as myZip:
-        myZip.write(filename = filename, archivedName = archivedName)
+        myZip.write(filename=filename, archivedName=archivedName)
         myZip.writestr(
             zinfo_or_archivedName='META-INF{0}container.xml'.format(
                 os.path.sep),
@@ -1028,10 +1036,11 @@ def uncompressMXL(filename, deleteOriginal=False):
     deleted from the system.
     '''
     if not filename.endswith(".mxl"):
-        return # not a musicXML file
+        return  # not a musicXML file
     environLocal.warn("Updating file: {0}".format(filename))
     filenames = filename.split(os.path.sep)
-    archivedName = filenames.pop() # find the archive name (name w/out filepath)
+    # find the archive name (name w/out filepath)
+    archivedName = filenames.pop()
 
     unarchivedName = os.path.splitext(archivedName)[0] + '.xml'
     extractPath = os.path.sep.join(filenames)
@@ -1051,14 +1060,6 @@ def uncompressMXL(filename, deleteOriginal=False):
 # libraries
 
 
-#beethoven = getComposer('beethoven')
-#josquin = getComposer('josquin')
-#mozart = getComposer('mozart')
-#monteverdi = getComposer('monteverdi')
-#haydn = getComposer('haydn')
-#handel = getComposer('handel')
-#bach = getComposer('bach')
-
 # additional libraries to define
 
 
@@ -1074,6 +1075,7 @@ def getBachChorales(fileExtensions='xml'):
 
     ::
 
+        >>> from music21 import corpus
         >>> a = corpus.getBachChorales()
         >>> len(a) > 400
         True
@@ -1194,13 +1196,13 @@ def getBachChorales(fileExtensions='xml'):
         )
     composerDirectory = getComposerDir('bach')
     results = []
-    if composerDirectory is None: # case where we have no corpus
+    if composerDirectory is None:  # case where we have no corpus
         return results
     paths = getPaths(fileExtensions)
     for filename in names:
         candidate = os.path.join(composerDirectory, filename)
-        if candidate not in paths: # it may not match extensions
-            if not os.path.exists(candidate): # it does not exist at all
+        if candidate not in paths:  # it may not match extensions
+            if not os.path.exists(candidate):  # it does not exist at all
                 filename2 = filename.replace('mxl', 'xml')
                 candidate2 = os.path.join(composerDirectory, filename2)
                 if candidate2 in paths:
@@ -1224,6 +1226,7 @@ def getHandelMessiah(fileExtensions='md'):
 
     ::
 
+        >>> from music21 import corpus
         >>> a = corpus.getHandelMessiah()
         >>> len(a)
         43
@@ -1253,8 +1256,8 @@ def getHandelMessiah(fileExtensions='md'):
     paths = getPaths(fileExtensions)
     for filename in names:
         candidate = os.path.join(composerDirectory, 'hwv56', filename)
-        if candidate not in paths: # it may not match extensions
-            if not os.path.exists(candidate): # it does not exist at all
+        if candidate not in paths:  # it may not match extensions
+            if not os.path.exists(candidate):  # it does not exist at all
                 environLocal.printDebug([
                     'corpus missing expected file path',
                     candidate,
@@ -1270,6 +1273,7 @@ def getMonteverdiMadrigals(fileExtensions='xml'):
 
     ::
 
+        >>> from music21 import corpus
         >>> a = corpus.getMonteverdiMadrigals()
         >>> len(a) > 40
         True
@@ -1300,8 +1304,8 @@ def getMonteverdiMadrigals(fileExtensions='xml'):
     paths = getPaths(fileExtensions)
     for filename in names:
         candidate = os.path.join(composerDirectory, filename)
-        if candidate not in paths: # it may not match extensions
-            if not os.path.exists(candidate): # it does not exist at all
+        if candidate not in paths:  # it may not match extensions
+            if not os.path.exists(candidate):  # it does not exist at all
                 environLocal.printDebug(['corpus missing expected file path',
                                     candidate])
         else:
@@ -1315,6 +1319,7 @@ def getBeethovenStringQuartets(fileExtensions=None):
 
     ::
 
+        >>> from music21 import corpus
         >>> a = corpus.getBeethovenStringQuartets()
         >>> len(a) > 10
         True
@@ -1332,37 +1337,9 @@ def getBeethovenStringQuartets(fileExtensions=None):
         False
 
     '''
-    candidates = []
-    candidates += getWorkList(('beethoven', 'opus18no1'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus18no3'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus18no4'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus18no5'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus59no1'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus59no2'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus59no3'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus74'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus132'),
-        fileExtensions=fileExtensions)
-    candidates += getWorkList(('beethoven', 'opus133'),
-        fileExtensions=fileExtensions)
-    results = []
-    for candidate in candidates:
-        if not os.path.exists(candidate):
-            environLocal.printDebug([
-                'corpus missing expected file path',
-                candidate,
-                ])
-        else:
-            results.append(candidate)
-    return candidates
+    return corpora.CoreCorpus().getBeethovenStringQuartets(
+        fileExtensions=fileExtensions,
+        )
 
 
 #------------------------------------------------------------------------------

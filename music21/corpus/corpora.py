@@ -302,7 +302,6 @@ class Corpus(object):
         raise NotImplementedError
 
 
-
 #------------------------------------------------------------------------------
 
 
@@ -333,6 +332,63 @@ class CoreCorpus(Corpus):
     _noCorpus = False
 
     ### PUBLIC METHODS ###
+
+    def getBeethovenStringQuartets(
+        self,
+        fileExtensions=None,
+        ):
+        '''
+        Return a list of all Beethoven String Quartet filenames.
+
+        ::
+
+            >>> from music21.corpus import corpora
+            >>> coreCorpus = corpora.CoreCorpus()
+            >>> a = coreCorpus.getBeethovenStringQuartets()
+            >>> len(a) > 10
+            True
+
+        ::
+
+            >>> a = coreCorpus.getBeethovenStringQuartets('krn')
+            >>> len(a) < 10 and len(a) > 0
+            True
+
+        ::
+
+            >>> a = coreCorpus.getBeethovenStringQuartets('xml')
+            >>> len(a) > 400
+            False
+
+        '''
+        names = (
+            'opus18no1',
+            'opus18no3',
+            'opus18no4',
+            'opus18no5',
+            'opus59no1',
+            'opus59no2',
+            'opus59no3',
+            'opus74',
+            'opus132',
+            'opus133',
+            )
+        candidates = []
+        for name in names:
+            candidates.extend(self.getWorkList(
+                ('beethoven', name),
+                fileExtensions=fileExtensions,
+                ))
+        results = []
+        for candidate in candidates:
+            if not os.path.exists(candidate):
+                environLocal.printDebug([
+                    'corpus missing expected file path',
+                    candidate,
+                    ])
+            else:
+                results.append(candidate)
+        return candidates
 
     def getPaths(
         self,
@@ -383,6 +439,134 @@ class CoreCorpus(Corpus):
                 )
         return Corpus._pathsCache[cacheKey]
 
+    def getWorkList(
+        self,
+        workName,
+        movementNumber=None,
+        fileExtensions=None,
+        ):
+        r'''
+        Search the corpus and return a list of filenames of works, always in a
+        list.
+
+        If no matches are found, an empty list is returned.
+
+        ::
+
+            >>> from music21.corpus import corpora
+            >>> coreCorpus = corpora.CoreCorpus()
+            >>> len(coreCorpus.getWorkList('beethoven/opus18no1'))
+            8
+
+        ::
+
+            >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1))
+            2
+
+        ::
+
+            >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1, '.krn'))
+            1
+
+        ::
+
+            >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1, '.xml'))
+            1
+
+        ::
+
+            >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 0, '.xml'))
+            0
+
+        ::
+
+            >>> len(coreCorpus.getWorkList('handel/hwv56', '1-02', '.md'))
+            1
+
+        ::
+
+            >>> len(coreCorpus.getWorkList('handel/hwv56', (2,1), '.md'))
+            1
+
+        ::
+
+            >>> len(coreCorpus.getWorkList(
+            ...     'bach/artOfFugue_bwv1080', 2, '.md'))
+            1
+
+        Make sure that 'verdi' just gets the single Verdi piece and not the
+        Monteverdi pieces:
+
+        ::
+
+            >>> len(coreCorpus.getWorkList('verdi'))
+            1
+
+        '''
+        if not common.isListLike(fileExtensions):
+            fileExtensions = [fileExtensions]
+        paths = self.getPaths(fileExtensions)
+        results = []
+        if common.isListLike(workName):
+            workName = os.path.sep.join(workName)
+        workSlashes = workName.replace('/', os.path.sep)
+        for path in paths:
+            if workName.lower() in path.lower():
+                results.append(path)
+            elif workSlashes.lower() in path.lower():
+                results.append(path)
+        if len(results):
+            previousResults = results
+            results = []
+            longName = os.sep + workSlashes.lower()
+            for path in previousResults:
+                if longName in path.lower():
+                    results.append(path)
+            if not len(results):
+                results = previousResults
+        movementResults = []
+        if movementNumber is not None and len(results):
+            movementStrList = []
+            if common.isListLike(movementNumber):
+                movementStrList.append(
+                    ''.join(str(x) for x in movementNumber))
+                movementStrList.append(
+                    '-'.join(str(x) for x in movementNumber))
+                movementStrList.append('movement' +
+                    '-'.join(str(x) for x in movementNumber))
+                movementStrList.append('movement' +
+                    '-0'.join(str(x) for x in movementNumber))
+            else:
+                movementStrList += [
+                    '0%s' % str(movementNumber),
+                    '%s' % str(movementNumber),
+                    'movement%s' % str(movementNumber),
+                    ]
+            for filePath in results:
+                filename = os.path.split(filePath)[1]
+                if '.' in filename:
+                    filenameWithoutExtension = os.path.splitext(filename)[0]
+                else:
+                    filenameWithoutExtension = None
+                searchPartialMatch = True
+                if filenameWithoutExtension is not None:
+                    for movementStr in movementStrList:
+                        if filenameWithoutExtension.lower() \
+                            == movementStr.lower():
+                            movementResults.append(filePath)
+                            searchPartialMatch = False
+                if len(movementResults):
+                    continue
+                if searchPartialMatch:
+                    for movementStr in movementStrList:
+                        if filename.startswith(movementStr.lower()):
+                            movementResults.append(filePath)
+            if not len(movementResults):
+                pass
+        else:
+            movementResults = results
+        return sorted(movementResults)
+
     def updateMetadataBundle(self):
         from music21 import metadata
         domain = 'core'
@@ -413,52 +597,6 @@ class CoreCorpus(Corpus):
                 CoreCorpus._noCorpus = False
         return CoreCorpus._noCorpus
 
-
-#------------------------------------------------------------------------------
-
-
-class VirtualCorpus(Corpus):
-
-    def getPaths(
-        self,
-        fileExtensions=None,
-        expandExtensions=True,
-        ):
-        '''
-        Get all paths in the virtual corpus that match a known extension.
-
-        An extension of None will return all known extensions.
-
-        ::
-
-            >>> from music21.corpus import corpora
-            >>> len(corpora.VirtualCorpus().getPaths()) > 6
-            True
-
-        '''
-        from music21 import corpus
-        fileExtensions = self._translateExtensions(
-            fileExtensions=fileExtensions,
-            expandExtensions=expandExtensions,
-            )
-        paths = []
-        for obj in corpus.VIRTUAL:
-            if obj.corpusPath is not None:
-                for fileExtension in fileExtensions:
-                    results = obj.getUrlByExt(fileExtension)
-                    for result in results:
-                        if result not in paths:
-                            paths.append(result)
-        return paths
-
-    def updateMetadataBundle(self):
-        from music21 import metadata
-        domain = 'virtual'
-        if Corpus._metadataBundles[domain] is None:
-            metadataBundle = metadata.MetadataBundle(domain)
-            metadataBundle.read()
-            metadataBundle.validate()
-            Corpus._metadataBundles[domain] = metadataBundle
 
 #------------------------------------------------------------------------------
 
@@ -517,6 +655,54 @@ class LocalCorpus(Corpus):
             metadataBundle.read()
             metadataBundle.validate()
             Corpus._metadataBundles[domain] = metadataBundle
+
+
+#------------------------------------------------------------------------------
+
+
+class VirtualCorpus(Corpus):
+
+    def getPaths(
+        self,
+        fileExtensions=None,
+        expandExtensions=True,
+        ):
+        '''
+        Get all paths in the virtual corpus that match a known extension.
+
+        An extension of None will return all known extensions.
+
+        ::
+
+            >>> from music21.corpus import corpora
+            >>> len(corpora.VirtualCorpus().getPaths()) > 6
+            True
+
+        '''
+        from music21 import corpus
+        fileExtensions = self._translateExtensions(
+            fileExtensions=fileExtensions,
+            expandExtensions=expandExtensions,
+            )
+        paths = []
+        for obj in corpus.VIRTUAL:
+            if obj.corpusPath is not None:
+                for fileExtension in fileExtensions:
+                    results = obj.getUrlByExt(fileExtension)
+                    for result in results:
+                        if result not in paths:
+                            paths.append(result)
+        return paths
+
+    def updateMetadataBundle(self):
+        from music21 import metadata
+        domain = 'virtual'
+        if Corpus._metadataBundles[domain] is None:
+            metadataBundle = metadata.MetadataBundle(domain)
+            metadataBundle.read()
+            metadataBundle.validate()
+            Corpus._metadataBundles[domain] = metadataBundle
+
 
 #------------------------------------------------------------------------------
 
