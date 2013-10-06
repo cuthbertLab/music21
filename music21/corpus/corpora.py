@@ -49,7 +49,20 @@ class Corpus(object):
 
     _pathsCache = {}
 
+    ### SPECIAL METHODS ###
+
+    def __repr__(self):
+        return '<{}.{}>'.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            )
+
     ### PRIVATE METHODS ###
+
+    def _removeNameFromCache(self, name):
+        for key in Corpus._pathsCache.keys():
+            if key[0] == name:
+                del(Corpus._pathsCache[key])
 
     def _findPaths(self, rootDirectoryPath, fileExtensions):
         '''
@@ -154,13 +167,38 @@ class Corpus(object):
 
     @staticmethod
     def fromName(name):
+        '''
+        Instantiate a specific corpus based on `name`:
+
+        ::
+
+            >>> from music21.corpus import corpora
+            >>> corpora.Corpus.fromName('core')
+            <music21.corpus.corpora.CoreCorpus>
+
+        ::
+
+            >>> corpora.Corpus.fromName('virtual')
+            <music21.corpus.corpora.VirtualCorpus>
+
+        ::
+
+            >>> corpora.Corpus.fromName('local')
+            <music21.corpus.corpora.LocalCorpus>
+
+        ::
+
+            >>> corpora.Corpus.fromName('test')
+            <music21.corpus.corpora.LocalCorpus: 'test'>
+
+        '''
         if name == 'core':
             return CoreCorpus()
         elif name == 'virtual':
             return VirtualCorpus()
         elif name == 'local':
             return LocalCorpus()
-        return LocalCorpus(name)
+        return LocalCorpus(name=name)
 
     @abc.abstractmethod
     def getPaths(self):
@@ -978,9 +1016,65 @@ class LocalCorpus(Corpus):
 
     ### CLASS VARIABLES ###
 
-    _temporaryLocalPaths = []
+    _temporaryLocalPaths = {}
+
+    ### INITIALIZER ###
+
+    def __init__(self, name=None):
+        assert isinstance(name, (str, unicode, type(None)))
+        if name is not None:
+            assert len(name)
+        self._name = name
+
+    ### SPECIAL METHODS ###
+
+    def __repr__(self):
+        if self.name is None:
+            return '<{}.{}>'.format(
+                self.__class__.__module__,
+                self.__class__.__name__,
+                )
+        return '<{}.{}: {!r}>'.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            self.name
+            )
+
+    ### PRIVATE METHODS ###
+
+    def _getSettings(self):
+        userSettings = environment.UserSettings()
+        if self.name is None:
+            return userSettings['localCorpusSettings']
+        return userSettings['localCorporaSettings'].get(self.name, None)
+
+    ### PRIVATE PROPERTIES ###
+
+    @property
+    def _cacheName(self):
+        cacheName = 'local'
+        if self.name is not None:
+            cacheName += '-{}'.format(self.name)
+        return cacheName
 
     ### PUBLIC METHODS ###
+
+    def addPath(self, directoryPath):
+        from music21 import corpus
+        if not isinstance(directoryPath, (str, unicode)):
+            raise corpus.CorpusException(
+                'an invalid file path has been provided: {0!r}'.format(
+                    directoryPath))
+        directoryPath = os.path.expanduser(directoryPath)
+        if not os.path.exists(directoryPath) or \
+            not os.path.isdir(directoryPath):
+            raise corpus.CorpusException(
+                'an invalid file path has been provided: {0!r}'.format(
+                    directoryPath))
+        if self._cacheName not in LocalCorpus._temporaryLocalPaths:
+            LocalCorpus._temporaryLocalPaths[self._cacheName] = set()
+        LocalCorpus._temporaryLocalPaths[self._cacheName].add(directoryPath)
+        self._removeNameFromCache(self._cacheName)
 
     def getPaths(
         self,
@@ -999,35 +1093,109 @@ class LocalCorpus(Corpus):
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
-        cacheKey = ('local', tuple(fileExtensions))
+        cacheKey = (self._cacheName, tuple(fileExtensions))
         # not cached, fetch and reset
         if cacheKey not in Corpus._pathsCache:
             # check paths before trying to search
-            candidatePaths = environLocal['localCorpusSettings']
             validPaths = []
-            for filePath in candidatePaths + LocalCorpus._temporaryLocalPaths:
-                if not os.path.isdir(filePath):
+            for directoryPath in self.directoryPaths:
+                if not os.path.isdir(directoryPath):
                     environLocal.warn(
                         'invalid path set as localCorpusSetting: {}'.format(
-                            filePath))
+                            directoryPath))
                 else:
-                    validPaths.append(filePath)
+                    validPaths.append(directoryPath)
             # append successive matches into one list
-            matched = []
-            for filePath in validPaths:
-                #environLocal.printDebug(['finding paths in:', filePath])
-                matched += self._findPaths(filePath, fileExtensions)
-            Corpus._pathsCache[cacheKey] = matched
+            matches = []
+            for directoryPath in validPaths:
+                matches += self._findPaths(directoryPath, fileExtensions)
+            Corpus._pathsCache[cacheKey] = matches
         return Corpus._pathsCache[cacheKey]
+
+    @staticmethod
+    def listLocalCorporaNames():
+        '''
+        List the names of all user-defined local corpora.
+
+        The entry for None refers to the default local corpus.
+        '''
+        userSettings = environment.UserSettings()
+        result = [None]
+        result.extend(userSettings['localCorporaSettings'].keys())
+        return result
+
+    def save(self):
+        userSettings = environment.UserSettings()
+        if self.name is None:
+            userSettings['localCorpusSettings'] = self.directoryPaths
+        else:
+            userSettings['localCorporaSettings'][self.name] = \
+                self.directoryPaths
+        environment.Environment().write()
+
+    def removePath(self, directoryPath):
+        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
+            self._cacheName, [])
+        if directoryPath in temporaryPaths:
+            temporaryPaths.remove(directoryPath)
+        elif self.existsInSettings:
+            settings = self._getSettings()
+            if directoryPath in settings:
+                settings.remove(directoryPath)
+            self.save()
+        self._removeNameFromCache(self._cacheName)
 
     def updateMetadataBundle(self):
         from music21 import metadata
-        domain = 'local'
+        domain = self._cacheName
         if Corpus._metadataBundles[domain] is None:
             metadataBundle = metadata.MetadataBundle(domain)
             metadataBundle.read()
             metadataBundle.validate()
             Corpus._metadataBundles[domain] = metadataBundle
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def directoryPaths(self):
+        candidatePaths = []
+        if self.existsInSettings:
+            if self.name is None:
+                candidatePaths = environLocal['localCorpusSettings']
+            else:
+                candidatePaths = \
+                    environLocal['localCorporaSettings'][self.name]
+        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
+            self._cacheName, [])
+        allPaths = tuple(sorted(set(candidatePaths).union(temporaryPaths)))
+        return allPaths
+
+    @property
+    def existsInSettings(self):
+        '''
+        True if this local corpus has a corresponding entry in music21's user
+        settings, otherwise false.
+        '''
+        if self.name is None:
+            return True
+        userSettings = environment.UserSettings()
+        return self.name in userSettings['localCorporaSettings']
+
+    @property
+    def name(self):
+        '''
+        The name of the local corpus.
+
+        A name of None indicates the default local corpus:
+
+        ::
+
+            >>> from music21.corpus import corpora
+            >>> corpora.LocalCorpus(name='Bach Chorales').name
+            'Bach Chorales'
+
+        '''
+        return self._name
 
 
 #------------------------------------------------------------------------------

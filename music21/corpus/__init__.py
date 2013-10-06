@@ -173,22 +173,23 @@ def addPath(filePath):
 
     Restart music21 after adding paths.
     '''
-    if filePath is None or not os.path.exists(filePath):
-        raise CorpusException(
-            'an invalid file path has been provided: {0!r}'.format(filePath))
-    if filePath in _pathsLocalTemp:
-        raise CorpusException(
-            'the provided path has already been added: {0!r}'.format(filePath))
-    if filePath in environLocal['localCorpusSettings']:
-        raise CorpusException(
-            'the provided path is already incldued in the Environment '
-            'localCorpusSettings: {0!r}'.format(filePath))
-
-    _pathsLocalTemp.append(filePath)
-    # delete all local keys in the cache
-    for key in _pathsCache:
-        if key[0] == 'local':
-            del _pathsCache[key]
+    corpora.LocalCorpus().addPath(filePath)
+#    if filePath is None or not os.path.exists(filePath):
+#        raise CorpusException(
+#            'an invalid file path has been provided: {0!r}'.format(filePath))
+#    if filePath in _pathsLocalTemp:
+#        raise CorpusException(
+#            'the provided path has already been added: {0!r}'.format(filePath))
+#    if filePath in environLocal['localCorpusSettings']:
+#        raise CorpusException(
+#            'the provided path is already incldued in the Environment '
+#            'localCorpusSettings: {0!r}'.format(filePath))
+#
+#    _pathsLocalTemp.append(filePath)
+#    # delete all local keys in the cache
+#    for key in _pathsCache:
+#        if key[0] == 'local':
+#            del _pathsCache[key]
 
 
 def getPaths(
