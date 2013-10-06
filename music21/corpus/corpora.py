@@ -256,7 +256,7 @@ class Corpus(object):
             filePath = workList[0]
         elif not len(workList):
             raise corpus.CorpusException(
-                'Could not find a work that met this criterion: %s'.format(
+                'Could not find a work that met this criterion: {}'.format(
                     workName))
         else:
             filePath = workList[0]
@@ -906,9 +906,9 @@ class CoreCorpus(Corpus):
                     '-0'.join(str(x) for x in movementNumber))
             else:
                 movementStrList += [
-                    '0%s' % str(movementNumber),
-                    '%s' % str(movementNumber),
-                    'movement%s' % str(movementNumber),
+                    '0{}'.format(movementNumber),
+                    str(movementNumber),
+                    'movement{}'.format(movementNumber),
                     ]
             for filePath in results:
                 filename = os.path.split(filePath)[1]
