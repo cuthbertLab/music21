@@ -110,8 +110,9 @@ class LocalCorpusSettings(xmlnode.XMLNodeList):
 
     ### INITIALIZER ###
 
-    def __init__(self):
+    def __init__(self, name=None):
         xmlnode.XMLNode.__init__(self)
+        self._attr['name'] = name
         self._tag = 'localCorpusSettings'  # assumed for now
         self.componentList = []  # list of LocalCorpusPath objects
 
@@ -122,37 +123,41 @@ class LocalCorpusSettings(xmlnode.XMLNodeList):
 
 
 class LocalCorporaSettings(xmlnode.XMLNodeList):
+    '''
+    An xmlnode.XMLNode subclass representing information about various
+    secondary local corpora:
+
+    ::
+
+        >>> from music21 import environment
+        >>> localCorpora = environment.LocalCorporaSettings()
+        >>> corpusA = environment.LocalCorpusSettings(name='A')
+        >>> corpusA.append(environment.LocalCorpusPath(path='foo'))
+        >>> corpusA.append(environment.LocalCorpusPath(path='bar'))
+        >>> corpusB = environment.LocalCorpusSettings(name='B')
+        >>> corpusB.append(environment.LocalCorpusPath(path='baz'))
+        >>> localCorpora.append(corpusA)
+        >>> localCorpora.append(corpusB)
+        >>> print localCorpora.xmlStr()
+        <?xml version="1.0" encoding="utf-8"?>
+        <localCorporaSettings>
+          <localCorpusSettings name="A">
+            <localCorpusPath>foo</localCorpusPath>
+            <localCorpusPath>bar</localCorpusPath>
+          </localCorpusSettings>
+          <localCorpusSettings name="B">
+            <localCorpusPath>baz</localCorpusPath>
+          </localCorpusSettings>
+        </localCorporaSettings>
+        <BLANKLINE>
+
+    '''
 
     ### INITIALIZER ###
 
     def __init__(self):
         xmlnode.XMLNode.__init__(self)
         self._tag = 'localCorporaSettings'
-        self.componentList = []
-
-    ### PRIVATE METHODS ###
-
-    def _getComponents(self):
-        return self.componentList
-
-
-class SecondaryLocalCorpusSettings(xmlnode.XMLNodeList):
-    '''
-    An xmlnode.XMLNode subclass representing a secondary, named local corpus:
-
-    ::
-
-        >>> from music21 import environment
-        >>> node = environment.SecondaryLocalCorpusSettings('trecento')
-
-    '''
-
-    ### INITIALIZER ###
-
-    def __init__(self, name):
-        xmlnode.XMLNode.__init__(self)
-        self._tag = 'secondaryLocalCorpusSettings'
-        self._attr['name'] = name
         self.componentList = []
 
     ### PRIVATE METHODS ###
@@ -184,10 +189,10 @@ class LocalCorpusPath(xmlnode.XMLNode):
 
     ### INITIALIZER ###
 
-    def __init__(self):
+    def __init__(self, path=None):
         xmlnode.XMLNode.__init__(self)
         self._tag = 'localCorpusPath'  # assumed for now
-        self.charData = None  # char data stores path
+        self.charData = path  # char data stores path
         # attributes
 
 
