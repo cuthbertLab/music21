@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         freezeThaw.py
 # Purpose:      Methods for storing any music21 object on disk.
 #               Uses pickle and json
@@ -7,85 +7,99 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21
+#               Project
 # License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
 r'''
 This module contains objects for storing complete `Music21Objects`, especially
-`Stream` and `Score` objects on disk.  Freezing (or "pickling") refers to writing
-the object to a file on disk (or to a string).  Thawing (or "unpickling") refers to reading
-in a string or file and returning a Music21 object.
+`Stream` and `Score` objects on disk.  Freezing (or "pickling") refers to
+writing the object to a file on disk (or to a string).  Thawing (or
+"unpickling") refers to reading in a string or file and returning a Music21
+object.
 
 This module offers alternatives to writing a `Score` to `MusicXML` with
 `s.write('musicxml')`.  `FreezeThaw` has some advantages over using `.write()`:
 virtually every aspect of a music21 object is retained when Freezing.  So
-objects like `medRen.Ligature`, which aren't supported by most formats,
-can be stored with `FreezeThaw` and then read back again.  Freezing is also
-much faster than most conversion methods.  But there's a big downside:
-only `music21` and `Python` can use the `Thaw` side to get back `Music21Objects`
-(though
-some information can be brought out of the JSONFreeze format through
-any .json reader).  In fact, there's not even a guarantee that future versions of music21
-will be able to read a frozen version of a `Stream`.  So the advantages and
-disadvantages of this model definitely need to be kept in mind.
+objects like `medRen.Ligature`, which aren't supported by most formats, can be
+stored with `FreezeThaw` and then read back again.  Freezing is also much
+faster than most conversion methods.  But there's a big downside: only
+`music21` and `Python` can use the `Thaw` side to get back `Music21Objects`
+(though some information can be brought out of the JSONFreeze format through
+any .json reader).  In fact, there's not even a guarantee that future versions
+of music21 will be able to read a frozen version of a `Stream`.  So the
+advantages and disadvantages of this model definitely need to be kept in mind.
 
-There are two formats that `freezeThaw` can produce: "Pickle" or JSON (for JavaScript Object
-Notation -- essentially a string representation of the JavaScript equivalent
-of a Python dictionary).  Pickle is a Python-specific idea for storing objects.
-The `pickle` module stores objects as a text file that can't be easily read by
-non-Python applications; it also isn't guaranteed to work across Python versions or
-even computers.  However, it works well, is fast, and is a standard part of python.
-JSON was originally created to pass JavaScript
-objects from a web server to a web browser, but its utility (combining the power
-of XML with the ease of use of objects) has made it a growing standard for
-other languages.  (see http://docs.python.org/library/json.html).
+There are two formats that `freezeThaw` can produce: "Pickle" or JSON (for
+JavaScript Object Notation -- essentially a string representation of the
+JavaScript equivalent of a Python dictionary).  Pickle is a Python-specific
+idea for storing objects.  The `pickle` module stores objects as a text file
+that can't be easily read by non-Python applications; it also isn't guaranteed
+to work across Python versions or even computers.  However, it works well, is
+fast, and is a standard part of python.  JSON was originally created to pass
+JavaScript objects from a web server to a web browser, but its utility
+(combining the power of XML with the ease of use of objects) has made it a
+growing standard for other languages.  (see
+http://docs.python.org/library/json.html).
 
-Both JSON and Pickle files can
-be huge, but `freezeThaw` can compress them with `gzip` or `ZipFile` and thus they're
-not that large at all.
+Both JSON and Pickle files can be huge, but `freezeThaw` can compress them with
+`gzip` or `ZipFile` and thus they're not that large at all.
 
+We thought about implementing JSON serialization using the freely distributable
+`jsonpickle` module found in `music21.ext.jsonpickle`.  See that folder's
+"license.txt" for copyright information.
 
+However, current versions of jsonpickle do not recreate the same object
+structures when decoded, so it can't really be used with complex nesting
+structures like music21 creates.  For instance:
 
-We thought about implementing JSON serialization using the freely distributable `jsonpickle`
-module found in `music21.ext.jsonpickle`.  See that folder's "license.txt" for
-copyright information.
+::
 
-However, current versions of jsonpickle do not recreate the same
-object structures when decoded, so it can't really be used
-with complex nesting structures like music21 creates.  For instance:
+    >>> from music21.ext import jsonpickle as jsp
+    >>> blah = {u'hello': u'there'}
+    >>> l = [blah, blah]
+    >>> l[0] is l[1]
+    True
 
->>> from music21.ext import jsonpickle as jsp
->>> blah = {u'hello': u'there'}
->>> l = [blah, blah]
->>> l[0] is l[1]
-True
+::
 
->>> d = jsp.encode(l)
->>> print d
-[{"hello": "there"}, {"hello": "there"}]
+    >>> d = jsp.encode(l)
+    >>> print d
+    [{"hello": "there"}, {"hello": "there"}]
 
->>> e = jsp.decode(d)
->>> e
-[{'hello': 'there'}, {'hello': 'there'}]
+::
 
->>> e[0] is e[1]
-False
+    >>> e = jsp.decode(d)
+    >>> e
+    [{'hello': 'there'}, {'hello': 'there'}]
+
+::
+
+    >>> e[0] is e[1]
+    False
 
 However, pickle works fine, so we use that by default:
 
->>> import pickle
->>> f = pickle.dumps(l)
->>> f
-'(lp0\n(dp1\nVhello\np2\nVthere\np3\nsag1\na.'
+::
+
+    >>> import pickle
+    >>> f = pickle.dumps(l)
+    >>> f
+    '(lp0\n(dp1\nVhello\np2\nVthere\np3\nsag1\na.'
 
 Pretty ugly, eh? but it works!
 
->>> g = pickle.loads(f)
->>> g
-[{u'hello': u'there'}, {u'hello': u'there'}]
+::
 
->>> g[0] is g[1]
-True
+    >>> g = pickle.loads(f)
+    >>> g
+    [{u'hello': u'there'}, {u'hello': u'there'}]
+
+::
+
+    >>> g[0] is g[1]
+    True
 
 The name freezeThaw comes from Perl's implementation of similar methods -- I
 like the idea of thawing something that's frozen; "unpickling" just doesn't
@@ -111,20 +125,20 @@ from music21 import environment
 _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
-#try:
-#    import cPickle as pickleMod
-#except ImportError:
-#    import pickle as pickleMod
-import pickle as pickleMod
+try:
+    import cPickle as pickleMod
+except ImportError:
+    import pickle as pickleMod
+#import pickle as pickleMod
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 class FreezeThawException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 class StreamFreezeThawBase(object):
@@ -151,7 +165,7 @@ class StreamFreezeThawBase(object):
         return allObjs
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class StreamFreezer(StreamFreezeThawBase):
     '''
     This class is used to freeze a Stream, preparing it for serialization
@@ -260,19 +274,31 @@ class StreamFreezer(StreamFreezeThawBase):
             if streamObj is None:
                 raise FreezeThawException("You need to pass in a stream when creating to work")
         self.unwrapVolumeWeakrefs(streamObj)
-        allEls = streamObj.recurse(restoreActiveSites = False)
+        allEls = streamObj.recurse(restoreActiveSites=False)
         if self.topLevel is True:
             self.findActiveStreamIdsInHierarchy(streamObj)
 
         for el in allEls:
             if el.isVariant:
                 # works like a whole new hierarchy... # no need for deepcopy
-                subSF = StreamFreezer(el._stream, fastButUnsafe=True, streamIds = self.streamIds, topLevel = False)
+                subSF = StreamFreezer(
+                    el._stream,
+                    fastButUnsafe=True,
+                    streamIds=self.streamIds,
+                    topLevel=False,
+                    )
                 subSF.setupSerializationScaffold()
             elif el.isSpanner:
                 # works like a whole new hierarchy... # no need for deepcopy
-                subSF = StreamFreezer(el.spannedElements, fastButUnsafe=True, streamIds = self.streamIds, topLevel = False)
+                subSF = StreamFreezer(
+                    el.spannedElements,
+                    fastButUnsafe=True,
+                    streamIds=self.streamIds,
+                    topLevel=False,
+                    )
                 subSF.setupSerializationScaffold()
+            elif el.isStream:
+                self.removeStreamStatusClient(el)
 
         self.removeStreamStatusClient(streamObj)
 
@@ -896,7 +922,7 @@ class StreamThawer(StreamFreezeThawBase):
         environLocal.printDebug("StreamThawer:openStr: storage is: %s" % storage)
         self.stream = self.unpackStream(storage)
 
-#---------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
 
 class JSONFreezerException(FreezeThawException):
     pass
