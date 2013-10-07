@@ -52,36 +52,18 @@ We thought about implementing JSON serialization using the freely distributable
 
 However, current versions of jsonpickle do not recreate the same object
 structures when decoded, so it can't really be used with complex nesting
-structures like music21 creates.  For instance:
+structures like music21 creates.  
 
-::
 
-    >>> from music21.ext import jsonpickle as jsp
-    >>> blah = {u'hello': u'there'}
-    >>> l = [blah, blah]
-    >>> l[0] is l[1]
-    True
-
-::
-
-    >>> d = jsp.encode(l)
-    >>> print d
-    [{"hello": "there"}, {"hello": "there"}]
-
-::
-
-    >>> e = jsp.decode(d)
-    >>> e
-    [{'hello': 'there'}, {'hello': 'there'}]
-
-::
-
-    >>> e[0] is e[1]
-    False
 
 However, pickle works fine, so we use that by default:
 
 ::
+
+    >>> blah = {u'hello': u'there'}
+    >>> l = [blah, blah]
+    >>> l[0] is l[1]
+    True
 
     >>> import pickle
     >>> f = pickle.dumps(l)
