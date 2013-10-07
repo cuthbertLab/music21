@@ -732,6 +732,8 @@ class StreamThawer(StreamFreezeThawBase):
                 subSF.teardownSerializationScaffold(e.spannedElements)
                 e.spannedElements._elementsChanged()
                 e._cache = {}
+            elif e.isStream:
+                self.restoreStreamStatusClient(e)
 
 
             #self.thawIds(e)
