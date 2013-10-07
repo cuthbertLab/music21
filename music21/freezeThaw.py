@@ -92,6 +92,7 @@ like the idea of thawing something that's frozen; "unpickling" just doesn't
 seem possible.  In any event, I needed a name that wouldn't already
 exist in the Python namespace.
 '''
+
 import codecs
 import copy
 import unittest
@@ -110,18 +111,22 @@ from music21 import environment
 _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
+#try:
+#    import cPickle as pickleMod
+#except ImportError:
+#    import pickle as pickleMod
+import pickle as pickleMod
 
-try:
-    import cPickle as pickleMod
-except ImportError:
-    import pickle as pickleMod
-#import pickle as pickleMod
 
 #-------------------------------------------------------------------------------
+
+
 class FreezeThawException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
+
+
 class StreamFreezeThawBase(object):
     '''
     Contains a few methods that are used for both
@@ -269,10 +274,16 @@ class StreamFreezer(StreamFreezeThawBase):
                 subSF = StreamFreezer(el.spannedElements, fastButUnsafe=True, streamIds = self.streamIds, topLevel = False)
                 subSF.setupSerializationScaffold()
 
+        self.removeStreamStatusClient(streamObj)
+
         self.setupStoredElementOffsetTuples(streamObj)
 
         if self.topLevel is True:
             self.recursiveClearSites(streamObj)
+
+    def removeStreamStatusClient(self, streamObj):
+        if hasattr(streamObj, '_streamStatus'):
+            streamObj._streamStatus._client = None
 
     def recursiveClearSites(self, startObj):
         '''
@@ -695,6 +706,8 @@ class StreamThawer(StreamFreezeThawBase):
 
         self.restoreElementsFromTuples(streamObj)
 
+        self.restoreStreamStatusClient(streamObj)
+
         allEls = self.findAllM21Objects(streamObj)
 
         for e in allEls:
@@ -782,6 +795,10 @@ class StreamThawer(StreamFreezeThawBase):
                 # if the spanner stores a part or something in the Stream
                 # for instance in a StaffGroup object
                 self.restoreElementsFromTuples(subElement)
+
+    def restoreStreamStatusClient(self, streamObj):
+        if hasattr(streamObj, '_streamStatus'):
+            streamObj._streamStatus._client = streamObj
 
     def wrapVolumeWeakrefs(self, streamObj = None):
         '''

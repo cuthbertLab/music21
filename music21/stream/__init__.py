@@ -276,7 +276,7 @@ class Stream(base.Music21Object):
     def __init__(self, givenElements=None, *args, **keywords):
         base.Music21Object.__init__(self)
 
-        #self._streamStatus = streamStatus.StreamStatus(self)
+        self._streamStatus = streamStatus.StreamStatus(self)
 
         # self._elements stores Music21Object objects.
         self._elements = []
