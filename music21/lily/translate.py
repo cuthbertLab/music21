@@ -1465,6 +1465,8 @@ class LilypondConverter(object):
             lilyName = 'tenor'
         elif 'SopranoClef' in c:
             lilyName = 'soprano'
+        elif 'PercussionClef' in c:
+            lilyName = 'percussion'
         else:
             environLocal.printDebug('got a clef that lilypond does not know what to do with: %s' % clefObj)
             lilyName = ""

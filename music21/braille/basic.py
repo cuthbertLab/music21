@@ -490,7 +490,7 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
             nameWithDuration = notesInStep[music21Note.duration.type]
             music21Note._brailleEnglish.append(u"{0} {1} {2}".format(music21Note.step, music21Note.duration.type, nameWithDuration))
         noteTrans.append(nameWithDuration)
-        for counter_dot in range(music21Note.duration.dots):
+        for unused_counter_dot in range(music21Note.duration.dots):
             noteTrans.append(symbols['dot'])
             music21Note._brailleEnglish.append(u"Dot {0}".format(symbols['dot']))
     except KeyError:
@@ -559,7 +559,7 @@ def restToBraille(music21Rest):
         simpleRest = rests[music21Rest.duration.type]
         restTrans.append(simpleRest)
         music21Rest._brailleEnglish.append(u"Rest {0} {1}".format(music21Rest.duration.type, simpleRest))
-        for counter_dot in range(music21Rest.duration.dots):
+        for unused_counter_dot in range(music21Rest.duration.dots):
             restTrans.append(symbols['dot'])
             music21Rest._brailleEnglish.append(u"Dot {0}".format(symbols['dot']))
         return u"".join(restTrans)

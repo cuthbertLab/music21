@@ -197,6 +197,22 @@ def opusToBraille(music21Opus, **keywords):
 def measureToBraille(music21Measure, **keywords):
     """
     Translates a :class:`~music21.stream.Measure` to braille.
+    
+    >>> p = stream.Part()
+    >>> p.append(note.WholeNote('C4'))
+    >>> p.makeMeasures(inPlace=True)
+    >>> p.show('t')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C>
+        {4.0} <music21.bar.Barline style=final>    
+    >>> print braille.translate.objectToBraille(p)
+    ⠀⠀⠼⠙⠲⠀⠀
+    ⠼⠁⠀⠐⠽⠣⠅
+    >>> print braille.translate.measureToBraille(p.measure(1))
+    ⠼⠙⠲⠀⠐⠽⠣⠅
+    
     """
     (inPlace, unused_debug) = _translateArgs(**keywords)
     if not 'showHeading' in keywords:

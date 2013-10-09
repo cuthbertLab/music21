@@ -225,7 +225,6 @@ class GeneralNote(base.Music21Object):
     _DOC_ORDER = ['duration', 'quarterLength', 'editorial']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'editorial': 'a :class:`~music21.editorial.NoteEditorial` object that stores editorial information (comments, harmonic information, ficta) and certain display information (color, hidden-state).',
     #'expressions': 'a list of :class:`music21.expressions.TextExpression` objects to store note-attached expressions',
     'isChord': 'Boolean read-only value describing if this object is a Chord.',
     'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
@@ -253,13 +252,46 @@ class GeneralNote(base.Music21Object):
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
         self.articulations = []
-        self.editorial = editorial.NoteEditorial()
-
+        self._editorial = None
+        
         if "lyric" in keywords:
             self.addLyric(keywords['lyric'])
 
         # note: Chords handle ties differently
         self.tie = None # store a Tie object
+
+    #---------------------------------------------------------------------------
+    def _getEditorial(self):
+        if (self._editorial is None):
+            self._editorial = editorial.NoteEditorial()
+        return self._editorial
+        
+    def _setEditorial(self, ed):
+        self._editorial = ed
+
+    editorial = property(_getEditorial, _setEditorial, doc = '''
+        a :class:`~music21.editorial.NoteEditorial` object that stores editorial information 
+        (comments, harmonic information, ficta) and certain display information (color, hidden-state).
+        
+        Created automatically as needed:
+        
+        >>> n = note.Note("C4")
+        >>> n._editorial
+        >>> n.editorial
+        <music21.editorial.NoteEditorial object at 0x...>
+        >>> n.editorial.ficta = pitch.Accidental('sharp')
+        >>> n.editorial.ficta
+        <accidental sharp>
+
+        OMIT_FROM_DOCS
+        >>> n2 = note.Note("D4")
+        >>> n2._editorial is None
+        True
+        >>> n2.editorial
+        <music21.editorial.NoteEditorial object at 0x...>
+        >>> n2._editorial is None
+        False
+        ''')
 
     #---------------------------------------------------------------------------
     def _getColor(self):

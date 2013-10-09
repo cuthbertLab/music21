@@ -1120,7 +1120,7 @@ class JSONFreezer(JSONFreezeThawBase):
         >>> n = note.Note()
         >>> jss = freezeThaw.JSONFreezer(n)
         >>> jss.autoGatherAttributes()
-        ['_activeSite', '_activeSiteId', '_duration', '_idLastDeepCopyOf', '_notehead', '_noteheadFill', '_noteheadParenthesis', '_overriddenLily', '_priority', '_stemDirection', '_volume']
+        ['_activeSite', '_activeSiteId', '_duration', '_editorial', '_idLastDeepCopyOf', '_notehead', '_noteheadFill', '_noteheadParenthesis', '_overriddenLily', '_priority', '_stemDirection', '_volume']
         '''
         post = []
         if self.storedObject is None:
@@ -1177,7 +1177,7 @@ class JSONFreezer(JSONFreezeThawBase):
         >>> gn = note.GeneralNote()
         >>> jsf = freezeThaw.JSONFreezer(gn)
         >>> jsf.jsonAttributes()
-        ['_activeSite', '_activeSiteId', '_duration', '_idLastDeepCopyOf', '_overriddenLily', '_priority', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie']
+        ['_activeSite', '_activeSiteId', '_duration', '_editorial', '_idLastDeepCopyOf', '_overriddenLily', '_priority', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie']
         '''
         if self.storedObject is None:
             return []

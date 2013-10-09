@@ -172,16 +172,16 @@ def convertDiatonicNumberToStep(dn):
         return 'B', -1
     elif dn > 0:
         octave = int((dn-1)/7.0)
-        stepnumber = (dn-1) - (octave * 7)
-        return STEPNAMES[stepnumber], octave
+        stepNumber = (dn-1) - (octave * 7)
+        return STEPNAMES[stepNumber], octave
 
 #        remainder, octave = math.modf((dn-1)/7.0)
         # what is .001 doing here? -- A: prevents floating point errors
 #        return STEPNAMES[int((remainder*7)+.001)], int(octave)
     elif dn < 0:
         octave = int((dn)/7.0)
-        stepnumber = (dn-1) - (octave * 7)
-        return STEPNAMES[stepnumber], (octave - 1)
+        stepNumber = (dn-1) - (octave * 7)
+        return STEPNAMES[stepNumber], (octave - 1)
 
 
 def convertSpecifier(specifier):
@@ -324,60 +324,13 @@ def convertGeneric(value):
     post = post * directionScalar
     return post
 
-
-def convertGenericToSemitone(value):
-    '''Convert a generic specification into an interval count. This uses a default mapping. 
-    '''
-    # translate strings; return number
-    # note: this may be negative
-    value = convertGeneric(value)
-    directionScalar = 1
-    if value < 0:
-        directionScalar = -1
-    value = abs(value)
-
-    st = None
-    if value == 1:
-        st = 0
-    elif value == 2:
-        st = 2
-    elif value == 3:
-        st = 4
-    elif value == 4:
-        st = 5
-    elif value == 5:
-        st = 7
-    elif value == 6:
-        st = 9
-    elif value == 7:
-        st = 11
-    elif value == 8:
-        st = 12
-    elif value == 9:
-        st = 2 + 12
-    elif value == 10:
-        st = 4 + 12
-    elif value == 11:
-        st = 5 + 12
-    elif value == 12:
-        st = 7 + 12
-    elif value == 13:
-        st = 9 + 12
-    elif value == 14:
-        st = 11 + 12
-    elif value == 15:
-        st = 12 + 12
-    elif value == 16:
-        st = 2 + 24
-
-    return st * directionScalar
     
 
 def convertSemitoneToSpecifierGenericMicrotone(count):
     '''
     Given a number of semitones, return a default diatonic specifier and cent offset.
 
-    
+    MSC: 2013 Oct -- unused and deprecated; may be moved or removed.
 
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(2.5)
     ('M', 2, 50.0)
@@ -2298,7 +2251,8 @@ def notesToInterval(n1, n2 = None):
     Works equally well with :class:`~music21.pitch.Pitch` objects.
 
 
-    N.B.: DEPRECATED.  Use: inverval.Interval(noteStart=aNote, noteEnd=bNote) instead.
+    N.B.: MOVE TO PRIVATE USE.  Use: inverval.Interval(noteStart=aNote, noteEnd=bNote) instead.
+    Do not remove because used in interval.Interval()! 
     
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g5')
@@ -2337,9 +2291,6 @@ def notesToInterval(n1, n2 = None):
     >>> interval.notesToInterval(pitch.Pitch('e##4'), pitch.Pitch('f--5'))
     <music21.interval.Interval dddd9>
     '''
-    # TODO: possibly remove: not clear how this offers any better functionality
-    # than just creating an Interval class?
-
     #note to self:  what's going on with the Note() representation in help?
     if n2 is None: 
         # this is not done in the constructor originally because of looping problems with tinyNotationNote

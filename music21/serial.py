@@ -778,7 +778,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     
     _DOC_ORDER = ['startMeasureNumber', 'startOffset', 'zeroCenteredTransformationsFromMatched', 'originalCenteredTransformationsFromMatched']
 
-    def __init__(self, segment, containerStream, partNumber):
+    def __init__(self, segment = None, containerStream = None, partNumber = 0):
         
         '''
         
@@ -792,19 +792,25 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         >>> s.insert(0, p)
         >>> CD_ContiguousSegment = serial.ContiguousSegmentOfNotes([n1, n2], s, 0)
         '''
-        
+        base.Music21Object.__init__(self)        
         self.segment = segment
         self.containerStream = containerStream
         self.partNumber = partNumber
-        base.Music21Object.__init__(self)
         
     def _getStartMeasureNumber(self):
-        return self.segment[0].measureNumber
+        if (len(self.segment)):
+            return self.segment[0].measureNumber
+        else:
+            return None
+    
     startMeasureNumber = property(_getStartMeasureNumber,
         doc = '''The measure number on which the contiguous segment begins.''')
     
     def _getStartOffset(self):
-        return self.segment[0].offset
+        if (len(self.segment)):
+            return self.segment[0].offset
+        else:
+            return None
     startOffset = property(_getStartOffset,
         doc = '''The offset of the beginning of the contiguous segment, with respect to the measure containing the first note.''')
     
@@ -1198,7 +1204,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
             pitchList = []
             totallength = 0 #counts each pitch within a chord once
             for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord]):
+                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
                     if n.tie == None or n.tie.type == 'start':
                         add = False
                         if includeChords == False:
@@ -1247,7 +1253,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
             pitchList = []
             totallength = 0     
             for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord]):
+                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
                     if n.tie == None or n.tie.type == 'start':
                         if includeChords == False:
                             if len(n.pitches) == 1:
@@ -1300,7 +1306,8 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
             pitchList = []
             totallength = 0
             for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord]):
+                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
+                    #environLocal.warn(str(n.measureNumber))
                     if n.tie == None or n.tie.type == 'start':
                         if includeChords == False:
                             if len(n.pitches) == 1:
@@ -1336,7 +1343,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
             pitchList = []
             totallength = 0
             for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord]):
+                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
                     if n.tie == None or n.tie.type == 'start':
                         if includeChords == False:
                             if len(n.pitches) == 1:
@@ -1528,7 +1535,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                 pitchList = []
                 totallength = 0
                 for m in measures:
-                    for n in m.getElementsByClass([note.Note, chord.Chord]):
+                    for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
                         if n.tie == None or n.tie.type == 'start':
                             if includeChords == False:
                                 if len(n.pitches) == 1:
@@ -2466,11 +2473,27 @@ def findMultisets(inputStream, searchList, reps = 'skipConsecutive', includeChor
     >>> part.append(n2)
     >>> part.append(n3)
     >>> part.append(n4)
-    >>> part = part.makeMeasures()
+    >>> part.makeMeasures(inPlace = True)
+    >>> part.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note E>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Note E>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0} <music21.note.Note F>
+    {12.0} <music21.stream.Measure 4 offset=12.0>
+        {0.0} <music21.note.Note E>
+        {4.0} <music21.bar.Barline style=final>
+            
     >>> #_DOCS_SHOW part.show()
     
     .. image:: images/serial-findMultisets.png
         :width: 150
+    
+    
+    Find all instances of the multiset [5,4,4] in the part
     
     >>> EEF = serial.findMultisets(part, [[5, 4, 4]], 'includeAll', includeChords = False)
     >>> [(seg.activeSegment, seg.startMeasureNumber) for seg in EEF]
@@ -2578,6 +2601,7 @@ def findMultisets(inputStream, searchList, reps = 'skipConsecutive', includeChor
                                     if segment[0].pitches[-1].pitchClass in multiset:
                                         if segment[-1].pitches[0].pitchClass in multiset:
                                             middleseg = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
+                                            # environLocal.warn("" + str(middleseg.startMeasureNumber))
                                             listOfPitchClasses = middleseg.readPitchClassesFromBottom()
                                             doneAddingFirst = False
                                             firstChordPitches = segment[0].pitches
@@ -3460,6 +3484,25 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
+    def testCarlCode(self):
+        part = stream.Part()
+        n1 = note.Note('e4')
+        n1.quarterLength = 4
+        n2 = note.Note('e4')
+        n2.quarterLength = 4
+        n3 = note.Note('f4')
+        n3.quarterLength = 4
+        n4 = note.Note('e4')
+        n4.quarterLength = 4
+        part.append(n1)
+        part.append(n2)
+        part.append(n3)
+        part.append(n4)
+        part.makeMeasures(inPlace = True)
+        EEF = findMultisets(part, [[5, 4, 4]], 'includeAll', includeChords = False)
+        x = [(seg.activeSegment, seg.startMeasureNumber) for seg in EEF]
+        x
 
 #    def testRows(self):
 #        from music21 import interval

@@ -2481,6 +2481,10 @@ class Stream(base.Music21Object):
         if returnStreamSubClass:
             try:
                 found = self.__class__()
+                # Copy measure number if measure object...
+                # TODO: other attributes?
+                if ('Measure' in self.classes):
+                    found.number = self.number
             except TypeError:
                 found = Stream()
         elif returnStreamSubClass == 'list':
@@ -10785,7 +10789,7 @@ class Measure(Stream):
         self.layoutWidth = other.layoutWidth
 
     #--------------------------------------------------------------------------
-    def makeNotation(self, inPlace=False):
+    def makeNotation(self, inPlace=False, **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this
         :class:`~music21.stream.Measure` to prepare notation.
@@ -10811,7 +10815,7 @@ class Measure(Stream):
         else:
             m = self
 
-        m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True)
+        m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **subroutineKeywords)
         # makeTies is for cross-bar associations, and cannot be used
         # at just the measure level
         #m.makeTies(meterStream, inPlace=True)

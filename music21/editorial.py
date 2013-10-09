@@ -117,6 +117,18 @@ class NoteEditorial(object):
     'melodicIntervalsOverRests': 'same thing but a list',
     'misc': 'A dict to hold anything you might like to store.',
     }
+    __slots__ = ('ficta',
+                 'color',
+                 'misc',
+                 'harmonicInterval',
+                 'harmonicIntervals',
+                 'hidden',
+                 'melodicInterval',
+                 'melodicIntervals',
+                 'melodicIntervalOverRests',
+                 'melodicIntervalsOverRests',
+                 'comment',
+                 )
     
     def __init__(self):
         self.ficta = None  # Accidental object -- N.B. for PRINTING only not for determining intervals
@@ -205,6 +217,8 @@ class Comment(object):
     u'^"hello"'
     
     '''
+    __slots__ = ('position', 'text')
+    
     def __init__(self):
         self.position = "below"
         self.text = None

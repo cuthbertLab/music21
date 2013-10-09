@@ -145,6 +145,10 @@ class Groups(list):
     '''
     # TODO: presently groups can be cased-differentiated; this may 
     # need to be made case independent
+    
+    # could be made into a set instance, but actually
+    # timing: a subclassed list and a set are almost the same speed...
+    
     def append(self, value):
         if isinstance(value, basestring):
             # do not permit the same entry more than once
@@ -207,6 +211,13 @@ class Sites(object):
     All defined contexts are stored as dictionaries in a 
     dictionary. The outermost dictionary stores objects.
     '''
+    __slots__ = ('_definedContexts',
+                 '_locationKeys',
+                 '_timeIndex',
+                 'containedById',
+                 '_lastID',
+                 '_lastOffset',
+                 )
     def __init__(self, containedById=None):
         # a dictionary of dictionaries
         self._definedContexts = {} 
@@ -494,8 +505,6 @@ class Sites(object):
         
             streamObj.remove(elObj)
 
-
-        
         >>> class Mock(base.Music21Object): 
         ...     pass
         >>> aSite = Mock()

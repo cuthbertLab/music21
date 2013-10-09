@@ -137,14 +137,15 @@ def testCode():
         print(val, ty.currentLevel())
 
 def testMIDIParse():
-    from music21 import converter
+    from music21 import converter, corpus
     from music21 import freezeThaw
 
-    a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
-    c = converter.parse(a)
+    #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+    #c = converter.parse(a)
+    c = corpus.parse('bwv66.6', forceSource=True)
     v = freezeThaw.StreamFreezer(c)
     v.setupSerializationScaffold()
-    #return v.writeStr() # returns a string
+    return v.writeStr() # returns a string
 
     mockType = lambda x: x.__class__.__name__ == 'weakref'
     ty = TreeYielder(mockType)
@@ -155,4 +156,4 @@ def testMIDIParse():
 if __name__ == "__main__":
     pass
     #testCode()
-    #testMIDIParse()
+    testMIDIParse()

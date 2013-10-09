@@ -45,9 +45,12 @@ class Test(unittest.TestCase):
 # I. Writing generic intervals (melodic)
 
     
-    def test_Ch6_basic_I_A(self, *arguments, **keywords):
+    def xtest_Ch6_basic_I_A(self, *arguments, **keywords):
         '''p55
         Write a whole note on the specified generic interval. Do not add sharps or flats. 
+        
+        
+        MSC: 2013 Oct -- No longer works now that convertGenericToSemitone() [buggy] has been removed.
         '''
         # note: sharps and flats are still being added: need generic transposition or scale-based approach
         pitches = ['d4', 'f4', 'e4', 'c4', 'a4']
