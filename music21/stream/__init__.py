@@ -276,7 +276,7 @@ class Stream(base.Music21Object):
     def __init__(self, givenElements=None, *args, **keywords):
         base.Music21Object.__init__(self)
 
-        self._streamStatus = streamStatus.StreamStatus(self)
+        self.streamStatus = streamStatus.StreamStatus(self)
 
         # self._elements stores Music21Object objects.
         self._elements = []
@@ -5365,7 +5365,7 @@ class Stream(base.Music21Object):
         has not been run. If any Beams exist, this method
         returns True, regardless of if makeBeams has actually been run.
         '''
-        return streamStatus.StreamStatus(self).haveBeamsBeenMade()
+        return self.streamStatus.haveBeamsBeenMade()
 
     def makeTupletBrackets(self, inPlace=True):
         '''
@@ -5511,7 +5511,7 @@ class Stream(base.Music21Object):
         other than None, this method returns True, regardless
         of if makeAccidentals has actually been run.
         '''
-        return streamStatus.StreamStatus(self).haveAccidentalsBeenMade()
+        return self.streamStatus.haveAccidentalsBeenMade()
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False, bestClef=False, **subroutineKeywords):
@@ -6721,7 +6721,6 @@ class Stream(base.Music21Object):
                 # do not recurse, as will get all Stream
                 e.makeMutable(recurse=False)
         self._elementsChanged()
-
 
     #---------------------------------------------------------------------------
     # duration and offset methods and properties

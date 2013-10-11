@@ -5,7 +5,7 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
@@ -25,11 +25,22 @@ class StreamStatus(object):
 
     ### CLASS VARIABLES ###
 
-    __slots__ = ('_client',)
+    __slots__ = (
+        '_accidentals',
+        '_beams',
+        '_client',
+        '_concertPitch',
+        '_dirty',
+        '_enharmonics',
+        '_measures',
+        '_ornaments',
+        '_rests',
+        '_ties',
+        )
 
     ### INITIALIZER ###
 
-    def __init__(self, client):
+    def __init__(self, client=None):
         self._client = client
 
     ### PUBLIC METHODS ###
@@ -65,6 +76,21 @@ class StreamStatus(object):
     @property
     def client(self):
         return self._client
+
+    @apply
+    def beams():
+        def fget(self):
+            if self._beams is None:
+                self._beams = self.haveBeamsBeenMade()
+            return self._beams
+
+        def fset(self, expr):
+            if expr is not None:
+                self._beams = bool(expr)
+            else:
+                self._beams = None
+
+        return property(**locals())
 
 
 #------------------------------------------------------------------------------

@@ -290,8 +290,8 @@ class StreamFreezer(StreamFreezeThawBase):
             self.recursiveClearSites(streamObj)
 
     def removeStreamStatusClient(self, streamObj):
-        if hasattr(streamObj, '_streamStatus'):
-            streamObj._streamStatus._client = None
+        if hasattr(streamObj, 'streamStatus'):
+            streamObj.streamStatus._client = None
 
     def recursiveClearSites(self, startObj):
         '''
@@ -807,8 +807,8 @@ class StreamThawer(StreamFreezeThawBase):
                 self.restoreElementsFromTuples(subElement)
 
     def restoreStreamStatusClient(self, streamObj):
-        if hasattr(streamObj, '_streamStatus'):
-            streamObj._streamStatus._client = streamObj
+        if hasattr(streamObj, 'streamStatus'):
+            streamObj.streamStatus._client = streamObj
 
     def wrapVolumeWeakrefs(self, streamObj = None):
         '''
