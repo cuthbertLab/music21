@@ -222,7 +222,7 @@ class GeneralNote(base.Music21Object):
     isChord = False
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['duration', 'quarterLength', 'editorial']
+    _DOC_ORDER = ['duration', 'quarterLength']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     #'expressions': 'a list of :class:`music21.expressions.TextExpression` objects to store note-attached expressions',

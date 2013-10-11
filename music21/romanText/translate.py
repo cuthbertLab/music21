@@ -180,6 +180,9 @@ def _copyMultipleMeasures(t, p, kCurrent):
     
     This is used for cases such as:
     m23-25 = m20-22
+    
+    
+    
     '''
     # the key provided needs to be the current key
     #environLocal.printDebug(['calling _copyMultipleMeasures()'])
@@ -212,6 +215,8 @@ def _copyMultipleMeasures(t, p, kCurrent):
                     raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
                     kCurrent = rnPast.key
+                elif rnPast.pivotChord is not None:
+                    kCurrent = rnPast.pivotChord.key
                 else:
                     rnPast.key = kCurrent                
         if mPast.number == targetEnd:
@@ -1034,6 +1039,23 @@ m3 NC b3 G: V
         from music21 import converter
         unused_s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
         #s.show('text')
+
+    def testPivotInCopy(self):
+        from music21 import converter
+        testCase = '''
+m1 G: I
+m2 I
+m3 V D: I
+m4 V
+m5 G: I
+m6-7 = m3-4
+m8 I
+'''
+        s = converter.parse(testCase, format='romanText')
+        m = s.measure(7).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+        m = s.measure(8).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
         
 
 #-------------------------------------------------------------------------------
