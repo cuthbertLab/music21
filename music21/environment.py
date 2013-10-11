@@ -668,20 +668,27 @@ class _EnvironmentCore(object):
         if app is not None:
             fpApp = app
         platform = common.getPlatform()
-        if fpApp is None and platform not in ['win', 'darwin']:
-            raise EnvironmentException(
-                "Cannot find a valid application path for format {}. "
-                "Specify this in your Environment by calling "
-                "environment.set({!r}, 'pathToApplication')".format(
-                    m21Format, environmentKey))
-        if platform == 'win' and fpApp is None:
-            # no need to specify application here:
-            # windows starts the program based on the file extension
-            cmd = 'start %s' % (filePath)
+        if fpApp is None:
+            if platform == 'win':
+                # no need to specify application here:
+                # windows starts the program based on the file extension
+                cmd = 'start %s' % (filePath)
+            elif platform == 'darwin':
+                cmd = 'open %s %s' % (options, filePath)
+            else:
+                if m21Format == 'braille':
+                    with open(filePath, 'r') as f:
+                        for line in f:
+                            print line
+                    return
+                else:
+                    raise EnvironmentException(
+                        "Cannot find a valid application path for format {}. "
+                        "Specify this in your Environment by calling "
+                        "environment.set({!r}, 'pathToApplication')".format(
+                            m21Format, environmentKey))
         elif platform == 'win':  # note extra set of quotes!
             cmd = '""%s" %s "%s""' % (fpApp, options, filePath)
-        elif platform == 'darwin' and fpApp is None:
-            cmd = 'open %s %s' % (options, filePath)
         elif platform == 'darwin':
             cmd = 'open -a"%s" %s %s' % (fpApp, options, filePath)
         elif platform == 'nix':
