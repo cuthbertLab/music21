@@ -1298,7 +1298,7 @@ class Test(unittest.TestCase):
         a = parse(mxString)
         a = a.flat
         b = a.getElementsByClass(dynamics.Dynamic)
-        # there should be 27 dyanmics found in this file
+        # there should be 27 dynamics found in this file
         self.assertEqual(len(b), 27)
         c = a.getElementsByClass(note.Note)
         self.assertEqual(len(c), 53)

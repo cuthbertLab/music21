@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         sieve.py
-# Purpose:      sieve opperations, after Iannis Xenakis.
+# Purpose:      sieve operations, after Iannis Xenakis.
 #
 # Authors:      Christopher Ariza
 #

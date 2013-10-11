@@ -1104,7 +1104,7 @@ def _streamToPackets(s, trackId=1):
     return packetsByOffset
 
 
-def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None, 
+def _processPackets(packets, channelForInstrument=None, channelsDynamic=None, 
         initChannelForTrack=None):
     '''
     Given a list of packets, assign each to a channel. 
@@ -1129,8 +1129,8 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
 
     if channelForInstrument is None:
         channelForInstrument = {}
-    if channelsDyanmic is None:
-        channelsDyanmic = []
+    if channelsDynamic is None:
+        channelsDynamic = []
     if initChannelForTrack is None:
         initChannelForTrack = {}
     
@@ -1217,7 +1217,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
         if len(channelExclude) > 0: # only change if necessary
             ch = None       
             # iterate in order over all channels: lower will be added first
-            for x in channelsDyanmic:
+            for x in channelsDynamic:
                 if x not in channelExclude:
                     ch = x
                     break
@@ -1246,7 +1246,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDyanmic=None,
             # always set corresponding event to the same channel
             p['midiEvent'].correspondingEvent.channel = ch
 
-        #environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDyanmic, "p['initChannel']", p['initChannel']])
+        #environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDynamic, "p['initChannel']", p['initChannel']])
 
         if centShift is not None:
             # add pitch bend
@@ -1729,7 +1729,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
         trackCount += 1
 
     channelForInstrument = {} # the instrument is the key
-    channelsDyanmic = [] # remaining channels
+    channelsDynamic = [] # remaining channels
     # create an entry for all unique instruments, assign channels
     # for each instrument, assign a channel; if we go above 16, that is fine
     # we just cannot use it and will take modulus later
@@ -1746,9 +1746,9 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
     # get the dynamic channels, or those not assigned
     for ch in allChannels:
         if ch not in channelsAssigned:
-            channelsDyanmic.append(ch)
+            channelsDynamic.append(ch)
 
-    #environLocal.printDebug(['channelForInstrument', channelForInstrument, 'channelsDyanmic', channelsDyanmic, 'allChannels', allChannels, 'allUniqueInstruments', allUniqueInstruments])
+    #environLocal.printDebug(['channelForInstrument', channelForInstrument, 'channelsDynamic', channelsDynamic, 'allChannels', allChannels, 'allUniqueInstruments', allUniqueInstruments])
 
     initChannelForTrack = {}
     # update packets with first channel
@@ -1779,7 +1779,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
     # process all channel assignments for all packets together
     netPackets = _processPackets(netPackets, 
         channelForInstrument=channelForInstrument, 
-        channelsDyanmic=channelsDyanmic, 
+        channelsDynamic=channelsDynamic, 
         initChannelForTrack=initChannelForTrack)
 
     #environLocal.printDebug(['got netPackets:', len(netPackets), 'packetStorage keys (tracks)', packetStorage.keys()])

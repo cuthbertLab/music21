@@ -330,7 +330,7 @@ class Handler(xml.sax.ContentHandler):
                 self._mxObjs['direction-type'].componentList.append(
                     self._mxObjs['dynamics'])
             else:
-                raise MusicXMLHandlerException('do not know where these dyanmics go', self._mxObjs['dynamics'])
+                raise MusicXMLHandlerException('do not know where these dynamics go', self._mxObjs['dynamics'])
 
         elif name == 'lyric':
             if self._mxObjs['note'] is not None: # can be associtaed w/ harmony tag

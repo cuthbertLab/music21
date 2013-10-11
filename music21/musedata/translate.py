@@ -140,7 +140,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 
 def _processPending(hasVoices, pendingRecords, eLast, m, vActive):
     e, dynamicObjs = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
-    # place dyanmics at same position as element
+    # place dynamics at same position as element
     if hasVoices:
         vActive._appendCore(e)
         for d in dynamicObjs:
@@ -579,7 +579,7 @@ class Test(unittest.TestCase):
             s.flat.getElementsByClass('TempoIndication')[0]), 
             '<music21.tempo.MetronomeMark Largo Quarter=46>')
 
-    def testMuseDataImportDyanmicsA(self):
+    def testMuseDataImportDynamicsA(self):
         # note: this is importing a large work, but this seems to presently
         # be the only one with dynamics
         from music21 import corpus

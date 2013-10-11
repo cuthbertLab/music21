@@ -898,7 +898,7 @@ def mxClefToClef(mxClefList, inputM21 = None):
         inputM21.line = clefObj.line
         inputM21.octaveChange = clefObj.octaveChange
 #-------------------------------------------------------------------------------
-# Dyanmics
+# Dynamics
 
 def mxToDynamicList(mxDirection):
     '''

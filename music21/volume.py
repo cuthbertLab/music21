@@ -197,7 +197,7 @@ class Volume(object):
  
         This can optionally take into account `dynamicContext`, `useVelocity`, and `useArticulation`.
 
-        If `useDynamicContext` is True, a context search for a dynamic will be done, else dynamics are ignored. Alternatively, the useDynamicContext may supply a Dyanmic object that will be used instead of a context search.
+        If `useDynamicContext` is True, a context search for a dynamic will be done, else dynamics are ignored. Alternatively, the useDynamicContext may supply a Dynamic object that will be used instead of a context search.
 
         If `useArticulations` is True and parent is not None, any articulations found on that parent will be used to adjust the volume. Alternatively, the `useArticulations` parameter may supply a list of articulations that will be used instead of that available on a parent.
 
@@ -217,7 +217,7 @@ class Volume(object):
         >>> s.notes[7].volume.getRealized()
         0.99212...
 
-        >>> # velocity, if set, will be scaled by dyanmics
+        >>> # velocity, if set, will be scaled by dynamics
         >>> s.notes[7].volume.velocity = 20
         >>> s.notes[7].volume.getRealized()
         0.22047...
@@ -345,7 +345,7 @@ class Volume(object):
 
 def realizeVolume(srcStream, setAbsoluteVelocity=False,         
             useDynamicContext=True, useVelocity=True, useArticulations=True):
-    '''Given a Stream with one level of dynamics (e.g., a Part, or two Staffs that share Dyanmics), destructively modify it to set all realized volume levels. These values will be stored in the Volume object as `cachedRealized` values. 
+    '''Given a Stream with one level of dynamics (e.g., a Part, or two Staffs that share Dynamics), destructively modify it to set all realized volume levels. These values will be stored in the Volume object as `cachedRealized` values. 
 
     This is a top-down routine, as opposed to bottom-up values available with context searches on Volume. This thus offers a performance benefit. 
 
@@ -358,17 +358,17 @@ def realizeVolume(srcStream, setAbsoluteVelocity=False,
     # get dynamic map
     flatSrc = srcStream.flat # assuming sorted
 
-    # check for any dyanmics
-    dyanmicsAvailable = False
+    # check for any dynamics
+    dynamicsAvailable = False
     if len(flatSrc.getElementsByClass('Dynamic')) > 0:
-        dyanmicsAvailable = True
+        dynamicsAvailable = True
     else: # no dynamics available
         if useDynamicContext is True: # only if True, and non avail, override
             useDynamicContext = False
 
-    if dyanmicsAvailable:
-        # extend durations of all dyanmics
-        # doing this in place as this is a destructive opperation
+    if dynamicsAvailable:
+        # extend durations of all dynamics
+        # doing this in place as this is a destructive operation
         boundaries = flatSrc.extendDurationAndGetBoundaries('Dynamic', inPlace=True)
         bKeys = boundaries.keys()
         bKeys.sort() # sort
@@ -383,7 +383,7 @@ def realizeVolume(srcStream, setAbsoluteVelocity=False,
             eStart = e.getOffsetBySite(flatSrc)
     
             # get the most recent dynamic
-            if dyanmicsAvailable and useDynamicContext is True:
+            if dynamicsAvailable and useDynamicContext is True:
                 dm = False # set to not search dynamic context
                 for k in range(lastRelevantKeyIndex, len(bKeys)):
                     start, end = bKeys[k]
@@ -436,7 +436,7 @@ class Test(unittest.TestCase):
         v1 = volume.Volume(parent=n1)
         s.insert(4, n1)
 
-        # can get dyanmics from volume object
+        # can get dynamics from volume object
         self.assertEqual(v1.getContextByClass('Dynamic'), d2)
         self.assertEqual(v1.getDynamicContext(), d2)
 
@@ -453,7 +453,7 @@ class Test(unittest.TestCase):
         n1 = note.Note('g')
         s.insert(4, n1)
 
-        # can get dyanmics from volume object
+        # can get dynamics from volume object
         self.assertEqual(n1.volume.getDynamicContext(), d2)
 
 
@@ -491,7 +491,7 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.91')
 
 
-        # if vel is at max, can scale down with a dyanmic
+        # if vel is at max, can scale down with a dynamic
         v1 = volume.Volume(velocity=127)
         d1 = dynamics.Dynamic('fff')
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '1.0')
@@ -531,7 +531,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)
 
-        # before insertion of dyanmics
+        # before insertion of dynamics
         match = [n.volume.cachedRealizedStr for n in s.notes]
         self.assertEqual(match, ['0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71'])
 

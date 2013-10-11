@@ -476,7 +476,7 @@ class MuseDataRecord(object):
         return post
 
     def getDynamicObjects(self):        
-        '''Return a list of 0 or more music21 Dyanmic objects
+        '''Return a list of 0 or more music21 Dynamic objects
 
         
         >>> mdr = musedata.MuseDataRecord('C5    12        e     u         ff')

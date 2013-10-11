@@ -198,9 +198,9 @@ class Test(unittest.TestCase):
 #        
 #        # an analysis package can identify dynamic countours, movements from
 #        # low to high or vice versa, and return these as a stream of
-#        # DyanmicMovement objects
+#        # DynamicMovement objects
 #    
-#        dynMovementStream = analysis.dyanmicContour(partStream)
+#        dynMovementStream = analysis.dynamicContour(partStream)
 #        swells = dynMovementStream.getElementsByClass(DynamicCrescendo)
 #        dips = dynMovementStream.getElementsByClass(DynamicDecrescendo)
 #        if len(swells) > len(dips):

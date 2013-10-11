@@ -759,7 +759,7 @@ def clefToMxClef(clefObj):
     return mxClef
 
 #-------------------------------------------------------------------------------
-# Dyanmics
+# Dynamics
 
 def dynamicToMx(d):
     '''

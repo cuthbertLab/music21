@@ -3616,7 +3616,6 @@ class Stream(base.Music21Object):
         measureTemplate = copy.deepcopy(self.getElementsByClass('Measure'))
         for m in measureTemplate:
             m.removeByClass(['GeneralNote']) # includes rests
-            m.removeByClass(['Dyanmic'])
             m.removeByClass(['Stream']) # get voices or sub-streams
             m.removeByClass(['Dynamic'])
             m.removeByClass(['Expression'])

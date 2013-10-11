@@ -86,7 +86,7 @@ def dynamicStrFromDecimal(n):
         return 'fff'
 
 # defaults used for volume scalar
-dyanmicStrToScalar = {
+dynamicStrToScalar = {
              None: .5, # default value
               'n': 0,
               'pppp': 0.1,
@@ -229,8 +229,8 @@ class Dynamic(base.Music21Object):
         if self._volumeScalar is not None:
             return self._volumeScalar
         # use default
-        if self._value in dyanmicStrToScalar:
-            return dyanmicStrToScalar[self._value]
+        if self._value in dynamicStrToScalar:
+            return dynamicStrToScalar[self._value]
         return 
 
     def _setVolumeScalar(self, value):
@@ -440,7 +440,7 @@ class Test(unittest.TestCase):
         self.assertEquals(pp.englishName, 'very soft')
 
 
-    def testCorpusDyanmicsWedge(self):
+    def testCorpusDynamicsWedge(self):
         from music21 import corpus
         a = corpus.parse('opus41no1/movement2') # has dynamics!
         b = a.parts[0].flat.getElementsByClass("Dynamic")

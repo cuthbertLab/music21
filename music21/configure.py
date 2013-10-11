@@ -803,7 +803,7 @@ class AskInstall(YesOrNo):
         fp = findSetup()
         if fp is not None:
 
-            self._writeToUser(['You must authorize writing in the following directory:', getSitePackages(), ' ', 'Please provide your user password to complete this opperation.', ''])
+            self._writeToUser(['You must authorize writing in the following directory:', getSitePackages(), ' ', 'Please provide your user password to complete this operation.', ''])
 
             stdoutSrc = sys.stdout
             #stderrSrc = sys.stderr

@@ -3094,7 +3094,7 @@ class Music21Object(object):
 
     def _setDuration(self, durationObj):
         '''
-        Set the offset as a quarterNote length
+        Set the duration as a quarterNote length
         '''
         if hasattr(durationObj, "quarterLength"):
             # we cannot directly test to see isInstance(duration.DurationCommon) because of
