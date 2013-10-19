@@ -25,23 +25,52 @@ class StreamStatus(object):
 
     ### CLASS VARIABLES ###
 
-    __slots__ = (
-        '_accidentals',
-        '_beams',
-        '_client',
-        '_concertPitch',
-        '_dirty',
-        '_enharmonics',
-        '_measures',
-        '_ornaments',
-        '_rests',
-        '_ties',
-        )
+#    __slots__ = (
+#        '_accidentals',
+#        '_beams',
+#        '_client',
+#        '_concertPitch',
+#        '_dirty',
+#        '_enharmonics',
+#        '_measures',
+#        '_ornaments',
+#        '_rests',
+#        '_ties',
+#        )
 
     ### INITIALIZER ###
 
     def __init__(self, client=None):
+        self._accidentals = None
+        self._beams = None
         self._client = client
+        self._concertPitch = None
+        self._dirty = None
+        self._enharmonics = None
+        self._measures = None
+        self._ornaments = None
+        self._rests = None
+        self._ties = None
+
+    ### SPECIAL METHODS ###
+
+#    def __getstate__(self):
+#        state = {}
+#        attributes = (
+#            '_accidentals',
+#            '_beams',
+#            '_client',
+#            '_concertPitch',
+#            '_dirty',
+#            '_enharmonics',
+#            '_measures',
+#            '_ornaments',
+#            '_rests',
+#            '_ties',
+#            )
+#        for attribute in attributes:
+#            state[attribute] = getattr(self, attribute)
+#        return state
 
     ### PUBLIC METHODS ###
 
