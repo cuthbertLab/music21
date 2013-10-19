@@ -297,6 +297,7 @@ class _EnvironmentCore(object):
         self._keysToPaths.append('vectorPath')
         self._keysToPaths.append('pdfPath')
         self._keysToPaths.append('midiPath')
+        self._keysToPaths.append('braillePath')
         self._keysToPaths.append('localCorpusPath')
         self._keysToPaths.append('musescoreDirectPNGPath')
 
@@ -460,6 +461,9 @@ class _EnvironmentCore(object):
 
         # path to a pdf viewer
         self._ref['pdfPath'] = None
+
+        # path to a braille viewer
+        self._ref['braillePath'] = None
 
         # path to MuseScore (if not the musicxmlPath...)
         # for direct creation of PNG from MusicXML
@@ -645,6 +649,8 @@ class _EnvironmentCore(object):
             environmentKey = 'musicxmlPath'
         elif m21Format == 'midi':
             environmentKey = 'midiPath'
+        elif m21Format == 'braille':
+            environmentKey = 'braillePath'
         elif m21Format == 'vexflow':
             try:
                 import webbrowser
@@ -679,7 +685,8 @@ class _EnvironmentCore(object):
                 if m21Format == 'braille':
                     with open(filePath, 'r') as f:
                         for line in f:
-                            print line
+                            print line,
+                        print
                     return
                 else:
                     raise EnvironmentException(
