@@ -144,10 +144,14 @@ class MetadataBundle(object):
 
     ### INITIALIZER ###
 
-    def __init__(self, name=None):
+    def __init__(self, expr=None):
+        from music21 import corpus
         self._metadataEntries = {}
-        assert name in ('core', 'local', 'virtual', None)
-        self._name = name
+        assert isinstance(expr, (str, corpus.corpora.Corpus, type(None)))
+        if isinstance(expr, corpus.corpora.Corpus):
+            self._name = expr.name
+        else:
+            self._name = expr
 
     ### SPECIAL METHODS ###
 
@@ -615,52 +619,66 @@ class MetadataBundle(object):
     ### PUBLIC PROPERTIES ###
 
     @property
+    def corpus(self):
+        r'''
+        The `corpus.corpora.Corpus` object associated with the metadata
+        bundle's name.
+        '''
+        from music21 import corpus
+        if self.name is None:
+            return None
+        return corpus.corpora.Corpus.fromName(self.name)
+
+    @property
     def filePath(self):
         r'''
         The filesystem name of the cached metadata bundle, if the metadata
         bundle's name is not None.
         '''
-        filePath = None
+        if self.name is None:
+            return None
         if self.name in ('virtual', 'core'):
-            filePath = os.path.join(common.getMetadataCacheFilePath(),
-                self.name + '.json')
+            filePath = os.path.join(
+                common.getMetadataCacheFilePath(),
+                self.name + '.json',
+                )
         elif self.name == 'local':
             # write in temporary dir
-            filePath = os.path.join(environLocal.getRootTempDir(),
-                self.name + '.json')
+            filePath = os.path.join(
+                environLocal.getRootTempDir(),
+                self.name + '.json',
+                )
+        else:
+            filePath = os.path.join(
+                environLocal.getRootTempDir(),
+                'local-{0}.json'.format(self.name),
+                )
         return filePath
 
-    @apply
-    def name(): # @NoSelf
-        def fget(self):
-            r'''
-            The name of the metadata bundle.
+    @property
+    def name(self):
+        r'''
+        The name of the metadata bundle.
 
-            Can be 'core', 'local', 'virtual' or None.
+        Can be 'core', 'local', 'virtual' or None.
 
-            The names 'core', 'local' and 'virtual refer to the core, local and
-            virtual corpuses respectively:
+        The names 'core', 'local' and 'virtual refer to the core, local and
+        virtual corpuses respectively:
 
-            ::
+        ::
 
-                >>> from music21 import metadata
-                >>> metadata.MetadataBundle().name is None
-                True
+            >>> from music21 import metadata
+            >>> metadata.MetadataBundle().name is None
+            True
 
-            ::
+        ::
 
-                >>> metadata.MetadataBundle.fromCoreCorpus().name
-                u'core'
+            >>> metadata.MetadataBundle.fromCoreCorpus().name == 'core'
+            True
 
-            Return string or None.
-            '''
-            return self._name
-
-        def fset(self, expr):
-            assert expr in ('core', 'local', 'virtual', None)
-            self._name = expr
-
-        return property(**locals())
+        Return string or None.
+        '''
+        return self._name
 
     ### PUBLIC METHODS ###
 

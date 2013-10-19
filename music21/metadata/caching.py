@@ -332,7 +332,7 @@ class JobProcessor(object):
         If `processCount` is none, use 1 fewer process than the number of
         available cores.
         '''
-        processCount = processCount or multiprocessing.cpu_count() - 1
+        processCount = processCount or (multiprocessing.cpu_count() * 2) - 1
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
