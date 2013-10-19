@@ -915,7 +915,7 @@ class MetadataBundle(object):
         return bundle
 
     @classmethod
-    def fromLocalCorpus(cls):
+    def fromLocalCorpus(cls, name=None):
         r'''
         Return a metadata bundle for the local corpus.
 
@@ -932,7 +932,10 @@ class MetadataBundle(object):
 
         '''
         from music21.corpus import corpora
-        domain = 'local'
+        if name is None or name == 'local':
+            domain = 'local'
+        else:
+            domain = 'local-{}'.format(name)
         if domain in corpora.Corpus._metadataBundles and \
             corpora.Corpus._metadataBundles[domain] is not None:
             return corpora.Corpus._metadataBundles[domain]
@@ -1199,14 +1202,11 @@ class MetadataBundle(object):
             return self
         self.clear()
         self.delete()
-        corpusOptions = {
-            'core': (corpus.getCorePaths, True),
-            'local': (corpus.getLocalPaths, False),
-            'virtual': (corpus.getVirtualPaths, False),
-            }
-        pathProcedure, useCorpus = corpusOptions[self.name]
+        useCorpus = False
+        if isinstance(self.corpus, corpus.corpora.CoreCorpus):
+            useCorpus = True
         self.addFromPaths(
-            pathProcedure(),
+            self.corpus.getPaths(),
             useCorpus=useCorpus,
             useMultiprocessing=useMultiprocessing,
             )

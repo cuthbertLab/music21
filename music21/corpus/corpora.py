@@ -344,7 +344,8 @@ class Corpus(object):
     def updateMetadataBundle(self):
         from music21 import metadata
         domain = self._cacheName
-        if Corpus._metadataBundles[domain] is None:
+        if domain not in Corpus._metadataBundles or \
+            Corpus._metadataBundles[domain] is None:
             metadataBundle = metadata.MetadataBundle(domain)
             metadataBundle.read()
             metadataBundle.validate()
@@ -1005,6 +1006,14 @@ class CoreCorpus(Corpus):
             movementResults = results
         return sorted(movementResults)
 
+    def search(self, query, field=None, fileExtensions=None):
+        from music21 import metadata
+        return metadata.MetadataBundle.fromCoreCorpus().search(
+            query,
+            field=field,
+            fileExtensions=fileExtensions,
+            )
+
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -1171,15 +1180,13 @@ class LocalCorpus(Corpus):
             self.save()
         self._removeNameFromCache(self._cacheName)
 
-    def updateMetadataBundle(self):
+    def search(self, query, field=None, fileExtensions=None):
         from music21 import metadata
-        domain = self._cacheName
-        if domain not in Corpus._metadataBundles or \
-            Corpus._metadataBundles[domain] is None:
-            metadataBundle = metadata.MetadataBundle(domain)
-            metadataBundle.read()
-            metadataBundle.validate()
-            Corpus._metadataBundles[domain] = metadataBundle
+        return metadata.MetadataBundle.fromLocalCorpus(self.name).search(
+            query,
+            field=field,
+            fileExtensions=fileExtensions,
+            )
 
     ### PUBLIC PROPERTIES ###
 
@@ -1313,14 +1320,13 @@ class VirtualCorpus(Corpus):
                 return obj.getUrlByExt(fileExtensions)
         return []
 
-    def updateMetadataBundle(self):
+    def search(self, query, field=None, fileExtensions=None):
         from music21 import metadata
-        domain = 'virtual'
-        if Corpus._metadataBundles[domain] is None:
-            metadataBundle = metadata.MetadataBundle(domain)
-            metadataBundle.read()
-            metadataBundle.validate()
-            Corpus._metadataBundles[domain] = metadataBundle
+        return metadata.MetadataBundle.fromVirtualCorpus(self.name).search(
+            query,
+            field=field,
+            fileExtensions=fileExtensions,
+            )
 
     ### PUBLIC PROPERTIES ###
 
