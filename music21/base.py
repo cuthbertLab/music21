@@ -211,13 +211,13 @@ class Sites(object):
     All defined contexts are stored as dictionaries in a 
     dictionary. The outermost dictionary stores objects.
     '''
-    __slots__ = ('_definedContexts',
-                 '_locationKeys',
-                 '_timeIndex',
-                 'containedById',
-                 '_lastID',
-                 '_lastOffset',
-                 )
+#    __slots__ = ('_definedContexts',
+#                 '_locationKeys',
+#                 '_timeIndex',
+#                 'containedById',
+#                 '_lastID',
+#                 '_lastOffset',
+#                 )
     def __init__(self, containedById=None):
         # a dictionary of dictionaries
         self._definedContexts = {} 
@@ -5627,7 +5627,10 @@ def mainTest(*testClasses):
     else: 
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        optionflags = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+        optionflags = (
+            doctest.ELLIPSIS|
+            doctest.NORMALIZE_WHITESPACE|
+            doctest.REPORT_ONLY_FIRST_FAILURE)
         if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv:
             s1 = doctest.DocTestSuite(
                 '__main__',

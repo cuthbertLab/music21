@@ -187,7 +187,7 @@ class Corpus(object):
         ::
 
             >>> corpora.Corpus.fromName('local')
-            <music21.corpus.corpora.LocalCorpus>
+            <music21.corpus.corpora.LocalCorpus: 'local'>
 
         ::
 
@@ -1174,7 +1174,8 @@ class LocalCorpus(Corpus):
     def updateMetadataBundle(self):
         from music21 import metadata
         domain = self._cacheName
-        if Corpus._metadataBundles[domain] is None:
+        if domain not in Corpus._metadataBundles or \
+            Corpus._metadataBundles[domain] is None:
             metadataBundle = metadata.MetadataBundle(domain)
             metadataBundle.read()
             metadataBundle.validate()

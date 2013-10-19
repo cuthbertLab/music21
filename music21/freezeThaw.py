@@ -1658,7 +1658,10 @@ class JSONThawer(JSONFreezeThawBase):
                             # values created at init
                             dst.update(subDict)
                     else: # assume a string
-                        setattr(obj, key, attrValue)
+                        try:
+                            setattr(obj, key, attrValue)
+                        except AttributeError:
+                            pass
             else:
                 raise JSONFreezerException('cannot handle json attr: %s'% attr)
 
