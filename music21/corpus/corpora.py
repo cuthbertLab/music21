@@ -353,8 +353,13 @@ class Corpus(object):
     ### PUBLIC PROPERTIES ###
 
     @abc.abstractproperty
-    def metadataBundle(self):
+    def name(self):
         raise NotImplementedError
+
+    @property
+    def metadataBundle(self):
+        from music21 import metadata
+        return metadata.MetadataBundle(self.name).read()
 
 
 #------------------------------------------------------------------------------
@@ -1003,6 +1008,10 @@ class CoreCorpus(Corpus):
     ### PUBLIC PROPERTIES ###
 
     @property
+    def name(self):
+        return 'core'
+
+    @property
     def noCorpus(self):
         '''
         Return True or False if this is a `corpus` or `noCoprus` distribution.
@@ -1037,7 +1046,10 @@ class LocalCorpus(Corpus):
         assert isinstance(name, (str, unicode, type(None)))
         if name is not None:
             assert len(name)
-        self._name = name
+        if name == 'local':
+            self._name = None
+        else:
+            self._name = name
 
     ### SPECIAL METHODS ###
 
@@ -1066,7 +1078,7 @@ class LocalCorpus(Corpus):
     @property
     def _cacheName(self):
         cacheName = 'local'
-        if self.name is not None:
+        if self.name is not None and self.name != 'local':
             cacheName += '-{}'.format(self.name)
         return cacheName
 
@@ -1108,7 +1120,8 @@ class LocalCorpus(Corpus):
             )
         cacheKey = (self._cacheName, tuple(fileExtensions))
         # not cached, fetch and reset
-        if cacheKey not in Corpus._pathsCache:
+        if True:
+        #if cacheKey not in Corpus._pathsCache:
             # check paths before trying to search
             validPaths = []
             for directoryPath in self.directoryPaths:
@@ -1173,7 +1186,7 @@ class LocalCorpus(Corpus):
     def directoryPaths(self):
         candidatePaths = []
         if self.existsInSettings:
-            if self.name is None:
+            if self.name == 'local':
                 candidatePaths = environLocal['localCorpusSettings']
             else:
                 candidatePaths = \
@@ -1189,7 +1202,7 @@ class LocalCorpus(Corpus):
         True if this local corpus has a corresponding entry in music21's user
         settings, otherwise false.
         '''
-        if self.name is None:
+        if self.name == 'local':
             return True
         userSettings = environment.UserSettings()
         return self.name in userSettings['localCorporaSettings']
@@ -1208,6 +1221,8 @@ class LocalCorpus(Corpus):
             'Bach Chorales'
 
         '''
+        if self._name is None:
+            return 'local'
         return self._name
 
 
@@ -1305,6 +1320,12 @@ class VirtualCorpus(Corpus):
             metadataBundle.read()
             metadataBundle.validate()
             Corpus._metadataBundles[domain] = metadataBundle
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def name(self):
+        return 'virtual'
 
 
 #------------------------------------------------------------------------------
