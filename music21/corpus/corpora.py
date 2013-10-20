@@ -107,8 +107,8 @@ class Corpus(object):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> for extension in coreCorpus._translateExtensions():
             ...     extension
             ...
@@ -175,23 +175,23 @@ class Corpus(object):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> corpora.Corpus.fromName('core')
+            >>> from music21 import corpus
+            >>> corpus.Corpus.fromName('core')
             <music21.corpus.corpora.CoreCorpus>
 
         ::
 
-            >>> corpora.Corpus.fromName('virtual')
+            >>> corpus.Corpus.fromName('virtual')
             <music21.corpus.corpora.VirtualCorpus>
 
         ::
 
-            >>> corpora.Corpus.fromName('local')
+            >>> corpus.Corpus.fromName('local')
             <music21.corpus.corpora.LocalCorpus: 'local'>
 
         ::
 
-            >>> corpora.Corpus.fromName('test')
+            >>> corpus.Corpus.fromName('test')
             <music21.corpus.corpora.LocalCorpus: 'test'>
 
         '''
@@ -359,6 +359,16 @@ class Corpus(object):
 
     @property
     def metadataBundle(self):
+        r'''
+        The metadata bundle for a corpus:
+
+        ::
+
+            >>> from music21 import corpus
+            >>> corpus.CoreCorpus().metadataBundle
+            <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+
+        '''
         from music21 import metadata
         return metadata.MetadataBundle(self.name).read()
 
@@ -415,8 +425,8 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> a = coreCorpus.getBachChorales()
             >>> len(a) > 400
             True
@@ -565,8 +575,8 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> a = coreCorpus.getBeethovenStringQuartets()
             >>> len(a) > 10
             True
@@ -628,8 +638,8 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> a = coreCorpus.getComposer('beethoven')
             >>> len(a) > 10
             True
@@ -685,8 +695,8 @@ class CoreCorpus(Corpus):
         ::
 
             >>> import os
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> a = coreCorpus.getComposerDirectoryPath('beethoven')
             >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
             True
@@ -724,8 +734,8 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> a = coreCorpus.getHandelMessiah()
             >>> len(a)
             43
@@ -774,8 +784,8 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> a = coreCorpus.getMonteverdiMadrigals()
             >>> len(a) > 40
             True
@@ -833,8 +843,8 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> corpusFilePaths = coreCorpus.getPaths()
             >>> len(corpusFilePaths)
             3045
@@ -879,8 +889,8 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> coreCorpus = corpora.CoreCorpus()
+            >>> from music21 import corpus
+            >>> coreCorpus = corpus.CoreCorpus()
             >>> len(coreCorpus.getWorkList('beethoven/opus18no1'))
             8
 
@@ -1027,8 +1037,8 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> corpora.CoreCorpus().noCorpus
+            >>> from music21 import corpus
+            >>> corpus.CoreCorpus().noCorpus
             False
 
         '''
@@ -1224,8 +1234,8 @@ class LocalCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> corpora.LocalCorpus(name='Bach Chorales').name
+            >>> from music21 import corpus
+            >>> corpus.LocalCorpus(name='Bach Chorales').name
             'Bach Chorales'
 
         '''
@@ -1270,8 +1280,8 @@ class VirtualCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> len(corpora.VirtualCorpus().getPaths()) > 6
+            >>> from music21 import corpus
+            >>> len(corpus.VirtualCorpus().getPaths()) > 6
             True
 
         '''
@@ -1301,8 +1311,8 @@ class VirtualCorpus(Corpus):
 
         ::
 
-            >>> from music21.corpus import corpora
-            >>> virtualCorpus = corpora.VirtualCorpus()
+            >>> from music21 import corpus
+            >>> virtualCorpus = corpus.VirtualCorpus()
             >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
             ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 
@@ -1337,6 +1347,13 @@ class VirtualCorpus(Corpus):
 
 #------------------------------------------------------------------------------
 
+
+__all__ = (
+    'Corpus',
+    'CoreCorpus',
+    'LocalCorpus',
+    'VirtualCorpus',
+    )
 
 if __name__ == "__main__":
     import music21

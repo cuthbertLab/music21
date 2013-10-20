@@ -178,11 +178,11 @@ class MetadataBundle(object):
 
     ::
 
-        >>> coreCorpus = corpus.corpora.CoreCorpus()
+        >>> coreCorpus = corpus.CoreCorpus()
         >>> coreBundle = metadata.MetadataBundle(coreCorpus)
-        >>> localCorpus = corpus.corpora.LocalCorpus()
+        >>> localCorpus = corpus.LocalCorpus()
         >>> localBundle = metadata.MetadataBundle(localCorpus)
-        >>> virtualCorpus = corpus.corpora.VirtualCorpus()
+        >>> virtualCorpus = corpus.VirtualCorpus()
         >>> virtualBundle = metadata.MetadataBundle(virtualCorpus)
 
     ::
@@ -229,7 +229,7 @@ class MetadataBundle(object):
     ::
 
         >>> anonymousBundle = metadata.MetadataBundle()
-        >>> paths = corpus.corpora.CoreCorpus().getMonteverdiMadrigals()[:4]
+        >>> paths = corpus.CoreCorpus().getMonteverdiMadrigals()[:4]
         >>> failedPaths = anonymousBundle.addFromPaths(
         ...     paths, useMultiprocessing=False)
 
@@ -729,7 +729,7 @@ class MetadataBundle(object):
 
         ::
 
-            >>> from music21 import corpus, metadata
+            >>> from music21 import metadata
             >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
             >>> coreBundle
             <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
