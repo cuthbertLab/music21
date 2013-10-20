@@ -137,9 +137,112 @@ class MetadataBundle(object):
     An object that provides access to, searches within, and stores and loads
     multiple Metadata objects.
 
-    Additionally, multiple MetadataBundles can be merged for additional
-    processing.  See corpus.metadata.metadataCache for the module that builds
-    these.
+    ::
+
+        >>> from music21 import corpus, metadata
+        >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle
+        <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+
+    ::
+
+        >>> searchResults = coreBundle.search('bach', 'composer')
+        >>> searchResults
+        <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+    ::
+
+        >>> searchResults.search('3/4')
+        <music21.metadata.bundles.MetadataBundle {4 entries}>
+
+    ::
+
+        >>> _[0]
+        <music21.metadata.bundles.MetadataEntry: bach_choraleAnalyses_riemenschneider007_rntxt>
+
+    ::
+
+        >>> _.parse()
+        <music21.stream.Score ...>
+
+    A metadata bundle can be instantiated via its static methods
+    ``fromCoreCorpus()``, ``fromLocalCorpus()`` and ``fromVirtualCorpus()``, as
+    well as from a ``Corpus`` instance, or a string indicating which corpus to
+    draw from:
+
+    ::
+
+        >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+        >>> localBundle = metadata.MetadataBundle.fromLocalCorpus()
+        >>> virtualBundle = metadata.MetadataBundle.fromVirtualCorpus()
+
+    ::
+
+        >>> coreCorpus = corpus.corpora.CoreCorpus()
+        >>> coreBundle = metadata.MetadataBundle(coreCorpus)
+        >>> localCorpus = corpus.corpora.LocalCorpus()
+        >>> localBundle = metadata.MetadataBundle(localCorpus)
+        >>> virtualCorpus = corpus.corpora.VirtualCorpus()
+        >>> virtualBundle = metadata.MetadataBundle(virtualCorpus)
+
+    ::
+
+        >>> coreBundle = metadata.MetadataBundle('core')
+        >>> localBundle = metadata.MetadataBundle('local')
+        >>> virtualBundle = metadata.MetadataBundle('virtual')
+
+    The static methods above take the additional step of reading the
+    persisted-to-disk metadata bundle file, and caching the result in memory as
+    necessary.
+
+    For the others, you'll need to call ``read()``:
+
+    ::
+
+        >>> virtualBundle.read()
+        <music21.metadata.bundles.MetadataBundle 'virtual': {8 entries}>
+
+    Additionally, any two metadata bundles can be operated on together as
+    though they were sets, allowing us to build up more complex searches:
+
+    ::
+
+        >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+        >>> bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle
+        <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+    ::
+
+        >>> tripleMeterBundle = coreBundle.search('3/4')
+        >>> tripleMeterBundle
+        <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+    ::
+
+        >>> bachBundle.intersection(tripleMeterBundle)
+        <music21.metadata.bundles.MetadataBundle {4 entries}>
+
+    Finally, a metadata bundle need not be associated with any corpus at all,
+    and can be populated ad hoc:
+
+    ::
+
+        >>> anonymousBundle = metadata.MetadataBundle()
+        >>> paths = corpus.corpora.CoreCorpus().getMonteverdiMadrigals()[:4]
+        >>> failedPaths = anonymousBundle.addFromPaths(
+        ...     paths, useMultiprocessing=False)
+
+    ::
+
+        >>> failedPaths
+        []
+
+    ::
+
+        >>> anonymousBundle
+        <music21.metadata.bundles.MetadataBundle {4 entries}>
+
     '''
 
     ### INITIALIZER ###
@@ -623,6 +726,19 @@ class MetadataBundle(object):
         r'''
         The `corpus.corpora.Corpus` object associated with the metadata
         bundle's name.
+
+        ::
+
+            >>> from music21 import corpus, metadata
+            >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
+            >>> coreBundle
+            <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+
+        ::
+
+            >>> coreBundle.corpus
+            <music21.corpus.corpora.CoreCorpus>
+
         '''
         from music21 import corpus
         if self.name is None:
