@@ -1120,6 +1120,15 @@ class LocalCorpus(Corpus):
         LocalCorpus._temporaryLocalPaths[self._cacheName].add(directoryPath)
         self._removeNameFromCache(self._cacheName)
 
+    def delete(self):
+        if self.name is None or self.name == 'local':
+            return
+        elif not self.existsInSettings:
+            return
+        userSettings = environment.UserSettings()
+        del(userSettings['localCorporaSettings'][self.name])
+        environment.Environment().write()
+
     def getPaths(
         self,
         fileExtensions=None,
