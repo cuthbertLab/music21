@@ -921,7 +921,7 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> len(coreCorpus.getWorkList('handel/hwv56', (2,1), '.md'))
+            >>> len(coreCorpus.getWorkList('handel/hwv56', (2, 1), '.md'))
             1
 
         ::
@@ -1014,7 +1014,7 @@ class CoreCorpus(Corpus):
                 pass
         else:
             movementResults = results
-        return sorted(movementResults)
+        return sorted(set(movementResults))
 
     def search(self, query, field=None, fileExtensions=None):
         from music21 import metadata

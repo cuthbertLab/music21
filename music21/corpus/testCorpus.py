@@ -150,8 +150,8 @@ class Test(unittest.TestCase):
 
     def testGetWorkList(self):
         self.assertEqual(len(corpus.getPaths('.md')) >= 38, True)
-        self.assertEqual(
-            len(corpus.getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')), 1)
+        workList = corpus.getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')
+        self.assertEqual(len(workList), 1)
         self.assertEqual(len(corpus.getWorkList('handel/hwv56', (1, 1), '.md')), 1)
         self.assertEqual(len(corpus.getWorkList('handel/hwv56', '1-01', '.md')), 1)
         self.assertEqual(len(corpus.getWorkList('bach/artOfFugue_bwv1080')), 21)

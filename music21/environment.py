@@ -1051,6 +1051,13 @@ class Environment(object):
             >>> a['debug']
             0
 
+        And we can ``read()`` the environment settings back from our
+        configuration file to restore our normal working environment.
+
+        ::
+
+            >>> a = environment.Environment().read()
+
         '''
         _environStorage['instance'].restoreDefaults()
 
