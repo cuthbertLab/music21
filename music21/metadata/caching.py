@@ -85,7 +85,7 @@ def cacheMetadata(
         else:
             raise MetadataCacheException('invalid domain provided: {0}'.format(
                 domain))
-        environLocal.warn(
+        environLocal.printDebug(
             'metadata cache: starting processing of paths: {0}'.format(
                 len(paths)))
         failingFilePaths += metadataBundle.addFromPaths(
@@ -93,7 +93,7 @@ def cacheMetadata(
             useCorpus=useCorpus,
             useMultiprocessing=useMultiprocessing,
             )
-        environLocal.warn(
+        environLocal.printDebug(
             'cache: writing time: {0} md items: {1}'.format(
                 timer, len(metadataBundle)))
         del metadataBundle
@@ -101,7 +101,7 @@ def cacheMetadata(
     environLocal.warn('cache: final writing time: {0} seconds'.format(
         timer))
     for failingFilePath in failingFilePaths:
-        environLocal.warn('path failed to parse: {0}'.format(
+        environLocal.printDebug('path failed to parse: {0}'.format(
             failingFilePath))
 
 
@@ -179,7 +179,7 @@ class MetadataCachingJob(object):
                 richMetadata = metadata.RichMetadata()
                 richMetadata.merge(parsedObject.metadata)
                 richMetadata.update(parsedObject)  # update based on Stream
-                environLocal.warn(
+                environLocal.printDebug(
                     'updateMetadataCache: storing: {0}'.format(corpusPath))
                 metadataEntry = metadata.MetadataEntry(
                     sourcePath=self.filePath,
@@ -187,7 +187,7 @@ class MetadataCachingJob(object):
                     )
                 self.results.append(metadataEntry)
             else:
-                environLocal.warn(
+                environLocal.printDebug(
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
                         common.relativepath(self.filePath)))
@@ -243,7 +243,7 @@ class MetadataCachingJob(object):
                     self.filePath,
                     number=score.metadata.number,
                     )
-                environLocal.warn(
+                environLocal.printDebug(
                     'addFromPaths: storing: {0}'.format(
                         corpusPath))
                 metadataEntry = metadata.MetadataEntry(

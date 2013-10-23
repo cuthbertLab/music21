@@ -892,6 +892,7 @@ class Environment(object):
             >>> for x in sorted(a.getKeysToPaths()):
             ...     x
             ...
+            'braillePath'
             'graphicsPath'
             'lilypondPath'
             'localCorpusPath'
@@ -919,6 +920,7 @@ class Environment(object):
             ...     x
             ...
             'autoDownload'
+            'braillePath'
             'debug'
             'directoryScratch'
             'graphicsPath'
@@ -974,6 +976,7 @@ class Environment(object):
         ...     x
         ...
         'autoDownload'
+        'braillePath'
         'debug'
         'directoryScratch'
         'graphicsPath'
@@ -1100,6 +1103,7 @@ class UserSettings(object):
         ...     key
         ...
         'autoDownload'
+        'braillePath'
         'debug'
         'directoryScratch'
         'graphicsPath'
@@ -1299,6 +1303,7 @@ def set(key, value):  # okay to override set here: @ReservedAssignment
         ...     x
         ...
         'autoDownload'
+        'braillePath'
         'debug'
         'directoryScratch'
         'graphicsPath'
@@ -1350,6 +1355,7 @@ def get(key):
         ...     x
         ...
         'autoDownload'
+        'braillePath'
         'debug'
         'directoryScratch'
         'graphicsPath'
@@ -1426,6 +1432,7 @@ class Test(unittest.TestCase):
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <preference name="autoDownload" value="ask"/>
+  <preference name="braillePath"/>
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
@@ -1454,6 +1461,7 @@ class Test(unittest.TestCase):
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <preference name="autoDownload" value="ask"/>
+  <preference name="braillePath"/>
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
@@ -1503,6 +1511,7 @@ class Test(unittest.TestCase):
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <preference name="autoDownload" value="ask"/>
+  <preference name="braillePath"/>
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
