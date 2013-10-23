@@ -166,6 +166,8 @@ def _copySingleMeasure(t, p, kCurrent):
                     raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
                     kCurrent = rnPast.key
+                elif rnPast.pivotChord is not None:
+                    kCurrent = rnPast.pivotChord.key
                 else:
                     rnPast.key = kCurrent
             break
@@ -1040,7 +1042,7 @@ m3 NC b3 G: V
         unused_s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
         #s.show('text')
 
-    def testPivotInCopy(self):
+    def testPivotInCopyMultiple(self):
         from music21 import converter
         testCase = '''
 m1 G: I
@@ -1056,6 +1058,21 @@ m8 I
         self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
         m = s.measure(8).flat
         self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+
+    def testPivotInCopySingle(self):
+        from music21 import converter
+        testCase = '''
+m1 G: I
+m2 I
+m3 V D: I
+m4 G: I
+m5 = m3
+m6 I
+'''
+        s = converter.parse(testCase, format='romanText')
+        m = s.measure(6).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+
         
 
 #-------------------------------------------------------------------------------
@@ -1068,7 +1085,7 @@ if __name__ == "__main__":
     import music21
     #from music21 import converter
     #r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
-    music21.mainTest(Test)
+    music21.mainTest(Test, 'noDocTest')
 
 
 #------------------------------------------------------------------------------

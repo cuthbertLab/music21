@@ -1924,7 +1924,6 @@ def relativepath(path, start='.'):
     on a different drive letter from `path`.
     '''
     import platform
-    import os
     if platform == 'Windows':
         return path
     return os.path.relpath(path, start)

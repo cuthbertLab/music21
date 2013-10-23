@@ -181,7 +181,6 @@ class Mensuration(meter.TimeSignature):
     '''
     
     def __init__(self, tempus = 'perfect', prolation = 'minor', mode = 'perfect', maximode = None, scalingFactor = 4):
- 
         self.tempus = tempus
         self.prolation = prolation
         self.mode = mode
@@ -219,7 +218,8 @@ class Mensuration(meter.TimeSignature):
     def __str__(self):
         return '<music21.medren.Mensuration %s>' % self.standardSymbol
     
-    __repr__= __str__
+    def __repr__(self):
+        return str(self)
     
     def _getMinimaPerMeasure(self):
         return self._minimaPerBrevis
@@ -271,8 +271,8 @@ class GeneralMensuralNote(base.Music21Object):
     Two general mensural notes are considered equal if they have the same mensural type, are present in the same context, and have the same offset within that context.
     '''
     def __init__(self, mensuralTypeOrAbbr = 'brevis'):
-        self._gettingDuration = False
         base.Music21Object.__init__(self)
+        self._gettingDuration = False
         self._duration = None
         if mensuralTypeOrAbbr in _validMensuralTypes:
             self._mensuralType = mensuralTypeOrAbbr
@@ -347,7 +347,7 @@ class GeneralMensuralNote(base.Music21Object):
                         MedRenException: blah is not a valid mensural type or abbreviation
                         ''')
     
-    def updateDurationFromMensuration(self, mensuration = None):
+    def updateDurationFromMensuration(self, mensuration = None, surroundingStream = None):
         '''
         The duration of a :class:`music21.medren.GeneralMensuralNote` object can be accessed and set using the :attr:`music21.medren.GeneralMensuralNote.duration` property. 
         The duration of a general mensural note is by default 0. If the object's subclass is not specified (:class:`music21.medren.MensuralNote` or :class:`music21.medren.MensuralRest`), the duration will remain 0 unless set to some other value.
@@ -378,7 +378,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> s.append(medren.MensuralNote('A', 'B'))
         >>> for mn in s:
         ...    if isinstance(mn, medren.GeneralMensuralNote):
-        ...        mn.updateDurationFromMensuration()
+        ...        mn.updateDurationFromMensuration(surroundingStream = s)
         ...        print mn.duration.quarterLength
         1.0
         1.0
@@ -399,7 +399,7 @@ class GeneralMensuralNote(base.Music21Object):
         else:
             mOrD = mensuration
             
-        index = self._getTranslator(mensurationOrDivisione = mOrD)
+        index = self._getTranslator(mensurationOrDivisione = mOrD, surroundingStream = surroundingStream)
         
         if len(self.lenList) > 0:
             if mOrD.standardSymbol in ['.q.', '.p.', '.i.', '.n.']:
@@ -413,12 +413,12 @@ class GeneralMensuralNote(base.Music21Object):
             self.duration = duration.ZeroDuration()
     
     
-    def _getTranslator(self, mensurationOrDivisione = None):
+    def _getTranslator(self, mensurationOrDivisione = None, surroundingStream = None):
 
         mOrD = mensurationOrDivisione
         if mOrD is None:
             mOrD = self._determineMensurationOrDivisione()
-        measure, index = self._getSurroundingMeasure(mensurationOrDivisione = mOrD)
+        measure, index = self._getSurroundingMeasure(mensurationOrDivisione = mOrD, activeSite = surroundingStream)
         
         self._gettingDuration = True
         if len(measure) > 0 and 'Divisione' in mOrD.classes:
@@ -467,7 +467,7 @@ class GeneralMensuralNote(base.Music21Object):
 #        
 #        return mOrD
     
-    def _getSurroundingMeasure(self, mensurationOrDivisione = None):
+    def _getSurroundingMeasure(self, mensurationOrDivisione = None, activeSite = None):
         '''
         Returns a list of the objects (ordered by offset) that are within the measure containing the general mensural note.
         If the general mensural note has no context, returns an empty list.
@@ -484,7 +484,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> s_1.append(gmn_1)
         >>> s_1.append(medren.MensuralNote('C', 'minima'))
         >>> s_1.append(trecento.notation.Punctus())
-        >>> gmn_1._getSurroundingMeasure()
+        >>> gmn_1._getSurroundingMeasure(activeSite = s_1)
         ([<music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.GeneralMensuralNote minima>, <music21.medren.MensuralNote minima C>], 4) 
         >>> 
         >>> s_2 = stream.Stream()
@@ -495,7 +495,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> gmn_2 = medren.GeneralMensuralNote('semibrevis')
         >>> s_2.append(gmn_2)
         >>> s_2.append(medren.Ligature(['A','B']))
-        >>> gmn_2._getSurroundingMeasure()
+        >>> gmn_2._getSurroundingMeasure(activeSite = s_2)
         ([<music21.medren.MensuralNote semibrevis A>, <music21.medren.MensuralNote semibrevis B>, <music21.medren.GeneralMensuralNote semibrevis>], 2)
         '''
         
@@ -507,8 +507,12 @@ class GeneralMensuralNote(base.Music21Object):
         currentIndex, index = -1, -1
         indOffset = 0 
         
-        if len(self.getSites()) > 1:
-            site = self.getSites()[1]
+        if activeSite is None:
+            site = self.activeSite
+        else:
+            site = activeSite
+        
+        if (site is not None):
             if self.mensuralType in ['brevis', 'longa', 'maxima']:
                 mList = [self]
                 currentIndex = 0
@@ -516,8 +520,7 @@ class GeneralMensuralNote(base.Music21Object):
                 tempList = site.recurse()[1:]
                 if site.isMeasure:
                     mList += tempList
-                else:
-                    
+                else:                    
                     for ind, item in enumerate(tempList):
                         if self is item:
                             currentIndex = ind
@@ -1562,7 +1565,7 @@ class Ligature(base.Music21Object):
         return notes
     
 #--------------------------------------------------------------------------------------------------------        
-def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
+def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates = False):
     '''
     Takes a stream as an argument. Takes a mensuration or divisione object as an optional argument.
      
@@ -1604,7 +1607,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
     >>> s.append(trecento.notation.Divisione('.p.'))
     >>> s.append(p)
     >>> s.append(m)
-    >>> medren.breakMensuralStreamIntoBrevisLengths(s)
+    >>> medren.breakMensuralStreamIntoBrevisLengths(s, printUpdates = True)
     Traceback (most recent call last):
     MedRenException: Mensuration or divisione <music21.trecento.notation.Divisione .q.> not consistent within hierarchy
     
@@ -1612,7 +1615,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
     >>> s.append(trecento.notation.Divisione('.q.'))
     >>> s.append(p)
     >>> s.append(m)
-    >>> t = medren.breakMensuralStreamIntoBrevisLengths(s)
+    >>> t = medren.breakMensuralStreamIntoBrevisLengths(s, printUpdates = True)
     Getting measure 0...
     ...
     >>> t.show('text')
@@ -1688,7 +1691,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
                     if e.isMeasure:
                         newStream.append(e)
                     else:
-                        newStream.append(breakMensuralStreamIntoBrevisLengths(e, mOrD))
+                        newStream.append(breakMensuralStreamIntoBrevisLengths(e, mOrD, printUpdates))
     else:
         measureNum = 0
         mensuralMeasure = []
@@ -1707,14 +1710,15 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
                 tempStream = stream.Stream()
                 for mn in e.notes:
                     tempStream.append(mn)
-                for m in breakMensuralStreamIntoBrevisLengths(tempStream):
+                for m in breakMensuralStreamIntoBrevisLengths(tempStream, printUpdates):
                     newStream.append(m)
             elif ('GeneralMensuralNote' in e.classes) and (e not in mensuralMeasure):
                 m = stream.Measure(number = measureNum)
-                
-                print 'Getting measure %s...' % measureNum
-                mensuralMeasure = e._getSurroundingMeasure(mOrD)[0]
-                print 'mensuralMeasure %s' % mensuralMeasure
+                if printUpdates is True:
+                    print 'Getting measure %s...' % measureNum
+                mensuralMeasure = e._getSurroundingMeasure(mOrD, inpStream_copy)[0]
+                if printUpdates is True:               
+                    print 'mensuralMeasure %s' % mensuralMeasure
                 for item in mensuralMeasure:
                     m.append(item)
                 newStream.append(m)

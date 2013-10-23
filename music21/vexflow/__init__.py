@@ -276,7 +276,9 @@ htmlCanvasPostamble=r'''
         $(document).ready(function(){
 '''
 
-vexflowPreamble = r'''            var canvas = $('#music21canvas')[0];
+vexflowPreamble = r'''            
+            var canvas = $('#music21canvas')[0];
+            console.log(canvas);
             var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
             var ctx = renderer.getContext();
 '''
@@ -2302,12 +2304,12 @@ class VexflowContext(object):
         if applyAttributes:
             self.canvasJSCode += ' ' + self.canvasJSName + '.width =' + \
                 str(self.getWidth()) +'; ' + self.canvasJSName + '.height = ' +\
-                str(self.getHeight()) + ';'
+                str(self.getHeight()) + ';'  
         
         self.rendererName = 'music21Renderer' + str(self.UID)
         self.rendererCode = 'var ' + self.rendererName + ' = new Vex.Flow.' + \
             'Renderer(' + self.canvasJSName + ', Vex.Flow.Renderer.Backends.' +\
-            'CANVAS);'
+            'CANVAS);' 
         
         self.contextName = 'music21Context' + str(self.UID)
         self.contextCode = 'var ' + self.contextName+ ' = '+self.rendererName +\

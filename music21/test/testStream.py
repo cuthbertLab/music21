@@ -4176,7 +4176,20 @@ class Test(unittest.TestCase):
             [6, 4, 4, 3, 4, 5, 5, 4, 4, 4, 4, 5, 4, 4, 5, 5, 5, 4, 5, 5, 3, 4, 3, 4, 4, 4, 7, 5, 4, 6, 2, 6, 4, 5, 4] )
         #sMod.show()
 
-
+    def testGetElementAtOrBeforeBarline(self):
+        '''
+        problems with getting elements at or before
+        
+        when triplets are involved...
+        '''
+        from music21 import converter
+        import os
+        bugtestFile = os.path.join(common.getSourceFilePath(), 'stream', 'tripletOffsetBugtest.xml')
+        s = converter.parse(bugtestFile)
+        p = s.parts[0]
+        m = p.getElementAtOrBefore(2)
+        self.assertEqual(m.number, 2)
+        
 
     def testElementsHighestTimeA(self): 
         '''Test adding elements at the highest time position

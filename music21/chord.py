@@ -1096,6 +1096,7 @@ class Chord(note.NotRest):
                 if val is True:
                     score += 1.0/(i+6)
             return score
+
         stepsFound = []
         nonDuplicatingPitches = []
         for p in self.pitches:

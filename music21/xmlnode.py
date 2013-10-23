@@ -520,6 +520,8 @@ class XMLNode(object):
                     except TypeError:
                         entry = u"%s" % content
                         #entry = str(content)
+                    except RuntimeError:  # IronPython
+                        entry = u"%s" % content                        
                     sub.appendChild(doc.createTextNode(entry))
                 node.appendChild(sub)
             elif isinstance(component, XMLNode): # its a XMLNode subclass

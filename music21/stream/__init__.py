@@ -2478,6 +2478,7 @@ class Stream(base.Music21Object):
         # or _endElements, or both; possible performance hit
         # NOTE: this is a performance critical operation
         returnList = False
+
         if returnStreamSubClass:
             try:
                 found = self.__class__()
@@ -2513,7 +2514,7 @@ class Stream(base.Music21Object):
                 found.isSorted = self.isSorted
                 return found
 
-        if not self.isSorted and self.autoSort:
+        if ((self.isSorted is False) and (self.autoSort is True)):
             self.sort() # will set isSorted to True
         # if this stream was sorted, the resultant stream is sorted
         if returnList is False:
@@ -3124,9 +3125,9 @@ class Stream(base.Music21Object):
                     continue
             span = offset - e.getOffsetBySite(self)
             #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(self), 'e', e])
-            if span < 0: # the e is after this offset
+            if (span < -.000000001): # i.e. , span < 0, but with epsilon # the e is after this offset
                 continue
-            elif span == 0: # should be almos equlas
+            elif common.almostEquals(span, 0):
                 candidates.append((span, e))
                 nearestTrailSpan = span
             else:
@@ -5043,12 +5044,13 @@ class Stream(base.Music21Object):
         # TODO: make chordify have an option where the Pitches are not deepcopied from the original, but
         #       are the same.
 
-        # for makeChords, below
+        # for makeChords, below        
         transferGroupsToPitches = False
         if addPartIdAsGroup:
             transferGroupsToPitches = True
 
         returnObj = copy.deepcopy(self)
+        returnObj.isSorted = False # this makes all the difference in the world for some reason...
         if returnObj.hasPartLikeStreams():
             allParts = returnObj.getElementsByClass('Stream')
         else: # simulate a list of Streams
@@ -7952,11 +7954,14 @@ class Stream(base.Music21Object):
         for ob in offsetMap:
             # if target is defined, only modify that object
             oStart, oEnd, e, unused_voiceCount = ob['offset'], ob['endTime'], ob['element'], ob['voiceIndex']
-
+            
             if target is not None and id(e) != id(target):
                 continue
 
             cutPoints = []
+            oStart = common.cleanupFloat(oStart)
+            oEnd = common.cleanupFloat(oEnd)
+
             for o in offsetList:
                 if o > oStart and o < oEnd:
                     cutPoints.append(o)
