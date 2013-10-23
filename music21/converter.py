@@ -890,10 +890,13 @@ class Converter(object):
         >>> #_DOCS_SHOW jeanieStream = c.stream
         '''
         autoDownload = environLocal['autoDownload']
-        if autoDownload == 'allow':
-            pass
-        elif autoDownload in ['deny', 'ask']:
-            raise ConverterException("""automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading: environment.set('autoDownload', 'allow')""" % autoDownload)
+        if autoDownload in ('deny', 'ask'):
+            message = 'Automatic downloading of URLs is presently set to {!r};'
+            message += ' configure your Environment "autoDownload" setting to '
+            message += '"allow" to permit automatic downloading: '
+            message += "environment.set('autoDownload', 'allow')"
+            message = message.format(autoDownload)
+            raise ConverterException(message)
 
         # If we give the URL to a Wikifonia main page,
         # redirect to musicxml page:
@@ -990,21 +993,27 @@ class Converter(object):
 
 
 def parseFile(fp, number=None, format=None, forceSource=False):  #@ReservedAssignment
-    '''Given a file path, attempt to parse the file into a Stream.
+    '''
+    Given a file path, attempt to parse the file into a Stream.
     '''
     v = Converter()
     v.parseFile(fp, number=number, format=format, forceSource=forceSource)
     return v.stream
 
 def parseData(dataStr, number=None, format=None): # @ReservedAssignment
-    '''Given musical data represented within a Python string, attempt to parse the data into a Stream.
+    '''
+    Given musical data represented within a Python string, attempt to parse the
+    data into a Stream.
     '''
     v = Converter()
     v.parseData(dataStr, number=number, format=format)
     return v.stream
 
 def parseURL(url, number=None, format=None, forceSource=False): # @ReservedAssignment
-    '''Given a URL, attempt to download and parse the file into a Stream. Note: URL downloading will not happen automatically unless the user has set their Environment "autoDownload" preference to "allow".
+    '''
+    Given a URL, attempt to download and parse the file into a Stream. Note:
+    URL downloading will not happen automatically unless the user has set their
+    Environment "autoDownload" preference to "allow".
     '''
     v = Converter()
     v.parseURL(url, format=format)
@@ -1012,34 +1021,25 @@ def parseURL(url, number=None, format=None, forceSource=False): # @ReservedAssig
 
 def parse(value, *args, **keywords):
     '''
-    Given a file path, encoded data in a Python string,
-    or a URL, attempt to parse the item into a Stream.
-    Note: URL downloading will not happen automatically unless
-    the user has set their Environment "autoDownload"
+    Given a file path, encoded data in a Python string, or a URL, attempt to
+    parse the item into a Stream.  Note: URL downloading will not happen
+    automatically unless the user has set their Environment "autoDownload"
     preference to "allow".
 
-
-    Keywords can include `number` which specifies a piece number
-    in a file of multipiece file.
-
+    Keywords can include `number` which specifies a piece number in a file of
+    multipiece file.
 
     `format` specifies the format to parse the line of text or the file as.
 
-    A string of text is first checked to see if it is a
-    filename that exists on disk.  If not it is searched
-    to see if it looks like a URL.  If not it is processed
-    as data.
+    A string of text is first checked to see if it is a filename that exists on
+    disk.  If not it is searched to see if it looks like a URL.  If not it is
+    processed as data.
 
-
-    The data is normally interpreted as a line of TinyNotation
-    with the first argument being the time signature:
-
+    The data is normally interpreted as a line of TinyNotation with the first
+    argument being the time signature:
 
     TODO: SHOW FILE
     TODO: SHOW URL
-
-
-
 
     >>> s = converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c")
     >>> s.getElementsByClass(meter.TimeSignature)[0]

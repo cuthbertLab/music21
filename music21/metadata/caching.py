@@ -282,7 +282,6 @@ class MetadataCachingJob(object):
         return self.filePath
 
 
-
 #------------------------------------------------------------------------------
 
 
