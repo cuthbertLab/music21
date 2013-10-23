@@ -832,7 +832,7 @@ class MetadataBundle(object):
         '''
         import music21
         from music21 import metadata
-        music21Path = music21.__path__[0]
+#        music21Path = music21.__path__[0]
         jobs = []
         accumulatedResults = []
         accumulatedErrors = []
@@ -854,11 +854,11 @@ class MetadataBundle(object):
                     skippedJobsCount += 1
                     continue
             currentJobNumber += 1
-            if path.startswith(music21Path):
-                path = os.path.join(
-                    'music21',
-                    common.relativepath(path, music21Path),
-                    )
+#            if path.startswith(music21Path):
+#                path = os.path.join(
+#                    'music21',
+#                    common.relativepath(path, music21Path),
+#                    )
             job = metadata.MetadataCachingJob(
                 path,
                 jobNumber=currentJobNumber,

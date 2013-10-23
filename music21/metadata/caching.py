@@ -174,7 +174,7 @@ class MetadataCachingJob(object):
         from music21 import metadata
         try:
             corpusPath = metadata.MetadataBundle.corpusPathToKey(
-                self.filePath)
+                self.cleanFilePath)
             if parsedObject.metadata is not None:
                 richMetadata = metadata.RichMetadata()
                 richMetadata.merge(parsedObject.metadata)
@@ -182,7 +182,7 @@ class MetadataCachingJob(object):
                 environLocal.printDebug(
                     'updateMetadataCache: storing: {0}'.format(corpusPath))
                 metadataEntry = metadata.MetadataEntry(
-                    sourcePath=self.filePath,
+                    sourcePath=self.cleanFilePath,
                     metadataPayload=richMetadata,
                     )
                 self.results.append(metadataEntry)
@@ -190,9 +190,9 @@ class MetadataCachingJob(object):
                 environLocal.printDebug(
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
-                        common.relativepath(self.filePath)))
+                        common.relativepath(self.cleanFilePath)))
                 metadataEntry = metadata.MetadataEntry(
-                    sourcePath=self.filePath,
+                    sourcePath=self.cleanFilePath,
                     metadataPayload=None,
                     )
                 self.results.append(metadataEntry)
@@ -220,7 +220,7 @@ class MetadataCachingJob(object):
         # This lets the metadata bundle know it has already processed this
         # entire opus on the next cache update.
         metadataEntry = metadata.MetadataEntry(
-            sourcePath=self.filePath,
+            sourcePath=self.cleanFilePath,
             metadataPayload=None,
             )
         self.results.append(metadataEntry)
@@ -240,14 +240,14 @@ class MetadataCachingJob(object):
             else:
                 # update path to include work number
                 corpusPath = metadata.MetadataBundle.corpusPathToKey(
-                    self.filePath,
+                    self.cleanFilePath,
                     number=score.metadata.number,
                     )
                 environLocal.printDebug(
                     'addFromPaths: storing: {0}'.format(
                         corpusPath))
                 metadataEntry = metadata.MetadataEntry(
-                    sourcePath=self.filePath,
+                    sourcePath=self.cleanFilePath,
                     number=scoreNumber,
                     metadataPayload=richMetadata,
                     )
@@ -267,6 +267,20 @@ class MetadataCachingJob(object):
 
     def getResults(self):
         return tuple(self.results)
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def cleanFilePath(self):
+        import music21
+        music21Path = music21.__path__[0]
+        if self.filePath.startswith(music21Path):
+            return os.path.join(
+                'music21',
+                common.relativepath(self.filePath, music21Path),
+                )
+        return self.filePath
+
 
 
 #------------------------------------------------------------------------------
