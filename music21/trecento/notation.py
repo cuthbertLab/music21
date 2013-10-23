@@ -576,7 +576,8 @@ def convertTrecentoStream(inpStream, inpDiv = None):
     >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(lowerString))
 
     >>> SePerDurecaConverted = trecento.notation.convertTrecentoStream(SePerDureca)
-    Getting measure 0...
+    <BLANKLINE>
+    Converting stream ... 
     ...
 
     >>> #_DOCS_HIDE SePerDurecaConverted.show()
