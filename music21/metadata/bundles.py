@@ -199,8 +199,8 @@ class MetadataBundle(object):
 
     ::
 
-        >>> virtualBundle.read()
-        <music21.metadata.bundles.MetadataBundle 'virtual': {8 entries}>
+        >>> coreBundle.read()
+        <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
 
     Additionally, any two metadata bundles can be operated on together as
     though they were sets, allowing us to build up more complex searches:
@@ -840,7 +840,7 @@ class MetadataBundle(object):
             metadataBundleModificationTime = os.path.getctime(self.filePath)
         else:
             metadataBundleModificationTime = time.time()
-        environLocal.warn([
+        environLocal.printDebug([
             'MetadataBundle Modification Time: {0}'.format(
                 metadataBundleModificationTime)
             ])
@@ -866,7 +866,7 @@ class MetadataBundle(object):
                 )
             jobs.append(job)
         currentIteration = 0
-        environLocal.warn('Skipped {0} sources already in cache.'.format(
+        environLocal.printDebug('Skipped {0} sources already in cache.'.format(
             skippedJobsCount))
         if useMultiprocessing:
             jobProcessor = metadata.JobProcessor.process_parallel
@@ -1304,14 +1304,7 @@ class MetadataBundle(object):
         metadata cache on disk, clear the bundle's contents and reload in all
         files from that associated corpus.
 
-        Return the metadata bundle.
-
-        ::
-
-            >>> from music21 import metadata
-            >>> virtualBundle = metadata.MetadataBundle.fromVirtualCorpus()
-            >>> virtualBundle = virtualBundle.rebuild(useMultiprocessing=False)
-
+        Return the rebuilt metadata bundle.
         '''
         from music21 import corpus
         if self.filePath is None:
@@ -1554,7 +1547,7 @@ class MetadataBundle(object):
         filePath = filePath or self.filePath
         if self.filePath is not None:
             filePath = self.filePath
-            environLocal.warn(['MetadataBundle: writing:', filePath])
+            environLocal.printDebug(['MetadataBundle: writing:', filePath])
             jsf = freezeThaw.JSONFreezer(self)
             return jsf.jsonWrite(filePath)
         return self

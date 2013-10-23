@@ -98,7 +98,7 @@ def cacheMetadata(
                 timer, len(metadataBundle)))
         del metadataBundle
 
-    environLocal.warn('cache: final writing time: {0} seconds'.format(
+    environLocal.printDebug('cache: final writing time: {0} seconds'.format(
         timer))
     for failingFilePath in failingFilePaths:
         environLocal.printDebug('path failed to parse: {0}'.format(
@@ -320,7 +320,7 @@ class JobProcessor(object):
                 filePathErrorCount,
                 filePath,
                 )
-        environLocal.warn(message)
+        environLocal.printDebug(message)
 
     ### PUBLIC METHODS ###
 
@@ -336,7 +336,7 @@ class JobProcessor(object):
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
-        environLocal.warn(
+        environLocal.printDebug(
             'Processing {0} jobs in parallel, with {1} processes.'.format(
                 remainingJobs, processCount))
         results = []
