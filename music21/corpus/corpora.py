@@ -986,7 +986,7 @@ class CoreCorpus(Corpus):
                     str(movementNumber),
                     'movement{}'.format(movementNumber),
                     ]
-            for filePath in results:
+            for filePath in sorted(results):
                 filename = os.path.split(filePath)[1]
                 if '.' in filename:
                     filenameWithoutExtension = os.path.splitext(filename)[0]
