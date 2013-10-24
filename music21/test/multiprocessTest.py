@@ -22,6 +22,8 @@ building a new release.
 
 Run test/testDocumentation after this.
 '''
+from __future__ import print_function
+
 import doctest
 import multiprocessing
 import os
@@ -167,7 +169,7 @@ def multime(multinum):
     sleeptime = multinum[0]/1000.0
     if multinum[0] == 900:
         raise Exception("Ha! 900!") 
-    print multinum, sleeptime
+    print(multinum, sleeptime)
     sys.stdout.flush()
     time.sleep(sleeptime)
     x = multinum[0] * multinum[1] / 10
@@ -178,7 +180,7 @@ def examplePoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     demo of a pool runner with failures and successes...
     '''
     poolSize = 2 #multiprocessing.cpu_count()
-    print 'Creating %d processes for multiprocessing' % poolSize
+    print('Creating %d processes for multiprocessing' % poolSize)
     pool = multiprocessing.Pool(processes=poolSize)
 
     storage = []
@@ -191,15 +193,15 @@ def examplePoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     while continueIt is True:
         try:
             newResult = res.next(timeout=1)
-            print newResult
+            print(newResult)
             timeouts = 0
             eventsProcessed += 1
             storage.append(newResult)
         except multiprocessing.TimeoutError:
             timeouts += 1
-            print "TIMEOUT!"
+            print("TIMEOUT!")
             if timeouts > 3 and eventsProcessed > 0:
-                print "Giving up..."
+                print("Giving up...")
                 continueIt = False
                 pool.close()
                 pool.join()
@@ -216,7 +218,7 @@ def examplePoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
         if x not in storageTwo:
             failLog = ("Fail", x)
             storage.append(failLog)
-    print storage
+    print(storage)
 
 def runOneModuleWithoutImp(args):
     modGath = args[0] # modGather object
@@ -291,7 +293,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     else:
         leaveOut = 0
 
-    print 'Creating %d processes for multiprocessing (omitting %d processors)' % (poolSize, leaveOut)
+    print('Creating %d processes for multiprocessing (omitting %d processors)' % (poolSize, leaveOut))
     
 
     modGather = ModuleGather()
@@ -311,21 +313,21 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
         try:
             newResult = res.next(timeout=1)
             if timeouts >= 5:
-                print ""
-            print newResult
+                print("")
+            print(newResult)
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
         except multiprocessing.TimeoutError:
             timeouts += 1
             if timeouts == 5 and eventsProcessed > 0:
-                print "Delay in processing, seconds: ",
+                print("Delay in processing, seconds: ", end="")
             elif timeouts == 5:
-                print "Starting first modules, should take 5-10 seconds: ",
+                print("Starting first modules, should take 5-10 seconds: ", end="")
             if timeouts % 5 == 0:
-                print str(timeouts) + " ",
+                print(str(timeouts) + " ", end="")
             if timeouts > maxTimeout and eventsProcessed > 0:
-                print "\nToo many delays, giving up..."
+                print("\nToo many delays, giving up...")
                 continueIt = False
                 printSummary(summaryOutput, timeStart, pathsToRun)
                 pool.close()
@@ -339,12 +341,10 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
             exceptionLog = ("UntrappedException", "%s" % excp)
             summaryOutput.append(exceptionLog)
 
-    #print summaryOutput
-
     printSummary(summaryOutput, timeStart, pathsToRun)
 
 def printSummary(summaryOutput, timeStart, pathsToRun):
-
+    outStr = ""
     summaryOutputTwo = [i[1] for i in summaryOutput]
     for fp in pathsToRun:
         if fp not in summaryOutputTwo:
@@ -387,10 +387,10 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                 errorsFoundSummary.append("\n-----------\n%s had %d ERRORS and %d FAILURES in %d tests:" %(moduleName, len(errorsList), len(failuresList), testsRun))
 
                 for e in errorsList:
-                    print e
+                    outStr += e + "\n"
                     errorsFoundSummary.append('%s' % (e))
                 for f in failuresList:
-                    print f
+                    outStr += f + "\n"
                     errorsFoundSummary.append('%s' % (f))
 #                for e in errorsList:
 #                    print e[0], e[1]
@@ -402,20 +402,27 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
             otherSummary.append("Unknown return code %s" % l)
 
 
-    print "\n\n---------------SUMMARY---------------------------------------------------"
+    outStr += "\n\n---------------SUMMARY---------------------------------------------------\n"
     for l in skippedSummary:
-        print l
+        outStr += l + "\n"
     for l in successSummary:
-        print l
+        outStr += l + "\n"
     for l in otherSummary:
-        print l
+        outStr += l + "\n"
     for l in errorsFoundSummary:
-        print l
-    print "-------------------------------------------------------------------------"
+        outStr += l + "\n"
+    outStr += "-------------------------------------------------------------------------\n"
     elapsedTime = time.time() - timeStart
-    print "Ran %d tests in %.4f seconds" % (totalTests, elapsedTime)
+    outStr += "Ran %d tests in %.4f seconds\n" % (totalTests, elapsedTime)
     sys.stdout.flush()
-
+    print(outStr)
+    sys.stdout.flush()
+    
+    from music21 import common
+    import datetime
+    with open(os.path.join(common.getSourceFilePath(), 'test', 'lastResults.txt'), 'w') as f:
+        f.write(outStr)
+        f.write("Run at " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 if __name__ == '__main__':
     #mg = ModuleGather()

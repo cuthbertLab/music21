@@ -786,6 +786,16 @@ class RomanNumeral(harmony.Harmony):
         >>> [str(p) for p in minorV.pitches]
         ['F#4', 'A4', 'B4', 'D5']
 
+
+    In minor -- VII and VI are assumed to refer to the flattened scale degree.
+    vii, viio, viio7, vii/o7 and vi, vio, vio7, vi/o7 refer to the sharpened scale
+    degree.  To get a minor triad on lowered 6 for instance, you will need to use 'bvi'
+    while to get a major triad on raised 6, use '#VI'.  
+    
+    The actual rule is that if the chord implies minor, diminished, or half-diminished,
+    an implied "#" is read before the figure.  Anything else does not add the sharp.
+    The lowered (natural minor) is the assumed basic chord.
+
     ::
 
         >>> majorFlatSeven = roman.RomanNumeral('VII', em)
