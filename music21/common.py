@@ -242,7 +242,7 @@ def findFormatExtFile(fp):
     ('musicxml', '.xml')
 
     >>> common.findFormatExtFile('test.mus')
-    ('finale', '.mus')l
+    ('finale', '.mus')
 
     >>> common.findFormatExtFile('test')
     (None, None)
