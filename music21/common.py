@@ -242,7 +242,7 @@ def findFormatExtFile(fp):
     ('musicxml', '.xml')
 
     >>> common.findFormatExtFile('test.mus')
-    ('finale', '.mus')
+    ('finale', '.mus')l
 
     >>> common.findFormatExtFile('test')
     (None, None)
@@ -616,7 +616,6 @@ def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
     IMPROVE: when 2.6 is everywhere: add numbers class.
 
-
     >>> common.isNum(3.0)
     True
     >>> common.isNum(3)
@@ -702,7 +701,7 @@ def isListLike(usrData):
     >>> common.isListLike(stream.Stream())
     False
     """
-    #TODO: add immutable sets and pre 2.6 set support
+    #TODO: add immutable sets
     if (isinstance(usrData, list) or
         isinstance(usrData, tuple) or
         isinstance(usrData, set)):

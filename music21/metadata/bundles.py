@@ -5,8 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
+#               Josiah Oberholtzer
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010, 2012-13 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
@@ -830,7 +831,6 @@ class MetadataBundle(object):
             1
 
         '''
-        import music21
         from music21 import metadata
 #        music21Path = music21.__path__[0]
         jobs = []

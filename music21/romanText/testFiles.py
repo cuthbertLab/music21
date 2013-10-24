@@ -667,7 +667,15 @@ m16 b3 i
 m17 V4/3 b2 V6/5 b2.5 V7 b3 i b4 V6/5 b4.5 C: ii2
 '''
 
-
+testSecondaryInCopy = '''
+Time Signature: 4/4
+m1 g: i
+m2 i6
+m3 V7/v
+m4-5 = m3-4
+m6 d: i
+m7-10 = m2-5
+'''
 
 
 ALL  = [monteverdi_3_13, riemenschneider001, swv23, mozartK279]

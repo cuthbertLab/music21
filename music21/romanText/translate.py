@@ -170,6 +170,13 @@ def _copySingleMeasure(t, p, kCurrent):
                     kCurrent = rnPast.pivotChord.key
                 else:
                     rnPast.key = kCurrent
+                if rnPast.secondaryRomanNumeral is not None:
+                    from music21 import roman
+                    newRN = roman.RomanNumeral(rnPast.figure, kCurrent)
+                    newRN.duration = copy.deepcopy(rnPast.duration)
+                    newRN.lyrics = copy.deepcopy(rnPast.lyrics)
+                    m.replace(rnPast, newRN)
+
             break
     return m, kCurrent
 
@@ -212,7 +219,8 @@ def _copyMultipleMeasures(t, p, kCurrent):
             m.number = t.number[0] + mPast.number - targetStart
             measures.append(m)
             # update all keys
-            for rnPast in m.getElementsByClass('RomanNumeral'):
+            allRNs = m.getElementsByClass('RomanNumeral').elements
+            for rnPast in allRNs:
                 if kCurrent is None: # should not happen
                     raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
@@ -221,6 +229,13 @@ def _copyMultipleMeasures(t, p, kCurrent):
                     kCurrent = rnPast.pivotChord.key
                 else:
                     rnPast.key = kCurrent                
+                if rnPast.secondaryRomanNumeral is not None:
+                    from music21 import roman
+                    newRN = roman.RomanNumeral(rnPast.figure, kCurrent)
+                    newRN.duration = copy.deepcopy(rnPast.duration)
+                    newRN.lyrics = copy.deepcopy(rnPast.lyrics)
+                    m.replace(rnPast, newRN)
+                    
         if mPast.number == targetEnd:
             break
     return measures, kCurrent
@@ -940,6 +955,64 @@ class TestSlow(unittest.TestCase):
         
 
 class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+    
+    def testPivotInCopyMultiple(self):
+        from music21 import converter
+        testCase = '''
+m1 G: I
+m2 I
+m3 V D: I
+m4 V
+m5 G: I
+m6-7 = m3-4
+m8 I
+'''
+        s = converter.parse(testCase, format='romanText')
+        m = s.measure(7).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+        m = s.measure(8).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+
+    def testPivotInCopySingle(self):
+        from music21 import converter
+        testCase = '''
+m1 G: I
+m2 I
+m3 V D: I
+m4 G: I
+m5 = m3
+m6 I
+'''
+        s = converter.parse(testCase, format='romanText')
+        m = s.measure(6).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+
+        
+    def testSecondaryInCopyMultiple(self):
+        '''
+        test secondary dominants after copy
+        '''
+        
+        testSecondaryInCopy = '''
+Time Signature: 4/4
+m1 g: i
+m2 i6
+m3 V7/v
+m4 d: i
+m5-6 = m2-3
+m7 = m3
+'''
+
+        s = romanTextToStreamScore(testSecondaryInCopy)
+        m = s.measure(6).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 'E5-dominant seventh chord')
+        m = s.measure(7).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 'E5-dominant seventh chord')
+        s.show()
+
     def testBasicB(self):
         from music21.romanText import testFiles
 
@@ -1042,38 +1115,6 @@ m3 NC b3 G: V
         unused_s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
         #s.show('text')
 
-    def testPivotInCopyMultiple(self):
-        from music21 import converter
-        testCase = '''
-m1 G: I
-m2 I
-m3 V D: I
-m4 V
-m5 G: I
-m6-7 = m3-4
-m8 I
-'''
-        s = converter.parse(testCase, format='romanText')
-        m = s.measure(7).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
-        m = s.measure(8).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
-
-    def testPivotInCopySingle(self):
-        from music21 import converter
-        testCase = '''
-m1 G: I
-m2 I
-m3 V D: I
-m4 G: I
-m5 = m3
-m6 I
-'''
-        s = converter.parse(testCase, format='romanText')
-        m = s.measure(6).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
-
-        
 
 #-------------------------------------------------------------------------------
 
@@ -1085,7 +1126,9 @@ if __name__ == "__main__":
     import music21
     #from music21 import converter
     #r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
-    music21.mainTest(Test, 'noDocTest')
+    import sys
+    sys.argv.append('testSecondaryInCopyMultiple')
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
