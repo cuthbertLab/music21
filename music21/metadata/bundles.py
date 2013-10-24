@@ -1251,7 +1251,7 @@ class MetadataBundle(object):
         ::
 
             >>> from music21 import metadata
-            >>> coreBundle = metadata.MetadataBundle('core').read()
+            >>> virtualBundle = metadata.MetadataBundle('virtual').read()
 
         If a metadata is unnamed, and no file path is specified, an exception
         will be thrown:
