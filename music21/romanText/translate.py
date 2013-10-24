@@ -1011,7 +1011,7 @@ m7 = m3
         self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 'E5-dominant seventh chord')
         m = s.measure(7).flat
         self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 'E5-dominant seventh chord')
-        s.show()
+        #s.show()
 
     def testBasicB(self):
         from music21.romanText import testFiles
@@ -1126,8 +1126,8 @@ if __name__ == "__main__":
     import music21
     #from music21 import converter
     #r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
-    import sys
-    sys.argv.append('testSecondaryInCopyMultiple')
+    #import sys
+    #sys.argv.append('testSecondaryInCopyMultiple')
     music21.mainTest(Test)
 
 
