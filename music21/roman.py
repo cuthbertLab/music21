@@ -1093,6 +1093,7 @@ class RomanNumeral(harmony.Harmony):
 
     _alterationRegex = re.compile('^(b+|\-+|\#+)')
     _omittedStepsRegex = re.compile('(\[(no[1-9])+\]\s*)+')
+    _bracketedAlterationRegex =  re.compile('\[(b+|\-+|\#+)(\d+)\]')
     _romanNumeralAloneRegex = \
         re.compile('(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N|Fr|Ger|It|Sw)')
     _secondarySlashRegex = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
@@ -1134,12 +1135,13 @@ class RomanNumeral(harmony.Harmony):
         self._scale = None
         self.impliedScale = None
         self.useImpliedScale = False
+        self.bracketedAlterations = None
 
         self._parsingComplete = False
 
         self.key = keyOrScale
         harmony.Harmony.__init__(self, figure)
-
+        self._correctBracketedPitches()
         self._parsingComplete = True
         self._functionalityScore = None
         # It is sometimes helpful to know if this is the first chord after a
@@ -1155,6 +1157,18 @@ class RomanNumeral(harmony.Harmony):
             return '<music21.roman.RomanNumeral %s>' % (self.figure)
 
     ### PRIVATE METHODS ###
+    def _correctBracketedPitches(self):
+        # correct bracketed figures
+        if (self.bracketedAlterations is not None):
+            for (alter, chordStep) in self.bracketedAlterations:
+                alter = re.sub('b','-', alter)
+                alterPitch = self.getChordStep(chordStep)
+                if alterPitch is not None:
+                    newAccidental = pitch.Accidental(alter)
+                    if alterPitch.accidental is None:
+                        alterPitch.accidental = newAccidental
+                    else:
+                        alterPitch.accidental.set(alterPitch.accidental.alter + newAccidental.alter)
 
     def _matchAccidentalsToQuality(self, impliedQuality):
         '''
@@ -1199,7 +1213,7 @@ class RomanNumeral(harmony.Harmony):
                         thisCorrect - thisSemis)
                 else:
                     acc = faultyPitch.accidental
-                    acc.set(thisCorrect - thisSemis + acc.alter)
+                    acc.set(thisCorrect - thisSemis + acc.alter)                        
 
     def _parseFigure(self):
         '''
@@ -1252,6 +1266,17 @@ class RomanNumeral(harmony.Harmony):
                 if x]
             workingFigure = self._omittedStepsRegex.sub('', workingFigure)
         self.omittedSteps = omittedSteps
+
+        matches = self._bracketedAlterationRegex.finditer(workingFigure)
+        for m in matches:
+            if self.bracketedAlterations is None:
+                self.bracketedAlterations = []
+            matchAlteration = m.group(1)
+            matchDegree = int(m.group(2))
+            newTuple = (matchAlteration, matchDegree)
+            self.bracketedAlterations.append(newTuple)
+        workingFigure = self._bracketedAlterationRegex.sub('', workingFigure)
+
 
         # Replace Neapolitan indication.
         workingFigure = re.sub('^N', 'bII', workingFigure)
@@ -1800,6 +1825,11 @@ class Test(unittest.TestCase):
         rnOmit = RomanNumeral('V[no3no5]', dminor)
         self.assertEqual(rnOmit.pitches, chord.Chord(['A4']).pitches)
 
+    def testBracketedAlterations(self):
+        r1 = RomanNumeral('V9[b7][b5]')
+        self.assertEqual(str(r1.bracketedAlterations), "[('b', 7), ('b', 5)]")
+        self.assertEqual(str(r1.pitches), '(<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D-5>, <music21.pitch.Pitch F-5>, <music21.pitch.Pitch A5>)')
+
 #    def xtestFirst(self):
 #         # associating a harmony with a scale
 #        sc1 = MajorScale('g4')
@@ -1848,7 +1878,7 @@ class Test(unittest.TestCase):
 #        h2.chord.show()
 
     def testYieldRemoveA(self):
-        from music21 import stream, key, note
+        from music21 import stream, note
         #s = corpus.parse('madrigal.3.1.rntxt')
         m = stream.Measure()
         m.append(key.KeySignature(4))
@@ -1933,7 +1963,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
 
     def testScaleDegreesA(self):
-        from music21 import key, roman
+        from music21 import roman
         k = key.Key('f#')  # 3-sharps minor
         rn = roman.RomanNumeral('V', k)
         self.assertEqual(str(rn.key), 'f# minor')
