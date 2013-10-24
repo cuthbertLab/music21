@@ -291,15 +291,16 @@ class _EnvironmentCore(object):
         # define all settings that are paths
         # store names of all values that are keys; check for validity
         self._keysToPaths = []
-        self._keysToPaths.append('lilypondPath')
-        self._keysToPaths.append('musicxmlPath')
-        self._keysToPaths.append('graphicsPath')
-        self._keysToPaths.append('vectorPath')
-        self._keysToPaths.append('pdfPath')
-        self._keysToPaths.append('midiPath')
         self._keysToPaths.append('braillePath')
+        self._keysToPaths.append('graphicsPath')
+        self._keysToPaths.append('lilypondPath')
         self._keysToPaths.append('localCorpusPath')
+        self._keysToPaths.append('manualCoreCorpusPath')
+        self._keysToPaths.append('midiPath')
         self._keysToPaths.append('musescoreDirectPNGPath')
+        self._keysToPaths.append('musicxmlPath')
+        self._keysToPaths.append('pdfPath')
+        self._keysToPaths.append('vectorPath')
 
         # defines all valid keys in ref
         self._loadDefaults(forcePlatform=forcePlatform)
@@ -484,6 +485,8 @@ class _EnvironmentCore(object):
         # store a list of strings
         self._ref['localCorpusSettings'] = []
         self._ref['localCorporaSettings'] = {}
+
+        self._ref['manualCoreCorpusPath'] = None
 
         if forcePlatform is None:
             platform = common.getPlatform()
@@ -896,6 +899,7 @@ class Environment(object):
             'graphicsPath'
             'lilypondPath'
             'localCorpusPath'
+            'manualCoreCorpusPath'
             'midiPath'
             'musescoreDirectPNGPath'
             'musicxmlPath'
@@ -930,6 +934,7 @@ class Environment(object):
             'lilypondVersion'
             'localCorporaSettings'
             'localCorpusSettings'
+            'manualCoreCorpusPath'
             'midiPath'
             'musescoreDirectPNGPath'
             'musicxmlPath'
@@ -987,6 +992,7 @@ class Environment(object):
         'localCorporaSettings'
         'localCorpusPath'
         'localCorpusSettings'
+        'manualCoreCorpusPath'
         'midiPath'
         'musescoreDirectPNGPath'
         'musicxmlPath'
@@ -1121,6 +1127,7 @@ class UserSettings(object):
         'localCorporaSettings'
         'localCorpusPath'
         'localCorpusSettings'
+        'manualCoreCorpusPath'
         'midiPath'
         'musescoreDirectPNGPath'
         'musicxmlPath'
@@ -1225,11 +1232,12 @@ class UserSettings(object):
         # this will accept localCorpusPath
         if key in self._environment.getKeysToPaths():
             # try to expand user if found; otherwise return unaltered
-            value = os.path.expanduser(value)
-            if not os.path.exists(value):
-                raise UserSettingsException(
-                    'attempting to set a path that does not exist: {}'.format(
-                        value))
+            if value is not None:
+                value = os.path.expanduser(value)
+                if not os.path.exists(value):
+                    raise UserSettingsException(
+                        'attempting to set a path that does not exist: {}'.format(
+                            value))
         # when setting a local corpus setting, if not a list, append
         elif key == 'localCorpusSettings':
             if not common.isListLike(value):
@@ -1321,6 +1329,7 @@ def set(key, value):  # okay to override set here: @ReservedAssignment
         'localCorporaSettings'
         'localCorpusPath'
         'localCorpusSettings'
+        'manualCoreCorpusPath'
         'midiPath'
         'musescoreDirectPNGPath'
         'musicxmlPath'
@@ -1373,6 +1382,7 @@ def get(key):
         'localCorporaSettings'
         'localCorpusPath'
         'localCorpusSettings'
+        'manualCoreCorpusPath'
         'midiPath'
         'musescoreDirectPNGPath'
         'musicxmlPath'
@@ -1449,6 +1459,7 @@ class Test(unittest.TestCase):
   <preference name="lilypondVersion"/>
   <localCorporaSettings/>
   <localCorpusSettings/>
+  <preference name="manualCoreCorpusPath"/>
   <preference name="midiPath" value="/Applications/QuickTime Player.app"/>
   <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
@@ -1488,6 +1499,7 @@ class Test(unittest.TestCase):
     <localCorpusPath>b</localCorpusPath>
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
+  <preference name="manualCoreCorpusPath"/>
   <preference name="midiPath" value="/Applications/QuickTime Player.app"/>
   <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
@@ -1532,6 +1544,7 @@ class Test(unittest.TestCase):
     <localCorpusPath>y</localCorpusPath>
     <localCorpusPath>z</localCorpusPath>
   </localCorpusSettings>
+  <preference name="manualCoreCorpusPath"/>
   <preference name="midiPath" value="w"/>
   <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>

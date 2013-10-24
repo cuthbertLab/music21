@@ -1480,6 +1480,7 @@ def getBuildDocRstFilePath():
         return post
     raise Exception('no such path exists: %s' % post)
 
+
 def getBuildDocFilePath():
     '''Return the directory that contains the documentation RST files.
     '''
@@ -1498,6 +1499,7 @@ def getTestDocsFilePath():
         return post
     raise Exception('no such path exists: %s' % post)
 
+
 def getMetadataCacheFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache.
 
@@ -1507,6 +1509,7 @@ def getMetadataCacheFilePath():
     '''
     return os.path.join(getSourceFilePath(), 'corpus', 'metadataCache')
 
+
 def getCorpusFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache.
 
@@ -1515,7 +1518,12 @@ def getCorpusFilePath():
     >>> fp.endswith('music21/corpus') or fp.endswith(r'music21\corpus')
     True
     '''
-    return os.path.join(getSourceFilePath(), 'corpus')
+    from music21 import corpus
+    coreCorpus = corpus.CoreCorpus()
+    if coreCorpus.manualCoreCorpusPath is None:
+        return os.path.join(getSourceFilePath(), 'corpus')
+    return coreCorpus.manualCoreCorpusPath
+
 
 def getCorpusContentDirs():
     '''Get all dirs that are found in the corpus that contain content; that is, exclude dirst that have code or other resoures.
@@ -1531,20 +1539,18 @@ def getCorpusContentDirs():
     directoryName = getCorpusFilePath()
     result = []
     # dirs to exclude; all files will be retained
-    exclude = [
-        '__init__.py',
-        'base.py',
-        'chorales.py',
-        'corpora.py',
+    excludedNames = (
         'license.txt',
         'metadataCache',
-        'testCorpus.py',
-        'virtual.py',
-        ]
+        )
     for filename in os.listdir(directoryName):
-        if filename not in exclude:
-            if not filename.endswith('.pyc') and not filename.startswith('.'):
-                result.append(filename)
+        if filename.endswith(('.py', '.pyc')):
+            continue
+        elif filename.startswith('.'):
+            continue
+        elif filename in excludedNames:
+            continue
+        result.append(filename)
     return sorted(result)
 
 

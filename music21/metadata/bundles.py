@@ -54,7 +54,7 @@ class MetadataEntry(object):
     ::
 
         >>> metadataEntry.sourcePath
-        u'music21/corpus/bach/bwv66.6.mxl'
+        u'bach/bwv66.6.mxl'
 
     The metadata payload contains its metadata object:
 
@@ -832,7 +832,6 @@ class MetadataBundle(object):
 
         '''
         from music21 import metadata
-#        music21Path = music21.__path__[0]
         jobs = []
         accumulatedResults = []
         accumulatedErrors = []
@@ -847,6 +846,8 @@ class MetadataBundle(object):
         currentJobNumber = 0
         skippedJobsCount = 0
         for path in paths:
+            if not path.startswith('http'):
+                path = os.path.abspath(path)
             key = self.corpusPathToKey(path)
             if key in self._metadataEntries and not key.startswith('http'):
                 pathModificationTime = os.path.getctime(path)
@@ -854,11 +855,6 @@ class MetadataBundle(object):
                     skippedJobsCount += 1
                     continue
             currentJobNumber += 1
-#            if path.startswith(music21Path):
-#                path = os.path.join(
-#                    'music21',
-#                    common.relativepath(path, music21Path),
-#                    )
             job = metadata.MetadataCachingJob(
                 path,
                 jobNumber=currentJobNumber,
@@ -935,25 +931,20 @@ class MetadataBundle(object):
             True
 
         '''
-        if 'corpus' in filePath and 'music21' in filePath:
+        if 'corpus' in filePath or 'music21' in filePath:
             # get filePath after corpus
             corpusPath = filePath.split('corpus')[-1]
         else:
             corpusPath = filePath
-
         if corpusPath.startswith(os.sep):
             corpusPath = corpusPath[1:]
-
         corpusPath = corpusPath.replace('/', '_')
         corpusPath = corpusPath.replace(os.sep, '_')
         corpusPath = corpusPath.replace('.', '_')
-
         # append name to metadata path
-        if number is None:
-            return corpusPath
-        else:
-            # append work number
-            return corpusPath + '_%s' % number
+        if number is not None:
+            return '{}_{}'.format(corpusPath, number)
+        return corpusPath
 
     def delete(self):
         r'''
@@ -1489,26 +1480,24 @@ class MetadataBundle(object):
         environLocal.printDebug(['MetadataBundle: validating...'])
         invalidatedKeys = []
         validatedPaths = set()
-        corpusPrefix = os.path.join('music21', 'corpus')
         for key, metadataEntry in self._metadataEntries.iteritems():
             # MetadataEntries for core corpus items use a relative path as
             # their source path, always starting with 'music21/corpus'.
             sourcePath = metadataEntry.sourcePath
             if sourcePath in validatedPaths:
                 continue
-            if sourcePath.startswith(corpusPrefix):
-                sourcePath = os.path.join(
-                    common.getCorpusFilePath(),
-                    common.relativepath(
-                        sourcePath,
-                        corpusPrefix,
-                        ))
-            if sourcePath.startswith('http:') or os.path.exists(sourcePath):
+            if sourcePath.startswith('http:'):
                 validatedPaths.add(metadataEntry.sourcePath)
-            else:
+                continue
+            if not os.path.isabs(sourcePath):
+                sourcePath = os.path.abspath(os.path.join(
+                    common.getCorpusFilePath(),
+                    sourcePath,
+                    ))
+            if not os.path.exists(sourcePath):
                 invalidatedKeys.append(key)
+            validatedPaths.add(metadataEntry.sourcePath)
         for key in invalidatedKeys:
-            print key
             del(self._metadataEntries[key])
         message = 'MetadataBundle: finished validating in {0} seconds.'.format(
             timer)

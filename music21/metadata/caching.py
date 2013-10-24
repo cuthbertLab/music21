@@ -272,14 +272,13 @@ class MetadataCachingJob(object):
 
     @property
     def cleanFilePath(self):
-        import music21
-        music21Path = music21.__path__[0]
-        if self.filePath.startswith(music21Path):
-            return os.path.join(
-                'music21',
-                common.relativepath(self.filePath, music21Path),
-                )
-        return self.filePath
+        from music21 import common
+        corpusPath = os.path.abspath(common.getCorpusFilePath())
+        if self.filePath.startswith(corpusPath):
+            cleanFilePath = common.relativepath(self.filePath, corpusPath)
+        else:
+            cleanFilePath = self.filePath
+        return cleanFilePath
 
 
 #------------------------------------------------------------------------------
