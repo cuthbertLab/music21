@@ -859,7 +859,7 @@ class TestSlow(unittest.TestCase):
         mStream = s.parts[0].getElementsByClass('Measure')
         # the first four measures should all have the same content
         rn1 = mStream[1].getElementsByClass('RomanNumeral')[0]
-        self.assertEqual(str(rn1.pitches), '[D5, F#5, A5]')
+        self.assertEqual([str(x) for x in rn1.pitches], ["D5", "F#5", "A5"])
         self.assertEqual(str(rn1.figure), 'V')
         rn2 = mStream[1].getElementsByClass('RomanNumeral')[1]
         self.assertEqual(str(rn2.figure), 'i')
@@ -1128,7 +1128,7 @@ if __name__ == "__main__":
     #r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
     #import sys
     #sys.argv.append('testSecondaryInCopyMultiple')
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestSlow)
 
 
 #------------------------------------------------------------------------------
