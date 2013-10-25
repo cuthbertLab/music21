@@ -118,9 +118,8 @@ can then search through to find scores with certain qualities, such as all
 scores in 6/8, or all scores by Monteverdi.
 
 There are a number of different ways to acquire a metadata bundle instance.
-
-You can access the ``metadataBundle`` attribute of any ``Corpus`` instance to
-get its corresponding metadata bundle:
+One way is to access the ``metadataBundle`` attribute of any ``Corpus``
+instance to get its corresponding metadata bundle:
 
 ::
 

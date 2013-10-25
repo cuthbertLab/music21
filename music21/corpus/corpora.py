@@ -406,7 +406,13 @@ class Corpus(object):
 
         '''
         from music21 import metadata
-        return metadata.MetadataBundle(self.name).read()
+        domain = self._cacheName
+        if domain in Corpus._metadataBundles \
+            and Corpus._metadataBundles[domain]:
+            return Corpus._metadataBundles[domain]
+        bundle = metadata.MetadataBundle(domain).read()
+        Corpus._metadataBundles[domain] = bundle
+        return bundle
 
 
 #------------------------------------------------------------------------------
