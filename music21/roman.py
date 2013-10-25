@@ -145,12 +145,26 @@ def expandShortHand(shorthand):
         >>> roman.expandShortHand("-")
         ['5', '-3']
 
+
+    Slashes don't matter
+    
     ::
 
         >>> roman.expandShortHand("6/4")
         ['6', '4']
 
-    Return list.
+    Note that this is not where abbreviations get expanded
+
+    ::
+
+        >>> roman.expandShortHand("7") # not 7,5,3
+        ['7']
+
+        >>> roman.expandShortHand("4/3") # not 6,4,3
+        ['4', '3']
+
+
+    Returns a list of expanded abbreviations.
     '''
     shorthand = shorthand.replace('/', '')
     if ENDWITHFLAT_RE.match(shorthand):
@@ -1095,8 +1109,9 @@ class RomanNumeral(harmony.Harmony):
     _alterationRegex = re.compile('^(b+|\-+|\#+)')
     _omittedStepsRegex = re.compile('(\[(no[1-9])+\]\s*)+')
     _bracketedAlterationRegex =  re.compile('\[(b+|\-+|\#+)(\d+)\]')
+    _augmentedSixthRegex = re.compile('(It|Ger|Fr|Sw)')
     _romanNumeralAloneRegex = \
-        re.compile('(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N|Fr|Ger|It|Sw)')
+        re.compile('(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
     _secondarySlashRegex = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
 
     _DOC_ATTR = {
@@ -1305,16 +1320,32 @@ class RomanNumeral(harmony.Harmony):
         self.frontAlterationAccidental = frontAlterationAccidental
 
         romanNumeralAlone = ''
-        if not self._romanNumeralAloneRegex.match(workingFigure):
+        if not self._romanNumeralAloneRegex.match(workingFigure) and not self._augmentedSixthRegex.match(workingFigure):
             raise RomanException('No roman numeral found in {!r}'.format(
                 workingFigure))
+        elif self._augmentedSixthRegex.match(workingFigure):
+            rm = self._augmentedSixthRegex.match(workingFigure)
+            romanNumeralAlone = rm.group(1)
+            if (romanNumeralAlone in ('It', 'Ger')):
+                self.scaleDegree = 4
+            else:
+                self.scaleDegree = 2
+            workingFigure = self._augmentedSixthRegex.sub('', workingFigure)
+            self.romanNumeralAlone = romanNumeralAlone
+            if self.bracketedAlterations is None:
+                self.bracketedAlterations = []
+            
+            if romanNumeralAlone != 'Fr':
+                fixTuple = ('#', 1)
+                self.bracketedAlterations.append(fixTuple)
+            if romanNumeralAlone in ('Fr','Sw'):
+                fixTuple = ('#', 3)
+                self.bracketedAlterations.append(fixTuple)
+                
         else:
             rm = self._romanNumeralAloneRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)
-            if romanNumeralAlone in ('Fr', 'Ger', 'It', 'Sw'):
-                self.scaleDegree = 6
-            else:
-                self.scaleDegree = common.fromRoman(romanNumeralAlone)
+            self.scaleDegree = common.fromRoman(romanNumeralAlone)
             workingFigure = self._romanNumeralAloneRegex.sub('', workingFigure)
             self.romanNumeralAlone = romanNumeralAlone
 
@@ -2148,6 +2179,25 @@ class Test(unittest.TestCase):
         rn = roman.RomanNumeral("VI+", k)
         self.assertEqual(p(rn), 'A-4 C5 E5')
 
+    def testAugmented(self):
+        from music21 import roman
+        def p(c):
+            return " ".join([x.nameWithOctave for x in c.pitches])
+
+        k = key.Key('a')
+
+        rn = roman.RomanNumeral("It6", k)
+        self.assertEqual(p(rn), 'F5 A5 D#6')
+        rn = roman.RomanNumeral("Ger65", k)
+        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
+        rn = roman.RomanNumeral("Ger6/5", k)
+        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
+        rn = roman.RomanNumeral("Fr43", k)
+        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
+        rn = roman.RomanNumeral("Fr4/3", k)
+        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
+        rn = roman.RomanNumeral("Sw43", k)
+        self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
 
 
 class TestExternal(unittest.TestCase):
@@ -2182,7 +2232,7 @@ class TestExternal(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #import sys
-    #sys.argv.append('testAllFormsOfVI')
+    #sys.argv.append('testAugmented')
     music21.mainTest(Test)
 
 
