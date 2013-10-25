@@ -1,4 +1,4 @@
-.. _overviewMetadata
+.. _overviewMetadata:
 
 Overview: Corpora and Metadata Bundles
 ======================================
@@ -141,7 +141,7 @@ metadata bundles can become quite large, and methods like ``fromCoreCorpus()``
 make sure to cache the metadata bundle in memory once it has been read from
 disk, potentially saving you a lot of time.
 
-You can, however, make the metadata bundles by hand, by passing in the name of
+You can also make the metadata bundles by hand, by passing in the name of
 the corpus you want the bundle to refer to, or an actual ``Corpus`` instance
 itself:
 
@@ -150,8 +150,9 @@ itself:
     >>> coreBundle = metadata.MetadataBundle('core')
     >>> coreBundle = metadata.MetadataBundle(corpus.CoreCorpus())
 
-However, you'll need to remember to read the data from disk, as that isn't
-handled automatically when you manually instantiate metadata bundles:
+However, you'll need to read the bundle's saved data from disk before you can
+do anything useful with the bundle, as that isn't handled automatically when
+you manually instantiate metadata bundles:
 
 ::
 
@@ -165,22 +166,67 @@ That's a lot of information! Now let's see what we can do with it ...
 Searching metadata bundles
 --------------------------
 
+Searching metadata bundles involves examining each metadata object in the
+entire bundle, and attempting to match the search string against the contents
+of the various search fields saved in that metadata object.
+
+Just as with creating metadata bundles, there are few different ways to search
+them.
+
+You can use ``corpus.search()`` like this, to search the metadata associated
+with all corpora, *core*, *virtual* and *local*:
+
 ::
 
     >>> corpus.search('6/8')
+    <music21.metadata.bundles.MetadataBundle {2211 entries}> 
+
+You can also search against a single ``Corpus`` instance, like this:
 
 ::
 
-    >>> coreCorpus.search('6/8')
+    >>> corpus.CoreCorpus().search('6/8')
+    <music21.metadata.bundles.MetadataBundle {2211 entries}> 
+
+Finally, if you already have a reference to a metadata bundle, you can search
+it too:
 
 ::
 
     >>> bachBundle = coreBundle.search('bach', 'composer')
     >>> bachBundle
+    <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+And because the result of every metadata search is also a metadata
+bundle, you can search your search results:
 
 ::
 
-    >>> bachBundle.search('6/8')
+    >>> bachBundle.search('3/4')
+    <music21.metadata.bundles.MetadataBundle {4 entries}>
+
+When you search metadata bundles, you can search either through every search
+field in every metadata instance, or through a single, specific search field.
+
+For example, searching for "bach" as a composer renders different results from
+searching for the word "bach" in general:
+
+::
+
+    >>> coreBundle.search('bach', 'composer')
+    <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+::
+
+    >>> coreBundle.search('bach', 'title')
+    <music21.metadata.bundles.MetadataBundle {20 entries}>
+
+::
+
+    >>> coreBundle.search('bach')
+    <music21.metadata.bundles.MetadataBundle {150 entries}>
+
+So what fields can we actually search through? You can find out like this:
 
 ::
 
@@ -210,13 +256,54 @@ Searching metadata bundles
 Inspecting metadata bundle search results
 -----------------------------------------
 
+Now let's take a closer look at some search results:
+
 ::
 
+    >>> bachBundle = corpus.CoreCorpus().search('bach', 'composer')
     >>> bachBundle[0]
+    <music21.metadata.bundles.MetadataEntry: bach_choraleAnalyses_riemenschneider014_rntxt> 
+
+Metadata bundles are composed of metadata *entries*. These *entries* allow us
+to associate a given ``RichMetadata`` object with a file name, and also allow
+us to parse the associated file into a music21 score:
+
+::
+
+    >>> bachBundle[0].sourcePath
+    u'bach/choraleAnalyses/riemenschneider014.rntxt'
+
+::
+
+    >>> bachBundle[0].metadataPayload
+    <music21.metadata.RichMetadata object at 0x112f54250>
 
 ::
 
     >>> bachBundle[0].parse()
+    <music21.stream.Score 4421475216>
+
+Manipulating multiple metadata bundles
+--------------------------------------
+
+Another useful feature of music21's metadata bundles is that they can be
+operated on as though they were sets, allowing you to union, intersect and
+difference multiple metadata bundles, thereby creating more complex search
+results:
+
+::
+
+    >>> beethovenBundle = corpus.search('beethoven', 'composer')
+    >>> beethovenBundle
+    <music21.metadata.bundles.MetadataBundle {16 entries}>
+
+::
+
+    >>> bachBundle.union(beethovenBundle)
+    <music21.metadata.bundles.MetadataBundle {37 entries}>
+
+Consult :py:class:`~music21.metadata.bundles.MetadataBundle`'s API for a more
+in depth look at how this works.
 
 Managing metadata bundles
 -------------------------
