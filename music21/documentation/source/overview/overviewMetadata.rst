@@ -283,6 +283,14 @@ the more obscure corners of the *core* corpus:
     >>> corpus.CoreCorpus().search('taiwan', 'locale')
     <music21.metadata.bundles.MetadataBundle {27 entries}>
 
+You can use a predicate callable as a query too, although make sure to
+construct your predicates with care:
+
+::
+
+    >>> predicate = lambda x: 5000 < x
+    >>> corpus.CoreCorpus().search(predicate, 'noteCount')
+    <music21.metadata.bundles.MetadataBundle {23 entries}>
 
 Inspecting metadata bundle search results
 -----------------------------------------

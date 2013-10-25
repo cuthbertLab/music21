@@ -431,6 +431,10 @@ class Metadata(base.Music21Object):
                 match = reQuery.search(str(value))
                 if match is not None:
                     return True, field
+        elif callable(query):
+            for value, field in valueFieldPairs:
+                if query(value):
+                    return True, field
         else:
             query = str(query)
             for value, field in valueFieldPairs:
