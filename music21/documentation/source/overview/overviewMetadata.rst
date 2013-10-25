@@ -71,6 +71,7 @@ You can add and remove paths from a *local* corpus with the ``addPath()`` and
 
     >>> localCorpus.removePath('~/Desktop')
 
+
 Creating local corpora
 ----------------------
 
@@ -121,6 +122,7 @@ Finally, we can delete the *local* corpus we previously created like this:
     >>> aNewLocalCorpus.delete()
     >>> aNewLocalCorpus.existsInSettings
     False
+
 
 Creating metadata bundles
 -------------------------
@@ -281,6 +283,7 @@ the more obscure corners of the *core* corpus:
     >>> corpus.CoreCorpus().search('taiwan', 'locale')
     <music21.metadata.bundles.MetadataBundle {27 entries}>
 
+
 Inspecting metadata bundle search results
 -----------------------------------------
 
@@ -311,6 +314,7 @@ us to parse the associated file into a music21 score:
     >>> bachBundle[0].parse()
     <music21.stream.Score 4421475216>
 
+
 Manipulating multiple metadata bundles
 --------------------------------------
 
@@ -332,6 +336,7 @@ results:
 
 Consult :py:class:`~music21.metadata.bundles.MetadataBundle`'s API for a more
 in depth look at how this works.
+
 
 Managing metadata bundles
 -------------------------
