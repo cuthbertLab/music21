@@ -308,8 +308,8 @@ in depth look at how this works.
 Managing metadata bundles
 -------------------------
 
-Metadata bundles can be written to and read from disk, as well as rebuilt
-completely.
+Metadata bundles can be written to and read from disk. They can also be
+completely rebuilt:
 
 ::
 
@@ -320,14 +320,50 @@ completely.
 
     >>> coreBundle.write()
 
+To add information to a bundle, use the ``addFromPaths()`` method:
+
+::
+
+    >>> newBundle = metadata.MetadataBundle()
+    >>> paths = corpus.CoreCorpus().getBachChorales()
+    >>> failedPaths = newBundle.addFromPaths(paths)
+    >>> failedPaths
+    []
+
+::
+
+    >>> newBundle
+    <music21.metadata.bundles.MetadataBundle {402 entries}>
+
+..  note::
+
+    Building metadata information can be an incredibly intensive process. For
+    example, building the *core* metadata bundle can easily take as long as an
+    hour! Please use caution, and be patient, when building metadata bundles
+    from large corpora. To monitor the corpus-building progress, make sure to
+    set 'debug' to True in your user settings:
+
+    ::
+
+        >>> environment.UserSettings()['debug'] = True
+
+You can delete, rebuild and save a metadata bundle in one go with the
+``rebuild()`` method:
+
 ::
 
     >>> virtualBundle = metadata.MetadataBundle.fromVirtualCorpus()
     >>> virtualBundle.rebuild()
 
+To delete a metadata bundle's cached-to-disk JSON file, use the ``delete()``
+method:
+
 ::
 
     >>> virtualBundle.delete()
+
+Deleting a metadata bundle's JSON file won't empty the in-memory contents of
+that bundle. For that, use ``clear()``:
 
 ::
 
