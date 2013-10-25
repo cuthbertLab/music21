@@ -1172,7 +1172,7 @@ class LocalCorpus(Corpus):
 
     def _getSettings(self):
         userSettings = environment.UserSettings()
-        if self.name is None:
+        if self.name is 'local':
             return userSettings['localCorpusSettings']
         return userSettings['localCorporaSettings'].get(self.name, None)
 
@@ -1262,26 +1262,27 @@ class LocalCorpus(Corpus):
         result.extend(userSettings['localCorporaSettings'].keys())
         return result
 
+    def removePath(self, directoryPath):
+        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
+            self._cacheName, [])
+        directoryPath = os.path.abspath(os.path.expanduser(directoryPath))
+        if directoryPath in temporaryPaths:
+            temporaryPaths.remove(directoryPath)
+        if self.existsInSettings:
+            settings = self._getSettings()
+            if settings is not None and directoryPath in settings:
+                settings.remove(directoryPath)
+            self.save()
+        self._removeNameFromCache(self._cacheName)
+
     def save(self):
         userSettings = environment.UserSettings()
-        if self.name is None:
+        if self.name is 'local':
             userSettings['localCorpusSettings'] = self.directoryPaths
         else:
             userSettings['localCorporaSettings'][self.name] = \
                 self.directoryPaths
         environment.Environment().write()
-
-    def removePath(self, directoryPath):
-        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self._cacheName, [])
-        if directoryPath in temporaryPaths:
-            temporaryPaths.remove(directoryPath)
-        elif self.existsInSettings:
-            settings = self._getSettings()
-            if directoryPath in settings:
-                settings.remove(directoryPath)
-            self.save()
-        self._removeNameFromCache(self._cacheName)
 
     def search(self, query, field=None, fileExtensions=None):
         from music21 import metadata

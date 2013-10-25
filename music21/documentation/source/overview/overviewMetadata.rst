@@ -3,17 +3,18 @@
 Overview: Corpora and Metadata Bundles
 ======================================
 
-One of music21's most important features is its capability to help us examine
-large bodies of musical works, or *corpora*.  We provide affordances for
+One of music21's important features is its capability to help users examine
+large bodies of musical works, or *corpora*.  Music21 provides tools for
 extracting useful metadata - the key signatures used in each piece, their
-durations, ambitus and so forth - into metadata bundles, and methods for
-searching and persisting the metadata to disk.
+durations, ambitus and so forth - into collections called metadata bundles. It
+also allows users to search those bundles, and persist them disk for later
+research.
 
 
 Types of corpora
 ----------------
 
-Music21 deals with three categories of *corpora*, made explicit via the
+Music21 works with three categories of *corpora*, made explicit via the
 ``corpus.Corpus`` abstract class.
 
 The first category is the *core* corpus, a large collection of musical works
@@ -29,9 +30,10 @@ practice era, and inumerable folk songs, in a variety of formats:
 
 ..  note::
 
-    If you've installed a "no corpus" version of music21, and have downloaded
-    and installed the *core* corpus in a non-standard location, you can teach
-    music21 where your copy of the *core* corpus is like this:
+    If you've installed a "no corpus" version of music21, you can still access
+    the *core* corpus with a little work.  Download the *core* corpus from
+    music21's website, and install it on your system somewhere. Then, teach
+    music21 where you installed it like this:    
 
     ::
 
@@ -48,19 +50,31 @@ haven't been included in the *core* corpus:
     'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
 
 Finally, music21 allows for *local* corpora: bodies of works provided and
-configured by individual music21 users for their own research, but operable on
-by the same machinery of searching and caching as the *core* and *virtual*
-corpora:
+configured by individual music21 users for their own research. *Local* corpora
+behave identically to the *core* and *virtual* corpora, and can be searched and
+cached in the same manner:
 
 ::
 
     >>> localCorpus = corpus.LocalCorpus()
 
+You can add and remove paths from a *local* corpus with the ``addPath()`` and
+``removePath()`` methods:
+
+::
+
+    >>> localCorpus.addPath('~/Desktop')
+    >>> localCorpus.directoryPaths
+    ('/Users/josiah/Desktop',)
+
+::
+
+    >>> localCorpus.removePath('~/Desktop')
 
 Creating local corpora
 ----------------------
 
-In addition to the default local corpus, music21 also allows users to create
+In addition to the default local corpus, music21 allows users to create
 and save as many named local corpora as they like, which will persist from
 session to session.
 
@@ -111,15 +125,16 @@ Finally, we can delete the *local* corpus we previously created like this:
 Creating metadata bundles
 -------------------------
 
-Metadata is information *about* a score, such as its composer, title, initial
-key signature or ambitus. A metadata *bundle*, however, is a collection of
-metadata pulled from an arbitrarily large group of different scores, which you
-can then search through to find scores with certain qualities, such as all
-scores in 6/8, or all scores by Monteverdi.
+In music21, metadata is information *about* a score, such as its composer,
+title, initial key signature or ambitus. A metadata *bundle* is a collection of
+metadata pulled from an arbitrarily large group of different scores. Users can
+search through metadata bundles to find scores with certain qualities, such as
+all scores in a given corpus with a time signature of ``6/8``, or all scores
+composed by Monteverdi.
 
-There are a number of different ways to acquire a metadata bundle instance.
-One way is to access the ``metadataBundle`` attribute of any ``Corpus``
-instance to get its corresponding metadata bundle:
+There are a number of different ways to acquire a metadata bundle.  One is to
+access the ``metadataBundle`` attribute of any ``Corpus`` instance to get its
+corresponding metadata bundle:
 
 ::
 
@@ -138,11 +153,11 @@ bundles associated with the *virtual*, *local* or *core* corpora:
 
 We strongly recommend using the above ``from*()`` methods. Some of these
 metadata bundles can become quite large, and methods like ``fromCoreCorpus()``
-make sure to cache the metadata bundle in memory once it has been read from
-disk, potentially saving you a lot of time.
+will cache the metadata bundle in memory once it has been read from disk,
+potentially saving you a lot of time.
 
-You can also make the metadata bundles by hand, by passing in the name of
-the corpus you want the bundle to refer to, or an actual ``Corpus`` instance
+You can also make metadata bundles manually, by passing in the name of the
+corpus you want the bundle to refer to, or an actual ``Corpus`` instance
 itself:
 
 ::
@@ -151,13 +166,17 @@ itself:
     >>> coreBundle = metadata.MetadataBundle(corpus.CoreCorpus())
 
 However, you'll need to read the bundle's saved data from disk before you can
-do anything useful with the bundle, as that isn't handled automatically when
-you manually instantiate metadata bundles:
+do anything useful with the bundle. Bundles don't read their associated JSON
+files automatically when they're manually instantiated.
 
 ::
 
-    >>> coreBundle = metadata.MetadataBundle('core').read()
     >>> coreBundle
+    <music21.metadata.bundles.MetadataBundle 'core': {0 entries}>
+
+::
+
+    >>> coreBundle.read()
     <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
 
 That's a lot of information! Now let's see what we can do with it ...
@@ -166,15 +185,13 @@ That's a lot of information! Now let's see what we can do with it ...
 Searching metadata bundles
 --------------------------
 
-Searching metadata bundles involves examining each metadata object in the
-entire bundle, and attempting to match the search string against the contents
-of the various search fields saved in that metadata object.
+When you search metadata bundles, music21 examines each metadata object in the
+entire bundle and attempts to match your search string against the contents of
+the various search fields saved in that metadata object.  Just as with creating
+metadata bundles, there are few different ways to search them.
 
-Just as with creating metadata bundles, there are few different ways to search
-them.
-
-You can use ``corpus.search()`` like this, to search the metadata associated
-with all corpora, *core*, *virtual* and *local*:
+You can use ``corpus.search()`` to search the metadata associated with all
+known corpora, *core*, *virtual* and even each *local* corpus:
 
 ::
 
@@ -189,7 +206,7 @@ You can also search against a single ``Corpus`` instance, like this:
     <music21.metadata.bundles.MetadataBundle {2211 entries}> 
 
 Finally, if you already have a reference to a metadata bundle, you can search
-it too:
+there too:
 
 ::
 
@@ -197,17 +214,20 @@ it too:
     >>> bachBundle
     <music21.metadata.bundles.MetadataBundle {21 entries}>
 
-And because the result of every metadata search is also a metadata
-bundle, you can search your search results:
+Because the result of every metadata search is also a metadata bundle, you can
+search your search results!
 
 ::
 
     >>> bachBundle.search('3/4')
     <music21.metadata.bundles.MetadataBundle {4 entries}>
 
+
+Metadata search fields
+----------------------
+
 When you search metadata bundles, you can search either through every search
 field in every metadata instance, or through a single, specific search field.
-
 For example, searching for "bach" as a composer renders different results from
 searching for the word "bach" in general:
 
@@ -252,6 +272,14 @@ So what fields can we actually search through? You can find out like this:
     'timeSignatureFirst'
     'timeSignatures'
     'title'
+
+Now that we know what all the search fields are, we can search through some of
+the more obscure corners of the *core* corpus:
+
+::
+
+    >>> corpus.CoreCorpus().search('taiwan', 'locale')
+    <music21.metadata.bundles.MetadataBundle {27 entries}>
 
 Inspecting metadata bundle search results
 -----------------------------------------
