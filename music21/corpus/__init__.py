@@ -270,7 +270,6 @@ def search(
     This method uses stored metadata and thus, on first usage, will incur a
     performance penalty during metadata loading.
     '''
-    searchResults = []
     return corpora.Corpus.search(
         query,
         field=field,

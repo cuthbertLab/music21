@@ -1238,6 +1238,40 @@ class MetadataBundle(object):
         '''
         return self._apply_set_predicate(metadataBundle, 'issuperset')
 
+    @staticmethod
+    def listSearchFields():
+        r'''
+        List all available search field names:
+
+        ::
+
+            >>> for field in metadata.MetadataBundle.listSearchFields():
+            ...     field
+            ...
+            'alternativeTitle'
+            'composer'
+            'date'
+            'keySignatureFirst'
+            'keySignatures'
+            'localeOfComposition'
+            'movementName'
+            'movementNumber'
+            'noteCount'
+            'number'
+            'opusNumber'
+            'pitchHighest'
+            'pitchLowest'
+            'quarterLength'
+            'tempoFirst'
+            'tempos'
+            'timeSignatureFirst'
+            'timeSignatures'
+            'title'
+
+        '''
+        from music21 import metadata
+        return tuple(sorted(metadata.RichMetadata._searchAttributes))
+
     def read(self, filePath=None):
         r'''
         Load cached metadata from the file path suggested by the name of this

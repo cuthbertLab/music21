@@ -208,6 +208,40 @@ class Corpus(object):
         raise NotImplementedError
 
     @staticmethod
+    def listSearchFields():
+        r'''
+        List all available search field names:
+
+        ::
+
+            >>> for field in corpus.Corpus.listSearchFields():
+            ...     field
+            ...
+            'alternativeTitle'
+            'composer'
+            'date'
+            'keySignatureFirst'
+            'keySignatures'
+            'localeOfComposition'
+            'movementName'
+            'movementNumber'
+            'noteCount'
+            'number'
+            'opusNumber'
+            'pitchHighest'
+            'pitchLowest'
+            'quarterLength'
+            'tempoFirst'
+            'tempos'
+            'timeSignatureFirst'
+            'timeSignatures'
+            'title'
+
+        '''
+        from music21 import metadata
+        return tuple(sorted(metadata.RichMetadata._searchAttributes))
+
+    @staticmethod
     def parse(
         workName,
         movementNumber=None,
@@ -327,8 +361,9 @@ class Corpus(object):
         This method uses stored metadata and thus, on first usage, will incur a
         performance penalty during metadata loading.
         '''
+        from music21 import metadata
         Corpus._updateAllMetadataBundles()
-        searchResults = []
+        allSearchResults = metadata.MetadataBundle()
         if domain is None:
             domain = []
             domain.append(CoreCorpus()._cacheName)
@@ -337,9 +372,10 @@ class Corpus(object):
                 domain.append(LocalCorpus(name)._cacheName)
         for name in domain:
             if name in Corpus._metadataBundles:
-                searchResults += Corpus._metadataBundles[name].search(
+                searchResults = Corpus._metadataBundles[name].search(
                     query, field, fileExtensions)
-        return searchResults
+                allSearchResults = allSearchResults.union(searchResults)
+        return allSearchResults
 
     def updateMetadataBundle(self):
         from music21 import metadata

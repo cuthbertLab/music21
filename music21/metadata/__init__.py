@@ -104,6 +104,21 @@ class Metadata(base.Music21Object):
 
     classSortOrder = -10
 
+    # used for the search() methods to determine what attributes
+    # are made available by default; add more as properties/import
+    # exists
+    _searchAttributes = (
+        'date',
+        'title',
+        'alternativeTitle',
+        'movementNumber',
+        'movementName',
+        'number',
+        'opusNumber',
+        'composer',
+        'localeOfComposition',
+        )
+
     # !!!OTL: Title.
     # !!!OTP: Popular Title.
     # !!!OTA: Alternative title.
@@ -188,21 +203,6 @@ class Metadata(base.Music21Object):
         for attr in ['composer', 'date', 'title']:
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
-
-        # used for the search() methods to determine what attributes
-        # are made available by default; add more as properties/import
-        # exists
-        self._searchAttributes = [
-            'date',
-            'title',
-            'alternativeTitle',
-            'movementNumber',
-            'movementName',
-            'number',
-            'opusNumber',
-            'composer',
-            'localeOfComposition',
-            ]
 
     ### SPECIAL METHODS ###
 
@@ -810,6 +810,21 @@ class RichMetadata(Metadata):
 
     '''
 
+    ### CLASS VARIABLES ###
+
+    _searchAttributes = Metadata._searchAttributes + (
+        'keySignatureFirst',
+        'keySignatures',
+        'noteCount',
+        'pitchHighest',
+        'pitchLowest',
+        'quarterLength',
+        'tempoFirst',
+        'tempos',
+        'timeSignatureFirst',
+        'timeSignatures',
+        )
+
     ### INITIALIZER ###
 
     def __init__(self, *args, **keywords):
@@ -826,18 +841,18 @@ class RichMetadata(Metadata):
         self.timeSignatureFirst = None
         self.timeSignatures = []
         # append to existing search attributes from Metdata
-        self._searchAttributes += [
-            'keySignatureFirst',
-            'keySignatures',
-            'noteCount',
-            'pitchHighest',
-            'pitchLowest',
-            'quarterLength',
-            'tempoFirst',
-            'tempos',
-            'timeSignatureFirst',
-            'timeSignatures',
-            ]
+#        self._searchAttributes += [
+#            'keySignatureFirst',
+#            'keySignatures',
+#            'noteCount',
+#            'pitchHighest',
+#            'pitchLowest',
+#            'quarterLength',
+#            'tempoFirst',
+#            'tempos',
+#            'timeSignatureFirst',
+#            'timeSignatures',
+#            ]
 
     ### PUBLIC METHODS ###
 

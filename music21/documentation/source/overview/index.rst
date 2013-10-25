@@ -5,6 +5,7 @@ Music21 Concepts Overview
    :maxdepth: 1
 
    overviewStreams
+   overviewMetadata
    overviewFormats
    overviewPostTonal
    overviewMeters
