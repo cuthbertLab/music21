@@ -1249,6 +1249,7 @@ class MetadataBundle(object):
             ...     field
             ...
             'alternativeTitle'
+            'ambitus'
             'composer'
             'date'
             'keySignatureFirst'

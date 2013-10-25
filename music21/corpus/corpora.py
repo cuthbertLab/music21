@@ -218,6 +218,7 @@ class Corpus(object):
             ...     field
             ...
             'alternativeTitle'
+            'ambitus'
             'composer'
             'date'
             'keySignatureFirst'
@@ -1059,6 +1060,26 @@ class CoreCorpus(Corpus):
         return sorted(set(movementResults))
 
     def search(self, query, field=None, fileExtensions=None):
+        r'''
+        Search the core corpus for metadata entries:
+
+        ::
+
+            >>> corpus.CoreCorpus().search('3/4')
+            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+
+        ::
+
+            >>> corpus.CoreCorpus().search('bach', 'composer')
+            <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        ::
+
+            >>> predicate = lambda noteCount: noteCount < 20
+            >>> corpus.CoreCorpus().search(predicate, 'noteCount')
+            <music21.metadata.bundles.MetadataBundle {131 entries}>
+
+        '''
         from music21 import metadata
         return metadata.MetadataBundle.fromCoreCorpus().search(
             query,

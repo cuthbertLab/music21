@@ -108,15 +108,15 @@ class Metadata(base.Music21Object):
     # are made available by default; add more as properties/import
     # exists
     _searchAttributes = (
-        'date',
-        'title',
         'alternativeTitle',
-        'movementNumber',
+        'composer',
+        'date',
+        'localeOfComposition',
         'movementName',
+        'movementNumber',
         'number',
         'opusNumber',
-        'composer',
-        'localeOfComposition',
+        'title',
         )
 
     # !!!OTL: Title.
@@ -428,17 +428,18 @@ class Metadata(base.Music21Object):
         if useRegex:
             for value, field in valueFieldPairs:
                 # re.I makes case insensitive
-                match = reQuery.search(str(value))
-                if match is not None:
-                    return True, field
+                if common.isStr(value):
+                    match = reQuery.search(value)
+                    if match is not None:
+                        return True, field
         elif callable(query):
             for value, field in valueFieldPairs:
                 if query(value):
                     return True, field
         else:
-            query = str(query)
             for value, field in valueFieldPairs:
                 if common.isStr(value):
+                    query = str(query)
                     if query.lower() in value.lower():
                         return True, field
                 elif query == value:
@@ -816,7 +817,8 @@ class RichMetadata(Metadata):
 
     ### CLASS VARIABLES ###
 
-    _searchAttributes = Metadata._searchAttributes + (
+    _searchAttributes = tuple(sorted(Metadata._searchAttributes + (
+        'ambitus',
         'keySignatureFirst',
         'keySignatures',
         'noteCount',
@@ -827,7 +829,7 @@ class RichMetadata(Metadata):
         'tempos',
         'timeSignatureFirst',
         'timeSignatures',
-        )
+        )))
 
     ### INITIALIZER ###
 
@@ -844,19 +846,6 @@ class RichMetadata(Metadata):
         self.tempos = []
         self.timeSignatureFirst = None
         self.timeSignatures = []
-        # append to existing search attributes from Metdata
-#        self._searchAttributes += [
-#            'keySignatureFirst',
-#            'keySignatures',
-#            'noteCount',
-#            'pitchHighest',
-#            'pitchLowest',
-#            'quarterLength',
-#            'tempoFirst',
-#            'tempos',
-#            'timeSignatureFirst',
-#            'timeSignatures',
-#            ]
 
     ### PUBLIC METHODS ###
 

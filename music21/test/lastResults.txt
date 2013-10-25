@@ -132,8 +132,8 @@ tempo successfully ran 45 tests
 stream_streamStatus successfully ran 4 tests
 stream_makeNotation successfully ran 9 tests
 theoryAnalysis_theoryAnalyzer successfully ran 42 tests
-spanner successfully ran 52 tests
 sieve successfully ran 40 tests
+spanner successfully ran 52 tests
 serial successfully ran 47 tests
 search_segment successfully ran 7 tests
 scale successfully ran 90 tests
@@ -204,43 +204,46 @@ documentation_library_cleaners successfully ran 3 tests
 derivation successfully ran 6 tests
 defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
-features_jSymbolic successfully ran 86 tests
 corpus_virtual successfully ran 5 tests
-corpus_corpora successfully ran 20 tests
+features_jSymbolic successfully ran 86 tests
+corpus_testCorpus successfully ran 25 tests
+corpus_corpora successfully ran 21 tests
 corpus_chorales successfully ran 9 tests
 contour successfully ran 10 tests
 composition_seeger successfully ran 3 tests
 converter successfully ran 35 tests
-common successfully ran 57 tests
 composition_phasing successfully ran 5 tests
+common successfully ran 57 tests
 clef successfully ran 27 tests
 chordTables successfully ran 17 tests
 features_native successfully ran 26 tests
+chord successfully ran 108 tests
 chant successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
-braille_translate successfully ran 7 tests
 braille_text successfully ran 4 tests
-braille_segment successfully ran 11 tests
+braille_translate successfully ran 7 tests
 braille_lookup successfully ran 3 tests
 classCache successfully ran 12 tests
-chord successfully ran 108 tests
+braille_segment successfully ran 11 tests
 braille_basic successfully ran 24 tests
 beam successfully ran 15 tests
 bar successfully ran 9 tests
 audioSearch_transcriber successfully ran 4 tests
+base successfully ran 112 tests
 audioSearch_recording successfully ran 4 tests
 articulations successfully ran 29 tests
-base successfully ran 112 tests
-analysis_search successfully ran 4 tests
+audioSearch_scoreFollower successfully ran 7 tests
 braille_examples successfully ran 5 tests
+analysis_search successfully ran 4 tests
 analysis_reduceChords successfully ran 7 tests
+analysis_phrasing successfully ran 3 tests
 analysis_patel successfully ran 6 tests
 analysis_neoRiemannian successfully ran 10 tests
 analysis_metrical successfully ran 6 tests
 analysis_discrete successfully ran 31 tests
 analysis_windowed successfully ran 9 tests
-analysis_reduction successfully ran 15 tests
 analysis_correlate successfully ran 6 tests
+analysis_reduction successfully ran 15 tests
 _version successfully ran 3 tests
 abc_testFiles successfully ran 5 tests
 abc_translate successfully ran 18 tests
@@ -269,16 +272,13 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
 -------------------------------------------------------------------------
-Ran 3212 tests in 471.5997 seconds
-Run at 2013-10-25 15:44:39
+Ran 3248 tests in 501.2122 seconds
+Run at 2013-10-25 18:11:27
