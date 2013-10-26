@@ -26,8 +26,13 @@ environLocal = environment.Environment(__file__)
 
 
 class Corpus(object):
+    r'''
+    Abstract base class of all corpora subclasses.
+    '''
 
     ### CLASS VARIABLES ###
+
+    __metaclass__ = abc.ABCMeta
 
     _allExtensions = (
         common.findInputExtension('abc') +
@@ -282,10 +287,7 @@ class Corpus(object):
         ::
 
             >>> from music21 import corpus
-
-        ::
-
-            >>> bachChorale = corpus.parse('bwv66.6')
+            >>> bachChorale = corpus.Corpus.parse('bwv66.6')
             >>> len(bachChorale.parts)
             4
 
@@ -1441,6 +1443,14 @@ class LocalCorpus(Corpus):
 
 
 class VirtualCorpus(Corpus):
+    r'''
+    A model of the *virtual* corpus.
+
+    ::
+
+        >>> virtualCorpus = corpus.VirtualCorpus()
+
+    '''
 
     ### CLASS VARIABLES ###
 
