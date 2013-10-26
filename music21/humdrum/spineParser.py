@@ -2306,7 +2306,26 @@ def kernTandemToObject(tandem):
             return MS
     elif tandem.startswith("*M"):
         meterType = tandem[2:]
-        return meter.TimeSignature(meterType)
+        tsTemp = re.match('(\d+)/(\d+)', meterType)
+        if (tsTemp):
+            numerator = int(tsTemp.group(1))
+            denominator = tsTemp.group(2)
+            if (denominator not in ('0', '00', '000')):
+                return meter.TimeSignature(meterType)
+            else:
+                if (denominator == '0'):
+                    numerator *= 2
+                    denominator = 1
+                elif (denominator == '00'):
+                    numerator *= 4
+                    denominator = 1
+                elif (denominator == '000'):
+                    numerator *= 8
+                    denominator = 1
+                return meter.TimeSignature('%d/%d' % (numerator, denominator))
+        else:
+            raise HumdrumException('Incorrect meter: %s found', tandem)
+        
     elif tandem.startswith("*IC"):
         instrumentClass = tandem[3:]
         try:
@@ -2495,6 +2514,17 @@ class Test(unittest.TestCase):
         self.assertEqual(m0.rightBarline.repeat_dots, "both")
         assert m0.rightBarline.pause is not None
         assert isinstance(m0.rightBarline.pause, expressions.Fermata)
+
+    def testMeterBreve(self):
+        m = kernTandemToObject("*M3/1")
+        self.assertEqual(str(m), '<music21.meter.TimeSignature 3/1>')
+        m = kernTandemToObject("*M3/0")
+        self.assertEqual(str(m), '<music21.meter.TimeSignature 6/1>')
+        m = kernTandemToObject("*M3/00")
+        self.assertEqual(str(m), '<music21.meter.TimeSignature 12/1>')
+        m = kernTandemToObject("*M3/000")
+        self.assertEqual(str(m), '<music21.meter.TimeSignature 24/1>')
+        
 
     def xtestFakePiece(self):
         '''
