@@ -205,6 +205,9 @@ class Corpus(object):
 
     @abc.abstractmethod
     def getPaths(self):
+        r'''
+        The paths of the files in a given corpus.
+        '''
         raise NotImplementedError
 
     @staticmethod
@@ -287,7 +290,7 @@ class Corpus(object):
             4
 
         After parsing, the file path within the corpus is stored as
-        `.corpusFilePath`
+        ``.corpusFilePath``
 
         ::
 
@@ -348,16 +351,21 @@ class Corpus(object):
     def search(
         query,
         field=None,
-        domain=None,
+        names=None,
         fileExtensions=None,
         ):
         '''
-        Search all stored metadata and return a list of file paths; to return a
-        list of parsed Streams, use `searchParse()`.
+        Search all stored metadata bundles and return a list of file paths.
 
-        The `domain` parameter can be used to specify one of three corpora:
-        core (included with music21), virtual (defined in music21 but hosted
-        online), and local (hosted on the user's system (not yet implemented)).
+        The ``names`` parameter can be used to specify which corpora to search,
+        for example:
+
+        ::
+
+            >>> corpus.Corpus.search('bach', names=('core', 'virtual'))
+            <music21.metadata.bundles.MetadataBundle {150 entries}>
+
+        If ``names`` is None, all corpora known to music21 will be searched.
 
         This method uses stored metadata and thus, on first usage, will incur a
         performance penalty during metadata loading.
@@ -365,13 +373,13 @@ class Corpus(object):
         from music21 import metadata
         Corpus._updateAllMetadataBundles()
         allSearchResults = metadata.MetadataBundle()
-        if domain is None:
-            domain = []
-            domain.append(CoreCorpus()._cacheName)
-            domain.append(VirtualCorpus()._cacheName)
+        if names is None:
+            names = []
+            names.append(CoreCorpus()._cacheName)
+            names.append(VirtualCorpus()._cacheName)
             for name in LocalCorpus.listLocalCorporaNames():
-                domain.append(LocalCorpus(name)._cacheName)
-        for name in domain:
+                names.append(LocalCorpus(name)._cacheName)
+        for name in names:
             if name in Corpus._metadataBundles:
                 searchResults = Corpus._metadataBundles[name].search(
                     query, field, fileExtensions)
@@ -379,6 +387,9 @@ class Corpus(object):
         return allSearchResults
 
     def updateMetadataBundle(self):
+        r'''
+        Update a corpus' metadata bundle from its stored JSON file on disk.
+        '''
         from music21 import metadata
         domain = self._cacheName
         if domain not in Corpus._metadataBundles or \
@@ -392,6 +403,9 @@ class Corpus(object):
 
     @abc.abstractproperty
     def name(self):
+        r'''
+        The name of a given corpus.
+        '''
         raise NotImplementedError
 
     @property
@@ -420,6 +434,14 @@ class Corpus(object):
 
 
 class CoreCorpus(Corpus):
+    r'''
+    A model of the *core* corpus.
+
+    ::
+
+        >>> coreCorpus = corpus.CoreCorpus()
+
+    '''
 
     ### CLASS VARIABLES ###
 
@@ -1159,6 +1181,21 @@ class CoreCorpus(Corpus):
 
 
 class LocalCorpus(Corpus):
+    r'''
+    A model of a *local* corpus.
+
+    ::
+
+        >>> localCorpus = corpus.LocalCorpus()
+
+    The default local corpus is unnamed, but an arbitrary number of
+    independent, named local corpora can be defined and persisted:
+
+    ::
+
+        >>> namedLocalCorpus = corpus.LocalCorpus('with a name')
+
+    '''
 
     ### CLASS VARIABLES ###
 
@@ -1209,6 +1246,17 @@ class LocalCorpus(Corpus):
     ### PUBLIC METHODS ###
 
     def addPath(self, directoryPath):
+        r'''
+        Add a directory path to a local corpus:
+
+        ::
+
+            >>> localCorpus = corpus.LocalCorpus('a new corpus')
+            >>> localCorpus.addPath('~/Desktop')
+
+        Paths added in this way will not be persisted from session to session
+        unless explicitly saved by a call to ``LocalCorpus.save()``.
+        '''
         from music21 import corpus
         if not isinstance(directoryPath, (str, unicode)):
             raise corpus.CorpusException(
@@ -1226,6 +1274,9 @@ class LocalCorpus(Corpus):
         self._removeNameFromCache(self._cacheName)
 
     def delete(self):
+        r'''
+        Delete a non-default local corpus from the user settings.
+        '''
         if self.name is None or self.name == 'local':
             return
         elif not self.existsInSettings:
@@ -1284,6 +1335,12 @@ class LocalCorpus(Corpus):
         return result
 
     def removePath(self, directoryPath):
+        r'''
+        Remove a directory path from a local corpus.
+
+        If that path is included in the list of persisted paths for the given
+        corpus, it will be removed permanently.
+        '''
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
             self._cacheName, [])
         directoryPath = os.path.abspath(os.path.expanduser(directoryPath))
@@ -1297,6 +1354,10 @@ class LocalCorpus(Corpus):
         self._removeNameFromCache(self._cacheName)
 
     def save(self):
+        r'''
+        Save the current list of directory paths in use by a given corpus in
+        the user settings.
+        '''
         userSettings = environment.UserSettings()
         if self.name is 'local':
             userSettings['localCorpusSettings'] = self.directoryPaths
@@ -1305,7 +1366,18 @@ class LocalCorpus(Corpus):
                 self.directoryPaths
         environment.Environment().write()
 
-    def search(self, query, field=None, fileExtensions=None):
+    def search(
+        self,
+        query,
+        field=None,
+        fileExtensions=None,
+        ):
+        r'''
+        Search a local corpus.
+
+        See :py:class:`music21.corpus.corpora.Corpus.search` for examples, as
+        the interface is the same.
+        '''
         from music21 import metadata
         return metadata.MetadataBundle.fromLocalCorpus(self.name).search(
             query,
@@ -1317,6 +1389,9 @@ class LocalCorpus(Corpus):
 
     @property
     def directoryPaths(self):
+        r'''
+        The directory paths in use by a given local corpus.
+        '''
         candidatePaths = []
         if self.existsInSettings:
             if self.name == 'local':
@@ -1331,7 +1406,7 @@ class LocalCorpus(Corpus):
 
     @property
     def existsInSettings(self):
-        '''
+        r'''
         True if this local corpus has a corresponding entry in music21's user
         settings, otherwise false.
         '''
@@ -1342,14 +1417,17 @@ class LocalCorpus(Corpus):
 
     @property
     def name(self):
-        '''
-        The name of the local corpus.
-
-        A name of None indicates the default local corpus:
+        r'''
+        The name of a given local corpus.
 
         ::
 
             >>> from music21 import corpus
+            >>> corpus.LocalCorpus().name
+            'local'
+
+        ::
+
             >>> corpus.LocalCorpus(name='Bach Chorales').name
             'Bach Chorales'
 
@@ -1446,6 +1524,12 @@ class VirtualCorpus(Corpus):
         return []
 
     def search(self, query, field=None, fileExtensions=None):
+        r'''
+        Search the virtual corpus.
+
+        See :py:class:`music21.corpus.corpora.Corpus.search` for examples, as
+        the interface is the same.
+        '''
         from music21 import metadata
         return metadata.MetadataBundle.fromVirtualCorpus(self.name).search(
             query,
@@ -1457,6 +1541,15 @@ class VirtualCorpus(Corpus):
 
     @property
     def name(self):
+        r'''
+        The name of the virtual corpus:
+
+        ::
+
+            >>> corpus.VirtualCorpus().name
+            'virtual'
+
+        '''
         return 'virtual'
 
 
@@ -1468,6 +1561,13 @@ __all__ = (
     'CoreCorpus',
     'LocalCorpus',
     'VirtualCorpus',
+    )
+
+_DOC_ORDER = (
+    Corpus,
+    CoreCorpus,
+    LocalCorpus,
+    VirtualCorpus,
     )
 
 if __name__ == "__main__":
