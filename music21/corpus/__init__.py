@@ -269,11 +269,15 @@ def search(
 
     This method uses stored metadata and thus, on first usage, will incur a
     performance penalty during metadata loading.
+    
+    >>> chinaPieces = corpus.search('china')
+    >>> len(chinaPieces)
+    1235
     '''
     return corpora.Corpus.search(
         query,
         field=field,
-        domain=domain,
+        names=domain,
         fileExtensions=fileExtensions,
         )
 

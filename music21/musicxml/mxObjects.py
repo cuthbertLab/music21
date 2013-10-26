@@ -2733,6 +2733,8 @@ class Lyric(MusicXMLElement):
         '''
         # this results in incorrect encoding of </>
         #text = xml.sax.saxutils.escape(text)
+        if (text is None):
+            return None
         text = text.replace('>', unichr(62))
         text = text.replace('<', unichr(60))
         text = text.replace('&', unichr(38))

@@ -1114,7 +1114,7 @@ class CoreCorpus(Corpus):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def manualCoreCorpusPath():
+    def manualCoreCorpusPath(): # @NoSelf
         r'''
         Set music21's core corpus to a directory, and save that information in
         the user settings.
@@ -1459,8 +1459,7 @@ class VirtualCorpus(Corpus):
         className = getattr(virtual, name)
         if callable(className):
             obj = className()
-            if isinstance(obj, virtual.VirtualWork) and \
-                obj.corpusPath is not None:
+            if isinstance(obj, virtual.VirtualWork) and obj.corpusPath is not None: # please don't break this long line!  @UndefinedVariable
                 _virtual_works.append(obj)
 
     ### PRIVATE PROPERTIES ###
