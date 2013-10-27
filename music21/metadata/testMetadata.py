@@ -165,14 +165,25 @@ class Test(unittest.TestCase):
         from music21 import corpus
         score = corpus.parse('ciconia')
         self.assertEqual(
-            score.metadata.search('quod', 'title'),
-            (True, 'title'))
+            score.metadata.search(
+                'quod',
+                field='title',
+                ),
+            (True, 'title'),
+            )
         self.assertEqual(
-            score.metadata.search('qu.d', 'title'),
-            (True, 'title'))
+            score.metadata.search(
+                'qu.d',
+                field='title',
+                ),
+            (True, 'title'),
+            )
         self.assertEqual(
-            score.metadata.search(re.compile('(.*)canon(.*)')),
-            (True, 'title'))
+            score.metadata.search(
+                re.compile('(.*)canon(.*)'),
+                ),
+            (True, 'movementName'),
+            )
 
     def testRichMetadata02(self):
         from music21 import VERSION

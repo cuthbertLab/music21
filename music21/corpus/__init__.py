@@ -41,20 +41,6 @@ from music21 import environment
 _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
-# a list of metadata's can reside in this module-level storage; this
-# data is loaded on demand.
-
-#------------------------------------------------------------------------------
-
-# update and access through property to make clear
-# that this is a corpus distribution or a no-corpus distribution
-
-# store all composers in the corpus (not virtual)
-# as two element tuples of path name, full name
-
-# instantiate an instance of each virtual work object in a module
-# level constant; this object contains meta data about the work
-
 
 #------------------------------------------------------------------------------
 
@@ -64,14 +50,6 @@ class CorpusException(exceptions21.Music21Exception):
 
 
 #------------------------------------------------------------------------------
-# core routines for getting file paths
-
-# module-level cache; only higher-level functions cache results
-_pathsCache = {}
-
-# store temporary local paths added by a user in a session and not stored in
-# Environment
-_pathsLocalTemp = []
 
 
 def getCorePaths(fileExtensions=None, expandExtensions=True):
@@ -175,46 +153,30 @@ def addPath(filePath):
     Restart music21 after adding paths.
     '''
     corpora.LocalCorpus().addPath(filePath)
-#    if filePath is None or not os.path.exists(filePath):
-#        raise CorpusException(
-#            'an invalid file path has been provided: {0!r}'.format(filePath))
-#    if filePath in _pathsLocalTemp:
-#        raise CorpusException(
-#            'the provided path has already been added: {0!r}'.format(filePath))
-#    if filePath in environLocal['localCorpusSettings']:
-#        raise CorpusException(
-#            'the provided path is already incldued in the Environment '
-#            'localCorpusSettings: {0!r}'.format(filePath))
-#
-#    _pathsLocalTemp.append(filePath)
-#    # delete all local keys in the cache
-#    for key in _pathsCache:
-#        if key[0] == 'local':
-#            del _pathsCache[key]
 
 
 def getPaths(
     fileExtensions=None,
     expandExtensions=True,
-    domain=('local', 'core', 'virtual'),
+    name=('local', 'core', 'virtual'),
     ):
     '''
-    Get paths from core, virtual, and/or local domains.
+    Get paths from core, virtual, and/or local corpora.
     This is the public interface for getting all corpus
     paths with one function.
     '''
     paths = []
-    if 'core' in domain:
+    if 'core' in name:
         paths += corpora.CoreCorpus().getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
-    if 'local' in domain:
+    if 'local' in name:
         paths += corpora.LocalCorpus().getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
-    if 'virtual' in domain:
+    if 'virtual' in name:
         paths += corpora.VirtualCorpus().getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
@@ -241,43 +203,54 @@ def _updateMetadataBundle():
     corpora.Corpus._updateAllMetadataBundles()
 
 
-def cacheMetadata(domainList=('local')):
+def cacheMetadata(corpusNames=('local',)):
     '''
     Rebuild the metadata cache.
     '''
-    if not common.isListLike(domainList):
-        domainList = [domainList]
-    for domain in domainList:
-        # remove any cached values
-        corpora.Corpus._metadataBundles[domain] = None
-    metadata.cacheMetadata(domainList)
+    if not common.isListLike(corpusNames):
+        corpusNames = [corpusNames]
+    for name in corpusNames:
+        corpora.Corpus._metadataBundles[name] = None
+    metadata.cacheMetadata(corpusNames)
 
 
 def search(
     query,
     field=None,
-    domain=('core', 'virtual', 'local'),
+    corpusNames=('core', 'virtual', 'local'),
     fileExtensions=None,
     ):
-    '''
+    r'''
     Search all stored metadata and return a list of file paths; to return a
     list of parsed Streams, use `searchParse()`.
 
-    The `domain` parameter can be used to specify one of three corpora: core
+    The `name` parameter can be used to specify one of three corpora: core
     (included with music21), virtual (defined in music21 but hosted online),
     and local (hosted on the user's system (not yet implemented)).
 
     This method uses stored metadata and thus, on first usage, will incur a
     performance penalty during metadata loading.
     
-    >>> chinaPieces = corpus.search('china')
-    >>> len(chinaPieces)
-    1235
+    ::
+
+        >>> corpus.search('china')
+        <music21.metadata.bundles.MetadataBundle {1235 entries}>
+
+    ::
+
+        >>> corpus.search('bach', 'composer')
+        <music21.metadata.bundles.MetadataBundle {21 entries}>
+       
+    ::
+
+        >>> corpus.search('coltrane', corpusNames=('virtual',))
+        <music21.metadata.bundles.MetadataBundle {1 entry}>
+
     '''
     return corpora.Corpus.search(
         query,
         field=field,
-        names=domain,
+        corpusNames=corpusNames,
         fileExtensions=fileExtensions,
         )
 
@@ -872,8 +845,6 @@ def getBachChorales(fileExtensions='xml'):
         fileExtensions=fileExtensions,
         )
 
-#bachChorales = property(getBachChorales)
-
 
 def getHandelMessiah(fileExtensions='md'):
     '''
@@ -940,16 +911,8 @@ def getBeethovenStringQuartets(fileExtensions=None):
 
 
 #------------------------------------------------------------------------------
-# define presented order in documentation
-
-
-_DOC_ORDER = [parse, getWork]
 
 
 if __name__ == "__main__":
     import music21
     music21.mainTest()
-
-
-#------------------------------------------------------------------------------
-# eof

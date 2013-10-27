@@ -40,17 +40,17 @@ class MetadataCacheException(exceptions21.Music21Exception):
 
 
 def cacheMetadata(
-    domains=('local', 'core', 'virtual'),
+    corpusNames=('local', 'core', 'virtual'),
     useMultiprocessing=True,
     ):
     '''
-    Cache metadata from corpuses in `domains` as local cache files:
+    Cache metadata from corpuses in `corpusNames` as local cache files:
 
     ::
 
         >>> from music21 import metadata
         >>> metadata.cacheMetadata(
-        ...     domains='core',
+        ...     corpusNames='core',
         ...     useMultiprocessing=False,
         ...     )
 
@@ -58,8 +58,8 @@ def cacheMetadata(
     from music21 import corpus
     from music21 import metadata
 
-    if not common.isListLike(domains):
-        domains = (domains,)
+    if not common.isListLike(corpusNames):
+        corpusNames = (corpusNames,)
 
     timer = common.Timer()
     timer.start()
@@ -69,40 +69,40 @@ def cacheMetadata(
 
     # the core cache is based on local files stored in music21
     # virtual is on-line
-    for domain in domains:
-        if domain == 'core':
+    for corpusName in corpusNames:
+        if corpusName == 'core':
             metadataBundle = metadata.MetadataBundle.fromCoreCorpus()
             paths = corpus.getCorePaths()
             useCorpus = True
-        elif domain == 'local':
+        elif corpusName == 'local':
             metadataBundle = metadata.MetadataBundle.fromLocalCorpus()
             paths = corpus.getLocalPaths()
             useCorpus = False
-        elif domain == 'virtual':
+        elif corpusName == 'virtual':
             metadataBundle = metadata.MetadataBundle.fromVirtualCorpus()
             paths = corpus.getVirtualPaths()
             useCorpus = False
         else:
-            raise MetadataCacheException('invalid domain provided: {0}'.format(
-                domain))
-        environLocal.printDebug(
-            'metadata cache: starting processing of paths: {0}'.format(
-                len(paths)))
+            message = 'invalid corpus name provided: {0!r}'.format(corpusName)
+            raise MetadataCacheException(message)
+        message = 'metadata cache: starting processing of paths: {0}'.format(
+                len(paths))
+        environLocal.printDebug(message)
         failingFilePaths += metadataBundle.addFromPaths(
             paths,
             useCorpus=useCorpus,
             useMultiprocessing=useMultiprocessing,
             )
-        environLocal.printDebug(
-            'cache: writing time: {0} md items: {1}'.format(
-                timer, len(metadataBundle)))
+        message = 'cache: writing time: {0} md items: {1}'.format(
+            timer, len(metadataBundle))
+        environLocal.printDebug(message)
         del metadataBundle
-
-    environLocal.printDebug('cache: final writing time: {0} seconds'.format(
-        timer))
+    message = 'cache: final writing time: {0} seconds'.format(timer)
+    environLocal.printDebug(message)
     for failingFilePath in failingFilePaths:
-        environLocal.printDebug('path failed to parse: {0}'.format(
-            failingFilePath))
+        message = 'path failed to parse: {0}'.format(failingFilePath)
+        environLocal.printDebug(message)
+            
 
 
 #------------------------------------------------------------------------------

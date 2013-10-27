@@ -353,7 +353,7 @@ class Corpus(object):
     def search(
         query,
         field=None,
-        names=None,
+        corpusNames=None,
         fileExtensions=None,
         ):
         '''
@@ -364,7 +364,7 @@ class Corpus(object):
 
         ::
 
-            >>> corpus.Corpus.search('bach', names=('core', 'virtual'))
+            >>> corpus.Corpus.search('bach', corpusNames=('core', 'virtual'))
             <music21.metadata.bundles.MetadataBundle {150 entries}>
 
         If ``names`` is None, all corpora known to music21 will be searched.
@@ -375,16 +375,16 @@ class Corpus(object):
         from music21 import metadata
         Corpus._updateAllMetadataBundles()
         allSearchResults = metadata.MetadataBundle()
-        if names is None:
-            names = []
-            names.append(CoreCorpus()._cacheName)
-            names.append(VirtualCorpus()._cacheName)
-            for name in LocalCorpus.listLocalCorporaNames():
-                names.append(LocalCorpus(name)._cacheName)
-        for name in names:
-            if name in Corpus._metadataBundles:
-                searchResults = Corpus._metadataBundles[name].search(
-                    query, field, fileExtensions)
+        if corpusNames is None:
+            corpusNames = []
+            corpusNames.append(CoreCorpus()._cacheName)
+            corpusNames.append(VirtualCorpus()._cacheName)
+            for corpusName in LocalCorpus.listLocalCorporacorpusNames():
+                corpusNames.append(LocalCorpus(corpusName)._cacheName)
+        for corpusName in corpusNames:
+            if corpusName in Corpus._metadataBundles:
+                searchResults = Corpus._metadataBundles[corpusName].search(
+                    query, field, fileExtensions=fileExtensions)
                 allSearchResults = allSearchResults.union(searchResults)
         return allSearchResults
 
@@ -393,13 +393,13 @@ class Corpus(object):
         Update a corpus' metadata bundle from its stored JSON file on disk.
         '''
         from music21 import metadata
-        domain = self._cacheName
-        if domain not in Corpus._metadataBundles or \
-            Corpus._metadataBundles[domain] is None:
-            metadataBundle = metadata.MetadataBundle(domain)
+        corpusName = self._cacheName
+        if corpusName not in Corpus._metadataBundles or \
+            Corpus._metadataBundles[corpusName] is None:
+            metadataBundle = metadata.MetadataBundle(corpusName)
             metadataBundle.read()
             metadataBundle.validate()
-            Corpus._metadataBundles[domain] = metadataBundle
+            Corpus._metadataBundles[corpusName] = metadataBundle
 
     ### PUBLIC PROPERTIES ###
 
@@ -423,12 +423,12 @@ class Corpus(object):
 
         '''
         from music21 import metadata
-        domain = self._cacheName
-        if domain in Corpus._metadataBundles \
-            and Corpus._metadataBundles[domain]:
-            return Corpus._metadataBundles[domain]
-        bundle = metadata.MetadataBundle(domain).read()
-        Corpus._metadataBundles[domain] = bundle
+        corpusName = self._cacheName
+        if corpusName in Corpus._metadataBundles \
+            and Corpus._metadataBundles[corpusName]:
+            return Corpus._metadataBundles[corpusName]
+        bundle = metadata.MetadataBundle(corpusName).read()
+        Corpus._metadataBundles[corpusName] = bundle
         return bundle
 
 
@@ -1114,7 +1114,7 @@ class CoreCorpus(Corpus):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def manualCoreCorpusPath(): # @NoSelf
+    def manualCoreCorpusPath():  # @NoSelf
         r'''
         Set music21's core corpus to a directory, and save that information in
         the user settings.
@@ -1459,8 +1459,9 @@ class VirtualCorpus(Corpus):
         className = getattr(virtual, name)
         if callable(className):
             obj = className()
-            if isinstance(obj, virtual.VirtualWork) and obj.corpusPath is not None: # please don't break this long line!  @UndefinedVariable
-                _virtual_works.append(obj)
+            if isinstance(obj, virtual.VirtualWork):
+                if obj.corpusPath is not None:
+                    _virtual_works.append(obj)
 
     ### PRIVATE PROPERTIES ###
 

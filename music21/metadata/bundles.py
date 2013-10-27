@@ -1013,12 +1013,12 @@ class MetadataBundle(object):
 
         '''
         from music21.corpus import corpora
-        domain = 'core'
-        if domain in corpora.Corpus._metadataBundles \
-            and corpora.Corpus._metadataBundles[domain]:
-            return corpora.Corpus._metadataBundles[domain]
-        bundle = cls(domain).read()
-        corpora.Corpus._metadataBundles[domain] = bundle
+        corpusName = 'core'
+        if corpusName in corpora.Corpus._metadataBundles \
+            and corpora.Corpus._metadataBundles[corpusName]:
+            return corpora.Corpus._metadataBundles[corpusName]
+        bundle = cls(corpusName).read()
+        corpora.Corpus._metadataBundles[corpusName] = bundle
         return bundle
 
     @classmethod
@@ -1040,14 +1040,14 @@ class MetadataBundle(object):
         '''
         from music21.corpus import corpora
         if name is None or name == 'local':
-            domain = 'local'
+            corpusName = 'local'
         else:
-            domain = 'local-{}'.format(name)
-        if domain in corpora.Corpus._metadataBundles and \
-            corpora.Corpus._metadataBundles[domain] is not None:
-            return corpora.Corpus._metadataBundles[domain]
-        bundle = cls(domain).read()
-        corpora.Corpus._metadataBundles[domain] = bundle
+            corpusName = 'local-{}'.format(name)
+        if corpusName in corpora.Corpus._metadataBundles and \
+            corpora.Corpus._metadataBundles[corpusName] is not None:
+            return corpora.Corpus._metadataBundles[corpusName]
+        bundle = cls(corpusName).read()
+        corpora.Corpus._metadataBundles[corpusName] = bundle
         return bundle
 
     @classmethod
@@ -1068,12 +1068,12 @@ class MetadataBundle(object):
 
         '''
         from music21.corpus import corpora
-        domain = 'virtual'
-        if domain in corpora.Corpus._metadataBundles and \
-            corpora.Corpus._metadataBundles[domain]:
-            return corpora.Corpus._metadataBundles[domain]
-        bundle = cls(domain).read()
-        corpora.Corpus._metadataBundles[domain] = bundle
+        corpusName = 'virtual'
+        if corpusName in corpora.Corpus._metadataBundles and \
+            corpora.Corpus._metadataBundles[corpusName]:
+            return corpora.Corpus._metadataBundles[corpusName]
+        bundle = cls(corpusName).read()
+        corpora.Corpus._metadataBundles[corpusName] = bundle
         return bundle
 
     def intersection(self, metadataBundle):
