@@ -278,7 +278,6 @@ htmlCanvasPostamble=r'''
 
 vexflowPreamble = r'''            
             var canvas = $('#music21canvas')[0];
-            console.log(canvas);
             var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
             var ctx = renderer.getContext();
 '''
@@ -2363,7 +2362,7 @@ class Test(unittest.TestCase):
 <body>
     <canvas width="525" height="120" id='music21canvas'></canvas>
     <script>
-        $(document).ready(function(){
+        $(document).ready(function(){ 
             var canvas = $('#music21canvas')[0];
             var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
             var ctx = renderer.getContext();
@@ -2388,7 +2387,7 @@ class Test(unittest.TestCase):
         v = VexflowNote(n)
         htmlOut = v.generateCode('html')
         self.maxDiff = 30000
-        self.assertMultiLineEqual(htmlOut, expectedOutput)
+        assert(common.basicallyEqual(htmlOut, expectedOutput))
 
     def testMeasureParts(self):
         self.maxDiff = 30000
@@ -2435,8 +2434,8 @@ music21Voice0.addTickables(music21Voice0Notes);
     </script>
 </body>
 </html>'''
-        self.assertMultiLineEqual(c, expectedOutput)
-        #assert(common.basicallyEqual(c, expectedOutput))  #only whitespace differences
+        #self.assertMultiLineEqual(c, expectedOutput)
+        assert(common.basicallyEqual(c, expectedOutput))  #only whitespace differences
 
 
 class TestExternal(unittest.TestCase):

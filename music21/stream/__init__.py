@@ -3143,6 +3143,20 @@ class Stream(base.Music21Object):
         else:
             return None
 
+#         if len(candidates) == 1:
+#             x = candidates[0][1]
+#             x.activeSite = self
+#             return x
+#         elif len(candidates) > 0:
+#             s = Stream([x[1] for x in candidates])
+#             s.sort() # TODO: this sort has side effects
+#             x = s[-1]
+#             x.activeSite = self
+#             return x
+#         else:
+#             return None
+
+
 
 #    def getElementAtOrAfter(self, offset, classList=None):
 #        '''Given an offset, find the element at this offset, or with the offset
