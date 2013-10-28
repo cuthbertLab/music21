@@ -91,9 +91,11 @@ class ModuleGather(object):
         'xmlnode'
         '''
         fn = fp.replace(self.dirParent, '') # remove parent
-        if fn.startswith(os.sep):
-            fn = fn[1:]
-        fn = fn.replace(os.sep, ':') # replace w/ dots
+        parts = fn.split(os.sep)
+        if parts[-1] == '__init__.py':
+            parts.pop()
+        fn = '.'.join(parts)
+        #fn = fn.replace(os.sep, ':') # replace w/ dots
         fn = fn.replace('.py', '')
         return fn
      

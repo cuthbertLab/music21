@@ -120,10 +120,12 @@ class ModuleGather(object):
         'trecento.findSevs'
         '''
         fn = fp.replace(self.dirParent, '') # remove parent
-        if fn.startswith(os.sep):
-            fn = fn[1:]
-        fn = fn.replace(os.sep, '.') # replace w/ period
+        parts = [x for x in fn.split(os.sep) if x]
+        if parts[-1] == '__init__.py':
+            parts.pop()
+        fn = '.'.join(parts) # replace w/ period
         fn = fn.replace('.py', '')
+
         return fn
      
 
@@ -131,6 +133,7 @@ class ModuleGather(object):
         '''
         gets one module object from the file path without using Imp
         '''
+        print(fp)
         skip = False
         for fnSkip in self.moduleSkip:
             if fp.endswith(fnSkip):
