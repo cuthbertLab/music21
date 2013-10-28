@@ -19,15 +19,20 @@ To do a release,
 3. run test/test.py (normally not necessary,because it's slower and mostly duplicates multiprocessTest, but should be done before making a release), 
 4. then test/testDocumentation
 5. then test/testSerialization
-6. If all tests pass, run `corpus.cacheMetadata('core')`, 
-7. run documentation/make.py
-8. run documentation/upload or upload via ssh.
+6. If all tests pass, run `corpus.cacheMetadata(['core'])`, 
+7. run documentation/make.py clean
+8. run documentation/make.py   [*]
+9. run documentation/upload [not via eclipse] or upload via ssh.
 
-and finally this file. (you'll need your GoogleCode password and will need to enter it THREE times; if you
+[*] you will need IPython (pip or easy_install) and pandoc (.dmg) installed
+
+10. and finally this file. (you'll need your GoogleCode password and will need to enter it THREE times; if you
 enter it wrong there will be a delay of 10-20 seconds.  If you enter it right, there will be a delay of
 several minutes while the code uploads.)
 
-then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking edit and augment
+11. Update "Featured" on GoogleCode
+
+12. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking edit and augment
 the version number and the download URL.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
@@ -146,7 +151,7 @@ class Distributor(object):
         # get the name of the dir after decompression
         fpSrcDir = os.path.join(fpDir, fn.replace(modeExt, ''))
             
-        # remove old dir if ti exists
+        # remove old dir if it exists
         if os.path.exists(fpDst):
             # can use shutil.rmtree
             os.system('rm -r %s' % fpDst)
@@ -173,6 +178,10 @@ class Distributor(object):
         for fn in common.getCorpusContentDirs():
             fp = os.path.join(fpDstDir, 'music21', 'corpus', fn)
             os.system('rm -r %s' % fp)
+        
+        fp = os.path.join(fpDstDir, 'music21', 'corpus', 'metadataCache')
+        os.system('rm -r %s' % fp)
+        
     
         # adjust the sources Txt file
         if mode == TAR:
