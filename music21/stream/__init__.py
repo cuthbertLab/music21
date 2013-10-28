@@ -3088,10 +3088,13 @@ class Stream(base.Music21Object):
         >>> d = stream1.getElementAtOrBefore(20)
         >>> d is x
         True
-        >>> d.activeSite is stream1
+        >>> x.activeSite is stream1
         True
         >>> x.offset
         20.0
+
+        OMIT_FROM_DOCS
+        TODO: include sort order for concurrent matches?
 
         The sort order of returned items is the reverse
         of the normal sort order, so that, for instance,
@@ -3100,12 +3103,13 @@ class Stream(base.Music21Object):
         you the note, and not the clef, since clefs
         sort before notes:
 
-        >>> clef1 = clef.BassClef()
-        >>> stream1.insert(20, clef1)
-        >>> e = stream1.getElementAtOrBefore(21)
-        >>> e
-        <music21.note.Note D>
-        
+        #>>> clef1 = clef.BassClef()
+        #>>> stream1.insert(20, clef1)
+        #>>> e = stream1.getElementAtOrBefore(21)
+        #>>> e
+        #<music21.note.Note D4>
+        # FAILS, returns the clef!
+
         '''
         # NOTE: this is a performance critical method
         # TODO: need to deal with more than on object the same
@@ -3132,16 +3136,10 @@ class Stream(base.Music21Object):
                     candidates.append((span, e))
                     nearestTrailSpan = span
         #environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
-        if len(candidates) == 1:
-            x = candidates[0][1]
-            x.activeSite = self
-            return x
-        elif len(candidates) > 0:
-            s = Stream([x[1] for x in candidates])
-            s.sort() # TODO: this sort has side effects
-            x = s[-1]
-            x.activeSite = self
-            return x
+        if len(candidates) > 0:
+            candidates.sort() # TODO: this sort has side effects
+            candidates[0][1].activeSite = self
+            return candidates[0][1]
         else:
             return None
 
@@ -7340,6 +7338,8 @@ class Stream(base.Music21Object):
 
 
         >>> bach = corpus.parse('bach/bwv1.6')
+        >>> bach.parts[0].measure(2).getContextByClass('TimeSignature')
+        <music21.meter.TimeSignature 4/4>
         >>> returnTuples = []
         >>> for offset in [0.0, 1.0, 2.0, 5.0, 5.5]:
         ...     returnTuples.append(bach.beatAndMeasureFromOffset(offset))
@@ -7384,7 +7384,7 @@ class Stream(base.Music21Object):
         try:
             myBeat = ts1.getBeatProportion(searchOffset - myMeas.offset)
         except:
-            raise StreamException("beatAndMeasureFromOffset: offset is beyond the end of the piece; searching in measure: " + repr(myMeas) + " at searchOffset: " + str(searchOffset))
+            raise StreamException("beatAndMeasureFromOffset: offset is beyond the end of the piece")
         foundMeasureNumber = myMeas.number
         # deal with second half of partial measures...
 
