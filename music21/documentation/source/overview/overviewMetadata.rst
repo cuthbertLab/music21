@@ -333,7 +333,7 @@ results:
 
 ::
 
-    >>> beethovenBundle = corpus.search('beethoven', 'composer')
+    >>> beethovenBundle = corpus.search('beethoven', field='composer')
     >>> beethovenBundle
     <music21.metadata.bundles.MetadataBundle {16 entries}>
 

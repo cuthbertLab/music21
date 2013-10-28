@@ -709,7 +709,7 @@ class Test(unittest.TestCase):
 
         scSrc = scale.MajorScale()
 
-        niederlande = corpus.search('niederlande', 'locale')
+        niederlande = corpus.search('niederlande', field='locale')
 
         results = {}
         for unused_name, group in [('niederlande', niederlande)]:

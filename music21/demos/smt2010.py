@@ -265,8 +265,8 @@ def corpusMelodicIntervalSearch(show = True):
     from music21.analysis import discrete
 
     mid = discrete.MelodicIntervalDiversity()
-    groupEast = corpus.search('shanxi', 'locale')
-    groupWest = corpus.search('niederlande', 'locale') 
+    groupEast = corpus.search('shanxi', field='locale')
+    groupWest = corpus.search('niederlande', field='locale') 
 
     msg = []
     for name, group in [('shanxi', groupEast), ('niederlande', groupWest)]:
@@ -295,9 +295,9 @@ def corpusMelodicIntervalSearch(show = True):
 
 
 
-       # ('anhui', corpus.search('anhui', 'locale')), # gets 3.5
-       # ('Qinghai', corpus.search('Qinghai', 'locale')), # gets 2.5
-       # ('Zhejiang', corpus.search('Zhejiang', 'locale')), # ; coastal
+       # ('anhui', corpus.search('anhui', field='locale')), # gets 3.5
+       # ('Qinghai', corpus.search('Qinghai', field='locale')), # gets 2.5
+       # ('Zhejiang', corpus.search('Zhejiang', field='locale')), # ; coastal
         # shanxi get 3.2
         # fujian gets 0.8
 
@@ -311,7 +311,7 @@ def corpusMelodicIntervalSearchBrief(show=False):
         workCount = 0
         intervalCount = 0
         seventhCount = 0
-        for metadataEntry in corpus.search(region, 'locale'):
+        for metadataEntry in corpus.search(region, field='locale'):
             workCount += 1
             score = corpus.parse(
                 metadataEntry.sourcePath,
@@ -337,8 +337,8 @@ def corpusFindMelodicSevenths(show = True):
     from music21.analysis import discrete
 
     mid = discrete.MelodicIntervalDiversity()
-    groupEast = corpus.search('shanxi', 'locale')
-    groupWest = corpus.search('niederlande', 'locale') 
+    groupEast = corpus.search('shanxi', field='locale')
+    groupWest = corpus.search('niederlande', field='locale') 
 
     found = []
     for name, group in [('shanxi', groupEast), ('niederlande', groupWest)]:

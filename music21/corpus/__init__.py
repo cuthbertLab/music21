@@ -238,7 +238,7 @@ def search(
 
     ::
 
-        >>> corpus.search('bach', 'composer')
+        >>> corpus.search('bach', field='composer')
         <music21.metadata.bundles.MetadataBundle {21 entries}>
        
     ::

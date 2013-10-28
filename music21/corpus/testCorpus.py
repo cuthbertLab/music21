@@ -62,15 +62,15 @@ class Test(unittest.TestCase):
         self.assertEqual(len(fpCollection) >= 1, True)
 
     def testSearch01(self):
-        searchResults = corpus.search('china', 'locale')
+        searchResults = corpus.search('china', field='locale')
         self.assertEqual(len(searchResults) > 1200, True)
 
     def testSearch02(self):
-        searchResults = corpus.search('Sichuan', 'locale')
+        searchResults = corpus.search('Sichuan', field='locale')
         self.assertEqual(len(searchResults), 47)
 
     def testSearch03(self):
-        searchResults = corpus.search('Taiwan', 'locale')
+        searchResults = corpus.search('Taiwan', field='locale')
         self.assertEqual(len(searchResults), 27)
         pathInfo = sorted((searchResult.sourcePath, searchResult.number)
             for searchResult in searchResults)
@@ -105,7 +105,7 @@ class Test(unittest.TestCase):
             ])
 
     def testSearch04(self):
-        searchResults = corpus.search('Sichuan|Taiwan', 'locale')
+        searchResults = corpus.search('Sichuan|Taiwan', field='locale')
         self.assertEqual(len(searchResults), 74)
 
     def testSearch05(self):
@@ -113,9 +113,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(searchResults) > 120, True)
 
     def testSearch06(self):
-        searchResults = corpus.search('haydn', 'composer')
+        searchResults = corpus.search('haydn', field='composer')
         self.assertEqual(len(searchResults), 0)
-        searchResults = corpus.search('haydn|beethoven', 'composer')
+        searchResults = corpus.search('haydn|beethoven', field='composer')
         self.assertEqual(len(searchResults) >= 16, True)
 
     def testSearch07(self):
@@ -123,26 +123,26 @@ class Test(unittest.TestCase):
         self.assertEqual(len(searchResults) >= 1, True)
 
     def testSearch08(self):
-        searchResults = corpus.search('3/8', 'timeSignature')
+        searchResults = corpus.search('3/8', field='timeSignature')
         self.assertEqual(len(searchResults) > 360, True)
 
     def testSearch09(self):
-        searchResults = corpus.search('3/.', 'timeSignature')
+        searchResults = corpus.search('3/.', field='timeSignature')
         self.assertEqual(len(searchResults) >= 2200 , True)
 
     def testSearch10(self):
         from music21 import key
         ks = key.KeySignature(3, 'major')
-        searchResults = corpus.search(str(ks), 'keySignature')
+        searchResults = corpus.search(str(ks), field='keySignature')
         self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
 
     def testSearch11(self):
-        searchResults = corpus.search('mode phry(.*)', 'keySignature')
+        searchResults = corpus.search('mode phry(.*)', field='keySignature')
         self.assertEqual(len(searchResults) >= 9, True)
 
     def testSearch12(self):
         # searching virtual entries
-        searchResults = corpus.search('coltrane', 'composer')
+        searchResults = corpus.search('coltrane', field='composer')
         self.assertEqual(len(searchResults) > 0, True)
         # returns items in pairs: url and work number
         self.assertEqual(searchResults[0].sourcePath,
