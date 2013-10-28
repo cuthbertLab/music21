@@ -48,7 +48,6 @@ class ModuleGather(object):
             'testInstallation.py', 
             'testLint.py', 
             'testPerformance.py',
-            '__init__.py', 
             'timeGraphs.py',
             'exceldiff.py', 
             # not testing translate due to dependency

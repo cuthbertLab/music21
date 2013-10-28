@@ -119,8 +119,8 @@ trecento_trecentoCadence successfully ran 7 tests
 webapps_commands successfully ran 10 tests
 variant successfully ran 34 tests
 trecento_polyphonicSnippet successfully ran 9 tests
-trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
+trecento_findTrecentoFragments successfully ran 3 tests
 trecento_tonality successfully ran 5 tests
 trecento_capua successfully ran 9 tests
 tinyNotation successfully ran 11 tests
@@ -148,9 +148,8 @@ noteworthy_binaryTranslate successfully ran 3 tests
 note successfully ran 48 tests
 musicxml_xmlHandler successfully ran 12 tests
 musicxml_toMxObjects successfully ran 37 tests
-musicxml_testPrimitive successfully ran 5 tests
-musicxml_testFiles successfully ran 5 tests
 repeat successfully ran 72 tests
+musicxml_testPrimitive successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
 test_testStream successfully ran 206 tests
 musicxml_m21ToString successfully ran 45 tests
@@ -159,8 +158,8 @@ midi_translate successfully ran 47 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
 musedata_translate successfully ran 16 tests
-metadata_primitives successfully ran 38 tests
 meter successfully ran 108 tests
+metadata_primitives successfully ran 38 tests
 musicxml_fromMxObjects successfully ran 65 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
@@ -173,15 +172,15 @@ interval successfully ran 55 tests
 instrument successfully ran 22 tests
 humdrum_testFiles successfully ran 3 tests
 humdrum_spineParser successfully ran 32 tests
-metadata_bundles successfully ran 34 tests
 humdrum_instruments successfully ran 8 tests
+metadata_bundles successfully ran 34 tests
 metadata_caching successfully ran 7 tests
 harmony successfully ran 27 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
-figuredBass_resolution successfully ran 17 tests
-figuredBass_realizerScale successfully ran 9 tests
 freezeThaw successfully ran 28 tests
+figuredBass_realizerScale successfully ran 9 tests
+figuredBass_resolution successfully ran 17 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
 figuredBass_fbPitch successfully ran 5 tests
@@ -199,28 +198,28 @@ duration successfully ran 72 tests
 documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
 documentation_library_extensions successfully ran 3 tests
-documentation_library_documenters successfully ran 29 tests
+features_jSymbolic successfully ran 86 tests
 documentation_library_cleaners successfully ran 3 tests
+documentation_library_documenters successfully ran 29 tests
 derivation successfully ran 6 tests
 defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
 corpus_virtual successfully ran 5 tests
-features_jSymbolic successfully ran 86 tests
-corpus_corpora successfully ran 27 tests
-corpus_testCorpus successfully ran 25 tests
 corpus_chorales successfully ran 9 tests
+corpus_corpora successfully ran 27 tests
 features_native successfully ran 26 tests
-contour successfully ran 10 tests
 converter successfully ran 35 tests
-composition_phasing successfully ran 5 tests
+contour successfully ran 10 tests
+composition_aug30 successfully ran 3 tests
 clef successfully ran 27 tests
+composition_phasing successfully ran 5 tests
 common successfully ran 57 tests
 chordTables successfully ran 17 tests
 chant successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
-braille_translate successfully ran 7 tests
 chord successfully ran 108 tests
 classCache successfully ran 12 tests
+braille_translate successfully ran 7 tests
 braille_text successfully ran 4 tests
 braille_lookup successfully ran 3 tests
 braille_segment successfully ran 11 tests
@@ -228,10 +227,11 @@ braille_basic successfully ran 24 tests
 beam successfully ran 15 tests
 bar successfully ran 9 tests
 audioSearch_transcriber successfully ran 4 tests
-audioSearch_recording successfully ran 4 tests
-braille_examples successfully ran 5 tests
 base successfully ran 112 tests
+braille_examples successfully ran 5 tests
+audioSearch_recording successfully ran 4 tests
 articulations successfully ran 29 tests
+audioSearch_scoreFollower successfully ran 7 tests
 analysis_search successfully ran 4 tests
 analysis_reduceChords successfully ran 7 tests
 analysis_patel successfully ran 6 tests
@@ -240,8 +240,9 @@ analysis_metrical successfully ran 6 tests
 analysis_windowed successfully ran 9 tests
 analysis_discrete successfully ran 31 tests
 analysis_reduction successfully ran 15 tests
-_version successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
+_version successfully ran 3 tests
+abc_testFiles successfully ran 5 tests
 abc_translate successfully ran 18 tests
 Not in Tree Error: vexflow.testShow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.quodJactatur is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -259,6 +260,7 @@ Not in Tree Error: test.testDocumentation is in the music21 directory but not im
 Not in Tree Error: test.testDocs.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testCoverage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musicxml.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: metadata.testMetadata is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: ipython21.objects is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -268,9 +270,8 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -278,7 +279,6 @@ Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 d
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: abc.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 -------------------------------------------------------------------------
-Ran 3237 tests in 496.2282 seconds
-Run at 2013-10-26 15:28:07
+Ran 3222 tests in 431.1419 seconds
+Run at 2013-10-28 15:24:48

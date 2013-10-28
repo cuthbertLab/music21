@@ -64,7 +64,6 @@ class ModuleGather(object):
             'testLint.py', 
             'testPerformance.py',
             'multiprocessTest.py',
-            '__init__.py', 
             'timeGraphs.py',
             'exceldiff.py', 
             'mrjobaws.py', # takes too long.
