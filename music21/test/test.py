@@ -91,7 +91,7 @@ class ModuleGather(object):
         'xmlnode'
         '''
         fn = fp.replace(self.dirParent, '') # remove parent
-        parts = fn.split(os.sep)
+        parts = [x for x in fn.split(os.sep) if x]
         if parts[-1] == '__init__.py':
             parts.pop()
         fn = '.'.join(parts)
