@@ -57,7 +57,7 @@ class Corpus(object):
     ### SPECIAL METHODS ###
 
     def __repr__(self):
-        return '<{}.{}>'.format(
+        return '<{0}.{1}>'.format(
             self.__class__.__module__,
             self.__class__.__name__,
             )
@@ -93,7 +93,7 @@ class Corpus(object):
                         continue
                 except UnicodeDecodeError as error:
                     raise corpus.CorpusException(
-                        'Incorrect filename in corpus path: {}: {!r}'.format(
+                        'Incorrect filename in corpus path: {0}: {1!r}'.format(
                             filename, error))
                 for extension in fileExtensions:
                     if filename.endswith(extension):
@@ -337,7 +337,7 @@ class Corpus(object):
             filePath = workList[0]
         elif not len(workList):
             raise corpus.CorpusException(
-                'Could not find a work that met this criterion: {}'.format(
+                'Could not find a work that met this criterion: {0}'.format(
                     workName))
         else:
             filePath = workList[0]
@@ -1052,9 +1052,9 @@ class CoreCorpus(Corpus):
                     '-0'.join(str(x) for x in movementNumber))
             else:
                 movementStrList += [
-                    '0{}'.format(movementNumber),
+                    '0{0}'.format(movementNumber),
                     str(movementNumber),
-                    'movement{}'.format(movementNumber),
+                    'movement{0}'.format(movementNumber),
                     ]
             for filePath in sorted(results):
                 filename = os.path.split(filePath)[1]
@@ -1227,11 +1227,11 @@ class LocalCorpus(Corpus):
 
     def __repr__(self):
         if self.name is None:
-            return '<{}.{}>'.format(
+            return '<{0}.{1}>'.format(
                 self.__class__.__module__,
                 self.__class__.__name__,
                 )
-        return '<{}.{}: {!r}>'.format(
+        return '<{0}.{1}: {2!r}>'.format(
             self.__class__.__module__,
             self.__class__.__name__,
             self.name
@@ -1251,7 +1251,7 @@ class LocalCorpus(Corpus):
     def _cacheName(self):
         cacheName = 'local'
         if self.name is not None and self.name != 'local':
-            cacheName += '-{}'.format(self.name)
+            cacheName += '-{0}'.format(self.name)
         return cacheName
 
     ### PUBLIC METHODS ###
@@ -1322,7 +1322,7 @@ class LocalCorpus(Corpus):
             for directoryPath in self.directoryPaths:
                 if not os.path.isdir(directoryPath):
                     environLocal.warn(
-                        'invalid path set as localCorpusSetting: {}'.format(
+                        'invalid path set as localCorpusSetting: {0}'.format(
                             directoryPath))
                 else:
                     validPaths.append(directoryPath)

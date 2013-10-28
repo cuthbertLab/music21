@@ -982,7 +982,7 @@ class MetadataBundle(object):
         corpusPath = corpusPath.replace('.', '_')
         # append name to metadata path
         if number is not None:
-            return '{}_{}'.format(corpusPath, number)
+            return '{0}_{1}'.format(corpusPath, number)
         return corpusPath
 
     def delete(self):
@@ -1081,7 +1081,7 @@ class MetadataBundle(object):
         if name is None or name == 'local':
             corpusName = 'local'
         else:
-            corpusName = 'local-{}'.format(name)
+            corpusName = 'local-{0}'.format(name)
         if corpusName in corpora.Corpus._metadataBundles and \
             corpora.Corpus._metadataBundles[corpusName] is not None:
             return corpora.Corpus._metadataBundles[corpusName]
