@@ -1471,7 +1471,7 @@ class JSONFreezer(JSONFreezeThawBase):
           "__class__": "music21.note.Note",
           "__version__": [
             1,
-            6,
+            7,
             0
           ]
         }
