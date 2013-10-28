@@ -16,42 +16,16 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webap
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/vexflow/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/exceldiff.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/theoryAnalysis/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/timeGraphs.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testPerformance.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testLint.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testInstallation.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testExternal.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testDocs/test.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testDocs/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testDefault.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/test.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/multiprocessTest.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/search/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scala/scl/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scala/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/romanText/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/noteworthy/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musedata/testPrimitive/test03/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musedata/testPrimitive/test02/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musedata/testPrimitive/test01/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musedata/testPrimitive/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musedata/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/metadata/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/languageExcerpts/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ipython21/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/humdrum/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/figuredBass/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/features/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/xldate.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/timemachine.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/sheet.py
@@ -71,8 +45,6 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/j
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/compat.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/largestAmbitus.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2011.py
@@ -98,26 +70,16 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/HarmonyRealizer.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/counterpoint/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/composition/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/capella/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/audioSearch/scores/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/audioSearch/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abc/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/__init__.py
 xmlnode successfully ran 12 tests
 webapps_apps successfully ran 6 tests
 webapps_templates successfully ran 9 tests
 volume successfully ran 20 tests
 voiceLeading successfully ran 64 tests
 trecento_trecentoCadence successfully ran 7 tests
-webapps_commands successfully ran 10 tests
 variant successfully ran 34 tests
+webapps_commands successfully ran 10 tests
 trecento_polyphonicSnippet successfully ran 9 tests
 trecento_notation successfully ran 17 tests
 trecento_findTrecentoFragments successfully ran 3 tests
@@ -148,8 +110,9 @@ noteworthy_binaryTranslate successfully ran 3 tests
 note successfully ran 48 tests
 musicxml_xmlHandler successfully ran 12 tests
 musicxml_toMxObjects successfully ran 37 tests
-repeat successfully ran 72 tests
 musicxml_testPrimitive successfully ran 5 tests
+repeat successfully ran 72 tests
+musicxml_testFiles successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
 test_testStream successfully ran 206 tests
 musicxml_m21ToString successfully ran 45 tests
@@ -158,8 +121,8 @@ midi_translate successfully ran 47 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
 musedata_translate successfully ran 16 tests
-meter successfully ran 108 tests
 metadata_primitives successfully ran 38 tests
+meter successfully ran 108 tests
 musicxml_fromMxObjects successfully ran 65 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
@@ -172,22 +135,22 @@ interval successfully ran 55 tests
 instrument successfully ran 22 tests
 humdrum_testFiles successfully ran 3 tests
 humdrum_spineParser successfully ran 32 tests
-humdrum_instruments successfully ran 8 tests
 metadata_bundles successfully ran 34 tests
+humdrum_instruments successfully ran 8 tests
 metadata_caching successfully ran 7 tests
 harmony successfully ran 27 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
-freezeThaw successfully ran 28 tests
-figuredBass_realizerScale successfully ran 9 tests
 figuredBass_resolution successfully ran 17 tests
+figuredBass_realizerScale successfully ran 9 tests
+freezeThaw successfully ran 28 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
-figuredBass_fbPitch successfully ran 5 tests
 figuredBass_realizer successfully ran 12 tests
+figuredBass_fbPitch successfully ran 5 tests
 figuredBass_checker successfully ran 16 tests
-figuredBass_examples successfully ran 15 tests
 graph successfully ran 62 tests
+figuredBass_examples successfully ran 15 tests
 features_base successfully ran 27 tests
 expressions successfully ran 26 tests
 exceptions21 successfully ran 3 tests
@@ -198,87 +161,124 @@ duration successfully ran 72 tests
 documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
 documentation_library_extensions successfully ran 3 tests
-features_jSymbolic successfully ran 86 tests
-documentation_library_cleaners successfully ran 3 tests
 documentation_library_documenters successfully ran 29 tests
+documentation_library_cleaners successfully ran 3 tests
+documentation_library___init__ successfully ran 3 tests
+documentation___init__ successfully ran 3 tests
+features_jSymbolic successfully ran 86 tests
 derivation successfully ran 6 tests
 defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
 corpus_virtual successfully ran 5 tests
-corpus_chorales successfully ran 9 tests
 corpus_corpora successfully ran 27 tests
 features_native successfully ran 26 tests
-converter successfully ran 35 tests
-contour successfully ran 10 tests
-composition_aug30 successfully ran 3 tests
-clef successfully ran 27 tests
+corpus_testCorpus successfully ran 25 tests
+corpus_chorales successfully ran 9 tests
 composition_phasing successfully ran 5 tests
 common successfully ran 57 tests
+contour successfully ran 10 tests
+clef successfully ran 27 tests
 chordTables successfully ran 17 tests
+converter successfully ran 35 tests
 chant successfully ran 12 tests
-capella_fromCapellaXML successfully ran 20 tests
 chord successfully ran 108 tests
 classCache successfully ran 12 tests
-braille_translate successfully ran 7 tests
+capella_fromCapellaXML successfully ran 20 tests
 braille_text successfully ran 4 tests
-braille_lookup successfully ran 3 tests
+braille_translate successfully ran 7 tests
 braille_segment successfully ran 11 tests
+braille_lookup successfully ran 3 tests
 braille_basic successfully ran 24 tests
+braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
 bar successfully ran 9 tests
 audioSearch_transcriber successfully ran 4 tests
 base successfully ran 112 tests
 braille_examples successfully ran 5 tests
 audioSearch_recording successfully ran 4 tests
+audioSearch_omrfollow successfully ran 3 tests
 articulations successfully ran 29 tests
-audioSearch_scoreFollower successfully ran 7 tests
 analysis_search successfully ran 4 tests
 analysis_reduceChords successfully ran 7 tests
+analysis_phrasing successfully ran 3 tests
 analysis_patel successfully ran 6 tests
 analysis_neoRiemannian successfully ran 10 tests
 analysis_metrical successfully ran 6 tests
 analysis_windowed successfully ran 9 tests
-analysis_discrete successfully ran 31 tests
 analysis_reduction successfully ran 15 tests
+analysis_discrete successfully ran 31 tests
 analysis_correlate successfully ran 6 tests
 _version successfully ran 3 tests
 abc_testFiles successfully ran 5 tests
 abc_translate successfully ran 18 tests
+Not in Tree Error: webapps.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: vexflow.testShow is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: vexflow.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.quodJactatur is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.find_vatican1790 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.findSevs is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.correlations is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.contenanceAngloise is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.capuaProbabilities is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: trecento.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: theoryAnalysis.wwnortonMGTA is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: theoryAnalysis.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.treeYield is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.toggleDebug is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocumentation is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocs.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: test.testDocs.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testCoverage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: musicxml.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: test.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: stream.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: search.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: scala.scl.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: scala.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: romanText.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: noteworthy.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musicxml.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musedata.testPrimitive.test03.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musedata.testPrimitive.test02.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musedata.testPrimitive.test01.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musedata.testPrimitive.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musedata.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: midi.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: metadata.testMetadata is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: metadata.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: lily.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: languageExcerpts.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: ipython21.objects is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: ipython21.ipExtension is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: ipython21.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: humdrum.questions is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: humdrum.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: figuredBass.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: features.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: counterpoint.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: corpus.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: composition.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: capella.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: audioSearch.scores.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: audioSearch.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: analysis.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: abc.__init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: __init__ is in the music21 directory but not imported in music21. Skipped -- fix! 
 -------------------------------------------------------------------------
-Ran 3222 tests in 431.1419 seconds
-Run at 2013-10-28 15:24:48
+Ran 3257 tests in 461.1823 seconds
+Run at 2013-10-28 15:32:48

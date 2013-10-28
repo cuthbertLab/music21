@@ -367,6 +367,7 @@ N: L0087
 O: Europa, Mitteleuropa, Deutschland
 N: Hamburg 1598 No. 77
 R: Lied
+N: measure 10 had 2 extra beats, a z2 after G2 was deleted
 M: 6/4
 L: 1/4
 K: A
@@ -374,7 +375,7 @@ A2 | A2A=G2E | =G2A2
 =c2 | =c2ec2A | G2A2
 A2 | A2A=G2E | =G2A2
 =c2 | =c2ec2A | G2A2
-=c2 | =c2Bc2A | BA=G2z2
+=c2 | =c2Bc2A | BA=G2
 =c2 | =c2Bc2d | e2=cA=G2
 c2 | =c2ec2A | G2A2
 
