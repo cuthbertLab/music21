@@ -344,17 +344,29 @@ class Metadata(base.Music21Object):
 
         ::
 
-            >>> md.search('beethoven', 'composer')
+            >>> md.search(
+            ...     'beethoven',
+            ...     field='composer',
+            ...     )
+            (True, 'composer')
+
+        Note how the incomplete field name in the following example is still
+        matched:
+
+        ::
+
+            >>> md.search(
+            ...     'beethoven',
+            ...     field='compose',
+            ...     )
             (True, 'composer')
 
         ::
 
-            >>> md.search('beethoven', 'compose')
-            (True, 'composer')
-
-        ::
-
-            >>> md.search('frank', 'composer')
+            >>> md.search(
+            ...     'frank',
+            ...     field='composer',
+            ...     )
             (False, None)
 
         ::
@@ -369,12 +381,18 @@ class Metadata(base.Music21Object):
 
         ::
 
-            >>> md.search('third', 'composer')
+            >>> md.search(
+            ...     'third',
+            ...     field='composer',
+            ...     )
             (False, None)
 
         ::
 
-            >>> md.search('third', 'title')
+            >>> md.search(
+            ...     'third',
+            ...     field='title',
+            ...     )
             (True, 'title')
 
         ::

@@ -147,7 +147,10 @@ class MetadataBundle(object):
 
     ::
 
-        >>> searchResults = coreBundle.search('bach', 'composer')
+        >>> searchResults = coreBundle.search(
+        ...     'bach',
+        ...     field='composer',
+        ...     )
         >>> searchResults
         <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -209,7 +212,10 @@ class MetadataBundle(object):
     ::
 
         >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
-        >>> bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = coreBundle.search(
+        ...     'bach',
+        ...     field='composer',
+        ...     )
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {21 entries}>
 
@@ -304,14 +310,23 @@ class MetadataBundle(object):
 
             >>> from music21 import metadata
             >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
-            >>> bachBundle = coreBundle.search('bach', 'composer')
-            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
+            >>> beethovenBundle = coreBundle.search(
+            ...     'beethoven',
+            ...     field='composer',
+            ...     )
             >>> bachBundle == beethovenBundle
             False
 
         ::
 
-            >>> bachBundle == coreBundle.search('bach', 'composer')
+            >>> bachBundle == coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
             True
 
         ::
@@ -334,8 +349,14 @@ class MetadataBundle(object):
 
             >>> from music21 import metadata
             >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
-            >>> bachBundle = coreBundle.search('bach', 'composer')
-            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
+            >>> beethovenBundle = coreBundle.search(
+            ...     'beethoven',
+            ...     field='composer',
+            ...     )
 
         ::
 
@@ -397,8 +418,14 @@ class MetadataBundle(object):
 
             >>> from music21 import metadata
             >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
-            >>> bachBundle = coreBundle.search('bach', 'composer')
-            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
+            >>> beethovenBundle = coreBundle.search(
+            ...     'beethoven',
+            ...     field='composer',
+            ...     )
 
         ::
 
@@ -458,8 +485,14 @@ class MetadataBundle(object):
 
             >>> from music21 import metadata
             >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
-            >>> bachBundle = coreBundle.search('bach', 'composer')
-            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
+            >>> beethovenBundle = coreBundle.search(
+            ...     'beethoven',
+            ...     field='composer',
+            ...     )
 
         ::
 
@@ -520,8 +553,14 @@ class MetadataBundle(object):
 
             >>> from music21 import metadata
             >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
-            >>> bachBundle = coreBundle.search('bach', 'composer')
-            >>> beethovenBundle = coreBundle.search('beethoven', 'composer')
+            >>> bachBundle = coreBundle.search(
+            ...     'bach',
+            ...     field='composer',
+            ...     )
+            >>> beethovenBundle = coreBundle.search(
+            ...     'beethoven',
+            ...     field='composer',
+            ...     )
 
         ::
 
@@ -1440,7 +1479,8 @@ class MetadataBundle(object):
         ::
 
             >>> bachBundle = coreBundle.search(
-            ...     'bach', field='composer',
+            ...     'bach',
+            ...     field='composer',
             ...     )
             >>> bachBundle
             <music21.metadata.bundles.MetadataBundle {21 entries}>
@@ -1551,7 +1591,9 @@ class MetadataBundle(object):
 
             >>> from music21 import metadata
             >>> bachBundle = metadata.MetadataBundle.fromCoreCorpus().search(
-            ...     'bach', 'composer')
+            ...     'bach',
+            ...     'composer',
+            ...     )
             >>> bachBundle.filePath is None
             True
 

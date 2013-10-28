@@ -364,7 +364,10 @@ class Corpus(object):
 
         ::
 
-            >>> corpus.Corpus.search('bach', corpusNames=('core', 'virtual'))
+            >>> corpus.Corpus.search(
+            ...     'bach',
+            ...     corpusNames=('core', 'virtual'),
+            ...     )
             <music21.metadata.bundles.MetadataBundle {150 entries}>
 
         If ``names`` is None, all corpora known to music21 will be searched.
@@ -1094,13 +1097,19 @@ class CoreCorpus(Corpus):
 
         ::
 
-            >>> corpus.CoreCorpus().search('bach', 'composer')
+            >>> corpus.CoreCorpus().search(
+            ...      'bach',
+            ...      field='composer',
+            ...      )
             <music21.metadata.bundles.MetadataBundle {21 entries}>
 
         ::
 
             >>> predicate = lambda noteCount: noteCount < 20
-            >>> corpus.CoreCorpus().search(predicate, 'noteCount')
+            >>> corpus.CoreCorpus().search(
+            ...     predicate,
+            ...     field='noteCount',
+            ...     )
             <music21.metadata.bundles.MetadataBundle {131 entries}>
 
         '''
