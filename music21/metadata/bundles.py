@@ -108,6 +108,10 @@ class MetadataEntry(object):
         else:
             return corpus.parse(self.sourcePath)
 
+    def show(self, showFormat=None):
+        score = self.parse()
+        score.show(showFormat)
+        
     def search(self, query, field=None):
         return self.metadataPayload.search(query, field)
 

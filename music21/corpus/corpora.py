@@ -1468,7 +1468,7 @@ class VirtualCorpus(Corpus):
         className = getattr(virtual, name)
         if callable(className):
             obj = className()
-            if isinstance(obj, virtual.VirtualWork):
+            if isinstance(obj, virtual.VirtualWork): # @UndefinedVariable
                 if obj.corpusPath is not None:
                     _virtual_works.append(obj)
 

@@ -108,6 +108,9 @@ class Distributor(object):
                 fpNew = fpNew.replace('.macosx-10.7-x86_64.exe', '.exe')
                 fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.8-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
                 if fpNew != fp:
                     os.rename(fp, fpNew)
                 self.fpWin = fpNew

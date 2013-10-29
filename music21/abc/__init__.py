@@ -2738,6 +2738,14 @@ class ABCFile(object):
             # rstrip because of '\r\n' carriage returns
             if line.strip().startswith('X:') and line.replace(' ', '').rstrip() == 'X:%s' % number:
                 gather = True
+            elif line.strip().startswith('X:') and gather is False:
+                # some numbers are like X:0490 but we may request them as 490...
+                try:
+                    forcedNum = int(line.replace(' ', '').rstrip().replace('X:', ''))
+                    if forcedNum == int(number):
+                        gather = True
+                except:
+                    pass
             # if already gathering and find another ref number definition
             # stop gathering
             elif gather is True and line.strip().startswith('X:'):

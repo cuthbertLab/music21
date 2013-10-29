@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2008-2013 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------

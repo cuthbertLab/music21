@@ -226,6 +226,9 @@ class MetadataCachingJob(object):
         self.results.append(metadataEntry)
 
     def _parseOpusScore(self, score, scoreNumber):
+        # scoreNumber is a zeroIndexed value.
+        # score.metadata.number is the retrieval code; which is
+        # probably 1 indexed, and might have gaps
         from music21 import metadata
         try:
             # updgrade metadata to richMetadata
@@ -248,7 +251,7 @@ class MetadataCachingJob(object):
                         corpusPath))
                 metadataEntry = metadata.MetadataEntry(
                     sourcePath=self.cleanFilePath,
-                    number=scoreNumber,
+                    number=score.metadata.number,
                     metadataPayload=richMetadata,
                     )
                 self.results.append(metadataEntry)
@@ -272,7 +275,6 @@ class MetadataCachingJob(object):
 
     @property
     def cleanFilePath(self):
-        from music21 import common
         corpusPath = os.path.abspath(common.getCorpusFilePath())
         if self.filePath.startswith(corpusPath):
             cleanFilePath = common.relativepath(self.filePath, corpusPath)

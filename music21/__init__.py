@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2008-2012 Michael Scott Cuthbert 
+The music21 Framework is Copyright © 2008-2013 Michael Scott Cuthbert 
 and the music21 Project
 
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
@@ -115,7 +115,6 @@ __all__ = [
     'meter', 
     'note', 
     'pitch', 
-    'ratios',
     'repeat',
     'roman',
     'scale',

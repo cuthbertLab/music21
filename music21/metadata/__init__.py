@@ -991,6 +991,12 @@ class RichMetadata(Metadata):
             self.pitchHighest = str(psRange[1])
         self.ambitus = analysisObject.getSolution(streamObj)
 
+#------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+    
 
 #------------------------------------------------------------------------------
 
@@ -1004,7 +1010,7 @@ __all__ = [
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
