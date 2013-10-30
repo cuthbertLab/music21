@@ -1405,11 +1405,21 @@ class ModuleDocumenter(ObjectDocumenter):
             >>> documenter.referenceName
             'moduleSerial'
 
+        ::
+
+            >>> from music21.stream import makeNotation
+            >>> module = makeNotation
+            >>> documenter = documentation.ModuleDocumenter(module)
+            >>> documenter.referenceName
+            'moduleStreamMakeNotation'
+
         '''
         referentPackagesystemPath = self.referentPackagesystemPath.replace(
             '.__init__', '')
         parts = referentPackagesystemPath.split('.')[1:]
-        parts = [part.capitalize() for part in parts]
+        for i, part in enumerate(parts):
+            if not part[0].isupper():
+                parts[i] = part[0].upper() + part[1:]
         parts = ['module'] + parts
         return ''.join(parts)
 
