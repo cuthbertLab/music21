@@ -37,7 +37,7 @@ def main(runOne=False):
     timeStart = time.time()
 
     if not os.path.exists(builddocRstDir):
-        raise Exception("Cannot run tests on documentation because the rst files in builddoc/staticDocs do not exist")
+        raise Exception("Cannot run tests on documentation because the rst files in documentation/source do not exist")
     
     for root, unused_dirnames, filenames in os.walk(builddocRstDir):
         for module in filenames:
@@ -80,5 +80,5 @@ def main(runOne=False):
 
 
 if __name__ == '__main__':
+    #main()
     main()
-    #main('usersGuide_05_listsOfLists.rst')

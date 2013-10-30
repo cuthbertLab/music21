@@ -17,14 +17,14 @@ file to a variable:
 
 ::
 
-	>>> from music21 import *
-	>>> bach = corpus.parse('bach/bwv66.6')
-	
+    >>> from music21 import *
+    >>> bach = corpus.parse('bach/bwv66.6')
+    
 
 Users can also build their own corpora to index and quickly search their own
 collections on disk.  Version 1.7 of music21 introduces the ability to have
 multiple local corpora that can be accessed individually.
-	
+    
 This user's guide will cover more about the corpus's basic features soon.
 This chapter focuses on music21's tools for
 extracting useful metadata - titles, locations, composers names, the key signatures 
@@ -61,8 +61,8 @@ practice era, and inumerable folk songs, in a variety of formats:
 
     ::
 
-		>>> coreCorpus = corpus.CoreCorpus()
-        >>> coreCorpus.manualCoreCorpusPath = 'path/to/core/corpus'
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath = 'path/to/core/corpus'
 
 Music21 also has the notion of a *virtual* corpus: a collection of musical
 works to be found at various locations online which, for reasons of licensing,
@@ -89,7 +89,8 @@ You can add and remove paths from a *local* corpus with the ``addPath()`` and
 ::
 
     >>> localCorpus.addPath('~/Desktop')
-    >>> localCorpus.directoryPaths
+    >>> #_DOCS_SHOW localCorpus.directoryPaths
+    >>> ('/Users/josiah/Desktop',) #_DOCS_HIDE
     ('/Users/josiah/Desktop',)
 
 ::
@@ -114,14 +115,15 @@ and then save it:
 
 ::
 
-    >>> aNewLocalCorpus = corpus.LocalCorpus('A new corpus')
+    >>> aNewLocalCorpus = corpus.LocalCorpus(u'A new corpus')
     >>> aNewLocalCorpus.existsInSettings
     False
 
 ::
 
     >>> aNewLocalCorpus.addPath('~/Desktop')
-    >>> aNewLocalCorpus.directoryPaths
+    >>> #_DOCS_SHOW aNewLocalCorpus.directoryPaths
+    >>> print("('/Users/josiah/Desktop',)")#_DOCS_HIDE
     ('/Users/josiah/Desktop',)
 
 ::
@@ -136,7 +138,7 @@ all saved *local* corpora:
 ::
 
     >>> corpus.LocalCorpus.listLocalCorporaNames()
-    [None, u'trecento', 'A new corpus', u'bach', u'fake']
+    [None, u'trecento', u'A new corpus', u'bach', u'fake']
 
 ..  note::
 
@@ -176,8 +178,8 @@ like a list and call ``.parse()`` on any element:
 
 ::
 
-	>>> myPiece = sixEight[0].parse()
-	
+    >>> myPiece = sixEight[0].parse()
+    
 This will return a ``music21.stream.Score`` object which you can work
 with like any other stream. Or if you just want to see it, there's a 
 convenience ``.show()`` method you can call directly on a MetadataEntry.
@@ -190,14 +192,20 @@ which ignores anything in your local corpus:
     >>> corpus.CoreCorpus().search('6/8')
     <music21.metadata.bundles.MetadataBundle {2211 entries}> 
 
-Finally, if you already have a reference to a metadata bundle, you can search
-there too:
+
+Because the result of every metadata search is also a metadata bundle, you can
+search your search results to do more complex searches.  Remember that 
+bachBundle is a collection of all works where the composer is Bach.  Here we
+will limit to those pieces in 3/4 time:
 
 ::
 
-    >>> bachBundle = coreBundle.search('bach', 'composer')
+    >>> bachBundle = corpus.search('bach', 'composer')
     >>> bachBundle
     <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+    >>> bachBundle.search('3/4')
+    <music21.metadata.bundles.MetadataBundle {4 entries}>
 
 ..  note::
 
@@ -208,21 +216,12 @@ there too:
     
     ::
     
-    	>>> allBach = corpus.search('bach')
-    	
+        >>> allBach = corpus.search('bach')
+        
     This will search filenames as well.  We will aim to get more complete
     metadata in the core corpus in the near future, and would appreciate
     community help to achieve this goal.
 
-Because the result of every metadata search is also a metadata bundle, you can
-search your search results to do more complex searches.  Remember that 
-bachBundle is a collection of all works where the composer is Bach.  Here we
-will limit to those pieces in 3/4 time:
-
-::
-
-    >>> bachBundle.search('3/4')
-    <music21.metadata.bundles.MetadataBundle {4 entries}>
 
 
 Metadata search fields
@@ -304,9 +303,9 @@ You can also pass in compiled regular expressions into the search:
 
 ::
 
-	>>> import re
-	>>> haydnOrHandel = re.compile('ha.d.*', re.IGNORECASE)
-	>>> bundle = corpus.search(haydnOrHandel)
+    >>> import re
+    >>> haydnOrHandel = re.compile('ha.d.*', re.IGNORECASE)
+    >>> bundle = corpus.search(haydnOrHandel)
 
 Though what you mostly get are Shandys.  Best to use a *^* to match
 at the beginning of the word next time.
@@ -335,12 +334,12 @@ also allow us to parse the associated file into a music21 score:
 ::
 
     >>> bachBundle[0].metadataPayload
-    <music21.metadata.RichMetadata object at 0x112f54250>
+    <music21.metadata.RichMetadata object at 0x...>
 
 ::
 
     >>> bachBundle[0].parse()
-    <music21.stream.Score 4421475216>
+    <music21.stream.Score ...>
 
 
 Manipulating multiple metadata bundles
@@ -440,10 +439,11 @@ Metadata bundles can be written to and read from disk.
 
     >>> coreBundle = metadata.MetadataBundle('core')
     >>> coreBundle.read()
+	<music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
 
 ::
 
-    >>> coreBundle.write()
+    >>> #_DOCS_SHOW coreBundle.write()
 
 They can also be completely rebuilt, as you will want to do for local
 corpora. To add information to a bundle, use the ``addFromPaths()`` method:
@@ -452,17 +452,29 @@ corpora. To add information to a bundle, use the ``addFromPaths()`` method:
 
     >>> newBundle = metadata.MetadataBundle()
     >>> paths = corpus.CoreCorpus().getBachChorales()
-    >>> failedPaths = newBundle.addFromPaths(paths)
+    >>> #_DOCS_SHOW failedPaths = newBundle.addFromPaths(paths)
+    >>> failedPaths = [] #_DOCS_HIDE
     >>> failedPaths
     []
 
 then call ``.write()`` to save to disk.
 
+OMIT_FROM_DOCS
+
+here we can set up or test anything that we want without it appearing in the docs...
+useful for not having a long set of #_DOCS_SHOW and #_DOCS_HIDE tags...
+
+	>>> 2+2
+	4
+
+RESUME_DOCS
+
 ::
 
-    >>> newBundle
+    >>> #_DOCS_SHOW newBundle
+    >>> print "<music21.metadata.bundles.MetadataBundle {402 entries}>" # did not actually run addFromPaths... #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {402 entries}>
-
+    
 ..  note::
 
     Building metadata information can be an incredibly intensive process. For
@@ -473,7 +485,8 @@ then call ``.write()`` to save to disk.
 
     ::
 
-        >>> environment.UserSettings()['debug'] = True
+        >>> #_DOCS_SHOW environment.UserSettings()['debug'] = True
+        
 
 You can delete, rebuild and save a metadata bundle in one go with the
 ``rebuild()`` method:
@@ -481,7 +494,7 @@ You can delete, rebuild and save a metadata bundle in one go with the
 ::
 
     >>> virtualBundle = metadata.MetadataBundle.fromVirtualCorpus()
-    >>> virtualBundle.rebuild()
+    >>> #_DOCS_SHOW virtualBundle.rebuild()
 
 The process of rebuilding will store the file as it goes so at the end there is 
 no need to call ``.write()``.
@@ -491,7 +504,7 @@ method:
 
 ::
 
-    >>> virtualBundle.delete()
+    >>> #_DOCS_SHOW virtualBundle.delete()
 
 Deleting a metadata bundle's JSON file won't empty the in-memory contents of
 that bundle. For that, use ``clear()``:

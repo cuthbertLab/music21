@@ -13,6 +13,6 @@ Users Guide
    usersGuide_06_stream2
    usersGuide_07_chords
    usersGuide_09_chordify
-   usersGuide_11_metadata
+   usersGuide_11_corpusSearching
    usersGuide_14_timeSignatures
    usersGuide_99_Table_of_Contents

@@ -12,6 +12,27 @@
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
+def fixLines(lines):
+    newLines = []
+    omitting = False
+    print len(lines)
+    for i, line in enumerate(lines):
+        if ' #_DOCS_SHOW ' in line:
+            newLines.append(line.replace(' #_DOCS_SHOW ', ' '))
+        elif '#_DOCS_HIDE' in line:
+            continue
+        elif 'OMIT_FROM_DOCS' in line:
+            omitting = True
+            continue
+        elif 'RESUME_DOCS' in line:
+            omitting = False
+            continue
+        elif omitting is True:
+            continue
+        else:
+            newLines.append(line)
+    lines[:] = newLines
+
 
 def processDocstring(app, what, name, obj, options, lines):
     '''Process the ``lines`` of each docstring, in place.'''
@@ -21,19 +42,13 @@ def processDocstring(app, what, name, obj, options, lines):
     #    print 'OBJ  ', obj
     #    print 'OPTS ', options
     #    print 'LINES', lines
-    newLines = []
-    for i, line in enumerate(lines):
-        if ' #_DOCS_SHOW ' in line:
-            newLines.append(line.replace(' #_DOCS_SHOW ', ' '))
-        elif '#_DOCS_HIDE' in line:
-            continue
-        elif 'OMIT_FROM_DOCS' in line:
-            break
-        else:
-            newLines.append(line)
-    lines[:] = newLines
-
+    fixLines(lines)
+    
+def processSource(app, name, lines):
+    linesSep = lines[0].split('\n')
+    fixLines(linesSep)
+    lines[0] = '\n'.join(linesSep)
 
 def setup(app):
     app.connect('autodoc-process-docstring', processDocstring)
-    
+    app.connect('source-read', processSource)
