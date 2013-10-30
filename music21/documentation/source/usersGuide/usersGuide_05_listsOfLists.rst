@@ -1,0 +1,287 @@
+.. _usersGuide_05_listsOfLists:
+
+User's Guide, Chapter 5: Lists of Lists, Functions, and Recursion 
+==================================================================
+
+In the last Chapter, we discussed Python Lists, how the :class:`~music21.stream.Stream`
+object is similar to a List, and how we can put :class:`~music21.note.Note` objects into a
+`Stream`, look at their offsets, and `.show()` the `Stream` in MusicXML or as text.  We
+ended by putting one `Stream` inside another `Stream`, which seemed like a neat trick
+until we discovered that we couldn't get at the elements inside the inner `Stream`.
+
+In this chapter we will work on how to exploit the power of nested `Streams`.  We'll
+begin with a discussion of recursive lists (since `Streams` work a lot like lists).
+Those with some programming will probably want to skip to the following section.
+
+Lists of Lists
+----------------
+Lists (similar to Arrays in other languages) can hold all sorts of other things inside them
+including other lists.  So let's begin by creating two lists:
+
+>>> listA = [10, 20, 30]
+>>> listB = [1, 2, 3, listA]
+
+Now when we look at listB, we'll see that listA is inside it:
+
+>>> listB
+[1, 2, 3, [10, 20, 30]]
+
+Notice that when we look at the length (`len()`) of listB it shows that there are
+4 elements, not 6:
+
+>>> len(listB)
+4
+
+That's because the fourth element of listB (which, you'll recall, is called
+`listB[3]` not `listB[4]`) is itself a list, listA:
+
+>>> listB[3]
+[10, 20, 30]
+>>> listB[3] is listA
+True
+
+So if we want to get the third element of listA, there is an easy way to do it:
+
+>>> listA[2]
+30
+
+But we can also think that `30` is also the third element *of the fourth element* of
+listB.  So we can write this instead:
+
+>>> listB[3][2]
+30
+
+Oh, and since each of these is the last elements of their respective lists, we could
+instead write:
+
+>>> listB[-1][-1]
+30
+
+which means "get the last element of the last element of listB"
+
+But what if we just wanted to know every number stored anywhere in listB, even if
+that number is inside a list itself?  This won't work:
+
+>>> for number in listB:
+...     print(number)
+1
+2
+3
+[10, 20, 30]
+
+Instead, we have to test to see if each "number" in `listB` is actually a number or
+a list.  And if it's a list, we should find each number in that and print it instead.
+Here's a slightly more complicated set of commands to do that (remember, don't type
+the >>> or ... ; they'll appear automatically in Python's shell):
+
+>>> for thing in listB:
+...     if isinstance(thing, list):
+...        for number in thing:
+...            print(number)
+...     else:
+...        print(thing)
+1
+2
+3
+10
+20
+30
+
+That did it!  How does it work?  Well we look at each "thing" in `listB` -- we
+call it "thing" here, because we're not sure if it's a number of a list.  Then
+in the next line ``if isinstance(thing, list):`` checks if the thing is a list.
+If that is `True` then we get to an inner loop, where we look at "thing" (which
+in this case is `listA`, but the program doesn't know that) and get the
+"number" from it.  But if "thing" is not a list, that's where the ``else`` comes
+in, which is what we run if we don't have a list, which just says, print the number.  
+(We're assuming in this case that there are only two types of things in `listB`, 
+numbers and other lists.)  If you get an error, be sure not to forget the ending ":" or to indent the next line.
+ 
+Functions and Recursion
+---------------------------------
+ 
+But what if we did this:
+
+>>> listC = [100, 200, 300, listB]
+
+Now since listB contains listA, we end up with a list within a list within a list:
+
+>>> listC
+[100, 200, 300, [1, 2, 3, [10, 20, 30]]]
+
+If we wanted to print all the numbers
+in listC, we could write an ugly set of commands like this one (I'll understand if 
+you don't actually want to type this and just want to trust me that this works):
+
+>>> for thing in listC:
+...     if isinstance(thing, list):
+...        for innerThing in thing:
+...            if isinstance(innerThing, list):
+...               for number in innerThing:
+...                   print(number)
+...            else:
+...               print(innerThing)
+...     else:
+...         print(thing)
+100
+200
+300
+1
+2
+3
+10
+20
+30
+
+
+Whew!  If this were the only way to do it, I wouldn't blame you if you decided
+that programming just wasn't worth the headache.  Especially since you've probably
+already guessed that we could make: ``listD = [4, 5, listC, 6, 7]`` and get another
+layer of lists.  Fortunately, there's a little bit of programming magic called
+"recursion" that we can use to get to the heart of the matter.  Notice that in the
+code I just wrote, there are a few lines that are basically the same (with a few
+words changed) as other parts of the code.  With recursive coding, we'll find a way
+to save those lines to reuse them.  Type these six lines:
+
+>>> def flatPrint(myList):
+...     for thing in myList:
+...         if isinstance(thing, list):
+...             flatPrint(thing)
+...         else:
+...             print(thing)
+
+What we've done is created a new function called ''flatPrint'' which reaches into lists
+of lists and prints anything that is in them.  
+
+Now try:
+
+>>> flatPrint(listC)
+100
+200
+300
+1
+2
+3
+10
+20
+30
+
+It works! But how?  Here's how functions work in general (skip this, if you know all about
+functions):
+
+	The `def` statement says that we're going to ''define'' a new function.  After the
+	word `def` comes the name of the function -- something we'll be able to call it to 
+	use it later. (We call the process of taking nested
+	structures and turning them into something linear "flattening" them, like crushing a
+	cardboard box.  Since this is a flattener that also prints what's inside it, `flatPrint`
+	is a good name for it.  Notice that just like with variables, case matters in Python, 
+	so `flatPrint` isn't the same as `flatprint` or `Flatprint` or `FlAtPrInT`.)
+
+	After "flatPrint", within parentheses comes the variable name `myList`.  Notice that
+	we haven't used the name `myList` yet -- it doesn't exist.  What `myList` means here
+	is that any time we use the function `flatPrint`, whatever the name of the list was,
+	within `flatPrint` it will be called `myList`.  So you could say `flatPrint(listC)`,
+	as we just did, and within the function `flatPrint`, `listC` will be known as `myList`.
+	
+	Here's a simpler function that will explain that better.  `squareMe` 
+	takes in a number and prints its square:
+	
+	>>> def squareMe(number):
+	...     print(number * number)
+	
+	Now we can try:
+	
+	>>> squareMe(10)
+	100
+	>>> squareMe(2.5)
+	6.25
+	>>> pi = 3.14
+	>>> squareMe(pi)
+	9.8596
+	
+	Notice two things in the last case.  First that pi isn't exactly 3.14 -- we all know that;
+	I just wanted to make sure the math teachers in the room didn't go into conniptions.  Second
+	that we gave the variable `pi` to the function `squareMe`.  But within the function `squareMe` we 
+	didn't write: ``print(pi * pi)``; instead within the function, `pi` (or any other variable
+	or number) will simply be called `number`.  (By the way, instead of writing ``print(number * number)``
+	we could have written ``print(number**2)`` since ''\*\*'' is how Python denotes exponents).    
+    
+	At the end of a function, you can either `print` something out, or `return` a value, which can
+	be used for anything else.  Here's ``cubeMe`` which works a lot like ``squareMe``, but it cubes
+	the number and instead of printing it, it returns it:
+	
+	>>> def cubeMe(number):
+	...     return number * number * number
+	
+	Because we're not printing number, we can assign the value of cubeMe to another variable:
+	
+	>>> x = cubeMe(2)
+	>>> x
+	8
+	
+	And then we can cube that:
+	
+	>>> y = cubeMe(x)
+	>>> y
+	512
+	
+	Notice that if ``x = cubeMe(2)`` and ``y = cubeMe(x)`` then we can substitute ``cubeMe(2)`` for
+	`x` and write:
+	
+	>>> y = cubeMe(cubeMe(2))
+	>>> y
+	512
+	
+	Thus, using `return` instead of `print` is more powerful, so after finishing with `flatPrint`, we'll
+	mostly write `return` and not `print` functions.
+
+So, getting back to `flatPrint`, which you'll recall is (I'm adding commented line numbers again so I can refer to them):
+
+>>> def flatPrint(myList):              # 1
+...     for thing in myList:            # 2
+...         if isinstance(thing, list): # 3
+...             flatPrint(thing)        # 4
+...         else:                       # 5
+...             print(thing)            # 6
+
+Let's look at it line by line.  
+
+Line 1, as we said, defines the function called `flatPrint` which
+expects a list which we'll call `myList`.
+
+Line 2, says "for each thing that is inside myList, grab it and call it `thing`."
+Once we're done with `thing`, the program will jump back to line 2 to get the next thing.
+
+Line 3, checks if `thing` is a list.  If so, we do line 4.  If not we jump to line 5.
+
+Line 4: This is where the magic happens.  We know now that `thing` is a list.  So how do
+we print a list (which might have other lists inside of it)? We use `flatPrint`!  In essence
+`flatPrint` uses its own power of discerning between lists and numbers to print any internal
+lists.  We call functions that use ("call") themselves *recursive functions* and the process
+of using recursive functions is called *recursion*.  It's a powerful tool and one we'll use
+in music21 a lot.
+
+Line 5, is where we jump to from line 3 if `thing` is not a list, so then Python executes line 6
+
+Line 6, simply prints `thing`, which we know by now is a number.
+
+A warning: unlike some programming languages (Java, C, etc.), Python never checks that what you
+pass to `flatPrint` actually is a list.  So you can try doing something like ``flatPrint(30)``
+but since `30` isn't a list, you'll get an error:
+
+>>> flatPrint(30)
+Traceback (most recent call last):
+TypeError: 'int' object is not iterable
+
+For more information on data structures (lists, lists of lists, and things we didn't get to,
+I suggest watching Google's Python tutorial [http://code.google.com/edu/languages/google-python-class/],
+especially class 2).
+
+
+Wrapup
+---------------------
+In this chapter we looked at how we can look inside lists of lists, which will be
+important when we consider how to work with `Streams` of `Streams` in music21, to look
+at `Measures` within `Parts` within a `Score`.  We also learned how to define a function
+and write recursive functions to do powerful work in just a few lines of code.  In the
+next chapter we apply all this to music.  Click ``Next`` below.
