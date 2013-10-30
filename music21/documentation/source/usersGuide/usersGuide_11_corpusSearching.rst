@@ -1,4 +1,4 @@
-.. _overviewMetadata:
+.. _usersGuide_11_corpusSearching:
 
 User's Guide: Chapter 11: Corpus Searching
 ==========================================
