@@ -162,10 +162,11 @@ class FunctionDocumenter(ObjectDocumenter):
 
     @property
     def referentPackagesystemPath(self):
-        return '.'.join((
+        path = '.'.join((
             self.referent.__module__,
             self.referent.__name__,
             ))
+        return path.replace('.__init__', '')
 
     @property
     def rstAutodocDirectiveFormat(self):
@@ -226,11 +227,12 @@ class MemberDocumenter(ObjectDocumenter):
 
     @property
     def referentPackagesystemPath(self):
-        return '.'.join((
+        path = '.'.join((
             self.definingClass.__module__,
             self.definingClass.__name__,
             self.memberName,
             ))
+        return path.replace('.__init__', '')
 
 
 class MethodDocumenter(MemberDocumenter):
@@ -809,10 +811,11 @@ class ClassDocumenter(ObjectDocumenter):
 
     @property
     def referentPackagesystemPath(self):
-        return '.'.join((
+        path = '.'.join((
             self.referent.__module__,
             self.referent.__name__,
             ))
+        return path.replace('.__init__', '')
 
     @property
     def rstAutodocDirectiveFormat(self):
@@ -1374,8 +1377,9 @@ class ModuleDocumenter(ObjectDocumenter):
     @property
     def referentPackagesystemPath(self):
         if isinstance(self.referent.__name__, tuple):
-            return self.referent.__name__[0],
-        return self.referent.__name__
+            path = self.referent.__name__[0],
+        path = self.referent.__name__
+        return path.replace('.__init__', '')
 
     @property
     def rstAutodocDirectiveFormat(self):
