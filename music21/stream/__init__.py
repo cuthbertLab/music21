@@ -5317,7 +5317,7 @@ class Stream(base.Music21Object):
         inPlace=False,
         ):
         '''
-        Calls :ref:`~music21.stream.makeNotation.makeMeasures`.
+        Calls :py:func:`~music21.stream.makeNotation.makeMeasures`.
         '''
         return makeNotation.makeMeasures(
             self,
@@ -5338,7 +5338,7 @@ class Stream(base.Music21Object):
         inPlace=True,
         ):
         '''
-        Calls :ref:`~music21.stream.makeNotation.makeRests`.
+        Calls :py:func:`~music21.stream.makeNotation.makeRests`.
         '''
         return makeNotation.makeRests(
             self,
@@ -5354,7 +5354,7 @@ class Stream(base.Music21Object):
         displayTiedAccidentals=False,
         ):
         '''
-        Calls :ref:`~music21.stream.makeNotation.makeTies`.
+        Calls :py:func:`~music21.stream.makeNotation.makeTies`.
         '''
         return makeNotation.makeTies(
             self,
@@ -5365,7 +5365,7 @@ class Stream(base.Music21Object):
 
     def makeBeams(self, inPlace=False):
         '''
-        Calls :ref:`~music21.stream.makeNotation.makeBeams`.
+        Calls :py:func:`~music21.stream.makeNotation.makeBeams`.
         '''
         return makeNotation.makeBeams(
             self,
@@ -5384,7 +5384,7 @@ class Stream(base.Music21Object):
 
     def makeTupletBrackets(self, inPlace=True):
         '''
-        Calls :ref:`~music21.stream.makeNotation.makeTupletBrackets`.
+        Calls :py:func:`~music21.stream.makeNotation.makeTupletBrackets`.
         '''
         return makeNotation.makeTupletBrackets(
             self,
@@ -5628,7 +5628,7 @@ class Stream(base.Music21Object):
 
     def realizeOrnaments(self):
         '''
-        Calls :ref:`~music21.stream.makeNotation.realizeOrnaments`.
+        Calls :py:func:`~music21.stream.makeNotation.realizeOrnaments`.
         '''
         return makeNotation.realizeOrnaments(self)
 
