@@ -1,114 +1,317 @@
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/testCorpus.py", line 104, in testSearch03
-    (u'essenFolksong/han2.abc', 219),
-AssertionError: Lists differ: [(u'essenFolksong/han1.abc', u... != [(u'essenFolksong/han1.abc', 2...
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.freezeThaw.JSONFreezer.jsonPrint
+  File "/Users/josiah/Documents/Development/music21/music21/freezeThaw.py", line 1370, in jsonPrint
 
-First differing element 0:
-(u'essenFolksong/han1.abc', u'269')
-(u'essenFolksong/han1.abc', 268)
+----------------------------------------------------------------------
+File "/Users/josiah/Documents/Development/music21/music21/freezeThaw.py", line 1377, in music21.freezeThaw.JSONFreezer.jsonPrint
+Failed example:
+    jsf.jsonPrint()
+Expected:
+    {
+      "__attr__": {
+        "_duration": {
+          "__attr__": {
+            "_cachedIsLinked": true,
+            "_components": [
+              {
+                "__attr__": {
+                  "_dots": [
+                    0
+                  ],
+                  "_link": true,
+                  "_qtrLength": 1.0,
+                  "_quarterLengthNeedsUpdating": false,
+                  "_tuplets": [],
+                  "_type": "quarter",
+                  "_typeNeedsUpdating": false
+                },
+                "__class__": "music21.duration.DurationUnit"
+              }
+            ],
+            "_componentsNeedUpdating": false,
+            "_qtrLength": 1.0,
+            "_quarterLengthNeedsUpdating": false
+          },
+          "__class__": "music21.duration.Duration"
+        },
+        "_notehead": "normal",
+        "_noteheadFill": "default",
+        "_noteheadParenthesis": false,
+        "_priority": 0,
+        "_stemDirection": "unspecified",
+        "articulations": [],
+        "beams": {
+          "__attr__": {
+            "beamsList": [],
+            "feathered": false
+          },
+          "__class__": "music21.beam.Beams"
+        },
+        "editorial": {
+          "__attr__": {
+            "comment": {
+              "__attr__": {},
+              "__class__": "music21.editorial.Comment"
+            },
+            "misc": {}
+          },
+          "__class__": "music21.editorial.NoteEditorial"
+        },
+        "expressions": [],
+        "lyrics": [],
+        "pitch": {
+          "__attr__": {
+            "_duration": {
+              "__attr__": {
+                "_cachedIsLinked": true,
+                "_components": [
+                  {
+                    "__attr__": {
+                      "_dots": [
+                        0
+                      ],
+                      "_link": true,
+                      "_qtrLength": 1.0,
+                      "_quarterLengthNeedsUpdating": false,
+                      "_tuplets": [],
+                      "_type": "quarter",
+                      "_typeNeedsUpdating": false
+                    },
+                    "__class__": "music21.duration.DurationUnit"
+                  }
+                ],
+                "_componentsNeedUpdating": false,
+                "_qtrLength": 1.0,
+                "_quarterLengthNeedsUpdating": false
+              },
+              "__class__": "music21.duration.Duration"
+            },
+            "_microtone": {
+              "__attr__": {
+                "_centShift": 0,
+                "_harmonicShift": 1
+              },
+              "__class__": "music21.pitch.Microtone"
+            },
+            "_octave": 4,
+            "_priority": 0,
+            "_step": "C"
+          },
+          "__class__": "music21.pitch.Pitch"
+        }
+      },
+      "__class__": "music21.note.Note",
+      "__version__": [
+        1,
+        7,
+        0
+      ]
+    }
+Got:
+    {
+      "__attr__": {
+        "_duration": {
+          "__attr__": {
+            "_cachedIsLinked": true, 
+            "_components": [
+              {
+                "__attr__": {
+                  "_dots": [
+                    0
+                  ], 
+                  "_link": true, 
+                  "_qtrLength": 1.0, 
+                  "_quarterLengthNeedsUpdating": false, 
+                  "_tuplets": [], 
+                  "_type": "quarter", 
+                  "_typeNeedsUpdating": false
+                }, 
+                "__class__": "music21.duration.DurationUnit"
+              }
+            ], 
+            "_componentsNeedUpdating": false, 
+            "_qtrLength": 1.0, 
+            "_quarterLengthNeedsUpdating": false
+          }, 
+          "__class__": "music21.duration.Duration"
+        }, 
+        "_notehead": "normal", 
+        "_noteheadFill": "default", 
+        "_noteheadParenthesis": false, 
+        "_priority": 0, 
+        "_stemDirection": "unspecified", 
+        "articulations": [], 
+        "beams": {
+          "__attr__": {
+            "beamsList": [], 
+            "feathered": false
+          }, 
+          "__class__": "music21.beam.Beams"
+        }, 
+        "editorial": {
+          "__attr__": {
+            "comment": {
+              "__attr__": {}, 
+              "__class__": "music21.editorial.Comment"
+            }, 
+            "misc": {}
+          }, 
+          "__class__": "music21.editorial.NoteEditorial"
+        }, 
+        "expressions": [], 
+        "lyrics": [], 
+        "pitch": {
+          "__attr__": {
+            "_duration": {
+              "__attr__": {
+                "_cachedIsLinked": true, 
+                "_components": [
+                  {
+                    "__attr__": {
+                      "_dots": [
+                        0
+                      ], 
+                      "_link": true, 
+                      "_qtrLength": 1.0, 
+                      "_quarterLengthNeedsUpdating": false, 
+                      "_tuplets": [], 
+                      "_type": "quarter", 
+                      "_typeNeedsUpdating": false
+                    }, 
+                    "__class__": "music21.duration.DurationUnit"
+                  }
+                ], 
+                "_componentsNeedUpdating": false, 
+                "_qtrLength": 1.0, 
+                "_quarterLengthNeedsUpdating": false
+              }, 
+              "__class__": "music21.duration.Duration"
+            }, 
+            "_microtone": {
+              "__attr__": {
+                "_centShift": 0, 
+                "_harmonicShift": 1
+              }, 
+              "__class__": "music21.pitch.Microtone"
+            }, 
+            "_octave": 4, 
+            "_priority": 0, 
+            "_step": "C"
+          }, 
+          "__class__": "music21.pitch.Pitch"
+        }
+      }, 
+      "__class__": "music21.note.Note", 
+      "__version__": [
+        1, 
+        7, 
+        1
+      ]
+    }
 
-Diff is 3201 characters long. Set self.maxDiff to None to see it.
 
 
 
 ---------------SUMMARY---------------------------------------------------
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/zipfileapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/wsgiapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/visualapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/urlqueryapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/urlapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/unifiedapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/jsonapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/featureinfo.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/featureapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/noteinfo/index.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/index.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/exceldiff.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/timeGraphs.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testPerformance.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testLint.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testInstallation.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testExternal.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testDocs/test.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testDefault.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/test.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/multiprocessTest.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/xldate.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/timemachine.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/sheet.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/licences.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/formula.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/formatting.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/examples/xlrdnameAPIdemo.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/compdoc.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/biffh.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/webcolors.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/util.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/unpickler.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/tags.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/pickler.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/handlers.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/compat.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/largestAmbitus.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2011.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2010.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/seaver_presentation_2008.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/seaverOct2009.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/runTrecentoCadence.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/nips2011.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/nemcog.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/monteverdi.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/misc2010.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/mgtaPart2.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/mgtaPart1.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/josquin/label_intervals.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/ismir2011.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/ismir2010.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/icmc2011.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/icmc2010.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/eschbeg.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/awsutility.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/HarmonyRealizer.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/zipfileapp.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/wsgiapp.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/visualapp.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/urlqueryapp.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/urlapp.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/unifiedapp.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/jsonapp.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/featureinfo.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/featureapp.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/noteinfo/index.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/index.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/humdrum/index.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/featureextractor/index.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/trecento/exceldiff.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/timeGraphs.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/testPerformance.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/testLint.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/testInstallation.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/testExternal.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/testDocs/test.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/testDefault.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/test.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/test/multiprocessTest.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/xldate.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/timemachine.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/sheet.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/licences.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/formula.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/formatting.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/examples/xlrdnameAPIdemo.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/compdoc.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/biffh.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/webcolors.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/util.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/unpickler.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/tags.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/pickler.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/handlers.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/compat.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/ext/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/trecento/largestAmbitus.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/trecento/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/smt2011.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/smt2010.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/seaver_presentation_2008.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/seaverOct2009.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/runTrecentoCadence.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/nips2011.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/nemcog.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/monteverdi.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/misc2010.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/mgtaPart2.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/mgtaPart1.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/josquin/label_intervals.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/ismir2011.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/ismir2010.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/icmc2011.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/icmc2010.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/eschbeg.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/mrjobaws/awsutility.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/mrjobaws/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/HarmonyRealizer.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/demos/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/configure.py
+Skipped: /Users/josiah/Documents/Development/music21/music21/braille/test.py
 xmlnode successfully ran 12 tests
 webapps_apps successfully ran 6 tests
-webapps_templates successfully ran 9 tests
 webapps___init__ successfully ran 14 tests
+webapps_templates successfully ran 9 tests
 volume successfully ran 20 tests
 voiceLeading successfully ran 64 tests
-webapps_commands successfully ran 10 tests
 vexflow___init__ successfully ran 28 tests
 trecento_trecentoCadence successfully ran 7 tests
-trecento_polyphonicSnippet successfully ran 9 tests
+webapps_commands successfully ran 10 tests
 variant successfully ran 34 tests
+trecento_polyphonicSnippet successfully ran 9 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
-trecento_tonality successfully ran 5 tests
 trecento_capua successfully ran 9 tests
 trecento___init__ successfully ran 3 tests
 tinyNotation successfully ran 11 tests
+trecento_tonality successfully ran 5 tests
 tie successfully ran 7 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
 text successfully ran 23 tests
-theoryAnalysis_theoryAnalyzer successfully ran 42 tests
 test___init__ successfully ran 3 tests
 tempo successfully ran 45 tests
 stream_streamStatus successfully ran 4 tests
+theoryAnalysis_theoryAnalyzer successfully ran 42 tests
 stream_makeNotation successfully ran 9 tests
 spanner successfully ran 52 tests
 sieve successfully ran 40 tests
@@ -127,14 +330,14 @@ roman successfully ran 28 tests
 pitch successfully ran 94 tests
 noteworthy_translate successfully ran 21 tests
 noteworthy_binaryTranslate successfully ran 3 tests
-test_testStream successfully ran 206 tests
 noteworthy___init__ successfully ran 3 tests
 note successfully ran 48 tests
+test_testStream successfully ran 206 tests
 musicxml_toMxObjects successfully ran 37 tests
+musicxml_testPrimitive successfully ran 5 tests
 musicxml_xmlHandler successfully ran 12 tests
 musicxml_testFiles successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
-musicxml_testPrimitive successfully ran 5 tests
 repeat successfully ran 72 tests
 musicxml___init__ successfully ran 3 tests
 musicxml_m21ToString successfully ran 45 tests
@@ -146,8 +349,8 @@ midi_percussion successfully ran 7 tests
 musicxml_fromMxObjects successfully ran 65 tests
 meter successfully ran 108 tests
 metadata_primitives successfully ran 38 tests
-musedata_translate successfully ran 16 tests
 midi___init__ successfully ran 28 tests
+musedata_translate successfully ran 16 tests
 metadata___init__ successfully ran 18 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
@@ -161,22 +364,21 @@ ipython21___init__ successfully ran 3 tests
 intervalNetwork successfully ran 57 tests
 interval successfully ran 55 tests
 instrument successfully ran 22 tests
-metadata_bundles successfully ran 34 tests
 humdrum_testFiles successfully ran 3 tests
+humdrum_spineParser successfully ran 32 tests
 humdrum_instruments successfully ran 8 tests
 humdrum___init__ successfully ran 3 tests
-humdrum_spineParser successfully ran 32 tests
+metadata_bundles successfully ran 34 tests
 metadata_caching successfully ran 7 tests
 harmony successfully ran 27 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
-figuredBass_realizer successfully ran 12 tests
-freezeThaw successfully ran 28 tests
-figuredBass_notation successfully ran 15 tests
 figuredBass_possibility successfully ran 20 tests
+figuredBass_notation successfully ran 15 tests
 figuredBass_fbPitch successfully ran 5 tests
+figuredBass_realizer successfully ran 12 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
 figuredBass_examples successfully ran 15 tests
@@ -193,33 +395,34 @@ documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
 documentation_library_extensions successfully ran 3 tests
 documentation_library_documenters successfully ran 29 tests
-features_jSymbolic successfully ran 86 tests
 documentation_library_cleaners successfully ran 3 tests
+features_jSymbolic successfully ran 86 tests
 documentation_library___init__ successfully ran 3 tests
 documentation___init__ successfully ran 3 tests
 derivation successfully ran 6 tests
 defaults successfully ran 4 tests
-counterpoint_species successfully ran 27 tests
 counterpoint___init__ successfully ran 3 tests
+counterpoint_species successfully ran 27 tests
 corpus_virtual successfully ran 5 tests
 corpus_corpora successfully ran 27 tests
 corpus_chorales successfully ran 9 tests
 corpus___init__ successfully ran 17 tests
-features_native successfully ran 26 tests
+corpus_testCorpus successfully ran 25 tests
 contour successfully ran 10 tests
-composition_aug30 successfully ran 3 tests
-converter successfully ran 35 tests
+composition_seeger successfully ran 3 tests
+features_native successfully ran 26 tests
 composition___init__ successfully ran 3 tests
+converter successfully ran 35 tests
 clef successfully ran 27 tests
 common successfully ran 57 tests
-composition_phasing successfully ran 5 tests
 chordTables successfully ran 17 tests
+composition_phasing successfully ran 5 tests
 chant successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
+braille_translate successfully ran 7 tests
 classCache successfully ran 12 tests
 chord successfully ran 108 tests
-braille_translate successfully ran 7 tests
 braille_text successfully ran 4 tests
 braille_lookup successfully ran 3 tests
 braille_segment successfully ran 11 tests
@@ -229,9 +432,9 @@ beam successfully ran 15 tests
 bar successfully ran 9 tests
 audioSearch_transcriber successfully ran 4 tests
 audioSearch_recording successfully ran 4 tests
-braille_examples successfully ran 5 tests
 base successfully ran 112 tests
 articulations successfully ran 29 tests
+braille_examples successfully ran 5 tests
 analysis_search successfully ran 4 tests
 audioSearch___init__ successfully ran 19 tests
 analysis_reduceChords successfully ran 7 tests
@@ -239,8 +442,8 @@ analysis_patel successfully ran 6 tests
 analysis_neoRiemannian successfully ran 10 tests
 analysis_metrical successfully ran 6 tests
 analysis_windowed successfully ran 9 tests
-analysis_discrete successfully ran 31 tests
 analysis_reduction successfully ran 15 tests
+analysis_discrete successfully ran 31 tests
 analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
 abc___init__ successfully ran 53 tests
@@ -277,7 +480,7 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -290,18 +493,221 @@ Not in Tree Error: analysis.phrasing is in the music21 directory but not importe
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
 
 -----------
-corpus_testCorpus had 0 ERRORS and 1 FAILURES in 25 tests:
+freezeThaw had 0 ERRORS and 1 FAILURES in 28 tests:
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/testCorpus.py", line 104, in testSearch03
-    (u'essenFolksong/han2.abc', 219),
-AssertionError: Lists differ: [(u'essenFolksong/han1.abc', u... != [(u'essenFolksong/han1.abc', 2...
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.freezeThaw.JSONFreezer.jsonPrint
+  File "/Users/josiah/Documents/Development/music21/music21/freezeThaw.py", line 1370, in jsonPrint
 
-First differing element 0:
-(u'essenFolksong/han1.abc', u'269')
-(u'essenFolksong/han1.abc', 268)
+----------------------------------------------------------------------
+File "/Users/josiah/Documents/Development/music21/music21/freezeThaw.py", line 1377, in music21.freezeThaw.JSONFreezer.jsonPrint
+Failed example:
+    jsf.jsonPrint()
+Expected:
+    {
+      "__attr__": {
+        "_duration": {
+          "__attr__": {
+            "_cachedIsLinked": true,
+            "_components": [
+              {
+                "__attr__": {
+                  "_dots": [
+                    0
+                  ],
+                  "_link": true,
+                  "_qtrLength": 1.0,
+                  "_quarterLengthNeedsUpdating": false,
+                  "_tuplets": [],
+                  "_type": "quarter",
+                  "_typeNeedsUpdating": false
+                },
+                "__class__": "music21.duration.DurationUnit"
+              }
+            ],
+            "_componentsNeedUpdating": false,
+            "_qtrLength": 1.0,
+            "_quarterLengthNeedsUpdating": false
+          },
+          "__class__": "music21.duration.Duration"
+        },
+        "_notehead": "normal",
+        "_noteheadFill": "default",
+        "_noteheadParenthesis": false,
+        "_priority": 0,
+        "_stemDirection": "unspecified",
+        "articulations": [],
+        "beams": {
+          "__attr__": {
+            "beamsList": [],
+            "feathered": false
+          },
+          "__class__": "music21.beam.Beams"
+        },
+        "editorial": {
+          "__attr__": {
+            "comment": {
+              "__attr__": {},
+              "__class__": "music21.editorial.Comment"
+            },
+            "misc": {}
+          },
+          "__class__": "music21.editorial.NoteEditorial"
+        },
+        "expressions": [],
+        "lyrics": [],
+        "pitch": {
+          "__attr__": {
+            "_duration": {
+              "__attr__": {
+                "_cachedIsLinked": true,
+                "_components": [
+                  {
+                    "__attr__": {
+                      "_dots": [
+                        0
+                      ],
+                      "_link": true,
+                      "_qtrLength": 1.0,
+                      "_quarterLengthNeedsUpdating": false,
+                      "_tuplets": [],
+                      "_type": "quarter",
+                      "_typeNeedsUpdating": false
+                    },
+                    "__class__": "music21.duration.DurationUnit"
+                  }
+                ],
+                "_componentsNeedUpdating": false,
+                "_qtrLength": 1.0,
+                "_quarterLengthNeedsUpdating": false
+              },
+              "__class__": "music21.duration.Duration"
+            },
+            "_microtone": {
+              "__attr__": {
+                "_centShift": 0,
+                "_harmonicShift": 1
+              },
+              "__class__": "music21.pitch.Microtone"
+            },
+            "_octave": 4,
+            "_priority": 0,
+            "_step": "C"
+          },
+          "__class__": "music21.pitch.Pitch"
+        }
+      },
+      "__class__": "music21.note.Note",
+      "__version__": [
+        1,
+        7,
+        0
+      ]
+    }
+Got:
+    {
+      "__attr__": {
+        "_duration": {
+          "__attr__": {
+            "_cachedIsLinked": true, 
+            "_components": [
+              {
+                "__attr__": {
+                  "_dots": [
+                    0
+                  ], 
+                  "_link": true, 
+                  "_qtrLength": 1.0, 
+                  "_quarterLengthNeedsUpdating": false, 
+                  "_tuplets": [], 
+                  "_type": "quarter", 
+                  "_typeNeedsUpdating": false
+                }, 
+                "__class__": "music21.duration.DurationUnit"
+              }
+            ], 
+            "_componentsNeedUpdating": false, 
+            "_qtrLength": 1.0, 
+            "_quarterLengthNeedsUpdating": false
+          }, 
+          "__class__": "music21.duration.Duration"
+        }, 
+        "_notehead": "normal", 
+        "_noteheadFill": "default", 
+        "_noteheadParenthesis": false, 
+        "_priority": 0, 
+        "_stemDirection": "unspecified", 
+        "articulations": [], 
+        "beams": {
+          "__attr__": {
+            "beamsList": [], 
+            "feathered": false
+          }, 
+          "__class__": "music21.beam.Beams"
+        }, 
+        "editorial": {
+          "__attr__": {
+            "comment": {
+              "__attr__": {}, 
+              "__class__": "music21.editorial.Comment"
+            }, 
+            "misc": {}
+          }, 
+          "__class__": "music21.editorial.NoteEditorial"
+        }, 
+        "expressions": [], 
+        "lyrics": [], 
+        "pitch": {
+          "__attr__": {
+            "_duration": {
+              "__attr__": {
+                "_cachedIsLinked": true, 
+                "_components": [
+                  {
+                    "__attr__": {
+                      "_dots": [
+                        0
+                      ], 
+                      "_link": true, 
+                      "_qtrLength": 1.0, 
+                      "_quarterLengthNeedsUpdating": false, 
+                      "_tuplets": [], 
+                      "_type": "quarter", 
+                      "_typeNeedsUpdating": false
+                    }, 
+                    "__class__": "music21.duration.DurationUnit"
+                  }
+                ], 
+                "_componentsNeedUpdating": false, 
+                "_qtrLength": 1.0, 
+                "_quarterLengthNeedsUpdating": false
+              }, 
+              "__class__": "music21.duration.Duration"
+            }, 
+            "_microtone": {
+              "__attr__": {
+                "_centShift": 0, 
+                "_harmonicShift": 1
+              }, 
+              "__class__": "music21.pitch.Microtone"
+            }, 
+            "_octave": 4, 
+            "_priority": 0, 
+            "_step": "C"
+          }, 
+          "__class__": "music21.pitch.Pitch"
+        }
+      }, 
+      "__class__": "music21.note.Note", 
+      "__version__": [
+        1, 
+        7, 
+        1
+      ]
+    }
 
-Diff is 3201 characters long. Set self.maxDiff to None to see it.
 
 -------------------------------------------------------------------------
-Ran 3748 tests in 496.2560 seconds
-Run at 2013-10-28 20:42:31
+Ran 3748 tests in 451.8150 seconds
+Run at 2013-10-30 15:12:51

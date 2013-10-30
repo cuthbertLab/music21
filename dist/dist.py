@@ -312,10 +312,19 @@ class Distributor(object):
 #         for fp in [self.fpTar, self.fpEgg, self.fpWin, 
 #             self.fpTarNoCorpus, self.fpEggNoCorpus]:
         if self.buildNoCorpus is True:
-            fileList = [self.fpEggNoCorpus, self.fpTarNoCorpus, self.fpWin, 
-                    self.fpEgg, self.fpTar]
+            fileList = (
+                self.fpEggNoCorpus,
+                self.fpTarNoCorpus,
+                self.fpWin,
+                self.fpEgg,
+                self.fpTar,
+                )
         else:
-            fileList = [self.fpWin, self.fpEgg, self.fpTar]
+            fileList = (
+                self.fpWin,
+                self.fpEgg,
+                self.fpTar,
+                )
         
         for fp in fileList:
             self.uploadGoogleCodeOneFile(fp)
@@ -330,9 +339,9 @@ class Distributor(object):
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
     d = Distributor()
-    d.buildNoCorpus = False
+    d.buildNoCorpus = True
     d.build()
     d.updatePaths()
     d.uploadGoogleCode()
     #d.uploadGoogleCodeOneFile(d.fpTar)
-    d.uploadPyPi()
+    #d.uploadPyPi()

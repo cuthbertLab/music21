@@ -1472,7 +1472,7 @@ class JSONFreezer(JSONFreezeThawBase):
           "__version__": [
             1,
             7,
-            0
+            1
           ]
         }
         '''
