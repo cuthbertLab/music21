@@ -57,11 +57,18 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
 
     2.  Note octaves are specified as follows:
 
-        CC to BB =  from C below bass clef to second-line B in bass clef
-        C to B =    from bass clef C to B below middle C.
-        c  to b =   from middle C to the middle of treble clef
-        c' to b' =  from C in treble clef to B above treble clef
-                    (make sure you’re NOT putting in smart quotes)
+        :CC to BB:
+            from C below bass clef to second-line B in bass clef
+
+        :C to B:
+            from bass clef C to B below middle C.
+
+        :c  to b:
+            from middle C to the middle of treble clef
+
+        :c' to b':
+            from C in treble clef to B above treble clef (make sure you’re NOT
+            putting in smart quotes)
 
     In 14th c. music, C to B and c to b will be most common
 
@@ -69,7 +76,6 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
         n. If the accidental is above the staff (i.e., editorial), enclose it
         in parentheses: (#), etc.  Make sure that flats in the key signatures
         are explicitly specified.
-
 
     4.  The syntax structure for a mensural note is as follows:
 

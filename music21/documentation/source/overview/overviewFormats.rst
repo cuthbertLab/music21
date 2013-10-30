@@ -120,8 +120,6 @@ the :meth:`~music21.stream.Opus.getScoreByTitle` method.
     >>> o = corpus.parse('essenFolksong/erk5')
     >>> s = o.getScoreByTitle('Vrienden, kommt alle gaere')
 
-::
-
 In some cases an ABC file may define individual parts each as a separate score.
 When parsed, these parts can be combined from the Opus into a single Score with
 the :meth:`music21.stream.Opus.mergeScores` method. 
