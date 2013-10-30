@@ -1,7 +1,7 @@
 .. _overviewMetadata:
 
-Overview: Corpora and Metadata Bundles
-======================================
+User's Guide, Chapter 11: Corpora and Metadata Bundles
+======================================================
 
 One of music21's important features is its capability to help users examine
 large bodies of musical works, or *corpora*.  Music21 provides tools for
@@ -64,8 +64,6 @@ You can add and remove paths from a *local* corpus with the ``addPath()`` and
 ::
 
     >>> localCorpus.addPath('~/Desktop')
-    >>> localCorpus.directoryPaths
-    ('/Users/josiah/Desktop',)
 
 ::
 
@@ -91,8 +89,6 @@ and then save it:
 ::
 
     >>> aNewLocalCorpus.addPath('~/Desktop')
-    >>> aNewLocalCorpus.directoryPaths
-    ('/Users/josiah/Desktop',)
 
 ::
 
