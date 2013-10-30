@@ -26,11 +26,10 @@ skipModules = [
 
 def main(runOne=False):
     music21init = music21.__file__
-    music21dir = os.path.dirname(music21init)
-    music21basedir = os.path.dirname(music21dir)
+    music21basedir = os.path.dirname(music21init)
     builddocRstDir = os.path.join(music21basedir,
-                                  'builddoc',
-                                  'staticDocs')
+                                  'documentation',
+                                  'source')
     
     totalTests = 0
     totalFailures = 0
@@ -40,35 +39,40 @@ def main(runOne=False):
     if not os.path.exists(builddocRstDir):
         raise Exception("Cannot run tests on documentation because the rst files in builddoc/staticDocs do not exist")
     
-    for module in os.listdir(builddocRstDir):
-        if not module.endswith('.rst'):
-            continue
-        if module.startswith('module'):
-            continue
-        if module in skipModules:
-            continue
-        if runOne is not False:
-            if not module.endswith(runOne):
+    for root, unused_dirnames, filenames in os.walk(builddocRstDir):
+        for module in filenames:
+            fullModulePath = os.path.join(root, module)
+            if not module.endswith('.rst'):
                 continue
-        
-        fullModulePath = builddocRstDir + os.sep + module
-        #print fullModulePath
-        print module + ":",
-        try:
-            (failcount, testcount) = doctest.testfile(fullModulePath, module_relative = False, optionflags = doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
-            if failcount > 0:
-                print "%s had %d failures in %d tests" % (module, failcount, testcount)
-            elif testcount == 0:
-                print "no tests"
-            else:
-                print "all %d tests ran successfully" % (testcount)
-            totalTests += testcount
-            totalFailures += failcount
-        except Exception as e:
-            print "failed miserably! %s" % str(e)
-            import traceback
-            tb = traceback.format_exc()
-            print "Here's the traceback for the exeception: \n%s" % (tb)
+            if module.startswith('module'):
+                continue
+            if module in skipModules:
+                continue
+            if runOne is not False:
+                if not module.endswith(runOne):
+                    continue
+            
+            moduleNoExtension = module[:-4]
+            if moduleNoExtension + '.ipynb' in filenames:
+                continue
+            
+            #print fullModulePath
+            print module + ":",
+            try:
+                (failcount, testcount) = doctest.testfile(fullModulePath, module_relative = False, optionflags = doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+                if failcount > 0:
+                    print "%s had %d failures in %d tests" % (module, failcount, testcount)
+                elif testcount == 0:
+                    print "no tests"
+                else:
+                    print "all %d tests ran successfully" % (testcount)
+                totalTests += testcount
+                totalFailures += failcount
+            except Exception as e:
+                print "failed miserably! %s" % str(e)
+                import traceback
+                tb = traceback.format_exc()
+                print "Here's the traceback for the exeception: \n%s" % (tb)
 
 
     elapsedTime = time.time() - timeStart
