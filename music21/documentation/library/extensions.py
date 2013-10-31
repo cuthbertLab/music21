@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         convertIPythonNotebooksToReST.py
-# Purpose:      music21 documentation IPython notebook to ReST converter
+# Purpose:      Sphinx extension for hiding and showing lines in docs
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
+
 
 def fixLines(lines):
     newLines = []
@@ -43,10 +44,12 @@ def processDocstring(app, what, name, obj, options, lines):
     #    print 'LINES', lines
     fixLines(lines)
     
+
 def processSource(app, name, lines):
     linesSep = lines[0].split('\n')
     fixLines(linesSep)
     lines[0] = '\n'.join(linesSep)
+
 
 def setup(app):
     app.connect('autodoc-process-docstring', processDocstring)

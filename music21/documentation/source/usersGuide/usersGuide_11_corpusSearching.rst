@@ -25,10 +25,10 @@ Users can also build their own corpora to index and quickly search their own
 collections on disk.  Version 1.7 of music21 introduces the ability to have
 multiple local corpora that can be accessed individually.
     
-This user's guide will cover more about the corpus's basic features soon.
-This chapter focuses on music21's tools for
-extracting useful metadata - titles, locations, composers names, the key signatures 
-used in each piece, total durations, ambitus (range) and so forth.
+This user's guide will cover more about the corpus's basic features soon.  This
+chapter focuses on music21's tools for extracting useful metadata - titles,
+locations, composers names, the key signatures used in each piece, total
+durations, ambitus (range) and so forth.
 
 This metadata is collected in *metadata bundles* for each corpus. The *corpus*
 module has tools to search these bundles and persist them disk for later
@@ -123,7 +123,7 @@ and then save it:
 
     >>> aNewLocalCorpus.addPath('~/Desktop')
     >>> #_DOCS_SHOW aNewLocalCorpus.directoryPaths
-    >>> print("('/Users/josiah/Desktop',)")#_DOCS_HIDE
+    >>> print("('/Users/josiah/Desktop',)") #_DOCS_HIDE
     ('/Users/josiah/Desktop',)
 
 ::
@@ -137,7 +137,8 @@ all saved *local* corpora:
 
 ::
 
-    >>> corpus.LocalCorpus.listLocalCorporaNames()
+    >>> #_DOCS_SHOW corpus.LocalCorpus.listLocalCorporaNames()
+    >>> print [None, u'trecento', u'A new corpus', u'bach', u'fake'] #_DOCS_HIDE
     [None, u'trecento', u'A new corpus', u'bach', u'fake']
 
 ..  note::
@@ -255,6 +256,7 @@ So what fields can we actually search through? You can find out like this:
     ...     field
     ...
     'alternativeTitle'
+    'ambitus'
     'composer'
     'date'
     'keySignatureFirst'
@@ -275,23 +277,24 @@ So what fields can we actually search through? You can find out like this:
     'title'
 
 This field will grow in the near future now that the development team is seeing
-how useful this searching method can be! Now that we know what all the search fields 
-are, we can search through some of the more obscure corners of the *core* corpus:
+how useful this searching method can be! Now that we know what all the search
+fields are, we can search through some of the more obscure corners of the
+*core* corpus:
 
 ::
 
     >>> corpus.search('taiwan', 'locale')
     <music21.metadata.bundles.MetadataBundle {27 entries}>
 
-What if you are not searching for an exact match? 
-If you're searching for short pieces, you probably don't want to find pieces
-with exactly 1 note then union that set with pieces with exactly 2 notes, etc.
-Or for pieces from the 19th century, you won't want to search for 1801, 1802, etc.
-What you can do is set up a "predicate callable" which is a function (either
-a full python ``def`` statement or a short ``lambda`` function) to filter
-the results.  Each piece will be checked against your predicate and only
-those that return true.  Here we'll search for pieces with between 400 and 
-500 notes, only in the ``core`` corpus:
+What if you are not searching for an exact match?  If you're searching for
+short pieces, you probably don't want to find pieces with exactly 1 note then
+union that set with pieces with exactly 2 notes, etc.  Or for pieces from the
+19th century, you won't want to search for 1801, 1802, etc.  What you can do is
+set up a "predicate callable" which is a function (either a full python ``def``
+statement or a short ``lambda`` function) to filter the results.  Each piece
+will be checked against your predicate and only those that return true.  Here
+we'll search for pieces with between 400 and 500 notes, only in the ``core``
+corpus:
 
 ::
 
@@ -458,16 +461,6 @@ corpora. To add information to a bundle, use the ``addFromPaths()`` method:
     []
 
 then call ``.write()`` to save to disk.
-
-OMIT_FROM_DOCS
-
-here we can set up or test anything that we want without it appearing in the docs...
-useful for not having a long set of #_DOCS_SHOW and #_DOCS_HIDE tags...
-
-	>>> 2+2
-	4
-
-RESUME_DOCS
 
 ::
 

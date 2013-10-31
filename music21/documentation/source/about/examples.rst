@@ -101,10 +101,10 @@ Folksong database, indexed and stored in the music21 corpus.
     ...     seventhCount = 0
     ...     # Perform a location search on the corpus and iterate over 
     ...     # resulting file name and work number
-    ...     for fp, n in corpus.search(region, field='locale'):
+    ...     for result in corpus.search(region, field='locale'):
     ...         workCount += 1
     ...         # Parse the work and create a dictionary of intervals
-    ...         s = converter.parse(fp, number=n)
+    ...         s = result.parse()
     ...         intervalDict = mid.countMelodicIntervals(s, found=intervalDict)
     ...     # Iterate through all intervals, and count totals and sevenths
     ...     for label in intervalDict.keys():
@@ -117,7 +117,9 @@ Folksong database, indexed and stored in the music21 corpus.
     ...
     >>> # Print results
     >>> for region, pcentSevenths, intervalCount, workCount in results: 
-    ...     print('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (region, pcentSevenths, intervalCount, workCount))
+    ...     print('locale: {}: found {} percent melodic sevenths, '
+    ...         'out of {} intervals in {} works'.format(
+    ...         region, pcentSevenths, intervalCount, workCount))
     ...
     locale: shanxi: found 3.1994 percent melodic sevenths, out of 4282 intervals in 77 works
     locale: fujian: found 0.7654 percent melodic sevenths, out of 2613 intervals in 53 works 

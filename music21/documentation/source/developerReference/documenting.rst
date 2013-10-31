@@ -96,23 +96,28 @@ The documentation looks like this:
 .. image:: images/completebach.*
     :width: 300
     
-Finally, if there is a section of your documentation that you'd rather sphinx not format at all, 
-append two colons to the last line of formatted text, followed by a space, followed by the *indented* text
-block, followed by a space. Text written after this space will be formatted. For example, in your code write::
+Finally, if there is a section of your documentation that you'd rather sphinx
+not format at all, append two colons to the last line of formatted text,
+followed by a space, followed by the *indented* text block, followed by a
+space. Text written after this space will be formatted. For example, in your
+code write:
+
+::
 	
-	...blah blah blah this text is formatted. now I'm ready for not-formatted text, so I put two colons::
+    ...blah blah blah this text is formatted. now I'm ready for not-formatted
+    text, so I put two colons::
 	
-		this text is NOT formatted
-		it must be indented
+        this text is NOT formatted it must be indented
 		
-		line breaks and spacing is preserved
-		**bold** sphinx formatting is not observed
+        line breaks and spacing is preserved **bold** sphinx formatting is not
+        observed
 		
-	Now I'm back to sphinx formatting...**now this is bold!*
+    Now I'm back to sphinx formatting...**now this is bold!*
 
 The documentation looks like this:
 
-...blah blah blah this text is formatted. now I'm ready for not-formatted text, so I put two colons::
+...blah blah blah this text is formatted. now I'm ready for not-formatted text,
+so I put two colons:
 	
 	this text is NOT formatted
 	it must be indented
@@ -124,24 +129,28 @@ Now I'm back to sphinx formatting. **now this is bold!**
 
 
 Displaying only some of the test code in the documentation
---------------------------------------------------------------------------------
+----------------------------------------------------------
 
-We use doctests a lot in music21 -- if you run /music21/test/test.py, it will run
-not only all the code in class Test() but also all the code in the documentation
-preceeded by '>>>' marks.  This way our documentation and our test code doesn't
-get out of sync with each other.  Pretty cool, eh?
+We use doctests a lot in music21 -- if you run /music21/test/test.py, it will
+run not only all the code in class Test() but also all the code in the
+documentation preceeded by '>>>' marks.  This way our documentation and our
+test code doesn't get out of sync with each other.  Pretty cool, eh?
 
-Here's the thing: good programming means that you test as much as possible in the
-code, but good documentation means showing enough example code that the readers
-get it, but not so much that they want to claw out their own eyeballs.  So how to proceed?
-simply add the line ::
+Here's the thing: good programming means that you test as much as possible in
+the code, but good documentation means showing enough example code that the
+readers get it, but not so much that they want to claw out their own eyeballs.
+So how to proceed?  simply add the line:
+
+::
 
    OMIT_FROM_DOCS
    
-in your documentation code and it won't display.  For instance, say we wanted to
-demonstrate the difference between note.name and note.step, but also wanted to 
-test to make sure that flats and sharps both were equally eliminated.  We could
-write documentation/test-code like this::
+in your documentation code and it won't display.  For instance, say we wanted
+to demonstrate the difference between note.name and note.step, but also wanted
+to test to make sure that flats and sharps both were equally eliminated.  We
+could write documentation/test-code like this:
+
+::
  
    '''
    >>> from music21 import *
@@ -153,7 +162,6 @@ write documentation/test-code like this::
    >>> c2 = note.Note('C-')
    >>> c2.step
    'C'
-   
    '''
    
 and what you'll get in your documentation is:
