@@ -15,9 +15,8 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 def fixLines(lines):
     newLines = []
     omitting = False
-    print len(lines)
     for i, line in enumerate(lines):
-        if ' #_DOCS_SHOW ' in line:
+        if ' #_DOCS_SHOW ' in line and omitting is not True:
             newLines.append(line.replace(' #_DOCS_SHOW ', ' '))
         elif '#_DOCS_HIDE' in line:
             continue
