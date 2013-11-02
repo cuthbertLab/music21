@@ -27,14 +27,18 @@ def getDirBuildHtml():
 if __name__ == '__main__':
     
     # this needs to be on level higher then the level of the source
-    DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc'
+    #DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
+    remoteHost = 'linux.mit.edu'
+    remoteDir = '/afs/athena.mit.edu/org/m/music21/doc/'
+    #tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
     
     user = getpass.getpass('provide user name : ')
     
     
     src = getDirBuildHtml()
     # -r flag makes this recursive
-    cmdStr = 'scp -r %s %s@%s' % (src, user, DST_MIT)
+    cmdStr = 'tar czpf - -C %s . | ssh %s@%s "tar xzpf - -C %s"' % (src, user, remoteHost, remoteDir)
+    #cmdStr = 'scp -r "%s" %s@%s' % (src + "/*", user, DST_MIT)
     print(cmdStr)
     
     os.system(cmdStr)

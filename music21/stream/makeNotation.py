@@ -12,7 +12,6 @@
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
 
-
 import copy
 import unittest
 
