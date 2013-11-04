@@ -8,3 +8,6 @@ http://web.mit.edu/music21
 
 And to install, see:
 http://web.mit.edu/music21/doc/installing/install.html
+
+Copyright © 2006-2013 Michael Scott Cuthbert and the music21 Project
+Released under the LGPL library.
