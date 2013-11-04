@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         abc.translate.py
+# Name:         abcFormat.translate.py
 # Purpose:      Translate ABC and music21 objects
 #
 # Authors:      Christopher Ariza
@@ -13,7 +13,7 @@
 #------------------------------------------------------------------------------
 '''
 Functions for translating music21 objects and
-:class:`~music21.abc.ABCHandler` instances.
+:class:`~music21.abcFormat.ABCHandler` instances.
 Mostly, these functions are for advanced, low level usage.
 For basic importing of ABC files from a file or URL to a
 :class:`~music21.stream.Stream`, use the music21 converter
@@ -34,7 +34,7 @@ from music21 import note
 from music21 import chord
 from music21 import spanner
 
-_MOD = 'abc.translate.py'
+_MOD = 'abcFormat.translate.py'
 environLocal = environment.Environment(_MOD)
 
 
@@ -47,7 +47,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
     The part object is then returned.
     '''
-    from music21 import abc
+    from music21 import abcFormat
 
     if inputM21 is None:
         p = stream.Part()
@@ -67,7 +67,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         barHandlers = abcHandler.splitByMeasure()
         #environLocal.printDebug(['barHandlers', len(barHandlers)])
         # merge loading meta data with each bar that preceedes it
-        mergedHandlers = abc.mergeLeadingMetaData(barHandlers)
+        mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
         #environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else: # simply stick in a single list
         mergedHandlers = [abcHandler]
@@ -153,7 +153,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         postTransposition = 0
         clefSet = False
         for t in mh.tokens:
-            if isinstance(t, abc.ABCMetadata):
+            if isinstance(t, abcFormat.ABCMetadata):
                 if t.isMeter():
                     ts = t.getTimeSignatureObject()
                     if ts != None: # can be None
@@ -183,13 +183,13 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     dst._appendCore(mmObj)
 
             # as ABCChord is subclass of ABCNote, handle first
-            elif isinstance(t, abc.ABCChord):
+            elif isinstance(t, abcFormat.ABCChord):
                 # may have more than notes?
                 pitchNameList = []
                 accStatusList = [] # accidental display status list
                 for tSub in t.subTokens:
                     # notes are contained as subtokens are already parsed
-                    if isinstance(tSub, abc.ABCNote):
+                    if isinstance(tSub, abcFormat.ABCNote):
                         pitchNameList.append(tSub.pitchName)
                         accStatusList.append(tSub.accidentalDisplayStatus)
                 c = chord.Chord(pitchNameList)
@@ -203,7 +203,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
                 #ql += t.quarterLength
 
-            elif isinstance(t, abc.ABCNote):
+            elif isinstance(t, abcFormat.ABCNote):
                 if t.isRest:
                     n = note.Rest()
                 else:
@@ -246,11 +246,11 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         n.articulations.append(articulations.Tenuto())
 
                 dst._appendCore(n)
-            elif isinstance(t, abc.ABCSlurStart):
+            elif isinstance(t, abcFormat.ABCSlurStart):
                 p._appendCore(t.slurObj)
-            elif isinstance(t, abc.ABCCrescStart):
+            elif isinstance(t, abcFormat.ABCCrescStart):
                 p._appendCore(t.crescObj)
-            elif isinstance(t, abc.ABCDimStart):
+            elif isinstance(t, abcFormat.ABCDimStart):
                 p._appendCore(t.dimObj)
         dst._elementsChanged()
 
@@ -316,7 +316,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
     if the optional parameter inputM21 is given a music21 Stream subclass, it will use that object
     as the outermost object.  However, inner parts will always be made :class:`~music21.stream.Part` objects.
     '''
-    from music21 import abc
+    from music21 import abcFormat
     from music21 import metadata
 
     if inputM21 == None:
@@ -331,7 +331,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
     # get title from large-scale metadata
     titleCount = 0
     for t in abcHandler.tokens:
-        if isinstance(t, abc.ABCMetadata):
+        if isinstance(t, abcFormat.ABCMetadata):
             if t.isTitle():
                 if titleCount == 0: # first
                     md.title = t.data
@@ -518,8 +518,8 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        from music21 import abc
-        #from music21.abc import testFiles
+        from music21 import abcFormat
+        #from music21.abcFormat import testFiles
 
         for tf in [
 #             testFiles.fyrareprisarn,
@@ -540,7 +540,7 @@ class Test(unittest.TestCase):
 #            testFiles.testPrimitivePolyphonic,
 
             ]:
-            af = abc.ABCFile()
+            af = abcFormat.ABCFile()
             ah = af.readstr(tf) # return handler, processes tokens
             s = abcToStreamScore(ah)
             s.show()
@@ -553,8 +553,8 @@ class Test(unittest.TestCase):
         NB -- only title is checked. not meter or key
         '''
 
-        from music21 import abc
-        from music21.abc import testFiles
+        from music21 import abcFormat
+        from music21.abcFormat import testFiles
 
         for (tf, titleEncoded, unused_meterEncoded, unused_keyEncoded) in [
             (testFiles.fyrareprisarn, 'Fyrareprisarn', '3/4', 'F'),
@@ -564,7 +564,7 @@ class Test(unittest.TestCase):
             (testFiles.williamAndNancy, 'William and Nancy', '6/8', 'G'),
             ]:
 
-            af = abc.ABCFile()
+            af = abcFormat.ABCFile()
             ah = af.readstr(tf) # returns an ABCHandler object
             s = abcToStreamScore(ah)
 
@@ -573,11 +573,11 @@ class Test(unittest.TestCase):
 
     def testChords(self):
 
-        from music21 import abc
-        from music21.abc import testFiles
+        from music21 import abcFormat
+        from music21.abcFormat import testFiles
 
         tf = testFiles.aleIsDear
-        af = abc.ABCFile()
+        af = abcFormat.ABCFile()
         s = abcToStreamScore(af.readstr(tf))
         #s.show()
         self.assertEqual(len(s.parts), 2)
@@ -603,12 +603,12 @@ class Test(unittest.TestCase):
 
     def testMultiVoice(self):
 
-        from music21 import abc
-        from music21.abc import testFiles
+        from music21 import abcFormat
+        from music21.abcFormat import testFiles
 
         tf = testFiles.testPrimitivePolyphonic
 
-        af = abc.ABCFile()
+        af = abcFormat.ABCFile()
         s = abcToStreamScore(af.readstr(tf))
 
         self.assertEqual(len(s.parts), 3)
@@ -623,11 +623,11 @@ class Test(unittest.TestCase):
 
     def testTuplets(self):
 
-        from music21 import abc
-        from music21.abc import testFiles
+        from music21 import abcFormat
+        from music21.abcFormat import testFiles
 
         tf = testFiles.testPrimitiveTuplet
-        af = abc.ABCFile()
+        af = abcFormat.ABCFile()
         s = abcToStreamScore(af.readstr(tf))
         match = []
         # match strings for better comparison
@@ -651,11 +651,11 @@ class Test(unittest.TestCase):
 
 
     def testAnacrusisPadding(self):
-        from music21 import abc
-        from music21.abc import testFiles
+        from music21 import abcFormat
+        from music21.abcFormat import testFiles
 
         # 2 quarter pickup in 3/4
-        ah = abc.ABCHandler()
+        ah = abcFormat.ABCHandler()
         ah.process(testFiles.hectorTheHero)
         s = abcToStreamScore(ah)
         m1 = s.parts[0].getElementsByClass('Measure')[0]
@@ -677,7 +677,7 @@ class Test(unittest.TestCase):
 
 
         # two 16th pickup in 4/4
-        ah = abc.ABCHandler()
+        ah = abcFormat.ABCHandler()
         ah.process(testFiles.theAleWifesDaughter)
         s = abcToStreamScore(ah)
         m1 = s.parts[0].getElementsByClass('Measure')[0]
@@ -695,13 +695,13 @@ class Test(unittest.TestCase):
 
     def testOpusImport(self):
         from music21 import corpus
-        from music21 import abc
+        from music21 import abcFormat
 
         # replace w/ ballad80, smaller or erk5
         fp = corpus.getWork('essenFolksong/teste')
         self.assertTrue(fp.endswith('essenFolksong/teste.abc') or fp.endswith(r'essenFolksong\teste.abc'))
 
-        af = abc.ABCFile()
+        af = abcFormat.ABCFile()
         af.open(fp) # return handler, processes tokens
         ah = af.read()
         af.close()
@@ -713,11 +713,11 @@ class Test(unittest.TestCase):
     def testLyrics(self):
         # TODO
 
-        from music21 import abc
-        from music21.abc import testFiles
+        from music21 import abcFormat
+        from music21.abcFormat import testFiles
 
         tf = testFiles.sicutRosa
-        af = abc.ABCFile()
+        af = abcFormat.ABCFile()
         s = abcToStreamScore(af.readstr(tf))
         assert s is not None
 
@@ -786,7 +786,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatBracketsA(self):
-        from music21.abc import testFiles
+        from music21.abcFormat import testFiles
         from music21 import converter
         s = converter.parse(testFiles.morrisonsJig)
         #s.show()
@@ -809,7 +809,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatBracketsB(self):
-        from music21.abc import testFiles
+        from music21.abcFormat import testFiles
         from music21 import converter
         from music21 import corpus
         s = converter.parse(testFiles.morrisonsJig)
@@ -825,7 +825,7 @@ class Test(unittest.TestCase):
 
 
     def testMetronomeMarkA(self):
-        from music21.abc import testFiles
+        from music21.abcFormat import testFiles
         from music21 import converter
         s = converter.parse(testFiles.fullRiggedShip)
         mmStream = s.flat.getElementsByClass('TempoIndication')

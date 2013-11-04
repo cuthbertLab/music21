@@ -15,7 +15,7 @@ import unittest
 # http://abcnotation.com/abc2mtex/abc.txt
 
 from music21 import environment
-_MOD = 'abc.testFiles.py'
+_MOD = 'abcFormat.testFiles.py'
 environLocal = environment.Environment(_MOD)
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -537,11 +537,11 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        from music21 import abc
-        from music21.abc import translate
+        from music21 import abcFormat
+        from music21.abcFormat import translate
         from music21.musicxml import m21ToString
 
-        af = abc.ABCFile()
+        af = abcFormat.ABCFile()
 
         for tf in ALL:
             ah = af.readstr(tf)

@@ -51,7 +51,7 @@ import zipfile
 # import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
 
-from music21 import abc
+from music21 import abcFormat
 from music21 import exceptions21
 from music21 import common
 from music21 import humdrum
@@ -572,16 +572,16 @@ class ConverterABC(object):
         :class:`~music21.stream.Opus` object will be returned;
         otherwise, a :class:`~music21.stream.Score` is returned.
         '''
-        af = abc.ABCFile()
+        af = abcFormat.ABCFile()
         # do not need to call open or close
         abcHandler = af.readstr(strData, number=number)
         # set to stream
         if abcHandler.definesReferenceNumbers():
             # this creates an Opus object, not a Score object
-            self._stream = abc.translate.abcToStreamOpus(abcHandler,
+            self._stream = abcFormat.translate.abcToStreamOpus(abcHandler,
                 number=number)
         else: # just one work
-            abc.translate.abcToStreamScore(abcHandler, self._stream)
+            abcFormat.translate.abcToStreamScore(abcHandler, self._stream)
 
     def parseFile(self, fp, number=None):
         '''Get MIDI data from a file path. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
@@ -590,7 +590,7 @@ class ConverterABC(object):
         '''
         #environLocal.printDebug(['ConverterABC.parseFile: got number', number])
 
-        af = abc.ABCFile()
+        af = abcFormat.ABCFile()
         af.open(fp)
         # returns a handler instance of parse tokens
         abcHandler = af.read(number=number)
@@ -601,11 +601,11 @@ class ConverterABC(object):
         if abcHandler.definesReferenceNumbers():
             # this creates a Score or Opus object, depending on if a number
             # is given
-            self._stream = abc.translate.abcToStreamOpus(abcHandler,
+            self._stream = abcFormat.translate.abcToStreamOpus(abcHandler,
                            number=number)
         # just get a single work
         else:
-            abc.translate.abcToStreamScore(abcHandler, self._stream)
+            abcFormat.translate.abcToStreamScore(abcHandler, self._stream)
 
     def _getStream(self):
         return self._stream
@@ -1710,7 +1710,7 @@ class Test(unittest.TestCase):
 
     def testConversionABCOpus(self):
 
-        from music21.abc import testFiles
+        from music21.abcFormat import testFiles
         from music21 import corpus
         from music21 import stream
 

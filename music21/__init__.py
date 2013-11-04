@@ -51,7 +51,7 @@ owners who have allowed them to be included with music21.
 __all__ = [
     'base', 
     # sub folders
-    'abc', 
+    'abcFormat', 
     'analysis', 
     'audioSearch',
     'braille', 

@@ -3106,7 +3106,7 @@ class Test(unittest.TestCase):
         
 
     def testExpandRepeatB(self):
-        from music21.abc import testFiles
+        from music21.abcFormat import testFiles
         from music21 import converter, repeat
         
         s = converter.parse(testFiles.draughtOfAle)
@@ -3129,7 +3129,7 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatC(self):
-        from music21.abc import testFiles
+        from music21.abcFormat import testFiles
         from music21 import converter, repeat
         
         s = converter.parse(testFiles.kingOfTheFairies)
@@ -3259,7 +3259,7 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatG(self):        
-        from music21.abc import testFiles
+        from music21.abcFormat import testFiles
         from music21 import converter
         
         unused_s = converter.parse(testFiles.hectorTheHero)
@@ -4494,7 +4494,7 @@ class Test(unittest.TestCase):
         
         
         from music21 import converter
-        from music21.abc import testFiles
+        from music21.abcFormat import testFiles
         
         s = converter.parse(testFiles.mysteryReel)
         #s.show()
