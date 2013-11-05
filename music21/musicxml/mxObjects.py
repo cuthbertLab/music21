@@ -2545,7 +2545,7 @@ class Dashes(MusicXMLElement):
 
 
 class Ornaments(MusicXMLElementList):
-    '''The Ornaments tag wraps the following muscixml entities: trill-mark, turn, delayed-turn, inverted-turn, shake, wavy-line, mordent, inverted mordent, schleifer, tremolo, other-ornament. 
+    '''The Ornaments tag wraps the following musicxml entities: trill-mark, turn, delayed-turn, inverted-turn, shake, wavy-line, mordent, inverted mordent, schleifer, tremolo, other-ornament. 
 
     Ornaments are stored on the notations object. 
     '''

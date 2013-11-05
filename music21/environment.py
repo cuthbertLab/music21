@@ -168,7 +168,7 @@ class LocalCorporaSettings(xmlnode.XMLNodeList):
 
 class LocalCorpusPath(xmlnode.XMLNode):
     '''
-    An xmlnode.XMLNode subclass representing a a list of environment
+    An xmlnode.XMLNode subclass representing a list of environment
     preference:
 
     ::

@@ -1324,7 +1324,7 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
     The key process here is finding the adjacent time 
     between events and adding DeltaTime events before each MIDI event.
 
-    Delta time channel values are derived from the the previous midi event. 
+    Delta time channel values are derived from the previous midi event. 
 
     If `trackIdFilter` is not None, process only packets with 
     a matching track id. this can be used to filter out events 
@@ -1622,7 +1622,7 @@ def _prepareStreamForMidi(s):
     '''
     Given a score, prepare it for midding processing. 
     In particular, place MetronomeMark objects at 
-    Score level, or elsewhere, place it in the the first part.
+    Score level, or elsewhere, place it in the first part.
     
     Note: will make a deepcopy() of the stream. (QUESTION: Could this
     be done with a shallow copy?)
@@ -1735,7 +1735,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
     # we just cannot use it and will take modulus later
     channelsAssigned = []
     for i, iPgm in enumerate(allUniqueInstruments): # values are program numbers
-        # the the key is the program number; the values is the start channel
+        # the key is the program number; the values is the start channel
         if i < len(allChannels) - 1: # save at least on dynamic channel
             channelForInstrument[iPgm] = allChannels[i]
             channelsAssigned.append(allChannels[i])

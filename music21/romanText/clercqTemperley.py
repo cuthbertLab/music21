@@ -679,7 +679,7 @@ in the text file as a string, and have python do the parsing.
     def _getStringWithBarsandDots(self, containsIndex, entireSplitString):
         '''
         given an index which corresponds to a charcter in the entireSplitString, method
-        returns the the surrounding bars and dots (if they exist) that correspond to
+        returns the surrounding bars and dots (if they exist) that correspond to
         that character.
         '''
         if entireSplitString[containsIndex - 1].startswith('['):
@@ -1183,7 +1183,7 @@ class CTRule(object):
             return self._musicText
 
     musicText = property(_getMusicText, _setMusicText, doc= '''
-        Gets just the music text of the CTRule, excluding the the left hand side and comments
+        Gets just the music text of the CTRule, excluding the left hand side and comments
         
         
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')

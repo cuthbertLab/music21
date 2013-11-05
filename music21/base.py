@@ -4312,7 +4312,7 @@ class Music21Object(object):
         return mm.durationToSeconds(self.duration)
 
     seconds = property(_getSeconds, _setSeconds, doc = '''
-        Get or set the the duration of this object in seconds, assuming 
+        Get or set the duration of this object in seconds, assuming 
         that this object has a :class:`~music21.tempo.MetronomeMark` or :class:`~music21.tempo.MetricModulation` in its past context.
 
         
@@ -4332,7 +4332,7 @@ class ElementWrapper(Music21Object):
     be positioned within a :class:`~music21.stream.Stream`.
     
     The object stored within ElementWrapper is available from 
-    the the :attr:`~music21.base.ElementWrapper.obj` attribute.
+    the :attr:`~music21.base.ElementWrapper.obj` attribute.
     All the attributes of the stored object (except .id and
     anything else that conflicts with a Music21Object attribute)
     are gettable and settable by querying the ElementWrapper.
@@ -4900,7 +4900,7 @@ class Test(unittest.TestCase):
             'TimeSignature')[0].beatStrength, 0.25)
         
         # compare offsets found with items positioned in Measures
-        # as the first bar is a pickup, the the measure offset here is returned
+        # as the first bar is a pickup, the measure offset here is returned
         # with padding (resulting in 3) 
         post = []
         for n in p1.flat.notesAndRests:

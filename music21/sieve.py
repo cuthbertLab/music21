@@ -1315,7 +1315,7 @@ class Sieve(object):
             return libKeys
 
     def _resPeriodList(self, state):
-        """For all residual classes, get the period, or the value of M, adn return these in a list. Remove any redundant values and sort. """
+        """For all residual classes, get the period, or the value of M, and return these in a list. Remove any redundant values and sort. """
         mList = []
         for key in self._resKeys(state):
             p = self._resLib[key].period()

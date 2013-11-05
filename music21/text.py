@@ -204,7 +204,7 @@ class TextFormat(object):
             self._justify = value.lower()
 
     justify = property(_getJustify, _setJustify, 
-        doc = '''Get or set the the justification.
+        doc = '''Get or set the justification.
 
         
         >>> tf = text.TextFormat()
@@ -381,7 +381,7 @@ class TextBox(base.Music21Object, TextFormat):
             self._content = value    
     
     content = property(_getContent, _setContent, 
-        doc = '''Get or set the the content.
+        doc = '''Get or set the content.
 
         
         >>> te = text.TextBox('testing')
@@ -402,7 +402,7 @@ class TextBox(base.Music21Object, TextFormat):
         # do not set otherwise
     
     page = property(_getPage, _setPage, 
-        doc = '''Get or set the the page number. The first page (page 1) is the default. 
+        doc = '''Get or set the page number. The first page (page 1) is the default. 
 
         
         >>> te = text.TextBox('testing')

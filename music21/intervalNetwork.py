@@ -1957,7 +1957,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         be specified by integer (starting from 1) or key 
         (a tuple of origin, destination keys). 
 
-        The `nodeDegreeTargets` specifies the the degrees to be 
+        The `nodeDegreeTargets` specifies the degrees to be 
         included within the specified range. 
 
         Example: build a network of the Major scale:
@@ -2337,7 +2337,7 @@ class BoundIntervalNetwork(IntervalNetwork):
     def getPitchFromNodeDegree(self, pitchReference, nodeName, nodeDegreeTarget, 
         direction=DIRECTION_ASCENDING, minPitch=None, 
         maxPitch=None, alteredDegrees={}, equateTermini=True):
-        '''Given a reference pitch assigned to node id, determine the pitch for the the target node degree. 
+        '''Given a reference pitch assigned to node id, determine the pitch for the target node degree. 
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']

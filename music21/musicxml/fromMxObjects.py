@@ -3364,7 +3364,7 @@ class Test(unittest.TestCase):
         # have 10 spanners
         self.assertEqual(len(s.flat.getElementsByClass('Spanner')), 5)
 
-        # can get the same from a a getAll search
+        # can get the same from a getAll search
         self.assertEqual(len(s.getAllContextsByClass('Spanner')), 5)
 
         # try to get all spanners from the first note
@@ -3522,7 +3522,7 @@ class Test(unittest.TestCase):
 
 
     def testImportRepeatExpressionsA(self):
-        # test importing from muscixml
+        # test importing from musicxml
         from music21.musicxml import testPrimitive
         from music21 import converter
 
@@ -3610,7 +3610,7 @@ class Test(unittest.TestCase):
         #s.show()
 
     def testImportGraceNotesA(self):
-        # test importing from muscixml
+        # test importing from musicxml
         from music21.musicxml import testPrimitive
         from music21 import converter
         unused_s = converter.parse(testPrimitive.graceNotes24a)
