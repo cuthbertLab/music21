@@ -240,7 +240,7 @@ class TextExpression(Expression, text.TextFormat):
 
 
     #---------------------------------------------------------------------------
-    # text expression in musicxml may be be repeat expressions
+    # text expression in musicxml may be repeat expressions
     # need to see if this is a repeat expression, and if so
     # return the appropriate object
 

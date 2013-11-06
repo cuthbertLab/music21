@@ -965,7 +965,7 @@ def mxToTextExpression(mxDirection):
     mxWordsList = mxDirection.getWords()
     for mxWords in mxWordsList:
         #environLocal.printDebug(['mxToTextExpression()', mxWords, mxWords.charData])
-        # content can be be passed with creation argument
+        # content can be passed with creation argument
         te = expressions.TextExpression(mxWords.charData)
 
         te.justify = mxWords.get('justify')
