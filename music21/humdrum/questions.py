@@ -63,7 +63,7 @@ class Test(unittest.TestCase):
         '''Add key velocities to some MIDI data that reflect accent levels arising from the meter.
 
         Modify this to just adjust dynamics based on meter; this should be 
-        reflected in muiscal output
+        reflected in musical output
         '''
         from music21 import articulations
         from music21 import converter

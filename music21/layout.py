@@ -72,7 +72,7 @@ code like this can be done:
      scoreExcerpt = s.measures(startMeasure, endMeasure)
      scoreExcerpt.show()  # will show page 2, system 3
 
-Note that while the the coordinates given by music21 for a musicxml score (based on margins,
+Note that while the coordinates given by music21 for a musicxml score (based on margins,
 staff size, etc.)
 generally reflect what is actually in a musicxml producer, unfortuantely, x-positions are
 far less accurately

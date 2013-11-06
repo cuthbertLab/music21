@@ -1978,8 +1978,8 @@ def colorResults(score, color='red', typeList=None):
 
 def removeFromAnalysisData(score, dictKeys):  
     '''
-    remove a a result entry or entries from the resultDict by specifying which key or keys in the dictionary
-    you'd like remove. Pass in a list of dictKeys or just a single dictionary key.
+    remove a result entry or entries from the resultDict by specifying which key or keys in the dictionary
+    you'd like removed. Pass in a list of dictKeys or just a single dictionary key.
     
     
     >>> sc = stream.Score()

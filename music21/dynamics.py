@@ -280,7 +280,7 @@ class Dynamic(base.Music21Object):
             self._positionDefaultY = value
     
     positionVertical = property(_getPositionVertical, _setPositionVertical,
-        doc='''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
+        doc='''Get or set the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
 
         
         >>> te = expressions.TextExpression()

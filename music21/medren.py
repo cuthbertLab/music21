@@ -260,7 +260,7 @@ class Mensuration(meter.TimeSignature):
 class GeneralMensuralNote(base.Music21Object):
     '''
     The base class object for :class:`music21.medren.MensuralNote` and :class:`music21.medren.MensuralRest`. This is arguably the most important mensural object, since it is responsible for getting the context and determining the contextual duration of objects within both subclasses.
-    A :class:`musci21.medren.GeneralMensuralNote` object takes a mensural type or its abbreviation as an argument. The default value for this argument is 'brevis'.
+    A :class:`music21.medren.GeneralMensuralNote` object takes a mensural type or its abbreviation as an argument. The default value for this argument is 'brevis'.
     
     Valid mensural types are 'maxima', 'longa', 'brevis', 'semibrevis', 'minima', and 'semiminima'.
     The corresponding abbreviations are 'Mx', 'L', 'B', 'SB', 'M', and 'SM'.

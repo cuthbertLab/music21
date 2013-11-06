@@ -347,7 +347,7 @@ spirit</words>
 
 
     def testImportRepeatExpressionsA(self):
-        # test importing from muscixml
+        # test importing from musicxml
         from music21.musicxml import testPrimitive
         from music21 import converter
 

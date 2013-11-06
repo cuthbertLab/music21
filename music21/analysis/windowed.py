@@ -189,7 +189,7 @@ class WindowedAnalysis(object):
         Calls :meth:`~music21.analysis.WindowedAnalysis._analyze` for 
         the number of different window sizes to be analyzed.
 
-        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. The `windowStepSize` parameter determines the the increment between these window sizes, in quarter lengths. 
+        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. The `windowStepSize` parameter determines the increment between these window sizes, in quarter lengths. 
 
         If `minWindow` or `maxWindow` is None, the largest window size available will be set. 
 

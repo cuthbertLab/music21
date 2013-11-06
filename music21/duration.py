@@ -1216,7 +1216,7 @@ class DurationCommon(object):
 
 #-------------------------------------------------------------------------------
 class DurationUnit(DurationCommon):
-    '''A DurationUnit is a duration notation that (generally) can be notated with a a single notation unit, such as one note head, without a tie. 
+    '''A DurationUnit is a duration notation that (generally) can be notated with a single notation unit, such as one note head, without a tie. 
     
     DurationUnits are not usually instantiated by users of music21, 
     but are used within Duration objects to model the containment of numerous summed components.

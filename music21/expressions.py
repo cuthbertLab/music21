@@ -168,7 +168,7 @@ class TextExpression(Expression, text.TextFormat):
         self._content = str(value)
     
     content = property(_getContent, _setContent, 
-        doc = '''Get or set the the content.
+        doc = '''Get or set the content.
 
         
         >>> te = expressions.TextExpression('testing')
@@ -188,7 +188,7 @@ class TextExpression(Expression, text.TextFormat):
             raise TextExpressionException('Not a supported justification: %s' % value)
     
     enclosure = property(_getEnclosure, _setEnclosure, 
-        doc = '''Get or set the the enclosure.
+        doc = '''Get or set the enclosure.
 
         
         >>> te = expressions.TextExpression()
@@ -217,7 +217,7 @@ class TextExpression(Expression, text.TextFormat):
     
     positionVertical = property(_getPositionVertical, _setPositionVertical, 
         doc = '''
-        Get or set the the vertical position, where 0 
+        Get or set the vertical position, where 0 
         is the top line of the staff and units 
         are in 10ths of a staff space.
 

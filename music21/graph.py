@@ -1837,7 +1837,7 @@ class PlotStream(object):
 
     def process(self):
         '''This will process all data, as well as call the done() method. 
-        What happens when the done() is called is determined by the the keyword argument `doneAction`; 
+        What happens when the done() is called is determined by the keyword argument `doneAction`; 
         options are 'show' (display immediately), 'write' (write the file to a supplied file path), 
         and None (do processing but do not write or show a graph).
 
@@ -2408,7 +2408,7 @@ class PlotMultiStream(object):
         '''
         This will process all data, as well as call 
         the done() method. What happens when the done() is 
-        called is determined by the the keyword argument `doneAction`; 
+        called is determined by the keyword argument `doneAction`; 
         options are 'show' (display immediately), 
         'write' (write the file to a supplied file path), 
         and None (do processing but do not write or show a graph).

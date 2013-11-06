@@ -78,7 +78,7 @@ class Distributor(object):
         directory = os.getcwd()
         parentDir = os.path.dirname(directory)
         parentContents = os.listdir(parentDir)
-        # make sure we are in the the proper directory
+        # make sure we are in the proper directory
         if (not directory.endswith("dist") or 
             'music21' not in parentContents):
             raise Exception("not in the music21%dist directory: %s" % (os.sep, directory))

@@ -71,7 +71,7 @@ class StreamIterator(object):
     returns this object, passing a reference to self.
 
     Note that this iterator automatically sets the active site of
-    returned elements to the the source Stream.
+    returned elements to the source Stream.
 
     Sets:
 
@@ -607,7 +607,7 @@ class Stream(base.Music21Object):
     def __setitem__(self, key, value):
         '''
         Insert an item at a currently filled index position,
-        as represented in the the elements list.
+        as represented in the elements list.
 
 
         >>> a = stream.Stream()
@@ -5851,7 +5851,7 @@ class Stream(base.Music21Object):
                 # that connected and same pitch value is tied; this is not
                 # frequently the case
                 elif matchByPitch:
-                    # find out if the the last index is in position connected
+                    # find out if the last index is in position connected
                     # if the pitches are the same for each note
                     if (nLast is not None and iLast in posConnected
                         and hasattr(nLast, "pitch") and hasattr(n, "pitch")
@@ -7064,7 +7064,7 @@ class Stream(base.Music21Object):
 
 
     seconds = property(_getSeconds, _setSeconds, doc = '''
-        Get or set the the duration of this Stream in seconds, assuming that this object contains a :class:`~music21.tempo.MetronomeMark` or :class:`~music21.tempo.MetricModulation`.
+        Get or set the duration of this Stream in seconds, assuming that this object contains a :class:`~music21.tempo.MetronomeMark` or :class:`~music21.tempo.MetricModulation`.
 
 
         >>> s = corpus.parse('bwv66.6') # piece without a tempo
