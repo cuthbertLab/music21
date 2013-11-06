@@ -1756,7 +1756,7 @@ def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = N
     identify all the harmonic intervals in the score between partNum1 or partNum2, or if not specified ALL
     possible combinations
     
-    :class:`~music21.theoryAnalysis.theoryAnalyzerIntervalTheoryResult` created with ``.value`` set to the the string most commonly
+    :class:`~music21.theoryAnalysis.theoryAnalyzerIntervalTheoryResult` created with ``.value`` set to the string most commonly
     used to identify the interval (0 through 9, with A4 and d5)
     
     

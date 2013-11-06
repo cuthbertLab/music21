@@ -62,7 +62,7 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
         
             return [resultStr]
         elif len(workList) == 0:
-            resultStr = "No results for for query "+pathParts[2]+"."
+            resultStr = "No results for query "+pathParts[2]+"."
             response_headers = [('Content-type', 'text/plain'),
             ('Content-Length', str(len(resultStr)))]
     

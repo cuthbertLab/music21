@@ -986,7 +986,7 @@ def makeTupletBrackets(s, inPlace=True):
     eCount = len(durList)
 
     #environLocal.printDebug([
-    #    'calling makeTupletBrackets, lenght of notes:', eCount])
+    #    'calling makeTupletBrackets, length of notes:', eCount])
 
     for i in range(eCount):
         e = durList[i]

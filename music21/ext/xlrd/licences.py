@@ -36,7 +36,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
  * Copyright (c) 2001 David Giffin.
  * All rights reserved.
  *
- * Based on the the Java version: Andrew Khan Copyright (c) 2000. 
+ * Based on the Java version: Andrew Khan Copyright (c) 2000. 
  *
  *
  * Redistribution and use in source and binary forms, with or without
