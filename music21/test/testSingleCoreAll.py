@@ -31,7 +31,7 @@ class ModuleGather(object):
     Utility class for gathering and importing all modules in the music21
     package. Puts them in self.modulePaths.
     
-    >>> from music21.test import test as testModule
+    >>> from music21.test import testSingleCoreAll as testModule
     >>> mg = testModule.ModuleGather()
     >>> #_DOCS_SHOW print mg.modulePaths[0]
     D:\Web\eclipse\music21base\music21\xmlnode.py
@@ -85,7 +85,7 @@ class ModuleGather(object):
         r'''
         Given full file path, find a name for the the module
         
-        >>> from music21.test import test as testModule
+        >>> from music21.test import testSingleCoreAll as testModule
         >>> mg = testModule.ModuleGather()
         >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\xmlnode.py')
         'xmlnode'

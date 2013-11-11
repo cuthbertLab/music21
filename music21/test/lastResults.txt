@@ -1,77 +1,1367 @@
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example26_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2849, in example26_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2853, in music21.braille.test.example26_2
+Failed example:
+    rightHand = example26_2()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_2[2]>", line 1, in <module>
+        rightHand = example26_2()[0]
+    NameError: name 'example26_2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2854, in music21.braille.test.example26_2
+Failed example:
+    leftHand = example26_2()[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_2[3]>", line 1, in <module>
+        leftHand = example26_2()[1]
+    NameError: name 'example26_2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2855, in music21.braille.test.example26_2
+Failed example:
+    print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_2[4]>", line 1, in <module>
+        print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+    NameError: name 'rightHand' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example26_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2877, in example26_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2881, in music21.braille.test.example26_3
+Failed example:
+    rightHand = example26_3()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_3[2]>", line 1, in <module>
+        rightHand = example26_3()[0]
+    NameError: name 'example26_3' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2882, in music21.braille.test.example26_3
+Failed example:
+    leftHand = example26_3()[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_3[3]>", line 1, in <module>
+        leftHand = example26_3()[1]
+    NameError: name 'example26_3' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2883, in music21.braille.test.example26_3
+Failed example:
+    print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_3[4]>", line 1, in <module>
+        print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+    NameError: name 'rightHand' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example26_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2905, in example26_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2909, in music21.braille.test.example26_4
+Failed example:
+    rightHand = example26_4()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_4[2]>", line 1, in <module>
+        rightHand = example26_4()[0]
+    NameError: name 'example26_4' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2910, in music21.braille.test.example26_4
+Failed example:
+    leftHand = example26_4()[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_4[3]>", line 1, in <module>
+        leftHand = example26_4()[1]
+    NameError: name 'example26_4' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2911, in music21.braille.test.example26_4
+Failed example:
+    print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_4[4]>", line 1, in <module>
+        print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+    NameError: name 'rightHand' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example26_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2933, in example26_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2937, in music21.braille.test.example26_5
+Failed example:
+    rightHand = example26_5()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_5[2]>", line 1, in <module>
+        rightHand = example26_5()[0]
+    NameError: name 'example26_5' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2938, in music21.braille.test.example26_5
+Failed example:
+    leftHand = example26_5()[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_5[3]>", line 1, in <module>
+        leftHand = example26_5()[1]
+    NameError: name 'example26_5' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2939, in music21.braille.test.example26_5
+Failed example:
+    print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_5[4]>", line 1, in <module>
+        print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+    NameError: name 'rightHand' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 29, in example2_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 33, in music21.braille.test.example2_1
+Failed example:
+    print translate.partToBraille(test.example2_1(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠓⠭⠋⠀⠛⠭⠊⠀⠓⠭⠛⠀⠋⠭⠭⠀⠋⠭⠙⠀⠑⠭⠛⠀⠋⠭⠑⠀⠙⠭⠭⠀⠑⠭⠛
+    ⠀⠀⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠓⠭⠋⠀⠛⠭⠊⠀⠓⠭⠛⠀⠋⠭⠭⠀⠋⠭⠙⠀⠑⠭⠛⠀⠋⠭⠑⠀⠙⠭⠭⠀⠑⠭⠛
+    ⠀⠀⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 43, in example2_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 47, in music21.braille.test.example2_2
+Failed example:
+    print translate.partToBraille(test.example2_2(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠚⠀⠑⠀⠑⠙⠚⠑⠀⠙⠚⠊⠙⠀⠚⠊⠓⠚⠀⠊⠊⠑⠭⠀⠋⠋⠓⠋⠀⠑⠋⠓⠚⠀⠑⠙⠚⠊
+    ⠀⠀⠓⠓⠓⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚⠀⠑⠀⠑⠙⠚⠑⠀⠙⠚⠊⠙⠀⠚⠊⠓⠚⠀⠊⠊⠑⠭⠀⠋⠋⠓⠋⠀⠑⠋⠓⠚⠀⠑⠙⠚⠊
+    ⠀⠀⠓⠓⠓⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 62, in example2_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 66, in music21.braille.test.example2_3
+Failed example:
+    print translate.partToBraille(test.example2_3(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠋⠋⠀⠓⠊⠀⠓⠛⠀⠋⠓⠀⠛⠋⠀⠑⠛⠀⠋⠙⠀⠑⠭⠀⠋⠋⠀⠛⠛⠀⠓⠊⠀⠚⠙
+    ⠀⠀⠊⠛⠀⠋⠑⠀⠙⠚⠀⠙⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠋⠋⠀⠓⠊⠀⠓⠛⠀⠋⠓⠀⠛⠋⠀⠑⠛⠀⠋⠙⠀⠑⠭⠀⠋⠋⠀⠛⠛⠀⠓⠊⠀⠚⠙
+    ⠀⠀⠊⠛⠀⠋⠑⠀⠙⠚⠀⠙⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 76, in example2_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 80, in music21.braille.test.example2_4
+Failed example:
+    print translate.partToBraille(test.example2_4(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠊⠙⠋⠀⠑⠙⠚⠀⠙⠭⠚⠀⠊⠭⠭⠀⠚⠚⠙⠀⠑⠙⠚⠀⠊⠭⠊⠀⠚⠭⠭⠣⠅⠄
+    ⠀⠀⠊⠋⠊⠀⠙⠚⠊⠀⠊⠚⠙⠀⠑⠭⠭⠀⠋⠑⠙⠀⠚⠋⠚⠀⠊⠭⠊⠀⠊⠭⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠊⠙⠋⠀⠑⠙⠚⠀⠙⠭⠚⠀⠊⠭⠭⠀⠚⠚⠙⠀⠑⠙⠚⠀⠊⠭⠊⠀⠚⠭⠭⠣⠅⠄
+    ⠀⠀⠊⠋⠊⠀⠙⠚⠊⠀⠊⠚⠙⠀⠑⠭⠭⠀⠋⠑⠙⠀⠚⠋⠚⠀⠊⠭⠊⠀⠊⠭⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 91, in example2_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 95, in music21.braille.test.example2_5
+Failed example:
+    print translate.partToBraille(test.example2_5(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠚⠀⠑⠋⠀⠛⠙⠊⠙⠀⠑⠙⠊⠙⠀⠊⠙⠊⠓⠀⠋⠓⠛⠭⠀⠑⠋⠛⠑⠀⠙⠑⠋⠛⠀⠓⠋⠙⠋
+    ⠀⠀⠛⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚⠀⠑⠋⠀⠛⠙⠊⠙⠀⠑⠙⠊⠙⠀⠊⠙⠊⠓⠀⠋⠓⠛⠭⠀⠑⠋⠛⠑⠀⠙⠑⠋⠛⠀⠓⠋⠙⠋
+    ⠀⠀⠛⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 110, in example2_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 114, in music21.braille.test.example2_6
+Failed example:
+    print translate.partToBraille(test.example2_6(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠓⠓⠓⠓⠋⠛⠀⠊⠓⠓⠓⠭⠓⠀⠊⠊⠊⠙⠚⠊⠀⠊⠓⠓⠓⠭⠭⠀⠓⠛⠛⠛⠭⠭
+    ⠀⠀⠛⠋⠋⠋⠭⠭⠀⠑⠋⠑⠓⠛⠑⠀⠙⠋⠑⠙⠭⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠓⠓⠓⠓⠋⠛⠀⠊⠓⠓⠓⠭⠓⠀⠊⠊⠊⠙⠚⠊⠀⠊⠓⠓⠓⠭⠭⠀⠓⠛⠛⠛⠭⠭
+    ⠀⠀⠛⠋⠋⠋⠭⠭⠀⠑⠋⠑⠓⠛⠑⠀⠙⠋⠑⠙⠭⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_7
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 124, in example2_7
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 128, in music21.braille.test.example2_7
+Failed example:
+    print translate.partToBraille(test.example2_7(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠋⠭⠋⠛⠭⠛⠀⠑⠭⠑⠋⠭⠋⠀⠙⠑⠋⠓⠛⠋⠀⠋⠑⠑⠑⠭⠭⠀⠙⠭⠙⠋⠭⠋
+    ⠀⠀⠛⠭⠛⠊⠭⠊⠀⠓⠭⠓⠓⠊⠚⠀⠑⠙⠙⠙⠭⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠋⠭⠋⠛⠭⠛⠀⠑⠭⠑⠋⠭⠋⠀⠙⠑⠋⠓⠛⠋⠀⠋⠑⠑⠑⠭⠭⠀⠙⠭⠙⠋⠭⠋
+    ⠀⠀⠛⠭⠛⠊⠭⠊⠀⠓⠭⠓⠓⠊⠚⠀⠑⠙⠙⠙⠭⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 141, in example3_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 145, in music21.braille.test.example3_1
+Failed example:
+    print translate.partToBraille(test.example3_1(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠱⠺⠳⠺⠀⠹⠺⠪⠧⠀⠺⠳⠫⠳⠀⠱⠺⠱⠧⠀⠫⠳⠪⠳⠀⠱⠳⠺⠱⠀⠫⠱⠹⠪
+    ⠀⠀⠳⠱⠳⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠱⠺⠳⠺⠀⠹⠺⠪⠧⠀⠺⠳⠫⠳⠀⠱⠺⠱⠧⠀⠫⠳⠪⠳⠀⠱⠳⠺⠱⠀⠫⠱⠹⠪
+    ⠀⠀⠳⠱⠳⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 155, in example3_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 159, in music21.braille.test.example3_2
+Failed example:
+    print translate.partToBraille(test.example3_2(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠪⠻⠹⠻⠀⠳⠫⠹⠫⠀⠻⠳⠪⠻⠀⠱⠫⠻⠧⠀⠳⠪⠳⠹⠀⠻⠪⠹⠱⠀⠹⠪⠳⠹
+    ⠀⠀⠱⠫⠻⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠪⠻⠹⠻⠀⠳⠫⠹⠫⠀⠻⠳⠪⠻⠀⠱⠫⠻⠧⠀⠳⠪⠳⠹⠀⠻⠪⠹⠱⠀⠹⠪⠳⠹
+    ⠀⠀⠱⠫⠻⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 169, in example3_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 173, in music21.braille.test.example3_3
+Failed example:
+    print translate.partToBraille(test.example3_3(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠳⠫⠀⠪⠳⠀⠻⠧⠀⠱⠧⠀⠹⠄⠙⠀⠱⠄⠑⠀⠫⠧⠀⠹⠧⠀⠳⠳⠀⠪⠺⠀⠹⠧⠀⠪⠧
+    ⠀⠀⠳⠄⠓⠀⠻⠱⠀⠹⠫⠀⠹⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠳⠫⠀⠪⠳⠀⠻⠧⠀⠱⠧⠀⠹⠄⠙⠀⠱⠄⠑⠀⠫⠧⠀⠹⠧⠀⠳⠳⠀⠪⠺⠀⠹⠧⠀⠪⠧
+    ⠀⠀⠳⠄⠓⠀⠻⠱⠀⠹⠫⠀⠹⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 183, in example3_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 187, in music21.braille.test.example3_4
+Failed example:
+    print translate.partToBraille(test.example3_4(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠫⠙⠑⠫⠧⠀⠻⠊⠛⠫⠧⠀⠱⠋⠛⠓⠋⠹⠀⠱⠱⠳⠧⠀⠻⠋⠑⠫⠧⠀⠳⠛⠋⠻⠧
+    ⠀⠀⠪⠓⠛⠋⠛⠳⠀⠻⠱⠹⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠫⠙⠑⠫⠧⠀⠻⠊⠛⠫⠧⠀⠱⠋⠛⠓⠋⠹⠀⠱⠱⠳⠧⠀⠻⠋⠑⠫⠧⠀⠳⠛⠋⠻⠧
+    ⠀⠀⠪⠓⠛⠋⠛⠳⠀⠻⠱⠹⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 197, in example3_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 201, in music21.braille.test.example3_5
+Failed example:
+    print translate.partToBraille(test.example3_5(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠻⠄⠙⠱⠫⠀⠻⠄⠓⠪⠻⠀⠪⠹⠱⠹⠀⠪⠻⠳⠧⠣⠅⠄⠀⠳⠄⠋⠹⠫⠀⠻⠄⠙⠻⠪
+    ⠀⠀⠳⠳⠻⠫⠀⠻⠪⠻⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠻⠄⠙⠱⠫⠀⠻⠄⠓⠪⠻⠀⠪⠹⠱⠹⠀⠪⠻⠳⠧⠣⠅⠄⠀⠳⠄⠋⠹⠫⠀⠻⠄⠙⠻⠪
+    ⠀⠀⠳⠳⠻⠫⠀⠻⠪⠻⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 212, in example3_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 216, in music21.braille.test.example3_6
+Failed example:
+    print translate.partToBraille(test.example3_6(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠳⠓⠱⠑⠀⠳⠚⠑⠚⠓⠀⠪⠊⠊⠚⠙⠀⠺⠚⠳⠭⠀⠪⠊⠱⠑⠀⠳⠚⠪⠙⠀⠚⠙⠑⠹⠊
+    ⠀⠀⠳⠓⠳⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠳⠓⠱⠑⠀⠳⠚⠑⠚⠓⠀⠪⠊⠊⠚⠙⠀⠺⠚⠳⠭⠀⠪⠊⠱⠑⠀⠳⠚⠪⠙⠀⠚⠙⠑⠹⠊
+    ⠀⠀⠳⠓⠳⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 229, in example4_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 233, in music21.braille.test.example4_1
+Failed example:
+    print translate.partToBraille(test.example4_1(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠝⠏⠀⠕⠟⠀⠏⠗⠀⠟⠎⠀⠗⠞⠀⠎⠝⠀⠞⠕⠀⠝⠥⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠝⠏⠀⠕⠟⠀⠏⠗⠀⠟⠎⠀⠗⠞⠀⠎⠝⠀⠞⠕⠀⠝⠥⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 241, in example4_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 245, in music21.braille.test.example4_2
+Failed example:
+    print translate.partToBraille(test.example4_2(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠟⠎⠀⠗⠝⠀⠱⠹⠱⠫⠀⠟⠥⠀⠕⠟⠀⠝⠟⠀⠫⠻⠳⠪⠀⠟⠥⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠟⠎⠀⠗⠝⠀⠱⠹⠱⠫⠀⠟⠥⠀⠕⠟⠀⠝⠟⠀⠫⠻⠳⠪⠀⠟⠥⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 253, in example4_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 257, in music21.braille.test.example4_3
+Failed example:
+    print translate.partToBraille(test.example4_3(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠝⠹⠀⠑⠙⠚⠙⠱⠀⠏⠫⠀⠛⠋⠑⠋⠻⠀⠗⠳⠀⠊⠓⠛⠓⠪⠀⠚⠊⠓⠊⠚⠑⠀⠹⠥
+    ⠀⠀⠏⠫⠀⠑⠙⠚⠙⠱⠀⠝⠹⠀⠚⠊⠓⠊⠺⠀⠎⠪⠀⠓⠛⠋⠛⠳⠀⠛⠋⠑⠋⠛⠑⠀⠹⠥⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠝⠹⠀⠑⠙⠚⠙⠱⠀⠏⠫⠀⠛⠋⠑⠋⠻⠀⠗⠳⠀⠊⠓⠛⠓⠪⠀⠚⠊⠓⠊⠚⠑⠀⠹⠥
+    ⠀⠀⠏⠫⠀⠑⠙⠚⠙⠱⠀⠝⠹⠀⠚⠊⠓⠊⠺⠀⠎⠪⠀⠓⠛⠋⠛⠳⠀⠛⠋⠑⠋⠛⠑⠀⠹⠥⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 268, in example4_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 272, in music21.braille.test.example4_4
+Failed example:
+    measure1 = example4_4()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_4[2]>", line 1, in <module>
+        measure1 = example4_4()[0]
+    NameError: name 'example4_4' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 273, in music21.braille.test.example4_4
+Failed example:
+    print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_4[3]>", line 1, in <module>
+        print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+    NameError: name 'measure1' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 282, in example4_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 286, in music21.braille.test.example4_5
+Failed example:
+    measure1 = example4_5()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_5[2]>", line 1, in <module>
+        measure1 = example4_5()[0]
+    NameError: name 'example4_5' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 287, in music21.braille.test.example4_5
+Failed example:
+    print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_5[3]>", line 1, in <module>
+        print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+    NameError: name 'measure1' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 296, in example4_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 300, in music21.braille.test.example4_6
+Failed example:
+    bm = example4_6()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[2]>", line 1, in <module>
+        bm = example4_6()
+    NameError: name 'example4_6' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 301, in music21.braille.test.example4_6
+Failed example:
+    measure1 = bm[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[3]>", line 1, in <module>
+        measure1 = bm[0]
+    NameError: name 'bm' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 302, in music21.braille.test.example4_6
+Failed example:
+    measure2 = bm[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[4]>", line 1, in <module>
+        measure2 = bm[1]
+    NameError: name 'bm' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 303, in music21.braille.test.example4_6
+Failed example:
+    print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[5]>", line 1, in <module>
+        print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+    NameError: name 'measure1' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 305, in music21.braille.test.example4_6
+Failed example:
+    print translate.measureToBraille(measure2, inPlace=True, suppressOctaveMarks = True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[6]>", line 1, in <module>
+        print translate.measureToBraille(measure2, inPlace=True, suppressOctaveMarks = True)
+    NameError: name 'measure2' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_7
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 314, in example4_7
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 318, in music21.braille.test.example4_7
+Failed example:
+    print translate.partToBraille(test.example4_7(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠗⠄⠀⠏⠄⠀⠝⠄⠀⠏⠄⠀⠹⠱⠫⠀⠳⠻⠫⠀⠕⠄⠈⠉⠀⠕⠄⠀⠏⠫⠀⠫⠻⠳⠀⠎⠪
+    ⠀⠀⠪⠳⠻⠀⠏⠻⠀⠕⠫⠀⠝⠄⠈⠉⠀⠝⠄⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠗⠄⠀⠏⠄⠀⠝⠄⠀⠏⠄⠀⠹⠱⠫⠀⠳⠻⠫⠀⠕⠄⠈⠉⠀⠕⠄⠀⠏⠫⠀⠫⠻⠳⠀⠎⠪
+    ⠀⠀⠪⠳⠻⠀⠏⠻⠀⠕⠫⠀⠝⠄⠈⠉⠀⠝⠄⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 332, in example5_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 336, in music21.braille.test.example5_1
+Failed example:
+    print translate.partToBraille(test.example5_1(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠽⠀⠮⠀⠿⠀⠮⠀⠽⠀⠵⠀⠽⠈⠉⠀⠽⠀⠵⠀⠯⠀⠿⠀⠵⠀⠽⠀⠷⠀⠿⠈⠉⠀⠿⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠽⠀⠮⠀⠿⠀⠮⠀⠽⠀⠵⠀⠽⠈⠉⠀⠽⠀⠵⠀⠯⠀⠿⠀⠵⠀⠽⠀⠷⠀⠿⠈⠉⠀⠿⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 344, in example5_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 348, in music21.braille.test.example5_2
+Failed example:
+    print translate.partToBraille(test.example5_2(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠽⠀⠯⠀⠷⠀⠮⠀⠾⠀⠮⠀⠷⠈⠉⠀⠷⠀⠮⠀⠽⠀⠮⠀⠿⠀⠷⠀⠾⠀⠷⠀⠯⠀⠿⠀⠮
+    ⠀⠀⠿⠀⠵⠀⠾⠀⠵⠀⠽⠈⠉⠀⠽⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠽⠀⠯⠀⠷⠀⠮⠀⠾⠀⠮⠀⠷⠈⠉⠀⠷⠀⠮⠀⠽⠀⠮⠀⠿⠀⠷⠀⠾⠀⠷⠀⠯⠀⠿⠀⠮
+    ⠀⠀⠿⠀⠵⠀⠾⠀⠵⠀⠽⠈⠉⠀⠽⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 357, in example5_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 361, in music21.braille.test.example5_3
+Failed example:
+    print translate.partToBraille(test.example5_3(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠍⠗⠀⠗⠗⠗⠀⠳⠳⠍⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠼⠉⠆⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠍⠗⠀⠗⠗⠗⠀⠳⠳⠍⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 369, in example5_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 373, in music21.braille.test.example5_4
+Failed example:
+    print translate.partToBraille(test.example5_4(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠏⠟⠀⠷⠀⠏⠕⠀⠽⠀⠕⠏⠀⠟⠏⠀⠵⠀⠍⠀⠝⠕⠀⠯⠀⠟⠗⠀⠮⠀⠗⠟⠀⠏⠕⠀⠽
+    ⠀⠀⠍⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠏⠟⠀⠷⠀⠏⠕⠀⠽⠀⠕⠏⠀⠟⠏⠀⠵⠀⠍⠀⠝⠕⠀⠯⠀⠟⠗⠀⠮⠀⠗⠟⠀⠏⠕⠀⠽
+    ⠀⠀⠍⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 383, in example5_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 387, in music21.braille.test.example5_5
+Failed example:
+    print translate.partToBraille(test.example5_5(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
+    ⠀⠀⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
+    ⠀⠀⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 397, in example5_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 403, in music21.braille.test.example5_6
+Failed example:
+    print translate.partToBraille(test.example5_6(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠮⠽⠾⠀⠝⠞⠮⠞⠝⠀⠾⠍⠘⠉⠍⠀⠷⠾⠎⠗⠀⠮⠘⠉⠮⠍⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠮⠽⠾⠀⠝⠞⠮⠞⠝⠀⠾⠍⠘⠉⠍⠀⠷⠾⠎⠗⠀⠮⠘⠉⠮⠍⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_10
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 571, in example6_10
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 575, in music21.braille.test.example6_10
+Failed example:
+    print translate.partToBraille(test.example6_10(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠪⠎⠪⠈⠉⠀⠪⠧⠣⠞⠀⠹⠹⠧⠹⠈⠉⠀⠹⠧⠕⠀⠋⠫⠋⠻⠧⠀⠋⠫⠋⠱⠧
+    ⠀⠀⠙⠹⠙⠣⠚⠺⠚⠀⠎⠄⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠪⠎⠪⠈⠉⠀⠪⠧⠣⠞⠀⠹⠹⠧⠹⠈⠉⠀⠹⠧⠕⠀⠋⠫⠋⠻⠧⠀⠋⠫⠋⠱⠧
+    ⠀⠀⠙⠹⠙⠣⠚⠺⠚⠀⠎⠄⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_11
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 585, in example6_11
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 589, in music21.braille.test.example6_11
+Failed example:
+    print translate.partToBraille(test.example6_11(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠪⠄⠚⠹⠺⠀⠊⠙⠋⠙⠊⠙⠫⠀⠱⠄⠛⠪⠻⠀⠑⠛⠊⠛⠑⠛⠪⠀⠩⠳⠄⠋⠎
+    ⠀⠀⠺⠄⠚⠝⠀⠑⠙⠚⠊⠩⠓⠋⠩⠛⠓⠀⠎⠈⠉⠊⠩⠓⠪⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠪⠄⠚⠹⠺⠀⠊⠙⠋⠙⠊⠙⠫⠀⠱⠄⠛⠪⠻⠀⠑⠛⠊⠛⠑⠛⠪⠀⠩⠳⠄⠋⠎
+    ⠀⠀⠺⠄⠚⠝⠀⠑⠙⠚⠊⠩⠓⠋⠩⠛⠓⠀⠎⠈⠉⠊⠩⠓⠪⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_12
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 599, in example6_12
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 603, in music21.braille.test.example6_12
+Failed example:
+    print translate.partToBraille(test.example6_12(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠋⠣⠋⠑⠣⠑⠙⠊⠣⠊⠓⠀⠣⠣⠚⠣⠊⠓⠣⠓⠛⠋⠑⠙⠀⠑⠚⠣⠚⠡⠚⠙⠑⠋⠛
+    ⠀⠀⠓⠩⠓⠊⠚⠹⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠋⠣⠋⠑⠣⠑⠙⠊⠣⠊⠓⠀⠣⠣⠚⠣⠊⠓⠣⠓⠛⠋⠑⠙⠀⠑⠚⠣⠚⠡⠚⠙⠑⠋⠛
+    ⠀⠀⠓⠩⠓⠊⠚⠹⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 466, in example6_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 470, in music21.braille.test.example6_3
+Failed example:
+    print translate.measureToBraille(test.example6_3()[0], inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠝⠣⠞⠈⠉
+Got:
+    ⠼⠙⠲⠀⠝⠣⠞⠈⠉
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 481, in example6_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 485, in music21.braille.test.example6_4
+Failed example:
+    print translate.measureToBraille(test.example6_4()[0], inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠡⠫⠋⠊⠙⠡⠋
+Got:
+    ⠼⠉⠲⠀⠡⠫⠋⠊⠙⠡⠋
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 498, in example6_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 502, in music21.braille.test.example6_5
+Failed example:
+    print translate.measureToBraille(test.example6_5()[0], inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠙⠣⠚⠊⠓⠻
+Got:
+    ⠼⠉⠲⠀⠙⠣⠚⠊⠓⠻
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 514, in example6_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 518, in music21.braille.test.example6_6
+Failed example:
+    print translate.partToBraille(test.example6_6(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠹⠩⠹⠱⠩⠱⠀⠫⠻⠩⠻⠳⠀⠩⠳⠪⠣⠺⠡⠺⠀⠝⠥⠀⠏⠣⠫⠱⠀⠹⠱⠡⠫⠹
+    ⠀⠀⠺⠣⠺⠪⠡⠺⠀⠝⠥⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠹⠩⠹⠱⠩⠱⠀⠫⠻⠩⠻⠳⠀⠩⠳⠪⠣⠺⠡⠺⠀⠝⠥⠀⠏⠣⠫⠱⠀⠹⠱⠡⠫⠹
+    ⠀⠀⠺⠣⠺⠪⠡⠺⠀⠝⠥⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_7
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 528, in example6_7
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 532, in music21.braille.test.example6_7
+Failed example:
+    print translate.partToBraille(test.example6_7(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹⠀⠺⠣⠺⠪⠣⠪⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹
+    ⠀⠀⠺⠹⠱⠫⠀⠝⠥⠀⠽⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹⠀⠺⠣⠺⠪⠣⠪⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹
+    ⠀⠀⠺⠹⠱⠫⠀⠝⠥⠀⠽⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_8
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 544, in example6_8
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 548, in music21.braille.test.example6_8
+Failed example:
+    print translate.partToBraille(test.example6_8(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠹⠙⠣⠚⠣⠊⠙⠛⠣⠊⠈⠉⠀⠊⠓⠛⠓⠝⠀⠣⠱⠛⠑⠙⠙⠣⠊⠛⠀⠓⠓⠙⠙⠟⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠹⠙⠣⠚⠣⠊⠙⠛⠣⠊⠈⠉⠀⠊⠓⠛⠓⠝⠀⠣⠱⠛⠑⠙⠙⠣⠊⠛⠀⠓⠓⠙⠙⠟⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_9
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 557, in example6_9
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 561, in music21.braille.test.example6_9
+Failed example:
+    print translate.partToBraille(test.example6_9(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠫⠗⠫⠀⠩⠻⠎⠻⠀⠓⠊⠺⠳⠫⠀⠩⠑⠋⠩⠻⠱⠳⠀⠹⠏⠩⠻⠀⠳⠞⠹
+    ⠀⠀⠚⠊⠓⠚⠊⠓⠩⠛⠩⠑⠀⠯⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠫⠗⠫⠀⠩⠻⠎⠻⠀⠓⠊⠺⠳⠫⠀⠩⠑⠋⠩⠻⠱⠳⠀⠹⠏⠩⠻⠀⠳⠞⠹
+    ⠀⠀⠚⠊⠓⠚⠊⠓⠩⠛⠩⠑⠀⠯⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 618, in example7_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 622, in music21.braille.test.example7_1
+Failed example:
+    print translate.partToBraille(test.example7_1(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠈⠽⠀⠘⠽⠀⠸⠽⠀⠐⠽⠀⠨⠽⠀⠰⠽⠀⠠⠽
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠈⠽⠀⠘⠽⠀⠸⠽⠀⠐⠽⠀⠨⠽⠀⠰⠽⠀⠠⠽
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_10
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 798, in example7_10
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 802, in music21.braille.test.example7_10
+Failed example:
+    inPart = example7_10()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[2]>", line 1, in <module>
+        inPart = example7_10()
+    NameError: name 'example7_10' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 803, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(2).notes[0].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[3]>", line 1, in <module>
+        inPart.measure(2).notes[0].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 805, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(2).notes[1].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[4]>", line 1, in <module>
+        inPart.measure(2).notes[1].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 807, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(3).notes[2].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[5]>", line 1, in <module>
+        inPart.measure(3).notes[2].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 809, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(3).notes[4].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[6]>", line 1, in <module>
+        inPart.measure(3).notes[4].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 811, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(3).notes[7].accidental.displayStatus == False
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[7]>", line 1, in <module>
+        inPart.measure(3).notes[7].accidental.displayStatus == False
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 813, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(4).notes[1].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[8]>", line 1, in <module>
+        inPart.measure(4).notes[1].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 815, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(4).notes[2].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[9]>", line 1, in <module>
+        inPart.measure(4).notes[2].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 817, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(5).notes[2].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[10]>", line 1, in <module>
+        inPart.measure(5).notes[2].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 819, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(7).notes[1].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[11]>", line 1, in <module>
+        inPart.measure(7).notes[1].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 821, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(7).notes[2].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[12]>", line 1, in <module>
+        inPart.measure(7).notes[2].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 823, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(7).notes[3].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[13]>", line 1, in <module>
+        inPart.measure(7).notes[3].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 825, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(7).notes[6].accidental.displayStatus == False
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[14]>", line 1, in <module>
+        inPart.measure(7).notes[6].accidental.displayStatus == False
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 829, in music21.braille.test.example7_10
+Failed example:
+    print translate.partToBraille(inPart, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[15]>", line 1, in <module>
+        print translate.partToBraille(inPart, inPlace=True)
+    NameError: name 'inPart' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_11
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 840, in example7_11
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 844, in music21.braille.test.example7_11
+Failed example:
+    inPart = example7_11()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[2]>", line 1, in <module>
+        inPart = example7_11()
+    NameError: name 'example7_11' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 845, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(4).notes[0].accidental.displayStatus == True # A-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[3]>", line 1, in <module>
+        inPart.measure(4).notes[0].accidental.displayStatus == True # A-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 847, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(4).notes[3].accidental.displayStatus == False # A-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[4]>", line 1, in <module>
+        inPart.measure(4).notes[3].accidental.displayStatus == False # A-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 849, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(5).notes[1].accidental.displayStatus == True # E-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[5]>", line 1, in <module>
+        inPart.measure(5).notes[1].accidental.displayStatus == True # E-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 851, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(5).notes[2].accidental.displayStatus == True # A-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[6]>", line 1, in <module>
+        inPart.measure(5).notes[2].accidental.displayStatus == True # A-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 853, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(6).notes[0].accidental.displayStatus == True # E-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[7]>", line 1, in <module>
+        inPart.measure(6).notes[0].accidental.displayStatus == True # E-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 855, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(6).notes[5].accidental.displayStatus == True # E-2
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[8]>", line 1, in <module>
+        inPart.measure(6).notes[5].accidental.displayStatus == True # E-2
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 858, in music21.braille.test.example7_11
+Failed example:
+    print translate.partToBraille(inPart, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[9]>", line 1, in <module>
+        print translate.partToBraille(inPart, inPlace=True)
+    NameError: name 'inPart' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 638, in example7_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 642, in music21.braille.test.example7_2
+Failed example:
+    print translate.partToBraille(test.example7_2(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠈⠈⠮⠾⠀⠠⠠⠽
+Got:
+    ⠀⠀⠀⠀⠀⠜⠦⠀⠀⠀⠀
+    ⠼⠁⠀⠈⠈⠮⠾⠀⠠⠠⠽
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 733, in example7_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 737, in music21.braille.test.example7_6
+Failed example:
+    inPart = example7_6()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_6[2]>", line 1, in <module>
+        inPart = example7_6()
+    NameError: name 'example7_6' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 738, in music21.braille.test.example7_6
+Failed example:
+    print translate.partToBraille(inPart, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_6[3]>", line 1, in <module>
+        print translate.partToBraille(inPart, inPlace=True)
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 741, in music21.braille.test.example7_6
+Failed example:
+    inPart.measure(7).notes[3].accidental
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_6[4]>", line 1, in <module>
+        inPart.measure(7).notes[3].accidental
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 743, in music21.braille.test.example7_6
+Failed example:
+    inPart.measure(7).notes[3].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_6[5]>", line 1, in <module>
+        inPart.measure(7).notes[3].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_7
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 752, in example7_7
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 760, in music21.braille.test.example7_7
+Failed example:
+    print translate.partToBraille(test.example7_7(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠐⠊⠙⠛⠙⠀⠨⠊⠙⠛⠙⠀⠰⠊⠛⠙⠑⠀⠨⠊⠛⠋⠙⠀⠟⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠊⠙⠛⠙⠀⠨⠊⠙⠛⠙⠀⠰⠊⠛⠙⠑⠀⠨⠊⠛⠋⠙⠀⠟⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_8
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 770, in example7_8
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 774, in music21.braille.test.example7_8
+Failed example:
+    print translate.partToBraille(test.example7_8(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠸⠝⠘⠳⠸⠫⠀⠱⠄⠙⠹⠹⠀⠸⠎⠳⠫⠀⠱⠗⠳⠀⠐⠹⠄⠚⠪⠳⠀⠪⠻⠹⠪
+    ⠀⠀⠘⠳⠳⠸⠱⠳⠀⠫⠝⠄⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠸⠝⠘⠳⠸⠫⠀⠱⠄⠙⠹⠹⠀⠸⠎⠳⠫⠀⠱⠗⠳⠀⠐⠹⠄⠚⠪⠳⠀⠪⠻⠹⠪
+    ⠀⠀⠘⠳⠳⠸⠱⠳⠀⠫⠝⠄⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_9
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 784, in example7_9
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 788, in music21.braille.test.example7_9
+Failed example:
+    print translate.partToBraille(test.example7_9(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠐⠫⠄⠊⠙⠋⠀⠱⠑⠙⠺⠀⠫⠄⠩⠓⠚⠨⠋⠀⠹⠙⠚⠪⠀⠊⠩⠙⠋⠊⠨⠙⠓
+    ⠀⠀⠨⠛⠑⠐⠊⠨⠋⠑⠐⠛⠀⠨⠙⠚⠐⠑⠊⠩⠓⠋⠀⠎⠄⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠫⠄⠊⠙⠋⠀⠱⠑⠙⠺⠀⠫⠄⠩⠓⠚⠨⠋⠀⠹⠙⠚⠪⠀⠊⠩⠙⠋⠊⠨⠙⠓
+    ⠀⠀⠨⠛⠑⠐⠊⠨⠋⠑⠐⠛⠀⠨⠙⠚⠐⠑⠊⠩⠓⠋⠀⠎⠄⠣⠅
+
+
 
 
 ---------------SUMMARY---------------------------------------------------
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/zipfileapp.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/wsgiapp.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/visualapp.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/urlqueryapp.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/urlapp.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/unifiedapp.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/jsonapp.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/featureinfo.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/server/featureapp.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/archive/server/mod_python/noteinfo/index.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/archive/server/mod_python/index.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/trecento/exceldiff.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/timeGraphs.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/testPerformance.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/testLint.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/testInstallation.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/testExternal.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/testDocs/test.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/testDefault.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/test.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/test/multiprocessTest.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/xldate.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/timemachine.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/sheet.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/licences.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/formula.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/formatting.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/examples/xlrdnameAPIdemo.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/compdoc.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/biffh.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/xlrd/__init__.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/webcolors.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/jsonpickle/util.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/jsonpickle/unpickler.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/jsonpickle/tags.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/jsonpickle/pickler.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/jsonpickle/handlers.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/jsonpickle/compat.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/jsonpickle/__init__.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/ext/__init__.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/trecento/largestAmbitus.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/trecento/__init__.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/smt2011.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/smt2010.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/seaver_presentation_2008.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/seaverOct2009.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/runTrecentoCadence.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/nips2011.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/nemcog.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/monteverdi.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/misc2010.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/mgtaPart2.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/mgtaPart1.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/josquin/label_intervals.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/ismir2011.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/ismir2010.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/icmc2011.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/icmc2010.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/eschbeg.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/awsutility.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/__init__.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/bhadley/__init__.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/bhadley/HarmonyRealizer.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/demos/__init__.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/configure.py
-Skipped: /Users/cuthbert/Dropbox/BackupEssentials/eclipseWork/music21base/music21/braille/test.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/zipfileapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/wsgiapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/visualapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/urlqueryapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/urlapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/unifiedapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/jsonapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/featureinfo.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/featureapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/noteinfo/index.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/index.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/exceldiff.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/timeGraphs.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testSingleCoreAll.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testPerformance.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testLint.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testInstallation.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testExternal.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testDefault.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/multiprocessTest.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/xldate.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/timemachine.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/sheet.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/licences.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/formula.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/formatting.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/examples/xlrdnameAPIdemo.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/compdoc.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/biffh.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/webcolors.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/util.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/unpickler.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/tags.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/pickler.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/handlers.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/compat.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/largestAmbitus.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2011.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2010.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/seaver_presentation_2008.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/seaverOct2009.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/runTrecentoCadence.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/nips2011.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/nemcog.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/monteverdi.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/misc2010.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/mgtaPart2.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/mgtaPart1.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/josquin/label_intervals.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/ismir2011.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/ismir2010.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/icmc2011.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/icmc2010.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/eschbeg.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/awsutility.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/HarmonyRealizer.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
 xmlnode successfully ran 12 tests
 webapps_apps successfully ran 6 tests
 webapps___init__ successfully ran 14 tests
@@ -80,16 +1370,16 @@ volume successfully ran 20 tests
 voiceLeading successfully ran 64 tests
 vexflow___init__ successfully ran 28 tests
 trecento_trecentoCadence successfully ran 7 tests
-webapps_commands successfully ran 10 tests
 variant successfully ran 34 tests
+webapps_commands successfully ran 10 tests
 trecento_polyphonicSnippet successfully ran 9 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
 trecento_capua successfully ran 9 tests
 trecento___init__ successfully ran 3 tests
 trecento_tonality successfully ran 5 tests
-tinyNotation successfully ran 11 tests
 tie successfully ran 7 tests
+tinyNotation successfully ran 11 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
@@ -97,33 +1387,33 @@ text successfully ran 23 tests
 test___init__ successfully ran 3 tests
 tempo successfully ran 45 tests
 stream_streamStatus successfully ran 4 tests
-theoryAnalysis_theoryAnalyzer successfully ran 42 tests
 stream_makeNotation successfully ran 9 tests
+theoryAnalysis_theoryAnalyzer successfully ran 42 tests
 spanner successfully ran 52 tests
 sieve successfully ran 40 tests
 serial successfully ran 47 tests
 stream___init__ successfully ran 144 tests
 search_segment successfully ran 7 tests
-scale successfully ran 90 tests
+search___init__ successfully ran 19 tests
 scala_scl___init__ successfully ran 3 tests
 scala___init__ successfully ran 12 tests
-search___init__ successfully ran 19 tests
+scale successfully ran 90 tests
 romanText_testFiles successfully ran 4 tests
 romanText_translate successfully ran 17 tests
 romanText___init__ successfully ran 45 tests
 romanText_clercqTemperley successfully ran 19 tests
-test_testStream successfully ran 206 tests
+roman successfully ran 28 tests
 pitch successfully ran 94 tests
 noteworthy_translate successfully ran 21 tests
 noteworthy_binaryTranslate successfully ran 3 tests
 noteworthy___init__ successfully ran 3 tests
-roman successfully ran 28 tests
 note successfully ran 48 tests
-musicxml_toMxObjects successfully ran 37 tests
 musicxml_xmlHandler successfully ran 12 tests
+test_testStream successfully ran 206 tests
+musicxml_toMxObjects successfully ran 37 tests
 musicxml_testFiles successfully ran 5 tests
-musicxml_testPrimitive successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
+musicxml_testPrimitive successfully ran 5 tests
 repeat successfully ran 72 tests
 musicxml___init__ successfully ran 3 tests
 musicxml_m21ToString successfully ran 45 tests
@@ -133,10 +1423,10 @@ midi_translate successfully ran 47 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
 musedata_translate successfully ran 16 tests
-meter successfully ran 108 tests
-metadata_primitives successfully ran 38 tests
-musicxml_fromMxObjects successfully ran 65 tests
 midi___init__ successfully ran 28 tests
+metadata_primitives successfully ran 38 tests
+meter successfully ran 108 tests
+musicxml_fromMxObjects successfully ran 65 tests
 metadata___init__ successfully ran 18 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
@@ -155,17 +1445,17 @@ humdrum_spineParser successfully ran 32 tests
 humdrum_instruments successfully ran 8 tests
 humdrum___init__ successfully ran 3 tests
 metadata_bundles successfully ran 34 tests
-metadata_caching successfully ran 7 tests
 harmony successfully ran 27 tests
+metadata_caching successfully ran 7 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
-freezeThaw successfully ran 28 tests
-figuredBass_possibility successfully ran 20 tests
-figuredBass_notation successfully ran 15 tests
-figuredBass_fbPitch successfully ran 5 tests
 figuredBass_realizer successfully ran 12 tests
+freezeThaw successfully ran 28 tests
+figuredBass_notation successfully ran 15 tests
+figuredBass_possibility successfully ran 20 tests
+figuredBass_fbPitch successfully ran 5 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
 figuredBass_examples successfully ran 15 tests
@@ -179,54 +1469,56 @@ editorial successfully ran 9 tests
 dynamics successfully ran 15 tests
 duration successfully ran 72 tests
 documentation_library_writers successfully ran 3 tests
-features_jSymbolic successfully ran 86 tests
 documentation_library_iterators successfully ran 6 tests
+documentation_library_extensions successfully ran 3 tests
+documentation_library_documenters successfully ran 29 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
 documentation___init__ successfully ran 3 tests
-documentation_library_documenters successfully ran 29 tests
 derivation successfully ran 6 tests
 defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
 counterpoint___init__ successfully ran 3 tests
 corpus_virtual successfully ran 5 tests
-features_native successfully ran 26 tests
+features_jSymbolic successfully ran 86 tests
 corpus_corpora successfully ran 27 tests
+corpus_testCorpus successfully ran 25 tests
 corpus_chorales successfully ran 9 tests
 corpus___init__ successfully ran 17 tests
+features_native successfully ran 26 tests
 contour successfully ran 10 tests
 composition_aug30 successfully ran 3 tests
 composition___init__ successfully ran 3 tests
-common successfully ran 57 tests
-clef successfully ran 27 tests
 composition_phasing successfully ran 5 tests
+clef successfully ran 27 tests
+common successfully ran 57 tests
 converter successfully ran 35 tests
 chordTables successfully ran 17 tests
 chant successfully ran 12 tests
-classCache successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
 braille_translate successfully ran 7 tests
 braille_text successfully ran 4 tests
-braille_lookup successfully ran 3 tests
-braille_segment successfully ran 11 tests
 chord successfully ran 108 tests
+braille_segment successfully ran 11 tests
+classCache successfully ran 12 tests
+braille_lookup successfully ran 3 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
-bar successfully ran 9 tests
 base successfully ran 112 tests
-audioSearch_recording successfully ran 4 tests
+bar successfully ran 9 tests
 braille_examples successfully ran 5 tests
-articulations successfully ran 29 tests
+audioSearch_recording successfully ran 4 tests
 audioSearch_transcriber successfully ran 4 tests
+articulations successfully ran 29 tests
 analysis_search successfully ran 4 tests
-analysis_windowed successfully ran 9 tests
 audioSearch___init__ successfully ran 19 tests
 analysis_reduceChords successfully ran 7 tests
 analysis_patel successfully ran 6 tests
-analysis_metrical successfully ran 6 tests
 analysis_neoRiemannian successfully ran 10 tests
+analysis_metrical successfully ran 6 tests
+analysis_windowed successfully ran 9 tests
 analysis_discrete successfully ran 31 tests
 analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
@@ -236,6 +1528,7 @@ _version successfully ran 3 tests
 abcFormat_testFiles successfully ran 5 tests
 abcFormat_translate successfully ran 18 tests
 Not in Tree Error: vexflow.testShow is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: vexflow.exporter is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.quodJactatur is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.find_vatican1790 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.findSevs is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -248,6 +1541,7 @@ Not in Tree Error: test.toggleDebug is in the music21 directory but not imported
 Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocumentation is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: test.testDocs.test is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocs.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocs is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testCoverage is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -265,8 +1559,6 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -278,6 +1570,1301 @@ Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
+
+-----------
+braille_test had 0 ERRORS and 48 FAILURES in 151 tests:
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example26_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2849, in example26_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2853, in music21.braille.test.example26_2
+Failed example:
+    rightHand = example26_2()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_2[2]>", line 1, in <module>
+        rightHand = example26_2()[0]
+    NameError: name 'example26_2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2854, in music21.braille.test.example26_2
+Failed example:
+    leftHand = example26_2()[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_2[3]>", line 1, in <module>
+        leftHand = example26_2()[1]
+    NameError: name 'example26_2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2855, in music21.braille.test.example26_2
+Failed example:
+    print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_2[4]>", line 1, in <module>
+        print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+    NameError: name 'rightHand' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example26_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2877, in example26_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2881, in music21.braille.test.example26_3
+Failed example:
+    rightHand = example26_3()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_3[2]>", line 1, in <module>
+        rightHand = example26_3()[0]
+    NameError: name 'example26_3' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2882, in music21.braille.test.example26_3
+Failed example:
+    leftHand = example26_3()[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_3[3]>", line 1, in <module>
+        leftHand = example26_3()[1]
+    NameError: name 'example26_3' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2883, in music21.braille.test.example26_3
+Failed example:
+    print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_3[4]>", line 1, in <module>
+        print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+    NameError: name 'rightHand' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example26_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2905, in example26_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2909, in music21.braille.test.example26_4
+Failed example:
+    rightHand = example26_4()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_4[2]>", line 1, in <module>
+        rightHand = example26_4()[0]
+    NameError: name 'example26_4' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2910, in music21.braille.test.example26_4
+Failed example:
+    leftHand = example26_4()[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_4[3]>", line 1, in <module>
+        leftHand = example26_4()[1]
+    NameError: name 'example26_4' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2911, in music21.braille.test.example26_4
+Failed example:
+    print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_4[4]>", line 1, in <module>
+        print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+    NameError: name 'rightHand' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example26_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2933, in example26_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2937, in music21.braille.test.example26_5
+Failed example:
+    rightHand = example26_5()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_5[2]>", line 1, in <module>
+        rightHand = example26_5()[0]
+    NameError: name 'example26_5' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2938, in music21.braille.test.example26_5
+Failed example:
+    leftHand = example26_5()[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_5[3]>", line 1, in <module>
+        leftHand = example26_5()[1]
+    NameError: name 'example26_5' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 2939, in music21.braille.test.example26_5
+Failed example:
+    print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example26_5[4]>", line 1, in <module>
+        print translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True)
+    NameError: name 'rightHand' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 29, in example2_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 33, in music21.braille.test.example2_1
+Failed example:
+    print translate.partToBraille(test.example2_1(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠓⠭⠋⠀⠛⠭⠊⠀⠓⠭⠛⠀⠋⠭⠭⠀⠋⠭⠙⠀⠑⠭⠛⠀⠋⠭⠑⠀⠙⠭⠭⠀⠑⠭⠛
+    ⠀⠀⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠓⠭⠋⠀⠛⠭⠊⠀⠓⠭⠛⠀⠋⠭⠭⠀⠋⠭⠙⠀⠑⠭⠛⠀⠋⠭⠑⠀⠙⠭⠭⠀⠑⠭⠛
+    ⠀⠀⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 43, in example2_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 47, in music21.braille.test.example2_2
+Failed example:
+    print translate.partToBraille(test.example2_2(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠚⠀⠑⠀⠑⠙⠚⠑⠀⠙⠚⠊⠙⠀⠚⠊⠓⠚⠀⠊⠊⠑⠭⠀⠋⠋⠓⠋⠀⠑⠋⠓⠚⠀⠑⠙⠚⠊
+    ⠀⠀⠓⠓⠓⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚⠀⠑⠀⠑⠙⠚⠑⠀⠙⠚⠊⠙⠀⠚⠊⠓⠚⠀⠊⠊⠑⠭⠀⠋⠋⠓⠋⠀⠑⠋⠓⠚⠀⠑⠙⠚⠊
+    ⠀⠀⠓⠓⠓⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 62, in example2_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 66, in music21.braille.test.example2_3
+Failed example:
+    print translate.partToBraille(test.example2_3(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠋⠋⠀⠓⠊⠀⠓⠛⠀⠋⠓⠀⠛⠋⠀⠑⠛⠀⠋⠙⠀⠑⠭⠀⠋⠋⠀⠛⠛⠀⠓⠊⠀⠚⠙
+    ⠀⠀⠊⠛⠀⠋⠑⠀⠙⠚⠀⠙⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠋⠋⠀⠓⠊⠀⠓⠛⠀⠋⠓⠀⠛⠋⠀⠑⠛⠀⠋⠙⠀⠑⠭⠀⠋⠋⠀⠛⠛⠀⠓⠊⠀⠚⠙
+    ⠀⠀⠊⠛⠀⠋⠑⠀⠙⠚⠀⠙⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 76, in example2_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 80, in music21.braille.test.example2_4
+Failed example:
+    print translate.partToBraille(test.example2_4(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠊⠙⠋⠀⠑⠙⠚⠀⠙⠭⠚⠀⠊⠭⠭⠀⠚⠚⠙⠀⠑⠙⠚⠀⠊⠭⠊⠀⠚⠭⠭⠣⠅⠄
+    ⠀⠀⠊⠋⠊⠀⠙⠚⠊⠀⠊⠚⠙⠀⠑⠭⠭⠀⠋⠑⠙⠀⠚⠋⠚⠀⠊⠭⠊⠀⠊⠭⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠊⠙⠋⠀⠑⠙⠚⠀⠙⠭⠚⠀⠊⠭⠭⠀⠚⠚⠙⠀⠑⠙⠚⠀⠊⠭⠊⠀⠚⠭⠭⠣⠅⠄
+    ⠀⠀⠊⠋⠊⠀⠙⠚⠊⠀⠊⠚⠙⠀⠑⠭⠭⠀⠋⠑⠙⠀⠚⠋⠚⠀⠊⠭⠊⠀⠊⠭⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 91, in example2_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 95, in music21.braille.test.example2_5
+Failed example:
+    print translate.partToBraille(test.example2_5(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠚⠀⠑⠋⠀⠛⠙⠊⠙⠀⠑⠙⠊⠙⠀⠊⠙⠊⠓⠀⠋⠓⠛⠭⠀⠑⠋⠛⠑⠀⠙⠑⠋⠛⠀⠓⠋⠙⠋
+    ⠀⠀⠛⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚⠀⠑⠋⠀⠛⠙⠊⠙⠀⠑⠙⠊⠙⠀⠊⠙⠊⠓⠀⠋⠓⠛⠭⠀⠑⠋⠛⠑⠀⠙⠑⠋⠛⠀⠓⠋⠙⠋
+    ⠀⠀⠛⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 110, in example2_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 114, in music21.braille.test.example2_6
+Failed example:
+    print translate.partToBraille(test.example2_6(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠓⠓⠓⠓⠋⠛⠀⠊⠓⠓⠓⠭⠓⠀⠊⠊⠊⠙⠚⠊⠀⠊⠓⠓⠓⠭⠭⠀⠓⠛⠛⠛⠭⠭
+    ⠀⠀⠛⠋⠋⠋⠭⠭⠀⠑⠋⠑⠓⠛⠑⠀⠙⠋⠑⠙⠭⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠓⠓⠓⠓⠋⠛⠀⠊⠓⠓⠓⠭⠓⠀⠊⠊⠊⠙⠚⠊⠀⠊⠓⠓⠓⠭⠭⠀⠓⠛⠛⠛⠭⠭
+    ⠀⠀⠛⠋⠋⠋⠭⠭⠀⠑⠋⠑⠓⠛⠑⠀⠙⠋⠑⠙⠭⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example2_7
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 124, in example2_7
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 128, in music21.braille.test.example2_7
+Failed example:
+    print translate.partToBraille(test.example2_7(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠋⠭⠋⠛⠭⠛⠀⠑⠭⠑⠋⠭⠋⠀⠙⠑⠋⠓⠛⠋⠀⠋⠑⠑⠑⠭⠭⠀⠙⠭⠙⠋⠭⠋
+    ⠀⠀⠛⠭⠛⠊⠭⠊⠀⠓⠭⠓⠓⠊⠚⠀⠑⠙⠙⠙⠭⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠋⠭⠋⠛⠭⠛⠀⠑⠭⠑⠋⠭⠋⠀⠙⠑⠋⠓⠛⠋⠀⠋⠑⠑⠑⠭⠭⠀⠙⠭⠙⠋⠭⠋
+    ⠀⠀⠛⠭⠛⠊⠭⠊⠀⠓⠭⠓⠓⠊⠚⠀⠑⠙⠙⠙⠭⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 141, in example3_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 145, in music21.braille.test.example3_1
+Failed example:
+    print translate.partToBraille(test.example3_1(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠱⠺⠳⠺⠀⠹⠺⠪⠧⠀⠺⠳⠫⠳⠀⠱⠺⠱⠧⠀⠫⠳⠪⠳⠀⠱⠳⠺⠱⠀⠫⠱⠹⠪
+    ⠀⠀⠳⠱⠳⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠱⠺⠳⠺⠀⠹⠺⠪⠧⠀⠺⠳⠫⠳⠀⠱⠺⠱⠧⠀⠫⠳⠪⠳⠀⠱⠳⠺⠱⠀⠫⠱⠹⠪
+    ⠀⠀⠳⠱⠳⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 155, in example3_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 159, in music21.braille.test.example3_2
+Failed example:
+    print translate.partToBraille(test.example3_2(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠪⠻⠹⠻⠀⠳⠫⠹⠫⠀⠻⠳⠪⠻⠀⠱⠫⠻⠧⠀⠳⠪⠳⠹⠀⠻⠪⠹⠱⠀⠹⠪⠳⠹
+    ⠀⠀⠱⠫⠻⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠪⠻⠹⠻⠀⠳⠫⠹⠫⠀⠻⠳⠪⠻⠀⠱⠫⠻⠧⠀⠳⠪⠳⠹⠀⠻⠪⠹⠱⠀⠹⠪⠳⠹
+    ⠀⠀⠱⠫⠻⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 169, in example3_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 173, in music21.braille.test.example3_3
+Failed example:
+    print translate.partToBraille(test.example3_3(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠳⠫⠀⠪⠳⠀⠻⠧⠀⠱⠧⠀⠹⠄⠙⠀⠱⠄⠑⠀⠫⠧⠀⠹⠧⠀⠳⠳⠀⠪⠺⠀⠹⠧⠀⠪⠧
+    ⠀⠀⠳⠄⠓⠀⠻⠱⠀⠹⠫⠀⠹⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠳⠫⠀⠪⠳⠀⠻⠧⠀⠱⠧⠀⠹⠄⠙⠀⠱⠄⠑⠀⠫⠧⠀⠹⠧⠀⠳⠳⠀⠪⠺⠀⠹⠧⠀⠪⠧
+    ⠀⠀⠳⠄⠓⠀⠻⠱⠀⠹⠫⠀⠹⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 183, in example3_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 187, in music21.braille.test.example3_4
+Failed example:
+    print translate.partToBraille(test.example3_4(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠫⠙⠑⠫⠧⠀⠻⠊⠛⠫⠧⠀⠱⠋⠛⠓⠋⠹⠀⠱⠱⠳⠧⠀⠻⠋⠑⠫⠧⠀⠳⠛⠋⠻⠧
+    ⠀⠀⠪⠓⠛⠋⠛⠳⠀⠻⠱⠹⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠫⠙⠑⠫⠧⠀⠻⠊⠛⠫⠧⠀⠱⠋⠛⠓⠋⠹⠀⠱⠱⠳⠧⠀⠻⠋⠑⠫⠧⠀⠳⠛⠋⠻⠧
+    ⠀⠀⠪⠓⠛⠋⠛⠳⠀⠻⠱⠹⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 197, in example3_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 201, in music21.braille.test.example3_5
+Failed example:
+    print translate.partToBraille(test.example3_5(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠻⠄⠙⠱⠫⠀⠻⠄⠓⠪⠻⠀⠪⠹⠱⠹⠀⠪⠻⠳⠧⠣⠅⠄⠀⠳⠄⠋⠹⠫⠀⠻⠄⠙⠻⠪
+    ⠀⠀⠳⠳⠻⠫⠀⠻⠪⠻⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠻⠄⠙⠱⠫⠀⠻⠄⠓⠪⠻⠀⠪⠹⠱⠹⠀⠪⠻⠳⠧⠣⠅⠄⠀⠳⠄⠋⠹⠫⠀⠻⠄⠙⠻⠪
+    ⠀⠀⠳⠳⠻⠫⠀⠻⠪⠻⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example3_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 212, in example3_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 216, in music21.braille.test.example3_6
+Failed example:
+    print translate.partToBraille(test.example3_6(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠳⠓⠱⠑⠀⠳⠚⠑⠚⠓⠀⠪⠊⠊⠚⠙⠀⠺⠚⠳⠭⠀⠪⠊⠱⠑⠀⠳⠚⠪⠙⠀⠚⠙⠑⠹⠊
+    ⠀⠀⠳⠓⠳⠭⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠳⠓⠱⠑⠀⠳⠚⠑⠚⠓⠀⠪⠊⠊⠚⠙⠀⠺⠚⠳⠭⠀⠪⠊⠱⠑⠀⠳⠚⠪⠙⠀⠚⠙⠑⠹⠊
+    ⠀⠀⠳⠓⠳⠭⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 229, in example4_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 233, in music21.braille.test.example4_1
+Failed example:
+    print translate.partToBraille(test.example4_1(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠝⠏⠀⠕⠟⠀⠏⠗⠀⠟⠎⠀⠗⠞⠀⠎⠝⠀⠞⠕⠀⠝⠥⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠝⠏⠀⠕⠟⠀⠏⠗⠀⠟⠎⠀⠗⠞⠀⠎⠝⠀⠞⠕⠀⠝⠥⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 241, in example4_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 245, in music21.braille.test.example4_2
+Failed example:
+    print translate.partToBraille(test.example4_2(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠟⠎⠀⠗⠝⠀⠱⠹⠱⠫⠀⠟⠥⠀⠕⠟⠀⠝⠟⠀⠫⠻⠳⠪⠀⠟⠥⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠟⠎⠀⠗⠝⠀⠱⠹⠱⠫⠀⠟⠥⠀⠕⠟⠀⠝⠟⠀⠫⠻⠳⠪⠀⠟⠥⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 253, in example4_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 257, in music21.braille.test.example4_3
+Failed example:
+    print translate.partToBraille(test.example4_3(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠝⠹⠀⠑⠙⠚⠙⠱⠀⠏⠫⠀⠛⠋⠑⠋⠻⠀⠗⠳⠀⠊⠓⠛⠓⠪⠀⠚⠊⠓⠊⠚⠑⠀⠹⠥
+    ⠀⠀⠏⠫⠀⠑⠙⠚⠙⠱⠀⠝⠹⠀⠚⠊⠓⠊⠺⠀⠎⠪⠀⠓⠛⠋⠛⠳⠀⠛⠋⠑⠋⠛⠑⠀⠹⠥⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠝⠹⠀⠑⠙⠚⠙⠱⠀⠏⠫⠀⠛⠋⠑⠋⠻⠀⠗⠳⠀⠊⠓⠛⠓⠪⠀⠚⠊⠓⠊⠚⠑⠀⠹⠥
+    ⠀⠀⠏⠫⠀⠑⠙⠚⠙⠱⠀⠝⠹⠀⠚⠊⠓⠊⠺⠀⠎⠪⠀⠓⠛⠋⠛⠳⠀⠛⠋⠑⠋⠛⠑⠀⠹⠥⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 268, in example4_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 272, in music21.braille.test.example4_4
+Failed example:
+    measure1 = example4_4()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_4[2]>", line 1, in <module>
+        measure1 = example4_4()[0]
+    NameError: name 'example4_4' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 273, in music21.braille.test.example4_4
+Failed example:
+    print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_4[3]>", line 1, in <module>
+        print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+    NameError: name 'measure1' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 282, in example4_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 286, in music21.braille.test.example4_5
+Failed example:
+    measure1 = example4_5()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_5[2]>", line 1, in <module>
+        measure1 = example4_5()[0]
+    NameError: name 'example4_5' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 287, in music21.braille.test.example4_5
+Failed example:
+    print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_5[3]>", line 1, in <module>
+        print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+    NameError: name 'measure1' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 296, in example4_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 300, in music21.braille.test.example4_6
+Failed example:
+    bm = example4_6()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[2]>", line 1, in <module>
+        bm = example4_6()
+    NameError: name 'example4_6' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 301, in music21.braille.test.example4_6
+Failed example:
+    measure1 = bm[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[3]>", line 1, in <module>
+        measure1 = bm[0]
+    NameError: name 'bm' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 302, in music21.braille.test.example4_6
+Failed example:
+    measure2 = bm[1]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[4]>", line 1, in <module>
+        measure2 = bm[1]
+    NameError: name 'bm' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 303, in music21.braille.test.example4_6
+Failed example:
+    print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[5]>", line 1, in <module>
+        print translate.measureToBraille(measure1, inPlace=True, suppressOctaveMarks = True)
+    NameError: name 'measure1' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 305, in music21.braille.test.example4_6
+Failed example:
+    print translate.measureToBraille(measure2, inPlace=True, suppressOctaveMarks = True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example4_6[6]>", line 1, in <module>
+        print translate.measureToBraille(measure2, inPlace=True, suppressOctaveMarks = True)
+    NameError: name 'measure2' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example4_7
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 314, in example4_7
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 318, in music21.braille.test.example4_7
+Failed example:
+    print translate.partToBraille(test.example4_7(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠗⠄⠀⠏⠄⠀⠝⠄⠀⠏⠄⠀⠹⠱⠫⠀⠳⠻⠫⠀⠕⠄⠈⠉⠀⠕⠄⠀⠏⠫⠀⠫⠻⠳⠀⠎⠪
+    ⠀⠀⠪⠳⠻⠀⠏⠻⠀⠕⠫⠀⠝⠄⠈⠉⠀⠝⠄⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠗⠄⠀⠏⠄⠀⠝⠄⠀⠏⠄⠀⠹⠱⠫⠀⠳⠻⠫⠀⠕⠄⠈⠉⠀⠕⠄⠀⠏⠫⠀⠫⠻⠳⠀⠎⠪
+    ⠀⠀⠪⠳⠻⠀⠏⠻⠀⠕⠫⠀⠝⠄⠈⠉⠀⠝⠄⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 332, in example5_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 336, in music21.braille.test.example5_1
+Failed example:
+    print translate.partToBraille(test.example5_1(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠽⠀⠮⠀⠿⠀⠮⠀⠽⠀⠵⠀⠽⠈⠉⠀⠽⠀⠵⠀⠯⠀⠿⠀⠵⠀⠽⠀⠷⠀⠿⠈⠉⠀⠿⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠽⠀⠮⠀⠿⠀⠮⠀⠽⠀⠵⠀⠽⠈⠉⠀⠽⠀⠵⠀⠯⠀⠿⠀⠵⠀⠽⠀⠷⠀⠿⠈⠉⠀⠿⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 344, in example5_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 348, in music21.braille.test.example5_2
+Failed example:
+    print translate.partToBraille(test.example5_2(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠽⠀⠯⠀⠷⠀⠮⠀⠾⠀⠮⠀⠷⠈⠉⠀⠷⠀⠮⠀⠽⠀⠮⠀⠿⠀⠷⠀⠾⠀⠷⠀⠯⠀⠿⠀⠮
+    ⠀⠀⠿⠀⠵⠀⠾⠀⠵⠀⠽⠈⠉⠀⠽⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠽⠀⠯⠀⠷⠀⠮⠀⠾⠀⠮⠀⠷⠈⠉⠀⠷⠀⠮⠀⠽⠀⠮⠀⠿⠀⠷⠀⠾⠀⠷⠀⠯⠀⠿⠀⠮
+    ⠀⠀⠿⠀⠵⠀⠾⠀⠵⠀⠽⠈⠉⠀⠽⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 357, in example5_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 361, in music21.braille.test.example5_3
+Failed example:
+    print translate.partToBraille(test.example5_3(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠍⠗⠀⠗⠗⠗⠀⠳⠳⠍⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠼⠉⠆⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠍⠗⠀⠗⠗⠗⠀⠳⠳⠍⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 369, in example5_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 373, in music21.braille.test.example5_4
+Failed example:
+    print translate.partToBraille(test.example5_4(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠏⠟⠀⠷⠀⠏⠕⠀⠽⠀⠕⠏⠀⠟⠏⠀⠵⠀⠍⠀⠝⠕⠀⠯⠀⠟⠗⠀⠮⠀⠗⠟⠀⠏⠕⠀⠽
+    ⠀⠀⠍⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠏⠟⠀⠷⠀⠏⠕⠀⠽⠀⠕⠏⠀⠟⠏⠀⠵⠀⠍⠀⠝⠕⠀⠯⠀⠟⠗⠀⠮⠀⠗⠟⠀⠏⠕⠀⠽
+    ⠀⠀⠍⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 383, in example5_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 387, in music21.braille.test.example5_5
+Failed example:
+    print translate.partToBraille(test.example5_5(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
+    ⠀⠀⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
+    ⠀⠀⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example5_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 397, in example5_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 403, in music21.braille.test.example5_6
+Failed example:
+    print translate.partToBraille(test.example5_6(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠮⠽⠾⠀⠝⠞⠮⠞⠝⠀⠾⠍⠘⠉⠍⠀⠷⠾⠎⠗⠀⠮⠘⠉⠮⠍⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠮⠽⠾⠀⠝⠞⠮⠞⠝⠀⠾⠍⠘⠉⠍⠀⠷⠾⠎⠗⠀⠮⠘⠉⠮⠍⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_10
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 571, in example6_10
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 575, in music21.braille.test.example6_10
+Failed example:
+    print translate.partToBraille(test.example6_10(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠪⠎⠪⠈⠉⠀⠪⠧⠣⠞⠀⠹⠹⠧⠹⠈⠉⠀⠹⠧⠕⠀⠋⠫⠋⠻⠧⠀⠋⠫⠋⠱⠧
+    ⠀⠀⠙⠹⠙⠣⠚⠺⠚⠀⠎⠄⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠪⠎⠪⠈⠉⠀⠪⠧⠣⠞⠀⠹⠹⠧⠹⠈⠉⠀⠹⠧⠕⠀⠋⠫⠋⠻⠧⠀⠋⠫⠋⠱⠧
+    ⠀⠀⠙⠹⠙⠣⠚⠺⠚⠀⠎⠄⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_11
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 585, in example6_11
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 589, in music21.braille.test.example6_11
+Failed example:
+    print translate.partToBraille(test.example6_11(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠪⠄⠚⠹⠺⠀⠊⠙⠋⠙⠊⠙⠫⠀⠱⠄⠛⠪⠻⠀⠑⠛⠊⠛⠑⠛⠪⠀⠩⠳⠄⠋⠎
+    ⠀⠀⠺⠄⠚⠝⠀⠑⠙⠚⠊⠩⠓⠋⠩⠛⠓⠀⠎⠈⠉⠊⠩⠓⠪⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠪⠄⠚⠹⠺⠀⠊⠙⠋⠙⠊⠙⠫⠀⠱⠄⠛⠪⠻⠀⠑⠛⠊⠛⠑⠛⠪⠀⠩⠳⠄⠋⠎
+    ⠀⠀⠺⠄⠚⠝⠀⠑⠙⠚⠊⠩⠓⠋⠩⠛⠓⠀⠎⠈⠉⠊⠩⠓⠪⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_12
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 599, in example6_12
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 603, in music21.braille.test.example6_12
+Failed example:
+    print translate.partToBraille(test.example6_12(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠋⠣⠋⠑⠣⠑⠙⠊⠣⠊⠓⠀⠣⠣⠚⠣⠊⠓⠣⠓⠛⠋⠑⠙⠀⠑⠚⠣⠚⠡⠚⠙⠑⠋⠛
+    ⠀⠀⠓⠩⠓⠊⠚⠹⠧⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠋⠣⠋⠑⠣⠑⠙⠊⠣⠊⠓⠀⠣⠣⠚⠣⠊⠓⠣⠓⠛⠋⠑⠙⠀⠑⠚⠣⠚⠡⠚⠙⠑⠋⠛
+    ⠀⠀⠓⠩⠓⠊⠚⠹⠧⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_3
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 466, in example6_3
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 470, in music21.braille.test.example6_3
+Failed example:
+    print translate.measureToBraille(test.example6_3()[0], inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠝⠣⠞⠈⠉
+Got:
+    ⠼⠙⠲⠀⠝⠣⠞⠈⠉
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_4
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 481, in example6_4
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 485, in music21.braille.test.example6_4
+Failed example:
+    print translate.measureToBraille(test.example6_4()[0], inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠡⠫⠋⠊⠙⠡⠋
+Got:
+    ⠼⠉⠲⠀⠡⠫⠋⠊⠙⠡⠋
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_5
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 498, in example6_5
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 502, in music21.braille.test.example6_5
+Failed example:
+    print translate.measureToBraille(test.example6_5()[0], inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠙⠣⠚⠊⠓⠻
+Got:
+    ⠼⠉⠲⠀⠙⠣⠚⠊⠓⠻
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 514, in example6_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 518, in music21.braille.test.example6_6
+Failed example:
+    print translate.partToBraille(test.example6_6(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠹⠩⠹⠱⠩⠱⠀⠫⠻⠩⠻⠳⠀⠩⠳⠪⠣⠺⠡⠺⠀⠝⠥⠀⠏⠣⠫⠱⠀⠹⠱⠡⠫⠹
+    ⠀⠀⠺⠣⠺⠪⠡⠺⠀⠝⠥⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠹⠩⠹⠱⠩⠱⠀⠫⠻⠩⠻⠳⠀⠩⠳⠪⠣⠺⠡⠺⠀⠝⠥⠀⠏⠣⠫⠱⠀⠹⠱⠡⠫⠹
+    ⠀⠀⠺⠣⠺⠪⠡⠺⠀⠝⠥⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_7
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 528, in example6_7
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 532, in music21.braille.test.example6_7
+Failed example:
+    print translate.partToBraille(test.example6_7(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹⠀⠺⠣⠺⠪⠣⠪⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹
+    ⠀⠀⠺⠹⠱⠫⠀⠝⠥⠀⠽⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹⠀⠺⠣⠺⠪⠣⠪⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹
+    ⠀⠀⠺⠹⠱⠫⠀⠝⠥⠀⠽⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_8
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 544, in example6_8
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 548, in music21.braille.test.example6_8
+Failed example:
+    print translate.partToBraille(test.example6_8(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠹⠙⠣⠚⠣⠊⠙⠛⠣⠊⠈⠉⠀⠊⠓⠛⠓⠝⠀⠣⠱⠛⠑⠙⠙⠣⠊⠛⠀⠓⠓⠙⠙⠟⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠹⠙⠣⠚⠣⠊⠙⠛⠣⠊⠈⠉⠀⠊⠓⠛⠓⠝⠀⠣⠱⠛⠑⠙⠙⠣⠊⠛⠀⠓⠓⠙⠙⠟⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example6_9
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 557, in example6_9
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 561, in music21.braille.test.example6_9
+Failed example:
+    print translate.partToBraille(test.example6_9(), inPlace=True, suppressOctaveMarks = True)
+Expected:
+    ⠼⠁⠀⠫⠗⠫⠀⠩⠻⠎⠻⠀⠓⠊⠺⠳⠫⠀⠩⠑⠋⠩⠻⠱⠳⠀⠹⠏⠩⠻⠀⠳⠞⠹
+    ⠀⠀⠚⠊⠓⠚⠊⠓⠩⠛⠩⠑⠀⠯⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠫⠗⠫⠀⠩⠻⠎⠻⠀⠓⠊⠺⠳⠫⠀⠩⠑⠋⠩⠻⠱⠳⠀⠹⠏⠩⠻⠀⠳⠞⠹
+    ⠀⠀⠚⠊⠓⠚⠊⠓⠩⠛⠩⠑⠀⠯⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_1
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 618, in example7_1
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 622, in music21.braille.test.example7_1
+Failed example:
+    print translate.partToBraille(test.example7_1(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠈⠽⠀⠘⠽⠀⠸⠽⠀⠐⠽⠀⠨⠽⠀⠰⠽⠀⠠⠽
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠈⠽⠀⠘⠽⠀⠸⠽⠀⠐⠽⠀⠨⠽⠀⠰⠽⠀⠠⠽
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_10
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 798, in example7_10
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 802, in music21.braille.test.example7_10
+Failed example:
+    inPart = example7_10()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[2]>", line 1, in <module>
+        inPart = example7_10()
+    NameError: name 'example7_10' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 803, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(2).notes[0].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[3]>", line 1, in <module>
+        inPart.measure(2).notes[0].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 805, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(2).notes[1].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[4]>", line 1, in <module>
+        inPart.measure(2).notes[1].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 807, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(3).notes[2].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[5]>", line 1, in <module>
+        inPart.measure(3).notes[2].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 809, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(3).notes[4].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[6]>", line 1, in <module>
+        inPart.measure(3).notes[4].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 811, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(3).notes[7].accidental.displayStatus == False
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[7]>", line 1, in <module>
+        inPart.measure(3).notes[7].accidental.displayStatus == False
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 813, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(4).notes[1].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[8]>", line 1, in <module>
+        inPart.measure(4).notes[1].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 815, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(4).notes[2].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[9]>", line 1, in <module>
+        inPart.measure(4).notes[2].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 817, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(5).notes[2].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[10]>", line 1, in <module>
+        inPart.measure(5).notes[2].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 819, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(7).notes[1].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[11]>", line 1, in <module>
+        inPart.measure(7).notes[1].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 821, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(7).notes[2].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[12]>", line 1, in <module>
+        inPart.measure(7).notes[2].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 823, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(7).notes[3].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[13]>", line 1, in <module>
+        inPart.measure(7).notes[3].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 825, in music21.braille.test.example7_10
+Failed example:
+    inPart.measure(7).notes[6].accidental.displayStatus == False
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[14]>", line 1, in <module>
+        inPart.measure(7).notes[6].accidental.displayStatus == False
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 829, in music21.braille.test.example7_10
+Failed example:
+    print translate.partToBraille(inPart, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_10[15]>", line 1, in <module>
+        print translate.partToBraille(inPart, inPlace=True)
+    NameError: name 'inPart' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_11
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 840, in example7_11
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 844, in music21.braille.test.example7_11
+Failed example:
+    inPart = example7_11()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[2]>", line 1, in <module>
+        inPart = example7_11()
+    NameError: name 'example7_11' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 845, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(4).notes[0].accidental.displayStatus == True # A-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[3]>", line 1, in <module>
+        inPart.measure(4).notes[0].accidental.displayStatus == True # A-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 847, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(4).notes[3].accidental.displayStatus == False # A-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[4]>", line 1, in <module>
+        inPart.measure(4).notes[3].accidental.displayStatus == False # A-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 849, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(5).notes[1].accidental.displayStatus == True # E-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[5]>", line 1, in <module>
+        inPart.measure(5).notes[1].accidental.displayStatus == True # E-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 851, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(5).notes[2].accidental.displayStatus == True # A-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[6]>", line 1, in <module>
+        inPart.measure(5).notes[2].accidental.displayStatus == True # A-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 853, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(6).notes[0].accidental.displayStatus == True # E-3
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[7]>", line 1, in <module>
+        inPart.measure(6).notes[0].accidental.displayStatus == True # E-3
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 855, in music21.braille.test.example7_11
+Failed example:
+    inPart.measure(6).notes[5].accidental.displayStatus == True # E-2
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[8]>", line 1, in <module>
+        inPart.measure(6).notes[5].accidental.displayStatus == True # E-2
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 858, in music21.braille.test.example7_11
+Failed example:
+    print translate.partToBraille(inPart, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_11[9]>", line 1, in <module>
+        print translate.partToBraille(inPart, inPlace=True)
+    NameError: name 'inPart' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_2
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 638, in example7_2
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 642, in music21.braille.test.example7_2
+Failed example:
+    print translate.partToBraille(test.example7_2(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠈⠈⠮⠾⠀⠠⠠⠽
+Got:
+    ⠀⠀⠀⠀⠀⠜⠦⠀⠀⠀⠀
+    ⠼⠁⠀⠈⠈⠮⠾⠀⠠⠠⠽
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_6
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 733, in example7_6
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 737, in music21.braille.test.example7_6
+Failed example:
+    inPart = example7_6()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_6[2]>", line 1, in <module>
+        inPart = example7_6()
+    NameError: name 'example7_6' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 738, in music21.braille.test.example7_6
+Failed example:
+    print translate.partToBraille(inPart, inPlace=True)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_6[3]>", line 1, in <module>
+        print translate.partToBraille(inPart, inPlace=True)
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 741, in music21.braille.test.example7_6
+Failed example:
+    inPart.measure(7).notes[3].accidental
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_6[4]>", line 1, in <module>
+        inPart.measure(7).notes[3].accidental
+    NameError: name 'inPart' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 743, in music21.braille.test.example7_6
+Failed example:
+    inPart.measure(7).notes[3].accidental.displayStatus == True
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.braille.test.example7_6[5]>", line 1, in <module>
+        inPart.measure(7).notes[3].accidental.displayStatus == True
+    NameError: name 'inPart' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_7
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 752, in example7_7
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 760, in music21.braille.test.example7_7
+Failed example:
+    print translate.partToBraille(test.example7_7(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠐⠊⠙⠛⠙⠀⠨⠊⠙⠛⠙⠀⠰⠊⠛⠙⠑⠀⠨⠊⠛⠋⠙⠀⠟⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠊⠙⠛⠙⠀⠨⠊⠙⠛⠙⠀⠰⠊⠛⠙⠑⠀⠨⠊⠛⠋⠙⠀⠟⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_8
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 770, in example7_8
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 774, in music21.braille.test.example7_8
+Failed example:
+    print translate.partToBraille(test.example7_8(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠸⠝⠘⠳⠸⠫⠀⠱⠄⠙⠹⠹⠀⠸⠎⠳⠫⠀⠱⠗⠳⠀⠐⠹⠄⠚⠪⠳⠀⠪⠻⠹⠪
+    ⠀⠀⠘⠳⠳⠸⠱⠳⠀⠫⠝⠄⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠸⠝⠘⠳⠸⠫⠀⠱⠄⠙⠹⠹⠀⠸⠎⠳⠫⠀⠱⠗⠳⠀⠐⠹⠄⠚⠪⠳⠀⠪⠻⠹⠪
+    ⠀⠀⠘⠳⠳⠸⠱⠳⠀⠫⠝⠄⠣⠅
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.braille.test.example7_9
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 784, in example7_9
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/braille/test.py", line 788, in music21.braille.test.example7_9
+Failed example:
+    print translate.partToBraille(test.example7_9(), inPlace=True)
+Expected:
+    ⠼⠁⠀⠐⠫⠄⠊⠙⠋⠀⠱⠑⠙⠺⠀⠫⠄⠩⠓⠚⠨⠋⠀⠹⠙⠚⠪⠀⠊⠩⠙⠋⠊⠨⠙⠓
+    ⠀⠀⠨⠛⠑⠐⠊⠨⠋⠑⠐⠛⠀⠨⠙⠚⠐⠑⠊⠩⠓⠋⠀⠎⠄⠣⠅
+Got:
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠫⠄⠊⠙⠋⠀⠱⠑⠙⠺⠀⠫⠄⠩⠓⠚⠨⠋⠀⠹⠙⠚⠪⠀⠊⠩⠙⠋⠊⠨⠙⠓
+    ⠀⠀⠨⠛⠑⠐⠊⠨⠋⠑⠐⠛⠀⠨⠙⠚⠐⠑⠊⠩⠓⠋⠀⠎⠄⠣⠅
+
+
 -------------------------------------------------------------------------
-Ran 3720 tests in 353.9656 seconds
-Run at 2013-11-05 17:25:06
+Ran 3899 tests in 435.4293 seconds
+Run at 2013-11-11 12:38:05
