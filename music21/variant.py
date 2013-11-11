@@ -2466,7 +2466,7 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut([p for p in sCopy.pitches]), 
             '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
     
-        # however, if the the Variant deepcopy still references the original
+        # however, if the Variant deepcopy still references the original
         # notes it had, then when we try to activate the variant in the 
         # in original Stream, we would get unexpected results (the octave shift)
     

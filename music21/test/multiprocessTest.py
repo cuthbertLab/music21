@@ -96,7 +96,7 @@ class ModuleGather(object):
 
     def _getName(self, fp):
         r'''
-        Given full file path, find a name for the the module with : as the separator.
+        Given full file path, find a name for the module with : as the separator.
         
         >>> from music21.test import testSingleCoreAll as testModule
         >>> mg = testModule.ModuleGather()
@@ -112,7 +112,7 @@ class ModuleGather(object):
 
     def _getNamePeriod(self, fp):
         r'''
-        Given full file path, find a name for the the module with . as the separator.
+        Given full file path, find a name for the module with . as the separator.
         
         >>> from music21.test import testSingleCoreAll as testModule
         >>> mg = testModule.ModuleGather()

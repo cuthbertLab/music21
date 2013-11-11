@@ -835,7 +835,7 @@ class MetricModulation(TempoIndication):
         return self._oldMetronome
 
     oldMetronome = property(_getOldMetronome, _setOldMetronome, doc=
-        '''Get or set the the left :class:`~music21.tempo.MetronomeMark` object for the old, or previous value. 
+        '''Get or set the left :class:`~music21.tempo.MetronomeMark` object for the old, or previous value. 
 
         
         >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
@@ -910,7 +910,7 @@ class MetricModulation(TempoIndication):
         return self._newMetronome
 
     newMetronome = property(_getNewMetronome, _setNewMetronome, doc=
-        '''Get or set the the right :class:`~music21.tempo.MetronomeMark` object for the new, or following value.
+        '''Get or set the right :class:`~music21.tempo.MetronomeMark` object for the new, or following value.
 
         
         >>> mm1 = tempo.MetronomeMark(number=60, referent=1)

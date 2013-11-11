@@ -2792,7 +2792,7 @@ class Test(unittest.TestCase):
     def testTokenization(self):
         from music21.abcFormat import testFiles
 
-        for (tf, countTokens, noteTokens, chrodTokens) in [
+        for (tf, countTokens, noteTokens, chordTokens) in [
             (testFiles.fyrareprisarn, 241, 152, 0), 
             (testFiles.mysteryReel, 192, 153, 0), 
             (testFiles.aleIsDear, 291, 206, 32),
@@ -2816,7 +2816,7 @@ class Test(unittest.TestCase):
                     countNotes += 1
 
             self.assertEqual(countNotes, noteTokens)
-            self.assertEqual(countChords, chrodTokens)
+            self.assertEqual(countChords, chordTokens)
         
 
     def testRe(self):

@@ -691,7 +691,7 @@ class MeterTerminal(object):
 
 
     def subdivide(self, value):
-        '''Subdivision takes a MeterTerminal and, making it into a a collection of MeterTerminals, Returns a MeterSequence.
+        '''Subdivision takes a MeterTerminal and, making it into a collection of MeterTerminals, Returns a MeterSequence.
 
         This is different than a partitioning a MeterSequence in that this does not happen in place and instead returns a new object.
 

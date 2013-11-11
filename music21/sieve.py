@@ -811,7 +811,7 @@ class Residual(object):
 class CompressionSegment(object):
     """Utility to convert from a point sequence to sieve.
 
-    A z range can be supplied to explicitly provide the complete sieve segment, both positive and negative values. all values in the z range not in the segment are interepreted as negative values. thus, there is an essential dependency on the the z range and the realized sieve.
+    A z range can be supplied to explicitly provide the complete sieve segment, both positive and negative values. all values in the z range not in the segment are interepreted as negative values. thus, there is an essential dependency on the z range and the realized sieve.
 
     No matter the size of the z range, there is a modulus at which one point in the segment can be found. As such, any segment can be reduced to, at a mimimum, a residual for each point in the segment, each, for the supplied z, providing a segment with one point.
 
@@ -1315,7 +1315,7 @@ class Sieve(object):
             return libKeys
 
     def _resPeriodList(self, state):
-        """For all residual classes, get the period, or the value of M, adn return these in a list. Remove any redundant values and sort. """
+        """For all residual classes, get the period, or the value of M, and return these in a list. Remove any redundant values and sort. """
         mList = []
         for key in self._resKeys(state):
             p = self._resLib[key].period()

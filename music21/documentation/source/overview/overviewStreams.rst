@@ -350,7 +350,7 @@ Let's print the name of each pitch here:
 >>> [str(p) for p in listOut]
 ['E4', 'F#4', 'D#5', 'D#5', 'D#5', 'D#5', 'D#5', 'D#5', 'B5']
 
-Gathering elements from a Stream based a single offset or an offset range permits treating the elements as part of timed sequence of events that can be be cut and sliced. 
+Gathering elements from a Stream based a single offset or an offset range permits treating the elements as part of timed sequence of events that can be cut and sliced. 
 
 The :meth:`~music21.stream.Stream.getElementsByOffset` method returns a Stream of all elements that fall either at a single offset or within a range of two offsets provided as an argument. In both cases a Stream is returned.
 

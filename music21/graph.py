@@ -1274,7 +1274,7 @@ class GraphScatterWeighted(Graph):
             if zList[i] > 1:
                 # xdistort does not seem to
                 # width shift can be between .1 and .25
-                # width is already shifted by by distort
+                # width is already shifted by distort
                 # use half of width == radius
                 ax.text(x+((width*.5)+(.05*xDistort)),
                         y+.10,
@@ -1812,7 +1812,7 @@ class PlotStream(object):
 
         #environLocal.printDebug(['after looking at Pitch:', 'xValues', xValues, 'yValues', yValues])
 
-        # if we only have one attribute form the Chrod, and many from the 
+        # if we only have one attribute form the Chord, and many from the 
         # Pitches, need to make the number of data points equal by 
         # duplicating data
         if matchPitchCount: 
@@ -1837,7 +1837,7 @@ class PlotStream(object):
 
     def process(self):
         '''This will process all data, as well as call the done() method. 
-        What happens when the done() is called is determined by the the keyword argument `doneAction`; 
+        What happens when the done() is called is determined by the keyword argument `doneAction`; 
         options are 'show' (display immediately), 'write' (write the file to a supplied file path), 
         and None (do processing but do not write or show a graph).
 
@@ -2408,7 +2408,7 @@ class PlotMultiStream(object):
         '''
         This will process all data, as well as call 
         the done() method. What happens when the done() is 
-        called is determined by the the keyword argument `doneAction`; 
+        called is determined by the keyword argument `doneAction`; 
         options are 'show' (display immediately), 
         'write' (write the file to a supplied file path), 
         and None (do processing but do not write or show a graph).

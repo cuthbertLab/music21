@@ -83,7 +83,7 @@ class ModuleGather(object):
 
     def _getName(self, fp):
         r'''
-        Given full file path, find a name for the the module
+        Given full file path, find a name for the module
         
         >>> from music21.test import testSingleCoreAll as testModule
         >>> mg = testModule.ModuleGather()

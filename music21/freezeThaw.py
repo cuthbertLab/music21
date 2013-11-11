@@ -921,6 +921,9 @@ class JSONFreezeThawBase(object):
     # __AUTO_GATHER__ : place all autoGatherAttributes here
     # __INHERIT__ : place all attributes from the inherited class here # NOT YET!
     storedClassAttributes = {
+        'music21.base.Music21Object' : [
+            '_duration', '_priority', 'offset',                
+            ],
         'music21.beam.Beam': [
             'type', 'direction', 'independentAngle', 'number',
             ],
@@ -987,8 +990,8 @@ class JSONFreezeThawBase(object):
             'text', 'syllabic', 'number', 'identifier',
             ],
         'music21.note.GeneralNote': [
-            '__AUTO_GATHER__', 'lyrics', 'expressions', 'articulations',
-            'editorial', 'tie',
+            '__INHERIT__', '_editorial', 'lyrics', 'expressions', 'articulations',
+            'tie',
             ],
         'music21.note.NotRest': [
             '__INHERIT__', '_notehead', '_noteheadFill',
@@ -997,6 +1000,24 @@ class JSONFreezeThawBase(object):
         'music21.note.Note': [
             '__INHERIT__', 'pitch', 'beams',
             ],
+        'music21.pitch.Accidental': [
+            '__AUTO_GATHER__',              
+            ],
+        
+        'music21.pitch.Pitch': [
+            '_accidental', '_microtone', '_octave', '_priority', '_step',              
+            ],
+        'music21.stream.Stream': ['__INHERIT__',
+                                  '_atSoundingPitch',
+                                  '_elements',
+                                  '_endElements',
+                                  ],
+        'music21.tie.Tie': [
+                            'type', 'style'
+                            ],
+        'music21.volume.Volume': [
+                                  '_velocity'
+                                  ],
         }
 
     postClassCreateCall = {
@@ -1127,7 +1148,7 @@ class JSONFreezer(JSONFreezeThawBase):
             return post
         obj = self.storedObject
         # names that we always do not need
-        exclude = ['_classes', '_fullyQualifiedClasses']
+        exclude = ('_classes', '_fullyQualifiedClasses', '_derivation')
         # get class names that exclude instance names
         # these names will be rejected in final accumulation
         classNames = []
@@ -1160,8 +1181,6 @@ class JSONFreezer(JSONFreezeThawBase):
 
         For an object which does not define this, just returns all the _underscore attributes:
 
-
-
         >>> ed = editorial.NoteEditorial()
         >>> jsf = freezeThaw.JSONFreezer(ed)
         >>> jsf.jsonAttributes()
@@ -1177,7 +1196,7 @@ class JSONFreezer(JSONFreezeThawBase):
         >>> gn = note.GeneralNote()
         >>> jsf = freezeThaw.JSONFreezer(gn)
         >>> jsf.jsonAttributes()
-        ['_activeSite', '_activeSiteId', '_duration', '_editorial', '_idLastDeepCopyOf', '_overriddenLily', '_priority', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie']
+        ['_duration', '_priority', 'offset', '_editorial', 'lyrics', 'expressions', 'articulations', 'tie']
         '''
         if self.storedObject is None:
             return []
@@ -1372,106 +1391,82 @@ class JSONFreezer(JSONFreezeThawBase):
         Prints out the json output for a given object:
 
 
-        >>> n = note.Note()
+        >>> n = note.Note('D#5')
         >>> jsf = freezeThaw.JSONFreezer(n)
         >>> jsf.jsonPrint()
         {
           "__attr__": {
             "_duration": {
               "__attr__": {
-                "_cachedIsLinked": true,
+                "_cachedIsLinked": true, 
                 "_components": [
                   {
                     "__attr__": {
                       "_dots": [
                         0
-                      ],
-                      "_link": true,
-                      "_qtrLength": 1.0,
-                      "_quarterLengthNeedsUpdating": false,
-                      "_tuplets": [],
-                      "_type": "quarter",
+                      ], 
+                      "_link": true, 
+                      "_qtrLength": 1.0, 
+                      "_quarterLengthNeedsUpdating": false, 
+                      "_tuplets": [], 
+                      "_type": "quarter", 
                       "_typeNeedsUpdating": false
-                    },
+                    }, 
                     "__class__": "music21.duration.DurationUnit"
                   }
-                ],
-                "_componentsNeedUpdating": false,
-                "_qtrLength": 1.0,
+                ], 
+                "_componentsNeedUpdating": false, 
+                "_qtrLength": 1.0, 
                 "_quarterLengthNeedsUpdating": false
-              },
+              }, 
               "__class__": "music21.duration.Duration"
-            },
-            "_notehead": "normal",
-            "_noteheadFill": "default",
-            "_noteheadParenthesis": false,
-            "_priority": 0,
-            "_stemDirection": "unspecified",
-            "articulations": [],
+            }, 
+            "_notehead": "normal", 
+            "_noteheadFill": "default", 
+            "_noteheadParenthesis": false, 
+            "_priority": 0, 
+            "_stemDirection": "unspecified", 
+            "articulations": [], 
             "beams": {
               "__attr__": {
-                "beamsList": [],
+                "beamsList": [], 
                 "feathered": false
-              },
+              }, 
               "__class__": "music21.beam.Beams"
-            },
-            "editorial": {
-              "__attr__": {
-                "comment": {
-                  "__attr__": {},
-                  "__class__": "music21.editorial.Comment"
-                },
-                "misc": {}
-              },
-              "__class__": "music21.editorial.NoteEditorial"
-            },
-            "expressions": [],
-            "lyrics": [],
+            }, 
+            "expressions": [], 
+            "lyrics": [], 
+            "offset": 0.0, 
             "pitch": {
               "__attr__": {
-                "_duration": {
+                "_accidental": {
                   "__attr__": {
-                    "_cachedIsLinked": true,
-                    "_components": [
-                      {
-                        "__attr__": {
-                          "_dots": [
-                            0
-                          ],
-                          "_link": true,
-                          "_qtrLength": 1.0,
-                          "_quarterLengthNeedsUpdating": false,
-                          "_tuplets": [],
-                          "_type": "quarter",
-                          "_typeNeedsUpdating": false
-                        },
-                        "__class__": "music21.duration.DurationUnit"
-                      }
-                    ],
-                    "_componentsNeedUpdating": false,
-                    "_qtrLength": 1.0,
-                    "_quarterLengthNeedsUpdating": false
-                  },
-                  "__class__": "music21.duration.Duration"
-                },
+                    "_alter": 1.0, 
+                    "_displayType": "normal", 
+                    "_modifier": "#", 
+                    "_name": "sharp", 
+                    "_priority": 0
+                  }, 
+                  "__class__": "music21.pitch.Accidental"
+                }, 
                 "_microtone": {
                   "__attr__": {
-                    "_centShift": 0,
+                    "_centShift": 0, 
                     "_harmonicShift": 1
-                  },
+                  }, 
                   "__class__": "music21.pitch.Microtone"
-                },
-                "_octave": 4,
-                "_priority": 0,
-                "_step": "C"
-              },
+                }, 
+                "_octave": 5, 
+                "_priority": 0, 
+                "_step": "D"
+              }, 
               "__class__": "music21.pitch.Pitch"
             }
-          },
-          "__class__": "music21.note.Note",
+          }, 
+          "__class__": "music21.note.Note", 
           "__version__": [
-            1,
-            7,
+            1, 
+            7, 
             1
           ]
         }

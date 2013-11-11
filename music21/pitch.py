@@ -3542,7 +3542,7 @@ class Pitch(base.Music21Object):
     def transposeBelowTarget(self, target, minimize=False):
         '''Given a source Pitch, shift it down octaves until it is below the target. Note: this manipulates src inPlace.
     
-        If `minimize` is True, a pitch below the the target will move up to the nearest octave. 
+        If `minimize` is True, a pitch below the target will move up to the nearest octave. 
 
         
         >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
@@ -3590,7 +3590,7 @@ class Pitch(base.Music21Object):
     def transposeAboveTarget(self, target, minimize=False):
         '''Given a source Pitch, shift it up octaves until it is above the target. Note: this manipulates src inPlace.
 
-        If `minimize` is True, a pitch above the the target will move down to the nearest octave. 
+        If `minimize` is True, a pitch above the target will move down to the nearest octave. 
 
         
         >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))

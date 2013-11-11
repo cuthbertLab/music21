@@ -176,7 +176,7 @@ class XMLNode(object):
         name, try to convert it to a Python 
         attribute name. If the Python name 
         is given, without and - dividers, 
-        the the proper name should be returned
+        the proper name should be returned
 
         
         >>> a = xmlnode.XMLNode()

@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
 #### thoughts on how to do this...
 #    def xtest001(self):
 #        '''Above G4 do higher pitches tend to be louder?
-#        Is this asking if all pithces above G4 are louder, or if, above G4, 
+#        Is this asking if all pitches above G4 are louder, or if, above G4, 
 #        as pitches get higher, are they louder?
 #        '''
 #        from music21 import analysis
@@ -63,7 +63,7 @@ class Test(unittest.TestCase):
         '''Add key velocities to some MIDI data that reflect accent levels arising from the meter.
 
         Modify this to just adjust dynamics based on meter; this should be 
-        reflected in muiscal output
+        reflected in musical output
         '''
         from music21 import articulations
         from music21 import converter
@@ -71,7 +71,7 @@ class Test(unittest.TestCase):
         partStream = converter.parse("dicterliebe1.xml")
         #for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
-        # into measure-lenght part streams
+        # into measure-length part streams
         for measure in partStream.getElementsByClass('Measure')():  # () ? 
             # measure is a partStream isolated for just the desired measure
             # assuming only one meter per measure

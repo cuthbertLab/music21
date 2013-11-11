@@ -4289,7 +4289,7 @@ class Test(unittest.TestCase):
         self.assertEqual(id(s[2]), id(b2))
 
 
-        # try to remove elements; the the second index is the barline
+        # try to remove elements; the second index is the barline
         self.assertEqual(s.pop(2), b2)
         self.assertEqual(len(s), 2)
         self.assertEqual([e.offset for e in s], [0.0, 30])
