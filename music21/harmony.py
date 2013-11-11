@@ -1044,12 +1044,16 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         >>> c = chord.Chord(['C3', 'D3', 'G3'])
         >>> harmony.chordSymbolFigureFromChord(c, True)
         ('Csus2', 'suspended-second')
+        >>> c.root()
+        <music21.pitch.Pitch C3>
     
     ::
 
         >>> c = chord.Chord(['C3', 'F3', 'G3'])
         >>> harmony.chordSymbolFigureFromChord(c, True)
         ('Csus', 'suspended-fourth')
+        >>> c.root()
+        <music21.pitch.Pitch C3>
 
     ::
 
