@@ -57,7 +57,7 @@ class ModuleGather(object):
         self.modulePaths = []
     
         self.moduleSkip = [
-            'test.py', 
+            'testSingleCoreAll.py', 
             'testExternal.py', 
             'testDefault.py', 
             'testInstallation.py', 
