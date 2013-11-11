@@ -905,7 +905,7 @@ def chordSymbolToMx(cs):
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1>>
  
     >>> hd = harmony.ChordStepModification()
-    >>> hd.type = 'alter'
+    >>> hd.modType = 'alter'
     >>> hd.interval = -1
     >>> hd.degree = 3
     >>> cs.addChordStepModification(hd)
@@ -913,6 +913,15 @@ def chordSymbolToMx(cs):
     >>> mxHarmony = musicxml.toMxObjects.chordSymbolToMx(cs)
     >>> mxHarmony
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1> <degree <degree-value charData=3> <degree-alter charData=-1> <degree-type charData=alter>>>
+
+    Test altered chords:
+    
+    Is this correct?
+
+    >>> f = harmony.ChordSymbol('F sus add 9')
+    >>> mxF = musicxml.toMxObjects.chordSymbolToMx(f)
+    >>> mxF
+    <harmony <root root-step=G> <kind text= charData=suspended-fourth> inversion=3 <bass bass-step=F> <degree <degree-value charData=9> <degree-alter > <degree-type charData=add>>>
     '''
     mxHarmony = mxObjects.Harmony()
 
@@ -947,14 +956,14 @@ def chordSymbolToMx(cs):
             mxDegreeValue = mxObjects.DegreeValue()
             mxDegreeValue.set('charData', hd.degree)
             mxDegree.componentList.append(mxDegreeValue)
+            mxDegreeAlter = mxObjects.DegreeAlter()
             if hd.interval is not None:
-                mxDegreeAlter = mxObjects.DegreeAlter()
                 # will return -1 for '-a1'
                 mxDegreeAlter.set('charData', hd.interval.chromatic.directed)
-                mxDegree.componentList.append(mxDegreeAlter)
+            mxDegree.componentList.append(mxDegreeAlter)
 
             mxDegreeType = mxObjects.DegreeType()
-            mxDegreeType.set('charData', hd.type)
+            mxDegreeType.set('charData', hd.modType)
             mxDegree.componentList.append(mxDegreeType)
 
         mxHarmony.set('degree', mxDegree)
