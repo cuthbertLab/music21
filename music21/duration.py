@@ -829,34 +829,34 @@ def updateTupletType(durationList):
                 #                         completionCount, completionTarget])
 
 
-
-
 #-------------------------------------------------------------------------------
+
+
 class TupletException(exceptions21.Music21Exception):
     pass
 
+
 class Tuplet(object):
     '''
-    A tuplet object is a representation of a musical tuplet (like a
-    triplet).  It expresses a ratio that
-    modifies duration values and are stored in Duration objects in
-    a "tuple" (immutable list; since there can be nested tuplets) in
-    the duration's .tuplets property.
+    A tuplet object is a representation of a musical tuplet (like a triplet).
+    It expresses a ratio that modifies duration values and are stored in
+    Duration objects in a "tuple" (immutable list; since there can be nested
+    tuplets) in the duration's .tuplets property.
 
     The primary representation uses two pairs of note numbers and durations.
 
     The first pair of note numbers and durations describes the representation
-    within the tuplet, or the value presented by the context. This is
-    called "actual." In a standard 8th note triplet this would be 3, eighth.
+    within the tuplet, or the value presented by the context. This is called
+    "actual." In a standard 8th note triplet this would be 3, eighth.
     Attributes are `numberNotesActual`, `durationActual`.
 
-    The second pair of note numbers and durations describes the space that would
-    have been occupied in a normal context. This is called "normal." In a
-    standard 8th note triplet this would be 2, eighth. Attributes
-    are `numberNotesNormal`, `durationNormal`.
+    The second pair of note numbers and durations describes the space that
+    would have been occupied in a normal context. This is called "normal." In a
+    standard 8th note triplet this would be 2, eighth. Attributes are
+    `numberNotesNormal`, `durationNormal`.
 
-    If duration values are not provided, the `durationActual` and `durationNormal`
-    are assumed to be eighths.
+    If duration values are not provided, the `durationActual` and
+    `durationNormal` are assumed to be eighths.
 
     If only one duration, either `durationActual` or `durationNormal`, is
     provided, both are set to the same value.
@@ -864,62 +864,79 @@ class Tuplet(object):
     Note that this is a duration modifier, or a generator of ratios to scale
     quarterLength values in Duration objects.
 
+    ::
 
-    >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
-    >>> print(myTup.tupletMultiplier())
-    0.8
-    >>> myTup2 = duration.Tuplet(8, 5)
-    >>> print(myTup2.tupletMultiplier())
-    0.625
-    >>> myTup2 = duration.Tuplet(6, 4, "16th")
-    >>> print(myTup2.durationActual.type)
-    16th
-    >>> print(myTup2.tupletMultiplier())
-    0.666...
+        >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+        >>> print(myTup.tupletMultiplier())
+        0.8
+
+    ::
+
+        >>> myTup2 = duration.Tuplet(8, 5)
+        >>> print(myTup2.tupletMultiplier())
+        0.625
+
+    ::
+
+        >>> myTup2 = duration.Tuplet(6, 4, "16th")
+        >>> print(myTup2.durationActual.type)
+        16th
+
+    ::
+
+        >>> print(myTup2.tupletMultiplier())
+        0.666...
 
     Tuplets may be frozen, in which case they become immutable. Tuplets
     which are attached to Durations are automatically frozen.  Otherwise
     a tuplet could change without the attached duration knowing about it,
     which would be a real problem.
 
-    >>> myTup.frozen = True
-    >>> myTup.tupletActual = [3, 2]
-    Traceback (most recent call last):
-    ...
-    TupletException: A frozen tuplet (or one attached to a duration) is immutable
+    ::
 
-    >>> myHalf = duration.Duration("half")
-    >>> myHalf.appendTuplet(myTup2)
-    >>> myTup2.tupletActual = [5, 4]
-    Traceback (most recent call last):
-    ...
-    TupletException: A frozen tuplet (or one attached to a duration) is immutable
+        >>> myTup.frozen = True
+        >>> myTup.tupletActual = [3, 2]
+        Traceback (most recent call last):
+        ...
+        TupletException: A frozen tuplet (or one attached to a duration) is immutable
 
+    ::
+
+        >>> myHalf = duration.Duration("half")
+        >>> myHalf.appendTuplet(myTup2)
+        >>> myTup2.tupletActual = [5, 4]
+        Traceback (most recent call last):
+        ...
+        TupletException: A frozen tuplet (or one attached to a duration) is immutable
 
     Note that if you want to create a note with a simple Tuplet attached to it,
     you can just change the quarterLength of the note:
 
-    >>> myNote = note.Note("C#4")
-    >>> myNote.quarterLength = 0.8
-    >>> myNote.duration.fullName
-    'Quarter Quintuplet (0.8QL)'
-    >>> myNote.duration.tuplets
-    (<music21.duration.Tuplet 5/4/quarter>,)
+    ::
 
+        >>> myNote = note.Note("C#4")
+        >>> myNote.quarterLength = 0.8
+        >>> myNote.duration.fullName
+        'Quarter Quintuplet (0.8QL)'
 
+    ::
 
+        >>> myNote.duration.tuplets
+        (<music21.duration.Tuplet 5/4/quarter>,)
 
     OMIT_FROM_DOCS
     We should also have a tupletGroup spanner.
 
-
     object that groups note objects into larger groups.
     # TODO: use __setattr__ to freeze all properties, and make a metaclass
     # exceptions: tuplet type, tuplet id: things that don't affect length
-
     '''
 
+    ### CLASS VARIABLES ###
+
     frozen = False
+
+    ### INITIALIZER ###
 
     def __init__(self, *arguments, **keywords):
         #environLocal.printDebug(['creating Tuplet instance'])
@@ -989,155 +1006,12 @@ class Tuplet(object):
         # this attribute is not yet used anywhere
         #self.nestedInside = ""  # could be a tuplet object
 
+    ### SPECIAL METHODS ###
 
     def __repr__(self):
         return ("<music21.duration.Tuplet %d/%d/%s>" % (self.numberNotesActual, self.numberNotesNormal, self.durationNormal.type))
 
-
-    #---------------------------------------------------------------------------
-    # properties
-
-    @apply
-    def tupletActual():
-        def fget(self):
-            '''
-            Get or set a two element list of number notes actual and duration
-            actual.
-            '''
-            return [self.numberNotesActual, self.durationActual]
-        def fset(self, tupList=[]):
-            if self.frozen is True:
-                raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-            self.numberNotesActual, self.durationActual = tupList
-        return property(**locals())
-
-    @apply
-    def tupletNormal():
-        def fget(self):
-            '''
-            Get or set a two element list of number notes actual and duration
-            normal.
-            '''
-            return self.numberNotesNormal, self.durationNormal
-        def fset(self, tupList=[]):
-            if self.frozen is True:
-                raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-            self.numberNotesNormal, self.durationNormal = tupList
-        return property(**locals())
-
-    #---------------------------------------------------------------------------
-    def tupletMultiplier(self):
-        '''Get a floating point value by which to scale the duration that
-        this Tuplet is associated with.
-
-
-        >>> myTuplet = duration.Tuplet()
-        >>> print(round(myTuplet.tupletMultiplier(), 3))
-        0.667
-        >>> myTuplet.tupletActual = [5, duration.Duration('eighth')]
-        >>> myTuplet.numberNotesActual
-        5
-        >>> myTuplet.durationActual.type
-        'eighth'
-        >>> print(myTuplet.tupletMultiplier())
-        0.4
-        '''
-        lengthActual = self.durationActual.quarterLength
-        return (self.totalTupletLength() / (
-                self.numberNotesActual * lengthActual))
-
-    def totalTupletLength(self):
-        '''
-        The total duration in quarter length of the tuplet as defined, assuming that
-        enough notes existed to fill all entire tuplet as defined.
-
-        For instance, 3 quarters in the place of 2 quarters = 2.0
-        5 half notes in the place of a 2 dotted half notes = 6.0
-        (In the end it's only the denominator that matters)
-
-
-        >>> a = duration.Tuplet()
-        >>> a.totalTupletLength()
-        1.0
-        >>> a.numberNotesActual = 3
-        >>> a.durationActual = duration.Duration('half')
-        >>> a.numberNotesNormal = 2
-        >>> a.durationNormal = duration.Duration('half')
-        >>> a.totalTupletLength()
-        4.0
-        >>> a.setRatio(5,4)
-        >>> a.totalTupletLength()
-        8.0
-        >>> a.setRatio(5,2)
-        >>> a.totalTupletLength()
-        4.0
-        '''
-        return self.numberNotesNormal * self.durationNormal.quarterLength
-
-
-    def setRatio(self, actual, normal):
-        '''Set the ratio of actual divisions to represented in normal divisions.
-        A triplet is 3 actual in the time of 2 normal.
-
-
-        >>> a = duration.Tuplet()
-        >>> a.tupletMultiplier()
-        0.666...
-        >>> a.setRatio(6,2)
-        >>> a.tupletMultiplier()
-        0.333...
-
-        One way of expressing 6/4-ish triplets without numbers:
-        >>> a = duration.Tuplet()
-        >>> a.setRatio(3,1)
-        >>> a.durationActual = duration.DurationUnit('quarter')
-        >>> a.durationNormal = duration.DurationUnit('half')
-        >>> a.tupletMultiplier()
-        0.666...
-        >>> a.totalTupletLength()
-        2.0
-        '''
-        if self.frozen is True:
-            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-
-        self.numberNotesActual = actual
-        self.numberNotesNormal = normal
-
-    def setDurationType(self, durType):
-        '''Set the Duration for both actual and normal.
-
-        A type string or quarter length can be given.
-
-
-        >>> a = duration.Tuplet()
-        >>> a.tupletMultiplier()
-        0.666...
-        >>> a.totalTupletLength()
-        1.0
-        >>> a.setDurationType('half')
-        >>> a.tupletMultiplier()
-        0.6666...
-        >>> a.totalTupletLength()
-        4.0
-
-        >>> a.setDurationType(2)
-        >>> a.totalTupletLength()
-        4.0
-        >>> a.setDurationType(4)
-        >>> a.totalTupletLength()
-        8.0
-
-
-        '''
-        # these used to be Duration; now using DurationUnits
-        if self.frozen is True:
-            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-        if common.isNum(durType):
-            durType = convertQuarterLengthToType(durType)
-
-        self.durationActual = DurationUnit(durType)
-        self.durationNormal = DurationUnit(durType)
-
+    ### PUBLIC METHODS ###
 
     def augmentOrDiminish(self, amountToScale, inPlace=True):
         '''
@@ -1186,6 +1060,119 @@ class Tuplet(object):
         #self.numberNotesActual = actual
         #self.numberNotesNormal = normal
 
+    def setDurationType(self, durType):
+        '''Set the Duration for both actual and normal.
+
+        A type string or quarter length can be given.
+
+
+        >>> a = duration.Tuplet()
+        >>> a.tupletMultiplier()
+        0.666...
+        >>> a.totalTupletLength()
+        1.0
+        >>> a.setDurationType('half')
+        >>> a.tupletMultiplier()
+        0.6666...
+        >>> a.totalTupletLength()
+        4.0
+
+        >>> a.setDurationType(2)
+        >>> a.totalTupletLength()
+        4.0
+        >>> a.setDurationType(4)
+        >>> a.totalTupletLength()
+        8.0
+
+
+        '''
+        # these used to be Duration; now using DurationUnits
+        if self.frozen is True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+        if common.isNum(durType):
+            durType = convertQuarterLengthToType(durType)
+
+        self.durationActual = DurationUnit(durType)
+        self.durationNormal = DurationUnit(durType)
+
+    def setRatio(self, actual, normal):
+        '''Set the ratio of actual divisions to represented in normal divisions.
+        A triplet is 3 actual in the time of 2 normal.
+
+
+        >>> a = duration.Tuplet()
+        >>> a.tupletMultiplier()
+        0.666...
+        >>> a.setRatio(6,2)
+        >>> a.tupletMultiplier()
+        0.333...
+
+        One way of expressing 6/4-ish triplets without numbers:
+        >>> a = duration.Tuplet()
+        >>> a.setRatio(3,1)
+        >>> a.durationActual = duration.DurationUnit('quarter')
+        >>> a.durationNormal = duration.DurationUnit('half')
+        >>> a.tupletMultiplier()
+        0.666...
+        >>> a.totalTupletLength()
+        2.0
+        '''
+        if self.frozen is True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+
+        self.numberNotesActual = actual
+        self.numberNotesNormal = normal
+
+    def totalTupletLength(self):
+        '''
+        The total duration in quarter length of the tuplet as defined, assuming that
+        enough notes existed to fill all entire tuplet as defined.
+
+        For instance, 3 quarters in the place of 2 quarters = 2.0
+        5 half notes in the place of a 2 dotted half notes = 6.0
+        (In the end it's only the denominator that matters)
+
+
+        >>> a = duration.Tuplet()
+        >>> a.totalTupletLength()
+        1.0
+        >>> a.numberNotesActual = 3
+        >>> a.durationActual = duration.Duration('half')
+        >>> a.numberNotesNormal = 2
+        >>> a.durationNormal = duration.Duration('half')
+        >>> a.totalTupletLength()
+        4.0
+        >>> a.setRatio(5,4)
+        >>> a.totalTupletLength()
+        8.0
+        >>> a.setRatio(5,2)
+        >>> a.totalTupletLength()
+        4.0
+        '''
+        return self.numberNotesNormal * self.durationNormal.quarterLength
+
+    def tupletMultiplier(self):
+        '''Get a floating point value by which to scale the duration that
+        this Tuplet is associated with.
+
+
+        >>> myTuplet = duration.Tuplet()
+        >>> print(round(myTuplet.tupletMultiplier(), 3))
+        0.667
+        >>> myTuplet.tupletActual = [5, duration.Duration('eighth')]
+        >>> myTuplet.numberNotesActual
+        5
+        >>> myTuplet.durationActual.type
+        'eighth'
+        >>> print(myTuplet.tupletMultiplier())
+        0.4
+        '''
+        lengthActual = self.durationActual.quarterLength
+        return (self.totalTupletLength() / (
+                self.numberNotesActual * lengthActual))
+
+    ### PUBLIC PROPERTIES ###
+
     @property
     def fullName(self):
         '''
@@ -1219,6 +1206,34 @@ class Tuplet(object):
         ordStr = common.ordinalAbbreviation(numNormal, plural=True)
         return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
 
+    @apply
+    def tupletActual():
+        def fget(self):
+            '''
+            Get or set a two element list of number notes actual and duration
+            actual.
+            '''
+            return [self.numberNotesActual, self.durationActual]
+        def fset(self, tupList=[]):
+            if self.frozen is True:
+                raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+            self.numberNotesActual, self.durationActual = tupList
+        return property(**locals())
+
+    @apply
+    def tupletNormal():
+        def fget(self):
+            '''
+            Get or set a two element list of number notes actual and duration
+            normal.
+            '''
+            return self.numberNotesNormal, self.durationNormal
+        def fset(self, tupList=[]):
+            if self.frozen is True:
+                raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+            self.numberNotesNormal, self.durationNormal = tupList
+        return property(**locals())
+
 
 #-------------------------------------------------------------------------------
 
@@ -1232,7 +1247,7 @@ class DurationCommon(object):
 
     _classes = None
 
-#    __slots__ = ()
+    __slots__ = ()
 
     ### PUBLIC METHODS ###
 
@@ -1315,14 +1330,16 @@ class DurationUnit(DurationCommon):
 
     ### CLASS VARIABLES ###
 
-#    __slots__ = (
-#        '_dots',
-#        '_qtrLength',
-#        '_quarterLengthNeedsUpdating'
-#        '_tuplets',
-#        '_typeNeedsUpdating',
-#        'type',
-#        )
+    __slots__ = (
+        '_dots',
+        '_link',
+        '_qtrLength',
+        '_quarterLengthNeedsUpdating',
+        '_tuplets',
+        '_type',
+        '_typeNeedsUpdating',
+        'type',
+        )
 
     ### INITIALIZER ###
 
@@ -1978,13 +1995,22 @@ class ZeroDuration(DurationUnit):
     '''
     Represents any Music21 element that does not last any length of time.
     '''
+
+    ### CLASS VARIABLES ###
+
     isGrace = False
+
+    __slots__ = ()
+
+    ### INITIALIZER ###
 
     def __init__(self):
         DurationUnit.__init__(self)
         self.unlink()
         self.type = 'zero'
         self.quarterLength = 0.0
+
+    ### SPECIAL METHODS ###
 
     def __repr__(self):
         '''Return a string representation.
@@ -1998,77 +2024,92 @@ class ZeroDuration(DurationUnit):
 
 
 #-------------------------------------------------------------------------------
+
+
 class DurationException(exceptions21.Music21Exception):
     pass
+
 
 class Duration(DurationCommon):
     '''
     Durations are one of the most important objects in music21. A Duration
-    represents a span of musical time measurable in terms of quarter notes
-    (or in advanced usage other units). For instance, "57 quarter notes"
-    or "dotted half tied to quintuplet sixteenth note" or simply "quarter note."
+    represents a span of musical time measurable in terms of quarter notes (or
+    in advanced usage other units). For instance, "57 quarter notes" or "dotted
+    half tied to quintuplet sixteenth note" or simply "quarter note."
 
+    A Duration object is made of one or more DurationUnit objects stored on the
+    `components` list.
 
-    A Duration object is made of one or more DurationUnit objects
-    stored on the `components` list.
+    Multiple DurationUnits in a single Duration may be used to express tied
+    notes, or may be used to split duration across barlines or beam groups.
+    Some Duration objects are not expressible as a single notation unit.
 
+    Duration objects are not Music21Objects. Duration objects share many
+    properties and attributes with DurationUnit objects, but Duration is not a
+    subclass of DurationUnit.
 
-    Multiple DurationUnits in a single Duration may be used
-    to express tied notes, or may be used to split duration
-    across barlines or beam groups. Some Duration objects are
-    not expressible as a single notation unit.
-
-
-    Duration objects are not Music21Objects. Duration objects share
-    many properties and attributes with DurationUnit objects,
-    but Duration is not a subclass of DurationUnit.
-
-
-    If a single argument is passed to Duration() and it is
-    a string, then it is assumed to be a type, such as
-    'half', 'eighth', or '16th', etc.  If that single argument
-    is a number then it is assumed to be a quarterLength (2 for
-    half notes, .5 for eighth notes, .75 for dotted eighth notes,
-    .333333333 for a triplet eighth, etc.).  If one or more
-    named arguments are passed then the Duration() is configured
-    according to those arguments.  Supported arguments are
-    'type', 'dots', or 'components' (a list of :class:`music21.duration.DurationUnit` objects),
-
+    If a single argument is passed to Duration() and it is a string, then it is
+    assumed to be a type, such as 'half', 'eighth', or '16th', etc.  If that
+    single argument is a number then it is assumed to be a quarterLength (2 for
+    half notes, .5 for eighth notes, .75 for dotted eighth notes, .333333333
+    for a triplet eighth, etc.).  If one or more named arguments are passed
+    then the Duration() is configured according to those arguments.  Supported
+    arguments are 'type', 'dots', or 'components' (a list of
+    :class:`music21.duration.DurationUnit` objects),
 
     Example 1: a triplet eighth configured by quarterLength:
 
+    ::
 
+        >>> d = duration.Duration(.333333333)
+        >>> d.type
+        'eighth'
 
-    >>> d = duration.Duration(.333333333)
-    >>> d.type
-    'eighth'
-    >>> d.tuplets
-    (<music21.duration.Tuplet 3/2/eighth>,)
+    ::
 
+        >>> d.tuplets
+        (<music21.duration.Tuplet 3/2/eighth>,)
 
-    Example 2: A Duration made up of multiple :class:`music21.duration.DurationUnit`
-    objects
-    automatically configured by the specified quarterLength.
+    Example 2: A Duration made up of multiple
+    :class:`music21.duration.DurationUnit` objects automatically configured by
+    the specified quarterLength.
 
+    ::
 
-    >>> d2 = duration.Duration(.625)
-    >>> d2.type
-    'complex'
-    >>> d2.components
-    [<music21.duration.DurationUnit 0.5>, <music21.duration.DurationUnit 0.125>]
+        >>> d2 = duration.Duration(.625)
+        >>> d2.type
+        'complex'
 
+    ::
 
+        >>> d2.components
+        [<music21.duration.DurationUnit 0.5>, <music21.duration.DurationUnit 0.125>]
 
     Example 3: A Duration configured by keywords.
 
+    ::
 
-    >>> d3 = duration.Duration(type = 'half', dots = 2)
-    >>> d3.quarterLength
-    3.5
+        >>> d3 = duration.Duration(type = 'half', dots = 2)
+        >>> d3.quarterLength
+        3.5
 
     '''
 
+    ### CLASS VARIABLES ###
+
     isGrace = False
+
+    __slots__ = (
+        'linkage',
+        '_cachedIsLinked',
+        '_components',
+        '_componentsNeedUpdating',
+        '_qtrLength',
+        '_quarterLengthNeedsUpdating',
+        '_typeNeedsUpdating',
+        )
+
+    ### INITIALIZER ###
 
     def __init__(self, *arguments, **keywords):
         '''
@@ -2117,32 +2158,33 @@ class Duration(DurationCommon):
         else:
             self.linkage = None
 
-    def __repr__(self):
-        '''Provide a representation.
-        '''
-        if self.isLinked:
-            return '<music21.duration.Duration %s>' % self.quarterLength
-        else:
-            return '<music21.duration.Duration unlinked type:%s quarterLength:%s>' % (self.type, self.quarterLength)
+    ### SPECIAL METHODS ###
 
     def __eq__(self, other):
-        '''Test equality. Note: this may not work with Tuplets until we
+        '''
+        Test equality. Note: this may not work with Tuplets until we
         define equality tests for tuplets.
 
+        ::
 
+            >>> aDur = duration.Duration('quarter')
+            >>> bDur = duration.Duration('16th')
+            >>> cDur = duration.Duration('16th')
+            >>> aDur == bDur
+            False
 
-        >>> aDur = duration.Duration('quarter')
-        >>> bDur = duration.Duration('16th')
-        >>> cDur = duration.Duration('16th')
-        >>> aDur == bDur
-        False
-        >>> cDur == bDur
-        True
+        ::
 
-        >>> dDur = duration.ZeroDuration()
-        >>> eDur = duration.ZeroDuration()
-        >>> dDur == eDur
-        True
+            >>> cDur == bDur
+            True
+
+        ::
+
+            >>> dDur = duration.ZeroDuration()
+            >>> eDur = duration.ZeroDuration()
+            >>> dDur == eDur
+            True
+
         '''
         if other is None or not isinstance(other, DurationCommon):
             return False
@@ -2161,280 +2203,34 @@ class Duration(DurationCommon):
     def __ne__(self, other):
         '''Test not equality.
 
+        ::
 
-        >>> aDur = duration.Duration('quarter')
-        >>> bDur = duration.Duration('16th')
-        >>> cDur = duration.Duration('16th')
-        >>> aDur != bDur
-        True
-        >>> cDur != bDur
-        False
+            >>> aDur = duration.Duration('quarter')
+            >>> bDur = duration.Duration('16th')
+            >>> cDur = duration.Duration('16th')
+            >>> aDur != bDur
+            True
+
+        ::
+
+            >>> cDur != bDur
+            False
+
         '''
         return not self.__eq__(other)
 
-
-    def link(self):
-        '''Set all components to be linked
-        '''
-        if len(self.components) >= 1:
-            for c in self.components:
-                c.link()
-            self._cachedIsLinked = True
-            # quarter length will be set based on component types
-            self._quarterLengthNeedsUpdating = True
-        else: # there may be components and still a zero type
-            raise DurationException("zero DurationUnits in components: cannt link or unlink")
-
-    def unlink(self):
-        '''
-        Unlink all components allowing the type, dots, etc., to not be the same as the
-        normal representation in quarterLength units.
-        '''
-        if len(self._components) >= 1:
-            for c in self._components: # these are Duration objects
-                c.unlink()
-            self._cachedIsLinked = False
-#         else: # there may be components and still a zero type
-#             raise DurationException("zero DurationUnits in components: cannot link or unlink")
-
-    @property
-    def isLinked(self):
-        '''
-        Return a boolean describing this duration is linked or not.  The
-        `isLinked` of the first component in a complex duration determines the
-        link status for the entire Duration
-
-        ::
-
-            >>> d = duration.Duration(2.0)
-            >>> d.type
-            'half'
-
-        ::
-
-            >>> d.quarterLength
-            2.0
-
-        ::
-
-            >>> d.isLinked
-            True
-
-        ::
-
-            >>> d.unlink()
-            >>> d.quarterLength = 4.0
-            >>> d.type
-            'half'
-
-        ::
-
-            >>> d.isLinked
-            False
-
-        '''
-        # reset _cachedIsLinked to None when components have changed
-        if self._cachedIsLinked is None:
-            if len(self._components) > 0:
-                # if there are components, determine linked status from them
-                for c in self._components:
-                    if c.isLinked:
-                        self._cachedIsLinked = True
-                        break
-                    else:
-                        self._cachedIsLinked = False
-                        break
-            else:  # there are no components, than it is linked (default)
-                self._cachedIsLinked = True
-        return self._cachedIsLinked
-
-    def updateQuarterLength(self):
-        '''Look to components and determine quarter length.
-        '''
+    def __repr__(self):
         if self.isLinked:
-            self._qtrLength = 0.0
-            for dur in self.components:
-                # if components quarterLength needs to be updated, it will
-                # be updated when this property is called
-                self._qtrLength += dur.quarterLength
-        self._quarterLengthNeedsUpdating = False
-
-    @apply
-    def components():
-        def fget(self):
-            if self._componentsNeedUpdating:
-                self._updateComponents()
-            return self._components
-        def fset(self, value):
-            # previously, self._componentsNeedUpdating was not set here
-            # this needs to be set because if _componentsNeedUpdating is True
-            # new components will be derived from quarterLength
-            if self._components is not value:
-                self._componentsNeedUpdating = False
-                self._components = value
-                # this is Ture b/c components are note the same
-                self._quarterLengthNeedsUpdating = True
-                # musst be cleared
-                self._cachedIsLinked = None
-        return property(**locals())
-
-    #---------------------------------------------------------------------------
-
-    @property
-    def isComplex(self):
-        '''
-        Returns True if this Duration has more than one DurationUnit object on
-        the `component` list.  That is to say if it's a single Duration that
-        need multiple tied noteheads to represent.
-
-        ::
-
-            >>> aDur = duration.Duration()
-            >>> aDur.quarterLength = 1.375
-            >>> aDur.isComplex
-            True
-
-        ::
-
-            >>> len(aDur.components)
-            2
-
-        ::
-
-            >>> aDur.components
-            [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.375>]
-
-        ::
-
-            >>> bDur = duration.Duration()
-            >>> bDur.quarterLength = 1.6666666
-            >>> bDur.isComplex
-            True
-
-        ::
-
-            >>> len(bDur.components)
-            2
-
-        ::
-
-            >>> bDur.components
-            [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.6666...>]
-
-        ::
-
-            >>> cDur = duration.Duration()
-            >>> cDur.quarterLength = .25
-            >>> cDur.isComplex
-            False
-        
-        ::
-
-            >>> len(cDur.components)
-            1
-
-        '''
-        if len(self.components) > 1:
-            return True
-#        for dur in self.components:
-            #environLocal.printDebug(['dur in components', dur])
-            # any one unlinked component means this is complex
-            if self._link is False:
-                return True
-        else: return False
-
-    @apply
-    def quarterLength():
-        def fget(self):
-            '''
-            Returns the quarter note length or Sets the quarter note length to
-            the specified value.
-
-            Currently (if the value is different from what is already stored)
-            this wipes out any existing components, not preserving their type.
-            So if you've set up Duration(1.5) as 3-eighth notes, setting
-            Duration to 1.75 will NOT dot the last eighth note, but instead
-            give you a single double-dotted half note.
-
-            ::
-
-                >>> a = duration.Duration()
-                >>> a.quarterLength = 3.5
-                >>> a.quarterLength
-                3.5
-
-            ::
-
-                >>> for thisUnit in a.components:
-                ...    print(duration.unitSpec(thisUnit))
-                (3.5, 'half', 2, None, None, None)
-
-            ::
-
-                >>> a.quarterLength = 2.5
-                >>> a.quarterLength
-                2.5
-
-            ::
-
-                >>> for thisUnit in a.components:
-                ...    print(duration.unitSpec(thisUnit))
-                (2.0, 'half', 0, None, None, None)
-                (0.5, 'eighth', 0, None, None, None)
-            
-            Note that integer values of quarter lengths get silently converted to floats:
-
-            ::
-
-                >>> b = duration.Duration()
-                >>> b.quarterLength = 5
-                >>> b.quarterLength
-                5.0
-
-            ::
-
-                >>> b.type  # complex because 5qL cannot be expressed as a single note.
-                'complex'
-
-            '''
-            if self._quarterLengthNeedsUpdating:
-                self.updateQuarterLength()
-            # this is set in updateQuarterLength
-            #self._quarterLengthNeedsUpdating = False
-            return self._qtrLength
-        def fset(self, value):
-            if self._qtrLength != value:
-                if isinstance(value, int):
-                    value = float(value)
-                self._qtrLength = value
-                self._componentsNeedUpdating = True
-                self._quarterLengthNeedsUpdating = False
-        return property(**locals())
-
-    def setQuarterLengthUnlinked(self, value):
-        '''Set the quarter note length to the specified value.
-        '''
-        # quarter length is always obtained from _qtrLength, even when
-        # not linked; yet a component must be present to provide a type
-        self._qtrLength = value
-        if len(self._components) == 0:
-            if self._qtrLength == 0.0: # if not set create a default
-                self._components.append(ZeroDuration())
-            else:
-                du = DurationUnit() # will get default quarter
-                du.unlink()
-                self._components.append(du)
-        # keep components, simply unlink; quarter lengths stored will
-        # not be included in this elements quater length
+            return '<music21.duration.Duration %s>' % self.quarterLength
         else:
-            for c in self._components:
-                c.unlink()
-        # reach ahead and set cached is linked: no need to check components
-        self._cachedIsLinked = False
+            return '<music21.duration.Duration unlinked type:%s quarterLength:%s>' % (self.type, self.quarterLength)
+
+    ### PRIVATE METHODS ###
 
     def _updateComponents(self):
-        '''This method will re-construct components and thus is not
-        good if the components are already configured as you like
+        '''
+        This method will re-construct components and thus is not good if the
+        components are already configured as you like
         '''
         # this update will not be necessary
         self._quarterLengthNeedsUpdating = False
@@ -2446,389 +2242,7 @@ class Duration(DurationCommon):
                 raise
         self._componentsNeedUpdating = False
 
-    @apply
-    def type():
-        def fget(self):
-            '''
-            Get or set the type of the Duration.
-
-            ::
-
-                >>> a = duration.Duration()
-                >>> a.type = 'half'
-                >>> a.quarterLength
-                2.0
-
-            ::
-
-                >>> a.type= '16th'
-                >>> a.quarterLength
-                0.25
-
-            '''
-            if self._componentsNeedUpdating:
-                self._updateComponents()
-
-            if len(self.components) == 1:
-                return self.components[0].type
-            elif len(self.components) > 1:
-                return 'complex'
-            else: # there may be components and still a zero type
-                return 'zero'
-    #            raise DurationException("zero DurationUnits in components")
-        def fset(self, value):
-
-            # need to check that type is valid
-            if value not in ordinalTypeFromNum:
-                raise DurationException("no such type exists: %s" % value)
-
-            if len(self.components) == 1:
-                # change the existing DurationUnit to the this type
-                self.components[0].type = value
-                self._quarterLengthNeedsUpdating = True
-            elif self.isComplex: # more than one component
-                raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
-                # what do we do if we already have multiple DurationUnits
-            else: # permit creating a new comoponent
-                # create a new duration unit
-                self.addDurationUnit(DurationUnit(value)) # updates
-                self._quarterLengthNeedsUpdating = True
-        return property(**locals())
-
-    def setTypeUnlinked(self, value):
-        '''Make this Duration unlinked, and set the type. Quarter note length will not be adjusted.
-        '''
-        # need to check that type is valid
-        if value not in ordinalTypeFromNum:
-            raise DurationException("no such type exists: %s" % value)
-
-        if len(self.components) == 1:
-            # change the existing DurationUnit to the this type
-            self.components[0].unlink()
-            self.components[0].type = value
-            #self._quarterLengthNeedsUpdating = True
-        elif self.isComplex: # more than one component
-            raise DurationException("cannot yet set type for a complex Duration")
-        else: # permit creating a new comoponent
-            # create a new duration unit; if link is True, will unlink
-            self.addDurationUnit(DurationUnit(value), link=False) # updates
-            #self._quarterLengthNeedsUpdating = True
-        self._cachedIsLinked = False
-
-    @apply
-    def dots():
-        def fget(self):
-            '''
-            Returns the number of dots in the Duration
-            if it is a simple Duration.  Otherwise raises error.
-            '''
-            if self._componentsNeedUpdating:
-                self._updateComponents()
-
-            if len(self.components) == 1:
-                return self.components[0].dots
-            elif len(self.components) > 1:
-                return None
-            else:  # there must be 1 or more components
-                raise DurationException("Cannot get dots on an object with zero DurationUnits in its duration.components")
-        def fset(self, value):
-            '''
-            Set dots if a number, as first element
-
-            ::
-
-                >>> a = duration.Duration()
-                >>> a.type = 'quarter'
-                >>> a.dots = 1
-                >>> a.quarterLength
-                1.5
-            
-            ::
-
-                >>> a.dots = 2
-                >>> a.quarterLength
-                1.75
-
-            '''
-            if not common.isNum(value):
-                raise DurationException('only numeric dot values can be used with this method.')
-
-            if len(self.components) == 1:
-                self.components[0].dots = value
-                self._quarterLengthNeedsUpdating = True
-            elif len(self.components) > 1:
-                raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
-            else:  # there must be 1 or more components
-                raise DurationException("Cannot set dots on an object with zero DurationUnits in its duration.components")
-        return property(**locals())
-
-    @apply
-    def dotGroups():
-        def fget(self):
-            '''
-            See the explanation under :class:`~music21.duration.DurationUnit` about
-            what dotGroups (medieval dotted-dotted notes are).  In a complex
-            duration, only the dotGroups of the first component matter
-
-            ::
-
-                >>> from music21 import duration
-                >>> a = duration.Duration()
-                >>> a.type = 'half'
-                >>> a.dotGroups = [1,1]
-                >>> a.quarterLength
-                4.5
-
-            '''
-            if self._componentsNeedUpdating is True:
-                self._updateComponents()
-
-            if len(self.components) == 1:
-                return self.components[0].dotGroups
-            elif len(self.components) > 1:
-                return None
-            else: # there must be 1 or more components
-                raise DurationException("Cannot get dotGroups on an object with zero DurationUnits in its duration.components (will cause problems later even if dotGroups are ignored)")
-        def fset(self, value):
-            if not common.isListLike(value):
-                raise DurationException('only list-like dotGroups values can be used with this method.')
-
-            if len(self.components) == 1:
-                self.components[0].dotGroups = value
-                self._quarterLengthNeedsUpdating = True
-            elif len(self.components) > 1:
-                raise DurationException("setting dotGroups: Myke and Chris need to decide what that means")
-            else: # there must be 1 or more components
-                raise DurationException("zero DurationUnits in components")
-        return property(**locals())
-
-    def splitDotGroups(self):
-        '''
-        splits a dotGroup-duration (of 1 component) into a new duration of two
-        components.  Returns a new duration
-
-        Probably does not handle properly tuplets of dot-groups.
-        Never seen one, so probably okay.
-
-
-        >>> d1 = duration.Duration(type = 'half')
-        >>> d1.dotGroups = [1,1]
-        >>> d1.quarterLength
-        4.5
-        >>> d2 = d1.splitDotGroups()
-        >>> d2.components
-        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
-        >>> d2.quarterLength
-        4.5
-
-        Here's how a system that does not support dotGroups can still display
-        the notes accurately.  N.B. MusicXML does this automatically, so
-        no need.
-
-        >>> n1 = note.Note()
-        >>> n1.duration = d1
-        >>> n1.duration = n1.duration.splitDotGroups()
-        >>> n1.duration.components
-        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
-        >>> s1 = stream.Stream()
-        >>> s1.append(meter.TimeSignature('9/8'))
-        >>> s1.append(n1)
-        >>> #_DOCS_SHOW s1.show('lily.png')
-        .. image:: images/duration_splitDotGroups.*
-
-        >>> n2 = note.Note()
-        >>> n2.duration.type = 'quarter'
-        >>> n2.duration.dotGroups = [1,1]
-        >>> n2.quarterLength
-        2.25
-        >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
-        '''
-        dG = self.dotGroups
-        if len(dG) < 2:
-            return copy.deepcopy(self)
-        else:
-            newDuration = copy.deepcopy(self)
-            newDuration.dotGroups = [0]
-            newDuration.components[0].dots = dG[0]
-            for i in range(1, len(dG)):
-                newComponent = copy.deepcopy(newDuration.components[i-1])
-                newComponent.type = nextSmallerType(newDuration.components[i-1].type)
-                newComponent.dots = dG[i]
-                newDuration.components.append(newComponent)
-            return newDuration
-
-    @apply
-    def tuplets():
-        def fget(self):
-            '''
-            When there are more than one component, each component may have its
-            own tuplet.
-            '''
-            if self._componentsNeedUpdating:
-                self._updateComponents()
-            if len(self.components) > 1:
-                return None
-            elif len(self.components) == 1:
-                return self.components[0].tuplets
-            else: # there must be 1 or more components
-                raise DurationException("zero DurationUnits in components")
-        def fset(self, tupletTuple):
-            #environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
-            if len(self.components) > 1:
-                raise DurationException("setting tuplets on Complex note: Myke and Chris need to decide what that means")
-            elif len(self.components) == 1:
-                for thisTuplet in tupletTuple:
-                    thisTuplet.frozen = True
-                self.components[0].tuplets = tupletTuple
-                self._quarterLengthNeedsUpdating = True
-            else: # there must be 1 or more components
-                raise DurationException("zero DurationUnits in components")
-        return property(**locals())
-
-    def appendTuplet(self, newTuplet):
-        self.tuplets = self.tuplets + (newTuplet,)
-
-    @property
-    def ordinal(self):
-        '''
-        Get the ordinal value of the Duration.
-
-
-        >>> d = duration.Duration()
-        >>> d.quarterLength = 2.0
-        >>> d.ordinal
-        5
-        '''
-        if self._componentsNeedUpdating:
-            self._updateComponents()
-
-        if len(self.components) > 1:
-            return 'complex'
-        elif len(self.components) == 1:
-            return self.components[0].ordinal
-        else:
-            return None
-#            raise DurationException("zero DurationUnits in components")
-
-    @property
-    def fullName(self):
-        '''
-        Return the most complete representation of this Duration, providing
-        dots, type, tuplet, and quarter length representation.
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=1.5)
-            >>> d.fullName
-            'Dotted Quarter'
-
-        ::
-
-            >>> d = duration.Duration(type='half')
-            >>> d.fullName
-            'Half'
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=1.25)
-            >>> d.fullName
-            'Quarter tied to 16th (1.25 total QL)'
-
-        ::
-
-            >>> d.addDurationUnit(duration.DurationUnit(.3333333))
-            >>> d.fullName
-            'Quarter tied to 16th tied to Eighth Triplet (0.33QL) (1.58 total QL)'
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=0.333333)
-            >>> d.fullName
-            'Eighth Triplet (0.33QL)'
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=0.666666)
-            >>> d.fullName
-            'Quarter Triplet (0.67QL)'
-        
-        ::
-
-            >>> d = duration.Duration(quarterLength=0.571428)
-            >>> d.fullName
-            'Quarter Tuplet of 7/4ths (0.57QL)'
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=0)
-            >>> d.fullName
-            'Zero Duration (0 total QL)'
-
-        '''
-        if len(self.components) > 1:
-            msg = []
-            for part in self.components:
-                msg.append(part.fullName)
-            msg = ' tied to '.join(msg)
-            msg += ' (%s total QL)' % (round(self.quarterLength, 2))
-            return msg
-        if len(self.components) == 1:
-            return self.components[0].fullName
-        else: # zero components
-            return 'Zero Duration (0 total QL)'
-
-    #---------------------------------------------------------------------------
-    # output formats
-
-    def write(self, format='musicxml', fp=None): # format is okay here @ReservedAssignment
-        '''
-        As in Music21Object.write: Writes a file in the given format (musicxml by default)
-
-        A None file path will result in temporary file.
-        '''
-        foundFormat, ext = common.findFormat(format)
-        if foundFormat is None:
-            raise DurationException('bad format (%s) provided to write()' % format)
-        elif foundFormat == 'musicxml':
-            from music21.musicxml import m21ToString
-            if fp is None:
-                fp = environLocal.getTempFile(ext)
-            dataStr = m21ToString.fromDuration(self)
-        else:
-            raise DurationException('cannot support writing in this format, %s yet' % foundFormat)
-        f = open(fp, 'w')
-        f.write(dataStr)
-        f.close()
-        return fp
-
-    def show(self, format='musicxml'): # format is okay here... @ReservedAssignment
-        '''
-        Same as Music21Object.show().
-        '''
-        environLocal.launch(format, self.write(format))
-
-
-    #---------------------------------------------------------------------------
-    # methods for manipulating components
-
-    def clear(self):
-        '''
-        Permit all components to be removed.
-        (It is not clear yet if this is needed)
-
-
-        >>> a = duration.Duration()
-        >>> a.quarterLength = 4
-        >>> a.type
-        'whole'
-        >>> a.clear()
-        >>> a.quarterLength
-        0.0
-        >>> a.type
-        'zero'
-        '''
-        self.components = []
-        self._quarterLengthNeedsUpdating = True
+    ### PUBLIC METHODS ###
 
     def addDurationUnit(self, dur, link=True):
         '''
@@ -2865,55 +2279,8 @@ class Duration(DurationCommon):
         if link:
             self._quarterLengthNeedsUpdating = True
 
-    def consolidate(self):
-        '''
-        Given a Duration with multiple components, consolidate into a single
-        Duration. This can only be based on quarterLength; this is
-        destructive: information is lost from components.
-
-
-        This cannot be done for all Durations, as DurationUnits cannot express all durations
-
-
-
-        >>> a = duration.Duration()
-        >>> a.fill(['quarter', 'half', 'quarter'])
-        >>> a.quarterLength
-        4.0
-        >>> len(a.components)
-        3
-        >>> a.consolidate()
-        >>> a.quarterLength
-        4.0
-        >>> len(a.components)
-        1
-
-
-        But it gains a type!
-
-
-        >>> a.type
-        'whole'
-        '''
-        if len(self.components) == 1:
-            pass # nothing to be done
-        else:
-            dur = DurationUnit()
-            # if quarter length is not notatable, will automatically unlink
-            # some notations will not properly unlin, and raise an error
-            dur.quarterLength = self.quarterLength
-            self.components = [dur]
-
-    def expand(self, qLenDiv=4):
-        '''
-        Make a duration notatable by partitioning it into smaller
-        units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength
-        '''
-        self.components = partitionQuarterLength(self.quarterLength,
-                                                    qLenDiv)
-        self._componentsNeedUpdating = False
-
-
+    def appendTuplet(self, newTuplet):
+        self.tuplets = self.tuplets + (newTuplet,)
 
     def augmentOrDiminish(self, amountToScale,
         retainComponents=False, inPlace=True):
@@ -2984,7 +2351,24 @@ class Duration(DurationCommon):
         else:
             return None
 
+    def clear(self):
+        '''
+        Permit all components to be removed.
+        (It is not clear yet if this is needed)
 
+
+        >>> a = duration.Duration()
+        >>> a.quarterLength = 4
+        >>> a.type
+        'whole'
+        >>> a.clear()
+        >>> a.quarterLength
+        0.0
+        >>> a.type
+        'zero'
+        '''
+        self.components = []
+        self._quarterLengthNeedsUpdating = True
 
     def componentIndexAtQtrPosition(self, quarterPosition):
         '''returns the index number of the duration component sounding at
@@ -3097,6 +2481,143 @@ class Duration(DurationCommon):
             currentPosition += self.components[i].quarterLength
         return currentPosition
 
+    def consolidate(self):
+        '''
+        Given a Duration with multiple components, consolidate into a single
+        Duration. This can only be based on quarterLength; this is
+        destructive: information is lost from components.
+
+
+        This cannot be done for all Durations, as DurationUnits cannot express all durations
+
+
+
+        >>> a = duration.Duration()
+        >>> a.fill(['quarter', 'half', 'quarter'])
+        >>> a.quarterLength
+        4.0
+        >>> len(a.components)
+        3
+        >>> a.consolidate()
+        >>> a.quarterLength
+        4.0
+        >>> len(a.components)
+        1
+
+
+        But it gains a type!
+
+
+        >>> a.type
+        'whole'
+        '''
+        if len(self.components) == 1:
+            pass # nothing to be done
+        else:
+            dur = DurationUnit()
+            # if quarter length is not notatable, will automatically unlink
+            # some notations will not properly unlin, and raise an error
+            dur.quarterLength = self.quarterLength
+            self.components = [dur]
+
+    def expand(self, qLenDiv=4):
+        '''
+        Make a duration notatable by partitioning it into smaller
+        units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength
+        '''
+        self.components = partitionQuarterLength(self.quarterLength,
+                                                    qLenDiv)
+        self._componentsNeedUpdating = False
+
+    def fill(self, quarterLengthList=['quarter', 'half', 'quarter']):
+        '''Utility method for testing; a quick way to fill components. This will
+        remove any exisiting values.
+        '''
+        self.components = []
+        for x in quarterLengthList:
+            self.addDurationUnit(Duration(x))
+
+    def getGraceDuration(self, appogiatura=False):
+        '''Return a deep copy of this Duration as a GraceDuration instance with the same types.
+
+
+        >>> d = duration.Duration(1.25)
+        >>> gd = d.getGraceDuration()
+        >>> gd.quarterLength
+        0.0
+        >>> [(x.quarterLength, x.type) for x in gd.components]
+        [(0.0, 'quarter'), (0.0, '16th')]
+        >>> d.quarterLength
+        1.25
+        '''
+        if self._componentsNeedUpdating:
+            self._updateComponents()
+        # manually copy all components
+        components = []
+        for c in self.components:
+            components.append(copy.deepcopy(c))
+        # create grace duration
+        if appogiatura:
+            gd = AppogiaturaDuration()
+        else:
+            gd = GraceDuration()
+        gd.components = components # set new components
+        gd.unlink()
+        gd.quarterLength = 0.0
+        return gd
+
+    def link(self):
+        '''Set all components to be linked
+        '''
+        if len(self.components) >= 1:
+            for c in self.components:
+                c.link()
+            self._cachedIsLinked = True
+            # quarter length will be set based on component types
+            self._quarterLengthNeedsUpdating = True
+        else: # there may be components and still a zero type
+            raise DurationException("zero DurationUnits in components: cannt link or unlink")
+
+    def setQuarterLengthUnlinked(self, value):
+        '''Set the quarter note length to the specified value.
+        '''
+        # quarter length is always obtained from _qtrLength, even when
+        # not linked; yet a component must be present to provide a type
+        self._qtrLength = value
+        if len(self._components) == 0:
+            if self._qtrLength == 0.0: # if not set create a default
+                self._components.append(ZeroDuration())
+            else:
+                du = DurationUnit() # will get default quarter
+                du.unlink()
+                self._components.append(du)
+        # keep components, simply unlink; quarter lengths stored will
+        # not be included in this elements quater length
+        else:
+            for c in self._components:
+                c.unlink()
+        # reach ahead and set cached is linked: no need to check components
+        self._cachedIsLinked = False
+
+    def setTypeUnlinked(self, value):
+        '''Make this Duration unlinked, and set the type. Quarter note length will not be adjusted.
+        '''
+        # need to check that type is valid
+        if value not in ordinalTypeFromNum:
+            raise DurationException("no such type exists: %s" % value)
+
+        if len(self.components) == 1:
+            # change the existing DurationUnit to the this type
+            self.components[0].unlink()
+            self.components[0].type = value
+            #self._quarterLengthNeedsUpdating = True
+        elif self.isComplex: # more than one component
+            raise DurationException("cannot yet set type for a complex Duration")
+        else: # permit creating a new comoponent
+            # create a new duration unit; if link is True, will unlink
+            self.addDurationUnit(DurationUnit(value), link=False) # updates
+            #self._quarterLengthNeedsUpdating = True
+        self._cachedIsLinked = False
 
     def sliceComponentAtPosition(self, quarterPosition):
         '''Given a quarter position within a component, divide that
@@ -3160,77 +2681,635 @@ class Duration(DurationCommon):
             # lengths should be the same as it was before
             self.updateQuarterLength()
 
-    def fill(self, quarterLengthList=['quarter', 'half', 'quarter']):
-        '''Utility method for testing; a quick way to fill components. This will
-        remove any exisiting values.
+    def show(self, format='musicxml'): # format is okay here... @ReservedAssignment
         '''
-        self.components = []
-        for x in quarterLengthList:
-            self.addDurationUnit(Duration(x))
+        Same as Music21Object.show().
+        '''
+        environLocal.launch(format, self.write(format))
+
+    def splitDotGroups(self):
+        '''
+        splits a dotGroup-duration (of 1 component) into a new duration of two
+        components.  Returns a new duration
+
+        Probably does not handle properly tuplets of dot-groups.
+        Never seen one, so probably okay.
 
 
-    def getGraceDuration(self, appogiatura=False):
-        '''Return a deep copy of this Duration as a GraceDuration instance with the same types.
+        >>> d1 = duration.Duration(type = 'half')
+        >>> d1.dotGroups = [1,1]
+        >>> d1.quarterLength
+        4.5
+        >>> d2 = d1.splitDotGroups()
+        >>> d2.components
+        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
+        >>> d2.quarterLength
+        4.5
+
+        Here's how a system that does not support dotGroups can still display
+        the notes accurately.  N.B. MusicXML does this automatically, so
+        no need.
+
+        >>> n1 = note.Note()
+        >>> n1.duration = d1
+        >>> n1.duration = n1.duration.splitDotGroups()
+        >>> n1.duration.components
+        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
+        >>> s1 = stream.Stream()
+        >>> s1.append(meter.TimeSignature('9/8'))
+        >>> s1.append(n1)
+        >>> #_DOCS_SHOW s1.show('lily.png')
+        .. image:: images/duration_splitDotGroups.*
+
+        >>> n2 = note.Note()
+        >>> n2.duration.type = 'quarter'
+        >>> n2.duration.dotGroups = [1,1]
+        >>> n2.quarterLength
+        2.25
+        >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
+        '''
+        dG = self.dotGroups
+        if len(dG) < 2:
+            return copy.deepcopy(self)
+        else:
+            newDuration = copy.deepcopy(self)
+            newDuration.dotGroups = [0]
+            newDuration.components[0].dots = dG[0]
+            for i in range(1, len(dG)):
+                newComponent = copy.deepcopy(newDuration.components[i-1])
+                newComponent.type = nextSmallerType(newDuration.components[i-1].type)
+                newComponent.dots = dG[i]
+                newDuration.components.append(newComponent)
+            return newDuration
+
+    def unlink(self):
+        '''
+        Unlink all components allowing the type, dots, etc., to not be the same as the
+        normal representation in quarterLength units.
+        '''
+        if len(self._components) >= 1:
+            for c in self._components: # these are Duration objects
+                c.unlink()
+            self._cachedIsLinked = False
+
+    def updateQuarterLength(self):
+        '''Look to components and determine quarter length.
+        '''
+        if self.isLinked:
+            self._qtrLength = 0.0
+            for dur in self.components:
+                # if components quarterLength needs to be updated, it will
+                # be updated when this property is called
+                self._qtrLength += dur.quarterLength
+        self._quarterLengthNeedsUpdating = False
+
+    def write(self, format='musicxml', fp=None): # format is okay here @ReservedAssignment
+        '''
+        As in Music21Object.write: Writes a file in the given format (musicxml by default)
+
+        A None file path will result in temporary file.
+        '''
+        foundFormat, ext = common.findFormat(format)
+        if foundFormat is None:
+            raise DurationException('bad format (%s) provided to write()' % format)
+        elif foundFormat == 'musicxml':
+            from music21.musicxml import m21ToString
+            if fp is None:
+                fp = environLocal.getTempFile(ext)
+            dataStr = m21ToString.fromDuration(self)
+        else:
+            raise DurationException('cannot support writing in this format, %s yet' % foundFormat)
+        f = open(fp, 'w')
+        f.write(dataStr)
+        f.close()
+        return fp
+
+    ### PUBLIC PROPERTIES ###
+
+    @apply
+    def components():
+        def fget(self):
+            if self._componentsNeedUpdating:
+                self._updateComponents()
+            return self._components
+        def fset(self, value):
+            # previously, self._componentsNeedUpdating was not set here
+            # this needs to be set because if _componentsNeedUpdating is True
+            # new components will be derived from quarterLength
+            if self._components is not value:
+                self._componentsNeedUpdating = False
+                self._components = value
+                # this is Ture b/c components are note the same
+                self._quarterLengthNeedsUpdating = True
+                # musst be cleared
+                self._cachedIsLinked = None
+        return property(**locals())
+
+    @apply
+    def dotGroups():
+        def fget(self):
+            '''
+            See the explanation under :class:`~music21.duration.DurationUnit` about
+            what dotGroups (medieval dotted-dotted notes are).  In a complex
+            duration, only the dotGroups of the first component matter
+
+            ::
+
+                >>> from music21 import duration
+                >>> a = duration.Duration()
+                >>> a.type = 'half'
+                >>> a.dotGroups = [1,1]
+                >>> a.quarterLength
+                4.5
+
+            '''
+            if self._componentsNeedUpdating is True:
+                self._updateComponents()
+
+            if len(self.components) == 1:
+                return self.components[0].dotGroups
+            elif len(self.components) > 1:
+                return None
+            else: # there must be 1 or more components
+                raise DurationException("Cannot get dotGroups on an object with zero DurationUnits in its duration.components (will cause problems later even if dotGroups are ignored)")
+        def fset(self, value):
+            if not common.isListLike(value):
+                raise DurationException('only list-like dotGroups values can be used with this method.')
+
+            if len(self.components) == 1:
+                self.components[0].dotGroups = value
+                self._quarterLengthNeedsUpdating = True
+            elif len(self.components) > 1:
+                raise DurationException("setting dotGroups: Myke and Chris need to decide what that means")
+            else: # there must be 1 or more components
+                raise DurationException("zero DurationUnits in components")
+        return property(**locals())
+
+    @apply
+    def dots():
+        def fget(self):
+            '''
+            Returns the number of dots in the Duration
+            if it is a simple Duration.  Otherwise raises error.
+            '''
+            if self._componentsNeedUpdating:
+                self._updateComponents()
+
+            if len(self.components) == 1:
+                return self.components[0].dots
+            elif len(self.components) > 1:
+                return None
+            else:  # there must be 1 or more components
+                raise DurationException("Cannot get dots on an object with zero DurationUnits in its duration.components")
+        def fset(self, value):
+            '''
+            Set dots if a number, as first element
+
+            ::
+
+                >>> a = duration.Duration()
+                >>> a.type = 'quarter'
+                >>> a.dots = 1
+                >>> a.quarterLength
+                1.5
+
+            ::
+
+                >>> a.dots = 2
+                >>> a.quarterLength
+                1.75
+
+            '''
+            if not common.isNum(value):
+                raise DurationException('only numeric dot values can be used with this method.')
+
+            if len(self.components) == 1:
+                self.components[0].dots = value
+                self._quarterLengthNeedsUpdating = True
+            elif len(self.components) > 1:
+                raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
+            else:  # there must be 1 or more components
+                raise DurationException("Cannot set dots on an object with zero DurationUnits in its duration.components")
+        return property(**locals())
+
+    @property
+    def fullName(self):
+        '''
+        Return the most complete representation of this Duration, providing
+        dots, type, tuplet, and quarter length representation.
+
+        ::
+
+            >>> d = duration.Duration(quarterLength=1.5)
+            >>> d.fullName
+            'Dotted Quarter'
+
+        ::
+
+            >>> d = duration.Duration(type='half')
+            >>> d.fullName
+            'Half'
+
+        ::
+
+            >>> d = duration.Duration(quarterLength=1.25)
+            >>> d.fullName
+            'Quarter tied to 16th (1.25 total QL)'
+
+        ::
+
+            >>> d.addDurationUnit(duration.DurationUnit(.3333333))
+            >>> d.fullName
+            'Quarter tied to 16th tied to Eighth Triplet (0.33QL) (1.58 total QL)'
+
+        ::
+
+            >>> d = duration.Duration(quarterLength=0.333333)
+            >>> d.fullName
+            'Eighth Triplet (0.33QL)'
+
+        ::
+
+            >>> d = duration.Duration(quarterLength=0.666666)
+            >>> d.fullName
+            'Quarter Triplet (0.67QL)'
+
+        ::
+
+            >>> d = duration.Duration(quarterLength=0.571428)
+            >>> d.fullName
+            'Quarter Tuplet of 7/4ths (0.57QL)'
+
+        ::
+
+            >>> d = duration.Duration(quarterLength=0)
+            >>> d.fullName
+            'Zero Duration (0 total QL)'
+
+        '''
+        if len(self.components) > 1:
+            msg = []
+            for part in self.components:
+                msg.append(part.fullName)
+            msg = ' tied to '.join(msg)
+            msg += ' (%s total QL)' % (round(self.quarterLength, 2))
+            return msg
+        if len(self.components) == 1:
+            return self.components[0].fullName
+        else: # zero components
+            return 'Zero Duration (0 total QL)'
+
+    @property
+    def isComplex(self):
+        '''
+        Returns True if this Duration has more than one DurationUnit object on
+        the `component` list.  That is to say if it's a single Duration that
+        need multiple tied noteheads to represent.
+
+        ::
+
+            >>> aDur = duration.Duration()
+            >>> aDur.quarterLength = 1.375
+            >>> aDur.isComplex
+            True
+
+        ::
+
+            >>> len(aDur.components)
+            2
+
+        ::
+
+            >>> aDur.components
+            [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.375>]
+
+        ::
+
+            >>> bDur = duration.Duration()
+            >>> bDur.quarterLength = 1.6666666
+            >>> bDur.isComplex
+            True
+
+        ::
+
+            >>> len(bDur.components)
+            2
+
+        ::
+
+            >>> bDur.components
+            [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.6666...>]
+
+        ::
+
+            >>> cDur = duration.Duration()
+            >>> cDur.quarterLength = .25
+            >>> cDur.isComplex
+            False
+
+        ::
+
+            >>> len(cDur.components)
+            1
+
+        '''
+        if len(self.components) > 1:
+            return True
+#        for dur in self.components:
+            #environLocal.printDebug(['dur in components', dur])
+            # any one unlinked component means this is complex
+            if self._link is False:
+                return True
+        else: return False
+
+    @property
+    def isLinked(self):
+        '''
+        Return a boolean describing this duration is linked or not.  The
+        `isLinked` of the first component in a complex duration determines the
+        link status for the entire Duration
+
+        ::
+
+            >>> d = duration.Duration(2.0)
+            >>> d.type
+            'half'
+
+        ::
+
+            >>> d.quarterLength
+            2.0
+
+        ::
+
+            >>> d.isLinked
+            True
+
+        ::
+
+            >>> d.unlink()
+            >>> d.quarterLength = 4.0
+            >>> d.type
+            'half'
+
+        ::
+
+            >>> d.isLinked
+            False
+
+        '''
+        # reset _cachedIsLinked to None when components have changed
+        if self._cachedIsLinked is None:
+            if len(self._components) > 0:
+                # if there are components, determine linked status from them
+                for c in self._components:
+                    if c.isLinked:
+                        self._cachedIsLinked = True
+                        break
+                    else:
+                        self._cachedIsLinked = False
+                        break
+            else:  # there are no components, than it is linked (default)
+                self._cachedIsLinked = True
+        return self._cachedIsLinked
+
+    @property
+    def ordinal(self):
+        '''
+        Get the ordinal value of the Duration.
 
 
-        >>> d = duration.Duration(1.25)
-        >>> gd = d.getGraceDuration()
-        >>> gd.quarterLength
-        0.0
-        >>> [(x.quarterLength, x.type) for x in gd.components]
-        [(0.0, 'quarter'), (0.0, '16th')]
-        >>> d.quarterLength
-        1.25
+        >>> d = duration.Duration()
+        >>> d.quarterLength = 2.0
+        >>> d.ordinal
+        5
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
-        # manually copy all components
-        components = []
-        for c in self.components:
-            components.append(copy.deepcopy(c))
-        # create grace duration
-        if appogiatura:
-            gd = AppogiaturaDuration()
+
+        if len(self.components) > 1:
+            return 'complex'
+        elif len(self.components) == 1:
+            return self.components[0].ordinal
         else:
-            gd = GraceDuration()
-        gd.components = components # set new components
-        gd.unlink()
-        gd.quarterLength = 0.0
-        return gd
+            return None
+
+    @apply
+    def quarterLength():
+        def fget(self):
+            '''
+            Returns the quarter note length or Sets the quarter note length to
+            the specified value.
+
+            Currently (if the value is different from what is already stored)
+            this wipes out any existing components, not preserving their type.
+            So if you've set up Duration(1.5) as 3-eighth notes, setting
+            Duration to 1.75 will NOT dot the last eighth note, but instead
+            give you a single double-dotted half note.
+
+            ::
+
+                >>> a = duration.Duration()
+                >>> a.quarterLength = 3.5
+                >>> a.quarterLength
+                3.5
+
+            ::
+
+                >>> for thisUnit in a.components:
+                ...    print(duration.unitSpec(thisUnit))
+                (3.5, 'half', 2, None, None, None)
+
+            ::
+
+                >>> a.quarterLength = 2.5
+                >>> a.quarterLength
+                2.5
+
+            ::
+
+                >>> for thisUnit in a.components:
+                ...    print(duration.unitSpec(thisUnit))
+                (2.0, 'half', 0, None, None, None)
+                (0.5, 'eighth', 0, None, None, None)
+
+            Note that integer values of quarter lengths get silently converted to floats:
+
+            ::
+
+                >>> b = duration.Duration()
+                >>> b.quarterLength = 5
+                >>> b.quarterLength
+                5.0
+
+            ::
+
+                >>> b.type  # complex because 5qL cannot be expressed as a single note.
+                'complex'
+
+            '''
+            if self._quarterLengthNeedsUpdating:
+                self.updateQuarterLength()
+            # this is set in updateQuarterLength
+            #self._quarterLengthNeedsUpdating = False
+            return self._qtrLength
+        def fset(self, value):
+            if self._qtrLength != value:
+                if isinstance(value, int):
+                    value = float(value)
+                self._qtrLength = value
+                self._componentsNeedUpdating = True
+                self._quarterLengthNeedsUpdating = False
+        return property(**locals())
+
+    @apply
+    def tuplets():
+        def fget(self):
+            '''
+            When there are more than one component, each component may have its
+            own tuplet.
+            '''
+            if self._componentsNeedUpdating:
+                self._updateComponents()
+            if len(self.components) > 1:
+                return None
+            elif len(self.components) == 1:
+                return self.components[0].tuplets
+            else: # there must be 1 or more components
+                raise DurationException("zero DurationUnits in components")
+        def fset(self, tupletTuple):
+            #environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
+            if len(self.components) > 1:
+                raise DurationException("setting tuplets on Complex note: Myke and Chris need to decide what that means")
+            elif len(self.components) == 1:
+                for thisTuplet in tupletTuple:
+                    thisTuplet.frozen = True
+                self.components[0].tuplets = tupletTuple
+                self._quarterLengthNeedsUpdating = True
+            else: # there must be 1 or more components
+                raise DurationException("zero DurationUnits in components")
+        return property(**locals())
+
+    @apply
+    def type():
+        def fget(self):
+            '''
+            Get or set the type of the Duration.
+
+            ::
+
+                >>> a = duration.Duration()
+                >>> a.type = 'half'
+                >>> a.quarterLength
+                2.0
+
+            ::
+
+                >>> a.type= '16th'
+                >>> a.quarterLength
+                0.25
+
+            '''
+            if self._componentsNeedUpdating:
+                self._updateComponents()
+
+            if len(self.components) == 1:
+                return self.components[0].type
+            elif len(self.components) > 1:
+                return 'complex'
+            else: # there may be components and still a zero type
+                return 'zero'
+    #            raise DurationException("zero DurationUnits in components")
+        def fset(self, value):
+
+            # need to check that type is valid
+            if value not in ordinalTypeFromNum:
+                raise DurationException("no such type exists: %s" % value)
+
+            if len(self.components) == 1:
+                # change the existing DurationUnit to the this type
+                self.components[0].type = value
+                self._quarterLengthNeedsUpdating = True
+            elif self.isComplex: # more than one component
+                raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
+                # what do we do if we already have multiple DurationUnits
+            else: # permit creating a new comoponent
+                # create a new duration unit
+                self.addDurationUnit(DurationUnit(value)) # updates
+                self._quarterLengthNeedsUpdating = True
+        return property(**locals())
+
 
 
 class GraceDuration(Duration):
-    '''A Duration that, no matter how it is created, always has a quarter length of zero.
+    '''
+    A Duration that, no matter how it is created, always has a quarter length
+    of zero.
 
-    GraceDuration can be created with an implied quarter length and type; these values are used to configure the duration, but then may not be relevant after instantiation.
+    GraceDuration can be created with an implied quarter length and type; these
+    values are used to configure the duration, but then may not be relevant
+    after instantiation.
 
+    ::
 
-    >>> gd = duration.GraceDuration(type='half')
-    >>> gd.quarterLength
-    0.0
-    >>> gd.type
-    'half'
+        >>> gd = duration.GraceDuration(type='half')
+        >>> gd.quarterLength
+        0.0
 
-    >>> gd = duration.GraceDuration(.25)
-    >>> gd.type
-    '16th'
-    >>> gd.quarterLength
-    0.0
-    >>> gd.isLinked
-    False
+    ::
 
-    >>> gd = duration.GraceDuration(1.25)
-    >>> gd.type
-    'complex'
-    >>> gd.quarterLength
-    0.0
-    >>> [(x.quarterLength, x.type) for x in gd.components]
-    [(0.0, 'quarter'), (0.0, '16th')]
+        >>> gd.type
+        'half'
+
+    ::
+
+        >>> gd = duration.GraceDuration(.25)
+        >>> gd.type
+        '16th'
+
+    ::
+
+        >>> gd.quarterLength
+        0.0
+
+    ::
+
+        >>> gd.isLinked
+        False
+
+    ::
+
+        >>> gd = duration.GraceDuration(1.25)
+        >>> gd.type
+        'complex'
+
+    ::
+
+        >>> gd.quarterLength
+        0.0
+
+    ::
+
+        >>> [(x.quarterLength, x.type) for x in gd.components]
+        [(0.0, 'quarter'), (0.0, '16th')]
+
     '''
 
     # TODO: there are many properties/methods of Duration that must
     # be overridden to provide consisten behavior
+    
+    ### CLASS VARIABLES ###
+
     isGrace = True
+
+    __slots__ = (
+        'slash',
+        'stealTimePrevious',
+        'stealTimeFollowing',
+        'makeTime',
+        )
+
+    ### INITIALIZER ###
 
     def __init__(self, *arguments, **keywords):
         Duration.__init__(self, *arguments, **keywords)
@@ -3241,7 +3320,6 @@ class GraceDuration(Duration):
             self._updateComponents()
         self.unlink()
         self.quarterLength = 0.0
-
 
         # TODO: make these properties
         self.slash = True # can be True, False, or None; make None go to True?
@@ -3254,6 +3332,13 @@ class GraceDuration(Duration):
 
 
 class AppogiaturaDuration(GraceDuration):
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = ()
+
+    ### INITIALIZER ###
+
     def __init__(self, *arguments, **keywords):
         GraceDuration.__init__(self, *arguments, **keywords)
         #self.unlink()
