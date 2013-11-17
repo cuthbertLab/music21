@@ -101,7 +101,9 @@ class XMLBarException(FromMxObjectsException):
 
 
 def configureStaffGroupFromMxPartGroup(staffGroup, mxPartGroup):
-    '''Given an already instantiated spanner.StaffGroup, configure it with parameters from an mxPartGroup.
+    '''
+    Given an already instantiated spanner.StaffGroup, 
+    configure it with parameters from an mxPartGroup.
     '''
     staffGroup.name = mxPartGroup.get('groupName')
     staffGroup.abbreviation = mxPartGroup.get('groupAbbreviation')
@@ -382,6 +384,8 @@ def mxToAccidental(mxAccidental, inputM21Object = None):
     True
     >>> b.name
     'half-flat'
+    >>> b.alter
+    -0.5
     '''    
     if inputM21Object == None:
         acc = pitch.Accidental()
@@ -413,7 +417,6 @@ def mxToPitch(mxNote, inputM21=None):
     '''
     Given a MusicXML Note object, set this Pitch object to its values.
 
-    
     >>> b = musicxml.mxObjects.Pitch()
     >>> b.set('octave', 3)
     >>> b.set('step', 'E')
@@ -473,8 +476,11 @@ def mxToPitch(mxNote, inputM21=None):
 
 def mxToTie(mxNote, inputM21=None):
     '''
-    Translate a MusicXML :class:`~music21.musicxml.mxObjects.Note` (!) to a music21 
+    Translate a MusicXML :class:`~music21.musicxml.mxObjects.Note` (sic!) to a music21 
     :class:`~music21.tie.Tie` object according to its <tieList> parameter.
+    
+    Only called if the mxObjects.Note has a tieList that is not blank, so as not to
+    create additional ties.
     '''
     if inputM21 == None:
         t = tie.Tie()
@@ -511,10 +517,11 @@ def mxToTie(mxNote, inputM21=None):
 
 def mxToLyric(mxLyric, inputM21=None):
     '''
-    Translate a MusicXML :class:`~music21.musicxml.mxObjects.Lyric` object to a music21 :class:`~music21.note.Lyric` object.
+    Translate a MusicXML :class:`~music21.musicxml.mxObjects.Lyric` object to a 
+    music21 :class:`~music21.note.Lyric` object.
     
-    If inputM21 is a :class:`~music21.note.Lyric` object, then the values of the mxLyric are transfered
-    there and nothing returned.
+    If inputM21 is a :class:`~music21.note.Lyric` object, then the values of the 
+    mxLyric are transfered there and nothing returned.
     
     Otherwise, a new `Lyric` object is created and returned.
     
@@ -570,7 +577,6 @@ def musicXMLTypeToType(value):
     Utility function to convert a MusicXML duration type to an music21 duration type.
     
     Only changes 'long' to 'longa'.
-
     
     >>> musicxml.fromMxObjects.musicXMLTypeToType('long')
     'longa'
@@ -594,19 +600,20 @@ def mxToDuration(mxNote, inputM21=None):
     Translate a `MusicXML` :class:`~music21.musicxml.mxObjects.Note` object 
     to a music21 :class:`~music21.duration.Duration` object.
 
+    ::
+        >>> a = musicxml.mxObjects.Note()
+        >>> a.setDefaults()
+        >>> m = musicxml.mxObjects.Measure()
+        >>> m.setDefaults()
+        >>> a.external['measure'] = m # assign measure for divisions ref
+        >>> a.external['divisions'] = m.external['divisions']
     
-    >>> a = musicxml.mxObjects.Note()
-    >>> a.setDefaults()
-    >>> m = musicxml.mxObjects.Measure()
-    >>> m.setDefaults()
-    >>> a.external['measure'] = m # assign measure for divisions ref
-    >>> a.external['divisions'] = m.external['divisions']
+        >>> c = duration.Duration()
+        >>> musicxml.fromMxObjects.mxToDuration(a, c)
+        <music21.duration.Duration 1.0>
+        >>> c.quarterLength
+        1.0
 
-    >>> c = duration.Duration()
-    >>> musicxml.fromMxObjects.mxToDuration(a, c)
-    <music21.duration.Duration 1.0>
-    >>> c.quarterLength
-    1.0
     '''
     if inputM21 == None:
         d = duration.Duration()
@@ -677,11 +684,12 @@ def mxToDuration(mxNote, inputM21=None):
 
 def mxToOffset(mxDirection, mxDivisions):
     '''
-    Translate a MusicXML :class:`~music21.musicxml.mxObjects.Direction` with an offset value to an offset in music21.
+    Translate a MusicXML :class:`~music21.musicxml.mxObjects.Direction` 
+    with an offset value to an offset in music21.
     '''
     if mxDivisions is None:
         raise FromMxObjectsException(
-        "cannont determine MusicXML duration without a reference to a measure (%s)" % mxDirection)
+        "cannot determine MusicXML duration without a reference to a measure (%s)" % mxDirection)
     if mxDirection.offset is None:
         return 0.0
     else:
@@ -996,7 +1004,9 @@ def mxToTextExpression(mxDirection):
 
 
 def mxToCoda(mxCoda):
-    '''Translate a MusicXML :class:`~music21.musicxml.mxObjects.Coda` object to a music21 :class:`~music21.repeat.Coda` object.
+    '''
+    Translate a MusicXML :class:`~music21.musicxml.mxObjects.Coda` object 
+    to a music21 :class:`~music21.repeat.Coda` object.
     '''
     rm = repeat.Coda()
     rm._positionDefaultX = mxCoda.get('default-x')
@@ -1004,7 +1014,9 @@ def mxToCoda(mxCoda):
     return rm
 
 def mxToSegno(mxCoda):
-    '''Translate a MusicXML :class:`~music21.musicxml.mxObjects.Coda` object to a music21 :class:`~music21.repeat.Coda` object.
+    '''
+    Translate a MusicXML :class:`~music21.musicxml.mxObjects.Coda` object 
+    to a music21 :class:`~music21.repeat.Coda` object.
     '''
     rm = repeat.Segno()
     rm._positionDefaultX = mxCoda.get('default-x')
@@ -1012,7 +1024,9 @@ def mxToSegno(mxCoda):
     return rm
 
 def mxToRepeatExpression(mxDirection):
-    '''Given an mxDirection that may define a coda, segno, or other repeat expression statement, realize the appropriate music21 object.
+    '''
+    Given an mxDirection that may define a coda, segno, or other repeat 
+    expression statement, realize the appropriate music21 object.
     '''
     pass
     # note: this may not be needed, as mx text expressions are converted to repeat objects in measure processing

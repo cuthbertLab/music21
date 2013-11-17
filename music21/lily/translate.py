@@ -1143,7 +1143,7 @@ class LilypondConverter(object):
         c = noteOrRest.classes
 
         simpleElementParts = []
-        if noteOrRest.editorial is not None:
+        if noteOrRest._editorial is not None:
             if noteOrRest.editorial.color and noteOrRest.hideObjectOnPrint is not True:
                 simpleElementParts.append(noteOrRest.editorial.colorLilyStart())
 

@@ -11,8 +11,6 @@
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
 
-# base -- the convention within music21 is that __init__ files contain:
-#    from base import *
 '''
 `music21.base` is what you get in `music21` if you type ``import music21``. It
 contains all the most low-level objects that also appear in the music21 module
