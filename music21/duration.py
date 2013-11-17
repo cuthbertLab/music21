@@ -3303,25 +3303,22 @@ class GraceDuration(Duration):
     isGrace = True
 
     __slots__ = (
-        'slash',
-        'stealTimePrevious',
-        'stealTimeFollowing',
-        'makeTime',
+        '_slash',
+        '_stealTimePrevious',
+        '_stealTimeFollowing',
+        '_makeTime',
         )
 
     ### INITIALIZER ###
 
     def __init__(self, *arguments, **keywords):
         Duration.__init__(self, *arguments, **keywords)
-
         # update components to derive types; this sets ql, but this
         # will later be removed
         if self._componentsNeedUpdating:
             self._updateComponents()
         self.unlink()
         self.quarterLength = 0.0
-
-        # TODO: make these properties
         self.slash = True # can be True, False, or None; make None go to True?
         # values are unit interval percentages
         self.stealTimePrevious = None
@@ -3329,6 +3326,43 @@ class GraceDuration(Duration):
         # make time is encoded in musicxml as divisions; here it can
         # by a duration; but should it be the duration suggested by the grace?
         self.makeTime = False
+
+    ### PUBLIC PROPERTIES ###
+
+    @apply
+    def makeTime():
+        def fget(self):
+            return self._makeTime
+        def fset(self, expr):
+            assert expr in (True, False, None)
+            self._makeTime = bool(expr)
+        return property(**locals())
+        
+    @apply
+    def slash():
+        def fget(self):
+            return self._slash
+        def fset(self, expr):
+            assert expr in (True, False, None)
+            self._slash = bool(expr)
+        return property(**locals())
+        
+    @apply
+    def stealTimePrevious():
+        def fget(self):
+            return self._stealTimePrevious
+        def fset(self, expr):
+            assert expr in (True, False, None)
+            self._stealTimePrevious = bool(expr)
+        return property(**locals())
+        
+    @apply
+    def stealTimeFollowing():
+        def fget(self):
+            return self._stealTimeFollowing
+        def fset(self, expr):
+            self._stealTimeFollowing = bool(expr)
+        return property(**locals())
 
 
 class AppogiaturaDuration(GraceDuration):
