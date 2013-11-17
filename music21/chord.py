@@ -3327,7 +3327,10 @@ class Chord(note.NotRest):
                 #235409
 
             '''
-            return self.editorial.color
+            if self._editorial is not None:
+                return self.editorial.color
+            else:
+                return None
         def fset(self, expr):
             self.editorial.color = expr
         return property(**locals())

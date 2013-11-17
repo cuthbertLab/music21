@@ -177,7 +177,9 @@ class TextFormatException(exceptions21.Music21Exception):
     pass
 
 class TextFormat(object):
-    '''An object for defining text formatting. This object can be multiple-inherited by objects that need storage and i/o of text settings. 
+    '''
+    An object for defining text formatting. 
+    This object can be multiple-inherited by objects that need storage and i/o of text settings. 
 
     See :class:`music21.expressions.TextExpression` for an example. 
     '''

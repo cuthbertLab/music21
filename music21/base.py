@@ -10,8 +10,6 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-# base -- the convention within music21 is that __init__ files contain:
-#    from base import *
 '''
 `music21.base` is what you get in `music21` if you type ``import music21``. It 
 contains all the most low-level objects that also appear in
@@ -35,7 +33,6 @@ available after importing music21.
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
-
 
 >>> base.Music21Object
 <class 'music21.base.Music21Object'>

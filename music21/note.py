@@ -296,23 +296,29 @@ class GeneralNote(base.Music21Object):
     #---------------------------------------------------------------------------
     def _getColor(self):
         '''Return the Note color. 
-        '''
-        return self.editorial.color
-
-    def _setColor(self, value): 
-        '''should check data here
-        uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
-        No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
-
         
         >>> a = note.GeneralNote()
         >>> a.duration.type = 'whole'
+        >>> a.color is None
+        True
         >>> a.color = '#235409'
         >>> a.color
         '#235409'
         >>> a.editorial.color
         '#235409'
 
+        
+        '''
+        #return self.editorial.color
+        if self._editorial is not None:
+            return self.editorial.color
+        else:
+            return None
+        
+    def _setColor(self, value): 
+        '''should check data here
+        uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
+        No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
         '''
         self.editorial.color = value
 
