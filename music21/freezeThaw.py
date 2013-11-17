@@ -1137,41 +1137,83 @@ class JSONFreezer(JSONFreezeThawBase):
 
         Returns a list of those data members
 
+        ::
 
-        >>> n = note.Note()
-        >>> jss = freezeThaw.JSONFreezer(n)
-        >>> jss.autoGatherAttributes()
-        ['_activeSite', '_activeSiteId', '_duration', '_editorial', '_idLastDeepCopyOf', '_notehead', '_noteheadFill', '_noteheadParenthesis', '_overriddenLily', '_priority', '_stemDirection', '_volume']
+            >>> n = note.Note()
+            >>> jss = freezeThaw.JSONFreezer(n)
+            >>> for attr in jss.autoGatherAttributes():
+            ...     attr
+            ...
+            '_activeSite'
+            '_activeSiteId'
+            '_duration'
+            '_editorial'
+            '_idLastDeepCopyOf'
+            '_notehead'
+            '_noteheadFill'
+            '_noteheadParenthesis'
+            '_overriddenLily'
+            '_priority'
+            '_stemDirection'
+            '_volume'
+
         '''
-        post = []
+        result = set()
         if self.storedObject is None:
-            return post
-        obj = self.storedObject
+            return []
         # names that we always do not need
-        exclude = ('_classes', '_fullyQualifiedClasses', '_derivation')
-        # get class names that exclude instance names
-        # these names will be rejected in final accumulation
-        classNames = []
-        for bundle in inspect.classify_class_attrs(obj.__class__):
-            if (bundle.name.startswith('_') and not
-                bundle.name.startswith('__')):
-                classNames.append(bundle.name)
-        #environLocal.printDebug(['classNames', classNames])
-        for name in dir(obj):
-            if name.startswith('_') and not name.startswith('__'):
-                attr = getattr(obj, name)
-                #environLocal.printDebug(['inspect.isroutine()', attr, inspect.isroutine(attr)])
-                if (not inspect.ismethod(attr) and not
-                    inspect.isfunction(attr) and not inspect.isroutine(attr)):
-                    # class names stored are class attrs, not needed for
-                    # reinstantiation
-                    if name not in classNames and name not in exclude:
-                        # store the name, not the attr
-                        post.append(name)
-        #environLocal.printDebug(['auto-derived jsonAttributes', post])
-        return post
+        excludedNames = [
+            '_classes',
+            '_fullyQualifiedClasses',
+            '_derivation',
+            '_DOC_ATTR',
+            '_DOC_ORDER',
+            ]
 
-    def jsonAttributes(self, autoGather = True):
+        for attr in inspect.classify_class_attrs(type(self.storedObject)):
+            if attr.kind == 'data' and inspect.ismemberdescriptor(attr.object):
+                if attr.name not in excludedNames and \
+                    attr.name.startswith('_') and \
+                    not attr.name.startswith('__'):
+                    result.add(attr.name)
+            else:
+                excludedNames.append(attr.name)
+        for name in dir(self.storedObject):
+            if not name.startswith('_') or name.startswith('__'):
+                continue
+            elif name in excludedNames:
+                continue
+            attr = getattr(self.storedObject, name)
+            if inspect.ismethod(attr) or \
+                inspect.isfunction(attr) or  \
+                inspect.isroutine(attr):
+                continue
+            result.add(name)
+
+#        # get class names that exclude instance names
+#        # these names will be rejected in final accumulation
+#        classNames = []
+#        for bundle in inspect.classify_class_attrs(obj.__class__):
+#            if (bundle.name.startswith('_') and not
+#                bundle.name.startswith('__')):
+#                classNames.append(bundle.name)
+#        #environLocal.printDebug(['classNames', classNames])
+#        for name in dir(obj):
+#            if name.startswith('_') and not name.startswith('__'):
+#                attr = getattr(obj, name)
+#                #environLocal.printDebug(['inspect.isroutine()', attr, inspect.isroutine(attr)])
+#                if (not inspect.ismethod(attr) and not
+#                    inspect.isfunction(attr) and not inspect.isroutine(attr)):
+#                    # class names stored are class attrs, not needed for
+#                    # reinstantiation
+#                    if name not in classNames and name not in exclude:
+#                        # store the name, not the attr
+#                        post.append(name)
+
+        result = sorted(result)
+        return result
+
+    def jsonAttributes(self, autoGather=True):
         '''
         Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic
         Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses,
@@ -1395,31 +1437,33 @@ class JSONFreezer(JSONFreezeThawBase):
         >>> jsf = freezeThaw.JSONFreezer(n)
         >>> jsf.jsonPrint()
         {
-          "__attr__": {
+        "__attr__": {
             "_duration": {
-              "__attr__": {
+            "__attr__": {
                 "_cachedIsLinked": true, 
                 "_components": [
-                  {
+                {
                     "__attr__": {
-                      "_dots": [
+                    "_componentsNeedUpdating": false, 
+                    "_dots": [
                         0
-                      ], 
-                      "_link": true, 
-                      "_qtrLength": 1.0, 
-                      "_quarterLengthNeedsUpdating": false, 
-                      "_tuplets": [], 
-                      "_type": "quarter", 
-                      "_typeNeedsUpdating": false
+                    ], 
+                    "_link": true, 
+                    "_qtrLength": 1.0, 
+                    "_quarterLengthNeedsUpdating": false, 
+                    "_tuplets": [], 
+                    "_type": "quarter", 
+                    "_typeNeedsUpdating": false
                     }, 
                     "__class__": "music21.duration.DurationUnit"
-                  }
+                }
                 ], 
                 "_componentsNeedUpdating": false, 
                 "_qtrLength": 1.0, 
-                "_quarterLengthNeedsUpdating": false
-              }, 
-              "__class__": "music21.duration.Duration"
+                "_quarterLengthNeedsUpdating": false, 
+                "_typeNeedsUpdating": false
+            }, 
+            "__class__": "music21.duration.Duration"
             }, 
             "_notehead": "normal", 
             "_noteheadFill": "default", 
@@ -1428,47 +1472,47 @@ class JSONFreezer(JSONFreezeThawBase):
             "_stemDirection": "unspecified", 
             "articulations": [], 
             "beams": {
-              "__attr__": {
+            "__attr__": {
                 "beamsList": [], 
                 "feathered": false
-              }, 
-              "__class__": "music21.beam.Beams"
+            }, 
+            "__class__": "music21.beam.Beams"
             }, 
             "expressions": [], 
             "lyrics": [], 
             "offset": 0.0, 
             "pitch": {
-              "__attr__": {
+            "__attr__": {
                 "_accidental": {
-                  "__attr__": {
+                "__attr__": {
                     "_alter": 1.0, 
                     "_displayType": "normal", 
                     "_modifier": "#", 
                     "_name": "sharp", 
                     "_priority": 0
-                  }, 
-                  "__class__": "music21.pitch.Accidental"
+                }, 
+                "__class__": "music21.pitch.Accidental"
                 }, 
                 "_microtone": {
-                  "__attr__": {
+                "__attr__": {
                     "_centShift": 0, 
                     "_harmonicShift": 1
-                  }, 
-                  "__class__": "music21.pitch.Microtone"
+                }, 
+                "__class__": "music21.pitch.Microtone"
                 }, 
                 "_octave": 5, 
                 "_priority": 0, 
                 "_step": "D"
-              }, 
-              "__class__": "music21.pitch.Pitch"
+            }, 
+            "__class__": "music21.pitch.Pitch"
             }
-          }, 
-          "__class__": "music21.note.Note", 
-          "__version__": [
+        }, 
+        "__class__": "music21.note.Note", 
+        "__version__": [
             1, 
             7, 
             1
-          ]
+        ]
         }
         '''
         print(json.dumps(

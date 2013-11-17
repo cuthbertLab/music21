@@ -1245,7 +1245,33 @@ class DurationCommon(object):
 
     ### CLASS VARIABLES ###
 
-    __slots__ = ()
+    __slots__ = (
+        '_componentsNeedUpdating',
+        '_quarterLengthNeedsUpdating',
+        '_typeNeedsUpdating',
+        )
+
+    ### INITIALIZER ###
+    
+    def __init__(self):
+        self._componentsNeedUpdating = False
+        self._quarterLengthNeedsUpdating = False
+        self._typeNeedsUpdating = False
+
+    ### SPECIAL METHODS ###
+
+    def __getstate__(self):
+        state = {}
+        slots = set()
+        for cls in self.__class__.mro():
+            slots.update(getattr(cls, '__slots__', ()))
+        for slot in slots:
+            state[slot] = getattr(self, slot, None)
+        return state
+
+    def __setstate__(self, state):
+        for slot, value in state.iteritems():
+            setattr(self, slot, value)
 
     ### PUBLIC METHODS ###
 
@@ -1330,17 +1356,15 @@ class DurationUnit(DurationCommon):
         '_dots',
         '_link',
         '_qtrLength',
-        '_quarterLengthNeedsUpdating',
         '_tuplets',
         '_type',
-        '_typeNeedsUpdating',
         'type',
         )
 
     ### INITIALIZER ###
 
     def __init__(self, prototype='quarter'):
-        #DurationCommon.__init__(self)
+        DurationCommon.__init__(self)
         self._link = True  # default is True
         self._type = ""
         # dots can be a float for expressing Crumb dots (1/2 dots)
@@ -2099,10 +2123,7 @@ class Duration(DurationCommon):
         'linkage',
         '_cachedIsLinked',
         '_components',
-        '_componentsNeedUpdating',
         '_qtrLength',
-        '_quarterLengthNeedsUpdating',
-        '_typeNeedsUpdating',
         )
 
     ### INITIALIZER ###
@@ -2111,8 +2132,8 @@ class Duration(DurationCommon):
         '''
         First positional argument is assumed to be type string or a quarterLength.
         '''
-        #DurationCommon.__init__(self)
-
+        DurationCommon.__init__(self)
+        self._quarterLengthNeedsUpdating = False
         self._qtrLength = 0.0
         # always have one DurationUnit object
         self._components = []
@@ -2120,14 +2141,12 @@ class Duration(DurationCommon):
         self._componentsNeedUpdating = False
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
-        self._cachedIsLinked = None # store for access w/o looking at components
+        self._cachedIsLinked = None  # store for access w/o looking at components
         if len(arguments) > 0:
             if common.isNum(arguments[0]):
                 self.quarterLength = arguments[0]
             else:
                 self.addDurationUnit(DurationUnit(arguments[0]))
-
-
         if 'dots' in keywords:
             storeDots = keywords['dots']
         else:
@@ -2144,7 +2163,6 @@ class Duration(DurationCommon):
         # permit as keyword so can be passed from notes
         if 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
-
         # linkage specifies the thing used to connect durations.
         # If undefined, nothing is used.  "tie" is the most common linkage
         # Other sorts of things could be
@@ -2521,8 +2539,8 @@ class Duration(DurationCommon):
         Make a duration notatable by partitioning it into smaller
         units (default qLenDiv = 4 (whole note)).  uses partitionQuarterLength
         '''
-        self.components = partitionQuarterLength(self.quarterLength,
-                                                    qLenDiv)
+        self.components = partitionQuarterLength(
+            self.quarterLength, qLenDiv)
         self._componentsNeedUpdating = False
 
     def fill(self, quarterLengthList=['quarter', 'half', 'quarter']):
@@ -2850,7 +2868,6 @@ class Duration(DurationCommon):
             '''
             if self._componentsNeedUpdating:
                 self._updateComponents()
-
             if len(self.components) == 1:
                 return self.components[0].dots
             elif len(self.components) > 1:
