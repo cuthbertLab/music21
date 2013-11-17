@@ -1245,8 +1245,6 @@ class DurationCommon(object):
 
     ### CLASS VARIABLES ###
 
-    _classes = None
-
     __slots__ = ()
 
     ### PUBLIC METHODS ###
@@ -1294,9 +1292,7 @@ class DurationCommon(object):
         and going up the mro() for the object.  Very similar to Perl's @ISA
         array.  See music21.Music21Object.classes for more details.
         '''
-        if self._classes is None:
-            self._classes = [x.__name__ for x in self.__class__.mro()]
-        return self._classes
+        return [x.__name__ for x in self.__class__.mro()]
 
 
 #------------------------------------------------------------------------------
