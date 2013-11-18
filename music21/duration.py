@@ -2849,7 +2849,6 @@ class Duration(DurationCommon):
         def fset(self, value):
             if not common.isListLike(value):
                 raise DurationException('only list-like dotGroups values can be used with this method.')
-
             if len(self.components) == 1:
                 self.components[0].dotGroups = value
                 self._quarterLengthNeedsUpdating = True
@@ -2895,7 +2894,6 @@ class Duration(DurationCommon):
             '''
             if not common.isNum(value):
                 raise DurationException('only numeric dot values can be used with this method.')
-
             if len(self.components) == 1:
                 self.components[0].dots = value
                 self._quarterLengthNeedsUpdating = True

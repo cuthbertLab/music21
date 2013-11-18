@@ -238,11 +238,11 @@ class Sites(object):
 
     __slots__ = (
         '_definedContexts',
+        '_lastID',
+        '_lastOffset',
         '_locationKeys',
         '_timeIndex',
         'containedById',
-        '_lastID',
-        '_lastOffset',
         )
 
     ### INITIALIZER ###
@@ -262,22 +262,7 @@ class Sites(object):
         self._lastID = -1  # cannot be None
         self._lastOffset = None
 
-    def __len__(self):
-        '''
-        Return the total number of references.
-
-        ::
-
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            >>> aObj = Mock()
-            >>> aContexts = base.Sites()
-            >>> aContexts.add(aObj)
-            >>> len(aContexts)
-            1
-
-        '''
-        return len(self._definedContexts)
+    ## SPECIAL METHODS ###
 
     def __deepcopy__(self, memo=None):
         '''
@@ -345,96 +330,55 @@ class Sites(object):
         new._timeIndex = self._timeIndex  # keep for coherency
         return new
 
-    def unwrapWeakref(self, purgeLocations=True):
+    def __len__(self):
         '''
-        Unwrap any and all weakrefs stored.
+        Return the total number of references.
 
         ::
 
             >>> class Mock(base.Music21Object):
             ...     pass
             >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> aSites = base.Sites()
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> common.isWeakref(aSites.get()[0]) # unwrapping happens
-            False
-
-        ::
-
-            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
-            True
-
-        ::
-
-            >>> aSites.unwrapWeakref()
-            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
-            False
-
-        ::
-
-            >>> common.isWeakref(aSites._definedContexts[id(bObj)]['obj'])
-            False
+            >>> aContexts = base.Sites()
+            >>> aContexts.add(aObj)
+            >>> len(aContexts)
+            1
 
         '''
-        if purgeLocations is True:
-            # might not be needed if you know they are all alive.
-            self.purgeLocations(rescanIsDead=True)
+        return len(self._definedContexts)
 
-        #environLocal.printDebug(['self', self, 'self._definedContexts.keys()', self._definedContexts.keys()])
-        for idKey in self._definedContexts:
-            if WEAKREF_ACTIVE:
-            #if common.isWeakref(self._definedContexts[idKey]['obj']):
-                target = self._definedContexts[idKey]['obj']
-                if target is None:
-                    continue
-                if common.isWeakref(target):
-                    #environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
-                    target = common.unwrapWeakref(target)
-                    self._definedContexts[idKey]['obj'] = target
+    ### PRIVATE METHODS ###
 
-    def wrapWeakref(self):
+    def _keysByTime(self, newFirst=True):
         '''
-        Wrap all stored objects with weakrefs.
+        Get keys sorted by creation time, where most
+        recent are first if `newFirst` is True. else, most recent are last.
 
         ::
 
-            >>> class Mock(base.Music21Object):
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
             ...     pass
             ...
             >>> aObj = Mock()
             >>> bObj = Mock()
-            >>> aSites = base.Sites()
+            >>> cObj = Mock()
+            >>> aSites = music21.Sites()
+            >>> aSites.add(cObj, 345)
             >>> aSites.add(aObj)
             >>> aSites.add(bObj)
-            >>> aSites.unwrapWeakref()
-            >>> aSites.wrapWeakref()
-            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
-            True
-
-        ::
-
-            >>> common.isWeakref(aSites._definedContexts[id(bObj)]['obj'])
+            >>> k = aSites._keysByTime()
+            >>> aSites._definedContexts[k[0]]['time'] > aSites._definedContexts[k[1]]['time'] > aSites._definedContexts[k[2]]['time']
             True
 
         '''
-        for idKey in self._definedContexts:
-            if self._definedContexts[idKey]['obj'] is None:
-                continue  # always skip None
-            if not common.isWeakref(self._definedContexts[idKey]['obj']):
-                #environLocal.printDebug(['wrapping:', self._definedContexts[idKey]['obj']])
-                post = common.wrapWeakref(self._definedContexts[idKey]['obj'])
-                self._definedContexts[idKey]['obj'] = post
-
-    def clear(self):
-        '''
-        Clear all stored data.
-        '''
-        self._definedContexts = {}
-        self._locationKeys = []
-        self._lastID = -1  # cannot be None
-        self._lastOffset = None
+        post = []
+        for key in self._definedContexts:
+            post.append((self._definedContexts[key]['time'], key))
+        post.sort()
+        if newFirst:
+            post.reverse()
+        return [k for unused_time, k in post]
 
     def _prepareObject(self, obj):
         '''
@@ -449,6 +393,8 @@ class Sites(object):
         # a normal reference, return unaltered
         else:
             return obj
+
+    ### PUBLIC METHODS ###
 
     def add(self, obj, offset=None, timeValue=None, idKey=None, classString=None):
         '''
@@ -528,137 +474,14 @@ class Sites(object):
         if not updateNotAdd:  # add new/missing information to dictionary
             self._definedContexts[idKey] = singleContextDict
 
-    def remove(self, site):
+    def clear(self):
         '''
-        Remove the object (a context or location site) specified from Sites.
-        Object provided can be a location site (i.e., a Stream) or a pure
-        context (like a Temperament).
-
-        N.B. -- like all .sites operations, this is an advanced tool not for
-        standard music21 usage.  Instead of:
-
-            elObj.remove(streamObj)
-
-        use this command, which will take care of `.sites.remove` as well as
-        removing `elObj` from `streamObj.elements`:
-
-            streamObj.remove(elObj)
-
-        ::
-
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> aSites = base.Sites()
-            >>> aSites.add(aSite, 23)
-            >>> len(aSites)
-            1
-
-        ::
-
-            >>> aSites.add(bSite, 233)
-            >>> len(aSites)
-            2
-
-        ::
-
-            >>> aSites.add(cSite, 232223)
-            >>> len(aSites)
-            3
-
-        ::
-
-            >>> aSites.remove(aSite)
-            >>> len(aSites)
-            2
-
-        OMIT_FROM_DOCS
-
-        ::
-
-            >>> len(aSites._locationKeys)
-            2
-
+        Clear all stored data.
         '''
-        # must clear
+        self._definedContexts = {}
+        self._locationKeys = []
         self._lastID = -1  # cannot be None
         self._lastOffset = None
-
-        siteId = None
-        if site is not None:
-            siteId = id(site)
-        try:
-            del self._definedContexts[siteId]
-            #environLocal.printDebug(['removed site w/o exception:', siteId, 'self._definedContexts.keys()', self._definedContexts.keys()])
-        except:
-            raise SitesException('an entry for this object (%s) is not stored in this Sites object' % site)
-        # also delete from location keys
-        if siteId in self._locationKeys:
-            self._locationKeys.pop(self._locationKeys.index(siteId))
-
-    def removeById(self, idKey):
-        '''
-        Remove a site entry by id key,
-        which is id() of the object.
-        '''
-        # must clear if removing
-        if idKey == self._lastID:
-            self._lastID = -1  # cannot be None
-            self._lastOffset = None
-        if idKey is None:
-            raise SitesException('trying to remove None idKey is not allowed')
-
-        #environLocal.printDebug(['removeById', idKey, 'self._definedContexts.keys()', self._definedContexts.keys()])
-        del self._definedContexts[idKey]
-        if idKey in self._locationKeys:
-            self._locationKeys.pop(self._locationKeys.index(idKey))
-
-    def getById(self, id):  # id is okay here @ReservedAssignment
-        '''
-        Return the object specified by an id.
-        Used for testing and debugging.
-        '''
-        singleContextDict = self._definedContexts[id]
-        # need to check if these is weakref
-        #if common.isWeakref(dict['obj']):
-        if WEAKREF_ACTIVE:
-            return common.unwrapWeakref(singleContextDict['obj'])
-        else:
-            return singleContextDict['obj']
-
-    def _keysByTime(self, newFirst=True):
-        '''
-        Get keys sorted by creation time, where most
-        recent are first if `newFirst` is True. else, most recent are last.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> cObj = Mock()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(cObj, 345)
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> k = aSites._keysByTime()
-            >>> aSites._definedContexts[k[0]]['time'] > aSites._definedContexts[k[1]]['time'] > aSites._definedContexts[k[2]]['time']
-            True
-
-        '''
-        post = []
-        for key in self._definedContexts:
-            post.append((self._definedContexts[key]['time'], key))
-        post.sort()
-        if newFirst:
-            post.reverse()
-        return [k for unused_time, k in post]
 
     def get(self, locationsTrail=False, sortByCreationTime=False,
             priorityTarget=None, excludeNone=False):
@@ -752,278 +575,329 @@ class Sites(object):
                 post.insert(0, post.pop(post.index(priorityTarget)))
         return post
 
-    def getSites(self, idExclude=None, excludeNone=False):
+    def getAllByClass(self, className, found=None, idFound=None, memo=None):
         '''
-        Get all defined contexts that are locations. Note that this unwraps
-        all sites from weakrefs and is thus an expensive operation.
+        Return all known references of a given class found in any association
+        with this Sites object.
+
+        This will recursively search the defined contexts of existing defined
+        contexts, and return a list of all objects that match the given class.
 
         ::
-        
+
             >>> import music21
             >>> class Mock(music21.Music21Object):
-            ...     pass
+            ...    pass
+            ...
+            >>> class Mocker(music21.Music21Object):
+            ...    pass
             ...
             >>> aObj = Mock()
             >>> bObj = Mock()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj, 234)
-            >>> aSites.add(bObj, 3000)
-            >>> len(aSites._locationKeys) == 2
-            True
-
-        ::
-
-            >>> len(aSites.getSites()) == 2
+            >>> cObj = Mocker()
+            >>> dc = music21.Sites()
+            >>> dc.add(aObj)
+            >>> dc.add(bObj)
+            >>> dc.add(cObj)
+            >>> dc.getAllByClass(Mock) == [aObj, bObj]
             True
 
         '''
-#         if idExclude is None:
-#             idExclude = [] # else, assume a list
-        # use pre-collected keys
-        post = []
-        for idKey in self._locationKeys:
-            if idExclude is not None:
-                if idKey in idExclude:
-                    continue
-            try:
-                objRef = self._definedContexts[idKey]['obj']
-            except KeyError:
-                raise SitesException('no such site: %s' % idKey)
-            # skip dead references
-            if self._definedContexts[idKey]['isDead']:
-                continue
-            if idKey is None:
-                if not excludeNone:
-                    post.append(None) # keep None as site
-            elif not WEAKREF_ACTIVE: # leave None alone
-                post.append(objRef)
-            else:
-                obj = common.unwrapWeakref(objRef)
-                if obj is None:
-                    self._definedContexts[idKey]['isDead'] = True
-                    continue
-                post.append(obj)
-        return post
+        if memo is None:
+            memo = {} # intialize
+        if found is None:
+            found = []
+        if idFound is None:
+            idFound = []
 
-    def getSitesByClass(self, className):
-        '''
-        Return sites that match the provided class.
-
-        Input can be either a Class object or a string
-
-            >>> import music21
-            >>> from music21 import stream
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> cObj = stream.Stream()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj, 234)
-            >>> aSites.add(bObj, 3000)
-            >>> aSites.add(cObj, 200)
-            >>> aSites.getSitesByClass(Mock) == [aObj, bObj]
-            True
-
-        ::
-
-            >>> aSites.getSitesByClass('Stream') == [cObj]
-            True
-
-        '''
-        found = []
-        if not isinstance(className, str):
-            className = common.classToClassStr(className)
-
-        for idKey in self._locationKeys:
-            if self._definedContexts[idKey]['isDead']:
-                continue
-            classStr = self._definedContexts[idKey]['class']
-            if classStr == className:
-                objRef = self._definedContexts[idKey]['obj']
-                if not WEAKREF_ACTIVE: # leave None alone
-                    obj = objRef
-                else:
-                    obj = common.unwrapWeakref(objRef)
-                found.append(obj)
+        objs = self.get(locationsTrail=False)
+        for obj in objs:
+            #environLocal.printDebug(['memo', memo])
+            if obj is None:
+                continue # in case the reference is dead
+            if common.isStr(className):
+                if type(obj).__name__.lower() == className.lower():
+                    found.append(obj)
+                    idFound.append(id(obj))
+            elif isinstance(obj, className):
+                    found.append(obj)
+                    idFound.append(id(obj))
+        for obj in objs:
+            if obj is None:
+                continue # in case the reference is dead
+            # if after trying to match name, look in the defined contexts'
+            # defined contexts [sic!]
+            if id(obj) not in memo:
+                # if the object is a Musci21Object
+                #if hasattr(obj, 'getContextByClass'):
+                # store this object as having been searched
+                memo[id(obj)] = obj
+                # will add values to found
+                #environLocal.printDebug(['getAllByClass()', 'about to call getAllContextsByClass', 'found', found, 'obj', obj])
+                obj.getAllContextsByClass(className, found=found,
+                    idFound=idFound, memo=memo)
+        # returning found, but not necessary
         return found
 
-    def hasSpannerSite(self):
+    def getAttrByName(self, attrName):
         '''
-        Return True if this object is found in any Spanner. This is determined
-        by looking for a SpannerStorage Stream class as a Site.
-        '''
-        for idKey in self._locationKeys:
-            if self._definedContexts[idKey]['isDead']:
-                continue
-            if self._definedContexts[idKey]['class'] == 'SpannerStorage':
-                return True
-        return False
-
-    def hasVariantSite(self):
-        '''
-        Return True if this object is found in any Variant. This is determined
-        by looking for a VariantStorage Stream class as a Site.
-        '''
-        for idKey in self._locationKeys:
-            if self._definedContexts[idKey]['isDead']:
-                continue
-            if self._definedContexts[idKey]['class'] == 'VariantStorage':
-                return True
-        return False
-
-    def getSiteCount(self):
-        '''
-        Return the number of non-dead sites, including None.  This does not
-        unwrap weakrefs for performance.
-        '''
-        count = 0
-        for idKey in self._locationKeys:
-            if self._definedContexts[idKey]['isDead']:
-                continue
-            count += 1
-        return count
-
-    def isSite(self, obj):
-        '''
-        Given an object, determine if it is a site stored in this Sites. This
-        will return False if the object is simply a context and not a location.
+        Given an attribute name, search all objects and find the first that
+        matches this attribute name; then return a reference to this attribute.
 
         ::
 
             >>> import music21
             >>> class Mock(music21.Music21Object):
-            ...     pass
+            ...     attr1 = 234
             ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 0)
-            >>> aLocations.add(bSite) # a context
-            >>> aLocations.isSite(aSite)
-            True
-
-        ::
-
-            >>> aLocations.isSite(bSite)
-            False
-
-        '''
-        if id(obj) in self._locationKeys:
-            return True
-        return False
-
-    def hasSiteId(self, siteId):
-        '''
-        Return True or False if this Sites object already has this site id
-        defined as a location
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> dc = music21.Sites()
-            >>> dc.add(aSite, 0)
-            >>> dc.add(bSite) # a context
-            >>> dc.hasSiteId(id(aSite))
-            True
-
-        ::
-
-            >>> dc.hasSiteId(id(bSite))
-            False
-
-        '''
-        if siteId in self._locationKeys:
-            return True
-        return False
-
-    def getSiteIds(self):
-        '''
-        Return a list of all site Ids.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> dc = music21.Sites()
-            >>> dc.add(aSite, 0)
-            >>> dc.add(bSite) # a context
-            >>> dc.getSiteIds() == [id(aSite)]
-            True
-
-        '''
-        # may want to convert to tuple to avoid user editing?
-        return self._locationKeys
-
-    def purgeLocations(self, rescanIsDead=False):
-        '''
-        Clean all locations that refer to objects that no longer exist.
-
-        The `removeOrphanedSites` option removes sites that may have been the
-        result of deepcopy: the element has the site, but the site does not
-        have the element. This results b/c Sites are shallow-copied, and then
-        elements are re-added.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> dSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 0)
-            >>> aLocations.add(cSite) # a context
-            >>> del aSite
-            >>> len(aLocations)
-            2
-
-        ::
-
-            >>> aLocations.purgeLocations(rescanIsDead=True)
-            >>> len(aLocations)
+            >>> aObj = Mock()
+            >>> aObj.attr1 = 234
+            >>> bObj = Mock()
+            >>> bObj.attr1 = 98
+            >>> aSites = music21.Sites()
+            >>> aSites.add(aObj)
+            >>> len(aSites)
             1
 
+        ::
+
+            >>> aSites.getAttrByName('attr1') == 234
+            True
+
+        ::
+
+            >>> aSites.remove(aObj)
+            >>> aSites.add(bObj)
+            >>> aSites.getAttrByName('attr1') == 98
+            True
+
         '''
-        # first, check if any sites are dead, and cache the results
-        if rescanIsDead:
-            for idKey in self._locationKeys:
-                if idKey is None:
-                    continue
-                if self._definedContexts[idKey]['isDead']:
-                    continue  # already marked
-                if WEAKREF_ACTIVE:
-                    obj = common.unwrapWeakref(
-                        self._definedContexts[idKey]['obj'])
-                else:
-                    obj = self._definedContexts[idKey]['obj']
-                if obj is None: # if None, it no longer exists
-                    self._definedContexts[idKey]['isDead'] = True
-        # use previously set isDead entry, so as not to
-        # unwrap all references
-        remove = []
-        for idKey in self._locationKeys:
-            if idKey is None:
+        post = None
+        for obj in self.get():
+            if obj is None:
+                continue # in case the reference is dead
+            try:
+                post = getattr(obj, attrName)
+                return post
+            except AttributeError:
+                pass
+
+    def getByClass(self, className, serialReverseSearch=True, callerFirst=None,
+             sortByCreationTime=False, prioritizeActiveSite=False,
+             priorityTarget=None, getElementMethod='getElementAtOrBefore',
+             memo=None):
+        '''
+        Return the most recently added reference based on className.  Class
+        name can be a string or the class name.
+
+        This will recursively search the defined contexts of existing defined
+        contexts.
+
+        The `callerFirst` parameters is simply used to pass a reference of the
+        first caller; this is necessary if we are looking within a Stream for a
+        flat offset position.
+
+        If `priorityTarget` is specified, this location will be searched first.
+        The `prioritizeActiveSite` is pased to to any recursively called
+        getContextByClass() calls.
+
+        The `getElementMethod` is a string that selects which Stream method is
+        used to get elements for searching with getElementsByClass() calls.
+
+        ::
+
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
+            ...     pass
+            ...
+            >>> import time
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> aSites = music21.Sites()
+            >>> aSites.add(aObj)
+            >>> #time.sleep(.05)
+            >>> aSites.add(bObj)
+            >>> # we get the most recently added object first
+            >>> aSites.getByClass('Mock', sortByCreationTime=True) == bObj
+            True
+        
+        ::
+
+            >>> aSites.getByClass(Mock, sortByCreationTime=True) == bObj
+            True
+
+        OMIT_FROM_DOCS
+        TODO: not sure if memo is properly working: need a test case
+        '''
+        #if DEBUG_CONTEXT: print 'Y: first call'
+        # in general, this should not be the first caller, as this method
+        # is called from a Music21Object, not directly on the Sites
+        # isntance. Nontheless, if this is the first caller, it is the first
+        # caller.
+        if callerFirst is None:  # this is the first caller
+            callerFirst = self  # set Sites as caller first
+        if memo is None:
+            memo = {}  # intialize
+        post = None
+        #count = 0
+
+        # search any defined contexts first
+        # need to sort: look at most-recently added objs are first
+        objs = self.get(
+            locationsTrail=False,
+            sortByCreationTime=sortByCreationTime,
+            priorityTarget=priorityTarget,
+            excludeNone=True,
+            )
+        #printMemo(memo, 'getByClass() called: looking at %s sites' % len(objs))
+        classNameIsStr = common.isStr(className)
+        for obj in objs:
+            #environLocal.printDebug(['memo', memo])
+            if classNameIsStr:
+                if className in obj.classes:
+                    post = obj
+                    break
+            elif isinstance(obj, className):
+                    post = obj
+                    break
+        if post is not None:
+            return post
+
+        # all objs here are containers, as they are all locations
+        # if we could be sure that these objs do not have their own locations
+        # and do not have the target class, we can skip
+        for obj in objs:
+            #if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
+            if (classNameIsStr and obj.isFlat and
+                obj.sites.getSiteCount() == 1):
+                #if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
+                #environLocal.printDebug(['\tY: skipping flat stream that does not contain object:'])
+                if not obj.hasElementOfClass(className, forceFlat=True):
+                    continue # skip, not in this stream
+
+            # if after trying to match name, look in the defined contexts'
+            # defined contexts [sic!]
+            #if post is None: # no match yet
+            # access public method to recurse
+            if id(obj) not in memo:
+                # if the object is a Musci21Object
+                #if hasattr(obj, 'getContextByClass'):
+                # store this object as having been searched
+                memo[id(obj)] = obj
+                post = obj.getContextByClass(className,
+                       serialReverseSearch=serialReverseSearch,
+                       callerFirst=callerFirst,
+                       sortByCreationTime=sortByCreationTime,
+                       prioritizeActiveSite=prioritizeActiveSite,
+                       getElementMethod=getElementMethod,
+                       memo=memo)
+                if post is not None:
+                    break
+#                 else: # this is not a music21 object
+#                     pass
+                    #environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
+#             else: # objec has already been searched
+#                 pass
+                #environLocal.printDebug['skipping searching of object already searched:', obj]
+#             else: # post is not None
+#                 break
+        return post
+
+    def getById(self, id):  # id is okay here @ReservedAssignment
+        '''
+        Return the object specified by an id.
+        Used for testing and debugging.
+        '''
+        singleContextDict = self._definedContexts[id]
+        # need to check if these is weakref
+        #if common.isWeakref(dict['obj']):
+        if WEAKREF_ACTIVE:
+            return common.unwrapWeakref(singleContextDict['obj'])
+        else:
+            return singleContextDict['obj']
+
+    def getOffsetByObjectMatch(self, obj):
+        '''
+        For a given object, return the offset using a direct object match.  The
+        stored id value is not used; instead, the id() of both the stored
+        object reference and the supplied object is used.
+
+        This should be replaced by getOffsetBySite(strictDeadCheck = True)...
+
+        ::
+
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
+            ...     pass
+            ...
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> aLocations = music21.Sites()
+            >>> aLocations.add(aSite, 23)
+            >>> aLocations.add(bSite, 121.5)
+            >>> aLocations.getOffsetByObjectMatch(aSite)
+            23
+
+        ::
+
+            >>> aLocations.getOffsetByObjectMatch(bSite)
+            121.5
+
+        '''
+        for idKey in self._definedContexts:
+            singleContextDict = self._definedContexts[idKey]
+            if singleContextDict['isDead']: # cal alway skip
                 continue
-            if self._definedContexts[idKey]['isDead']:
-                remove.append(idKey)
-        for idKey in remove:
-            # this call changes the ._locationKeys list, and thus must be
-            # out side _locationKeys loop
-            self.removeById(idKey)
+            # must unwrap references before comparison
+            #if common.isWeakref(dict['obj']):
+            if WEAKREF_ACTIVE:
+                compareObj = common.unwrapWeakref(singleContextDict['obj'])
+            else:
+                compareObj = singleContextDict['obj']
+            if compareObj is None: # mark isDead for later removal
+                singleContextDict['isDead'] = True
+                continue
+            if id(compareObj) == id(obj):
+                #environLocal.printDebug(['found object as site', obj, id(obj), 'idKey', idKey])
+                return self.getOffsetBySiteId(idKey) #dict['offset']
+        raise SitesException('an entry for this object (%s) is not stored in Sites' % obj)
+
+    def getOffsetBySite(self, site):
+        '''
+        For a given site return this Sites's offset in it. The None site is
+        permitted. The id() of the site is used to find the offset.
+
+        ::
+
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
+            ...     pass
+            ...
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> aLocations = music21.Sites()
+            >>> aLocations.add(aSite, 23)
+            >>> aLocations.add(bSite, 121.5)
+            >>> aLocations.getOffsetBySite(aSite)
+            23
+
+        ::
+
+            >>> aLocations.getOffsetBySite(bSite)
+            121.5
+
+        '''
+        # NOTE: this is a performance critical operation
+        siteId = None
+        if site is not None:
+            siteId = id(site)
+        try:
+            # will raise a key error if not found
+            return self.getOffsetBySiteId(siteId)
+            #post = self._definedContexts[siteId]['offset']
+        except SitesException: # the site id is not valid
+            #environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
+            raise # re-raise Exception
 
     def getOffsetBySiteId(self, idKey, strictDeadCheck=False):
         '''
@@ -1147,13 +1021,13 @@ class Sites(object):
         # here, already having location keys may be an advantage
         return [self.getOffsetBySiteId(x) for x in self._locationKeys]
 
-    def getOffsetByObjectMatch(self, obj):
+    def getSiteByOffset(self, offset):
         '''
-        For a given object, return the offset using a direct object match.  The
-        stored id value is not used; instead, the id() of both the stored
-        object reference and the supplied object is used.
+        For a given offset return the site that fits it
 
-        This should be replaced by getOffsetBySite(strictDeadCheck = True)...
+        More than one Site may have the same offset; this at one point returned
+        the last site added by sorting time, but now we use a dict, so there's
+        no guarantee that the one you want will be there -- need orderedDicts!
 
         ::
 
@@ -1163,40 +1037,220 @@ class Sites(object):
             ...
             >>> aSite = Mock()
             >>> bSite = Mock()
+            >>> cSite = Mock()
             >>> aLocations = music21.Sites()
             >>> aLocations.add(aSite, 23)
-            >>> aLocations.add(bSite, 121.5)
-            >>> aLocations.getOffsetByObjectMatch(aSite)
-            23
+            >>> aLocations.add(bSite, 23121.5)
+            >>> aSite == aLocations.getSiteByOffset(23)
+            True
+
+        '''
+
+        match = None
+        for siteId in self._definedContexts:
+            # might need to use almost equals here
+            if self._definedContexts[siteId]['offset'] == offset:
+                if self._definedContexts[siteId]['isDead']:
+                    return None
+                match = self._definedContexts[siteId]['obj']
+                break
+        if WEAKREF_ACTIVE:
+            if match is None: # this is a dead erfs
+                return match
+            elif not common.isWeakref(match):
+                raise SitesException('site on coordinates is not a weak ref: %s' % match)
+            return common.unwrapWeakref(match)
+        else:
+            return match
+
+    def getSiteCount(self):
+        '''
+        Return the number of non-dead sites, including None.  This does not
+        unwrap weakrefs for performance.
+        '''
+        count = 0
+        for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['isDead']:
+                continue
+            count += 1
+        return count
+
+    def getSiteIds(self):
+        '''
+        Return a list of all site Ids.
 
         ::
 
-            >>> aLocations.getOffsetByObjectMatch(bSite)
-            121.5
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
+            ...     pass
+            ...
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> dc = music21.Sites()
+            >>> dc.add(aSite, 0)
+            >>> dc.add(bSite) # a context
+            >>> dc.getSiteIds() == [id(aSite)]
+            True
 
         '''
-        for idKey in self._definedContexts:
-            singleContextDict = self._definedContexts[idKey]
-            if singleContextDict['isDead']: # cal alway skip
+        # may want to convert to tuple to avoid user editing?
+        return self._locationKeys
+
+    def getSites(self, idExclude=None, excludeNone=False):
+        '''
+        Get all defined contexts that are locations. Note that this unwraps
+        all sites from weakrefs and is thus an expensive operation.
+
+        ::
+        
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
+            ...     pass
+            ...
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> aSites = music21.Sites()
+            >>> aSites.add(aObj, 234)
+            >>> aSites.add(bObj, 3000)
+            >>> len(aSites._locationKeys) == 2
+            True
+
+        ::
+
+            >>> len(aSites.getSites()) == 2
+            True
+
+        '''
+#         if idExclude is None:
+#             idExclude = [] # else, assume a list
+        # use pre-collected keys
+        post = []
+        for idKey in self._locationKeys:
+            if idExclude is not None:
+                if idKey in idExclude:
+                    continue
+            try:
+                objRef = self._definedContexts[idKey]['obj']
+            except KeyError:
+                raise SitesException('no such site: %s' % idKey)
+            # skip dead references
+            if self._definedContexts[idKey]['isDead']:
                 continue
-            # must unwrap references before comparison
-            #if common.isWeakref(dict['obj']):
-            if WEAKREF_ACTIVE:
-                compareObj = common.unwrapWeakref(singleContextDict['obj'])
+            if idKey is None:
+                if not excludeNone:
+                    post.append(None) # keep None as site
+            elif not WEAKREF_ACTIVE: # leave None alone
+                post.append(objRef)
             else:
-                compareObj = singleContextDict['obj']
-            if compareObj is None: # mark isDead for later removal
-                singleContextDict['isDead'] = True
-                continue
-            if id(compareObj) == id(obj):
-                #environLocal.printDebug(['found object as site', obj, id(obj), 'idKey', idKey])
-                return self.getOffsetBySiteId(idKey) #dict['offset']
-        raise SitesException('an entry for this object (%s) is not stored in Sites' % obj)
+                obj = common.unwrapWeakref(objRef)
+                if obj is None:
+                    self._definedContexts[idKey]['isDead'] = True
+                    continue
+                post.append(obj)
+        return post
 
-    def getOffsetBySite(self, site):
+    def getSitesByClass(self, className):
         '''
-        For a given site return this Sites's offset in it. The None site is
-        permitted. The id() of the site is used to find the offset.
+        Return sites that match the provided class.
+
+        Input can be either a Class object or a string
+
+            >>> import music21
+            >>> from music21 import stream
+            >>> class Mock(music21.Music21Object):
+            ...     pass
+            ...
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> cObj = stream.Stream()
+            >>> aSites = music21.Sites()
+            >>> aSites.add(aObj, 234)
+            >>> aSites.add(bObj, 3000)
+            >>> aSites.add(cObj, 200)
+            >>> aSites.getSitesByClass(Mock) == [aObj, bObj]
+            True
+
+        ::
+
+            >>> aSites.getSitesByClass('Stream') == [cObj]
+            True
+
+        '''
+        found = []
+        if not isinstance(className, str):
+            className = common.classToClassStr(className)
+
+        for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['isDead']:
+                continue
+            classStr = self._definedContexts[idKey]['class']
+            if classStr == className:
+                objRef = self._definedContexts[idKey]['obj']
+                if not WEAKREF_ACTIVE: # leave None alone
+                    obj = objRef
+                else:
+                    obj = common.unwrapWeakref(objRef)
+                found.append(obj)
+        return found
+
+    def hasSiteId(self, siteId):
+        '''
+        Return True or False if this Sites object already has this site id
+        defined as a location
+
+        ::
+
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
+            ...     pass
+            ...
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> dc = music21.Sites()
+            >>> dc.add(aSite, 0)
+            >>> dc.add(bSite) # a context
+            >>> dc.hasSiteId(id(aSite))
+            True
+
+        ::
+
+            >>> dc.hasSiteId(id(bSite))
+            False
+
+        '''
+        if siteId in self._locationKeys:
+            return True
+        return False
+
+    def hasSpannerSite(self):
+        '''
+        Return True if this object is found in any Spanner. This is determined
+        by looking for a SpannerStorage Stream class as a Site.
+        '''
+        for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['isDead']:
+                continue
+            if self._definedContexts[idKey]['class'] == 'SpannerStorage':
+                return True
+        return False
+
+    def hasVariantSite(self):
+        '''
+        Return True if this object is found in any Variant. This is determined
+        by looking for a VariantStorage Stream class as a Site.
+        '''
+        for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['isDead']:
+                continue
+            if self._definedContexts[idKey]['class'] == 'VariantStorage':
+                return True
+        return False
+
+    def isSite(self, obj):
+        '''
+        Given an object, determine if it is a site stored in this Sites. This
+        will return False if the object is simply a context and not a location.
 
         ::
 
@@ -1207,28 +1261,200 @@ class Sites(object):
             >>> aSite = Mock()
             >>> bSite = Mock()
             >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 23)
-            >>> aLocations.add(bSite, 121.5)
-            >>> aLocations.getOffsetBySite(aSite)
-            23
+            >>> aLocations.add(aSite, 0)
+            >>> aLocations.add(bSite) # a context
+            >>> aLocations.isSite(aSite)
+            True
 
         ::
 
-            >>> aLocations.getOffsetBySite(bSite)
-            121.5
+            >>> aLocations.isSite(bSite)
+            False
 
         '''
-        # NOTE: this is a performance critical operation
+        if id(obj) in self._locationKeys:
+            return True
+        return False
+
+    def purgeLocations(self, rescanIsDead=False):
+        '''
+        Clean all locations that refer to objects that no longer exist.
+
+        The `removeOrphanedSites` option removes sites that may have been the
+        result of deepcopy: the element has the site, but the site does not
+        have the element. This results b/c Sites are shallow-copied, and then
+        elements are re-added.
+
+        ::
+
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
+            ...     pass
+            ...
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cSite = Mock()
+            >>> dSite = Mock()
+            >>> aLocations = music21.Sites()
+            >>> aLocations.add(aSite, 0)
+            >>> aLocations.add(cSite) # a context
+            >>> del aSite
+            >>> len(aLocations)
+            2
+
+        ::
+
+            >>> aLocations.purgeLocations(rescanIsDead=True)
+            >>> len(aLocations)
+            1
+
+        '''
+        # first, check if any sites are dead, and cache the results
+        if rescanIsDead:
+            for idKey in self._locationKeys:
+                if idKey is None:
+                    continue
+                if self._definedContexts[idKey]['isDead']:
+                    continue  # already marked
+                if WEAKREF_ACTIVE:
+                    obj = common.unwrapWeakref(
+                        self._definedContexts[idKey]['obj'])
+                else:
+                    obj = self._definedContexts[idKey]['obj']
+                if obj is None: # if None, it no longer exists
+                    self._definedContexts[idKey]['isDead'] = True
+        # use previously set isDead entry, so as not to
+        # unwrap all references
+        remove = []
+        for idKey in self._locationKeys:
+            if idKey is None:
+                continue
+            if self._definedContexts[idKey]['isDead']:
+                remove.append(idKey)
+        for idKey in remove:
+            # this call changes the ._locationKeys list, and thus must be
+            # out side _locationKeys loop
+            self.removeById(idKey)
+
+    def remove(self, site):
+        '''
+        Remove the object (a context or location site) specified from Sites.
+        Object provided can be a location site (i.e., a Stream) or a pure
+        context (like a Temperament).
+
+        N.B. -- like all .sites operations, this is an advanced tool not for
+        standard music21 usage.  Instead of:
+
+            elObj.remove(streamObj)
+
+        use this command, which will take care of `.sites.remove` as well as
+        removing `elObj` from `streamObj.elements`:
+
+            streamObj.remove(elObj)
+
+        ::
+
+            >>> class Mock(base.Music21Object):
+            ...     pass
+            ...
+            >>> aSite = Mock()
+            >>> bSite = Mock()
+            >>> cSite = Mock()
+            >>> aSites = base.Sites()
+            >>> aSites.add(aSite, 23)
+            >>> len(aSites)
+            1
+
+        ::
+
+            >>> aSites.add(bSite, 233)
+            >>> len(aSites)
+            2
+
+        ::
+
+            >>> aSites.add(cSite, 232223)
+            >>> len(aSites)
+            3
+
+        ::
+
+            >>> aSites.remove(aSite)
+            >>> len(aSites)
+            2
+
+        OMIT_FROM_DOCS
+
+        ::
+
+            >>> len(aSites._locationKeys)
+            2
+
+        '''
+        # must clear
+        self._lastID = -1  # cannot be None
+        self._lastOffset = None
+
         siteId = None
         if site is not None:
             siteId = id(site)
         try:
-            # will raise a key error if not found
-            return self.getOffsetBySiteId(siteId)
-            #post = self._definedContexts[siteId]['offset']
-        except SitesException: # the site id is not valid
-            #environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
-            raise # re-raise Exception
+            del self._definedContexts[siteId]
+            #environLocal.printDebug(['removed site w/o exception:', siteId, 'self._definedContexts.keys()', self._definedContexts.keys()])
+        except:
+            raise SitesException('an entry for this object (%s) is not stored in this Sites object' % site)
+        # also delete from location keys
+        if siteId in self._locationKeys:
+            self._locationKeys.pop(self._locationKeys.index(siteId))
+
+    def removeById(self, idKey):
+        '''
+        Remove a site entry by id key,
+        which is id() of the object.
+        '''
+        # must clear if removing
+        if idKey == self._lastID:
+            self._lastID = -1  # cannot be None
+            self._lastOffset = None
+        if idKey is None:
+            raise SitesException('trying to remove None idKey is not allowed')
+
+        #environLocal.printDebug(['removeById', idKey, 'self._definedContexts.keys()', self._definedContexts.keys()])
+        del self._definedContexts[idKey]
+        if idKey in self._locationKeys:
+            self._locationKeys.pop(self._locationKeys.index(idKey))
+
+    def setAttrByName(self, attrName, value):
+        '''
+        Given an attribute name, search all objects and find the first that
+        matches this attribute name; then return a reference to this attribute.
+
+        ::
+
+            >>> import music21
+            >>> class Mock(music21.Music21Object):
+            ...     attr1 = 234
+            ...
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> bObj.attr1 = 98
+            >>> aSites = music21.Sites()
+            >>> aSites.add(aObj)
+            >>> aSites.add(bObj)
+            >>> aSites.setAttrByName('attr1', 'test')
+            >>> aSites.getAttrByName('attr1') == 'test'
+            True
+
+        '''
+        #post = None
+        for obj in self.get():
+            if obj is None:
+                continue  # in case the reference is dead
+            try:
+                junk = getattr(obj, attrName)  # if attr already exists
+                setattr(obj, attrName, value)  # if attr already exists
+            except AttributeError:
+                pass
 
     def setOffsetBySite(self, site, value):
         '''Changes the offset of the site specified.  Note that this can also
@@ -1283,310 +1509,87 @@ class Sites(object):
         except KeyError:
             raise SitesException('an entry for this object (%s) is not stored in Sites' % siteId)
 
-    def getSiteByOffset(self, offset):
+    def unwrapWeakref(self, purgeLocations=True):
         '''
-        For a given offset return the site that fits it
-
-        More than one Site may have the same offset; this at one point returned
-        the last site added by sorting time, but now we use a dict, so there's
-        no guarantee that the one you want will be there -- need orderedDicts!
+        Unwrap any and all weakrefs stored.
 
         ::
 
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
+            >>> class Mock(base.Music21Object):
+            ...     pass
+            >>> aObj = Mock()
+            >>> bObj = Mock()
+            >>> aSites = base.Sites()
+            >>> aSites.add(aObj)
+            >>> aSites.add(bObj)
+            >>> common.isWeakref(aSites.get()[0]) # unwrapping happens
+            False
+
+        ::
+
+            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
+            True
+
+        ::
+
+            >>> aSites.unwrapWeakref()
+            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
+            False
+
+        ::
+
+            >>> common.isWeakref(aSites._definedContexts[id(bObj)]['obj'])
+            False
+
+        '''
+        if purgeLocations is True:
+            # might not be needed if you know they are all alive.
+            self.purgeLocations(rescanIsDead=True)
+
+        #environLocal.printDebug(['self', self, 'self._definedContexts.keys()', self._definedContexts.keys()])
+        for idKey in self._definedContexts:
+            if WEAKREF_ACTIVE:
+            #if common.isWeakref(self._definedContexts[idKey]['obj']):
+                target = self._definedContexts[idKey]['obj']
+                if target is None:
+                    continue
+                if common.isWeakref(target):
+                    #environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
+                    target = common.unwrapWeakref(target)
+                    self._definedContexts[idKey]['obj'] = target
+
+    def wrapWeakref(self):
+        '''
+        Wrap all stored objects with weakrefs.
+
+        ::
+
+            >>> class Mock(base.Music21Object):
             ...     pass
             ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 23)
-            >>> aLocations.add(bSite, 23121.5)
-            >>> aSite == aLocations.getSiteByOffset(23)
-            True
-
-        '''
-
-        match = None
-        for siteId in self._definedContexts:
-            # might need to use almost equals here
-            if self._definedContexts[siteId]['offset'] == offset:
-                if self._definedContexts[siteId]['isDead']:
-                    return None
-                match = self._definedContexts[siteId]['obj']
-                break
-        if WEAKREF_ACTIVE:
-            if match is None: # this is a dead erfs
-                return match
-            elif not common.isWeakref(match):
-                raise SitesException('site on coordinates is not a weak ref: %s' % match)
-            return common.unwrapWeakref(match)
-        else:
-            return match
-
-    #--------------------------------------------------------------------------
-    # for dealing with contexts or getting other information
-
-    def getByClass(self, className, serialReverseSearch=True, callerFirst=None,
-             sortByCreationTime=False, prioritizeActiveSite=False,
-             priorityTarget=None, getElementMethod='getElementAtOrBefore',
-             memo=None):
-        '''
-        Return the most recently added reference based on className.  Class
-        name can be a string or the class name.
-
-        This will recursively search the defined contexts of existing defined
-        contexts.
-
-        The `callerFirst` parameters is simply used to pass a reference of the
-        first caller; this is necessary if we are looking within a Stream for a
-        flat offset position.
-
-        If `priorityTarget` is specified, this location will be searched first.
-        The `prioritizeActiveSite` is pased to to any recursively called
-        getContextByClass() calls.
-
-        The `getElementMethod` is a string that selects which Stream method is
-        used to get elements for searching with getElementsByClass() calls.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> import time
             >>> aObj = Mock()
             >>> bObj = Mock()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj)
-            >>> #time.sleep(.05)
-            >>> aSites.add(bObj)
-            >>> # we get the most recently added object first
-            >>> aSites.getByClass('Mock', sortByCreationTime=True) == bObj
-            True
-        
-        ::
-
-            >>> aSites.getByClass(Mock, sortByCreationTime=True) == bObj
-            True
-
-        OMIT_FROM_DOCS
-        TODO: not sure if memo is properly working: need a test case
-        '''
-        #if DEBUG_CONTEXT: print 'Y: first call'
-        # in general, this should not be the first caller, as this method
-        # is called from a Music21Object, not directly on the Sites
-        # isntance. Nontheless, if this is the first caller, it is the first
-        # caller.
-        if callerFirst is None:  # this is the first caller
-            callerFirst = self  # set Sites as caller first
-        if memo is None:
-            memo = {}  # intialize
-        post = None
-        #count = 0
-
-        # search any defined contexts first
-        # need to sort: look at most-recently added objs are first
-        objs = self.get(
-            locationsTrail=False,
-            sortByCreationTime=sortByCreationTime,
-            priorityTarget=priorityTarget,
-            excludeNone=True,
-            )
-        #printMemo(memo, 'getByClass() called: looking at %s sites' % len(objs))
-        classNameIsStr = common.isStr(className)
-        for obj in objs:
-            #environLocal.printDebug(['memo', memo])
-            if classNameIsStr:
-                if className in obj.classes:
-                    post = obj
-                    break
-            elif isinstance(obj, className):
-                    post = obj
-                    break
-        if post is not None:
-            return post
-
-        # all objs here are containers, as they are all locations
-        # if we could be sure that these objs do not have their own locations
-        # and do not have the target class, we can skip
-        for obj in objs:
-            #if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
-            if (classNameIsStr and obj.isFlat and
-                obj.sites.getSiteCount() == 1):
-                #if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
-                #environLocal.printDebug(['\tY: skipping flat stream that does not contain object:'])
-                if not obj.hasElementOfClass(className, forceFlat=True):
-                    continue # skip, not in this stream
-
-            # if after trying to match name, look in the defined contexts'
-            # defined contexts [sic!]
-            #if post is None: # no match yet
-            # access public method to recurse
-            if id(obj) not in memo:
-                # if the object is a Musci21Object
-                #if hasattr(obj, 'getContextByClass'):
-                # store this object as having been searched
-                memo[id(obj)] = obj
-                post = obj.getContextByClass(className,
-                       serialReverseSearch=serialReverseSearch,
-                       callerFirst=callerFirst,
-                       sortByCreationTime=sortByCreationTime,
-                       prioritizeActiveSite=prioritizeActiveSite,
-                       getElementMethod=getElementMethod,
-                       memo=memo)
-                if post is not None:
-                    break
-#                 else: # this is not a music21 object
-#                     pass
-                    #environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
-#             else: # objec has already been searched
-#                 pass
-                #environLocal.printDebug['skipping searching of object already searched:', obj]
-#             else: # post is not None
-#                 break
-        return post
-
-    def getAllByClass(self, className, found=None, idFound=None, memo=None):
-        '''
-        Return all known references of a given class found in any association
-        with this Sites object.
-
-        This will recursively search the defined contexts of existing defined
-        contexts, and return a list of all objects that match the given class.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...    pass
-            ...
-            >>> class Mocker(music21.Music21Object):
-            ...    pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> cObj = Mocker()
-            >>> dc = music21.Sites()
-            >>> dc.add(aObj)
-            >>> dc.add(bObj)
-            >>> dc.add(cObj)
-            >>> dc.getAllByClass(Mock) == [aObj, bObj]
-            True
-
-        '''
-        if memo is None:
-            memo = {} # intialize
-        if found is None:
-            found = []
-        if idFound is None:
-            idFound = []
-
-        objs = self.get(locationsTrail=False)
-        for obj in objs:
-            #environLocal.printDebug(['memo', memo])
-            if obj is None:
-                continue # in case the reference is dead
-            if common.isStr(className):
-                if type(obj).__name__.lower() == className.lower():
-                    found.append(obj)
-                    idFound.append(id(obj))
-            elif isinstance(obj, className):
-                    found.append(obj)
-                    idFound.append(id(obj))
-        for obj in objs:
-            if obj is None:
-                continue # in case the reference is dead
-            # if after trying to match name, look in the defined contexts'
-            # defined contexts [sic!]
-            if id(obj) not in memo:
-                # if the object is a Musci21Object
-                #if hasattr(obj, 'getContextByClass'):
-                # store this object as having been searched
-                memo[id(obj)] = obj
-                # will add values to found
-                #environLocal.printDebug(['getAllByClass()', 'about to call getAllContextsByClass', 'found', found, 'obj', obj])
-                obj.getAllContextsByClass(className, found=found,
-                    idFound=idFound, memo=memo)
-        # returning found, but not necessary
-        return found
-
-    def getAttrByName(self, attrName):
-        '''
-        Given an attribute name, search all objects and find the first that
-        matches this attribute name; then return a reference to this attribute.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     attr1 = 234
-            ...
-            >>> aObj = Mock()
-            >>> aObj.attr1 = 234
-            >>> bObj = Mock()
-            >>> bObj.attr1 = 98
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj)
-            >>> len(aSites)
-            1
-
-        ::
-
-            >>> aSites.getAttrByName('attr1') == 234
-            True
-
-        ::
-
-            >>> aSites.remove(aObj)
-            >>> aSites.add(bObj)
-            >>> aSites.getAttrByName('attr1') == 98
-            True
-
-        '''
-        post = None
-        for obj in self.get():
-            if obj is None:
-                continue # in case the reference is dead
-            try:
-                post = getattr(obj, attrName)
-                return post
-            except AttributeError:
-                pass
-
-    def setAttrByName(self, attrName, value):
-        '''
-        Given an attribute name, search all objects and find the first that
-        matches this attribute name; then return a reference to this attribute.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     attr1 = 234
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> bObj.attr1 = 98
-            >>> aSites = music21.Sites()
+            >>> aSites = base.Sites()
             >>> aSites.add(aObj)
             >>> aSites.add(bObj)
-            >>> aSites.setAttrByName('attr1', 'test')
-            >>> aSites.getAttrByName('attr1') == 'test'
+            >>> aSites.unwrapWeakref()
+            >>> aSites.wrapWeakref()
+            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
+            True
+
+        ::
+
+            >>> common.isWeakref(aSites._definedContexts[id(bObj)]['obj'])
             True
 
         '''
-        #post = None
-        for obj in self.get():
-            if obj is None:
-                continue  # in case the reference is dead
-            try:
-                junk = getattr(obj, attrName)  # if attr already exists
-                setattr(obj, attrName, value)  # if attr already exists
-            except AttributeError:
-                pass
+        for idKey in self._definedContexts:
+            if self._definedContexts[idKey]['obj'] is None:
+                continue  # always skip None
+            if not common.isWeakref(self._definedContexts[idKey]['obj']):
+                #environLocal.printDebug(['wrapping:', self._definedContexts[idKey]['obj']])
+                post = common.wrapWeakref(self._definedContexts[idKey]['obj'])
+                self._definedContexts[idKey]['obj'] = post
 
 
 #------------------------------------------------------------------------------
