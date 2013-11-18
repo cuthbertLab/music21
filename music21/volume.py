@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         volume.py
-# Purpose:      Objects for representing volume, amplitude, and related 
+# Purpose:      Objects for representing volume, amplitude, and related
 #               parameters
 #
 # Authors:      Christopher Ariza
@@ -9,51 +9,81 @@
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''This module defines the object model of Volume, covering all representation of amplitude, volume, velocity, and related parameters.  
+
 '''
- 
+This module defines the object model of Volume, covering all representation of
+amplitude, volume, velocity, and related parameters.
+'''
+
 import unittest
 
 from music21 import exceptions21
 from music21 import common
+from music21.base import SlottedObject
 
 from music21 import environment
-_MOD = "volume.py"  
+_MOD = "volume.py"
 environLocal = environment.Environment(_MOD)
 
 
-
 #-------------------------------------------------------------------------------
+
+
 class VolumeException(exceptions21.Music21Exception):
     pass
 
+
 #-------------------------------------------------------------------------------
-class Volume(object):
-    '''The Volume object lives on NotRest objects and subclasses. It is not a Music21Object subclass. 
 
-    
-    >>> v = volume.Volume()     
+
+class Volume(SlottedObject):
     '''
-    def __init__(self, parent=None, velocity=None, velocityScalar=None, 
-                velocityIsRelative=True):
+    The Volume object lives on NotRest objects and subclasses. It is not a
+    Music21Object subclass.
 
-        # store a reference to the parent, as we use this to do context 
+    ::
+
+        >>> v = volume.Volume()
+
+    '''
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '_parent',
+        '_velocity',
+        '_cachedRealized',
+        'velocityIsRelative',
+        )
+
+    ### INITIALIZER ###
+
+    def __init__(
+        self,
+        parent=None,
+        velocity=None,
+        velocityScalar=None,
+        velocityIsRelative=True,
+        ):
+        # store a reference to the parent, as we use this to do context
         # will use property; if None will leave as None
         self._parent = None
-        self.parent = parent    
+        self.parent = parent
         self._velocity = None
         if velocity is not None:
             self.velocity = velocity
         elif velocityScalar is not None:
             self.velocityScalar = velocityScalar
-
         self._cachedRealized = None
-
         #  replace with a property
         self.velocityIsRelative = velocityIsRelative
 
+    ### SPECIAL METHODS ###
+
     def __deepcopy__(self, memo=None):
-        '''Need to manage copying of weak ref; when copying, do not copy weak ref, but keep as a reference to the same object. 
+        '''
+        Need to manage copying of weak ref; when copying, do not copy weak ref,
+        but keep as a reference to the same object.
         '''
         new = self.__class__()
         new.mergeAttributes(self) # will get all numerical values
@@ -61,96 +91,12 @@ class Volume(object):
         new._parent = self._parent
         return new
 
-
     def __repr__(self):
         return "<music21.volume.Volume realized=%s>" % round(self.realized, 2)
 
-    #---------------------------------------------------------------------------
-    # properties
-        
-    def _getParent(self):
-        if self._parent is None:
-            return None
-        post = common.unwrapWeakref(self._parent)
-        if post is None:
-            # set attribute for speed
-            self._parent = None
-        return post
+    ### PUBLIC METHODS ###
 
-    def _setParent(self, parent):
-        if parent is not None:
-            if hasattr(parent, 'classes') and 'NotRest' in parent.classes:
-                self._parent = common.wrapWeakref(parent)
-        else:
-            self._parent = None
-
-    parent = property(_getParent, _setParent, doc = '''
-        Get or set the parent, which must be a note.NotRest subclass. The parent is wrapped in a weak reference.
-        ''')
-
-
-    def _getVelocity(self):
-        return self._velocity
-        
-    def _setVelocity(self, value):
-        if not common.isNum(value):
-            raise VolumeException('value provided for velocity must be a number, not %s' % value)
-        if value < 0:
-            self._velocity = 0
-        elif value > 127:
-            self._velocity = 127
-        else:
-            self._velocity = value
-
-    velocity = property(_getVelocity, _setVelocity, doc = '''
-        Get or set the velocity value, a numerical value between 0 and 127 and available setting amplitude on each Note or Pitch in chord. 
-
-        
-        >>> n = note.Note()
-        >>> n.volume.velocity = 20
-        >>> n.volume.parent == n
-        True
-        >>> n.volume.velocity 
-        20
-        ''')
-
-
-    def _getVelocityScalar(self):
-        # multiplying by 1/127. for performance
-        return self._velocity * 0.007874015748031496
-        
-    def _setVelocityScalar(self, value):
-        if not common.isNum(value):
-            raise VolumeException('value provided for velocityScalar must be a number, not %s' % value)
-        if value < 0:
-            scalar = 0
-        elif value > 1:
-            scalar = 1
-        else:
-            scalar = value
-        self._velocity = int(round(scalar * 127))
-
-    velocityScalar = property(_getVelocityScalar, _setVelocityScalar, doc = '''
-        Get or set the velocityScalar value, a numerical value between 0 and 1 and available setting amplitude on each Note or Pitch in chord. This value is mapped to the range 0 to 127 on output.
-
-        Note that this value is derived from the set velocity value. Floating point error seen here will not be found in the velocity value. 
-
-        When setting this value, an integer-based velocity value will be derived and stored. 
-
-        
-        >>> n = note.Note()
-        >>> n.volume.velocityScalar = .5
-        >>> n.volume.velocity
-        64
-        >>> n.volume.velocity = 127
-        >>> n.volume.velocityScalar
-        1.0
-        ''')
-
-    #---------------------------------------------------------------------------
-    # high-level methods
-
-    def getContextByClass(self, className, sortByCreationTime=False,         
+    def getContextByClass(self, className, sortByCreationTime=False,
             getElementMethod='getElementAtOrBefore'):
         '''Simulate get context by class method as found on parent NotRest object.
         '''
@@ -159,7 +105,7 @@ class Volume(object):
             raise VolumeException('cannot call getContextByClass because parent is None.')
         # call on parent object
         return p.getContextByClass(className, serialReverseSearch=True,
-            callerFirst=None, sortByCreationTime=sortByCreationTime, prioritizeActiveSite=True, getElementMethod=getElementMethod, 
+            callerFirst=None, sortByCreationTime=sortByCreationTime, prioritizeActiveSite=True, getElementMethod=getElementMethod,
             memo=None)
 
     def getDynamicContext(self):
@@ -169,9 +115,9 @@ class Volume(object):
         return self.getContextByClass('Dynamic')
 
     def mergeAttributes(self, other):
-        '''Given another Volume object, gather all attributes except parent. Values are always copied, not passed by reference. 
+        '''Given another Volume object, gather all attributes except parent. Values are always copied, not passed by reference.
 
-        
+
         >>> n1 = note.Note()
         >>> v1 = volume.Volume()
         >>> v1.velocity = 111
@@ -184,63 +130,112 @@ class Volume(object):
         >>> v2.velocity
         111
         '''
-        if other is not None:      
+        if other is not None:
             self._velocity = other._velocity
             self.velocityIsRelative = other.velocityIsRelative
-        
 
-    def getRealized(self, useDynamicContext=True, useVelocity=True,
+    def getRealizedStr(self, useDynamicContext=True, useVelocity=True,
         useArticulations=True, baseLevel=0.5, clip=True):
-        '''Get a realized unit-interval scalar for this Volume. This scalar is to be applied to the dynamic range of whatever output is available, whatever that may be. 
+        '''Return the realized as rounded and formatted string value. Useful for testing.
 
-        The `baseLevel` value is a middle value between 0 and 1 that all scalars modify. This also becomes the default value for unspecified dynamics. When scalars (between 0 and 1) are used, their values are doubled, such that mid-values (around .5, which become 1) make no change. 
- 
-        This can optionally take into account `dynamicContext`, `useVelocity`, and `useArticulation`.
 
-        If `useDynamicContext` is True, a context search for a dynamic will be done, else dynamics are ignored. Alternatively, the useDynamicContext may supply a Dynamic object that will be used instead of a context search.
-
-        If `useArticulations` is True and parent is not None, any articulations found on that parent will be used to adjust the volume. Alternatively, the `useArticulations` parameter may supply a list of articulations that will be used instead of that available on a parent.
-
-        The `velocityIsRelative` tag determines if the velocity value includes contextual values, such as dynamics and and accents, or not. 
-
-        
-        >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
-        >>> s.insert([0, dynamics.Dynamic('p'), 1, dynamics.Dynamic('mp'), 2, dynamics.Dynamic('mf'), 3, dynamics.Dynamic('f')])
-
-        >>> s.notes[0].volume.getRealized()
-        0.496...
-        >>> s.notes[1].volume.getRealized()
-        0.496...
-        >>> s.notes[2].volume.getRealized()
-        0.63779...
-        >>> s.notes[7].volume.getRealized()
-        0.99212...
-
-        >>> # velocity, if set, will be scaled by dynamics
-        >>> s.notes[7].volume.velocity = 20
-        >>> s.notes[7].volume.getRealized()
-        0.22047...
-
-        >>> # unless we set the velocity to not be relative
-        >>> s.notes[7].volume.velocityIsRelative = False
-        >>> s.notes[7].volume.getRealized()
-        0.1574803...
+        >>> v = volume.Volume(velocity=64)
+        >>> v.getRealizedStr()
+        '0.5'
         '''
-        #velocityIsRelative might be best set at import. e.g., from MIDI, 
-        # velocityIsRelative is False, but in other applications, it may not 
-        # be
+        val = self.getRealized(useDynamicContext=useDynamicContext,
+                    useVelocity=useVelocity, useArticulations=useArticulations,
+                    baseLevel=baseLevel, clip=clip)
+        return str(round(val, 2))
 
+    def getRealized(
+        self,
+        useDynamicContext=True,
+        useVelocity=True,
+        useArticulations=True,
+        baseLevel=0.5,
+        clip=True,
+        ):
+        '''
+        Get a realized unit-interval scalar for this Volume. This scalar is to
+        be applied to the dynamic range of whatever output is available,
+        whatever that may be.
+
+        The `baseLevel` value is a middle value between 0 and 1 that all
+        scalars modify. This also becomes the default value for unspecified
+        dynamics. When scalars (between 0 and 1) are used, their values are
+        doubled, such that mid-values (around .5, which become 1) make no
+        change.
+
+        This can optionally take into account `dynamicContext`, `useVelocity`,
+        and `useArticulation`.
+
+        If `useDynamicContext` is True, a context search for a dynamic will be
+        done, else dynamics are ignored. Alternatively, the useDynamicContext
+        may supply a Dynamic object that will be used instead of a context
+        search.
+
+        If `useArticulations` is True and parent is not None, any articulations
+        found on that parent will be used to adjust the volume. Alternatively,
+        the `useArticulations` parameter may supply a list of articulations
+        that will be used instead of that available on a parent.
+
+        The `velocityIsRelative` tag determines if the velocity value includes
+        contextual values, such as dynamics and and accents, or not.
+
+        ::
+
+            >>> s = stream.Stream()
+            >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
+            >>> s.insert([0, dynamics.Dynamic('p'), 1, dynamics.Dynamic('mp'), 2, dynamics.Dynamic('mf'), 3, dynamics.Dynamic('f')])
+
+        ::
+
+            >>> s.notes[0].volume.getRealized()
+            0.496...
+
+        ::
+
+            >>> s.notes[1].volume.getRealized()
+            0.496...
+
+        ::
+
+            >>> s.notes[2].volume.getRealized()
+            0.63779...
+
+        ::
+
+            >>> s.notes[7].volume.getRealized()
+            0.99212...
+
+        ::
+
+            >>> # velocity, if set, will be scaled by dynamics
+            >>> s.notes[7].volume.velocity = 20
+            >>> s.notes[7].volume.getRealized()
+            0.22047...
+
+        ::
+
+            >>> # unless we set the velocity to not be relative
+            >>> s.notes[7].volume.velocityIsRelative = False
+            >>> s.notes[7].volume.getRealized()
+            0.1574803...
+
+        '''
+        #velocityIsRelative might be best set at import. e.g., from MIDI,
+        # velocityIsRelative is False, but in other applications, it may not
+        # be
         val = baseLevel
         dm = None  # no dynamic mark
- 
-        # velocity is checked first; the range between 0 and 1 is doubled, 
-        # to 0 to 2. a velocityScalar of .7 thus scales the base value of 
+        # velocity is checked first; the range between 0 and 1 is doubled,
+        # to 0 to 2. a velocityScalar of .7 thus scales the base value of
         # .5 by 1.4 to become .7
         if useVelocity:
             if self._velocity is not None:
                 if not self.velocityIsRelative:
-                    # if velocity is not relateive 
+                    # if velocity is not relateive
                     # it should fully determines output independent of anything
                     # else
                     val = self.velocityScalar
@@ -250,20 +245,19 @@ class Volume(object):
             # this not a scalar application but a shift.
             else: # target :0.70866
                 val += 0.20866
-
-        # only change the val from here if velocity is relative 
-        if self.velocityIsRelative:                    
+        # only change the val from here if velocity is relative
+        if self.velocityIsRelative:
             if useDynamicContext is not False:
-                if hasattr(useDynamicContext, 
+                if hasattr(useDynamicContext,
                     'classes') and 'Dynamic' in useDynamicContext.classes:
                     dm = useDynamicContext # it is a dynamic
                 elif self.parent is not None:
                     dm = self.getDynamicContext() # dm may be None
                 else:
-                    environLocal.printDebug(['getRealized():', 
+                    environLocal.printDebug(['getRealized():',
                     'useDynamicContext is True but no dynamic supplied or found in context'])
                 if dm is not None:
-                    # double scalare (so range is between 0 and 1) and scale 
+                    # double scalare (so range is between 0 and 1) and scale
                     # t he current val (around the base)
                     val = val * (dm.volumeScalar * 2.0)
             # userArticulations can be a list of 1 or more articulation objects
@@ -272,7 +266,7 @@ class Volume(object):
                 am = None
                 if common.isListLike(useArticulations):
                     am = useArticulations
-                elif hasattr(useArticulations, 
+                elif hasattr(useArticulations,
                     'classes') and 'Articulation' in useArticulations.classes:
                     am = [useArticulations] # place in a list
                 elif self.parent is not None:
@@ -281,79 +275,168 @@ class Volume(object):
                     for a in am:
                         # add in volume shift for all articulations
                         val += a.volumeShift
-            
         if clip: # limit between 0 and 1
             if val > 1:
                 val = 1.0
             elif val < 0:
                 val = 0.0
-        # might to rebalance range after scalings       
-
+        # might to rebalance range after scalings
         # always update cached result each time this is called
         self._cachedRealized = val
         return val
 
-    def getRealizedStr(self, useDynamicContext=True, useVelocity=True,
-        useArticulations=True, baseLevel=0.5, clip=True):
-        '''Return the realized as rounded and formatted string value. Useful for testing. 
+    ### PUBLIC PROPERTIES ###
 
-        
-        >>> v = volume.Volume(velocity=64)
-        >>> v.getRealizedStr()
-        '0.5'
-        '''  
-        val = self.getRealized(useDynamicContext=useDynamicContext, 
-                    useVelocity=useVelocity, useArticulations=useArticulations, 
-                    baseLevel=baseLevel, clip=clip)
-        return str(round(val, 2))
+    @property
+    def cachedRealized(self):
+        '''
+        Return the cached realized value of this volume. This will be the last
+        realized value or, if that value has not been set, a newly realized
+        value. If the caller knows that the realized values have all been
+        recently set, using this property will add significant performance
+        boost.
 
+        ::
 
-    realized = property(getRealized, doc='''
-        Return the realized unit-interval scalar for this Volume
-        ''')
+            >>> v = volume.Volume(velocity=128)
+            >>> v.cachedRealized
+            1.0
 
-    
-    def _getCachedRealized(self):
+        '''
         if self._cachedRealized is None:
             self._cachedRealized = self.getRealized()
         return self._cachedRealized
 
-    cachedRealized = property(_getCachedRealized, doc='''
-        Return the cached realized value of this volume. This will be the last realized value or, if that value has not been set, a newly realized value. If the caller knows that the realized values have all been recently set, using this property will add significant performance boost.
-
-        
-        >>> v = volume.Volume(velocity=128)
-        >>> v.cachedRealized
-        1.0
-        ''')
-
-    def _getCachedRealizedStr(self):
-        return str(round(self._getCachedRealized(), 2))
-
-    cachedRealizedStr = property(_getCachedRealizedStr, doc='''
+    @property
+    def cachedRealizedStr(self):
+        '''
         Convenience property for testing.
 
-        
-        >>> v = volume.Volume(velocity=128)
-        >>> v.cachedRealizedStr
-        '1.0'
-        ''')
+        ::
+
+            >>> v = volume.Volume(velocity=128)
+            >>> v.cachedRealizedStr
+            '1.0'
+
+        '''
+        return str(round(self.cachedRealized, 2))
+
+    @apply
+    def parent():
+        def fget(self):
+            '''
+            Get or set the parent, which must be a note.NotRest subclass. The
+            parent is wrapped in a weak reference.
+            '''
+            if self._parent is None:
+                return None
+            post = common.unwrapWeakref(self._parent)
+            if post is None:
+                # set attribute for speed
+                self._parent = None
+            return post
+        def fset(self, parent):
+            if parent is not None:
+                if hasattr(parent, 'classes') and 'NotRest' in parent.classes:
+                    self._parent = common.wrapWeakref(parent)
+            else:
+                self._parent = None
+        return property(**locals())
+
+    @property
+    def realized(self):
+        return self.getRealized()
+
+    @apply
+    def velocity():
+        def fget(self):
+            '''
+            Get or set the velocity value, a numerical value between 0 and 127 and
+            available setting amplitude on each Note or Pitch in chord.
+
+            ::
+
+                >>> n = note.Note()
+                >>> n.volume.velocity = 20
+                >>> n.volume.parent == n
+                True
+
+            ::
+
+                >>> n.volume.velocity
+                20
+            '''
+            return self._velocity
+        def fset(self, value):
+            if not common.isNum(value):
+                raise VolumeException('value provided for velocity must be a number, not %s' % value)
+            if value < 0:
+                self._velocity = 0
+            elif value > 127:
+                self._velocity = 127
+            else:
+                self._velocity = value
+        return property(**locals())
+
+    @apply
+    def velocityScalar():
+        def fget(self):
+            '''
+            Get or set the velocityScalar value, a numerical value between 0
+            and 1 and available setting amplitude on each Note or Pitch in
+            chord. This value is mapped to the range 0 to 127 on output.
+
+            Note that this value is derived from the set velocity value.
+            Floating point error seen here will not be found in the velocity
+            value.
+
+            When setting this value, an integer-based velocity value will be
+            derived and stored.
+
+            ::
+
+                >>> n = note.Note()
+                >>> n.volume.velocityScalar = .5
+                >>> n.volume.velocity
+                64
+
+            ::
+
+                >>> n.volume.velocity = 127
+                >>> n.volume.velocityScalar
+                1.0
+
+            '''
+            # multiplying by 1/127. for performance
+            return self._velocity * 0.007874015748031496
+        def fset(self, value):
+            if not common.isNum(value):
+                raise VolumeException('value provided for velocityScalar must be a number, not %s' % value)
+            if value < 0:
+                scalar = 0
+            elif value > 1:
+                scalar = 1
+            else:
+                scalar = value
+            self._velocity = int(round(scalar * 127))
+        return property(**locals())
+
 
 #-------------------------------------------------------------------------------
 # utility stream processing methods
 
 
-def realizeVolume(srcStream, setAbsoluteVelocity=False,         
+def realizeVolume(srcStream, setAbsoluteVelocity=False,
             useDynamicContext=True, useVelocity=True, useArticulations=True):
-    '''Given a Stream with one level of dynamics (e.g., a Part, or two Staffs that share Dynamics), destructively modify it to set all realized volume levels. These values will be stored in the Volume object as `cachedRealized` values. 
+    '''Given a Stream with one level of dynamics (e.g., a Part, or two Staffs that share Dynamics), destructively modify it to set all realized volume levels. These values will be stored in the Volume object as `cachedRealized` values.
 
-    This is a top-down routine, as opposed to bottom-up values available with context searches on Volume. This thus offers a performance benefit. 
+    This is a top-down routine, as opposed to bottom-up values available with context searches on Volume. This thus offers a performance benefit.
 
     This is always done in place; for the option of non-in place processing, see Stream.realizeVolume().
 
     If setAbsoluteVelocity is True, the realized values will overwrite all existing velocity values, and the Volume objects velocityIsRelative parameters will be set to False.
 
-    
+
     '''
     # get dynamic map
     flatSrc = srcStream.flat # assuming sorted
@@ -381,7 +464,7 @@ def realizeVolume(srcStream, setAbsoluteVelocity=False,
         if hasattr(e, 'volume') and 'NotRest' in e.classes:
             # try to find a dynamic
             eStart = e.getOffsetBySite(flatSrc)
-    
+
             # get the most recent dynamic
             if dynamicsAvailable and useDynamicContext is True:
                 dm = False # set to not search dynamic context
@@ -395,9 +478,9 @@ def realizeVolume(srcStream, setAbsoluteVelocity=False,
                         break
             else: # permit supplying a single dynamic context for all materia
                 dm = useDynamicContext
-            # this returns a value, but all we need to do is to set the 
+            # this returns a value, but all we need to do is to set the
             # cached values stored internally
-            val = e.volume.getRealized(useDynamicContext=dm, useVelocity=True, 
+            val = e.volume.getRealized(useDynamicContext=dm, useVelocity=True,
                   useArticulations=True)
             if setAbsoluteVelocity:
                 e.volume.velocityIsRelative = False
@@ -405,7 +488,7 @@ def realizeVolume(srcStream, setAbsoluteVelocity=False,
                 e.volume.velocityScalar = val
 
 
-        
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -425,7 +508,7 @@ class Test(unittest.TestCase):
 
     def testGetContextSearchA(self):
         from music21 import stream, note, volume, dynamics
-        
+
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
         s.insert(0, d1)
@@ -443,7 +526,7 @@ class Test(unittest.TestCase):
 
     def testGetContextSearchB(self):
         from music21 import stream, note, dynamics
-        
+
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
         s.insert(0, d1)
@@ -459,13 +542,13 @@ class Test(unittest.TestCase):
 
     def testDeepCopyA(self):
         import copy
-        from music21 import volume, note    
+        from music21 import volume, note
         n1 = note.Note()
 
         v1 = volume.Volume()
         v1.velocity = 111
         v1.parent = n1
-        
+
         v1Copy = copy.deepcopy(v1)
         self.assertEqual(v1.velocity, 111)
         self.assertEqual(v1Copy.velocity, 111)
@@ -505,7 +588,7 @@ class Test(unittest.TestCase):
 
 
     def testGetRealizedB(self):
-        
+
 
         from music21 import articulations
 
@@ -571,24 +654,24 @@ class Test(unittest.TestCase):
     def testRealizeVolumeB(self):
         from music21 import corpus, dynamics
         s = corpus.parse('bwv66.6')
-        
+
         durUnit = s.highestTime  // 8 # let floor
         dyns = ['pp', 'p', 'mp', 'f', 'mf', 'ff', 'f', 'mf']
-        
+
         for i, p in enumerate(s.parts):
             for j, d in enumerate(dyns):
                 oTarget = j*durUnit
                 # placing dynamics in Measure requires extra handling
-                m = p.getElementsByOffset(oTarget, 
+                m = p.getElementsByOffset(oTarget,
                     mustBeginInSpan=False).getElementsByClass('Measure')[0]
                 oInsert = oTarget - m.getOffsetBySite(p)
                 m.insert(oInsert, dynamics.Dynamic(d))
             # shift 2 places each time
             dyns = dyns[2:] + dyns[:2]
-        
+
         #s.show()
         #s.show('midi')
-        
+
         #### TODO: BUG -- one note too loud...
         match = [n.volume.cachedRealizedStr for n in s.parts[0].flat.notes]
         self.assertEqual(match, ['0.35', '0.35', '0.35', '0.35', '0.35', '0.5', '0.5', '0.5', '0.5', '0.64', '0.64', '0.64', '0.64', '0.64', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '1.0', '1.0', '1.0', '1.0', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '0.78', '0.78', '0.78'])
