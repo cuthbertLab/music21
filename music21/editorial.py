@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import unittest
 from music21 import exceptions21
+from music21.base import SlottedObject
 
 
 #------------------------------------------------------------------------------
@@ -97,7 +98,7 @@ def getObjectsWithEditorial(
     return listofOBJToReturn
 
 
-class NoteEditorial(object):
+class NoteEditorial(SlottedObject):
     '''
     Editorial comments and special effects that can be applied to notes
     Standard ones are stored as attributes.  Non-standard/one-off effects are
@@ -131,32 +132,32 @@ class NoteEditorial(object):
     '''
 
     _DOC_ATTR = {
-    'color': 'the color of the note (x11 colors and extended x11colors are allowed), only displays properly in lilypond',
-    'comment': 'a reference to a :class:`~music21.editorial.Comment` object',
-    'ficta': 'a :class:`~music21.pitch.Accidental` object that specifies musica ficta for the note.  Will only be displayed in LilyPond and then only if there is no Accidental object on the note itself',
-    'hidden': 'boolean value about whether to hide the note or not (only works in lilypond)',
-    'harmonicInterval': 'an :class:`~music21.interval.Interval` object that specifies the harmonic interval between this note and a single other note (useful for storing information post analysis',
-    'harmonicIntervals': 'a list for when you want to store more than one harmonicInterval',
-    'melodicInterval': 'an :class:`~music21.interval.Interval` object that specifies the melodic interval to the next note in this part/voice/stream, etc.',
-    'melodicIntervals': 'a list for storing more than one melodic interval',
-    'melodicIntervalOverRests': 'same as melodicInterval but ignoring rests; MIGHT BE REMOVED SOON',
-    'melodicIntervalsOverRests': 'same thing but a list',
-    'misc': 'A dict to hold anything you might like to store.',
-    }
+        'color': 'the color of the note (x11 colors and extended x11colors are allowed), only displays properly in lilypond',
+        'comment': 'a reference to a :class:`~music21.editorial.Comment` object',
+        'ficta': 'a :class:`~music21.pitch.Accidental` object that specifies musica ficta for the note.  Will only be displayed in LilyPond and then only if there is no Accidental object on the note itself',
+        'hidden': 'boolean value about whether to hide the note or not (only works in lilypond)',
+        'harmonicInterval': 'an :class:`~music21.interval.Interval` object that specifies the harmonic interval between this note and a single other note (useful for storing information post analysis',
+        'harmonicIntervals': 'a list for when you want to store more than one harmonicInterval',
+        'melodicInterval': 'an :class:`~music21.interval.Interval` object that specifies the melodic interval to the next note in this part/voice/stream, etc.',
+        'melodicIntervals': 'a list for storing more than one melodic interval',
+        'melodicIntervalOverRests': 'same as melodicInterval but ignoring rests; MIGHT BE REMOVED SOON',
+        'melodicIntervalsOverRests': 'same thing but a list',
+        'misc': 'A dict to hold anything you might like to store.',
+        }
 
-#    __slots__ = (
-#        'ficta',
-#        'color',
-#        'misc',
-#        'harmonicInterval',
-#        'harmonicIntervals',
-#        'hidden',
-#        'melodicInterval',
-#        'melodicIntervals',
-#        'melodicIntervalOverRests',
-#        'melodicIntervalsOverRests',
-#        'comment',
-#        )
+    __slots__ = (
+        'ficta',
+        'color',
+        'misc',
+        'harmonicInterval',
+        'harmonicIntervals',
+        'hidden',
+        'melodicInterval',
+        'melodicIntervals',
+        'melodicIntervalOverRests',
+        'melodicIntervalsOverRests',
+        'comment',
+        )
 
     ### INITIALIZER ###
 
@@ -164,7 +165,7 @@ class NoteEditorial(object):
         # Accidental object -- N.B. for PRINTING only not for determining intervals
         self.ficta = None
         self.color = None
-        self.misc  = {}
+        self.misc = {}
         self.harmonicInterval = None
         self.harmonicIntervals = []
         self.hidden = False
@@ -239,7 +240,7 @@ class NoteEditorial(object):
         return result
 
 
-class Comment(object):
+class Comment(SlottedObject):
     '''
     An object that adds text above or below a note:
 
@@ -255,10 +256,10 @@ class Comment(object):
 
     ### CLASS VARIABLES ###
 
-#    __slots__ = (
-#        'position',
-#        'text',
-#        )
+    __slots__ = (
+        'position',
+        'text',
+        )
 
     ### INITIALIZER ###
 
@@ -288,6 +289,12 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
+    def testSlots(self):
+        editorial = NoteEditorial()
+        assert not hasattr(editorial, '__dict__')
+        comment = Comment()
+        assert not hasattr(comment, '__dict__')
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
