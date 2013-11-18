@@ -9,27 +9,35 @@
 # Copyright:    Copyright © 2009-2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+
 '''
 The `tie` module contains a single class, `Tie` that represents the visual and
 conceptual idea of tied notes.  They can be start or stop ties.
 '''
 
-
 import unittest
 
+from music21.base import SlottedObject
+
 #-------------------------------------------------------------------------------
+
 class Tie(object):
     '''
-    Object added to notes that are tied to other notes. The `type` value is one of start, stop, or continue.
+    Object added to notes that are tied to other notes. The `type` value is one
+    of start, stop, or continue.
 
-    
-    >>> note1 = note.Note()
-    >>> note1.tie = tie.Tie("start")
-    >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
-    >>> note1.tie.type
-    'start'
-    >>> note1.tie
-    <music21.tie.Tie start>
+    ::
+
+        >>> note1 = note.Note()
+        >>> note1.tie = tie.Tie("start")
+        >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
+        >>> note1.tie.type
+        'start'
+
+    ::
+
+        >>> note1.tie
+        <music21.tie.Tie start>
 
     Differences from MusicXML:
        notes do not need to know if they are tied from a
@@ -48,38 +56,57 @@ class Tie(object):
     two-note-head unison?)
     '''
 
-    def __init__(self, type = 'start'): #@ReservedAssignment
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        'style',
+        'type',
+        )
+
+    ### INITIALIZER ###
+
+    def __init__(self, type='start'): #@ReservedAssignment
         #music21.Music21Object.__init__(self)
         self.type = type
         self.style = "normal"
 
-    # investigate using weak-refs for .to and .from
+    ### SPECIAL METHODS ###
 
     def __eq__(self, other):
-        '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
-
-        
-        >>> t1 = tie.Tie('start')
-        >>> t2 = tie.Tie('start')
-        >>> t3 = tie.Tie('end')
-        >>> t1 == t2
-        True
-        >>> t2 == t3, t3 == t1
-        (False, False)
-        >>> t2 == None
-        False
         '''
-        if other == None or not isinstance(other, Tie):
+        Equality. Based on attributes (such as pitch, accidental, duration,
+        articulations, and ornaments) that are  not dependent on the wider
+        context of a note (such as offset, beams, stem direction).
+
+        ::
+
+            >>> t1 = tie.Tie('start')
+            >>> t2 = tie.Tie('start')
+            >>> t3 = tie.Tie('end')
+            >>> t1 == t2
+            True
+
+        ::
+
+            >>> t2 == t3, t3 == t1
+            (False, False)
+
+        ::
+
+            >>> t2 == None
+            False
+
+        '''
+        if other is None or not isinstance(other, Tie):
             return False
         elif self.type == other.type:
             return True
         return False
 
     def __ne__(self, other):
-
         '''
         Tests for object inequality. Needed for pitch comparisons.
-        
+
         >>> a = tie.Tie('start')
         >>> b = tie.Tie('end')
         >>> a != b
@@ -93,10 +120,10 @@ class Tie(object):
 
 
 class Test(unittest.TestCase):
-    
+
     def runTest(self):
         pass
-    
+
 
 #-------------------------------------------------------------------------------
 
