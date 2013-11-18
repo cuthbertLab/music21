@@ -2945,31 +2945,31 @@ class Chord(note.NotRest):
             >>> for noteheadType in note.noteheadTypeNames:
             ...    noteheadType
             ...
-            'slash'
-            'triangle'
-            'diamond'
-            'square'
-            'cross'
-            'x'
-            'circle-x'
-            'inverted triangle'
             'arrow down'
             'arrow up'
-            'slashed'
             'back slashed'
-            'normal'
-            'cluster'
-            'none'
-            'do'
-            're'
-            'mi'
-            'fa'
-            'so'
-            'la'
-            'ti'
             'circle dot'
+            'circle-x'
+            'cluster'
+            'cross'
+            'diamond'
+            'do'
+            'fa'
+            'inverted triangle'
+            'la'
             'left triangle'
+            'mi'
+            'none'
+            'normal'
+            're'
             'rectangle'
+            'slash'
+            'slashed'
+            'so'
+            'square'
+            'ti'
+            'triangle'
+            'x'
 
         ::
 
@@ -3027,8 +3027,15 @@ class Chord(note.NotRest):
 
         ::
 
-            >>> note.stemDirectionNames
-            ['up', 'down', 'noStem', 'double', 'unspecified', 'none']
+            >>> for name in note.stemDirectionNames:
+            ...     name
+            ...
+            'double'
+            'down'
+            'noStem'
+            'none'
+            'unspecified'
+            'up'
 
         ::
 

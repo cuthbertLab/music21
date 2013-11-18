@@ -124,6 +124,34 @@ class ElementException(exceptions21.Music21Exception):
 
 
 #------------------------------------------------------------------------------
+
+
+class SlottedObject(object):
+    r'''
+    Provides template for classes implementing slots.
+    '''
+    
+    ### CLASS VARIABLES ###
+
+    __slots__ = ()
+
+    ### SPECIAL METHODS ###
+
+    def __getstate__(self):
+        state = {}
+        slots = set()
+        for cls in self.__class__.mro():
+            slots.update(getattr(cls, '__slots__', ()))
+        for slot in slots:
+            state[slot] = getattr(self, slot, None)
+        return state
+
+    def __setstate__(self, state):
+        for slot, value in state.iteritems():
+            setattr(self, slot, value)
+
+
+#------------------------------------------------------------------------------
 # make subclass of set once that is defined properly
 
 
@@ -221,7 +249,7 @@ class Groups(list):
 #------------------------------------------------------------------------------
 
 
-class Sites(object):
+class Sites(SlottedObject):
     '''
     An object, stored within a Music21Object, that stores (weak) references to
     a collection of objects that may be contextually relevant to this object.

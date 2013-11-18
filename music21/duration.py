@@ -64,6 +64,7 @@ import copy
 
 from music21 import common
 from music21 import exceptions21
+from music21.base import SlottedObject
 
 from music21 import environment
 _MOD = "duration.py"
@@ -1238,7 +1239,7 @@ class Tuplet(object):
 #-------------------------------------------------------------------------------
 
 
-class DurationCommon(object):
+class DurationCommon(SlottedObject):
     '''
     A base class for both Duration and DurationUnit objects.
     '''
@@ -1260,18 +1261,18 @@ class DurationCommon(object):
 
     ### SPECIAL METHODS ###
 
-    def __getstate__(self):
-        state = {}
-        slots = set()
-        for cls in self.__class__.mro():
-            slots.update(getattr(cls, '__slots__', ()))
-        for slot in slots:
-            state[slot] = getattr(self, slot, None)
-        return state
-
-    def __setstate__(self, state):
-        for slot, value in state.iteritems():
-            setattr(self, slot, value)
+#    def __getstate__(self):
+#        state = {}
+#        slots = set()
+#        for cls in self.__class__.mro():
+#            slots.update(getattr(cls, '__slots__', ()))
+#        for slot in slots:
+#            state[slot] = getattr(self, slot, None)
+#        return state
+#
+#    def __setstate__(self, state):
+#        for slot, value in state.iteritems():
+#            setattr(self, slot, value)
 
     ### PUBLIC METHODS ###
 
@@ -3363,8 +3364,7 @@ class GraceDuration(Duration):
         def fget(self):
             return self._stealTimePrevious
         def fset(self, expr):
-            assert expr in (True, False, None)
-            self._stealTimePrevious = bool(expr)
+            self._stealTimePrevious = expr
         return property(**locals())
         
     @apply
@@ -3372,7 +3372,7 @@ class GraceDuration(Duration):
         def fget(self):
             return self._stealTimeFollowing
         def fset(self, expr):
-            self._stealTimeFollowing = bool(expr)
+            self._stealTimeFollowing = expr
         return property(**locals())
 
 
