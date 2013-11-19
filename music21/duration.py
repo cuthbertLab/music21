@@ -630,7 +630,7 @@ def partitionQuarterLength(qLen, qLenDiv=4):
         return post
 
 
-def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
+def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     '''
     Given a rhythm type (`dType`), number of dots (`dots`), an optional list of
     Tuplet objects (`tuplets`), and a (very) optional list of
@@ -663,7 +663,6 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     >>> duration.convertTypeToQuarterLength('half', dots = 1, dotGroups = [1,1])
     4.5
     '''
-
     if dType in typeToDuration:
         durationFromType = typeToDuration[dType]
     else:
@@ -673,15 +672,16 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     qtrLength = durationFromType
 
     # weird medieval notational device; rarely used.
-    if len(dotGroups) > 1:
+    if dotGroups is not None and len(dotGroups) > 1:
         for dots in dotGroups:
             if dots > 0:
                 qtrLength *= common.dotMultiplier(dots)
     else:
         qtrLength *= common.dotMultiplier(dots)
 
-    for tup in tuplets:
-        qtrLength *= tup.tupletMultiplier()
+    if tuplets is not None:
+        for tup in tuplets:
+            qtrLength *= tup.tupletMultiplier()
     return qtrLength
 
 
@@ -1253,7 +1253,7 @@ class DurationCommon(SlottedObject):
         )
 
     ### INITIALIZER ###
-    
+
     def __init__(self):
         self._componentsNeedUpdating = False
         self._quarterLengthNeedsUpdating = False
@@ -3308,7 +3308,7 @@ class GraceDuration(Duration):
 
     # TODO: there are many properties/methods of Duration that must
     # be overridden to provide consisten behavior
-    
+
     ### CLASS VARIABLES ###
 
     isGrace = True
@@ -3348,7 +3348,7 @@ class GraceDuration(Duration):
     def makeTime(self, expr):
         assert expr in (True, False, None)
         self._makeTime = bool(expr)
-        
+
     @property
     def slash(self):
         return self._slash
@@ -3357,7 +3357,7 @@ class GraceDuration(Duration):
     def slash(self, expr):
         assert expr in (True, False, None)
         self._slash = bool(expr)
-        
+
     @property
     def stealTimePrevious(self):
         return self._stealTimePrevious
@@ -3365,7 +3365,7 @@ class GraceDuration(Duration):
     @stealTimePrevious.setter
     def stealTimePrevious(self, expr):
         self._stealTimePrevious = expr
-        
+
     @property
     def stealTimeFollowing(self):
         return self._stealTimeFollowing

@@ -35,3 +35,11 @@ nosetests.xml
 .project
 .pydevproject
 /.settings
+
+music21/documentation/source/tutorials/MersenneDemo.rst
+
+music21/documentation/source/tutorials/MersenneDemo_files/_fig_01.png
+
+music21/documentation/source/tutorials/MersenneDemo_files/_fig_03.png
+
+music21/documentation/source/tutorials/MersenneDemo_files/_fig_05.png

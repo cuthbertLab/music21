@@ -527,6 +527,12 @@ class GenericInterval(base.Music21Object):
         >>> aInterval.isStep
         True
 
+
+        Intervals >= 23rd use numbers instead of names
+        
+        >>> aInterval = interval.GenericInterval(23)
+        >>> aInterval.niceName
+        '23'
         '''
         base.Music21Object.__init__(self)
 
@@ -599,11 +605,15 @@ class GenericInterval(base.Music21Object):
 
         if self.undirected < len(common.musicOrdinals):
             self.niceName = common.musicOrdinals[self.undirected]
+            self.simpleNiceName = common.musicOrdinals[self.simpleUndirected]
+            self.semiSimpleNiceName = common.musicOrdinals[self.semiSimpleUndirected]
+
         else:
             self.niceName = str(self.undirected)
-        self.simpleNiceName = common.musicOrdinals[self.simpleUndirected]
-        self.semiSimpleNiceName = common.musicOrdinals[self.semiSimpleUndirected]
-
+            self.simpleNiceName = str(self.simpleUndirected)
+            self.semiSimpleNiceName = str(self.semiSimpleUndirected)
+        
+ 
         if abs(self.directed) == 1:
             self.staffDistance = 0
         elif self.directed > 1:
