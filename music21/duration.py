@@ -630,7 +630,7 @@ def partitionQuarterLength(qLen, qLenDiv=4):
         return post
 
 
-def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
+def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     '''
     Given a rhythm type (`dType`), number of dots (`dots`), an optional list of
     Tuplet objects (`tuplets`), and a (very) optional list of
@@ -663,7 +663,6 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     >>> duration.convertTypeToQuarterLength('half', dots = 1, dotGroups = [1,1])
     4.5
     '''
-
     if dType in typeToDuration:
         durationFromType = typeToDuration[dType]
     else:
@@ -673,15 +672,16 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     qtrLength = durationFromType
 
     # weird medieval notational device; rarely used.
-    if len(dotGroups) > 1:
+    if dotGroups is not None and len(dotGroups) > 1:
         for dots in dotGroups:
             if dots > 0:
                 qtrLength *= common.dotMultiplier(dots)
     else:
         qtrLength *= common.dotMultiplier(dots)
 
-    for tup in tuplets:
-        qtrLength *= tup.tupletMultiplier()
+    if tuplets is not None:
+        for tup in tuplets:
+            qtrLength *= tup.tupletMultiplier()
     return qtrLength
 
 
@@ -1208,28 +1208,32 @@ class Tuplet(object):
         return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
 
     @apply
-    def tupletActual():
+    def tupletActual():  # @NoSelf
         def fget(self):
             '''
             Get or set a two element list of number notes actual and duration
             actual.
             '''
             return [self.numberNotesActual, self.durationActual]
-        def fset(self, tupList=[]):
+        def fset(self, tupList=None):
+            if tupList is None:
+                tupList = []
             if self.frozen is True:
                 raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
             self.numberNotesActual, self.durationActual = tupList
         return property(**locals())
 
     @apply
-    def tupletNormal():
+    def tupletNormal():  # @NoSelf
         def fget(self):
             '''
             Get or set a two element list of number notes actual and duration
             normal.
             '''
             return self.numberNotesNormal, self.durationNormal
-        def fset(self, tupList=[]):
+        def fset(self, tupList=None):
+            if tupList is None:
+                tupList = []
             if self.frozen is True:
                 raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
             self.numberNotesNormal, self.durationNormal = tupList
@@ -1592,7 +1596,7 @@ class DurationUnit(DurationCommon):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def dotGroups():
+    def dotGroups():  # @NoSelf
         def fget(self):
             '''
             _dots is a list (so we can do weird things like dot groups)
@@ -1636,7 +1640,7 @@ class DurationUnit(DurationCommon):
         return property(**locals())
 
     @apply
-    def dots():
+    def dots():  # @NoSelf
         def fget(self):
             '''
             _dots is a list (so we can do weird things like dot groups)
@@ -1828,7 +1832,7 @@ class DurationUnit(DurationCommon):
             return ordinalFound
 
     @apply
-    def quarterLength():
+    def quarterLength():  # @NoSelf
         def fget(self):
             '''
             Property for getting or setting the quarterLength of a
@@ -1942,7 +1946,7 @@ class DurationUnit(DurationCommon):
         return property(**locals())
 
     @apply
-    def tuplets():
+    def tuplets():  # @NoSelf
         def fget(self):
             '''Return a tuple of Tuplet objects '''
             if self._typeNeedsUpdating:
@@ -1966,7 +1970,7 @@ class DurationUnit(DurationCommon):
         return property(**locals())
 
     @apply
-    def type():
+    def type():  # @NoSelf
         def fget(self):
             '''
             Property for getting or setting the type of a DurationUnit.
@@ -2802,7 +2806,7 @@ class Duration(DurationCommon):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def components():
+    def components():  # @NoSelf
         def fget(self):
             if self._componentsNeedUpdating:
                 self._updateComponents()
@@ -2821,7 +2825,7 @@ class Duration(DurationCommon):
         return property(**locals())
 
     @apply
-    def dotGroups():
+    def dotGroups():  # @NoSelf
         def fget(self):
             '''
             See the explanation under :class:`~music21.duration.DurationUnit` about
@@ -2860,7 +2864,7 @@ class Duration(DurationCommon):
         return property(**locals())
 
     @apply
-    def dots():
+    def dots():  # @NoSelf
         def fget(self):
             '''
             Returns the number of dots in the Duration
@@ -3107,7 +3111,7 @@ class Duration(DurationCommon):
             return None
 
     @apply
-    def quarterLength():
+    def quarterLength():  # @NoSelf
         def fget(self):
             '''
             Returns the quarter note length or Sets the quarter note length to
@@ -3175,7 +3179,7 @@ class Duration(DurationCommon):
         return property(**locals())
 
     @apply
-    def tuplets():
+    def tuplets():  # @NoSelf
         def fget(self):
             '''
             When there are more than one component, each component may have its
@@ -3203,7 +3207,7 @@ class Duration(DurationCommon):
         return property(**locals())
 
     @apply
-    def type():
+    def type():  # @NoSelf
         def fget(self):
             '''
             Get or set the type of the Duration.
@@ -3342,7 +3346,7 @@ class GraceDuration(Duration):
     ### PUBLIC PROPERTIES ###
 
     @apply
-    def makeTime():
+    def makeTime():  # @NoSelf
         def fget(self):
             return self._makeTime
         def fset(self, expr):
@@ -3351,7 +3355,7 @@ class GraceDuration(Duration):
         return property(**locals())
         
     @apply
-    def slash():
+    def slash():  # @NoSelf
         def fget(self):
             return self._slash
         def fset(self, expr):
@@ -3360,7 +3364,7 @@ class GraceDuration(Duration):
         return property(**locals())
         
     @apply
-    def stealTimePrevious():
+    def stealTimePrevious():  # @NoSelf
         def fget(self):
             return self._stealTimePrevious
         def fset(self, expr):
@@ -3368,7 +3372,7 @@ class GraceDuration(Duration):
         return property(**locals())
         
     @apply
-    def stealTimeFollowing():
+    def stealTimeFollowing():  # @NoSelf
         def fget(self):
             return self._stealTimeFollowing
         def fset(self, expr):
