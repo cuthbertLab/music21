@@ -527,6 +527,12 @@ class GenericInterval(base.Music21Object):
         >>> aInterval.isStep
         True
 
+
+        Intervals >= 23rd use numbers instead of names
+        
+        >>> aInterval = interval.GenericInterval(23)
+        >>> aInterval.niceName
+        '23'
         '''
         base.Music21Object.__init__(self)
 
