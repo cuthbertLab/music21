@@ -321,105 +321,105 @@ class Volume(SlottedObject):
         '''
         return str(round(self.cachedRealized, 2))
 
-    @apply
-    def parent():
-        def fget(self):
-            '''
-            Get or set the parent, which must be a note.NotRest subclass. The
-            parent is wrapped in a weak reference.
-            '''
-            if self._parent is None:
-                return None
-            post = common.unwrapWeakref(self._parent)
-            if post is None:
-                # set attribute for speed
-                self._parent = None
-            return post
-        def fset(self, parent):
-            if parent is not None:
-                if hasattr(parent, 'classes') and 'NotRest' in parent.classes:
-                    self._parent = common.wrapWeakref(parent)
-            else:
-                self._parent = None
-        return property(**locals())
+    @property
+    def parent(self):
+        '''
+        Get or set the parent, which must be a note.NotRest subclass. The
+        parent is wrapped in a weak reference.
+        '''
+        if self._parent is None:
+            return None
+        post = common.unwrapWeakref(self._parent)
+        if post is None:
+            # set attribute for speed
+            self._parent = None
+        return post
+
+    @parent.setter
+    def parent(self, parent):
+        if parent is not None:
+            if hasattr(parent, 'classes') and 'NotRest' in parent.classes:
+                self._parent = common.wrapWeakref(parent)
+        else:
+            self._parent = None
 
     @property
     def realized(self):
         return self.getRealized()
 
-    @apply
-    def velocity():
-        def fget(self):
-            '''
-            Get or set the velocity value, a numerical value between 0 and 127 and
-            available setting amplitude on each Note or Pitch in chord.
+    @property
+    def velocity(self):
+        '''
+        Get or set the velocity value, a numerical value between 0 and 127 and
+        available setting amplitude on each Note or Pitch in chord.
 
-            ::
+        ::
 
-                >>> n = note.Note()
-                >>> n.volume.velocity = 20
-                >>> n.volume.parent == n
-                True
+            >>> n = note.Note()
+            >>> n.volume.velocity = 20
+            >>> n.volume.parent == n
+            True
 
-            ::
+        ::
 
-                >>> n.volume.velocity
-                20
-            '''
-            return self._velocity
-        def fset(self, value):
-            if not common.isNum(value):
-                raise VolumeException('value provided for velocity must be a number, not %s' % value)
-            if value < 0:
-                self._velocity = 0
-            elif value > 127:
-                self._velocity = 127
-            else:
-                self._velocity = value
-        return property(**locals())
+            >>> n.volume.velocity
+            20
+        '''
+        return self._velocity
 
-    @apply
-    def velocityScalar():
-        def fget(self):
-            '''
-            Get or set the velocityScalar value, a numerical value between 0
-            and 1 and available setting amplitude on each Note or Pitch in
-            chord. This value is mapped to the range 0 to 127 on output.
+    @velocity.setter
+    def velocity(self, value):
+        if not common.isNum(value):
+            raise VolumeException('value provided for velocity must be a number, not %s' % value)
+        if value < 0:
+            self._velocity = 0
+        elif value > 127:
+            self._velocity = 127
+        else:
+            self._velocity = value
 
-            Note that this value is derived from the set velocity value.
-            Floating point error seen here will not be found in the velocity
-            value.
+    @property
+    def velocityScalar(self):
+        '''
+        Get or set the velocityScalar value, a numerical value between 0
+        and 1 and available setting amplitude on each Note or Pitch in
+        chord. This value is mapped to the range 0 to 127 on output.
 
-            When setting this value, an integer-based velocity value will be
-            derived and stored.
+        Note that this value is derived from the set velocity value.
+        Floating point error seen here will not be found in the velocity
+        value.
 
-            ::
+        When setting this value, an integer-based velocity value will be
+        derived and stored.
 
-                >>> n = note.Note()
-                >>> n.volume.velocityScalar = .5
-                >>> n.volume.velocity
-                64
+        ::
 
-            ::
+            >>> n = note.Note()
+            >>> n.volume.velocityScalar = .5
+            >>> n.volume.velocity
+            64
 
-                >>> n.volume.velocity = 127
-                >>> n.volume.velocityScalar
-                1.0
+        ::
 
-            '''
-            # multiplying by 1/127. for performance
-            return self._velocity * 0.007874015748031496
-        def fset(self, value):
-            if not common.isNum(value):
-                raise VolumeException('value provided for velocityScalar must be a number, not %s' % value)
-            if value < 0:
-                scalar = 0
-            elif value > 1:
-                scalar = 1
-            else:
-                scalar = value
-            self._velocity = int(round(scalar * 127))
-        return property(**locals())
+            >>> n.volume.velocity = 127
+            >>> n.volume.velocityScalar
+            1.0
+
+        '''
+        # multiplying by 1/127. for performance
+        return self._velocity * 0.007874015748031496
+
+    @velocityScalar.setter
+    def velocityScalar(self, value):
+        if not common.isNum(value):
+            raise VolumeException('value provided for velocityScalar must be a number, not %s' % value)
+        if value < 0:
+            scalar = 0
+        elif value > 1:
+            scalar = 1
+        else:
+            scalar = value
+        self._velocity = int(round(scalar * 127))
 
 
 #-------------------------------------------------------------------------------

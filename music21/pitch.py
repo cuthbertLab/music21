@@ -24,13 +24,12 @@ from music21 import common
 from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
+from music21.base import SlottedObject
 
 
 from music21 import environment
 _MOD = "pitch.py"
 environLocal = environment.Environment(_MOD)
-
-
 
 STEPREF = {
            'C' : 0,
@@ -49,30 +48,30 @@ TWELFTH_ROOT_OF_TWO = 2.0 ** (1.0/12)
 # where 1 is a half step. this means that 4 significant digits of cents will be kept
 PITCH_SPACE_SIG_DIGITS = 6
 
-# basic accidental string and symbol definitions; 
-# additional symbolic and text-based alternatives 
+# basic accidental string and symbol definitions;
+# additional symbolic and text-based alternatives
 # are given in the set Accidental.set() method
 MICROTONE_OPEN = '('
 MICROTONE_CLOSE = ')'
 accidentalNameToModifier = {
-    'natural' : '',
-    'sharp' : '#',
-    'double-sharp':'##',
-    'triple-sharp':'###',
-    'quadruple-sharp':'####',
-    'flat':'-',
-    'double-flat':'--',
-    'triple-flat':'---',
-    'quadruple-flat':'----',
-    'half-sharp':'~',
-    'one-and-a-half-sharp':'#~',
-    'half-flat':'`',
-    'one-and-a-half-flat':'-`',
-}
+    'natural': '',
+    'sharp': '#',
+    'double-sharp': '##',
+    'triple-sharp': '###',
+    'quadruple-sharp': '####',
+    'flat': '-',
+    'double-flat': '--',
+    'triple-flat': '---',
+    'quadruple-flat': '----',
+    'half-sharp': '~',
+    'one-and-a-half-sharp': '#~',
+    'half-flat': '`',
+    'one-and-a-half-flat': '-`',
+    }
 
 # sort modifiers by length, from longest to shortest
 accidentalModifiersSorted = []
-for i in (4,3,2,1):
+for i in (4, 3, 2, 1):
     for sym in accidentalNameToModifier.values():
         if len(sym) == i:
             accidentalModifiersSorted.append(sym)
@@ -80,12 +79,12 @@ for i in (4,3,2,1):
 
 #-------------------------------------------------------------------------------
 # utility functions
+
 def _convertPitchClassToNumber(ps):
-    '''Given a pitch class or pitch class value, 
-    look for strings. If a string is found, 
+    '''Given a pitch class or pitch class value,
+    look for strings. If a string is found,
     replace it with the default pitch class representation.
 
-    
     >>> pitch._convertPitchClassToNumber(3)
     3
     >>> pitch._convertPitchClassToNumber('a')
@@ -104,11 +103,10 @@ def _convertPitchClassToNumber(ps):
             return 11
         # maybe its a string of an integer?
         return int(ps)
-        
-def _convertPitchClassToStr(pc):
-    '''Given a pitch class number, return a string. 
 
-    
+def _convertPitchClassToStr(pc):
+    '''Given a pitch class number, return a string.
+
     >>> pitch._convertPitchClassToStr(3)
     '3'
     >>> pitch._convertPitchClassToStr(10)
@@ -117,15 +115,13 @@ def _convertPitchClassToStr(pc):
     pc = pc % 12 # do just in case
     # replace 10 with A and 11 with B
     return '%X' % pc  # using hex conversion, good up to 15
-        
 
 
 def _convertPsToOct(ps):
     '''Utility conversion; does not process internals.
     Converts a midiNote number to an octave number.
     Assume C4 middle C, so 60 returns 4
-    
-    
+
     >>> [pitch._convertPsToOct(59), pitch._convertPsToOct(60), pitch._convertPsToOct(61)]
     [3, 4, 4]
     >>> [pitch._convertPsToOct(12), pitch._convertPsToOct(0), pitch._convertPsToOct(-12)]
@@ -137,13 +133,15 @@ def _convertPsToOct(ps):
     return int(math.floor(ps / 12.)) - 1
 
 def _convertPsToStep(ps):
-    '''Utility conversion; does not process internal representations. 
+    '''
+    Utility conversion; does not process internal representations.
 
-    Takes in a pitch space floating-point value or a MIDI note number (Assume C4 middle C, so 60 returns 4).
+    Takes in a pitch space floating-point value or a MIDI note number (Assume
+    C4 middle C, so 60 returns 4).
 
-    Returns a tuple of Step, an Accidental object, and a Microtone object or None.
-    
-    
+    Returns a tuple of Step, an Accidental object, and a Microtone object or
+    None.
+
     >>> pitch._convertPsToStep(60)
     ('C', <accidental natural>, (+0c), 0)
     >>> pitch._convertPsToStep(66)
@@ -172,7 +170,7 @@ def _convertPsToStep(ps):
     '''
     # rounding here is essential
     ps = round(ps, PITCH_SPACE_SIG_DIGITS)
-    pcReal = ps % 12 
+    pcReal = ps % 12
     # micro here will be between 0 and 1
     pc, micro = divmod(pcReal, 1)
 
@@ -212,14 +210,14 @@ def _convertPsToStep(ps):
     if pc in [4, 11] and alter == 1:
         acc = Accidental(0)
         pcName = (pc + 1) % 12
-        # if a B, we are shifting out of this octave, and need to get 
-        # the above octave, which may not be represented in ps value 
+        # if a B, we are shifting out of this octave, and need to get
+        # the above octave, which may not be represented in ps value
         if pc == 11:
             octShift = 1
     # its a natural; nothing to do
     elif pc in STEPREF.values():
         acc = Accidental(0+alter)
-        pcName = pc 
+        pcName = pc
     # if we take the pc down a half-step, do we get a stepref (natural) value
     elif pc-1 in [0, 5, 7]: # c, f, g: can be sharped
         # then we need an accidental to accommodate; here, a sharp
@@ -228,7 +226,7 @@ def _convertPsToStep(ps):
     # if we take the pc up a half-step, do we get a stepref (natural) value
     elif pc+1 in [11, 4]: # b, e: can be flattened
         # then we need an accidental to accommodate; here, a flat
-        acc = Accidental(-1+alter) 
+        acc = Accidental(-1+alter)
         pcName = pc+1
     else:
         raise PitchException('cannot match condition for pc: %s' % pc)
@@ -249,9 +247,8 @@ def _convertPsToStep(ps):
 
 def _convertCentsToAlterAndCents(shift):
     '''
-    Given any floating point value, split into accidental and microtone components. 
-    
-    
+    Given any floating point value, split into accidental and microtone components.
+
     >>> pitch._convertCentsToAlterAndCents(125)
     (1, 25.0)
     >>> pitch._convertCentsToAlterAndCents(-75)
@@ -275,7 +272,7 @@ def _convertCentsToAlterAndCents(shift):
             value += 100
             alterAdd -= 1
 
-    if value < -75: 
+    if value < -75:
         alterShift = -1
         cents = value + 100
     elif value >= -75 and value < -25:
@@ -287,7 +284,7 @@ def _convertCentsToAlterAndCents(shift):
     elif value > 25 and value <= 75:
         alterShift = .5
         cents = value - 50
-    elif value > 75: 
+    elif value > 75:
         alterShift = 1
         cents = value - 100
     else:
@@ -296,9 +293,8 @@ def _convertCentsToAlterAndCents(shift):
 
 
 def _convertHarmonicToCents(value):
-    '''Given a harmonic number, return the total number shift in cents assuming 12 tone equal temperament. 
-    
-    
+    '''Given a harmonic number, return the total number shift in cents assuming 12 tone equal temperament.
+
     >>> pitch._convertHarmonicToCents(8)
     3600
     >>> [pitch._convertHarmonicToCents(x) for x in [5, 6, 7, 8]]
@@ -312,15 +308,15 @@ def _convertHarmonicToCents(value):
 
     Works with subHarmonics as well by specifying them as either 1/x or negative numbers.
     note that -2 is the first subharmonic, since -1 == 1:
-    
+
     >>> [pitch._convertHarmonicToCents(1.0/x) for x in [1, 2, 3, 4]]
     [0, -1200, -1902, -2400]
     >>> [pitch._convertHarmonicToCents(x) for x in [-1, -2, -3, -4]]
     [0, -1200, -1902, -2400]
-    
+
     So the fifth subharmonic of the 7th harmonic (remember floating point division for Python 2.x!),
     which is C2->C3->G3->C4->E4->G4->B\`4 --> B\`3->E\`3->B\`2->G-\`2
-    
+
     >>> pitch._convertHarmonicToCents(7.0/5.0)
     583
     >>> pitch._convertHarmonicToCents(7.0) - pitch._convertHarmonicToCents(5.0)
@@ -331,68 +327,100 @@ def _convertHarmonicToCents(value):
     return int(round(1200*math.log(value, 2), 0))
 
 
+#------------------------------------------------------------------------------
 
 
-#-------------------------------------------------------------------------------
 class AccidentalException(exceptions21.Music21Exception):
     pass
+
 
 class PitchException(exceptions21.Music21Exception):
     pass
 
+
 class MicrotoneException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+
+
 class Microtone(object):
     '''
-    The Microtone object defines a pitch transformation above 
-    or below a standard Pitch and its Accidental.
+    The Microtone object defines a pitch transformation above or below a
+    standard Pitch and its Accidental.
 
-    
-    >>> m = pitch.Microtone(20)
-    >>> m.cents
-    20
-    >>> m.alter
-    0.2...
-    >>> m
-    (+20c)
+    ::
 
+        >>> m = pitch.Microtone(20)
+        >>> m.cents
+        20
+
+    ::
+
+        >>> m.alter
+        0.2...
+
+    ::
+
+        >>> m
+        (+20c)
 
     Microtones can be shifted according to the harmonic. Here we take the 3rd
     harmonic of the previous microtone
 
-    >>> m.harmonicShift = 3
-    >>> m
-    (+20c+3rdH)
-    >>> m.cents
-    1922
-    >>> m.alter
-    19.2...
+    ::
 
+        >>> m.harmonicShift = 3
+        >>> m
+        (+20c+3rdH)
 
-    Microtonal changes can be positive or negative.
-    Both Positive and negative numbers can optionally be placed in parentheses
-    Negative numbers in parentheses still need the minus sign.
-    
+    ::
 
-    >>> m = pitch.Microtone('(-33.333333)')
-    >>> m
-    (-33c)
-    >>> m = pitch.Microtone('33.333333')
-    >>> m
-    (+33c)
-    
-    
-    Note that we round the display of microtones to the nearest cent,
-    but we keep the exact alteration in both .cents and .alter:
+        >>> m.cents
+        1922
 
-    >>> m.cents
-    33.333...
-    >>> m.alter
-    0.3333...
+    ::
+
+        >>> m.alter
+        19.2...
+
+    Microtonal changes can be positive or negative.  Both Positive and negative
+    numbers can optionally be placed in parentheses Negative numbers in
+    parentheses still need the minus sign.
+
+    ::
+
+        >>> m = pitch.Microtone('(-33.333333)')
+        >>> m
+        (-33c)
+
+    ::
+
+        >>> m = pitch.Microtone('33.333333')
+        >>> m
+        (+33c)
+
+    Note that we round the display of microtones to the nearest cent, but we
+    keep the exact alteration in both .cents and .alter:
+
+    ::
+
+        >>> m.cents
+        33.333...
+
+    ::
+
+        >>> m.alter
+        0.3333...
+
     '''
+
+    ### CLASS VARIABLES ###
+
     _jsonFreezer = True
+
+    ### INITIALIZER ###
 
     def __init__(self, centsOrString=0):
         self._centShift = 0
@@ -402,53 +430,16 @@ class Microtone(object):
             self._centShift = centsOrString # specify harmonic in cents
         else:
             self._parseString(centsOrString)
-        # need to additional store a reference to a position in a 
-        # another pitches overtone series? 
+        # need to additional store a reference to a position in a
+        # another pitches overtone series?
         # such as: A4(+69c [7thH/C3])?
 
-    def _parseString(self, value):
-        '''Parse a string representation.
-        '''
-        # strip any delimiters
-        value = value.replace(MICROTONE_OPEN, '')
-        value = value.replace(MICROTONE_CLOSE, '')
-
-        # need to look for and split off harmonic definitions
-
-        if value[0] in ['+'] or value[0].isdigit():
-            # positive cent representation
-            num, unused_nonNum = common.getNumFromStr(value, numbers='0123456789.')
-            if num == '':
-                raise MicrotoneException('no numbers found in string value: %s' % value)
-            else:
-                centValue = float(num)
-        elif value[0] in ['-']:
-            num, unused_nonNum = common.getNumFromStr(value[1:], numbers='0123456789.')
-            centValue = float(num) * -1
-        
-        self._centShift = centValue
-
-
-    def __repr__(self):
-        '''Return a string representation
-        '''
-        # cent values may be of any resolution, but round to nearest int
-        
-        if self._centShift >= 0:
-            sub = '+%sc' % int(round(self._centShift))
-        elif self._centShift < 0:
-            sub = '%sc' % int(round(self._centShift))
-        # only show a harmonic if present
-        if self._harmonicShift != 1:
-            sub += '+%s%sH' % (self._harmonicShift,
-                            common.ordinalAbbreviation(self._harmonicShift))
-        return '%s%s%s' % (MICROTONE_OPEN, sub, MICROTONE_CLOSE)
-
+    ### SPECIAL METHODS ###
 
     def __eq__(self, other):
         '''Compare cents.
 
-        
+
         >>> m1 = pitch.Microtone(20)
         >>> m2 = pitch.Microtone(20)
         >>> m3 = pitch.Microtone(21)
@@ -466,82 +457,125 @@ class Microtone(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def _getHarmonicShift(self):
-        return self._harmonicShift
+    def __repr__(self):
+        '''Return a string representation
+        '''
+        # cent values may be of any resolution, but round to nearest int
 
-    def _setHarmonicShift(self, value):
-        self._harmonicShift = value
+        if self._centShift >= 0:
+            sub = '+%sc' % int(round(self._centShift))
+        elif self._centShift < 0:
+            sub = '%sc' % int(round(self._centShift))
+        # only show a harmonic if present
+        if self._harmonicShift != 1:
+            sub += '+%s%sH' % (self._harmonicShift,
+                            common.ordinalAbbreviation(self._harmonicShift))
+        return '%s%s%s' % (MICROTONE_OPEN, sub, MICROTONE_CLOSE)
 
-    harmonicShift = property(_getHarmonicShift, _setHarmonicShift, 
-        doc = '''Set or get the harmonic shift, altering the microtone
-        ''')
+    ### PRIVATE METHODS ###
 
+    def _parseString(self, value):
+        '''Parse a string representation.
+        '''
+        # strip any delimiters
+        value = value.replace(MICROTONE_OPEN, '')
+        value = value.replace(MICROTONE_CLOSE, '')
+        # need to look for and split off harmonic definitions
+        if value[0] in ['+'] or value[0].isdigit():
+            # positive cent representation
+            num, unused_nonNum = common.getNumFromStr(value, numbers='0123456789.')
+            if num == '':
+                raise MicrotoneException('no numbers found in string value: %s' % value)
+            else:
+                centValue = float(num)
+        elif value[0] in ['-']:
+            num, unused_nonNum = common.getNumFromStr(value[1:], numbers='0123456789.')
+            centValue = float(num) * -1
+        self._centShift = centValue
 
-    def _getCents(self):
-        '''Return the cents.
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def alter(self):
+        '''
+        Return the microtone value in accidental alter values.
+        '''
+        return self.cents * .01
+
+    @property
+    def cents(self):
+        '''
+        Return the microtone value in cents.  This is not a settable property.
+        To set the value in cents, simply use that value as a creation
+        argument.
         '''
         return _convertHarmonicToCents(self._harmonicShift) + self._centShift
 
-    cents = property(_getCents, 
-        doc = '''Return the microtone value in cents. 
-        This is not a settable property. To set the value in cents, 
-        simply use that value as a creation argument. 
-        ''')
-
-    def _getAlter(self):
-        '''Return the value as an alter value, where 1 is 1 half step.
+    @property
+    def harmonicShift(self):
         '''
-        return self._getCents() * .01
-        
-    alter = property(_getAlter, 
-        doc = '''Return the microtone value in accidental alter values. 
-        ''')
+        Set or get the harmonic shift, altering the microtone
+        '''
+        return self._harmonicShift
 
-        
-class Accidental(base.Music21Object):
+    @harmonicShift.setter
+    def harmonicShift(self, value):
+        self._harmonicShift = value
+
+
+class Accidental(object):
+#class Accidental(base.Music21Object):
     '''
-    Accidental class, representing the symbolic and numerical representation of pitch deviation from a pitch name (e.g., G, B). 
-    
+    Accidental class, representing the symbolic and numerical representation of
+    pitch deviation from a pitch name (e.g., G, B).
+
     Two accidentals are considered equal if their names are equal.
 
-    Accidentals have three defining attributes: a name, a modifier, and an alter. 
-    For microtonal specifications, the name and modifier are the same except in
-    the case of half-sharp, half-flat, one-and-a-half-flat, and one-and-a-half-sharp.
-    
+    Accidentals have three defining attributes: a name, a modifier, and an
+    alter.  For microtonal specifications, the name and modifier are the same
+    except in the case of half-sharp, half-flat, one-and-a-half-flat, and
+    one-and-a-half-sharp.
+
     Accidentals up to quadruple-sharp and quadruple-flat are allowed.
 
     Natural-sharp etc. (for canceling a previous flat) are not yet supported.
 
+    ::
 
-    
-    >>> a = pitch.Accidental('sharp')
-    >>> a.name, a.alter, a.modifier
-    ('sharp', 1.0, '#')
+        >>> a = pitch.Accidental('sharp')
+        >>> a.name, a.alter, a.modifier
+        ('sharp', 1.0, '#')
 
     '''
+
+    ### CLASS VARIABLES ###
+
+
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'modifier', 'alter', 'set']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'name': '''A string name of the Accidental, such as "sharp" or 
-        "double-flat".''',
-    'modifier': '''A string symbol used to modify the pitch name, such as "#" or 
-        "-" for sharp and flat, respectively.''',
-    'alter': '''A signed decimal representing the number of half-steps shifted
-         by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.''',
-    'displaySize': 'Size in display: "cue", "large", or a percentage.',
-    'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
-    'displayStatus': 'Determines if this Accidental is to be displayed; can be None (for not set), True, or False.',
-    'displayLocation': 'Location of accidental: "normal", "above", "below".'
-    }
+        'name': '''A string name of the Accidental, such as "sharp" or
+            "double-flat".''',
+        'modifier': '''A string symbol used to modify the pitch name, such as "#" or
+            "-" for sharp and flat, respectively.''',
+        'alter': '''A signed decimal representing the number of half-steps shifted
+            by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.''',
+        'displaySize': 'Size in display: "cue", "large", or a percentage.',
+        'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
+        'displayStatus': 'Determines if this Accidental is to be displayed; can be None (for not set), True, or False.',
+        'displayLocation': 'Location of accidental: "normal", "above", "below".'
+        }
+
+    ### INITIALIZER ###
 
     def __init__(self, specifier='natural'):
-        base.Music21Object.__init__(self)
+        #base.Music21Object.__init__(self)
 
         # managed by properties
         self._displayType = "normal" # always, never, unless-repeated, even-tied
         self._displayStatus = None # None, True, False
-    
+
         # not yet managed by properties: TODO
         self.displayStyle = "normal" # "parentheses", "bracket", "both"
         self.displaySize  = "full"   # "cue", "large", or a percentage
@@ -551,110 +585,139 @@ class Accidental(base.Music21Object):
         self._name = None
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
-        #alterFrac = [0,0]   # fractional alteration 
+        #alterFrac = [0,0]   # fractional alteration
         # (e.g., 1/6); fraction class in 2.6
-        #alterExp  = [0,0,0] # exponental alteration 
+        #alterExp  = [0,0,0] # exponental alteration
         # (e.g., [2,3,19] = 2**(3/19))
         #alterHarm = 0       # altered according to a harmonic
         #environLocal.printDebug(['specifier', specifier])
         self.set(specifier)
 
-    def __repr__(self):
-        return '<accidental %s>' % self.name
-        
+    ### SPECIAL METHODS ###
+
 
     def __eq__(self, other):
-        '''Equality. Needed for pitch comparisons.
+        '''
+        Equality. Needed for pitch comparisons.
 
+        ::
         
-        >>> a = pitch.Accidental('double-flat')
-        >>> b = pitch.Accidental('double-flat')
-        >>> c = pitch.Accidental('double-sharp')
-        >>> a == b   
-        True
-        >>> a == c
-        False
+            >>> a = pitch.Accidental('double-flat')
+            >>> b = pitch.Accidental('double-flat')
+            >>> c = pitch.Accidental('double-sharp')
+            >>> a == b
+            True
+
+        ::
+
+            >>> a == c
+            False
 
         '''
         if other is None or not isinstance(other, Accidental):
             return False
-        if self.name == other.name: 
+        if self.name == other.name:
             return True
-        else: 
-            return False
-
-    def __ne__(self, other):
-        '''Inequality. Needed for pitch comparisons.
-        '''
-        if other is None:
-            return True
-        if self.name == other.name: 
-            return False
-        else: 
-            return True
-
-
-    def __gt__(self, other):
-        '''Greater than.  Based on the accidentals' alter function.
-
-        
-        >>> a = pitch.Accidental('sharp')
-        >>> b = pitch.Accidental('flat')
-        >>> a < b   
-        False
-        >>> a > b
-        True
-        '''
-        if other is None:
-            return False
-        if self.alter > other.alter: 
-            return True
-        else: 
+        else:
             return False
 
     def __ge__(self, other):
-        '''Greater than or equal.  Based on the accidentals' alter function.
+        '''
+        Greater than or equal.  Based on the accidentals' alter function.
 
-        
-        >>> a = pitch.Accidental('sharp')
-        >>> b = pitch.Accidental('flat')
-        >>> a >= b
-        True
+        ::
+
+            >>> a = pitch.Accidental('sharp')
+            >>> b = pitch.Accidental('flat')
+            >>> a >= b
+            True
+
         '''
         return self.__gt__(other) or self.__eq__(other)
 
-    def __lt__(self, other):
-        '''Less than
+    def __gt__(self, other):
+        '''
+        Greater than.  Based on the accidentals' alter function.
 
-        
-        >>> a = pitch.Accidental('natural')
-        >>> b = pitch.Accidental('flat')
-        >>> a > b   
-        True
-        >>> a < b
-        False
+        ::
+
+            >>> a = pitch.Accidental('sharp')
+            >>> b = pitch.Accidental('flat')
+            >>> a < b
+            False
+
+        ::
+
+            >>> a > b
+            True
+
         '''
         if other is None:
+            return False
+        if self.alter > other.alter:
             return True
-        if self.alter < other.alter: 
-            return True
-        else: 
+        else:
             return False
 
     def __le__(self, other):
-        '''Less than or equal.  Based on the accidentals' alter function.
+        '''
+        Less than or equal.  Based on the accidentals' alter function.
 
-        
-        >>> a = pitch.Accidental('sharp')
-        >>> b = pitch.Accidental('flat')
-        >>> c = pitch.Accidental('sharp')
-        >>> a <= b
-        False
-        >>> a <= c
-        True
+        ::
+
+            >>> a = pitch.Accidental('sharp')
+            >>> b = pitch.Accidental('flat')
+            >>> c = pitch.Accidental('sharp')
+            >>> a <= b
+            False
+
+        ::
+
+            >>> a <= c
+            True
+
         '''
         return self.__lt__(other) or self.__eq__(other)
 
+    def __lt__(self, other):
+        '''
+        Less than.
+
+        ::
+
+            >>> a = pitch.Accidental('natural')
+            >>> b = pitch.Accidental('flat')
+            >>> a > b
+            True
+
+        ::
+
+            >>> a < b
+            False
+
+        '''
+        if other is None:
+            return True
+        if self.alter < other.alter:
+            return True
+        else:
+            return False
+
+    def __ne__(self, other):
+        '''
+        Inequality. Needed for pitch comparisons.
+        '''
+        if other is None:
+            return True
+        if self.name == other.name:
+            return False
+        else:
+            return True
+
+    def __repr__(self):
+        return '<accidental %s>' % self.name
+
+    ### PUBLIC METHODS ###
 
     def set(self, name):
         '''
@@ -662,7 +725,7 @@ class Accidental(base.Music21Object):
         Abbreviations are all accepted.  All other values will change
         after setting.
 
-        
+
         >>> a = pitch.Accidental()
         >>> a.set('sharp')
         >>> a.alter
@@ -684,49 +747,49 @@ class Accidental(base.Music21Object):
         '''
         if common.isStr(name):
             name = name.lower() # sometimes args get capitalized
-        if name in ['natural', "n", 0]: 
+        if name in ['natural', "n", 0]:
             self._name = 'natural'
             self._alter = 0.0
         elif name in ['sharp', accidentalNameToModifier['sharp'], "is", 1, 1.0]:
             self._name = 'sharp'
             self._alter = 1.0
-        elif name in ['double-sharp', accidentalNameToModifier['double-sharp'], 
+        elif name in ['double-sharp', accidentalNameToModifier['double-sharp'],
             "isis", 2]:
             self._name = 'double-sharp'
             self._alter = 2.0
         elif name in ['flat', accidentalNameToModifier['flat'], "es", -1]:
             self._name = 'flat'
             self._alter = -1.0
-        elif name in ['double-flat', accidentalNameToModifier['double-flat'], 
+        elif name in ['double-flat', accidentalNameToModifier['double-flat'],
             "eses", -2]:
             self._name = 'double-flat'
             self._alter = -2.0
-        
-        elif name in ['half-sharp', accidentalNameToModifier['half-sharp'], 
+
+        elif name in ['half-sharp', accidentalNameToModifier['half-sharp'],
             'quarter-sharp', 'ih', 'semisharp', .5]:
             self._name = 'half-sharp'
             self._alter = 0.5
-        elif name in ['one-and-a-half-sharp', 
+        elif name in ['one-and-a-half-sharp',
             accidentalNameToModifier['one-and-a-half-sharp'],
-            'three-quarter-sharp', 'three-quarters-sharp', 'isih', 
+            'three-quarter-sharp', 'three-quarters-sharp', 'isih',
             'sesquisharp', 1.5]:
             self._name = 'one-and-a-half-sharp'
-            self._alter = 1.5  
-        elif name in ['half-flat', accidentalNameToModifier['half-flat'], 
+            self._alter = 1.5
+        elif name in ['half-flat', accidentalNameToModifier['half-flat'],
             'quarter-flat', 'eh', 'semiflat', -.5]:
             self._name = 'half-flat'
             self._alter = -0.5
-        elif name in ['one-and-a-half-flat', 
+        elif name in ['one-and-a-half-flat',
             accidentalNameToModifier['one-and-a-half-flat'],
-            'three-quarter-flat', 'three-quarters-flat', 'eseh', 
+            'three-quarter-flat', 'three-quarters-flat', 'eseh',
             'sesquiflat', -1.5]:
             self._name = 'one-and-a-half-flat'
             self._alter = -1.5
-        elif name in ['triple-sharp', accidentalNameToModifier['triple-sharp'], 
+        elif name in ['triple-sharp', accidentalNameToModifier['triple-sharp'],
             'isisis', 3]:
             self._name = 'triple-sharp'
             self._alter = 3.0
-        elif name in ['quadruple-sharp', 
+        elif name in ['quadruple-sharp',
             accidentalNameToModifier['quadruple-sharp'], 'isisisis', 4]:
             self._name = 'quadruple-sharp'
             self._alter = 4.0
@@ -734,7 +797,7 @@ class Accidental(base.Music21Object):
             'eseses', -3]:
             self._name = 'triple-flat'
             self._alter = -3.0
-        elif name in ['quadruple-flat', 
+        elif name in ['quadruple-flat',
             accidentalNameToModifier['quadruple-flat'], 'eseseses', -4]:
             self._name = 'quadruple-flat'
             self._alter = -4.0
@@ -743,11 +806,10 @@ class Accidental(base.Music21Object):
 
         self._modifier = accidentalNameToModifier[self._name]
 
-
     def isTwelveTone(self):
         '''Return a boolean if this Accidental describes a twelve-tone pitch.
 
-        
+
         >>> a = pitch.Accidental('~')
         >>> a.isTwelveTone()
         False
@@ -757,22 +819,22 @@ class Accidental(base.Music21Object):
         True
 
         '''
-        if self.name in ['half-sharp', 'one-and-a-half-sharp', 'half-flat', 
+        if self.name in ['half-sharp', 'one-and-a-half-sharp', 'half-flat',
             'one-and-a-half-flat', ]:
             return False
         return True
 
-
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     # main properties
+
     def _getName(self):
         return self._name
 
     def _setName(self, value):
         # can alternatively call set()
         self._name = value
-    
-    name = property(_getName, _setName, 
+
+    name = property(_getName, _setName,
         doc = '''Get or set the name of the Accidental, like 'sharp' or 'double-flat'
         ''')
 
@@ -782,11 +844,10 @@ class Accidental(base.Music21Object):
     def _setAlter(self, value):
         # can alternatively call set()
         self._alter = value
-    
-    alter = property(_getAlter, _setAlter, 
+
+    alter = property(_getAlter, _setAlter,
         doc = '''Get or set the alter of the Accidental, or the semitone shift caused by the Accidental.'
         ''')
-
 
     def _getModifier(self):
         return self._modifier
@@ -794,35 +855,33 @@ class Accidental(base.Music21Object):
     def _setModifier(self, value):
         # can alternatively call set()
         self._modifier = value
-    
-    modifier = property(_getModifier, _setModifier, 
+
+    modifier = property(_getModifier, _setModifier,
         doc = '''Get or set the alter of the modifier, or the string representation.'
         ''')
-
 
     def _getDisplayType(self):
         return self._displayType
 
     def _setDisplayType(self, value):
-        if value not in ['normal', 'always', 'never', 
+        if value not in ['normal', 'always', 'never',
             'unless-repeated', 'even-tied']:
             raise AccidentalException('supplied display type is not supported: %s' % value)
         self._displayType = value
-    
-    displayType = property(_getDisplayType, _setDisplayType, 
+
+    displayType = property(_getDisplayType, _setDisplayType,
         doc = '''
         Returns or sets the display type of the accidental
-        
+
         "normal" (default) displays it if it is the first in measure,
         or is needed to contradict a previous accidental, etc.
-        
+
         other valid terms:
         "always", "never", "unless-repeated" (show always unless
         the immediately preceding note is the same), "even-tied"
         (stronger than always: shows even if it is tied to the
         previous note)
         ''')
-
 
     def _getDisplayStatus(self):
         return self._displayStatus
@@ -831,19 +890,18 @@ class Accidental(base.Music21Object):
         if value not in [True, False, None]:
             raise AccidentalException('supplied display status is not supported: %s' % value)
         self._displayStatus = value
-    
-    displayStatus = property(_getDisplayStatus, _setDisplayStatus, 
+
+    displayStatus = property(_getDisplayStatus, _setDisplayStatus,
         doc = '''
         Given the displayType, should this accidental be displayed?
 
-        In general, a display status of None is assumed to mean that no high-level 
-        processing of accidentals has happened. 
+        In general, a display status of None is assumed to mean that no high-level
+        processing of accidentals has happened.
 
         Can be True, False, or None if not defined. For contexts where
         the next program down the line cannot evaluate displayType.  See
         stream.makeAccidentals() for more information.
         ''')
-
 
     def _getUnicode(self):
         '''Return a unicode representation of this accidental.
@@ -876,36 +934,37 @@ class Accidental(base.Music21Object):
         elif self.name == 'half-flat':
             # 1D133
             # raised flat: 1D12C
-            return u"\uD834\uDD33" 
+            return u"\uD834\uDD33"
 
         else: # get our best ascii representation
             return self.modifier
 
-    unicode = property(_getUnicode, 
+    unicode = property(_getUnicode,
         doc = '''
         Return a unicode representation of this accidental or the best ascii representation
         if that is not possible.
         ''')
 
-
-
     def _getFullName(self):
         # keep lower case for now
         return self.name
 
-    fullName = property(_getFullName, 
-        doc = '''Return the most complete representation of this Accidental. 
+    fullName = property(_getFullName,
+        doc = '''Return the most complete representation of this Accidental.
 
-        
-        >>> a = pitch.Accidental('double-flat')
-        >>> a.fullName
-        'double-flat'
+        ::
+
+            >>> a = pitch.Accidental('double-flat')
+            >>> a.fullName
+            'double-flat'
 
         Note that non-standard microtones are converted to standard ones
-        
-        >>> a = pitch.Accidental('quarter-flat')
-        >>> a.fullName
-        'half-flat'
+
+        ::
+
+            >>> a = pitch.Accidental('quarter-flat')
+            >>> a.fullName
+            'half-flat'
 
         ''')
 
@@ -913,20 +972,20 @@ class Accidental(base.Music21Object):
     #---------------------------------------------------------------------------
     def inheritDisplay(self, other):
         '''Given another Accidental object, inherit all the display properites
-        of that object. 
+        of that object.
 
-        This is needed when transposing Pitches: we need to retain accidental display properties. 
+        This is needed when transposing Pitches: we need to retain accidental display properties.
 
-        
+
         >>> a = pitch.Accidental('double-flat')
         >>> a.displayType = 'always'
         >>> b = pitch.Accidental('sharp')
         >>> b.inheritDisplay(a)
         >>> b.displayType
         'always'
-        '''        
-        if other != None: # empty accidental attributes are None
-            for attr in ['displayType', 'displayStatus', 
+        '''
+        if other is not None: # empty accidental attributes are None
+            for attr in ['displayType', 'displayStatus',
                         'displayStyle', 'displaySize', 'displayLocation']:
                 value = getattr(other, attr)
                 setattr(self, attr, value)
@@ -936,12 +995,12 @@ class Accidental(base.Music21Object):
 class Pitch(base.Music21Object):
     '''
     A fundamental `Music21Object` that represents a single pitch.
-    
+
     `Pitch` objects are most often created by passing in a note name
     (C, D, E, F, G, A, B), an optional accidental (one or more "#"s or "-"s,
     where "-" means flat), and an optional octave number:
-    
-    
+
+
     >>> highEflat = pitch.Pitch('E-6')
     >>> highEflat.name
     'E-'
@@ -951,23 +1010,23 @@ class Pitch(base.Music21Object):
     <accidental flat>
     >>> highEflat.octave
     6
-    
+
     The `.nameWithOctave` property gives back what we put in, `'E-6'`:
-    
+
     >>> highEflat.nameWithOctave
     'E-6'
-    
+
 
     `Pitch` objects represent themselves as the class name followed
     by the `.nameWithOctave`:
-    
+
     >>> p1 = pitch.Pitch('a#4')
     >>> p1
     <music21.pitch.Pitch A#4>
-    
-    Printing a `pitch.Pitch` object or converting it 
+
+    Printing a `pitch.Pitch` object or converting it
     to a string gives a more compact form:
-    
+
     >>> print(p1)
     A#4
     >>> str(p1)
@@ -995,25 +1054,25 @@ class Pitch(base.Music21Object):
     If a `Pitch` doesn't have an associated octave, then its
     `.octave` value is None.  This means that it represents
     any G#, regardless of octave.  Transposing this note up
-    an octave doesn't change anything.  
-    
+    an octave doesn't change anything.
+
     >>> anyGsharp = pitch.Pitch("G#")
     >>> anyGsharp.octave is None
     True
     >>> print anyGsharp.transpose("P8")
     G#
-    
+
     Sometimes we need an octave for a `Pitch` even if it's not
     specified.  For instance, we can't play an octave-less `Pitch`
     in MIDI or display it on a staff.  So there is an `.implicitOctave`
     tag to deal with these situations; by default it's always 4.
-    
+
     >>> anyGsharp.implicitOctave
     4
-    
+
     If a `Pitch` has its `.octave` explicitly set, then `.implicitOctave`
     always equals `.octave`.
-    
+
     >>> highEflat.implicitOctave
     6
 
@@ -1031,7 +1090,7 @@ class Pitch(base.Music21Object):
     is set to `True`.  That means that when it is transposed or
     displayed, other programs should feel free to substitute an
     enharmonically equivalent pitch in its place:
-    
+
     >>> p2.implicitAccidental
     True
     >>> p1.implicitAccidental
@@ -1042,7 +1101,7 @@ class Pitch(base.Music21Object):
 
     >>> p3 = pitch.Pitch(name = 'C', accidental = '#', octave = 7, microtone = -30)
     >>> p3.fullName
-    'C-sharp in octave 7 (-30c)'        
+    'C-sharp in octave 7 (-30c)'
 
     The full list of supported key words are: `name`, `accidental` (which
     can be a string or an :class:`~music21.pitch.Accidental` object), `octave`,
@@ -1050,12 +1109,12 @@ class Pitch(base.Music21Object):
     `pitchClass` (0-11), `fundamental` (another `Pitch` object representing the
     fundamental for this harmonic; `harmonic` is not yet supported, but should be),
     and `midi` or `ps` (two ways of specifying nearly the same thing, see below).
-    
+
     Using keywords to create `Pitch` objects is especially important if
-    extreme pitches might be found.  For instance, the first `Pitch` is B-double flat 
+    extreme pitches might be found.  For instance, the first `Pitch` is B-double flat
     in octave 3, not B-flat in octave -3.  The second object creates that low `Pitch`
     properly:
-    
+
     >>> p4 = pitch.Pitch("B--3")
     >>> p4.accidental
     <accidental double-flat>
@@ -1068,31 +1127,31 @@ class Pitch(base.Music21Object):
     >>> p5.octave
     -3
 
-    Internally, pitches are represented by their 
+    Internally, pitches are represented by their
     scale step (`self.step`), their octave, and their
-    accidental. `Pitch` objects use these three elements to figure out their 
-    pitch space representation (`self.ps`); altering any 
-    of the first three changes the pitch space (ps) representation. 
-    Similarly, altering the .ps representation 
+    accidental. `Pitch` objects use these three elements to figure out their
+    pitch space representation (`self.ps`); altering any
+    of the first three changes the pitch space (ps) representation.
+    Similarly, altering the .ps representation
     alters the first three.
-    
+
     >>> aSharp = pitch.Pitch("A#5")
     >>> aSharp.ps
     82.0
-    
+
     >>> aSharp.octave = 4
     >>> aSharp.ps
     70.0
-    
+
     >>> aSharp.ps = 60.0
     >>> aSharp.nameWithOctave
     'C4'
-            
+
     Two Pitches are equal if they represent the same
-    pitch and are spelled the same (enharmonics do not count).  
+    pitch and are spelled the same (enharmonics do not count).
     A Pitch is greater than another Pitch if its `.ps` is greater than
     the other.  Thus C##4 > D-4.
-    
+
     >>> pitch.Pitch("C#5") == pitch.Pitch("C#5")
     True
     >>> pitch.Pitch("C#5") == pitch.Pitch("D-5")
@@ -1103,7 +1162,7 @@ class Pitch(base.Music21Object):
     A consequence of comparing enharmonics for equality but .ps for comparisons
     is that a `Pitch` can be neither less than
     or greater than another `Pitch` without being equal:
-    
+
     >>> pitch.Pitch("C#5") == pitch.Pitch("D-5")
     False
     >>> pitch.Pitch("C#5") > pitch.Pitch("D-5")
@@ -1126,14 +1185,14 @@ class Pitch(base.Music21Object):
         # this should not be set, as will be updated when needed
         self._step = defaults.pitchStep # this is only the pitch step
         # keep an accidental object based on self._alter
-        
+
         self._overridden_freq440 = None
 
         # store an Accidental and Microtone objects
         # note that creating an Accidental objects is much more time consuming
         # than a microtone
         self._accidental = None
-        self._microtone = Microtone() 
+        self._microtone = Microtone()
 
         # CA, Q: should this remain an attribute or only refer to value in defaults?
         # MSC A: no, it's a useful attribute for cases such as scales where if there are
@@ -1147,7 +1206,7 @@ class Pitch(base.Music21Object):
 
         # name combines step, octave, and accidental
         if name is not None:
-            if not common.isNum(name):       
+            if not common.isNum(name):
                 self._setName(name) # set based on string
             else: # is a number
                 if name < 12: # is a pitchClass
@@ -1198,8 +1257,8 @@ class Pitch(base.Music21Object):
 
     def __eq__(self, other):
         '''Do not accept enharmonic equivalance.
-        
-        
+
+
         >>> a = pitch.Pitch('c2')
         >>> a.octave
         2
@@ -1210,25 +1269,25 @@ class Pitch(base.Music21Object):
         False
         >>> a != b
         True
-        
+
         >>> c = 7
         >>> a == c
         False
-        
+
         >>> a != c
         True
-        
+
         >>> d = pitch.Pitch('d-4')
         >>> b == d
         False
-        
+
         '''
         if other is None:
             return False
-        elif (hasattr(other, 'octave') == False or hasattr(other, 'step') == False or
-              hasattr(other, 'step') == False):
+        elif (hasattr(other, 'octave') is False or hasattr(other, 'step') is False or
+              hasattr(other, 'step') is False):
             return False
-        elif (self.octave == other.octave and self.step == other.step and 
+        elif (self.octave == other.octave and self.step == other.step and
             self.accidental == other.accidental and self.microtone == other.microtone):
             return True
         else:
@@ -1238,9 +1297,9 @@ class Pitch(base.Music21Object):
         return not self.__eq__(other)
 
     def __lt__(self, other):
-        '''Accepts enharmonic equivalence. Based entirely on pitch space 
+        '''Accepts enharmonic equivalence. Based entirely on pitch space
         representation.
-        
+
         >>> a = pitch.Pitch('c4')
         >>> b = pitch.Pitch('c#4')
         >>> a < b
@@ -1256,7 +1315,7 @@ class Pitch(base.Music21Object):
         Less than or equal.  Based on the accidentals' alter function.
         Note that to be equal enharmonics must be the same. So two pitches can
         be neither lt or gt and not equal to each other!
-        
+
         >>> a = pitch.Pitch('d4')
         >>> b = pitch.Pitch('d8')
         >>> c = pitch.Pitch('d4')
@@ -1266,22 +1325,22 @@ class Pitch(base.Music21Object):
         True
         >>> a <= c
         True
-        
+
         >>> d = pitch.Pitch('c##4')
         >>> c >= d
         False
         >>> c <= d
         False
-        
+
         Do not rely on this behavior -- it may be changed in a future version
         to create a total ordering.
         '''
         return self.__lt__(other) or self.__eq__(other)
 
     def __gt__(self, other):
-        '''Accepts enharmonic equivalance. Based entirely on pitch space 
+        '''Accepts enharmonic equivalance. Based entirely on pitch space
         representation.
-        
+
         >>> a = pitch.Pitch('d4')
         >>> b = pitch.Pitch('d8')
         >>> a > b
@@ -1298,7 +1357,7 @@ class Pitch(base.Music21Object):
         Note that to be equal enharmonics must be the same. So two pitches can
         be neither lt or gt and not equal to each other!
 
-        
+
         >>> a = pitch.Pitch('d4')
         >>> b = pitch.Pitch('d8')
         >>> c = pitch.Pitch('d4')
@@ -1310,22 +1369,22 @@ class Pitch(base.Music21Object):
         True
         >>> c >= a
         True
-        
+
         >>> d = pitch.Pitch('c##4')
         >>> c >= d
         False
         >>> c <= d
         False
-        
+
         Do not rely on this behavior -- it may be changed in a future version
-        to create a total ordering.        
+        to create a total ordering.
         '''
         return self.__gt__(other) or self.__eq__(other)
 
     #---------------------------------------------------------------------------
     def _getAccidental(self):
         return self._accidental
-    
+
     def _setAccidental(self, value):
         if isinstance(value, basestring):
             self._accidental = Accidental(value)
@@ -1337,21 +1396,21 @@ class Pitch(base.Music21Object):
                 self._setMicrotone(cents)
         else: # assume an accidental object
             self._accidental = value
-    
+
     accidental = property(_getAccidental, _setAccidental,
         doc='''
         Stores an optional accidental object contained within the
         Pitch object.  This might return None, which is different
         than a natural accidental:
-        
 
-        
+
+
         >>> a = pitch.Pitch('E-')
         >>> a.accidental.alter
         -1.0
         >>> a.accidental.modifier
         '-'
-        
+
         >>> b = pitch.Pitch('C4')
         >>> b.accidental is None
         True
@@ -1360,7 +1419,7 @@ class Pitch(base.Music21Object):
         False
         >>> b.accidental
         <accidental natural>
-        
+
         >>> b = pitch.Pitch('C4')
         >>> b.accidental = 1.5
         >>> print(b)
@@ -1376,7 +1435,7 @@ class Pitch(base.Music21Object):
 
     def _getMicrotone(self):
         return self._microtone
-    
+
     def _setMicrotone(self, value):
         if (isinstance(value, basestring) or common.isNum(value)):
             self._microtone = Microtone(value)
@@ -1391,54 +1450,54 @@ class Pitch(base.Music21Object):
 #         if common.almostEquals(self._microtone.cents, 0.0):
 #             self._microtone = None
 
-    
+
     microtone = property(_getMicrotone, _setMicrotone,
         doc='''
         Sets the microtone object contained within the
         Pitch object. Microtones must be supplied in cents.
 
-        
+
         >>> p = pitch.Pitch('E4-')
         >>> p.microtone.cents == 0
         True
         >>> p.ps
         63.0
-        >>> p.microtone = 33 # adjustment in cents     
+        >>> p.microtone = 33 # adjustment in cents
         >>> str(p)
         'E-4(+33c)'
         >>> (p.name, p.nameWithOctave) # these representations are unchanged
         ('E-', 'E-4')
-        >>> p.microtone = '(-12c' # adjustment in cents     
+        >>> p.microtone = '(-12c' # adjustment in cents
         >>> p
         <music21.pitch.Pitch E-4(-12c)>
         >>> p.microtone = pitch.Microtone(-30)
         >>> p
         <music21.pitch.Pitch E-4(-30c)>
-        
+
         ''')
 
 
     def isTwelveTone(self):
         '''
-        Return True if this Pitch is 
+        Return True if this Pitch is
         one of the twelve tones available on a piano
-        keyboard. Returns False if it instead 
-        has a non-zero microtonal adjustment or 
+        keyboard. Returns False if it instead
+        has a non-zero microtonal adjustment or
         has a quarter tone accidental.
 
 
-        
+
         >>> p = pitch.Pitch('g4')
         >>> p.isTwelveTone()
         True
         >>> p.microtone = -20
         >>> p.isTwelveTone()
         False
-        
-        
+
+
         >>> p2 = pitch.Pitch('g~4')
         >>> p2.isTwelveTone()
-        False            
+        False
         '''
         if self.accidental is not None:
             if not self.accidental.isTwelveTone():
@@ -1451,10 +1510,10 @@ class Pitch(base.Music21Object):
     def getCentShiftFromMidi(self):
         '''Get cent deviation of this pitch from MIDI pitch.
 
-        
+
         >>> p = pitch.Pitch('c~4')
         >>> p.midi # midi values automatically round up
-        61 
+        61
         >>> p.getCentShiftFromMidi()
         50
         >>> p = pitch.Pitch('c#4')
@@ -1481,7 +1540,7 @@ class Pitch(base.Music21Object):
 
         # see if we have a quarter tone alter
 
-        # if a quarter tone, get necessary shift above or below the 
+        # if a quarter tone, get necessary shift above or below the
         # standard accidental
         shift = 0
         if self.accidental is not None:
@@ -1498,10 +1557,10 @@ class Pitch(base.Music21Object):
         post += self.microtone.alter
         return post
 
-    alter = property(_getAlter, 
+    alter = property(_getAlter,
         doc = '''Return the pitch alteration as a numeric value, where 1 is the space of one half step and all base pitch values are given by step alone. Thus, the alter value combines the pitch change suggested by the Accidental and the Microtone combined.
 
-        
+
         >>> p = pitch.Pitch('g#4')
         >>> p.alter
         1.0
@@ -1515,7 +1574,7 @@ class Pitch(base.Music21Object):
     def convertQuarterTonesToMicrotones(self, inPlace=True):
         '''Convert any quarter tone Accidentals to Microtones.
 
-        
+
         >>> p = pitch.Pitch('G#~')
         >>> str(p), p.microtone
         ('G#~', (+0c))
@@ -1524,7 +1583,7 @@ class Pitch(base.Music21Object):
         68.5
         >>> str(p), p.microtone
         ('G#(+50c)', (+50c))
-        
+
         >>> p = pitch.Pitch('A`')
         >>> str(p), p.microtone
         ('A`', (+0c))
@@ -1543,15 +1602,15 @@ class Pitch(base.Music21Object):
             if returnObj.accidental.name in ['half-flat']:
                 returnObj.accidental = None
                 returnObj.microtone = returnObj.microtone.cents - 50 # in cents
-    
+
             elif returnObj.accidental.name in ['half-sharp']:
                 returnObj.accidental = None
                 returnObj.microtone = returnObj.microtone.cents + 50 # in cents
-    
+
             elif returnObj.accidental.name in ['one-and-a-half-sharp']:
                 returnObj.accidental = 1.0
                 returnObj.microtone = returnObj.microtone.cents + 50 # in cents
-    
+
             elif returnObj.accidental.name in ['one-and-a-half-flat']:
                 returnObj.accidental = -1.0
                 returnObj.microtone = returnObj.microtone.cents - 50 # in cents
@@ -1564,9 +1623,9 @@ class Pitch(base.Music21Object):
 
 
     def convertMicrotonesToQuarterTones(self, inPlace=True):
-        '''Convert any Microtones available to quarter tones, if possible. 
+        '''Convert any Microtones available to quarter tones, if possible.
 
-        
+
         >>> p = pitch.Pitch('g3')
         >>> p.microtone = 78
         >>> str(p)
@@ -1574,7 +1633,7 @@ class Pitch(base.Music21Object):
         >>> p.convertMicrotonesToQuarterTones(inPlace=True)
         >>> str(p)
         'G#3(-22c)'
-        
+
         >>> p = pitch.Pitch('d#3')
         >>> p.microtone = 46
         >>> p
@@ -1582,7 +1641,7 @@ class Pitch(base.Music21Object):
         >>> p.convertMicrotonesToQuarterTones(inPlace=True)
         >>> p
         <music21.pitch.Pitch D#~3(-4c)>
-        
+
         >>> p = pitch.Pitch('f#2')
         >>> p.microtone = -38
         >>> p.convertMicrotonesToQuarterTones(inPlace=True)
@@ -1603,7 +1662,7 @@ class Pitch(base.Music21Object):
                             returnObj.accidental.alter + alterShift)
         else:
             returnObj.accidental = Accidental(alterShift)
-        returnObj.microtone = cents        
+        returnObj.microtone = cents
 
         if inPlace:
             return None
@@ -1617,15 +1676,15 @@ class Pitch(base.Music21Object):
 
     def _getPs(self):
         '''
-        recalculates the pitchSpace number. Called when self.step, self.octave 
+        recalculates the pitchSpace number. Called when self.step, self.octave
         or self.accidental are changed.
-        
+
         should be called when .defaultOctave is changed if octave is None,
         but isn't yet.
-        
+
         Returns a pitch space value as a floating point MIDI note number.
 
-        
+
         >>> pitch.Pitch('c#4')._getPs()
         61.0
         >>> pitch.Pitch('d--2')._getPs()
@@ -1637,15 +1696,15 @@ class Pitch(base.Music21Object):
         '''
         step = self._step.upper()
         ps = float(((self.implicitOctave + 1) * 12) + STEPREF[step])
-        if self.accidental is not None:        
+        if self.accidental is not None:
             ps = ps + self.accidental.alter
         if self.microtone is not None:
             ps = ps + self.microtone.alter
-        return ps        
-    
+        return ps
+
     def _setPs(self, value):
         '''
-        
+
         >>> p = pitch.Pitch()
         >>> p.ps = 61
         >>> p.ps
@@ -1676,39 +1735,39 @@ class Pitch(base.Music21Object):
         self.implicitAccidental = True
 
 
-    ps = property(_getPs, _setPs, 
+    ps = property(_getPs, _setPs,
         doc='''
-        The ps property permits getting and setting 
-        a pitch space value, a floating point number 
-        representing pitch space, where 60.0 is C4, middle C, 
-        61.0 is C#4 or D-4, and floating point values are 
+        The ps property permits getting and setting
+        a pitch space value, a floating point number
+        representing pitch space, where 60.0 is C4, middle C,
+        61.0 is C#4 or D-4, and floating point values are
         microtonal tunings (.01 is equal to one cent), so
         a quarter-tone sharp above C5 is 72.5.
-        
+
         Note that the choice of 60.0 for C4 makes it identical
         to the integer value of 60 for .midi, but .midi
         does not allow for microtones and is limited to 0-127
         while .ps allows for notes before midi 0 or above midi 127.
-        
 
-        
+
+
         >>> a = pitch.Pitch("C4")
         >>> a.ps
         60.0
-        
+
         Changing the ps value for `a` will change the step and octave:
-        
+
         >>> a.ps = 45
         >>> a
         <music21.pitch.Pitch A2>
         >>> a.ps
         45.0
 
-        
+
         Notice that ps 61 represents both
         C# and D-flat.  Thus "implicitAccidental"
         will be true after setting our pitch to 61:
-        
+
         >>> a.ps = 61
         >>> a
         <music21.pitch.Pitch C#4>
@@ -1716,25 +1775,25 @@ class Pitch(base.Music21Object):
         61.0
         >>> a.implicitAccidental
         True
-        
+
         Microtonal accidentals and pure Microtones are allowed, as are extreme ranges:
-        
+
         >>> b = pitch.Pitch('B9')
         >>> b.accidental = pitch.Accidental('half-flat')
         >>> b
         <music21.pitch.Pitch B`9>
         >>> b.ps
         130.5
-        
+
 
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20
         >>> print '%.1f' % p._getPs()
         60.2
 
-        
+
         Octaveless pitches use their .implicitOctave attributes:
-        
+
         >>> d = pitch.Pitch("D#")
         >>> d.octave is None
         True
@@ -1742,10 +1801,10 @@ class Pitch(base.Music21Object):
         4
         >>> d.ps
         63.0
-        
+
         >>> d.defaultOctave = 5
         >>> d.ps
-        75.0        
+        75.0
         ''')
 
 
@@ -1767,7 +1826,7 @@ class Pitch(base.Music21Object):
     def getMidiPreCentShift(self):
         '''If pitch bend will be used to adjust MIDI values, the given pitch values for microtones should go to the nearest non-microtonal pitch value, not rounded up or down. This method is used in MIDI output generation.
 
-        
+
         >>> p = pitch.Pitch('c~4')
         >>> p.getMidiPreCentShift()
         60
@@ -1793,22 +1852,22 @@ class Pitch(base.Music21Object):
             if value < (127-12):
                 value += 12
         elif value < 0:
-            value = 0 + (value % 12) # lowest oct plus modulus            
+            value = 0 + (value % 12) # lowest oct plus modulus
         self._setPs(value)
 
         # all midi settings must set implicit to True, as we do not know
         # what accidental this is
         self.implicitAccidental = True
 
-    
-    midi = property(_getMidi, _setMidi, 
-        doc=''' 
-        Get or set a pitch value in MIDI. 
-        MIDI pitch values are like ps values (pitchSpace) rounded to 
+
+    midi = property(_getMidi, _setMidi,
+        doc='''
+        Get or set a pitch value in MIDI.
+        MIDI pitch values are like ps values (pitchSpace) rounded to
         the nearest integer; while the ps attribute will accommodate floats.
 
 
-        
+
         >>> c = pitch.Pitch('C4')
         >>> c.midi
         60
@@ -1817,7 +1876,7 @@ class Pitch(base.Music21Object):
         24
 
 
-        Note that like ps (pitchSpace), MIDI notes do not distinguish between 
+        Note that like ps (pitchSpace), MIDI notes do not distinguish between
         sharps and flats, etc.
 
 
@@ -1827,10 +1886,10 @@ class Pitch(base.Music21Object):
         >>> eFlat = pitch.Pitch('E-4')
         >>> eFlat.midi
         63
-        
+
         Midi values are constrained to the space 0-127.  Higher or lower
         values will be transposed octaves to fit in this space.
-        
+
         >>> veryHighFHalfFlat = pitch.Pitch("F")
         >>> veryHighFHalfFlat.octave = 12
         >>> veryHighFHalfFlat.accidental = pitch.Accidental('half-flat')
@@ -1840,7 +1899,7 @@ class Pitch(base.Music21Object):
         160.5
         >>> veryHighFHalfFlat.midi
         125
-        
+
         >>> notAsHighNote = pitch.Pitch()
         >>> notAsHighNote.ps = veryHighFHalfFlat.midi
         >>> notAsHighNote
@@ -1862,7 +1921,7 @@ class Pitch(base.Music21Object):
     def _getName(self):
         '''Name presently returns pitch name and accidental without octave.
 
-        
+
         >>> a = pitch.Pitch('G#')
         >>> a.name
         'G#'
@@ -1871,11 +1930,11 @@ class Pitch(base.Music21Object):
             return self.step + self.accidental.modifier
         else:
             return self.step
-        
+
     def _setName(self, usrStr):
         '''
         Set name, which may be provided with or without octave values. C4 or D-3
-        are both accepted.         
+        are both accepted.
         '''
         usrStr = usrStr.strip().upper()
         # extract any numbers that may be octave designations
@@ -1898,18 +1957,18 @@ class Pitch(base.Music21Object):
             self.accidental = Accidental(usrStr[1:])
         else:
             raise PitchException("Cannot make a name out of %s" % repr(usrStr))
-        if octFound != '': 
+        if octFound != '':
             octave = int(octFound)
             self.octave = octave
 
         # when setting by name, we assume that the accidental intended
         self.implicitAccidental = False
-    
+
     name = property(_getName, _setName, doc='''
         Gets or sets the name (pitch name with accidental but
         without octave) of the Pitch.
 
-        
+
         >>> p = pitch.Pitch("D#5")
         >>> p.name
         'D#'
@@ -1918,13 +1977,13 @@ class Pitch(base.Music21Object):
         'C#'
 
         OMIT_FROM_DOCS
-        
+
         move to implicitAccidental section...
 
-        >>> p.implicitAccidental 
+        >>> p.implicitAccidental
         False
         >>> p.ps = 61
-        >>> p.implicitAccidental 
+        >>> p.implicitAccidental
         True
         >>> p.name
         'C#'
@@ -1933,7 +1992,7 @@ class Pitch(base.Music21Object):
         'B-'
 
         >>> p.name = 'C#'
-        >>> p.implicitAccidental 
+        >>> p.implicitAccidental
         False
     ''')
 
@@ -1941,7 +2000,7 @@ class Pitch(base.Music21Object):
     def _getUnicodeName(self):
         '''Name presently returns pitch name and accidental without octave.
 
-        
+
         >>> a = pitch.Pitch('G#')
         >>> a.name
         'G#'
@@ -1951,8 +2010,8 @@ class Pitch(base.Music21Object):
         else:
             return self.step
 
-    unicodeName = property(_getUnicodeName, 
-        doc = '''Return the pitch name in a unicode encoding. 
+    unicodeName = property(_getUnicodeName,
+        doc = '''Return the pitch name in a unicode encoding.
         ''')
 
     def _getNameWithOctave(self):
@@ -1966,9 +2025,9 @@ class Pitch(base.Music21Object):
     def _setNameWithOctave(self, value):
         '''
         Sets pitch name and octave
-        
+
         Test exception:
-        
+
         >>> a = pitch.Pitch()
         >>> a.nameWithOctave = 'C#9'
         >>> a.nameWithOctave = 'C#'
@@ -1983,14 +2042,14 @@ class Pitch(base.Music21Object):
             self.octave = octave
         except:
             raise PitchException("Cannot set a nameWithOctave with '%s'" % value)
-        
-    nameWithOctave = property(_getNameWithOctave, 
+
+    nameWithOctave = property(_getNameWithOctave,
                               _setNameWithOctave,
                               doc = '''
-        Return or set the pitch name with an octave designation. 
-        If no octave as been set, no octave value is returned. 
-        
-        
+        Return or set the pitch name with an octave designation.
+        If no octave as been set, no octave value is returned.
+
+
         >>> gSharp = pitch.Pitch('G#4')
         >>> gSharp.nameWithOctave
         'G#4'
@@ -2017,7 +2076,7 @@ class Pitch(base.Music21Object):
         >>> lowA.name = 'A'
         >>> lowA.octave = -1
         >>> lowA.nameWithOctave
-        'A-1'                
+        'A-1'
         >>> lowA.nameWithOctave = lowA.nameWithOctave
         >>> lowA.name
         'A-'
@@ -2033,11 +2092,11 @@ class Pitch(base.Music21Object):
         else:
             return self.unicodeName + str(self.octave)
 
-    unicodeNameWithOctave = property(_getUnicodeNameWithOctave, 
+    unicodeNameWithOctave = property(_getUnicodeNameWithOctave,
         doc = '''
-        Return the pitch name with octave with unicode accidental symbols, 
-        if available. 
-        
+        Return the pitch name with octave with unicode accidental symbols,
+        if available.
+
         Read only attribute
         ''')
 
@@ -2057,18 +2116,18 @@ class Pitch(base.Music21Object):
         return name
 
 
-    fullName = property(_getFullName, 
+    fullName = property(_getFullName,
         doc = '''
-        Return the most complete representation of this Pitch, 
-        providing name, octave, accidental, and any 
-        microtonal adjustments. 
+        Return the most complete representation of this Pitch,
+        providing name, octave, accidental, and any
+        microtonal adjustments.
 
-        
+
         >>> p = pitch.Pitch('A-3')
         >>> p.microtone = 33.33
         >>> p.fullName
         'A-flat in octave 3 (+33c)'
-        
+
         >>> p = pitch.Pitch('A`7')
         >>> p.fullName
         'A-half-flat in octave 7'
@@ -2077,7 +2136,7 @@ class Pitch(base.Music21Object):
 
     def _getStep(self):
         '''
-        
+
         >>> a = pitch.Pitch('C#3')
         >>> a._getStep()
         'C'
@@ -2094,18 +2153,18 @@ class Pitch(base.Music21Object):
             raise PitchException("Cannot make a step out of '%s'" % usrStr)
 
     step = property(_getStep, _setStep,
-        doc='''The diatonic name of the note; i.e. does not give the 
+        doc='''The diatonic name of the note; i.e. does not give the
         accidental or octave.
 
-        
+
         >>> a = pitch.Pitch('B-3')
         >>> a.step
         'B'
-        
-        
+
+
         Upper-case or lower-case names can be given to `.step` -- they
         will be converted to upper-case
-        
+
         >>> b = pitch.Pitch()
         >>> b.step = "c"
         >>> b.step
@@ -2113,17 +2172,17 @@ class Pitch(base.Music21Object):
 
 
         Changing the `.step` does not change the `.accidental` or
-        `.octave`: 
+        `.octave`:
 
         >>> a = pitch.Pitch('F#5')
         >>> a.step = 'D'
         >>> a.nameWithOctave
         'D#5'
-                
-                
+
+
         Giving a value that includes an accidental raises a PitchException.
         Use .name instead to change that.
-        
+
         >>> b = pitch.Pitch('E4')
         >>> b.step = "B-"
         Traceback (most recent call last):
@@ -2147,7 +2206,7 @@ class Pitch(base.Music21Object):
     def _setPitchClass(self, value):
         '''Set the pitchClass.
 
-        
+
         >>> a = pitch.Pitch('a3')
         >>> a.pitchClass = 3
         >>> a
@@ -2161,7 +2220,7 @@ class Pitch(base.Music21Object):
         # permit the submission of strings, like A an dB
         value = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
-        self._step, self._accidental, self._microtone, unused_octShift = _convertPsToStep(value)  
+        self._step, self._accidental, self._microtone, unused_octShift = _convertPsToStep(value)
 
         # do not know what accidental is
         self.implicitAccidental = True
@@ -2171,8 +2230,8 @@ class Pitch(base.Music21Object):
         Returns or sets the integer value for the pitch, 0-11, where C=0,
         C#=1, D=2...B=11. Can be set using integers (0-11) or 'A' or 'B'
         for 10 or 11.
-                
-        
+
+
         >>> a = pitch.Pitch('a3')
         >>> a.pitchClass
         9
@@ -2182,10 +2241,10 @@ class Pitch(base.Music21Object):
         >>> dis.accidental = pitch.Accidental("#")
         >>> dis.pitchClass
         3
-        
+
         If a string "A" or "B" is given to pitchClass, it is
         still returned as an int.
-        
+
         >>> dis.pitchClass = "A"
         >>> dis.pitchClass
         10
@@ -2196,7 +2255,7 @@ class Pitch(base.Music21Object):
 
     def _getPitchClassString(self):
         '''
-        
+
 
         >>> a = pitch.Pitch('a3')
         >>> a._getPitchClassString()
@@ -2207,15 +2266,15 @@ class Pitch(base.Music21Object):
         '''
         return _convertPitchClassToStr(self._getPitchClass())
 
-    pitchClassString = property(_getPitchClassString, _setPitchClass, 
+    pitchClassString = property(_getPitchClassString, _setPitchClass,
         doc = '''
-        Returns or sets a string representation of the pitch class, 
-        where integers greater than 10 are replaced by A and B, 
-        respectively. Can be used to set pitch class by a 
-        string representation as well (though this is also 
+        Returns or sets a string representation of the pitch class,
+        where integers greater than 10 are replaced by A and B,
+        respectively. Can be used to set pitch class by a
+        string representation as well (though this is also
         possible with :attr:`~music21.pitch.Pitch.pitchClass`.
-    
-        
+
+
         >>> a = pitch.Pitch('a#3')
         >>> a.pitchClass
         10
@@ -2223,15 +2282,15 @@ class Pitch(base.Music21Object):
         'A'
 
         We can set the pitchClassString as well:
-        
+
         >>> a.pitchClassString = 'B'
         >>> a.pitchClass
         11
-        
-        
+
+
         ''')
 
-    def _getOctave(self): 
+    def _getOctave(self):
         '''
         This is _octave, not implicitOctave
         '''
@@ -2244,11 +2303,11 @@ class Pitch(base.Music21Object):
             self._octave = None
 
     octave = property(_getOctave, _setOctave, doc='''
-        Returns or sets the octave of the note.  
+        Returns or sets the octave of the note.
         Setting the octave
         updates the pitchSpace attribute.
 
-        
+
 
         >>> a = pitch.Pitch('g')
         >>> a.octave is None
@@ -2272,13 +2331,13 @@ class Pitch(base.Music21Object):
     ''')
 
     def _getImplicitOctave(self):
-        if self.octave is None: 
+        if self.octave is None:
             return self.defaultOctave
-        else: 
+        else:
             return self.octave
-        
+
     implicitOctave = property(_getImplicitOctave, doc='''
-    Returns the octave of the Pitch, or defaultOctave if 
+    Returns the octave of the Pitch, or defaultOctave if
     octave was never set. To set an octave, use .octave.
     Default octave is usually 4.
     ''')
@@ -2312,16 +2371,16 @@ class Pitch(base.Music21Object):
             multipleFlats = abs(tempAlter) - 1
             tempName =  tempStep + firstFlatName + (multipleFlats * 'es')
             return tempName
-    
-    german = property(_getGerman, 
+
+    german = property(_getGerman,
         doc ='''
-        Read-only attribute. Returns the name 
-        of a Pitch in the German system 
+        Read-only attribute. Returns the name
+        of a Pitch in the German system
         (where B-flat = B, B = H, etc.)
-        (Microtones and Quartertones raise an error).  Note that 
+        (Microtones and Quartertones raise an error).  Note that
         Ases is used instead of the also acceptable Asas.
-        
-        
+
+
         >>> print pitch.Pitch('B-').german
         B
         >>> print pitch.Pitch('B').german
@@ -2337,15 +2396,15 @@ class Pitch(base.Music21Object):
         >>> p1.german
         Traceback (most recent call last):
         PitchException: Es geht nicht "german" zu benutzen mit Microtönen.  Schade!
-    
+
         Note these rarely used pitches:
-            
+
         >>> print pitch.Pitch('B--').german
         Heses
         >>> print pitch.Pitch('B#').german
         His
     ''')
-    
+
     def _getDutch(self):
         if self.accidental is not None:
             tempAlter = self.accidental.alter
@@ -2367,15 +2426,15 @@ class Pitch(base.Music21Object):
                 firstFlatName = 's'
             multipleFlats = abs(tempAlter) - 1
             return tempStep + firstFlatName + (multipleFlats * 'es')
-        
+
     dutch = property(_getDutch,
                       doc ='''
-        Read-only attribute. Returns the name 
-        of a Pitch in the German system 
+        Read-only attribute. Returns the name
+        of a Pitch in the German system
         (where B-flat = B, B = H, etc.)
         (Microtones and Quartertones raise an error).
-        
-        
+
+
         >>> print pitch.Pitch('B-').dutch
         Bes
         >>> print pitch.Pitch('B').dutch
@@ -2392,8 +2451,8 @@ class Pitch(base.Music21Object):
         Traceback (most recent call last):
         PitchException: Quarter-tones not supported
     ''')
-        
-    
+
+
     def _getItalian(self):
         if self.accidental is not None:
             tempAlter = self.accidental.alter
@@ -2404,10 +2463,10 @@ class Pitch(base.Music21Object):
             raise PitchException('Incompatible with quarter-tones')
         else:
             tempAlter = int(tempAlter)
-            
+
         cardinalityMap = {1: " ", 2: " doppio ", 3: " triplo ", 4: " quadruplo "}
         solfeggeMap = {"C": "do", "D": "re", "E": "mi", "F": "fa", "G": "sol", "A": "la", "B": "si"}
-        
+
         if tempAlter == 0:
             return solfeggeMap[tempStep]
         elif tempAlter > 0:
@@ -2419,15 +2478,15 @@ class Pitch(base.Music21Object):
             if tempAlter > 4:
                 raise PitchException('Entirely too many flats')
             return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + "bemolle"
-    
-    italian = property(_getItalian, 
+
+    italian = property(_getItalian,
         doc ='''
-        Read-only attribute. Returns the name 
-        of a Pitch in the Italian system 
+        Read-only attribute. Returns the name
+        of a Pitch in the Italian system
         (F-sharp is fa diesis, C-flat is do bemolle, etc.)
-        (Microtones and Quartertones raise an error).  
-        
-        
+        (Microtones and Quartertones raise an error).
+
+
         >>> print pitch.Pitch('B-').italian
         si bemolle
         >>> print pitch.Pitch('B').italian
@@ -2443,23 +2502,23 @@ class Pitch(base.Music21Object):
         >>> p1.italian
         Traceback (most recent call last):
         PitchException: Incompatible with quarter-tones
-    
+
         Note these rarely used pitches:
-        
+
         >>> print pitch.Pitch('E####').italian
         mi quadruplo diesis
         >>> print pitch.Pitch('D---').italian
         re triplo bemolle
     ''')
-    
 
-        
+
+
     def _getSpanishCardinal(self):
         if self.accidental is None:
             return ''
         else:
             i = abs(self.accidental.alter)
-            # already checked for microtones, etc.        
+            # already checked for microtones, etc.
             if i == 1:
                 return ''
             elif i == 2:
@@ -2468,7 +2527,7 @@ class Pitch(base.Music21Object):
                 return ' triple'
             elif i == 4:
                 return ' cuádruple'
-    
+
     def _getSpanishSolfege(self):
         p = self.step
         if p == 'A':
@@ -2503,14 +2562,14 @@ class Pitch(base.Music21Object):
                 return solfege + self._getSpanishCardinal() + ' bèmol'
             elif tempAlter in [1,2,3,4]:
                 return solfege + self._getSpanishCardinal() + ' sostenido'
-    
-    spanish = property(_getSpanish, 
+
+    spanish = property(_getSpanish,
         doc ='''
-        Read-only attribute. Returns the name 
+        Read-only attribute. Returns the name
         of a Pitch in Spanish
         (Microtones and Quartertones raise an error).
-        
-        
+
+
         >>> print pitch.Pitch('B-').spanish
         si bèmol
         >>> print pitch.Pitch('E-').spanish
@@ -2524,15 +2583,15 @@ class Pitch(base.Music21Object):
         >>> p1.spanish
         Traceback (most recent call last):
         PitchException: Unsupported accidental type.
-    
-        Note these rarely used pitches:    
-        
+
+        Note these rarely used pitches:
+
         >>> print pitch.Pitch('B--').spanish
         si doble bèmol
         >>> print pitch.Pitch('B#').spanish
         si sostenido
     ''')
-    
+
 
     def _getFrench(self):
         if self.accidental is not None:
@@ -2560,7 +2619,7 @@ class Pitch(base.Music21Object):
             tempStep = 'fa'
         if tempStep == 'G':
             tempStep = 'sol'
-        
+
         if tempAlter == 0:
             return tempStep
         elif abs(tempAlter) == 1.0:
@@ -2569,26 +2628,26 @@ class Pitch(base.Music21Object):
             tempNumberedStep = tempStep + ' double'
         elif abs(tempAlter) == 3.0:
             tempNumberedStep = tempStep + ' triple'
-        elif abs(tempAlter) == 4.0:  
+        elif abs(tempAlter) == 4.0:
             tempNumberedStep = tempStep + ' quadruple'
-        
+
         if tempAlter/abs(tempAlter) == 1.0: #sharps are positive
             tempName = tempNumberedStep + ' dièse'
             return tempName
         else: # flats are negative
             tempName = tempNumberedStep + ' bémol'
             return tempName
-        
-    
-    french = property(_getFrench, 
+
+
+    french = property(_getFrench,
         doc ='''
-        Read-only attribute. Returns the name 
-        of a Pitch in the French system 
+        Read-only attribute. Returns the name
+        of a Pitch in the French system
         (where A = la, B = si, B-flat = si bémol, C-sharp = do dièse, etc.)
-        (Microtones and Quartertones raise an error).  Note that 
+        (Microtones and Quartertones raise an error).  Note that
         do is used instead of the also acceptable ut.
-            
-        
+
+
         >>> print pitch.Pitch('B-').french
         si bémol
         >>> print pitch.Pitch('B').french
@@ -2606,7 +2665,7 @@ class Pitch(base.Music21Object):
         PitchException: On ne peut pas utiliser les microtones avec "french." Quelle Dommage!
     ''')
 
-    def _getFrequency(self):        
+    def _getFrequency(self):
         return self._getFreq440()
 
     def _setFrequency(self, value):
@@ -2614,12 +2673,12 @@ class Pitch(base.Music21Object):
 
     frequency = property(_getFrequency, _setFrequency, doc='''
         The frequency property gets or sets the frequency of
-        the pitch in hertz.  
+        the pitch in hertz.
 
         If the frequency has not been overridden, then
         it is computed based on A440Hz and equal temperament
 
-        
+
         >>> a = pitch.Pitch()
         >>> a.frequency = 440.0
         >>> a.frequency
@@ -2628,9 +2687,9 @@ class Pitch(base.Music21Object):
         'A'
         >>> a.octave
         4
-        
+
         Microtones are captured if the frequency doesn't correspond to any standard note.
-        
+
         >>> a.frequency = 450.0
         >>> a
         <music21.pitch.Pitch A~4(-11c)>
@@ -2641,7 +2700,7 @@ class Pitch(base.Music21Object):
     # name of method and property could be more clear
     def _getFreq440(self):
         '''
-        
+
         >>> a = pitch.Pitch('A4')
         >>> a.freq440
         440.0
@@ -2652,12 +2711,12 @@ class Pitch(base.Music21Object):
             # works off of .ps values and thus will capture microtones
             A4offset = self.ps - 69
             return 440.0 * (self._twelfth_root_of_two ** A4offset)
-            
+
     def _setFreq440(self, value):
-        post = 12 * (math.log(value/ 440.0) / math.log(2)) + 69 
+        post = 12 * (math.log(value/ 440.0) / math.log(2)) + 69
         #environLocal.printDebug(['convertFqToPs():', 'input', fq, 'output', repr(post)])
         # rounding here is essential
-        p2  = round(post, PITCH_SPACE_SIG_DIGITS)  
+        p2  = round(post, PITCH_SPACE_SIG_DIGITS)
 
         self.ps = p2
 
@@ -2665,7 +2724,7 @@ class Pitch(base.Music21Object):
     Gets the frequency of the note as if it's in an equal temperment
     context where A4 = 440hz.  The same as .frequency so long
     as no other temperments are currently being used.
-    
+
     Since we don't have any other temperament objects as
     of v1.3, this is the same as .frequency always.
     ''')
@@ -2674,7 +2733,7 @@ class Pitch(base.Music21Object):
     def getHarmonic(self, number):
         '''Return a Pitch object representing the harmonic found above this Pitch.
 
-        
+
         >>> p = pitch.Pitch('a4')
         >>> print(p.getHarmonic(2))
         A5
@@ -2690,7 +2749,7 @@ class Pitch(base.Music21Object):
         F#~7(+19c)
         >>> print(p.getHarmonic(8))
         A7
-        
+
         >>> p2 = p.getHarmonic(2)
         >>> p2
         <music21.pitch.Pitch A5>
@@ -2702,23 +2761,23 @@ class Pitch(base.Music21Object):
         >>> p2.fundamental
         <music21.pitch.Pitch E5>
 
-        Or we can iterate over a list of the next 8 odd harmonics:        
-        
+        Or we can iterate over a list of the next 8 odd harmonics:
+
         >>> for i in [9,11,13,15,17,19,21,23]:
         ...     print p.getHarmonic(i),
         B7(+4c) D~8(+1c) F~8(-9c) G#8(-12c) B-8(+5c) C9(-2c) C#~9(+21c) E`9(-22c)
 
-        Microtonally adjusted notes also generate harmonics:        
-        
+        Microtonally adjusted notes also generate harmonics:
+
         >>> q = pitch.Pitch('C4')
         >>> q.microtone = 10
         >>> q.getHarmonic(2)
         <music21.pitch.Pitch C5(+10c)>
         >>> q.getHarmonic(3)
         <music21.pitch.Pitch G5(+12c)>
-        
-        The fundamental is stored with the harmonic. 
-        
+
+        The fundamental is stored with the harmonic.
+
         >>> h7 = pitch.Pitch("A4").getHarmonic(7)
         >>> print(h7)
         F#~7(+19c)
@@ -2740,7 +2799,7 @@ class Pitch(base.Music21Object):
         >>> h2
         <music21.pitch.Pitch F#~6(+19c)>
         >>> h2.fundamental.fundamental
-        <music21.pitch.Pitch A2>        
+        <music21.pitch.Pitch A2>
         '''
         centShift = _convertHarmonicToCents(number)
         temp = copy.deepcopy(self)
@@ -2751,7 +2810,7 @@ class Pitch(base.Music21Object):
         if temp.microtone is not None:
             temp.microtone = temp.microtone.cents + centShift
         else:
-            temp.microtone = centShift    
+            temp.microtone = centShift
 
         #environLocal.printDebug(['getHarmonic()', 'self', self, 'self.frequency', self.frequency, 'centShift', centShift, 'temp', temp, 'temp.frequency', temp.frequency, 'temp.microtone', temp.microtone])
 
@@ -2768,20 +2827,20 @@ class Pitch(base.Music21Object):
 
     def harmonicFromFundamental(self, fundamental):
         '''
-        Given another Pitch as a fundamental, find the harmonic 
-        of that pitch that is equal to this Pitch. 
+        Given another Pitch as a fundamental, find the harmonic
+        of that pitch that is equal to this Pitch.
 
         Returns a tuple of harmonic number and the number of cents that
         the first Pitch object would have to be shifted to be the exact
-        harmonic of this fundamental. 
+        harmonic of this fundamental.
 
-        Microtones applied to the fundamental are irrelevant, 
-        as the fundamental may be microtonally shifted to find a match to this Pitch.         
+        Microtones applied to the fundamental are irrelevant,
+        as the fundamental may be microtonally shifted to find a match to this Pitch.
 
         Example: G4 is the third harmonic of C3, albeit 2 cents flatter than
         the true 3rd harmonic.
-        
-        
+
+
         >>> p = pitch.Pitch('g4')
         >>> f = pitch.Pitch('c3')
         >>> p.harmonicFromFundamental(f)
@@ -2796,13 +2855,13 @@ class Pitch(base.Music21Object):
         second argument is a float, but because the default rounding of
         music21 is to the nearest cent, the .0 is not a significant digit.
         I.e. it might be more like 31.3 cents.
-        
+
         >>> p = pitch.Pitch('B-5')
         >>> f = pitch.Pitch('C3')
         >>> p.harmonicFromFundamental(f)
         (7, -31.0)
         '''
-        
+
         if common.isStr(fundamental):
             fundamental = Pitch(fundamental)
         # else assume a Pitch object
@@ -2866,7 +2925,7 @@ class Pitch(base.Music21Object):
 #         gap = round(gap, PITCH_SPACE_SIG_DIGITS)
 #         # create a pitch with the appropriate gap as a Microtone
 #         if fundamental.microtone is not None:
-#             # if the result is zero, .microtone will automatically 
+#             # if the result is zero, .microtone will automatically
 #             # be set to None
 #             fundamental.microtone = fundamental.microtone.cents + (gap * 100)
 #         else:
@@ -2877,28 +2936,28 @@ class Pitch(base.Music21Object):
 
     def harmonicString(self, fundamental = None):
         '''
-        Return a string representation of a harmonic equivalence. 
+        Return a string representation of a harmonic equivalence.
 
         N.B. this has nothing to do with what string a string player
-        would use to play the harmonic on.  (Perhaps should be 
+        would use to play the harmonic on.  (Perhaps should be
         renamed).
 
-        
+
         >>> pitch.Pitch('g4').harmonicString('c3')
         '3rdH(-2c)/C3'
-        
+
         >>> pitch.Pitch('c4').harmonicString('c3')
         '2ndH/C3'
-        
+
         >>> p = pitch.Pitch('c4')
-        >>> p.microtone = 20 # raise 20 
+        >>> p.microtone = 20 # raise 20
         >>> p.harmonicString('c3')
         '2ndH(+20c)/C3'
-        
-        >>> p.microtone = -20 # lower 20 
+
+        >>> p.microtone = -20 # lower 20
         >>> p.harmonicString('c3')
         '2ndH(-20c)/C3'
-        
+
         >>> p = pitch.Pitch('c4')
         >>> f = pitch.Pitch('c3')
         >>> f.microtone = -20
@@ -2907,12 +2966,12 @@ class Pitch(base.Music21Object):
         >>> f.microtone = +20
         >>> p.harmonicString(f)
         '2ndH(-20c)/C3(+20c)'
-        
+
         >>> p = pitch.Pitch('A4')
         >>> p.microtone = 69
         >>> p.harmonicString('c2')
         '7thH/C2'
-        
+
         >>> p = pitch.Pitch('A4')
         >>> p.harmonicString('c2')
         '7thH(-69c)/C2'
@@ -2931,17 +2990,17 @@ class Pitch(base.Music21Object):
         if cents == 0:
             return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic), fundamental)
         else:
-            return '%s%sH%s/%s' % (harmonic, common.ordinalAbbreviation(harmonic), 
+            return '%s%sH%s/%s' % (harmonic, common.ordinalAbbreviation(harmonic),
                             microtone, fundamental)
 
 
     def harmonicAndFundamentalFromPitch(self, target):
         '''
-        Given a Pitch that is a plausible target for a fundamental, 
-        return the harmonic number and a potentially shifted fundamental 
+        Given a Pitch that is a plausible target for a fundamental,
+        return the harmonic number and a potentially shifted fundamental
         that describes this Pitch.
 
-        
+
         >>> g4 = pitch.Pitch('g4')
         >>> g4.harmonicAndFundamentalFromPitch('c3')
         (3, <music21.pitch.Pitch C3(-2c)>)
@@ -2949,7 +3008,7 @@ class Pitch(base.Music21Object):
         if common.isStr(target):
             target = Pitch(target)
         else: # make a copy
-            target = copy.deepcopy(target) 
+            target = copy.deepcopy(target)
 
         harmonic, cents = self.harmonicFromFundamental(target)
         # flip direction
@@ -2957,7 +3016,7 @@ class Pitch(base.Music21Object):
 
         # create a pitch with the appropriate gap as a Microtone
         if target.microtone is not None:
-            # if the result is zero, .microtone will automatically 
+            # if the result is zero, .microtone will automatically
             # be set to None
             target.microtone = target.microtone.cents + cents
         else:
@@ -2970,22 +3029,22 @@ class Pitch(base.Music21Object):
     def harmonicAndFundamentalStringFromPitch(self, fundamental):
         '''Given a Pitch that is a plausible target for a fundamental, return the harmonic number and a potentially shifted fundamental that describes this Pitch. Return a string representation.
 
-        
+
         >>> pitch.Pitch('g4').harmonicAndFundamentalStringFromPitch('c3')
         '3rdH/C3(-2c)'
-        
+
         >>> pitch.Pitch('c4').harmonicAndFundamentalStringFromPitch('c3')
         '2ndH/C3'
-        
+
         >>> p = pitch.Pitch('c4')
-        >>> p.microtone = 20 # raise 20 
+        >>> p.microtone = 20 # raise 20
         >>> p.harmonicAndFundamentalStringFromPitch('c3')
         '2ndH/C3(+20c)'
-        
-        >>> p.microtone = -20 # lower 20 
+
+        >>> p.microtone = -20 # lower 20
         >>> p.harmonicAndFundamentalStringFromPitch('c3')
         '2ndH/C3(-20c)'
-        
+
         >>> p = pitch.Pitch('c4')
         >>> f = pitch.Pitch('c3')
         >>> f.microtone = -20
@@ -2994,12 +3053,12 @@ class Pitch(base.Music21Object):
         >>> f.microtone = +20
         >>> p.harmonicAndFundamentalStringFromPitch(f)
         '2ndH/C3'
-        
+
         >>> p = pitch.Pitch('A4')
         >>> p.microtone = 69
         >>> p.harmonicAndFundamentalStringFromPitch('c2')
         '7thH/C2'
-        
+
         >>> p = pitch.Pitch('A4')
         >>> p.harmonicAndFundamentalStringFromPitch('c2')
         '7thH/C2(-69c)'
@@ -3007,7 +3066,7 @@ class Pitch(base.Music21Object):
         '''
         harmonic, fundamental = self.harmonicAndFundamentalFromPitch(
             fundamental)
-        return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic), 
+        return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic),
                             fundamental)
 
 
@@ -3016,9 +3075,9 @@ class Pitch(base.Music21Object):
     #---------------------------------------------------------------------------
     def isEnharmonic(self, other):
         '''
-        Return True if other is an enharmonic equivalent of self. 
+        Return True if other is an enharmonic equivalent of self.
 
-        
+
         >>> p1 = pitch.Pitch('C#3')
         >>> p2 = pitch.Pitch('D-3')
         >>> p3 = pitch.Pitch('D#3')
@@ -3028,7 +3087,7 @@ class Pitch(base.Music21Object):
         True
         >>> p3.isEnharmonic(p1)
         False
-        
+
         OMIT_FROM_DOCS
         >>> p4 = pitch.Pitch('B##3')
         >>> p5 = pitch.Pitch('D-4')
@@ -3043,10 +3102,10 @@ class Pitch(base.Music21Object):
     def getHigherEnharmonic(self, inPlace=False):
         '''
         Returns an enharmonic `Pitch` object that is a higher
-        enharmonic.  That is, the `Pitch` a diminished-second above 
+        enharmonic.  That is, the `Pitch` a diminished-second above
         the current `Pitch`.
 
-        
+
         >>> p1 = pitch.Pitch('C#3')
         >>> p2 = p1.getHigherEnharmonic()
         >>> print(p2)
@@ -3059,20 +3118,20 @@ class Pitch(base.Music21Object):
         >>> p1.getHigherEnharmonic(inPlace=True)
         >>> print(p1)
         D-3
-        
+
         The method even works for certain CRAZY enharmonics
-        
+
         >>> p3 = pitch.Pitch('D--3')
         >>> p4 = p3.getHigherEnharmonic()
         >>> print(p4)
         E----3
-        
+
         But not for things that are just utterly insane:
-        
+
         >>> p4.getHigherEnharmonic()
         Traceback (most recent call last):
         AccidentalException: -5 is not a supported accidental type
-        
+
         '''
         intervalObj = interval.Interval('d2')
         octaveStored = self.octave # may be None
@@ -3088,15 +3147,15 @@ class Pitch(base.Music21Object):
             if octaveStored is None:
                 self.octave = None
             return None
-    
+
     def getLowerEnharmonic(self, inPlace=False):
         '''
-        returns a Pitch enharmonic that is a diminished second 
+        returns a Pitch enharmonic that is a diminished second
         below the current note
-        
-        If `inPlace` is set to true, changes the current Pitch.        
-        
-        
+
+        If `inPlace` is set to true, changes the current Pitch.
+
+
         >>> p1 = pitch.Pitch('C-3')
         >>> p2 = p1.getLowerEnharmonic()
         >>> print(p2)
@@ -3131,27 +3190,27 @@ class Pitch(base.Music21Object):
         more common than A#).  Useful to call if you ever have an
         algorithm that might take your piece far into the realm of
         double or triple flats or sharps.
-        
-        If mostCommon is set to true, then the most commonly used 
+
+        If mostCommon is set to true, then the most commonly used
         enharmonic spelling is chosen (that is, the one that appears
         first in key signatures as you move away from C on the circle
         of fifths).  Thus G-flat becomes F#, A# becomes B-flat,
         D# becomes E-flat, D-flat becomes C#, G# and A-flat are left
         alone.
-        
+
         TODO: should be called automatically after ChromaticInterval
         transpositions.
-        
-        
+
+
         >>> p1 = pitch.Pitch("B#5")
         >>> p1.simplifyEnharmonic().nameWithOctave
         'C6'
-        
+
         >>> p2 = pitch.Pitch("A#2")
         >>> p2.simplifyEnharmonic(inPlace = True)
         >>> p2
         <music21.pitch.Pitch A#2>
-        
+
         >>> p3 = pitch.Pitch("E--3")
         >>> p4 = p3.transpose(interval.Interval('-A5'))
         >>> p4.simplifyEnharmonic()
@@ -3163,7 +3222,7 @@ class Pitch(base.Music21Object):
         >>> pList = [pitch.Pitch("A#4"), pitch.Pitch("B-4"), pitch.Pitch("G-4"), pitch.Pitch("F#4")]
         >>> [str(p.simplifyEnharmonic(mostCommon = True)) for p in pList]
         ['B-4', 'B-4', 'F#4', 'F#4']
-        
+
         Note that pitches with implicit octaves retain their implicit octaves.
         This might change the pitch space for B#s and C-s.
 
@@ -3183,7 +3242,7 @@ class Pitch(base.Music21Object):
         else:
             returnObj = copy.deepcopy(self)
 
-        if returnObj.accidental != None:
+        if returnObj.accidental is not None:
             if abs(returnObj.accidental.alter) < 2.0 and \
                 returnObj.name not in ('E#', 'B#', 'C-', 'F-'):
                 pass
@@ -3195,7 +3254,7 @@ class Pitch(base.Music21Object):
                 if saveOctave is None:
                     returnObj.octave = None
 
-        if mostCommon == True:
+        if mostCommon is True:
             if returnObj.name == 'D#':
                 returnObj.step = 'E'
                 returnObj.accidental = Accidental('flat')
@@ -3208,8 +3267,8 @@ class Pitch(base.Music21Object):
             elif returnObj.name == 'D-':
                 returnObj.step = 'C'
                 returnObj.accidental = Accidental('sharp')
-        
-        
+
+
         if inPlace:
             return None
         else:
@@ -3219,34 +3278,34 @@ class Pitch(base.Music21Object):
     def getEnharmonic(self, inPlace=False):
         '''
         Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
-        
+
         N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true.
-        For instance: 
-        
-            getEnharmonic(E##) => F# 
+        For instance:
+
+            getEnharmonic(E##) => F#
             getEnharmonic(F#) => G-
             getEnharmonic(A--) => G
             getEnharmonic(G) => F##
 
-        However, for all cases not involving double sharps or flats 
+        However, for all cases not involving double sharps or flats
         (and even many that do), getEnharmonic(getEnharmonic(n)) = n
-        
+
         For the most ambiguous cases, it's good to know that these are the enharmonics:
-        
+
                C <-> B#, D <-> C##, E <-> F-; F <-> E#, G <-> F##, A <-> B--, B <-> C-
-    
+
         However, isEnharmonic() for A## and B certainly returns True.
-    
-        
+
+
         >>> p = pitch.Pitch('d#')
         >>> print(p.getEnharmonic())
         E-
         >>> p = pitch.Pitch('e-8')
         >>> print(p.getEnharmonic())
         D#8
-        
+
         Other tests:
-        
+
         >>> print(pitch.Pitch('c-3').getEnharmonic())
         B2
         >>> print(pitch.Pitch('e#2').getEnharmonic())
@@ -3260,7 +3319,7 @@ class Pitch(base.Music21Object):
         >>> print(pitch.Pitch('B7').getEnharmonic())
         C-8
 
-        Octaveless Pitches remain octaveless:        
+        Octaveless Pitches remain octaveless:
 
         >>> p = pitch.Pitch('a-')
         >>> p.getEnharmonic()
@@ -3274,62 +3333,62 @@ class Pitch(base.Music21Object):
         else:
             post = copy.deepcopy(self)
 
-        if post.accidental != None:
+        if post.accidental is not None:
             if post.accidental.alter > 0:
                 # we have a sharp, need to get the equivalent flat
                 post.getHigherEnharmonic(inPlace=True)
             elif post.accidental.alter < 0:
                 post.getLowerEnharmonic(inPlace=True)
             else: # assume some direction, perhaps using a dictionary
-                if self.step in ['C','D','G']:               
+                if self.step in ['C','D','G']:
                     post.getLowerEnharmonic(inPlace=True)
                 else:
                     post.getHigherEnharmonic(inPlace=True)
 
         else:
-            if self.step in ['C','D','G']:               
+            if self.step in ['C','D','G']:
                 post.getLowerEnharmonic(inPlace=True)
             else:
                 post.getHigherEnharmonic(inPlace=True)
 
-        
+
         if inPlace:
             return None
         else:
             return post
-        
+
 
 # not sure these are necessary
 # def getQuarterToneEnharmonic(note1):
 #     '''like getEnharmonic but handles quarterTones as well'''
 #     pass
-# 
+#
 # def flipQuarterToneEnharmonic(note1):
 #     pass
-# 
+#
 # def areQuarterToneEnharmonics(note1, note2):
 #     pass
 
 
     def getAllCommonEnharmonics(self, alterLimit=2):
         '''
-        Return all common unique enharmonics for a pitch, 
+        Return all common unique enharmonics for a pitch,
         or those that do not involve more than two accidentals.
 
-        
+
         >>> p = pitch.Pitch('c#3')
         >>> p.getAllCommonEnharmonics()
         [<music21.pitch.Pitch D-3>, <music21.pitch.Pitch B##2>]
-        
+
         "Higher" enharmonics are listed before "Lower":
-        
+
         >>> p = pitch.Pitch('G4')
         >>> p.getAllCommonEnharmonics()
         [<music21.pitch.Pitch A--4>, <music21.pitch.Pitch F##4>]
-        
+
         By setting `alterLimit` to a higher or lower number we
         can limit the maximum number of notes to return:
-        
+
         >>> p = pitch.Pitch('G-6')
         >>> p.getAllCommonEnharmonics(alterLimit=1)
         [<music21.pitch.Pitch F#6>]
@@ -3383,15 +3442,15 @@ class Pitch(base.Music21Object):
     #---------------------------------------------------------------------------
     def _getDiatonicNoteNum(self):
         '''
-        Returns (or takes) an integer that uniquely identifies the 
+        Returns (or takes) an integer that uniquely identifies the
         diatonic version of a note, that is ignoring accidentals.
         The number returned is the diatonic interval above C0 (the lowest C on
         a Boesendorfer Imperial Grand), so G0 = 5, C1 = 8, etc.
-        Numbers can be negative for very low notes.        
-        
+        Numbers can be negative for very low notes.
+
         C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc.
-        
-        
+
+
         >>> c = pitch.Pitch('c4')
         >>> c.diatonicNoteNum
         29
@@ -3401,28 +3460,28 @@ class Pitch(base.Music21Object):
         >>> c = pitch.Pitch('c#4')
         >>> c.diatonicNoteNum
         29
-        
+
         But D-double-flat has a different `diatonicNoteNum` than C.
-        
+
         >>> d = pitch.Pitch('d--4')
         >>> d.accidental.name
         'double-flat'
         >>> d.diatonicNoteNum
         30
-        
-        
+
+
         >>> lowc = pitch.Pitch('c1')
         >>> lowc.diatonicNoteNum
         8
 
         >>> b = pitch.Pitch()
         >>> b.step = "B"
-        >>> b.octave = -1 
+        >>> b.octave = -1
         >>> b.diatonicNoteNum
         0
-        
+
         An `implicitOctave` of 4 is used if octave is not set:
-        
+
         >>> c = pitch.Pitch("C")
         >>> c.diatonicNoteNum
         29
@@ -3441,12 +3500,12 @@ class Pitch(base.Music21Object):
         Negative diatonicNoteNums are possible,
         in case, like John Luther Adams, you want
         to notate the sounds of sub-sonic Earth rumblings.
-        
+
         >>> lowlowA = pitch.Pitch("A")
         >>> lowlowA.octave = -1
         >>> lowlowA.diatonicNoteNum
         -1
-        
+
         >>> lowlowlowD = pitch.Pitch("D")
         >>> lowlowlowD.octave = -3
         >>> lowlowlowD.diatonicNoteNum
@@ -3456,7 +3515,7 @@ class Pitch(base.Music21Object):
             noteNumber = ['C','D','E','F','G','A','B'].index(self.step.upper())
             return (noteNumber + 1 + (7 * self.implicitOctave))
         else:
-            raise PitchException("Could not find " + self.step + " in the index of notes") 
+            raise PitchException("Could not find " + self.step + " in the index of notes")
 
     def _setDiatonicNoteNum(self, newNum):
         octave = int((newNum-1)/7)
@@ -3470,50 +3529,70 @@ class Pitch(base.Music21Object):
     diatonicNoteNum = property(_getDiatonicNoteNum, _setDiatonicNoteNum,
         doc = _getDiatonicNoteNum.__doc__)
 
-                                    
     def transpose(self, value, inPlace=False):
-        '''Transpose the pitch by the user-provided value. 
-        If the value is an integer, the transposition is 
-        treated in half steps. If the value is a string, 
-        any Interval string specification can be provided. 
-        Alternatively, a :class:`music21.interval.Interval` 
-        object can be supplied.
+        '''
+        Transpose the pitch by the user-provided value.  If the value is an
+        integer, the transposition is treated in half steps. If the value is a
+        string, any Interval string specification can be provided.
+        Alternatively, a :class:`music21.interval.Interval` object can be
+        supplied.
 
+        ::
+
+            >>> aPitch = pitch.Pitch('g4')
+            >>> bPitch = aPitch.transpose('m3')
+            >>> bPitch
+            <music21.pitch.Pitch B-4>
+
+        ::
+
+            >>> aInterval = interval.Interval(-6)
+            >>> bPitch = aPitch.transpose(aInterval)
+            >>> bPitch
+            <music21.pitch.Pitch C#4>
+
+        ::
         
-        >>> aPitch = pitch.Pitch('g4')
-        >>> bPitch = aPitch.transpose('m3')
-        >>> bPitch
-        <music21.pitch.Pitch B-4>
-        >>> aInterval = interval.Interval(-6)
-        >>> bPitch = aPitch.transpose(aInterval)
-        >>> bPitch
-        <music21.pitch.Pitch C#4>
-        
-        >>> aPitch
-        <music21.pitch.Pitch G4>
-        >>> aPitch.transpose(aInterval, inPlace=True)
-        >>> aPitch
-        <music21.pitch.Pitch C#4>
-        
+            >>> aPitch
+            <music21.pitch.Pitch G4>
+
+        ::
+
+            >>> aPitch.transpose(aInterval, inPlace=True)
+            >>> aPitch
+            <music21.pitch.Pitch C#4>
+
         OMIT_FROM_DOCS
-        
+
         Test to make sure that extreme ranges work
-        >>> dPitch = pitch.Pitch('D2')
-        >>> lowC = dPitch.transpose('m-23')
-        >>> lowC
-        <music21.pitch.Pitch C#-1>
-        
+
+        ::
+
+            >>> dPitch = pitch.Pitch('D2')
+            >>> lowC = dPitch.transpose('m-23')
+            >>> lowC
+            <music21.pitch.Pitch C#-1>
+
         Implicit octaves should remain implicit:
-        >>> anyGsharp = pitch.Pitch("G#")
-        >>> print(anyGsharp.transpose("P8"))
-        G#
-        >>> print(anyGsharp.transpose("P5"))
-        D#
-        
-        >>> otherPitch = pitch.Pitch('D2')
-        >>> otherPitch.transpose('m-23', inPlace = True)
-        >>> print(otherPitch)
-        C#-1
+
+        ::
+
+            >>> anyGsharp = pitch.Pitch("G#")
+            >>> print(anyGsharp.transpose("P8"))
+            G#
+
+        ::
+
+            >>> print(anyGsharp.transpose("P5"))
+            D#
+
+        ::
+
+            >>> otherPitch = pitch.Pitch('D2')
+            >>> otherPitch.transpose('m-23', inPlace = True)
+            >>> print(otherPitch)
+            C#-1
+
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'diatonic'): # its an Interval class with a DiatonicInterval class
@@ -3526,7 +3605,7 @@ class Pitch(base.Music21Object):
             p = intervalObj.transposePitch(self)
             # can setName with nameWithOctave to recreate all essential
             # pitch attributes
-            # NOTE: in some cases this may not return exactly the proper config            
+            # NOTE: in some cases this may not return exactly the proper config
             self._setName(p.name)
             if self.octave is not None:
                 self._setOctave(p.octave)
@@ -3540,30 +3619,47 @@ class Pitch(base.Music21Object):
     # utilities for pitch object manipulation
 
     def transposeBelowTarget(self, target, minimize=False):
-        '''Given a source Pitch, shift it down octaves until it is below the target. Note: this manipulates src inPlace.
-    
-        If `minimize` is True, a pitch below the target will move up to the nearest octave. 
+        '''
+        Given a source Pitch, shift it down octaves until it is below the
+        target. Note: this manipulates src inPlace.
 
-        
-        >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
-        <music21.pitch.Pitch G3>
-        
-        if already below the target, make no change
-        
-        >>> pitch.Pitch('g#3').transposeBelowTarget(pitch.Pitch('c#6'))
-        <music21.pitch.Pitch G#3>
-        
-        accept the same pitch
-        
-        >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
-        <music21.pitch.Pitch G#1>
+        If `minimize` is True, a pitch below the target will move up to the
+        nearest octave.
 
-        >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
-        <music21.pitch.Pitch G#2>
-        >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
-        <music21.pitch.Pitch G#7>
-        >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
-        <music21.pitch.Pitch F#8>
+        ::
+
+            >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
+            <music21.pitch.Pitch G3>
+
+        If already below the target, make no change:
+
+        ::
+
+            >>> pitch.Pitch('g#3').transposeBelowTarget(pitch.Pitch('c#6'))
+            <music21.pitch.Pitch G#3>
+
+        Accept the same pitch:
+
+        ::
+
+            >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
+            <music21.pitch.Pitch G#1>
+
+        ::
+
+            >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
+            <music21.pitch.Pitch G#2>
+
+        ::
+
+            >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+            <music21.pitch.Pitch G#7>
+
+        ::
+
+            >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+            <music21.pitch.Pitch F#8>
+
         '''
         # TODO: add inPlace as an option, default is True
         src = self
@@ -3574,7 +3670,6 @@ class Pitch(base.Music21Object):
                 break
             # lower one octave
             src.octave -= 1
-
         # case where self is below target and minimize is True
         if minimize:
             while True:
@@ -3582,38 +3677,51 @@ class Pitch(base.Music21Object):
                     break
                 else:
                     src.octave += 1
-
-
         return src
-    
-    
+
     def transposeAboveTarget(self, target, minimize=False):
-        '''Given a source Pitch, shift it up octaves until it is above the target. Note: this manipulates src inPlace.
+        '''
+        Given a source Pitch, shift it up octaves until it is above the target.
+        Note: this manipulates src inPlace.
 
-        If `minimize` is True, a pitch above the target will move down to the nearest octave. 
+        If `minimize` is True, a pitch above the target will move down to the
+        nearest octave.
 
-        
-        >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
-        <music21.pitch.Pitch D5>
-        
-        if already above the target, make no change
-        
-        >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'))
-        <music21.pitch.Pitch D7>
-        
-        accept the same pitch
-        
-        >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('d8'))
-        <music21.pitch.Pitch D8>
+        ::
 
-        if minimize is True, we go the closest position
-        
-        >>> pitch.Pitch('d#8').transposeAboveTarget(pitch.Pitch('d2'), minimize=True)
-        <music21.pitch.Pitch D#2>
-        >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
-        <music21.pitch.Pitch D3>
-        >>> pitch.Pitch('d0').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
-        <music21.pitch.Pitch D3>
+            >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
+            <music21.pitch.Pitch D5>
+
+        If already above the target, make no change:
+
+        ::
+
+            >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'))
+            <music21.pitch.Pitch D7>
+
+        Accept the same pitch:
+
+        ::
+
+            >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('d8'))
+            <music21.pitch.Pitch D8>
+
+        If minimize is True, we go the closest position:
+
+        ::
+
+            >>> pitch.Pitch('d#8').transposeAboveTarget(pitch.Pitch('d2'), minimize=True)
+            <music21.pitch.Pitch D#2>
+
+        ::
+
+            >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
+            <music21.pitch.Pitch D3>
+
+        ::
+
+            >>> pitch.Pitch('d0').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
+            <music21.pitch.Pitch D3>
 
         '''
         src = self
@@ -3625,33 +3733,36 @@ class Pitch(base.Music21Object):
                 break
             # raise one octave
             src.octave += 1
-
         # case where self is above target and minimize is True
         if minimize:
             while True:
                 if src.ps - target.ps < 12:
                     break
                 else:
-                    src.octave -= 1 
-
-
+                    src.octave -= 1
         return src
-    
-    
 
-    #---------------------------------------------------------------------------             
+    #---------------------------------------------------------------------------
+
     def _nameInKeySignature(self, alteredPitches):
-        '''Determine if this pitch is in the collection of supplied altered pitches, derived from a KeySignature object
+        '''
+        Determine if this pitch is in the collection of supplied altered
+        pitches, derived from a KeySignature object
 
-        
-        >>> a = pitch.Pitch('c#')
-        >>> b = pitch.Pitch('g#')
-        >>> ks = key.KeySignature(2)
-        >>> a._nameInKeySignature(ks.alteredPitches)
-        True
-        >>> b._nameInKeySignature(ks.alteredPitches)
-        False
-        ''' 
+        ::
+
+            >>> a = pitch.Pitch('c#')
+            >>> b = pitch.Pitch('g#')
+            >>> ks = key.KeySignature(2)
+            >>> a._nameInKeySignature(ks.alteredPitches)
+            True
+
+        ::
+
+            >>> b._nameInKeySignature(ks.alteredPitches)
+            False
+
+        '''
         for p in alteredPitches: # all are altered tones, must have acc
             if p.step == self.step: # A# to A or A# to A-, etc
                 if p.accidental.name == self.accidental.name:
@@ -3659,97 +3770,115 @@ class Pitch(base.Music21Object):
         return False
 
     def _stepInKeySignature(self, alteredPitches):
-        '''Determine if this pitch is in the collection of supplied altered pitches, derived from a KeySignature object
+        '''
+        Determine if this pitch is in the collection of supplied altered
+        pitches, derived from a KeySignature object
 
-        
-        >>> a = pitch.Pitch('c')
-        >>> b = pitch.Pitch('g')
-        >>> ks = key.KeySignature(2)
-        >>> a._stepInKeySignature(ks.alteredPitches)
-        True
-        >>> b._stepInKeySignature(ks.alteredPitches)
-        False
-        ''' 
+        ::
+
+            >>> a = pitch.Pitch('c')
+            >>> b = pitch.Pitch('g')
+            >>> ks = key.KeySignature(2)
+            >>> a._stepInKeySignature(ks.alteredPitches)
+            True
+
+        ::
+
+            >>> b._stepInKeySignature(ks.alteredPitches)
+            False
+
+        '''
         for p in alteredPitches: # all are altered tones, must have acc
             if p.step == self.step: # A# to A or A# to A-, etc
                 return True
         return False
 
-
-    def updateAccidentalDisplay(self, pitchPast=None, pitchPastMeasure=None,
-                                alteredPitches=None,
-            cautionaryPitchClass=True, cautionaryAll=False, 
-            overrideStatus=False, cautionaryNotImmediateRepeat=True,
-            lastNoteWasTied=False,
-            ):
+    def updateAccidentalDisplay(
+        self,
+        pitchPast=None,
+        pitchPastMeasure=None,
+        alteredPitches=None,
+        cautionaryPitchClass=True,
+        cautionaryAll=False,
+        overrideStatus=False,
+        cautionaryNotImmediateRepeat=True,
+        lastNoteWasTied=False,
+        ):
         '''
-        Given an ordered list of Pitch objects in `pitchPast`, 
-        determine if this pitch's Accidental object needs 
-        to be created or updated with a natural or other cautionary accidental.
+        Given an ordered list of Pitch objects in `pitchPast`, determine if
+        this pitch's Accidental object needs to be created or updated with a
+        natural or other cautionary accidental.
 
         Changes to this Pitch object's Accidental object are made in-place.
 
-        `pitchPast` is a list of pitches preceeding this pitch.  If None, a new list
-        will be made.
-        
-        `pitchPastMeasure` is a list of pitches preceeding this pitch but in a previous measure. If None, a new list
-        will be made.
+        `pitchPast` is a list of pitches preceeding this pitch.  If None, a new
+        list will be made.
 
-        The `alteredPitches` list supplies pitches from a :class:`~music21.key.KeySignature` object using the 
-        :attr:`~music21.key.KeySignature.alteredPitches` property. If None, a new list
-        will be made.
+        `pitchPastMeasure` is a list of pitches preceeding this pitch but in a
+        previous measure. If None, a new list will be made.
 
-        If `cautionaryPitchClass` is True, comparisons to past accidentals 
-        are made regardless of register. That is, if a past sharp is found two 
-        octaves above a present natural, a natural sign is still displayed. 
-        Note that this has nothing to do with whether a sharp (not in the key signature)
-        is found in a different octave from the same note in a different octave.  The
-        sharp must always be displayed.
-        
-        If `overrideStatus` is True, this method will ignore any current 
-        `displayStatus` stetting found on the Accidental. By default this 
-        does not happen. If `displayStatus` is set to None, the 
-        Accidental's `displayStatus` is set. 
+        The `alteredPitches` list supplies pitches from a
+        :class:`~music21.key.KeySignature` object using the
+        :attr:`~music21.key.KeySignature.alteredPitches` property. If None, a
+        new list will be made.
 
-        If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed 
-        for an altered pitch even if that pitch had already been displayed as altered (unless
-        it's an immediate repetition).
+        If `cautionaryPitchClass` is True, comparisons to past accidentals are
+        made regardless of register. That is, if a past sharp is found two
+        octaves above a present natural, a natural sign is still displayed.
+        Note that this has nothing to do with whether a sharp (not in the key
+        signature) is found in a different octave from the same note in a
+        different octave.  The sharp must always be displayed.
 
-        If `lastNoteWasTied` is True then this note will be treated 
-        as immediately following a tie.
+        If `overrideStatus` is True, this method will ignore any current
+        `displayStatus` stetting found on the Accidental. By default this does
+        not happen. If `displayStatus` is set to None, the Accidental's
+        `displayStatus` is set.
 
-        
-        >>> a = pitch.Pitch('a')
-        >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
-        >>> a.accidental, a.accidental.displayStatus
-        (<accidental natural>, True)
+        If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will
+        be displayed for an altered pitch even if that pitch had already been
+        displayed as altered (unless it's an immediate repetition).
 
-        >>> b = pitch.Pitch('a')
-        >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> b.updateAccidentalDisplay(past) # should add a natural
-        >>> b.accidental, b.accidental.displayStatus
-        (<accidental natural>, True)
+        If `lastNoteWasTied` is True then this note will be treated as
+        immediately following a tie.
 
-        In this example, the method will not add a natural because the match is 
+        ::
+
+            >>> a = pitch.Pitch('a')
+            >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
+            >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
+            >>> a.accidental, a.accidental.displayStatus
+            (<accidental natural>, True)
+
+        ::
+
+            >>> b = pitch.Pitch('a')
+            >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
+            >>> b.updateAccidentalDisplay(past) # should add a natural
+            >>> b.accidental, b.accidental.displayStatus
+            (<accidental natural>, True)
+
+        In this example, the method will not add a natural because the match is
         pitchSpace and our octave is different.
 
-        >>> a4 = pitch.Pitch('a4')
-        >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> a4.updateAccidentalDisplay(past, cautionaryPitchClass=False)
-        >>> a4.accidental == None
-        True
+        ::
+
+            >>> a4 = pitch.Pitch('a4')
+            >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
+            >>> a4.updateAccidentalDisplay(past, cautionaryPitchClass=False)
+            >>> a4.accidental is None
+            True
+
         '''
         ### N.B. -- this is a very complex method
         ###         do not alter it without significant testing.
-        
+
         if pitchPast is None:
             pitchPast = []
         if pitchPastMeasure is None:
             pitchPastMeasure = []
         if alteredPitches is None:
             alteredPitches = []
-        
+
         # TODO: this presently deals with chords as simply a list
         # we might permit pitchPast to contain a list of pitches, to represent
         # a simultaneity?
@@ -3760,17 +3889,17 @@ class Pitch(base.Music21Object):
 
         pitchPastAll = pitchPastMeasure + pitchPast
 
-        if overrideStatus == False: # go with what we have defined
+        if overrideStatus is False: # go with what we have defined
             if self.accidental is None:
                 pass # no accidental defined; we may need to add one
-            elif self.accidental.displayStatus == None: # not set; need to set  
+            elif self.accidental.displayStatus is None: # not set; need to set
                 # configure based on displayStatus alone, continue w/ normal
                 pass
-            elif (self.accidental != None and 
-                self.accidental.displayStatus in [True, False]): 
+            elif (self.accidental is not None and
+                self.accidental.displayStatus in [True, False]):
                 return # exit: already set, do not override
 
-        if lastNoteWasTied == True:
+        if lastNoteWasTied is True:
             if self.accidental is not None:
                 if self.accidental.displayType != 'even-tied':
                     self.accidental.displayStatus = False
@@ -3780,9 +3909,9 @@ class Pitch(base.Music21Object):
 
         ### no pitches in past...
         if len(pitchPastAll) == 0:
-            # if we have no past, we always need to show the accidental, 
+            # if we have no past, we always need to show the accidental,
             # unless this accidental is in the alteredPitches list
-            if (self.accidental != None 
+            if (self.accidental is not None
             and self.accidental.displayStatus in [False, None]):
                 if not self._nameInKeySignature(alteredPitches):
                     self.accidental.displayStatus = True
@@ -3790,16 +3919,16 @@ class Pitch(base.Music21Object):
                     self.accidental.displayStatus = False
 
             # in case display set to True and in alteredPitches, makeFalse
-            elif (self.accidental != None 
-                  and self.accidental.displayStatus == True 
+            elif (self.accidental is not None
+                  and self.accidental.displayStatus is True
                   and self._nameInKeySignature(alteredPitches)):
                 self.accidental.displayStatus = False
 
             # if no accidental or natural but matches step in key sig
             # we need to show or add or an accidental
-            elif ((self.accidental == None or self.accidental.name == 'natural')
+            elif ((self.accidental is None or self.accidental.name == 'natural')
                   and self._stepInKeySignature(alteredPitches)):
-                if self.accidental == None:
+                if self.accidental is None:
                     self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
             return # do not search past
@@ -3821,20 +3950,20 @@ class Pitch(base.Music21Object):
 
 
         # here tied and always are treated the same; we assume that
-        # making ties sets the displayStatus, and thus we would not be 
+        # making ties sets the displayStatus, and thus we would not be
         # overriding that display status here
-        if (cautionaryAll == True or 
-            (self.accidental != None 
-             and self.accidental.displayType in ['even-tied', 'always'])): 
+        if (cautionaryAll is True or
+            (self.accidental is not None
+             and self.accidental.displayType in ['even-tied', 'always'])):
             # show all no matter
-            if self.accidental == None:
+            if self.accidental is None:
                 self.accidental = Accidental('natural')
             # show all accidentals, even if past encountered
             self.accidental.displayStatus = True
             return # do not search past
 
         # store if a match was found and display set from past pitches
-        setFromPitchPast = False 
+        setFromPitchPast = False
 
         if cautionaryPitchClass is True: # warn no mater what octave; thus create new without oct
             pSelf = Pitch(self.name)
@@ -3853,10 +3982,10 @@ class Pitch(base.Music21Object):
         ## which are the same as this one and in the same measure?
         ## if so, set continuousRepeatsInMeasure to True
         ## else, set to False
-        
+
         ## figure out if this pitch is in the measure (pPastInMeasure = True)
         ## or not.
-        for i in reversed(range(len(pitchPastAll))):            
+        for i in reversed(range(len(pitchPastAll))):
             # is the past pitch in the measure or out of the measure?
             if i < outOfMeasureLength:
                 pPastInMeasure = False
@@ -3865,23 +3994,23 @@ class Pitch(base.Music21Object):
                 pPastInMeasure = True
                 for j in range(i, len(pitchPastAll)):
                     # do we have a continuous stream of the same note leading up to this one...
-                    if pitchPastAll[j].nameWithOctave != self.nameWithOctave:                    
+                    if pitchPastAll[j].nameWithOctave != self.nameWithOctave:
                         continuousRepeatsInMeasure = False
                         break
                 else:
                     continuousRepeatsInMeasure = True
-            # if the pitch is the first of a measure, has an accidental, 
-            # it is not an altered key signature pitch, 
+            # if the pitch is the first of a measure, has an accidental,
+            # it is not an altered key signature pitch,
             # and it is not a natural, it should always be set to display
-            if (pPastInMeasure == False
-                and self.accidental != None 
+            if (pPastInMeasure is False
+                and self.accidental is not None
                 and not self._nameInKeySignature(alteredPitches)):
                 self.accidental.displayStatus = True
                 return # do not search past
-             
+
             # create Pitch objects for comparison; remove pitch space
             # information if we are only doing a pitch class comparison
-            if cautionaryPitchClass == True: # no octave; create new without oct
+            if cautionaryPitchClass is True: # no octave; create new without oct
                 pPast = Pitch(pitchPastAll[i].name)
                 # must manually assign reference to the same accidentals
                 # as name alone will not transfer display status
@@ -3902,30 +4031,30 @@ class Pitch(base.Music21Object):
 
             # repeats of the same pitch immediately following, in the same measure
             # where one previous pitch has displayStatus = True; don't display
-            if (continuousRepeatsInMeasure == True
-                and pPast.accidental != None
-                and pPast.accidental.displayStatus == True
+            if (continuousRepeatsInMeasure is True
+                and pPast.accidental is not None
+                and pPast.accidental.displayStatus is True
                 ):
-                if pSelf.accidental != None: #only needed if one has a natural and this does not
+                if pSelf.accidental is not None: #only needed if one has a natural and this does not
                     self.accidental.displayStatus = False
                 return
 
             # repeats of the same accidentally immediately following
             # if An to An or A# to A#: do not need unless repeats requested,
-            # regardless of if 'unless-repeated' is set, this will catch 
+            # regardless of if 'unless-repeated' is set, this will catch
             # a repeated case
-            
-            elif (continuousRepeatsInMeasure == True
-                and pPast.accidental != None 
-                and pSelf.accidental != None 
+
+            elif (continuousRepeatsInMeasure is True
+                and pPast.accidental is not None
+                and pSelf.accidental is not None
                 and pPast.accidental.name == pSelf.accidental.name):
 
                 ### BUG! what about C#4 C#5 C#4 C#5 -- last C#4 and C#5 should not show accidental if cautionaryNotImmediateRepeat is False
-                                
+
                 # if not in the same octave, and not in the key sig, do show accidental
-                if (self._nameInKeySignature(alteredPitches) == False
-                    and (octaveMatch == False
-                         or pPast.accidental.displayStatus == False)
+                if (self._nameInKeySignature(alteredPitches) is False
+                    and (octaveMatch is False
+                         or pPast.accidental.displayStatus is False)
                     ):
                     displayAccidentalIfNoPreviousAccidentals = True
                     continue
@@ -3936,74 +4065,72 @@ class Pitch(base.Music21Object):
 
             # if An to A: do not need another natural
             # yet, if we are against the key sig, then we need another natural if in another octave
-            elif (pPast.accidental != None 
-                  and pPast.accidental.name == 'natural' 
-                  and (pSelf.accidental == None 
+            elif (pPast.accidental is not None
+                  and pPast.accidental.name == 'natural'
+                  and (pSelf.accidental is None
                        or pSelf.accidental.name == 'natural')):
-                if continuousRepeatsInMeasure == True: # an immediate repeat; do not show
-                    # unless we are altering the key signature and in 
+                if continuousRepeatsInMeasure is True: # an immediate repeat; do not show
+                    # unless we are altering the key signature and in
                     # a different register
-                    if (self._stepInKeySignature(alteredPitches) == True
-                        and octaveMatch == False):
-                        if self.accidental == None:
+                    if (self._stepInKeySignature(alteredPitches) is True
+                        and octaveMatch is False):
+                        if self.accidental is None:
                             self.accidental = Accidental('natural')
                         self.accidental.displayStatus = True
                     else:
-                        if self.accidental != None:
+                        if self.accidental is not None:
                             self.accidental.displayStatus = False
-                # if we match the step in a key signature and we want 
+                # if we match the step in a key signature and we want
                 # cautionary not immediate repeated
-                elif (self._stepInKeySignature(alteredPitches) == True
-                      and cautionaryNotImmediateRepeat == True):
-                    if self.accidental == None:
+                elif (self._stepInKeySignature(alteredPitches) is True
+                      and cautionaryNotImmediateRepeat is True):
+                    if self.accidental is None:
                         self.accidental = Accidental('natural')
                     self.accidental.displayStatus = True
 
-                # cautionaryNotImmediateRepeat == False
+                # cautionaryNotImmediateRepeat is False
                 # but the previous note was not in this measure,
                 # so do the previous step anyhow
-                elif (self._stepInKeySignature(alteredPitches) == True
-                      and cautionaryNotImmediateRepeat == False
-                      and pPastInMeasure == False):
-                    if self.accidental == None:
+                elif (self._stepInKeySignature(alteredPitches) is True
+                      and cautionaryNotImmediateRepeat is False
+                      and pPastInMeasure is False):
+                    if self.accidental is None:
                         self.accidental = Accidental('natural')
                     self.accidental.displayStatus = True
 
-                
-                
-                # other cases: already natural in past usage, do not need 
+                # other cases: already natural in past usage, do not need
                 # natural again (and not in key sig)
                 else:
-                    if self.accidental != None:
+                    if self.accidental is not None:
                         self.accidental.displayStatus = False
                 setFromPitchPast = True
                 break
 
             # if A# to A, or A- to A, but not A# to A#
             # we use step and octave though not necessarily a ps comparison
-            elif (pPast.accidental != None 
-                  and pPast.accidental.name != 'natural' 
-                  and (pSelf.accidental == None 
-                       or pSelf.accidental.displayStatus == False)):
-                if octaveMatch == False and cautionaryPitchClass == False:
+            elif (pPast.accidental is not None
+                  and pPast.accidental.name != 'natural'
+                  and (pSelf.accidental is None
+                       or pSelf.accidental.displayStatus is False)):
+                if octaveMatch is False and cautionaryPitchClass is False:
                     continue
-                if self.accidental == None:
+                if self.accidental is None:
                     self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
                 setFromPitchPast = True
                 break
 
             # if An or A to A#: need to make sure display is set
-            elif ((pPast.accidental == None 
-                   or pPast.accidental.name == 'natural') 
-                  and pSelf.accidental != None 
+            elif ((pPast.accidental is None
+                   or pPast.accidental.name == 'natural')
+                  and pSelf.accidental is not None
                   and pSelf.accidental.name != 'natural'):
                 self.accidental.displayStatus = True
                 setFromPitchPast = True
                 break
 
             # if A- or An to A#: need to make sure display is set
-            elif (pPast.accidental != None and pSelf.accidental != None 
+            elif (pPast.accidental is not None and pSelf.accidental is not None
                   and pPast.accidental.name != pSelf.accidental.name):
                 self.accidental.displayStatus = True
                 setFromPitchPast = True
@@ -4012,7 +4139,7 @@ class Pitch(base.Music21Object):
             # going from a natural to an accidental, we should already be
             # showing the accidental, but just to check
             # if A to A#, or A to A-, but not A# to A
-            elif (pPast.accidental == None and pSelf.accidental != None):
+            elif (pPast.accidental is None and pSelf.accidental is not None):
                 self.accidental.displayStatus = True
                 #environLocal.printDebug(['match previous no mark'])
                 setFromPitchPast = True
@@ -4021,13 +4148,13 @@ class Pitch(base.Music21Object):
             # if A# to A# and not immediately repeated:
             # default is to show accidental
             # if cautionaryNotImmediateRepeat is False, will not be shown
-            elif (continuousRepeatsInMeasure == False
-                  and pPast.accidental != None 
-                  and pSelf.accidental != None 
+            elif (continuousRepeatsInMeasure is False
+                  and pPast.accidental is not None
+                  and pSelf.accidental is not None
                   and pPast.accidental.name == pSelf.accidental.name
-                  and octaveMatch == True):
-                if (cautionaryNotImmediateRepeat == False 
-                    and pPast.accidental.displayStatus != False): 
+                  and octaveMatch is True):
+                if (cautionaryNotImmediateRepeat is False
+                    and pPast.accidental.displayStatus != False):
                     # do not show (unless previous note's accidental wasn't displayed
                     # because of a tie or some other reason)
                     # result will be False, do not need to check altered tones
@@ -4035,7 +4162,7 @@ class Pitch(base.Music21Object):
                     displayAccidentalIfNoPreviousAccidentals = False
                     setFromPitchPast = True
                     break
-                elif pPast.accidental.displayStatus == False:
+                elif pPast.accidental.displayStatus is False:
                     # in case of ties...
                     displayAccidentalIfNoPreviousAccidentals = True
                 else:
@@ -4045,39 +4172,39 @@ class Pitch(base.Music21Object):
                         self.accidental.displayStatus = False
                     setFromPitchPast = True
                     return
-            
+
             else:
                 pass
 
-        # if we have no previous matches for this pitch and there is 
+        # if we have no previous matches for this pitch and there is
         # an accidental: show, unless in alteredPitches
         # cases of displayAlways and related are matched above
-        if displayAccidentalIfNoPreviousAccidentals == True:
+        if displayAccidentalIfNoPreviousAccidentals is True:
             # not the first pitch of this nameWithOctave in the measure
             # but, because of ties, the first to be displayed
-            if self._nameInKeySignature(alteredPitches) == False:
+            if self._nameInKeySignature(alteredPitches) is False:
                 if self.accidental is None:
                     self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
             else:
                 self.accidental.displayStatus = False
             displayAccidentalIfNoPreviousAccidentals = False #just to be sure
-        elif not setFromPitchPast and self.accidental != None:
+        elif not setFromPitchPast and self.accidental is not None:
             if not self._nameInKeySignature(alteredPitches):
                 self.accidental.displayStatus = True
             else:
                 self.accidental.displayStatus = False
 
         # if we have natural that alters the key sig, create a natural
-        elif not setFromPitchPast and self.accidental == None:
+        elif not setFromPitchPast and self.accidental is None:
             if self._stepInKeySignature(alteredPitches):
                 self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
-                
+
     def getStringHarmonic(self, chordIn):
         '''
-        Given a chord, determines whether the chord constitutes a string 
-        harmonic and then returns a new chord with the proper sounding pitch 
+        Given a chord, determines whether the chord constitutes a string
+        harmonic and then returns a new chord with the proper sounding pitch
         added.
 
         ::
@@ -4098,16 +4225,16 @@ class Pitch(base.Music21Object):
         '''
         #Takes in a chord, finds the interval between the notes
         from music21 import note, chord
-        
+
         pitchList = chordIn.pitches
         isStringHarmonic = False
-        
+
         if chordIn.getNotehead(pitchList[1]) == 'diamond':
-            isStringHarmonic = True 
-            
-        if isStringHarmonic == True:
+            isStringHarmonic = True
+
+        if isStringHarmonic is True:
             chordInt = interval.notesToChromatic(pitchList[0], pitchList[1])
-            
+
             if chordInt.intervalClass == 12:
                 soundingPitch = pitchList[0].getHarmonic(2)
             elif chordInt.intervalClass == 7:
@@ -4117,7 +4244,7 @@ class Pitch(base.Music21Object):
             elif chordInt.intervalClass == 4:
                 soundingPitch = pitchList[0].getHarmonic(5)
             elif chordInt.intervalClass == 3:
-                soundingPitch = pitchList[0].getHarmonic(6) 
+                soundingPitch = pitchList[0].getHarmonic(6)
             elif chordInt.intervalClass == 6:
                 soundingPitch = pitchList[0].getHarmonic(7)
             elif chordInt.intervalClass == 8:
@@ -4125,29 +4252,31 @@ class Pitch(base.Music21Object):
             else:
                 #make this give an error or something
                 soundingPitch = pitchList[0]
-            
+
         noteOut = note.Note(soundingPitch.nameWithOctave)
         noteOut.noteheadParenthesis = True
         noteOut.noteheadFill = 'yes'
         noteOut.stemDirection = 'noStem'
-        
+
         note1 = note.Note(pitchList[0].nameWithOctave)
         note2 = note.Note(pitchList[1].nameWithOctave)
         note2.notehead = chordIn.getNotehead(pitchList[1])
-        
+
         #to do: make note small
-        
+
         chordOut = chord.Chord([note1, note2, noteOut])
-        
+
         return chordOut
 
 
 #-------------------------------------------------------------------------------
+
+
 class TestExternal(unittest.TestCase):
-    
+
     def runTest(self):
         pass
-    
+
     def testSingle(self):
         a = Pitch()
         a.name = 'c#'
@@ -4155,7 +4284,7 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
-    
+
     def runTest(self):
         pass
 
@@ -4184,11 +4313,10 @@ class Test(unittest.TestCase):
         self.assertTrue(p1 is not p2)
         self.assertTrue(p1.accidental is not p2.accidental)
 
-
     def testOctave(self):
         b = Pitch("B#3")
         self.assertEqual(b.octave, 3)
-    
+
     def testAccidentalImport(self):
         '''Test that we are getting the properly set accidentals
         '''
@@ -4206,7 +4334,6 @@ class Test(unittest.TestCase):
         self.assertEqual(pAltered.accidental.name, 'sharp')
         self.assertEqual(pAltered.accidental.displayStatus, True)
 
-
     def testUpdateAccidentalDisplaySimple(self):
         '''Test updating accidental display.
         '''
@@ -4222,11 +4349,9 @@ class Test(unittest.TestCase):
         a.updateAccidentalDisplay(past, overrideStatus=True)
         self.assertEqual(a.accidental.displayStatus, True)
 
-
         b = copy.deepcopy(a)
         self.assertEqual(b.accidental.displayStatus, True)
         self.assertEqual(b.accidental.name, 'natural')
-
 
     def testUpdateAccidentalDisplaySeries(self):
         '''Test updating accidental display.
@@ -4241,7 +4366,7 @@ class Test(unittest.TestCase):
             #environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
-                if p.accidental == None:
+                if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
                 else:
@@ -4256,64 +4381,64 @@ class Test(unittest.TestCase):
                 self.assertEqual(pDisplayStatus, targetDisplayStatus, "%d: %s display: %s, target %s" % (i, p, pDisplayStatus, targetDisplayStatus))
 
         # alternating, in a sequence, same pitch space
-        pList = [Pitch('a#3'), Pitch('a3'), Pitch('a#3'), 
+        pList = [Pitch('a#3'), Pitch('a3'), Pitch('a#3'),
                  Pitch('a3'), Pitch('a#3')]
-        result = [('sharp', True), ('natural', True), ('sharp', True), 
+        result = [('sharp', True), ('natural', True), ('sharp', True),
                   ('natural', True), ('sharp', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
         # alternating, in a sequence, different pitch space
-        pList = [Pitch('a#2'), Pitch('a6'), Pitch('a#1'), 
+        pList = [Pitch('a#2'), Pitch('a6'), Pitch('a#1'),
                  Pitch('a5'), Pitch('a#3')]
-        result = [('sharp', True), ('natural', True), ('sharp', True), 
+        result = [('sharp', True), ('natural', True), ('sharp', True),
                   ('natural', True), ('sharp', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
         # alternating, after gaps
-        pList = [Pitch('a-2'), Pitch('g3'), Pitch('a5'), 
+        pList = [Pitch('a-2'), Pitch('g3'), Pitch('a5'),
                  Pitch('a#5'), Pitch('g-3'), Pitch('a3')]
-        result = [('flat', True), (None, None), ('natural', True), 
+        result = [('flat', True), (None, None), ('natural', True),
                   ('sharp', True), ('flat', True), ('natural', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
         # repeats of the same: show at different registers
-        pList = [Pitch('a-2'), Pitch('a-2'), Pitch('a-5'), 
+        pList = [Pitch('a-2'), Pitch('a-2'), Pitch('a-5'),
                  Pitch('a#5'), Pitch('a#3'), Pitch('a3'), Pitch('a2')]
-        result = [('flat', True), ('flat', False), ('flat', True), 
+        result = [('flat', True), ('flat', False), ('flat', True),
                   ('sharp', True), ('sharp', True), ('natural', True), ('natural', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
-        #the always- 'unless-repeated' setting 
+        #the always- 'unless-repeated' setting
         # first, with no modification, repeated accidentals are not shown
         pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#5')]
         result = [('flat', True), ('sharp', True), ('sharp', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
-        # second, with status set to always 
+        # second, with status set to always
         pList = [Pitch('a-2'), Pitch('a#3'), Pitch('a#3')]
         pList[2].accidental.displayType = 'always'
         result = [('flat', True), ('sharp', True), ('sharp', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
-        # status set to always 
+        # status set to always
         pList = [Pitch('a2'), Pitch('a3'), Pitch('a5')]
         pList[2].accidental = Accidental('natural')
         pList[2].accidental.displayType = 'always'
         result = [(None, None), (None, None), ('natural', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
         # first use after other pitches in different register
         # note: this will force the display of the accidental
         pList = [Pitch('a-2'), Pitch('g3'), Pitch('a-5')]
         result = [('flat', True), (None, None), ('flat', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
         # first use after other pitches in different register
@@ -4321,15 +4446,14 @@ class Test(unittest.TestCase):
         pList = [Pitch('a-2'), Pitch('g3'), Pitch('a-2')]
         # pairs of accidental, displayStatus
         result = [('flat', True), (None, None), ('flat', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
 
         # accidentals, first usage, not first pitch
         pList = [Pitch('a2'), Pitch('g#3'), Pitch('d-2')]
         result = [(None, None), ('sharp', True), ('flat', True)]
-        proc(pList, [])        
+        proc(pList, [])
         compare(pList, result)
-
 
     def testUpdateAccidentalDisplaySeriesKeySignature(self):
         '''Test updating accidental display against a KeySignature
@@ -4345,7 +4469,7 @@ class Test(unittest.TestCase):
             #environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
-                if p.accidental == None:
+                if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
                 else:
@@ -4360,84 +4484,83 @@ class Test(unittest.TestCase):
                 self.assertEqual(pDisplayStatus, targetDisplayStatus, "%d: %s display: %s, target %s" % (i, p, pDisplayStatus, targetDisplayStatus))
 
         # chromatic alteration of key
-        pList = [Pitch('f#3'), Pitch('f#2'), Pitch('f3'), 
+        pList = [Pitch('f#3'), Pitch('f#2'), Pitch('f3'),
             Pitch('f#3'), Pitch('f#3'), Pitch('g3'), Pitch('f#3')]
-        result = [('sharp', False), ('sharp', False), ('natural', True), 
+        result = [('sharp', False), ('sharp', False), ('natural', True),
             ('sharp', True), ('sharp', False), (None, None), ('sharp', False)]
         ks = key.KeySignature(1) # f3
-        proc(pList, [], ks.alteredPitches)        
+        proc(pList, [], ks.alteredPitches)
         compare(pList, result)
 
         # non initial scale tones
-        pList = [Pitch('a3'), Pitch('b2'), Pitch('c#3'), 
+        pList = [Pitch('a3'), Pitch('b2'), Pitch('c#3'),
             Pitch('f#3'), Pitch('g#3'), Pitch('f#3'), Pitch('a4')]
-        result = [(None, None), (None, None), ('sharp', False), 
+        result = [(None, None), (None, None), ('sharp', False),
             ('sharp', False), ('sharp', False), ('sharp', False), (None, None)]
-        ks = key.KeySignature(3) 
-        proc(pList, [], ks.alteredPitches)        
+        ks = key.KeySignature(3)
+        proc(pList, [], ks.alteredPitches)
         compare(pList, result)
 
         # non initial scale tones with chromatic alteration
-        pList = [Pitch('a3'), Pitch('c#3'), Pitch('g#3'), 
+        pList = [Pitch('a3'), Pitch('c#3'), Pitch('g#3'),
         Pitch('g3'), Pitch('c#4'), Pitch('g#4')]
-        result = [(None, None), ('sharp', False), ('sharp', False), 
+        result = [(None, None), ('sharp', False), ('sharp', False),
             ('natural', True), ('sharp', False), ('sharp', True)]
-        ks = key.KeySignature(3) 
-        proc(pList, [], ks.alteredPitches)        
+        ks = key.KeySignature(3)
+        proc(pList, [], ks.alteredPitches)
         compare(pList, result)
 
         # non initial scale tones with chromatic alteration
-        pList = [Pitch('a3'), Pitch('c#3'), Pitch('g#3'), 
+        pList = [Pitch('a3'), Pitch('c#3'), Pitch('g#3'),
         Pitch('g3'), Pitch('c#4'), Pitch('g#4')]
-        result = [(None, None), ('sharp', False), ('sharp', False), 
+        result = [(None, None), ('sharp', False), ('sharp', False),
             ('natural', True), ('sharp', False), ('sharp', True)]
-        ks = key.KeySignature(3) 
-        proc(pList, [], ks.alteredPitches)        
+        ks = key.KeySignature(3)
+        proc(pList, [], ks.alteredPitches)
         compare(pList, result)
 
         # initial scale tones with chromatic alteration, repeated tones
-        pList = [Pitch('f#3'), Pitch('f3'), Pitch('f#3'), 
+        pList = [Pitch('f#3'), Pitch('f3'), Pitch('f#3'),
                  Pitch('g3'), Pitch('f#4'), Pitch('f#4')]
-        result = [('sharp', False), ('natural', True), ('sharp', True), 
+        result = [('sharp', False), ('natural', True), ('sharp', True),
                    (None, None), ('sharp', True), ('sharp', False)]  # no 4 is a dicey affair; could go either way
-        ks = key.KeySignature(1) 
-        proc(pList, [], ks.alteredPitches)        
+        ks = key.KeySignature(1)
+        proc(pList, [], ks.alteredPitches)
         compare(pList, result)
 
         # initial scale tones with chromatic alteration, repeated tones
-        pList = [Pitch('d3'), Pitch('e3'), Pitch('f#3'), 
+        pList = [Pitch('d3'), Pitch('e3'), Pitch('f#3'),
         Pitch('g3'), Pitch('f4'), Pitch('g#4'),
         Pitch('c#3'), Pitch('f#4'), Pitch('c#4')]
-        result = [(None, None), (None, None), ('sharp', False), 
+        result = [(None, None), (None, None), ('sharp', False),
             (None, None), ('natural', True), ('sharp', True),
             ('sharp', False), ('sharp', True), ('sharp', False)]
-        ks = key.KeySignature(2) 
-        proc(pList, [], ks.alteredPitches)        
+        ks = key.KeySignature(2)
+        proc(pList, [], ks.alteredPitches)
         compare(pList, result)
 
         # altered tones outside of key
-        pList = [Pitch('b3'), Pitch('a3'), Pitch('e3'), 
-        Pitch('b-3'), Pitch('a-3'), Pitch('e-3'), 
+        pList = [Pitch('b3'), Pitch('a3'), Pitch('e3'),
+        Pitch('b-3'), Pitch('a-3'), Pitch('e-3'),
         Pitch('b-3'), Pitch('a-3'), Pitch('e-3'),
         Pitch('b-3'), Pitch('a-3'), Pitch('e-3')]
-        result = [('natural', True), ('natural', True), ('natural', True), 
+        result = [('natural', True), ('natural', True), ('natural', True),
             ('flat', True), ('flat', True), ('flat', True),
             ('flat', False), ('flat', False), ('flat', False),
             ('flat', False), ('flat', False), ('flat', False),]
-        ks = key.KeySignature(-3) # b-, e-, a- 
-        proc(pList, [], ks.alteredPitches)        
+        ks = key.KeySignature(-3) # b-, e-, a-
+        proc(pList, [], ks.alteredPitches)
         compare(pList, result)
 
-
         # naturals against the key signature are required for each and every use
-        pList = [Pitch('b3'), Pitch('a3'), Pitch('e3'), 
-                 Pitch('b4'), Pitch('a-3'), Pitch('e-3'), 
+        pList = [Pitch('b3'), Pitch('a3'), Pitch('e3'),
+                 Pitch('b4'), Pitch('a-3'), Pitch('e-3'),
                  Pitch('b3'), Pitch('a3'), Pitch('e3')]
-        result = [('natural', True), ('natural', True), ('natural', True), 
+        result = [('natural', True), ('natural', True), ('natural', True),
             ('natural', True), ('flat', True), ('flat', True),
             ('natural', True), ('natural', True), ('natural', True)]
-        ks = key.KeySignature(-3) # b-, e-, a- 
-        proc(pList, [], ks.alteredPitches)        
+        ks = key.KeySignature(-3) # b-, e-, a-
+        proc(pList, [], ks.alteredPitches)
         compare(pList, result)
 
     def testUpdateAccidentalDisplayOctaves(self):
@@ -4455,12 +4578,11 @@ class Test(unittest.TestCase):
                 p.updateAccidentalDisplay(past, cautionaryPitchClass=False, cautionaryNotImmediateRepeat=False)
                 past.append(p)
 
-
         def compare(past, result):
             #environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
-                if p.accidental == None:
+                if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
                 else:
@@ -4474,15 +4596,15 @@ class Test(unittest.TestCase):
                 self.assertEqual(pName, targetName)
                 self.assertEqual(pDisplayStatus, targetDisplayStatus, "%d: %s display: %s, target %s" % (i, p, pDisplayStatus, targetDisplayStatus))
 
-        pList = [Pitch('c#3'), Pitch('c#4'), Pitch('c#3'), 
+        pList = [Pitch('c#3'), Pitch('c#4'), Pitch('c#3'),
                  Pitch('c#4')]
-        result = [('sharp', True), ('sharp', True), ('sharp', False), 
+        result = [('sharp', True), ('sharp', True), ('sharp', False),
                   ('sharp', False)]
-        proc1(pList, [])        
+        proc1(pList, [])
         compare(pList, result)
-        pList = [Pitch('c#3'), Pitch('c#4'), Pitch('c#3'), 
+        pList = [Pitch('c#3'), Pitch('c#4'), Pitch('c#3'),
                  Pitch('c#4')]
-        proc2(pList, [])        
+        proc2(pList, [])
         compare(pList, result)
 
         a4 = Pitch('a4')
@@ -4502,24 +4624,23 @@ class Test(unittest.TestCase):
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.flat.notes
         assert(bm.flat.notes[0].accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[0].accidental.displayStatus == True)
+        assert(bm.flat.notes[0].accidental.displayStatus is True)
         assert(bm.flat.notes[1].accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[1].accidental.displayStatus == True)
+        assert(bm.flat.notes[1].accidental.displayStatus is True)
         assert(bm.flat.notes[2].accidental.name == 'flat')        # E-4
-        assert(bm.flat.notes[2].accidental.displayStatus == True)
+        assert(bm.flat.notes[2].accidental.displayStatus is True)
         assert(bm.flat.notes[3].accidental.name == 'flat')        # E-5
-        assert(bm.flat.notes[3].accidental.displayStatus == True)
-        assert(bm.flat.notes[4].accidental.name == 'natural')     # En4 
-        assert(bm.flat.notes[4].accidental.displayStatus == True)
-        assert(bm.flat.notes[5].accidental.name == 'natural')     # En4 
-        assert(bm.flat.notes[5].accidental.displayStatus == True)
+        assert(bm.flat.notes[3].accidental.displayStatus is True)
+        assert(bm.flat.notes[4].accidental.name == 'natural')     # En4
+        assert(bm.flat.notes[4].accidental.displayStatus is True)
+        assert(bm.flat.notes[5].accidental.name == 'natural')     # En4
+        assert(bm.flat.notes[5].accidental.displayStatus is True)
 
-        assert(bm.flat.notes[6].accidental != None)               # En5
+        assert(bm.flat.notes[6].accidental is not None)               # En5
         assert(bm.flat.notes[6].accidental.name == 'natural')
-        assert(bm.flat.notes[6].accidental.displayStatus == True)
-    
-        return
+        assert(bm.flat.notes[6].accidental.displayStatus is True)
 
+        return
 
     def testPitchEquality(self):
         '''Test updating accidental display.
@@ -4532,7 +4653,6 @@ class Test(unittest.TestCase):
             p1 = Pitch(x)
             p2 = Pitch(y)
             self.assertEqual(p1==p2, match)
-
         # specific case of changing octave
         p1 = Pitch('a#')
         p2 = Pitch('a#')
@@ -4550,7 +4670,6 @@ class Test(unittest.TestCase):
         lowC = dPitch.transpose('M-23')
         self.assertEqual(lowC.name, "C")
         self.assertEqual(lowC.octave, -1)
-
 
     def testQuarterToneA(self):
         from music21 import stream, note, scale
@@ -4590,17 +4709,15 @@ class Test(unittest.TestCase):
         match = [str(n.pitch) for n in s.notes]
         self.assertEqual(match, ['C~4', 'D#~4', 'E-`4', 'F`4', 'G~4', 'A#~4', 'B`4', 'C-`4', 'D~4'])
 
-        
         match = [e.ps for e in s]
         self.assertEqual(match, [60.5, 63.5, 62.5, 64.5, 67.5, 70.5, 70.5, 58.5, 62.5] )
 
-
-    def testMicrotoneA(self):        
+    def testMicrotoneA(self):
         from music21 import pitch
 
         p = pitch.Pitch('a4')
         p.microtone = 25
-        
+
         self.assertEqual(str(p), 'A4(+25c)')
         self.assertEqual(p.ps, 69.25)
 
@@ -4610,12 +4727,9 @@ class Test(unittest.TestCase):
 
         self.assertEqual(p.pitchClass, 9)
 
-
         p = p.transpose(12)
         self.assertEqual(str(p), 'A5(-10c)')
         self.assertEqual(p.ps, 80.90)
-
-
 
     def testMicrotoneB(self):
         from music21 import pitch
@@ -4634,7 +4748,6 @@ class Test(unittest.TestCase):
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(6)), 'G6(+2c)')
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(7)), 'A~6(+19c)')
 
-
         self.assertEqual(pitch.Pitch('g4').harmonicString('c3'), '3rdH(-2c)/C3')
 
         #self.assertEqual(str(_convertPsToStep(60.0)), "('C', <accidental natural>, None, 0)")
@@ -4645,16 +4758,14 @@ class Test(unittest.TestCase):
 
         self.assertEqual(pitch.Pitch('c4').harmonicString('c3'), '2ndH/C3')
 
-
         f = pitch.Pitch('c3')
         f.microtone = -10
         self.assertEqual(str(f.getHarmonic(2)), 'C4(-10c)')
 
-
         p = pitch.Pitch('c4')
         f = pitch.Pitch('c3')
         f.microtone = -20
-        # the third harmonic of c3 -20 is closer than the 
+        # the third harmonic of c3 -20 is closer than the
         self.assertEqual(p.harmonicString(f), '2ndH(+20c)/C3(-20c)')
 
         f.microtone = +20
@@ -4662,14 +4773,13 @@ class Test(unittest.TestCase):
 
         p1 = pitch.Pitch('c1')
         self.assertEqual(str(p1.getHarmonic(13)), 'G#~4(-9c)')
-        
+
         p2 = pitch.Pitch('a1')
         self.assertEqual(str(p2.getHarmonic(13)), 'F~5(-9c)')
-        
+
         self.assertEqual(str(p1.transpose('M6')), 'A1')
         # not sure if this is correct:
         #self.assertEqual(str(p1.getHarmonic(13).transpose('M6')), 'E##5(-9c)')
-
 
     def testMicrotoneC(self):
         from music21 import pitch
@@ -4681,7 +4791,6 @@ class Test(unittest.TestCase):
             match.append(str(p))
             p.microtone = p.microtone.cents - 1
         self.assertEqual(str(match), "['C4(+5c)', 'C4(+4c)', 'C4(+3c)', 'C4(+2c)', 'C4(+1c)', 'C4', 'C4(-1c)', 'C4(-2c)', 'C4(-3c)', 'C4(-4c)', 'C4(-5c)']")
-
 
     def testMicrotoneD(self):
         from music21 import pitch
@@ -4696,16 +4805,14 @@ class Test(unittest.TestCase):
             pList.append(str(p))
         self.assertEqual(str(pList), "['A4', 'A~4(+21c)', 'B`4(-11c)', 'B4(+4c)', 'B~4(+17c)', 'C~5(-22c)', 'C#5(-14c)', 'C#~5(-7c)', 'C##5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)', 'E5(+2c)', 'E~5(-1c)', 'F5(-4c)', 'F~5(-9c)', 'F#5(-16c)', 'F#~5(-23c)', 'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']")
 
-        
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
+
+
 _DOC_ORDER = [Pitch, Accidental, Microtone]
 
 
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
-
-#------------------------------------------------------------------------------
-# eof
-

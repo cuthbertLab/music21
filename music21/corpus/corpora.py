@@ -1122,8 +1122,8 @@ class CoreCorpus(Corpus):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def manualCoreCorpusPath():  # @NoSelf
+    @property
+    def manualCoreCorpusPath(self):
         r'''
         Set music21's core corpus to a directory, and save that information in
         the user settings.
@@ -1148,21 +1148,21 @@ class CoreCorpus(Corpus):
             True
 
         '''
-        def fget(self):
-            userSettings = environment.UserSettings()
-            if 'manualCoreCorpusPath' in userSettings.keys():
-                return userSettings['manualCoreCorpusPath']
-            return None
-        def fset(self, expr):
-            userSettings = environment.UserSettings() 
-            if expr is not None:
-                path = os.path.expanduser(expr)
-                assert os.path.isdir(path) and os.path.exists(path)
-                userSettings['manualCoreCorpusPath'] = path
-            else:
-                userSettings['manualCoreCorpusPath'] = None
-            environment.Environment().write()
-        return property(**locals())
+        userSettings = environment.UserSettings()
+        if 'manualCoreCorpusPath' in userSettings.keys():
+            return userSettings['manualCoreCorpusPath']
+        return None
+
+    @manualCoreCorpusPath.setter
+    def manualCoreCorpusPath(self, expr):
+        userSettings = environment.UserSettings() 
+        if expr is not None:
+            path = os.path.expanduser(expr)
+            assert os.path.isdir(path) and os.path.exists(path)
+            userSettings['manualCoreCorpusPath'] = path
+        else:
+            userSettings['manualCoreCorpusPath'] = None
+        environment.Environment().write()
 
     @property
     def name(self):

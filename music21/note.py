@@ -211,57 +211,57 @@ class Lyric(SlottedObject):
 
     ### PUBLIC PROPERTIES ###
     
-    @apply
-    def identifier():
-        def fget(self):
-            '''
-            By default, this is the same as self.number. However, if there is a
-            descriptive identifier like 'part2verse1', it is stored here and
-            will be different from self.number. When converting to musicXML,
-            this property will be stored in the lyric 'number' attribute which
-            can store a number or a descriptive identifier but not both.
+    @property
+    def identifier(self):
+        '''
+        By default, this is the same as self.number. However, if there is a
+        descriptive identifier like 'part2verse1', it is stored here and
+        will be different from self.number. When converting to musicXML,
+        this property will be stored in the lyric 'number' attribute which
+        can store a number or a descriptive identifier but not both.
 
-            ::
+        ::
 
-                >>> l = note.Lyric()
-                >>> l.number = 12
-                >>> l.identifier
-                12
+            >>> l = note.Lyric()
+            >>> l.number = 12
+            >>> l.identifier
+            12
 
-            ::
+        ::
 
-                >>> l.identifier = 'Rainbow'
-                >>> l.identifier
-                'Rainbow'
+            >>> l.identifier = 'Rainbow'
+            >>> l.identifier
+            'Rainbow'
 
-            '''
-            if self._identifier is None:
-                return self._number
-            else:
-                return self._identifier
-        def fset(self, value):
-            self._identifier = value
-        return property(**locals())
-
-    @apply
-    def number():
-        def fget(self):
-            '''
-            This stores the number of the lyric (which determines the order
-            lyrics appear in the score if there are multiple lyrics). Unlike
-            the musicXML lyric number attribute, this value must always be a
-            number; lyric order is always stored in this form. Descriptive
-            identifiers like 'part2verse1' which can be found in the musicXML
-            lyric number attribute should be stored in self.identifier.
-
-            '''
+        '''
+        if self._identifier is None:
             return self._number
-        def fset(self, value):
-            if not common.isNum(value):
-                raise LyricException('Number best be number')
-            else:
-                self._number = value
-        return property(**locals())
+        else:
+            return self._identifier
+
+    @identifier.setter
+    def identifier(self, value):
+        self._identifier = value
+
+    @property
+    def number(self):
+        '''
+        This stores the number of the lyric (which determines the order
+        lyrics appear in the score if there are multiple lyrics). Unlike
+        the musicXML lyric number attribute, this value must always be a
+        number; lyric order is always stored in this form. Descriptive
+        identifiers like 'part2verse1' which can be found in the musicXML
+        lyric number attribute should be stored in self.identifier.
+
+        '''
+        return self._number
+
+    @number.setter
+    def number(self, value):
+        if not common.isNum(value):
+            raise LyricException('Number best be number')
+        else:
+            self._number = value
 
 
 #-------------------------------------------------------------------------------

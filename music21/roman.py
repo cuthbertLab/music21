@@ -1494,21 +1494,19 @@ class RomanNumeral(harmony.Harmony):
             return (self.frontAlterationAccidental.modifier +
                 self.romanNumeralAlone)
 
-    @apply
-    def figure():  # @NoSelf
-        def fget(self):
-            '''
-            Gets or sets the entire figure (the whole enchilada).
-            '''
-            return self._figure
+    @property
+    def figure(self):
+        '''
+        Gets or sets the entire figure (the whole enchilada).
+        '''
+        return self._figure
 
-        def fset(self, newFigure):
-            self._figure = newFigure
-            if self._parsingComplete:
-                self._parseFigure()
-                self._updatePitches()
-
-        return property(**locals())
+    @figure.setter
+    def figure(self, newFigure):
+        self._figure = newFigure
+        if self._parsingComplete:
+            self._parseFigure()
+            self._updatePitches()
 
     @property
     def figureAndKey(self):
@@ -1541,113 +1539,113 @@ class RomanNumeral(harmony.Harmony):
             tonic = tonic.upper()
         return '%s in %s%s' % (self.figure, tonic, mode)
 
-    @apply
-    def key():  # @NoSelf
-        def fget(self):
-            '''
-            Gets or Sets the current Key (or Scale object) for a given
-            RomanNumeral object.
+    @property
+    def key(self):
+        '''
+        Gets or Sets the current Key (or Scale object) for a given
+        RomanNumeral object.
 
-            If a new key is set, then the pitches will probably change:
+        If a new key is set, then the pitches will probably change:
 
-            ::
+        ::
 
-                >>> from music21 import roman
-                >>> r1 = roman.RomanNumeral('V')
+            >>> from music21 import roman
+            >>> r1 = roman.RomanNumeral('V')
 
-            (implicit C-major)
+        (implicit C-major)
 
-            ::
+        ::
 
-                >>> [str(p) for p in r1.pitches]
-                ['G4', 'B4', 'D5']
+            >>> [str(p) for p in r1.pitches]
+            ['G4', 'B4', 'D5']
 
-            Change to A major
+        Change to A major
 
-            ::
+        ::
 
-                >>> r1.key = key.Key('A')
-                >>> [str(p) for p in r1.pitches]
-                ['E5', 'G#5', 'B5']
+            >>> r1.key = key.Key('A')
+            >>> [str(p) for p in r1.pitches]
+            ['E5', 'G#5', 'B5']
 
-            ::
+        ::
 
-                >>> r1
-                <music21.roman.RomanNumeral V in A major>
+            >>> r1
+            <music21.roman.RomanNumeral V in A major>
 
-            ::
+        ::
 
-                >>> r1.key
-                <music21.key.Key of A major>
+            >>> r1.key
+            <music21.key.Key of A major>
 
-            ::
+        ::
 
-                >>> r1.key = key.Key('e')
-                >>> [str(p) for p in r1.pitches]
-                ['B4', 'D#5', 'F#5']
+            >>> r1.key = key.Key('e')
+            >>> [str(p) for p in r1.pitches]
+            ['B4', 'D#5', 'F#5']
 
-            ::
+        ::
 
-                >>> r1
-                <music21.roman.RomanNumeral V in e minor>
+            >>> r1
+            <music21.roman.RomanNumeral V in e minor>
 
-            '''
-            return self._scale
+        '''
+        return self._scale
 
-        def fset(self, keyOrScale):
-            '''
-            Provide a new key or scale, and re-configure the RN with the
-            existing figure.
-            '''
-            # try to get Scale or Key object from cache: this will offer
-            # performance boost as Scale stores cached pitch segments
-            if common.isStr(keyOrScale):
-                if keyOrScale in _keyCache:
-                    keyOrScale = _keyCache[keyOrScale]
-                else:
-                    keyOrScale = key.Key(keyOrScale)
-                    _keyCache[keyOrScale] = keyOrScale
-            elif keyOrScale is not None:
-                #environLocal.printDebug(['got keyOrScale', keyOrScale])
-                try:
-                    keyClasses = keyOrScale.classes
-                except:
-                    raise RomanNumeralException(
-                        'Cannot call classes on object {0!r}, send only Key '
-                        'or Scale Music21Objects'.format(keyOrScale))
-                if 'Key' in keyClasses:
-                    if keyOrScale.name in _keyCache:
-                        # use stored scale as already has cache
-                        keyOrScale = _keyCache[keyOrScale.name]
-                    else:
-                        _keyCache[keyOrScale.name] = keyOrScale
-                elif 'Scale' in keyClasses:
-                    if keyOrScale.name in _scaleCache:
-                        # use stored scale as already has cache
-                        keyOrScale = _scaleCache[keyOrScale.name]
-                    else:
-                        _scaleCache[keyOrScale.name] = keyOrScale
-                else:
-                    raise RomanNumeralException(
-                        'Cannot get a key from this object {0!r}, send only '
-                        'Key or Scale objects'.format(keyOrScale))
+    @key.setter
+    def key(self, keyOrScale):
+        '''
+        Provide a new key or scale, and re-configure the RN with the
+        existing figure.
+        '''
+        # try to get Scale or Key object from cache: this will offer
+        # performance boost as Scale stores cached pitch segments
+        if common.isStr(keyOrScale):
+            if keyOrScale in _keyCache:
+                keyOrScale = _keyCache[keyOrScale]
             else:
-                pass
-                # cache object if passed directly
-            self._scale = keyOrScale
-            if keyOrScale is None or (hasattr(keyOrScale, "isConcrete") and
-                not keyOrScale.isConcrete):
-                self.useImpliedScale = True
-                if self._scale is not None:
-                    self.impliedScale = self._scale.derive(1, 'C')
+                keyOrScale = key.Key(keyOrScale)
+                _keyCache[keyOrScale] = keyOrScale
+        elif keyOrScale is not None:
+            #environLocal.printDebug(['got keyOrScale', keyOrScale])
+            try:
+                keyClasses = keyOrScale.classes
+            except:
+                raise RomanNumeralException(
+                    'Cannot call classes on object {0!r}, send only Key '
+                    'or Scale Music21Objects'.format(keyOrScale))
+            if 'Key' in keyClasses:
+                if keyOrScale.name in _keyCache:
+                    # use stored scale as already has cache
+                    keyOrScale = _keyCache[keyOrScale.name]
                 else:
-                    self.impliedScale = scale.MajorScale('C')
+                    _keyCache[keyOrScale.name] = keyOrScale
+            elif 'Scale' in keyClasses:
+                if keyOrScale.name in _scaleCache:
+                    # use stored scale as already has cache
+                    keyOrScale = _scaleCache[keyOrScale.name]
+                else:
+                    _scaleCache[keyOrScale.name] = keyOrScale
             else:
-                self.useImpliedScale = False
-            # need to permit object creation with no arguments, thus
-            # self._figure can be None
-            if self._parsingComplete:
-                self._updatePitches()
+                raise RomanNumeralException(
+                    'Cannot get a key from this object {0!r}, send only '
+                    'Key or Scale objects'.format(keyOrScale))
+        else:
+            pass
+            # cache object if passed directly
+        self._scale = keyOrScale
+        if keyOrScale is None or (hasattr(keyOrScale, "isConcrete") and
+            not keyOrScale.isConcrete):
+            self.useImpliedScale = True
+            if self._scale is not None:
+                self.impliedScale = self._scale.derive(1, 'C')
+            else:
+                self.impliedScale = scale.MajorScale('C')
+        else:
+            self.useImpliedScale = False
+        # need to permit object creation with no arguments, thus
+        # self._figure can be None
+        if self._parsingComplete:
+            self._updatePitches()
 #            environLocal.printDebug([
 #                'Roman.setKeyOrScale:',
 #                'called w/ scale', self.key,
@@ -1655,7 +1653,6 @@ class RomanNumeral(harmony.Harmony):
 #                'pitches', self.pitches,
 #                ])
 
-        return property(**locals())
 
 #    def nextInversion(self):
 #        '''
@@ -1684,29 +1681,28 @@ class RomanNumeral(harmony.Harmony):
 #        self._bassMemberIndex = ((self._bassMemberIndex + 1) %
 #            len(self._members))
 
-    @apply
-    def scaleDegreeWithAlteration():  # @NoSelf
-        def fget(self):
-            '''
-            Returns or sets a two element tuple of the scale degree and the
-            accidental that alters the scale degree for things such as #ii or
-            bV.
+    @property
+    def scaleDegreeWithAlteration(self):
+        '''
+        Returns or sets a two element tuple of the scale degree and the
+        accidental that alters the scale degree for things such as #ii or
+        bV.
 
-            Note that vi and vii in minor have a frontAlterationAccidental of
-            <sharp> even if it is not preceded by a # sign.
+        Note that vi and vii in minor have a frontAlterationAccidental of
+        <sharp> even if it is not preceded by a # sign.
 
-            Has the same effect as setting .scaleDegree and
-            .frontAlterationAccidental separately
-            '''
-            return (self.scaleDegree, self.frontAlterationAccidental)
+        Has the same effect as setting .scaleDegree and
+        .frontAlterationAccidental separately
+        '''
+        return (self.scaleDegree, self.frontAlterationAccidental)
 
-        def fset(self, scaleDegree, alteration):
-            self.scaleDegree = scaleDegree
-            self.frontAlterationAccidental = alteration
-            if self._parsingComplete:
-                self._updatePitches()
+    @scaleDegreeWithAlteration.setter
+    def scaleDegreeWithAlteration(self, scaleDegree, alteration):
+        self.scaleDegree = scaleDegree
+        self.frontAlterationAccidental = alteration
+        if self._parsingComplete:
+            self._updatePitches()
 
-        return property(**locals())
 
     def bassScaleDegreeFromNotation(self, notationObject):
         '''
@@ -1753,47 +1749,46 @@ class RomanNumeral(harmony.Harmony):
             bassSD = 7
         return bassSD
 
-    @apply
-    def functionalityScore():  # @NoSelf
-        def fget(self):
-            '''
-            Return or set a number from 1 to 100 representing the relative
-            functionality of this RN.figure (possibly given the mode, etc.).
+    @property
+    def functionalityScore(self):
+        '''
+        Return or set a number from 1 to 100 representing the relative
+        functionality of this RN.figure (possibly given the mode, etc.).
 
-            Numbers are ordinal, not cardinal.
+        Numbers are ordinal, not cardinal.
 
-            ::
+        ::
 
-                >>> from music21 import roman
-                >>> rn1 = roman.RomanNumeral('V7')
-                >>> rn1.functionalityScore
-                80
+            >>> from music21 import roman
+            >>> rn1 = roman.RomanNumeral('V7')
+            >>> rn1.functionalityScore
+            80
 
-            ::
+        ::
 
-                >>> rn2 = roman.RomanNumeral('vi6')
-                >>> rn2.functionalityScore
-                10
+            >>> rn2 = roman.RomanNumeral('vi6')
+            >>> rn2.functionalityScore
+            10
 
-            ::
+        ::
 
-                >>> rn2.functionalityScore = 99
-                >>> rn2.functionalityScore
-                99
+            >>> rn2.functionalityScore = 99
+            >>> rn2.functionalityScore
+            99
 
-            '''
-            if self._functionalityScore is not None:
-                return self._functionalityScore
-            try:
-                score = functionalityScores[self.figure]
-            except KeyError:
-                score = 0
-            return score
+        '''
+        if self._functionalityScore is not None:
+            return self._functionalityScore
+        try:
+            score = functionalityScores[self.figure]
+        except KeyError:
+            score = 0
+        return score
 
-        def fset(self, value):
-            self._functionalityScore = value
+    @functionalityScore.setter
+    def functionalityScore(self, value):
+        self._functionalityScore = value
 
-        return property(**locals())
 
 #------------------------------------------------------------------------------
 

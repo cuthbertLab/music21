@@ -534,23 +534,22 @@ class DateSingle(object):
         # get from stored Date object
         return self._data[0].datetime
 
-    @apply
-    def relevance():  # @NoSelf
-        def fget(self):
-            return self._relevance
+    @property
+    def relevance(self):
+        return self._relevance
 
-        def fset(self, value):
-            if value in ['certain', 'approximate', 'uncertain']:
-                self._relevance = value
-                self._dataError = []
-                # only here is dataError the same as relevance
-                self._dataError.append(value)
-            else:
-                raise exceptions21.MetadataException(
-                    'Relevance value is not supported by this object: '
-                    '{0!r}'.format(value))
+    @relevance.setter
+    def relevance(self, value):
+        if value in ['certain', 'approximate', 'uncertain']:
+            self._relevance = value
+            self._dataError = []
+            # only here is dataError the same as relevance
+            self._dataError.append(value)
+        else:
+            raise exceptions21.MetadataException(
+                'Relevance value is not supported by this object: '
+                '{0!r}'.format(value))
 
-        return property(**locals())
 
 
 #------------------------------------------------------------------------------
@@ -586,19 +585,18 @@ class DateRelative(DateSingle):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def relevance():  # @NoSelf
-        def fget(self):
-            return self._relevance
+    @property
+    def relevance(self):
+        return self._relevance
 
-        def fset(self, value):
-            if value not in ['prior', 'after']:
-                raise exceptions21.MetadataException(
-                    'Relevance value is not supported by this object: '
-                    '{0!r}'.format(value))
-            self._relevance = value
+    @relevance.setter
+    def relevance(self, value):
+        if value not in ['prior', 'after']:
+            raise exceptions21.MetadataException(
+                'Relevance value is not supported by this object: '
+                '{0!r}'.format(value))
+        self._relevance = value
 
-        return property(**locals())
 
 
 #------------------------------------------------------------------------------
@@ -657,19 +655,18 @@ class DateBetween(DateSingle):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def relevance():  # @NoSelf
-        def fget(self):
-            return self._relevance
+    @property
+    def relevance(self):
+        return self._relevance
 
-        def fset(self, value):
-            if value not in ['between']:
-                raise exceptions21.MetadataException(
-                    'Relevance value is not supported by this object: '
-                    '{0!r}'.format(value))
-            self._relevance = value
+    @relevance.setter
+    def relevance(self, value):
+        if value not in ['between']:
+            raise exceptions21.MetadataException(
+                'Relevance value is not supported by this object: '
+                '{0!r}'.format(value))
+        self._relevance = value
 
-        return property(**locals())
 
 
 #------------------------------------------------------------------------------
@@ -735,19 +732,18 @@ class DateSelection(DateSingle):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def relevance():  # @NoSelf
-        def fget(self):
-            return self._relevance
+    @property
+    def relevance(self):
+        return self._relevance
 
-        def fset(self, value):
-            if value not in ['or']:
-                raise exceptions21.MetadataException(
-                    'Relevance value is not supported by this object: '
-                    '{0!r}'.format(value))
-            self._relevance = value
+    @relevance.setter
+    def relevance(self, value):
+        if value not in ['or']:
+            raise exceptions21.MetadataException(
+                'Relevance value is not supported by this object: '
+                '{0!r}'.format(value))
+        self._relevance = value
 
-        return property(**locals())
 
 
 #------------------------------------------------------------------------------
@@ -791,27 +787,26 @@ class Text(object):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def language():  # @NoSelf
-        def fget(self):
-            r'''
-            Set the language of the Text stored within.
+    @property
+    def language(self):
+        r'''
+        Set the language of the Text stored within.
 
-            ::
+        ::
 
-                >>> from music21 import metadata
-                >>> t = metadata.Text('my text')
-                >>> t.language = 'en'
-                >>> t.language
-                'en'
+            >>> from music21 import metadata
+            >>> t = metadata.Text('my text')
+            >>> t.language = 'en'
+            >>> t.language
+            'en'
 
-            '''
-            return self._language
+        '''
+        return self._language
 
-        def fset(self, value):
-            self._language = value
+    @language.setter
+    def language(self, value):
+        self._language = value
 
-        return property(**locals())
 
     ### PUBLIC METHODS ###
 
@@ -970,37 +965,36 @@ class Contributor(object):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def name():  # @NoSelf
-        def fget(self):
-            r'''
-            Returns the text name, or the first of many names entered.
+    @property
+    def name(self):
+        r'''
+        Returns the text name, or the first of many names entered.
 
-            ::
+        ::
 
-                >>> from music21 import metadata
-                >>> td = metadata.Contributor(
-                ...     role='composer',
-                ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
-                ...     )
-                >>> td.name
-                'Chopin, Fryderyk'
+            >>> from music21 import metadata
+            >>> td = metadata.Contributor(
+            ...     role='composer',
+            ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
+            ...     )
+            >>> td.name
+            'Chopin, Fryderyk'
 
-            ::
+        ::
 
-                >>> td.names
-                ['Chopin, Fryderyk', 'Chopin, Frederick']
+            >>> td.names
+            ['Chopin, Fryderyk', 'Chopin, Frederick']
 
-            '''
-            # return first name
-            return str(self._names[0])
+        '''
+        # return first name
+        return str(self._names[0])
 
-        def fset(self, value):
-            # return first name
-            self._names = []  # reset
-            self._names.append(Text(value))
+    @name.setter
+    def name(self, value):
+        # return first name
+        self._names = []  # reset
+        self._names.append(Text(value))
 
-        return property(**locals())
 
     @property
     def names(self):
@@ -1024,41 +1018,40 @@ class Contributor(object):
             msg.append(str(n))
         return msg
 
-    @apply
-    def role():  # @NoSelf
-        def fget(self):
-            r'''
-            The role is what part this Contributor plays in the work.  Both
-            full roll strings and roll abbreviations may be used.
+    @property
+    def role(self):
+        r'''
+        The role is what part this Contributor plays in the work.  Both
+        full roll strings and roll abbreviations may be used.
 
-            ::
+        ::
 
-                >>> from music21 import metadata
-                >>> td = metadata.Contributor()
-                >>> td.role = 'composer'
-                >>> td.role
-                'composer'
+            >>> from music21 import metadata
+            >>> td = metadata.Contributor()
+            >>> td.role = 'composer'
+            >>> td.role
+            'composer'
 
-            ::
+        ::
 
-                >>> td.role = 'lor'
-                >>> td.role
-                'orchestrator'
+            >>> td.role = 'lor'
+            >>> td.role
+            'orchestrator'
 
-            '''
-            return self._role
+        '''
+        return self._role
 
-        def fset(self, value):
-            if value is None or value in self.roleAbbreviationsDict.values():
-                self._role = value
-            elif value in self.roleAbbreviationsDict.keys():
-                self._role = self.roleAbbreviationsDict[value]
-            else:
-                raise exceptions21.MetadataException(
-                    'Role value is not supported by this object: '
-                    '{0!r}'.format(value))
+    @role.setter
+    def role(self, value):
+        if value is None or value in self.roleAbbreviationsDict.values():
+            self._role = value
+        elif value in self.roleAbbreviationsDict.keys():
+            self._role = self.roleAbbreviationsDict[value]
+        else:
+            raise exceptions21.MetadataException(
+                'Role value is not supported by this object: '
+                '{0!r}'.format(value))
 
-        return property(**locals())
 
     @staticmethod
     def abbreviationToRole(abbreviation):

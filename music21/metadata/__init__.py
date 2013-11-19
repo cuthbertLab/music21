@@ -550,65 +550,61 @@ class Metadata(base.Music21Object):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def alternativeTitle():  # @NoSelf
-        def fget(self):
-            r'''
-            Get or set the alternative title.
+    @property
+    def alternativeTitle(self):
+        r'''
+        Get or set the alternative title.
 
-            ::
+        ::
 
-                >>> from music21 import metadata
-                >>> md = metadata.Metadata(popularTitle='Eroica')
-                >>> md.alternativeTitle = 'Heroic Symphony'
-                >>> md.alternativeTitle
-                'Heroic Symphony'
+            >>> from music21 import metadata
+            >>> md = metadata.Metadata(popularTitle='Eroica')
+            >>> md.alternativeTitle = 'Heroic Symphony'
+            >>> md.alternativeTitle
+            'Heroic Symphony'
 
-            '''
-            result = self._workIds['alternativeTitle']
-            if result is not None:
-                return str(result)
+        '''
+        result = self._workIds['alternativeTitle']
+        if result is not None:
+            return str(result)
 
-        def fset(self, value):
-            self._workIds['alternativeTitle'] = Text(value)
+    @alternativeTitle.setter
+    def alternativeTitle(self, value):
+        self._workIds['alternativeTitle'] = Text(value)
 
-        return property(**locals())
+    @property
+    def composer(self):
+        r'''
+        Get or set the composer of this work. More than one composer may be
+        specified.
 
-    @apply
-    def composer():  # @NoSelf
-        def fget(self):
-            r'''
-            Get or set the composer of this work. More than one composer may be
-            specified.
+        The composer attribute does not live in Metadata, but creates a
+        :class:`~music21.metadata.Contributor` object in the Metadata
+        object.
 
-            The composer attribute does not live in Metadata, but creates a
-            :class:`~music21.metadata.Contributor` object in the Metadata
-            object.
+        ::
 
-            ::
+            >>> from music21 import metadata
+            >>> md = metadata.Metadata(
+            ...     title='Third Symphony',
+            ...     popularTitle='Eroica',
+            ...     composer='Beethoven, Ludwig van',
+            ...     )
+            >>> md.composer
+            'Beethoven, Ludwig van'
 
-                >>> from music21 import metadata
-                >>> md = metadata.Metadata(
-                ...     title='Third Symphony',
-                ...     popularTitle='Eroica',
-                ...     composer='Beethoven, Ludwig van',
-                ...     )
-                >>> md.composer
-                'Beethoven, Ludwig van'
+        '''
+        result = self.getContributorsByRole('composer')
+        if result is not None:
+            # get just the name of the first composer
+            return str(result[0].name)
 
-            '''
-            result = self.getContributorsByRole('composer')
-            if result is not None:
-                # get just the name of the first composer
-                return str(result[0].name)
-
-        def fset(self, value):
-            c = Contributor()
-            c.name = value
-            c.role = 'composer'
-            self._contributors.append(c)
-
-        return property(**locals())
+    @composer.setter
+    def composer(self, value):
+        c = Contributor()
+        c.name = value
+        c.role = 'composer'
+        self._contributors.append(c)
 
     @property
     def composers(self):
@@ -621,190 +617,177 @@ class Metadata(base.Music21Object):
             # get just the name of the first composer
             return [x.name for x in result]
 
-    @apply
-    def date():  # @NoSelf
-        def fget(self):
-            r'''
-            Get or set the date of this work as one of the following date
-            objects:
+    @property
+    def date(self):
+        r'''
+        Get or set the date of this work as one of the following date
+        objects:
 
-            :class:`~music21.metadata.DateSingle`,
-            :class:`~music21.metadata.DateRelative`,
-            :class:`~music21.metadata.DateBetween`,
-            :class:`~music21.metadata.DateSelection`,
+        :class:`~music21.metadata.DateSingle`,
+        :class:`~music21.metadata.DateRelative`,
+        :class:`~music21.metadata.DateBetween`,
+        :class:`~music21.metadata.DateSelection`,
 
-            ::
+        ::
 
-                >>> from music21 import metadata
-                >>> md = metadata.Metadata(
-                ...     title='Third Symphony',
-                ...     popularTitle='Eroica',
-                ...     composer='Beethoven, Ludwig van',
-                ...     )
-                >>> md.date = '2010'
-                >>> md.date
-                '2010/--/--'
+            >>> from music21 import metadata
+            >>> md = metadata.Metadata(
+            ...     title='Third Symphony',
+            ...     popularTitle='Eroica',
+            ...     composer='Beethoven, Ludwig van',
+            ...     )
+            >>> md.date = '2010'
+            >>> md.date
+            '2010/--/--'
 
-            ::
+        ::
 
-                >>> md.date = metadata.DateBetween(['2009/12/31', '2010/1/28'])
-                >>> md.date
-                '2009/12/31 to 2010/01/28'
+            >>> md.date = metadata.DateBetween(['2009/12/31', '2010/1/28'])
+            >>> md.date
+            '2009/12/31 to 2010/01/28'
 
-            '''
-            return str(self._date)
+        '''
+        return str(self._date)
 
-        def fset(self, value):
-            # all inherit date single
-            if isinstance(value, DateSingle):
-                self._date = value
-            else:
-                # assume date single; could be other sublcass
-                ds = DateSingle(value)
-                self._date = ds
+    @date.setter
+    def date(self, value):
+        # all inherit date single
+        if isinstance(value, DateSingle):
+            self._date = value
+        else:
+            # assume date single; could be other sublcass
+            ds = DateSingle(value)
+            self._date = ds
 
-        return property(**locals())
+    @property
+    def localeOfComposition(self):
+        r'''
+        Get or set the locale of composition, or origin, of the work.
+        '''
+        result = self._workIds['localeOfComposition']
+        if result is not None:
+            return str(result)
 
-    @apply
-    def localeOfComposition():  # @NoSelf
-        def fget(self):
-            r'''
-            Get or set the locale of composition, or origin, of the work.
-            '''
-            result = self._workIds['localeOfComposition']
-            if result is not None:
-                return str(result)
+    @localeOfComposition.setter
+    def localeOfComposition(self, value):
+        self._workIds['localeOfComposition'] = Text(value)
 
-        def fset(self, value):
-            self._workIds['localeOfComposition'] = Text(value)
+    @property
+    def movementName(self):
+        r'''
+        Get or set the movement title.
 
-        return property(**locals())
+        Note that a number of pieces from various MusicXML datasets have
+        the piece title as the movement title. For instance, the Bach
+        Chorales, since they are technically movements of larger cantatas.
 
-    @apply
-    def movementName():  # @NoSelf
-        def fget(self):
-            r'''
-            Get or set the movement title.
+        '''
+        result = self._workIds['movementName']
+        if result is not None:
+            return str(result)
 
-            Note that a number of pieces from various MusicXML datasets have
-            the piece title as the movement title. For instance, the Bach
-            Chorales, since they are technically movements of larger cantatas.
+    @movementName.setter
+    def movementName(self, value):
+        self._workIds['movementName'] = Text(value)
 
-            '''
-            result = self._workIds['movementName']
-            if result is not None:
-                return str(result)
+    @property
+    def movementNumber(self):
+        r'''
+        Get or set the movement number.
+        '''
+        result = self._workIds['movementNumber']
+        if result is not None:
+            return str(result)
 
-        def fset(self, value):
-            self._workIds['movementName'] = Text(value)
+    @movementNumber.setter
+    def movementNumber(self, value):
+        self._workIds['movementNumber'] = Text(value)
 
-        return property(**locals())
+    @property
+    def number(self):
+        r'''
+        Get or set the number of the work.
 
-    @apply
-    def movementNumber():  # @NoSelf
-        def fget(self):
-            r'''
-            Get or set the movement number.
-            '''
-            result = self._workIds['movementNumber']
-            if result is not None:
-                return str(result)
+        TODO: Explain what this means...
+        '''
+        result = self._workIds['number']
+        if result is not None:
+            return str(result)
 
-        def fset(self, value):
-            self._workIds['movementNumber'] = Text(value)
+    @number.setter
+    def number(self, value):
+        self._workIds['number'] = Text(value)
 
-        return property(**locals())
+    @property
+    def opusNumber(self):
+        r'''
+        Get or set the opus number.
+        '''
+        result = self._workIds['opusNumber']
+        if result is not None:
+            return str(result)
 
-    @apply
-    def number():  # @NoSelf
-        def fget(self):
-            r'''
-            Get or set the number of the work.
+    @opusNumber.setter
+    def opusNumber(self, value):
+        self._workIds['opusNumber'] = Text(value)
 
-            TODO: Explain what this means...
-            '''
-            result = self._workIds['number']
-            if result is not None:
-                return str(result)
+    @property
+    def title(self):
+        r'''
+        Get the title of the work, or the next-matched title string
+        available from a related parameter fields.
 
-        def fset(self, value):
-            self._workIds['number'] = Text(value)
+        ::
 
-        return property(**locals())
+            >>> from music21 import metadata
+            >>> md = metadata.Metadata(title='Third Symphony')
+            >>> md.title
+            'Third Symphony'
 
-    @apply
-    def opusNumber():  # @NoSelf
-        def fget(self):
-            r'''
-            Get or set the opus number.
-            '''
-            result = self._workIds['opusNumber']
-            if result is not None:
-                return str(result)
+        ::
 
-        def fset(self, value):
-            self._workIds['opusNumber'] = Text(value)
+            >>> md = metadata.Metadata(popularTitle='Eroica')
+            >>> md.title
+            'Eroica'
 
-        return property(**locals())
+        ::
 
-    @apply
-    def title():  # @NoSelf
-        def fget(self):
-            r'''
-            Get the title of the work, or the next-matched title string
-            available from a related parameter fields.
+            >>> md = metadata.Metadata(
+            ...     title='Third Symphony',
+            ...     popularTitle='Eroica',
+            ...     )
+            >>> md.title
+            'Third Symphony'
 
-            ::
+        ::
 
-                >>> from music21 import metadata
-                >>> md = metadata.Metadata(title='Third Symphony')
-                >>> md.title
-                'Third Symphony'
+            >>> md.popularTitle
+            'Eroica'
 
-            ::
+        ::
 
-                >>> md = metadata.Metadata(popularTitle='Eroica')
-                >>> md.title
-                'Eroica'
+            >>> md.otp
+            'Eroica'
 
-            ::
+        '''
+        searchId = (
+            'title',
+            'popularTitle',
+            'alternativeTitle',
+            'movementName',
+            )
+        result = None
+        for key in searchId:
+            result = self._workIds[key]
+            if result is not None:  # get first matched
+                # get a string from this Text object
+                # get with normalized articles
+                return self._workIds[key].getNormalizedArticle()
 
-                >>> md = metadata.Metadata(
-                ...     title='Third Symphony',
-                ...     popularTitle='Eroica',
-                ...     )
-                >>> md.title
-                'Third Symphony'
+    @title.setter
+    def title(self, value):
+        self._workIds['title'] = Text(value)
 
-            ::
-
-                >>> md.popularTitle
-                'Eroica'
-
-            ::
-
-                >>> md.otp
-                'Eroica'
-
-            '''
-            searchId = (
-                'title',
-                'popularTitle',
-                'alternativeTitle',
-                'movementName',
-                )
-            result = None
-            for key in searchId:
-                result = self._workIds[key]
-                if result is not None:  # get first matched
-                    # get a string from this Text object
-                    # get with normalized articles
-                    return self._workIds[key].getNormalizedArticle()
-
-        def fset(self, value):
-            self._workIds['title'] = Text(value)
-
-        return property(**locals())
 
 
 #------------------------------------------------------------------------------

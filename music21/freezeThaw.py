@@ -1489,7 +1489,6 @@ class JSONFreezer(JSONFreezeThawBase):
                     "_displayType": "normal", 
                     "_modifier": "#", 
                     "_name": "sharp", 
-                    "_priority": 0
                 }, 
                 "__class__": "music21.pitch.Accidental"
                 }, 

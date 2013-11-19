@@ -106,20 +106,19 @@ class StreamStatus(object):
     def client(self):
         return self._client
 
-    @apply
-    def beams():
-        def fget(self):
-            if self._beams is None:
-                self._beams = self.haveBeamsBeenMade()
-            return self._beams
+    @property
+    def beams(self):
+        if self._beams is None:
+            self._beams = self.haveBeamsBeenMade()
+        return self._beams
 
-        def fset(self, expr):
-            if expr is not None:
-                self._beams = bool(expr)
-            else:
-                self._beams = None
+    @beams.setter
+    def beams(self, expr):
+        if expr is not None:
+            self._beams = bool(expr)
+        else:
+            self._beams = None
 
-        return property(**locals())
 
 
 #------------------------------------------------------------------------------

@@ -1207,33 +1207,33 @@ class Tuplet(object):
         ordStr = common.ordinalAbbreviation(numNormal, plural=True)
         return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
 
-    @apply
-    def tupletActual():
-        def fget(self):
-            '''
-            Get or set a two element list of number notes actual and duration
-            actual.
-            '''
-            return [self.numberNotesActual, self.durationActual]
-        def fset(self, tupList=[]):
-            if self.frozen is True:
-                raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-            self.numberNotesActual, self.durationActual = tupList
-        return property(**locals())
+    @property
+    def tupletActual(self):
+        '''
+        Get or set a two element list of number notes actual and duration
+        actual.
+        '''
+        return [self.numberNotesActual, self.durationActual]
 
-    @apply
-    def tupletNormal():
-        def fget(self):
-            '''
-            Get or set a two element list of number notes actual and duration
-            normal.
-            '''
-            return self.numberNotesNormal, self.durationNormal
-        def fset(self, tupList=[]):
-            if self.frozen is True:
-                raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-            self.numberNotesNormal, self.durationNormal = tupList
-        return property(**locals())
+    @tupletActual.setter
+    def tupletActual(self, tupList=[]):
+        if self.frozen is True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+        self.numberNotesActual, self.durationActual = tupList
+
+    @property
+    def tupletNormal(self):
+        '''
+        Get or set a two element list of number notes actual and duration
+        normal.
+        '''
+        return self.numberNotesNormal, self.durationNormal
+
+    @tupletNormal.setter
+    def tupletNormal(self, tupList=[]):
+        if self.frozen is True:
+            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+        self.numberNotesNormal, self.durationNormal = tupList
 
 
 #-------------------------------------------------------------------------------
@@ -1591,89 +1591,88 @@ class DurationUnit(DurationCommon):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def dotGroups():
-        def fget(self):
-            '''
-            _dots is a list (so we can do weird things like dot groups)
-            _getDotGroups lets you do the entire list (as a tuple)
+    @property
+    def dotGroups(self):
+        '''
+        _dots is a list (so we can do weird things like dot groups)
+        _getDotGroups lets you do the entire list (as a tuple)
 
-            ::
+        ::
 
-                >>> d1 = duration.DurationUnit()
-                >>> d1.type = 'half'
-                >>> d1.dotGroups = [1, 1]  # dotted dotted half
-                >>> d1.dots
-                1
+            >>> d1 = duration.DurationUnit()
+            >>> d1.type = 'half'
+            >>> d1.dotGroups = [1, 1]  # dotted dotted half
+            >>> d1.dots
+            1
 
-            ::
+        ::
 
-                >>> d1.dotGroups
-                (1, 1)
+            >>> d1.dotGroups
+            (1, 1)
 
-            ::
+        ::
 
-                >>> d1.quarterLength
-                4.5
+            >>> d1.quarterLength
+            4.5
 
-            '''
-            if self._typeNeedsUpdating:
-                self.updateType()
-            return tuple(self._dots)
+        '''
+        if self._typeNeedsUpdating:
+            self.updateType()
+        return tuple(self._dots)
 
-        def fset(self, listValue):
-            '''
-            Sets the number of dots in a dot group
-            '''
+    @dotGroups.setter
+    def dotGroups(self, listValue):
+        '''
+        Sets the number of dots in a dot group
+        '''
+        self._quarterLengthNeedsUpdating = True
+        if common.isListLike(listValue):
+            if not isinstance(listValue, list):
+                self._dots = list(listValue)
+            else:
+                self._dots = listValue
+        else:
+            raise DurationException("number of dots must be a number")
+
+    @property
+    def dots(self):
+        '''
+        _dots is a list (so we can do weird things like dot groups)
+        Normally we only want the first element.
+        So that's what dots returns...
+
+        ::
+
+            >>> a = duration.DurationUnit()
+            >>> a.dots # dots is zero before assignment
+            0
+
+        ::
+
+            >>> a.type = 'quarter'
+            >>> a.dots = 1
+            >>> a.quarterLength
+            1.5
+
+        ::
+
+            >>> a.dots = 2
+            >>> a.quarterLength
+            1.75
+
+        '''
+        if self._typeNeedsUpdating:
+            self.updateType()
+        return self._dots[0]
+
+    @dots.setter
+    def dots(self, value):
+        if value != self._dots[0]:
             self._quarterLengthNeedsUpdating = True
-            if common.isListLike(listValue):
-                if not isinstance(listValue, list):
-                    self._dots = list(listValue)
-                else:
-                    self._dots = listValue
-            else:
-                raise DurationException("number of dots must be a number")
-        return property(**locals())
-
-    @apply
-    def dots():
-        def fget(self):
-            '''
-            _dots is a list (so we can do weird things like dot groups)
-            Normally we only want the first element.
-            So that's what dots returns...
-
-            ::
-
-                >>> a = duration.DurationUnit()
-                >>> a.dots # dots is zero before assignment
-                0
-
-            ::
-
-                >>> a.type = 'quarter'
-                >>> a.dots = 1
-                >>> a.quarterLength
-                1.5
-
-            ::
-
-                >>> a.dots = 2
-                >>> a.quarterLength
-                1.75
-
-            '''
-            if self._typeNeedsUpdating:
-                self.updateType()
-            return self._dots[0]
-        def fset(self, value):
-            if value != self._dots[0]:
-                self._quarterLengthNeedsUpdating = True
-            if common.isNum(value):
-                self._dots[0] = value
-            else:
-                raise DurationException("number of dots must be a number")
-        return property(**locals())
+        if common.isNum(value):
+            self._dots[0] = value
+        else:
+            raise DurationException("number of dots must be a number")
 
     @property
     def fullName(self):
@@ -1827,186 +1826,186 @@ class DurationUnit(DurationCommon):
         else:
             return ordinalFound
 
-    @apply
-    def quarterLength():
-        def fget(self):
-            '''
-            Property for getting or setting the quarterLength of a
-            DurationUnit.
+    @property
+    def quarterLength(self):
+        '''
+        Property for getting or setting the quarterLength of a
+        DurationUnit.
 
-            ::
+        ::
 
-                >>> a = duration.DurationUnit()
-                >>> a.quarterLength = 3
-                >>> a.quarterLength
-                3.0
+            >>> a = duration.DurationUnit()
+            >>> a.quarterLength = 3
+            >>> a.quarterLength
+            3.0
 
-            ::
+        ::
 
-                >>> a.type
-                'half'
+            >>> a.type
+            'half'
 
-            ::
+        ::
 
-                >>> a.dots
-                1
+            >>> a.dots
+            1
 
-            ::
+        ::
 
-                >>> a.quarterLength = .5
-                >>> a.type
-                'eighth'
+            >>> a.quarterLength = .5
+            >>> a.type
+            'eighth'
 
-            ::
+        ::
 
-                >>> a.quarterLength = .75
-                >>> a.type
-                'eighth'
+            >>> a.quarterLength = .75
+            >>> a.type
+            'eighth'
 
-            ::
+        ::
 
-                >>> a.dots
-                1
+            >>> a.dots
+            1
 
-            ::
+        ::
 
-                >>> b = duration.DurationUnit()
-                >>> b.quarterLength = 16
-                >>> b.type
-                'longa'
+            >>> b = duration.DurationUnit()
+            >>> b.quarterLength = 16
+            >>> b.type
+            'longa'
 
-            '''
-            if self._quarterLengthNeedsUpdating:
-                self.updateQuarterLength()
-            return self._qtrLength
-        def fset(self, value):
-            '''Set the quarter note length to the specified value.
+        '''
+        if self._quarterLengthNeedsUpdating:
+            self.updateQuarterLength()
+        return self._qtrLength
 
-            (We no longer unlink if quarterLength is greater than a longa)
+    @quarterLength.setter
+    def quarterLength(self, value):
+        '''Set the quarter note length to the specified value.
 
-            ::
+        (We no longer unlink if quarterLength is greater than a longa)
 
-                >>> a = duration.DurationUnit()
-                >>> a.quarterLength = 3
-                >>> a.type
-                'half'
+        ::
 
-            ::
+            >>> a = duration.DurationUnit()
+            >>> a.quarterLength = 3
+            >>> a.type
+            'half'
 
-                >>> a.dots
-                1
+        ::
 
-            ::
+            >>> a.dots
+            1
 
-                >>> a.quarterLength = .5
-                >>> a.type
-                'eighth'
+        ::
 
-            ::
+            >>> a.quarterLength = .5
+            >>> a.type
+            'eighth'
 
-                >>> a.quarterLength = .75
-                >>> a.type
-                'eighth'
+        ::
 
-            ::
+            >>> a.quarterLength = .75
+            >>> a.type
+            'eighth'
 
-                >>> a.dots
-                1
+        ::
 
-            ::
+            >>> a.dots
+            1
 
-                >>> b = duration.DurationUnit()
-                >>> b.quarterLength = 16
-                >>> b.type
-                'longa'
+        ::
 
-            ::
+            >>> b = duration.DurationUnit()
+            >>> b.quarterLength = 16
+            >>> b.type
+            'longa'
 
-                >>> c = duration.DurationUnit()
-                >>> c.quarterLength = 129
-                >>> c.type
-                Traceback (most recent call last):
-                    ...
-                DurationException: Cannot return types greater than double duplex-maxima, your length was 129.0 : remove this when we are sure this works...
+        ::
 
-            '''
-            if not common.isNum(value):
-                raise DurationException(
-                "not a valid quarter length (%s)" % value)
-            if isinstance(value, int):
-                value = float(value)
-            if self._link:
-                self._typeNeedsUpdating = True
-            # need to make sure its a float for comparisons
-            self._qtrLength = value
-        return property(**locals())
+            >>> c = duration.DurationUnit()
+            >>> c.quarterLength = 129
+            >>> c.type
+            Traceback (most recent call last):
+                ...
+            DurationException: Cannot return types greater than double duplex-maxima, your length was 129.0 : remove this when we are sure this works...
 
-    @apply
-    def tuplets():
-        def fget(self):
-            '''Return a tuple of Tuplet objects '''
-            if self._typeNeedsUpdating:
-                self.updateType()
-            return self._tuplets
-        def fset(self, value):
-            '''Takes in a tuple of Tuplet objects
-            '''
-            if not isinstance(value, tuple):
-                raise DurationException(
-                "value submitted (%s) is not a tuple of tuplets" % value)
-            if self._tuplets != value:
-                self._quarterLengthNeedsUpdating = True
-            # note that in some cases this methods seems to be called more
-            # often than necessary
-            #environLocal.printDebug(['assigning tuplets in DurationUnit',
-            #                         value, id(value)])
-            for thisTuplet in value:
-                thisTuplet.frozen = True
-            self._tuplets = value
-        return property(**locals())
+        '''
+        if not common.isNum(value):
+            raise DurationException(
+            "not a valid quarter length (%s)" % value)
+        if isinstance(value, int):
+            value = float(value)
+        if self._link:
+            self._typeNeedsUpdating = True
+        # need to make sure its a float for comparisons
+        self._qtrLength = value
 
-    @apply
-    def type():
-        def fget(self):
-            '''
-            Property for getting or setting the type of a DurationUnit.
+    @property
+    def tuplets(self):
+        '''Return a tuple of Tuplet objects '''
+        if self._typeNeedsUpdating:
+            self.updateType()
+        return self._tuplets
 
-            ::
+    @tuplets.setter
+    def tuplets(self, value):
+        '''Takes in a tuple of Tuplet objects
+        '''
+        if not isinstance(value, tuple):
+            raise DurationException(
+            "value submitted (%s) is not a tuple of tuplets" % value)
+        if self._tuplets != value:
+            self._quarterLengthNeedsUpdating = True
+        # note that in some cases this methods seems to be called more
+        # often than necessary
+        #environLocal.printDebug(['assigning tuplets in DurationUnit',
+        #                         value, id(value)])
+        for thisTuplet in value:
+            thisTuplet.frozen = True
+        self._tuplets = value
 
-                >>> a = duration.DurationUnit()
-                >>> a.quarterLength = 3
-                >>> a.type
-                'half'
+    @property
+    def type(self):
+        '''
+        Property for getting or setting the type of a DurationUnit.
 
-            ::
+        ::
 
-                >>> a.dots
-                1
+            >>> a = duration.DurationUnit()
+            >>> a.quarterLength = 3
+            >>> a.type
+            'half'
 
-            ::
+        ::
 
-                >>> a.type = 'quarter'
-                >>> a.quarterLength
-                1.5
+            >>> a.dots
+            1
 
-            ::
+        ::
 
-                >>> a.type = '16th'
-                >>> a.quarterLength
-                0.375
+            >>> a.type = 'quarter'
+            >>> a.quarterLength
+            1.5
 
-            '''
-            if self._typeNeedsUpdating:
-                self.updateType()
-            return self._type
-        def fset(self, value):
-            if value not in typeToDuration:
-                raise DurationException("no such type exists: %s" % value)
-            if value != self._type:  # only update if different
-                # link status will be checked in quarterLengthNeeds updating
-                self._quarterLengthNeedsUpdating = True
-            self._type = value
-        return property(**locals())
+        ::
+
+            >>> a.type = '16th'
+            >>> a.quarterLength
+            0.375
+
+        '''
+        if self._typeNeedsUpdating:
+            self.updateType()
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        if value not in typeToDuration:
+            raise DurationException("no such type exists: %s" % value)
+        if value != self._type:  # only update if different
+            # link status will be checked in quarterLengthNeeds updating
+            self._quarterLengthNeedsUpdating = True
+        self._type = value
 
 
 #-------------------------------------------------------------------------------
@@ -2801,108 +2800,108 @@ class Duration(DurationCommon):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def components():
-        def fget(self):
-            if self._componentsNeedUpdating:
-                self._updateComponents()
-            return self._components
-        def fset(self, value):
-            # previously, self._componentsNeedUpdating was not set here
-            # this needs to be set because if _componentsNeedUpdating is True
-            # new components will be derived from quarterLength
-            if self._components is not value:
-                self._componentsNeedUpdating = False
-                self._components = value
-                # this is Ture b/c components are note the same
-                self._quarterLengthNeedsUpdating = True
-                # musst be cleared
-                self._cachedIsLinked = None
-        return property(**locals())
+    @property
+    def components(self):
+        if self._componentsNeedUpdating:
+            self._updateComponents()
+        return self._components
 
-    @apply
-    def dotGroups():
-        def fget(self):
-            '''
-            See the explanation under :class:`~music21.duration.DurationUnit` about
-            what dotGroups (medieval dotted-dotted notes are).  In a complex
-            duration, only the dotGroups of the first component matter
+    @components.setter
+    def components(self, value):
+        # previously, self._componentsNeedUpdating was not set here
+        # this needs to be set because if _componentsNeedUpdating is True
+        # new components will be derived from quarterLength
+        if self._components is not value:
+            self._componentsNeedUpdating = False
+            self._components = value
+            # this is Ture b/c components are note the same
+            self._quarterLengthNeedsUpdating = True
+            # musst be cleared
+            self._cachedIsLinked = None
 
-            ::
+    @property
+    def dotGroups(self):
+        '''
+        See the explanation under :class:`~music21.duration.DurationUnit` about
+        what dotGroups (medieval dotted-dotted notes are).  In a complex
+        duration, only the dotGroups of the first component matter
 
-                >>> from music21 import duration
-                >>> a = duration.Duration()
-                >>> a.type = 'half'
-                >>> a.dotGroups = [1,1]
-                >>> a.quarterLength
-                4.5
+        ::
 
-            '''
-            if self._componentsNeedUpdating is True:
-                self._updateComponents()
+            >>> from music21 import duration
+            >>> a = duration.Duration()
+            >>> a.type = 'half'
+            >>> a.dotGroups = [1,1]
+            >>> a.quarterLength
+            4.5
 
-            if len(self.components) == 1:
-                return self.components[0].dotGroups
-            elif len(self.components) > 1:
-                return None
-            else: # there must be 1 or more components
-                raise DurationException("Cannot get dotGroups on an object with zero DurationUnits in its duration.components (will cause problems later even if dotGroups are ignored)")
-        def fset(self, value):
-            if not common.isListLike(value):
-                raise DurationException('only list-like dotGroups values can be used with this method.')
-            if len(self.components) == 1:
-                self.components[0].dotGroups = value
-                self._quarterLengthNeedsUpdating = True
-            elif len(self.components) > 1:
-                raise DurationException("setting dotGroups: Myke and Chris need to decide what that means")
-            else: # there must be 1 or more components
-                raise DurationException("zero DurationUnits in components")
-        return property(**locals())
+        '''
+        if self._componentsNeedUpdating is True:
+            self._updateComponents()
 
-    @apply
-    def dots():
-        def fget(self):
-            '''
-            Returns the number of dots in the Duration
-            if it is a simple Duration.  Otherwise raises error.
-            '''
-            if self._componentsNeedUpdating:
-                self._updateComponents()
-            if len(self.components) == 1:
-                return self.components[0].dots
-            elif len(self.components) > 1:
-                return None
-            else:  # there must be 1 or more components
-                raise DurationException("Cannot get dots on an object with zero DurationUnits in its duration.components")
-        def fset(self, value):
-            '''
-            Set dots if a number, as first element
+        if len(self.components) == 1:
+            return self.components[0].dotGroups
+        elif len(self.components) > 1:
+            return None
+        else: # there must be 1 or more components
+            raise DurationException("Cannot get dotGroups on an object with zero DurationUnits in its duration.components (will cause problems later even if dotGroups are ignored)")
 
-            ::
+    @dotGroups.setter
+    def dotGroups(self, value):
+        if not common.isListLike(value):
+            raise DurationException('only list-like dotGroups values can be used with this method.')
+        if len(self.components) == 1:
+            self.components[0].dotGroups = value
+            self._quarterLengthNeedsUpdating = True
+        elif len(self.components) > 1:
+            raise DurationException("setting dotGroups: Myke and Chris need to decide what that means")
+        else: # there must be 1 or more components
+            raise DurationException("zero DurationUnits in components")
 
-                >>> a = duration.Duration()
-                >>> a.type = 'quarter'
-                >>> a.dots = 1
-                >>> a.quarterLength
-                1.5
+    @property
+    def dots(self):
+        '''
+        Returns the number of dots in the Duration
+        if it is a simple Duration.  Otherwise raises error.
+        '''
+        if self._componentsNeedUpdating:
+            self._updateComponents()
+        if len(self.components) == 1:
+            return self.components[0].dots
+        elif len(self.components) > 1:
+            return None
+        else:  # there must be 1 or more components
+            raise DurationException("Cannot get dots on an object with zero DurationUnits in its duration.components")
 
-            ::
+    @dots.setter
+    def dots(self, value):
+        '''
+        Set dots if a number, as first element
 
-                >>> a.dots = 2
-                >>> a.quarterLength
-                1.75
+        ::
 
-            '''
-            if not common.isNum(value):
-                raise DurationException('only numeric dot values can be used with this method.')
-            if len(self.components) == 1:
-                self.components[0].dots = value
-                self._quarterLengthNeedsUpdating = True
-            elif len(self.components) > 1:
-                raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
-            else:  # there must be 1 or more components
-                raise DurationException("Cannot set dots on an object with zero DurationUnits in its duration.components")
-        return property(**locals())
+            >>> a = duration.Duration()
+            >>> a.type = 'quarter'
+            >>> a.dots = 1
+            >>> a.quarterLength
+            1.5
+
+        ::
+
+            >>> a.dots = 2
+            >>> a.quarterLength
+            1.75
+
+        '''
+        if not common.isNum(value):
+            raise DurationException('only numeric dot values can be used with this method.')
+        if len(self.components) == 1:
+            self.components[0].dots = value
+            self._quarterLengthNeedsUpdating = True
+        elif len(self.components) > 1:
+            raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
+        else:  # there must be 1 or more components
+            raise DurationException("Cannot set dots on an object with zero DurationUnits in its duration.components")
 
     @property
     def fullName(self):
@@ -3106,150 +3105,150 @@ class Duration(DurationCommon):
         else:
             return None
 
-    @apply
-    def quarterLength():
-        def fget(self):
-            '''
-            Returns the quarter note length or Sets the quarter note length to
-            the specified value.
+    @property
+    def quarterLength(self):
+        '''
+        Returns the quarter note length or Sets the quarter note length to
+        the specified value.
 
-            Currently (if the value is different from what is already stored)
-            this wipes out any existing components, not preserving their type.
-            So if you've set up Duration(1.5) as 3-eighth notes, setting
-            Duration to 1.75 will NOT dot the last eighth note, but instead
-            give you a single double-dotted half note.
+        Currently (if the value is different from what is already stored)
+        this wipes out any existing components, not preserving their type.
+        So if you've set up Duration(1.5) as 3-eighth notes, setting
+        Duration to 1.75 will NOT dot the last eighth note, but instead
+        give you a single double-dotted half note.
 
-            ::
+        ::
 
-                >>> a = duration.Duration()
-                >>> a.quarterLength = 3.5
-                >>> a.quarterLength
-                3.5
+            >>> a = duration.Duration()
+            >>> a.quarterLength = 3.5
+            >>> a.quarterLength
+            3.5
 
-            ::
+        ::
 
-                >>> for thisUnit in a.components:
-                ...    print(duration.unitSpec(thisUnit))
-                (3.5, 'half', 2, None, None, None)
+            >>> for thisUnit in a.components:
+            ...    print(duration.unitSpec(thisUnit))
+            (3.5, 'half', 2, None, None, None)
 
-            ::
+        ::
 
-                >>> a.quarterLength = 2.5
-                >>> a.quarterLength
-                2.5
+            >>> a.quarterLength = 2.5
+            >>> a.quarterLength
+            2.5
 
-            ::
+        ::
 
-                >>> for thisUnit in a.components:
-                ...    print(duration.unitSpec(thisUnit))
-                (2.0, 'half', 0, None, None, None)
-                (0.5, 'eighth', 0, None, None, None)
+            >>> for thisUnit in a.components:
+            ...    print(duration.unitSpec(thisUnit))
+            (2.0, 'half', 0, None, None, None)
+            (0.5, 'eighth', 0, None, None, None)
 
-            Note that integer values of quarter lengths get silently converted to floats:
+        Note that integer values of quarter lengths get silently converted to floats:
 
-            ::
+        ::
 
-                >>> b = duration.Duration()
-                >>> b.quarterLength = 5
-                >>> b.quarterLength
-                5.0
+            >>> b = duration.Duration()
+            >>> b.quarterLength = 5
+            >>> b.quarterLength
+            5.0
 
-            ::
+        ::
 
-                >>> b.type  # complex because 5qL cannot be expressed as a single note.
-                'complex'
+            >>> b.type  # complex because 5qL cannot be expressed as a single note.
+            'complex'
 
-            '''
-            if self._quarterLengthNeedsUpdating:
-                self.updateQuarterLength()
-            # this is set in updateQuarterLength
-            #self._quarterLengthNeedsUpdating = False
-            return self._qtrLength
-        def fset(self, value):
-            if self._qtrLength != value:
-                if isinstance(value, int):
-                    value = float(value)
-                self._qtrLength = value
-                self._componentsNeedUpdating = True
-                self._quarterLengthNeedsUpdating = False
-        return property(**locals())
+        '''
+        if self._quarterLengthNeedsUpdating:
+            self.updateQuarterLength()
+        # this is set in updateQuarterLength
+        #self._quarterLengthNeedsUpdating = False
+        return self._qtrLength
 
-    @apply
-    def tuplets():
-        def fget(self):
-            '''
-            When there are more than one component, each component may have its
-            own tuplet.
-            '''
-            if self._componentsNeedUpdating:
-                self._updateComponents()
-            if len(self.components) > 1:
-                return None
-            elif len(self.components) == 1:
-                return self.components[0].tuplets
-            else: # there must be 1 or more components
-                raise DurationException("zero DurationUnits in components")
-        def fset(self, tupletTuple):
-            #environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
-            if len(self.components) > 1:
-                raise DurationException("setting tuplets on Complex note: Myke and Chris need to decide what that means")
-            elif len(self.components) == 1:
-                for thisTuplet in tupletTuple:
-                    thisTuplet.frozen = True
-                self.components[0].tuplets = tupletTuple
-                self._quarterLengthNeedsUpdating = True
-            else: # there must be 1 or more components
-                raise DurationException("zero DurationUnits in components")
-        return property(**locals())
+    @quarterLength.setter
+    def quarterLength(self, value):
+        if self._qtrLength != value:
+            if isinstance(value, int):
+                value = float(value)
+            self._qtrLength = value
+            self._componentsNeedUpdating = True
+            self._quarterLengthNeedsUpdating = False
 
-    @apply
-    def type():
-        def fget(self):
-            '''
-            Get or set the type of the Duration.
+    @property
+    def tuplets(self):
+        '''
+        When there are more than one component, each component may have its
+        own tuplet.
+        '''
+        if self._componentsNeedUpdating:
+            self._updateComponents()
+        if len(self.components) > 1:
+            return None
+        elif len(self.components) == 1:
+            return self.components[0].tuplets
+        else: # there must be 1 or more components
+            raise DurationException("zero DurationUnits in components")
 
-            ::
+    @tuplets.setter
+    def tuplets(self, tupletTuple):
+        #environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
+        if len(self.components) > 1:
+            raise DurationException("setting tuplets on Complex note: Myke and Chris need to decide what that means")
+        elif len(self.components) == 1:
+            for thisTuplet in tupletTuple:
+                thisTuplet.frozen = True
+            self.components[0].tuplets = tupletTuple
+            self._quarterLengthNeedsUpdating = True
+        else: # there must be 1 or more components
+            raise DurationException("zero DurationUnits in components")
 
-                >>> a = duration.Duration()
-                >>> a.type = 'half'
-                >>> a.quarterLength
-                2.0
+    @property
+    def type(self):
+        '''
+        Get or set the type of the Duration.
 
-            ::
+        ::
 
-                >>> a.type= '16th'
-                >>> a.quarterLength
-                0.25
+            >>> a = duration.Duration()
+            >>> a.type = 'half'
+            >>> a.quarterLength
+            2.0
 
-            '''
-            if self._componentsNeedUpdating:
-                self._updateComponents()
+        ::
 
-            if len(self.components) == 1:
-                return self.components[0].type
-            elif len(self.components) > 1:
-                return 'complex'
-            else: # there may be components and still a zero type
-                return 'zero'
-    #            raise DurationException("zero DurationUnits in components")
-        def fset(self, value):
+            >>> a.type= '16th'
+            >>> a.quarterLength
+            0.25
 
-            # need to check that type is valid
-            if value not in ordinalTypeFromNum:
-                raise DurationException("no such type exists: %s" % value)
+        '''
+        if self._componentsNeedUpdating:
+            self._updateComponents()
 
-            if len(self.components) == 1:
-                # change the existing DurationUnit to the this type
-                self.components[0].type = value
-                self._quarterLengthNeedsUpdating = True
-            elif self.isComplex: # more than one component
-                raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
-                # what do we do if we already have multiple DurationUnits
-            else: # permit creating a new comoponent
-                # create a new duration unit
-                self.addDurationUnit(DurationUnit(value)) # updates
-                self._quarterLengthNeedsUpdating = True
-        return property(**locals())
+        if len(self.components) == 1:
+            return self.components[0].type
+        elif len(self.components) > 1:
+            return 'complex'
+        else: # there may be components and still a zero type
+            return 'zero'
+#            raise DurationException("zero DurationUnits in components")
+
+    @type.setter
+    def type(self, value):
+
+        # need to check that type is valid
+        if value not in ordinalTypeFromNum:
+            raise DurationException("no such type exists: %s" % value)
+
+        if len(self.components) == 1:
+            # change the existing DurationUnit to the this type
+            self.components[0].type = value
+            self._quarterLengthNeedsUpdating = True
+        elif self.isComplex: # more than one component
+            raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
+            # what do we do if we already have multiple DurationUnits
+        else: # permit creating a new comoponent
+            # create a new duration unit
+            self.addDurationUnit(DurationUnit(value)) # updates
+            self._quarterLengthNeedsUpdating = True
 
 
 
@@ -3341,39 +3340,39 @@ class GraceDuration(Duration):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def makeTime():
-        def fget(self):
-            return self._makeTime
-        def fset(self, expr):
-            assert expr in (True, False, None)
-            self._makeTime = bool(expr)
-        return property(**locals())
+    @property
+    def makeTime(self):
+        return self._makeTime
+
+    @makeTime.setter
+    def makeTime(self, expr):
+        assert expr in (True, False, None)
+        self._makeTime = bool(expr)
         
-    @apply
-    def slash():
-        def fget(self):
-            return self._slash
-        def fset(self, expr):
-            assert expr in (True, False, None)
-            self._slash = bool(expr)
-        return property(**locals())
+    @property
+    def slash(self):
+        return self._slash
+
+    @slash.setter
+    def slash(self, expr):
+        assert expr in (True, False, None)
+        self._slash = bool(expr)
         
-    @apply
-    def stealTimePrevious():
-        def fget(self):
-            return self._stealTimePrevious
-        def fset(self, expr):
-            self._stealTimePrevious = expr
-        return property(**locals())
+    @property
+    def stealTimePrevious(self):
+        return self._stealTimePrevious
+
+    @stealTimePrevious.setter
+    def stealTimePrevious(self, expr):
+        self._stealTimePrevious = expr
         
-    @apply
-    def stealTimeFollowing():
-        def fget(self):
-            return self._stealTimeFollowing
-        def fset(self, expr):
-            self._stealTimeFollowing = expr
-        return property(**locals())
+    @property
+    def stealTimeFollowing(self):
+        return self._stealTimeFollowing
+
+    @stealTimeFollowing.setter
+    def stealTimeFollowing(self, expr):
+        self._stealTimeFollowing = expr
 
 
 class AppogiaturaDuration(GraceDuration):

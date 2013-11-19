@@ -248,162 +248,162 @@ class Harmony(chord.Chord):
 
     ### PUBLIC PROPERTIES ###
 
-    @apply
-    def figure(): # @NoSelf
-        def fget(self):
-            '''
-            Get or set the figure of the harmony object. The figure is the 
-            character (string) representation of the object. For example, 'I', 
-            'CM', '3#'.
+    @property
+    def figure(self):
+        '''
+        Get or set the figure of the harmony object. The figure is the 
+        character (string) representation of the object. For example, 'I', 
+        'CM', '3#'.
 
-            When you instantiate a harmony object, if you pass in a figure it 
-            is stored internally and returned when you access the figure 
-            property. If you don't instantiate the object with a figure, this 
-            property calls :meth:`music21.harmony.findFigure` method which 
-            deduces the figure provided other information about the object, 
-            especially the chord.
+        When you instantiate a harmony object, if you pass in a figure it 
+        is stored internally and returned when you access the figure 
+        property. If you don't instantiate the object with a figure, this 
+        property calls :meth:`music21.harmony.findFigure` method which 
+        deduces the figure provided other information about the object, 
+        especially the chord.
 
-            If the pitches of the harmony object have been modified after being 
-            instantiated, call :meth:`music21.harmony.findFigure` to deduce the 
-            new figure.
+        If the pitches of the harmony object have been modified after being 
+        instantiated, call :meth:`music21.harmony.findFigure` to deduce the 
+        new figure.
 
-            ::
+        ::
 
-                >>> h = harmony.ChordSymbol('CM')
-                >>> h.figure
-                'CM'
+            >>> h = harmony.ChordSymbol('CM')
+            >>> h.figure
+            'CM'
 
-            ::
+        ::
 
-                >>> harmony.ChordSymbol(root = 'C', bass = 'A', kind = 'minor').figure
-                'Cm/A'
+            >>> harmony.ChordSymbol(root = 'C', bass = 'A', kind = 'minor').figure
+            'Cm/A'
 
-            ::
+        ::
 
-                >>> h.bass(note.Note('E'))
-                >>> h.figure
-                'CM'
+            >>> h.bass(note.Note('E'))
+            >>> h.figure
+            'CM'
 
-            '''
-            if self._figure == None:
-                return self.findFigure()
-            else:
-                return self._figure
-        def fset(self, value):
-            self._figure = value
-            if self._figure is not None:
-                self._parseFigure(self._figure)
-                self._updatePitches()
-        return property(**locals())
+        '''
+        if self._figure == None:
+            return self.findFigure()
+        else:
+            return self._figure
 
-    @apply
-    def key(): # @NoSelf
-        def fget(self):
-            '''
-            Gets or sets the current Key (or Scale object) associated with this 
-            Harmony object.
-            
-            For a given RomanNumeral object. Each sub-classed harmony object 
-            may treat this property differently, for example Roman Numeral 
-            objects update the pitches when the key is changed, but chord 
-            symbol objects do not and the key provides more information about 
-            the musical context from where the harmony object was extracted.
-            
-            ::
+    @figure.setter
+    def figure(self, value):
+        self._figure = value
+        if self._figure is not None:
+            self._parseFigure(self._figure)
+            self._updatePitches()
 
-                >>> r1 = roman.RomanNumeral('V')
-                >>> r1.pitches
-                (<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>)
+    @property
+    def key(self):
+        '''
+        Gets or sets the current Key (or Scale object) associated with this 
+        Harmony object.
+        
+        For a given RomanNumeral object. Each sub-classed harmony object 
+        may treat this property differently, for example Roman Numeral 
+        objects update the pitches when the key is changed, but chord 
+        symbol objects do not and the key provides more information about 
+        the musical context from where the harmony object was extracted.
+        
+        ::
 
-            ::
+            >>> r1 = roman.RomanNumeral('V')
+            >>> r1.pitches
+            (<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>)
 
-                >>> r1.key = key.Key('A')
-                >>> r1.pitches
-                (<music21.pitch.Pitch E5>, <music21.pitch.Pitch G#5>, <music21.pitch.Pitch B5>)
-            
-            Changing the key for a ChordSymbol object does nothing, since it's
-            not dependent on key:
-            
-            ::
+        ::
 
-                >>> h1 = harmony.ChordSymbol('D-m11')
-                >>> [str(p) for p in h1.pitches]
-                ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
+            >>> r1.key = key.Key('A')
+            >>> r1.pitches
+            (<music21.pitch.Pitch E5>, <music21.pitch.Pitch G#5>, <music21.pitch.Pitch B5>)
+        
+        Changing the key for a ChordSymbol object does nothing, since it's
+        not dependent on key:
+        
+        ::
 
-            ::
+            >>> h1 = harmony.ChordSymbol('D-m11')
+            >>> [str(p) for p in h1.pitches]
+            ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
 
-                >>> h1.key = 'CM'
-                >>> [str(p) for p in h1.pitches]
-                ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
+        ::
 
-            '''
-            return self._key
-        def fset(self, keyOrScale):
-            if common.isStr(keyOrScale):
-                self._key = key.Key(keyOrScale)
-            else:
-                self._key = key
-        return property(**locals())
+            >>> h1.key = 'CM'
+            >>> [str(p) for p in h1.pitches]
+            ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
 
-    @apply
-    def romanNumeral(): # @NoSelf
-        # TODO: move this attribute to roman class which inherits from harmony.Harmony objects
-        def fget(self):
-            '''
-            Get or set the romanNumeral numeral function of the Harmony as a 
-            :class:`~music21.romanNumeral.RomanNumeral` object. String 
-            representations accepted by RomanNumeral are also accepted.
+        '''
+        return self._key
 
-            ::
+    @key.setter
+    def key(self, keyOrScale):
+        if common.isStr(keyOrScale):
+            self._key = key.Key(keyOrScale)
+        else:
+            self._key = key
 
-                >>> h = harmony.ChordSymbol()
-                >>> h.romanNumeral = 'III'
-                >>> h.romanNumeral
-                <music21.roman.RomanNumeral III>
+    @property
+    # TODO: move this attribute to roman class which inherits from harmony.Harmony objects
+    def romanNumeral(self):
+        '''
+        Get or set the romanNumeral numeral function of the Harmony as a 
+        :class:`~music21.romanNumeral.RomanNumeral` object. String 
+        representations accepted by RomanNumeral are also accepted.
 
-            ::
+        ::
 
-                >>> h.romanNumeral = roman.RomanNumeral('vii')
-                >>> h.romanNumeral
-                <music21.roman.RomanNumeral vii>
+            >>> h = harmony.ChordSymbol()
+            >>> h.romanNumeral = 'III'
+            >>> h.romanNumeral
+            <music21.roman.RomanNumeral III>
 
-            '''
-            if self._roman is None:
-                from music21 import roman
-                self._roman = roman.romanNumeralFromChord(self)
-            return self._roman
-        def fset(self, value):
-            if hasattr(value, 'classes') and 'RomanNumeral' in value.classes:
-                self._roman = value
-                return
+        ::
+
+            >>> h.romanNumeral = roman.RomanNumeral('vii')
+            >>> h.romanNumeral
+            <music21.roman.RomanNumeral vii>
+
+        '''
+        if self._roman is None:
             from music21 import roman
-            try: # try to create
-                self._roman = roman.RomanNumeral(value)
-                return
-            except exceptions21.Music21Exception:
-                pass
-            raise HarmonyException('not a valid pitch specification: %s' % value)
-        return property(**locals())
+            self._roman = roman.romanNumeralFromChord(self)
+        return self._roman
 
-    @apply
-    def writeAsChord(): # @NoSelf
-        def fget(self):
-            '''
-            Boolean attribute of all harmony objects that specifies how this 
-            object will be written to the musicxml of a stream. If true 
-            (default for romanNumerals), the chord with pitches is written. If 
-            False (default for ChordSymbols) the harmony symbol is written.
-            '''
-            return self._writeAsChord
-        def fset(self, val):
-            self._writeAsChord = val
-            try:
-                self._updatePitches()
-            except:
-                pass
-            if val and self.duration.quarterLength == 0:
-                self.duration = duration.Duration(1)
-        return property(**locals())
+    @romanNumeral.setter
+    def romanNumeral(self, value):
+        if hasattr(value, 'classes') and 'RomanNumeral' in value.classes:
+            self._roman = value
+            return
+        from music21 import roman
+        try: # try to create
+            self._roman = roman.RomanNumeral(value)
+            return
+        except exceptions21.Music21Exception:
+            pass
+        raise HarmonyException('not a valid pitch specification: %s' % value)
+
+    @property
+    def writeAsChord(self):
+        '''
+        Boolean attribute of all harmony objects that specifies how this 
+        object will be written to the musicxml of a stream. If true 
+        (default for romanNumerals), the chord with pitches is written. If 
+        False (default for ChordSymbols) the harmony symbol is written.
+        '''
+        return self._writeAsChord
+
+    @writeAsChord.setter
+    def writeAsChord(self, val):
+        self._writeAsChord = val
+        try:
+            self._updatePitches()
+        except:
+            pass
+        if val and self.duration.quarterLength == 0:
+            self.duration = duration.Duration(1)
 
     ### PUBLIC METHODS ###
 
@@ -531,105 +531,105 @@ class ChordStepModification(object):
 
     ### PUBLIC PROPERTIES ###
     
-    @apply
-    def degree(): # @NoSelf
-        def fget(self):
-            '''
-            ::
+    @property
+    def degree(self):
+        '''
+        ::
 
-                >>> hd = harmony.ChordStepModification()
-                >>> hd.degree = 3
-                >>> hd.degree
-                3
+            >>> hd = harmony.ChordStepModification()
+            >>> hd.degree = 3
+            >>> hd.degree
+            3
 
-            ::
+        ::
 
-                >>> hd.degree = 'juicy'
-                Traceback (most recent call last):
-                ChordStepModificationException: not a valid degree: juicy
+            >>> hd.degree = 'juicy'
+            Traceback (most recent call last):
+            ChordStepModificationException: not a valid degree: juicy
 
-            '''
-            return self._degree
-        def fset(self, expr):
-            if expr is not None and common.isNum(expr):
-                self._degree = int(expr) # should always be an integer
+        '''
+        return self._degree
+
+    @degree.setter
+    def degree(self, expr):
+        if expr is not None and common.isNum(expr):
+            self._degree = int(expr) # should always be an integer
+            return
+        raise ChordStepModificationException(
+            'not a valid degree: {0}'.format(expr))
+
+    @property
+    def interval(self):
+        '''
+        Get or set the alteration of this degree as a 
+        :class:`~music21.interval.Interval` object.
+        
+        ::
+
+            >>> hd = harmony.ChordStepModification()
+            >>> hd.interval = 1
+            >>> hd.interval
+            <music21.interval.Interval A1>
+
+        ::
+
+            >>> hd.interval = -2
+            >>> hd.interval
+            <music21.interval.Interval AA-1>
+        
+        '''
+        return self._interval
+
+    @interval.setter
+    def interval(self, value):
+        if value in (None,):
+            self._interval = None
+        elif hasattr(value, 'classes') and 'Interval' in value.classes:
+            # an interval object: set directly
+            self._interval = value
+        else:
+            # accept numbers to permit loading from mxl alter specs
+            if value in [1]:
+                self._interval = interval.Interval('a1')
+            elif value in [2]: # double augmented
+                self._interval = interval.Interval('aa1')
+            elif value in [-1]:
+                self._interval = interval.Interval('-a1')
+            elif value in [-2]:
+                self._interval = interval.Interval('-aa1')
+            else: # try to create interval object
+                self._interval = interval.Interval(value)
+
+    @property
+    def modType(self):
+        '''
+        Get or set the ChordStepModification modification type, where 
+        permitted types are the strings add, subtract, or alter.
+        
+        ::
+
+            >>> hd = harmony.ChordStepModification()
+            >>> hd.modType = 'add'
+            >>> hd.modType
+            'add'
+
+        ::
+
+            >>> hd.modType = 'juicy'
+            Traceback (most recent call last):
+            ChordStepModificationException: not a valid degree modification type: juicy
+
+        '''
+        return self._modType
+
+    @modType.setter
+    def modType(self, expr):
+        if expr is not None and common.isStr(expr):
+            if expr.lower() in ['add', 'subtract', 'alter']:
+                self._modType = expr.lower()
                 return
-            raise ChordStepModificationException(
-                'not a valid degree: {0}'.format(expr))
-        return property(**locals())
-
-    @apply
-    def interval(): # @NoSelf
-        def fget(self):
-            '''
-            Get or set the alteration of this degree as a 
-            :class:`~music21.interval.Interval` object.
-            
-            ::
-
-                >>> hd = harmony.ChordStepModification()
-                >>> hd.interval = 1
-                >>> hd.interval
-                <music21.interval.Interval A1>
-
-            ::
-
-                >>> hd.interval = -2
-                >>> hd.interval
-                <music21.interval.Interval AA-1>
-            
-            '''
-            return self._interval
-        def fset(self, value):
-            if value in (None,):
-                self._interval = None
-            elif hasattr(value, 'classes') and 'Interval' in value.classes:
-                # an interval object: set directly
-                self._interval = value
-            else:
-                # accept numbers to permit loading from mxl alter specs
-                if value in [1]:
-                    self._interval = interval.Interval('a1')
-                elif value in [2]: # double augmented
-                    self._interval = interval.Interval('aa1')
-                elif value in [-1]:
-                    self._interval = interval.Interval('-a1')
-                elif value in [-2]:
-                    self._interval = interval.Interval('-aa1')
-                else: # try to create interval object
-                    self._interval = interval.Interval(value)
-        return property(**locals())
-
-    @apply
-    def modType(): # @NoSelf
-        def fget(self):
-            '''
-            Get or set the ChordStepModification modification type, where 
-            permitted types are the strings add, subtract, or alter.
-            
-            ::
-
-                >>> hd = harmony.ChordStepModification()
-                >>> hd.modType = 'add'
-                >>> hd.modType
-                'add'
-
-            ::
-
-                >>> hd.modType = 'juicy'
-                Traceback (most recent call last):
-                ChordStepModificationException: not a valid degree modification type: juicy
-
-            '''
-            return self._modType
-        def fset(self, expr):
-            if expr is not None and common.isStr(expr):
-                if expr.lower() in ['add', 'subtract', 'alter']:
-                    self._modType = expr.lower()
-                    return
-            raise ChordStepModificationException(
-                'not a valid degree modification type: {0}'.format(expr))
-        return property(**locals())
+        raise ChordStepModificationException(
+            'not a valid degree modification type: {0}'.format(expr))
 
 
 #-------------------------------------------------------------------------------
