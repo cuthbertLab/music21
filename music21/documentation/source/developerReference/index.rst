@@ -1,13 +1,14 @@
 Developer Reference
 ===================
 
-.. toctree::
-   :maxdepth: 2
+..  toctree::
+    :maxdepth: 2
 
-   documenting
-   buildingDocumentation
-   usingEclipse
-   installIPython
+    documenting
+    buildingDocumentation
+    usingEclipse
+    usingGit
+    installIPython
 
 
 
