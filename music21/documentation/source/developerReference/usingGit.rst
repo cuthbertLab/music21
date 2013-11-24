@@ -145,27 +145,99 @@ Forking music21 on GitHub
 Cloning your music21 fork in Eclipse
 ------------------------------------
 
-..  image:: images/usingGit/eclipse__clone__1__edited.png
+Once you've forked music21 on GitHub, you need to clone your fork locally to
+your machine in order to start working.
 
-..  image:: images/usingGit/eclipse__clone__2__edited.png
+To start the cloning process, choose *"Import..."* from Eclipse's *File* menu,
+or right-click in the Package Explorer and choose *"Import"* from the
+contextual menu that appears.
 
-..  image:: images/usingGit/eclipse__clone__3__edited.png
+1.  In the *Import* dialog, open the *Git* folder and select *Projects from
+    Git*, then click *Next*:
 
-..  image:: images/usingGit/eclipse__clone__4__edited.png
+    ..  image:: images/usingGit/eclipse__clone__1__edited.png
 
-..  image:: images/usingGit/eclipse__clone__5__edited.png
+2.  You'll now be asked to choose a repository source. While you can try using
+    the *"GitHub"* repository source - which allows dynamically searching
+    GitHub for repositories - if you've just made your fork a few minutes ago
+    it won't show up when searching. We recommend selecting the *"Clone URI"*
+    option. Once you've selected *"Clone URI"*, click *"Next"*:
 
-..  image:: images/usingGit/eclipse__clone__6.png
+    ..  image:: images/usingGit/eclipse__clone__2__edited.png
 
-..  image:: images/usingGit/eclipse__clone__7__edited.png
+3.  
 
-..  image:: images/usingGit/eclipse__clone__8__edited.png
+    ..  image:: images/usingGit/eclipse__clone__3__edited.png
+
+4.  
+
+    ..  image:: images/usingGit/eclipse__clone__4__edited.png
+
+5.  
+
+    ..  image:: images/usingGit/eclipse__clone__5__edited.png
+
+6.  
+
+    ..  image:: images/usingGit/eclipse__clone__6.png
+
+7.  
+
+    ..  image:: images/usingGit/eclipse__clone__7__edited.png
+
+8.  
+
+    ..  image:: images/usingGit/eclipse__clone__8__edited.png
+
+
 
 
 Configuring PyDev
 -----------------
 
 ..  image:: images/usingGit/eclipse__configure_pydev.png
+
+
+Configuring the music21 Environment
+-----------------------------------
+
+Configuring the music21 Environment is done mostly like a normal install with
+one big difference noted below.
+
+To create a user environment settings file, open the music21/configure.py file
+and run it by pressing the green circle with a white arrowhead in it at the top
+of the Eclipse interface.
+
+..  image:: images/usingEclipse/runningconfigure.*
+    :width: 650
+    
+A new "Run As" window will appear in which you will be prompted to select a way
+to run configure.py. Choose "Python Run" and click on "OK." (You should always
+click this when running Python programs)
+
+..  image:: images/usingEclipse/runas.*
+    :width: 650
+
+In the console, you may see errors about installing additional packages, after
+which you will see a message beginning with "Welcome to the music21
+Configuration Assisstant." 
+
+..  image:: images/usingEclipse/welcometoconfigassistant.*
+    :width: 650
+    
+When asked if you would like to install music21 in the normal place for Python
+packages, type ``no`` and press Enter.
+
+..  warning::
+
+    Make sure you write ``no`` here.
+
+..  image:: images/usingEclipse/saynotosavingmusic21.*
+    :width: 650
+
+See :ref:`environment` for more information on configuring user settings.
+Otherwise, head to: :ref:`usersGuide_00_introduction` for further demos and
+tutorials on using music21.
 
 
 Committing, pushing and pulling in Eclipse
