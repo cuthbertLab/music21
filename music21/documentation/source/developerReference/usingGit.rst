@@ -275,6 +275,8 @@ Committing, pushing and pulling in Eclipse
 ------------------------------------------
 
 
+
+
 Configurating Git remotes in Eclipse
 ------------------------------------
 
