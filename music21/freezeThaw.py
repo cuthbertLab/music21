@@ -1437,33 +1437,33 @@ class JSONFreezer(JSONFreezeThawBase):
         >>> jsf = freezeThaw.JSONFreezer(n)
         >>> jsf.jsonPrint()
         {
-        "__attr__": {
+          "__attr__": {
             "_duration": {
-            "__attr__": {
+              "__attr__": {
                 "_cachedIsLinked": true, 
                 "_components": [
-                {
+                  {
                     "__attr__": {
-                    "_componentsNeedUpdating": false, 
-                    "_dots": [
+                      "_componentsNeedUpdating": false, 
+                      "_dots": [
                         0
-                    ], 
-                    "_link": true, 
-                    "_qtrLength": 1.0, 
-                    "_quarterLengthNeedsUpdating": false, 
-                    "_tuplets": [], 
-                    "_type": "quarter", 
-                    "_typeNeedsUpdating": false
+                      ], 
+                      "_link": true, 
+                      "_qtrLength": 1.0, 
+                      "_quarterLengthNeedsUpdating": false, 
+                      "_tuplets": [], 
+                      "_type": "quarter", 
+                      "_typeNeedsUpdating": false
                     }, 
                     "__class__": "music21.duration.DurationUnit"
-                }
+                  }
                 ], 
                 "_componentsNeedUpdating": false, 
                 "_qtrLength": 1.0, 
                 "_quarterLengthNeedsUpdating": false, 
                 "_typeNeedsUpdating": false
-            }, 
-            "__class__": "music21.duration.Duration"
+              }, 
+              "__class__": "music21.duration.Duration"
             }, 
             "_notehead": "normal", 
             "_noteheadFill": "default", 
@@ -1472,46 +1472,46 @@ class JSONFreezer(JSONFreezeThawBase):
             "_stemDirection": "unspecified", 
             "articulations": [], 
             "beams": {
-            "__attr__": {
+              "__attr__": {
                 "beamsList": [], 
                 "feathered": false
-            }, 
-            "__class__": "music21.beam.Beams"
+              }, 
+              "__class__": "music21.beam.Beams"
             }, 
             "expressions": [], 
             "lyrics": [], 
             "offset": 0.0, 
             "pitch": {
-            "__attr__": {
+              "__attr__": {
                 "_accidental": {
-                "__attr__": {
+                  "__attr__": {
                     "_alter": 1.0, 
                     "_displayType": "normal", 
                     "_modifier": "#", 
-                    "_name": "sharp", 
-                }, 
-                "__class__": "music21.pitch.Accidental"
+                    "_name": "sharp" 
+                  }, 
+                  "__class__": "music21.pitch.Accidental"
                 }, 
                 "_microtone": {
-                "__attr__": {
+                  "__attr__": {
                     "_centShift": 0, 
                     "_harmonicShift": 1
-                }, 
-                "__class__": "music21.pitch.Microtone"
+                  }, 
+                  "__class__": "music21.pitch.Microtone"
                 }, 
                 "_octave": 5, 
                 "_priority": 0, 
                 "_step": "D"
-            }, 
-            "__class__": "music21.pitch.Pitch"
+              }, 
+              "__class__": "music21.pitch.Pitch"
             }
-        }, 
-        "__class__": "music21.note.Note", 
-        "__version__": [
+          }, 
+          "__class__": "music21.note.Note", 
+          "__version__": [
             1, 
             7, 
             1
-        ]
+          ]
         }
         '''
         print(json.dumps(
