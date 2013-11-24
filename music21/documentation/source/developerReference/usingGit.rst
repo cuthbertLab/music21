@@ -141,6 +141,11 @@ repositories. Both of these can be installed via the Eclipse Marketplace.
 Forking music21 on GitHub
 -------------------------
 
+To fork the official music21 repository, simply navigate to
+`https://github.com/cuthbertLab/music21
+<https://github.com/cuthbertLab/music21>`_ on GitHub while signed in to your
+GitHub account, and click **Fork** in the upper right-hand corner of the page.
+
 
 Cloning your music21 fork in Eclipse
 ------------------------------------
@@ -328,9 +333,29 @@ Luckily, configuring Git remotes in Eclipse is easy.
 Fetching from upstream
 ----------------------
 
-..  image:: images/usingGit/eclipse__fetch_from_upstream__1.png
+Once you've configured an **upstream** remote, you can fetch history from the
+official music21 repository.
 
-..  image:: images/usingGit/eclipse__fetch_from_upstream__2__edited.png
+1.  Right-click on your music21 project in Eclipse's **Project Explorer** and
+    select **Team** > **Remote** > **Fetch from...**:
 
-..  image:: images/usingGit/eclipse__fetch_from_upstream__3.png
+    ..  image:: images/usingGit/eclipse__fetch_from_upstream__1.png
 
+2.  In the **Fetch from Another Repository** dialog, choose the **upstream**
+    remote from the **Configured remote repository** drop-down menu, then press
+    **Finish**:
+
+    ..  image:: images/usingGit/eclipse__fetch_from_upstream__2__edited.png
+
+3.  If there were any changes in the official repository, you'll see them come
+    in now:
+
+    ..  image:: images/usingGit/eclipse__fetch_from_upstream__3.png
+
+..  note::
+
+    With Git, **fetching** history (from your own fork, or from another
+    **remote**) does **not** change the contents of your working directory.
+
+    After **fetching**, you need to **pull** in order for that history to be
+    reflected in your working directory.
