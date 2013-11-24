@@ -90,13 +90,14 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
+from music21.base import SlottedObject
 
 
 class BeamException(exceptions21.Music21Exception):
     pass
 
 
-class Beam(object):
+class Beam(SlottedObject):
     '''
     A Beam is an object representation of one single beam, that is, one
     horizontal line connecting two notes together (or less commonly a note to a
@@ -132,6 +133,15 @@ class Beam(object):
         <music21.beam.Beam None/start>
     '''
 
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        'direction',
+        'independentAngle',
+        'number',
+        'type',
+        )
+
     ### INITIALIZER ###
 
     def __init__(self, type=None, direction=None):  # type is okay @ReservedAssignment
@@ -154,7 +164,7 @@ class Beam(object):
 #------------------------------------------------------------------------------
 
 
-class Beams(object):
+class Beams(SlottedObject):
     '''
     The Beams object stores in it attribute beamsList (a list) all the Beam
     objects defined above.  Thus len(beam.Beams) tells you how many beams the
@@ -186,6 +196,13 @@ class Beams(object):
         <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
 
     '''
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        'beamsList',
+        'feathered',
+        )
 
     _DOC_ATTR = {
         'feathered': 'Boolean determining if this is a feathered beam or not (does nothing for now).',
