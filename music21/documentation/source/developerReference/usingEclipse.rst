@@ -3,64 +3,68 @@
 Using music21 with SVN for Eclipse
 ==================================
 
-In order to develop music21 and stay current with updates to the latest versions, it is necessary 
-to modify code using SVN for Eclipse.
+In order to develop music21 and stay current with updates to the latest
+versions, it is necessary to modify code using SVN for Eclipse.
 
-**IMPORTANT: BEFORE BEGINNING, UNINSTALL ALL EXISTING VERSIONS OF MUSIC21. ADDITIONAL VERSIONS OF 
-MUSIC21 INSTALLED IN OTHER LOCATIONS CAN CAUSE DIRECTORY ROUTING PROBLEMS.**
+**IMPORTANT: BEFORE BEGINNING, UNINSTALL ALL EXISTING VERSIONS OF MUSIC21.
+ADDITIONAL VERSIONS OF MUSIC21 INSTALLED IN OTHER LOCATIONS CAN CAUSE DIRECTORY
+ROUTING PROBLEMS.**
 
 
 1. Installing Eclipse
 ----------------------------------------------
 
-First, download and install the appropriate version of Eclipse from the following url if you 
-don't already have it: http://www.eclipse.org/downloads/packages/eclipse-classic-37/indigor
+First, download and install the appropriate version of Eclipse from the
+following url if you don't already have it:
+http://www.eclipse.org/downloads/packages/eclipse-classic-37/indigor
 
-You may use Juno (Eclipse 4.2) if you'd like -- it is just a little slower, but is the future of Eclipse.
-The docs below are for Eclipse 3.7, but the procedure is mostly the same for using 4.2.  If you're
-upgrading, you can delete your music21base project in your old version of Eclipse and then just follow the same steps below.
+You may use Juno (Eclipse 4.2) if you'd like -- it is just a little slower, but
+is the future of Eclipse.  The docs below are for Eclipse 3.7, but the
+procedure is mostly the same for using 4.2.  If you're upgrading, you can
+delete your music21base project in your old version of Eclipse and then just
+follow the same steps below.
 
 Installing for Windows
 ``````````````````````````````````````````````
-For Windows users, the safest bet is the 32-bit version, regardless of your system's 
-capabilities. 
+For Windows users, the safest bet is the 32-bit version, regardless of your
+system's capabilities. 
 
-If you download the 32-bit version save the Eclipse folder within the zip 
-file in your "Program Files (x86)" directory if there is one, or 
-"Program Files" if there isn't.  
+If you download the 32-bit version save the Eclipse folder within the zip file
+in your "Program Files (x86)" directory if there is one, or "Program Files" if
+there isn't.  
 
-If you choose the 64-bit version 
-(getting more stable) then put the folder in the "Program Files" 
-directory even if there is an "(x86)" directory.  You may need to give 
-permission or your password to make this copy.  
+If you choose the 64-bit version (getting more stable) then put the folder in
+the "Program Files" directory even if there is an "(x86)" directory.  You may
+need to give permission or your password to make this copy.  
 
-After you've put the folder, 
-go into the folder and drag a shortcut (by holding down Alt when dragging) 
-to Eclipse to your start menu 
-(or know how to find it later).
+After you've put the folder, go into the folder and drag a shortcut (by holding
+down Alt when dragging) to Eclipse to your start menu (or know how to find it
+later).
 
-If you try running Eclipse and it gives you a warning about not having Java installed, go to
-http://www.java.com/en/download/help/windows_manual_download.xml#download and download a copy there.
+If you try running Eclipse and it gives you a warning about not having Java
+installed, go to
+http://www.java.com/en/download/help/windows_manual_download.xml#download and
+download a copy there.
 
 
 Installing for Mac
 ``````````````````````````````````````````````
-For Mac users, download the version that complies with your system. If in 
-doubt, 32-bit is a safe option, as 64-bit systems are back-compatible to 32-bit programs.
+For Mac users, download the version that complies with your system. If in
+doubt, 32-bit is a safe option, as 64-bit systems are back-compatible to 32-bit
+programs.
 
-For Mac users, once the .tar file has been unzipped, drag the 'eclipse' folder into the Applications 
-folder in your dock (make sure to drag the folder and not just the Eclipse icon - there are libraries 
-and other dependencies that need to be kept together).
+For Mac users, once the .tar file has been unzipped, drag the 'eclipse' folder
+into the Applications folder in your dock (make sure to drag the folder and not
+just the Eclipse icon - there are libraries and other dependencies that need to
+be kept together).
 
-.. image:: images/usingEclipse/eclipsefolder.*
+..  image:: images/usingEclipse/eclipsefolder.*
     :width: 650
     
-
 Once done, click on the Eclipse icon in the eclipse folder, and it should load. 
 
-.. image:: images/usingEclipse/eclipseicon.*
+..  image:: images/usingEclipse/eclipseicon.*
     :width: 650
-
 
 You'll be prompted to select a workspace directory, which, by default is created 
 in your documents folder. Be sure to remember where this directory is, 
