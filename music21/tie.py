@@ -21,7 +21,7 @@ from music21.base import SlottedObject
 
 #-------------------------------------------------------------------------------
 
-class Tie(object):
+class Tie(SlottedObject):
     '''
     Object added to notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.

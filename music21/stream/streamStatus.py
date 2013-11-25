@@ -14,6 +14,7 @@
 import unittest
 
 from music21 import environment
+from music21.base import SlottedObject
 
 environLocal = environment.Environment(__file__)
 
@@ -21,22 +22,22 @@ environLocal = environment.Environment(__file__)
 #------------------------------------------------------------------------------
 
 
-class StreamStatus(object):
+class StreamStatus(SlottedObject):
 
     ### CLASS VARIABLES ###
 
-#    __slots__ = (
-#        '_accidentals',
-#        '_beams',
-#        '_client',
-#        '_concertPitch',
-#        '_dirty',
-#        '_enharmonics',
-#        '_measures',
-#        '_ornaments',
-#        '_rests',
-#        '_ties',
-#        )
+    __slots__ = (
+        '_accidentals',
+        '_beams',
+        '_client',
+        '_concertPitch',
+        '_dirty',
+        '_enharmonics',
+        '_measures',
+        '_ornaments',
+        '_rests',
+        '_ties',
+        )
 
     ### INITIALIZER ###
 
@@ -51,26 +52,6 @@ class StreamStatus(object):
         self._ornaments = None
         self._rests = None
         self._ties = None
-
-    ### SPECIAL METHODS ###
-
-#    def __getstate__(self):
-#        state = {}
-#        attributes = (
-#            '_accidentals',
-#            '_beams',
-#            '_client',
-#            '_concertPitch',
-#            '_dirty',
-#            '_enharmonics',
-#            '_measures',
-#            '_ornaments',
-#            '_rests',
-#            '_ties',
-#            )
-#        for attribute in attributes:
-#            state[attribute] = getattr(self, attribute)
-#        return state
 
     ### PUBLIC METHODS ###
 
