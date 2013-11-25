@@ -527,7 +527,7 @@ class Microtone(SlottedObject):
         self._harmonicShift = value
 
 
-class Accidental(object):
+class Accidental(SlottedObject):
 #class Accidental(base.Music21Object):
     '''
     Accidental class, representing the symbolic and numerical representation of
@@ -554,6 +554,16 @@ class Accidental(object):
 
     ### CLASS VARIABLES ###
 
+    __slots__ = (
+        '_alter',
+        '_displayStatus',
+        '_displayType',
+        '_modifier',
+        '_name',
+        'displayLocation',
+        'displaySize',
+        'displayStyle',
+        )
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'modifier', 'alter', 'set']
