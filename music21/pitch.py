@@ -345,7 +345,7 @@ class MicrotoneException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 
 
-class Microtone(object):
+class Microtone(SlottedObject):
     '''
     The Microtone object defines a pitch transformation above or below a
     standard Pitch and its Accidental.
@@ -418,6 +418,11 @@ class Microtone(object):
 
     ### CLASS VARIABLES ###
 
+    __slots__ = (
+        '_centShift',
+        '_harmonicShift',
+        )
+
     _jsonFreezer = True
 
     ### INITIALIZER ###
@@ -438,7 +443,6 @@ class Microtone(object):
 
     def __eq__(self, other):
         '''Compare cents.
-
 
         >>> m1 = pitch.Microtone(20)
         >>> m2 = pitch.Microtone(20)
