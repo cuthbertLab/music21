@@ -4,7 +4,7 @@ Using music21 with Git for Eclipse
 ==================================
 
 In order to develop music21 and stay current with updates to the latest
-versions, it is necessary to modify code using SVN for Eclipse.
+versions, it is necessary to modify code using Git for Eclipse.
 
 **IMPORTANT: BEFORE BEGINNING, UNINSTALL ALL EXISTING VERSIONS OF MUSIC21.
 ADDITIONAL VERSIONS OF MUSIC21 INSTALLED IN OTHER LOCATIONS CAN CAUSE DIRECTORY
