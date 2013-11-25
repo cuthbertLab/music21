@@ -1,37 +1,41 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         meter.py
 # Purpose:      Classes for meters
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 
+#               Project
 # License:      LGPL
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 '''This module defines the :class:`~music21.meter.TimeSignature` object,
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
 
+import copy
+import re
 import unittest
-import re, copy
 #import fractions # available in 2.6 and greater
 
 from music21 import base
 from music21 import beam
 from music21 import common
-from music21 import exceptions21
 from music21 import duration
 from music21 import environment
+from music21 import exceptions21
+from music21.base import SlottedObject
 _MOD = 'meter.py'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-validDenominators = [1,2,4,8,16,32,64,128] # in order
+
+validDenominators = [1, 2, 4, 8, 16, 32, 64, 128] # in order
 # also [pow(2,x) for x in range(8)]
 MIN_DENOMINATOR_TYPE = '128th'
 
@@ -46,6 +50,7 @@ _meterSequenceAccentArchetypes = {}
 # store meter sequence division options, once created, in a module
 # level dictionary
 _meterSequenceDivisionOptions = {}
+
 
 def slashToFraction(value):
     '''
@@ -77,6 +82,7 @@ def slashToFraction(value):
         environLocal.printDebug(['slashToFraction() cannot find two part fraction', value])
         return None
 
+
 def slashCompoundToFraction(value):
     '''
 
@@ -93,7 +99,7 @@ def slashCompoundToFraction(value):
     value = value.split('+')
     for part in value:
         m = slashToFraction(part)
-        if m == None:
+        if m is None:
             pass
         else:
             n, d, unused_tempoIndication = m
@@ -102,10 +108,10 @@ def slashCompoundToFraction(value):
 
 
 def slashMixedToFraction(valueSrc):
-    '''Given a mixture if possible meter fraction representations, return
-    a list of pairs. If originally given as a summed numerator; break
-    into separate fractions.
-
+    '''
+    Given a mixture if possible meter fraction representations, return a list
+    of pairs. If originally given as a summed numerator; break into separate
+    fractions.
 
     >>> meter.slashMixedToFraction('3/8+2/8')
     ([(3, 8), (2, 8)], False)
@@ -136,7 +142,7 @@ def slashMixedToFraction(valueSrc):
     for part in value:
         if '/' in part:
             fraction = slashToFraction(part)
-            if fraction == None:
+            if fraction is None:
                 raise TimeSignatureException('cannot create time signature from:', valueSrc)
             n, d, unused_tempoIndication = fraction
             pre.append([n, d])
@@ -144,23 +150,23 @@ def slashMixedToFraction(valueSrc):
             try:
                 pre.append([int(part), None])
             except ValueError:
-                raise exceptions21.Music21Exception('Cannot parse this file -- this error often comes ' 
+                raise exceptions21.Music21Exception('Cannot parse this file -- this error often comes '
                   'up if the musicxml pickled file is out of date after a change in musicxml/__init__.py . '
                   'Clear your temp directory of .p files and try again...')
-                
+
     # when encountering a missing denominator, find the fist defined
     # and apply to all previous
     for i in range(len(pre)):
-        if pre[i][1] != None: # there is a denominator
+        if pre[i][1] is not None: # there is a denominator
             post.append(tuple(pre[i]))
         else: # search ahead for next defined denominator
             summedNumerator = True
             match = None
             for j in range(i, len(pre)):
-                if pre[j][1] != None:
+                if pre[j][1] is not None:
                     match = pre[j][1]
                     break
-            if match == None:
+            if match is None:
                 raise MeterException('cannot match denominator to numerator in: %s' % valueSrc)
             else:
                 pre[i][1] = match
@@ -170,9 +176,9 @@ def slashMixedToFraction(valueSrc):
 
 
 def fractionToSlashMixed(fList):
-    '''Given a list of fraction values, compact numerators by sum if
-    denominators are the same
-
+    '''
+    Given a list of fraction values, compact numerators by sum if denominators
+    are the same
 
     >>> meter.fractionToSlashMixed([(3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)])
     [('3+2+5', 8), ('3', 4), ('2+1+4', 16)]
@@ -192,7 +198,7 @@ def fractionToSlashMixed(fList):
             else:
                 break # if not found in one less
 
-        if match == None:
+        if match is None:
             pre.append([[n], d])
         else: # appnd nuemrator
             pre[match][0].append(n)
@@ -208,8 +214,8 @@ def fractionToSlashMixed(fList):
 
 
 def fractionSum(fList):
-    '''Given a list of fractions represented as a list, find the sum
-
+    '''
+    Given a list of fractions represented as a list, find the sum
 
     >>> meter.fractionSum([(3,8), (5,8), (1,8)])
     (9, 8)
@@ -252,8 +258,9 @@ def fractionSum(fList):
 
 
 def proportionToFraction(value):
-    '''Given a floating point proportional value between 0 and 1, return the best-fit slash-base fraction
-
+    '''
+    Given a floating point proportional value between 0 and 1, return the
+    best-fit slash-base fraction
 
     >>> meter.proportionToFraction(.5)
     (1, 2)
@@ -284,11 +291,10 @@ def proportionToFraction(value):
 
 def bestTimeSignature(meas):
     '''
-    Given a Measure with elements in it,
-    get a TimeSignature that contains all elements.
+    Given a Measure with elements in it, get a TimeSignature that contains all
+    elements.
 
     Note: this does not yet accommodate triplets.
-
 
     >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
     >>> m = stream.Measure()
@@ -297,7 +303,6 @@ def bestTimeSignature(meas):
     >>> ts = meter.bestTimeSignature(m)
     >>> ts
     <music21.meter.TimeSignature 3/4>
-
 
     >>> s2 = converter.parse('C8. D16 E8 F8. G16 A8', format='tinyNotation')
     >>> m2 = stream.Measure()
@@ -314,7 +319,6 @@ def bestTimeSignature(meas):
     >>> ts3 = meter.bestTimeSignature(m3)
     >>> ts3
     <music21.meter.TimeSignature 3/2>
-
 
     >>> s4 = converter.parse('C8. D16 E8 F8. G16 A8 C4. D4.', format='tinyNotation')
     >>> m4 = stream.Measure()
@@ -359,7 +363,6 @@ def bestTimeSignature(meas):
             minDurQL = e.quarterLength
             if e.duration.dots > 0:
                 minDurDotted = True
-
 
     # first, we need to evenly divide min dur into total
     minDurTest = minDurQL
@@ -408,7 +411,6 @@ def bestTimeSignature(meas):
             denominator = num
     # numerator is the count of min parts in the sum
     numerator = int(sumDurQL / minDurQL)
-
 
     #simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
     denom = common.euclidGCD(numerator, denominator)
@@ -461,19 +463,23 @@ def bestTimeSignature(meas):
         return ts
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+
 class MeterException(exceptions21.Music21Exception):
     pass
+
 
 class TimeSignatureException(MeterException):
     pass
 
 
-#-------------------------------------------------------------------------------
-class MeterTerminal(object):
-    '''
-    A MeterTerminal is a nestable primitive of rhythmic division
+#------------------------------------------------------------------------------
 
+
+class MeterTerminal(SlottedObject):
+    '''
+    A MeterTerminal is a nestable primitive of rhythmic division.
 
     >>> a = meter.MeterTerminal('2/4')
     >>> a.duration.quarterLength
@@ -486,12 +492,26 @@ class MeterTerminal(object):
     10.0
 
     '''
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '_denominator',
+        '_duration',
+        '_numerator',
+        '_overriddenDuration',
+        '_weight',
+        )
+
+    ### INITIALIZER ###
+
     def __init__(self, slashNotation=None, weight=1):
+        self._duration = None
         self._numerator = 0
         self._denominator = 1
         self._overriddenDuration = None
 
-        if slashNotation != None:
+        if slashNotation is not None:
             # assign directly to values, not properties, to avoid
             # calling _ratioChanged more than necessary
             values = slashToFraction(slashNotation)
@@ -506,13 +526,15 @@ class MeterTerminal(object):
         # in the derived class MeterSequence
         MeterTerminal._setWeight(self, weight)
 
+    ### SPECIAL METHODS ###
 
     def __deepcopy__(self, memo=None):
-        '''Helper method to copy.py's deepcopy function. Call it from there.
+        '''
+        Helper method to copy.py's deepcopy function. Call it from there.
 
-        Defining a custom __deepcopy__ here is a performance boost, particularly in not copying _duration, directly assigning _weight, and other benefits.
-
-        >>> from copy import deepcopy
+        Defining a custom __deepcopy__ here is a performance boost,
+        particularly in not copying _duration, directly assigning _weight, and
+        other benefits.
         '''
         # call class to get a new, empty instance
         new = self.__class__()
@@ -524,11 +546,11 @@ class MeterTerminal(object):
         new._weight = self._weight # these are numbers
         return new
 
-    def __str__(self):
-        return str(int(self.numerator)) + "/" + str(int(self.denominator))
-
     def __repr__(self):
         return '<MeterTerminal %s>' % self.__str__()
+
+    def __str__(self):
+        return str(int(self.numerator)) + "/" + str(int(self.denominator))
 
 # now using ratioEqual()
 
@@ -540,7 +562,7 @@ class MeterTerminal(object):
 #         '''
 # #         if not isinstnace(other, MeterTerminal):
 # #             return False
-#         if other == None: return False
+#         if other is None: return False
 #         if (other.numerator == self.numerator and
 #             other.denominator == self.denominator):
 #             return True
@@ -552,16 +574,12 @@ class MeterTerminal(object):
 #         '''
 # #         if not isinstnace(other, MeterTerminal):
 # #             return True
-#         if other == None: return True
+#         if other is None: return True
 #         if (other.numerator == self.numerator and
 #             other.denominator == self.denominator):
 #             return False
 #         else:
 #             return True
-
-
-
-
 
     def ratioEqual(self, other):
         '''
@@ -580,15 +598,15 @@ class MeterTerminal(object):
         >>> a.ratioEqual(d)
         True
         '''
-        if other == None: return False
+        if other is None: return False
         if (other.numerator == self.numerator and
             other.denominator == self.denominator):
             return True
         else:
             return False
 
+    #--------------------------------------------------------------------------
 
-    #---------------------------------------------------------------------------
     def subdivideByCount(self, countRequest=None):
         '''
         returns a MeterSequence made up of taking this MeterTerminal and
@@ -689,7 +707,6 @@ class MeterTerminal(object):
         #ms.partitionByOtherMeterSequence(other) # this will split weight
         return ms
 
-
     def subdivide(self, value):
         '''Subdivision takes a MeterTerminal and, making it into a collection of MeterTerminals, Returns a MeterSequence.
 
@@ -706,9 +723,7 @@ class MeterTerminal(object):
         else:
             raise MeterException('cannot process partition argument %s' % value)
 
-
-
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     # properties
 
     def _getWeight(self):
@@ -727,7 +742,6 @@ class MeterTerminal(object):
         self._weight = value
 
     weight = property(_getWeight, _setWeight)
-
 
     def _getNumerator(self):
         return self._numerator
@@ -767,13 +781,12 @@ class MeterTerminal(object):
 
     denominator = property(_getDenominator, _setDenominator)
 
-
     def _ratioChanged(self):
         '''If ratio has been changed, call this to update duration
         '''
         # NOTE: this is a performance critical method and should only be
         # called when necessary
-        if self.numerator == None or self.denominator == None:
+        if self.numerator is None or self.denominator is None:
             self._duration = None
         else:
             self._duration = duration.Duration()
@@ -813,14 +826,12 @@ class MeterTerminal(object):
 
     duration = property(_getDuration, _setDuration)
 
-
     def _getDepth(self):
         '''Return how many levels deep this part is. Depth of a terminal is always 1
         '''
         return 1
 
     depth = property(_getDepth)
-
 
 #     def _getBeatLengthToQuarterLengthRatio(self):
 #         '''
@@ -846,25 +857,25 @@ class MeterTerminal(object):
 #
 
 
+#------------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-#-------------------------------------------------------------------------------
 class MeterSequence(MeterTerminal):
-    '''A meter sequence is a list of MeterTerminals, or other MeterSequences
     '''
+    A meter sequence is a list of MeterTerminals, or other MeterSequences
+    '''
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '_levelListCache',
+        '_partition',
+        'parenthesis',
+        'summedNumerator',
+        )
+
+    ### INITIALIZER ###
+
     def __init__(self, value=None, partitionRequest=None):
         MeterTerminal.__init__(self)
 
@@ -885,8 +896,10 @@ class MeterSequence(MeterTerminal):
         # needed in cases where a meter component is parenthetical
         self.parenthesis = False
 
-        if value != None:
+        if value is not None:
             self.load(value, partitionRequest)
+
+    ### SPECIAL METHODS ###
 
     def __deepcopy__(self, memo=None):
         '''Helper method to copy.py's deepcopy function. Call it from there.
@@ -919,27 +932,18 @@ class MeterSequence(MeterTerminal):
 
         return new
 
-    def __str__(self):
-        msg = []
-        for mt in self._partition:
-            msg.append(str(mt))
-        return '{%s}' % '+'.join(msg)
-
-    def __repr__(self):
-        return '<MeterSequence %s>' % self.__str__()
-
-    def __len__(self):
-        '''
-        Return the length of the partition list
+    def __getitem__(self, key):
+        '''Get an MeterTerminal from _partition
 
 
         >>> a = meter.MeterSequence('4/4', 4)
-        >>> a
-        <MeterSequence {1/4+1/4+1/4+1/4}>
-        >>> len(a)
-        4
+        >>> a[3].numerator
+        1
         '''
-        return len(self._partition)
+        if abs(key) >= self.__len__():
+            raise IndexError
+        else:
+            return self._partition[key]
 
     def __iter__(self):
         '''
@@ -954,18 +958,21 @@ class MeterSequence(MeterTerminal):
         '''
         return common.Iterator(self._partition)
 
-    def __getitem__(self, key):
-        '''Get an MeterTerminal from _partition
+    def __len__(self):
+        '''
+        Return the length of the partition list
 
 
         >>> a = meter.MeterSequence('4/4', 4)
-        >>> a[3].numerator
-        1
+        >>> a
+        <MeterSequence {1/4+1/4+1/4+1/4}>
+        >>> len(a)
+        4
         '''
-        if abs(key) >= self.__len__():
-            raise IndexError
-        else:
-            return self._partition[key]
+        return len(self._partition)
+
+    def __repr__(self):
+        return '<MeterSequence %s>' % self.__str__()
 
     def __setitem__(self, key, value):
         '''
@@ -995,7 +1002,13 @@ class MeterSequence(MeterTerminal):
         # clear cache
         self._levelListCache = {}
 
-    #---------------------------------------------------------------------------
+    def __str__(self):
+        msg = []
+        for mt in self._partition:
+            msg.append(str(mt))
+        return '{%s}' % '+'.join(msg)
+
+    #--------------------------------------------------------------------------
     # load common meter templates into this sequence
 
     def _divisionOptionsFractionsUpward(self, n, d, opts=None):
@@ -1250,7 +1263,6 @@ class MeterSequence(MeterTerminal):
         self._divisionOptionsFractionsUpward(n, d, opts)
         return opts
 
-
     def _divisionOptionsPreset(self, n, d):
         '''
         Provide fixed set of meter divisions that will not be easily
@@ -1275,8 +1287,8 @@ class MeterSequence(MeterTerminal):
             opts.append(['2/%d' % d, '1/%d' % d, '2/%d' %d])
         return opts
 
+    #--------------------------------------------------------------------------
 
-    #---------------------------------------------------------------------------
     def _clearPartition(self):
         '''
         This will not sync with .numerator and .denominator if called alone
@@ -1309,7 +1321,6 @@ class MeterSequence(MeterTerminal):
         # clear cache
         self._levelListCache = {}
 
-
     def _getOptions(self):
         # all-string python dictionaries are optimized; use string key
         n = int(self.numerator)
@@ -1326,8 +1337,8 @@ class MeterSequence(MeterTerminal):
             _meterSequenceDivisionOptions[tsStr] = opts
         return opts
 
+    #--------------------------------------------------------------------------
 
-    #---------------------------------------------------------------------------
     def partitionByCount(self, countRequest, loadDefault=True):
         '''
         Divide the current MeterSequence into the requested number of parts.
@@ -1379,17 +1390,17 @@ class MeterSequence(MeterTerminal):
         optMatch = None
         # get the first encountered load string with the desired
         # number of beats
-        if countRequest != None:
+        if countRequest is not None:
             for opt in opts:
                 if len(opt) == countRequest:
                     optMatch = opt
                     break
 
         # if no matches this method provides a default
-        if optMatch == None and loadDefault:
+        if optMatch is None and loadDefault:
             optMatch = opts[0]
 
-        if optMatch != None:
+        if optMatch is not None:
             targetWeight = self.weight
             #environLocal.printDebug(['partitionByCount, targetWeight', targetWeight])
             self._clearPartition() # weight will now be zero
@@ -1470,7 +1481,7 @@ class MeterSequence(MeterTerminal):
                     break
 
         # if a n/d match, now set this MeterSequence
-        if optMatch != None:
+        if optMatch is not None:
             targetWeight = self.weight
             self._clearPartition() # clears self.weight
             for mStr in optMatch:
@@ -1481,7 +1492,6 @@ class MeterSequence(MeterTerminal):
 
         # clear cache
         self._levelListCache = {}
-
 
     def partitionByOtherMeterSequence(self, other):
         '''
@@ -1513,7 +1523,6 @@ class MeterSequence(MeterTerminal):
 
         # clear cache
         self._levelListCache = {}
-
 
     def partition(self, value):
         '''
@@ -1558,7 +1567,6 @@ class MeterSequence(MeterTerminal):
         else:
             raise MeterException('cannot process partition argument %s' % value)
 
-
     def subdividePartitionsEqual(self, divisions=None):
         '''Subdivide all partitions by equally-spaced divisions, given a divisions value. Manipulates this MeterSequence in place.
 
@@ -1584,7 +1592,7 @@ class MeterSequence(MeterTerminal):
 
         '''
         for i in range(len(self)):
-            if divisions == None: # get dynamically
+            if divisions is None: # get dynamically
                 if self[i].numerator in [1, 2, 4, 8, 16]:
                     divisionsLocal = 2
                 elif self[i].numerator in [3]:
@@ -1677,7 +1685,7 @@ class MeterSequence(MeterTerminal):
             self.load(firstPartitionForm.getLevel(0))
             depthCount += 1
         else: # can be just a number
-            if firstPartitionForm == None:
+            if firstPartitionForm is None:
                 firstPartitionForm = self.numerator
             # use a fixed mapping for first divider; may be a good algo solution
             if firstPartitionForm in [1, 2, 4, 8, 16, 32]:
@@ -1732,7 +1740,6 @@ class MeterSequence(MeterTerminal):
         self._levelListCache = {}
 
         #environLocal.printDebug(['subdivideNestedHierarchy(): post nested processing:',  self])
-
 
     #---------------------------------------------------------------------------
     def _getPartitionStr(self):
@@ -1816,7 +1823,7 @@ class MeterSequence(MeterTerminal):
         '''
         # NOTE: this is a performance critical method
         if autoWeight:
-            if targetWeight != None:
+            if targetWeight is not None:
                 targetWeight = targetWeight
             else: # get from current MeterSequence
                 targetWeight = self.weight # store old
@@ -1837,7 +1844,7 @@ class MeterSequence(MeterTerminal):
         elif isinstance(value, MeterTerminal):
             # if we have a singel MeterTerminal and autoWeight is active
             # set this terminal to the old weight
-            if targetWeight != None:
+            if targetWeight is not None:
                 value.weight = targetWeight
             self._addTerminal(value)
             self._updateRatio()
@@ -1853,12 +1860,11 @@ class MeterSequence(MeterTerminal):
         else:
             raise MeterException('cannot create a MeterSequence with a %s' % repr(value))
 
-        if partitionRequest != None:
+        if partitionRequest is not None:
             self.partition(partitionRequest)
 
         # clear cache
         self._levelListCache = {}
-
 
     def _updateRatio(self):
         '''
@@ -1875,8 +1881,6 @@ class MeterSequence(MeterTerminal):
         self._numerator, self._denominator = fractionSum(fList)
         # must call ratio changed directly as not using properties
         self._ratioChanged()
-
-
 
     #---------------------------------------------------------------------------
     # properties
@@ -1909,7 +1913,7 @@ class MeterSequence(MeterTerminal):
         '''
         #environLocal.printDebug(['calling setWeight with value', value])
 
-        if value == None:
+        if value is None:
             pass # do nothing
         else:
             if not common.isNum(value):
@@ -2017,7 +2021,6 @@ class MeterSequence(MeterTerminal):
 
     flatWeight = property(_getFlatWeight)
 
-
     def _getDepth(self):
         '''
         Return how many unique levels deep this part is
@@ -2036,7 +2039,6 @@ class MeterSequence(MeterTerminal):
         return depth
 
     depth = property(_getDepth)
-
 
     def isUniformPartition(self, depth=0):
         '''Return True if the top-level partitions have equal durations
@@ -2125,7 +2127,6 @@ class MeterSequence(MeterTerminal):
         self._levelListCache[cacheKey] = mtList
         return mtList
 
-
     def getLevel(self, level=0, flat=True):
         '''
         Return a complete MeterSequence with the same numerator/denominator
@@ -2177,7 +2178,6 @@ class MeterSequence(MeterTerminal):
             pos += ms[i].duration.quarterLength
         return mapping
 
-
     def getLevelWeight(self, level=0):
         '''
         The weightList is an array of weights found in the components.
@@ -2211,7 +2211,6 @@ class MeterSequence(MeterTerminal):
         for mt in self._getLevelList(level):
             post.append(mt.weight)
         return post
-
 
     def setLevelWeight(self, weightList, level=0):
         '''
@@ -2247,7 +2246,6 @@ class MeterSequence(MeterTerminal):
         for i in range(len(levelObjs)):
             mt = levelObjs[i]
             mt.weight = weightList[i%len(weightList)]
-
 
     #---------------------------------------------------------------------------
     # given a quarter note position, return the active index
@@ -2314,7 +2312,6 @@ class MeterSequence(MeterTerminal):
             qPos += self[i].duration.quarterLength
         return match
 
-
     def offsetToAddress(self, qLenPos, includeCoincidentBoundaries=False):
         '''
         Give a list of values that show all indices necessary to access
@@ -2373,7 +2370,6 @@ class MeterSequence(MeterTerminal):
                      includeCoincidentBoundaries)
 
         return match
-
 
     def offsetToSpan(self, qLenPos, permitMeterModulus=False):
         '''
@@ -2444,7 +2440,6 @@ class MeterSequence(MeterTerminal):
         iMatch = self.offsetToIndex(qLenPos)
         return self[iMatch].weight
 
-
     def offsetToDepth(self, qLenPos, align='quantize'):
         '''
         Given a qLenPos, return the maximum available depth at this position
@@ -2491,8 +2486,9 @@ class MeterSequence(MeterTerminal):
         return score
 
 
+#------------------------------------------------------------------------------
 
-#-------------------------------------------------------------------------------
+
 class TimeSignature(base.Music21Object):
     '''
     The `TimeSignature` object representes time signatures in musical scores (4/4, 3/8, 2/4+5/16, Cut, etc.).
@@ -2664,22 +2660,22 @@ class TimeSignature(base.Music21Object):
     classSortOrder = 4
 
     _DOC_ATTR = {
-    'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
-    'beamSequence': 'A :class:`~music21.meter.MeterSequence` governing automatic beaming.',
-    'accentSequence': 'A :class:`~music21.meter.MeterSequence` governing accent partitioning.',
-    'displaySequence': 'A :class:`~music21.meter.MeterSequence` governing the display of the TimeSignature.',
-    'symbol': 'A string representation of how to display the TimeSignature.  can be "common", "cut", "single-number" (i.e., ' +
-               'no denominator), or "normal" or "".',
-    'symbolizeDenominator': 'If set to `True` (default is `False`) then the denominator will be displayed as a symbol rather than ' +
-                            'a number.  Hindemith uses this in his scores.  Finale and other MusicXML readers do not support this ' +
-                            'so don\'t expect proper output yet.',
+        'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
+        'beamSequence': 'A :class:`~music21.meter.MeterSequence` governing automatic beaming.',
+        'accentSequence': 'A :class:`~music21.meter.MeterSequence` governing accent partitioning.',
+        'displaySequence': 'A :class:`~music21.meter.MeterSequence` governing the display of the TimeSignature.',
+        'symbol': 'A string representation of how to display the TimeSignature.  can be "common", "cut", "single-number" (i.e., ' +
+                'no denominator), or "normal" or "".',
+        'symbolizeDenominator': 'If set to `True` (default is `False`) then the denominator will be displayed as a symbol rather than ' +
+                                'a number.  Hindemith uses this in his scores.  Finale and other MusicXML readers do not support this ' +
+                                'so don\'t expect proper output yet.',
         }
 
     def __init__(self, value='4/4', partitionRequest=None):
         base.Music21Object.__init__(self)
         self.resetValues(value, partitionRequest)
 
-    def resetValues(self, value = '4/4', partitionRequest = None):
+    def resetValues(self, value='4/4', partitionRequest=None):
         '''
         reset all values according to a new value and partitionRequest
         '''
@@ -2720,7 +2716,7 @@ class TimeSignature(base.Music21Object):
         '''
         self.resetValues(newRatioString)
 
-    ratioString = property(_getRatioString, _setRatioString, doc = '''
+    ratioString = property(_getRatioString, _setRatioString, doc='''
         returns a simple string representing the time signature ratio or
         sets a new one.  Cannot be used for very complex time signatures:
 
@@ -2741,19 +2737,16 @@ class TimeSignature(base.Music21Object):
     def __repr__(self):
         return "<music21.meter.TimeSignature %s>" % self.ratioString
 
-
     def ratioEqual(self, other):
         '''A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio.
         '''
-        if other == None: return False
+        if other is None: return False
         if (other.numerator == self.numerator and
             other.denominator == self.denominator):
             return True
         else:
             return False
 
-
-    #---------------------------------------------------------------------------
     def _setDefaultBeatPartitions(self, favorCompound=True):
         '''Set default beat partitions based on numerator and denominator.
 
@@ -2828,11 +2821,9 @@ class TimeSignature(base.Music21Object):
             self.beamSequence.partition([3] * (self.numerator / 3))
         else:
             pass # doing nothing will beam all together
-
         #environLocal.printDebug('default beam partitions set to: %s' % self.beamSequence)
-#         if cacheKey != None:
+#         if cacheKey is not None:
 #             _meterSequenceBeamArchetypes[cacheKey] = copy.deepcopy(self.beamSequence)
-
 
     def _setDefaultAccentWeights(self, depth=3):
         '''This sets default accent weights based on common hierarchical notions for meters; each beat is given a weight, as defined by the top level count of self.beatSequence
@@ -2901,9 +2892,8 @@ class TimeSignature(base.Music21Object):
                 # get values from weightValues dictionary
                 self.accentSequence[i].weight = weightValues[weightInts[i]]
 
-            if cacheKey != None:
+            if cacheKey is not None:
                 _meterSequenceAccentArchetypes[cacheKey] = copy.deepcopy(self.accentSequence)
-
 
     def load(self, value, partitionRequest=None):
         '''Loading a meter destroys all internal representations
@@ -2939,7 +2929,7 @@ class TimeSignature(base.Music21Object):
         # used for setting one level of accents
         self.accentSequence = MeterSequence(value, partitionRequest)
 
-        if partitionRequest == None: # set default beam partitions
+        if partitionRequest is None: # set default beam partitions
             # beam is not adjust by tempo indication
             self._setDefaultBeamPartitions()
 
@@ -2968,10 +2958,8 @@ class TimeSignature(base.Music21Object):
         value = '%s/%s' % (numerator, denominator)
         self.load(value, partitionRequest)
 
-
     #---------------------------------------------------------------------------
     # properties
-
 
 #     def _setStringNotation(self, value):
 #         self.load(value)
@@ -2990,8 +2978,6 @@ class TimeSignature(base.Music21Object):
 #         >>> ts.stringNotation
 #         '4/2'
 #         ''')
-
-
 
     # temp for backward compat
     def _getTotalLength(self):
@@ -3049,7 +3035,6 @@ class TimeSignature(base.Music21Object):
         newRatioString = str(nummy) + '/' + str(value)
         self.resetValues(newRatioString)
 
-
     denominator = property(_getDenominator, _setDenominator,
         doc = '''
         Return the denominator of the TimeSignature as a number or set it.
@@ -3073,7 +3058,6 @@ class TimeSignature(base.Music21Object):
         >>> ts.denominator
         8
         ''')
-
 
     def _getBarDuration(self):
         '''
@@ -3110,7 +3094,6 @@ class TimeSignature(base.Music21Object):
 
         ''')
 
-
     def _getBeatLengthToQuarterLengthRatio(self):
         '''
 
@@ -3123,15 +3106,11 @@ class TimeSignature(base.Music21Object):
     beatLengthToQuarterLengthRatio = property(
                                     _getBeatLengthToQuarterLengthRatio)
 
-
     def _getQuarterLengthToBeatLengthRatio(self):
         return self.denominator/4.0
 
     quarterLengthToBeatLengthRatio = property(
                                     _getQuarterLengthToBeatLengthRatio)
-
-
-
 
     #---------------------------------------------------------------------------
     # meter classifications used for classifying meters such as
@@ -3241,7 +3220,6 @@ class TimeSignature(base.Music21Object):
 
         ''')
 
-
     def _getBeatDivisionCount(self):
         # first, find if there is more than one beat and if all beats are uniformly partitioned
         post = []
@@ -3312,7 +3290,6 @@ class TimeSignature(base.Music21Object):
 
         ''')
 
-
     def _getBeatDivisionDurations(self):
         post = []
         if len(self.beatSequence) == 1:
@@ -3328,7 +3305,6 @@ class TimeSignature(base.Music21Object):
         else:
             raise TimeSignatureException('non uniform beat division: %s' % post)
 
-
     beatDivisionDurations = property(_getBeatDivisionDurations,
         doc = '''Return the beat division, or the durations that make up one beat, as a list of :class:`~music21.duration.Duration` objects, if and only if the TimeSignature has a uniform beat division for all beats.
 
@@ -3341,7 +3317,6 @@ class TimeSignature(base.Music21Object):
         >>> ts.beatDivisionDurations
         [<music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>, <music21.duration.Duration 0.5>]
         ''')
-
 
     def _getBeatSubDivisionDurations(self):
         '''Subdivide each beat division in two.
@@ -3367,7 +3342,6 @@ class TimeSignature(base.Music21Object):
         '''
         )
 
-
     def _getClassification(self):
         return '%s %s' % (self._getBeatDivisionCountName(),
                           self._getBeatCountName())
@@ -3386,7 +3360,6 @@ class TimeSignature(base.Music21Object):
         >>> ts.classification
         'Simple Quadruple'
         ''')
-
 
     #---------------------------------------------------------------------------
     # access data for other processing
@@ -3460,7 +3433,7 @@ class TimeSignature(base.Music21Object):
             dur = durList[i]
             if dur.type not in self._beamableDurationTypes:
                 beamsList.append(None) # placeholder
-            elif srcStream != None and srcStream[i].isRest == True:
+            elif srcStream is not None and srcStream[i].isRest is True:
                 beamsList.append(None) # placeholder
             else:
                 # we have a beamable duration
@@ -3481,7 +3454,7 @@ class TimeSignature(base.Music21Object):
                 dur = durList[i]
                 beams = beamsList[i]
 
-                if beams == None: # if a place holder
+                if beams is None: # if a place holder
                     pos += dur.quarterLength
                     continue
 
@@ -3527,7 +3500,7 @@ class TimeSignature(base.Music21Object):
                 archetypeSpan = archetype.offsetToSpan(start)
                 #environLocal.printDebug(['at level, got archetype span', depth,
                 #                         archetypeSpan])
-                if beamNext == None: # last note or before a non-beamable note (half, whole, etc.)
+                if beamNext is None: # last note or before a non-beamable note (half, whole, etc.)
                     archetypeSpanNext = None
                 else:
                     archetypeSpanNext = archetype.offsetToSpan(startNext)
@@ -3547,14 +3520,14 @@ class TimeSignature(base.Music21Object):
                 if i == 0: # if the first, we always start
                     beamType = 'start'
                     # get a partial beam if we cannot continue this
-                    if (beamNext == None or
+                    if (beamNext is None or
                         beamNumber not in beamNext.getNumbers()):
                         beamType = 'partial-right'
 
                 elif i == len(durList) - 1: # last is always stop
                     beamType = 'stop'
                     # get a partial beam if we cannot come form a beam
-                    if (beamPrevious == None or
+                    if (beamPrevious is None or
                         beamNumber not in beamPrevious.getNumbers()):
                         #environLocal.printDebug(['triggering partial left where a stop normally falls'])
                         beamType = 'partial-left'
@@ -3564,12 +3537,12 @@ class TimeSignature(base.Music21Object):
                 # if last beam was not defined, we need to either
                 # start or have a partial left beam
                 # or, if beam number was not active in last beams
-                elif beamPrevious == None or beamNumber not in beamPrevious.getNumbers():
-                    if beamNumber == 1 and beamNext == None:
+                elif beamPrevious is None or beamNumber not in beamPrevious.getNumbers():
+                    if beamNumber == 1 and beamNext is None:
                         beamsList[i] = None
                         pos += dur.quarterLength
                         continue
-                    elif beamNext == None and beamNumber > 1:
+                    elif beamNext is None and beamNumber > 1:
                         beamType = 'partial-left'
 
                     elif (common.greaterThanOrEqual(startNext,
@@ -3579,7 +3552,7 @@ class TimeSignature(base.Music21Object):
                         # the greater boundary of this span), and we did not have a
                         # beam or beam number in the previous beam
 
-                        # may need to check: beamNext != None and
+                        # may need to check: beamNext is not None and
                         #   beamNumber in beamNext.getNumbers()
                         # note: it is critical that we check archetypeSpan here
                         # not archetypeSpanNext
@@ -3591,17 +3564,17 @@ class TimeSignature(base.Music21Object):
 
                 # last beams was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
-                elif (beamPrevious != None and
+                elif (beamPrevious is not None and
                     beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
-                    beamNext != None):
+                    beamNext is not None):
                         beamType = 'start'
 
 
                 # last note had beams but stopped, next note cannot be beamed to  was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
-                elif (beamPrevious != None and
+                elif (beamPrevious is not None and
                     beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
-                    beamNext == None):
+                    beamNext is None):
                         beamType = 'partial-left'  # will be deleted later in the script
 
 
@@ -3610,7 +3583,7 @@ class TimeSignature(base.Music21Object):
 
                 # if no beam is defined next (we know this already)
                 # then must stop
-                elif (beamNext == None or
+                elif (beamNext is None or
                     beamNumber not in beamNext.getNumbers()):
                     beamType = 'stop'
 
@@ -3636,7 +3609,7 @@ class TimeSignature(base.Music21Object):
                     raise TimeSignatureException('cannot match beamType')
 
                 # debugging information displays:
-#                 if beamPrevious != None:
+#                 if beamPrevious is not None:
 #                     environLocal.printDebug(['beamPrevious', beamPrevious, 'beamPrevious.getNumbers()', beamPrevious.getNumbers(), 'beamPrevious.getByNumber(beamNumber).type'])
 #                     if beamNumber in beamPrevious.getNumbers():
 #                         environLocal.printDebug(['beamPrevious type', beamPrevious.getByNumber(beamNumber).type])
@@ -3651,7 +3624,7 @@ class TimeSignature(base.Music21Object):
         ## clear elements that have partial beams with no full beams:
 
         for i in range(len(beamsList)):
-            if beamsList[i] == None:
+            if beamsList[i] is None:
                 continue
             allTypes = beamsList[i].getTypes()
             if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
@@ -3660,7 +3633,6 @@ class TimeSignature(base.Music21Object):
 
 
         return beamsList
-
 
     def setDisplay(self, value, partitionRequest=None):
         '''
@@ -3690,7 +3662,6 @@ class TimeSignature(base.Music21Object):
         # need to update summed numerator states
         self.summedNumerator = self.displaySequence.summedNumerator
 
-
     def getAccent(self, qLenPos):
         '''Return True or False if the qLenPos is at the start of an accent
         division.
@@ -3713,7 +3684,6 @@ class TimeSignature(base.Music21Object):
                 return True
             pos += self.accentSequence[i].duration.quarterLength
         return False
-
 
     def setAccentWeight(self, weightList, level=0):
         '''Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used.
@@ -3743,7 +3713,7 @@ class TimeSignature(base.Music21Object):
         for i in range(len(msLevel)):
             msLevel[i].weight = weightList[i % len(weightList)]
 
-    def averageBeatStrength(self, streamIn, notesOnly = True):
+    def averageBeatStrength(self, streamIn, notesOnly=True):
         '''
         returns a float of the average beat strength of all objects (or if notesOnly is True
         [default] only the notes) in the `Stream` specified as streamIn.
@@ -3858,7 +3828,6 @@ class TimeSignature(base.Music21Object):
                     return post # do not add offset for end of bar
                 post.append(o)
 
-
     def getBeatDuration(self, qLenPos):
         '''
         Returns a :class:`~music21.duration.Duration`
@@ -3906,7 +3875,6 @@ class TimeSignature(base.Music21Object):
         <music21.duration.Duration 1.0>
         '''
         return self.beatSequence[self.beatSequence.offsetToIndex(qLenPos)].duration
-
 
     def getOffsetFromBeat(self, beat):
         '''
@@ -3980,8 +3948,6 @@ class TimeSignature(base.Music21Object):
         # round to 3 values
         return round(post, 4)
 
-
-
     def getBeatProgress(self, qLenPos):
         '''
         Given a quarterLength position, get the beat,
@@ -4012,7 +3978,6 @@ class TimeSignature(base.Music21Object):
         start, unused_end = self.beatSequence.offsetToSpan(qLenPos)
         return beatIndex + 1, qLenPos - start
 
-
     def getBeatProportion(self, qLenPos):
         '''
         Given a quarter length position into the meter, return a numerical progress
@@ -4042,10 +4007,8 @@ class TimeSignature(base.Music21Object):
         progress = qLenPos - start # how far in QL
         return beatIndex + 1 + (progress / totalRange)
 
-
     def getBeatProportionStr(self, qLenPos):
         '''Return a string presentation of the beat.
-
 
         >>> ts1 = meter.TimeSignature('3/4')
         >>> ts1.getBeatProportionStr(0.0)
@@ -4062,7 +4025,6 @@ class TimeSignature(base.Music21Object):
 
         >>> ts4 = meter.TimeSignature(['6/8']) # will partition as 2 beat
         '''
-
         beatIndex = int(self.beatSequence.offsetToIndex(qLenPos))
         start, end = self.beatSequence.offsetToSpan(qLenPos)
         totalRange = end - start
@@ -4075,12 +4037,10 @@ class TimeSignature(base.Music21Object):
             post = '%s %s/%s' % (beatIndex + 1, a, b) # just show beat
         return post
 
-
     def getBeatDepth(self, qLenPos, align='quantize'):
         '''Return the number of levels of beat partitioning given a QL into the TimeSignature. Note that by default beat partitioning always has a single, top-level partition.
 
         The `align` parameter is passed to the :meth:`~music21.meter.MeterSequence.offsetToDepth` method, and can be used to find depths based on start position overlaps.
-
 
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeatDepth(0)
@@ -4104,29 +4064,32 @@ class TimeSignature(base.Music21Object):
         '''
         return self.beatSequence.offsetToDepth(qLenPos, align)
 
-
-
-    def quarteroffsetToBeat(self, currentQtrPosition = 0):
+    def quarteroffsetToBeat(self, currentQtrPosition=0):
         '''For backward compatibility. Ultimately, remove.
         '''
         #return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
         return self.getBeat(currentQtrPosition)
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
 
 class CompoundTimeSignature(TimeSignature):
     pass
+
 
 class DurationDenominatorTimeSignature(TimeSignature):
     '''If you have played Hindemith you know these, 3/(dot-quarter) etc.'''
     pass
 
+
 class NonPowerOfTwoTimeSignature(TimeSignature):
     pass
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+
 class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
@@ -4170,7 +4133,6 @@ class TestExternal(unittest.TestCase):
             a.insert(m.timeSignature.barDuration.quarterLength, m)
         a.show()
 
-
     def testMeterBeam(self):
         import music21
         from music21 import stream, note
@@ -4185,14 +4147,12 @@ class TestExternal(unittest.TestCase):
         s.show()
 
 
-
 class Test(unittest.TestCase):
     '''Unit tests
     '''
 
     def runTest(self):
         pass
-
 
     def setUp(self):
         pass
@@ -4217,7 +4177,6 @@ class Test(unittest.TestCase):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
 
-
     def testMeterSubdivision(self):
         a = MeterSequence()
         a.load('4/4', 4)
@@ -4228,8 +4187,6 @@ class Test(unittest.TestCase):
 
         a[3] = a[3].subdivide(4)
         self.assertTrue(str(a) == '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}', str(a))
-
-
 
     def testMeterDeepcopy(self):
         a = MeterSequence()
@@ -4242,7 +4199,6 @@ class Test(unittest.TestCase):
         d = copy.deepcopy(c)
         self.assertNotEqual(c, d)
 
-
     def testGetBeams(self):
         from music21 import duration
 
@@ -4254,10 +4210,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(c), match)
 
-
-
     def testoffsetToDepth(self):
-
         # get a maximally divided 4/4 to the level of 1/8
         a = MeterSequence('4/4')
         for h in range(len(a)):
@@ -4287,7 +4240,6 @@ class Test(unittest.TestCase):
             pos = (x * .5) + .25
             test = a.offsetToDepth(pos, align='quantize')
             self.assertEqual(test, match[x])
-
 
     def testDefaultBeatPartitions(self):
         src = [('2/2'), ('2/4'), ('2/8'), ('6/4'), ('6/8'), ('6/16')]
@@ -4355,8 +4307,6 @@ class Test(unittest.TestCase):
             #self.assertEqual(len(ts.beatSequence), 6)
             self.assertEqual(ts.beatCountName, None)
 
-
-
     def testBeatProportionFromTimeSignature(self):
 
         # given meter, ql, beat proportion, and beat ql
@@ -4383,10 +4333,7 @@ class Test(unittest.TestCase):
                 self.assertEqual(ts.getBeatDuration(ql).quarterLength,
                                  beatDur[i])
 
-
-
     def testSubdividePartitionsEqual(self):
-
         ms = MeterSequence('2/4')
         ms.subdividePartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/4+1/4}}')
@@ -4419,9 +4366,6 @@ class Test(unittest.TestCase):
         ms = MeterSequence('3/8+3/4')
         ms.subdividePartitionsEqual(None) # can partition by another
         self.assertEqual(str(ms), '{{1/8+1/8+1/8}+{1/4+1/4+1/4}}')
-
-
-
 
     def testSetDefaultAccentWeights(self):
         # these tests take the level to 3. in some cases, a level of 2
@@ -4492,8 +4436,6 @@ class Test(unittest.TestCase):
             ts1._setDefaultAccentWeights(3) # going to a lower level here
             self.assertEqual([mt.weight for mt in ts1.accentSequence], match)
 
-
-
     def testJSONStorage(self):
         from music21 import meter
         from music21 import freezeThaw
@@ -4522,7 +4464,6 @@ class Test(unittest.TestCase):
         freezeThaw.JSONThawer(tsNew).json = freezer.json
         self.assertEqual(tsNew.ratioString, '3/4')
 
-
     def testMusicxmlDirectOut(self):
         # test rendering musicxml directly from meter
         from music21.musicxml import m21ToString as toMusicXML
@@ -4534,7 +4475,6 @@ class Test(unittest.TestCase):
         xmlout = xmlout.replace(' ', '')
         xmlout = xmlout.replace('\n', '')
         self.assertTrue(xmlout.find(match) != -1)
-
 
     def testSlowSixEight(self):
         # create a meter with 6 beats but beams in 2 groups
@@ -4567,7 +4507,6 @@ class Test(unittest.TestCase):
         self.assertEqual(ts.beatDivisionCountName, 'Compound')
         self.assertEqual(str(ts.beatSequence), '{{1/8+1/8+1/8}+{1/8+1/8+1/8}}')
 
-
     def testMixedDurationsBeams(self):
         fourFour = TimeSignature('4/4')
         d = duration.Duration
@@ -4591,17 +4530,21 @@ class Test(unittest.TestCase):
         beamList = [n.beams for n in bm2.flat.notes]
         beamListRepr = [str(i) + repr(beamList[i]) for i in range(len(beamList))]
         self.maxDiff = 2000
-        self.assertEqual(beamListRepr, ['0<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>',
-                                        '1<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
-                                        '2<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>',
-                                        '3<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>',
-                                        '4<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>',
-                                        '5<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
-                                        '6<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>',
-                                        ])
+        self.assertEqual(beamListRepr, [
+            '0<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>',
+            '1<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
+            '2<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>',
+            '3<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>',
+            '4<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>',
+            '5<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
+            '6<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>',
+            ])
 
-#-------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 # define presented order in documentation
+
+
 _DOC_ORDER = [TimeSignature, CompoundTimeSignature]
 
 
