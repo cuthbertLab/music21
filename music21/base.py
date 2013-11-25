@@ -155,7 +155,7 @@ class SlottedObject(object):
 # make subclass of set once that is defined properly
 
 
-class Groups(list):
+class Groups(SlottedObject, list):
     '''
     Groups is a list of strings used to identify associations that an element
     might have.
@@ -190,6 +190,8 @@ class Groups(list):
 
     # could be made into a set instance, but actually
     # timing: a subclassed list and a set are almost the same speed...
+
+    __slots__ = ()
 
     def append(self, value):
         if isinstance(value, basestring):
