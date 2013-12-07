@@ -251,7 +251,7 @@ click this when running Python programs)
 
 In the console, you may see errors about installing additional packages, after
 which you will see a message beginning with "Welcome to the music21
-Configuration Assisstant." 
+Configuration Assistant." 
 
 ..  image:: images/usingEclipse/welcometoconfigassistant.png
     :width: 650
@@ -277,6 +277,82 @@ Committing, pushing and pulling in Eclipse
 Git and Subversion differ in a lot of ways, and one of the biggest is in how
 they handle committing changes.
 
+In SVN, making a commit both updates the history in your local copy of the
+repository and sends those changes up to the central server for that
+repository.
+
+In Git, these actions are broken into smaller discrete steps:
+
+1.  **Add** modifications in your working directory to the "staging area" - the
+    list of changes you intend to bundle into a **commit**.
+
+2.  Make a **commit** out of the "staged changes". Now the history of your
+    local repository has changed. You can repeat steps one and two to make as
+    many commits as you like.
+
+3.  **Push** your commits to the central server. If you've changed files that
+    someone else was working on, you may be obliged to **merge**, but Git makes
+    that relatively painless. After pushing, all of your local commits will be
+    added to the history in the central server for others to fetch.
+
+Likewise, in SVN, updating takes the current state of the central server
+and both updates the history in your local copy and changes the files and
+directories present there - adding, deleting or modifying the contents of your
+working directory.
+
+Again, in Git, these actions are broken into smaller discrete steps:
+
+1.  **Fetch** history from the central server. Now you can see how the history
+    in your local repository differs from the history **upstream** - the changes
+    that everyone else has been making.
+
+2.  If you like what you see, you can **pull** to update your working directory
+    to be the same as the most recent change from upstream. You can also
+    **pull** from any point in the history of the repository. Git is incredibly
+    flexible, but also potentially intimidating for the same reason.
+
+Eclipse with EGit makes all of this simple. You'll probably never have to worry 
+about most of Git's advanced features - branching, rebasing, etc.
+
+Adding changes, committing and pushing in Eclipse
+`````````````````````````````````````````````````
+
+1.  To **add** changes to Git's "staging area", right-click in Eclipse's
+    Project Explorer on the music21 project folder and select **Add to Index**
+    from the **Team** submenu:
+
+	..  image:: images/usingGit/eclipse__committing__1.png
+
+    Files and folders with changes staged for commit will appear with a little
+    asterisk in the Project Explorer.
+
+2.  To make a **commit**, right-click in Eclipse's Project Explorer on the
+    music21 project folder and select **Commit...** from the **Team** submenu: 
+
+	..  image:: images/usingGit/eclipse__committing__2.png
+
+3.  Now you can write a commit message in the **Commit Changes** dialog box.
+    You can also refine which modifications you want included in the commit by
+    selecting and deselecting files in the **Files** list at the bottom of the
+    dialog box.
+
+    When you're happy with the commit message, click on either **Commit** or
+    **Commit and Push**. The first option will simply add the commit to your
+    local history, while the second option will both commit to your local
+    history and then send that history up to GitHub. In the rare occurance that
+    you have a merge conflict (for example, if you've been developing on
+    different computers with slightly different history on each), Eclipse will
+    help you **merge** before **pushing**:
+
+	..  image:: images/usingGit/eclipse__committing__3.png
+
+Fetching and pulling in Eclipse
+```````````````````````````````
+
+Fetching and pulling in Eclipse are even easier than committing and pushing.
+Just right-click on the music21 project folder in Eclipse's Project Explorer
+and select either **Pull** to pull or **Fetch from Upstream** to fetch from
+your fork on GitHub.
 
 
 Configurating Git remotes in Eclipse
@@ -288,7 +364,7 @@ history and pull changes, those changes come from your fork.
 
 However, Git repositories can be taught about other remote repositories,
 otherwise known as **remotes**. This is important, because the changes that are
-made to the official music21 repository will not be automatically propogated to
+made to the official music21 repository will not be automatically propagated to
 your fork. You need to teach your fork about the official repository, and fetch
 those changes into your forks history manually.
 
@@ -300,7 +376,7 @@ Luckily, configuring Git remotes in Eclipse is easy.
 
     ..  image:: images/usingGit/eclipse__add_upstream_remote__1.png
 
-2.  In the *Repositories View** you'll find the various Git repositories on
+2.  In the **Repositories View** you'll find the various Git repositories on
     your system that Eclipse is aware of. Underneath music21, you'll find
     sections titled **Branches**, **Tags**, **References**, **Remotes** and
     **Working Directory**. Right-click on **Remotes** and select **Create
@@ -369,7 +445,7 @@ Sending pull requests to the official music21 repository
 --------------------------------------------------------
 
 To get your changes into the official music21 repository, you'll have to make a
-**pull request** via the GitHub website. A **pull request** is just what it
+**pull request** via the GitHub web site. A **pull request** is just what it
 sounds like: a request to another repository for them to pull in changes from
 your repository.
 
