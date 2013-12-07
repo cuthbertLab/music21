@@ -28,7 +28,7 @@ these instructions are written with Eclipse Standard 4.3 (Kepler) in mind.
 
 
 Installing for Windows
-``````````````````````````````````````````````
+``````````````````````
 
 For Windows users, the safest bet is the 32-bit version, regardless of your
 system's capabilities. 
@@ -52,7 +52,7 @@ download a copy there.
 
 
 Installing for Mac
-``````````````````````````````````````````````
+``````````````````
 
 For Mac users, download the version that complies with your system. If in
 doubt, 32-bit is a safe option, as 64-bit systems are back-compatible to 32-bit
@@ -77,7 +77,7 @@ as it is where music21 will be installed.
 
 
 Installing for Unix
-``````````````````````````````````````````````
+```````````````````
 
 You've chosen to run Unix -- you should be able to figure this out on your own.
 :-)
@@ -277,6 +277,7 @@ Committing, pushing and pulling in Eclipse
 
 
 
+
 Configurating Git remotes in Eclipse
 ------------------------------------
 
@@ -361,3 +362,16 @@ official music21 repository.
 
     After **fetching**, you need to **pull** in order for that history to be
     reflected in your working directory.
+
+
+Sending pull requests to the official music21 repository
+--------------------------------------------------------
+
+To get your changes into the official music21 repository, you'll have to make a
+**pull request** via the GitHub website.
+
+    ..  image:: images/usingGit/github__pull_requests__1.png
+
+    ..  image:: images/usingGit/github__pull_requests__2.png
+
+    ..  image:: images/usingGit/github__pull_requests__3.png
