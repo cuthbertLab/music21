@@ -274,7 +274,8 @@ tutorials on using music21.
 Committing, pushing and pulling in Eclipse
 ------------------------------------------
 
-
+Git and Subversion differ in a lot of ways, and one of the biggest is in how
+they handle committing changes.
 
 
 
@@ -368,10 +369,41 @@ Sending pull requests to the official music21 repository
 --------------------------------------------------------
 
 To get your changes into the official music21 repository, you'll have to make a
-**pull request** via the GitHub website.
+**pull request** via the GitHub website. A **pull request** is just what it
+sounds like: a request to another repository for them to pull in changes from
+your repository.
+
+Making pull requests is easy:
+
+1.  Log into GitHub and find your fork of music21. Under the repository summary
+    header you'll see a green button with two arrows, labeled "Compare &
+    review".
+    
+    Click that button:
 
     ..  image:: images/usingGit/github__pull_requests__1.png
 
+2.  If your repository differs from the official music21 repository, you'll be
+    shown the diff stats, as well as a large banner with the text ``Click to
+    create a pull request for this comparison``. 
+
+    Click on that banner to continue:
+
     ..  image:: images/usingGit/github__pull_requests__2.png
 
+3.  Almost done. Now you can write a description of what your pull request
+    involves. While the music21 team can and will review the diffs for your
+    request, please provide a useful description. What do your changes
+    accomplish?  Do they address one of the issues in the official issue
+    tracker? Which issue?  Do they represent an enhancement, or new
+    functionality?
+
+    When you've finished writing your description, click on the ``Send pull
+    request`` button. You've sent your pull pull request!
+
     ..  image:: images/usingGit/github__pull_requests__3.png
+
+Once you've sent a pull request to the music21 team they'll need to review the
+changes you've suggested.  They can opt to accept some, all or none of the
+commits you've included in your pull request. If the work looks good, they'll
+merge your changes into the official repository.
