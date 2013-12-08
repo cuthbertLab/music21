@@ -321,10 +321,15 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
-    def xtestTrecentoMadrigal(self):
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testTrecentoMadrigal(self):
         from music21 import corpus
-        c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-        #c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        #c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
+        c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #c = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #c = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
@@ -332,12 +337,14 @@ class Test(unittest.TestCase):
         #c = corpus.parse('PMFC_12_13').measures(1, 40)
 
         # fix clef
-#         from music21 import clef
-#         startClefs = c.parts[1].getElementsByClass('Measure')[0].getElementsByClass('Clef')
-#         if len(startClefs):
-#             clef1 = startClefs[0]
-#             c.parts[1].getElementsByClass('Measure')[0].remove(clef1)
-#         c.parts[1].getElementsByClass('Measure')[0].insert(0, clef.Treble8vbClef())
+        fixClef = True
+        if fixClef:
+            from music21 import clef
+            startClefs = c.parts[1].getElementsByClass('Measure')[0].getElementsByClass('Clef')
+            if len(startClefs):
+                clef1 = startClefs[0]
+                c.parts[1].getElementsByClass('Measure')[0].remove(clef1)
+            c.parts[1].getElementsByClass('Measure')[0].insert(0, clef.Treble8vbClef())
         
 
         cr = ChordReducer()
@@ -356,7 +363,7 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
 
 
 #------------------------------------------------------------------------------

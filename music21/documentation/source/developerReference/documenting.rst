@@ -139,16 +139,13 @@ test code doesn't get out of sync with each other.  Pretty cool, eh?
 Here's the thing: good programming means that you test as much as possible in
 the code, but good documentation means showing enough example code that the
 readers get it, but not so much that they want to claw out their own eyeballs.
-So how to proceed?  simply add the line:
+So how to proceed?  simply add the line "OMIT_FROM_Docs"  in ALL CAPS
+instead of lowercase. (I can't write it in all caps here or nothing else will display!)
 
-::
-
-   OMIT_FROM_DOCS
-   
-in your documentation code and it won't display.  For instance, say we wanted
-to demonstrate the difference between note.name and note.step, but also wanted
+Anything after that line in your documentation code won't display.  For instance, 
+say we wanted to demonstrate the difference between note.name and note.step, but also wanted
 to test to make sure that flats and sharps both were equally eliminated.  We
-could write documentation/test-code like this:
+could write documentation/test-code like this (but with all caps)
 
 ::
  
@@ -158,7 +155,8 @@ could write documentation/test-code like this:
    >>> c1.step
    'C'
    
-   OMIT_FROM_DOCS
+   OMIT_FROM_Docs
+   
    >>> c2 = note.Note('C-')
    >>> c2.step
    'C'
@@ -166,25 +164,35 @@ could write documentation/test-code like this:
    
 and what you'll get in your documentation is:
 
+:: 
+
    >>> from music21 import * 
    >>> c1 = note.Note('C#')
    >>> c1.step
    'C'
  
 Lines can be omitted on an individual basis by adding the expression 
-"#_DOCS_HIDE" somewhere on the line.  On the other hand, the text 
-"#_DOCS_SHOW" is removed from any line before it appears in the 
+"#_DOCS_Hide" (again in all caps) somewhere on the line.  On the other hand, the text 
+"#_DOCS_Show" (again in all caps) is removed from any line before it appears in the 
 documentation.  So you could use some of the same lines to test 
 code and also to give an example like so::
 
    >>> d1 = note.Note("D-")
-   >>> assert(d1.name == 'D-')  #_DOCS_HIDE
-   >>> #_DOCS_SHOW d1.show('lily.png')
+   >>> assert(d1.name == 'D-')  #_DOCS_Hide
+   >>> #_DOCS_Show d1.show('lily.png')
    
 in this case, the assertion code is omitted from the documentation 
 generated from the module, while the lilypond file is not generated
-during doctests.  Together with OMIT_FROM_DOCS, it's a great way to
-have your cake and eat it too.
+during doctests.  It will look to your users like:
+
+:: 
+
+   >>> d1 = note.Note("D-")
+   >>> d1.show('lily.png')
+
+
+Together with OMIT_FROM_Docs, it's a great way to
+have your cake and eat it too. (remember that these need to be in all caps)
 
 Ordering Module-Level Class Names and Module-Level Functions
 -----------------------------------------------------------------------------
@@ -228,21 +236,23 @@ The following abbreviated example is from pitch.py::
 Documenting Class-Level Properties
 ---------------------------------------------------
 
-To document a property do something like this::
+To document a property do something like this:
 
-  def _getName(self):
-     return self._storedName
+::
+
+    def _getName(self):
+       return self._storedName
   
-  def _setName(self, newName):
-     if newName == 'Cuthbert':
-        raise Exception("what a dumb name!")
-     else:
-        self._storedName = newName
+    def _setName(self, newName):
+       if newName == 'Cuthbert':
+           raise Exception("what a dumb name!")
+       else:
+           self._storedName = newName
   
-  name = property(_getName, _setName, doc = '''
-      The name property stores a name for the object
-      unless the name is something truly idiotic.
-      '''
+    name = property(_getName, _setName, doc = '''
+          The name property stores a name for the object
+          unless the name is something truly idiotic.
+          '''
 
 Documenting Class-Level Attributes
 --------------------------------------------------------------
@@ -257,7 +267,8 @@ Like `_DOC_ORDER`, don't put this in `__init__()`.
 Here's an example from note.py::
 
     class Note(NotRest):
-        '''Class doc string. goes here.
+        '''
+        Class doc string goes here.
         '''
         isNote = True
         isUnpitched = False
@@ -282,10 +293,12 @@ If a `_DOC_ATTR` attribute is not defined, the most-recently inherited `_DOC_ATT
 To explicitly merge an inherited `_DOC_ATTR` attribute with a locally defined `_DOC_ATTR`, use the 
 dictionary's `update()` method.
 
-The following abbreviated example, showing the updating of the `_DOC_ATTR` inherited from NotRest, is from chord.py::
+The following abbreviated example, showing the updating of the `_DOC_ATTR` inherited from NotRest, 
+is from chord.py::
 
     class Chord(note.NotRest):
-        '''Class doc strings.
+        '''
+        Class doc strings.
         '''
         isChord = True
         isNote = False
@@ -316,7 +329,8 @@ A typical example of source code might look like this::
 		[instance variables, __init__, etc.]
 		def myNewMethod(self,parameters):
 		    '''
-		    this is documentation for this method
+		    This is documentation for this method
+		    
 		    >>> myInstance = className()
 		    >>> myInstance.myNewMethod(someParameters)
 		    >>> myUnicorn.someInstanceVariable

@@ -17,11 +17,12 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 from music21 import corpus
 from music21 import converter
+from music21 import exceptions21
 import threading
 import Queue as queue
 import Tkinter
 import time
-#import math
+import math
 
 _missingImport = []
 try:
@@ -36,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 
 from music21.audioSearch import * #@UnusedWildImport
 #from music21.audioSearch import recording
-from music21.audioSearch import scoreFollower
+from music21 import scale
  
 try:
     import AppKit 
@@ -55,7 +56,7 @@ class SFApp():
     def __init__(self, master):
         self.debug = True
         if 'PIL' in _missingImport:
-            raise music21.Music21Exception("Need PIL installed to run Score Follower")
+            raise exceptions21.Music21Exception("Need PIL installed to run Score Follower")
         self.master = master
         self.frame = Tkinter.Frame(master)
         self.master.wm_title("Score follower - music21")
@@ -85,7 +86,7 @@ class SFApp():
             self.resolution = True
         except: # mac and linux
             try:   
-                for screen in AppKit.NSScreen.screens():
+                for screen in AppKit.NSScreen.screens():  # @UndefinedVariable
                     self.screenResolution = [int(screen.frame().size.width), int(screen.frame().size.height)]             
                 environLocal.printDebug("screen resolution (MAC or linux) %d x %d" % (self.screenResolution[0], self.screenResolution[1]))
                 self.resolution = True             
