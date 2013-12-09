@@ -6,7 +6,6 @@ Developer Reference
 
     documenting
     buildingDocumentation
-    usingEclipse
     usingGit
     installIPython
 
