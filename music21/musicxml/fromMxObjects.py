@@ -14,8 +14,7 @@ Low-level conversion routines from MusicXML to music21.
 
 This module supposes that the musicxml document has already been parsed by xml.sax (by 
 base.Document.read() ) and is stored as a collection of mxObjects -- equivalent parsing 
-methods could be created
-and fed into `mxScoreToScore` to make this work.
+methods could be created and fed into `mxScoreToScore` to make this work.
 '''
 import unittest
 import copy
