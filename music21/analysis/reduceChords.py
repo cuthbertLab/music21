@@ -214,11 +214,7 @@ class ChordReducer(object):
         Everything from before plus consonance
         '''
         consonanceScore = 1.0 if c.isConsonant() else 0.1
-        
-        if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
-            return c.quarterLength * consonanceScore # call beatStrength 1
-        else:
-            return self.quarterLengthBeatStrength(c) * consonanceScore
+        return self.quarterLengthBeatStrengthMeasurePosition(c) * consonanceScore
 
     def multiPartReduction(self, inStream, maxChords = 2, closedPosition = False, forceOctave = False):
         '''
