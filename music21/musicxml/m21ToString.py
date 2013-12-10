@@ -857,7 +857,7 @@ spirit</words>
         h.chordKindStr = 'M'
 
         hd = harmony.ChordStepModification()
-        hd.type = 'alter'
+        hd.modType = 'alter'
         hd.interval = -1
         hd.degree = 3
         h.addChordStepModification(hd)

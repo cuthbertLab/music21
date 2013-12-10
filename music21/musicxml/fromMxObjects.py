@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 # Name:         musicxml/fromMxObjects.py
 # Purpose:      Translate from MusicXML mxObjects to music21 objects
-#
+# 
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
