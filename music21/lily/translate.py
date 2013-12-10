@@ -19,6 +19,7 @@ this replaces (July 2012) the old LilyString() conversion methods.
 from __future__ import unicode_literals
 
 import os
+import subprocess
 import sys
 import re
 # import threading
@@ -164,8 +165,18 @@ class LilypondConverter(object):
             else:
                 LILYEXEC = 'lilypond'
         self.LILYEXEC = LILYEXEC
-        self.majorVersion = 2 # this should be obtained from user and/or user's system
-        self.minorVersion = 13
+
+        command = self.LILYEXEC + ' --version'
+        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+        versionString = proc.stdout.readline()
+        versionString = versionString.split()[-1]
+        versionString = versionString.strip()
+        versionPieces = versionString.split('.')
+        self.majorVersion = versionPieces[0]
+        self.minorVersion = versionPieces[1]
+
+        #self.majorVersion = 2 # this should be obtained from user and/or user's system
+        #self.minorVersion = 13
         self.versionString = self.topLevelObject.backslash + "version " + self.topLevelObject.quoteString(str(self.majorVersion) + '.' + str(self.minorVersion))
         self.versionScheme = lyo.LyEmbeddedScm(self.versionString)
         self.headerScheme  = lyo.LyEmbeddedScm(self.bookHeader)
@@ -201,7 +212,7 @@ class LilypondConverter(object):
 
         >>> n = note.Note()
         >>> print lily.translate.LilypondConverter().textFromMusic21Object(n)
-        \version "2.13"
+        \version "2..."
         \include "lilypond-book-preamble.ly"
         color = #(define-music-function (parser location color) (string?) #{
                 \once \override NoteHead #'color = #(x11-color $color)
