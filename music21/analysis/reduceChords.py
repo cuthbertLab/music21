@@ -69,6 +69,133 @@ class Verticality(object):
         self._startElements = tuple(startElements)
         self._overlapElements = tuple(overlapElements)
 
+    ### PUBLIC METHODS ###
+
+    @staticmethod
+    def iterateVerticalities(expr):
+        '''
+        Iterate overlapping elements:
+
+        ::
+
+            >>> score = corpus.parse('PMFC_06_Giovanni-05_Donna')
+            >>> for i in range(1, 5):
+            ...     measure = score.measure(i)
+            ...     print 'Measure {}:'.format(i)
+            ...     verticalities = analysis.reduceChords.Verticality.iterateVerticalities(measure)
+            ...     for j, verticality in enumerate(verticalities):
+            ...         print '\tVerticality {}:'.format(j)
+            ...         print '\t\tOld:', verticality.overlapElements
+            ...         print '\t\tNew:', verticality.startElements
+            ...
+            Measure 1:
+                Verticality 0:
+                    Old: ()
+                    New: (<music21.note.Note D>, <music21.note.Note G>)
+            Measure 2:
+                Verticality 0:
+                    Old: ()
+                    New: (<music21.note.Note D>, <music21.note.Note G>)
+                Verticality 1:
+                    Old: (<music21.note.Note G>,)
+                    New: (<music21.note.Note C>,)
+            Measure 3:
+                Verticality 0:
+                    Old: ()
+                    New: (<music21.note.Note B>, <music21.note.Note G>)
+            Measure 4:
+                Verticality 0:
+                    Old: ()
+                    New: (<music21.note.Note B>, <music21.note.Note G>)
+                Verticality 1:
+                    Old: (<music21.note.Note G>,)
+                    New: (<music21.note.Note B>,)
+                Verticality 2:
+                    Old: (<music21.note.Note G>,)
+                    New: (<music21.note.Note C>,)
+
+        '''
+        leafLists = []
+        for part in expr:
+            innerMeasure = part.getElementsByClass('Measure')[0]
+            leaves = innerMeasure.notesAndRests
+            leafLists.append(leaves)
+        currentIndices = [0 for _ in leafLists]
+        currentStartOffset = None
+        earliestStopOffset = None
+        latestStopOffset = None
+        for i, index in enumerate(currentIndices):
+            leaf = leafLists[i][index]
+            startOffset = leaf.offset
+            stopOffset = leaf.offset + leaf.quarterLength
+            if currentStartOffset is None or startOffset < currentStartOffset:
+                currentStartOffset = startOffset
+            if earliestStopOffset is None or stopOffset < earliestStopOffset:
+                earliestStopOffset = stopOffset
+            if latestStopOffset is None or latestStopOffset < stopOffset:
+                latestStopOffset = stopOffset
+        overlapElements = []
+        startElements = []
+        for leaves, i in zip(leafLists, currentIndices):
+            leaf = leaves[i]
+            if leaf.offset == currentStartOffset:
+                startElements.append(leaf)
+            else:
+                overlapElements.append(leaf)
+        yield Verticality(
+            startElements=startElements,
+            overlapElements=overlapElements,
+            )
+        while True:
+            indexIsLast = []
+            for i, index in enumerate(currentIndices):
+                if (index + 1) == len(leafLists[i]):
+                    indexIsLast.append(True)
+                    continue
+                indexIsLast.append(False)
+                thisLeaf = leafLists[i][index]
+                nextLeaf = leafLists[i][index + 1]
+                if nextLeaf.offset == earliestStopOffset:
+                    currentIndices[i] = index + 1
+            currentStartOffset = earliestStopOffset
+            earliestStopOffset = None
+            for i, index in enumerate(currentIndices):
+                thisLeaf = leafLists[i][index]
+                stopOffset = thisLeaf.offset + thisLeaf.quarterLength
+                if latestStopOffset < stopOffset:
+                    latestStopOffset = stopOffset
+                if earliestStopOffset is None or \
+                    stopOffset < earliestStopOffset:
+                    earliestStopOffset = stopOffset
+            if all(indexIsLast):
+                break
+            overlapElements = []
+            startElements = []
+            for leaves, i in zip(leafLists, currentIndices):
+                leaf = leaves[i]
+                if leaf.offset == currentStartOffset:
+                    startElements.append(leaf)
+                else:
+                    overlapElements.append(leaf)
+            yield Verticality(
+                startElements=startElements,
+                overlapElements=overlapElements,
+                )
+        raise StopIteration
+
+    @staticmethod
+    def iterateVerticalitiesNwise(expr, n=2):
+        verticalities = tuple(Verticality.iterateVerticalities(expr))
+        if len(verticalities) < n:
+            yield verticalities
+        else:
+            verticalityBuffer = []
+            for verticality in expr:
+                verticalityBuffer.append(verticality)
+                if len(verticalityBuffer) == n:
+                    yield tuple(verticalityBuffer)
+                    verticalityBuffer.pop(0)
+
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -118,7 +245,7 @@ class ChordReducer(object):
 
     def _alignByLyrics(self, inputMeasure):
         reallignments = []
-        for verticality in self._iterateVerticalities(inputMeasure):
+        for verticality in Verticality.iterateVerticalities(inputMeasure):
             elements = verticality.elements
             if not all(x.hasLyrics() for x in elements):
                 continue
@@ -236,101 +363,6 @@ class ChordReducer(object):
         measure.append(previousChord)
         chordifiedInputMeasure.show('text')
         return chordifiedInputMeasure
-
-    def _iterateVerticalities(self, inputMeasure):
-        '''
-        Iterate overlapping elements:
-
-        ::
-
-            >>> score = corpus.parse('PMFC_06_Giovanni-05_Donna')
-            >>> reducer = analysis.reduceChords.ChordReducer()
-            >>> for i in range(1, 5):
-            ...     measure = score.measure(i)
-            ...     print 'Measure {}:'.format(i)
-            ...     for moment in reducer._iterateVerticalities(measure):
-            ...         print '\t', moment.elements
-            ...
-            Measure 1:
-                (<music21.note.Note D>, <music21.note.Note G>)
-            Measure 2:
-                (<music21.note.Note D>, <music21.note.Note G>)
-                (<music21.note.Note C>, <music21.note.Note G>)
-            Measure 3:
-                (<music21.note.Note B>, <music21.note.Note G>)
-            Measure 4:
-                (<music21.note.Note B>, <music21.note.Note G>)
-                (<music21.note.Note B>, <music21.note.Note G>)
-                (<music21.note.Note C>, <music21.note.Note G>)
-
-        '''
-        leafLists = []
-        for part in inputMeasure:
-            innerMeasure = part.getElementsByClass('Measure')[0]
-            leaves = innerMeasure.notesAndRests
-            leafLists.append(leaves)
-        currentIndices = [0 for _ in leafLists]
-        currentStartOffset = None
-        earliestStopOffset = None
-        latestStopOffset = None
-        for i, index in enumerate(currentIndices):
-            leaf = leafLists[i][index]
-            startOffset = leaf.offset
-            stopOffset = leaf.offset + leaf.quarterLength
-            if currentStartOffset is None or startOffset < currentStartOffset:
-                currentStartOffset = startOffset
-            if earliestStopOffset is None or stopOffset < earliestStopOffset:
-                earliestStopOffset = stopOffset
-            if latestStopOffset is None or latestStopOffset < stopOffset:
-                latestStopOffset = stopOffset
-        overlapElements = []
-        startElements = []
-        for leaves, i in zip(leafLists, currentIndices):
-            leaf = leaves[i]
-            if leaf.offset == currentStartOffset:
-                startElements.append(leaf)
-            else:
-                overlapElements.append(leaf)
-        yield Verticality(
-            startElements=startElements,
-            overlapElements=overlapElements,
-            )
-        while True:
-            indexIsLast = []
-            for i, index in enumerate(currentIndices):
-                if (index + 1) == len(leafLists[i]):
-                    indexIsLast.append(True)
-                    continue
-                indexIsLast.append(False)
-                thisLeaf = leafLists[i][index]
-                nextLeaf = leafLists[i][index + 1]
-                if nextLeaf.offset == earliestStopOffset:
-                    currentIndices[i] = index + 1
-            currentStartOffset = earliestStopOffset
-            earliestStopOffset = None
-            for i, index in enumerate(currentIndices):
-                thisLeaf = leafLists[i][index]
-                stopOffset = thisLeaf.offset + thisLeaf.quarterLength
-                if latestStopOffset < stopOffset:
-                    latestStopOffset = stopOffset
-                if earliestStopOffset is None or \
-                    stopOffset < earliestStopOffset:
-                    earliestStopOffset = stopOffset
-            if all(indexIsLast):
-                break
-            overlapElements = []
-            startElements = []
-            for leaves, i in zip(leafLists, currentIndices):
-                leaf = leaves[i]
-                if leaf.offset == currentStartOffset:
-                    startElements.append(leaf)
-                else:
-                    overlapElements.append(leaf)
-            yield Verticality(
-                startElements=startElements,
-                overlapElements=overlapElements,
-                )
-        raise StopIteration
 
     ### PUBLIC METHODS ###
 
