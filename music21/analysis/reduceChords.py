@@ -49,6 +49,59 @@ def testMeasureStream1():
     return measure
 
 
+class Verticality(object):
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '_overlapElements',
+        '_startElements',
+        )
+
+    ### INITIALIZER ###
+
+    def __init__(
+        self,
+        overlapElements=(),
+        startElements=(),
+        ):
+        assert startElements
+        self._startElements = tuple(startElements)
+        self._overlapElements = tuple(overlapElements)
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def elements(self):
+        return self.startElements + self.overlapElements
+
+    @property
+    def overlapElements(self):
+        return self._overlapElements
+
+    @property
+    def startElements(self):
+        return self._startElements
+
+    @property
+    def startOffset(self):
+        return self._startElements[0].offset
+
+    @property
+    def earliestStartOffset(self):
+        if self.overlapElements:
+            return min(x.offset for x in self.overlapElements)
+        return self.startOffset
+
+    @property
+    def earliestStopOffset(self):
+        return min(x.offset + x.quarterLength for x in self.elements)
+
+    @property
+    def latestStopOffset(self):
+        return max(x.offset + x.quarterLength for x in self.elements)
+
+
 class ChordReducer(object):
     r'''
     A chord reducer.
@@ -65,18 +118,19 @@ class ChordReducer(object):
 
     def _alignByLyrics(self, inputMeasure):
         reallignments = []
-        for verticalMoment in self._iterateVerticalMoments(inputMeasure):
-            if not all(x.hasLyrics() for x in verticalMoment):
+        for verticality in self._iterateVerticalities(inputMeasure):
+            elements = verticality.elements
+            if not all(x.hasLyrics() for x in elements):
                 continue
-            if not len(set(x.lyric for x in verticalMoment)) == 1:
+            if not len(set(x.lyric for x in elements)) == 1:
                 continue
-            bestBeatStrength = verticalMoment[0].beatStrength
-            bestOffset = verticalMoment[0].offset
-            for x in verticalMoment[1:]:
+            bestBeatStrength = elements[0].beatStrength
+            bestOffset = elements[0].offset
+            for x in elements[1:]:
                 if bestBeatStrength < x.beatStrength:
                     bestBeatStrength = x.beatStrength
                     bestOffset = x.offset
-            for x in verticalMoment:
+            for x in elements:
                 if x.beatStrength != bestBeatStrength:
                     reallignments.append((x, bestOffset))
         for element, newOffset in reallignments:
@@ -183,7 +237,7 @@ class ChordReducer(object):
         chordifiedInputMeasure.show('text')
         return chordifiedInputMeasure
 
-    def _iterateVerticalMoments(self, inputMeasure):
+    def _iterateVerticalities(self, inputMeasure):
         '''
         Iterate overlapping elements:
 
@@ -194,20 +248,20 @@ class ChordReducer(object):
             >>> for i in range(1, 5):
             ...     measure = score.measure(i)
             ...     print 'Measure {}:'.format(i)
-            ...     for moment in reducer._iterateVerticalMoments(measure):
-            ...         print '\t', moment
+            ...     for moment in reducer._iterateVerticalities(measure):
+            ...         print '\t', moment.elements
             ...
             Measure 1:
-                [<music21.note.Note D>, <music21.note.Note G>]
+                (<music21.note.Note D>, <music21.note.Note G>)
             Measure 2:
-                [<music21.note.Note D>, <music21.note.Note G>]
-                [<music21.note.Note C>, <music21.note.Note G>]
+                (<music21.note.Note D>, <music21.note.Note G>)
+                (<music21.note.Note C>, <music21.note.Note G>)
             Measure 3:
-                [<music21.note.Note B>, <music21.note.Note G>]
+                (<music21.note.Note B>, <music21.note.Note G>)
             Measure 4:
-                [<music21.note.Note B>, <music21.note.Note G>]
-                [<music21.note.Note B>, <music21.note.Note G>]
-                [<music21.note.Note C>, <music21.note.Note G>]
+                (<music21.note.Note B>, <music21.note.Note G>)
+                (<music21.note.Note B>, <music21.note.Note G>)
+                (<music21.note.Note C>, <music21.note.Note G>)
 
         '''
         leafLists = []
@@ -229,7 +283,18 @@ class ChordReducer(object):
                 earliestStopOffset = stopOffset
             if latestStopOffset is None or latestStopOffset < stopOffset:
                 latestStopOffset = stopOffset
-        yield [leaves[i] for leaves, i in zip(leafLists, currentIndices)]
+        overlapElements = []
+        startElements = []
+        for leaves, i in zip(leafLists, currentIndices):
+            leaf = leaves[i]
+            if leaf.offset == currentStartOffset:
+                startElements.append(leaf)
+            else:
+                overlapElements.append(leaf)
+        yield Verticality(
+            startElements=startElements,
+            overlapElements=overlapElements,
+            )
         while True:
             indexIsLast = []
             for i, index in enumerate(currentIndices):
@@ -253,7 +318,18 @@ class ChordReducer(object):
                     earliestStopOffset = stopOffset
             if all(indexIsLast):
                 break
-            yield [leaves[i] for leaves, i in zip(leafLists, currentIndices)]
+            overlapElements = []
+            startElements = []
+            for leaves, i in zip(leafLists, currentIndices):
+                leaf = leaves[i]
+                if leaf.offset == currentStartOffset:
+                    startElements.append(leaf)
+                else:
+                    overlapElements.append(leaf)
+            yield Verticality(
+                startElements=startElements,
+                overlapElements=overlapElements,
+                )
         raise StopIteration
 
     ### PUBLIC METHODS ###
