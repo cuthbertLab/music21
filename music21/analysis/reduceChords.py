@@ -45,10 +45,220 @@ def testMeasureStream1():
 
 
 class ChordReducer(object):
+    r'''
+    A chord reducer.
+    '''
+
+    ### INITIALIZER ###
+
     def __init__(self):
         self.printDebug = False
         self.weightAlgorithm = self.qlbsmpConsonance
         self.maxChords = 3
+
+    ### PRIVATE METHODS ###
+
+    def _buildOutputMeasure(self,
+        closedPosition,
+        forceOctave,
+        i,
+        inputMeasure,
+        inputMeasureReduction,
+        lastPitchedObject,
+        lastTimeSignature,
+        ):
+        outputMeasure = stream.Measure()
+        outputMeasure.number = i
+        #inputMeasureReduction.show('text')
+        cLast = None
+        cLastEnd = 0.0
+        for cEl in inputMeasureReduction:
+            cElCopy = copy.deepcopy(cEl)
+            if 'Chord' in cEl.classes:
+                if closedPosition is not False:
+                    if forceOctave is not False:
+                        cElCopy.closedPosition(
+                            forceOctave=forceOctave,
+                            inPlace=True,
+                            )
+                    else:
+                        cElCopy.closedPosition(inPlace=True)
+                    cElCopy.removeRedundantPitches(inPlace=True)
+            newOffset = cEl.getOffsetBySite(inputMeasureReduction)
+            # extend over gaps
+            if cLast is not None:
+                if round(newOffset - cLastEnd, 6) != 0.0:
+                    cLast.quarterLength += newOffset - cLastEnd
+            cLast = cElCopy
+            cLastEnd = newOffset + cElCopy.quarterLength
+            outputMeasure._insertCore(newOffset, cElCopy)
+        tsContext = inputMeasure.parts[0].getContextByClass('TimeSignature')
+        if tsContext is not None:
+            if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
+                cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
+        outputMeasure._elementsChanged()
+        # add ties
+        if lastPitchedObject is not None:
+            firstPitched = outputMeasure[0]
+            if lastPitchedObject.isNote and firstPitched.isNote:
+                if lastPitchedObject.pitch == firstPitched.pitch:
+                    lastPitchedObject.tie = tie.Tie("start")
+            elif lastPitchedObject.isChord and firstPitched.isChord:
+                if len(lastPitchedObject) == len(firstPitched):
+                    allSame = True
+                    for pitchI in range(len(lastPitchedObject)):
+                        if lastPitchedObject.pitches[pitchI] != firstPitched.pitches[pitchI]:
+                            allSame = False
+                    if allSame is True:
+                        lastPitchedObject.tie = tie.Tie('start')
+        lastPitchedObject = outputMeasure[-1]
+        sourceMeasureTs = inputMeasure.parts[0].getElementsByClass('Measure')[0].timeSignature
+        if sourceMeasureTs != lastTimeSignature:
+            outputMeasure.timeSignature = copy.deepcopy(sourceMeasureTs)
+            lastTimeSignature = sourceMeasureTs
+        return lastPitchedObject, lastTimeSignature, outputMeasure
+
+    ### PUBLIC METHODS ###
+
+    def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
+        '''
+        Compute measure chord weights:
+
+        ::
+
+            >>> s = analysis.reduceChords.testMeasureStream1().notes
+            >>> cr = analysis.reduceChords.ChordReducer()
+            >>> cws = cr.computeMeasureChordWeights(s)
+            >>> for pcs in sorted(cws):
+            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
+                (0, 4, 7)  3.0
+            (0, 11, 4, 5)  1.0
+
+        Add beatStrength:
+
+        ::
+
+            >>> cws = cr.computeMeasureChordWeights(s,
+            ...     weightAlgorithm=cr.quarterLengthBeatStrength)
+            >>> for pcs in sorted(cws):
+            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
+                (0, 4, 7)  2.2
+            (0, 11, 4, 5)  0.5
+
+        Give extra weight to the last element in a measure:
+
+        ::
+
+            >>> cws = cr.computeMeasureChordWeights(s,
+            ...     weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
+            >>> for pcs in sorted(cws):
+            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
+                (0, 4, 7)  3.0
+            (0, 11, 4, 5)  0.5
+
+        Make consonance count a lot:
+
+        >>> cws = cr.computeMeasureChordWeights(s,
+        ...     weightAlgorithm=cr.qlbsmpConsonance)
+        >>> for pcs in sorted(cws):
+        ...     print "%18r  %2.1f" % (pcs, cws[pcs])
+             (0, 4, 7)  3.0
+         (0, 11, 4, 5)  0.1
+        '''
+        if weightAlgorithm is None:
+            weightAlgorithm = self.quarterLengthOnly
+        presentPCs = {}
+
+        self.positionInMeasure = 0
+        self.numberOfElementsInMeasure = len(measureObj)
+
+        for i, c in enumerate(measureObj):
+            self.positionInMeasure = i
+            if c.isNote:
+                p = tuple(c.pitch.pitchClass)
+            else:
+                p = tuple(set([x.pitchClass for x in c.pitches]))
+            if p not in presentPCs:
+                presentPCs[p] = 0.0
+            presentPCs[p] += weightAlgorithm(c)
+
+        self.positionInMeasure = 0
+        self.numberOfElementsInMeasure = 0
+
+        return presentPCs
+
+    def multiPartReduction(
+        self,
+        inputStream,
+        maxChords=2,
+        closedPosition=False,
+        forceOctave=False,
+        ):
+        '''
+        Return a multipart reduction of a stream.
+        '''
+        i = 0
+        outputStream = stream.Part()
+        gobcM = inputStream.parts[0].getElementsByClass('Measure')
+        lenMeasures = len(gobcM)
+        lastPitchedObject = None
+        lastTimeSignature = None
+        while i <= lenMeasures:
+            inputMeasure = inputStream.measure(i, ignoreNumbers=True)
+            if not len(inputMeasure.flat.notesAndRests):
+                if not i:
+                    pass
+                else:
+                    break
+            else:
+                inputMeasureReduction = self.reduceMeasureToNChords(
+                    inputMeasure.chordify(),
+                    maxChords,
+                    weightAlgorithm=self.qlbsmpConsonance,
+                    trimBelow=0.3,
+                    )
+                lastPitchedObject, lastTimeSignature, outputMeasure = \
+                    self._buildOutputMeasure(
+                        closedPosition,
+                        forceOctave,
+                        i,
+                        inputMeasure,
+                        inputMeasureReduction,
+                        lastPitchedObject,
+                        lastTimeSignature,
+                        )
+                outputStream._appendCore(outputMeasure)
+            if self.printDebug:
+                print i, " ",
+                if i % 20 == 0 and i != 0:
+                    print ""
+            i += 1
+        outputStream._elementsChanged()
+        outputStream.getElementsByClass('Measure')[0].insert(
+            0, outputStream.bestClef(allowTreble8vb=True))
+        outputStream.makeNotation(inPlace=True)
+        return outputStream
+
+    def qlbsmpConsonance(self, c):
+        '''
+        Everything from before plus consonance
+        '''
+        consonanceScore = 1.0 if c.isConsonant() else 0.1
+        if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
+            return c.quarterLength * consonanceScore  # call beatStrength 1
+        return self.quarterLengthBeatStrengthMeasurePosition(c) * consonanceScore
+
+    def quarterLengthBeatStrength(self, c):
+        return c.quarterLength * c.beatStrength
+
+    def quarterLengthBeatStrengthMeasurePosition(self, c):
+        if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
+            return c.quarterLength  # call beatStrength 1
+        else:
+            return self.quarterLengthBeatStrength(c)
+
+    def quarterLengthOnly(self, c):
+        return c.quarterLength
 
     def reduceMeasureToNChords(
         self,
@@ -154,192 +364,6 @@ class ChordReducer(object):
                 c.quarterLength += cOffsetSyncop
 
         return mObj
-        # closed position
-
-    def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
-        '''
-        Compute measure chord weights:
-
-        ::
-
-            >>> s = analysis.reduceChords.testMeasureStream1().notes
-            >>> cr = analysis.reduceChords.ChordReducer()
-            >>> cws = cr.computeMeasureChordWeights(s)
-            >>> for pcs in sorted(cws):
-            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
-                (0, 4, 7)  3.0
-            (0, 11, 4, 5)  1.0
-
-        Add beatStrength:
-
-        ::
-
-            >>> cws = cr.computeMeasureChordWeights(s,
-            ...     weightAlgorithm=cr.quarterLengthBeatStrength)
-            >>> for pcs in sorted(cws):
-            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
-                (0, 4, 7)  2.2
-            (0, 11, 4, 5)  0.5
-
-        Give extra weight to the last element in a measure:
-
-        ::
-
-            >>> cws = cr.computeMeasureChordWeights(s,
-            ...     weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
-            >>> for pcs in sorted(cws):
-            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
-                (0, 4, 7)  3.0
-            (0, 11, 4, 5)  0.5
-
-        Make consonance count a lot:
-
-        >>> cws = cr.computeMeasureChordWeights(s,
-        ...     weightAlgorithm=cr.qlbsmpConsonance)
-        >>> for pcs in sorted(cws):
-        ...     print "%18r  %2.1f" % (pcs, cws[pcs])
-             (0, 4, 7)  3.0
-         (0, 11, 4, 5)  0.1
-        '''
-        if weightAlgorithm is None:
-            weightAlgorithm = self.quarterLengthOnly
-        presentPCs = {}
-
-        self.positionInMeasure = 0
-        self.numberOfElementsInMeasure = len(measureObj)
-
-        for i, c in enumerate(measureObj):
-            self.positionInMeasure = i
-            if c.isNote:
-                p = tuple(c.pitch.pitchClass)
-            else:
-                p = tuple(set([x.pitchClass for x in c.pitches]))
-            if p not in presentPCs:
-                presentPCs[p] = 0.0
-            presentPCs[p] += weightAlgorithm(c)
-
-        self.positionInMeasure = 0
-        self.numberOfElementsInMeasure = 0
-
-        return presentPCs
-
-    def quarterLengthOnly(self, c):
-        return c.quarterLength
-
-    def quarterLengthBeatStrength(self, c):
-        return c.quarterLength * c.beatStrength
-
-    def quarterLengthBeatStrengthMeasurePosition(self, c):
-        if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
-            return c.quarterLength  # call beatStrength 1
-        else:
-            return self.quarterLengthBeatStrength(c)
-
-    def qlbsmpConsonance(self, c):
-        '''
-        Everything from before plus consonance
-        '''
-        consonanceScore = 1.0 if c.isConsonant() else 0.1
-        if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
-            return c.quarterLength * consonanceScore  # call beatStrength 1
-        return self.quarterLengthBeatStrengthMeasurePosition(c) * consonanceScore
-
-    def multiPartReduction(
-        self,
-        inStream,
-        maxChords=2,
-        closedPosition=False,
-        forceOctave=False,
-        ):
-        '''
-        Return a multipart reduction of a stream.
-        '''
-        i = 0
-        p = stream.Part()
-        lastPitchedObject = None
-        gobcM = inStream.parts[0].getElementsByClass('Measure')
-        lenMeasures = len(gobcM)
-        lastTs = None
-        while i <= lenMeasures:
-            mI = inStream.measure(i, ignoreNumbers=True)
-            if len(mI.flat.notesAndRests) == 0:
-                if i == 0:
-                    pass
-                else:
-                    break
-            else:
-                m = stream.Measure()
-                m.number = i
-                mIchord = mI.chordify()
-                newPart = self.reduceMeasureToNChords(
-                    mIchord,
-                    maxChords,
-                    weightAlgorithm=self.qlbsmpConsonance,
-                    trimBelow=0.3,
-                    )
-                #newPart.show('text')
-                cLast = None
-                cLastEnd = 0.0
-                for cEl in newPart:
-                    cElCopy = copy.deepcopy(cEl)
-                    if 'Chord' in cEl.classes:
-                        if closedPosition is not False:
-                            if forceOctave is not False:
-                                cElCopy.closedPosition(
-                                    forceOctave=forceOctave,
-                                    inPlace=True,
-                                    )
-                            else:
-                                cElCopy.closedPosition(inPlace=True)
-                            cElCopy.removeRedundantPitches(inPlace=True)
-                    newOffset = cEl.getOffsetBySite(newPart)
-
-                    # extend over gaps
-                    if cLast is not None:
-                        if round(newOffset - cLastEnd, 6) != 0.0:
-                            cLast.quarterLength += newOffset - cLastEnd
-                    cLast = cElCopy
-                    cLastEnd = newOffset + cElCopy.quarterLength
-                    m._insertCore(newOffset, cElCopy)
-
-                tsContext = mI.parts[0].getContextByClass('TimeSignature')
-                if tsContext is not None:
-                    if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
-                        cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
-
-                m._elementsChanged()
-
-                # add ties
-                if lastPitchedObject is not None:
-                    firstPitched = m[0]
-                    if lastPitchedObject.isNote and firstPitched.isNote:
-                        if lastPitchedObject.pitch == firstPitched.pitch:
-                            lastPitchedObject.tie = tie.Tie("start")
-                    elif lastPitchedObject.isChord and firstPitched.isChord:
-                        if len(lastPitchedObject) == len(firstPitched):
-                            allSame = True
-                            for pitchI in range(len(lastPitchedObject)):
-                                if lastPitchedObject.pitches[pitchI] != firstPitched.pitches[pitchI]:
-                                    allSame = False
-                            if allSame is True:
-                                lastPitchedObject.tie = tie.Tie('start')
-                lastPitchedObject = m[-1]
-
-                sourceMeasureTs = mI.parts[0].getElementsByClass('Measure')[0].timeSignature
-                if sourceMeasureTs != lastTs:
-                    m.timeSignature = copy.deepcopy(sourceMeasureTs)
-                    lastTs = sourceMeasureTs
-
-                p._appendCore(m)
-            if self.printDebug:
-                print i, " ",
-                if i % 20 == 0 and i != 0:
-                    print ""
-            i += 1
-        p._elementsChanged()
-        p.getElementsByClass('Measure')[0].insert(0, p.bestClef(allowTreble8vb=True))
-        p.makeNotation(inPlace=True)
-        return p
 
 
 #------------------------------------------------------------------------------
