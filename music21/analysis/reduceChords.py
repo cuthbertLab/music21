@@ -15,6 +15,7 @@ Automatically reduce a MeasureStack to a single chord or group of chords.
 
 import unittest
 import copy
+from music21 import chord
 from music21 import meter
 from music21 import note
 from music21 import stream
@@ -149,8 +150,38 @@ class ChordReducer(object):
             lastTimeSignature = sourceMeasureTs
         return lastPitchedObject, lastTimeSignature, outputMeasure
 
-    def _collapseArpeggios(self, inputMeasure):
-        pass
+    def _collapseArpeggios(self, chordifiedInputMeasure):
+        measure = chordifiedInputMeasure[0]
+        notesAndRests = measure.notesAndRests
+        if not len(notesAndRests):
+            return chordifiedInputMeasure
+        for noteOrRest in notesAndRests:
+            measure.pop(measure.index(noteOrRest))
+        previousChord = notesAndRests[0]
+        for currentChord in notesAndRests[1:]:
+            if previousChord.isRest or \
+                currentChord.isRest or \
+                not currentChord.isConsonant() or \
+                not previousChord.isConsonant():
+                measure.append(previousChord)
+                previousChord = currentChord
+                continue
+            previousPitches = set(previousChord.pitches)
+            currentPitches = set(currentChord.pitches)
+            newPitches = previousPitches.union(currentPitches)
+            previousDuration = previousChord.quarterLength
+            currentDuration = currentChord.quarterLength
+            newDuration = previousDuration + currentDuration
+            newChord = chord.Chord(newPitches)
+            newChord.quarterLength = newDuration
+            if newChord.isConsonant():
+                previousChord = newChord
+            else:
+                measure.append(previousChord)
+                previousChord = currentChord
+        measure.append(previousChord)
+        chordifiedInputMeasure.show('text')
+        return chordifiedInputMeasure
 
     def _iterateVerticalMoments(self, inputMeasure):
         '''
@@ -314,10 +345,11 @@ class ChordReducer(object):
                 else:
                     break
             else:
+                environLocal.printDebug(str(i))
                 inputMeasure = copy.deepcopy(inputMeasure)
                 self._alignByLyrics(inputMeasure)
-                self._collapseArpeggios(inputMeasure)
                 chordifiedInputMeasure = inputMeasure.chordify()
+                #newPart = self._collapseArpeggios(chordifiedInputMeasure)
                 inputMeasureReduction = self.reduceMeasureToNChords(
                     chordifiedInputMeasure,
                     maxChords,
@@ -410,8 +442,8 @@ class ChordReducer(object):
         if numChords > len(chordWeights):
             numChords = len(chordWeights)
 
-        sortedChords = sorted(chordWeights, key=chordWeights.get, reverse=True)
-        maxNChords = sortedChords[:numChords]
+        sortedChordWeights = sorted(chordWeights, key=chordWeights.get, reverse=True)
+        maxNChords = sortedChordWeights[:numChords]
         if len(maxNChords) == 0:
             r = note.Rest()
             r.quarterLength = mObj.duration.quarterLength
@@ -499,6 +531,7 @@ class TestExternal(unittest.TestCase):
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
+        #c = corpus.parse('bach/bwv846').measures(1, 5)
         #c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
         c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
@@ -507,7 +540,7 @@ class TestExternal(unittest.TestCase):
         #c = corpus.parse('PMFC_12_13').measures(1, 40)
 
         # fix clef
-        fixClef = True
+        fixClef = False
         if fixClef:
             from music21 import clef
             firstMeasure = c.parts[1].getElementsByClass('Measure')[0]
