@@ -2,19 +2,19 @@
 #-------------------------------------------------------------------------------
 # Name:         musicxml/fromMxObjects.py
 # Purpose:      Translate from MusicXML mxObjects to music21 objects
-#
+# 
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Low-level conversion routines from MusicXML to music21.
 
-This module supposes that the musicxml document has already been parsed by xml.sax (by base.Document.read() )
-and is stored as a collection of mxObjects -- equivalent parsing methods could be created
-and fed into `mxScoreToScore` to make this work.
+This module supposes that the musicxml document has already been parsed by xml.sax (by 
+base.Document.read() ) and is stored as a collection of mxObjects -- equivalent parsing 
+methods could be created and fed into `mxScoreToScore` to make this work.
 '''
 import unittest
 import copy
@@ -196,7 +196,9 @@ def mxTransposeToInterval(mxTranspose):
     return post
 
 def mxToTempoIndication(mxMetronome, mxWords=None):
-    '''Given an mxMetronome, convert to either a TempoIndication subclass, either a tempo.MetronomeMark or tempo.MetricModulation.
+    '''
+    Given an mxMetronome, convert to either a TempoIndication subclass, 
+    either a tempo.MetronomeMark or tempo.MetricModulation.
 
     
     >>> m = musicxml.mxObjects.Metronome()
@@ -232,7 +234,8 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
         mm = tempo.MetricModulation()
         #environLocal.printDebug(['found metric modulaton:', 'durations', durations])
         if len(durations) < 2:
-            raise FromMxObjectsException('found incompletely specified musicxml metric moduation: less than 2 duration defined')
+            raise FromMxObjectsException('found incompletely specified musicxml metric moduation: '+
+                                         'fewer than two durations defined')
         # all we have are referents, no values are defined in musicxml
         # will need to update context after adding to Stream
         mm.oldReferent = durations[0]
@@ -295,7 +298,8 @@ def mxToRepeat(mxBarline, inputM21=None):
 
     mxRepeat = mxBarline.get('repeatObj')
     if mxRepeat is None:
-        raise bar.BarException('attempting to create a Repeat from an MusicXML bar that does not define a repeat')
+        raise bar.BarException('attempting to create a Repeat from an MusicXML bar that does not ' +
+                               'define a repeat')
 
     mxDirection = mxRepeat.get('direction')
 
@@ -500,7 +504,8 @@ def mxToTie(mxNote, inputM21=None):
             t.type = 'continue'
             #self.type = 'start'
         else:
-            environLocal.printDebug(['found unexpected arrangement of multiple tie types when importing from musicxml:', typesFound])
+            environLocal.printDebug(['found unexpected arrangement of multiple tie types when ' +
+                                     'importing from musicxml:', typesFound])
 
 # from old note.py code
     # not sure this is necessary
@@ -656,8 +661,11 @@ def mxToDuration(mxNote, inputM21=None):
             try:
                 d.components = durRaw.components
             except duration.DurationException:
-                environLocal.warn(['mxToDuration', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
-                environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
+                environLocal.warn(['mxToDuration', 'supplying quarterLength of 1 as type is not ' +
+                                   'defined and raw quarterlength (%s) is not a computable duration' % qLen])
+                environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType, 
+                                         'mxNote.duration:', mxNote.duration, 
+                                         'last mxDivisions:', mxDivisions])
                 durRaw.quarterLength = 1.
         else: # a cooked version builds up from pieces
             durUnit = duration.DurationUnit()
@@ -667,7 +675,8 @@ def mxToDuration(mxNote, inputM21=None):
                 durUnit.appendTuplet(tup)
             durCooked = duration.Duration(components=[durUnit])
             if durUnit.quarterLength != durCooked.quarterLength:
-                environLocal.printDebug(['error in stored MusicXML representaiton and duration value', durCooked])
+                environLocal.printDebug(['error in stored MusicXML representaiton and ' +
+                                         'duration value', durCooked])
             # old way just used qLen
             #self.quarterLength = qLen
             d.components = durCooked.components
@@ -709,7 +718,8 @@ def mxToTuplet(mxNote, inputM21Object = None):
     else:
         t = inputM21Object
     if t.frozen is True:
-        raise duration.TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+        raise duration.TupletException("A frozen tuplet (or one attached to a duration) " +
+                                       "is immutable")
 
     mxTimeModification = mxNote.get('timeModificationObj')
     #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
@@ -775,10 +785,6 @@ def mxToTimeSignature(mxTimeList, inputM21=None):
     else: # there may be more than one if we have more staffs per part
         mxTime = mxTimeList[0]
 
-#         if len(mxTimeList) == 0:
-#             raise MeterException('cannot create a TimeSignature from an empty MusicXML timeList: %s' % mxObjects.Attributes() )
-#         mxTime = mxTimeList[0] # only one for now
-
     n = []
     d = []
     for obj in mxTime.componentList:
@@ -805,11 +811,9 @@ def mxToTimeSignature(mxTimeList, inputM21=None):
 
 def mxKeyListToKeySignature(mxKeyList, inputM21 = None):
     '''
-    
     Given a mxKey object or keyList, return a music21.key.KeySignature
     object and return it, or if inputM21 is None, change its
     attributes and return nothing.
-
     
     >>> mxk = musicxml.mxObjects.Key()
     >>> mxk.set('fifths', 5)
@@ -940,9 +944,12 @@ def mxToDynamicList(mxDirection):
                 if isinstance(mxObjSub, mxObjects.Dynamics):
                     mxDynamics = mxObjSub
     if mxDynamics == None:
-        raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, did not find a DynamicMark')
+        raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, ' +
+                                        'did not find a DynamicMark')
 #     if len(mxDynamics) > 1:
-#         raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, found more than one DynamicMark contained, namely %s' % str(mxDynamics))
+#         raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, '
+#                                         'found more than one DynamicMark contained, namely %s' % 
+#                                            str(mxDynamics))
 
     post = []
     for sub in mxDynamics.componentList:
@@ -1219,13 +1226,17 @@ def mxToInstrument(mxScorePart, inputM21=None):
 
 
 def mxNotationsToSpanners(target, mxNotations, spannerBundle):
-    '''General routines for gathering spanners from notes via mxNotations objects and placing them in a spanner bundle.
+    '''
+    General routines for gathering spanners from notes via mxNotations objects and placing them 
+    in a spanner bundle.
 
     Spanners may be found in musicXML notations and directions objects.
 
-    The passed-in spannerBundle will be edited in-place; existing spanners may be completed, or new spanners may be added.
+    The passed-in spannerBundle will be edited in-place; existing spanners may be completed, or 
+    new spanners may be added.
 
-    The `target` object is a reference to the relevant music21 object this spanner is associated with.
+    The `target` object is a reference to the relevant music21 object this spanner is associated 
+    with.
     '''
     mxSlurList = mxNotations.getSlurs()
     for mxObj in mxSlurList:
@@ -1977,6 +1988,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
         mSuffix = None
     else:
         mNum, mSuffix = common.getNumFromStr(mNumRaw)
+
     # assume that measure numbers are integers
     if mNum not in [None, '']:
         m.number = int(mNum)
@@ -2552,9 +2564,20 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
     for i, mxMeasure in enumerate(mxPart):
         # t here is transposition, if defined; otherwise it is None
-        m, staffReference, t = mxToMeasure(mxMeasure,
-                               spannerBundle=spannerBundle,
-                               lastMeasureInfo=(lastMeasureNumber, lastMeasureSuffix))
+        try:
+            m, staffReference, t = mxToMeasure(mxMeasure,
+                                   spannerBundle=spannerBundle,
+                                   lastMeasureInfo=(lastMeasureNumber, lastMeasureSuffix))
+        except Exception as e:
+            import sys
+            measureNumber = "unknown"
+            try:
+                measureNumber = mxMeasure.get('number')
+            except:
+                pass
+            # see http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
+            message = "In measure (" + measureNumber + "): " + e.message
+            raise type(e), type(e)(message), sys.exc_info()[2]
         if t is not None:
             if lastTransposition is None and i == 0: # if this is the first
                 #environLocal.printDebug(['transposition', t])
@@ -2806,14 +2829,18 @@ def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
     #partNameIds = mxPartIdDictionary.keys()
     #partNameIds.sort()
     #for partId in partNameIds: # part names are part ids
-    for partId in mxPartIds: # part names are part ids
+    for pNum, partId in enumerate(mxPartIds): # part names are part ids
         # NOTE: setting partId not partId: might change
         # return the part; however, it is still already attached to the Score
         try:
             part = mxToStreamPart(mxScore, partId=partId,
                                   spannerBundle=spannerBundle, inputM21=s)
-        except FromMxObjectsException as strerror:
-            raise FromMxObjectsException('cannot translate part %s: %s' % (partId, strerror))
+        except Exception as e:
+            import sys
+            # see http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
+            message = "For part number " + str(pNum + 1) + ", with Id (" + partId + "): " + e.message
+            raise type(e), type(e)(message), sys.exc_info()[2]
+
         # update dictionary to store music21 part
         m21PartIdDictionary[partId] = part
         #print("%r %s %r" % (m21PartIdDictionary, partId, part))

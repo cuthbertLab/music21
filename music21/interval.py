@@ -450,7 +450,9 @@ class GenericInterval(base.Music21Object):
     A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth.
     Constructor takes an integer or string specifying the interval and direction. 
 
-    The interval is not specified in half-steps, but in numeric values derived from interval names: a Third is 3; a Seventh is 7, etc. String values for interval names ('3rd' or 'third') are accepted.
+    The interval is not specified in half-steps, but in numeric values derived from interval names: 
+    a Third is 3; a Seventh is 7, etc. String values for interval names ('3rd' or 'third') 
+    are generally accepted, but discouraged since not every one will work.
     
     staffDistance: the number of lines or spaces apart, eg:
       
@@ -543,7 +545,8 @@ class GenericInterval(base.Music21Object):
         if self.directed == 1:
             self.direction = OBLIQUE
 #         elif self.directed == -1:
-#             raise IntervalException("Descending P1s not allowed; did you mean to write a diminished unison instead?")
+#             raise IntervalException("Descending P1s not allowed; did you mean to write a " + 
+#                                     "diminished unison instead?")
         elif self.directed == 0:
             raise IntervalException("The Zeroth is not an interval")
         elif self.directed == self.undirected:
@@ -731,10 +734,11 @@ class GenericInterval(base.Music21Object):
 class DiatonicInterval(base.Music21Object):
     '''
     A class representing a diatonic interval. Two required arguments are a string `specifier` 
-    (such as perfect, major, or minor) and `generic`, either an int of an interval size (such as 2, 2nd, or second)
-    or a :class:`~music21.interval.GenericInterval` object.
+    (such as perfect, major, or minor) and `generic`, either an int of an interval size (such as 
+    2, 2nd, or second) or a :class:`~music21.interval.GenericInterval` object.
 
-    Two DiatonicIntervals are the same if their GenericIntervals are the same and their specifiers are the same and they should be
+    Two DiatonicIntervals are the same if their GenericIntervals are the same and their specifiers 
+    are the same and they should be
     if their directions are the same, but this is not checked yet.    
     '''
     _DOC_ATTR = {
@@ -746,7 +750,8 @@ class DiatonicInterval(base.Music21Object):
 
     def __init__(self, specifier = "P", generic = 1):
         '''
-        The `specifier` is an integer or string specifying a value in the `prefixSpecs` and `niceSpecNames` lists. 
+        The `specifier` is an integer or string specifying a value in the `prefixSpecs` and 
+        `niceSpecNames` lists. 
 
         The `generic` is an integer or GenericInterval instance.
 
@@ -915,9 +920,7 @@ class DiatonicInterval(base.Music21Object):
         False
         >>> e = interval.DiatonicInterval('d', 4)
         >>> d == e
-        True
-        
-        TODO: Direction should also have to be the same...
+        True        
         '''
         if other is None:
             return False
@@ -932,7 +935,9 @@ class DiatonicInterval(base.Music21Object):
         ## untested...
         #if self.direction != other.direction:
         #    return False
-        if self.generic == other.generic and self.specifier == other.specifier:
+        if (self.generic == other.generic and 
+            self.specifier == other.specifier and 
+            self.direction == other.direction):
             return True
         else:
             return False
@@ -1161,8 +1166,8 @@ class ChromaticInterval(base.Music21Object):
 
     def getDiatonic(self):
         '''
-        Given a ChromaticInterval, return a :class:`~music21.interval.DiatonicInterval` object of the
-        same size. 
+        Given a ChromaticInterval, return a :class:`~music21.interval.DiatonicInterval` 
+        object of the same size. 
         
         While there is more than one Generic Interval for any given chromatic 
         interval, this is needed to to permit easy chromatic specification of 
@@ -1378,12 +1383,14 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
         try:
             specifier = perfSpecifiers[perfOffset + semisRounded - normalSemis]
         except IndexError:
-            raise IntervalException("cannot get a specifier for a note with this many semitones off of Perfect: " + str(theseSemis - normalSemis))
+            raise IntervalException("cannot get a specifier for a note with this many semitones " +
+                                    "off of Perfect: " + str(theseSemis - normalSemis))
     else:
         try:
             specifier = specifiers[majOffset + semisRounded - normalSemis]
         except IndexError:
-            raise IntervalException("cannot get a specifier for a note with this many semitones off of Major: " + str(theseSemis - normalSemis))
+            raise IntervalException("cannot get a specifier for a note with this many semitones " +
+                                    "off of Major: " + str(theseSemis - normalSemis))
 
     return specifier    
 
@@ -1637,12 +1644,15 @@ class Interval(base.Music21Object):
         self.reinit()
 
     def reinit(self):
-        '''Reinitialize the internal interval objects in case something has changed. Called during __init__ to assign attributes.
+        '''
+        Reinitialize the internal interval objects in case something has changed. 
+        Called during __init__ to assign attributes.
         '''
         # catch case where only one Note is provided
         if (self._noteStart != None and self._noteEnd == None or 
             self._noteEnd != None and self._noteStart == None):
-            raise IntervalException('either both the starting and the ending note.Note must be given or neither can be given.  You cannot have one without the other.')
+            raise IntervalException('either both the starting and the ending note.Note must be ' +
+                'given or neither can be given.  You cannot have one without the other.')
 
         if self._noteStart is not None and self._noteEnd is not None:
             genericInterval = notesToGeneric(self._noteStart, self._noteEnd)
@@ -1654,7 +1664,9 @@ class Interval(base.Music21Object):
         # check for error of only one type being defined
         if (self.chromatic != None and self.diatonic == None or 
             self.diatonic != None and self.chromatic == None):
-            raise IntervalException('either both a DiatonicInterval and a ChromaticInterval object have to be given or neither can be given.  You cannot have one without the other.')
+            raise IntervalException('either both a DiatonicInterval and a ChromaticInterval ' + 
+                                    'object have to be given or neither can be given.  ' +
+                                    'You cannot have one without the other.')
 
         if self.chromatic != None:
             self.direction = self.chromatic.direction
@@ -1701,7 +1713,8 @@ class Interval(base.Music21Object):
         '''
         returns True if the pitches are a major or minor third or sixth or perfect fifth or unison.
 
-        These rules define all common-practice consonances (and earlier back to about 1300 all imperfect consonances)
+        These rules define all common-practice consonances (and earlier back to about 
+        1300 all imperfect consonances)
 
         
         >>> i1 = interval.notesToInterval(note.Note('C'), note.Note('E'))
@@ -1761,8 +1774,8 @@ class Interval(base.Music21Object):
     
     complement = property(_getComplement, 
         doc='''
-        Return a new :class:`~music21.interval.Interval` object that is the complement of this Interval.
-
+        Return a new :class:`~music21.interval.Interval` object that is the 
+        complement of this Interval.
         
         >>> aInterval = interval.Interval('M3')
         >>> bInterval = aInterval.complement
@@ -1933,7 +1946,10 @@ class Interval(base.Music21Object):
 
         if pitch1.fundamental is not None:
             # recursively call method
-            pitch2.fundamental = self.transposePitch(pitch1.fundamental, reverse=reverse, clearAccidentalDisplay=clearAccidentalDisplay, maxAccidental=maxAccidental)
+            pitch2.fundamental = self.transposePitch(pitch1.fundamental, 
+                                                     reverse=reverse, 
+                                                     clearAccidentalDisplay=clearAccidentalDisplay, 
+                                                     maxAccidental=maxAccidental)
             if pitch1.fundamental.octave is None:
                 pitch2.fundamental.octave = None
 
@@ -2303,7 +2319,8 @@ def notesToInterval(n1, n2 = None):
     '''
     #note to self:  what's going on with the Note() representation in help?
     if n2 is None: 
-        # this is not done in the constructor originally because of looping problems with tinyNotationNote
+        # this is not done in the constructor originally because of looping problems 
+        # with tinyNotationNote
         # but also because we now support Pitches as well
         if hasattr(n1, 'pitch'):
             from music21 import note
@@ -2387,7 +2404,6 @@ def subtract(intervalList):
     >>> a.chromatic.semitones
     -1    
     
-    TODO: BUG: should be Descending Diminished Unison, currently giving Oblique Augmented Unison ! AARGH
     '''
     from music21 import pitch
     if len(intervalList) == 0:
@@ -2431,7 +2447,6 @@ class Test(unittest.TestCase):
         dInt1 = int1.diatonic   # returns same as gInt1 -- just a different way of thinking of things
         gInt1 = dInt1.generic
     
-        ## TODO: rewrite all assertion code using self.assertEqual etc.
         self.assertEqual(gInt1.isDiatonicStep, False)
         self.assertEqual(gInt1.isSkip, True)
         
@@ -2627,13 +2642,17 @@ class Test(unittest.TestCase):
         sSub = s.parts[3].measures(2,6)
         
         self.assertEqual(collectAccidentalDisplayStatus(sSub), 
-                        ['x', False, 'x', 'x', True, False, 'x', False, False, False, False, False, False, 'x', 'x', 'x', False, False, False, 'x', 'x', 'x', 'x', True, False])
+                        ['x', False, 'x', 'x', True, False, 'x', False, False, False, 
+                         False, False, False, 'x', 'x', 'x', False, False, False, 
+                         'x', 'x', 'x', 'x', True, False])
 
         sTransposed = sSub.flat.transpose('p5')
         #sTransposed.show()
 
         self.assertEqual(collectAccidentalDisplayStatus(sTransposed), 
-                        ['x', None, 'x', 'x', None, None, None, None, None, None, None, None, None, 'x', None, None, None, None, None, 'x', 'x', 'x', None, None, None])
+                        ['x', None, 'x', 'x', None, None, None, None, None, 
+                         None, None, None, None, 'x', None, None, None, None, 
+                         None, 'x', 'x', 'x', None, None, None])
 
 
 

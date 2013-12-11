@@ -1,80 +1,80 @@
 Traceback (most recent call last):
-  File "/Users/josiah/Documents/Development/music21/music21/musicxml/m21ToString.py", line 871, in testHarmonyC
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/m21ToString.py", line 871, in testHarmonyC
     self.assertEqual(raw.find('<degree-type>alter</degree-type>') > 0, True)
 AssertionError: False != True
 
 
 
 ---------------SUMMARY---------------------------------------------------
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/zipfileapp.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/wsgiapp.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/visualapp.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/urlqueryapp.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/urlapp.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/unifiedapp.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/jsonapp.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/featureinfo.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/server/featureapp.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/noteinfo/index.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/index.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/humdrum/index.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/featureextractor/index.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/trecento/exceldiff.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/test/timeGraphs.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/test/testSingleCoreAll.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/test/testPerformance.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/test/testLint.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/test/testInstallation.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/test/testExternal.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/test/testDefault.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/test/multiprocessTest.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/xldate.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/timemachine.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/sheet.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/licences.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/formula.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/formatting.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/examples/xlrdnameAPIdemo.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/compdoc.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/biffh.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/xlrd/__init__.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/webcolors.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/util.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/unpickler.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/tags.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/pickler.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/handlers.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/compat.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/jsonpickle/__init__.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/ext/__init__.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/trecento/largestAmbitus.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/trecento/__init__.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/smt2011.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/smt2010.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/seaver_presentation_2008.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/seaverOct2009.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/runTrecentoCadence.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/nips2011.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/nemcog.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/monteverdi.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/misc2010.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/mgtaPart2.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/mgtaPart1.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/josquin/label_intervals.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/ismir2011.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/ismir2010.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/icmc2011.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/icmc2010.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/eschbeg.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/mrjobaws/awsutility.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/mrjobaws/__init__.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/__init__.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/bhadley/HarmonyRealizer.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/demos/__init__.py
-Skipped: /Users/josiah/Documents/Development/music21/music21/configure.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/zipfileapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/wsgiapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/visualapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/urlqueryapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/urlapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/unifiedapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/jsonapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/featureinfo.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/featureapp.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/noteinfo/index.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/index.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/exceldiff.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/timeGraphs.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testSingleCoreAll.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testPerformance.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testLint.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testInstallation.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testExternal.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testDefault.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/multiprocessTest.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/xldate.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/timemachine.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/sheet.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/licences.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/formula.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/formatting.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/examples/xlrdnameAPIdemo.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/compdoc.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/biffh.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/webcolors.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/util.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/unpickler.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/tags.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/pickler.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/handlers.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/compat.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/largestAmbitus.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2011.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2010.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/seaver_presentation_2008.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/seaverOct2009.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/runTrecentoCadence.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/nips2011.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/nemcog.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/monteverdi.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/misc2010.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/mgtaPart2.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/mgtaPart1.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/josquin/label_intervals.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/ismir2011.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/ismir2010.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/icmc2011.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/icmc2010.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/eschbeg.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/awsutility.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/HarmonyRealizer.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
 xmlnode successfully ran 12 tests
 webapps_apps successfully ran 6 tests
 webapps___init__ successfully ran 14 tests
@@ -100,17 +100,17 @@ text successfully ran 23 tests
 test___init__ successfully ran 3 tests
 tempo successfully ran 45 tests
 stream_streamStatus successfully ran 4 tests
-stream_makeNotation successfully ran 9 tests
 theoryAnalysis_theoryAnalyzer successfully ran 42 tests
+stream_makeNotation successfully ran 9 tests
 spanner successfully ran 52 tests
 sieve successfully ran 40 tests
 serial successfully ran 47 tests
 stream___init__ successfully ran 144 tests
 search_segment successfully ran 7 tests
-search___init__ successfully ran 19 tests
+scale successfully ran 90 tests
 scala_scl___init__ successfully ran 3 tests
 scala___init__ successfully ran 12 tests
-scale successfully ran 90 tests
+search___init__ successfully ran 19 tests
 romanText_testFiles successfully ran 4 tests
 romanText_translate successfully ran 17 tests
 romanText___init__ successfully ran 45 tests
@@ -123,14 +123,16 @@ noteworthy___init__ successfully ran 3 tests
 note successfully ran 49 tests
 musicxml_xmlHandler successfully ran 12 tests
 musicxml_toMxObjects successfully ran 37 tests
-repeat successfully ran 72 tests
 musicxml_testPrimitive successfully ran 5 tests
+musicxml_testFiles successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
+repeat successfully ran 72 tests
 musicxml___init__ successfully ran 3 tests
-musicxml_fromMxObjects successfully ran 65 tests
-musedata_base40 successfully ran 9 tests
-musedata___init__ successfully ran 49 tests
 musedata_translate successfully ran 16 tests
+musedata_testFiles successfully ran 5 tests
+musedata_base40 successfully ran 9 tests
+musicxml_fromMxObjects successfully ran 65 tests
+musedata___init__ successfully ran 49 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
 midi_translate successfully ran 47 tests
@@ -150,19 +152,19 @@ key successfully ran 19 tests
 ipython21___init__ successfully ran 3 tests
 intervalNetwork successfully ran 57 tests
 interval successfully ran 55 tests
-metadata_caching successfully ran 7 tests
 instrument successfully ran 22 tests
 humdrum_testFiles successfully ran 3 tests
-humdrum_instruments successfully ran 8 tests
-humdrum___init__ successfully ran 3 tests
 humdrum_spineParser successfully ran 32 tests
+humdrum_instruments successfully ran 8 tests
+metadata_caching successfully ran 7 tests
+humdrum___init__ successfully ran 3 tests
 metadata_bundles successfully ran 34 tests
 freezeThaw successfully ran 28 tests
+figuredBass_segment successfully ran 16 tests
 harmony successfully ran 27 tests
 figuredBass_rules successfully ran 5 tests
-figuredBass_segment successfully ran 16 tests
-figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
+figuredBass_resolution successfully ran 17 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
 figuredBass_fbPitch successfully ran 5 tests
@@ -194,45 +196,46 @@ corpus_virtual successfully ran 5 tests
 features_jSymbolic successfully ran 86 tests
 corpus_corpora successfully ran 28 tests
 corpus_chorales successfully ran 9 tests
-features_native successfully ran 26 tests
 corpus___init__ successfully ran 17 tests
+features_native successfully ran 26 tests
 corpus_testCorpus successfully ran 25 tests
 composition_seeger successfully ran 3 tests
 composition_phasing successfully ran 5 tests
 composition_aug30 successfully ran 3 tests
-composition___init__ successfully ran 3 tests
-common successfully ran 57 tests
-clef successfully ran 27 tests
-contour successfully ran 10 tests
-chordTables successfully ran 17 tests
 converter successfully ran 35 tests
+composition___init__ successfully ran 3 tests
+clef successfully ran 27 tests
+common successfully ran 57 tests
+chordTables successfully ran 17 tests
+contour successfully ran 10 tests
 chant successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
-classCache successfully ran 12 tests
-braille_text successfully ran 4 tests
 braille_translate successfully ran 7 tests
-braille_segment successfully ran 11 tests
-braille_lookup successfully ran 3 tests
+braille_text successfully ran 4 tests
 chord successfully ran 108 tests
+classCache successfully ran 12 tests
+braille_lookup successfully ran 3 tests
+braille_segment successfully ran 11 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
-braille_examples successfully ran 5 tests
 base successfully ran 112 tests
 bar successfully ran 9 tests
-audioSearch_recording successfully ran 4 tests
+braille_examples successfully ran 5 tests
 audioSearch_transcriber successfully ran 4 tests
+audioSearch_recording successfully ran 4 tests
+audioSearch_scoreFollower successfully ran 7 tests
 articulations successfully ran 29 tests
-audioSearch___init__ successfully ran 19 tests
 braille_test successfully ran 151 tests
+audioSearch___init__ successfully ran 19 tests
 analysis_search successfully ran 4 tests
 analysis_reduceChords successfully ran 7 tests
 analysis_patel successfully ran 6 tests
 analysis_neoRiemannian successfully ran 10 tests
 analysis_metrical successfully ran 6 tests
-analysis_windowed successfully ran 9 tests
 analysis_discrete successfully ran 31 tests
+analysis_windowed successfully ran 9 tests
 analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
 abcFormat___init__ successfully ran 53 tests
@@ -259,12 +262,10 @@ Not in Tree Error: test.testDocs is in the music21 directory but not imported in
 Not in Tree Error: test.testCoverage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.memoryUsage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: musicxml.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test03 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test02 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test01 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: musedata.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: metadata.testMetadata is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: ipython21.objects is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: ipython21.ipExtension is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -274,7 +275,6 @@ Not in Tree Error: documentation.upload is in the music21 directory but not impo
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -288,10 +288,10 @@ Not in Tree Error:  is in the music21 directory but not imported in music21. Ski
 -----------
 musicxml_m21ToString had 0 ERRORS and 1 FAILURES in 45 tests:
 Traceback (most recent call last):
-  File "/Users/josiah/Documents/Development/music21/music21/musicxml/m21ToString.py", line 871, in testHarmonyC
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/m21ToString.py", line 871, in testHarmonyC
     self.assertEqual(raw.find('<degree-type>alter</degree-type>') > 0, True)
 AssertionError: False != True
 
 -------------------------------------------------------------------------
-Ran 3888 tests in 510.4583 seconds
-Run at 2013-11-24 21:50:54
+Ran 3905 tests in 510.6021 seconds
+Run at 2013-12-10 15:47:10
