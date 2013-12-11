@@ -16,8 +16,12 @@ Automatically reduce a MeasureStack to a single chord or group of chords.
 import unittest
 import copy
 from music21 import meter
+from music21 import note
 from music21 import stream
 from music21 import tie
+from music21 import environment
+
+environLocal = environment.Environment('reduceChords')
 
 
 def testMeasureStream1():
@@ -33,15 +37,15 @@ def testMeasureStream1():
     {3.0} <music21.chord.Chord C4 E4 G4 C5>
     '''
     from music21 import chord
-    s = stream.Measure()
-    t = meter.TimeSignature('4/4')
-    c1 = chord.Chord('C4 E4 G4 C5')
-    c1.quarterLength = 2.0
-    c2 = chord.Chord('C4 E4 F4 B4')
-    c3 = chord.Chord('C4 E4 G4 C5')
-    for c in [t, c1, c2, c3]:
-        s.append(c)
-    return s
+    measure = stream.Measure()
+    timeSignature = meter.TimeSignature('4/4')
+    chord1 = chord.Chord('C4 E4 G4 C5')
+    chord1.quarterLength = 2.0
+    chord2 = chord.Chord('C4 E4 F4 B4')
+    chord3 = chord.Chord('C4 E4 G4 C5')
+    for element in (timeSignature, chord1, chord2, chord3):
+        measure.append(element)
+    return measure
 
 
 class ChordReducer(object):
@@ -57,6 +61,31 @@ class ChordReducer(object):
         self.maxChords = 3
 
     ### PRIVATE METHODS ###
+
+    def _alignByLyrics(self, inputMeasure):
+        reallignments = []
+        for verticalMoment in self._iterateVerticalMoments(inputMeasure):
+            if not all(x.hasLyrics() for x in verticalMoment):
+                continue
+            if not len(set(x.lyric for x in verticalMoment)) == 1:
+                continue
+            bestBeatStrength = verticalMoment[0].beatStrength
+            bestOffset = verticalMoment[0].offset
+            for x in verticalMoment[1:]:
+                if bestBeatStrength < x.beatStrength:
+                    bestBeatStrength = x.beatStrength
+                    bestOffset = x.offset
+            for x in verticalMoment:
+                if x.beatStrength != bestBeatStrength:
+                    reallignments.append((x, bestOffset))
+        for element, newOffset in reallignments:
+            if isinstance(element, note.Rest):
+                continue
+            oldOffset = element.offset
+            for site in element.sites.getSites():
+                element.sites.setOffsetBySite(site, newOffset)
+            element.quarterLength += (oldOffset - newOffset)
+            element.offset = newOffset
 
     def _buildOutputMeasure(self,
         closedPosition,
@@ -92,7 +121,8 @@ class ChordReducer(object):
             cLast = cElCopy
             cLastEnd = newOffset + cElCopy.quarterLength
             outputMeasure._insertCore(newOffset, cElCopy)
-        tsContext = inputMeasure.parts[0].getContextByClass('TimeSignature')
+        tsContext = inputMeasure.getContextByClass('TimeSignature')
+        #tsContext = inputMeasure.parts[0].getContextByClass('TimeSignature')
         if tsContext is not None:
             if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
                 cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
@@ -112,11 +142,88 @@ class ChordReducer(object):
                     if allSame is True:
                         lastPitchedObject.tie = tie.Tie('start')
         lastPitchedObject = outputMeasure[-1]
-        sourceMeasureTs = inputMeasure.parts[0].getElementsByClass('Measure')[0].timeSignature
+        #sourceMeasureTs = inputMeasure.parts[0].getElementsByClass('Measure')[0].timeSignature
+        sourceMeasureTs = tsContext
         if sourceMeasureTs != lastTimeSignature:
             outputMeasure.timeSignature = copy.deepcopy(sourceMeasureTs)
             lastTimeSignature = sourceMeasureTs
         return lastPitchedObject, lastTimeSignature, outputMeasure
+
+    def _collapseArpeggios(self, inputMeasure):
+        pass
+
+    def _iterateVerticalMoments(self, inputMeasure):
+        '''
+        Iterate overlapping elements:
+
+        ::
+
+            >>> score = corpus.parse('PMFC_06_Giovanni-05_Donna')
+            >>> reducer = analysis.reduceChords.ChordReducer()
+            >>> for i in range(1, 5):
+            ...     measure = score.measure(i)
+            ...     print 'Measure {}:'.format(i)
+            ...     for moment in reducer._iterateVerticalMoments(measure):
+            ...         print '\t', moment
+            ...
+            Measure 1:
+                [<music21.note.Note D>, <music21.note.Note G>]
+            Measure 2:
+                [<music21.note.Note D>, <music21.note.Note G>]
+                [<music21.note.Note C>, <music21.note.Note G>]
+            Measure 3:
+                [<music21.note.Note B>, <music21.note.Note G>]
+            Measure 4:
+                [<music21.note.Note B>, <music21.note.Note G>]
+                [<music21.note.Note B>, <music21.note.Note G>]
+                [<music21.note.Note C>, <music21.note.Note G>]
+
+        '''
+        leafLists = []
+        for part in inputMeasure:
+            innerMeasure = part.getElementsByClass('Measure')[0]
+            leaves = innerMeasure.notesAndRests
+            leafLists.append(leaves)
+        currentIndices = [0 for _ in leafLists]
+        currentStartOffset = None
+        earliestStopOffset = None
+        latestStopOffset = None
+        for i, index in enumerate(currentIndices):
+            leaf = leafLists[i][index]
+            startOffset = leaf.offset
+            stopOffset = leaf.offset + leaf.quarterLength
+            if currentStartOffset is None or startOffset < currentStartOffset:
+                currentStartOffset = startOffset
+            if earliestStopOffset is None or stopOffset < earliestStopOffset:
+                earliestStopOffset = stopOffset
+            if latestStopOffset is None or latestStopOffset < stopOffset:
+                latestStopOffset = stopOffset
+        yield [leaves[i] for leaves, i in zip(leafLists, currentIndices)]
+        while True:
+            indexIsLast = []
+            for i, index in enumerate(currentIndices):
+                if (index + 1) == len(leafLists[i]):
+                    indexIsLast.append(True)
+                    continue
+                indexIsLast.append(False)
+                thisLeaf = leafLists[i][index]
+                nextLeaf = leafLists[i][index + 1]
+                if nextLeaf.offset == earliestStopOffset:
+                    currentIndices[i] = index + 1
+            currentStartOffset = earliestStopOffset
+            earliestStopOffset = None
+            for i, index in enumerate(currentIndices):
+                thisLeaf = leafLists[i][index]
+                stopOffset = thisLeaf.offset + thisLeaf.quarterLength
+                if latestStopOffset < stopOffset:
+                    latestStopOffset = stopOffset
+                if earliestStopOffset is None or \
+                    stopOffset < earliestStopOffset:
+                    earliestStopOffset = stopOffset
+            if all(indexIsLast):
+                break
+            yield [leaves[i] for leaves, i in zip(leafLists, currentIndices)]
+        raise StopIteration
 
     ### PUBLIC METHODS ###
 
@@ -168,10 +275,8 @@ class ChordReducer(object):
         if weightAlgorithm is None:
             weightAlgorithm = self.quarterLengthOnly
         presentPCs = {}
-
         self.positionInMeasure = 0
         self.numberOfElementsInMeasure = len(measureObj)
-
         for i, c in enumerate(measureObj):
             self.positionInMeasure = i
             if c.isNote:
@@ -181,10 +286,8 @@ class ChordReducer(object):
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
-
         self.positionInMeasure = 0
         self.numberOfElementsInMeasure = 0
-
         return presentPCs
 
     def multiPartReduction(
@@ -199,11 +302,11 @@ class ChordReducer(object):
         '''
         i = 0
         outputStream = stream.Part()
-        gobcM = inputStream.parts[0].getElementsByClass('Measure')
-        lenMeasures = len(gobcM)
+        allMeasures = inputStream.parts[0].getElementsByClass('Measure')
+        measureCount = len(allMeasures)
         lastPitchedObject = None
         lastTimeSignature = None
-        while i <= lenMeasures:
+        while i <= measureCount:
             inputMeasure = inputStream.measure(i, ignoreNumbers=True)
             if not len(inputMeasure.flat.notesAndRests):
                 if not i:
@@ -211,8 +314,12 @@ class ChordReducer(object):
                 else:
                     break
             else:
+                inputMeasure = copy.deepcopy(inputMeasure)
+                self._alignByLyrics(inputMeasure)
+                self._collapseArpeggios(inputMeasure)
+                chordifiedInputMeasure = inputMeasure.chordify()
                 inputMeasureReduction = self.reduceMeasureToNChords(
-                    inputMeasure.chordify(),
+                    chordifiedInputMeasure,
                     maxChords,
                     weightAlgorithm=self.qlbsmpConsonance,
                     trimBelow=0.3,
