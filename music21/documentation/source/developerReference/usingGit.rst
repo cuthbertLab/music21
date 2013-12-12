@@ -106,6 +106,13 @@ Installing PyDev and EGit for Eclipse
     If you are using Windows, make sure to install Python through the normal
     Windows installation routines. See :ref:`installWindows`.
 
+..  warning::
+
+    If you are using Windows and have a firewall or anti-virus software
+    active, we recommend disabling them while installing Eclipse plugins.
+    Anti-virus software, such as AVG, can cause Eclipse to hang while
+    attempting to fetch packages. 
+
 With Eclipse installed, you next need to install two plugins: PyDev and EGit.
 
 PyDev is a Python IDE for Eclipse, which may be used in Python, Jython, and
@@ -152,7 +159,14 @@ repositories. Both of these can be installed via the Eclipse Marketplace.
 
     ..  image:: images/usingGit/eclipse__install_plugins__7.png
 
+..  warning::
 
+    The 3.x series of PyDev - currently available in the Eclipse Marketplace -
+    requires Java 7. The plugin will **not** activate in Eclipse without Java
+    7. If you are unable or unwilling to install Java 7, uninstall your PyDev
+    3.x plugin via the Eclipse Marketplace dialog, and install a copy of PyDev
+    from the 2.x series manually.
+    
 Forking music21 on GitHub
 -------------------------
 
@@ -168,6 +182,7 @@ To fork the official music21 repository, simply navigate to
 <https://github.com/cuthbertLab/music21>`_ on GitHub while signed in to your
 GitHub account, and click **Fork** in the upper right-hand corner of the page.
 
+..  image:: images/usingGit/github__forking__01.png
 
 Cloning your music21 fork in Eclipse
 ------------------------------------
@@ -235,9 +250,18 @@ contextual menu that appears.
     ..  image:: images/usingGit/eclipse__clone__7__edited.png
 
 8.  Finally, you'll be given the option to choose how Eclipse will refer to the
-    project. Unless you already have a project named **music21** in Eclipse,
-    just accept the default and click **Finish**:
+    project. Choose `music21base` instead of `music21`.
 
+    ..  note::
+
+        You can name your `music21` Eclipse project whatever you like. However,
+        we strongly recommend choosing a project name other than `music21`.
+        Why? The project you've now downloaded contains a directory named
+        `music21`. You may run into problems if you create subsequent projects
+        in Eclipse which attempt to reference the `music21` Python package
+        inside the `music21` Eclipse project. Naming the Eclipse project to
+        something other than `music21` mitigates this reference problem.
+    
     ..  image:: images/usingGit/eclipse__clone__8__edited.png
 
 
