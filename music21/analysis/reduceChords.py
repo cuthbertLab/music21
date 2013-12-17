@@ -338,31 +338,46 @@ class ChordReducer(object):
             return chordifiedInputMeasure
         for noteOrRest in notesAndRests:
             measure.pop(measure.index(noteOrRest))
-        previousChord = notesAndRests[0]
-        for currentChord in notesAndRests[1:]:
-            if previousChord.isRest or \
-                currentChord.isRest or \
-                not currentChord.isConsonant() or \
-                not previousChord.isConsonant():
-                measure.append(previousChord)
-                previousChord = currentChord
-                continue
-            previousPitches = set(previousChord.pitches)
-            currentPitches = set(currentChord.pitches)
-            newPitches = previousPitches.union(currentPitches)
-            previousDuration = previousChord.quarterLength
-            currentDuration = currentChord.quarterLength
-            newDuration = previousDuration + currentDuration
-            newChord = chord.Chord(newPitches)
-            newChord.quarterLength = newDuration
-            if newChord.isConsonant():
-                previousChord = newChord
+        currentChords = []
+        currentPitches = set()
+        for currentChord in notesAndRests:
+            tieSet = self._getTieSet(currentChord)
+            if not tieSet:
+                currentChords = []
+                currentPitches = set()
+                measure.append(currentChord)
+            elif all(x == 'stop' for x in tieSet):
+                currentChords.append(currentChord)
+                currentPitches.update(str(x) for x in currentChord.pitches)
+                newChord = chord.Chord(currentPitches)
+                newChord.quarterLength = \
+                    sum(x.quarterLength for x in currentChords)
+                if newChord.isTriad() or \
+                    newChord.isSeventh() or \
+                    newChord.isConsonant():
+                    measure.append(newChord)
+                else:
+                    measure.extend(currentChords)
+                currentChords = []
+                currentPitches = set()
             else:
-                measure.append(previousChord)
-                previousChord = currentChord
-        measure.append(previousChord)
-        chordifiedInputMeasure.show('text')
+                currentChords.append(currentChord)
+                currentPitches.update(str(x) for x in currentChord.pitches)
+        if currentChords:
+            if newChord.isTriad() or \
+                newChord.isSeventh() or \
+                newChord.isConsonant():
+                measure.append(currentChord)
+            else:
+                measure.extend(currentChords)
         return chordifiedInputMeasure
+
+    def _getTieSet(self, chord):
+        result = set()
+        for note in chord._notes:
+            if note.tie is not None:
+                result.add(note.tie.type)
+        return result
 
     ### PUBLIC METHODS ###
 
@@ -433,7 +448,9 @@ class ChordReducer(object):
         self,
         inputStream,
         maxChords=2,
+        alignLyrics=False,
         closedPosition=False,
+        collapseArpeggios=False,
         forceOctave=False,
         ):
         '''
@@ -455,9 +472,12 @@ class ChordReducer(object):
             else:
                 environLocal.printDebug(str(i))
                 inputMeasure = copy.deepcopy(inputMeasure)
-                self._alignByLyrics(inputMeasure)
+                if alignLyrics:
+                    self._alignByLyrics(inputMeasure)
                 chordifiedInputMeasure = inputMeasure.chordify()
-                #newPart = self._collapseArpeggios(chordifiedInputMeasure)
+                if collapseArpeggios:
+                    chordifiedInputMeasure = self._collapseArpeggios(
+                        chordifiedInputMeasure)
                 inputMeasureReduction = self.reduceMeasureToNChords(
                     chordifiedInputMeasure,
                     maxChords,
@@ -639,31 +659,40 @@ class TestExternal(unittest.TestCase):
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
-        #c = corpus.parse('bach/bwv846').measures(1, 5)
-        #c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-        c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
-        #c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
-        #c = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
-        #c = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
-        #c = corpus.parse('PMFC_12_13').measures(1, 40)
+        score = corpus.parse('bach/bwv846').measures(1, 19)
+        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
+        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
+        #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
+        #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
+        #score = corpus.parse('PMFC_12_13').measures(1, 40)
 
         # fix clef
         fixClef = False
         if fixClef:
             from music21 import clef
-            firstMeasure = c.parts[1].getElementsByClass('Measure')[0]
+            firstMeasure = score.parts[1].getElementsByClass('Measure')[0]
             startClefs = firstMeasure.getElementsByClass('Clef')
             if len(startClefs):
                 clef1 = startClefs[0]
                 firstMeasure.remove(clef1)
             firstMeasure.insert(0, clef.Treble8vbClef())
 
-        cr = ChordReducer()
-        #cr.printDebug = True
-        p = cr.multiPartReduction(c, maxChords=3, closedPosition=True)
-        #p = cr.multiPartReduction(c, closedPosition=True)
-        c.insert(0, p)
-        c.show()
+        chordReducer = ChordReducer()
+        #chordReducer.printDebug = True
+        reduction = chordReducer.multiPartReduction(
+            score,
+            alignLyrics=True,
+            closedPosition=True,
+            collapseArpeggios=True,
+            maxChords=3,
+            )
+        #reduction = chordReducer.multiPartReduction(
+        #    score,
+        #    closedPosition=True,
+        #    )
+        score.insert(0, reduction)
+        score.show()
 
 
 #------------------------------------------------------------------------------
