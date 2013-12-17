@@ -331,46 +331,82 @@ class ChordReducer(object):
             lastTimeSignature = sourceMeasureTs
         return lastPitchedObject, lastTimeSignature, outputMeasure
 
-    def _collapseArpeggios(self, chordifiedInputMeasure):
-        measure = chordifiedInputMeasure[0]
-        notesAndRests = measure.notesAndRests
-        if not len(notesAndRests):
-            return chordifiedInputMeasure
-        for noteOrRest in notesAndRests:
-            measure.pop(measure.index(noteOrRest))
+    def _collapseArpeggios(self, inputMeasure):
+        if not len(inputMeasure):
+            return inputStream
+        newStream = stream.Stream()
         currentChords = []
         currentPitches = set()
-        for currentChord in notesAndRests:
+        for currentChord in inputMeasure:
+            if currentChord.isRest:
+                currentChords = []
+                currentPitches = set()
+                newStream.append(currentChord)
+                continue
             tieSet = self._getTieSet(currentChord)
             if not tieSet:
                 currentChords = []
                 currentPitches = set()
-                measure.append(currentChord)
+                newStream.append(currentChord)
             elif all(x == 'stop' for x in tieSet):
                 currentChords.append(currentChord)
-                currentPitches.update(str(x) for x in currentChord.pitches)
+                currentPitches.update(currentChord.pitchNames)
                 newChord = chord.Chord(currentPitches)
                 newChord.quarterLength = \
                     sum(x.quarterLength for x in currentChords)
                 if newChord.isTriad() or \
                     newChord.isSeventh() or \
                     newChord.isConsonant():
-                    measure.append(newChord)
+                    newStream.append(newChord)
                 else:
-                    measure.extend(currentChords)
+                    for oldChord in currentChords:
+                        newStream.append(oldChord)
                 currentChords = []
                 currentPitches = set()
             else:
                 currentChords.append(currentChord)
-                currentPitches.update(str(x) for x in currentChord.pitches)
+                currentPitches.update(currentChord.pitchNames)
         if currentChords:
+            newChord = chord.Chord(currentPitches)
+            newChord.quarterLength = \
+                sum(x.quarterLength for x in currentChords)
             if newChord.isTriad() or \
                 newChord.isSeventh() or \
                 newChord.isConsonant():
-                measure.append(currentChord)
+                newStream.append(currentChord)
             else:
-                measure.extend(currentChords)
-        return chordifiedInputMeasure
+                for oldChord in currentChords:
+                    newStream.append(oldChord)
+        return newStream
+
+    def _collapseIdenticalChords(self, inputMeasure):
+        if not len(inputMeasure):
+            return inputMeasure
+        outputMeasure = stream.Stream()
+        if not inputMeasure[0].isRest:
+            previousChord = chord.Chord(set(inputMeasure[0].pitchNames))
+            previousChord.quarterLength = inputMeasure[0].quarterLength
+        else:
+            previousChord = inputMeasure[0]
+        for currentChord in inputMeasure[1:]:
+            if previousChord.isChord and currentChord.isChord:
+                previousPitches = set(previousChord.pitchNames)
+                currentPitches = set(currentChord.pitchNames)
+                if previousPitches == currentPitches:
+                    previousChord.quarterLength += currentChord.quarterLength
+                else:
+                    outputMeasure.append(previousChord)
+                    previousChord = chord.Chord(set(currentChord.pitchNames))
+                    previousChord.quarterLength = currentChord.quarterLength
+            else:
+                outputMeasure.append(previousChord)
+                if currentChord.isChord:
+                    previousChord = chord.Chord(set(currentChord.pitchNames))
+                    previousChord.quarterLength = currentChord.quarterLength
+                else:
+                    previousChord = currentChord
+        outputMeasure.append(previousChord)
+        return outputMeasure
 
     def _getTieSet(self, chord):
         result = set()
@@ -474,16 +510,33 @@ class ChordReducer(object):
                 inputMeasure = copy.deepcopy(inputMeasure)
                 if alignLyrics:
                     self._alignByLyrics(inputMeasure)
-                chordifiedInputMeasure = inputMeasure.chordify()
+
+                inputMeasureReduction = \
+                    inputMeasure.chordify().flat.notesAndRests
                 if collapseArpeggios:
-                    chordifiedInputMeasure = self._collapseArpeggios(
-                        chordifiedInputMeasure)
-                inputMeasureReduction = self.reduceMeasureToNChords(
-                    chordifiedInputMeasure,
-                    maxChords,
-                    weightAlgorithm=self.qlbsmpConsonance,
-                    trimBelow=0.3,
-                    )
+                    #print 'Chordify:'
+                    #inputMeasureReduction.show('text')
+
+                    #print 'Collapse Arpeggios:'
+                    inputMeasureReduction = self._collapseArpeggios(
+                        inputMeasureReduction)
+                    #inputMeasureReduction.show('text')
+
+                    #print 'Collapse Identical Chords:'
+                    inputMeasureReduction = self._collapseIdenticalChords(
+                        inputMeasureReduction)
+                    #inputMeasureReduction.show('text')
+
+#                print 'Reduce to N Chords:'
+#                inputMeasureReduction = self.reduceMeasureToNChords(
+#                    chordifiedInputMeasure,
+#                    maxChords,
+#                    weightAlgorithm=self.qlbsmpConsonance,
+#                    trimBelow=0.3,
+#                    )
+#                inputMeasureReduction.show('text')
+#                print
+
                 lastPitchedObject, lastTimeSignature, outputMeasure = \
                     self._buildOutputMeasure(
                         closedPosition,
@@ -503,7 +556,7 @@ class ChordReducer(object):
         outputStream._elementsChanged()
         outputStream.getElementsByClass('Measure')[0].insert(
             0, outputStream.bestClef(allowTreble8vb=True))
-        outputStream.makeNotation(inPlace=True)
+        #outputStream.makeNotation(inPlace=True)
         return outputStream
 
     def qlbsmpConsonance(self, c):
@@ -660,6 +713,7 @@ class TestExternal(unittest.TestCase):
     def testTrecentoMadrigal(self):
         from music21 import corpus
         score = corpus.parse('bach/bwv846').measures(1, 19)
+        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 3)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
@@ -701,5 +755,6 @@ class TestExternal(unittest.TestCase):
 _DOC_ORDER = []
 
 if __name__ == "__main__":
+    #TestExternal().testTrecentoMadrigal()
     import music21
     music21.mainTest(TestExternal)
