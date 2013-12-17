@@ -118,8 +118,9 @@ class Verticality(object):
         '''
         leafLists = []
         for part in expr:
-            innerMeasure = part.getElementsByClass('Measure')[0]
-            leaves = innerMeasure.notesAndRests
+            if not part.isStream:
+                continue
+            leaves = part.flat.notesAndRests
             leafLists.append(leaves)
         currentIndices = [0 for _ in leafLists]
         currentStartOffset = None
@@ -193,29 +194,41 @@ class Verticality(object):
             yield verticalities
         else:
             verticalityBuffer = []
-            for verticality in expr:
+            for verticality in verticalities:
                 verticalityBuffer.append(verticality)
                 if len(verticalityBuffer) == n:
                     yield tuple(verticalityBuffer)
                     verticalityBuffer.pop(0)
 
+    @staticmethod
+    def unwrapHorizontalities(verticalities):
+        r'''
+        Unwrap horizontalities in `verticalities`:
+
+        ::
+
+            >>> score = corpus.parse('PMFC_06_Giovanni-05_Donna')
+            >>> Verticality = analysis.reduceChords.Verticality
+            >>> triples = [x for x in Verticality.iterateVerticalitiesNwise(
+            ...     score, 3)]
+            >>> result = Verticality.unwrapHorizontalities(triples[0])
+            >>> for index, elements in result.iteritems():
+            ...     print index, elements
+            ... 
+            0 [<music21.note.Note D>, <music21.note.Note D>, <music21.note.Note C>]
+            1 [<music21.note.Note G>, <music21.note.Note G>]
+
+
+        '''
+        result = {}
+        for verticality in verticalities:
+            for index, element in verticality.startElements.iteritems():
+                if index not in result:
+                    result[index] = []
+                result[index].append(element)
+        return result
+
     ### PUBLIC PROPERTIES ###
-
-    @property
-    def elements(self):
-        return self.startElements.values() + self.overlapElements.values()
-
-    @property
-    def overlapElements(self):
-        return self._overlapElements
-
-    @property
-    def startElements(self):
-        return self._startElements
-
-    @property
-    def startOffset(self):
-        return self._startElements.values()[0].offset
 
     @property
     def earliestStartOffset(self):
@@ -228,8 +241,32 @@ class Verticality(object):
         return min(x.offset + x.quarterLength for x in self.elements)
 
     @property
+    def elements(self):
+        return self.startElements.values() + self.overlapElements.values()
+
+    @property
     def latestStopOffset(self):
         return max(x.offset + x.quarterLength for x in self.elements)
+
+    @property
+    def overlapElements(self):
+        return self._overlapElements
+
+    @property
+    def pitchClassSet(self):
+        result = set()
+        for element in self.elements:
+            for pitch in getattr(element, 'pitches', ()):
+                result.add(pitch.name)
+        return result
+
+    @property
+    def startElements(self):
+        return self._startElements
+
+    @property
+    def startOffset(self):
+        return self._startElements.values()[0].offset
 
 
 class ChordReducer(object):
