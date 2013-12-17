@@ -62,12 +62,13 @@ class Verticality(object):
 
     def __init__(
         self,
-        overlapElements=(),
-        startElements=(),
+        startElements={},
+        overlapElements=None,
         ):
-        assert startElements
-        self._startElements = tuple(startElements)
-        self._overlapElements = tuple(overlapElements)
+        assert isinstance(startElements, dict) and startElements
+        assert isinstance(overlapElements, (dict, type(None)))
+        self._startElements = startElements
+        self._overlapElements = overlapElements or {}
 
     ### PUBLIC METHODS ###
 
@@ -90,29 +91,29 @@ class Verticality(object):
             ...
             Measure 1:
                 Verticality 0:
-                    Old: ()
-                    New: (<music21.note.Note D>, <music21.note.Note G>)
+                    Old: {}
+                    New: {0: <music21.note.Note D>, 1: <music21.note.Note G>}
             Measure 2:
                 Verticality 0:
-                    Old: ()
-                    New: (<music21.note.Note D>, <music21.note.Note G>)
+                    Old: {}
+                    New: {0: <music21.note.Note D>, 1: <music21.note.Note G>}
                 Verticality 1:
-                    Old: (<music21.note.Note G>,)
-                    New: (<music21.note.Note C>,)
+                    Old: {1: <music21.note.Note G>}
+                    New: {0: <music21.note.Note C>}
             Measure 3:
                 Verticality 0:
-                    Old: ()
-                    New: (<music21.note.Note B>, <music21.note.Note G>)
+                    Old: {}
+                    New: {0: <music21.note.Note B>, 1: <music21.note.Note G>}
             Measure 4:
                 Verticality 0:
-                    Old: ()
-                    New: (<music21.note.Note B>, <music21.note.Note G>)
+                    Old: {}
+                    New: {0: <music21.note.Note B>, 1: <music21.note.Note G>}
                 Verticality 1:
-                    Old: (<music21.note.Note G>,)
-                    New: (<music21.note.Note B>,)
+                    Old: {1: <music21.note.Note G>}
+                    New: {0: <music21.note.Note B>}
                 Verticality 2:
-                    Old: (<music21.note.Note G>,)
-                    New: (<music21.note.Note C>,)
+                    Old: {1: <music21.note.Note G>}
+                    New: {0: <music21.note.Note C>}
 
         '''
         leafLists = []
@@ -134,14 +135,15 @@ class Verticality(object):
                 earliestStopOffset = stopOffset
             if latestStopOffset is None or latestStopOffset < stopOffset:
                 latestStopOffset = stopOffset
-        overlapElements = []
-        startElements = []
-        for leaves, i in zip(leafLists, currentIndices):
+        overlapElements = {}
+        startElements = {}
+        for j, pair in enumerate(zip(leafLists, currentIndices)):
+            leaves, i = pair
             leaf = leaves[i]
             if leaf.offset == currentStartOffset:
-                startElements.append(leaf)
+                startElements[j] = leaf
             else:
-                overlapElements.append(leaf)
+                overlapElements[j] = leaf
         yield Verticality(
             startElements=startElements,
             overlapElements=overlapElements,
@@ -169,14 +171,15 @@ class Verticality(object):
                     earliestStopOffset = stopOffset
             if all(indexIsLast):
                 break
-            overlapElements = []
-            startElements = []
-            for leaves, i in zip(leafLists, currentIndices):
+            overlapElements = {}
+            startElements = {}
+            for j, pair in enumerate(zip(leafLists, currentIndices)):
+                leaves, i = pair
                 leaf = leaves[i]
                 if leaf.offset == currentStartOffset:
-                    startElements.append(leaf)
+                    startElements[j] = leaf
                 else:
-                    overlapElements.append(leaf)
+                    overlapElements[j] = leaf
             yield Verticality(
                 startElements=startElements,
                 overlapElements=overlapElements,
@@ -200,7 +203,7 @@ class Verticality(object):
 
     @property
     def elements(self):
-        return self.startElements + self.overlapElements
+        return self.startElements.values() + self.overlapElements.values()
 
     @property
     def overlapElements(self):
@@ -212,12 +215,12 @@ class Verticality(object):
 
     @property
     def startOffset(self):
-        return self._startElements[0].offset
+        return self._startElements.values()[0].offset
 
     @property
     def earliestStartOffset(self):
         if self.overlapElements:
-            return min(x.offset for x in self.overlapElements)
+            return min(x.offset for x in self.overlapElements.values())
         return self.startOffset
 
     @property
@@ -714,10 +717,10 @@ class TestExternal(unittest.TestCase):
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
-        score = corpus.parse('bach/bwv846').measures(1, 19)
+        #score = corpus.parse('bach/bwv846').measures(1, 19)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 3)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
