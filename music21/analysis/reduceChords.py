@@ -487,6 +487,7 @@ class ChordReducer(object):
         alignLyrics=False,
         closedPosition=False,
         collapseArpeggios=False,
+        collapseIdenticalChords=False,
         forceOctave=False,
         ):
         '''
@@ -522,6 +523,7 @@ class ChordReducer(object):
                         inputMeasureReduction)
                     #inputMeasureReduction.show('text')
 
+                if collapseIdenticalChords:
                     #print 'Collapse Identical Chords:'
                     inputMeasureReduction = self._collapseIdenticalChords(
                         inputMeasureReduction)
@@ -739,6 +741,7 @@ class TestExternal(unittest.TestCase):
             alignLyrics=True,
             closedPosition=True,
             collapseArpeggios=True,
+            collapseIdenticalChords=True,
             maxChords=3,
             )
         #reduction = chordReducer.multiPartReduction(
