@@ -1,8 +1,3 @@
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/m21ToString.py", line 871, in testHarmonyC
-    self.assertEqual(raw.find('<degree-type>alter</degree-type>') > 0, True)
-AssertionError: False != True
-
 
 
 ---------------SUMMARY---------------------------------------------------
@@ -91,55 +86,55 @@ trecento_notation successfully ran 17 tests
 trecento_capua successfully ran 9 tests
 trecento_tonality successfully ran 5 tests
 trecento___init__ successfully ran 3 tests
-tinyNotation successfully ran 11 tests
 tie successfully ran 7 tests
+tinyNotation successfully ran 11 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
 text successfully ran 23 tests
 test___init__ successfully ran 3 tests
 tempo successfully ran 45 tests
-stream_streamStatus successfully ran 4 tests
 theoryAnalysis_theoryAnalyzer successfully ran 42 tests
+stream_streamStatus successfully ran 4 tests
 stream_makeNotation successfully ran 9 tests
 spanner successfully ran 52 tests
 sieve successfully ran 40 tests
 serial successfully ran 47 tests
 stream___init__ successfully ran 144 tests
 search_segment successfully ran 7 tests
-scale successfully ran 90 tests
+search___init__ successfully ran 19 tests
 scala_scl___init__ successfully ran 3 tests
 scala___init__ successfully ran 12 tests
-search___init__ successfully ran 19 tests
+scale successfully ran 90 tests
 romanText_testFiles successfully ran 4 tests
 romanText_translate successfully ran 17 tests
 romanText___init__ successfully ran 45 tests
+romanText_clercqTemperley successfully ran 19 tests
 roman successfully ran 28 tests
-test_testStream successfully ran 206 tests
 pitch successfully ran 94 tests
 noteworthy_translate successfully ran 21 tests
 noteworthy_binaryTranslate successfully ran 3 tests
 noteworthy___init__ successfully ran 3 tests
 note successfully ran 49 tests
-musicxml_xmlHandler successfully ran 12 tests
+test_testStream successfully ran 206 tests
 musicxml_toMxObjects successfully ran 37 tests
-musicxml_testPrimitive successfully ran 5 tests
+musicxml_xmlHandler successfully ran 12 tests
 musicxml_testFiles successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
+musicxml_testPrimitive successfully ran 5 tests
 repeat successfully ran 72 tests
 musicxml___init__ successfully ran 3 tests
-musedata_translate successfully ran 16 tests
-musedata_testFiles successfully ran 5 tests
+musicxml_m21ToString successfully ran 45 tests
 musedata_base40 successfully ran 9 tests
-musicxml_fromMxObjects successfully ran 65 tests
 musedata___init__ successfully ran 49 tests
+midi_translate successfully ran 47 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
-midi_translate successfully ran 47 tests
+musedata_translate successfully ran 16 tests
 meter successfully ran 107 tests
 metadata_primitives successfully ran 38 tests
 midi___init__ successfully ran 28 tests
-romanText_clercqTemperley successfully ran 19 tests
+musicxml_fromMxObjects successfully ran 65 tests
 metadata___init__ successfully ran 18 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
@@ -156,23 +151,23 @@ instrument successfully ran 22 tests
 humdrum_testFiles successfully ran 3 tests
 humdrum_spineParser successfully ran 32 tests
 humdrum_instruments successfully ran 8 tests
-metadata_caching successfully ran 7 tests
 humdrum___init__ successfully ran 3 tests
+metadata_caching successfully ran 7 tests
 metadata_bundles successfully ran 34 tests
 freezeThaw successfully ran 28 tests
 figuredBass_segment successfully ran 16 tests
-harmony successfully ran 27 tests
 figuredBass_rules successfully ran 5 tests
-figuredBass_realizerScale successfully ran 9 tests
 figuredBass_resolution successfully ran 17 tests
+figuredBass_realizerScale successfully ran 9 tests
+harmony successfully ran 27 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
 figuredBass_fbPitch successfully ran 5 tests
 figuredBass_realizer successfully ran 12 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
-figuredBass_examples successfully ran 15 tests
 graph successfully ran 62 tests
+figuredBass_examples successfully ran 15 tests
 features_base successfully ran 27 tests
 features___init__ successfully ran 8 tests
 expressions successfully ran 26 tests
@@ -194,26 +189,25 @@ counterpoint_species successfully ran 27 tests
 counterpoint___init__ successfully ran 3 tests
 corpus_virtual successfully ran 5 tests
 features_jSymbolic successfully ran 86 tests
+features_native successfully ran 26 tests
 corpus_corpora successfully ran 28 tests
 corpus_chorales successfully ran 9 tests
 corpus___init__ successfully ran 17 tests
-features_native successfully ran 26 tests
 corpus_testCorpus successfully ran 25 tests
 composition_seeger successfully ran 3 tests
-composition_phasing successfully ran 5 tests
-composition_aug30 successfully ran 3 tests
-converter successfully ran 35 tests
-composition___init__ successfully ran 3 tests
-clef successfully ran 27 tests
-common successfully ran 57 tests
-chordTables successfully ran 17 tests
 contour successfully ran 10 tests
+composition___init__ successfully ran 3 tests
+common successfully ran 57 tests
+clef successfully ran 27 tests
+converter successfully ran 35 tests
+chordTables successfully ran 17 tests
+composition_phasing successfully ran 5 tests
 chant successfully ran 12 tests
-capella_fromCapellaXML successfully ran 20 tests
-capella___init__ successfully ran 3 tests
-braille_translate successfully ran 7 tests
-braille_text successfully ran 4 tests
 chord successfully ran 108 tests
+capella___init__ successfully ran 3 tests
+capella_fromCapellaXML successfully ran 20 tests
+braille_text successfully ran 4 tests
+braille_translate successfully ran 7 tests
 classCache successfully ran 12 tests
 braille_lookup successfully ran 3 tests
 braille_segment successfully ran 11 tests
@@ -223,24 +217,25 @@ beam successfully ran 15 tests
 base successfully ran 112 tests
 bar successfully ran 9 tests
 braille_examples successfully ran 5 tests
-audioSearch_transcriber successfully ran 4 tests
 audioSearch_recording successfully ran 4 tests
-audioSearch_scoreFollower successfully ran 7 tests
+audioSearch_transcriber successfully ran 4 tests
 articulations successfully ran 29 tests
-braille_test successfully ran 151 tests
 audioSearch___init__ successfully ran 19 tests
 analysis_search successfully ran 4 tests
+braille_test successfully ran 151 tests
 analysis_reduceChords successfully ran 7 tests
-analysis_patel successfully ran 6 tests
-analysis_neoRiemannian successfully ran 10 tests
-analysis_metrical successfully ran 6 tests
-analysis_discrete successfully ran 31 tests
 analysis_windowed successfully ran 9 tests
+analysis_phrasing successfully ran 3 tests
+analysis_patel successfully ran 6 tests
+analysis_metrical successfully ran 6 tests
+analysis_neoRiemannian successfully ran 10 tests
+analysis_discrete successfully ran 31 tests
 analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
+analysis_reduction successfully ran 15 tests
 abcFormat___init__ successfully ran 53 tests
 _version successfully ran 3 tests
-analysis_reduction successfully ran 15 tests
+abcFormat_testFiles successfully ran 5 tests
 abcFormat_translate successfully ran 18 tests
 Not in Tree Error: vexflow.testShow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: vexflow.exporter is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -266,6 +261,7 @@ Not in Tree Error: musedata.testPrimitive.test03 is in the music21 directory but
 Not in Tree Error: musedata.testPrimitive.test02 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test01 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musedata.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: metadata.testMetadata is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: ipython21.objects is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: ipython21.ipExtension is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -274,24 +270,16 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: abcFormat.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
-
------------
-musicxml_m21ToString had 0 ERRORS and 1 FAILURES in 45 tests:
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/m21ToString.py", line 871, in testHarmonyC
-    self.assertEqual(raw.find('<degree-type>alter</degree-type>') > 0, True)
-AssertionError: False != True
-
 -------------------------------------------------------------------------
-Ran 3905 tests in 510.6021 seconds
-Run at 2013-12-10 15:47:10
+Ran 3898 tests in 421.6779 seconds
+Run at 2013-12-23 17:46:41

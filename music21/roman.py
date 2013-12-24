@@ -1324,6 +1324,10 @@ class RomanNumeral(harmony.Harmony):
             raise RomanException('No roman numeral found in {!r}'.format(
                 workingFigure))
         elif self._augmentedSixthRegex.match(workingFigure):
+            if useScale.mode == 'major':
+                useScale = key.Key(useScale.tonic, 'minor')
+                self.impliedScale = useScale
+                self.useImpliedScale = True
             rm = self._augmentedSixthRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)
             if (romanNumeralAlone in ('It', 'Ger')):
@@ -2192,6 +2196,20 @@ class Test(unittest.TestCase):
         rn = roman.RomanNumeral("Fr4/3", k)
         self.assertEqual(p(rn), 'F5 A5 B5 D#6')
         rn = roman.RomanNumeral("Sw43", k)
+        self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
+
+        kMaj = key.Key('A')
+        rn = roman.RomanNumeral("It6", kMaj)
+        self.assertEqual(p(rn), 'F5 A5 D#6')
+        rn = roman.RomanNumeral("Ger65", kMaj)
+        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
+        rn = roman.RomanNumeral("Ger6/5", kMaj)
+        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
+        rn = roman.RomanNumeral("Fr43", kMaj)
+        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
+        rn = roman.RomanNumeral("Fr4/3", kMaj)
+        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
+        rn = roman.RomanNumeral("Sw43", kMaj)
         self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
 
 
