@@ -35,13 +35,6 @@ from music21 import environment
 _MOD = "instrument.py"
 environLocal = environment.Environment(_MOD)
 
-#def fromName(name):
-#    '''
-#    returns a new Instrument object of the proper class given
-#    a name as a string.  Currently must be uppercase first letter,
-#    lower for rest.
-#    '''
-#    eval(name + "()")
 
 class InstrumentException(exceptions21.Music21Exception):
     pass
@@ -1664,11 +1657,17 @@ def fromString(instrumentString):
         try:
             englishName = instrumentLookup.allToBestName[unicode(substring.lower())]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
-            thisInstClass = eval("{0}".format(className))
+            thisInstClass = globals()[className]        
+            thisInstClassParentClasses = [parentcls.__name__ for parentcls in thisInstClass.mro()]
+            if 'Instrument' not in thisInstClassParentClasses or \
+                'Music21Object' not in thisInstClassParentClasses:
+                # little bit of security against calling another global...
+                raise KeyError
+
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
             if bestInstClass is None or len(thisBestName.split())\
-             >= len(bestName.split()) and not issubclass(bestInstClass, thisInstClass):
+                    >= len(bestName.split()) and not issubclass(bestInstClass, thisInstClass):
                 # priority is also given to same length instruments which fall later
                 # on in the string (i.e. Bb Piccolo Trumpet)
                 bestInstClass = thisInstClass

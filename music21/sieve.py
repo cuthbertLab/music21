@@ -1569,7 +1569,6 @@ class Sieve(object):
 
         resObj = Residual(1, 0, 0, z) # create a temporary residual 1@!
         setStr = self._setInstantiateStr(resObj()) # get segment
-
         evalStr = evalStr.replace('-', ('%s-' % setStr))
         # replace residuals (this will add - as -numbers)
         for key in keys:

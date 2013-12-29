@@ -812,7 +812,7 @@ class CommandProcessor(object):
         
         # Call the function
         try:
-            result = eval(functionName)(*argList)
+            result = eval(functionName)(*argList)  # safe because of check for functionName in availableFunctions
         except Exception as e:
             self.recordError("Error: "+str(e)+" executing function "+str(functionName)+" :"+str(commandElement))
             return
@@ -1129,6 +1129,7 @@ class CommandProcessor(object):
             for (i,arg) in enumerate(argList):
                 parsedArg = self.parseInputToPrimitive(arg)
                 argList[i] = parsedArg  
+            # safe because check for self.outputTemplate in availableOutputTemplates
             (output, outputType) = eval(self.outputTemplate)(*argList)
         return (output, outputType)
     
