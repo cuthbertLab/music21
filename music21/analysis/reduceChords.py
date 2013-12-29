@@ -65,7 +65,8 @@ class Verticality(object):
         startElements={},
         overlapElements=None,
         ):
-        assert isinstance(startElements, dict) and startElements
+        assert isinstance(startElements, dict)
+        assert len(startElements)
         assert isinstance(overlapElements, (dict, type(None)))
         self._startElements = startElements
         self._overlapElements = overlapElements or {}
@@ -116,6 +117,8 @@ class Verticality(object):
                     New: {0: <music21.note.Note C>}
 
         '''
+        # TODO: This doesn't handle cases where elements share offsets
+        #       Should be rewritten to iterate over a map of offset:elements.
         leafLists = []
         for part in expr:
             if not part.isStream:
@@ -214,10 +217,9 @@ class Verticality(object):
             >>> result = Verticality.unwrapHorizontalities(triples[0])
             >>> for index, elements in result.iteritems():
             ...     print index, elements
-            ... 
+            ...
             0 [<music21.note.Note D>, <music21.note.Note D>, <music21.note.Note C>]
             1 [<music21.note.Note G>, <music21.note.Note G>]
-
 
         '''
         result = {}
@@ -243,6 +245,12 @@ class Verticality(object):
     @property
     def elements(self):
         return self.startElements.values() + self.overlapElements.values()
+
+    @property
+    def isConsonant(self):
+        if chord.Chord(self.pitchClassSet).isConsonant():
+            return True
+        return False
 
     @property
     def latestStopOffset(self):
@@ -371,9 +379,9 @@ class ChordReducer(object):
             lastTimeSignature = sourceMeasureTs
         return lastPitchedObject, lastTimeSignature, outputMeasure
 
-    def _collapseArpeggios(self, inputMeasure):
+    def _collapseTies(self, inputMeasure):
         if not len(inputMeasure):
-            return inputStream
+            return inputMeasure
         newStream = stream.Stream()
         currentChords = []
         currentPitches = set()
@@ -455,6 +463,35 @@ class ChordReducer(object):
                 result.add(note.tie.type)
         return result
 
+    def _prunePassingTones(self, inputMeasure):
+        pendingExtensions = []
+        pendingRemovals = []
+        for verticalities in Verticality.iterateVerticalitiesNwise(
+            inputMeasure, n=3):
+            if len(verticalities) != 3:
+                continue
+            if verticalities[0].isConsonant and \
+                not verticalities[1].isConsonant and \
+                verticalities[0].isConsonant:
+                horizontalities = Verticality.unwrapHorizontalities(
+                    verticalities)
+                for horizontality in horizontalities.values():
+                    if len(horizontality) != 3:
+                        continue
+                    toExtend = horizontality[0]
+                    toRemove = horizontality[1]
+                    pendingRemovals.append(toRemove)
+                    pendingExtension = (toExtend, toRemove.quarterLength)
+                    pendingExtensions.append(pendingExtension)
+        print 'TO REMOVE:', pendingRemovals
+        for pendingRemoval in pendingRemovals:
+            for site in pendingRemoval.sites.getSites():
+                if not isinstance(site, stream.Stream):
+                    continue
+                site.remove(pendingRemoval)
+        for pendingExtension, quarterLength in pendingExtensions:
+            pendingExtension.quarterLength += quarterLength
+
     ### PUBLIC METHODS ###
 
     def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
@@ -523,12 +560,13 @@ class ChordReducer(object):
     def multiPartReduction(
         self,
         inputStream,
-        maxChords=2,
         alignLyrics=False,
         closedPosition=False,
-        collapseArpeggios=False,
         collapseIdenticalChords=False,
+        collapseTies=False,
         forceOctave=False,
+        maxChords=2,
+        prunePassingTones=True,
         ):
         '''
         Return a multipart reduction of a stream.
@@ -547,27 +585,24 @@ class ChordReducer(object):
                 else:
                     break
             else:
-                environLocal.printDebug(str(i))
                 inputMeasure = copy.deepcopy(inputMeasure)
+
                 if alignLyrics:
                     self._alignByLyrics(inputMeasure)
 
+                if prunePassingTones:
+                    self._prunePassingTones(inputMeasure)
+
                 inputMeasureReduction = \
                     inputMeasure.chordify().flat.notesAndRests
-                if collapseArpeggios:
-                    #print 'Chordify:'
-                    #inputMeasureReduction.show('text')
 
-                    #print 'Collapse Arpeggios:'
-                    inputMeasureReduction = self._collapseArpeggios(
+                if collapseTies:
+                    inputMeasureReduction = self._collapseTies(
                         inputMeasureReduction)
-                    #inputMeasureReduction.show('text')
 
                 if collapseIdenticalChords:
-                    #print 'Collapse Identical Chords:'
                     inputMeasureReduction = self._collapseIdenticalChords(
                         inputMeasureReduction)
-                    #inputMeasureReduction.show('text')
 
 #                print 'Reduce to N Chords:'
 #                inputMeasureReduction = self.reduceMeasureToNChords(
@@ -590,10 +625,6 @@ class ChordReducer(object):
                         lastTimeSignature,
                         )
                 outputStream._appendCore(outputMeasure)
-            if self.printDebug:
-                print i, " ",
-                if i % 20 == 0 and i != 0:
-                    print ""
             i += 1
         outputStream._elementsChanged()
         outputStream.getElementsByClass('Measure')[0].insert(
@@ -680,7 +711,6 @@ class ChordReducer(object):
         for pcTuples in maxNChords:
             if chordWeights[pcTuples] >= maxChordWeight * trimBelow:
                 trimmedMaxChords.append(pcTuples)
-                #print chordWeights[pcTuples], maxChordWeight
             else:
                 break
 
@@ -775,14 +805,14 @@ class TestExternal(unittest.TestCase):
             firstMeasure.insert(0, clef.Treble8vbClef())
 
         chordReducer = ChordReducer()
-        #chordReducer.printDebug = True
         reduction = chordReducer.multiPartReduction(
             score,
-            alignLyrics=True,
+            alignLyrics=False,
             closedPosition=True,
-            collapseArpeggios=True,
             collapseIdenticalChords=True,
+            collapseTies=True,
             maxChords=3,
+            prunePassingTones=True,
             )
         #reduction = chordReducer.multiPartReduction(
         #    score,
