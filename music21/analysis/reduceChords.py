@@ -49,6 +49,32 @@ def testMeasureStream1():
     return measure
 
 
+def _buildOffsetMap(currentStream):
+    offsetMap = {}
+    def recurse(currentStream, offsetMap):
+        for x in currentStream:
+            if isinstance(x, stream.Measure):
+                for element in x:
+                    if not isinstance(element, (
+                        note.Note,
+                        chord.Chord,
+                        )):
+                        continue
+                    measureOffset = x.offset
+                    elementOffset = element.offset
+                    aggregateOffset = measureOffset + elementOffset
+                    if aggregateOffset not in offsetMap:
+                        offsetMap[aggregateOffset] = []
+                    offsetMap[aggregateOffset].append(element)
+            elif isinstance(x, stream.Stream):
+                recurse(x, offsetMap)
+    recurse(currentStream, offsetMap)
+    for offset, elementList in offsetMap.iteritems():
+        offsetMap[offset] = \
+            tuple(sorted(elementList, key=lambda x: x.quarterLength))
+    return offsetMap
+
+
 class Verticality(object):
 
     ### CLASS VARIABLES ###
