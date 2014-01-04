@@ -13,6 +13,7 @@
 
 import collections
 import itertools
+import unittest
 from music21 import chord
 from music21 import note
 from music21 import stream
@@ -124,7 +125,7 @@ class OffsetTree(object):
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = analysis.offsetTree.OffsetTree(score)
-        >>> for x in tree.findByOffset(34.5):
+        >>> for x in tree.findElementsIntersectingOffset(34.5):
         ...     x
         ...
         <music21.note.Note F#>
@@ -222,7 +223,120 @@ class OffsetTree(object):
 
     ### PUBLIC METHODS ###
 
-    def findByOffset(self, offset):
+    def findElementsStartingAtOffset(self, offset):
+        r'''
+        Find elements starting at `offset`:
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree(score)
+            >>> for element in tree.findElementsStartingAtOffset(0.5):
+            ...     element
+            ...
+            <music21.note.Note B>
+            <music21.note.Note B>
+            <music21.note.Note G#>
+
+        '''
+        def recurse(node, offset):
+            result = []
+            for offsetPair in node.offsetPairs:
+                if offsetPair.startOffset == offset:
+                    result.append(offsetPair)
+            if offset < node.centerOffset and node.leftNode:
+                result.extend(recurse(node.leftNode, offset))
+            if node.centerOffset < offset and node.rightNode:
+                result.extend(recurse(node.rightNode, offset))
+            return result
+        offsetPairs = recurse(self._root, offset)
+        result = []
+        for offsetPair in offsetPairs:
+            result.extend(offsetPair.elements)
+        return result
+
+    def findElementsStoppingAtOffset(self, offset):
+        r'''
+        Find elements stopping at `offset`:
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree(score)
+            >>> for element in tree.findElementsStoppingAtOffset(0.5):
+            ...     element
+            ...
+            <music21.note.Note C#>
+            <music21.note.Note A>
+            <music21.note.Note A>
+            
+        '''
+        def recurse(node, offset):
+            result = []
+            for offsetPair in node.offsetPairs:
+                if offsetPair.stopOffset == offset:
+                    result.append(offsetPair)
+            if offset < node.centerOffset and node.leftNode:
+                result.extend(recurse(node.leftNode, offset))
+            if node.centerOffset < offset and node.rightNode:
+                result.extend(recurse(node.rightNode, offset))
+            return result
+        offsetPairs = recurse(self._root, offset)
+        result = []
+        for offsetPair in offsetPairs:
+            result.extend(offsetPair.elements)
+        return result
+
+    def findElementsOverlappingOffset(self, offset):
+        r'''
+        Find elements overlapping `offset`:
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree(score)
+            >>> for element in tree.findElementsOverlappingOffset(0.5):
+            ...     element
+            ...
+            <music21.note.Note E>
+
+        '''
+        def recurse(node, offset):
+            result = []
+            for offsetPair in node.offsetPairs:
+                if offsetPair.startOffset < offset < offsetPair.stopOffset: 
+                    result.append(offsetPair)
+            if offset < node.centerOffset and node.leftNode:
+                result.extend(recurse(node.leftNode, offset))
+            if node.centerOffset < offset and node.rightNode:
+                result.extend(recurse(node.rightNode, offset))
+            return result
+        offsetPairs = recurse(self._root, offset)
+        result = []
+        for offsetPair in offsetPairs:
+            result.extend(offsetPair.elements)
+        return result
+
+    def findElementsIntersectingOffset(self, offset):
+        r'''
+        Find elements intersecting `offset`:
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree(score)
+            >>> for elements in tree.findElementsIntersectingOffset(0.5):
+            ...     elements
+            ...
+            <music21.note.Note E>
+            <music21.note.Note B>
+            <music21.note.Note B>
+            <music21.note.Note G#>
+            <music21.note.Note C#>
+            <music21.note.Note A>
+            <music21.note.Note A>
+
+        '''
         def recurse(node, offset):
             result = []
             for offsetPair in node.offsetPairs:
@@ -239,5 +353,46 @@ class OffsetTree(object):
             result.extend(offsetPair.elements)
         return result
 
-    def findByOffsetRange(self, start, stop):
+    def iterateVerticalities(self):
+        r'''
+        Iterate all vertical moments in the analyzed score:
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree(score)
+            >>> result = [x for x in tree.iterateVerticalities()]
+
+        '''
+        overlapElements = set()
+        startElements = set()
+        previousStartOffset = None
+        for offsetPair in self:
+            if offsetPair.startOffset != previousStartOffset:
+                if previousStartOffset is not None:
+                    yield previousStartOffset, startElements, overlapElements
+                previousStartOffset = offsetPair.startOffset
+                overlapElements = set()
+                startElements = set()
+            startElements.update(offsetPair.elements)
+            overlapElements.update(
+                self.findElementsOverlappingOffset(previousStartOffset))
+        yield (
+            previousStartOffset,
+            tuple(startElements),
+            tuple(overlapElements),
+            )
+
+
+#------------------------------------------------------------------------------
+
+
+class Test(unittest.TestCase):
+
+    def runTest(self):
         pass
+
+
+if __name__ == "__main__":
+    import music21
+    music21.mainTest()
