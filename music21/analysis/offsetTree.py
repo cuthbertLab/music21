@@ -19,44 +19,74 @@ from music21 import note
 from music21 import stream
 
 
+class Parentage(object):
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '_element',
+        '_parentage',
+        )
+
+    ### INITIALIZER ###
+
+    def __init__(self, element, parentage):
+        self._element = element
+        assert len(parentage)
+        parentage = tuple(reversed(parentage))
+        assert isinstance(parentage[0], stream.Measure)
+        assert isinstance(parentage[-1], stream.Score)
+        self._parentage = parentage
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def element(self):
+        return self._element
+
+    @property
+    def parentage(self):
+        return self._parentage
+
+
 class OffsetPair(collections.Sequence):
 
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '_elements',
+        '_parentages',
         '_startOffset',
         '_stopOffset',
         )
 
     ### INITIALIZER ###
 
-    def __init__(self, startOffset, stopOffset, elements):
+    def __init__(self, startOffset, stopOffset, parentages):
         self._startOffset = startOffset
         self._stopOffset = stopOffset
-        self._elements = tuple(elements)
+        self._parentages = tuple(parentages)
 
     ### SPECIAL METHODS ###
 
     def __getitem__(self, i):
-        return self._elements[i]
+        return self._parentages[i]
 
     def __len__(self):
-        return len(self._elements)
+        return len(self._parentages)
 
     def __repr__(self):
         return '<{} {}:{} [{}]>'.format(
             type(self).__name__,
             self.startOffset,
             self.stopOffset,
-            len(self.elements),
+            len(self.parentages),
             )
 
     ### PUBLIC PROPERTIES ###
 
     @property
-    def elements(self):
-        return self._elements
+    def parentages(self):
+        return self._parentages
 
     @property
     def startOffset(self):
@@ -125,8 +155,8 @@ class OffsetTree(object):
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = analysis.offsetTree.OffsetTree(score)
-        >>> for x in tree.findElementsIntersectingOffset(34.5):
-        ...     x
+        >>> for x in tree.findParentagesIntersectingOffset(34.5):
+        ...     x.element
         ...
         <music21.note.Note F#>
         <music21.note.Note D>
@@ -153,11 +183,10 @@ class OffsetTree(object):
     ### PRIVATE METHODS ###
 
     def _buildOffsetMap(self, inputStream):
-        offsetMap = {}
-
-        def recurse(inputStream, offsetMap):
+        def recurse(inputStream, offsetMap, currentParentage):
             for x in inputStream:
                 if isinstance(x, stream.Measure):
+                    currentParentage = currentParentage + (x,)
                     for element in x:
                         if not isinstance(element, (
                             note.Note,
@@ -169,26 +198,33 @@ class OffsetTree(object):
                         aggregateOffset = measureOffset + elementOffset
                         if aggregateOffset not in offsetMap:
                             offsetMap[aggregateOffset] = []
-                        offsetMap[aggregateOffset].append(element)
+                        parentage = Parentage(element, currentParentage)
+                        offsetMap[aggregateOffset].append(parentage)
                 elif isinstance(x, stream.Stream):
-                    recurse(x, offsetMap)
-
-        recurse(inputStream, offsetMap)
-        for offset, elementList in offsetMap.iteritems():
-            offsetMap[offset] = \
-                tuple(sorted(elementList, key=lambda x: x.quarterLength))
+                    currentParentage = currentParentage + (x,)
+                    recurse(x, offsetMap, currentParentage)
+        offsetMap = {}
+        initialParentage = (inputStream,)
+        recurse(inputStream, offsetMap, currentParentage=initialParentage)
+        for offset, parentageList in offsetMap.iteritems():
+            offsetMap[offset] = tuple(sorted(
+                parentageList,
+                key=lambda parentage: parentage.element.quarterLength,
+                ))
         return offsetMap
 
     def _buildOffsetPairs(self, offsetMap):
         offsetPairs = []
-        for startOffset, elements in sorted(offsetMap.iteritems()):
-            for quarterLength, elements in itertools.groupby(
-                elements, lambda x: x.quarterLength):
+        for startOffset, parentageList in sorted(offsetMap.iteritems()):
+            for quarterLength, parentageList in itertools.groupby(
+                parentageList,
+                lambda parentage: parentage.element.quarterLength,
+                ):
                 stopOffset = startOffset + quarterLength
                 offsetPair = OffsetPair(
                     startOffset,
                     stopOffset,
-                    tuple(elements),
+                    tuple(parentageList),
                     )
                 offsetPairs.append(offsetPair)
         return offsetPairs
@@ -223,16 +259,16 @@ class OffsetTree(object):
 
     ### PUBLIC METHODS ###
 
-    def findElementsStartingAtOffset(self, offset):
+    def findParentagesStartingAtOffset(self, offset):
         r'''
-        Find elements starting at `offset`:
+        Find parentages starting at `offset`:
 
         ::
 
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree(score)
-            >>> for element in tree.findElementsStartingAtOffset(0.5):
-            ...     element
+            >>> for parentage in tree.findParentagesStartingAtOffset(0.5):
+            ...     parentage.element
             ...
             <music21.note.Note B>
             <music21.note.Note B>
@@ -252,24 +288,24 @@ class OffsetTree(object):
         offsetPairs = recurse(self._root, offset)
         result = []
         for offsetPair in offsetPairs:
-            result.extend(offsetPair.elements)
+            result.extend(offsetPair.parentages)
         return result
 
-    def findElementsStoppingAtOffset(self, offset):
+    def findParentagesStoppingAtOffset(self, offset):
         r'''
-        Find elements stopping at `offset`:
+        Find parentages stopping at `offset`:
 
         ::
 
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree(score)
-            >>> for element in tree.findElementsStoppingAtOffset(0.5):
-            ...     element
+            >>> for parentage in tree.findParentagesStoppingAtOffset(0.5):
+            ...     parentage.element
             ...
             <music21.note.Note C#>
             <music21.note.Note A>
             <music21.note.Note A>
-            
+
         '''
         def recurse(node, offset):
             result = []
@@ -284,19 +320,19 @@ class OffsetTree(object):
         offsetPairs = recurse(self._root, offset)
         result = []
         for offsetPair in offsetPairs:
-            result.extend(offsetPair.elements)
+            result.extend(offsetPair.parentages)
         return result
 
-    def findElementsOverlappingOffset(self, offset):
+    def findParentagesOverlappingOffset(self, offset):
         r'''
-        Find elements overlapping `offset`:
+        Find parentages overlapping `offset`:
 
         ::
 
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree(score)
-            >>> for element in tree.findElementsOverlappingOffset(0.5):
-            ...     element
+            >>> for parentage in tree.findParentagesOverlappingOffset(0.5):
+            ...     parentage.element
             ...
             <music21.note.Note E>
 
@@ -304,7 +340,7 @@ class OffsetTree(object):
         def recurse(node, offset):
             result = []
             for offsetPair in node.offsetPairs:
-                if offsetPair.startOffset < offset < offsetPair.stopOffset: 
+                if offsetPair.startOffset < offset < offsetPair.stopOffset:
                     result.append(offsetPair)
             if offset < node.centerOffset and node.leftNode:
                 result.extend(recurse(node.leftNode, offset))
@@ -314,19 +350,19 @@ class OffsetTree(object):
         offsetPairs = recurse(self._root, offset)
         result = []
         for offsetPair in offsetPairs:
-            result.extend(offsetPair.elements)
+            result.extend(offsetPair.parentages)
         return result
 
-    def findElementsIntersectingOffset(self, offset):
+    def findParentagesIntersectingOffset(self, offset):
         r'''
-        Find elements intersecting `offset`:
+        Find parentages intersecting `offset`:
 
         ::
 
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree(score)
-            >>> for elements in tree.findElementsIntersectingOffset(0.5):
-            ...     elements
+            >>> for parentage in tree.findParentagesIntersectingOffset(0.5):
+            ...     parentage.element
             ...
             <music21.note.Note E>
             <music21.note.Note B>
@@ -350,7 +386,7 @@ class OffsetTree(object):
         offsetPairs = recurse(self._root, offset)
         result = []
         for offsetPair in offsetPairs:
-            result.extend(offsetPair.elements)
+            result.extend(offsetPair.parentages)
         return result
 
     def iterateVerticalities(self):
@@ -364,23 +400,23 @@ class OffsetTree(object):
             >>> result = [x for x in tree.iterateVerticalities()]
 
         '''
-        overlapElements = set()
-        startElements = set()
+        overlapParentages = set()
+        startParentages = set()
         previousStartOffset = None
         for offsetPair in self:
             if offsetPair.startOffset != previousStartOffset:
                 if previousStartOffset is not None:
-                    yield previousStartOffset, startElements, overlapElements
+                    yield previousStartOffset, startParentages, overlapParentages
                 previousStartOffset = offsetPair.startOffset
-                overlapElements = set()
-                startElements = set()
-            startElements.update(offsetPair.elements)
-            overlapElements.update(
-                self.findElementsOverlappingOffset(previousStartOffset))
+                overlapParentages = set()
+                startParentages = set()
+            startParentages.update(offsetPair.parentages)
+            overlapParentages.update(
+                self.findParentagesOverlappingOffset(previousStartOffset))
         yield (
             previousStartOffset,
-            tuple(startElements),
-            tuple(overlapElements),
+            tuple(startParentages),
+            tuple(overlapParentages),
             )
 
 
