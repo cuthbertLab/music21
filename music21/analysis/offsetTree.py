@@ -176,6 +176,14 @@ class OffsetTree(object):
 
     ### SPECIAL METHODS ###
 
+    def __getitem__(self, i):
+        if isinstance(i, (int, float)):
+            result = self.findParentagesStartingAtOffset(i)
+            if result is not None:
+                return result
+            raise IndexError
+        raise TypeError
+
     def __iter__(self):
         for x in self._root:
             yield x
@@ -186,7 +194,7 @@ class OffsetTree(object):
         def recurse(inputStream, offsetMap, currentParentage):
             for x in inputStream:
                 if isinstance(x, stream.Measure):
-                    currentParentage = currentParentage + (x,)
+                    localParentage = currentParentage + (x,)
                     for element in x:
                         if not isinstance(element, (
                             note.Note,
@@ -198,11 +206,11 @@ class OffsetTree(object):
                         aggregateOffset = measureOffset + elementOffset
                         if aggregateOffset not in offsetMap:
                             offsetMap[aggregateOffset] = []
-                        parentage = Parentage(element, currentParentage)
+                        parentage = Parentage(element, localParentage)
                         offsetMap[aggregateOffset].append(parentage)
                 elif isinstance(x, stream.Stream):
-                    currentParentage = currentParentage + (x,)
-                    recurse(x, offsetMap, currentParentage)
+                    localParentage = currentParentage + (x,)
+                    recurse(x, offsetMap, localParentage)
         offsetMap = {}
         initialParentage = (inputStream,)
         recurse(inputStream, offsetMap, currentParentage=initialParentage)
