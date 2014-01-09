@@ -15,6 +15,7 @@ import collections
 import itertools
 import unittest
 from music21 import chord
+from music21 import instrument
 from music21 import note
 from music21 import stream
 
@@ -26,17 +27,43 @@ class Parentage(object):
     __slots__ = (
         '_element',
         '_parentage',
+        '_startOffset',
+        '_stopOffset',
         )
 
     ### INITIALIZER ###
 
-    def __init__(self, element, parentage):
+    def __init__(
+        self,
+        element,
+        parentage,
+        startOffset=None,
+        stopOffset=None,
+        ):
         self._element = element
         assert len(parentage)
-        parentage = tuple(reversed(parentage))
-        assert isinstance(parentage[0], stream.Measure)
-        assert isinstance(parentage[-1], stream.Score)
+        parentage = tuple(parentage)
+        assert isinstance(parentage[0], stream.Measure), parentage[0]
+        assert isinstance(parentage[-1], stream.Score), parentage[-1]
         self._parentage = parentage
+        self._startOffset = startOffset
+        self._stopOffset = stopOffset
+
+    ### PUBLIC METHODS ###
+
+    def new(
+        self,
+        startOffset=None,
+        stopOffset=None,
+        ):
+        startOffset = startOffset or self.startOffset
+        stopOffset = stopOffset or self.stopOffset
+        return type(self)(
+            self.element,
+            self.parentage,
+            startOffset=startOffset,
+            stopOffset=stopOffset,
+            )
 
     ### PUBLIC PROPERTIES ###
 
@@ -45,8 +72,30 @@ class Parentage(object):
         return self._element
 
     @property
+    def measureNumber(self):
+        return self.parentage[0].measureNumber
+
+    @property
     def parentage(self):
         return self._parentage
+
+    @property
+    def partName(self):
+        for x in self.parentage:
+            if not isinstance(x, stream.Part):
+                continue
+            for y in x:
+                if isinstance(y, instrument.Instrument):
+                    return y.partName
+        return None
+
+    @property
+    def startOffset(self):
+        return self._startOffset
+
+    @property
+    def stopOffset(self):
+        return self._stopOffset
 
 
 class OffsetPair(collections.Sequence):
@@ -156,13 +205,13 @@ class OffsetTree(object):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = analysis.offsetTree.OffsetTree(score)
         >>> for x in tree.findParentagesIntersectingOffset(34.5):
-        ...     x.element
+        ...     x.element, x.startOffset, x.stopOffset, x.partName
         ...
-        <music21.note.Note F#>
-        <music21.note.Note D>
-        <music21.note.Note B>
-        <music21.note.Note B>
-        <music21.note.Note E#>
+        (<music21.note.Note F#>, 34.0, 34.5, u'Soprano')
+        (<music21.note.Note D>, 34.0, 35.0, u'Alto')
+        (<music21.note.Note B>, 34.0, 35.0, u'Tenor')
+        (<music21.note.Note B>, 34.0, 35.0, u'Bass')
+        (<music21.note.Note E#>, 34.5, 35.0, u'Soprano')
 
     '''
 
@@ -195,19 +244,25 @@ class OffsetTree(object):
             for x in inputStream:
                 if isinstance(x, stream.Measure):
                     localParentage = currentParentage + (x,)
+                    measureOffset = x.offset
                     for element in x:
                         if not isinstance(element, (
                             note.Note,
                             chord.Chord,
                             )):
                             continue
-                        measureOffset = x.offset
                         elementOffset = element.offset
-                        aggregateOffset = measureOffset + elementOffset
-                        if aggregateOffset not in offsetMap:
-                            offsetMap[aggregateOffset] = []
-                        parentage = Parentage(element, localParentage)
-                        offsetMap[aggregateOffset].append(parentage)
+                        startOffset = measureOffset + elementOffset
+                        stopOffset = startOffset + element.quarterLength
+                        if startOffset not in offsetMap:
+                            offsetMap[startOffset] = []
+                        parentage = Parentage(
+                            element,
+                            tuple(reversed(localParentage)),
+                            startOffset=startOffset,
+                            stopOffset=stopOffset,
+                            )
+                        offsetMap[startOffset].append(parentage)
                 elif isinstance(x, stream.Stream):
                     localParentage = currentParentage + (x,)
                     recurse(x, offsetMap, localParentage)
