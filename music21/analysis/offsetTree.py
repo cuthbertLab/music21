@@ -110,10 +110,10 @@ class OffsetPair(collections.Sequence):
 
     ### INITIALIZER ###
 
-    def __init__(self, startOffset, stopOffset, parentages):
+    def __init__(self, startOffset, stopOffset, parentages=None):
         self._startOffset = startOffset
         self._stopOffset = stopOffset
-        self._parentages = tuple(parentages)
+        self._parentage = parentages or []
 
     ### SPECIAL METHODS ###
 
@@ -152,29 +152,29 @@ class OffsetNode(object):
 
     __slots__ = (
         '_centerOffset',
-        '_leftNode',
+        '_leftChild',
         '_offsetPairs',
-        '_rightNode',
+        '_rightChild',
         )
 
     ### INITIALIZER ###
 
-    def __init__(self, centerOffset, offsetPairs, leftNode, rightNode):
+    def __init__(self, centerOffset, offsetPairs, leftChild, rightChild):
         self._centerOffset = centerOffset
         self._offsetPairs = tuple(offsetPairs)
-        self._leftNode = leftNode
-        self._rightNode = rightNode
+        self._leftChild = leftChild
+        self._rightChild = rightChild
 
     ### SPECIAL METHODS ###
 
     def __iter__(self):
-        if self.leftNode:
-            for x in self.leftNode:
+        if self.leftChild:
+            for x in self.leftChild:
                 yield x
         for x in self.offsetPairs:
             yield x
-        if self.rightNode:
-            for x in self.rightNode:
+        if self.rightChild:
+            for x in self.rightChild:
                 yield x
 
     ### PUBLIC PROPERTIES ###
@@ -184,16 +184,16 @@ class OffsetNode(object):
         return self._centerOffset
 
     @property
-    def leftNode(self):
-        return self._leftNode
+    def leftChild(self):
+        return self._leftChild
 
     @property
     def offsetPairs(self):
         return self._offsetPairs
 
     @property
-    def rightNode(self):
-        return self._rightNode
+    def rightChild(self):
+        return self._rightChild
 
 
 class OffsetTree(object):
@@ -343,10 +343,10 @@ class OffsetTree(object):
             for offsetPair in node.offsetPairs:
                 if offsetPair.startOffset == offset:
                     result.append(offsetPair)
-            if offset < node.centerOffset and node.leftNode:
-                result.extend(recurse(node.leftNode, offset))
-            if node.centerOffset < offset and node.rightNode:
-                result.extend(recurse(node.rightNode, offset))
+            if offset < node.centerOffset and node.leftChild:
+                result.extend(recurse(node.leftChild, offset))
+            if node.centerOffset < offset and node.rightChild:
+                result.extend(recurse(node.rightChild, offset))
             return result
         offsetPairs = recurse(self._root, offset)
         result = []
@@ -375,10 +375,10 @@ class OffsetTree(object):
             for offsetPair in node.offsetPairs:
                 if offsetPair.stopOffset == offset:
                     result.append(offsetPair)
-            if offset < node.centerOffset and node.leftNode:
-                result.extend(recurse(node.leftNode, offset))
-            if node.centerOffset < offset and node.rightNode:
-                result.extend(recurse(node.rightNode, offset))
+            if offset < node.centerOffset and node.leftChild:
+                result.extend(recurse(node.leftChild, offset))
+            if node.centerOffset < offset and node.rightChild:
+                result.extend(recurse(node.rightChild, offset))
             return result
         offsetPairs = recurse(self._root, offset)
         result = []
@@ -405,10 +405,10 @@ class OffsetTree(object):
             for offsetPair in node.offsetPairs:
                 if offsetPair.startOffset < offset < offsetPair.stopOffset:
                     result.append(offsetPair)
-            if offset < node.centerOffset and node.leftNode:
-                result.extend(recurse(node.leftNode, offset))
-            if node.centerOffset < offset and node.rightNode:
-                result.extend(recurse(node.rightNode, offset))
+            if offset < node.centerOffset and node.leftChild:
+                result.extend(recurse(node.leftChild, offset))
+            if node.centerOffset < offset and node.rightChild:
+                result.extend(recurse(node.rightChild, offset))
             return result
         offsetPairs = recurse(self._root, offset)
         result = []
@@ -441,10 +441,10 @@ class OffsetTree(object):
             for offsetPair in node.offsetPairs:
                 if offsetPair.startOffset <= offset <= offsetPair.stopOffset:
                     result.append(offsetPair)
-            if offset < node.centerOffset and node.leftNode:
-                result.extend(recurse(node.leftNode, offset))
-            if node.centerOffset < offset and node.rightNode:
-                result.extend(recurse(node.rightNode, offset))
+            if offset < node.centerOffset and node.leftChild:
+                result.extend(recurse(node.leftChild, offset))
+            if node.centerOffset < offset and node.rightChild:
+                result.extend(recurse(node.rightChild, offset))
             return result
         offsetPairs = recurse(self._root, offset)
         result = []
