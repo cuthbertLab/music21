@@ -23,26 +23,33 @@ class AVLNode(object):
     __slots__ = (
         '_balance',
         '_height',
-        '_key',
         '_leftChild',
         '_rightChild',
+        '_startOffset',
+        '_earliestStopOffset',
+        '_latestStopOffset',
+        '_payload',
         )
 
     ### INITIALIZER ###
 
-    def __init__(self, key):
+    def __init__(self, startOffset):
         self._balance = 0
+        self._earliestStopOffset = None
         self._height = 0
-        self._key = key
+        self._latestStopOffset = None
         self._leftChild = None
+        self._payload = set()
         self._rightChild = None
+        self._startOffset = startOffset
 
     ### SPECIAL METHODS ###
 
     def __repr__(self):
-        return '<{}: {}>'.format(
+        return '<{}: {} {}>'.format(
             type(self).__name__,
-            self.key,
+            self.startOffset,
+            self.payload,
             )
 
     ### PRIVATE METHODS ###
@@ -65,12 +72,16 @@ class AVLNode(object):
         return self._balance
 
     @property
+    def earliestStopOffset(self):
+        return self._earliestStopOffset
+
+    @property
     def height(self):
         return self._height
 
     @property
-    def key(self):
-        return self._key
+    def latestStopOffset(self):
+        return self._latestStopOffset
 
     @property
     def leftChild(self):
@@ -82,6 +93,10 @@ class AVLNode(object):
         self._update()
 
     @property
+    def payload(self):
+        return self._payload
+
+    @property
     def rightChild(self):
         return self._rightChild
 
@@ -89,6 +104,10 @@ class AVLNode(object):
     def rightChild(self, node):
         self._rightChild = node
         self._update()
+
+    @property
+    def startOffset(self):
+        return self._startOffset
 
 
 class AVLTree(object):
@@ -117,17 +136,17 @@ class AVLTree(object):
                 yield node
                 for child in recurse(node.rightChild):
                     yield child
-        return recurse(self.root)
+        return recurse(self._root)
 
     ### PRIVATE METHODS ###
 
-    def _insert(self, node, key):
+    def _insert(self, node, startOffset):
         if node is None:
-            return AVLNode(key)
-        if key < node.key:
-            node.leftChild = self._insert(node.leftChild, key)
-        elif node.key < key:
-            node.rightChild = self._insert(node.rightChild, key)
+            return AVLNode(startOffset)
+        if startOffset < node.startOffset:
+            node.leftChild = self._insert(node.leftChild, startOffset)
+        elif node.startOffset < startOffset:
+            node.rightChild = self._insert(node.rightChild, startOffset)
         return self._rebalance(node)
 
     def _rebalance(self, node):
@@ -145,22 +164,23 @@ class AVLTree(object):
             assert -1 <= node.balance <= 1
         return node
 
-    def _remove(self, node, key):
+    def _remove(self, node, startOffset):
         if node is not None:
-            if node.key == key:
+            if node.startOffset == startOffset:
                 if node.leftChild and node.rightChild:
                     nextNode = node.rightChild
                     while nextNode.leftChild:
                         nextNode = nextNode.leftChild
-                    node._key = nextNode._key
+                    node._startOffset = nextNode._startOffset
+                    node._payload = nextNode._payload
                     node.rightChild = self._remove(
-                        node.rightChild, nextNode.key)
+                        node.rightChild, nextNode.startOffset)
                 else:
                     node = node.leftChild or node.rightChild
-            elif key < node.key:
-                node.leftChild = self._remove(node.leftChild, key)
-            elif node.key < key:
-                node.rightChild = self._remove(node.rightChild, key)
+            elif startOffset < node.startOffset:
+                node.leftChild = self._remove(node.leftChild, startOffset)
+            elif node.startOffset < startOffset:
+                node.rightChild = self._remove(node.rightChild, startOffset)
         return self._rebalance(node)
 
     def _rotateLeftLeft(self, node):
@@ -185,19 +205,57 @@ class AVLTree(object):
         nextNode.leftChild = node
         return nextNode
 
+    def _search(self, node, startOffset):
+        if node is not None:
+            if node.startOffset == startOffset:
+                return node
+            elif node.leftChild and startOffset < node.startOffset:
+                return self._search(node.leftChild, startOffset)
+            elif node.rightChild and node.startOffset < startOffset:
+                return self._search(node.rightChild, startOffset)
+        return None
+
+    def _updateOffsets(self, node):
+        if node is None:
+            return
+        minimum = min(x.stopOffset for x in node.payload)
+        maximum = max(x.stopOffset for x in node.payload)
+        if node.leftChild:
+            leftMinimum, leftMaximum = self._updateOffsets(node.leftChild)
+            if leftMinimum < minimum:
+                minimum = leftMinimum
+            if maximum < leftMaximum:
+                maximum = leftMaximum
+        if node.rightChild:
+            rightMinimum, rightMaximum = self._updateOffsets(node.rightChild)
+            if rightMinimum < minimum:
+                minimum = rightMinimum
+            if maximum < rightMaximum:
+                maximum = rightMaximum
+        node._earliestStopOffset = minimum
+        node._latestStopOffset = maximum
+        return minimum, maximum
+
     ### PUBLIC METHODS ###
 
-    def insert(self, key):
-        self._root = self._insert(self._root, key)
+    def insert(self, timespan):
+        assert hasattr(timespan, 'startOffset')
+        assert hasattr(timespan, 'stopOffset')
+        self._root = self._insert(self._root, timespan.startOffset)
+        node = self._search(self._root, timespan.startOffset)
+        node.payload.add(timespan)
+        self._updateOffsets(self._root)
 
-    def remove(self, key):
-        self._root = self._remove(self._root, key)
-
-    ### PUBLIC PROPERTIES ###
-
-    @property
-    def root(self):
-        return self._root
+    def remove(self, timespan):
+        assert hasattr(timespan, 'startOffset')
+        assert hasattr(timespan, 'stopOffset')
+        node = self._search(self._root, timespan.startOffset)
+        if node is None:
+            return
+        node.payload.remove(timespan)
+        if not node.payload:
+            self._root = self._remove(self._root, timespan.startOffset)
+        self._updateOffsets(self._root)
 
 
 #------------------------------------------------------------------------------
@@ -209,22 +267,70 @@ class Test(unittest.TestCase):
         pass
 
     def testAVLTree(self):
+
+        class Timespan(object):
+            def __init__(self, startOffset, stopOffset):
+                if startOffset < stopOffset:
+                    self.startOffset = startOffset
+                    self.stopOffset = stopOffset
+                else:
+                    self.startOffset = stopOffset
+                    self.stopOffset = startOffset
+
+            def __eq__(self, expr):
+                if isinstance(expr, type(self)):
+                    if expr.startOffset == self.startOffset:
+                        if expr.stopOffset == self.stopOffset:
+                            return True
+                return False
+
+            def __repr__(self):
+                return '<{} {} {}>'.format(
+                    type(self).__name__,
+                    self.startOffset,
+                    self.stopOffset,
+                    )
+
         for attempt in range(100):
-            items = range(100)
-            random.shuffle(items)
+            starts = range(100)
+            stops = range(100)
+            random.shuffle(starts)
+            random.shuffle(stops)
+            timespans = [Timespan(start, stop)
+                for start, stop in zip(starts, stops)
+                ]
             tree = AVLTree()
-            for i, item in enumerate(items):
-                tree.insert(item)
-                inorder = [node.key for node in tree]
-                compare = list(sorted(items[:i + 1]))
-                assert inorder == compare
-            random.shuffle(items)
-            while items:
-                item = items.pop()
-                tree.remove(item)
-                inorder = [node.key for node in tree]
-                compare = list(sorted(items[:i + 1]))
-                assert inorder == compare
+            current_timespans_in_list = []
+            for timespan in timespans:
+                tree.insert(timespan)
+                current_timespans_in_list.append(timespan)
+                current_timespans_in_list.sort(
+                    key=lambda x: (x.startOffset, x.stopOffset))
+                current_timespans_in_tree = []
+                for node in tree:
+                    current_timespans_in_tree.extend(sorted(node.payload,
+                        key=lambda x: x.stopOffset))
+                assert current_timespans_in_tree == current_timespans_in_list
+                assert tree._root.earliestStopOffset == \
+                    min(x.stopOffset for x in current_timespans_in_list)
+                assert tree._root.latestStopOffset == \
+                    max(x.stopOffset for x in current_timespans_in_list)
+            random.shuffle(timespans)
+            while timespans:
+                timespan = timespans.pop()
+                current_timespans_in_list = sorted(timespans,
+                    key=lambda x: (x.startOffset, x.stopOffset))
+                tree.remove(timespan)
+                current_timespans_in_tree = []
+                for node in tree:
+                    current_timespans_in_tree.extend(sorted(node.payload,
+                        key=lambda x: x.stopOffset))
+                assert current_timespans_in_tree == current_timespans_in_list
+                if tree._root is not None:
+                    assert tree._root.earliestStopOffset == \
+                        min(x.stopOffset for x in current_timespans_in_list)
+                    assert tree._root.latestStopOffset == \
+                        max(x.stopOffset for x in current_timespans_in_list)
 
 
 if __name__ == "__main__":
