@@ -39,7 +39,7 @@ class AVLNode(object):
         self._height = 0
         self._latestStopOffset = None
         self._leftChild = None
-        self._payload = set()
+        self._payload = []
         self._rightChild = None
         self._startOffset = startOffset
 
@@ -131,11 +131,14 @@ class AVLTree(object):
     def __iter__(self):
         def recurse(node):
             if node is not None:
-                for child in recurse(node.leftChild):
-                    yield child
-                yield node
-                for child in recurse(node.rightChild):
-                    yield child
+                if node.leftChild is not None:
+                    for timespan in recurse(node.leftChild):
+                        yield timespan
+                for timespan in node.payload:
+                    yield timespan
+                if node.rightChild is not None:
+                    for timespan in recurse(node.rightChild):
+                        yield timespan
         return recurse(self._root)
 
     ### PRIVATE METHODS ###
@@ -243,7 +246,8 @@ class AVLTree(object):
         assert hasattr(timespan, 'stopOffset')
         self._root = self._insert(self._root, timespan.startOffset)
         node = self._search(self._root, timespan.startOffset)
-        node.payload.add(timespan)
+        node.payload.append(timespan)
+        node.payload.sort(key=lambda x: x.stopOffset)
         self._updateOffsets(self._root)
 
     def remove(self, timespan):
@@ -252,7 +256,8 @@ class AVLTree(object):
         node = self._search(self._root, timespan.startOffset)
         if node is None:
             return
-        node.payload.remove(timespan)
+        if timespan in node.payload:
+            node.payload.remove(timespan)
         if not node.payload:
             self._root = self._remove(self._root, timespan.startOffset)
         self._updateOffsets(self._root)
@@ -278,9 +283,9 @@ class Test(unittest.TestCase):
                     self.stopOffset = startOffset
 
             def __eq__(self, expr):
-                if isinstance(expr, type(self)):
-                    if expr.startOffset == self.startOffset:
-                        if expr.stopOffset == self.stopOffset:
+                if type(self) is type(expr):
+                    if self.startOffset == expr.startOffset:
+                        if self.stopOffset == expr.stopOffset:
                             return True
                 return False
 
@@ -300,32 +305,28 @@ class Test(unittest.TestCase):
                 for start, stop in zip(starts, stops)
                 ]
             tree = AVLTree()
-            current_timespans_in_list = []
-            for timespan in timespans:
+
+            for i, timespan in enumerate(timespans):
                 tree.insert(timespan)
-                current_timespans_in_list.append(timespan)
-                current_timespans_in_list.sort(
-                    key=lambda x: (x.startOffset, x.stopOffset))
-                current_timespans_in_tree = []
-                for node in tree:
-                    current_timespans_in_tree.extend(sorted(node.payload,
-                        key=lambda x: x.stopOffset))
-                assert current_timespans_in_tree == current_timespans_in_list
+                current_timespans_in_list = list(sorted(timespans[:i + 1],
+                    key=lambda x: (x.startOffset, x.stopOffset)))
+                current_timespans_in_tree = [x for x in tree]
+                assert current_timespans_in_tree == current_timespans_in_list, \
+                    (attempt, current_timespans_in_tree, current_timespans_in_list)
                 assert tree._root.earliestStopOffset == \
                     min(x.stopOffset for x in current_timespans_in_list)
                 assert tree._root.latestStopOffset == \
                     max(x.stopOffset for x in current_timespans_in_list)
+
             random.shuffle(timespans)
             while timespans:
                 timespan = timespans.pop()
                 current_timespans_in_list = sorted(timespans,
                     key=lambda x: (x.startOffset, x.stopOffset))
                 tree.remove(timespan)
-                current_timespans_in_tree = []
-                for node in tree:
-                    current_timespans_in_tree.extend(sorted(node.payload,
-                        key=lambda x: x.stopOffset))
-                assert current_timespans_in_tree == current_timespans_in_list
+                current_timespans_in_tree = [x for x in tree]
+                assert current_timespans_in_tree == current_timespans_in_list, \
+                    (attempt, current_timespans_in_tree, current_timespans_in_list)
                 if tree._root is not None:
                     assert tree._root.earliestStopOffset == \
                         min(x.stopOffset for x in current_timespans_in_list)
