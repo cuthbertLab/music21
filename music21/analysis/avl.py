@@ -262,6 +262,58 @@ class AVLTree(object):
             self._root = self._remove(self._root, timespan.startOffset)
         self._updateOffsets(self._root)
 
+    def findTimespansStartingAt(self, offset):
+        results = []
+        node = self._search(self._root, offset)
+        if node is not None:
+            results.extend(node.payload)
+        return results
+
+    def findTimespansStoppingAt(self, offset):
+        def recurse(node, offset):
+            result = []
+            if node.earliestStopOffset <= offset <= node.latestStopOffset:
+                for timespan in node.payload:
+                    if timespan.stopOffset == offset:
+                        result.append(timespan)
+                if node.leftChild is not None:
+                    result.extend(recurse(node.leftChild, offset))
+                if node.rightChild is not None:
+                    result.extend(recurse(node.rightChild, offset))
+            return result
+        results = recurse(self._root, offset)
+        results.sort(key=lambda x: (x.startOffset, x.stopOffset))
+        return results
+
+    def findTimespansOverlapping(self, offset):
+        def recurse(node, offset, indent=0):
+            result = []
+            #indent_string = '\t' * indent
+            #print '{}SEARCHING: {}'.format(indent_string, node)
+            if node is not None:
+                if node.startOffset < offset < node.latestStopOffset:
+                    #print '{}\tSTART < OFFSET < LATEST STOP'.format(
+                    #    indent_string)
+                    result.extend(recurse(node.leftChild, offset, indent + 1))
+                    for timespan in node.payload:
+                        if offset < timespan.stopOffset:
+                            result.append(timespan)
+                            #print '{}\t\tADDING: {}'.format(
+                            #    indent_string, timespan)
+                        #else:
+                            #print '{}\t\tSKIPPING: {}'.format(
+                            #    indent_string, timespan)
+                    result.extend(recurse(node.rightChild, offset, indent + 1))
+                elif offset <= node.startOffset:
+                    #print '{}\tOFFSET < START'.format(indent_string)
+                    result.extend(recurse(node.leftChild, offset, indent + 1))
+                #else:
+                    #print '{}\tNOPE'.format(indent_string)
+            return result
+        results = recurse(self._root, offset)
+        results.sort(key=lambda x: (x.startOffset, x.stopOffset))
+        return results
+
 
 #------------------------------------------------------------------------------
 
