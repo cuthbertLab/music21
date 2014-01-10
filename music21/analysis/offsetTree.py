@@ -113,7 +113,7 @@ class OffsetPair(collections.Sequence):
     def __init__(self, startOffset, stopOffset, parentages=None):
         self._startOffset = startOffset
         self._stopOffset = stopOffset
-        self._parentage = parentages or []
+        self._parentages = parentages or []
 
     ### SPECIAL METHODS ###
 
