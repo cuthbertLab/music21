@@ -13,6 +13,7 @@
 import random
 import unittest
 from music21 import chord
+from music21 import instrument
 from music21 import note
 from music21 import stream
 
@@ -45,6 +46,16 @@ class Parentage(object):
         self._parentage = parentage
         self._startOffset = startOffset
         self._stopOffset = stopOffset
+
+    ### SPECIAL METHODS ###
+
+    def __repr__(self):
+        return '<{} {}:{} {!r}>'.format(
+            type(self).__name__,
+            self.startOffset,
+            self.stopOffset,
+            self.element,
+            )
 
     ### PUBLIC METHODS ###
 
@@ -123,6 +134,13 @@ class Verticality(object):
         self._stopTimespans = stopTimespans
         self._overlapTimespans = overlapTimespans
 
+    def __repr__(self):
+        return '<{} {} {{{}}}>'.format(
+            type(self).__name__,
+            self.startOffset,
+            ' '.join(sorted(self.pitchClassSet)),
+            )
+
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -139,7 +157,7 @@ class Verticality(object):
 
     @property
     def overlapTimespans(self):
-        return self._overlapParentage
+        return self._overlapTimespans
 
     @property
     def beatStrength(self):
@@ -148,7 +166,7 @@ class Verticality(object):
     @property
     def pitchClassSet(self):
         pitchClassSet = set()
-        for parentage in self.startParentage:
+        for parentage in self.startTimespans:
             element = parentage.element
             pitchClassSet.update([x.name for x in element.pitches])
         return pitchClassSet
@@ -499,7 +517,60 @@ class OffsetTree(object):
 
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
-            >>> result = [x for x in tree.iterateVerticalities()]
+            >>> for x in tree.iterateVerticalities():
+            ...     x
+            ...
+            <Verticality 0.0 {A C# E}>
+            <Verticality 0.5 {B G#}>
+            <Verticality 1.0 {A C# F#}>
+            <Verticality 2.0 {B E G#}>
+            <Verticality 3.0 {A C# E}>
+            <Verticality 4.0 {B E G#}>
+            <Verticality 5.0 {A C# E}>
+            <Verticality 5.5 {A C# E}>
+            <Verticality 6.0 {B E G#}>
+            <Verticality 6.5 {D}>
+            <Verticality 7.0 {A C# E}>
+            <Verticality 8.0 {C# E# G#}>
+            <Verticality 9.0 {A C# F#}>
+            <Verticality 9.5 {B D G#}>
+            <Verticality 10.0 {C# E# G#}>
+            <Verticality 10.5 {B}>
+            <Verticality 11.0 {A C# F#}>
+            <Verticality 12.0 {A C# F#}>
+            <Verticality 13.0 {B F# G#}>
+            <Verticality 13.5 {F#}>
+            <Verticality 14.0 {B E G#}>
+            <Verticality 14.5 {A}>
+            <Verticality 15.0 {B D# F#}>
+            <Verticality 15.5 {A B}>
+            <Verticality 16.0 {C# E G#}>
+            <Verticality 17.0 {A C# F#}>
+            <Verticality 17.5 {D F#}>
+            <Verticality 18.0 {B C# E G#}>
+            <Verticality 18.5 {B}>
+            <Verticality 19.0 {A C# E}>
+            <Verticality 20.0 {A C# E}>
+            <Verticality 21.0 {A D F#}>
+            <Verticality 22.0 {B D F#}>
+            <Verticality 23.0 {C# E# G#}>
+            <Verticality 24.0 {A C# F#}>
+            <Verticality 25.0 {B D F# G#}>
+            <Verticality 25.5 {C# E#}>
+            <Verticality 26.0 {C# D F#}>
+            <Verticality 26.5 {B F#}>
+            <Verticality 27.0 {C# E# G#}>
+            <Verticality 29.0 {A# C# F#}>
+            <Verticality 29.5 {D}>
+            <Verticality 30.0 {C# E}>
+            <Verticality 31.0 {B F#}>
+            <Verticality 32.0 {B C# D F#}>
+            <Verticality 32.5 {A# C#}>
+            <Verticality 33.0 {B D F#}>
+            <Verticality 33.5 {C#}>
+            <Verticality 34.0 {B D F#}>
+            <Verticality 34.5 {E#}>
+            <Verticality 35.0 {A# C# F#}>
 
         '''
         for startOffset in self.allStartOffsets:
@@ -513,6 +584,14 @@ class OffsetTree(object):
                 stopTimespans=stopTimespans,
                 )
             yield verticality
+
+    def iterateVerticalitiesNwise(self, n=2):
+        verticalityBuffer = []
+        for verticality in self.iterateVerticalities():
+            verticalityBuffer.append(verticality)
+            if len(verticalityBuffer) == n:
+                yield tuple(verticalityBuffer)
+                verticalityBuffer.pop(0)
 
     ### PUBLIC PROPERTIES ###
 
