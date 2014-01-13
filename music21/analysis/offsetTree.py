@@ -382,25 +382,27 @@ class OffsetTree(object):
 
     ### PUBLIC METHODS ###
 
-    def insert(self, timespan):
-        assert hasattr(timespan, 'startOffset')
-        assert hasattr(timespan, 'stopOffset')
-        self._root = self._insert(self._root, timespan.startOffset)
-        node = self._search(self._root, timespan.startOffset)
-        node.payload.append(timespan)
-        node.payload.sort(key=lambda x: x.stopOffset)
+    def insert(self, *timespans):
+        for timespan in timespans:
+            assert hasattr(timespan, 'startOffset')
+            assert hasattr(timespan, 'stopOffset')
+            self._root = self._insert(self._root, timespan.startOffset)
+            node = self._search(self._root, timespan.startOffset)
+            node.payload.append(timespan)
+            node.payload.sort(key=lambda x: x.stopOffset)
         self._updateOffsets(self._root)
 
-    def remove(self, timespan):
-        assert hasattr(timespan, 'startOffset')
-        assert hasattr(timespan, 'stopOffset')
-        node = self._search(self._root, timespan.startOffset)
-        if node is None:
-            return
-        if timespan in node.payload:
-            node.payload.remove(timespan)
-        if not node.payload:
-            self._root = self._remove(self._root, timespan.startOffset)
+    def remove(self, *timespans):
+        for timespan in timespans:
+            assert hasattr(timespan, 'startOffset')
+            assert hasattr(timespan, 'stopOffset')
+            node = self._search(self._root, timespan.startOffset)
+            if node is None:
+                return
+            if timespan in node.payload:
+                node.payload.remove(timespan)
+            if not node.payload:
+                self._root = self._remove(self._root, timespan.startOffset)
         self._updateOffsets(self._root)
 
     def findTimespansStartingAt(self, offset):
@@ -486,8 +488,7 @@ class OffsetTree(object):
         initialParentage = (inputScore,)
         recurse(inputScore, parentages, currentParentage=initialParentage)
         tree = OffsetTree()
-        for parentage in parentages:
-            tree.insert(parentage)
+        tree.insert(*parentages)
         return tree
 
     def iterateVerticalities(self):
