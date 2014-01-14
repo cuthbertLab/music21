@@ -19,6 +19,9 @@ from music21 import stream
 
 
 class Parentage(object):
+    r'''
+    The parentage hierarchy of an element in a score.
+    '''
 
     ### CLASS VARIABLES ###
 
@@ -107,6 +110,9 @@ class Parentage(object):
 
 
 class Verticality(object):
+    r'''
+    A verticality of objects at a given start offset.
+    '''
 
     ### CLASS VARIABLES ###
 
@@ -199,103 +205,6 @@ class Verticality(object):
         return pitchClassSet
 
 
-class OffsetTreeNode(object):
-    r'''
-    A node in an offset tree.
-    '''
-
-    ### CLASS VARIABLES ###
-
-    __slots__ = (
-        '_balance',
-        '_height',
-        '_leftChild',
-        '_rightChild',
-        '_startOffset',
-        '_earliestStopOffset',
-        '_latestStopOffset',
-        '_payload',
-        )
-
-    ### INITIALIZER ###
-
-    def __init__(self, startOffset):
-        self._balance = 0
-        self._earliestStopOffset = None
-        self._height = 0
-        self._latestStopOffset = None
-        self._leftChild = None
-        self._payload = []
-        self._rightChild = None
-        self._startOffset = startOffset
-
-    ### SPECIAL METHODS ###
-
-    def __repr__(self):
-        return '<{}: {} {}>'.format(
-            type(self).__name__,
-            self.startOffset,
-            self.payload,
-            )
-
-    ### PRIVATE METHODS ###
-
-    def _update(self):
-        leftHeight = -1
-        rightHeight = -1
-        if self.leftChild is not None:
-            leftHeight = self.leftChild.height
-        if self.rightChild is not None:
-            rightHeight = self.rightChild.height
-        self._height = max(leftHeight, rightHeight) + 1
-        self._balance = rightHeight - leftHeight
-        return self.height
-
-    ### PUBLIC PROPERTIES ###
-
-    @property
-    def balance(self):
-        return self._balance
-
-    @property
-    def earliestStopOffset(self):
-        return self._earliestStopOffset
-
-    @property
-    def height(self):
-        return self._height
-
-    @property
-    def latestStopOffset(self):
-        return self._latestStopOffset
-
-    @property
-    def leftChild(self):
-        return self._leftChild
-
-    @leftChild.setter
-    def leftChild(self, node):
-        self._leftChild = node
-        self._update()
-
-    @property
-    def payload(self):
-        return self._payload
-
-    @property
-    def rightChild(self):
-        return self._rightChild
-
-    @rightChild.setter
-    def rightChild(self, node):
-        self._rightChild = node
-        self._update()
-
-    @property
-    def startOffset(self):
-        return self._startOffset
-
-
 class OffsetTree(object):
     r'''
     An offset tree.
@@ -306,6 +215,104 @@ class OffsetTree(object):
     __slots__ = (
         '_root'
         )
+
+    class OffsetTreeNode(object):
+        r'''
+        A node in an offset tree.
+
+        Not for public use.
+        '''
+
+        ### CLASS VARIABLES ###
+
+        __slots__ = (
+            '_balance',
+            '_height',
+            '_leftChild',
+            '_rightChild',
+            '_startOffset',
+            '_earliestStopOffset',
+            '_latestStopOffset',
+            '_payload',
+            )
+
+        ### INITIALIZER ###
+
+        def __init__(self, startOffset):
+            self._balance = 0
+            self._earliestStopOffset = None
+            self._height = 0
+            self._latestStopOffset = None
+            self._leftChild = None
+            self._payload = []
+            self._rightChild = None
+            self._startOffset = startOffset
+
+        ### SPECIAL METHODS ###
+
+        def __repr__(self):
+            return '<{}: {} {}>'.format(
+                type(self).__name__,
+                self.startOffset,
+                self.payload,
+                )
+
+        ### PRIVATE METHODS ###
+
+        def _update(self):
+            leftHeight = -1
+            rightHeight = -1
+            if self.leftChild is not None:
+                leftHeight = self.leftChild.height
+            if self.rightChild is not None:
+                rightHeight = self.rightChild.height
+            self._height = max(leftHeight, rightHeight) + 1
+            self._balance = rightHeight - leftHeight
+            return self.height
+
+        ### PUBLIC PROPERTIES ###
+
+        @property
+        def balance(self):
+            return self._balance
+
+        @property
+        def earliestStopOffset(self):
+            return self._earliestStopOffset
+
+        @property
+        def height(self):
+            return self._height
+
+        @property
+        def latestStopOffset(self):
+            return self._latestStopOffset
+
+        @property
+        def leftChild(self):
+            return self._leftChild
+
+        @leftChild.setter
+        def leftChild(self, node):
+            self._leftChild = node
+            self._update()
+
+        @property
+        def payload(self):
+            return self._payload
+
+        @property
+        def rightChild(self):
+            return self._rightChild
+
+        @rightChild.setter
+        def rightChild(self, node):
+            self._rightChild = node
+            self._update()
+
+        @property
+        def startOffset(self):
+            return self._startOffset
 
     ### INITIALIZER ###
 
@@ -331,7 +338,7 @@ class OffsetTree(object):
 
     def _insert(self, node, startOffset):
         if node is None:
-            return OffsetTreeNode(startOffset)
+            return OffsetTree.OffsetTreeNode(startOffset)
         if startOffset < node.startOffset:
             node.leftChild = self._insert(node.leftChild, startOffset)
         elif node.startOffset < startOffset:
