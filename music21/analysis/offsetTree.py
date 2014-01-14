@@ -111,6 +111,7 @@ class Verticality(object):
     ### CLASS VARIABLES ###
 
     __slots__ = (
+        '_offsetTree',
         '_overlapTimespans',
         '_startTimespans',
         '_startOffset',
@@ -121,11 +122,14 @@ class Verticality(object):
 
     def __init__(
         self,
+        offsetTree=None,
         overlapTimespans=None,
         startTimespans=None,
         startOffset=None,
         stopTimespans=None,
         ):
+        assert isinstance(offsetTree, (OffsetTree, type(None)))
+        self._offsetTree = offsetTree
         self._startOffset = startOffset
         assert isinstance(startTimespans, tuple)
         assert isinstance(stopTimespans, (tuple, type(None)))
@@ -142,6 +146,26 @@ class Verticality(object):
             )
 
     ### PUBLIC PROPERTIES ###
+
+    @property
+    def nextVerticality(self):
+        tree = self._offsetTree
+        if tree is None:
+            return None
+        startOffset = tree.getStartOffsetAfter(self.startOffset)
+        if startOffset is None:
+            return None
+        return tree.getVerticalityAt(startOffset)
+
+    @property
+    def previousVerticality(self):
+        tree = self._offsetTree
+        if tree is None:
+            return None
+        startOffset = tree.getStartOffsetBefore(self.startOffset)
+        if startOffset is None:
+            return None
+        return tree.getVerticalityAt(startOffset)
 
     @property
     def startOffset(self):
@@ -167,6 +191,9 @@ class Verticality(object):
     def pitchClassSet(self):
         pitchClassSet = set()
         for parentage in self.startTimespans:
+            element = parentage.element
+            pitchClassSet.update([x.name for x in element.pitches])
+        for parentage in self.overlapTimespans:
             element = parentage.element
             pitchClassSet.update([x.name for x in element.pitches])
         return pitchClassSet
@@ -509,6 +536,95 @@ class OffsetTree(object):
         tree.insert(*parentages)
         return tree
 
+    def getStartOffsetAfter(self, offset):
+        r'''
+        Get start offset after `offset`.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> tree.getStartOffsetAfter(0.5)
+            1.0
+
+        ::
+
+            >>> tree.getStartOffsetAfter(35) is None
+            True
+
+        Return none if no succeeding offset exists.
+        '''
+        def recurse(node, offset):
+            if node is None:
+                return None
+            result = None
+            if node.startOffset <= offset and node.rightChild:
+                result = recurse(node.rightChild, offset)
+            elif offset < node.startOffset:
+                result = recurse(node.leftChild, offset) or node
+            return result
+        result = recurse(self._root, offset)
+        if result is None:
+            return None
+        return result.startOffset
+
+    def getStartOffsetBefore(self, offset):
+        r'''
+        Get start offset before `offset`.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> tree.getStartOffsetBefore(100)
+            35.0
+
+        ::
+
+            >>> tree.getStartOffsetBefore(0) is None
+            True
+
+        Return none if no preceding offset exists.
+        '''
+        def recurse(node, offset):
+            if node is None:
+                return None
+            result = None
+            if node.startOffset < offset:
+                result = recurse(node.rightChild, offset) or node
+            elif offset <= node.startOffset and node.leftChild:
+                result = recurse(node.leftChild, offset)
+            return result
+        result = recurse(self._root, offset)
+        if result is None:
+            return None
+        return result.startOffset
+
+    def getVerticalityAt(self, offset):
+        r'''
+        Get verticality in offset tree at `offset`.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> tree.getVerticalityAt(2.5)
+            <Verticality 2.5 {B E G#}>
+
+        Return verticality.
+        '''
+        startTimespans = self.findTimespansStartingAt(offset)
+        stopTimespans = self.findTimespansStoppingAt(offset)
+        overlapTimespans = self.findTimespansOverlapping(offset)
+        verticality = Verticality(
+            offsetTree=self,
+            overlapTimespans=overlapTimespans,
+            startTimespans=startTimespans,
+            startOffset=offset,
+            stopTimespans=stopTimespans,
+            )
+        return verticality
+
     def iterateVerticalities(self):
         r'''
         Iterate all vertical moments in the analyzed score:
@@ -521,7 +637,7 @@ class OffsetTree(object):
             ...     x
             ...
             <Verticality 0.0 {A C# E}>
-            <Verticality 0.5 {B G#}>
+            <Verticality 0.5 {B E G#}>
             <Verticality 1.0 {A C# F#}>
             <Verticality 2.0 {B E G#}>
             <Verticality 3.0 {A C# E}>
@@ -529,26 +645,26 @@ class OffsetTree(object):
             <Verticality 5.0 {A C# E}>
             <Verticality 5.5 {A C# E}>
             <Verticality 6.0 {B E G#}>
-            <Verticality 6.5 {D}>
+            <Verticality 6.5 {B D E G#}>
             <Verticality 7.0 {A C# E}>
             <Verticality 8.0 {C# E# G#}>
             <Verticality 9.0 {A C# F#}>
             <Verticality 9.5 {B D G#}>
             <Verticality 10.0 {C# E# G#}>
-            <Verticality 10.5 {B}>
+            <Verticality 10.5 {B C# E# G#}>
             <Verticality 11.0 {A C# F#}>
             <Verticality 12.0 {A C# F#}>
             <Verticality 13.0 {B F# G#}>
-            <Verticality 13.5 {F#}>
+            <Verticality 13.5 {B F#}>
             <Verticality 14.0 {B E G#}>
-            <Verticality 14.5 {A}>
+            <Verticality 14.5 {A B E}>
             <Verticality 15.0 {B D# F#}>
-            <Verticality 15.5 {A B}>
+            <Verticality 15.5 {A B D# F#}>
             <Verticality 16.0 {C# E G#}>
             <Verticality 17.0 {A C# F#}>
-            <Verticality 17.5 {D F#}>
+            <Verticality 17.5 {A D F#}>
             <Verticality 18.0 {B C# E G#}>
-            <Verticality 18.5 {B}>
+            <Verticality 18.5 {B E G#}>
             <Verticality 19.0 {A C# E}>
             <Verticality 20.0 {A C# E}>
             <Verticality 21.0 {A D F#}>
@@ -556,42 +672,51 @@ class OffsetTree(object):
             <Verticality 23.0 {C# E# G#}>
             <Verticality 24.0 {A C# F#}>
             <Verticality 25.0 {B D F# G#}>
-            <Verticality 25.5 {C# E#}>
+            <Verticality 25.5 {C# E# G#}>
             <Verticality 26.0 {C# D F#}>
-            <Verticality 26.5 {B F#}>
+            <Verticality 26.5 {B D F#}>
             <Verticality 27.0 {C# E# G#}>
             <Verticality 29.0 {A# C# F#}>
-            <Verticality 29.5 {D}>
-            <Verticality 30.0 {C# E}>
-            <Verticality 31.0 {B F#}>
+            <Verticality 29.5 {A# D F#}>
+            <Verticality 30.0 {A# C# E F#}>
+            <Verticality 31.0 {B C# E F#}>
             <Verticality 32.0 {B C# D F#}>
-            <Verticality 32.5 {A# C#}>
+            <Verticality 32.5 {A# C# F#}>
             <Verticality 33.0 {B D F#}>
-            <Verticality 33.5 {C#}>
+            <Verticality 33.5 {B C# D F#}>
             <Verticality 34.0 {B D F#}>
-            <Verticality 34.5 {E#}>
+            <Verticality 34.5 {B D E#}>
             <Verticality 35.0 {A# C# F#}>
 
         '''
         for startOffset in self.allStartOffsets:
-            startTimespans = self.findTimespansStartingAt(startOffset)
-            stopTimespans = self.findTimespansStoppingAt(startOffset)
-            overlapTimespans = self.findTimespansOverlapping(startOffset)
-            verticality = Verticality(
-                overlapTimespans=overlapTimespans,
-                startTimespans=startTimespans,
-                startOffset=startOffset,
-                stopTimespans=stopTimespans,
-                )
-            yield verticality
+            yield self.getVerticalityAt(startOffset)
 
-    def iterateVerticalitiesNwise(self, n=2):
+    def iterateVerticalitiesNwise(self, n=3, unwrapParts=False):
         verticalityBuffer = []
         for verticality in self.iterateVerticalities():
             verticalityBuffer.append(verticality)
-            if len(verticalityBuffer) == n:
-                yield tuple(verticalityBuffer)
-                verticalityBuffer.pop(0)
+            if len(verticalityBuffer) < n:
+                continue
+            result = tuple(verticalityBuffer)
+            if unwrapParts:
+                unwrapped = {}
+                for timespan in result[0].overlapTimespans:
+                    if timespan.partName not in unwrapped:
+                        unwrapped[timespan.partName] = []
+                    unwrapped[timespan.partName].append(timespan)
+                for timespan in result[0].startTimespans:
+                    if timespan.partName not in unwrapped:
+                        unwrapped[timespan.partName] = []
+                    unwrapped[timespan.partName].append(timespan)
+                for verticality in result[1:]:
+                    for timespan in verticality.startTimespans:
+                        if timespan.partName not in unwrapped:
+                            unwrapped[timespan.partName] = []
+                        unwrapped[timespan.partName].append(timespan)
+                result = unwrapped
+            yield result
+            verticalityBuffer.pop(0)
 
     ### PUBLIC PROPERTIES ###
 
