@@ -181,6 +181,75 @@ class Verticality(object):
         return self.startTimespans[0].element.beatStrength
 
     @property
+    def isConsonant(self):
+        r'''
+        Is true when the pitch set of a verticality is consonant.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> for verticality in tree.iterateVerticalities():
+            ...     print verticality, verticality.isConsonant
+            ...
+            <Verticality 0.0 {A3 C#5 E4}> True
+            <Verticality 0.5 {B3 B4 E4 G#3}> True
+            <Verticality 1.0 {A4 C#4 F#3 F#4}> True
+            <Verticality 2.0 {B3 B4 E4 G#3}> True
+            <Verticality 3.0 {A3 C#5 E4}> True
+            <Verticality 4.0 {B3 E4 E5 G#3}> True
+            <Verticality 5.0 {A3 C#5 E4}> True
+            <Verticality 5.5 {A4 C#3 C#5 E4}> True
+            <Verticality 6.0 {B4 E3 E4 G#4}> True
+            <Verticality 6.5 {B4 D4 E3 G#4}> False
+            <Verticality 7.0 {A2 A4 C#4 E4}> True
+            <Verticality 8.0 {C#4 C#5 E#3 G#4}> True
+            <Verticality 9.0 {A4 C#4 F#3 F#4}> True
+            <Verticality 9.5 {B2 B4 D4 G#4}> False
+            <Verticality 10.0 {C#3 C#4 E#4 G#4}> True
+            <Verticality 10.5 {B3 C#3 E#4 G#4}> False
+            <Verticality 11.0 {A3 C#4 F#2 F#4}> True
+            <Verticality 12.0 {A4 C#4 F#3 F#4}> True
+            <Verticality 13.0 {B3 B4 F#4 G#3}> False
+            <Verticality 13.5 {B3 B4 F#3 F#4}> False
+            <Verticality 14.0 {B3 B4 E4 G#3}> True
+            <Verticality 14.5 {A3 B3 B4 E4}> False
+            <Verticality 15.0 {B3 D#4 F#4}> True
+            <Verticality 15.5 {A3 B2 D#4 F#4}> False
+            <Verticality 16.0 {C#3 C#4 E4 G#3}> True
+            <Verticality 17.0 {A4 C#4 F#3}> True
+            <Verticality 17.5 {A4 D4 F#3 F#4}> True
+            <Verticality 18.0 {B4 C#4 E4 G#3}> False
+            <Verticality 18.5 {B3 B4 E4 G#3}> True
+            <Verticality 19.0 {A3 C#5 E4}> True
+            <Verticality 20.0 {A3 A4 C#5 E4}> True
+            <Verticality 21.0 {A4 D4 F#4}> True
+            <Verticality 22.0 {B3 B4 D4 F#4}> True
+            <Verticality 23.0 {C#4 C#5 E#3 G#4}> True
+            <Verticality 24.0 {A4 C#4 F#3 F#4}> True
+            <Verticality 25.0 {B2 D4 F#4 G#4}> False
+            <Verticality 25.5 {C#3 C#4 E#4 G#4}> True
+            <Verticality 26.0 {C#4 D3 F#4}> False
+            <Verticality 26.5 {B3 D3 F#3 F#4}> True
+            <Verticality 27.0 {C#3 C#4 E#3 G#4}> True
+            <Verticality 29.0 {A#2 C#4 F#3 F#4}> True
+            <Verticality 29.5 {A#2 D4 F#3 F#4}> False
+            <Verticality 30.0 {A#2 C#4 E4 F#4}> False
+            <Verticality 31.0 {B2 C#4 E4 F#4}> False
+            <Verticality 32.0 {B3 C#3 D4 F#4}> False
+            <Verticality 32.5 {A#3 C#3 C#4 F#4}> False
+            <Verticality 33.0 {B3 D3 F#4}> True
+            <Verticality 33.5 {B3 C#4 D3 F#4}> False
+            <Verticality 34.0 {B2 B3 D4 F#4}> True
+            <Verticality 34.5 {B2 B3 D4 E#4}> False
+            <Verticality 35.0 {A#3 C#4 F#3 F#4}> True
+
+        '''
+        if chord.Chord(self.pitchSet).isConsonant():
+            return True
+        return False
+
+    @property
     def nextVerticality(self):
         r'''
         Gets the next verticality after a verticality.
