@@ -1835,7 +1835,7 @@ class ChordSymbol(Harmony):
             st = st.replace(root, '')
             prelimFigure = prelimFigure.replace(',', '')
         else:
-            m1 = re.match(r"[A-Ga-g][#-]?", prelimFigure) #match not case sensitive, 
+            m1 = re.match(r"[A-Ga-g][#-]*", prelimFigure) #match not case sensitive, 
             if m1:
                 root = m1.group()
                 st = prelimFigure.replace(m1.group(), '')  #remove the root and bass from the string and any additions/omitions/alterations/
@@ -1844,7 +1844,7 @@ class ChordSymbol(Harmony):
             self.root(pitch.Pitch(root))
 
         #Get optional Bass:
-        m2 = re.search(r"/[A-Ga-g][#-]?", prelimFigure) #match not case sensitive
+        m2 = re.search(r"/[A-Ga-g][#-]*", prelimFigure) #match not case sensitive
         remaining = st
         if m2:
             bass = m2.group()
@@ -2404,7 +2404,7 @@ class Test(unittest.TestCase):
         h.addChordStepModification(hd)
         self.assertEqual(len(h.chordStepModifications), 1)
 
-    def testCountHarmonicMotion(self):
+    def xtestCountHarmonicMotion(self):
         from music21 import converter
         s = converter.parse('http://wikifonia.org/node/8859')
         harms = s.flat.getElementsByClass('Harmony')
@@ -2456,6 +2456,10 @@ class Test(unittest.TestCase):
         cs.chordKindStr = 'M'
         self.assertEqual(repr(cs), '<music21.harmony.ChordSymbol E-/B->')
 
+    def testDoubleSharpsEtc(self):
+        cisisdim = chord.Chord(('c##5','e#5','g#5'))
+        fig = chordSymbolFigureFromChord(cisisdim)
+        self.assertEqual(fig, "C##dim")
 
 class TestExternal(unittest.TestCase):
 

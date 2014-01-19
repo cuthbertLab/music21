@@ -1233,7 +1233,9 @@ class Sieve(object):
             return None
     
         try: # assume we have either an int (M), or a tuple (M,N)
-            args = eval(usrStr) 
+            # better to remove the eval, but at least there are no globals or locals this way
+            # waste of two {} dicts -- could be cached, but not worth it for now...
+            args = eval(usrStr, {'__builtins__': {'set': set}}, {}) 
         except (NameError, SyntaxError, TypeError):
             return None
 
@@ -1580,7 +1582,9 @@ class Sieve(object):
 
         # this may raise an exception if mal-formed
         try:
-            seg = eval(evalStr)
+            # better to remove the eval, but at least there are no globals or locals this way
+            # waste of two {} dicts -- could be cached, but not worth it for now...
+            seg = eval(evalStr, {'__builtins__': {'set': set}}, {})
         except SyntaxError:
             raise SieveException('badly formed logical string (%s)' % evalStr)
 
