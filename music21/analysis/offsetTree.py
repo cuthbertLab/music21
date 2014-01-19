@@ -22,6 +22,16 @@ from music21 import stream
 class Parentage(object):
     r'''
     The parentage hierarchy of an element in a score.
+
+    ::
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> parentage = verticality.startTimespans[0]
+        >>> parentage
+        <Parentage 1.0:2.0 <music21.note.Note A>>
+
     '''
 
     ### CLASS VARIABLES ###
@@ -81,18 +91,74 @@ class Parentage(object):
 
     @property
     def element(self):
+        r'''
+        The parentage's element.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> parentage = verticality.startTimespans[0]
+            >>> parentage.element
+            <music21.note.Note A>
+
+        '''
         return self._element
 
     @property
     def measureNumber(self):
+        r'''
+        The measure number of the measure containing the element.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> parentage = verticality.startTimespans[0]
+            >>> parentage.measureNumber
+            1
+
+        '''
         return self.parentage[0].measureNumber
 
     @property
     def parentage(self):
+        r'''
+        The parentage hierarchy above the parentage's element.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> parentage = verticality.startTimespans[0]
+            >>> for x in parentage.parentage:
+            ...     x
+            ...
+            <music21.stream.Measure 1 offset=1.0>
+            <music21.stream.Part Soprano>
+            <music21.stream.Score ...>
+
+        '''
         return self._parentage
 
     @property
     def partName(self):
+        r'''
+        The part name of the part containing the parentage's element.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> parentage = verticality.startTimespans[0]
+            >>> parentage.partName
+            u'Soprano'
+
+        '''
         for x in self.parentage:
             if not isinstance(x, stream.Part):
                 continue
@@ -103,10 +169,38 @@ class Parentage(object):
 
     @property
     def startOffset(self):
+        r'''
+        The start offset of the parentage's element, relative to its containing
+        score.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> parentage = verticality.startTimespans[0]
+            >>> parentage.startOffset
+            1.0
+
+        '''
         return self._startOffset
 
     @property
     def stopOffset(self):
+        r'''
+        The stop offset of the parentage's element, relative to its containing
+        score.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> parentage = verticality.startTimespans[0]
+            >>> parentage.stopOffset
+            2.0
+
+        '''
         return self._stopOffset
 
 
@@ -187,65 +281,70 @@ class Verticality(object):
 
         ::
 
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
-            >>> for verticality in tree.iterateVerticalities():
-            ...     print verticality, verticality.isConsonant
-            ...
-            <Verticality 0.0 {A3 C#5 E4}> True
-            <Verticality 0.5 {B3 B4 E4 G#3}> True
-            <Verticality 1.0 {A4 C#4 F#3 F#4}> True
-            <Verticality 2.0 {B3 B4 E4 G#3}> True
-            <Verticality 3.0 {A3 C#5 E4}> True
-            <Verticality 4.0 {B3 E4 E5 G#3}> True
-            <Verticality 5.0 {A3 C#5 E4}> True
-            <Verticality 5.5 {A4 C#3 C#5 E4}> True
-            <Verticality 6.0 {B4 E3 E4 G#4}> True
-            <Verticality 6.5 {B4 D4 E3 G#4}> False
-            <Verticality 7.0 {A2 A4 C#4 E4}> True
-            <Verticality 8.0 {C#4 C#5 E#3 G#4}> True
-            <Verticality 9.0 {A4 C#4 F#3 F#4}> True
-            <Verticality 9.5 {B2 B4 D4 G#4}> False
-            <Verticality 10.0 {C#3 C#4 E#4 G#4}> True
-            <Verticality 10.5 {B3 C#3 E#4 G#4}> False
-            <Verticality 11.0 {A3 C#4 F#2 F#4}> True
-            <Verticality 12.0 {A4 C#4 F#3 F#4}> True
-            <Verticality 13.0 {B3 B4 F#4 G#3}> False
-            <Verticality 13.5 {B3 B4 F#3 F#4}> False
-            <Verticality 14.0 {B3 B4 E4 G#3}> True
-            <Verticality 14.5 {A3 B3 B4 E4}> False
-            <Verticality 15.0 {B3 D#4 F#4}> True
-            <Verticality 15.5 {A3 B2 D#4 F#4}> False
-            <Verticality 16.0 {C#3 C#4 E4 G#3}> True
-            <Verticality 17.0 {A4 C#4 F#3}> True
-            <Verticality 17.5 {A4 D4 F#3 F#4}> True
-            <Verticality 18.0 {B4 C#4 E4 G#3}> False
-            <Verticality 18.5 {B3 B4 E4 G#3}> True
-            <Verticality 19.0 {A3 C#5 E4}> True
-            <Verticality 20.0 {A3 A4 C#5 E4}> True
-            <Verticality 21.0 {A4 D4 F#4}> True
-            <Verticality 22.0 {B3 B4 D4 F#4}> True
-            <Verticality 23.0 {C#4 C#5 E#3 G#4}> True
-            <Verticality 24.0 {A4 C#4 F#3 F#4}> True
-            <Verticality 25.0 {B2 D4 F#4 G#4}> False
-            <Verticality 25.5 {C#3 C#4 E#4 G#4}> True
-            <Verticality 26.0 {C#4 D3 F#4}> False
-            <Verticality 26.5 {B3 D3 F#3 F#4}> True
-            <Verticality 27.0 {C#3 C#4 E#3 G#4}> True
-            <Verticality 29.0 {A#2 C#4 F#3 F#4}> True
-            <Verticality 29.5 {A#2 D4 F#3 F#4}> False
-            <Verticality 30.0 {A#2 C#4 E4 F#4}> False
-            <Verticality 31.0 {B2 C#4 E4 F#4}> False
-            <Verticality 32.0 {B3 C#3 D4 F#4}> False
-            <Verticality 32.5 {A#3 C#3 C#4 F#4}> False
-            <Verticality 33.0 {B3 D3 F#4}> True
-            <Verticality 33.5 {B3 C#4 D3 F#4}> False
-            <Verticality 34.0 {B2 B3 D4 F#4}> True
-            <Verticality 34.5 {B2 B3 D4 E#4}> False
-            <Verticality 35.0 {A#3 C#4 F#3 F#4}> True
+                >>> score = corpus.parse('bwv66.6')
+                >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+                >>> for verticality in tree.iterateVerticalities():
+                ...     print verticality, verticality.isConsonant
+                ...
+                <Verticality 0.0 {A3 C#5 E4}> True
+                <Verticality 0.5 {B3 B4 E4 G#3}> True
+                <Verticality 1.0 {A4 C#4 F#3 F#4}> True
+                <Verticality 2.0 {B3 B4 E4 G#3}> True
+                <Verticality 3.0 {A3 C#5 E4}> True
+                <Verticality 4.0 {B3 E4 E5 G#3}> True
+                <Verticality 5.0 {A3 C#5 E4}> True
+                <Verticality 5.5 {A4 C#3 C#5 E4}> True
+                <Verticality 6.0 {B4 E3 E4 G#4}> True
+                <Verticality 6.5 {B4 D4 E3 G#4}> True
+                <Verticality 7.0 {A2 A4 C#4 E4}> True
+                <Verticality 8.0 {C#4 C#5 E#3 G#4}> True
+                <Verticality 9.0 {A4 C#4 F#3 F#4}> True
+                <Verticality 9.5 {B2 B4 D4 G#4}> True
+                <Verticality 10.0 {C#3 C#4 E#4 G#4}> True
+                <Verticality 10.5 {B3 C#3 E#4 G#4}> True
+                <Verticality 11.0 {A3 C#4 F#2 F#4}> True
+                <Verticality 12.0 {A4 C#4 F#3 F#4}> True
+                <Verticality 13.0 {B3 B4 F#4 G#3}> False
+                <Verticality 13.5 {B3 B4 F#3 F#4}> False
+                <Verticality 14.0 {B3 B4 E4 G#3}> True
+                <Verticality 14.5 {A3 B3 B4 E4}> False
+                <Verticality 15.0 {B3 D#4 F#4}> True
+                <Verticality 15.5 {A3 B2 D#4 F#4}> True
+                <Verticality 16.0 {C#3 C#4 E4 G#3}> True
+                <Verticality 17.0 {A4 C#4 F#3}> True
+                <Verticality 17.5 {A4 D4 F#3 F#4}> True
+                <Verticality 18.0 {B4 C#4 E4 G#3}> True
+                <Verticality 18.5 {B3 B4 E4 G#3}> True
+                <Verticality 19.0 {A3 C#5 E4}> True
+                <Verticality 20.0 {A3 A4 C#5 E4}> True
+                <Verticality 21.0 {A4 D4 F#4}> True
+                <Verticality 22.0 {B3 B4 D4 F#4}> True
+                <Verticality 23.0 {C#4 C#5 E#3 G#4}> True
+                <Verticality 24.0 {A4 C#4 F#3 F#4}> True
+                <Verticality 25.0 {B2 D4 F#4 G#4}> True
+                <Verticality 25.5 {C#3 C#4 E#4 G#4}> True
+                <Verticality 26.0 {C#4 D3 F#4}> False
+                <Verticality 26.5 {B3 D3 F#3 F#4}> True
+                <Verticality 27.0 {C#3 C#4 E#3 G#4}> True
+                <Verticality 29.0 {A#2 C#4 F#3 F#4}> True
+                <Verticality 29.5 {A#2 D4 F#3 F#4}> True
+                <Verticality 30.0 {A#2 C#4 E4 F#4}> True
+                <Verticality 31.0 {B2 C#4 E4 F#4}> False
+                <Verticality 32.0 {B3 C#3 D4 F#4}> False
+                <Verticality 32.5 {A#3 C#3 C#4 F#4}> True
+                <Verticality 33.0 {B3 D3 F#4}> True
+                <Verticality 33.5 {B3 C#4 D3 F#4}> False
+                <Verticality 34.0 {B2 B3 D4 F#4}> True
+                <Verticality 34.5 {B2 B3 D4 E#4}> False
+                <Verticality 35.0 {A#3 C#4 F#3 F#4}> True
 
         '''
-        if chord.Chord(self.pitchSet).isConsonant():
+        newChord = chord.Chord(sorted(self.pitchSet))
+        if newChord.isTriad():
+            return True
+        elif newChord.isSeventh():
+            return True
+        elif newChord.isConsonant():
             return True
         return False
 
