@@ -15,6 +15,7 @@ import unittest
 from music21 import chord
 from music21 import instrument
 from music21 import note
+from music21 import pitch
 from music21 import stream
 
 
@@ -112,6 +113,15 @@ class Parentage(object):
 class Verticality(object):
     r'''
     A verticality of objects at a given start offset.
+
+    ::
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> verticality
+        <Verticality 1.0 {A4 C#4 F#3 F#4}>
+
     '''
 
     ### CLASS VARIABLES ###
@@ -145,16 +155,45 @@ class Verticality(object):
         self._overlapTimespans = overlapTimespans
 
     def __repr__(self):
+        sortedPitches = sorted(self.pitchSet)
         return '<{} {} {{{}}}>'.format(
             type(self).__name__,
             self.startOffset,
-            ' '.join(sorted(self.pitchClassSet)),
+            ' '.join(sorted(x.nameWithOctave for x in sortedPitches))
             )
 
     ### PUBLIC PROPERTIES ###
 
     @property
+    def beatStrength(self):
+        r'''
+        Gets the beat strength of a verticality.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> verticality.beatStrength
+            1.0
+
+        '''
+        return self.startTimespans[0].element.beatStrength
+
+    @property
     def nextVerticality(self):
+        r'''
+        Gets the next verticality after a verticality.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> verticality.nextVerticality
+            <Verticality 2.0 {B3 B4 E4 G#3}>
+
+        '''
         tree = self._offsetTree
         if tree is None:
             return None
@@ -164,7 +203,90 @@ class Verticality(object):
         return tree.getVerticalityAt(startOffset)
 
     @property
+    def overlapTimespans(self):
+        r'''
+        Gets timespans overlapping the start offset of a verticality.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(0.5)
+            >>> verticality.overlapTimespans
+            (<Parentage 0.0:1.0 <music21.note.Note E>>,)
+
+        '''
+        return self._overlapTimespans
+
+    @property
+    def pitchSet(self):
+        r'''
+        Gets the pitch set of all elements in a verticality.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> for pitch in sorted(verticality.pitchSet):
+            ...     pitch
+            ...
+            <music21.pitch.Pitch F#3>
+            <music21.pitch.Pitch C#4>
+            <music21.pitch.Pitch F#4>
+            <music21.pitch.Pitch A4>
+
+        '''
+        pitchSet = set()
+        for parentage in self.startTimespans:
+            element = parentage.element
+            pitches = [x.nameWithOctave for x in element.pitches]
+            pitchSet.update(pitches)
+        for parentage in self.overlapTimespans:
+            element = parentage.element
+            pitches = [x.nameWithOctave for x in element.pitches]
+            pitchSet.update(pitches)
+        pitchSet = set([pitch.Pitch(x) for x in pitchSet])
+        return pitchSet
+
+    @property
+    def pitchClassSet(self):
+        r'''
+        Gets the pitch-class set of all elements in a verticality.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> for pitchClass in sorted(verticality.pitchClassSet):
+            ...     pitchClass
+            ...
+            <music21.pitch.Pitch C#> 
+            <music21.pitch.Pitch F#>
+            <music21.pitch.Pitch A>
+
+        '''
+        pitchClassSet = set()
+        for currentPitch in self.pitchSet:
+            pitchClassSet.add(currentPitch.name)
+        pitchClassSet = set([pitch.Pitch(x) for x in pitchClassSet])
+        return pitchClassSet
+
+    @property
     def previousVerticality(self):
+        r'''
+        Gets the previous verticality before a verticality.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> verticality.previousVerticality
+            <Verticality 0.5 {B3 B4 E4 G#3}>
+
+        '''
         tree = self._offsetTree
         if tree is None:
             return None
@@ -175,34 +297,61 @@ class Verticality(object):
 
     @property
     def startOffset(self):
+        r'''
+        Gets the start offset of a verticality.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> verticality.startOffset
+            1.0
+
+        '''
         return self._startOffset
 
     @property
     def startTimespans(self):
+        r'''
+        Gets the timespans starting at a verticality's start offset.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> for timespan in verticality.startTimespans:
+            ...     timespan
+            ...
+            <Parentage 1.0:2.0 <music21.note.Note A>>
+            <Parentage 1.0:2.0 <music21.note.Note F#>>
+            <Parentage 1.0:2.0 <music21.note.Note C#>>
+            <Parentage 1.0:2.0 <music21.note.Note F#>>
+
+        '''
         return self._startTimespans
 
     @property
     def stopTimespans(self):
+        r'''
+        Gets the timespans stopping at a verticality's start offset.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> for timespan in verticality.stopTimespans:
+            ...     timespan
+            ...
+            <Parentage 0.0:1.0 <music21.note.Note E>>
+            <Parentage 0.5:1.0 <music21.note.Note B>>
+            <Parentage 0.5:1.0 <music21.note.Note B>>
+            <Parentage 0.5:1.0 <music21.note.Note G#>>
+
+        '''
         return self._stopTimespans
-
-    @property
-    def overlapTimespans(self):
-        return self._overlapTimespans
-
-    @property
-    def beatStrength(self):
-        return self.startTimespans[0].element.beatStrength
-
-    @property
-    def pitchClassSet(self):
-        pitchClassSet = set()
-        for parentage in self.startTimespans:
-            element = parentage.element
-            pitchClassSet.update([x.name for x in element.pitches])
-        for parentage in self.overlapTimespans:
-            element = parentage.element
-            pitchClassSet.update([x.name for x in element.pitches])
-        return pitchClassSet
 
 
 class OffsetTree(object):
@@ -616,7 +765,7 @@ class OffsetTree(object):
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
             >>> tree.getVerticalityAt(2.5)
-            <Verticality 2.5 {B E G#}>
+            <Verticality 2.5 {B3 B4 E4 G#3}>
 
         Return verticality.
         '''
@@ -643,57 +792,57 @@ class OffsetTree(object):
             >>> for x in tree.iterateVerticalities():
             ...     x
             ...
-            <Verticality 0.0 {A C# E}>
-            <Verticality 0.5 {B E G#}>
-            <Verticality 1.0 {A C# F#}>
-            <Verticality 2.0 {B E G#}>
-            <Verticality 3.0 {A C# E}>
-            <Verticality 4.0 {B E G#}>
-            <Verticality 5.0 {A C# E}>
-            <Verticality 5.5 {A C# E}>
-            <Verticality 6.0 {B E G#}>
-            <Verticality 6.5 {B D E G#}>
-            <Verticality 7.0 {A C# E}>
-            <Verticality 8.0 {C# E# G#}>
-            <Verticality 9.0 {A C# F#}>
-            <Verticality 9.5 {B D G#}>
-            <Verticality 10.0 {C# E# G#}>
-            <Verticality 10.5 {B C# E# G#}>
-            <Verticality 11.0 {A C# F#}>
-            <Verticality 12.0 {A C# F#}>
-            <Verticality 13.0 {B F# G#}>
-            <Verticality 13.5 {B F#}>
-            <Verticality 14.0 {B E G#}>
-            <Verticality 14.5 {A B E}>
-            <Verticality 15.0 {B D# F#}>
-            <Verticality 15.5 {A B D# F#}>
-            <Verticality 16.0 {C# E G#}>
-            <Verticality 17.0 {A C# F#}>
-            <Verticality 17.5 {A D F#}>
-            <Verticality 18.0 {B C# E G#}>
-            <Verticality 18.5 {B E G#}>
-            <Verticality 19.0 {A C# E}>
-            <Verticality 20.0 {A C# E}>
-            <Verticality 21.0 {A D F#}>
-            <Verticality 22.0 {B D F#}>
-            <Verticality 23.0 {C# E# G#}>
-            <Verticality 24.0 {A C# F#}>
-            <Verticality 25.0 {B D F# G#}>
-            <Verticality 25.5 {C# E# G#}>
-            <Verticality 26.0 {C# D F#}>
-            <Verticality 26.5 {B D F#}>
-            <Verticality 27.0 {C# E# G#}>
-            <Verticality 29.0 {A# C# F#}>
-            <Verticality 29.5 {A# D F#}>
-            <Verticality 30.0 {A# C# E F#}>
-            <Verticality 31.0 {B C# E F#}>
-            <Verticality 32.0 {B C# D F#}>
-            <Verticality 32.5 {A# C# F#}>
-            <Verticality 33.0 {B D F#}>
-            <Verticality 33.5 {B C# D F#}>
-            <Verticality 34.0 {B D F#}>
-            <Verticality 34.5 {B D E#}>
-            <Verticality 35.0 {A# C# F#}>
+            <Verticality 0.0 {A3 C#5 E4}>
+            <Verticality 0.5 {B3 B4 E4 G#3}>
+            <Verticality 1.0 {A4 C#4 F#3 F#4}>
+            <Verticality 2.0 {B3 B4 E4 G#3}>
+            <Verticality 3.0 {A3 C#5 E4}>
+            <Verticality 4.0 {B3 E4 E5 G#3}>
+            <Verticality 5.0 {A3 C#5 E4}>
+            <Verticality 5.5 {A4 C#3 C#5 E4}>
+            <Verticality 6.0 {B4 E3 E4 G#4}>
+            <Verticality 6.5 {B4 D4 E3 G#4}>
+            <Verticality 7.0 {A2 A4 C#4 E4}>
+            <Verticality 8.0 {C#4 C#5 E#3 G#4}>
+            <Verticality 9.0 {A4 C#4 F#3 F#4}>
+            <Verticality 9.5 {B2 B4 D4 G#4}>
+            <Verticality 10.0 {C#3 C#4 E#4 G#4}>
+            <Verticality 10.5 {B3 C#3 E#4 G#4}>
+            <Verticality 11.0 {A3 C#4 F#2 F#4}>
+            <Verticality 12.0 {A4 C#4 F#3 F#4}>
+            <Verticality 13.0 {B3 B4 F#4 G#3}>
+            <Verticality 13.5 {B3 B4 F#3 F#4}>
+            <Verticality 14.0 {B3 B4 E4 G#3}>
+            <Verticality 14.5 {A3 B3 B4 E4}>
+            <Verticality 15.0 {B3 D#4 F#4}>
+            <Verticality 15.5 {A3 B2 D#4 F#4}>
+            <Verticality 16.0 {C#3 C#4 E4 G#3}>
+            <Verticality 17.0 {A4 C#4 F#3}>
+            <Verticality 17.5 {A4 D4 F#3 F#4}>
+            <Verticality 18.0 {B4 C#4 E4 G#3}>
+            <Verticality 18.5 {B3 B4 E4 G#3}>
+            <Verticality 19.0 {A3 C#5 E4}>
+            <Verticality 20.0 {A3 A4 C#5 E4}>
+            <Verticality 21.0 {A4 D4 F#4}>
+            <Verticality 22.0 {B3 B4 D4 F#4}>
+            <Verticality 23.0 {C#4 C#5 E#3 G#4}>
+            <Verticality 24.0 {A4 C#4 F#3 F#4}>
+            <Verticality 25.0 {B2 D4 F#4 G#4}>
+            <Verticality 25.5 {C#3 C#4 E#4 G#4}>
+            <Verticality 26.0 {C#4 D3 F#4}>
+            <Verticality 26.5 {B3 D3 F#3 F#4}>
+            <Verticality 27.0 {C#3 C#4 E#3 G#4}>
+            <Verticality 29.0 {A#2 C#4 F#3 F#4}>
+            <Verticality 29.5 {A#2 D4 F#3 F#4}>
+            <Verticality 30.0 {A#2 C#4 E4 F#4}>
+            <Verticality 31.0 {B2 C#4 E4 F#4}>
+            <Verticality 32.0 {B3 C#3 D4 F#4}>
+            <Verticality 32.5 {A#3 C#3 C#4 F#4}>
+            <Verticality 33.0 {B3 D3 F#4}>
+            <Verticality 33.5 {B3 C#4 D3 F#4}>
+            <Verticality 34.0 {B2 B3 D4 F#4}>
+            <Verticality 34.5 {B2 B3 D4 E#4}>
+            <Verticality 35.0 {A#3 C#4 F#3 F#4}>
 
         '''
         for startOffset in self.allStartOffsets:
