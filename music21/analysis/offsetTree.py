@@ -349,6 +349,22 @@ class Verticality(object):
         return False
 
     @property
+    def measureNumber(self):
+        r'''
+        Gets the measure number of the verticality's starting elements.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(7.0)
+            >>> verticality.measureNumber
+            2
+
+        '''
+        return self.startTimespans[0].measureNumber
+
+    @property
     def nextVerticality(self):
         r'''
         Gets the next verticality after a verticality.
@@ -948,6 +964,64 @@ class OffsetTree(object):
             stopTimespans=stopTimespans,
             )
         return verticality
+
+    def iterateConsonanceBoundedVerticalities(self):
+        r'''
+        Iterates consonant-bounded verticality subsequences in tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> for subsequence in tree.iterateConsonanceBoundedVerticalities():
+            ...     print 'Subequence:'
+            ...     for verticality in subsequence:
+            ...         print '\t[{}] {}: {} [{}]'.format(
+            ...             verticality.measureNumber,
+            ...             verticality,
+            ...             verticality.isConsonant,
+            ...             verticality.beatStrength,
+            ...             )
+            ...
+            Subequence:
+                [3] <Verticality 12.0 {A4 C#4 F#3 F#4}>: True [0.25]
+                [4] <Verticality 13.0 {B3 B4 F#4 G#3}>: False [1.0]
+                [4] <Verticality 13.5 {B3 B4 F#3 F#4}>: False [0.125]
+                [4] <Verticality 14.0 {B3 B4 E4 G#3}>: True [0.25]
+            Subequence:
+                [4] <Verticality 14.0 {B3 B4 E4 G#3}>: True [0.25]
+                [4] <Verticality 14.5 {A3 B3 B4 E4}>: False [0.125]
+                [4] <Verticality 15.0 {B3 D#4 F#4}>: True [0.5]
+            Subequence:
+                [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True [0.125]
+                [7] <Verticality 26.0 {C#4 D3 F#4}>: False [0.25]
+                [7] <Verticality 26.5 {B3 D3 F#3 F#4}>: True [0.125]
+            Subequence:
+                [8] <Verticality 30.0 {A#2 C#4 E4 F#4}>: True [0.25]
+                [8] <Verticality 31.0 {B2 C#4 E4 F#4}>: False [0.5]
+                [8] <Verticality 32.0 {B3 C#3 D4 F#4}>: False [0.25]
+                [8] <Verticality 32.5 {A#3 C#3 C#4 F#4}>: True [0.125]
+            Subequence:
+                [9] <Verticality 33.0 {B3 D3 F#4}>: True [1.0]
+                [9] <Verticality 33.5 {B3 C#4 D3 F#4}>: False [0.125]
+                [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True [0.25]
+            Subequence:
+                [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True [0.25]
+                [9] <Verticality 34.5 {B2 B3 D4 E#4}>: False [0.125]
+                [9] <Verticality 35.0 {A#3 C#4 F#3 F#4}>: True [0.5]
+
+        '''
+        iterator = self.iterateVerticalities()
+        startingVerticality = iterator.next()
+        while not startingVerticality.isConsonant:
+            startingVerticality = iterator.next()
+        verticalityBuffer = [startingVerticality]
+        for verticality in iterator:
+            verticalityBuffer.append(verticality)
+            if verticality.isConsonant:
+                if 2 < len(verticalityBuffer):
+                    yield tuple(verticalityBuffer)
+                verticalityBuffer = [verticality]
 
     def iterateVerticalities(self):
         r'''
