@@ -1116,7 +1116,35 @@ class OffsetTree(object):
             yield result
             verticalityBuffer.pop(0)
 
+    def toChordifiedScore(self):
+        allOffsets = self.allOffsets
+        elements = []
+        for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
+            verticality = self.getVerticalityAt(startOffset)
+            quarterLength = stopOffset - startOffset
+            if verticality.pitchSet:
+                element = chord.Chord(sorted(verticality.pitchSet))
+            else:
+                element = note.Rest()
+            element.duration.quarterLength = quarterLength
+            elements.append(element)
+
     ### PUBLIC PROPERTIES ###
+
+    @property
+    def allOffsets(self):
+        def recurse(node):
+            result = set()
+            if node is not None:
+                if node.leftChild is not None:
+                    result.update(recurse(node.leftChild))
+                result.add(node.startOffset)
+                result.add(node.earliestStopOffset)
+                result.add(node.latestStopOffset)
+                if node.rightChild is not None:
+                    result.update(recurse(node.rightChild))
+            return result
+        return tuple(sorted(recurse(self._root)))
 
     @property
     def allStartOffsets(self):
@@ -1131,6 +1159,19 @@ class OffsetTree(object):
             return result
         return tuple(recurse(self._root))
 
+    @property
+    def allStopOffsets(self):
+        def recurse(node):
+            result = set()
+            if node is not None:
+                if node.leftChild is not None:
+                    result.update(recurse(node.leftChild))
+                result.add(node.earliestStopOffset)
+                result.add(node.latestStopOffset)
+                if node.rightChild is not None:
+                    result.update(recurse(node.rightChild))
+            return result
+        return tuple(sorted(recurse(self._root)))
 
 #------------------------------------------------------------------------------
 
