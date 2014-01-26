@@ -1238,7 +1238,46 @@ class OffsetTree(object):
                 shards = overlap.splitAt(offset)
                 self.insert(*shards)
 
-    def toChordifiedScore(self):
+    @staticmethod
+    def extractMeasuresAndMeasureOffsets(inputScore):
+        r'''
+        Extract a measure template from `inputScore`.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> result = tree.extractMeasuresAndMeasureOffsets(score)
+            >>> result[0]
+            <music21.stream.Score ...>
+
+        ::
+
+            >>> result[1]
+            [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 36.0]
+
+        '''
+        from music21 import meter
+        part = inputScore.parts[0]
+        score = stream.Score()
+        offsets = []
+        for oldMeasure in part:
+            if not isinstance(oldMeasure, stream.Measure):
+                continue
+            offsets.append(oldMeasure.offset)
+            newMeasure = stream.Measure()
+            newMeasure.paddingLeft = oldMeasure.paddingLeft
+            newMeasure.paddingRight = oldMeasure.paddingRight
+            if oldMeasure.timeSignature is not None:
+                newTimeSignature = meter.TimeSignature(
+                    oldMeasure.timeSignature.ratioString,
+                    )
+                newMeasure.insert(0, newTimeSignature)
+            score.append(newMeasure)
+        offsets.append(inputScore.duration.quarterLength)
+        return score, offsets
+
+    def toChordifiedScore(self, templateScore=None):
         r'''
         Creates a score from the Parentage objects stored in this offset-tree.
         '''
