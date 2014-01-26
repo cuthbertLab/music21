@@ -74,7 +74,19 @@ class ChordReducer(object):
         from music21.analysis import offsetTree
         assert isinstance(inputScore, stream.Score)
         tree = offsetTree.OffsetTree.fromScore(inputScore)
-
+        tree.splitAt(tree.allOffsets)
+        for verticalities in tree.iterateVerticalitiesPairwise():
+            horizontalities = tree.unwrapVerticalities(verticalities)
+            for part, timespans in horizontalities.iteritems():
+                if len(timespans) < 2:
+                    continue
+                elif timespans[0].stopOffset != timespans[1].startOffset:
+                    continue
+                elif timespans[0].pitches != timespans[1].pitches:
+                    continue
+                tree.remove(*timespans)
+                merged = timespans[0].mergeWith(timespans[1])
+                tree.insert(merged)
         reducedScore = tree.toChordifiedScore(templateScore=inputScore)
         reducedPart = stream.Part()
         reducedPart.append([x for x in reducedScore])

@@ -1404,7 +1404,8 @@ class OffsetTree(object):
             tree = self.copy()
             tree.splitAt(templateOffsets)
             measureIndex = 0
-            allOffsets = tree.allOffsets
+            allOffsets = tree.allOffsets + tuple(templateOffsets)
+            allOffsets = sorted(set(allOffsets))
             for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
                 while templateOffsets[1] <= startOffset:
                     templateOffsets.pop(0)
