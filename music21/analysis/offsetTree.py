@@ -1213,34 +1213,49 @@ class OffsetTree(object):
             <Verticality 35.0 {A#3 C#4 F#3 F#4}>
 
         '''
-        for startOffset in self.allStartOffsets:
-            yield self.getVerticalityAt(startOffset)
+        #for startOffset in self.allStartOffsets:
+        #    yield self.getVerticalityAt(startOffset)
+        startOffset = self.allStartOffsets[0]
+        verticality = self.getVerticalityAt(startOffset)
+        yield verticality
+        verticality = verticality.nextVerticality
+        while verticality is not None:
+            yield verticality
+            verticality = verticality.nextVerticality
 
-    def iterateVerticalitiesNwise(self, n=3, unwrapParts=False):
+    def iterateVerticalitiesNwise(self, n=3):
         verticalityBuffer = []
         for verticality in self.iterateVerticalities():
             verticalityBuffer.append(verticality)
             if len(verticalityBuffer) < n:
                 continue
             result = tuple(verticalityBuffer)
-            if unwrapParts:
-                unwrapped = {}
-                for timespan in result[0].overlapTimespans:
-                    if timespan.partName not in unwrapped:
-                        unwrapped[timespan.partName] = []
-                    unwrapped[timespan.partName].append(timespan)
-                for timespan in result[0].startTimespans:
-                    if timespan.partName not in unwrapped:
-                        unwrapped[timespan.partName] = []
-                    unwrapped[timespan.partName].append(timespan)
-                for verticality in result[1:]:
-                    for timespan in verticality.startTimespans:
-                        if timespan.partName not in unwrapped:
-                            unwrapped[timespan.partName] = []
-                        unwrapped[timespan.partName].append(timespan)
-                result = unwrapped
             yield result
             verticalityBuffer.pop(0)
+
+    def iterateVerticalitiesPairwise(self):
+        for verticality in self.iterateVerticalities():
+            previousVerticality = verticality.previousVerticality
+            if previousVerticality is not None:
+                yield (previousVerticality, verticality)
+
+    @staticmethod
+    def unwrapVerticalities(verticalities):
+        unwrapped = {}
+        for timespan in verticalities[0].overlapTimespans:
+            if timespan.part not in unwrapped:
+                unwrapped[timespan.part] = []
+            unwrapped[timespan.part].append(timespan)
+        for timespan in verticalities[0].startTimespans:
+            if timespan.part not in unwrapped:
+                unwrapped[timespan.part] = []
+            unwrapped[timespan.part].append(timespan)
+        for verticality in verticalities[1:]:
+            for timespan in verticality.startTimespans:
+                if timespan.part not in unwrapped:
+                    unwrapped[timespan.part] = []
+                unwrapped[timespan.part].append(timespan)
+        return unwrapped
 
     def remove(self, *timespans):
         r'''
