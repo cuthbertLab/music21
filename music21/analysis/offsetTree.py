@@ -820,18 +820,46 @@ class OffsetTree(object):
         '''
         return type(self)(self)
 
-    def insert(self, *timespans):
+    @staticmethod
+    def extractMeasuresAndMeasureOffsets(inputScore):
         r'''
-        Inserts `timespans` into this offset-tree.
+        Extract a measure template from `inputScore`.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> result = tree.extractMeasuresAndMeasureOffsets(score)
+            >>> result[0]
+            <music21.stream.Score ...>
+
+        ::
+
+            >>> result[1]
+            [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 36.0]
+
         '''
-        for timespan in timespans:
-            assert hasattr(timespan, 'startOffset'), timespan
-            assert hasattr(timespan, 'stopOffset'), timespan
-            self._root = self._insert(self._root, timespan.startOffset)
-            node = self._search(self._root, timespan.startOffset)
-            node.payload.append(timespan)
-            node.payload.sort(key=lambda x: x.stopOffset)
-        self._updateOffsets(self._root)
+        from music21 import meter
+        part = inputScore.parts[0]
+        score = stream.Score()
+        offsets = []
+        for oldMeasure in part:
+            if not isinstance(oldMeasure, stream.Measure):
+                continue
+            offsets.append(oldMeasure.offset)
+            newMeasure = stream.Measure()
+            if oldMeasure.timeSignature is not None:
+                newTimeSignature = meter.TimeSignature(
+                    oldMeasure.timeSignature.ratioString,
+                    )
+                newMeasure.insert(0, newTimeSignature)
+            score.append(newMeasure)
+            newMeasure.number = oldMeasure.number
+            newMeasure.offset = oldMeasure.offset
+            newMeasure.paddingLeft = oldMeasure.paddingLeft
+            newMeasure.paddingRight = oldMeasure.paddingRight
+        offsets.append(inputScore.duration.quarterLength)
+        return score, offsets
 
     def findTimespansStartingAt(self, offset):
         r'''
@@ -1021,6 +1049,19 @@ class OffsetTree(object):
             stopTimespans=stopTimespans,
             )
         return verticality
+
+    def insert(self, *timespans):
+        r'''
+        Inserts `timespans` into this offset-tree.
+        '''
+        for timespan in timespans:
+            assert hasattr(timespan, 'startOffset'), timespan
+            assert hasattr(timespan, 'stopOffset'), timespan
+            self._root = self._insert(self._root, timespan.startOffset)
+            node = self._search(self._root, timespan.startOffset)
+            node.payload.append(timespan)
+            node.payload.sort(key=lambda x: x.stopOffset)
+        self._updateOffsets(self._root)
 
     def iterateConsonanceBoundedVerticalities(self):
         r'''
@@ -1237,47 +1278,6 @@ class OffsetTree(object):
                 self.remove(overlap)
                 shards = overlap.splitAt(offset)
                 self.insert(*shards)
-
-    @staticmethod
-    def extractMeasuresAndMeasureOffsets(inputScore):
-        r'''
-        Extract a measure template from `inputScore`.
-
-        ::
-
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
-            >>> result = tree.extractMeasuresAndMeasureOffsets(score)
-            >>> result[0]
-            <music21.stream.Score ...>
-
-        ::
-
-            >>> result[1]
-            [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 36.0]
-
-        '''
-        from music21 import meter
-        part = inputScore.parts[0]
-        score = stream.Score()
-        offsets = []
-        for oldMeasure in part:
-            if not isinstance(oldMeasure, stream.Measure):
-                continue
-            offsets.append(oldMeasure.offset)
-            newMeasure = stream.Measure()
-            if oldMeasure.timeSignature is not None:
-                newTimeSignature = meter.TimeSignature(
-                    oldMeasure.timeSignature.ratioString,
-                    )
-                newMeasure.insert(0, newTimeSignature)
-            score.append(newMeasure)
-            newMeasure.number = oldMeasure.number
-            newMeasure.offset = oldMeasure.offset
-            newMeasure.paddingLeft = oldMeasure.paddingLeft
-            newMeasure.paddingRight = oldMeasure.paddingRight
-        offsets.append(inputScore.duration.quarterLength)
-        return score, offsets
 
     def toChordifiedScore(self, templateScore=None):
         r'''
