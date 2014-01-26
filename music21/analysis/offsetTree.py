@@ -190,6 +190,14 @@ class Parentage(object):
         return self._parentage
 
     @property
+    def part(self):
+        for x in self.parentage:
+            if not isinstance(x, stream.Part):
+                continue
+            return x
+        return None
+
+    @property
     def partName(self):
         r'''
         The part name of the part containing the parentage's element.
