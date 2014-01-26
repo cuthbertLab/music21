@@ -13,6 +13,7 @@
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
 
+
 import unittest
 import copy
 from music21 import chord
@@ -23,6 +24,9 @@ from music21 import tie
 from music21 import environment
 
 environLocal = environment.Environment('reduceChords')
+
+
+#------------------------------------------------------------------------------
 
 
 def testMeasureStream1():
@@ -49,258 +53,7 @@ def testMeasureStream1():
     return measure
 
 
-def _buildOffsetMap(currentStream):
-    offsetMap = {}
-    def recurse(currentStream, offsetMap):
-        for x in currentStream:
-            if isinstance(x, stream.Measure):
-                for element in x:
-                    if not isinstance(element, (
-                        note.Note,
-                        chord.Chord,
-                        )):
-                        continue
-                    measureOffset = x.offset
-                    elementOffset = element.offset
-                    aggregateOffset = measureOffset + elementOffset
-                    if aggregateOffset not in offsetMap:
-                        offsetMap[aggregateOffset] = []
-                    offsetMap[aggregateOffset].append(element)
-            elif isinstance(x, stream.Stream):
-                recurse(x, offsetMap)
-    recurse(currentStream, offsetMap)
-    for offset, elementList in offsetMap.iteritems():
-        offsetMap[offset] = \
-            tuple(sorted(elementList, key=lambda x: x.quarterLength))
-    return offsetMap
-
-
-class Verticality(object):
-
-    ### CLASS VARIABLES ###
-
-    __slots__ = (
-        '_overlapElements',
-        '_startElements',
-        )
-
-    ### INITIALIZER ###
-
-    def __init__(
-        self,
-        startElements={},
-        overlapElements=None,
-        ):
-        assert isinstance(startElements, dict)
-        assert len(startElements)
-        assert isinstance(overlapElements, (dict, type(None)))
-        self._startElements = startElements
-        self._overlapElements = overlapElements or {}
-
-    ### PUBLIC METHODS ###
-
-    @staticmethod
-    def iterateVerticalities(expr):
-        '''
-        Iterate overlapping elements:
-
-        ::
-
-            >>> score = corpus.parse('PMFC_06_Giovanni-05_Donna')
-            >>> for i in range(1, 5):
-            ...     measure = score.measure(i)
-            ...     print 'Measure {}:'.format(i)
-            ...     verticalities = analysis.reduceChords.Verticality.iterateVerticalities(measure)
-            ...     for j, verticality in enumerate(verticalities):
-            ...         print '\tVerticality {}:'.format(j)
-            ...         print '\t\tOld:', verticality.overlapElements
-            ...         print '\t\tNew:', verticality.startElements
-            ...
-            Measure 1:
-                Verticality 0:
-                    Old: {}
-                    New: {0: <music21.note.Note D>, 1: <music21.note.Note G>}
-            Measure 2:
-                Verticality 0:
-                    Old: {}
-                    New: {0: <music21.note.Note D>, 1: <music21.note.Note G>}
-                Verticality 1:
-                    Old: {1: <music21.note.Note G>}
-                    New: {0: <music21.note.Note C>}
-            Measure 3:
-                Verticality 0:
-                    Old: {}
-                    New: {0: <music21.note.Note B>, 1: <music21.note.Note G>}
-            Measure 4:
-                Verticality 0:
-                    Old: {}
-                    New: {0: <music21.note.Note B>, 1: <music21.note.Note G>}
-                Verticality 1:
-                    Old: {1: <music21.note.Note G>}
-                    New: {0: <music21.note.Note B>}
-                Verticality 2:
-                    Old: {1: <music21.note.Note G>}
-                    New: {0: <music21.note.Note C>}
-
-        '''
-        # TODO: This doesn't handle cases where elements share offsets
-        #       Should be rewritten to iterate over a map of offset:elements.
-        leafLists = []
-        for part in expr:
-            if not part.isStream:
-                continue
-            leaves = part.flat.notesAndRests
-            leafLists.append(leaves)
-        currentIndices = [0 for _ in leafLists]
-        currentStartOffset = None
-        earliestStopOffset = None
-        latestStopOffset = None
-        for i, index in enumerate(currentIndices):
-            leaf = leafLists[i][index]
-            startOffset = leaf.offset
-            stopOffset = leaf.offset + leaf.quarterLength
-            if currentStartOffset is None or startOffset < currentStartOffset:
-                currentStartOffset = startOffset
-            if earliestStopOffset is None or stopOffset < earliestStopOffset:
-                earliestStopOffset = stopOffset
-            if latestStopOffset is None or latestStopOffset < stopOffset:
-                latestStopOffset = stopOffset
-        overlapElements = {}
-        startElements = {}
-        for j, pair in enumerate(zip(leafLists, currentIndices)):
-            leaves, i = pair
-            leaf = leaves[i]
-            if leaf.offset == currentStartOffset:
-                startElements[j] = leaf
-            else:
-                overlapElements[j] = leaf
-        yield Verticality(
-            startElements=startElements,
-            overlapElements=overlapElements,
-            )
-        while True:
-            indexIsLast = []
-            for i, index in enumerate(currentIndices):
-                if (index + 1) == len(leafLists[i]):
-                    indexIsLast.append(True)
-                    continue
-                indexIsLast.append(False)
-                thisLeaf = leafLists[i][index]
-                nextLeaf = leafLists[i][index + 1]
-                if nextLeaf.offset == earliestStopOffset:
-                    currentIndices[i] = index + 1
-            currentStartOffset = earliestStopOffset
-            earliestStopOffset = None
-            for i, index in enumerate(currentIndices):
-                thisLeaf = leafLists[i][index]
-                stopOffset = thisLeaf.offset + thisLeaf.quarterLength
-                if latestStopOffset < stopOffset:
-                    latestStopOffset = stopOffset
-                if earliestStopOffset is None or \
-                    stopOffset < earliestStopOffset:
-                    earliestStopOffset = stopOffset
-            if all(indexIsLast):
-                break
-            overlapElements = {}
-            startElements = {}
-            for j, pair in enumerate(zip(leafLists, currentIndices)):
-                leaves, i = pair
-                leaf = leaves[i]
-                if leaf.offset == currentStartOffset:
-                    startElements[j] = leaf
-                else:
-                    overlapElements[j] = leaf
-            yield Verticality(
-                startElements=startElements,
-                overlapElements=overlapElements,
-                )
-        raise StopIteration
-
-    @staticmethod
-    def iterateVerticalitiesNwise(expr, n=2):
-        verticalities = tuple(Verticality.iterateVerticalities(expr))
-        if len(verticalities) < n:
-            yield verticalities
-        else:
-            verticalityBuffer = []
-            for verticality in verticalities:
-                verticalityBuffer.append(verticality)
-                if len(verticalityBuffer) == n:
-                    yield tuple(verticalityBuffer)
-                    verticalityBuffer.pop(0)
-
-    @staticmethod
-    def unwrapHorizontalities(verticalities):
-        r'''
-        Unwrap horizontalities in `verticalities`:
-
-        ::
-
-            >>> score = corpus.parse('PMFC_06_Giovanni-05_Donna')
-            >>> Verticality = analysis.reduceChords.Verticality
-            >>> triples = [x for x in Verticality.iterateVerticalitiesNwise(
-            ...     score, 3)]
-            >>> result = Verticality.unwrapHorizontalities(triples[0])
-            >>> for index, elements in result.iteritems():
-            ...     print index, elements
-            ...
-            0 [<music21.note.Note D>, <music21.note.Note D>, <music21.note.Note C>]
-            1 [<music21.note.Note G>, <music21.note.Note G>]
-
-        '''
-        result = {}
-        for verticality in verticalities:
-            for index, element in verticality.startElements.iteritems():
-                if index not in result:
-                    result[index] = []
-                result[index].append(element)
-        return result
-
-    ### PUBLIC PROPERTIES ###
-
-    @property
-    def earliestStartOffset(self):
-        if self.overlapElements:
-            return min(x.offset for x in self.overlapElements.values())
-        return self.startOffset
-
-    @property
-    def earliestStopOffset(self):
-        return min(x.offset + x.quarterLength for x in self.elements)
-
-    @property
-    def elements(self):
-        return self.startElements.values() + self.overlapElements.values()
-
-    @property
-    def isConsonant(self):
-        if chord.Chord(self.pitchClassSet).isConsonant():
-            return True
-        return False
-
-    @property
-    def latestStopOffset(self):
-        return max(x.offset + x.quarterLength for x in self.elements)
-
-    @property
-    def overlapElements(self):
-        return self._overlapElements
-
-    @property
-    def pitchClassSet(self):
-        result = set()
-        for element in self.elements:
-            for pitch in getattr(element, 'pitches', ()):
-                result.add(pitch.name)
-        return result
-
-    @property
-    def startElements(self):
-        return self._startElements
-
-    @property
-    def startOffset(self):
-        return self._startElements.values()[0].offset
+#------------------------------------------------------------------------------
 
 
 class ChordReducer(object):
@@ -315,33 +68,9 @@ class ChordReducer(object):
         self.weightAlgorithm = self.qlbsmpConsonance
         self.maxChords = 3
 
-    ### PRIVATE METHODS ###
+    ### SPECIAL METHODS ###
 
-    def _alignByLyrics(self, inputMeasure):
-        reallignments = []
-        for verticality in Verticality.iterateVerticalities(inputMeasure):
-            elements = verticality.elements
-            if not all(x.hasLyrics() for x in elements):
-                continue
-            if not len(set(x.lyric for x in elements)) == 1:
-                continue
-            bestBeatStrength = elements[0].beatStrength
-            bestOffset = elements[0].offset
-            for x in elements[1:]:
-                if bestBeatStrength < x.beatStrength:
-                    bestBeatStrength = x.beatStrength
-                    bestOffset = x.offset
-            for x in elements:
-                if x.beatStrength != bestBeatStrength:
-                    reallignments.append((x, bestOffset))
-        for element, newOffset in reallignments:
-            if isinstance(element, note.Rest):
-                continue
-            oldOffset = element.offset
-            for site in element.sites.getSites():
-                element.sites.setOffsetBySite(site, newOffset)
-            element.quarterLength += (oldOffset - newOffset)
-            element.offset = newOffset
+    ### PRIVATE METHODS ###
 
     def _buildOutputMeasure(self,
         closedPosition,
@@ -404,119 +133,6 @@ class ChordReducer(object):
             outputMeasure.timeSignature = copy.deepcopy(sourceMeasureTs)
             lastTimeSignature = sourceMeasureTs
         return lastPitchedObject, lastTimeSignature, outputMeasure
-
-    def _collapseTies(self, inputMeasure):
-        if not len(inputMeasure):
-            return inputMeasure
-        newStream = stream.Stream()
-        currentChords = []
-        currentPitches = set()
-        for currentChord in inputMeasure:
-            if currentChord.isRest:
-                currentChords = []
-                currentPitches = set()
-                newStream.append(currentChord)
-                continue
-            tieSet = self._getTieSet(currentChord)
-            if not tieSet:
-                currentChords = []
-                currentPitches = set()
-                newStream.append(currentChord)
-            elif all(x == 'stop' for x in tieSet):
-                currentChords.append(currentChord)
-                currentPitches.update(currentChord.pitchNames)
-                newChord = chord.Chord(currentPitches)
-                newChord.quarterLength = \
-                    sum(x.quarterLength for x in currentChords)
-                if newChord.isTriad() or \
-                    newChord.isSeventh() or \
-                    newChord.isConsonant():
-                    newStream.append(newChord)
-                else:
-                    for oldChord in currentChords:
-                        newStream.append(oldChord)
-                currentChords = []
-                currentPitches = set()
-            else:
-                currentChords.append(currentChord)
-                currentPitches.update(currentChord.pitchNames)
-        if currentChords:
-            newChord = chord.Chord(currentPitches)
-            newChord.quarterLength = \
-                sum(x.quarterLength for x in currentChords)
-            if newChord.isTriad() or \
-                newChord.isSeventh() or \
-                newChord.isConsonant():
-                newStream.append(currentChord)
-            else:
-                for oldChord in currentChords:
-                    newStream.append(oldChord)
-        return newStream
-
-    def _collapseIdenticalChords(self, inputMeasure):
-        if not len(inputMeasure):
-            return inputMeasure
-        outputMeasure = stream.Stream()
-        if not inputMeasure[0].isRest:
-            previousChord = chord.Chord(set(inputMeasure[0].pitchNames))
-            previousChord.quarterLength = inputMeasure[0].quarterLength
-        else:
-            previousChord = inputMeasure[0]
-        for currentChord in inputMeasure[1:]:
-            if previousChord.isChord and currentChord.isChord:
-                previousPitches = set(previousChord.pitchNames)
-                currentPitches = set(currentChord.pitchNames)
-                if previousPitches == currentPitches:
-                    previousChord.quarterLength += currentChord.quarterLength
-                else:
-                    outputMeasure.append(previousChord)
-                    previousChord = chord.Chord(set(currentChord.pitchNames))
-                    previousChord.quarterLength = currentChord.quarterLength
-            else:
-                outputMeasure.append(previousChord)
-                if currentChord.isChord:
-                    previousChord = chord.Chord(set(currentChord.pitchNames))
-                    previousChord.quarterLength = currentChord.quarterLength
-                else:
-                    previousChord = currentChord
-        outputMeasure.append(previousChord)
-        return outputMeasure
-
-    def _getTieSet(self, chord):
-        result = set()
-        for note in chord._notes:
-            if note.tie is not None:
-                result.add(note.tie.type)
-        return result
-
-    def _prunePassingTones(self, inputMeasure):
-        pendingExtensions = []
-        pendingRemovals = []
-        for verticalities in Verticality.iterateVerticalitiesNwise(
-            inputMeasure, n=3):
-            if len(verticalities) != 3:
-                continue
-            if verticalities[0].isConsonant and \
-                not verticalities[1].isConsonant and \
-                verticalities[0].isConsonant:
-                horizontalities = Verticality.unwrapHorizontalities(
-                    verticalities)
-                for horizontality in horizontalities.values():
-                    if len(horizontality) != 3:
-                        continue
-                    toExtend = horizontality[0]
-                    toRemove = horizontality[1]
-                    pendingRemovals.append(toRemove)
-                    pendingExtension = (toExtend, toRemove.quarterLength)
-                    pendingExtensions.append(pendingExtension)
-        print 'TO REMOVE:', pendingRemovals
-        for pendingRemoval in pendingRemovals:
-            for site in pendingRemoval.sites.getSites():
-                if not isinstance(site, stream.Stream):
-                    continue
-                site.remove(pendingRemoval)
-        for pendingExtension, quarterLength in pendingExtensions:
-            pendingExtension.quarterLength += quarterLength
 
     ### PUBLIC METHODS ###
 
@@ -586,13 +202,9 @@ class ChordReducer(object):
     def multiPartReduction(
         self,
         inputStream,
-        alignLyrics=False,
         closedPosition=False,
-        collapseIdenticalChords=False,
-        collapseTies=False,
         forceOctave=False,
         maxChords=2,
-        prunePassingTones=True,
         ):
         '''
         Return a multipart reduction of a stream.
@@ -612,34 +224,8 @@ class ChordReducer(object):
                     break
             else:
                 inputMeasure = copy.deepcopy(inputMeasure)
-
-                if alignLyrics:
-                    self._alignByLyrics(inputMeasure)
-
-                if prunePassingTones:
-                    self._prunePassingTones(inputMeasure)
-
                 inputMeasureReduction = \
                     inputMeasure.chordify().flat.notesAndRests
-
-                if collapseTies:
-                    inputMeasureReduction = self._collapseTies(
-                        inputMeasureReduction)
-
-                if collapseIdenticalChords:
-                    inputMeasureReduction = self._collapseIdenticalChords(
-                        inputMeasureReduction)
-
-#                print 'Reduce to N Chords:'
-#                inputMeasureReduction = self.reduceMeasureToNChords(
-#                    chordifiedInputMeasure,
-#                    maxChords,
-#                    weightAlgorithm=self.qlbsmpConsonance,
-#                    trimBelow=0.3,
-#                    )
-#                inputMeasureReduction.show('text')
-#                print
-
                 lastPitchedObject, lastTimeSignature, outputMeasure = \
                     self._buildOutputMeasure(
                         closedPosition,
@@ -833,12 +419,8 @@ class TestExternal(unittest.TestCase):
         chordReducer = ChordReducer()
         reduction = chordReducer.multiPartReduction(
             score,
-            alignLyrics=False,
             closedPosition=True,
-            collapseIdenticalChords=True,
-            collapseTies=True,
             maxChords=3,
-            prunePassingTones=True,
             )
         #reduction = chordReducer.multiPartReduction(
         #    score,
