@@ -70,6 +70,16 @@ class ChordReducer(object):
 
     ### SPECIAL METHODS ###
 
+    def __call__(self, inputScore):
+        from music21.analysis import offsetTree
+        assert isinstance(inputScore, stream.Score)
+        tree = offsetTree.OffsetTree.fromScore(inputScore)
+
+        reducedScore = tree.toChordifiedScore(templateScore=inputScore)
+        reducedPart = stream.Part()
+        reducedPart.append([x for x in reducedScore])
+        return reducedPart
+
     ### PRIVATE METHODS ###
 
     def _buildOutputMeasure(self,
@@ -417,14 +427,11 @@ class TestExternal(unittest.TestCase):
             firstMeasure.insert(0, clef.Treble8vbClef())
 
         chordReducer = ChordReducer()
-        reduction = chordReducer.multiPartReduction(
-            score,
-            closedPosition=True,
-            maxChords=3,
-            )
+        reduction = chordReducer(score)
         #reduction = chordReducer.multiPartReduction(
         #    score,
         #    closedPosition=True,
+        #    maxChords=3,
         #    )
         score.insert(0, reduction)
         score.show()
