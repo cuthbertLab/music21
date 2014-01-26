@@ -574,7 +574,7 @@ class Verticality(object):
 
 class OffsetTree(object):
     r'''
-    An offset tree.
+    An offset-tree.
     '''
 
     ### CLASS VARIABLES ###
@@ -585,7 +585,7 @@ class OffsetTree(object):
 
     class OffsetTreeNode(object):
         r'''
-        A node in an offset tree.
+        A node in an offset-tree.
 
         Not for public use.
         '''
@@ -683,8 +683,12 @@ class OffsetTree(object):
 
     ### INITIALIZER ###
 
-    def __init__(self):
+    def __init__(self, *timespans):
         self._root = None
+        if len(timespans) == 1 and isinstance(timespans[0], type(self)):
+            timespans = [x for x in timespans[0]]
+        if timespans:
+            self.insert(*timespans)
 
     ### SPECIAL METHODS ###
 
@@ -801,7 +805,25 @@ class OffsetTree(object):
 
     ### PUBLIC METHODS ###
 
+    def copy(self):
+        r'''
+        Creates a new offset-tree with the same timespans as this offset-tree.
+
+        This is analogous to `dict.copy()`.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> newTree = tree.copy()
+
+        '''
+        return type(self)(self)
+
     def insert(self, *timespans):
+        r'''
+        Inserts `timespans` into this offset-tree.
+        '''
         for timespan in timespans:
             assert hasattr(timespan, 'startOffset'), timespan
             assert hasattr(timespan, 'stopOffset'), timespan
@@ -812,6 +834,9 @@ class OffsetTree(object):
         self._updateOffsets(self._root)
 
     def findTimespansStartingAt(self, offset):
+        r'''
+        Finds timespans in this offset-tree which start at `offset`.
+        '''
         results = []
         node = self._search(self._root, offset)
         if node is not None:
@@ -819,6 +844,9 @@ class OffsetTree(object):
         return tuple(results)
 
     def findTimespansStoppingAt(self, offset):
+        r'''
+        Finds timespans in this offset-tree which stop at `offset`.
+        '''
         def recurse(node, offset):
             result = []
             if node.earliestStopOffset <= offset <= node.latestStopOffset:
@@ -835,6 +863,9 @@ class OffsetTree(object):
         return tuple(results)
 
     def findTimespansOverlapping(self, offset):
+        r'''
+        Finds timespans in this offset-tree which overlap `offset`.
+        '''
         def recurse(node, offset, indent=0):
             result = []
             #indent_string = '\t' * indent
@@ -865,6 +896,10 @@ class OffsetTree(object):
 
     @staticmethod
     def fromScore(inputScore):
+        r'''
+        Creates a new offset-tree from `inputScore`, populated by Parentage
+        timespans.
+        '''
         def recurse(inputStream, parentages, currentParentage):
             for x in inputStream:
                 if isinstance(x, stream.Measure):
@@ -899,7 +934,7 @@ class OffsetTree(object):
 
     def getStartOffsetAfter(self, offset):
         r'''
-        Get start offset after `offset`.
+        Gets start offset after `offset`.
 
         ::
 
@@ -913,7 +948,7 @@ class OffsetTree(object):
             >>> tree.getStartOffsetAfter(35) is None
             True
 
-        Return none if no succeeding offset exists.
+        Returns none if no succeeding offset exists.
         '''
         def recurse(node, offset):
             if node is None:
@@ -931,7 +966,8 @@ class OffsetTree(object):
 
     def getStartOffsetBefore(self, offset):
         r'''
-        Get start offset before `offset`.
+        Gets the start offset immediately preceding `offset` in this
+        offset-tree.
 
         ::
 
@@ -963,7 +999,7 @@ class OffsetTree(object):
 
     def getVerticalityAt(self, offset):
         r'''
-        Get verticality in offset tree at `offset`.
+        Gets the verticality in this offset-tree which starts at `offset`.
 
         ::
 
@@ -988,7 +1024,8 @@ class OffsetTree(object):
 
     def iterateConsonanceBoundedVerticalities(self):
         r'''
-        Iterates consonant-bounded verticality subsequences in tree.
+        Iterates consonant-bounded verticality subsequences in this
+        offset-tree.
 
         ::
 
@@ -1046,7 +1083,7 @@ class OffsetTree(object):
 
     def iterateVerticalities(self):
         r'''
-        Iterate all vertical moments in the analyzed score:
+        Iterates all vertical moments in this offset-tree.
 
         ::
 
@@ -1138,6 +1175,9 @@ class OffsetTree(object):
             verticalityBuffer.pop(0)
 
     def remove(self, *timespans):
+        r'''
+        Removes `timespans` from this offset-tree.
+        '''
         for timespan in timespans:
             assert hasattr(timespan, 'startOffset'), timespan
             assert hasattr(timespan, 'stopOffset'), timespan
@@ -1152,7 +1192,7 @@ class OffsetTree(object):
 
     def splitAt(self, *offsets):
         r'''
-        Split all timespans in this offset-tree at `offsets`, operating in
+        Splits all timespans in this offset-tree at `offsets`, operating in
         place.
 
         ::
@@ -1199,6 +1239,9 @@ class OffsetTree(object):
                 self.insert(*shards)
 
     def toChordifiedScore(self):
+        r'''
+        Creates a score from the Parentage objects stored in this offset-tree.
+        '''
         allOffsets = self.allOffsets
         elements = []
         for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
@@ -1219,6 +1262,10 @@ class OffsetTree(object):
 
     @property
     def allOffsets(self):
+        r'''
+        Gets all unique offsets (both starting and stopping) of all timespans
+        in this offset-tree.
+        '''
         def recurse(node):
             result = set()
             if node is not None:
@@ -1234,6 +1281,9 @@ class OffsetTree(object):
 
     @property
     def allStartOffsets(self):
+        r'''
+        Gets all unique start offsets of all timespans in this offset-tree.
+        '''
         def recurse(node):
             result = []
             if node is not None:
@@ -1247,6 +1297,9 @@ class OffsetTree(object):
 
     @property
     def allStopOffsets(self):
+        r'''
+        Gets all unique stop offsets of all timespans in this offset-tree.
+        '''
         def recurse(node):
             result = set()
             if node is not None:
