@@ -92,7 +92,7 @@ class Parentage(object):
         Split parentage at `offset`.
 
         ::
-        
+
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
             >>> verticality = tree.getVerticalityAt(0)
@@ -480,7 +480,7 @@ class Verticality(object):
             >>> for pitchClass in sorted(verticality.pitchClassSet):
             ...     pitchClass
             ...
-            <music21.pitch.Pitch C#> 
+            <music21.pitch.Pitch C#>
             <music21.pitch.Pitch F#>
             <music21.pitch.Pitch A>
 
@@ -1266,36 +1266,132 @@ class OffsetTree(object):
                 continue
             offsets.append(oldMeasure.offset)
             newMeasure = stream.Measure()
-            newMeasure.paddingLeft = oldMeasure.paddingLeft
-            newMeasure.paddingRight = oldMeasure.paddingRight
             if oldMeasure.timeSignature is not None:
                 newTimeSignature = meter.TimeSignature(
                     oldMeasure.timeSignature.ratioString,
                     )
                 newMeasure.insert(0, newTimeSignature)
             score.append(newMeasure)
+            newMeasure.number = oldMeasure.number
+            newMeasure.offset = oldMeasure.offset
+            newMeasure.paddingLeft = oldMeasure.paddingLeft
+            newMeasure.paddingRight = oldMeasure.paddingRight
         offsets.append(inputScore.duration.quarterLength)
         return score, offsets
 
     def toChordifiedScore(self, templateScore=None):
         r'''
         Creates a score from the Parentage objects stored in this offset-tree.
+
+        A "template" score may be used to provide measure and time-signature
+        information.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> chordifiedScore = tree.toChordifiedScore(templateScore=score)
+            >>> chordifiedScore.show('text')
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.meter.TimeSignature 4/4>
+                {0.0} <music21.chord.Chord A3 E4 C#5>
+                {0.5} <music21.chord.Chord G#3 B3 E4 B4>
+            {1.0} <music21.stream.Measure 1 offset=1.0>
+                {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+                {1.0} <music21.chord.Chord G#3 B3 E4 B4>
+                {2.0} <music21.chord.Chord A3 E4 C#5>
+                {3.0} <music21.chord.Chord G#3 B3 E4 E5>
+            {5.0} <music21.stream.Measure 2 offset=5.0>
+                {0.0} <music21.chord.Chord A3 E4 C#5>
+                {0.5} <music21.chord.Chord C#3 E4 A4 C#5>
+                {1.0} <music21.chord.Chord E3 E4 G#4 B4>
+                {1.5} <music21.chord.Chord E3 D4 G#4 B4>
+                {2.0} <music21.chord.Chord A2 C#4 E4 A4>
+                {3.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
+            {9.0} <music21.stream.Measure 3 offset=9.0>
+                {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+                {0.5} <music21.chord.Chord B2 D4 G#4 B4>
+                {1.0} <music21.chord.Chord C#3 C#4 E#4 G#4>
+                {1.5} <music21.chord.Chord C#3 B3 E#4 G#4>
+                {2.0} <music21.chord.Chord F#2 A3 C#4 F#4>
+                {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+            {13.0} <music21.stream.Measure 4 offset=13.0>
+                {0.0} <music21.chord.Chord G#3 B3 F#4 B4>
+                {0.5} <music21.chord.Chord F#3 B3 F#4 B4>
+                {1.0} <music21.chord.Chord G#3 B3 E4 B4>
+                {1.5} <music21.chord.Chord A3 B3 E4 B4>
+                {2.0} <music21.chord.Chord B3 D#4 F#4>
+                {2.5} <music21.chord.Chord B2 A3 D#4 F#4>
+                {3.0} <music21.chord.Chord C#3 G#3 C#4 E4>
+            {17.0} <music21.stream.Measure 5 offset=17.0>
+                {0.0} <music21.chord.Chord F#3 C#4 A4>
+                {0.5} <music21.chord.Chord F#3 D4 F#4 A4>
+                {1.0} <music21.chord.Chord G#3 C#4 E4 B4>
+                {1.5} <music21.chord.Chord G#3 B3 E4 B4>
+                {2.0} <music21.chord.Chord A3 E4 C#5>
+                {3.0} <music21.chord.Chord A3 E4 A4 C#5>
+            {21.0} <music21.stream.Measure 6 offset=21.0>
+                {0.0} <music21.chord.Chord D4 F#4 A4>
+                {1.0} <music21.chord.Chord B3 D4 F#4 B4>
+                {2.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
+                {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+            {25.0} <music21.stream.Measure 7 offset=25.0>
+                {0.0} <music21.chord.Chord B2 D4 F#4 G#4>
+                {0.5} <music21.chord.Chord C#3 C#4 E#4 G#4>
+                {1.0} <music21.chord.Chord D3 C#4 F#4>
+                {1.5} <music21.chord.Chord D3 F#3 B3 F#4>
+                {2.0} <music21.chord.Chord C#3 E#3 C#4 G#4>
+            {29.0} <music21.stream.Measure 8 offset=29.0>
+                {0.0} <music21.chord.Chord A#2 F#3 C#4 F#4>
+                {0.5} <music21.chord.Chord A#2 F#3 D4 F#4>
+                {1.0} <music21.chord.Chord A#2 C#4 E4 F#4>
+                {2.0} <music21.chord.Chord B2 C#4 E4 F#4>
+                {3.0} <music21.chord.Chord C#3 B3 D4 F#4>
+                {3.5} <music21.chord.Chord C#3 A#3 C#4 F#4>
+            {33.0} <music21.stream.Measure 9 offset=33.0>
+                {0.0} <music21.chord.Chord D3 B3 F#4>
+                {0.5} <music21.chord.Chord D3 B3 C#4 F#4>
+                {1.0} <music21.chord.Chord B2 B3 D4 F#4>
+                {1.5} <music21.chord.Chord B2 B3 D4 E#4>
+                {2.0} <music21.chord.Chord F#3 A#3 C#4 F#4>
+
         '''
-        allOffsets = self.allOffsets
-        elements = []
-        for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
-            verticality = self.getVerticalityAt(startOffset)
-            quarterLength = stopOffset - startOffset
-            if verticality.pitchSet:
-                element = chord.Chord(sorted(verticality.pitchSet))
-            else:
-                element = note.Rest()
-            element.duration.quarterLength = quarterLength
-            elements.append(element)
-        score = stream.Score()
-        for element in elements:
-            score.append(element)
-        return score
+        if isinstance(templateScore, stream.Score):
+            templateScore, templateOffsets = \
+                self.extractMeasuresAndMeasureOffsets(templateScore)
+            tree = self.copy()
+            tree.splitAt(templateOffsets)
+            measureIndex = 0
+            allOffsets = tree.allOffsets
+            for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
+                while templateOffsets[1] <= startOffset:
+                    templateOffsets.pop(0)
+                    measureIndex += 1
+                verticality = self.getVerticalityAt(startOffset)
+                quarterLength = stopOffset - startOffset
+                if verticality.pitchSet:
+                    element = chord.Chord(sorted(verticality.pitchSet))
+                else:
+                    element = note.Rest()
+                element.duration.quarterLength = quarterLength
+                templateScore[measureIndex].append(element)
+            return templateScore
+        else:
+            allOffsets = self.allOffsets
+            elements = []
+            for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
+                verticality = self.getVerticalityAt(startOffset)
+                quarterLength = stopOffset - startOffset
+                if verticality.pitchSet:
+                    element = chord.Chord(sorted(verticality.pitchSet))
+                else:
+                    element = note.Rest()
+                element.duration.quarterLength = quarterLength
+                elements.append(element)
+            score = stream.Score()
+            for element in elements:
+                score.append(element)
+            return score
 
     ### PUBLIC PROPERTIES ###
 
