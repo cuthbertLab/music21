@@ -5,7 +5,7 @@ Overview: Importing File and Data Formats
 
 Music21 can import and export a variety of musical data formats. Many examples
 of these formats are distributed with music21 as part of the corpus module (see
-:ref:`moduleCorpus.base`). 
+:ref:`moduleCorpus`). 
 
 The converter module, as well as the module function
 :func:`music21.converter.parse` handle importing all supported formats. For

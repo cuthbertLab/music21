@@ -328,7 +328,7 @@ Stream. However, in general, :class:`~music21.meter.TimeSignature`
 objects are found within :class:`~music21.stream.Measure` objects
 inside a :class:`~music21.stream.Part` object. Both ``Measure`` and
 ``Part`` are subclasses of ``Stream``. Let's get a Bach chorale with
-some nice eighth-note runs from the :ref:`moduleCorpus.base` module's
+some nice eighth-note runs from the :ref:`moduleCorpus` module's
 :func:`~music21.corpus.parse` function. It returns a
 :class:`~music21.stream.Score`, which is also a ``Stream`` subclass.
 

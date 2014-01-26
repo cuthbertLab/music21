@@ -394,7 +394,7 @@ A common arrangement of nested Streams is a
 :class:`~music21.stream.Part` Streams, each Part Stream in turn containing one 
 or more :class:`~music21.stream.Measure` Streams. 
 
-Such an arrangement of Stream objects is the common way musical scores are represented in music21. For example, importing a four-part chorale by J. S. Bach will provide a Score object with four Part Streams, each Part containing multiple Measure objects. Music21 comes with a :ref:`moduleCorpus.base` module that provides access to a large collection of scores, including all the Bach chorales. We can parse the score from the corpus with the :func:`~music21.corpus.parse` function. 
+Such an arrangement of Stream objects is the common way musical scores are represented in music21. For example, importing a four-part chorale by J. S. Bach will provide a Score object with four Part Streams, each Part containing multiple Measure objects. Music21 comes with a :ref:`moduleCorpus` module that provides access to a large collection of scores, including all the Bach chorales. We can parse the score from the corpus with the :func:`~music21.corpus.parse` function. 
 
 >>> from music21 import *
 >>> sBach = corpus.parse('bach/bwv57.8')
