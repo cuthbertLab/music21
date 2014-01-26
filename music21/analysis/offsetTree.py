@@ -73,6 +73,17 @@ class Parentage(object):
 
     ### PUBLIC METHODS ###
 
+    def mergeWith(self, timespan):
+        assert isinstance(timespan, type(self))
+        assert (self.stopOffset == timespan.startOffset) or \
+            (timespan.stopOffset == self.startOffset)
+        assert self.pitches == timespan.pitches
+        if self.startOffset < timespan.startOffset:
+            mergedParentage = self.new(stopOffset=timespan.stopOffset)
+        else:
+            mergedParentage = timespan.new(stopOffset=self.stopOffset)
+        return mergedParentage
+
     def new(
         self,
         startOffset=None,
