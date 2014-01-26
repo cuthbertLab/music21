@@ -212,13 +212,21 @@ class Parentage(object):
             u'Soprano'
 
         '''
-        for x in self.parentage:
-            if not isinstance(x, stream.Part):
-                continue
-            for y in x:
-                if isinstance(y, instrument.Instrument):
-                    return y.partName
+        part = self.part
+        if part is None:
+            return None
+        for element in part:
+            if isinstance(element, instrument.Instrument):
+                return element.partName
         return None
+
+    @property
+    def pitches(self):
+        result = []
+        if hasattr(self.element, 'pitches'):
+            result.extend(self.element.pitches)
+        result.sort()
+        return tuple(result)
 
     @property
     def startOffset(self):
