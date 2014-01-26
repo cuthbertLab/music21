@@ -53,7 +53,7 @@ class Parentage(object):
         stopOffset=None,
         ):
         self._element = element
-        assert len(parentage)
+        assert len(parentage), parentage
         parentage = tuple(parentage)
         assert isinstance(parentage[0], stream.Measure), parentage[0]
         assert isinstance(parentage[-1], stream.Score), parentage[-1]
@@ -86,6 +86,40 @@ class Parentage(object):
             startOffset=startOffset,
             stopOffset=stopOffset,
             )
+
+    def splitAt(self, offset):
+        r'''
+        Split parentage at `offset`.
+
+        ::
+        
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(0)
+            >>> timespan = verticality.startTimespans[0]
+            >>> timespan
+            <Parentage 0.0:0.5 <music21.note.Note C#>>
+
+        ::
+
+            >>> for shard in timespan.splitAt(0.25):
+            ...     shard
+            ...
+            <Parentage 0.0:0.25 <music21.note.Note C#>>
+            <Parentage 0.25:0.5 <music21.note.Note C#>>
+
+        ::
+
+            >>> timespan.splitAt(1000)
+            (<Parentage 0.0:0.5 <music21.note.Note C#>>,)
+
+        '''
+
+        if offset < self.startOffset or self.stopOffset < offset:
+            return (self,)
+        left = self.new(stopOffset=offset)
+        right = self.new(startOffset=offset)
+        return left, right
 
     ### PUBLIC PROPERTIES ###
 
@@ -769,25 +803,12 @@ class OffsetTree(object):
 
     def insert(self, *timespans):
         for timespan in timespans:
-            assert hasattr(timespan, 'startOffset')
-            assert hasattr(timespan, 'stopOffset')
+            assert hasattr(timespan, 'startOffset'), timespan
+            assert hasattr(timespan, 'stopOffset'), timespan
             self._root = self._insert(self._root, timespan.startOffset)
             node = self._search(self._root, timespan.startOffset)
             node.payload.append(timespan)
             node.payload.sort(key=lambda x: x.stopOffset)
-        self._updateOffsets(self._root)
-
-    def remove(self, *timespans):
-        for timespan in timespans:
-            assert hasattr(timespan, 'startOffset')
-            assert hasattr(timespan, 'stopOffset')
-            node = self._search(self._root, timespan.startOffset)
-            if node is None:
-                return
-            if timespan in node.payload:
-                node.payload.remove(timespan)
-            if not node.payload:
-                self._root = self._remove(self._root, timespan.startOffset)
         self._updateOffsets(self._root)
 
     def findTimespansStartingAt(self, offset):
@@ -868,7 +889,7 @@ class OffsetTree(object):
                 elif isinstance(x, stream.Stream):
                     localParentage = currentParentage + (x,)
                     recurse(x, parentages, localParentage)
-        assert isinstance(inputScore, stream.Score)
+        assert isinstance(inputScore, stream.Score), inputScore
         parentages = []
         initialParentage = (inputScore,)
         recurse(inputScore, parentages, currentParentage=initialParentage)
@@ -1116,6 +1137,67 @@ class OffsetTree(object):
             yield result
             verticalityBuffer.pop(0)
 
+    def remove(self, *timespans):
+        for timespan in timespans:
+            assert hasattr(timespan, 'startOffset'), timespan
+            assert hasattr(timespan, 'stopOffset'), timespan
+            node = self._search(self._root, timespan.startOffset)
+            if node is None:
+                return
+            if timespan in node.payload:
+                node.payload.remove(timespan)
+            if not node.payload:
+                self._root = self._remove(self._root, timespan.startOffset)
+        self._updateOffsets(self._root)
+
+    def splitAt(self, *offsets):
+        r'''
+        Split all timespans in this offset-tree at `offsets`, operating in
+        place.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> tree.findTimespansStartingAt(0.1)
+            ()
+
+        ::
+
+            >>> for timespan in tree.findTimespansOverlapping(0.1):
+            ...     timespan
+            ...
+            <Parentage 0.0:0.5 <music21.note.Note C#>>
+            <Parentage 0.0:0.5 <music21.note.Note A>>
+            <Parentage 0.0:0.5 <music21.note.Note A>>
+            <Parentage 0.0:1.0 <music21.note.Note E>>
+
+        ::
+
+            >>> tree.splitAt(0.1)
+            >>> for timespan in tree.findTimespansStartingAt(0.1):
+            ...     timespan
+            ...
+            <Parentage 0.1:0.5 <music21.note.Note C#>>
+            <Parentage 0.1:0.5 <music21.note.Note A>>
+            <Parentage 0.1:0.5 <music21.note.Note A>>
+            <Parentage 0.1:1.0 <music21.note.Note E>>
+
+        ::
+
+            >>> tree.findTimespansOverlapping(0.1)
+            ()
+
+        '''
+        for offset in offsets:
+            overlaps = self.findTimespansOverlapping(offset)
+            if not overlaps:
+                continue
+            for overlap in overlaps:
+                self.remove(overlap)
+                shards = overlap.splitAt(offset)
+                self.insert(*shards)
+
     def toChordifiedScore(self):
         allOffsets = self.allOffsets
         elements = []
@@ -1128,6 +1210,10 @@ class OffsetTree(object):
                 element = note.Rest()
             element.duration.quarterLength = quarterLength
             elements.append(element)
+        score = stream.Score()
+        for element in elements:
+            score.append(element)
+        return score
 
     ### PUBLIC PROPERTIES ###
 
