@@ -1233,6 +1233,18 @@ class OffsetTree(object):
             yield result
             verticalityBuffer.pop(0)
 
+    def iterateVerticalitiesNwise2(self, n=3):
+        n = int(n)
+        assert 0 < n
+        for verticality in self.iterateVerticalities():
+            verticalities = [verticality]
+            while len(verticalities) < n:
+                previousVerticality = verticalities[-1].previousVerticality
+                if previousVerticality is None:
+                    break
+                verticalities.append(previousVerticality)
+            yield tuple(reversed(verticalities))
+
     def iterateVerticalitiesPairwise(self):
         for verticality in self.iterateVerticalities():
             previousVerticality = verticality.previousVerticality
