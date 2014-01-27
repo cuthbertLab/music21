@@ -74,7 +74,8 @@ class ChordReducer(object):
         from music21.analysis import offsetTree
         assert isinstance(inputScore, stream.Score)
         tree = offsetTree.OffsetTree.fromScore(inputScore)
-        tree.splitAt(tree.allOffsets)
+
+        # Connect like-pitched timespans in same part.
         for verticalities in tree.iterateVerticalitiesPairwise():
             horizontalities = tree.unwrapVerticalities(verticalities)
             for part, timespans in horizontalities.iteritems():
@@ -87,9 +88,31 @@ class ChordReducer(object):
                 tree.remove(*timespans)
                 merged = timespans[0].mergeWith(timespans[1])
                 tree.insert(merged)
+
+        # Align notes across parts by lyrics.
+
+        # Remove passing and neighbor tones.
+        for verticalities in tree.iterateVerticalitiesNwise2(n=3):
+            if len(verticalities) < 3:
+                continue
+            if verticalities[0].isConsonant and \
+                not verticalities[1].isConsonant and \
+                verticalities[2].isConsonant:
+                horizontalities = tree.unwrapVerticalities(verticalities)
+                beatStrength = verticalities[0].beatStrength
+                # Next, identify neighbor or passing contours.
+                # Decide how to handle accented non-chord tones.
+
+        # Attempt to collapse arpeggiated chord tones.
+
+        # Convert the offset-tree to a score.
         reducedScore = tree.toChordifiedScore(templateScore=inputScore)
         reducedPart = stream.Part()
         reducedPart.append([x for x in reducedScore])
+
+        # With the now-realized score, reduce chords-per-measure.
+
+        # Like-pitched chords should be tied together.
         return reducedPart
 
     ### PRIVATE METHODS ###
