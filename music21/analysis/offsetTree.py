@@ -1300,16 +1300,6 @@ class OffsetTree(object):
             verticality = verticality.nextVerticality
 
     def iterateVerticalitiesNwise(self, n=3):
-        verticalityBuffer = []
-        for verticality in self.iterateVerticalities():
-            verticalityBuffer.append(verticality)
-            if len(verticalityBuffer) < n:
-                continue
-            result = tuple(verticalityBuffer)
-            yield result
-            verticalityBuffer.pop(0)
-
-    def iterateVerticalitiesNwise2(self, n=3):
         n = int(n)
         assert 0 < n
         for verticality in self.iterateVerticalities():
