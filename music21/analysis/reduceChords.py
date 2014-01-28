@@ -92,14 +92,19 @@ class ChordReducer(object):
         # Align notes across parts by lyrics.
 
         # Remove passing and neighbor tones.
-        for verticalities in tree.iterateVerticalitiesNwise2(n=3):
+        for verticalities in tree.iterateVerticalitiesNwise(n=3):
             if len(verticalities) < 3:
                 continue
             if verticalities[0].isConsonant and \
                 not verticalities[1].isConsonant and \
                 verticalities[2].isConsonant:
                 horizontalities = tree.unwrapVerticalities(verticalities)
-                beatStrength = verticalities[0].beatStrength
+                for part, horizontality in horizontalities.iteritems():
+                    pass
+                    #print horizontality,
+                    #print horizontality.isPassing,
+                    #print horizontality.isNeighbor
+                # beatStrength = verticalities[0].beatStrength
                 # Next, identify neighbor or passing contours.
                 # Decide how to handle accented non-chord tones.
 
