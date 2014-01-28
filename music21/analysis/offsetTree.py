@@ -10,6 +10,7 @@
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
 
+import collections
 import random
 import unittest
 from music21 import chord
@@ -263,6 +264,47 @@ class Parentage(object):
 
         '''
         return self._stopOffset
+
+
+class Horizontality(collections.Sequence):
+    r'''
+    A horizontality of consecutive objects.
+    '''
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '_timespans',
+        )
+
+    ### INITIALIZER ###
+
+    def __init__(self,
+        timespans=None,
+        ):
+        assert isinstance(timespans, collections.Sequence)
+        assert len(timespans)
+        assert all(hasattr(x, 'startOffset') and hasattr(x, 'stopOffset')
+            for x in timespans)
+        self._timespans = tuple(timespans)
+
+    ### SPECIAL METHODS ###
+
+    def __getitem__(self, item):
+        return self._timespans[item]
+
+    def __len__(self):
+        return len(self._timespans)
+
+    ### PROPERTIES ###
+
+    @property
+    def isPassing(self):
+        pass
+
+    @property
+    def isNeighbor(self):
+        pass
 
 
 class Verticality(object):
@@ -1267,6 +1309,8 @@ class OffsetTree(object):
                 if timespan.part not in unwrapped:
                     unwrapped[timespan.part] = []
                 unwrapped[timespan.part].append(timespan)
+        for part, timespans in unwrapped.iteritems():
+            unwrapped[part] = Horizontality(timespans=unwrapped[part])
         return unwrapped
 
     def remove(self, *timespans):
