@@ -310,7 +310,7 @@ class Horizontality(collections.Sequence):
     ### PROPERTIES ###
 
     @property
-    def isPassing(self):
+    def hasPassingTone(self):
         if len(self) < 3:
             return False
         elif not all(len(x.pitches) for x in self):
@@ -325,7 +325,7 @@ class Horizontality(collections.Sequence):
         return False
 
     @property
-    def isNeighbor(self):
+    def hasNeighborTone(self):
         if len(self) < 3:
             return False
         elif not all(len(x.pitches) for x in self):
@@ -476,7 +476,10 @@ class Verticality(object):
                 <Verticality 35.0 {A#3 C#4 F#3 F#4}> True
 
         '''
-        newChord = chord.Chord(sorted(self.pitchSet))
+        pitchClassSet = sorted(self.pitchClassSet)
+        if len(pitchClassSet) == 1:
+            return True
+        newChord = chord.Chord(pitchClassSet)
         if newChord.isTriad():
             return True
         elif newChord.isSeventh():

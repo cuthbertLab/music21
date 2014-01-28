@@ -81,15 +81,16 @@ class ChordReducer(object):
             for part, timespans in horizontalities.iteritems():
                 if len(timespans) < 2:
                     continue
-                elif timespans[0].stopOffset != timespans[1].startOffset:
-                    continue
+                #elif timespans[0].stopOffset != timespans[1].startOffset:
+                #    continue
                 elif timespans[0].pitches != timespans[1].pitches:
                     continue
                 tree.remove(*timespans)
-                merged = timespans[0].mergeWith(timespans[1])
+                #merged = timespans[0].mergeWith(timespans[1])
+                merged = timespans[0].new(
+                    stopOffset=timespans[1].stopOffset,
+                    )
                 tree.insert(merged)
-
-        # Align notes across parts by lyrics.
 
         # Remove passing and neighbor tones.
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
@@ -100,13 +101,33 @@ class ChordReducer(object):
                 verticalities[2].isConsonant:
                 horizontalities = tree.unwrapVerticalities(verticalities)
                 for part, horizontality in horizontalities.iteritems():
-                    pass
-                    #print horizontality,
-                    #print horizontality.isPassing,
-                    #print horizontality.isNeighbor
-                # beatStrength = verticalities[0].beatStrength
-                # Next, identify neighbor or passing contours.
-                # Decide how to handle accented non-chord tones.
+                    if not horizontality.hasPassingTone and \
+                        not horizontality.hasNeighborTone:
+                        continue
+                    #elif horizontality[0].beatStrength < \
+                    #    horizontality[1].beatStrength:
+                    #    continue
+                    merged = horizontality[0].new(
+                        stopOffset=horizontality[1].stopOffset,
+                        )
+                    tree.remove(horizontality[0], horizontality[1])
+                    tree.insert(merged)
+
+        # Connect like-pitched timespans in same part.
+        for verticalities in tree.iterateVerticalitiesPairwise():
+            horizontalities = tree.unwrapVerticalities(verticalities)
+            for part, timespans in horizontalities.iteritems():
+                if len(timespans) < 2:
+                    continue
+                elif timespans[0].stopOffset != timespans[1].startOffset:
+                    continue
+                elif timespans[0].pitches != timespans[1].pitches:
+                    continue
+                tree.remove(*timespans)
+                merged = timespans[0].mergeWith(timespans[1])
+                tree.insert(merged)
+
+        # Align notes across parts by lyrics.
 
         # Attempt to collapse arpeggiated chord tones.
 
