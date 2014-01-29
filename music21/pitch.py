@@ -1194,6 +1194,9 @@ class Pitch(base.Music21Object):
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
     def __init__(self, name=None, **keywords):
+        if isinstance(name, type(self)):
+            name = name.nameWithOctave
+
         base.Music21Object.__init__(self, **keywords)
 
         # this should not be set, as will be updated when needed
