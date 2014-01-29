@@ -18,7 +18,7 @@ import unittest
 import copy
 from music21 import chord
 from music21 import meter
-from music21 import note
+from music21 import pitch
 from music21 import stream
 from music21 import tie
 from music21 import environment
@@ -204,6 +204,19 @@ class ChordReducer(object):
             outputMeasure.timeSignature = copy.deepcopy(sourceMeasureTs)
             lastTimeSignature = sourceMeasureTs
         return lastPitchedObject, lastTimeSignature, outputMeasure
+
+    @staticmethod
+    def _getIntervalClassSet(pitches):
+        result = set()
+        pitches = [pitch.Pitch(x) for x in pitches]
+        for i, x in enumerate(pitches):
+            for y in pitches[i + 1:]:
+                interval = int(abs(x.ps - y.ps))
+                interval %= 12
+                if 6 < interval:
+                    interval = 12 - interval
+                result.add(interval)
+        return result
 
     ### PUBLIC METHODS ###
 
