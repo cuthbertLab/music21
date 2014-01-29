@@ -130,6 +130,50 @@ class ChordReducer(object):
         # Align notes across parts by lyrics.
 
         # Attempt to collapse arpeggiated chord tones.
+        for verticalities in tree.iterateVerticalitiesPairwise():
+            one, two = verticalities
+            print one.measureNumber
+            onePitches, twoPitches = sorted(one.pitchSet), sorted(two.pitchSet)
+            if onePitches[0].nameWithOctave != twoPitches[0].nameWithOctave:
+                continue
+            elif one.measureNumber != two.measureNumber:
+                continue
+            #elif not offsetTree.Verticality.pitchesAreConsonant(onePitches):
+            #    continue
+            #elif not offsetTree.Verticality.pitchesAreConsonant(twoPitches):
+            #    continue
+            sumPitches = set()
+            sumPitches.update([x.nameWithOctave for x in onePitches])
+            sumPitches.update([x.nameWithOctave for x in twoPitches])
+            sumPitches = sorted([pitch.Pitch(x) for x in sumPitches])
+            if not offsetTree.Verticality.pitchesAreConsonant(sumPitches):
+                intervalClasses = self._getIntervalClassSet(sumPitches)
+                if intervalClasses not in (
+                    frozenset([1, 4, 5]),
+                    frozenset([2, 3, 5]),
+                    frozenset([1, 4, 5]),
+                    frozenset([1, 3, 4]),
+                    frozenset([2, 4, 6]),
+                    frozenset([2, 3, 5]),
+                    ):
+                    print sumPitches
+                    continue
+            else:
+                print sumPitches
+            horizontalities = tree.unwrapVerticalities(verticalities)
+            for part, timespans in horizontalities.iteritems():
+                if len(timespans) < 2:
+                    continue
+                elif timespans[0].pitches == timespans[1].pitches:
+                    continue
+                sumPitches = timespans[0].pitches + timespans[1].pitches
+                sumChord = chord.Chord(sumPitches)
+                tree.remove(*timespans)
+                merged = timespans[0].new(
+                    element=sumChord,
+                    stopOffset=timespans[1].stopOffset,
+                    )
+                tree.insert(merged)
 
         # Convert the offset-tree to a score.
         reducedScore = tree.toChordifiedScore(templateScore=inputScore)
