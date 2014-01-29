@@ -149,12 +149,10 @@ class ChordReducer(object):
             if not offsetTree.Verticality.pitchesAreConsonant(sumPitches):
                 intervalClasses = self._getIntervalClassSet(sumPitches)
                 if intervalClasses not in (
-                    frozenset([1, 4, 5]),
-                    frozenset([2, 3, 5]),
-                    frozenset([1, 4, 5]),
                     frozenset([1, 3, 4]),
-                    frozenset([2, 4, 6]),
+                    frozenset([1, 4, 5]),
                     frozenset([2, 3, 5]),
+                    frozenset([2, 4, 6]),
                     ):
                     print sumPitches
                     continue
