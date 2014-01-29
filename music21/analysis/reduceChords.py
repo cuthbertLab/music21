@@ -96,22 +96,22 @@ class ChordReducer(object):
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
             if len(verticalities) < 3:
                 continue
-            if verticalities[0].isConsonant and \
-                not verticalities[1].isConsonant and \
-                verticalities[2].isConsonant:
-                horizontalities = tree.unwrapVerticalities(verticalities)
-                for part, horizontality in horizontalities.iteritems():
-                    if not horizontality.hasPassingTone and \
-                        not horizontality.hasNeighborTone:
-                        continue
-                    #elif horizontality[0].beatStrength < \
-                    #    horizontality[1].beatStrength:
-                    #    continue
-                    merged = horizontality[0].new(
-                        stopOffset=horizontality[1].stopOffset,
-                        )
-                    tree.remove(horizontality[0], horizontality[1])
-                    tree.insert(merged)
+            horizontalities = tree.unwrapVerticalities(verticalities)
+            for part, horizontality in horizontalities.iteritems():
+                if not horizontality.hasPassingTone and \
+                    not horizontality.hasNeighborTone:
+                    continue
+                elif horizontality[0].measureNumber != \
+                    horizontality[1].measureNumber:
+                    continue
+                #elif horizontality[0].element.beatStrength < \
+                #    horizontality[1].element.beatStrength:
+                #    continue
+                merged = horizontality[0].new(
+                    stopOffset=horizontality[1].stopOffset,
+                    )
+                tree.remove(horizontality[0], horizontality[1])
+                tree.insert(merged)
 
         # Connect like-pitched timespans in same part.
         for verticalities in tree.iterateVerticalitiesPairwise():

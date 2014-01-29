@@ -322,6 +322,8 @@ class Horizontality(collections.Sequence):
             )
         if pitches[0] < pitches[1] < pitches[2]:
             return True
+        elif pitches[0] > pitches[1] > pitches[2]:
+            return True
         return False
 
     @property
