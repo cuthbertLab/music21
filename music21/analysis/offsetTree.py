@@ -87,13 +87,15 @@ class Parentage(object):
 
     def new(
         self,
+        element=None,
         startOffset=None,
         stopOffset=None,
         ):
+        element = element or self.element
         startOffset = startOffset or self.startOffset
         stopOffset = stopOffset or self.stopOffset
         return type(self)(
-            self.element,
+            element,
             self.parentage,
             startOffset=startOffset,
             stopOffset=stopOffset,
@@ -395,6 +397,24 @@ class Verticality(object):
             ' '.join(sorted(x.nameWithOctave for x in sortedPitches))
             )
 
+    ### PUBLIC METHODS ###
+
+    @staticmethod
+    def pitchesAreConsonant(pitches):
+        assert all(isinstance(x, pitch.Pitch) for x in pitches)
+        pitchClassSet = sorted(pitch.Pitch(x.nameWithOctave)
+            for x in pitches)
+        if len(pitchClassSet) == 1:
+            return True
+        newChord = chord.Chord(pitchClassSet)
+        if newChord.isTriad():
+            return True
+        elif newChord.isSeventh():
+            return True
+        elif newChord.isConsonant():
+            return True
+        return False
+
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -478,17 +498,7 @@ class Verticality(object):
                 <Verticality 35.0 {A#3 C#4 F#3 F#4}> True
 
         '''
-        pitchClassSet = sorted(self.pitchClassSet)
-        if len(pitchClassSet) == 1:
-            return True
-        newChord = chord.Chord(pitchClassSet)
-        if newChord.isTriad():
-            return True
-        elif newChord.isSeventh():
-            return True
-        elif newChord.isConsonant():
-            return True
-        return False
+        return self.pitchesAreConsonant(self.pitchClassSet)
 
     @property
     def measureNumber(self):
