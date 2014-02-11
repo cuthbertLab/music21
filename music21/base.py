@@ -3666,9 +3666,10 @@ class Music21Object(object):
     derivationHierarchy = property(_getDerivationHierarchy,
         doc = '''
         Return a list of Stream subclasses that this Stream
-        is contained within. This provides a way of seeing
+        is contained within or derived from. This provides a way of seeing
         Streams contained within Streams.
 
+        TODO: Better Name
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> [str(e.__class__) for e in s[1][2][3].derivationHierarchy]
