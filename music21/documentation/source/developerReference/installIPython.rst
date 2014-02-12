@@ -97,7 +97,7 @@ directory (or have that directory in your PATH) and run:
 
 ::
 
-   $bin/ipython notebook --pylab inline
+   bin/ipython notebook --pylab inline
 
 Congrats. You should now be able to access iPython notebook in your browser.
 
