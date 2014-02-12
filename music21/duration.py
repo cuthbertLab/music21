@@ -3342,6 +3342,12 @@ class GraceDuration(Duration):
 
     @property
     def makeTime(self):
+        '''
+        True, False, or None (=unknown) whether the grace note should occupy time
+        in performance. Default False. Currently not used in generated playback.
+
+        TODO: allow a duration object or number for duration.
+        '''
         return self._makeTime
 
     @makeTime.setter
@@ -3351,6 +3357,11 @@ class GraceDuration(Duration):
 
     @property
     def slash(self):
+        '''
+        True, False, or None (=unknown) whether the grace note should have a slash
+        through it. Default True.
+        '''
+
         return self._slash
 
     @slash.setter
@@ -3360,6 +3371,10 @@ class GraceDuration(Duration):
 
     @property
     def stealTimePrevious(self):
+        '''
+        Number from 0 to 1 or None (default) for the amount of time to steal from
+        the previous note.
+        '''
         return self._stealTimePrevious
 
     @stealTimePrevious.setter
@@ -3368,6 +3383,11 @@ class GraceDuration(Duration):
 
     @property
     def stealTimeFollowing(self):
+        '''
+        Number from 0 to 1 or None (default) for the amount of time to steal from
+        the following note.
+        '''
+
         return self._stealTimeFollowing
 
     @stealTimeFollowing.setter
