@@ -2,8 +2,54 @@ Using ``music21`` with the iPython Notebook
 ===========================================
 
 
-To get ``music21`` to work with iPython Notebook, first install the
-anaconda distribution of python...
+Setting up the iPython environment
+----------------------------------
+
+To get ``music21`` to work with iPython Notebook, first install
+`anaconda`. Detailed instructions for installing ``anaconda`` on different operating systems can be found here:
+
+* http://docs.continuum.io/anaconda/install.html
+
+.. _anaconda: http://docs.continuum.io/anaconda/index.html
+
+After installing ``anaconda``, run the following commands to update
+the ``conda`` package manager and ``ipython``
+
+::
+
+    $ conda update conda
+    $ conda update ipython
+
+.. warning:: 
+    Anaconda messes with your `PATH`, so I suggest opening your 
+    `~/.bash\_profile` and putting the `anaconda` directory after
+    `$PATH` not before:
+
+    :: 
+
+        # added by Anaconda 1.5.1 installer 
+        export PATH="$PATH:/Users/cuthbert/anaconda/bin
+
+
+Installing music21
+------------------
+
+If you are running an ``anaconda`` version < 1.8.0, you may install 
+``music21`` by entering:
+
+::
+
+    $ conda pip music21
+
+If you are running an ``anaconda`` version >= 1.8.0, the command ``conda pip`` is
+no longer allowed by ``anaconda``. Instead, you may use ``pip install``
+to install ``music21``:
+
+:: 
+
+    $ pip install music21
+
+Here are sample outputs for the installation process:
 
 ::
 
@@ -43,19 +89,21 @@ anaconda distribution of python...
         linking
 
 
-Anaconda messes with your PATH, so I suggest opening your
-~/.bash\_profile and putting the condo command after $PATH not before:
+Starting iPython notebook
+-------------------------
 
-``# added by Anaconda 1.5.1 installer export PATH="$PATH:/Users/cuthbert/anaconda/bin"``
+Now you're ready to run `iPython`. Make sure you're in the `anaconda`
+directory (or have that directory in your PATH) and run:
 
-Now you're ready to run iPython. Make sure you're in the anaconda
-directory and run:
+::
 
-``ciconia:anaconda cuthbert$ bin/ipython notebook --pylab inline``
+   $bin/ipython notebook --pylab inline
+
+Congrats. You should now be able to access iPython notebook in your browser.
+
 
 Using the web-based IP Notebook
 -------------------------------
-
 
 Now in the webbrowser you can type commands such as the ones below:
 
@@ -77,9 +125,9 @@ Now in the webbrowser you can type commands such as the ones below:
 
 All other normal ``music21`` commands will work as they should
 
+
 Displaying graphics inline
 --------------------------
-
 
 By default, you cannot just call .show() because you'll open up your
 MusicXML reader locally...
@@ -192,7 +240,6 @@ any other iPython notebook
 
 Turn off pesky prompts. Run this and then hide it
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 .. code:: python
 
