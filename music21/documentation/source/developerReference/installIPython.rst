@@ -6,60 +6,38 @@ Setting up the iPython environment
 ----------------------------------
 
 To get ``music21`` to work with iPython Notebook, first install
-`anaconda`. Detailed instructions for installing ``anaconda`` on different operating systems can be found here:
+``anaconda``. Detailed instructions for installing ``anaconda`` on
+different operating systems can be found at
+http://docs.continuum.io/anaconda/install.html . On Mac the commands may
+look something like this:
 
-* http://docs.continuum.io/anaconda/install.html
+``$ cd Downloads $ bash Anaconda-1.5.1-MacOSX-x86_64.sh $ cd ~ $ cd anaconda``
 
-.. _anaconda: http://docs.continuum.io/anaconda/index.html
+After installing ``anaconda``, run the following commands to update the
+``conda`` package manager and ``ipython``:
 
-After installing ``anaconda``, run the following commands to update
-the ``conda`` package manager and ``ipython``
+``$ conda update conda $ conda update ipython``
 
-::
+Anaconda messes with your PATH, so I suggest opening your
+~/.bash\_profile and putting the condo command after $PATH not before:
 
-    $ conda update conda
-    $ conda update ipython
+``# added by Anaconda 1.5.1 installer export PATH="$PATH:/Users/cuthbert/anaconda/bin"``
 
-.. warning:: 
-    Anaconda messes with your `PATH`, so I suggest opening your 
-    `~/.bash\_profile` and putting the `anaconda` directory after
-    `$PATH` not before:
+Installing music21 for anaconda
+-------------------------------
 
-    :: 
+If you are running an ``anaconda`` version < 1.8.0, you may install
+music21 by entering:
 
-        # added by Anaconda 1.5.1 installer 
-        export PATH="$PATH:/Users/cuthbert/anaconda/bin
+``$ conda pip music21``
 
+If you are running an ``anaconda`` version >= 1.8.0, the command
+``conda pip`` is no longer allowed by ``anaconda``. Instead you may use
+``pip install`` to install ``music21``.
 
-Installing music21
-------------------
-
-If you are running an ``anaconda`` version < 1.8.0, you may install 
-``music21`` by entering:
-
-::
-
-    $ conda pip music21
-
-If you are running an ``anaconda`` version >= 1.8.0, the command ``conda pip`` is
-no longer allowed by ``anaconda``. Instead, you may use ``pip install``
-to install ``music21``:
-
-:: 
-
-    $ pip install music21
+``$ pip install music21``
 
 Here are sample outputs for the installation process:
-
-::
-
-    ciconia:~ cuthbert$ cd Downloads
-    ciconia:Downloads cuthbert$ bash Anaconda-1.5.1-MacOSX-x86_64.sh
-    ciconia:Downloads cuthbert$ cd ~
-    ciconia:~ cuthbert$ cd anaconda
-    ciconia:anaconda cuthbert$ bin/conda update conda 
-    ciconia:anaconda cuthbert$ bin/conda update ipython
-    ciconia:anaconda cuthbert$ bin/conda pip music21
 
 ::
 
@@ -89,21 +67,17 @@ Here are sample outputs for the installation process:
         linking
 
 
-Starting iPython notebook
--------------------------
+Now you're ready to run iPython. Make sure you're in the anaconda
+directory and run:
 
-Now you're ready to run `iPython`. Make sure you're in the `anaconda`
-directory (or have that directory in your PATH) and run:
+``$ bin/ipython notebook --pylab inline``
 
-::
-
-   bin/ipython notebook --pylab inline
-
-Congrats. You should now be able to access iPython notebook in your browser.
-
+Congrats. You should now be able to access iPython notebook in your
+browser
 
 Using the web-based IP Notebook
 -------------------------------
+
 
 Now in the webbrowser you can type commands such as the ones below:
 
@@ -125,9 +99,9 @@ Now in the webbrowser you can type commands such as the ones below:
 
 All other normal ``music21`` commands will work as they should
 
-
 Displaying graphics inline
 --------------------------
+
 
 By default, you cannot just call .show() because you'll open up your
 MusicXML reader locally...
@@ -240,6 +214,7 @@ any other iPython notebook
 
 Turn off pesky prompts. Run this and then hide it
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 .. code:: python
 
