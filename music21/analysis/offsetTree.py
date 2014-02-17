@@ -39,7 +39,7 @@ class Parentage(object):
 
     __slots__ = (
         '_element',
-        '_parentage',
+        '_parentage',  # TODO: rename to ancestry?
         '_startOffset',
         '_stopOffset',
         )
@@ -74,15 +74,15 @@ class Parentage(object):
 
     ### PUBLIC METHODS ###
 
-    def mergeWith(self, timespan):
-        assert isinstance(timespan, type(self))
-        assert (self.stopOffset == timespan.startOffset) or \
-            (timespan.stopOffset == self.startOffset)
-        assert self.pitches == timespan.pitches
-        if self.startOffset < timespan.startOffset:
-            mergedParentage = self.new(stopOffset=timespan.stopOffset)
+    def mergeWith(self, parentage):
+        assert isinstance(parentage, type(self))
+        assert (self.stopOffset == parentage.startOffset) or \
+            (parentage.stopOffset == self.startOffset)
+        assert self.pitches == parentage.pitches
+        if self.startOffset < parentage.startOffset:
+            mergedParentage = self.new(stopOffset=parentage.stopOffset)
         else:
-            mergedParentage = timespan.new(stopOffset=self.stopOffset)
+            mergedParentage = parentage.new(stopOffset=self.stopOffset)
         return mergedParentage
 
     def new(
@@ -225,6 +225,11 @@ class Parentage(object):
 
     @property
     def pitches(self):
+        r'''
+        Gets the pitches of the element wrapped by this parentage.
+
+        This treats notes as chords.
+        '''
         result = []
         if hasattr(self.element, 'pitches'):
             result.extend(self.element.pitches)
@@ -270,7 +275,7 @@ class Parentage(object):
 
 class Horizontality(collections.Sequence):
     r'''
-    A horizontality of consecutive objects.
+    A horizontality of consecutive parentage objects.
     '''
 
     ### CLASS VARIABLES ###
@@ -313,6 +318,9 @@ class Horizontality(collections.Sequence):
 
     @property
     def hasPassingTone(self):
+        r'''
+        Is true if the horizontality contains a passing tone.
+        '''
         if len(self) < 3:
             return False
         elif not all(len(x.pitches) for x in self):
@@ -330,6 +338,9 @@ class Horizontality(collections.Sequence):
 
     @property
     def hasNeighborTone(self):
+        r'''
+        Is true if the horizontality contains a neighbor tone.
+        '''
         if len(self) < 3:
             return False
         elif not all(len(x.pitches) for x in self):
@@ -400,20 +411,14 @@ class Verticality(object):
     ### PUBLIC METHODS ###
 
     @staticmethod
-    def pitchesAreConsonant(pitches):
+    def pitchesAreConsonant(
+        pitches,
+        ):
         assert all(isinstance(x, pitch.Pitch) for x in pitches)
         pitchClassSet = sorted(pitch.Pitch(x.nameWithOctave)
             for x in pitches)
-        if len(pitchClassSet) == 1:
-            return True
-        newChord = chord.Chord(pitchClassSet)
-        if newChord.isTriad():
-            return True
-        elif newChord.isSeventh():
-            return True
-        elif newChord.isConsonant():
-            return True
-        return False
+        testChord = chord.Chord(pitchClassSet)
+        return testChord.isConsonant()
 
     ### PUBLIC PROPERTIES ###
 
@@ -442,60 +447,20 @@ class Verticality(object):
 
                 >>> score = corpus.parse('bwv66.6')
                 >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
-                >>> for verticality in tree.iterateVerticalities():
+                >>> verticalities = list(tree.iterateVerticalities())
+                >>> for verticality in verticalities[:10]:
                 ...     print verticality, verticality.isConsonant
                 ...
                 <Verticality 0.0 {A3 C#5 E4}> True
                 <Verticality 0.5 {B3 B4 E4 G#3}> True
-                <Verticality 1.0 {A4 C#4 F#3 F#4}> True
+                <Verticality 1.0 {A4 C#4 F#3 F#4}> False
                 <Verticality 2.0 {B3 B4 E4 G#3}> True
                 <Verticality 3.0 {A3 C#5 E4}> True
                 <Verticality 4.0 {B3 E4 E5 G#3}> True
                 <Verticality 5.0 {A3 C#5 E4}> True
                 <Verticality 5.5 {A4 C#3 C#5 E4}> True
                 <Verticality 6.0 {B4 E3 E4 G#4}> True
-                <Verticality 6.5 {B4 D4 E3 G#4}> True
-                <Verticality 7.0 {A2 A4 C#4 E4}> True
-                <Verticality 8.0 {C#4 C#5 E#3 G#4}> True
-                <Verticality 9.0 {A4 C#4 F#3 F#4}> True
-                <Verticality 9.5 {B2 B4 D4 G#4}> True
-                <Verticality 10.0 {C#3 C#4 E#4 G#4}> True
-                <Verticality 10.5 {B3 C#3 E#4 G#4}> True
-                <Verticality 11.0 {A3 C#4 F#2 F#4}> True
-                <Verticality 12.0 {A4 C#4 F#3 F#4}> True
-                <Verticality 13.0 {B3 B4 F#4 G#3}> False
-                <Verticality 13.5 {B3 B4 F#3 F#4}> False
-                <Verticality 14.0 {B3 B4 E4 G#3}> True
-                <Verticality 14.5 {A3 B3 B4 E4}> False
-                <Verticality 15.0 {B3 D#4 F#4}> True
-                <Verticality 15.5 {A3 B2 D#4 F#4}> True
-                <Verticality 16.0 {C#3 C#4 E4 G#3}> True
-                <Verticality 17.0 {A4 C#4 F#3}> True
-                <Verticality 17.5 {A4 D4 F#3 F#4}> True
-                <Verticality 18.0 {B4 C#4 E4 G#3}> True
-                <Verticality 18.5 {B3 B4 E4 G#3}> True
-                <Verticality 19.0 {A3 C#5 E4}> True
-                <Verticality 20.0 {A3 A4 C#5 E4}> True
-                <Verticality 21.0 {A4 D4 F#4}> True
-                <Verticality 22.0 {B3 B4 D4 F#4}> True
-                <Verticality 23.0 {C#4 C#5 E#3 G#4}> True
-                <Verticality 24.0 {A4 C#4 F#3 F#4}> True
-                <Verticality 25.0 {B2 D4 F#4 G#4}> True
-                <Verticality 25.5 {C#3 C#4 E#4 G#4}> True
-                <Verticality 26.0 {C#4 D3 F#4}> False
-                <Verticality 26.5 {B3 D3 F#3 F#4}> True
-                <Verticality 27.0 {C#3 C#4 E#3 G#4}> True
-                <Verticality 29.0 {A#2 C#4 F#3 F#4}> True
-                <Verticality 29.5 {A#2 D4 F#3 F#4}> True
-                <Verticality 30.0 {A#2 C#4 E4 F#4}> True
-                <Verticality 31.0 {B2 C#4 E4 F#4}> False
-                <Verticality 32.0 {B3 C#3 D4 F#4}> False
-                <Verticality 32.5 {A#3 C#3 C#4 F#4}> True
-                <Verticality 33.0 {B3 D3 F#4}> True
-                <Verticality 33.5 {B3 C#4 D3 F#4}> False
-                <Verticality 34.0 {B2 B3 D4 F#4}> True
-                <Verticality 34.5 {B2 B3 D4 E#4}> False
-                <Verticality 35.0 {A#3 C#4 F#3 F#4}> True
+                <Verticality 6.5 {B4 D4 E3 G#4}> False
 
         '''
         return self.pitchesAreConsonant(self.pitchClassSet)
@@ -693,6 +658,22 @@ class Verticality(object):
 class OffsetTree(object):
     r'''
     An offset-tree.
+
+    This datastructure stores timespans: objects which implement both a
+    `startOffset` and `stopOffset` property. It provides fast lookups of such
+    objects and can quickly locate vertical overlaps.
+
+    While you can construct an offset-tree by hand, inserting timespans one at
+    a time, the common use-case is to construct the offset-tree from an entire
+    score at once:
+
+    ::
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+        >>> verticality = tree.getVerticalityAt(1.5)
+
+    All offsets are assumed to be relative to the score's origin.
     '''
 
     ### CLASS VARIABLES ###
@@ -1014,27 +995,15 @@ class OffsetTree(object):
         '''
         def recurse(node, offset, indent=0):
             result = []
-            #indent_string = '\t' * indent
-            #print '{}SEARCHING: {}'.format(indent_string, node)
             if node is not None:
                 if node.startOffset < offset < node.latestStopOffset:
-                    #print '{}\tSTART < OFFSET < LATEST STOP'.format(
-                    #    indent_string)
                     result.extend(recurse(node.leftChild, offset, indent + 1))
                     for timespan in node.payload:
                         if offset < timespan.stopOffset:
                             result.append(timespan)
-                            #print '{}\t\tADDING: {}'.format(
-                            #    indent_string, timespan)
-                        #else:
-                            #print '{}\t\tSKIPPING: {}'.format(
-                            #    indent_string, timespan)
                     result.extend(recurse(node.rightChild, offset, indent + 1))
                 elif offset <= node.startOffset:
-                    #print '{}\tOFFSET < START'.format(indent_string)
                     result.extend(recurse(node.leftChild, offset, indent + 1))
-                #else:
-                    #print '{}\tNOPE'.format(indent_string)
             return result
         results = recurse(self._root, offset)
         results.sort(key=lambda x: (x.startOffset, x.stopOffset))
@@ -1045,6 +1014,26 @@ class OffsetTree(object):
         r'''
         Creates a new offset-tree from `inputScore`, populated by Parentage
         timespans.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> timespans = list(tree)
+            >>> for timespan in timespans[:10]:
+            ...     timespan
+            ...
+            <Parentage 0.0:0.5 <music21.note.Note C#>>
+            <Parentage 0.0:0.5 <music21.note.Note A>>
+            <Parentage 0.0:0.5 <music21.note.Note A>>
+            <Parentage 0.0:1.0 <music21.note.Note E>>
+            <Parentage 0.5:1.0 <music21.note.Note B>>
+            <Parentage 0.5:1.0 <music21.note.Note B>>
+            <Parentage 0.5:1.0 <music21.note.Note G#>>
+            <Parentage 1.0:2.0 <music21.note.Note A>>
+            <Parentage 1.0:2.0 <music21.note.Note F#>>
+            <Parentage 1.0:2.0 <music21.note.Note C#>>
+
         '''
         def recurse(inputStream, parentages, currentParentage):
             for x in inputStream:
@@ -1201,7 +1190,23 @@ class OffsetTree(object):
             ...             )
             ...
             Subequence:
-                [3] <Verticality 12.0 {A4 C#4 F#3 F#4}>: True [0.25]
+                [0] <Verticality 0.5 {B3 B4 E4 G#3}>: True [0.125]
+                [1] <Verticality 1.0 {A4 C#4 F#3 F#4}>: False [1.0]
+                [1] <Verticality 2.0 {B3 B4 E4 G#3}>: True [0.25]
+            Subequence:
+                [2] <Verticality 6.0 {B4 E3 E4 G#4}>: True [0.25]
+                [2] <Verticality 6.5 {B4 D4 E3 G#4}>: False [0.125]
+                [2] <Verticality 7.0 {A2 A4 C#4 E4}>: True [0.5]
+            Subequence:
+                [2] <Verticality 8.0 {C#4 C#5 E#3 G#4}>: True [0.25]
+                [3] <Verticality 9.0 {A4 C#4 F#3 F#4}>: False [1.0]
+                [3] <Verticality 9.5 {B2 B4 D4 G#4}>: False [0.125]
+                [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True [0.25]
+            Subequence:
+                [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True [0.25]
+                [3] <Verticality 10.5 {B3 C#3 E#4 G#4}>: False [0.125]
+                [3] <Verticality 11.0 {A3 C#4 F#2 F#4}>: False [0.5]
+                [3] <Verticality 12.0 {A4 C#4 F#3 F#4}>: False [0.25]
                 [4] <Verticality 13.0 {B3 B4 F#4 G#3}>: False [1.0]
                 [4] <Verticality 13.5 {B3 B4 F#3 F#4}>: False [0.125]
                 [4] <Verticality 14.0 {B3 B4 E4 G#3}>: True [0.25]
@@ -1210,22 +1215,39 @@ class OffsetTree(object):
                 [4] <Verticality 14.5 {A3 B3 B4 E4}>: False [0.125]
                 [4] <Verticality 15.0 {B3 D#4 F#4}>: True [0.5]
             Subequence:
+                [4] <Verticality 15.0 {B3 D#4 F#4}>: True [0.5]
+                [4] <Verticality 15.5 {A3 B2 D#4 F#4}>: False [0.125]
+                [4] <Verticality 16.0 {C#3 C#4 E4 G#3}>: True [0.25]
+            Subequence:
+                [4] <Verticality 16.0 {C#3 C#4 E4 G#3}>: True [0.25]
+                [5] <Verticality 17.0 {A4 C#4 F#3}>: False [1.0]
+                [5] <Verticality 17.5 {A4 D4 F#3 F#4}>: True [0.125]
+            Subequence:
+                [5] <Verticality 17.5 {A4 D4 F#3 F#4}>: True [0.125]
+                [5] <Verticality 18.0 {B4 C#4 E4 G#3}>: False [0.25]
+                [5] <Verticality 18.5 {B3 B4 E4 G#3}>: True [0.125]
+            Subequence:
+                [6] <Verticality 23.0 {C#4 C#5 E#3 G#4}>: True [0.5]
+                [6] <Verticality 24.0 {A4 C#4 F#3 F#4}>: False [0.25]
+                [7] <Verticality 25.0 {B2 D4 F#4 G#4}>: False [1.0]
+                [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True [0.125]
+            Subequence:
                 [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True [0.125]
                 [7] <Verticality 26.0 {C#4 D3 F#4}>: False [0.25]
                 [7] <Verticality 26.5 {B3 D3 F#3 F#4}>: True [0.125]
             Subequence:
-                [8] <Verticality 30.0 {A#2 C#4 E4 F#4}>: True [0.25]
+                [7] <Verticality 27.0 {C#3 C#4 E#3 G#4}>: True [0.5]
+                [8] <Verticality 29.0 {A#2 C#4 F#3 F#4}>: False [1.0]
+                [8] <Verticality 29.5 {A#2 D4 F#3 F#4}>: False [0.125]
+                [8] <Verticality 30.0 {A#2 C#4 E4 F#4}>: False [0.25]
                 [8] <Verticality 31.0 {B2 C#4 E4 F#4}>: False [0.5]
                 [8] <Verticality 32.0 {B3 C#3 D4 F#4}>: False [0.25]
-                [8] <Verticality 32.5 {A#3 C#3 C#4 F#4}>: True [0.125]
+                [8] <Verticality 32.5 {A#3 C#3 C#4 F#4}>: False [0.125]
+                [9] <Verticality 33.0 {B3 D3 F#4}>: True [1.0]
             Subequence:
                 [9] <Verticality 33.0 {B3 D3 F#4}>: True [1.0]
                 [9] <Verticality 33.5 {B3 C#4 D3 F#4}>: False [0.125]
                 [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True [0.25]
-            Subequence:
-                [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True [0.25]
-                [9] <Verticality 34.5 {B2 B3 D4 E#4}>: False [0.125]
-                [9] <Verticality 35.0 {A#3 C#4 F#3 F#4}>: True [0.5]
 
         '''
         iterator = self.iterateVerticalities()
@@ -1240,16 +1262,27 @@ class OffsetTree(object):
                     yield tuple(verticalityBuffer)
                 verticalityBuffer = [verticality]
 
-    def iterateVerticalities(self):
+    def iterateVerticalities(
+        self,
+        reverse=False,
+        ):
         r'''
         Iterates all vertical moments in this offset-tree.
+
+        ..  note:: The offset-tree can be mutated while its verticalities are
+            iterated over. Each verticality holds a reference back to the
+            offset-tree and will ask for the start-offset after (or before) its
+            own start offset in order to determine the next verticality to
+            yield. If you mutate the tree by adding or deleting timespans, the
+            next verticality will reflect those changes.
 
         ::
 
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
-            >>> for x in tree.iterateVerticalities():
-            ...     x
+            >>> iterator = tree.iterateVerticalities()
+            >>> for _ in range(10):
+            ...     iterator.next()
             ...
             <Verticality 0.0 {A3 C#5 E4}>
             <Verticality 0.5 {B3 B4 E4 G#3}>
@@ -1261,79 +1294,152 @@ class OffsetTree(object):
             <Verticality 5.5 {A4 C#3 C#5 E4}>
             <Verticality 6.0 {B4 E3 E4 G#4}>
             <Verticality 6.5 {B4 D4 E3 G#4}>
-            <Verticality 7.0 {A2 A4 C#4 E4}>
-            <Verticality 8.0 {C#4 C#5 E#3 G#4}>
-            <Verticality 9.0 {A4 C#4 F#3 F#4}>
-            <Verticality 9.5 {B2 B4 D4 G#4}>
-            <Verticality 10.0 {C#3 C#4 E#4 G#4}>
-            <Verticality 10.5 {B3 C#3 E#4 G#4}>
-            <Verticality 11.0 {A3 C#4 F#2 F#4}>
-            <Verticality 12.0 {A4 C#4 F#3 F#4}>
-            <Verticality 13.0 {B3 B4 F#4 G#3}>
-            <Verticality 13.5 {B3 B4 F#3 F#4}>
-            <Verticality 14.0 {B3 B4 E4 G#3}>
-            <Verticality 14.5 {A3 B3 B4 E4}>
-            <Verticality 15.0 {B3 D#4 F#4}>
-            <Verticality 15.5 {A3 B2 D#4 F#4}>
-            <Verticality 16.0 {C#3 C#4 E4 G#3}>
-            <Verticality 17.0 {A4 C#4 F#3}>
-            <Verticality 17.5 {A4 D4 F#3 F#4}>
-            <Verticality 18.0 {B4 C#4 E4 G#3}>
-            <Verticality 18.5 {B3 B4 E4 G#3}>
-            <Verticality 19.0 {A3 C#5 E4}>
-            <Verticality 20.0 {A3 A4 C#5 E4}>
-            <Verticality 21.0 {A4 D4 F#4}>
-            <Verticality 22.0 {B3 B4 D4 F#4}>
-            <Verticality 23.0 {C#4 C#5 E#3 G#4}>
-            <Verticality 24.0 {A4 C#4 F#3 F#4}>
-            <Verticality 25.0 {B2 D4 F#4 G#4}>
-            <Verticality 25.5 {C#3 C#4 E#4 G#4}>
-            <Verticality 26.0 {C#4 D3 F#4}>
-            <Verticality 26.5 {B3 D3 F#3 F#4}>
-            <Verticality 27.0 {C#3 C#4 E#3 G#4}>
-            <Verticality 29.0 {A#2 C#4 F#3 F#4}>
-            <Verticality 29.5 {A#2 D4 F#3 F#4}>
-            <Verticality 30.0 {A#2 C#4 E4 F#4}>
-            <Verticality 31.0 {B2 C#4 E4 F#4}>
-            <Verticality 32.0 {B3 C#3 D4 F#4}>
-            <Verticality 32.5 {A#3 C#3 C#4 F#4}>
-            <Verticality 33.0 {B3 D3 F#4}>
-            <Verticality 33.5 {B3 C#4 D3 F#4}>
-            <Verticality 34.0 {B2 B3 D4 F#4}>
-            <Verticality 34.5 {B2 B3 D4 E#4}>
+
+        Verticalities can also be iterated in reverse:
+
+            >>> iterator = tree.iterateVerticalities(reverse=True)
+            >>> for _ in range(10):
+            ...     iterator.next()
+            ...
             <Verticality 35.0 {A#3 C#4 F#3 F#4}>
+            <Verticality 34.5 {B2 B3 D4 E#4}>
+            <Verticality 34.0 {B2 B3 D4 F#4}>
+            <Verticality 33.5 {B3 C#4 D3 F#4}>
+            <Verticality 33.0 {B3 D3 F#4}>
+            <Verticality 32.5 {A#3 C#3 C#4 F#4}>
+            <Verticality 32.0 {B3 C#3 D4 F#4}>
+            <Verticality 31.0 {B2 C#4 E4 F#4}>
+            <Verticality 30.0 {A#2 C#4 E4 F#4}>
+            <Verticality 29.5 {A#2 D4 F#3 F#4}>
 
         '''
-        #for startOffset in self.allStartOffsets:
-        #    yield self.getVerticalityAt(startOffset)
-        startOffset = self.allStartOffsets[0]
-        verticality = self.getVerticalityAt(startOffset)
-        yield verticality
-        verticality = verticality.nextVerticality
-        while verticality is not None:
+        if reverse:
+            startOffset = self.latestStartOffset
+            verticality = self.getVerticalityAt(startOffset)
+            yield verticality
+            verticality = verticality.previousVerticality
+            while verticality is not None:
+                yield verticality
+                verticality = verticality.previousVerticality
+        else:
+            startOffset = self.earliestStartOffset
+            verticality = self.getVerticalityAt(startOffset)
             yield verticality
             verticality = verticality.nextVerticality
+            while verticality is not None:
+                yield verticality
+                verticality = verticality.nextVerticality
 
-    def iterateVerticalitiesNwise(self, n=3):
+    def iterateVerticalitiesNwise(
+        self,
+        n=3,
+        reverse=False,
+        ):
+        r'''
+        Iterates verticalities in groups of `n`.
+
+        ..  note:: The offset-tree can be mutated while its verticalities are
+            iterated over. Each verticality holds a reference back to the
+            offset-tree and will ask for the start-offset after (or before) its
+            own start offset in order to determine the next verticality to
+            yield. If you mutate the tree by adding or deleting timespans, the
+            next verticality will reflect those changes.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> iterator = tree.iterateVerticalitiesNwise(n=2)
+            >>> for _ in range(4):
+            ...     print iterator.next()
+            ...
+            (<Verticality 0.0 {A3 C#5 E4}>, <Verticality 0.5 {B3 B4 E4 G#3}>)
+            (<Verticality 0.5 {B3 B4 E4 G#3}>, <Verticality 1.0 {A4 C#4 F#3 F#4}>)
+            (<Verticality 1.0 {A4 C#4 F#3 F#4}>, <Verticality 2.0 {B3 B4 E4 G#3}>)
+            (<Verticality 2.0 {B3 B4 E4 G#3}>, <Verticality 3.0 {A3 C#5 E4}>)
+
+        Grouped verticalities can also be iterated in reverse:
+
+        ::
+
+            >>> iterator = tree.iterateVerticalitiesNwise(n=2, reverse=True)
+            >>> for _ in range(4):
+            ...     print iterator.next()
+            ...
+            (<Verticality 34.5 {B2 B3 D4 E#4}>, <Verticality 35.0 {A#3 C#4 F#3 F#4}>)
+            (<Verticality 34.0 {B2 B3 D4 F#4}>, <Verticality 34.5 {B2 B3 D4 E#4}>)
+            (<Verticality 33.5 {B3 C#4 D3 F#4}>, <Verticality 34.0 {B2 B3 D4 F#4}>)
+            (<Verticality 33.0 {B3 D3 F#4}>, <Verticality 33.5 {B3 C#4 D3 F#4}>)
+
+        '''
         n = int(n)
         assert 0 < n
-        for verticality in self.iterateVerticalities():
-            verticalities = [verticality]
-            while len(verticalities) < n:
-                previousVerticality = verticalities[-1].previousVerticality
-                if previousVerticality is None:
-                    break
-                verticalities.append(previousVerticality)
-            yield tuple(reversed(verticalities))
+        if reverse:
+            for verticality in self.iterateVerticalities(reverse=True):
+                verticalities = [verticality]
+                while len(verticalities) < n:
+                    nextVerticality = verticalities[-1].nextVerticality
+                    if nextVerticality is None:
+                        break
+                    verticalities.append(nextVerticality)
+                if len(verticalities) == n:
+                    yield tuple(verticalities)
+        else:
+            for verticality in self.iterateVerticalities():
+                verticalities = [verticality]
+                while len(verticalities) < n:
+                    previousVerticality = verticalities[-1].previousVerticality
+                    if previousVerticality is None:
+                        break
+                    verticalities.append(previousVerticality)
+                if len(verticalities) == n:
+                    yield tuple(reversed(verticalities))
 
     def iterateVerticalitiesPairwise(self):
-        for verticality in self.iterateVerticalities():
-            previousVerticality = verticality.previousVerticality
-            if previousVerticality is not None:
-                yield (previousVerticality, verticality)
+        #for verticality in self.iterateVerticalities():
+        #    previousVerticality = verticality.previousVerticality
+        #    if previousVerticality is not None:
+        #        yield (previousVerticality, verticality)
+        return self.iterateVerticaltiesNwise(n=2)
 
     @staticmethod
     def unwrapVerticalities(verticalities):
+        r'''
+        Unwraps a sequence of `Verticality` objects into a dictionary of
+        `Part`:`Horizontality` key/value pairs.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> iterator = tree.iterateVerticalitiesNwise()
+            >>> verticalities = iterator.next()
+            >>> unwrapped = tree.unwrapVerticalities(verticalities)
+            >>> for part in sorted(unwrapped,
+            ...     key=lambda x: x.getInstrument().partName,
+            ...     ):
+            ...     print part
+            ...     horizontality = unwrapped[part]
+            ...     for timespan in horizontality:
+            ...         print '\t', timespan
+            ...
+            <music21.stream.Part Alto>
+                <Parentage 0.0:1.0 <music21.note.Note E>>
+                <Parentage 1.0:2.0 <music21.note.Note F#>>
+            <music21.stream.Part Bass>
+                <Parentage 0.0:0.5 <music21.note.Note A>>
+                <Parentage 0.5:1.0 <music21.note.Note G#>>
+                <Parentage 1.0:2.0 <music21.note.Note F#>>
+            <music21.stream.Part Soprano>
+                <Parentage 0.0:0.5 <music21.note.Note C#>>
+                <Parentage 0.5:1.0 <music21.note.Note B>>
+                <Parentage 1.0:2.0 <music21.note.Note A>>
+            <music21.stream.Part Tenor>
+                <Parentage 0.0:0.5 <music21.note.Note A>>
+                <Parentage 0.5:1.0 <music21.note.Note B>>
+                <Parentage 1.0:2.0 <music21.note.Note C#>>
+
+        '''
         unwrapped = {}
         for timespan in verticalities[0].overlapTimespans:
             if timespan.part not in unwrapped:
@@ -1538,6 +1644,25 @@ class OffsetTree(object):
         r'''
         Gets all unique offsets (both starting and stopping) of all timespans
         in this offset-tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> for offset in tree.allOffsets[:10]:
+            ...     offset
+            ...
+            0.0
+            0.5
+            1.0
+            2.0
+            3.0
+            4.0
+            5.0
+            5.5
+            6.0
+            6.5
+
         '''
         def recurse(node):
             result = set()
@@ -1556,6 +1681,25 @@ class OffsetTree(object):
     def allStartOffsets(self):
         r'''
         Gets all unique start offsets of all timespans in this offset-tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> for offset in tree.allStartOffsets[:10]:
+            ...     offset
+            ...
+            0.0
+            0.5
+            1.0
+            2.0
+            3.0
+            4.0
+            5.0
+            5.5
+            6.0
+            6.5
+
         '''
         def recurse(node):
             result = []
@@ -1572,6 +1716,25 @@ class OffsetTree(object):
     def allStopOffsets(self):
         r'''
         Gets all unique stop offsets of all timespans in this offset-tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> for offset in tree.allStopOffsets[:10]:
+            ...     offset
+            ...
+            0.5
+            1.0
+            2.0
+            4.0
+            5.5
+            6.0
+            7.0
+            8.0
+            9.5
+            10.5
+
         '''
         def recurse(node):
             result = set()
@@ -1584,6 +1747,75 @@ class OffsetTree(object):
                     result.update(recurse(node.rightChild))
             return result
         return tuple(sorted(recurse(self._root)))
+
+    @property
+    def earliestStartOffset(self):
+        r'''
+        Gets the earlies start offset in this offset-tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> tree.earliestStartOffset
+            0.0
+
+        '''
+        def recurse(node):
+            if node.leftChild is not None:
+                return recurse(node.leftChild)
+            return node.startOffset
+        return recurse(self._root)
+
+    @property
+    def earliestStopOffset(self):
+        r'''
+        Gets the earliest stop offset in this offset-tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> tree.earliestStopOffset
+            0.5
+
+        '''
+        return self._root.earliestStopOffset
+
+    @property
+    def latestStartOffset(self):
+        r'''
+        Gets the lateset start offset in this offset-tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> tree.latestStartOffset
+            35.0
+
+        '''
+        def recurse(node):
+            if node.rightChild is not None:
+                return recurse(node._rightChild)
+            return node.startOffset
+        return recurse(self._root)
+
+    @property
+    def latestStopOffset(self):
+        r'''
+        Gets the latest stop offset in this offset-tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> tree.latestStopOffset
+            36.0
+
+        '''
+        return self._root.latestStopOffset
+
 
 #------------------------------------------------------------------------------
 
