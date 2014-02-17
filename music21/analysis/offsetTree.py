@@ -414,6 +414,10 @@ class Verticality(object):
     def pitchesAreConsonant(
         pitches,
         ):
+        r'''
+        Is true if all pitches in the elements starting or overlapping this
+        verticality's start-offset are consonant.
+        '''
         assert all(isinstance(x, pitch.Pitch) for x in pitches)
         pitchClassSet = sorted(pitch.Pitch(x.nameWithOctave)
             for x in pitches)
@@ -491,8 +495,26 @@ class Verticality(object):
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
             >>> verticality = tree.getVerticalityAt(1.0)
-            >>> verticality.nextVerticality
+            >>> print verticality
+            <Verticality 1.0 {A4 C#4 F#3 F#4}>
+
+        ::
+
+            >>> nextVerticality = verticality.nextVerticality
+            >>> print nextVerticality
             <Verticality 2.0 {B3 B4 E4 G#3}>
+
+        Verticality objects created by an offset-tree hold a reference back to
+        that offset-tree. This means that they determine their next or previous
+        verticality dynamically based on the state of the offset-tree only when
+        asked. Because of this, it is safe to mutate the offset-tree by
+        inserting or removing timespans while iterating over it.
+
+        ::
+
+            >>> tree.remove(nextVerticality.startTimespans)
+            >>> verticality.nextVerticality
+            <Verticality 3.0 {A3 C#5 E4}>
 
         '''
         tree = self._offsetTree
@@ -584,8 +606,26 @@ class Verticality(object):
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
             >>> verticality = tree.getVerticalityAt(1.0)
-            >>> verticality.previousVerticality
+            >>> print verticality
+            <Verticality 1.0 {A4 C#4 F#3 F#4}>
+
+        ::
+
+            >>> previousVerticality = verticality.previousVerticality
+            >>> print previousVerticality
             <Verticality 0.5 {B3 B4 E4 G#3}>
+
+        Verticality objects created by an offset-tree hold a reference back to
+        that offset-tree. This means that they determine their next or previous
+        verticality dynamically based on the state of the offset-tree only when
+        asked. Because of this, it is safe to mutate the offset-tree by
+        inserting or removing timespans while iterating over it.
+
+        ::
+
+            >>> tree.remove(previousVerticality.startTimespans)
+            >>> verticality.previousVerticality
+            <Verticality 0.0 {A3 C#5 E4}>
 
         '''
         tree = self._offsetTree
@@ -671,7 +711,8 @@ class OffsetTree(object):
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
-        >>> verticality = tree.getVerticalityAt(1.5)
+        >>> print tree.getVerticalityAt(17.0)
+        <Verticality 17.0 {A4 C#4 F#3}>
 
     All offsets are assumed to be relative to the score's origin.
     '''
@@ -782,12 +823,16 @@ class OffsetTree(object):
 
     ### INITIALIZER ###
 
-    def __init__(self, *timespans):
+    def __init__(self, timespans=None):
         self._root = None
-        if len(timespans) == 1 and isinstance(timespans[0], type(self)):
-            timespans = [x for x in timespans[0]]
+        if timespans is not None:
+            if isinstance(timespans, type(self)):
+                timespans = [x for x in timespans]
+            elif hasattr(timespans, 'startOffset') and \
+                hasattr(timespans, 'stopOffset'):
+                timespans = [timespans]
         if timespans:
-            self.insert(*timespans)
+            self.insert(timespans)
 
     ### SPECIAL METHODS ###
 
@@ -963,6 +1008,16 @@ class OffsetTree(object):
     def findTimespansStartingAt(self, offset):
         r'''
         Finds timespans in this offset-tree which start at `offset`.
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> for timespan in tree.findTimespansStartingAt(0.5):
+            ...     timespan
+            ...
+            <Parentage 0.5:1.0 <music21.note.Note B>>
+            <Parentage 0.5:1.0 <music21.note.Note B>>
+            <Parentage 0.5:1.0 <music21.note.Note G#>>
+
         '''
         results = []
         node = self._search(self._root, offset)
@@ -973,6 +1028,16 @@ class OffsetTree(object):
     def findTimespansStoppingAt(self, offset):
         r'''
         Finds timespans in this offset-tree which stop at `offset`.
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> for timespan in tree.findTimespansStoppingAt(0.5):
+            ...     timespan
+            ...
+            <Parentage 0.0:0.5 <music21.note.Note C#>>
+            <Parentage 0.0:0.5 <music21.note.Note A>>
+            <Parentage 0.0:0.5 <music21.note.Note A>>
+
         '''
         def recurse(node, offset):
             result = []
@@ -992,6 +1057,14 @@ class OffsetTree(object):
     def findTimespansOverlapping(self, offset):
         r'''
         Finds timespans in this offset-tree which overlap `offset`.
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> for timespan in tree.findTimespansOverlapping(0.5):
+            ...     timespan
+            ...
+            <Parentage 0.0:1.0 <music21.note.Note E>>
+
         '''
         def recurse(node, offset, indent=0):
             result = []
@@ -1064,7 +1137,7 @@ class OffsetTree(object):
         initialParentage = (inputScore,)
         recurse(inputScore, parentages, currentParentage=initialParentage)
         tree = OffsetTree()
-        tree.insert(*parentages)
+        tree.insert(parentages)
         return tree
 
     def getStartOffsetAfter(self, offset):
@@ -1157,10 +1230,13 @@ class OffsetTree(object):
             )
         return verticality
 
-    def insert(self, *timespans):
+    def insert(self, timespans):
         r'''
         Inserts `timespans` into this offset-tree.
         '''
+        if hasattr(timespans, 'startOffset') and \
+            hasattr(timespans, 'stopOffset'):
+            timespans = [timespans]
         for timespan in timespans:
             assert hasattr(timespan, 'startOffset'), timespan
             assert hasattr(timespan, 'stopOffset'), timespan
@@ -1336,7 +1412,7 @@ class OffsetTree(object):
         reverse=False,
         ):
         r'''
-        Iterates verticalities in groups of `n`.
+        Iterates verticalities in groups of length `n`.
 
         ..  note:: The offset-tree can be mutated while its verticalities are
             iterated over. Each verticality holds a reference back to the
@@ -1395,13 +1471,6 @@ class OffsetTree(object):
                 if len(verticalities) == n:
                     yield tuple(reversed(verticalities))
 
-    def iterateVerticalitiesPairwise(self):
-        #for verticality in self.iterateVerticalities():
-        #    previousVerticality = verticality.previousVerticality
-        #    if previousVerticality is not None:
-        #        yield (previousVerticality, verticality)
-        return self.iterateVerticaltiesNwise(n=2)
-
     @staticmethod
     def unwrapVerticalities(verticalities):
         r'''
@@ -1458,10 +1527,13 @@ class OffsetTree(object):
             unwrapped[part] = Horizontality(timespans=unwrapped[part])
         return unwrapped
 
-    def remove(self, *timespans):
+    def remove(self, timespans):
         r'''
         Removes `timespans` from this offset-tree.
         '''
+        if hasattr(timespans, 'startOffset') and \
+            hasattr(timespans, 'stopOffset'):
+            timespans = [timespans]
         for timespan in timespans:
             assert hasattr(timespan, 'startOffset'), timespan
             assert hasattr(timespan, 'stopOffset'), timespan
@@ -1474,7 +1546,7 @@ class OffsetTree(object):
                 self._root = self._remove(self._root, timespan.startOffset)
         self._updateOffsets(self._root)
 
-    def splitAt(self, *offsets):
+    def splitAt(self, offsets):
         r'''
         Splits all timespans in this offset-tree at `offsets`, operating in
         place.
@@ -1513,6 +1585,8 @@ class OffsetTree(object):
             ()
 
         '''
+        if not isinstance(offsets, collections.Iterable):
+            offsets = [offsets]
         for offset in offsets:
             overlaps = self.findTimespansOverlapping(offset)
             if not overlaps:
@@ -1520,7 +1594,7 @@ class OffsetTree(object):
             for overlap in overlaps:
                 self.remove(overlap)
                 shards = overlap.splitAt(offset)
-                self.insert(*shards)
+                self.insert(shards)
 
     def toChordifiedScore(self, templateScore=None):
         r'''
