@@ -1140,6 +1140,26 @@ class OffsetTree(object):
         tree.insert(parentages)
         return tree
 
+    def fuseLikePitchedPartContiguousTimespans(self):
+        r'''
+        Fuses like-pitched part-contiguous timespans in place.
+        '''
+        for verticalities in self.iterateVerticalitiesNwise(n=2):
+            horizontalities = self.unwrapVerticalities(verticalities)
+            for part, timespans in horizontalities.iteritems():
+                if len(timespans) < 2:
+                    continue
+                else:
+                    if timespans[0].stopOffset != timespans[1].startOffset:
+                        continue
+                    elif timespans[0].pitches != timespans[1].pitches:
+                        continue
+                self.remove(timespans)
+                fusedTimespan = timespans[0].new(
+                    stopOffset=timespans[1].stopOffset,
+                    )
+                self.insert(fusedTimespan)
+
     def getStartOffsetAfter(self, offset):
         r'''
         Gets start offset after `offset`.

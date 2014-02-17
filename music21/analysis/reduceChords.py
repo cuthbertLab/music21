@@ -76,21 +76,7 @@ class ChordReducer(object):
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
         # Connect like-pitched timespans in same part.
-        for verticalities in tree.iterateVerticalitiesPairwise():
-            horizontalities = tree.unwrapVerticalities(verticalities)
-            for part, timespans in horizontalities.iteritems():
-                if len(timespans) < 2:
-                    continue
-                #elif timespans[0].stopOffset != timespans[1].startOffset:
-                #    continue
-                elif timespans[0].pitches != timespans[1].pitches:
-                    continue
-                tree.remove(*timespans)
-                #merged = timespans[0].mergeWith(timespans[1])
-                merged = timespans[0].new(
-                    stopOffset=timespans[1].stopOffset,
-                    )
-                tree.insert(merged)
+        tree.fuseLikePitchedPartContiguousTimespans()
 
         # Remove passing and neighbor tones.
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
@@ -110,27 +96,16 @@ class ChordReducer(object):
                 merged = horizontality[0].new(
                     stopOffset=horizontality[1].stopOffset,
                     )
-                tree.remove(horizontality[0], horizontality[1])
+                tree.remove((horizontality[0], horizontality[1]))
                 tree.insert(merged)
 
         # Connect like-pitched timespans in same part.
-        for verticalities in tree.iterateVerticalitiesPairwise():
-            horizontalities = tree.unwrapVerticalities(verticalities)
-            for part, timespans in horizontalities.iteritems():
-                if len(timespans) < 2:
-                    continue
-                elif timespans[0].stopOffset != timespans[1].startOffset:
-                    continue
-                elif timespans[0].pitches != timespans[1].pitches:
-                    continue
-                tree.remove(*timespans)
-                merged = timespans[0].mergeWith(timespans[1])
-                tree.insert(merged)
+        tree.fuseLikePitchedPartContiguousTimespans()
 
         # Align notes across parts by lyrics.
 
         # Attempt to collapse arpeggiated chord tones.
-        for verticalities in tree.iterateVerticalitiesPairwise():
+        for verticalities in tree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
             print one.measureNumber
             onePitches, twoPitches = sorted(one.pitchSet), sorted(two.pitchSet)
@@ -166,7 +141,7 @@ class ChordReducer(object):
                     continue
                 sumPitches = timespans[0].pitches + timespans[1].pitches
                 sumChord = chord.Chord(sumPitches)
-                tree.remove(*timespans)
+                tree.remove(timespans)
                 merged = timespans[0].new(
                     element=sumChord,
                     stopOffset=timespans[1].stopOffset,
