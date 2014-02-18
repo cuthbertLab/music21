@@ -1005,6 +1005,24 @@ class OffsetTree(object):
         offsets.append(inputScore.duration.quarterLength)
         return score, offsets
 
+    def findNextParentageInSamePart(self, parentage):
+        assert isinstance(parentage, Parentage)
+        verticality = self.getVerticalityAt(parentage.startOffset)
+        while verticality is not None:
+            verticality = verticality.nextVerticality
+            for nextParentage in verticality.startTimespans:
+                if nextParentage.part is parentage.part:
+                    return nextParentage
+
+    def findPreviousParentageInSamePart(self, parentage):
+        assert isinstance(parentage, Parentage)
+        verticality = self.getVerticalityAt(parentage.startOffset)
+        while verticality is not None:
+            verticality = verticality.previousVerticality
+            for previousParentage in verticality.startTimespans:
+                if previousParentage.part is parentage.part:
+                    return previousParentage
+
     def findTimespansStartingAt(self, offset):
         r'''
         Finds timespans in this offset-tree which start at `offset`.
