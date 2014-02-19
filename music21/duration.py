@@ -636,7 +636,6 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     Tuplet objects (`tuplets`), and a (very) optional list of
     Medieval dot groups (`dotGroups`), return the equivalent quarter length.
 
-
     >>> duration.convertTypeToQuarterLength('whole')
     4.0
     >>> duration.convertTypeToQuarterLength('16th')
@@ -717,7 +716,6 @@ def updateTupletType(durationList):
     examine each Duration, and each component, and set Tuplet type to
     start or stop, as necessary.
 
-
     >>> a = duration.Duration(); a.quarterLength = .33333
     >>> b = duration.Duration(); b.quarterLength = .33333
     >>> c = duration.DurationUnit(); c.quarterLength = .33333
@@ -758,7 +756,9 @@ def updateTupletType(durationList):
             if tuplets in [(), None]: # no tuplets, length is zero
                 tupletMap.append([None, dur])
             elif len(tuplets) > 1:
-                raise Exception('got multi-tuplet DurationUnit; cannot yet handle this. %s' % tuplets)
+                #for i in range(len(tuplets)):
+                #    tupletMap.append([tuplets[i],dur])
+                environLocal.warn('got multi-tuplet DurationUnit; cannot yet handle this. %s' % repr(tuplets))
             elif len(tuplets) == 1:
                 tupletMap.append([tuplets[0], dur])
                 if tuplets[0] != dur.tuplets[0]:
