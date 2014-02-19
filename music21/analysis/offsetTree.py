@@ -1165,7 +1165,10 @@ class OffsetTree(object):
         tree.insert(parentages)
         return tree
 
-    def fuseLikePitchedPartContiguousTimespans(self):
+    def fuseLikePitchedPartContiguousTimespans(
+        self,
+        onlyInSameMeasure=True,
+        ):
         r'''
         Fuses like-pitched part-contiguous timespans in place.
         '''
@@ -1178,6 +1181,11 @@ class OffsetTree(object):
                     if timespans[0].stopOffset != timespans[1].startOffset:
                         continue
                     elif timespans[0].pitches != timespans[1].pitches:
+                        continue
+                if onlyInSameMeasure:
+                    oneMeasureNumber = timespans[0].measureNumber
+                    twoMeasureNumber = timespans[1].measureNumber
+                    if oneMeasureNumber != twoMeasureNumber:
                         continue
                 self.remove(timespans)
                 fusedTimespan = timespans[0].new(
