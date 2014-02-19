@@ -1243,33 +1243,55 @@ class OffsetTree(object):
         tree.insert(parentages)
         return tree
 
-    def fuseLikePitchedPartContiguousTimespans(
-        self,
-        onlyInSameMeasure=True,
-        ):
+    def fuseLikePitchedPartContiguousTimespans(self):
         r'''
         Fuses like-pitched part-contiguous timespans in place.
         '''
-        for verticalities in self.iterateVerticalitiesNwise(n=2):
-            horizontalities = self.unwrapVerticalities(verticalities)
-            for part, timespans in horizontalities.iteritems():
-                if len(timespans) < 2:
-                    continue
-                else:
-                    if timespans[0].stopOffset != timespans[1].startOffset:
-                        continue
-                    elif timespans[0].pitches != timespans[1].pitches:
-                        continue
-                if onlyInSameMeasure:
-                    oneMeasureNumber = timespans[0].measureNumber
-                    twoMeasureNumber = timespans[1].measureNumber
-                    if oneMeasureNumber != twoMeasureNumber:
-                        continue
-                self.remove(timespans)
-                fusedTimespan = timespans[0].new(
-                    stopOffset=timespans[1].stopOffset,
-                    )
-                self.insert(fusedTimespan)
+        for verticality in self.iterateVerticalities():
+            for parentage in verticality.startTimespans:
+                previousParentage = self.findPreviousParentageInSamePart(
+                    parentage)
+                if previousParentage is not None and \
+                    previousParentage.stopOffset == parentage.startOffset and \
+                    previousParentage.pitches == parentage.pitches:
+                    print previousParentage, parentage
+                    self.remove(parentage)
+                    self.remove(previousParentage)
+                    newParentage = previousParentage.new(
+                        stopOffset=parentage.stopOffset,
+                        )
+                    self.insert(newParentage)
+
+    def fillMeasureGaps(self):
+        for verticality in self.iterateVerticalities():
+            for parentage in verticality.startTimespans:
+                previousParentage = self.findPreviousParentageInSamePart(
+                    parentage)
+                changed = False
+                startOffset = parentage.startOffset
+                beatStrength = parentage.beatStrength
+                if previousParentage is None or \
+                    previousParentage.measureNumber != parentage.measureNumber:
+                    if parentage.startOffset != parentage.measureStartOffset:
+                        changed = True
+                        startOffset = parentage.measureStartOffset
+                        startVerticality = self.getVerticalityAt(startOffset)
+                        beatStrength = startVerticality.beatStrength
+                nextParentage = self.findNextParentageInSamePart(parentage)
+                stopOffset = parentage.stopOffset
+                if nextParentage is None or \
+                    nextParentage.measureNumber != parentage.measureNumber:
+                    if parentage.stopOffset != parentage.measureStopOffset:
+                        changed = True
+                        stopOffset = parentage.measureStopOffset
+                if changed:
+                    self.remove(parentage)
+                    newParentage = parentage.new(
+                        beatStrength=beatStrength,
+                        startOffset=startOffset,
+                        stopOffset=stopOffset,
+                        )
+                    self.insert(newParentage)
 
     def getStartOffsetAfter(self, offset):
         r'''
