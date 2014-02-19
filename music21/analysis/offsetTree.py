@@ -523,6 +523,26 @@ class Verticality(object):
         return self.startTimespans[0].measureNumber
 
     @property
+    def nextStartOffset(self):
+        r'''
+        Gets the next start-offset in the verticality's offset-tree.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> verticality.nextStartOffset
+            2.0
+
+        '''
+        tree = self._offsetTree
+        if tree is None:
+            return None
+        startOffset = tree.getStartOffsetAfter(self.startOffset)
+        return startOffset
+
+    @property
     def nextVerticality(self):
         r'''
         Gets the next verticality after a verticality.
