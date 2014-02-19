@@ -38,6 +38,7 @@ class Parentage(object):
     ### CLASS VARIABLES ###
 
     __slots__ = (
+        '_beatStrength',
         '_element',
         '_parentage',  # TODO: rename to ancestry?
         '_startOffset',
@@ -50,6 +51,7 @@ class Parentage(object):
         self,
         element,
         parentage,
+        beatStrength=None,
         startOffset=None,
         stopOffset=None,
         ):
@@ -59,7 +61,14 @@ class Parentage(object):
         assert isinstance(parentage[0], stream.Measure), parentage[0]
         assert isinstance(parentage[-1], stream.Score), parentage[-1]
         self._parentage = parentage
+        if beatStrength is not None:
+            beatStrength = float(beatStrength)
+        self._beatStrength = beatStrength
+        if startOffset is not None:
+            startOffset = float(startOffset)
         self._startOffset = startOffset
+        if stopOffset is not None:
+            stopOffset = float(stopOffset)
         self._stopOffset = stopOffset
 
     ### SPECIAL METHODS ###
@@ -137,6 +146,21 @@ class Parentage(object):
 
     ### PUBLIC PROPERTIES ###
 
+    @property
+    def beatStrength(self):
+        r'''
+        The parentage's element's beat-strength.
+
+        This may be overrided during instantiation by passing in a custom
+        beat-strength. That can be useful when you are generating new
+        parentages based on old ones, and want to maintain pitch information
+        from the old parentage but change the start offset to reflect that of
+        another timespan.
+        '''
+        if self._beatStrength is not None:
+            return self._beatStrength
+        return self._element.beatStrength
+    
     @property
     def element(self):
         r'''
@@ -447,7 +471,7 @@ class Verticality(object):
             1.0
 
         '''
-        return self.startTimespans[0].element.beatStrength
+        return self.startTimespans[0].beatStrength
 
     @property
     def isConsonant(self):
