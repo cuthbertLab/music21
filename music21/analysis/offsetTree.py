@@ -96,16 +96,22 @@ class Parentage(object):
 
     def new(
         self,
+        beatStrength=None,
         element=None,
         startOffset=None,
         stopOffset=None,
         ):
+        if beatStrength is None:
+            beatStrength = self.beatStrength
         element = element or self.element
-        startOffset = startOffset or self.startOffset
-        stopOffset = stopOffset or self.stopOffset
+        if startOffset is None:
+            startOffset = self.startOffset
+        if stopOffset is None:
+            stopOffset = self.stopOffset
         return type(self)(
             element,
             self.parentage,
+            beatStrength=beatStrength,
             startOffset=startOffset,
             stopOffset=stopOffset,
             )
