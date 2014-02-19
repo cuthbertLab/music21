@@ -73,21 +73,30 @@ class ChordReducer(object):
     def __call__(
         self,
         inputScore,
-        removeNonChordTones=True,
+        alignHockets=True,
         collapseArpeggios=True,
+        removeNonChordTones=True,
         ):
         from music21.analysis import offsetTree
         assert isinstance(inputScore, stream.Score)
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
         if removeNonChordTones:
-            self._removeNonChordTones(tree)
+            self.removeNonChordTones(tree)
+
+        if alignHockets:
+            self.alignHockets(tree)
 
         if collapseArpeggios:
-            self._collapseArpeggios(tree)
+            self.collapseArpeggios(tree)
 
         # Convert the offset-tree to a score.
+
+        # need a score with individual parts
+
         reducedScore = tree.toChordifiedScore(templateScore=inputScore)
+        return reducedScore
+
         reducedPart = stream.Part()
         reducedPart.append([x for x in reducedScore])
 
@@ -97,6 +106,35 @@ class ChordReducer(object):
         return reducedPart
 
     ### PRIVATE METHODS ###
+
+    def alignHockets(self, tree):
+        for verticalities in tree.iterateVerticalitiesNwise(n=2):
+            one, two = verticalities
+            onePitchSet = one.pitchSet
+            twoPitchSet = two.pitchSet
+            if not one.isConsonant or not two.isConsonant:
+                continue
+            if one.measureNumber != two.measureNumber:
+                continue
+            if onePitchSet.issubset(twoPitchSet):
+                for timespan in two.startTimespans:
+                    tree.remove(timespan)
+                    newTimespan = timespan.new(
+                        beatStrength=one.beatStrength,
+                        startOffset=one.startOffset,
+                        )
+                    tree.insert(newTimespan)
+            if all(timespan.stopOffset <= two.startOffset
+                for timespan in one.startTimespans):
+                for timespan in one.startTimespans:
+                    if timespan.stopOffset == two.startOffset:
+                        continue
+                    tree.remove(timespan)
+                    newTimespan = timespan.new(
+                        stopOffset=two.startOffset,
+                        )
+                    tree.insert(newTimespan)
+        tree.fuseLikePitchedPartContiguousTimespans()
 
     def _buildOutputMeasure(self,
         closedPosition,
@@ -160,7 +198,7 @@ class ChordReducer(object):
             lastTimeSignature = sourceMeasureTs
         return lastPitchedObject, lastTimeSignature, outputMeasure
 
-    def _collapseArpeggios(self, tree):
+    def collapseArpeggios(self, tree):
         from music21.analysis import offsetTree
         for verticalities in tree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
@@ -340,7 +378,7 @@ class ChordReducer(object):
         outputStream._elementsChanged()
         outputStream.getElementsByClass('Measure')[0].insert(
             0, outputStream.bestClef(allowTreble8vb=True))
-        #outputStream.makeNotation(inPlace=True)
+        outputStream.makeNotation(inPlace=True)
         return outputStream
 
     def qlbsmpConsonance(self, c):
@@ -516,11 +554,15 @@ class TestExternal(unittest.TestCase):
             firstMeasure.insert(0, clef.Treble8vbClef())
 
         chordReducer = ChordReducer()
+
         reduction = chordReducer(
             score,
-            collapseArpeggios=True,
+            alignHockets=True,
+            collapseArpeggios=False,
             removeNonChordTones=True,
             )
+
+        #reduction = chordReducer.multiPartReduction(score)
 
         score.insert(0, reduction)
         score.show()
