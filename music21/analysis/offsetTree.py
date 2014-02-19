@@ -155,6 +155,13 @@ class Parentage(object):
         return self._element
 
     @property
+    def lyric(self):
+        r'''
+        The parentage's element's lyric.
+        '''
+        return self._element.lyric
+
+    @property
     def measureNumber(self):
         r'''
         The measure number of the measure containing the element.
