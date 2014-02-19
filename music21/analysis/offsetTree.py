@@ -40,7 +40,9 @@ class Parentage(object):
     __slots__ = (
         '_beatStrength',
         '_element',
-        '_parentage',  # TODO: rename to ancestry?
+        '_measureStartOffset',
+        '_measureStopOffset',
+        '_parentage',
         '_startOffset',
         '_stopOffset',
         )
@@ -54,6 +56,8 @@ class Parentage(object):
         beatStrength=None,
         startOffset=None,
         stopOffset=None,
+        measureStartOffset=None,
+        measureStopOffset=None,
         ):
         self._element = element
         assert len(parentage), parentage
@@ -70,6 +74,12 @@ class Parentage(object):
         if stopOffset is not None:
             stopOffset = float(stopOffset)
         self._stopOffset = stopOffset
+        if measureStartOffset is not None:
+            measureStartOffset = float(measureStartOffset)
+        self._measureStartOffset = measureStartOffset
+        if measureStopOffset is not None:
+            measureStopOffset = float(measureStopOffset)
+        self._measureStopOffset = measureStopOffset
 
     ### SPECIAL METHODS ###
 
@@ -98,12 +108,18 @@ class Parentage(object):
         self,
         beatStrength=None,
         element=None,
+        measureStartOffset=None,
+        measureStopOffset=None,
         startOffset=None,
         stopOffset=None,
         ):
         if beatStrength is None:
             beatStrength = self.beatStrength
         element = element or self.element
+        if measureStartOffset is None:
+            measureStartOffset = self.measureStartOffset
+        if measureStopOffset is None:
+            measureStopOffset = self.measureStopOffset
         if startOffset is None:
             startOffset = self.startOffset
         if stopOffset is None:
@@ -112,6 +128,8 @@ class Parentage(object):
             element,
             self.parentage,
             beatStrength=beatStrength,
+            measureStartOffset=measureStartOffset,
+            measureStopOffset=measureStopOffset,
             startOffset=startOffset,
             stopOffset=stopOffset,
             )
@@ -207,6 +225,14 @@ class Parentage(object):
 
         '''
         return self.parentage[0].measureNumber
+
+    @property
+    def measureStartOffset(self):
+        return self._measureStartOffset
+
+    @property
+    def measureStopOffset(self):
+        return self._measureStopOffset
 
     @property
     def parentage(self):
@@ -1189,7 +1215,9 @@ class OffsetTree(object):
             for x in inputStream:
                 if isinstance(x, stream.Measure):
                     localParentage = currentParentage + (x,)
-                    measureOffset = x.offset
+                    measureStartOffset = x.offset
+                    measureStopOffset = measureStartOffset + \
+                        x.duration.quarterLength
                     for element in x:
                         if not isinstance(element, (
                             note.Note,
@@ -1197,11 +1225,13 @@ class OffsetTree(object):
                             )):
                             continue
                         elementOffset = element.offset
-                        startOffset = measureOffset + elementOffset
+                        startOffset = measureStartOffset + elementOffset
                         stopOffset = startOffset + element.quarterLength
                         parentage = Parentage(
                             element,
                             tuple(reversed(localParentage)),
+                            measureStartOffset=measureStartOffset,
+                            measureStopOffset=measureStopOffset,
                             startOffset=startOffset,
                             stopOffset=stopOffset,
                             )
