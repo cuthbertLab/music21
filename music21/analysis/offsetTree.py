@@ -492,6 +492,10 @@ class Verticality(object):
         return self.startTimespans[0].beatStrength
 
     @property
+    def degreeOfOverlap(self):
+        return len(self.startTimespans) + len(self.overlapTimespans)
+
+    @property
     def isConsonant(self):
         r'''
         Is true when the pitch set of a verticality is consonant.
@@ -2012,6 +2016,28 @@ class OffsetTree(object):
 
         '''
         return self._root.latestStopOffset
+
+    @property
+    def maximumOverlap(self):
+        overlap = None
+        for verticality in self.iterateVerticalities():
+            degreeOfOverlap = verticality.degreeOfOverlap
+            if overlap is None:
+                overlap = degreeOfOverlap
+            elif overlap < degreeOfOverlap:
+                overlap = degreeOfOverlap
+        return overlap
+
+    @property
+    def minimumOverlap(self):
+        overlap = None
+        for verticality in self.iterateVerticalities():
+            degreeOfOverlap = verticality.degreeOfOverlap
+            if overlap is None:
+                overlap = degreeOfOverlap
+            elif degreeOfOverlap < overlap:
+                overlap = degreeOfOverlap
+        return overlap
 
 
 #------------------------------------------------------------------------------
