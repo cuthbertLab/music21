@@ -617,6 +617,7 @@ class Verticality(object):
             <music21.pitch.Pitch A4>
 
         '''
+        from music21.figuredBass.fbPitch import HashablePitch
         pitchSet = set()
         for parentage in self.startTimespans:
             element = parentage.element
@@ -626,7 +627,7 @@ class Verticality(object):
             element = parentage.element
             pitches = [x.nameWithOctave for x in element.pitches]
             pitchSet.update(pitches)
-        pitchSet = set([pitch.Pitch(x) for x in pitchSet])
+        pitchSet = set([HashablePitch(x) for x in pitchSet])
         return pitchSet
 
     @property
@@ -647,10 +648,11 @@ class Verticality(object):
             <music21.pitch.Pitch A>
 
         '''
+        from music21.figuredBass.fbPitch import HashablePitch
         pitchClassSet = set()
         for currentPitch in self.pitchSet:
             pitchClassSet.add(currentPitch.name)
-        pitchClassSet = set([pitch.Pitch(x) for x in pitchClassSet])
+        pitchClassSet = set([HashablePitch(x) for x in pitchClassSet])
         return pitchClassSet
 
     @property
