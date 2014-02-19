@@ -1087,6 +1087,8 @@ class OffsetTree(object):
         verticality = self.getVerticalityAt(parentage.startOffset)
         while verticality is not None:
             verticality = verticality.nextVerticality
+            if verticality is None:
+                return None
             for nextParentage in verticality.startTimespans:
                 if nextParentage.part is parentage.part:
                     return nextParentage
@@ -1096,6 +1098,8 @@ class OffsetTree(object):
         verticality = self.getVerticalityAt(parentage.startOffset)
         while verticality is not None:
             verticality = verticality.previousVerticality
+            if verticality is None:
+                return None
             for previousParentage in verticality.startTimespans:
                 if previousParentage.part is parentage.part:
                     return previousParentage
