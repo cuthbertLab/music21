@@ -463,29 +463,15 @@ class Verticality(object):
         self._stopTimespans = stopTimespans
         self._overlapTimespans = overlapTimespans
 
+    ### SPECIAL METHODS ###
+
     def __repr__(self):
         sortedPitches = sorted(self.pitchSet)
         return '<{} {} {{{}}}>'.format(
             type(self).__name__,
             self.startOffset,
-            ' '.join(sorted(x.nameWithOctave for x in sortedPitches))
+            ' '.join(x.nameWithOctave for x in sortedPitches)
             )
-
-    ### PUBLIC METHODS ###
-
-    @staticmethod
-    def pitchesAreConsonant(
-        pitches,
-        ):
-        r'''
-        Is true if all pitches in the elements starting or overlapping this
-        verticality's start-offset are consonant.
-        '''
-        assert all(isinstance(x, pitch.Pitch) for x in pitches)
-        pitchClassSet = sorted(pitch.Pitch(x.nameWithOctave)
-            for x in pitches)
-        testChord = chord.Chord(pitchClassSet)
-        return testChord.isConsonant()
 
     ### PUBLIC PROPERTIES ###
 
@@ -530,7 +516,9 @@ class Verticality(object):
                 <Verticality 6.5 {B4 D4 E3 G#4}> False
 
         '''
-        return self.pitchesAreConsonant(self.pitchClassSet)
+        pitchSet = sorted(self.pitchSet)
+        testChord = chord.Chord(pitchSet)
+        return testChord.isConsonant()
 
     @property
     def measureNumber(self):
