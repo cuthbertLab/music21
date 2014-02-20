@@ -262,7 +262,16 @@ class ChordReducer(object):
                     )
                 tree.remove((horizontality[0], horizontality[1]))
                 tree.insert(merged)
-        tree.fuseLikePitchedPartContiguousTimespans()
+
+    def _removeVerticalDissonances(self, tree):
+        for verticality in tree.iterateVerticalities():
+            if verticality.isConsonant:
+                continue
+            pitchSet = verticality.pitchSet
+            lowestPitch = min(pitchSet)
+            for timespan in verticality.startTimespans:
+                if min(timespan.pitches) != lowestPitch:
+                    tree.remove(timespan)
 
     @staticmethod
     def _getIntervalClassSet(pitches):
