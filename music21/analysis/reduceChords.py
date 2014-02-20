@@ -204,8 +204,7 @@ class ChordReducer(object):
             lastTimeSignature = sourceMeasureTs
         return lastPitchedObject, lastTimeSignature, outputMeasure
 
-    def collapseArpeggios(self, tree):
-        from music21.analysis import offsetTree
+    def _collapseArpeggios(self, tree):
         for verticalities in tree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
             onePitches = sorted(one.pitchSet)
@@ -243,12 +242,9 @@ class ChordReducer(object):
                 tree.insert(merged)
 
     def _removeNonChordTones(self, tree):
-        tree.fuseLikePitchedPartContiguousTimespans()
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
             if len(verticalities) < 3:
                 continue
-            # `horizontalities` is a dictionary of Part:Horizontality pairs
-            # A `Horizontality` is a sequence of `Parentage` objects
             horizontalities = tree.unwrapVerticalities(verticalities)
             for part, horizontality in horizontalities.iteritems():
                 if not horizontality.hasPassingTone and \
@@ -547,37 +543,27 @@ class TestExternal(unittest.TestCase):
         pass
 
     def testTrecentoMadrigal(self):
+        from music21 import clef
         from music21 import corpus
+
         #score = corpus.parse('bach/bwv846').measures(1, 19)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 3)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 8)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
         #score = corpus.parse('PMFC_12_13').measures(1, 40)
 
-        # fix clef
-        fixClef = False
-        if fixClef:
-            from music21 import clef
-            firstMeasure = score.parts[1].getElementsByClass('Measure')[0]
-            startClefs = firstMeasure.getElementsByClass('Clef')
-            if len(startClefs):
-                clef1 = startClefs[0]
-                firstMeasure.remove(clef1)
-            firstMeasure.insert(0, clef.Treble8vbClef())
-
         chordReducer = ChordReducer()
+        reduction = chordReducer(score)
 
-        reduction = chordReducer(
-            score,
-            alignHockets=True,
-            collapseArpeggios=False,
-            removeNonChordTones=True,
-            )
-
-        #reduction = chordReducer.multiPartReduction(score)
+        firstMeasure = reduction.getElementsByClass('Measure')[0]
+        startClefs = firstMeasure.getElementsByClass('Clef')
+        if len(startClefs):
+            clef1 = startClefs[0]
+            firstMeasure.remove(clef1)
+        firstMeasure.insert(0, clef.Treble8vbClef())
 
         score.insert(0, reduction)
         score.show()
