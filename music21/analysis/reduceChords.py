@@ -73,68 +73,74 @@ class ChordReducer(object):
     def __call__(
         self,
         inputScore,
-        alignHockets=True,
-        collapseArpeggios=True,
-        removeNonChordTones=True,
         ):
         from music21.analysis import offsetTree
         assert isinstance(inputScore, stream.Score)
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
-        if removeNonChordTones:
-            self.removeNonChordTones(tree)
+        # tree.fuseLikePitchedPartContiguousTimespans()
 
-        if alignHockets:
-            self.alignHockets(tree)
+        self._removeVerticalDissonances(tree)
+        assert tree.maximumOverlap == 2
 
-        if collapseArpeggios:
-            self.collapseArpeggios(tree)
+        tree.fillMeasureGaps()
+        assert tree.maximumOverlap == 2
 
-        # Convert the offset-tree to a score.
+        self._alignHockets(tree)
+        assert tree.maximumOverlap == 2
 
-        # need a score with individual parts
+        # tree.fuseLikePitchedPartContiguousTimespans()
 
-        reducedScore = tree.toChordifiedScore(templateScore=inputScore)
-        return reducedScore
+        # self._removeNonChordTones(tree)
 
-        reducedPart = stream.Part()
-        reducedPart.append([x for x in reducedScore])
+        # tree.fuseLikePitchedPartContiguousTimespans()
 
-        # With the now-realized score, reduce chords-per-measure.
+        # self._collapseArpeggios(tree)
 
-        # Like-pitched chords should be tied together.
-        return reducedPart
+        # tree.fuseLikePitchedPartContiguousTimespans()
+
+        for verticality in tree.iterateVerticalities():
+            print verticality
+            for timespan in verticality.startTimespans:
+                print '\t', timespan
+
+        reduction = tree.toChordifiedScore(templateScore=inputScore)
+        return reduction 
+
 
     ### PRIVATE METHODS ###
 
-    def alignHockets(self, tree):
+    def _alignHockets(self, tree):
         for verticalities in tree.iterateVerticalitiesNwise(n=2):
-            one, two = verticalities
-            onePitchSet = one.pitchSet
-            twoPitchSet = two.pitchSet
-            if not one.isConsonant or not two.isConsonant:
+            verticalityOne, verticalityTwo = verticalities
+            pitchSetOne = verticalityOne.pitchSet
+            pitchSetTwo = verticalityTwo.pitchSet
+            print verticalityOne, verticalityTwo
+            if not verticalityOne.isConsonant or \
+                not verticalityTwo.isConsonant:
                 continue
-            if one.measureNumber != two.measureNumber:
+            if verticalityOne.measureNumber != verticalityTwo.measureNumber:
                 continue
-            if onePitchSet.issubset(twoPitchSet):
-                for timespan in two.startTimespans:
+            if verticalityOne.pitchSet == verticalityTwo.pitchSet:
+                continue
+            if pitchSetOne.issubset(pitchSetTwo):
+                for timespan in verticalityTwo.startTimespans:
                     tree.remove(timespan)
                     newTimespan = timespan.new(
-                        beatStrength=one.beatStrength,
-                        startOffset=one.startOffset,
+                        beatStrength=verticalityOne.beatStrength,
+                        startOffset=verticalityOne.startOffset,
                         )
+                    print '\tHOCKET:', timespan, newTimespan
                     tree.insert(newTimespan)
-            if all(timespan.stopOffset <= two.startOffset
-                for timespan in one.startTimespans):
-                for timespan in one.startTimespans:
-                    if timespan.stopOffset == two.startOffset:
-                        continue
-                    tree.remove(timespan)
-                    newTimespan = timespan.new(
-                        stopOffset=two.startOffset,
-                        )
-                    tree.insert(newTimespan)
-        tree.fuseLikePitchedPartContiguousTimespans()
+            elif pitchSetTwo.issubset(pitchSetOne):
+                for timespan in verticalityOne.startTimespans:
+                    if timespan.stopOffset < verticalityTwo.startOffset:
+                        tree.remove(timespan)
+                        newTimespan = timespan.new(
+                            stopOffset=verticalityTwo.startOffset,
+                            )
+                        print '\tEXPAND:', timespan, newTimespan
+                        tree.insert(newTimespan)
 
     def _buildOutputMeasure(self,
         closedPosition,
