@@ -104,9 +104,12 @@ class ChordReducer(object):
             for timespan in verticality.startTimespans:
                 print '\t', timespan
 
-        reduction = tree.toChordifiedScore(templateScore=inputScore)
-        return reduction 
+        #reduction = tree.toChordifiedScore(templateScore=inputScore)
+        reduction = tree.toPartwiseScore(templateScore=inputScore)
 
+        reduction.show('text')
+
+        return reduction
 
     ### PRIVATE METHODS ###
 
@@ -558,14 +561,16 @@ class TestExternal(unittest.TestCase):
         chordReducer = ChordReducer()
         reduction = chordReducer(score)
 
-        firstMeasure = reduction.getElementsByClass('Measure')[0]
-        startClefs = firstMeasure.getElementsByClass('Clef')
-        if len(startClefs):
-            clef1 = startClefs[0]
-            firstMeasure.remove(clef1)
-        firstMeasure.insert(0, clef.Treble8vbClef())
+#        firstMeasure = reduction.getElementsByClass('Measure')[0]
+#        startClefs = firstMeasure.getElementsByClass('Clef')
+#        if len(startClefs):
+#            clef1 = startClefs[0]
+#            firstMeasure.remove(clef1)
+#        firstMeasure.insert(0, clef.Treble8vbClef())
 
-        score.insert(0, reduction)
+        for part in reduction:
+            score.insert(0, part)
+
         score.show()
 
 
