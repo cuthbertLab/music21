@@ -10,13 +10,14 @@
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
 
+import bisect
 import collections
+import copy
 import random
 import unittest
 from music21 import chord
 from music21 import instrument
 from music21 import note
-from music21 import pitch
 from music21 import stream
 
 
@@ -51,8 +52,8 @@ class Parentage(object):
 
     def __init__(
         self,
-        element,
-        parentage,
+        element=None,
+        parentage=None,
         beatStrength=None,
         startOffset=None,
         stopOffset=None,
@@ -60,10 +61,11 @@ class Parentage(object):
         measureStopOffset=None,
         ):
         self._element = element
-        assert len(parentage), parentage
-        parentage = tuple(parentage)
-        assert isinstance(parentage[0], stream.Measure), parentage[0]
-        assert isinstance(parentage[-1], stream.Score), parentage[-1]
+        if parentage is not None:
+            assert len(parentage), parentage
+            parentage = tuple(parentage)
+            assert isinstance(parentage[0], stream.Measure), parentage[0]
+            assert isinstance(parentage[-1], stream.Score), parentage[-1]
         self._parentage = parentage
         if beatStrength is not None:
             beatStrength = float(beatStrength)
@@ -184,7 +186,7 @@ class Parentage(object):
         if self._beatStrength is not None:
             return self._beatStrength
         return self._element.beatStrength
-    
+
     @property
     def element(self):
         r'''
@@ -429,7 +431,7 @@ class Verticality(object):
         >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> verticality
-        <Verticality 1.0 {A4 C#4 F#3 F#4}>
+        <Verticality 1.0 {F#3 C#4 F#4 A4}>
 
     '''
 
@@ -508,16 +510,16 @@ class Verticality(object):
                 >>> for verticality in verticalities[:10]:
                 ...     print verticality, verticality.isConsonant
                 ...
-                <Verticality 0.0 {A3 C#5 E4}> True
-                <Verticality 0.5 {B3 B4 E4 G#3}> True
-                <Verticality 1.0 {A4 C#4 F#3 F#4}> False
-                <Verticality 2.0 {B3 B4 E4 G#3}> True
-                <Verticality 3.0 {A3 C#5 E4}> True
-                <Verticality 4.0 {B3 E4 E5 G#3}> True
-                <Verticality 5.0 {A3 C#5 E4}> True
-                <Verticality 5.5 {A4 C#3 C#5 E4}> True
-                <Verticality 6.0 {B4 E3 E4 G#4}> True
-                <Verticality 6.5 {B4 D4 E3 G#4}> False
+                <Verticality 0.0 {A3 E4 C#5}> True
+                <Verticality 0.5 {G#3 B3 E4 B4}> True
+                <Verticality 1.0 {F#3 C#4 F#4 A4}> True
+                <Verticality 2.0 {G#3 B3 E4 B4}> True
+                <Verticality 3.0 {A3 E4 C#5}> True
+                <Verticality 4.0 {G#3 B3 E4 E5}> True
+                <Verticality 5.0 {A3 E4 C#5}> True
+                <Verticality 5.5 {C#3 E4 A4 C#5}> True
+                <Verticality 6.0 {E3 E4 G#4 B4}> True
+                <Verticality 6.5 {E3 D4 G#4 B4}> False
 
         '''
         pitchSet = sorted(self.pitchSet)
@@ -571,13 +573,13 @@ class Verticality(object):
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> print verticality
-            <Verticality 1.0 {A4 C#4 F#3 F#4}>
+            <Verticality 1.0 {F#3 C#4 F#4 A4}>
 
         ::
 
             >>> nextVerticality = verticality.nextVerticality
             >>> print nextVerticality
-            <Verticality 2.0 {B3 B4 E4 G#3}>
+            <Verticality 2.0 {G#3 B3 E4 B4}>
 
         Verticality objects created by an offset-tree hold a reference back to
         that offset-tree. This means that they determine their next or previous
@@ -589,7 +591,7 @@ class Verticality(object):
 
             >>> tree.remove(nextVerticality.startTimespans)
             >>> verticality.nextVerticality
-            <Verticality 3.0 {A3 C#5 E4}>
+            <Verticality 3.0 {A3 E4 C#5}>
 
         '''
         tree = self._offsetTree
@@ -684,13 +686,13 @@ class Verticality(object):
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> print verticality
-            <Verticality 1.0 {A4 C#4 F#3 F#4}>
+            <Verticality 1.0 {F#3 C#4 F#4 A4}>
 
         ::
 
             >>> previousVerticality = verticality.previousVerticality
             >>> print previousVerticality
-            <Verticality 0.5 {B3 B4 E4 G#3}>
+            <Verticality 0.5 {G#3 B3 E4 B4}>
 
         Verticality objects created by an offset-tree hold a reference back to
         that offset-tree. This means that they determine their next or previous
@@ -702,7 +704,7 @@ class Verticality(object):
 
             >>> tree.remove(previousVerticality.startTimespans)
             >>> verticality.previousVerticality
-            <Verticality 0.0 {A3 C#5 E4}>
+            <Verticality 0.0 {A3 E4 C#5}>
 
         '''
         tree = self._offsetTree
@@ -789,7 +791,7 @@ class OffsetTree(object):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
         >>> print tree.getVerticalityAt(17.0)
-        <Verticality 17.0 {A4 C#4 F#3}>
+        <Verticality 17.0 {F#3 C#4 A4}>
 
     All offsets are assumed to be relative to the score's origin.
     '''
@@ -1367,7 +1369,7 @@ class OffsetTree(object):
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
             >>> tree.getVerticalityAt(2.5)
-            <Verticality 2.5 {B3 B4 E4 G#3}>
+            <Verticality 2.5 {G#3 B3 E4 B4}>
 
         Return verticality.
         '''
@@ -1419,64 +1421,58 @@ class OffsetTree(object):
             ...             )
             ...
             Subequence:
-                [0] <Verticality 0.5 {B3 B4 E4 G#3}>: True [0.125]
-                [1] <Verticality 1.0 {A4 C#4 F#3 F#4}>: False [1.0]
-                [1] <Verticality 2.0 {B3 B4 E4 G#3}>: True [0.25]
+                [2] <Verticality 6.0 {E3 E4 G#4 B4}>: True [0.25]
+                [2] <Verticality 6.5 {E3 D4 G#4 B4}>: False [0.125]
+                [2] <Verticality 7.0 {A2 C#4 E4 A4}>: True [0.5]
             Subequence:
-                [2] <Verticality 6.0 {B4 E3 E4 G#4}>: True [0.25]
-                [2] <Verticality 6.5 {B4 D4 E3 G#4}>: False [0.125]
-                [2] <Verticality 7.0 {A2 A4 C#4 E4}>: True [0.5]
-            Subequence:
-                [2] <Verticality 8.0 {C#4 C#5 E#3 G#4}>: True [0.25]
-                [3] <Verticality 9.0 {A4 C#4 F#3 F#4}>: False [1.0]
-                [3] <Verticality 9.5 {B2 B4 D4 G#4}>: False [0.125]
+                [3] <Verticality 9.0 {F#3 C#4 F#4 A4}>: True [1.0]
+                [3] <Verticality 9.5 {B2 D4 G#4 B4}>: False [0.125]
                 [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True [0.25]
             Subequence:
                 [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True [0.25]
-                [3] <Verticality 10.5 {B3 C#3 E#4 G#4}>: False [0.125]
-                [3] <Verticality 11.0 {A3 C#4 F#2 F#4}>: False [0.5]
-                [3] <Verticality 12.0 {A4 C#4 F#3 F#4}>: False [0.25]
-                [4] <Verticality 13.0 {B3 B4 F#4 G#3}>: False [1.0]
-                [4] <Verticality 13.5 {B3 B4 F#3 F#4}>: False [0.125]
-                [4] <Verticality 14.0 {B3 B4 E4 G#3}>: True [0.25]
+                [3] <Verticality 10.5 {C#3 B3 E#4 G#4}>: False [0.125]
+                [3] <Verticality 11.0 {F#2 A3 C#4 F#4}>: True [0.5]
             Subequence:
-                [4] <Verticality 14.0 {B3 B4 E4 G#3}>: True [0.25]
-                [4] <Verticality 14.5 {A3 B3 B4 E4}>: False [0.125]
+                [3] <Verticality 12.0 {F#3 C#4 F#4 A4}>: True [0.25]
+                [4] <Verticality 13.0 {G#3 B3 F#4 B4}>: False [1.0]
+                [4] <Verticality 13.5 {F#3 B3 F#4 B4}>: False [0.125]
+                [4] <Verticality 14.0 {G#3 B3 E4 B4}>: True [0.25]
+            Subequence:
+                [4] <Verticality 14.0 {G#3 B3 E4 B4}>: True [0.25]
+                [4] <Verticality 14.5 {A3 B3 E4 B4}>: False [0.125]
                 [4] <Verticality 15.0 {B3 D#4 F#4}>: True [0.5]
             Subequence:
                 [4] <Verticality 15.0 {B3 D#4 F#4}>: True [0.5]
-                [4] <Verticality 15.5 {A3 B2 D#4 F#4}>: False [0.125]
-                [4] <Verticality 16.0 {C#3 C#4 E4 G#3}>: True [0.25]
+                [4] <Verticality 15.5 {B2 A3 D#4 F#4}>: False [0.125]
+                [4] <Verticality 16.0 {C#3 G#3 C#4 E4}>: True [0.25]
             Subequence:
-                [4] <Verticality 16.0 {C#3 C#4 E4 G#3}>: True [0.25]
-                [5] <Verticality 17.0 {A4 C#4 F#3}>: False [1.0]
-                [5] <Verticality 17.5 {A4 D4 F#3 F#4}>: True [0.125]
+                [5] <Verticality 17.5 {F#3 D4 F#4 A4}>: True [0.125]
+                [5] <Verticality 18.0 {G#3 C#4 E4 B4}>: False [0.25]
+                [5] <Verticality 18.5 {G#3 B3 E4 B4}>: True [0.125]
             Subequence:
-                [5] <Verticality 17.5 {A4 D4 F#3 F#4}>: True [0.125]
-                [5] <Verticality 18.0 {B4 C#4 E4 G#3}>: False [0.25]
-                [5] <Verticality 18.5 {B3 B4 E4 G#3}>: True [0.125]
-            Subequence:
-                [6] <Verticality 23.0 {C#4 C#5 E#3 G#4}>: True [0.5]
-                [6] <Verticality 24.0 {A4 C#4 F#3 F#4}>: False [0.25]
+                [6] <Verticality 24.0 {F#3 C#4 F#4 A4}>: True [0.25]
                 [7] <Verticality 25.0 {B2 D4 F#4 G#4}>: False [1.0]
                 [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True [0.125]
             Subequence:
                 [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True [0.125]
-                [7] <Verticality 26.0 {C#4 D3 F#4}>: False [0.25]
-                [7] <Verticality 26.5 {B3 D3 F#3 F#4}>: True [0.125]
+                [7] <Verticality 26.0 {D3 C#4 F#4}>: False [0.25]
+                [7] <Verticality 26.5 {D3 F#3 B3 F#4}>: True [0.125]
             Subequence:
-                [7] <Verticality 27.0 {C#3 C#4 E#3 G#4}>: True [0.5]
-                [8] <Verticality 29.0 {A#2 C#4 F#3 F#4}>: False [1.0]
-                [8] <Verticality 29.5 {A#2 D4 F#3 F#4}>: False [0.125]
+                [8] <Verticality 29.0 {A#2 F#3 C#4 F#4}>: True [1.0]
+                [8] <Verticality 29.5 {A#2 F#3 D4 F#4}>: False [0.125]
                 [8] <Verticality 30.0 {A#2 C#4 E4 F#4}>: False [0.25]
                 [8] <Verticality 31.0 {B2 C#4 E4 F#4}>: False [0.5]
-                [8] <Verticality 32.0 {B3 C#3 D4 F#4}>: False [0.25]
-                [8] <Verticality 32.5 {A#3 C#3 C#4 F#4}>: False [0.125]
-                [9] <Verticality 33.0 {B3 D3 F#4}>: True [1.0]
+                [8] <Verticality 32.0 {C#3 B3 D4 F#4}>: False [0.25]
+                [8] <Verticality 32.5 {C#3 A#3 C#4 F#4}>: False [0.125]
+                [9] <Verticality 33.0 {D3 B3 F#4}>: True [1.0]
             Subequence:
-                [9] <Verticality 33.0 {B3 D3 F#4}>: True [1.0]
-                [9] <Verticality 33.5 {B3 C#4 D3 F#4}>: False [0.125]
+                [9] <Verticality 33.0 {D3 B3 F#4}>: True [1.0]
+                [9] <Verticality 33.5 {D3 B3 C#4 F#4}>: False [0.125]
                 [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True [0.25]
+            Subequence:
+                [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True [0.25]
+                [9] <Verticality 34.5 {B2 B3 D4 E#4}>: False [0.125]
+                [9] <Verticality 35.0 {F#3 A#3 C#4 F#4}>: True [0.5]
 
         '''
         iterator = self.iterateVerticalities()
@@ -1513,16 +1509,16 @@ class OffsetTree(object):
             >>> for _ in range(10):
             ...     iterator.next()
             ...
-            <Verticality 0.0 {A3 C#5 E4}>
-            <Verticality 0.5 {B3 B4 E4 G#3}>
-            <Verticality 1.0 {A4 C#4 F#3 F#4}>
-            <Verticality 2.0 {B3 B4 E4 G#3}>
-            <Verticality 3.0 {A3 C#5 E4}>
-            <Verticality 4.0 {B3 E4 E5 G#3}>
-            <Verticality 5.0 {A3 C#5 E4}>
-            <Verticality 5.5 {A4 C#3 C#5 E4}>
-            <Verticality 6.0 {B4 E3 E4 G#4}>
-            <Verticality 6.5 {B4 D4 E3 G#4}>
+            <Verticality 0.0 {A3 E4 C#5}>
+            <Verticality 0.5 {G#3 B3 E4 B4}>
+            <Verticality 1.0 {F#3 C#4 F#4 A4}>
+            <Verticality 2.0 {G#3 B3 E4 B4}>
+            <Verticality 3.0 {A3 E4 C#5}>
+            <Verticality 4.0 {G#3 B3 E4 E5}>
+            <Verticality 5.0 {A3 E4 C#5}>
+            <Verticality 5.5 {C#3 E4 A4 C#5}>
+            <Verticality 6.0 {E3 E4 G#4 B4}>
+            <Verticality 6.5 {E3 D4 G#4 B4}>
 
         Verticalities can also be iterated in reverse:
 
@@ -1530,16 +1526,16 @@ class OffsetTree(object):
             >>> for _ in range(10):
             ...     iterator.next()
             ...
-            <Verticality 35.0 {A#3 C#4 F#3 F#4}>
+            <Verticality 35.0 {F#3 A#3 C#4 F#4}>
             <Verticality 34.5 {B2 B3 D4 E#4}>
             <Verticality 34.0 {B2 B3 D4 F#4}>
-            <Verticality 33.5 {B3 C#4 D3 F#4}>
-            <Verticality 33.0 {B3 D3 F#4}>
-            <Verticality 32.5 {A#3 C#3 C#4 F#4}>
-            <Verticality 32.0 {B3 C#3 D4 F#4}>
+            <Verticality 33.5 {D3 B3 C#4 F#4}>
+            <Verticality 33.0 {D3 B3 F#4}>
+            <Verticality 32.5 {C#3 A#3 C#4 F#4}>
+            <Verticality 32.0 {C#3 B3 D4 F#4}>
             <Verticality 31.0 {B2 C#4 E4 F#4}>
             <Verticality 30.0 {A#2 C#4 E4 F#4}>
-            <Verticality 29.5 {A#2 D4 F#3 F#4}>
+            <Verticality 29.5 {A#2 F#3 D4 F#4}>
 
         '''
         if reverse:
@@ -1582,10 +1578,10 @@ class OffsetTree(object):
             >>> for _ in range(4):
             ...     print iterator.next()
             ...
-            (<Verticality 0.0 {A3 C#5 E4}>, <Verticality 0.5 {B3 B4 E4 G#3}>)
-            (<Verticality 0.5 {B3 B4 E4 G#3}>, <Verticality 1.0 {A4 C#4 F#3 F#4}>)
-            (<Verticality 1.0 {A4 C#4 F#3 F#4}>, <Verticality 2.0 {B3 B4 E4 G#3}>)
-            (<Verticality 2.0 {B3 B4 E4 G#3}>, <Verticality 3.0 {A3 C#5 E4}>)
+            (<Verticality 0.0 {A3 E4 C#5}>, <Verticality 0.5 {G#3 B3 E4 B4}>)
+            (<Verticality 0.5 {G#3 B3 E4 B4}>, <Verticality 1.0 {F#3 C#4 F#4 A4}>)
+            (<Verticality 1.0 {F#3 C#4 F#4 A4}>, <Verticality 2.0 {G#3 B3 E4 B4}>)
+            (<Verticality 2.0 {G#3 B3 E4 B4}>, <Verticality 3.0 {A3 E4 C#5}>)
 
         Grouped verticalities can also be iterated in reverse:
 
@@ -1595,10 +1591,10 @@ class OffsetTree(object):
             >>> for _ in range(4):
             ...     print iterator.next()
             ...
-            (<Verticality 34.5 {B2 B3 D4 E#4}>, <Verticality 35.0 {A#3 C#4 F#3 F#4}>)
+            (<Verticality 34.5 {B2 B3 D4 E#4}>, <Verticality 35.0 {F#3 A#3 C#4 F#4}>)
             (<Verticality 34.0 {B2 B3 D4 F#4}>, <Verticality 34.5 {B2 B3 D4 E#4}>)
-            (<Verticality 33.5 {B3 C#4 D3 F#4}>, <Verticality 34.0 {B2 B3 D4 F#4}>)
-            (<Verticality 33.0 {B3 D3 F#4}>, <Verticality 33.5 {B3 C#4 D3 F#4}>)
+            (<Verticality 33.5 {D3 B3 C#4 F#4}>, <Verticality 34.0 {B2 B3 D4 F#4}>)
+            (<Verticality 33.0 {D3 B3 F#4}>, <Verticality 33.5 {D3 B3 C#4 F#4}>)
 
         '''
         n = int(n)
@@ -1864,6 +1860,52 @@ class OffsetTree(object):
                 score.append(element)
             return score
 
+    def toPartwiseOffsetTrees(self):
+        partwiseOffsetTrees = {}
+        for part in self.allParts:
+            partwiseOffsetTrees[part] = type(self)
+        for parentage in self:
+            partwiseOffsetTrees[parentage.part].insert(parentage)
+        return partwiseOffsetTrees
+
+    def toPartwiseScore(self, templateScore=None):
+        templateScore, templateOffsets = \
+            self.extractMeasuresAndMeasureOffsets(templateScore)
+        partMapping = collections.OrderedDict()
+        outputScore = stream.Score()
+        for part in self.allParts:
+            newPart = stream.Part()
+            #instrument = copy.copy(part.getInstrument())
+            #newPart.append(instrument)
+            for measure in templateScore:
+                measure = copy.deepcopy(measure)
+                newPart.append(measure)
+            partMapping[part] = newPart
+            outputScore.append(newPart)
+        tree = self.copy()
+        tree.splitAt(templateOffsets)
+        for timespan in self:
+            startOffset = timespan.startOffset
+            stopOffset = timespan.stopOffset
+            quarterLength = stopOffset - startOffset
+            pitches = timespan.pitches
+            if len(pitches) == 1:
+                element = note.Note(pitches[0])
+            elif 1 < len(pitches):
+                element = note.Note(sorted(pitches))
+            else:
+                raise Exception('How did we get here?')
+            element.quarterLength = quarterLength
+            part = partMapping[timespan.part]
+            measureIndex = bisect.bisect(templateOffsets, startOffset) - 1
+            measureOffset = templateOffsets[measureIndex]
+            measure = part[measureIndex]
+            measureInternalOffset = startOffset - measureOffset
+            measure.insert(measureInternalOffset, element)
+        for part in outputScore:
+            part.makeRests(fillGaps=True)
+        return outputScore
+
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -1903,6 +1945,14 @@ class OffsetTree(object):
                     result.update(recurse(node.rightChild))
             return result
         return tuple(sorted(recurse(self._root)))
+
+    @property
+    def allParts(self):
+        parts = set()
+        for timespan in self:
+            parts.add(timespan.part)
+        parts = sorted(parts, key=lambda x: x.getInstrument().partId)
+        return parts
 
     @property
     def allStartOffsets(self):
