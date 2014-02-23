@@ -82,6 +82,13 @@ class ChordReducer(object):
         self._removeVerticalDissonances(tree)
         assert tree.maximumOverlap == 2
 
+        # extend this to account for the possibility of filtering out all
+        # timespans in a given measure
+        timespans = [timespan for timespan in tree]
+        for timespan in timespans:
+            if (timespan.stopOffset - timespan.startOffset) < 0.5:
+                tree.remove(timespan)
+
         self._fillOuterMeasureGaps(tree)
         assert tree.maximumOverlap == 2
 
@@ -528,7 +535,7 @@ class TestExternal(unittest.TestCase):
         #score = corpus.parse('bach/bwv846').measures(1, 19)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 3)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 8)
+        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
