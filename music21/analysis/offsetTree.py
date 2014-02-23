@@ -1264,37 +1264,6 @@ class OffsetTree(object):
                         )
                     self.insert(newParentage)
 
-    def fillMeasureGaps(self):
-        for verticality in self.iterateVerticalities():
-            for parentage in verticality.startTimespans:
-                previousParentage = self.findPreviousParentageInSamePart(
-                    parentage)
-                changed = False
-                startOffset = parentage.startOffset
-                beatStrength = parentage.beatStrength
-                if previousParentage is None or \
-                    previousParentage.measureNumber != parentage.measureNumber:
-                    if parentage.startOffset != parentage.measureStartOffset:
-                        changed = True
-                        startOffset = parentage.measureStartOffset
-                        startVerticality = self.getVerticalityAt(startOffset)
-                        beatStrength = startVerticality.beatStrength
-                nextParentage = self.findNextParentageInSamePart(parentage)
-                stopOffset = parentage.stopOffset
-                if nextParentage is None or \
-                    nextParentage.measureNumber != parentage.measureNumber:
-                    if parentage.stopOffset != parentage.measureStopOffset:
-                        changed = True
-                        stopOffset = parentage.measureStopOffset
-                if changed:
-                    self.remove(parentage)
-                    newParentage = parentage.new(
-                        beatStrength=beatStrength,
-                        startOffset=startOffset,
-                        stopOffset=stopOffset,
-                        )
-                    self.insert(newParentage)
-
     def getStartOffsetAfter(self, offset):
         r'''
         Gets start offset after `offset`.
@@ -1863,14 +1832,16 @@ class OffsetTree(object):
     def toPartwiseOffsetTrees(self):
         partwiseOffsetTrees = {}
         for part in self.allParts:
-            partwiseOffsetTrees[part] = type(self)
+            partwiseOffsetTrees[part] = OffsetTree()
         for parentage in self:
-            partwiseOffsetTrees[parentage.part].insert(parentage)
+            partwiseOffsetTree = partwiseOffsetTrees[parentage.part]
+            partwiseOffsetTree.insert(parentage)
         return partwiseOffsetTrees
 
     def toPartwiseScore(self, templateScore=None):
         templateScore, templateOffsets = \
             self.extractMeasuresAndMeasureOffsets(templateScore)
+
         partMapping = collections.OrderedDict()
         outputScore = stream.Score()
         for part in self.allParts:
@@ -1882,28 +1853,53 @@ class OffsetTree(object):
                 newPart.append(measure)
             partMapping[part] = newPart
             outputScore.append(newPart)
-        tree = self.copy()
-        tree.splitAt(templateOffsets)
-        for timespan in self:
-            startOffset = timespan.startOffset
-            stopOffset = timespan.stopOffset
-            quarterLength = stopOffset - startOffset
-            pitches = timespan.pitches
-            if len(pitches) == 1:
-                element = note.Note(pitches[0])
-            elif 1 < len(pitches):
-                element = note.Note(sorted(pitches))
-            else:
-                raise Exception('How did we get here?')
-            element.quarterLength = quarterLength
-            part = partMapping[timespan.part]
-            measureIndex = bisect.bisect(templateOffsets, startOffset) - 1
-            measureOffset = templateOffsets[measureIndex]
-            measure = part[measureIndex]
-            measureInternalOffset = startOffset - measureOffset
-            measure.insert(measureInternalOffset, element)
-        for part in outputScore:
-            part.makeRests(fillGaps=True)
+
+        treeMapping = self.toPartwiseOffsetTrees()
+        for tree in treeMapping.values():
+            assert tree.maximumOverlap == 1
+            silenceTimespans = []
+            previousOffset = 0
+            for timespan in tree:
+                if timespan.startOffset != previousOffset:
+                    silenceTimespan = Parentage(
+                        startOffset=previousOffset,
+                        stopOffset=timespan.startOffset,
+                        )
+                    silenceTimespans.append(silenceTimespan)
+                previousOffset = timespan.stopOffset
+            if previousOffset != max(templateOffsets):
+                silenceTimespan = Parentage(
+                    startOffset=previousOffset,
+                    stopOffset=max(templateOffsets),
+                    )
+                silenceTimespans.append(silenceTimespan)
+            tree.insert(silenceTimespans)
+            tree.splitAt(templateOffsets)
+
+        for oldPart in partMapping:
+            tree = treeMapping[oldPart]
+            part = partMapping[oldPart]
+            for timespan in treeMapping[oldPart]:
+                startOffset = timespan.startOffset
+                stopOffset = timespan.stopOffset
+                quarterLength = stopOffset - startOffset
+                if timespan.element is not None:
+                    pitches = timespan.pitches
+                    if len(pitches) == 1:
+                        element = note.Note(pitches[0])
+                    elif 1 < len(pitches):
+                        element = note.Note(sorted(pitches))
+                    else:
+                        raise Exception('How did we get here?')
+                else:
+                    element = note.Rest()
+                element.quarterLength = quarterLength
+                measureIndex = bisect.bisect(templateOffsets, startOffset) - 1
+                measureOffset = templateOffsets[measureIndex]
+                measure = part[measureIndex]
+                measureInternalOffset = startOffset - measureOffset
+                measure.insert(measureInternalOffset, element)
+
         return outputScore
 
     ### PUBLIC PROPERTIES ###
