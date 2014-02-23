@@ -78,8 +78,6 @@ class ChordReducer(object):
         assert isinstance(inputScore, stream.Score)
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
-        # tree.fuseLikePitchedPartContiguousTimespans()
-
         self._removeVerticalDissonances(tree)
         assert tree.maximumOverlap == 2
 
@@ -94,11 +92,7 @@ class ChordReducer(object):
 
         # self._removeNonChordTones(tree)
 
-        # tree.fuseLikePitchedPartContiguousTimespans()
-
         # self._collapseArpeggios(tree)
-
-        # tree.fuseLikePitchedPartContiguousTimespans()
 
         for verticality in tree.iterateVerticalities():
             print verticality
