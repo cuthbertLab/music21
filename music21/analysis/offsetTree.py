@@ -18,6 +18,7 @@ import unittest
 from music21 import chord
 from music21 import instrument
 from music21 import note
+from music21 import pitch
 from music21 import stream
 
 
@@ -637,7 +638,6 @@ class Verticality(object):
             <music21.pitch.Pitch A4>
 
         '''
-        from music21.figuredBass.fbPitch import HashablePitch
         pitchSet = set()
         for parentage in self.startTimespans:
             element = parentage.element
@@ -647,7 +647,7 @@ class Verticality(object):
             element = parentage.element
             pitches = [x.nameWithOctave for x in element.pitches]
             pitchSet.update(pitches)
-        pitchSet = set([HashablePitch(x) for x in pitchSet])
+        pitchSet = set([pitch.Pitch(x) for x in pitchSet])
         return pitchSet
 
     @property
@@ -668,11 +668,10 @@ class Verticality(object):
             <music21.pitch.Pitch A>
 
         '''
-        from music21.figuredBass.fbPitch import HashablePitch
         pitchClassSet = set()
         for currentPitch in self.pitchSet:
-            pitchClassSet.add(currentPitch.name)
-        pitchClassSet = set([HashablePitch(x) for x in pitchClassSet])
+            pitchClass = pitch.Pitch(currentPitch.name)
+            pitchClassSet.add(pitchClass)
         return pitchClassSet
 
     @property
@@ -799,7 +798,8 @@ class OffsetTree(object):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '_root'
+        '_root',
+        '_sourceScore',
         )
 
     class OffsetTreeNode(object):
@@ -902,7 +902,11 @@ class OffsetTree(object):
 
     ### INITIALIZER ###
 
-    def __init__(self, timespans=None):
+    def __init__(
+        self,
+        timespans=None,
+        sourceScore=None,
+        ):
         self._root = None
         if timespans is not None:
             if isinstance(timespans, type(self)):
@@ -912,6 +916,9 @@ class OffsetTree(object):
                 timespans = [timespans]
         if timespans:
             self.insert(timespans)
+        if sourceScore is not None:
+            assert isinstance(sourceScore, stream.Score)
+        self._sourceScore = sourceScore
 
     ### SPECIAL METHODS ###
 
@@ -1041,7 +1048,10 @@ class OffsetTree(object):
             >>> newTree = tree.copy()
 
         '''
-        return type(self)(self)
+        return type(self)(
+            sourceScore=self.sourceScore,
+            timespans=[x for x in self],
+            )
 
     @staticmethod
     def extractMeasuresAndMeasureOffsets(inputScore):
@@ -1063,6 +1073,13 @@ class OffsetTree(object):
 
         '''
         from music21 import meter
+#        part = inputScore.parts[0]
+#        outputScore = part.measureTemplate(
+#            fillWithRests=False,
+#            )
+#        offsets = [x.offset for x in outputScore]
+#        offsets.append(inputScore.duration.quarterLength)
+#        return outputScore, offsets
         part = inputScore.parts[0]
         score = stream.Score()
         offsets = []
@@ -1241,7 +1258,7 @@ class OffsetTree(object):
         parentages = []
         initialParentage = (inputScore,)
         recurse(inputScore, parentages, currentParentage=initialParentage)
-        tree = OffsetTree()
+        tree = OffsetTree(sourceScore=inputScore)
         tree.insert(parentages)
         return tree
 
@@ -1695,7 +1712,7 @@ class OffsetTree(object):
                 shards = overlap.splitAt(offset)
                 self.insert(shards)
 
-    def toChordifiedScore(self, templateScore=None):
+    def toChordifiedScore(self):
         r'''
         Creates a score from the Parentage objects stored in this offset-tree.
 
@@ -1706,7 +1723,7 @@ class OffsetTree(object):
 
             >>> score = corpus.parse('bwv66.6')
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
-            >>> chordifiedScore = tree.toChordifiedScore(templateScore=score)
+            >>> chordifiedScore = tree.toChordifiedScore()
             >>> chordifiedScore.show('text')
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.meter.TimeSignature 4/4>
@@ -1772,6 +1789,7 @@ class OffsetTree(object):
                 {2.0} <music21.chord.Chord F#3 A#3 C#4 F#4>
 
         '''
+        templateScore = self.sourceScore
         if isinstance(templateScore, stream.Score):
             templateScore, templateOffsets = \
                 self.extractMeasuresAndMeasureOffsets(templateScore)
@@ -1820,6 +1838,8 @@ class OffsetTree(object):
         return partwiseOffsetTrees
 
     def toPartwiseScore(self, templateScore=None):
+        templateScore = self.sourceScore
+
         templateScore, templateOffsets = \
             self.extractMeasuresAndMeasureOffsets(templateScore)
 
@@ -2091,6 +2111,10 @@ class OffsetTree(object):
             elif degreeOfOverlap < overlap:
                 overlap = degreeOfOverlap
         return overlap
+
+    @property
+    def sourceScore(self):
+        return self._sourceScore
 
 
 #------------------------------------------------------------------------------

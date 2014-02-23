@@ -99,8 +99,8 @@ class ChordReducer(object):
         assert tree.maximumOverlap == 2
 
         # convert offset trees into music21 scores
-        partwiseReduction = tree.toPartwiseScore(templateScore=inputScore)
-        chordifiedReduction = tree.toChordifiedScore(templateScore=inputScore)
+        partwiseReduction = tree.toPartwiseScore()
+        chordifiedReduction = tree.toChordifiedScore()
 
         # reduce chords in chordified reduction
         chordifiedPart = stream.Part()
