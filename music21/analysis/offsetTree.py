@@ -77,12 +77,16 @@ class Parentage(object):
         if stopOffset is not None:
             stopOffset = float(stopOffset)
         self._stopOffset = stopOffset
+        if startOffset is not None and stopOffset is not None:
+            assert startOffset <= stopOffset
         if measureStartOffset is not None:
             measureStartOffset = float(measureStartOffset)
         self._measureStartOffset = measureStartOffset
         if measureStopOffset is not None:
             measureStopOffset = float(measureStopOffset)
         self._measureStopOffset = measureStopOffset
+        if measureStartOffset is not None and measureStopOffset is not None:
+            assert measureStartOffset <= measureStopOffset
 
     ### SPECIAL METHODS ###
 
@@ -186,6 +190,8 @@ class Parentage(object):
         '''
         if self._beatStrength is not None:
             return self._beatStrength
+        elif self._element is None:
+            return None
         return self._element.beatStrength
 
     @property
@@ -1082,27 +1088,6 @@ class OffsetTree(object):
         offsets.append(inputScore.duration.quarterLength)
         return outputScore, offsets
 
-#        part = inputScore.parts[0]
-#        score = stream.Score()
-#        offsets = []
-#        for oldMeasure in part:
-#            if not isinstance(oldMeasure, stream.Measure):
-#                continue
-#            offsets.append(oldMeasure.offset)
-#            newMeasure = stream.Measure()
-#            if oldMeasure.timeSignature is not None:
-#                newTimeSignature = meter.TimeSignature(
-#                    oldMeasure.timeSignature.ratioString,
-#                    )
-#                newMeasure.insert(0, newTimeSignature)
-#            score.append(newMeasure)
-#            newMeasure.number = oldMeasure.number
-#            newMeasure.offset = oldMeasure.offset
-#            newMeasure.paddingLeft = oldMeasure.paddingLeft
-#            newMeasure.paddingRight = oldMeasure.paddingRight
-#        offsets.append(inputScore.duration.quarterLength)
-#        return score, offsets
-
     def findNextParentageInSamePart(self, parentage):
         assert isinstance(parentage, Parentage)
         verticality = self.getVerticalityAt(parentage.startOffset)
@@ -1771,6 +1756,7 @@ class OffsetTree(object):
                     measureIndex += 1
                 verticality = self.getVerticalityAt(startOffset)
                 quarterLength = stopOffset - startOffset
+                assert 0 < quarterLength, verticality
                 if verticality.pitchSet:
                     element = chord.Chord(sorted(verticality.pitchSet))
                 else:
@@ -1784,6 +1770,7 @@ class OffsetTree(object):
             for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
                 verticality = self.getVerticalityAt(startOffset)
                 quarterLength = stopOffset - startOffset
+                assert 0 < quarterLength, verticality
                 if verticality.pitchSet:
                     element = chord.Chord(sorted(verticality.pitchSet))
                 else:
@@ -1822,7 +1809,7 @@ class OffsetTree(object):
 
         treeMapping = self.toPartwiseOffsetTrees()
         for tree in treeMapping.values():
-            assert tree.maximumOverlap == 1
+            #assert tree.maximumOverlap == 1
             silenceTimespans = []
             previousOffset = 0
             for timespan in tree:
@@ -1849,12 +1836,13 @@ class OffsetTree(object):
                 startOffset = timespan.startOffset
                 stopOffset = timespan.stopOffset
                 quarterLength = stopOffset - startOffset
+                assert 0 < quarterLength, timespan
                 if timespan.element is not None:
                     pitches = timespan.pitches
                     if len(pitches) == 1:
                         element = note.Note(pitches[0])
                     elif 1 < len(pitches):
-                        element = note.Note(sorted(pitches))
+                        element = chord.Chord(sorted(pitches))
                     else:
                         raise Exception('How did we get here?')
                 else:
