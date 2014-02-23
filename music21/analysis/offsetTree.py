@@ -1880,6 +1880,7 @@ class OffsetTree(object):
                 measure = part[measureIndex]
                 measureInternalOffset = startOffset - measureOffset
                 measure.insert(measureInternalOffset, element)
+            part.insert(0, oldPart.getClefs()[0])
 
         return outputScore
 

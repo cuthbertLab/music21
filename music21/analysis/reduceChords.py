@@ -90,21 +90,16 @@ class ChordReducer(object):
         self._fillInnerMeasureGaps(tree)
         assert tree.maximumOverlap == 2
 
-        # self._removeNonChordTones(tree)
+        partwiseReduction = tree.toPartwiseScore(templateScore=inputScore)
+        chordifiedReduction = tree.toChordifiedScore(templateScore=inputScore)
 
-        # self._collapseArpeggios(tree)
+        # process chordified reduction
 
-        for verticality in tree.iterateVerticalities():
-            print verticality
-            for timespan in verticality.startTimespans:
-                print '\t', timespan
+        chordifiedPart = stream.Part()
+        chordifiedPart.append(chordifiedReduction[:])
+        partwiseReduction.append(chordifiedPart)
 
-        #reduction = tree.toChordifiedScore(templateScore=inputScore)
-        reduction = tree.toPartwiseScore(templateScore=inputScore)
-
-        reduction.show('text')
-
-        return reduction
+        return partwiseReduction
 
     ### PRIVATE METHODS ###
 
