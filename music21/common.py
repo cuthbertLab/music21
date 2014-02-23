@@ -269,8 +269,6 @@ def findFormatExtURL(url):
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
     >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
-    >>> urlD = 'http://static.wikifonia.org/4918/musicxml.mxl'
-    >>> urlE = 'http://static.wikifonia.org/4306/musicxml.mxl'
     >>> urlF = 'http://junk'
 
     >>> common.findFormatExtURL(urlA)
@@ -279,10 +277,6 @@ def findFormatExtURL(url):
     ('humdrum', '.krn')
     >>> common.findFormatExtURL(urlC)
     ('musicxml', '.xml')
-    >>> common.findFormatExtURL(urlD)
-    ('musicxml', '.mxl')
-    >>> common.findFormatExtURL(urlE)
-    ('musicxml', '.mxl')
     >>> common.findFormatExtURL(urlF)
     (None, None)
     '''

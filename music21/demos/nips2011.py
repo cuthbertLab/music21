@@ -7,11 +7,14 @@ import json
 import orange, orngTree
 
 try:
+    import BeautifulSoup
     from BeautifulSoup import *
 except:
     pass
 
-from music21 import *
+from music21 import common
+from music21 import features
+from music21 import converter
 
 def nipsBuild(useOurExtractors = True, buildSet = 1, evaluationMethod = 'coarse'):
     '''
@@ -28,8 +31,8 @@ def nipsBuild(useOurExtractors = True, buildSet = 1, evaluationMethod = 'coarse'
     
     entryDict = {}
     for d in entries: 
-        id = d.keys()[0]; 
-        entryDict[int(id)] = d[id]
+        sid = d.keys()[0]; 
+        entryDict[int(sid)] = d[sid]
     
     
     ourExtractors = ['cs12', 'p22', 'k1', 'ql1', 'ql2', 'ql3', 'ql4', 'md1', ]
@@ -57,7 +60,7 @@ def nipsBuild(useOurExtractors = True, buildSet = 1, evaluationMethod = 'coarse'
             fn = wikifoniaDir + str(wf) + '.mxl'
             print fn, year, entryDict[wf][1]
             s = converter.parse(fn)
-            id = s.metadata.title
+            title_id = s.metadata.title
             #cv = year  # if not using coarse but instead using the exact year as the class value
             
             if evaluationMethod == 'coarse':            
@@ -70,7 +73,7 @@ def nipsBuild(useOurExtractors = True, buildSet = 1, evaluationMethod = 'coarse'
                 # fine grained evaluations
                 cv = year  # if not using coarse but instead using the exact year as the class value
 
-            ds.addData(s, classValue=cv, id=id)
+            ds.addData(s, classValue=cv, id=title_id)
     
     ds.process()
     ds.write('d:/desktop/year7-ourextractors-only.tab')
@@ -335,7 +338,6 @@ def probabilityOfChance():
     which is far too unlikely to be the result of random chance, thus
     proving the validity of the music21 feature extraction.
     '''
-    import math
     from math import factorial
     import random
     
@@ -347,12 +349,12 @@ def probabilityOfChance():
         old = 0
         new = 1
         avg = 0.0
-        for trials in range(0, 10000):
+        for unused_trials in range(0, 10000):
             #generating the answerKey
             answerKey = []
-            for x in range(0,NUM_OLD_PIECES):
+            for i in range(0,NUM_OLD_PIECES):
                 answerKey.append(old)
-            for x in range(0,NUM_NEW_PIECES):
+            for i in range(0,NUM_NEW_PIECES):
                 answerKey.append(new)
             random.shuffle(answerKey)
             

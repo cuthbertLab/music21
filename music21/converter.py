@@ -870,19 +870,7 @@ class Converter(object):
         Note that this checks the user Environment
         `autoDownlaad` setting before downloading.
 
-        As a convenience method, links to Wikifonia main
-        page for a piece are redirected to the musicxml
-        (n.b., it is up to you to determine if any piece
-        on Wikifonia is in or out of copyright in your
-        juristiction).
-
-
-        Demonstration of rewrite ability for URLs.
-        Actual URL is http://static.wikifonia.org/4391/musicxml.xml
-        but the URL below is what's shown on the browser, so either
-        is accepted.
-
-
+        TODO: replace with free version of jeanieLightBrownHair
 
         >>> #_DOCS_SHOW jeanieLightBrownURL = 'http://www.wikifonia.org/node/4391'
         >>> c = converter.Converter()

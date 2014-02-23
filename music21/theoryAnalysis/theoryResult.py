@@ -183,9 +183,9 @@ class NoteTheoryResult(TheoryResult):
         self.currentColor  = color
         self.n.color = color
             
-class VerticalSliceTheoryResult(TheoryResult):     
+class VerticalityTheoryResult(TheoryResult):     
     
-    _DOC_ATTR = {'vs': 'The actual :class:`~music21.voiceLeading.VerticalSlice` \
+    _DOC_ATTR = {'vs': 'The actual :class:`~music21.voiceLeading.Verticality` \
     object associated with this theory result object'}  
          
     def __init__(self, vs): 
@@ -224,9 +224,9 @@ class ThreeNoteLinearSegmentTheoryResult(TheoryResult):
         if 3 in noteList:
             self.tnls.n3.color = color
         
-class VerticalSliceNTupletTheoryResult(TheoryResult):
+class VerticalityNTupletTheoryResult(TheoryResult):
     
-    _DOC_ATTR = {'vsnt': 'The actual :class:`~music21.voiceLeading.VerticalSliceNTuplet` \
+    _DOC_ATTR = {'vsnt': 'The actual :class:`~music21.voiceLeading.VerticalityNTuplet` \
     object associated with this theory result object', 'partNumIdentified':'Storate location for \
     the part of importance that can be used later to color the results' }     
     
@@ -249,14 +249,14 @@ class VerticalSliceNTupletTheoryResult(TheoryResult):
 
     def markNoteEditorial(self, editorialDictKey, editorialValue, editorialMarkDict={2:[1]}):        
         '''
-        editorialMarkDict is a dictionary denoting which object in the verticalSlice Triplet to 
+        editorialMarkDict is a dictionary denoting which object in the verticality Triplet to 
         mark with the editorial object. the keys of the dictionary correspond to which vertical
         slice (0, 1, 2, etc.) and the editorialValues are a list of the partNums to mark.
         
         '''       
         for vsNum, partNumList in editorialMarkDict.items():
-            for counter_partNum in partNumList:
-                self.vsnt.verticalSlices[vsNum].getObjectsByPart(0, classFilterList=['Note']).editorial.misc[editorialDictKey] = editorialValue
+            for unused_counter_partNum in partNumList:
+                self.vsnt.verticalities[vsNum].getObjectsByPart(0, classFilterList=['Note']).editorial.misc[editorialDictKey] = editorialValue
 
 
 class Test(unittest.TestCase):

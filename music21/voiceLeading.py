@@ -20,9 +20,9 @@ The list of objects included here are:
 
 * :class:`~music21.voiceLeading.VoiceLeadingQuartet` : two by two matrix of notes
 
-* :class:`~music21.voiceLeading.VerticalSlice` : vertical context in a score, composed of any music21 objects
-    * :class:`~music21.voiceLeading.VerticalSliceNTuplet` : group of three contiguous verticalSlice objects
-        * :class:`~music21.voiceLeading.VerticalSliceTriplet` : three vertical slices
+* :class:`~music21.voiceLeading.Verticality` : vertical context in a score, composed of any music21 objects
+    * :class:`~music21.voiceLeading.VerticalityNTuplet` : group of three contiguous verticality objects
+        * :class:`~music21.voiceLeading.VerticalityTriplet` : three vertical slices
 
 * :class:`~music21.voiceLeading.NObjectLinearSegment` : n (any number) of music21 objects
     * :class:`~music21.voiceLeading.NNoteLinearSegment` : n (any number) of notes
@@ -1006,20 +1006,20 @@ class VoiceLeadingQuartetException(exceptions21.Music21Exception):
     pass
 
 
-def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None):
+def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None):
     '''
-    returns the :class:`~music21.voiceLeading.VerticalSlice` object given a score, and a music21 object within this score
+    returns the :class:`~music21.voiceLeading.Verticality` object given a score, and a music21 object within this score
     (under development)
     
     >>> c = corpus.parse('bach/bwv66.6')
     >>> n1 = c.flat.getElementsByClass(note.Note)[0]
-    >>> voiceLeading.getVerticalSliceFromObject(n1, c)
-    <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.clef.TrebleClef>, <music21.instrument.Instrument P1: Soprano: Instrument 1>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C#>], 1: [<music21.clef.TrebleClef>, <music21.instrument.Instrument P2: Alto: Instrument 2>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note E>], 2: [<music21.clef.BassClef>, <music21.instrument.Instrument P3: Tenor: Instrument 3>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>], 3: [<music21.clef.BassClef>, <music21.instrument.Instrument P4: Bass: Instrument 4>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>]}  
+    >>> voiceLeading.getVerticalityFromObject(n1, c)
+    <music21.voiceLeading.Verticality contentDict={0: [<music21.clef.TrebleClef>, <music21.instrument.Instrument P1: Soprano: Instrument 1>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C#>], 1: [<music21.clef.TrebleClef>, <music21.instrument.Instrument P2: Alto: Instrument 2>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note E>], 2: [<music21.clef.BassClef>, <music21.instrument.Instrument P3: Tenor: Instrument 3>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>], 3: [<music21.clef.BassClef>, <music21.instrument.Instrument P4: Bass: Instrument 4>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>]}  
 
     for getting things at the beginning of scores, probably better to use a classFilterList:
 
-    >>> voiceLeading.getVerticalSliceFromObject(n1, c, classFilterList = [note.Note, chord.Chord, note.Rest])
-    <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.note.Note C#>], 1: [<music21.note.Note E>], 2: [<music21.note.Note A>], 3: [<music21.note.Note A>]}  
+    >>> voiceLeading.getVerticalityFromObject(n1, c, classFilterList = [note.Note, chord.Chord, note.Rest])
+    <music21.voiceLeading.Verticality contentDict={0: [<music21.note.Note C#>], 1: [<music21.note.Note E>], 2: [<music21.note.Note A>], 3: [<music21.note.Note A>]}  
     '''
     offsetOfObject =  music21Obj.getOffsetBySite(scoreObjectIsFrom.flat)
     
@@ -1031,14 +1031,14 @@ def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=No
                 contentDict[partNum].append(el)
             else:
                 contentDict[partNum] = [el]
-    return VerticalSlice(contentDict)
+    return Verticality(contentDict)
 
 
-class VerticalSlice(base.Music21Object):
+class Verticality(base.Music21Object):
     ''' A vertical slice object provides more accessible information about
     vertical moments in a score. A vertical slice is instantiated by passing in a dictionary of 
     the form {partNumber : [ music21Objects ] } 
-    To create vertical slices out of a score, call by :meth:`~music21.theoryAnalzyer.getVerticalSlices`
+    To create vertical slices out of a score, call by :meth:`~music21.theoryAnalzyer.getVerticalities`
     
     Vertical slices are useful to provide direct and easy access to objects in a part. A list of vertical
     slices, although similar to the list of chords from a chordified score, provides easier access to partnumber
@@ -1047,7 +1047,7 @@ class VerticalSlice(base.Music21Object):
     of the vertical slice in the score directly.
     
 
-    >>> vs1 = voiceLeading.VerticalSlice({0:[note.Note('A4'), harmony.ChordSymbol('Cm')], 1: [note.Note('F2')]})
+    >>> vs1 = voiceLeading.Verticality({0:[note.Note('A4'), harmony.ChordSymbol('Cm')], 1: [note.Note('F2')]})
     >>> vs1.getObjectsByClass(note.Note)
     [<music21.note.Note A>, <music21.note.Note F>]
     >>> vs1.getObjectsByPart(0, note.Note)
@@ -1076,17 +1076,17 @@ class VerticalSlice(base.Music21Object):
         consonance rules. Method generates chord of all simultaneously sounding pitches, then calls 
         :meth:`~music21.chord.isConsonant`
         
-        >>> voiceLeading.VerticalSlice({0:note.Note('A4'), 1:note.Note('B4'), 2:note.Note('A4')}).isConsonant()
+        >>> voiceLeading.Verticality({0:note.Note('A4'), 1:note.Note('B4'), 2:note.Note('A4')}).isConsonant()
         False
-        >>> voiceLeading.VerticalSlice({0:note.Note('A4'), 1:note.Note('B4'), 2:note.Note('C#4')}).isConsonant()
+        >>> voiceLeading.Verticality({0:note.Note('A4'), 1:note.Note('B4'), 2:note.Note('C#4')}).isConsonant()
         False
-        >>> voiceLeading.VerticalSlice({0:note.Note('C3'), 1:note.Note('G5'), 2:chord.Chord(['C3','E4','G5'])}).isConsonant()
+        >>> voiceLeading.Verticality({0:note.Note('C3'), 1:note.Note('G5'), 2:chord.Chord(['C3','E4','G5'])}).isConsonant()
         True
-        >>> voiceLeading.VerticalSlice({0:note.Note('A3'), 1:note.Note('B3'), 2:note.Note('C4')}).isConsonant()
+        >>> voiceLeading.Verticality({0:note.Note('A3'), 1:note.Note('B3'), 2:note.Note('C4')}).isConsonant()
         False
-        >>> voiceLeading.VerticalSlice({0:note.Note('C1'), 1:note.Note('C2'), 2:note.Note('C3'), 3:note.Note('G1'), 4:note.Note('G2'), 5:note.Note('G3')}).isConsonant()
+        >>> voiceLeading.Verticality({0:note.Note('C1'), 1:note.Note('C2'), 2:note.Note('C3'), 3:note.Note('G1'), 4:note.Note('G2'), 5:note.Note('G3')}).isConsonant()
         True
-        >>> voiceLeading.VerticalSlice({0:note.Note('A3'), 1:harmony.ChordSymbol('Am')}).isConsonant()
+        >>> voiceLeading.Verticality({0:note.Note('A3'), 1:harmony.ChordSymbol('Am')}).isConsonant()
         True
         '''
         return self.getChord().isConsonant()
@@ -1096,10 +1096,10 @@ class VerticalSlice(base.Music21Object):
         extracts all simultaneously sounding pitches (from chords, notes, harmony objects, etc.) and returns
         as a chord. Pretty much returns the vertical slice to a chordified output.
         
-        >>> vs1 = voiceLeading.VerticalSlice({0:note.Note('A4'), 1:chord.Chord(['B','C','A']), 2:note.Note('A')})
+        >>> vs1 = voiceLeading.Verticality({0:note.Note('A4'), 1:chord.Chord(['B','C','A']), 2:note.Note('A')})
         >>> vs1.getChord()
         <music21.chord.Chord A4 B C A A>
-        >>> voiceLeading.VerticalSlice({0:note.Note('A3'), 1:chord.Chord(['F3','D4','A4']), 2:harmony.ChordSymbol('Am')}).getChord()
+        >>> voiceLeading.Verticality({0:note.Note('A3'), 1:chord.Chord(['F3','D4','A4']), 2:harmony.ChordSymbol('Am')}).getChord()
         <music21.chord.Chord A3 F3 D4 A4 A2 C3 E3>
         '''
         pitches = []
@@ -1122,7 +1122,7 @@ class VerticalSlice(base.Music21Object):
         >>> n2.quarterLength = 2
         >>> cs = harmony.ChordSymbol('C')
         >>> cs.quarterLength = 4
-        >>> vs1 = voiceLeading.VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1 = voiceLeading.Verticality({0:n1, 1:n2, 2:cs})
         >>> vs1.makeAllSmallestDuration()
         >>> [x.quarterLength for x in vs1.objects]
         [1.0, 1.0, 1.0]
@@ -1140,7 +1140,7 @@ class VerticalSlice(base.Music21Object):
         >>> n2.quarterLength = 2
         >>> cs = harmony.ChordSymbol('C')
         >>> cs.quarterLength = 4
-        >>> vs1 = voiceLeading.VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1 = voiceLeading.Verticality({0:n1, 1:n2, 2:cs})
         >>> vs1.makeAllLargestDuration()
         >>> [x.quarterLength for x in vs1.objects]
         [4.0, 4.0, 4.0]
@@ -1157,7 +1157,7 @@ class VerticalSlice(base.Music21Object):
         >>> n2.quarterLength = 2
         >>> cs = harmony.ChordSymbol('C')
         >>> cs.quarterLength = 4
-        >>> vs1 = voiceLeading.VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1 = voiceLeading.Verticality({0:n1, 1:n2, 2:cs})
         >>> vs1.getShortestDuration()
         1.0
         '''
@@ -1177,7 +1177,7 @@ class VerticalSlice(base.Music21Object):
         >>> n2.quarterLength = 2
         >>> cs = harmony.ChordSymbol('C')
         >>> cs.quarterLength = 4
-        >>> vs1 = voiceLeading.VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1 = voiceLeading.Verticality({0:n1, 1:n2, 2:cs})
         >>> vs1.getLongestDuration()
         4.0
         '''
@@ -1197,7 +1197,7 @@ class VerticalSlice(base.Music21Object):
         >>> n2.quarterLength = 2
         >>> cs = harmony.ChordSymbol('C')
         >>> cs.quarterLength = 4
-        >>> vs1 = voiceLeading.VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1 = voiceLeading.Verticality({0:n1, 1:n2, 2:cs})
         >>> vs1.changeDurationofAllObjects(1.5)
         >>> [x.quarterLength for x in vs1.objects]
         [1.5, 1.5, 1.5]
@@ -1211,7 +1211,7 @@ class VerticalSlice(base.Music21Object):
         the single object if only one. Optionally specify which
         type of objects to return with classFilterList
         
-        >>> vs1 = voiceLeading.VerticalSlice({0:[note.Note('A4'), harmony.ChordSymbol('C')], 1: [note.Note('C')]})
+        >>> vs1 = voiceLeading.Verticality({0:[note.Note('A4'), harmony.ChordSymbol('C')], 1: [note.Note('C')]})
         >>> vs1.getObjectsByPart(0, classFilterList=['Harmony'])
         <music21.harmony.ChordSymbol C>
         >>> vs1.getObjectsByPart(0)
@@ -1241,7 +1241,7 @@ class VerticalSlice(base.Music21Object):
         returns a list of all objects in the vertical slice of a type contained in the classFilterList. Optionally
         specify partnumbers to only search for matching objects
         
-        >>> vs1 = voiceLeading.VerticalSlice({0:[note.Note('A4'), harmony.ChordSymbol('C')], 1: [note.Note('C')], 2: [note.Note('B'), note.Note('F#')]})
+        >>> vs1 = voiceLeading.Verticality({0:[note.Note('A4'), harmony.ChordSymbol('C')], 1: [note.Note('C')], 2: [note.Note('B'), note.Note('F#')]})
         >>> vs1.getObjectsByClass('Note')
         [<music21.note.Note A>, <music21.note.Note C>, <music21.note.Note B>, <music21.note.Note F#>]
         >>> vs1.getObjectsByClass('Note', [1,2])
@@ -1276,7 +1276,7 @@ class VerticalSlice(base.Music21Object):
     objects = property(_getObjects, doc = '''
         return a list of all the music21 objects in the vertical slice
         
-        >>> vs1 = voiceLeading.VerticalSlice({0:[ harmony.ChordSymbol('C'), note.Note('A4'),], 1: [note.Note('C')]})
+        >>> vs1 = voiceLeading.Verticality({0:[ harmony.ChordSymbol('C'), note.Note('A4'),], 1: [note.Note('C')]})
         >>> vs1.objects
         [<music21.harmony.ChordSymbol C>, <music21.note.Note A>, <music21.note.Note C>]
         ''')
@@ -1284,11 +1284,11 @@ class VerticalSlice(base.Music21Object):
     def getStream(self, streamVSCameFrom = None):
         '''
         returns the stream representation of this vertical slice. Optionally pass in
-        the full stream that this verticalSlice was extracted from, and correct key, meter, and time
+        the full stream that this verticality was extracted from, and correct key, meter, and time
         signatures will be included
         (under development)
         
-        >>> vs1 = voiceLeading.VerticalSlice({0:[ harmony.ChordSymbol('C'), note.Note('A4'),], 1: [note.Note('C')]})
+        >>> vs1 = voiceLeading.Verticality({0:[ harmony.ChordSymbol('C'), note.Note('A4'),], 1: [note.Note('C')]})
         >>> len(vs1.getStream().flat.getElementsByClass(note.Note))
         2
         >>> len(vs1.getStream().flat.getElementsByClass('Harmony'))
@@ -1340,7 +1340,7 @@ class VerticalSlice(base.Music21Object):
         >>> s.append(n2)
         >>> n2.offset
         1.0
-        >>> vs = voiceLeading.VerticalSlice({0:n1, 1: n2})
+        >>> vs = voiceLeading.Verticality({0:n1, 1: n2})
         >>> vs.getObjectsByClass(note.Note)
         [<music21.note.Note A>, <music21.note.Note F>]
 
@@ -1367,7 +1367,7 @@ class VerticalSlice(base.Music21Object):
     lyric = property(_getLyric, _setLyric, doc = '''
         sets each element on the vertical slice to have the passed in lyric
         
-        >>> h = voiceLeading.VerticalSlice({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
+        >>> h = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
         >>> h.lyric = 'vertical slice 1'
         >>> h.getStream().flat.getElementsByClass(note.Note)[0].lyric
         'vertical slice 1'
@@ -1387,39 +1387,39 @@ class VerticalSlice(base.Music21Object):
     color = property(_getColor, _setColor, doc = '''
         sets the color of each element in the vertical slice
         
-        >>> vs1 = voiceLeading.VerticalSlice({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
+        >>> vs1 = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
         >>> vs1.color = 'blue'
         >>> [x.color for x in vs1.objects]
         ['blue', 'blue']
     ''')
     
                                       
-class VerticalSliceNTuplet(base.Music21Object):
+class VerticalityNTuplet(base.Music21Object):
     '''a collection of n number of vertical slices. These objects are useful when analyzing counterpoint
     motion and music theory elements such as passing tones'''
-    def __init__(self, listofVerticalSlices): 
+    def __init__(self, listofVerticalities): 
         base.Music21Object.__init__(self)
               
-        self.verticalSlices = listofVerticalSlices
-        self.nTupletNum = len(listofVerticalSlices)
+        self.verticalities = listofVerticalities
+        self.nTupletNum = len(listofVerticalities)
         
         self.chordList = []
-        if listofVerticalSlices:
+        if listofVerticalities:
             self._calcChords()
         
     def _calcChords(self):
-        for vs in self.verticalSlices:
+        for vs in self.verticalities:
             self.chordList.append(chord.Chord(vs.getObjectsByClass(note.Note)))
     
     def __repr__(self):
-        return '<music21.voiceLeading.%s listofVerticalSlices=%s ' % (self.__class__.__name__, self.verticalSlices)
+        return '<music21.voiceLeading.%s listofVerticalities=%s ' % (self.__class__.__name__, self.verticalities)
     def __str__(self):
         return self.__repr__()
     
-class VerticalSliceTriplet(VerticalSliceNTuplet):
+class VerticalityTriplet(VerticalityNTuplet):
     '''a collection of three vertical slices'''
-    def __init__(self, listofVerticalSlices):
-        VerticalSliceNTuplet.__init__(self, listofVerticalSlices)
+    def __init__(self, listofVerticalities):
+        VerticalityNTuplet.__init__(self, listofVerticalities)
         
         self.tnlsDict = {} #defaultdict(int) #Three Note Linear Segments
         self._calcTNLS()
@@ -1428,12 +1428,12 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
         '''
         calculates the three note linear segments if only three vertical slices provided
         '''
-        for partNum in range(0,min(len(self.verticalSlices[0].getObjectsByClass(note.Note)), \
-                                   len(self.verticalSlices[1].getObjectsByClass(note.Note)),\
-                                    len(self.verticalSlices[2].getObjectsByClass(note.Note)))):
-            self.tnlsDict[partNum] = ThreeNoteLinearSegment([self.verticalSlices[0].getObjectsByPart(partNum, note.Note),\
-                                                              self.verticalSlices[1].getObjectsByPart(partNum, note.Note), \
-                                                              self.verticalSlices[2].getObjectsByPart(partNum, note.Note)])
+        for partNum in range(0,min(len(self.verticalities[0].getObjectsByClass(note.Note)), \
+                                   len(self.verticalities[1].getObjectsByClass(note.Note)),\
+                                    len(self.verticalities[2].getObjectsByClass(note.Note)))):
+            self.tnlsDict[partNum] = ThreeNoteLinearSegment([self.verticalities[0].getObjectsByPart(partNum, note.Note),\
+                                                              self.verticalities[1].getObjectsByPart(partNum, note.Note), \
+                                                              self.verticalities[2].getObjectsByPart(partNum, note.Note)])
 
        
     def hasPassingTone(self, partNumToIdentify, unaccentedOnly=False):  
@@ -1446,10 +1446,10 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
          
         partNum is the part (starting with 0) to identify the passing tone
         
-        >>> vs1 = voiceLeading.VerticalSlice({0:note.Note('A4'), 1: note.Note('F2')})
-        >>> vs2 = voiceLeading.VerticalSlice({0:note.Note('B-4'), 1: note.Note('F2')})
-        >>> vs3 = voiceLeading.VerticalSlice({0:note.Note('C5'), 1: note.Note('E2')})
-        >>> tbtm = voiceLeading.VerticalSliceTriplet([vs1, vs2, vs3])
+        >>> vs1 = voiceLeading.Verticality({0:note.Note('A4'), 1: note.Note('F2')})
+        >>> vs2 = voiceLeading.Verticality({0:note.Note('B-4'), 1: note.Note('F2')})
+        >>> vs3 = voiceLeading.Verticality({0:note.Note('C5'), 1: note.Note('E2')})
+        >>> tbtm = voiceLeading.VerticalityTriplet([vs1, vs2, vs3])
         >>> tbtm.hasPassingTone(0)
         True
         >>> tbtm.hasPassingTone(1)
@@ -1481,10 +1481,10 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
         partNum is the part (starting with 0) to identify the passing tone
         for use on 3 vertical slices (3tuplet)
         
-        >>> vs1 = voiceLeading.VerticalSlice({0:note.Note('E-4'), 1: note.Note('C3')})
-        >>> vs2 = voiceLeading.VerticalSlice({0:note.Note('E-4'), 1: note.Note('B2')})
-        >>> vs3 = voiceLeading.VerticalSlice({0:note.Note('C5'), 1: note.Note('C3')})
-        >>> tbtm = voiceLeading.VerticalSliceTriplet([vs1, vs2, vs3])
+        >>> vs1 = voiceLeading.Verticality({0:note.Note('E-4'), 1: note.Note('C3')})
+        >>> vs2 = voiceLeading.Verticality({0:note.Note('E-4'), 1: note.Note('B2')})
+        >>> vs3 = voiceLeading.Verticality({0:note.Note('C5'), 1: note.Note('C3')})
+        >>> tbtm = voiceLeading.VerticalityTriplet([vs1, vs2, vs3])
         >>> tbtm.hasNeighborTone(1)
         True
         '''
@@ -2030,7 +2030,7 @@ class TestExternal(unittest.TestCase):
 
 #------------------------------------------------------------------------------
 
-_DOC_ORDER = [VoiceLeadingQuartet, ThreeNoteLinearSegment, VerticalSlice, VerticalSliceNTuplet]
+_DOC_ORDER = [VoiceLeadingQuartet, ThreeNoteLinearSegment, Verticality, VerticalityNTuplet]
 
 if __name__ == "__main__":
     import music21

@@ -5,8 +5,10 @@
 #
 # Authors:      Beth Hadley
 #               Lars Johnson
+#               Josiah Wolf Oberholtzer
+#               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2012 The music21 Project
+# Copyright:    (c) 2009-2014 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -19,7 +21,7 @@ Theory Analyzer methods provide easy analysis tools for common music theory type
 a :class:`~music21.stream.Score` (**must have parts**), such as finding the parallel fifths, locating the passing tones, finding
 dissonant harmonic intervals, etc. These analysis methods typically operate in the following way:
 
-1. the score is automatically parsed into small bits for analysis (such as :class:`~music21.voiceLeading.VerticalSlice`, :class:`~music21.voiceLeading.VoiceLeadingQuartet`,  etc.)
+1. the score is automatically parsed into small bits for analysis (such as :class:`~music21.voiceLeading.Verticality`, :class:`~music21.voiceLeading.VoiceLeadingQuartet`,  etc.)
 2. these bits are analyzed for certain attributes, according to analysis methods in :class:`~music21.voiceLeading`
 3. the results are stored in the score's analysisData dictionary, (and also returned as a list depending on which method is called)
 
@@ -32,11 +34,11 @@ these methods break the score up into voiceLeading atoms, and return objects of 
 because they provide easy access to the components within them, and those components (notes, chords, etc.) contain
 a direct pointer to the original object in the score.
 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getVerticalSlices` 
+* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getVerticalities` 
 * :meth:`~music21.theoryAnalysis.theoryAnalyzer.getVLQs` 
 * :meth:`~music21.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments` 
 * :meth:`~music21.theoryAnalysis.theoryAnalyzer.getLinearSegments` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getVerticalSliceNTuplets` 
+* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets` 
 * :meth:`~music21.theoryAnalysis.theoryAnalyzer.getHarmonicIntervals` 
 * :meth:`~music21.theoryAnalysis.theoryAnalyzer.getMelodicIntervals` 
 
@@ -99,12 +101,12 @@ useful as 'get' methods (such as those above), merely run the identify method an
 These methods provide a preliminary implementation for removing passing tones & neighbor tones from a score.
 As an example, the steps involved in these methods calls include:
 
-1. break the score into verticalSlices 
-2. formsverticalSliceTriplets out of these vertical slices 
-3. break each verticalSliceTriplet into threeNoteLinearSegments 
+1. break the score into Verticalities 
+2. forms verticalityTriplets out of these vertical slices 
+3. break each verticalityTriplet into threeNoteLinearSegments 
 4. check to see if the threeNoteLinearSegment couldBePassingTone() or couldBeNeighborTone() (horizontal analysis) 
-5. check to see if the verticalSlice identified as a possible passingTone or neighborTone is dissonant
-6. check to see if previous verticalSlice and next verticalSlice isdissonant
+5. check to see if the Verticality identified as a possible passingTone or neighborTone is dissonant
+6. check to see if previous Verticality and next Verticality isdissonant
 7. if all checks are true, the passingTone or neighborTone is removed from the score (because the whole point of parsing the score into voiceLeadingObjects was to maintain a direct pointer to the original object in the score.
 8. the gap created by the deletion is filled in by extending the duration of the previous note
 
@@ -158,7 +160,7 @@ from music21 import environment
 _MOD = 'theoryAnalyzer.py'
 environLocal = environment.Environment(_MOD)
 
-_DOC_ORDER = ['getVerticalSlices', 'getVLQs', 'getThreeNoteLinearSegments', 'getLinearSegments', 'getVerticalSliceNTuplets','getHarmonicIntervals', 'getMelodicIntervals', 'getParallelFifths', 'getPassingTones', 
+_DOC_ORDER = ['getVerticalities', 'getVLQs', 'getThreeNoteLinearSegments', 'getLinearSegments', 'getVerticalityNTuplets','getHarmonicIntervals', 'getMelodicIntervals', 'getParallelFifths', 'getPassingTones', 
             'getNeighborTones','getParallelOctaves', 'identifyParallelFifths',  'identifyParallelOctaves', 'identifyParallelUnisons',
             'identifyHiddenFifths', 'identifyHiddenOctaves', 'identifyImproperResolutions',
             'identifyLeapNotSetWithStep', 'identifyOpensIncorrectly', 'identifyClosesIncorrectly',
@@ -209,11 +211,11 @@ def addAnalysisData(score):
 #---------------------------------------------------------------------------------------
 # Methods to split the score up into little pieces for analysis
 # The little pieces are all from voiceLeading.py, such as
-# Vertical Slices, VoiceLeadingQuartet, ThreeNoteLinearSegment, and VerticalSliceNTuplet       
+# Vertical Slices, VoiceLeadingQuartet, ThreeNoteLinearSegment, and VerticalityNTuplet       
     
-def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']):
+def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']):
     '''
-    returns a list of :class:`~music21.voiceLeading.VerticalSlice` objects in
+    returns a list of :class:`~music21.voiceLeading.Verticality` objects in
     by parsing the score. Note that it uses the combined rhythm of the parts 
     to determine what vertical slices to take. Default is to return only objects of
     type Note, Chord, Harmony, and Rest.
@@ -234,9 +236,9 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
     >>> part1.append(n3)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.getVerticalSlices(sc)
-    [<music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note G>]})  ]
-    >>> len(theoryAnalysis.theoryAnalyzer.getVerticalSlices(sc))
+    >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc)
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note G>]})  ]
+    >>> len(theoryAnalysis.theoryAnalyzer.getVerticalities(sc))
     2
 
     >>> sc4 = stream.Score()
@@ -245,8 +247,8 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
     >>> part4.append(chord.Chord(['A','B','C']))
     >>> part4.append(chord.Chord(['A','B','C']))
     >>> sc4.insert(part4)
-    >>> theoryAnalysis.theoryAnalyzer.getVerticalSlices(sc4)
-    [<music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  ]
+    >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc4)
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  ]
 
     >>> sc3 = stream.Score()
     >>> p1 = stream.Part()
@@ -254,15 +256,15 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
     >>> p1.append(harmony.ChordSymbol('D', quarterLength = 3))
     >>> p1.append(harmony.ChordSymbol('E7', quarterLength = 4))
     >>> sc3.append(p1)
-    >>> theoryAnalysis.theoryAnalyzer.getVerticalSlices(sc3)
-    [<music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol C>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol D>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol E7>]})  ]
+    >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc3)
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol D>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol E7>]})  ]
 
     '''   
     
     vsList = []
     addAnalysisData(score)
-    if 'VerticalSlices' in score.analysisData and score.analysisData['VerticalSlices'] != None:
-        return score.analysisData['VerticalSlices']
+    if 'Verticalities' in score.analysisData and score.analysisData['Verticalities'] != None:
+        return score.analysisData['Verticalities']
 
     # if elements exist at same offset, return both 
 
@@ -287,11 +289,11 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
             for el in elementStream.elements:
                 contentDict[partNum].append(el)    
             partNum+=1
-                    
-        vs = voiceLeading.VerticalSlice(contentDict)
+
+        vs = voiceLeading.Verticality(contentDict)
         vsList.append(vs)
     if classFilterList==['Note', 'Chord', 'Harmony', 'Rest']:
-        score.analysisData['VerticalSlices'] = vsList
+        score.analysisData['Verticalities'] = vsList
     
     return vsList
      
@@ -328,16 +330,16 @@ def getVLQs(score, partNum1, partNum2):
     
     vlqList = []
     
-    verticalSlices = getVerticalSlices(score)
+    verticalities = getVerticalities(score)
     
-    for (i, verticalSlice) in enumerate(verticalSlices[:-1]):
-        nextVerticalSlice = verticalSlices[i + 1]
+    for (i, verticality) in enumerate(verticalities[:-1]):
+        nextVerticality = verticalities[i + 1]
         
-        v1n1 = verticalSlice.getObjectsByPart(partNum1, classFilterList=['Note'])
-        v1n2 = nextVerticalSlice.getObjectsByPart(partNum1, classFilterList=['Note'])
+        v1n1 = verticality.getObjectsByPart(partNum1, classFilterList=['Note'])
+        v1n2 = nextVerticality.getObjectsByPart(partNum1, classFilterList=['Note'])
          
-        v2n1 = verticalSlice.getObjectsByPart(partNum2, classFilterList=['Note'])
-        v2n2 = nextVerticalSlice.getObjectsByPart(partNum2, classFilterList=['Note'])
+        v2n1 = verticality.getObjectsByPart(partNum2, classFilterList=['Note'])
+        v2n2 = nextVerticality.getObjectsByPart(partNum2, classFilterList=['Note'])
         
         if v1n1 != None and v1n2 != None and v2n1 != None and v2n2 != None:
             getKeyAtMeasure(score, v1n1.measureNumber)
@@ -439,12 +441,12 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     
     linearSegments = []
     #no caching here - possibly implement later on...
-    verticalSlices = getVerticalSlices(score)
+    verticalities = getVerticalities(score)
 
-    for i in range(0, len(verticalSlices)-lengthLinearSegment+1):
+    for i in range(0, len(verticalities)-lengthLinearSegment+1):
         objects = []
         for n in range(0,lengthLinearSegment):
-            objects.append(verticalSlices[i+n].getObjectsByPart(partNum, classFilterList))           
+            objects.append(verticalities[i+n].getObjectsByPart(partNum, classFilterList))           
             #print objects
         if lengthLinearSegment == 3 and 'Note' in _getTypeOfAllObjects(objects):
             tnls = voiceLeading.ThreeNoteLinearSegment(objects[0], objects[1], objects[2])
@@ -474,9 +476,9 @@ def _getTypeOfAllObjects(objectList):
         return newIntersection
     else: return []
 
-def getVerticalSliceNTuplets(score, ntupletNum):
+def getVerticalityNTuplets(score, ntupletNum):
     '''
-    extracts and returns a list of the :class:`~music21.voiceLeading.VerticalSliceNTuplet` or the 
+    extracts and returns a list of the :class:`~music21.voiceLeading.VerticalityNTuplet` or the 
     corresponding subclass (currently only supports triplets) 
     
     
@@ -494,31 +496,31 @@ def getVerticalSliceNTuplets(score, ntupletNum):
     >>> part1.append(note.Note('d6'))
     >>> sc.insert(part0)
     >>> sc.insert(part1) 
-    >>> len(theoryAnalysis.theoryAnalyzer.getVerticalSliceNTuplets(sc, 3))
+    >>> len(theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets(sc, 3))
     2
-    >>> theoryAnalysis.theoryAnalyzer.getVerticalSliceNTuplets(sc, 3)[1]
-    <music21.voiceLeading.VerticalSliceTriplet listofVerticalSlices=[<music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note G>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note A>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note E>], 1: [<music21.note.Note D>]})  ] 
+    >>> theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets(sc, 3)[1]
+    <music21.voiceLeading.VerticalityTriplet listofVerticalities=[<music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note G>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note A>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note E>], 1: [<music21.note.Note D>]})  ] 
 
     '''
 
-    verticalSliceNTuplets = []
+    verticalityNTuplets = []
     addAnalysisData(score)
-    if 'VerticalSlices' not in score.analysisData:
-        verticalSlices = getVerticalSlices(score)
+    if 'Verticalities' not in score.analysisData:
+        verticalities = getVerticalities(score)
     else:
-        verticalSlices = score.analysisData['VerticalSlices']
-        if verticalSlices == None:
-            verticalSlices = getVerticalSlices(score)
-    for i in range(0, len(verticalSlices)-(ntupletNum-1)):
-        verticalSliceList = []
+        verticalities = score.analysisData['Verticalities']
+        if verticalities == None:
+            verticalities = getVerticalities(score)
+    for i in range(0, len(verticalities)-(ntupletNum-1)):
+        verticalityList = []
         for countNum in range(i,i+ntupletNum):
-            verticalSliceList.append(verticalSlices[countNum])
+            verticalityList.append(verticalities[countNum])
         if ntupletNum == 3:
-            vsnt = voiceLeading.VerticalSliceTriplet(verticalSliceList)
+            vsnt = voiceLeading.VerticalityTriplet(verticalityList)
         else: 
-            vsnt = voiceLeading.VerticalSliceNTuplet(verticalSliceList)
-        verticalSliceNTuplets.append(vsnt)
-    return verticalSliceNTuplets
+            vsnt = voiceLeading.VerticalityNTuplet(verticalityList)
+        verticalityNTuplets.append(vsnt)
+    return verticalityNTuplets
 
 
 #---------------------------------------------------------------------------------------
@@ -551,11 +553,11 @@ def getHarmonicIntervals(score, partNum1, partNum2):
     'm3'
     '''
     hInvList = []
-    verticalSlices = getVerticalSlices(score)
-    for verticalSlice in verticalSlices:
+    verticalities = getVerticalities(score)
+    for verticality in verticalities:
         
-        nUpper = verticalSlice.getObjectsByPart(partNum1, classFilterList=['Note'])
-        nLower = verticalSlice.getObjectsByPart(partNum2, classFilterList=['Note'])
+        nUpper = verticality.getObjectsByPart(partNum1, classFilterList=['Note'])
+        nLower = verticality.getObjectsByPart(partNum2, classFilterList=['Note'])
         
         if nLower is None or nUpper is None:
             hIntv = None
@@ -776,16 +778,16 @@ def _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunct
                     tr.color(color)
                 _updateScoreResultDict(score, dictKey, tr)
                    
-def _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunction, responseOffsetMap=[]):
+def _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, responseOffsetMap=[]):
     addAnalysisData(score)
-    if 'VerticalSlices' not in score.analysisData:
-        unused_vslist = getVerticalSlices(score)
+    if 'Verticalities' not in score.analysisData:
+        unused_vslist = getVerticalities(score)
     
-    for vs in score.analysisData['VerticalSlices']:
+    for vs in score.analysisData['Verticalities']:
         if responseOffsetMap and vs.offset(leftAlign=True) not in responseOffsetMap:
             continue
         if testFunction(vs, score) is not False:
-            tr = theoryResult.VerticalSliceTheoryResult(vs)
+            tr = theoryResult.VerticalityTheoryResult(vs)
             tr.value = testFunction(vs, score)
             
             if dictKey == 'romanNumerals' or  dictKey == 'romanNumeralsVandI':
@@ -795,18 +797,18 @@ def _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunct
             
             _updateScoreResultDict(score, dictKey, tr)
 
-def _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey, testFunction, textFunction=None, color=None, \
+def _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey, testFunction, textFunction=None, color=None, \
                                          editorialDictKey=None,editorialValue=None, editorialMarkDict={}, nTupletNum=3):        
 
     addAnalysisData(score)
     if partNumToIdentify == None:
         for partNum in range(0,len(score.parts)):
-            _identifyBasedOnVerticalSliceNTuplet(score, partNum, dictKey, testFunction,  textFunction, color, \
+            _identifyBasedOnVerticalityNTuplet(score, partNum, dictKey, testFunction,  textFunction, color, \
                                                       editorialDictKey=None,editorialValue=None, editorialMarkDict={}, nTupletNum=3)
     else:
-        for vsnt in getVerticalSliceNTuplets(score, nTupletNum):
+        for vsnt in getVerticalityNTuplets(score, nTupletNum):
             if testFunction(vsnt, partNumToIdentify) is not False:
-                tr = theoryResult.VerticalSliceNTupletTheoryResult(vsnt, partNumToIdentify)
+                tr = theoryResult.VerticalityNTupletTheoryResult(vsnt, partNumToIdentify)
                 if editorialDictKey != None:
                     tr.markNoteEditorial(editorialDictKey, editorialValue, editorialMarkDict)
                 if textFunction is not None:
@@ -1272,12 +1274,12 @@ def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey 
         dictKey = 'accentedPassingTones'
     testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
     textFunction = lambda vsnt, pn:  vsnt.tnlsDict[pn].n2.name + ' identified as a passing tone in part ' + str(pn+1)
-    _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey, testFunction, textFunction, color, editorialDictKey, editorialValue, editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
+    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey, testFunction, textFunction, color, editorialDictKey, editorialValue, editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
 
 def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=True):
     '''
     returns a list of all passing tones present in the score, as identified by 
-    :meth:`~music21.voiceLeading.VerticalSliceTriplet.hasPassingTone`
+    :meth:`~music21.voiceLeading.VerticalityTriplet.hasPassingTone`
     
     
 
@@ -1304,7 +1306,7 @@ def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=
     elif dictKey == None:
         dictKey = 'accentedPassingTones'
     testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
-    _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey=dictKey, testFunction=testFunction, nTupletNum=3)
+    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey=dictKey, testFunction=testFunction, nTupletNum=3)
     if dictKey in score.analysisData['ResultDict']:
         return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in score.analysisData['ResultDict'][dictKey]]
     else:
@@ -1312,7 +1314,7 @@ def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=
 
 def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=True):
     '''
-    returns a list of all passing tones present in the score, as identified by :meth:`~music21.voiceLeading.VerticalSliceTriplet.hasNeighborTone`
+    returns a list of all passing tones present in the score, as identified by :meth:`~music21.voiceLeading.VerticalityTriplet.hasNeighborTone`
     
     
 
@@ -1339,7 +1341,7 @@ def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly
     elif dictKey == None:
         dictKey = 'accentedNeighborTones'
     testFunction = lambda vst, pn: vst.hasNeighborTone(pn, unaccentedOnly)
-    _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey=dictKey, testFunction=testFunction, nTupletNum=3)
+    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey=dictKey, testFunction=testFunction, nTupletNum=3)
     if dictKey in score.analysisData['ResultDict']:
         return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in score.analysisData['ResultDict'][dictKey]]
     else:
@@ -1384,7 +1386,7 @@ def removePassingTones(score, dictKey = 'unaccentedPassingTones'):
                 break
         a.n1.duration = music21.duration.Duration(durationNewTone)
         score.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
-    score.analysisData['VerticalSlices'] = None
+    score.analysisData['Verticalities'] = None
     
 def removeNeighborTones(score, dictKey = 'unaccentedNeighborTones'):
     '''
@@ -1427,7 +1429,7 @@ def removeNeighborTones(score, dictKey = 'unaccentedNeighborTones'):
         a.n1.duration = music21.duration.Duration(durationNewTone)
         score.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
         #a.n1.color = 'red'
-    score.analysisData['VerticalSlices'] = None
+    score.analysisData['Verticalities'] = None
 
 def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey = None, unaccentedOnly=True, \
                           editorialDictKey='isNeighborTone', editorialValue=True):
@@ -1466,7 +1468,7 @@ def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey
         
     testFunction = lambda vst, pn: vst.hasNeighborTone(pn, unaccentedOnly)
     textFunction = lambda vsnt, pn:  vsnt.tnlsDict[pn].n2.name + ' identified as a neighbor tone in part ' + str(pn+1)
-    _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify,  dictKey, testFunction, textFunction, color, editorialDictKey, editorialValue, editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
+    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify,  dictKey, testFunction, textFunction, color, editorialDictKey, editorialValue, editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
 
 def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'dissonantHarmonicIntervals'):
     '''
@@ -1669,7 +1671,7 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
     '''
     Identifies the roman numerals in the piece by iterating throgh the vertical slices and figuring
     out which roman numeral best corresponds to that vertical slice. Optionally specify the responseOffsetMap
-    which limits the resultObjects returned to only those with ``verticalSlice's.offset(leftAlign=True)`` included
+    which limits the resultObjects returned to only those with ``verticality's.offset(leftAlign=True)`` included
     in the list. For example, if only roman numerals were to be written for the vertical slice at offset 0, 6, and 7
     in the piece, pass ``responseOffsetMap = [0,6,7]``
     
@@ -1715,7 +1717,7 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
             notes+= n.name + ','
         notes = notes[:-1]
         return "Roman Numeral of " + notes + ' is ' + rn
-    _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
+    _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
 
 # TODO: improve this method...it's the beginnings of a harmonic analysis system for music21, but not developed well enough
 # for general use - it was used briefly as a proof-of-concept for some music theory homework assignments
@@ -1727,7 +1729,7 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
 #    out which roman numeral best corresponds to that vertical slice. (calls :meth:`~music21.roman.romanNumeralFromChord`)
 #    
 #    Optionally specify the responseOffsetMap which limits the resultObjects returned to only those with 
-#    verticalSlice's.offset(leftAlign=True) included in the list. For example, if only roman numerals
+#    verticality's.offset(leftAlign=True) included in the list. For example, if only roman numerals
 #    were to be written for the vertical slice at offset 0, 6, and 7 in the piece, pass responseOffsetMap = [0,6,7]
 #    
 #    '''
@@ -1749,7 +1751,7 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
 #            notes+= n.name + ','
 #        notes = notes[:-1]
 #        return "Roman Numeral of " + notes + ' is ' + rn
-#    _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
+#    _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
     
 def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'harmonicIntervals'):
     '''

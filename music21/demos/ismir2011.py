@@ -13,13 +13,16 @@
 #-------------------------------------------------------------------------------
 
 
-from music21 import *
+from music21 import corpus, features, converter
+from music21 import trecento, figuredBass, tinyNotation
+from music21 import expressions, stream
 
 def example2():
     handel = corpus.parse('hwv56/movement3-05.md')
     fe = features.jSymbolic.TripleMeterFeature(handel)
     print fe.extract().vector
 
+    # no longer works...
     soft = converter.parse("http://static.wikifonia.org/10699/musicxml.xml")
     fe.setData(soft)
     print fe.extract().vector
@@ -89,12 +92,12 @@ def prepareChinaEurope1():
         
     # add works, defining the class value 
     for w in oChina1.scores:
-        id = 'essenFolksong/%s-%s' % ('han1', w.metadata.number)
-        ds.addData(w, classValue='China', id=id)
+        sid = 'essenFolksong/%s-%s' % ('han1', w.metadata.number)
+        ds.addData(w, classValue='China', id=sid)
 
     for w in oCEurope1.scores:
-        id = 'essenFolksong/%s-%s' % ('europe1', w.metadata.number)
-        ds.addData(w, classValue='CentralEurope', id=id)
+        sid = 'essenFolksong/%s-%s' % ('europe1', w.metadata.number)
+        ds.addData(w, classValue='CentralEurope', id=sid)
     # process with all feature extractors, store all features
     ds.process()
     ds.write('d:/desktop/folkTrain.tab')
@@ -111,12 +114,12 @@ def prepareChinaEurope2():
         
     # add works, defining the class value 
     for w in oChina2.scores:
-        id = 'essenFolksong/%s-%s' % ('han2', w.metadata.number)
-        ds2.addData(w, classValue='China', id=id)
+        sid = 'essenFolksong/%s-%s' % ('han2', w.metadata.number)
+        ds2.addData(w, classValue='China', id=sid)
 
     for w in oCEurope2.scores:
-        id = 'essenFolksong/%s-%s' % ('europe2', w.metadata.number)
-        ds2.addData(w, classValue='CentralEurope', id=id)
+        sid = 'essenFolksong/%s-%s' % ('europe2', w.metadata.number)
+        ds2.addData(w, classValue='CentralEurope', id=sid)
     # process with all feature extractors, store all features
     ds2.process()
     ds2.write('d:/desktop/folkTest.tab')
@@ -162,13 +165,13 @@ def xtestChinaEuropeSimpler():
     knnWrong = 0
         
     for testRow in testData:
-      majGuess = majClassifier(testRow)
-      knnGuess = knnClassifier(testRow)
-      realAnswer = testRow.getclass()
-      if majGuess != realAnswer:
-        majWrong += 1
-      if knnGuess != realAnswer:
-        knnWrong += 1
+        majGuess = majClassifier(testRow)
+        knnGuess = knnClassifier(testRow)
+        realAnswer = testRow.getclass()
+        if majGuess != realAnswer:
+            majWrong += 1
+        if knnGuess != realAnswer:
+            knnWrong += 1
        
     total = float(len(testData))
     print majWrong/total, knnWrong/total
@@ -219,13 +222,13 @@ def testTrecentoSimpler():
     knnWrong = 0
         
     for testRow in testData:
-      majGuess = majClassifier(testRow)
-      knnGuess = knnClassifier(testRow)
-      realAnswer = testRow.getclass()
-      if majGuess != realAnswer:
-        majWrong += 1
-      if knnGuess != realAnswer:
-        knnWrong += 1
+        majGuess = majClassifier(testRow)
+        knnGuess = knnClassifier(testRow)
+        realAnswer = testRow.getclass()
+        if majGuess != realAnswer:
+            majWrong += 1
+        if knnGuess != realAnswer:
+            knnWrong += 1
        
     total = float(len(testData))
     print majWrong/total, knnWrong/total

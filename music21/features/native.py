@@ -699,14 +699,19 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
     be stored in i = 11).  i = 0 is always 0.0 since consecutive
     chords on the same pitch are ignored (unless there are 0 or 1 harmonies, in which case it is 1)
        
-    Sample test on the beatles' "here comes the sun"
+    Sample test on the BlowinInTheWind, showing all motion is 3rds, 6ths, or especially 4ths and 5ths.
     
-    
-    >>> s = converter.parse('http://wikifonia.org/node/8859') # here comes the sun
+    >>> s = corpus.parse('demos/BlowinInTheWind') 
     >>> fe = features.native.ChordBassMotionFeature(s)
     >>> fe.extract().vector 
-    [0.0, 0.05..., 0.14..., 0.03..., 0.06..., 0.3..., 0.008..., 0.303..., 0.0, 0.0, 0.07..., 0.008...]
+    [0.0, 0.0, 0.0, 0.0416..., 0.0416..., 0.166..., 0.0, 0.54166..., 0.0, 0.0, 0.2083... 0.0]
 
+
+    For comparison, the Beatles Here Comes the Sun has more tone motion
+
+    [0.0, 0.05..., 0.14..., 0.03..., 0.06..., 0.3..., 0.008..., 0.303..., 0.0, 0.0, 0.07..., 0.008...]
+    
+    Post 1990s music has a lot more semitone motion.
     
     '''
     id = 'CS12'

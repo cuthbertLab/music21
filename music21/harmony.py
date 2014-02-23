@@ -2579,7 +2579,7 @@ class TestExternal(unittest.TestCase):
         theoryAnalyzer.removePassingTones(excerpt)
         theoryAnalyzer.removeNeighborTones(excerpt)
     
-        slices = theoryAnalyzer.getVerticalSlices(excerpt)
+        slices = theoryAnalyzer.getVerticalities(excerpt)
         for vs in slices:
             x = harmony.chordSymbolFigureFromChord(vs.getChord())
             if x  != 'Chord Symbol Cannot Be Identified':

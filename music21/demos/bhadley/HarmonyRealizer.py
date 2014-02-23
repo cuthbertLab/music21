@@ -147,7 +147,7 @@ def generatePopSongRules():
 
 def mergeLeadSheetAndBassLine(leadsheet, bassLine):
     '''
-    method to combine the lead sheet (i.e. from wikifonia) with just the melody line
+    method to combine the lead sheet (i.e. from the ex-wikifonia) with just the melody line
     and chord symbols with the newly realized bassLine (i.e. from fbRealizer) which 
     consists of two parts, the treble line and bass line.
     '''
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     #test = HarmonyRealizer.TestExternal()
 
     #test.leadsheetEx1()
-    #sc = converter.parse('C:/wikifonia/wikifonia-4750.mxl') #hey Jude
+    #sc = converter.parse('C:/wikifonia/wikifonia-4750.mxl') #hey Jude -- gone
     
     #sc = corpus.parse('demos/BlowinInTheWind.mxl')
     #test.realizeLeadsheet(sc)

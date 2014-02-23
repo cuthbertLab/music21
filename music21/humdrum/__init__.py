@@ -30,7 +30,7 @@ correl_       None                                               Use numpy.corrc
 deg_          Several tools, see Notes                           Closest is :meth:`~music21.scale.Scale.getScaleDegreeAndAccidentalFromPitch`. See also `stream.Stream.analyze('key')`
 degree_       see above for "`deg`"
 diss_         To-Do                                              Will be "analysis.kkdiss".
-ditto_        see Notes                                          :meth:`~music21.stream.Stream.choridfy` and the VerticalSlice objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
+ditto_        see Notes                                          :meth:`~music21.stream.Stream.choridfy` and the offsetTree objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
 encode_       `midi.(severaltools)`                              Multifunction humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically
 extract_      None                                               Use python commands to extract objects with certain properties
 fields_       None                                               Not needed.

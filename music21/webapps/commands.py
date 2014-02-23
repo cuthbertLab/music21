@@ -281,7 +281,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     from music21 import roman
     
     score = scoreIn.sliceByGreatestDivisor(addTies=True)
-    vsList = theoryAnalyzer.getVerticalSlices(score)
+    vsList = theoryAnalyzer.getVerticalities(score)
     user = len(offsetList)
     music21VS = 0
     both = 0
