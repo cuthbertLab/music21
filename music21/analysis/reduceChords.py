@@ -17,6 +17,7 @@ Automatically reduce a MeasureStack to a single chord or group of chords.
 import unittest
 import copy
 from music21 import chord
+from music21 import note
 from music21 import meter
 from music21 import pitch
 from music21 import stream
@@ -90,14 +91,25 @@ class ChordReducer(object):
         self._fillInnerMeasureGaps(tree)
         assert tree.maximumOverlap == 2
 
+        # convert offset trees into music21 scores
         partwiseReduction = tree.toPartwiseScore(templateScore=inputScore)
         chordifiedReduction = tree.toChordifiedScore(templateScore=inputScore)
 
-        # process chordified reduction
-
+        # reduce chords in chordified reduction
         chordifiedPart = stream.Part()
-        chordifiedPart.append(chordifiedReduction[:])
+        for measure in chordifiedReduction:
+            reducedMeasure = self.reduceMeasureToNChords(
+                measure,
+                numChords=3,
+                weightAlgorithm=self.qlbsmpConsonance,
+                trimBelow=0.25,
+                )
+            chordifiedPart.append(reducedMeasure)
+
+        # clean up notation in all reduction parts
         partwiseReduction.append(chordifiedPart)
+        for part in partwiseReduction:
+            self._applyTies(part)
 
         return partwiseReduction
 
@@ -108,7 +120,6 @@ class ChordReducer(object):
             verticalityOne, verticalityTwo = verticalities
             pitchSetOne = verticalityOne.pitchSet
             pitchSetTwo = verticalityTwo.pitchSet
-            print verticalityOne, verticalityTwo
             if not verticalityOne.isConsonant or \
                 not verticalityTwo.isConsonant:
                 continue
@@ -123,7 +134,6 @@ class ChordReducer(object):
                         beatStrength=verticalityOne.beatStrength,
                         startOffset=verticalityOne.startOffset,
                         )
-                    print '\tHOCKET:', timespan, newTimespan
                     tree.insert(newTimespan)
             elif pitchSetTwo.issubset(pitchSetOne):
                 for timespan in verticalityOne.startTimespans:
@@ -132,8 +142,16 @@ class ChordReducer(object):
                         newTimespan = timespan.new(
                             stopOffset=verticalityTwo.startOffset,
                             )
-                        print '\tEXPAND:', timespan, newTimespan
                         tree.insert(newTimespan)
+
+    def _applyTies(self, part):
+        for one, two in self._iterateElementsPairwise(part):
+            if one.isNote and two.isNote:
+                if one.pitch == two.pitch:
+                    one.tie = tie.Tie('start')
+            elif one.isChord and two.isChord:
+                if one.pitches == two.pitches:
+                    one.tie = tie.Tie('start')
 
     def _buildOutputMeasure(self,
         closedPosition,
@@ -293,6 +311,21 @@ class ChordReducer(object):
                         stopOffset=stopOffset,
                         )
                     tree.insert(newParentage)
+
+    def _iterateElementsPairwise(self, stream):
+        elementBuffer = []
+        prototype = (
+            chord.Chord,
+            note.Note,
+            note.Rest,
+            )
+        for element in stream.flat:
+            if not isinstance(element, prototype):
+                continue
+            elementBuffer.append(element)
+            if len(elementBuffer) == 2:
+                yield tuple(elementBuffer)
+                elementBuffer.pop(0)
 
     def _removeNonChordTones(self, tree):
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
