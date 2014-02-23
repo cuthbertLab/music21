@@ -1084,6 +1084,37 @@ class OffsetTree(object):
         offsets.append(inputScore.duration.quarterLength)
         return score, offsets
 
+    def fillMeasureGaps(self):
+        for verticality in self.iterateVerticalities():
+            for parentage in verticality.startTimespans:
+                previousParentage = self.findPreviousParentageInSamePart(
+                    parentage)
+                changed = False
+                startOffset = parentage.startOffset
+                beatStrength = parentage.beatStrength
+                if previousParentage is None or \
+                    previousParentage.measureNumber != parentage.measureNumber:
+                    if parentage.startOffset != parentage.measureStartOffset:
+                        changed = True
+                        startOffset = parentage.measureStartOffset
+                        startVerticality = self.getVerticalityAt(startOffset)
+                        beatStrength = startVerticality.beatStrength
+                nextParentage = self.findNextParentageInSamePart(parentage)
+                stopOffset = parentage.stopOffset
+                if nextParentage is None or \
+                    nextParentage.measureNumber != parentage.measureNumber:
+                    if parentage.stopOffset != parentage.measureStopOffset:
+                        changed = True
+                        stopOffset = parentage.measureStopOffset
+                if changed:
+                    self.remove(parentage)
+                    newParentage = parentage.new(
+                        beatStrength=beatStrength,
+                        startOffset=startOffset,
+                        stopOffset=stopOffset,
+                        )
+                    self.insert(newParentage)
+
     def findNextParentageInSamePart(self, parentage):
         assert isinstance(parentage, Parentage)
         verticality = self.getVerticalityAt(parentage.startOffset)
