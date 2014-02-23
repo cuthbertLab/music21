@@ -458,6 +458,15 @@ class Microtone(SlottedObject):
             return True
         return False
 
+    def __hash__(self):
+        hashValues = (
+            self._centShift,
+            self._harmonicShift,
+            type(self),
+            )
+        return hash(hashValues)
+
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -627,7 +636,7 @@ class Accidental(SlottedObject):
         Equality. Needed for pitch comparisons.
 
         ::
-        
+
             >>> a = pitch.Accidental('double-flat')
             >>> b = pitch.Accidental('double-flat')
             >>> c = pitch.Accidental('double-sharp')
@@ -1321,6 +1330,18 @@ class Pitch(base.Music21Object):
             return True
         else:
             return False
+
+    def __hash__(self):
+        hashValues = (
+            self.accidental,
+            self.fundamental,
+            self.implicitAccidental,
+            self.microtone,
+            self.octave,
+            self.step,
+            type(self),
+            )
+        return hash(hashValues)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -3581,7 +3602,7 @@ class Pitch(base.Music21Object):
             <music21.pitch.Pitch C#4>
 
         ::
-        
+
             >>> aPitch
             <music21.pitch.Pitch G4>
 
