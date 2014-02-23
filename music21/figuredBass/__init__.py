@@ -2,7 +2,6 @@
 
 __all__ = ['checker',
            'examples',
-           'fbPitch',
            'notation',
            'possibility',
            'realizer',
@@ -13,7 +12,6 @@ __all__ = ['checker',
            
 import checker
 import examples
-import fbPitch
 import notation
 import possibility
 import realizer

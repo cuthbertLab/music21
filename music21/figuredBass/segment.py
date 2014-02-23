@@ -21,7 +21,6 @@ from music21 import exceptions21
 from music21 import note
 from music21 import pitch
 from music21 import scale
-from music21.figuredBass import fbPitch
 from music21.figuredBass import possibility
 from music21.figuredBass import realizerScale
 from music21.figuredBass import resolution

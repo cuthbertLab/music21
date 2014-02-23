@@ -1229,6 +1229,9 @@ class Stream(base.Music21Object):
         '''
         Remove all elements not of the specified
         class or subclass in the Steam in place.
+
+        
+
         '''
         if not common.isListLike(classFilterList):
             classFilterList = [classFilterList]
@@ -3683,10 +3686,29 @@ class Stream(base.Music21Object):
         {5.0} <music21.stream.Measure 2 offset=5.0>
         ...
         
+        
+        Setting customRemove to True removes everything:
+        
+        >>> bass = b.parts[3]
+        >>> bassEmpty = bass.measureTemplate(fillWithRests=False, customRemove=True)
+        >>> bassEmpty.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+        <BLANKLINE>
+        {1.0} <music21.stream.Measure 1 offset=1.0>
+        <BLANKLINE>
+        {5.0} <music21.stream.Measure 2 offset=5.0>
+        <BLANKLINE>
+        {9.0} <music21.stream.Measure 3 offset=9.0>
+        <BLANKLINE>
+        {13.0} <music21.stream.Measure 4 offset=13.0>
+        <BLANKLINE>
+        ...
+        
+        
         classType explains what to extract.  Might be Voice, etc. 
         
         Is not recursive, so cannot template a whole Score...yet.
-        
+        TODO: rename to template -- set default to Stream not Measure, add recurse...
         '''
         if not self.hasMeasures():
             raise StreamException('the requested Stream does not have Measures')
@@ -3695,7 +3717,10 @@ class Stream(base.Music21Object):
         for m in measureTemplate:
             ql = m.duration.quarterLength
             if customRemove is not None:
-                m.removeByClass(customRemove)
+                if customRemove is True:
+                    m.removeByNotOfClass([])
+                else:
+                    m.removeByClass(customRemove)
             else:
                 #                 + rests    voices/substreams
                 m.removeByClass(['GeneralNote', 'Stream', 'Dynamic', 'Expression'])
