@@ -1094,13 +1094,16 @@ class LilypondConverter(object):
         <BLANKLINE>
 
         '''
-        if self.variantMode is True:
-            #Then should attach \noBeam to note if it is the last note
-            if "NotRest" in noteOrRest.classes:
-                n = noteOrRest
-                activeSite = n.activeSite
-                if n.getOffsetBySite(activeSite) + n.duration.quarterLength == activeSite.duration.quarterLength:
-                    pass
+        # commented out until complete
+#         if self.variantMode is True:
+#             #TODO: attach \noBeam to note if it is the last note
+#             if "NotRest" in noteOrRest.classes:
+#                 n = noteOrRest
+#                 activeSite = n.activeSite
+#                 offset = n.offset
+#                 # failed at least once...
+#                 if offset + n.duration.quarterLength == activeSite.duration.quarterLength:
+#                     pass
 
         self.setContextForTupletStart(noteOrRest)
         self.appendBeamCode(noteOrRest)

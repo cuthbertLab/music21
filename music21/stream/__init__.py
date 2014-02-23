@@ -3619,24 +3619,88 @@ class Stream(base.Music21Object):
             return None
 
 
-    def measureTemplate(self, fillWithRests=True):
+    def measureTemplate(self, fillWithRests=True, classType='Measure', customRemove=None):
         '''
         If this Stream contains measures, return a new Stream
         with new Measures populated with the same characteristics of those found in this Stream.
 
         That is, TimeSignatures, KeySignatures, etc. are retained.
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> sopr = b.parts[0]
+        >>> soprEmpty = sopr.measureTemplate()
+        >>> soprEmpty.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Rest rest>
+        {1.0} <music21.stream.Measure 1 offset=1.0>
+            {0.0} <music21.note.Rest rest>
+        {5.0} <music21.stream.Measure 2 offset=5.0>
+            {0.0} <music21.note.Rest rest>
+        {9.0} <music21.stream.Measure 3 offset=9.0>
+            {0.0} <music21.layout.SystemLayout>
+            {0.0} <music21.note.Rest rest>
+        {13.0} <music21.stream.Measure 4 offset=13.0>
+        ...
+        
+        
+        Really make empty with fillWithRests = False
+        
+        >>> alto = b.parts[1]
+        >>> altoEmpty = alto.measureTemplate(fillWithRests = False)
+        >>> altoEmpty.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
+            {0.0} <music21.meter.TimeSignature 4/4>
+        {1.0} <music21.stream.Measure 1 offset=1.0>
+        <BLANKLINE>
+        {5.0} <music21.stream.Measure 2 offset=5.0>
+        <BLANKLINE>
+        {9.0} <music21.stream.Measure 3 offset=9.0>
+            {0.0} <music21.layout.SystemLayout>
+        ...
+        
+        
+        customRemove can be a list of classes to remove.  By default it is
+        ['GeneralNote', 'Stream', 'Dynamic', 'Expression']
+        
+        if GeneralNote is not included in customRemove, make sure fillWithRests is False
+        
+        >>> tenor = b.parts[2]
+        >>> tenorNoClefsSignatures = tenor.measureTemplate(fillWithRests=False, customRemove=['Clef','KeySignature','TimeSignature'])
+        >>> tenorNoClefsSignatures.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {0.5} <music21.note.Note B>
+        {1.0} <music21.stream.Measure 1 offset=1.0>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        {5.0} <music21.stream.Measure 2 offset=5.0>
+        ...
+        
+        classType explains what to extract.  Might be Voice, etc. 
+        
+        Is not recursive, so cannot template a whole Score...yet.
+        
         '''
         if not self.hasMeasures():
             raise StreamException('the requested Stream does not have Measures')
-        measureTemplate = copy.deepcopy(self.getElementsByClass('Measure'))
+        # should this be deepcopy or just a recursive call...
+        measureTemplate = copy.deepcopy(self.getElementsByClass(classType))
         for m in measureTemplate:
-            m.removeByClass(['GeneralNote']) # includes rests
-            m.removeByClass(['Stream']) # get voices or sub-streams
-            m.removeByClass(['Dynamic'])
-            m.removeByClass(['Expression'])
+            ql = m.duration.quarterLength
+            if customRemove is not None:
+                m.removeByClass(customRemove)
+            else:
+                #                 + rests    voices/substreams
+                m.removeByClass(['GeneralNote', 'Stream', 'Dynamic', 'Expression'])
 
             if fillWithRests:
-                ql = m.duration.quarterLength
                 # quarterLength duration will be appropriate to pickup
                 m.insert(0, note.Rest(quarterLength=ql))
         return measureTemplate
@@ -4565,8 +4629,9 @@ class Stream(base.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: maxBefore -- maximum number of elements to return before; etc.
+        TODO: use .template to get new Stream
 
-        NOTE: RENAME: this probably should be renamed, as we use Context in a specail way. Perhaps better is extractNeighbors?
+        NOTE: RENAME: this probably should be renamed, as we use Context in a special way. Perhaps better is extractNeighbors?
 
         '''
         if forceOutputClass is None:
