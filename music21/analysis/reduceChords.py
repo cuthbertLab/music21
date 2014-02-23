@@ -83,13 +83,14 @@ class ChordReducer(object):
         self._removeVerticalDissonances(tree)
         assert tree.maximumOverlap == 2
 
-        tree.fillMeasureGaps()
+        self._fillOuterMeasureGaps(tree)
         assert tree.maximumOverlap == 2
 
         self._alignHockets(tree)
         assert tree.maximumOverlap == 2
 
-        # tree.fuseLikePitchedPartContiguousTimespans()
+        self._fillInnerMeasureGaps(tree)
+        assert tree.maximumOverlap == 2
 
         # self._removeNonChordTones(tree)
 
@@ -243,6 +244,66 @@ class ChordReducer(object):
                     stopOffset=timespans[1].stopOffset,
                     )
                 tree.insert(merged)
+
+    def _fillInnerMeasureGaps(self, tree):
+        for verticality in tree.iterateVerticalities():
+            for parentage in verticality.startTimespans:
+                nextParentage = tree.findNextParentageInSamePart(parentage)
+                if nextParentage is None:
+                    nextStartOffset = parentage.measureStopOffset
+                else:
+                    nextStartOffset = nextParentage.startOffset
+                if parentage.stopOffset != nextStartOffset:
+                    tree.remove(parentage)
+                    parentage = parentage.new(
+                        stopOffset=nextStartOffset,
+                        )
+                    tree.insert(parentage)
+                previousParentage = tree.findPreviousParentageInSamePart(
+                    parentage)
+                if previousParentage is None:
+                    continue
+                if previousParentage.measureNumber != parentage.measureNumber:
+                    continue
+                if previousParentage.pitches != parentage.pitches:
+                    continue
+                tree.remove(parentage)
+                tree.remove(previousParentage)
+                newParentage = previousParentage.new(
+                    stopOffset=parentage.stopOffset,
+                    )
+                tree.insert(newParentage)
+
+    def _fillOuterMeasureGaps(self, tree):
+        for verticality in tree.iterateVerticalities():
+            for parentage in verticality.startTimespans:
+                previousParentage = tree.findPreviousParentageInSamePart(
+                    parentage)
+                changed = False
+                startOffset = parentage.startOffset
+                beatStrength = parentage.beatStrength
+                if previousParentage is None or \
+                    previousParentage.measureNumber != parentage.measureNumber:
+                    if parentage.startOffset != parentage.measureStartOffset:
+                        changed = True
+                        startOffset = parentage.measureStartOffset
+                        startVerticality = tree.getVerticalityAt(startOffset)
+                        beatStrength = startVerticality.beatStrength
+                nextParentage = tree.findNextParentageInSamePart(parentage)
+                stopOffset = parentage.stopOffset
+                if nextParentage is None or \
+                    nextParentage.measureNumber != parentage.measureNumber:
+                    if parentage.stopOffset != parentage.measureStopOffset:
+                        changed = True
+                        stopOffset = parentage.measureStopOffset
+                if changed:
+                    tree.remove(parentage)
+                    newParentage = parentage.new(
+                        beatStrength=beatStrength,
+                        startOffset=startOffset,
+                        stopOffset=stopOffset,
+                        )
+                    tree.insert(newParentage)
 
     def _removeNonChordTones(self, tree):
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
