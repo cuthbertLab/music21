@@ -153,68 +153,6 @@ class ChordReducer(object):
                 if one.pitches == two.pitches:
                     one.tie = tie.Tie('start')
 
-    def _buildOutputMeasure(self,
-        closedPosition,
-        forceOctave,
-        i,
-        inputMeasure,
-        inputMeasureReduction,
-        lastPitchedObject,
-        lastTimeSignature,
-        ):
-        outputMeasure = stream.Measure()
-        outputMeasure.number = i
-        #inputMeasureReduction.show('text')
-        cLast = None
-        cLastEnd = 0.0
-        for cEl in inputMeasureReduction:
-            cElCopy = copy.deepcopy(cEl)
-            if 'Chord' in cEl.classes:
-                if closedPosition is not False:
-                    if forceOctave is not False:
-                        cElCopy.closedPosition(
-                            forceOctave=forceOctave,
-                            inPlace=True,
-                            )
-                    else:
-                        cElCopy.closedPosition(inPlace=True)
-                    cElCopy.removeRedundantPitches(inPlace=True)
-            newOffset = cEl.getOffsetBySite(inputMeasureReduction)
-            # extend over gaps
-            if cLast is not None:
-                if round(newOffset - cLastEnd, 6) != 0.0:
-                    cLast.quarterLength += newOffset - cLastEnd
-            cLast = cElCopy
-            cLastEnd = newOffset + cElCopy.quarterLength
-            outputMeasure._insertCore(newOffset, cElCopy)
-        tsContext = inputMeasure.getContextByClass('TimeSignature')
-        #tsContext = inputMeasure.parts[0].getContextByClass('TimeSignature')
-        if tsContext is not None:
-            if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
-                cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
-        outputMeasure._elementsChanged()
-        # add ties
-        if lastPitchedObject is not None:
-            firstPitched = outputMeasure[0]
-            if lastPitchedObject.isNote and firstPitched.isNote:
-                if lastPitchedObject.pitch == firstPitched.pitch:
-                    lastPitchedObject.tie = tie.Tie("start")
-            elif lastPitchedObject.isChord and firstPitched.isChord:
-                if len(lastPitchedObject) == len(firstPitched):
-                    allSame = True
-                    for pitchI in range(len(lastPitchedObject)):
-                        if lastPitchedObject.pitches[pitchI] != firstPitched.pitches[pitchI]:
-                            allSame = False
-                    if allSame is True:
-                        lastPitchedObject.tie = tie.Tie('start')
-        lastPitchedObject = outputMeasure[-1]
-        #sourceMeasureTs = inputMeasure.parts[0].getElementsByClass('Measure')[0].timeSignature
-        sourceMeasureTs = tsContext
-        if sourceMeasureTs != lastTimeSignature:
-            outputMeasure.timeSignature = copy.deepcopy(sourceMeasureTs)
-            lastTimeSignature = sourceMeasureTs
-        return lastPitchedObject, lastTimeSignature, outputMeasure
-
     def _collapseArpeggios(self, tree):
         for verticalities in tree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
@@ -312,6 +250,19 @@ class ChordReducer(object):
                         )
                     tree.insert(newParentage)
 
+    @staticmethod
+    def _getIntervalClassSet(pitches):
+        result = set()
+        pitches = [pitch.Pitch(x) for x in pitches]
+        for i, x in enumerate(pitches):
+            for y in pitches[i + 1:]:
+                interval = int(abs(x.ps - y.ps))
+                interval %= 12
+                if 6 < interval:
+                    interval = 12 - interval
+                result.add(interval)
+        return result
+
     def _iterateElementsPairwise(self, stream):
         elementBuffer = []
         prototype = (
@@ -354,19 +305,6 @@ class ChordReducer(object):
             for timespan in verticality.startTimespans:
                 if min(timespan.pitches) != lowestPitch:
                     tree.remove(timespan)
-
-    @staticmethod
-    def _getIntervalClassSet(pitches):
-        result = set()
-        pitches = [pitch.Pitch(x) for x in pitches]
-        for i, x in enumerate(pitches):
-            for y in pitches[i + 1:]:
-                interval = int(abs(x.ps - y.ps))
-                interval %= 12
-                if 6 < interval:
-                    interval = 12 - interval
-                result.add(interval)
-        return result
 
     ### PUBLIC METHODS ###
 
@@ -433,51 +371,6 @@ class ChordReducer(object):
         self.numberOfElementsInMeasure = 0
         return presentPCs
 
-    def multiPartReduction(
-        self,
-        inputStream,
-        closedPosition=False,
-        forceOctave=False,
-        maxChords=2,
-        ):
-        '''
-        Return a multipart reduction of a stream.
-        '''
-        i = 0
-        outputStream = stream.Part()
-        allMeasures = inputStream.parts[0].getElementsByClass('Measure')
-        measureCount = len(allMeasures)
-        lastPitchedObject = None
-        lastTimeSignature = None
-        while i <= measureCount:
-            inputMeasure = inputStream.measure(i, ignoreNumbers=True)
-            if not len(inputMeasure.flat.notesAndRests):
-                if not i:
-                    pass
-                else:
-                    break
-            else:
-                inputMeasure = copy.deepcopy(inputMeasure)
-                inputMeasureReduction = \
-                    inputMeasure.chordify().flat.notesAndRests
-                lastPitchedObject, lastTimeSignature, outputMeasure = \
-                    self._buildOutputMeasure(
-                        closedPosition,
-                        forceOctave,
-                        i,
-                        inputMeasure,
-                        inputMeasureReduction,
-                        lastPitchedObject,
-                        lastTimeSignature,
-                        )
-                outputStream._appendCore(outputMeasure)
-            i += 1
-        outputStream._elementsChanged()
-        outputStream.getElementsByClass('Measure')[0].insert(
-            0, outputStream.bestClef(allowTreble8vb=True))
-        outputStream.makeNotation(inPlace=True)
-        return outputStream
-
     def qlbsmpConsonance(self, c):
         '''
         Everything from before plus consonance
@@ -536,13 +429,17 @@ class ChordReducer(object):
             mObj = measureObj.flat.notes
         else:
             mObj = measureObj.notes
-
-        chordWeights = self.computeMeasureChordWeights(mObj, weightAlgorithm)
-
+        chordWeights = self.computeMeasureChordWeights(
+            mObj,
+            weightAlgorithm,
+            )
         if numChords > len(chordWeights):
             numChords = len(chordWeights)
-
-        sortedChordWeights = sorted(chordWeights, key=chordWeights.get, reverse=True)
+        sortedChordWeights = sorted(
+            chordWeights,
+            key=chordWeights.get,
+            reverse=True,
+            )
         maxNChords = sortedChordWeights[:numChords]
         if len(maxNChords) == 0:
             r = note.Rest()
@@ -552,14 +449,12 @@ class ChordReducer(object):
             mObj.insert(0, r)
             return mObj
         maxChordWeight = chordWeights[maxNChords[0]]
-
         trimmedMaxChords = []
         for pcTuples in maxNChords:
             if chordWeights[pcTuples] >= maxChordWeight * trimBelow:
                 trimmedMaxChords.append(pcTuples)
             else:
                 break
-
         currentGreedyChord = None
         currentGreedyChordPCs = None
         currentGreedyChordNewLength = 0.0
@@ -589,7 +484,6 @@ class ChordReducer(object):
         if currentGreedyChord is not None:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
             currentGreedyChordNewLength = 0.0
-
         # even chord lengths...
         for i in range(1, len(mObj)):
             c = mObj[i]
@@ -600,7 +494,6 @@ class ChordReducer(object):
                 lastC.quarterLength -= cOffsetSyncop
                 c.offset = int(cOffsetCurrent)
                 c.quarterLength += cOffsetSyncop
-
         return mObj
 
 
