@@ -553,7 +553,7 @@ class Segment(object):
         ['G4', 'G3', 'C4', 'C3']
         '''
         iterables = [self.allPitchesAboveBass] * (self.numParts - 1)
-        iterables.append([fbPitch.HashablePitch(self.bassNote.pitch.nameWithOctave)])
+        iterables.append([pitch.Pitch(self.bassNote.pitch.nameWithOctave)])
         return itertools.product(*iterables)
     
     def allCorrectSinglePossibilities(self):
@@ -737,9 +737,9 @@ class OverlayedSegment(Segment):
     '''
     def allSinglePossibilities(self):
         iterables = [self.allPitchesAboveBass] * (self.numParts - 1) # Parts 1 -> n-1
-        iterables.append([fbPitch.HashablePitch(self.bassNote.pitch.nameWithOctave)]) # Part n
+        iterables.append([pitch.Pitch(self.bassNote.pitch.nameWithOctave)]) # Part n
         for (partNumber, partPitch) in self.fbRules._partPitchLimits:
-            iterables[partNumber - 1] = [fbPitch.HashablePitch(partPitch.nameWithOctave)]
+            iterables[partNumber - 1] = [pitch.Pitch(partPitch.nameWithOctave)]
         return itertools.product(*iterables)
 
     
@@ -771,7 +771,7 @@ def getPitches(pitchNames = ['C','E','G'], bassPitch = 'C3', maxPitch = 'C8'):
         maxPitch = pitch.Pitch(maxPitch)
     
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
-    iter2 = itertools.imap(lambda x: fbPitch.HashablePitch(x[0] + str(x[1])), iter1)
+    iter2 = itertools.imap(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
     iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
     iter4 = itertools.ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
     allPitches = list(iter4)

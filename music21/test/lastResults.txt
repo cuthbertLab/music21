@@ -1,6 +1,55 @@
 Traceback (most recent call last):
   File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants
+  File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1688, in lyPrefixCompositeMusicFromRelatedVariants
+
+----------------------------------------------------------------------
+File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1740, in music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants
+Failed example:
+    print lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants[31]>", line 1, in <module>
+        print lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0]
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1866, in lyPrefixCompositeMusicFromRelatedVariants
+        lpOssiaMusicVariantPreFraction = self.lyOssiaMusicFromVariant(vStripped)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 2099, in lyOssiaMusicFromVariant
+        self.appendObjectsToContextFromStream(variantIn._stream)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 916, in appendObjectsToContextFromStream
+        self.appendM21ObjectToContext(el)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1007, in appendM21ObjectToContext
+        self.appendObjectsToContextFromStream(thisObject)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 916, in appendObjectsToContextFromStream
+        self.appendM21ObjectToContext(el)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1018, in appendM21ObjectToContext
+        self.appendContextFromNoteOrRest(thisObject)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1102, in appendContextFromNoteOrRest
+        if n.getOffsetBySite(activeSite) + n.duration.quarterLength == activeSite.duration.quarterLength:
+    AttributeError: 'NoneType' object has no attribute 'duration'
+
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.figuredBass.fbPitch.HashablePitch.__init__
+  File "/Users/josiah/Documents/Development/music21/music21/figuredBass/fbPitch.py", line 7, in __init__
+
+----------------------------------------------------------------------
+File "/Users/josiah/Documents/Development/music21/music21/figuredBass/fbPitch.py", line 29, in music21.figuredBass.fbPitch.HashablePitch.__init__
+Failed example:
+    hash(p1) == hash(p2)
+Expected:
+    False
+Got:
+    True
+
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
 AssertionError: Failed doctest test for music21.features.native.ChordBassMotionFeature
   File "/Users/josiah/Documents/Development/music21/music21/features/native.py", line 694, in ChordBassMotionFeature
 
@@ -45,6 +94,29 @@ Exception raised:
       File "<doctest music21.features.native.ChordBassMotionFeature[2]>", line 1, in <module>
         fe.extract().vector
     NameError: name 'fe' is not defined
+
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.documentation.library.documenters.IPythonNotebookDocumenter
+  File "/Users/josiah/Documents/Development/music21/music21/documentation/library/documenters.py", line 1570, in IPythonNotebookDocumenter
+
+----------------------------------------------------------------------
+File "/Users/josiah/Documents/Development/music21/music21/documentation/library/documenters.py", line 1583, in music21.documentation.library.documenters.IPythonNotebookDocumenter
+Failed example:
+    restructuredText = documenter()
+Exception raised:
+    Traceback (most recent call last):
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.documentation.library.documenters.IPythonNotebookDocumenter[5]>", line 1, in <module>
+        restructuredText = documenter()
+      File "/Users/josiah/Documents/Development/music21/music21/documentation/library/documenters.py", line 1599, in __call__
+        result.extend(self.getCellRstFormat(cell))
+      File "/Users/josiah/Documents/Development/music21/music21/documentation/library/documenters.py", line 1630, in getCellRstFormat
+        cellType))
+    Exception: Unhandled IPython notebook cell type u'heading'
 
 
 
@@ -133,8 +205,8 @@ trecento_polyphonicSnippet successfully ran 9 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
 trecento_capua successfully ran 9 tests
-trecento_tonality successfully ran 5 tests
 trecento___init__ successfully ran 3 tests
+trecento_tonality successfully ran 5 tests
 tie successfully ran 7 tests
 tinyNotation successfully ran 11 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
@@ -144,8 +216,8 @@ text successfully ran 23 tests
 test___init__ successfully ran 3 tests
 tempo successfully ran 45 tests
 stream_streamStatus successfully ran 4 tests
-stream_makeNotation successfully ran 9 tests
 theoryAnalysis_theoryAnalyzer successfully ran 42 tests
+stream_makeNotation successfully ran 9 tests
 spanner successfully ran 52 tests
 sieve successfully ran 40 tests
 serial successfully ran 47 tests
@@ -167,9 +239,9 @@ noteworthy___init__ successfully ran 3 tests
 note successfully ran 49 tests
 test_testStream successfully ran 206 tests
 musicxml_toMxObjects successfully ran 37 tests
-musicxml_testPrimitive successfully ran 5 tests
-musicxml_testFiles successfully ran 5 tests
 musicxml_xmlHandler successfully ran 12 tests
+musicxml_testFiles successfully ran 5 tests
+musicxml_testPrimitive successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
 repeat successfully ran 72 tests
 musicxml___init__ successfully ran 3 tests
@@ -180,13 +252,12 @@ midi_translate successfully ran 47 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
 musedata_translate successfully ran 16 tests
+midi___init__ successfully ran 28 tests
 meter successfully ran 107 tests
 metadata_primitives successfully ran 38 tests
 musicxml_fromMxObjects successfully ran 65 tests
-midi___init__ successfully ran 28 tests
 metadata___init__ successfully ran 18 tests
 medren successfully ran 30 tests
-lily_translate successfully ran 32 tests
 lily_lilyObjects successfully ran 14 tests
 lily___init__ successfully ran 3 tests
 layout successfully ran 22 tests
@@ -208,69 +279,64 @@ figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
-figuredBass_realizer successfully ran 12 tests
+freezeThaw successfully ran 28 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
-figuredBass_fbPitch successfully ran 5 tests
-freezeThaw successfully ran 28 tests
+figuredBass_realizer successfully ran 12 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
 figuredBass_examples successfully ran 15 tests
 graph successfully ran 62 tests
-features_jSymbolic successfully ran 86 tests
 features_base successfully ran 27 tests
+features___init__ successfully ran 8 tests
 expressions successfully ran 26 tests
 exceptions21 successfully ran 3 tests
 environment successfully ran 27 tests
 editorial successfully ran 10 tests
-features___init__ successfully ran 8 tests
+dynamics successfully ran 15 tests
 duration successfully ran 66 tests
 documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
-documentation_library_extensions successfully ran 3 tests
-dynamics successfully ran 15 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
 documentation___init__ successfully ran 3 tests
-documentation_library_documenters successfully ran 29 tests
 derivation successfully ran 6 tests
 defaults successfully ran 4 tests
 counterpoint___init__ successfully ran 3 tests
 counterpoint_species successfully ran 27 tests
 corpus_virtual successfully ran 5 tests
+features_jSymbolic successfully ran 86 tests
 corpus_chorales successfully ran 9 tests
 corpus_corpora successfully ran 28 tests
 corpus___init__ successfully ran 17 tests
-composition_seeger successfully ran 3 tests
-converter successfully ran 35 tests
+composition_phasing successfully ran 5 tests
 composition___init__ successfully ran 3 tests
 common successfully ran 57 tests
-composition_phasing successfully ran 5 tests
 clef successfully ran 27 tests
-chordTables successfully ran 17 tests
 contour successfully ran 10 tests
+chordTables successfully ran 17 tests
+converter successfully ran 35 tests
 chant successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
 braille_translate successfully ran 7 tests
 braille_text successfully ran 4 tests
 chord successfully ran 108 tests
-braille_segment successfully ran 11 tests
 classCache successfully ran 12 tests
 braille_lookup successfully ran 3 tests
+braille_segment successfully ran 11 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
 base successfully ran 112 tests
 bar successfully ran 9 tests
-braille_examples successfully ran 5 tests
 audioSearch_transcriber successfully ran 4 tests
 audioSearch_recording successfully ran 4 tests
-audioSearch_scoreFollower successfully ran 7 tests
+braille_examples successfully ran 5 tests
 articulations successfully ran 29 tests
 audioSearch___init__ successfully ran 19 tests
-analysis_search successfully ran 4 tests
 braille_test successfully ran 151 tests
+analysis_search successfully ran 4 tests
 analysis_reduceChords successfully ran 7 tests
 analysis_patel successfully ran 6 tests
 analysis_windowed successfully ran 9 tests
@@ -280,10 +346,9 @@ analysis_discrete successfully ran 31 tests
 analysis_reduction successfully ran 15 tests
 analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
-analysis_offsetTree successfully ran 33 tests
 abcFormat___init__ successfully ran 53 tests
 _version successfully ran 3 tests
-abcFormat_testFiles successfully ran 5 tests
+analysis_offsetTree successfully ran 48 tests
 abcFormat_translate successfully ran 18 tests
 Not in Tree Error: vexflow.testShow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: vexflow.exporter is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -318,9 +383,12 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -328,7 +396,63 @@ Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 d
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: abcFormat.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
+
+-----------
+lily_translate had 0 ERRORS and 1 FAILURES in 32 tests:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants
+  File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1688, in lyPrefixCompositeMusicFromRelatedVariants
+
+----------------------------------------------------------------------
+File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1740, in music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants
+Failed example:
+    print lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants[31]>", line 1, in <module>
+        print lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0]
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1866, in lyPrefixCompositeMusicFromRelatedVariants
+        lpOssiaMusicVariantPreFraction = self.lyOssiaMusicFromVariant(vStripped)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 2099, in lyOssiaMusicFromVariant
+        self.appendObjectsToContextFromStream(variantIn._stream)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 916, in appendObjectsToContextFromStream
+        self.appendM21ObjectToContext(el)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1007, in appendM21ObjectToContext
+        self.appendObjectsToContextFromStream(thisObject)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 916, in appendObjectsToContextFromStream
+        self.appendM21ObjectToContext(el)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1018, in appendM21ObjectToContext
+        self.appendContextFromNoteOrRest(thisObject)
+      File "/Users/josiah/Documents/Development/music21/music21/lily/translate.py", line 1102, in appendContextFromNoteOrRest
+        if n.getOffsetBySite(activeSite) + n.duration.quarterLength == activeSite.duration.quarterLength:
+    AttributeError: 'NoneType' object has no attribute 'duration'
+
+
+
+-----------
+figuredBass_fbPitch had 0 ERRORS and 1 FAILURES in 5 tests:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.figuredBass.fbPitch.HashablePitch.__init__
+  File "/Users/josiah/Documents/Development/music21/music21/figuredBass/fbPitch.py", line 7, in __init__
+
+----------------------------------------------------------------------
+File "/Users/josiah/Documents/Development/music21/music21/figuredBass/fbPitch.py", line 29, in music21.figuredBass.fbPitch.HashablePitch.__init__
+Failed example:
+    hash(p1) == hash(p2)
+Expected:
+    False
+Got:
+    True
+
+
 
 -----------
 features_native had 0 ERRORS and 1 FAILURES in 26 tests:
@@ -381,6 +505,32 @@ Exception raised:
     NameError: name 'fe' is not defined
 
 
+
+-----------
+documentation_library_documenters had 0 ERRORS and 1 FAILURES in 29 tests:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.documentation.library.documenters.IPythonNotebookDocumenter
+  File "/Users/josiah/Documents/Development/music21/music21/documentation/library/documenters.py", line 1570, in IPythonNotebookDocumenter
+
+----------------------------------------------------------------------
+File "/Users/josiah/Documents/Development/music21/music21/documentation/library/documenters.py", line 1583, in music21.documentation.library.documenters.IPythonNotebookDocumenter
+Failed example:
+    restructuredText = documenter()
+Exception raised:
+    Traceback (most recent call last):
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.documentation.library.documenters.IPythonNotebookDocumenter[5]>", line 1, in <module>
+        restructuredText = documenter()
+      File "/Users/josiah/Documents/Development/music21/music21/documentation/library/documenters.py", line 1599, in __call__
+        result.extend(self.getCellRstFormat(cell))
+      File "/Users/josiah/Documents/Development/music21/music21/documentation/library/documenters.py", line 1630, in getCellRstFormat
+        cellType))
+    Exception: Unhandled IPython notebook cell type u'heading'
+
+
 -------------------------------------------------------------------------
-Ran 3910 tests in 417.0281 seconds
-Run at 2014-01-26 16:37:59
+Ran 3907 tests in 391.1047 seconds
+Run at 2014-02-23 13:46:55
