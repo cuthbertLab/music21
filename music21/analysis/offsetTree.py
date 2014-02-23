@@ -1827,11 +1827,9 @@ class OffsetTree(object):
         outputScore = stream.Score()
         for part in self.allParts:
             newPart = stream.Part()
-            #instrument = copy.copy(part.getInstrument())
-            #newPart.append(instrument)
             for measure in templateScore:
-                measure = copy.deepcopy(measure)
-                newPart.append(measure)
+                newMeasure = copy.deepcopy(measure)
+                newPart.insert(measure.offset, newMeasure)
             partMapping[part] = newPart
             outputScore.append(newPart)
 
@@ -1880,7 +1878,8 @@ class OffsetTree(object):
                 measure = part[measureIndex]
                 measureInternalOffset = startOffset - measureOffset
                 measure.insert(measureInternalOffset, element)
-            part.insert(0, oldPart.getClefs()[0])
+            clef = part.bestClef(allowTreble8vb=True)
+            part.insert(0, clef)
 
         return outputScore
 
