@@ -608,6 +608,18 @@ class Accidental(SlottedObject):
         self.set(specifier)
 
     ### SPECIAL METHODS ###
+    def __hash__(self):
+        hashValues = (
+        self._alter,
+        self._displayStatus,
+        self._displayType,
+        self._modifier,
+        self._name,
+        self.displayLocation,
+        self.displaySize,
+        self.displayStyle,
+        )
+        return hash(hashValues)
 
 
     def __eq__(self, other):
