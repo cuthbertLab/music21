@@ -1064,7 +1064,7 @@ class OffsetTree(object):
             >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
             >>> result = tree.extractMeasuresAndMeasureOffsets(score)
             >>> result[0]
-            <music21.stream.Score ...>
+            <music21.stream.Part ...>
 
         ::
 
@@ -1073,33 +1073,35 @@ class OffsetTree(object):
 
         '''
         from music21 import meter
-#        part = inputScore.parts[0]
-#        outputScore = part.measureTemplate(
-#            fillWithRests=False,
-#            )
-#        offsets = [x.offset for x in outputScore]
-#        offsets.append(inputScore.duration.quarterLength)
-#        return outputScore, offsets
+
         part = inputScore.parts[0]
-        score = stream.Score()
-        offsets = []
-        for oldMeasure in part:
-            if not isinstance(oldMeasure, stream.Measure):
-                continue
-            offsets.append(oldMeasure.offset)
-            newMeasure = stream.Measure()
-            if oldMeasure.timeSignature is not None:
-                newTimeSignature = meter.TimeSignature(
-                    oldMeasure.timeSignature.ratioString,
-                    )
-                newMeasure.insert(0, newTimeSignature)
-            score.append(newMeasure)
-            newMeasure.number = oldMeasure.number
-            newMeasure.offset = oldMeasure.offset
-            newMeasure.paddingLeft = oldMeasure.paddingLeft
-            newMeasure.paddingRight = oldMeasure.paddingRight
+        outputScore = part.measureTemplate(
+            fillWithRests=False,
+            )
+        offsets = [x.offset for x in outputScore]
         offsets.append(inputScore.duration.quarterLength)
-        return score, offsets
+        return outputScore, offsets
+
+#        part = inputScore.parts[0]
+#        score = stream.Score()
+#        offsets = []
+#        for oldMeasure in part:
+#            if not isinstance(oldMeasure, stream.Measure):
+#                continue
+#            offsets.append(oldMeasure.offset)
+#            newMeasure = stream.Measure()
+#            if oldMeasure.timeSignature is not None:
+#                newTimeSignature = meter.TimeSignature(
+#                    oldMeasure.timeSignature.ratioString,
+#                    )
+#                newMeasure.insert(0, newTimeSignature)
+#            score.append(newMeasure)
+#            newMeasure.number = oldMeasure.number
+#            newMeasure.offset = oldMeasure.offset
+#            newMeasure.paddingLeft = oldMeasure.paddingLeft
+#            newMeasure.paddingRight = oldMeasure.paddingRight
+#        offsets.append(inputScore.duration.quarterLength)
+#        return score, offsets
 
     def findNextParentageInSamePart(self, parentage):
         assert isinstance(parentage, Parentage)
@@ -1726,6 +1728,8 @@ class OffsetTree(object):
             >>> chordifiedScore = tree.toChordifiedScore()
             >>> chordifiedScore.show('text')
             {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
+                {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.chord.Chord A3 E4 C#5>
                 {0.5} <music21.chord.Chord G#3 B3 E4 B4>
@@ -1742,51 +1746,14 @@ class OffsetTree(object):
                 {2.0} <music21.chord.Chord A2 C#4 E4 A4>
                 {3.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
             {9.0} <music21.stream.Measure 3 offset=9.0>
+                {0.0} <music21.layout.SystemLayout>
                 {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
                 {0.5} <music21.chord.Chord B2 D4 G#4 B4>
                 {1.0} <music21.chord.Chord C#3 C#4 E#4 G#4>
                 {1.5} <music21.chord.Chord C#3 B3 E#4 G#4>
                 {2.0} <music21.chord.Chord F#2 A3 C#4 F#4>
                 {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-            {13.0} <music21.stream.Measure 4 offset=13.0>
-                {0.0} <music21.chord.Chord G#3 B3 F#4 B4>
-                {0.5} <music21.chord.Chord F#3 B3 F#4 B4>
-                {1.0} <music21.chord.Chord G#3 B3 E4 B4>
-                {1.5} <music21.chord.Chord A3 B3 E4 B4>
-                {2.0} <music21.chord.Chord B3 D#4 F#4>
-                {2.5} <music21.chord.Chord B2 A3 D#4 F#4>
-                {3.0} <music21.chord.Chord C#3 G#3 C#4 E4>
-            {17.0} <music21.stream.Measure 5 offset=17.0>
-                {0.0} <music21.chord.Chord F#3 C#4 A4>
-                {0.5} <music21.chord.Chord F#3 D4 F#4 A4>
-                {1.0} <music21.chord.Chord G#3 C#4 E4 B4>
-                {1.5} <music21.chord.Chord G#3 B3 E4 B4>
-                {2.0} <music21.chord.Chord A3 E4 C#5>
-                {3.0} <music21.chord.Chord A3 E4 A4 C#5>
-            {21.0} <music21.stream.Measure 6 offset=21.0>
-                {0.0} <music21.chord.Chord D4 F#4 A4>
-                {1.0} <music21.chord.Chord B3 D4 F#4 B4>
-                {2.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
-                {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-            {25.0} <music21.stream.Measure 7 offset=25.0>
-                {0.0} <music21.chord.Chord B2 D4 F#4 G#4>
-                {0.5} <music21.chord.Chord C#3 C#4 E#4 G#4>
-                {1.0} <music21.chord.Chord D3 C#4 F#4>
-                {1.5} <music21.chord.Chord D3 F#3 B3 F#4>
-                {2.0} <music21.chord.Chord C#3 E#3 C#4 G#4>
-            {29.0} <music21.stream.Measure 8 offset=29.0>
-                {0.0} <music21.chord.Chord A#2 F#3 C#4 F#4>
-                {0.5} <music21.chord.Chord A#2 F#3 D4 F#4>
-                {1.0} <music21.chord.Chord A#2 C#4 E4 F#4>
-                {2.0} <music21.chord.Chord B2 C#4 E4 F#4>
-                {3.0} <music21.chord.Chord C#3 B3 D4 F#4>
-                {3.5} <music21.chord.Chord C#3 A#3 C#4 F#4>
-            {33.0} <music21.stream.Measure 9 offset=33.0>
-                {0.0} <music21.chord.Chord D3 B3 F#4>
-                {0.5} <music21.chord.Chord D3 B3 C#4 F#4>
-                {1.0} <music21.chord.Chord B2 B3 D4 F#4>
-                {1.5} <music21.chord.Chord B2 B3 D4 E#4>
-                {2.0} <music21.chord.Chord F#3 A#3 C#4 F#4>
+            ...
 
         '''
         templateScore = self.sourceScore
