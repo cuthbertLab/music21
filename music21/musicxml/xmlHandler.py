@@ -469,6 +469,10 @@ class Handler(xml.sax.ContentHandler):
             self._mxObjs['staff-details'].staffSize = self._currentTag.charData
     
     
+        elif name == 'staff-lines':
+            self._mxObjs['staff-details'].staffLines = self._currentTag.charData
+
+    
         elif name == 'forward':
             self._mxObjs['measure'].componentList.append(
                 self._mxObjs['forward'])
