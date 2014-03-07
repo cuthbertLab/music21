@@ -14,8 +14,9 @@ from music21 import *
 
 #mystream.show()
 
-mXMLtest = converter.parse("C:/Users/Michael/Dropbox/Music21/test.xml") 
-mXMLtest.show()
+#mXMLtest = converter.parse("C:/Users/Michael/Dropbox/Music21/test.xml") 
+mXMLtest = converter.parse("/home/mibo/Dropbox/Music21/test.xml")
+mXMLtest.show('text')
 
 if __name__ == '__main__':
     pass

@@ -1175,7 +1175,8 @@ class Test(unittest.TestCase):
     def testTestFiles(self):
         # note: this import path will likel change
         from music21.musicxml import testFiles
-        for score in testFiles.ALL[:1]: # @UndefinedVariable
+        #for score in testFiles.ALL[:1]: # @UndefinedVariable
+        for score in testFiles.ALL: # @UndefinedVariable
             a = Document()
             a.read(score)
 
