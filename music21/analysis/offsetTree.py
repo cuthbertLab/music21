@@ -195,6 +195,10 @@ class Parentage(object):
         return self._element.beatStrength
 
     @property
+    def duration(self):
+        return self.stopOffset - self.startOffset
+
+    @property
     def element(self):
         r'''
         The parentage's element.
