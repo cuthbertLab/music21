@@ -13,16 +13,16 @@
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
 
-
-import unittest
 import copy
+import itertools
+import unittest
 from music21 import chord
-from music21 import note
+from music21 import environment
 from music21 import meter
+from music21 import note
 from music21 import pitch
 from music21 import stream
 from music21 import tie
-from music21 import environment
 
 environLocal = environment.Environment('reduceChords')
 
@@ -84,9 +84,10 @@ class ChordReducer(object):
 
         # extend this to account for the possibility of filtering out all
         # timespans in a given measure
+        #self._removeShortTimespans(tree)
         timespans = [timespan for timespan in tree]
         for timespan in timespans:
-            if (timespan.stopOffset - timespan.startOffset) < 0.5:
+            if timespan.duration < 0.5:
                 tree.remove(timespan)
 
         self._fillOuterMeasureGaps(tree)
@@ -302,6 +303,17 @@ class ChordReducer(object):
                     )
                 tree.remove((horizontality[0], horizontality[1]))
                 tree.insert(merged)
+
+    def _removeShortTimespans(self, tree):
+        duration = 0.5
+        procedure = lambda x: (x.measureNumber, x.duration < duration)
+        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+            for key, group in itertools.groupby(subtree, procedure):
+                measureNumber, isShort = key
+                if not isShort:
+                    continue
+                group = list(group)
+                print part, measureNumber, group
 
     def _removeVerticalDissonances(self, tree):
         for verticality in tree.iterateVerticalities():
@@ -534,8 +546,8 @@ class TestExternal(unittest.TestCase):
 
         #score = corpus.parse('bach/bwv846').measures(1, 19)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 3)
-        score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
-        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
+        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
