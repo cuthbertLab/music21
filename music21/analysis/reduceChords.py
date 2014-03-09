@@ -13,7 +13,7 @@
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
 
-import copy
+#import copy
 import itertools
 import unittest
 from music21 import chord
@@ -42,7 +42,7 @@ def testMeasureStream1():
     {2.0} <music21.chord.Chord C4 E4 F4 B4>
     {3.0} <music21.chord.Chord C4 E4 G4 C5>
     '''
-    from music21 import chord
+    #from music21 import chord
     measure = stream.Measure()
     timeSignature = meter.TimeSignature('4/4')
     chord1 = chord.Chord('C4 E4 G4 C5')
@@ -184,7 +184,7 @@ class ChordReducer(object):
             #        ):
             #        continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for part, timespans in horizontalities.iteritems():
+            for unused_part, timespans in horizontalities.iteritems():
                 if len(timespans) < 2:
                     continue
                 elif timespans[0].pitches == timespans[1].pitches:
@@ -291,7 +291,7 @@ class ChordReducer(object):
             if len(verticalities) < 3:
                 continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for part, horizontality in horizontalities.iteritems():
+            for unused_part, horizontality in horizontalities.iteritems():
                 if not horizontality.hasPassingTone and \
                     not horizontality.hasNeighborTone:
                     continue
@@ -443,7 +443,7 @@ class ChordReducer(object):
             4.0
 
         '''
-        from music21 import note
+        #from music21 import note
         if measureObj.isFlat is False:
             mObj = measureObj.flat.notes
         else:
@@ -525,7 +525,7 @@ class Test(unittest.TestCase):
         pass
 
     def testSimpleMeasure(self):
-        from music21 import chord
+        #from music21 import chord
         s = stream.Measure()
         c1 = chord.Chord('C4 E4 G4 C5')
         c1.quarterLength = 2.0
@@ -541,7 +541,6 @@ class TestExternal(unittest.TestCase):
         pass
 
     def testTrecentoMadrigal(self):
-        from music21 import clef
         from music21 import corpus
 
         #score = corpus.parse('bach/bwv846').measures(1, 19)
@@ -561,6 +560,7 @@ class TestExternal(unittest.TestCase):
 #        if len(startClefs):
 #            clef1 = startClefs[0]
 #            firstMeasure.remove(clef1)
+#        from music21 import clef
 #        firstMeasure.insert(0, clef.Treble8vbClef())
 
         for part in reduction:
