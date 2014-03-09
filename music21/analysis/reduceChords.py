@@ -3,7 +3,7 @@
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Cuthbert, Josiah Wolf Oberholtzer
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
@@ -13,7 +13,7 @@
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
 
-#import copy
+import collections
 import itertools
 import unittest
 from music21 import chord
@@ -65,7 +65,6 @@ class ChordReducer(object):
     ### INITIALIZER ###
 
     def __init__(self):
-        self.printDebug = False
         self.weightAlgorithm = self.qlbsmpConsonance
         self.maxChords = 3
 
@@ -79,25 +78,11 @@ class ChordReducer(object):
         assert isinstance(inputScore, stream.Score)
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
-        self._removeVerticalDissonances(tree)
-        #assert tree.maximumOverlap == 2
-
-        # extend this to account for the possibility of filtering out all
-        # timespans in a given measure
-        #self._removeShortTimespans(tree)
-        timespans = [timespan for timespan in tree]
-        for timespan in timespans:
-            if timespan.duration < 0.5:
-                tree.remove(timespan)
-
-        self._fillOuterMeasureGaps(tree)
-        #assert tree.maximumOverlap == 2
-
-        self._alignHockets(tree)
-        #assert tree.maximumOverlap == 2
-
-        self._fillInnerMeasureGaps(tree)
-        #assert tree.maximumOverlap == 2
+        self.removeVerticalDissonances(tree)
+        self.removeShortTimespans(tree)
+        self.fillOuterMeasureGaps(tree)
+        self.alignHockets(tree)
+        self.fillInnerMeasureGaps(tree)
 
         # convert offset trees into music21 scores
         partwiseReduction = tree.toPartwiseScore()
@@ -123,7 +108,49 @@ class ChordReducer(object):
 
     ### PRIVATE METHODS ###
 
-    def _alignHockets(self, tree):
+    def _applyTies(self, part):
+        for one, two in self._iterateElementsPairwise(part):
+            if one.isNote and two.isNote:
+                if one.pitch == two.pitch:
+                    one.tie = tie.Tie('start')
+            elif one.isChord and two.isChord:
+                if one.pitches == two.pitches:
+                    one.tie = tie.Tie('start')
+
+    @staticmethod
+    def _getIntervalClassSet(pitches):
+        result = set()
+        pitches = [pitch.Pitch(x) for x in pitches]
+        for i, x in enumerate(pitches):
+            for y in pitches[i + 1:]:
+                interval = int(abs(x.ps - y.ps))
+                interval %= 12
+                if 6 < interval:
+                    interval = 12 - interval
+                result.add(interval)
+        return result
+
+    def _iterateElementsPairwise(self, stream):
+        elementBuffer = []
+        prototype = (
+            chord.Chord,
+            note.Note,
+            note.Rest,
+            )
+        for element in stream.flat:
+            if not isinstance(element, prototype):
+                continue
+            elementBuffer.append(element)
+            if len(elementBuffer) == 2:
+                yield tuple(elementBuffer)
+                elementBuffer.pop(0)
+
+    ### PUBLIC METHODS ###
+
+    def alignHockets(self, tree):
+        r'''
+        Aligns hockets between parts in `tree`.
+        '''
         for verticalities in tree.iterateVerticalitiesNwise(n=2):
             verticalityOne, verticalityTwo = verticalities
             pitchSetOne = verticalityOne.pitchSet
@@ -152,16 +179,10 @@ class ChordReducer(object):
                             )
                         tree.insert(newTimespan)
 
-    def _applyTies(self, part):
-        for one, two in self._iterateElementsPairwise(part):
-            if one.isNote and two.isNote:
-                if one.pitch == two.pitch:
-                    one.tie = tie.Tie('start')
-            elif one.isChord and two.isChord:
-                if one.pitches == two.pitches:
-                    one.tie = tie.Tie('start')
-
-    def _collapseArpeggios(self, tree):
+    def collapseArpeggios(self, tree):
+        r'''
+        Collapses arpeggios in `tree`.
+        '''
         for verticalities in tree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
             onePitches = sorted(one.pitchSet)
@@ -198,136 +219,11 @@ class ChordReducer(object):
                     )
                 tree.insert(merged)
 
-    def _fillInnerMeasureGaps(self, tree):
-        for verticality in tree.iterateVerticalities():
-            for parentage in verticality.startTimespans:
-                nextParentage = tree.findNextParentageInSamePart(parentage)
-                if nextParentage is None:
-                    nextStartOffset = parentage.measureStopOffset
-                else:
-                    nextStartOffset = nextParentage.startOffset
-                if parentage.stopOffset != nextStartOffset:
-                    tree.remove(parentage)
-                    parentage = parentage.new(
-                        stopOffset=nextStartOffset,
-                        )
-                    tree.insert(parentage)
-                previousParentage = tree.findPreviousParentageInSamePart(
-                    parentage)
-                if previousParentage is None:
-                    continue
-                if previousParentage.measureNumber != parentage.measureNumber:
-                    continue
-                if previousParentage.pitches != parentage.pitches:
-                    continue
-                tree.remove(parentage)
-                tree.remove(previousParentage)
-                newParentage = previousParentage.new(
-                    stopOffset=parentage.stopOffset,
-                    )
-                tree.insert(newParentage)
-
-    def _fillOuterMeasureGaps(self, tree):
-        for verticality in tree.iterateVerticalities():
-            for parentage in verticality.startTimespans:
-                previousParentage = tree.findPreviousParentageInSamePart(
-                    parentage)
-                changed = False
-                startOffset = parentage.startOffset
-                beatStrength = parentage.beatStrength
-                if previousParentage is None or \
-                    previousParentage.measureNumber != parentage.measureNumber:
-                    if parentage.startOffset != parentage.measureStartOffset:
-                        changed = True
-                        startOffset = parentage.measureStartOffset
-                        startVerticality = tree.getVerticalityAt(startOffset)
-                        beatStrength = startVerticality.beatStrength
-                nextParentage = tree.findNextParentageInSamePart(parentage)
-                stopOffset = parentage.stopOffset
-                if nextParentage is None or \
-                    nextParentage.measureNumber != parentage.measureNumber:
-                    if parentage.stopOffset != parentage.measureStopOffset:
-                        changed = True
-                        stopOffset = parentage.measureStopOffset
-                if changed:
-                    tree.remove(parentage)
-                    newParentage = parentage.new(
-                        beatStrength=beatStrength,
-                        startOffset=startOffset,
-                        stopOffset=stopOffset,
-                        )
-                    tree.insert(newParentage)
-
-    @staticmethod
-    def _getIntervalClassSet(pitches):
-        result = set()
-        pitches = [pitch.Pitch(x) for x in pitches]
-        for i, x in enumerate(pitches):
-            for y in pitches[i + 1:]:
-                interval = int(abs(x.ps - y.ps))
-                interval %= 12
-                if 6 < interval:
-                    interval = 12 - interval
-                result.add(interval)
-        return result
-
-    def _iterateElementsPairwise(self, stream):
-        elementBuffer = []
-        prototype = (
-            chord.Chord,
-            note.Note,
-            note.Rest,
-            )
-        for element in stream.flat:
-            if not isinstance(element, prototype):
-                continue
-            elementBuffer.append(element)
-            if len(elementBuffer) == 2:
-                yield tuple(elementBuffer)
-                elementBuffer.pop(0)
-
-    def _removeNonChordTones(self, tree):
-        for verticalities in tree.iterateVerticalitiesNwise(n=3):
-            if len(verticalities) < 3:
-                continue
-            horizontalities = tree.unwrapVerticalities(verticalities)
-            for unused_part, horizontality in horizontalities.iteritems():
-                if not horizontality.hasPassingTone and \
-                    not horizontality.hasNeighborTone:
-                    continue
-                elif horizontality[0].measureNumber != \
-                    horizontality[1].measureNumber:
-                    continue
-                merged = horizontality[0].new(
-                    stopOffset=horizontality[1].stopOffset,
-                    )
-                tree.remove((horizontality[0], horizontality[1]))
-                tree.insert(merged)
-
-    def _removeShortTimespans(self, tree):
-        duration = 0.5
-        procedure = lambda x: (x.measureNumber, x.duration < duration)
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
-            for key, group in itertools.groupby(subtree, procedure):
-                measureNumber, isShort = key
-                if not isShort:
-                    continue
-                group = list(group)
-                print part, measureNumber, group
-
-    def _removeVerticalDissonances(self, tree):
-        for verticality in tree.iterateVerticalities():
-            if verticality.isConsonant:
-                continue
-            pitchSet = verticality.pitchSet
-            lowestPitch = min(pitchSet)
-            for timespan in verticality.startTimespans:
-                if min(timespan.pitches) != lowestPitch:
-                    tree.remove(timespan)
-
-    ### PUBLIC METHODS ###
-
-    def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
+    def computeMeasureChordWeights(
+        self,
+        measureObject,
+        weightAlgorithm=None,
+        ):
         '''
         Compute measure chord weights:
 
@@ -376,8 +272,8 @@ class ChordReducer(object):
             weightAlgorithm = self.quarterLengthOnly
         presentPCs = {}
         self.positionInMeasure = 0
-        self.numberOfElementsInMeasure = len(measureObj)
-        for i, c in enumerate(measureObj):
+        self.numberOfElementsInMeasure = len(measureObject)
+        for i, c in enumerate(measureObject):
             self.positionInMeasure = i
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
@@ -390,30 +286,101 @@ class ChordReducer(object):
         self.numberOfElementsInMeasure = 0
         return presentPCs
 
-    def qlbsmpConsonance(self, c):
+    def fillInnerMeasureGaps(self, tree):
+        r'''
+        Fills inner measure gaps in `tree`.
+        '''
+        for verticality in tree.iterateVerticalities():
+            for parentage in verticality.startTimespans:
+                nextParentage = tree.findNextParentageInSamePart(parentage)
+                if nextParentage is None:
+                    nextStartOffset = parentage.measureStopOffset
+                else:
+                    nextStartOffset = nextParentage.startOffset
+                if parentage.stopOffset != nextStartOffset:
+                    tree.remove(parentage)
+                    parentage = parentage.new(
+                        stopOffset=nextStartOffset,
+                        )
+                    tree.insert(parentage)
+                previousParentage = tree.findPreviousParentageInSamePart(
+                    parentage)
+                if previousParentage is None:
+                    continue
+                if previousParentage.measureNumber != parentage.measureNumber:
+                    continue
+                if previousParentage.pitches != parentage.pitches:
+                    continue
+                tree.remove(parentage)
+                tree.remove(previousParentage)
+                newParentage = previousParentage.new(
+                    stopOffset=parentage.stopOffset,
+                    )
+                tree.insert(newParentage)
+
+    def fillOuterMeasureGaps(self, tree):
+        r'''
+        Fills outer measure gaps in `tree`.
+        '''
+        for verticality in tree.iterateVerticalities():
+            for parentage in verticality.startTimespans:
+                previousParentage = tree.findPreviousParentageInSamePart(
+                    parentage)
+                changed = False
+                startOffset = parentage.startOffset
+                beatStrength = parentage.beatStrength
+                if previousParentage is None or \
+                    previousParentage.measureNumber != parentage.measureNumber:
+                    if parentage.startOffset != parentage.measureStartOffset:
+                        changed = True
+                        startOffset = parentage.measureStartOffset
+                        startVerticality = tree.getVerticalityAt(startOffset)
+                        beatStrength = startVerticality.beatStrength
+                nextParentage = tree.findNextParentageInSamePart(parentage)
+                stopOffset = parentage.stopOffset
+                if nextParentage is None or \
+                    nextParentage.measureNumber != parentage.measureNumber:
+                    if parentage.stopOffset != parentage.measureStopOffset:
+                        changed = True
+                        stopOffset = parentage.measureStopOffset
+                if changed:
+                    tree.remove(parentage)
+                    newParentage = parentage.new(
+                        beatStrength=beatStrength,
+                        startOffset=startOffset,
+                        stopOffset=stopOffset,
+                        )
+                    tree.insert(newParentage)
+
+    def qlbsmpConsonance(self, chordObject):
         '''
         Everything from before plus consonance
         '''
-        consonanceScore = 1.0 if c.isConsonant() else 0.1
+        consonanceScore = 1.0 if chordObject.isConsonant() else 0.1
         if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
-            return c.quarterLength * consonanceScore  # call beatStrength 1
-        return self.quarterLengthBeatStrengthMeasurePosition(c) * consonanceScore
-
-    def quarterLengthBeatStrength(self, c):
-        return c.quarterLength * c.beatStrength
-
-    def quarterLengthBeatStrengthMeasurePosition(self, c):
-        if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
-            return c.quarterLength  # call beatStrength 1
+            # call beatStrength 1
+            weight = chordObject.quarterLength
         else:
-            return self.quarterLengthBeatStrength(c)
+            weight = self.quarterLengthBeatStrengthMeasurePosition(chordObject)
+        weight *= consonanceScore
+        return weight
 
-    def quarterLengthOnly(self, c):
-        return c.quarterLength
+    def quarterLengthBeatStrength(self, chordObject):
+        weight = chordObject.quarterLength * chordObject.beatStrength
+        return weight
+
+    def quarterLengthBeatStrengthMeasurePosition(self, chordObject):
+        if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
+            return chordObject.quarterLength  # call beatStrength 1
+        else:
+            return self.quarterLengthBeatStrength(chordObject)
+
+    def quarterLengthOnly(self, chordObject):
+        return chordObject.quarterLength
 
     def reduceMeasureToNChords(
         self,
-        measureObj,
+        measureObject,
         numChords=1,
         weightAlgorithm=None,
         trimBelow=0.25,
@@ -444,12 +411,12 @@ class ChordReducer(object):
 
         '''
         #from music21 import note
-        if measureObj.isFlat is False:
-            mObj = measureObj.flat.notes
+        if measureObject.isFlat is False:
+            measureObject = measureObject.flat.notes
         else:
-            mObj = measureObj.notes
+            measureObject = measureObject.notes
         chordWeights = self.computeMeasureChordWeights(
-            mObj,
+            measureObject,
             weightAlgorithm,
             )
         if numChords > len(chordWeights):
@@ -462,11 +429,11 @@ class ChordReducer(object):
         maxNChords = sortedChordWeights[:numChords]
         if len(maxNChords) == 0:
             r = note.Rest()
-            r.quarterLength = mObj.duration.quarterLength
-            for c in mObj:
-                mObj.remove(c)
-            mObj.insert(0, r)
-            return mObj
+            r.quarterLength = measureObject.duration.quarterLength
+            for c in measureObject:
+                measureObject.remove(c)
+            measureObject.insert(0, r)
+            return measureObject
         maxChordWeight = chordWeights[maxNChords[0]]
         trimmedMaxChords = []
         for pcTuples in maxNChords:
@@ -477,7 +444,7 @@ class ChordReducer(object):
         currentGreedyChord = None
         currentGreedyChordPCs = None
         currentGreedyChordNewLength = 0.0
-        for c in mObj:
+        for c in measureObject:
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
             else:
@@ -499,21 +466,86 @@ class ChordReducer(object):
                 currentGreedyChordNewLength += c.quarterLength
             else:
                 currentGreedyChordNewLength += c.quarterLength
-                mObj.remove(c)
+                measureObject.remove(c)
         if currentGreedyChord is not None:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
             currentGreedyChordNewLength = 0.0
         # even chord lengths...
-        for i in range(1, len(mObj)):
-            c = mObj[i]
+        for i in range(1, len(measureObject)):
+            c = measureObject[i]
             cOffsetCurrent = c.offset
             cOffsetSyncop = cOffsetCurrent - int(cOffsetCurrent)
             if round(cOffsetSyncop, 3) in [0.250, 0.125, 0.333, 0.063, 0.062]:
-                lastC = mObj[i - 1]
+                lastC = measureObject[i - 1]
                 lastC.quarterLength -= cOffsetSyncop
                 c.offset = int(cOffsetCurrent)
                 c.quarterLength += cOffsetSyncop
-        return mObj
+        return measureObject
+
+    def removeNonChordTones(self, tree):
+        r'''
+        Removes timespans containing passing and neighbor tones from `tree`.
+        '''
+        for verticalities in tree.iterateVerticalitiesNwise(n=3):
+            if len(verticalities) < 3:
+                continue
+            horizontalities = tree.unwrapVerticalities(verticalities)
+            for unused_part, horizontality in horizontalities.iteritems():
+                if not horizontality.hasPassingTone and \
+                    not horizontality.hasNeighborTone:
+                    continue
+                elif horizontality[0].measureNumber != \
+                    horizontality[1].measureNumber:
+                    continue
+                merged = horizontality[0].new(
+                    stopOffset=horizontality[1].stopOffset,
+                    )
+                tree.remove((horizontality[0], horizontality[1]))
+                tree.insert(merged)
+
+    def removeShortTimespans(self, tree, duration=0.5):
+        r'''
+        Removes timespans in `tree` shorter than `duration`.
+
+        Special treatment is given to groups of short timespans if they take up
+        an entire measure. In that case, the timespans with the most common
+        sets of pitches are kept.
+        '''
+        procedure = lambda x: (x.measureNumber, x.duration < duration)
+        timespansToRemove = []
+        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+            for key, group in itertools.groupby(subtree, procedure):
+                measureNumber, isShort = key
+                if not isShort:
+                    continue
+                group = list(group)
+                isEntireMeasure = False
+                if group[0].startOffset == group[0].measureStartOffset:
+                    if group[-1].stopOffset == group[0].measureStopOffset:
+                        isEntireMeasure = True
+                if isEntireMeasure:
+                    counter = collections.Counter()
+                    for timespan in group:
+                        counter[timespan.pitches] += timespan.duration
+                    timespansToRemove.extend(group)
+                else:
+                    timespansToRemove.extend(group)
+                print part, measureNumber, group
+        tree.remove(timespansToRemove)
+
+    def removeVerticalDissonances(self, tree):
+        r'''
+        Removes timespans in each dissonant verticality of `tree` whose pitches
+        are above the lowest pitch in that verticality.
+        '''
+        for verticality in tree.iterateVerticalities():
+            if verticality.isConsonant:
+                continue
+            pitchSet = verticality.pitchSet
+            lowestPitch = min(pitchSet)
+            for timespan in verticality.startTimespans:
+                if min(timespan.pitches) != lowestPitch:
+                    tree.remove(timespan)
 
 
 #------------------------------------------------------------------------------
@@ -543,10 +575,10 @@ class TestExternal(unittest.TestCase):
     def testTrecentoMadrigal(self):
         from music21 import corpus
 
+        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #score = corpus.parse('bach/bwv846').measures(1, 19)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 3)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
-        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
@@ -554,14 +586,6 @@ class TestExternal(unittest.TestCase):
 
         chordReducer = ChordReducer()
         reduction = chordReducer(score)
-
-#        firstMeasure = reduction.getElementsByClass('Measure')[0]
-#        startClefs = firstMeasure.getElementsByClass('Clef')
-#        if len(startClefs):
-#            clef1 = startClefs[0]
-#            firstMeasure.remove(clef1)
-#        from music21 import clef
-#        firstMeasure.insert(0, clef.Treble8vbClef())
 
         for part in reduction:
             score.insert(0, part)
