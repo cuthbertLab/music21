@@ -523,14 +523,21 @@ class ChordReducer(object):
                 if group[0].startOffset == group[0].measureStartOffset:
                     if group[-1].stopOffset == group[0].measureStopOffset:
                         isEntireMeasure = True
+                print part, measureNumber
+                for timespan in group:
+                    print '\t', timespan
                 if isEntireMeasure:
                     counter = collections.Counter()
                     for timespan in group:
                         counter[timespan.pitches] += timespan.duration
-                    timespansToRemove.extend(group)
+                    bestPitches, duration = counter.most_common()[0]
+                    print '\t', bestPitches
+                    for timespan in group:
+                        if timespan.pitches != bestPitches:
+                            print '\t\t', timespan
+                            timespansToRemove.append(timespan)
                 else:
                     timespansToRemove.extend(group)
-                print part, measureNumber, group
         tree.remove(timespansToRemove)
 
     def removeVerticalDissonances(self, tree):
