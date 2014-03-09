@@ -5407,7 +5407,10 @@ class Stream(base.Music21Object):
         inPlace=False,
         ):
         '''
-        Calls :py:func:`~music21.stream.makeNotation.makeMeasures`.
+        Return a new stream (or if inPlace=True change in place) this
+        Stream so that it has internal measures.
+
+        For more details, see :py:func:`~music21.stream.makeNotation.makeMeasures`.
         '''
         return makeNotation.makeMeasures(
             self,
@@ -5455,7 +5458,10 @@ class Stream(base.Music21Object):
 
     def makeBeams(self, inPlace=False):
         '''
-        Calls :py:func:`~music21.stream.makeNotation.makeBeams`.
+        Return a new Stream, or modify the Stream in place, with beams applied to all
+        notes.
+
+        See :py:func:`~music21.stream.makeNotation.makeBeams`.
         '''
         return makeNotation.makeBeams(
             self,
@@ -5469,10 +5475,13 @@ class Stream(base.Music21Object):
         assumed that Beams have not been set and/or makeBeams
         has not been run. If any Beams exist, this method
         returns True, regardless of if makeBeams has actually been run.
+        
+        DEPRECATED: Use :meth:`~music21.stream.streamStatus.StreamStatus.haveBeamsBeenMade`
+        instead.
         '''
         return self.streamStatus.haveBeamsBeenMade()
 
-    def makeTupletBrackets(self, inPlace=True):
+    def makeTupletBrackets(self, inPlace=False):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTupletBrackets`.
         '''
@@ -6258,11 +6267,10 @@ class Stream(base.Music21Object):
         ''')
 
 
-    def _getFlatOrSemiFlat(self, retainContainers):
+    def _getFlatOrSemiFlat(self, retainContainers=False):
         '''
-        The `retainContainers` option, if True,
-        returns a semiFlat version: containers are not
-        discarded in flattening.
+        A private method that implements the .flat or .semiFlat reduction types by using
+        `retainContainers` = False to get .flat and retainContainers = True to get .semiFlat
         '''
         #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self, 'self.activeSite', self.activeSite])
 
@@ -6341,6 +6349,8 @@ class Stream(base.Music21Object):
     def _getFlatFromSemiFlat(self):
         '''
         If the semiflat form is available, derive flat from semiflat.
+        
+        Makes it faster to create both.
         '''
         # this must not be None!
         if 'semiFlat' in self._cache:
@@ -8346,6 +8356,7 @@ class Stream(base.Music21Object):
         if 'notes' not in self._cache or self._cache['notes'] is None:
             self._cache['notes'] = self.getElementsByClass('NotRest',
                                         returnStreamSubClass=False)
+            self._cache['notes'].derivationMethod = 'notes'
         return self._cache['notes']
 
 

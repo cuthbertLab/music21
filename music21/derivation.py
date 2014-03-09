@@ -28,7 +28,7 @@ environLocal = environment.Environment(_MOD)
 
 class Derivation(SlottedObject):
     '''
-    A derivation.
+    A Derivation object keeps track of which Streams
 
     ::
 
@@ -72,7 +72,7 @@ class Derivation(SlottedObject):
     ### INITIALIZER ###
 
     def __init__(self, container=None):
-        # store a reference to the Stream that contains this derivation
+        # store a reference to the Stream that has this Derivation object as a property
         self._container = None
         self._containerId = None  # store id to optimize w/o unwrapping
         self._method = None
@@ -104,6 +104,22 @@ class Derivation(SlottedObject):
         return common.unwrapWeakref(self._container)
 
     def getMethod(self):
+        '''
+        Returns the string of the method that was used to generate this
+        Stream.  Note that it's identical to the property derivationMethod on a 
+        Stream, so no need for any but the most advanced usages.
+        
+        >>> s = stream.Stream()
+        >>> s.derivationMethod is s._derivation.getMethod()
+        True
+        >>> s.derivationMethod is None
+        True
+        >>> sNotes = s.notes
+        >>> sNotes.derivationMethod
+        'notes'
+        >>> sNotes._derivation.getMethod()
+        'notes'
+        '''
         return self._method
 
     def setAncestor(self, ancestor):
@@ -117,7 +133,7 @@ class Derivation(SlottedObject):
             #self._ancestor = common.wrapWeakref(ancestor)
 
     def setContainer(self, container):
-        # container is the Stream that contains
+        # container is the Stream that this derivation lives on
         if container is None:
             self._containerId = None
             self._container = None
@@ -128,6 +144,24 @@ class Derivation(SlottedObject):
     def setMethod(self, method):
         '''
         Sets a string identifying how the object was derived.
+        
+        Some examples are 'getElementsByClass' etc.
+        
+        >>> s = stream.Stream()
+        >>> s.append(clef.TrebleClef())
+        >>> s.append(note.Note())
+        >>> sNotes = s.notes
+        >>> sNotes._derivation
+        <music21.derivation.Derivation object at 0x...>
+
+        >>> derived = sNotes._derivation
+        >>> derived.getMethod()
+        'notes'
+        >>> derived.setMethod('blah')
+        >>> derived.getMethod()
+        'blah'
+        >>> sNotes.derivationMethod
+        'blah'
         '''
         self._method = method
 

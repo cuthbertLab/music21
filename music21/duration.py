@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -712,7 +712,10 @@ def convertTypeToNumber(dType):
 
 
 def updateTupletType(durationList):
-    '''Given a list of Durations or DurationUnits,
+    '''
+    N.B. -- DEPRECATED -- call stream.makeNotation.makeTupletBrackets
+    
+    Given a list of Durations or DurationUnits,
     examine each Duration, and each component, and set Tuplet type to
     start or stop, as necessary.
 
@@ -733,101 +736,27 @@ def updateTupletType(durationList):
     True
     >>> c.tuplets[0].type == 'stop'
     True
+    >>> d.tuplets
+    ()
     >>> e.tuplets[0].type == 'start'
+    True
+    >>> f.tuplets[0].type is None
     True
     >>> g.tuplets[0].type == 'stop'
     True
 
-    TODO: Move to TupletFixer
+    A single duration with tuplet (automatically forces into a List):
+    
+    >>> dur = duration.Duration(1.0/3)
+    >>> duration.updateTupletType([dur] )
+    >>> dur.tuplets[0].type
+    'startStop'     
     '''
-    #environLocal.printDebug(['calling updateTupletType'])
-    tupletMap = [] # a list of tuplet obj / dur pairs
-
     if isinstance(durationList, Duration): # if a Duration object alone
         durationList = [durationList] # put in list
-
-    for part in durationList: # can be Durations or DurationUnits
-        if isinstance(part, Duration):
-            partGroup = part.components
-        else:
-            partGroup = [part] # emulate Duration.components
-        for dur in partGroup: # all DurationUnits
-            tuplets = dur.tuplets
-            if tuplets in [(), None]: # no tuplets, length is zero
-                tupletMap.append([None, dur])
-            elif len(tuplets) > 1:
-                #for i in range(len(tuplets)):
-                #    tupletMap.append([tuplets[i],dur])
-                environLocal.warn('got multi-tuplet DurationUnit; cannot yet handle this. %s' % repr(tuplets))
-            elif len(tuplets) == 1:
-                tupletMap.append([tuplets[0], dur])
-                if tuplets[0] != dur.tuplets[0]:
-                    raise Exception('cannot access Tuplets object from within DurationUnit')
-            else:
-                raise Exception('cannot handle these tuplets: %s' % tuplets)
-
-    # have a list of tuplet, DurationUnit pairs
-    completionCount = 0 # qLen currently filled
-    completionTarget = None # qLen necessary to fill tuplet
-    for i in range(len(tupletMap)):
-        tuplet, dur = tupletMap[i]
-
-        if i > 0:
-            tupletPrevious, unused_durPrevious = tupletMap[i - 1]
-        else:
-            tupletPrevious, unused_durPrevious = None, None
-
-        if i < len(tupletMap) - 1:
-            tupletNext, unused_durNext = tupletMap[i + 1]
-#            if tupletNext != None:
-#                nextNormalType = tupletNext.durationNormal.type
-#            else:
-#                nextNormalType = None
-        else:
-            tupletNext, unused_durNext = None, None
-#            nextNormalType = None
-
-#         environLocal.printDebug(['updateTupletType previous, this, next:',
-#                                  tupletPrevious, tuplet, tupletNext])
-
-        if tuplet != None:
-#            thisNormalType = tuplet.durationNormal.type
-            completionCount += dur.quarterLength
-            # if previous tuplet is None, always start
-            # always reset completion target
-            if tupletPrevious is None or completionTarget is None:
-                tuplet.type = 'start'
-                # get total quarter length of this tuplet
-                completionTarget = (tuplet.numberNotesNormal *
-                                   tuplet.durationNormal.quarterLength)
-
-                #environLocal.printDebug(['starting tuplet type, value:',
-                #                         tuplet, tuplet.type])
-                #environLocal.printDebug(['completion count, target:',
-                #                         completionCount, completionTarget])
-
-            # if tuplet next is None, always stop
-            # if both previous and next are None, just keep a start
-
-            # this, below, is optional:
-            # if next normal type is not the same as this one, also stop
-            # common.greaterThan uses is >= w/ almost equals
-            elif (tupletNext is None or
-                common.greaterThanOrEqual(completionCount, completionTarget)):
-                tuplet.type = 'stop'
-                completionTarget = None # reset
-                completionCount = 0 # rest
-                #environLocal.printDebug(['stopping tuplet type, value:',
-                #                         tuplet, tuplet.type])
-                #environLocal.printDebug(['completion count, target:',
-                #                         completionCount, completionTarget])
-
-            # if typlet next and previous not None, increment
-            elif tupletPrevious != None and tupletNext != None:
-                # do not need to change tuplet type; should be None
-                pass
-                #environLocal.printDebug(['completion count, target:',
-                #                         completionCount, completionTarget])
+    
+    import stream.makeNotation
+    stream.makeNotation.makeTupletBrackets(durationList, inPlace = True)
 
 
 #-------------------------------------------------------------------------------
@@ -1023,7 +952,6 @@ class Tuplet(object):
         set to False, returns a new duration that has
         the new length.
 
-
         Note that the default for inPlace is the opposite
         of what it is for augmentOrDiminish on a Stream.
         This is done purposely to reflect the most common
@@ -1084,8 +1012,6 @@ class Tuplet(object):
         >>> a.setDurationType(4)
         >>> a.totalTupletLength()
         8.0
-
-
         '''
         # these used to be Duration; now using DurationUnits
         if self.frozen is True:

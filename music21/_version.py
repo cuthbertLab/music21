@@ -1,9 +1,9 @@
 '''
 This file contains Music21's version number information.
 
-Why here and not in music21/__init__.py?
+Q: Why is this here and not in music21/__init__.py?
 
-Keeping the information here makes it available to Music21's setup.py file
+A: Keeping the information here makes it available to Music21's setup.py file
 by simply reading this file in and evaluating its contents.
 
 Importantly, that means that Music21's setup.py *doesn't* need to import any
@@ -17,5 +17,5 @@ tuple assigned to __version_info__, and the __version__ string will be
 updated along with it.
 '''
 
-__version_info__ = (1, 7, 1)
+__version_info__ = (1, 8, 0)
 __version__ = '.'.join(str(x) for x in __version_info__)

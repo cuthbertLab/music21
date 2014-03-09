@@ -13,6 +13,7 @@
 #------------------------------------------------------------------------------
 
 import copy
+import types
 import unittest
 
 from music21 import common
@@ -33,10 +34,6 @@ def makeBeams(s, inPlace=False):
     Return a new Measure, or Stream of Measures, with beams applied to all
     notes. Measures with Voices will process voices independently.
 
-    In the process of making Beams, this method also updates tuplet types.
-    This is destructive and thus changes an attribute of Durations in
-    Notes.
-
     Note that `makeBeams()` is automatically called in show('musicxml') and
     other formats if there is no beaming information in the piece (see
     `haveBeamsBeenMade`).
@@ -45,7 +42,8 @@ def makeBeams(s, inPlace=False):
     this returns a modified deep copy.
 
     .. note: Before Version 1.6, `inPlace` default was `True`; now `False`
-             like most `inPlace` options in music21.
+             like most `inPlace` options in music21.  Also, in 1.8, no tuplets are made
+             automatically.  Use makeTupletBrackets()
 
     See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
 
@@ -158,9 +156,6 @@ def makeBeams(s, inPlace=False):
             for i in range(len(noteStream)):
                 # this may try to assign a beam to a Rest
                 noteStream[i].beams = beamsList[i]
-            # apply tuple types in place; this modifies the durations
-            # in dur list
-            duration.updateTupletType(durList)
 
     del mColl  # remove Stream no longer needed
     if inPlace is not True:
@@ -955,99 +950,143 @@ def makeTies(
         return None
 
 
-def makeTupletBrackets(s, inPlace=True):
+def makeTupletBrackets(s, inPlace=False):
     '''
-    Given a Stream of mixed durations, the first and last tuplet of any group
-    of tuplets must be designated as the start and end.
+    Given a Stream of mixed durations, designates the first and last tuplet of any group
+    of tuplets as the start or end of the tuplet, respectively.
 
-    Need to not only look at Notes, but components within Notes, as these might
-    contain additional tuplets.
+    This plan looks not only at Durations, but components (DurationUnits) within Durations, 
+    as these might contain additional tuplets.
 
-    TODO: inPlace default should become False -- like all inPlace arguments
-    TODO: if inPlace is True, return None
+    Changed in 1.8::
+    
+        * `inPlace` is False by default
+        * to incorporate duration.updateTupletType, can take a list of durations
+                    
+    TODO: does not handle nested tuplets
+
+    >>> n = note.Note()
+    >>> n.duration.quarterLength = 1.0/3
+    >>> s = stream.Stream()
+    >>> s.insert(0, meter.TimeSignature('2/4'))
+    >>> s.repeatAppend(n, 6)
+    >>> tupletTypes = [x.duration.tuplets[0].type for x in s.notes]
+    >>> tupletTypes
+    [None, None, None, None, None, None]
+    >>> stream.makeNotation.makeTupletBrackets(s, inPlace=True)
+    >>> tupletTypes = [x.duration.tuplets[0].type for x in s.notes]
+    >>> tupletTypes
+    ['start', None, 'stop', 'start', None, 'stop']
     '''
-
-    if not inPlace:  # make a copy
-        returnObj = copy.deepcopy(s)
-    else:
-        returnObj = s
-
-    isOpen = False
-    tupletCount = 0
-    lastTuplet = None
-
-    # only want to look at notes
-    notes = returnObj.notesAndRests
-    durList = []
-    for e in notes:
-        for d in e.duration.components:
-            durList.append(d)
-
-    eCount = len(durList)
-
-    #environLocal.printDebug([
-    #    'calling makeTupletBrackets, length of notes:', eCount])
-
-    for i in range(eCount):
-        e = durList[i]
-        if e is not None:
-            if e.tuplets is None:
-                continue
-            tContainer = e.tuplets
-            #environLocal.printDebug(['makeTupletBrackets', tContainer])
-            if len(tContainer) == 0:
-                t = None
+    durationUnitList = []
+    
+    # legacy -- works on lists not just streams...
+    if isinstance(s, types.ListType) or isinstance(s, types.TupleType):
+        for thisDuration in s:
+            if isinstance(thisDuration, duration.Duration):
+                for c in thisDuration.components:
+                    durationUnitList.append(c)
             else:
-                t = tContainer[0]  # get first?
+                durationUnitList.append(thisDuration) # emulate Duration.components
 
-            # end case: this Note does not have a tuplet
-            if t is None:
-                if isOpen is True:  # at the end of a tuplet span
-                    isOpen = False
-                    # now have a non-tuplet, but the tuplet span was only
-                    # one tuplet long; do not place a bracket
-                    if tupletCount == 1:
-                        lastTuplet.type = 'startStop'
-                        lastTuplet.bracket = False
-                    else:
-                        lastTuplet.type = 'stop'
-                tupletCount = 0
-            else:  # have a tuplet
-                tupletCount += 1
-                # store this as the last tupelt
-                lastTuplet = t
+    else:
+        # Stream, as it should be...
+        if not inPlace:  # make a copy
+            returnObj = copy.deepcopy(s)
+        else:
+            returnObj = s
+    
+        # only want to look at notes
+        notes = returnObj.notesAndRests
+        for n in notes:
+            for d in n.duration.components:
+                durationUnitList.append(d)
 
-                #environLocal.printDebug([
-                #    'makeTupletBrackets', e, 'existing typlet type', t.type,
-                #    'bracket', t.bracket, 'tuplet count:', tupletCount])
+    tupletMap = [] # a list of (tuplet obj / DurationUnit or Duration) pairs
+    for durationUnit in durationUnitList: # all DurationUnits
+        tupletList = durationUnit.tuplets
+        if tupletList in [(), None]: # no tuplets, length is zero
+            tupletMap.append([None, durationUnit])
+        elif len(tupletList) > 1:
+            #for i in range(len(tuplets)):
+            #    tupletMap.append([tuplets[i],dur])
+            environLocal.warn('got multi-tuplet DurationUnit; cannot yet handle this. %s' % repr(tupletList))
+        elif len(tupletList) == 1:
+            tupletMap.append([tupletList[0], durationUnit])
+            if tupletList[0] != durationUnit.tuplets[0]:
+                raise Exception('cannot access Tuplets object from within DurationUnit')
+        else:
+            raise Exception('cannot handle these tuplets: %s' % tupletList)
 
-                # already open bracket
-                if isOpen:
-                    # end case: this is the last element and its a tuplet
-                    # since this is an open bracket, we know we have more
-                    # than one tuplet in this span
-                    if i == eCount - 1:
-                        t.type = 'stop'
-                    # if this the middle of a span, do nothing
-                    else:
-                        pass
-                else:  # need to open
-                    isOpen = True
-                    # if this is the last event in this Stream
-                    # do not create bracket
-                    if i == eCount - 1:
-                        t.type = 'startStop'
-                        t.bracket = False
-                    # normal start of tuplet span
-                    else:
-                        t.type = 'start'
 
-#                 if t is not None:
-#                     environLocal.printDebug([
-#                         'makeTupletBrackets', e, 'final type', t.type,
-#                         'bracket', t.bracket])
+    # have a list of tuplet, DurationUnit pairs
+    completionCount = 0 # qLen currently filled
+    completionTarget = None # qLen necessary to fill tuplet
+    for i in range(len(tupletMap)):
+        tupletObj, durationUnit = tupletMap[i]
 
-    return returnObj
+        if i > 0:
+            tupletPrevious = tupletMap[i - 1][0]
+        else:
+            tupletPrevious = None
+
+        if i < len(tupletMap) - 1:
+            tupletNext = tupletMap[i + 1][0]
+#            if tupletNext != None:
+#                nextNormalType = tupletNext.durationNormal.type
+#            else:
+#                nextNormalType = None
+        else:
+            tupletNext = None
+#            nextNormalType = None
+
+#         environLocal.printDebug(['updateTupletType previous, this, next:',
+#                                  tupletPrevious, tuplet, tupletNext])
+
+        if tupletObj is not None:
+#            thisNormalType = tuplet.durationNormal.type
+            completionCount += durationUnit.quarterLength
+            # if previous tuplet is None, always start
+            # always reset completion target
+            if tupletPrevious is None or completionTarget is None:
+                if tupletNext is None: # single tuplet w/o tuplets either side
+                    tupletObj.type = 'startStop'
+                    tupletObj.bracket = False
+                    completionCount = 0 # reset
+                else:
+                    tupletObj.type = 'start'
+                    # get total quarter length of this tuplet
+                    completionTarget = tupletObj.totalTupletLength()
+                    #environLocal.printDebug(['starting tuplet type, value:',
+                    #                         tuplet, tuplet.type])
+                    #environLocal.printDebug(['completion count, target:',
+                    #                         completionCount, completionTarget])
+
+            # if tuplet next is None, always stop
+            # if both previous and next are None, just keep a start
+
+            # this, below, is optional:
+            # if next normal type is not the same as this one, also stop
+            # common.greaterThan uses is >= w/ almost equals
+            elif (tupletNext is None or
+                common.greaterThanOrEqual(completionCount, completionTarget)):
+                tupletObj.type = 'stop'
+                completionTarget = None # reset
+                completionCount = 0 # reset
+                #environLocal.printDebug(['stopping tuplet type, value:',
+                #                         tuplet, tuplet.type])
+                #environLocal.printDebug(['completion count, target:',
+                #                         completionCount, completionTarget])
+
+            # if tuplet next and previous not None, increment
+            elif tupletPrevious != None and tupletNext != None:
+                # do not need to change tuplet type; should be None
+                pass
+                #environLocal.printDebug(['completion count, target:',
+                #                         completionCount, completionTarget])
+
+    if not inPlace:
+        return returnObj
 
 
 def realizeOrnaments(s):
