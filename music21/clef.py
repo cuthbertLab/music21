@@ -8,6 +8,9 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
+#
+# Changes:      04th March 2014 by Michael Bodenbach
+#               - TabClef added
 #-------------------------------------------------------------------------------
 '''
 This module defines numerous subclasses of 
@@ -101,6 +104,14 @@ class Clef(base.Music21Object):
             return False
 
 #-------------------------------------------------------------------------------
+class PitchClef(Clef):
+    '''
+    superclass for all other clef subclasses. 
+    '''
+    def __init__(self):
+        Clef.__init__(self)
+
+
 class PercussionClef(Clef):
     '''
     represents a Percussion clef. 
@@ -113,19 +124,20 @@ class NoClef(Clef):
     '''
     pass
 
-class TabClef(Clef):
+class TabClef(PitchClef):
     '''
-    represents a Tablature clef (not used). 
-    '''
-    pass
-
-class PitchClef(Clef):
-    '''
-    superclass for all other clef subclasses. 
+    represents a Tablature clef. 
     '''
     def __init__(self):
-        Clef.__init__(self)
-
+        '''
+        
+        >>> a = clef.TabClef()
+        >>> a.sign
+        'TAB'
+        '''        
+        PitchClef.__init__(self)
+        self.sign = "TAB"
+        self.line = 5
 
 #-------------------------------------------------------------------------------
 class GClef(PitchClef):
@@ -374,7 +386,8 @@ class SubBassClef(FClef):
 CLASS_FROM_TYPE = {
     "G": [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     "C": [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
-    "F": [None, None, None, FBaritoneClef, BassClef, SubBassClef]
+    "F": [None, None, None, FBaritoneClef, BassClef, SubBassClef],
+    "TAB" : [None, None, None, None, None, TabClef]
     }
 
 
@@ -460,6 +473,8 @@ def clefFromString(clefString, octaveShift = 0):
                 clefObj = FClef()
             elif thisType == "C":
                 clefObj = CClef()
+            elif thisType == "TAB":
+                clefObj = TabClef()
             clefObj.line = lineNum
         else:
             clefObj = CLASS_FROM_TYPE[thisType][lineNum]()
@@ -505,7 +520,7 @@ class Test(unittest.TestCase):
         for clefObjName in [FrenchViolinClef, TrebleClef, Treble8vbClef, 
                 GSopranoClef, SopranoClef, MezzoSopranoClef,
                 TenorClef, CBaritoneClef, FBaritoneClef, BassClef, 
-                SubBassClef]:
+                SubBassClef,TabClef]:
             a = clefObjName()
             unused_mxClef = toMxObjects.clefToMxClef(a)
 
@@ -536,7 +551,8 @@ class Test(unittest.TestCase):
             [('F', 4, 0), clef.BassClef],
             [('F', 4, 1), clef.Bass8vaClef],
             [('F', 4, -1), clef.Bass8vbClef],
-            [('F', 5, 0), clef.SubBassClef]
+            [('F', 5, 0), clef.SubBassClef],
+            [('TAB', 5, 0), clef.TabClef]
         ]
 
         for params, className in src:

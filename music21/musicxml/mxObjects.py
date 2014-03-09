@@ -242,6 +242,7 @@ class TagLib(object):
         
         ('divisions', True), 
         ('staff-details', False, StaffDetails),
+        ('staff-lines', True),
         ('staff-size', True),
         
         ('forward', False, Forward), 
@@ -1398,15 +1399,22 @@ class StaffDetails(MusicXMLElement):
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'staff-details'
+        
+        # attributes
         self._attr['number'] = None
         self._attr['print-object'] = True
+        
+        # elements     
         self.staffSize = None
+        self.staffLines = 5
+        
         self._crossReference['number'] = ['number']
         self._crossReference['print-object'] = ['print-object', 'printObject']
 
     def _getComponents(self):
         c = []
         c.append(('staff-size', self.staffSize))
+        c.append(('staff-lines', self.staffLines))
         return c
 
     

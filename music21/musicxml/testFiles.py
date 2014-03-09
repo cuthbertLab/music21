@@ -15953,6 +15953,126 @@ edgefield82b = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 </score-partwise>
 """
 
+tabTest = """<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE score-partwise PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN' 'http://www.musicxml.org/dtds/2.0/partwise.dtd'>
+<score-partwise version="2.0">
+ <movement-title>test</movement-title>
+ <identification>
+  <encoding>
+   <encoding-date>2014-02-26</encoding-date>
+   <software>Guitar Pro 6</software>
+  </encoding>
+ </identification>
+ <part-list>
+  <score-part id="P0">
+   <part-name>Electric Guitar</part-name>
+   <part-abbreviation>E-Gt</part-abbreviation>
+   <midi-instrument id="P0">
+    <midi-channel>1</midi-channel>
+    <midi-bank>1</midi-bank>
+    <midi-program>28</midi-program>
+    <volume>80</volume>
+    <pan>0</pan>
+   </midi-instrument>
+  </score-part>
+ </part-list>
+ <part id="P0">
+  <measure number="0">
+   <attributes>
+    <divisions>1</divisions>
+    <key>
+     <fifths>0</fifths>
+     <mode>major</mode>
+    </key>
+    <time>
+     <beats>4</beats>
+     <beat-type>4</beat-type>
+    </time>
+    <clef>
+     <sign>TAB</sign>
+     <line>5</line>
+    </clef>
+    <staff-details>
+     <staff-lines>6</staff-lines>
+     <staff-tuning line="1">
+      <tuning-step>E</tuning-step>
+      <tuning-octave>2</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="2">
+      <tuning-step>A</tuning-step>
+      <tuning-octave>2</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="3">
+      <tuning-step>D</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="4">
+      <tuning-step>G</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="5">
+      <tuning-step>B</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="6">
+      <tuning-step>E</tuning-step>
+      <tuning-octave>4</tuning-octave>
+     </staff-tuning>
+    </staff-details>
+    <transpose>
+     <diatonic>0</diatonic>
+     <chromatic>0</chromatic>
+     <octave-change>0</octave-change>
+    </transpose>
+   </attributes>
+   <direction directive="yes" placement="above">
+    <direction-type>
+     <metronome default-y="40" parentheses="yes">
+      <beat-unit>quarter</beat-unit>
+      <per-minute>120</per-minute>
+     </metronome>
+    </direction-type>
+    <sound tempo="120"/>
+   </direction>
+   <note>
+    <pitch>
+     <step>F</step>
+     <octave>2</octave>
+    </pitch>
+    <duration>2</duration>
+    <voice>1</voice>
+    <type>half</type>
+    <stem>up</stem>
+    <notations>
+     <technical>
+      <string>6</string>
+      <fret>1</fret>
+     </technical>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>F</step>
+     <alter>1</alter>
+     <octave>2</octave>
+    </pitch>
+    <duration>2</duration>
+    <voice>1</voice>
+    <type>half</type>
+    <accidental>sharp</accidental>
+    <stem>up</stem>
+    <notations>
+     <technical>
+      <string>6</string>
+      <fret>2</fret>
+     </technical>
+    </notations>
+   </note>
+  </measure>
+ </part>
+</score-partwise>
+"""
+
 
 #-------------------------------------------------------------------------------
 # define all strings for access
@@ -15970,7 +16090,7 @@ edgefield82b = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
  
 
 
-ALL  = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1, binchoisMagnificat, edgefield82b]
+ALL  = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1, binchoisMagnificat, edgefield82b, tabTest]
 
 
 def get(contentRequest):
