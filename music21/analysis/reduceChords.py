@@ -645,6 +645,20 @@ class ChordReducer(object):
                 if min(timespan.pitches) != lowestPitch:
                     tree.remove(timespan)
 
+    def removeZeroDurationTimespans(self, tree):
+        zeroDurationTimespans = [x for x in tree if x.duration == 0]
+        tree.remove(zeroDurationTimespans)
+
+    def splitByBass(self, tree):
+        parts = tree.allParts
+        for part in parts:
+            self.fuseTimespansByPart(tree, part)
+        mapping = tree.toPartwiseOffsetTrees()
+        bassPart = parts[-1]
+        bassTree = mapping[bassPart]
+        bassOffsets = bassTree.allOffsets
+        tree.splitAt(bassOffsets)
+
 
 #------------------------------------------------------------------------------
 
