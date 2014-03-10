@@ -79,7 +79,9 @@ class ChordReducer(object):
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
         self.removeVerticalDissonances(tree)
+        self.fillBassGaps(tree)
         self.removeShortTimespans(tree)
+        self.fillBassGaps(tree)
         self.fillOuterMeasureGaps(tree)
         self.alignHockets(tree)
         self.fillInnerMeasureGaps(tree)
@@ -285,6 +287,64 @@ class ChordReducer(object):
         self.positionInMeasure = 0
         self.numberOfElementsInMeasure = 0
         return presentPCs
+
+    def fillBassGaps(self, tree):
+        def procedure(timespan):
+            verticality = tree.getVerticalityAt(timespan.startOffset)
+            return verticality.bassTimespan
+        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+            timespans = [x for x in subtree]
+            for bassTimespan, group in itertools.groupby(timespans, procedure):
+                group = list(group)
+                if len(group) == 1:
+                    timespan = group[0]
+                    shouldReplace = False
+                    beatStrength = timespan.beatStrength
+                    startOffset = timespan.startOffset
+                    stopOffset = timespan.stopOffset
+                    if bassTimespan.startOffset < group[0].startOffset:
+                        shouldReplace = True
+                        beatStrength = bassTimespan.beatStrength
+                        startOffset = bassTimespan.startOffset
+                    if timespan.stopOffset < bassTimespan.stopOffset:
+                        shouldReplace = True
+                        stopOffset = bassTimespan.stopOffset
+                    if shouldReplace:
+                        tree.remove(timespan)
+                        newTimespan = timespan.new(
+                            beatStrength=beatStrength,
+                            startOffset=startOffset,
+                            stopOffset=stopOffset,
+                            )
+                        tree.insert(newTimespan)
+                    continue
+                else:
+                    if bassTimespan.startOffset < group[0].startOffset:
+                        tree.remove(group[0])
+                        newTimespan = group[0].new(
+                            beatStrength=bassTimespan.beatStrength,
+                            startOffset=bassTimespan.startOffset,
+                            )
+                        tree.insert(newTimespan)
+                        group[0] = newTimespan
+                    if group[-1].stopOffset < bassTimespan.stopOffset:
+                        tree.remove(group[-1])
+                        newTimespan = group[-1].new(
+                            stopOffset=bassTimespan.stopOffset,
+                            )
+                        tree.insert(newTimespan)
+                        group[-1] = newTimespan
+                for i in range(len(group) - 1):
+                    timespanOne, timespanTwo = group[i], group[i + 1]
+                    if timespanOne.pitches == timespanTwo.pitches or \
+                        timespanOne.stopOffset != timespanTwo.startOffset:
+                        newTimespan = timespanOne.new(
+                            stopOffset=timespanTwo.stopOffset,
+                            )
+                        group[i] = newTimespan
+                        group[i + 1] = newTimespan
+                        tree.remove((timespanOne, timespanTwo))
+                        tree.insert(newTimespan)
 
     def fillInnerMeasureGaps(self, tree):
         r'''
@@ -531,7 +591,11 @@ class ChordReducer(object):
                 if group[0].startOffset == group[0].measureStartOffset:
                     if group[-1].stopOffset == group[0].measureStopOffset:
                         isEntireMeasure = True
-                print part, measureNumber, bassTimespan
+                if bassTimespan is not None:
+                    if group[0].startOffset == bassTimespan.startOffset:
+                        if group[-1].stopOffset == bassTimespan.stopOffset:
+                            isEntireMeasure = True
+                print part, measureNumber, bassTimespan, isEntireMeasure
                 for timespan in group:
                     print '\t', timespan
                 if isEntireMeasure:
