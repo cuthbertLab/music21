@@ -818,6 +818,40 @@ class Verticality(object):
         return self._stopTimespans
 
 
+class VerticalitySequence(collections.Sequence):
+    r'''
+    A segment of verticalities.
+    '''
+
+    ### INITIALIZER ###
+
+    def __init__(self, verticalities):
+        self._verticalities = tuple(verticalities)
+
+    ### SPECIAL METHODS ###
+
+    def __getitem__(self, item):
+        return self._verticalities[item]
+
+    def __len__(self):
+        return len(self._verticalities)
+
+    def __repr__(self):
+        string = '<VerticalitySequence: [\n\t{}\n\t]>'.format(
+            ',\n\t'.join(repr(x) for x in self))
+        return string
+
+    ### PUBLIC METHODS ###
+
+    def hasNeighborTone(self, partIdentifier, unaccentedOnly=False):
+        assert len(self) == 3
+        pass
+
+    def hasPassingTone(self, partIdentifier, unaccentedOnly=False):
+        assert len(self) == 3
+        pass
+
+
 class OffsetTree(object):
     r'''
     An offset-tree.
@@ -1571,10 +1605,22 @@ class OffsetTree(object):
             >>> for _ in range(4):
             ...     print iterator.next()
             ...
-            (<Verticality 0.0 {A3 E4 C#5}>, <Verticality 0.5 {G#3 B3 E4 B4}>)
-            (<Verticality 0.5 {G#3 B3 E4 B4}>, <Verticality 1.0 {F#3 C#4 F#4 A4}>)
-            (<Verticality 1.0 {F#3 C#4 F#4 A4}>, <Verticality 2.0 {G#3 B3 E4 B4}>)
-            (<Verticality 2.0 {G#3 B3 E4 B4}>, <Verticality 3.0 {A3 E4 C#5}>)
+            <VerticalitySequence: [
+                <Verticality 0.0 {A3 E4 C#5}>,
+                <Verticality 0.5 {G#3 B3 E4 B4}>
+                ]>
+            <VerticalitySequence: [
+                <Verticality 0.5 {G#3 B3 E4 B4}>,
+                <Verticality 1.0 {F#3 C#4 F#4 A4}>
+                ]>
+            <VerticalitySequence: [
+                <Verticality 1.0 {F#3 C#4 F#4 A4}>,
+                <Verticality 2.0 {G#3 B3 E4 B4}>
+                ]>
+            <VerticalitySequence: [
+                <Verticality 2.0 {G#3 B3 E4 B4}>,
+                <Verticality 3.0 {A3 E4 C#5}>
+                ]>
 
         Grouped verticalities can also be iterated in reverse:
 
@@ -1584,10 +1630,22 @@ class OffsetTree(object):
             >>> for _ in range(4):
             ...     print iterator.next()
             ...
-            (<Verticality 34.5 {B2 B3 D4 E#4}>, <Verticality 35.0 {F#3 A#3 C#4 F#4}>)
-            (<Verticality 34.0 {B2 B3 D4 F#4}>, <Verticality 34.5 {B2 B3 D4 E#4}>)
-            (<Verticality 33.5 {D3 B3 C#4 F#4}>, <Verticality 34.0 {B2 B3 D4 F#4}>)
-            (<Verticality 33.0 {D3 B3 F#4}>, <Verticality 33.5 {D3 B3 C#4 F#4}>)
+            <VerticalitySequence: [
+                <Verticality 34.5 {B2 B3 D4 E#4}>,
+                <Verticality 35.0 {F#3 A#3 C#4 F#4}>
+                ]>
+            <VerticalitySequence: [
+                <Verticality 34.0 {B2 B3 D4 F#4}>,
+                <Verticality 34.5 {B2 B3 D4 E#4}>
+                ]>
+            <VerticalitySequence: [
+                <Verticality 33.5 {D3 B3 C#4 F#4}>,
+                <Verticality 34.0 {B2 B3 D4 F#4}>
+                ]>
+            <VerticalitySequence: [
+                <Verticality 33.0 {D3 B3 F#4}>,
+                <Verticality 33.5 {D3 B3 C#4 F#4}>
+                ]>
 
         '''
         n = int(n)
@@ -1601,7 +1659,7 @@ class OffsetTree(object):
                         break
                     verticalities.append(nextVerticality)
                 if len(verticalities) == n:
-                    yield tuple(verticalities)
+                    yield VerticalitySequence(verticalities)
         else:
             for verticality in self.iterateVerticalities():
                 verticalities = [verticality]
@@ -1611,7 +1669,7 @@ class OffsetTree(object):
                         break
                     verticalities.append(previousVerticality)
                 if len(verticalities) == n:
-                    yield tuple(reversed(verticalities))
+                    yield VerticalitySequence(reversed(verticalities))
 
     @staticmethod
     def unwrapVerticalities(verticalities):
