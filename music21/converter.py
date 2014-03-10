@@ -1200,9 +1200,9 @@ class TestExternal(unittest.TestCase):
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
-        mxString = testFiles.ALL[1] # @UndefinedVariable
-        a = ConverterMusicXML()
-        a.parseData(mxString)
+        for mxString in testFiles.ALL:
+            a = ConverterMusicXML(False)
+            a.parseData(mxString)
 
     def testConversionMusicXml(self):
         c = stream.Score()
