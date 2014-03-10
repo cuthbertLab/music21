@@ -511,11 +511,19 @@ class ChordReducer(object):
         an entire measure. In that case, the timespans with the most common
         sets of pitches are kept.
         '''
-        procedure = lambda x: (x.measureNumber, x.duration < duration)
+        def procedure(timespan):
+            measureNumber = timespan.measureNumber
+            isShort = timespan.duration < duration
+            verticality = tree.getVerticalityAt(timespan.startOffset)
+            bassTimespan = verticality.bassTimespan
+            if bassTimespan is not None:
+                if bassTimespan.duration < duration:
+                    bassTimespan = None
+            return measureNumber, isShort, bassTimespan
         timespansToRemove = []
         for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
             for key, group in itertools.groupby(subtree, procedure):
-                measureNumber, isShort = key
+                measureNumber, isShort, bassTimespan = key
                 if not isShort:
                     continue
                 group = list(group)
@@ -523,7 +531,7 @@ class ChordReducer(object):
                 if group[0].startOffset == group[0].measureStartOffset:
                     if group[-1].stopOffset == group[0].measureStopOffset:
                         isEntireMeasure = True
-                print part, measureNumber
+                print part, measureNumber, bassTimespan
                 for timespan in group:
                     print '\t', timespan
                 if isEntireMeasure:
