@@ -78,18 +78,22 @@ class ChordReducer(object):
         assert isinstance(inputScore, stream.Score)
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
+        self.removeZeroDurationTimespans(tree)
+        self.splitByBass(tree)
+
         self.removeVerticalDissonances(tree)
         self.fillBassGaps(tree)
 
         self.removeShortTimespans(tree, duration=0.5)
         self.fillBassGaps(tree)
 
+        self.fillOuterMeasureGaps(tree)
+        self.fillInnerMeasureGaps(tree)
+
         self.removeShortTimespans(tree, duration=1.0)
         self.fillBassGaps(tree)
 
-        self.fillOuterMeasureGaps(tree)
-        self.alignHockets(tree)
-        self.fillInnerMeasureGaps(tree)
+        #self.alignHockets(tree)
 
         # convert offset trees into music21 scores
         partwiseReduction = tree.toPartwiseScore()
@@ -293,6 +297,7 @@ class ChordReducer(object):
         self.numberOfElementsInMeasure = 0
         return presentPCs
 
+    # TODO: Clean this up, remove duplicated code
     def fillBassGaps(self, tree):
         def procedure(timespan):
             verticality = tree.getVerticalityAt(timespan.startOffset)
@@ -301,19 +306,34 @@ class ChordReducer(object):
             timespans = [x for x in subtree]
             for bassTimespan, group in itertools.groupby(timespans, procedure):
                 group = list(group)
+
+                print part, group
+
                 if len(group) == 1:
                     timespan = group[0]
                     shouldReplace = False
                     beatStrength = timespan.beatStrength
                     startOffset = timespan.startOffset
                     stopOffset = timespan.stopOffset
+
                     if bassTimespan.startOffset < group[0].startOffset:
                         shouldReplace = True
                         beatStrength = bassTimespan.beatStrength
                         startOffset = bassTimespan.startOffset
+                        previousTimespan = tree.findPreviousParentageInSamePart(group[0])
+                        if previousTimespan is not None:
+                            assert previousTimespan.stopOffset <= timespan.startOffset
+                            if startOffset < previousTimespan.stopOffset:
+                                startOffset = previousTimespan.stopOffset
+
                     if timespan.stopOffset < bassTimespan.stopOffset:
+                        nextTimespan = tree.findNextParentageInSamePart(timespan)
+                        if nextTimespan is not None:
+                            assert timespan.stopOffset <= nextTimespan.startOffset
+                            assert bassTimespan.stopOffset <= nextTimespan.startOffset
                         shouldReplace = True
                         stopOffset = bassTimespan.stopOffset
+
                     if shouldReplace:
                         tree.remove(timespan)
                         newTimespan = timespan.new(
@@ -322,23 +342,33 @@ class ChordReducer(object):
                             stopOffset=stopOffset,
                             )
                         tree.insert(newTimespan)
-                    continue
+
                 else:
                     if bassTimespan.startOffset < group[0].startOffset:
+                        beatStrength = bassTimespan.beatStrength
+                        startOffset = bassTimespan.startOffset
+                        previousTimespan = \
+                            tree.findPreviousParentageInSamePart(group[0])
+                        if previousTimespan is not None:
+                            if startOffset < previousTimespan.stopOffset:
+                                startOffset = previousTimespan.stopOffset
                         tree.remove(group[0])
                         newTimespan = group[0].new(
-                            beatStrength=bassTimespan.beatStrength,
-                            startOffset=bassTimespan.startOffset,
+                            beatStrength=beatStrength,
+                            startOffset=startOffset,
                             )
                         tree.insert(newTimespan)
                         group[0] = newTimespan
                     if group[-1].stopOffset < bassTimespan.stopOffset:
+                        nextTimespan = tree.findNextParentageInSamePart(
+                            group[-1])
                         tree.remove(group[-1])
                         newTimespan = group[-1].new(
                             stopOffset=bassTimespan.stopOffset,
                             )
                         tree.insert(newTimespan)
                         group[-1] = newTimespan
+
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
                     if timespanOne.pitches == timespanTwo.pitches or \
@@ -689,7 +719,7 @@ class TestExternal(unittest.TestCase):
 
         score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #score = corpus.parse('bach/bwv846').measures(1, 19)
-        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 3)
+        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 10)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
