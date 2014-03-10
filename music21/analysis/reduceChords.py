@@ -417,6 +417,25 @@ class ChordReducer(object):
                         )
                     tree.insert(newParentage)
 
+    def fuseTimespansByPart(self, tree, part):
+        def procedure(timespan):
+            measureNumber = timespan.measureNumber
+            pitches = timespan.pitches
+            return measureNumber, pitches
+        mapping = tree.toPartwiseOffsetTrees()
+        subtree = mapping[part]
+        timespans = [x for x in subtree]
+        for key, group in itertools.groupby(timespans, procedure):
+            measureNumber, pitches = key
+            group = list(group)
+            if len(group) == 1:
+                continue
+            tree.remove(group)
+            newTimespan = group[0].new(
+                stopOffset=group[-1].stopOffset,
+                )
+            tree.insert(newTimespan)
+
     def qlbsmpConsonance(self, chordObject):
         '''
         Everything from before plus consonance
