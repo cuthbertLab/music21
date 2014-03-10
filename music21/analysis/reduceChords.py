@@ -80,8 +80,13 @@ class ChordReducer(object):
 
         self.removeVerticalDissonances(tree)
         self.fillBassGaps(tree)
-        self.removeShortTimespans(tree)
+
+        self.removeShortTimespans(tree, duration=0.5)
         self.fillBassGaps(tree)
+
+        self.removeShortTimespans(tree, duration=1.0)
+        self.fillBassGaps(tree)
+
         self.fillOuterMeasureGaps(tree)
         self.alignHockets(tree)
         self.fillInnerMeasureGaps(tree)
@@ -584,9 +589,9 @@ class ChordReducer(object):
         for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
             for key, group in itertools.groupby(subtree, procedure):
                 measureNumber, isShort, bassTimespan = key
+                group = list(group)
                 if not isShort:
                     continue
-                group = list(group)
                 isEntireMeasure = False
                 if group[0].startOffset == group[0].measureStartOffset:
                     if group[-1].stopOffset == group[0].measureStopOffset:
@@ -595,18 +600,13 @@ class ChordReducer(object):
                     if group[0].startOffset == bassTimespan.startOffset:
                         if group[-1].stopOffset == bassTimespan.stopOffset:
                             isEntireMeasure = True
-                print part, measureNumber, bassTimespan, isEntireMeasure
-                for timespan in group:
-                    print '\t', timespan
                 if isEntireMeasure:
                     counter = collections.Counter()
                     for timespan in group:
                         counter[timespan.pitches] += timespan.duration
-                    bestPitches, duration = counter.most_common()[0]
-                    print '\t', bestPitches
+                    bestPitches, totalDuration = counter.most_common()[0]
                     for timespan in group:
                         if timespan.pitches != bestPitches:
-                            print '\t\t', timespan
                             timespansToRemove.append(timespan)
                 else:
                     timespansToRemove.extend(group)
