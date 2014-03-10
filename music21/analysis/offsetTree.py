@@ -489,6 +489,41 @@ class Verticality(object):
     ### PUBLIC PROPERTIES ###
 
     @property
+    def bassTimespan(self):
+        r'''
+        Gets the bass timespan in this verticality.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = analysis.offsetTree.OffsetTree.fromScore(score)
+            >>> verticality = tree.getVerticalityAt(1.0)
+            >>> verticality
+            <Verticality 1.0 {F#3 C#4 F#4 A4}>
+
+        ::
+
+            >>> verticality.bassTimespan
+            <Parentage 1.0:2.0 <music21.note.Note F#>>
+
+        '''
+        pitches = sorted(self.pitchSet)
+        lowestPitch = pitches[0]
+        timespans = self.startTimespans + self.overlapTimespans
+        bassTimespans = []
+        for timespan in timespans:
+            pitches = timespan.pitches
+            if lowestPitch in pitches:
+                bassTimespans.append(timespan)
+        if bassTimespans:
+            bassTimespans.sort(
+                key=lambda x: x.part.getInstrument().partId,
+                reverse=True,
+                )
+            return bassTimespans[0]
+        return None
+
+    @property
     def beatStrength(self):
         r'''
         Gets the beat strength of a verticality.
