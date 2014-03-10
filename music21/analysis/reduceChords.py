@@ -86,11 +86,14 @@ class ChordReducer(object):
 
         self.removeShortTimespans(tree, duration=0.5)
         self.fillBassGaps(tree)
-
         self.fillOuterMeasureGaps(tree)
         self.fillInnerMeasureGaps(tree)
 
+        #self._debug(tree)
+
         self.removeShortTimespans(tree, duration=1.0)
+        self.fillOuterMeasureGaps(tree)
+        self.fillInnerMeasureGaps(tree)
         self.fillBassGaps(tree)
 
         #self.alignHockets(tree)
@@ -102,13 +105,14 @@ class ChordReducer(object):
         # reduce chords in chordified reduction
         chordifiedPart = stream.Part()
         for measure in chordifiedReduction:
-            reducedMeasure = self.reduceMeasureToNChords(
-                measure,
-                numChords=3,
-                weightAlgorithm=self.qlbsmpConsonance,
-                trimBelow=0.25,
-                )
-            chordifiedPart.append(reducedMeasure)
+        #    reducedMeasure = self.reduceMeasureToNChords(
+        #        measure,
+        #        numChords=3,
+        #        weightAlgorithm=self.qlbsmpConsonance,
+        #        trimBelow=0.25,
+        #        )
+        #    chordifiedPart.append(reducedMeasure)
+            chordifiedPart.append(measure)
 
         # clean up notation in all reduction parts
         partwiseReduction.append(chordifiedPart)
@@ -127,6 +131,18 @@ class ChordReducer(object):
             elif one.isChord and two.isChord:
                 if one.pitches == two.pitches:
                     one.tie = tie.Tie('start')
+
+    @staticmethod
+    def _debug(tree):
+        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+            print part
+            timespans = [x for x in subtree]
+            for timespan in timespans:
+                print '\t', timespan
+            overlap = subtree.maximumOverlap
+            if 1 < overlap:
+                print part
+                raise Exception
 
     @staticmethod
     def _getIntervalClassSet(pitches):
@@ -307,67 +323,29 @@ class ChordReducer(object):
             for bassTimespan, group in itertools.groupby(timespans, procedure):
                 group = list(group)
 
-                print part, group
+                if bassTimespan.startOffset < group[0].startOffset:
+                    beatStrength = bassTimespan.beatStrength
+                    startOffset = bassTimespan.startOffset
+                    previousTimespan = tree.findPreviousParentageInSamePart(group[0])
+                    if previousTimespan is not None:
+                        assert previousTimespan.stopOffset <= group[0].startOffset
+                        if startOffset < previousTimespan.stopOffset:
+                            startOffset = previousTimespan.stopOffset
+                    tree.remove(group[0])
+                    newTimespan = group[0].new(
+                        beatStrength=beatStrength,
+                        startOffset=startOffset,
+                        )
+                    tree.insert(newTimespan)
+                    group[0] = newTimespan
 
-                if len(group) == 1:
-                    timespan = group[0]
-                    shouldReplace = False
-                    beatStrength = timespan.beatStrength
-                    startOffset = timespan.startOffset
-                    stopOffset = timespan.stopOffset
-
-                    if bassTimespan.startOffset < group[0].startOffset:
-                        shouldReplace = True
-                        beatStrength = bassTimespan.beatStrength
-                        startOffset = bassTimespan.startOffset
-                        previousTimespan = tree.findPreviousParentageInSamePart(group[0])
-                        if previousTimespan is not None:
-                            assert previousTimespan.stopOffset <= timespan.startOffset
-                            if startOffset < previousTimespan.stopOffset:
-                                startOffset = previousTimespan.stopOffset
-
-                    if timespan.stopOffset < bassTimespan.stopOffset:
-                        nextTimespan = tree.findNextParentageInSamePart(timespan)
-                        if nextTimespan is not None:
-                            assert timespan.stopOffset <= nextTimespan.startOffset
-                            assert bassTimespan.stopOffset <= nextTimespan.startOffset
-                        shouldReplace = True
-                        stopOffset = bassTimespan.stopOffset
-
-                    if shouldReplace:
-                        tree.remove(timespan)
-                        newTimespan = timespan.new(
-                            beatStrength=beatStrength,
-                            startOffset=startOffset,
-                            stopOffset=stopOffset,
-                            )
-                        tree.insert(newTimespan)
-
-                else:
-                    if bassTimespan.startOffset < group[0].startOffset:
-                        beatStrength = bassTimespan.beatStrength
-                        startOffset = bassTimespan.startOffset
-                        previousTimespan = \
-                            tree.findPreviousParentageInSamePart(group[0])
-                        if previousTimespan is not None:
-                            if startOffset < previousTimespan.stopOffset:
-                                startOffset = previousTimespan.stopOffset
-                        tree.remove(group[0])
-                        newTimespan = group[0].new(
-                            beatStrength=beatStrength,
-                            startOffset=startOffset,
-                            )
-                        tree.insert(newTimespan)
-                        group[0] = newTimespan
-                    if group[-1].stopOffset < bassTimespan.stopOffset:
-                        nextTimespan = tree.findNextParentageInSamePart(
-                            group[-1])
-                        tree.remove(group[-1])
-                        newTimespan = group[-1].new(
-                            stopOffset=bassTimespan.stopOffset,
-                            )
-                        tree.insert(newTimespan)
-                        group[-1] = newTimespan
+                if group[-1].stopOffset < bassTimespan.stopOffset:
+                    stopOffset = bassTimespan.stopOffset
+                    newTimespan = group[-1].new(
+                        stopOffset=stopOffset,
+                        )
+                    tree.insert(newTimespan)
+                    group[-1] = newTimespan
 
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
@@ -385,67 +363,47 @@ class ChordReducer(object):
         r'''
         Fills inner measure gaps in `tree`.
         '''
-        for verticality in tree.iterateVerticalities():
-            for parentage in verticality.startTimespans:
-                nextParentage = tree.findNextParentageInSamePart(parentage)
-                if nextParentage is None:
-                    nextStartOffset = parentage.measureStopOffset
-                else:
-                    nextStartOffset = nextParentage.startOffset
-                if parentage.stopOffset != nextStartOffset:
-                    tree.remove(parentage)
-                    parentage = parentage.new(
-                        stopOffset=nextStartOffset,
-                        )
-                    tree.insert(parentage)
-                previousParentage = tree.findPreviousParentageInSamePart(
-                    parentage)
-                if previousParentage is None:
-                    continue
-                if previousParentage.measureNumber != parentage.measureNumber:
-                    continue
-                if previousParentage.pitches != parentage.pitches:
-                    continue
-                tree.remove(parentage)
-                tree.remove(previousParentage)
-                newParentage = previousParentage.new(
-                    stopOffset=parentage.stopOffset,
-                    )
-                tree.insert(newParentage)
+        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+            timespans = [x for x in subtree]
+            for measureNumber, group in itertools.groupby(
+                timespans, lambda x: x.measureNumber):
+                group = list(group)
+                for i in range(len(group) - 1):
+                    timespanOne, timespanTwo = group[i], group[i + 1]
+                    if timespanOne.pitches == timespanTwo.pitches or \
+                        timespanOne.stopOffset != timespanTwo.startOffset:
+                        newTimespan = timespanOne.new(
+                            stopOffset=timespanTwo.stopOffset,
+                            )
+                        group[i] = newTimespan
+                        group[i + 1] = newTimespan
+                        tree.remove((timespanOne, timespanTwo))
+                        tree.insert(newTimespan)
 
     def fillOuterMeasureGaps(self, tree):
         r'''
         Fills outer measure gaps in `tree`.
         '''
-        for verticality in tree.iterateVerticalities():
-            for parentage in verticality.startTimespans:
-                previousParentage = tree.findPreviousParentageInSamePart(
-                    parentage)
-                changed = False
-                startOffset = parentage.startOffset
-                beatStrength = parentage.beatStrength
-                if previousParentage is None or \
-                    previousParentage.measureNumber != parentage.measureNumber:
-                    if parentage.startOffset != parentage.measureStartOffset:
-                        changed = True
-                        startOffset = parentage.measureStartOffset
-                        startVerticality = tree.getVerticalityAt(startOffset)
-                        beatStrength = startVerticality.beatStrength
-                nextParentage = tree.findNextParentageInSamePart(parentage)
-                stopOffset = parentage.stopOffset
-                if nextParentage is None or \
-                    nextParentage.measureNumber != parentage.measureNumber:
-                    if parentage.stopOffset != parentage.measureStopOffset:
-                        changed = True
-                        stopOffset = parentage.measureStopOffset
-                if changed:
-                    tree.remove(parentage)
-                    newParentage = parentage.new(
-                        beatStrength=beatStrength,
-                        startOffset=startOffset,
-                        stopOffset=stopOffset,
+        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+            timespans = [x for x in subtree]
+            for measureNumber, group in itertools.groupby(
+                timespans, lambda x: x.measureNumber):
+                group = list(group)
+                if group[0].startOffset != group[0].measureStartOffset:
+                    tree.remove(group[0])
+                    newTimespan = group[0].new(
+                        beatStrength=1.0,
+                        startOffset=group[0].measureStartOffset,
                         )
-                    tree.insert(newParentage)
+                    tree.insert(newTimespan)
+                    group[0] = newTimespan
+                if group[-1].stopOffset != group[-1].measureStopOffset:
+                    tree.remove(group[-1])
+                    newTimespan = group[-1].new(
+                        stopOffset=group[-1].measureStopOffset,
+                        )
+                    tree.insert(newTimespan)
+                    group[-1] = newTimespan
 
     def fuseTimespansByPart(self, tree, part):
         def procedure(timespan):
@@ -719,7 +677,7 @@ class TestExternal(unittest.TestCase):
 
         score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         #score = corpus.parse('bach/bwv846').measures(1, 19)
-        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 10)
+        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 18)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
