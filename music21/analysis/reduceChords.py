@@ -318,7 +318,7 @@ class ChordReducer(object):
         def procedure(timespan):
             verticality = tree.getVerticalityAt(timespan.startOffset)
             return verticality.bassTimespan
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+        for unused_part, subtree in tree.toPartwiseOffsetTrees().iteritems():
             timespans = [x for x in subtree]
             for bassTimespan, group in itertools.groupby(timespans, procedure):
                 group = list(group)
@@ -366,9 +366,9 @@ class ChordReducer(object):
         r'''
         Fills inner measure gaps in `tree`.
         '''
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+        for unused_part, subtree in tree.toPartwiseOffsetTrees().iteritems():
             timespans = [x for x in subtree]
-            for measureNumber, group in itertools.groupby(
+            for unused_measureNumber, group in itertools.groupby(
                 timespans, lambda x: x.measureNumber):
                 group = list(group)
                 for i in range(len(group) - 1):
@@ -387,9 +387,9 @@ class ChordReducer(object):
         r'''
         Fills outer measure gaps in `tree`.
         '''
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+        for unused_part, subtree in tree.toPartwiseOffsetTrees().iteritems():
             timespans = [x for x in subtree]
-            for measureNumber, group in itertools.groupby(
+            for unused_measureNumber, group in itertools.groupby(
                 timespans, lambda x: x.measureNumber):
                 group = list(group)
                 if group[0].startOffset != group[0].measureStartOffset:
@@ -416,8 +416,8 @@ class ChordReducer(object):
         mapping = tree.toPartwiseOffsetTrees()
         subtree = mapping[part]
         timespans = [x for x in subtree]
-        for key, group in itertools.groupby(timespans, procedure):
-            measureNumber, pitches = key
+        for unused_key, group in itertools.groupby(timespans, procedure):
+            #measureNumber, pitches = key
             group = list(group)
             if len(group) == 1:
                 continue
@@ -596,9 +596,9 @@ class ChordReducer(object):
                     bassTimespan = None
             return measureNumber, isShort, bassTimespan
         timespansToRemove = []
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+        for unused_part, subtree in tree.toPartwiseOffsetTrees().iteritems():
             for key, group in itertools.groupby(subtree, procedure):
-                measureNumber, isShort, bassTimespan = key
+                unused_measureNumber, isShort, bassTimespan = key
                 group = list(group)
                 if not isShort:
                     continue
@@ -614,7 +614,7 @@ class ChordReducer(object):
                     counter = collections.Counter()
                     for timespan in group:
                         counter[timespan.pitches] += timespan.duration
-                    bestPitches, totalDuration = counter.most_common()[0]
+                    bestPitches, unused_totalDuration = counter.most_common()[0]
                     for timespan in group:
                         if timespan.pitches != bestPitches:
                             timespansToRemove.append(timespan)
