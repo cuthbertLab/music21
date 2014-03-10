@@ -373,7 +373,13 @@ class ClassDocumenter(ObjectDocumenter):
         self._baseClassDocumenters = tuple(
             type(self).fromIdentityMap(cls) for cls in self.baseClasses)
 
-        self._docAttr = getattr(self.referent, '_DOC_ATTR', {})
+        self._docAttr = None
+        attrs = inspect.classify_class_attrs(self.referent)
+        docAttrAttr = [attr for attr in attrs if attr.name == '_DOC_ATTR']
+        if docAttrAttr:
+            docAttrAttr = docAttrAttr[0]
+            if docAttrAttr.defining_class is self.referent:
+                self._docAttr = self.referent._DOC_ATTR
         self._docOrder = getattr(self.referent, '_DOC_ORDER', [])
 
         inheritedDocAttr = {}
