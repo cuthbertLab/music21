@@ -1222,27 +1222,21 @@ class TestExternal(unittest.TestCase):
 
 
     def testParseURL(self):
-        urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=xml'
         urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-06.krn&f=kern'
         urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=xml'
-        for url in [urlA, urlB, urlC]:
-            unused_post = parseURL(url)
-
+        for url in [urlB, urlC]:
+            try:
+                unused_post = parseURL(url)
+            except:
+                print url
+                raise
 
     def testFreezer(self):
-        from music21 import stream, note, corpus, freezeThaw
-        s = stream.Stream()
-        n = note.Note()
-        s.append(n)
-
-        s = corpus.parse('bach')
-
-        aConverter = freezeThaw.StreamFreezer(s)
-        fp = aConverter.write()
-
-        aConverter.openPickle(fp)
-        #aConverter.stream
-        aConverter.stream.show()
+        from music21 import corpus
+        s = corpus.parse('bach/bwv66.6.xml')
+        fp = freeze(s)
+        s2 = thaw(fp)
+        s2.show()
 
 
 class Test(unittest.TestCase):
