@@ -78,7 +78,7 @@ class Parentage(object):
             stopOffset = float(stopOffset)
         self._stopOffset = stopOffset
         if startOffset is not None and stopOffset is not None:
-            assert startOffset <= stopOffset
+            assert startOffset <= stopOffset, (startOffset, stopOffset)
         if measureStartOffset is not None:
             measureStartOffset = float(measureStartOffset)
         self._measureStartOffset = measureStartOffset
