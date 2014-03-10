@@ -5962,8 +5962,8 @@ class Stream(base.Music21Object):
                         and hasattr(nLast, "pitches") and hasattr(n, "pitches")
                         and len(nLast.pitches) == len(n.pitches)):
                         allPitchesMatched = True
-                        for i in range(nLast.pitches):
-                            if nLast.pitches[i] != n.pitches[i]:
+                        for pitchIndex in range(len(nLast.pitches)):
+                            if nLast.pitches[pitchIndex] != n.pitches[pitchIndex]:
                                 allPitchesMatched = False
                                 break
                         if allPitchesMatched == True:
