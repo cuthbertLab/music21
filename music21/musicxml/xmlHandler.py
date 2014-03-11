@@ -1179,7 +1179,14 @@ class Test(unittest.TestCase):
         for score in testFiles.ALL: # @UndefinedVariable
             a = Document()
             a.read(score)
-
+            
+    def testStaffLines(self):
+        # note: this import path will likel change
+        from music21.musicxml import testFiles
+        data = testFiles.ALL[5] # TabFile
+        a = Document()
+        a.read(data)
+        self.assertEqual(a.score.componentList[0][0].attributesObj.staffDetailsList[0].staffLines, '6')
 
     def testTestPrimitive(self):
         # note: this import path will likel change
