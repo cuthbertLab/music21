@@ -9,7 +9,7 @@ from music21 import analysis, corpus, interval
 
 def countNGrams(part, nGramLength = 2):
     stripped = part.stripTies(matchByPitch=True)
-    stripped.show()
+    #stripped.show()
     chords = stripped.flat.getElementsByClass('Chord')
     #chords.show()
     allNGrams = []
@@ -34,17 +34,32 @@ def countNGrams(part, nGramLength = 2):
                 intervalString = interval.Interval(c[0], c[1]).name
                 #print intervalString
             visType.append(intervalString)
-        print visType            
+        allNGrams.append(tuple(visType))         
+    return allNGrams
+
+def hashNGrams(nGrams):
+    import operator
+    nGramDict = {}
+    for ng in nGrams:
+        if ng not in nGramDict:
+            nGramDict[ng] = 1
+        else:
+            nGramDict[ng] += 1
+    sorted_dict = sorted(nGramDict.iteritems(), key=operator.itemgetter(1))
+    return sorted_dict
 
 if __name__ == '__main__':
+    import pprint
     f = 'PMFC_06_Giovanni-05_Donna_Gia_Fu_Leggiadra.xml'
     score = corpus.parse('trecento/' + f).measures(1, 20)
-    #chordReducer = analysis.reduceChords.ChordReducer()
-    #reduction = chordReducer(score).parts[-1]
-    #countNGrams(reduction)
+    chordReducer = analysis.reduceChords.ChordReducer()
+    reduction = chordReducer(score).parts[-1]
+    nGrams = countNGrams(reduction)
+    pprint.pprint(hashNGrams(nGrams))
+    
     chordified = score.chordify()
-    countNGrams(chordified)
-
+    nGrams = countNGrams(chordified)
+    pprint.pprint(hashNGrams(nGrams))
 
 
 
