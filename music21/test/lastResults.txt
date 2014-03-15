@@ -1,115 +1,60 @@
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 3516, in testMakeTupletBracketsA
-    self.assertEqual(collectType(s), [None, None, None, 'startStop'])
-AssertionError: Lists differ: [None, None, None, None] != [None, None, None, 'startStop'...
-
-First differing element 3:
-None
-startStop
-
-- [None, None, None, None]
-?                    ^ ^^
-
-+ [None, None, None, 'startStop']
-?                    ^^^^^^^^ ^^
-
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 3549, in testMakeTupletBracketsB
-    self.assertEqual(collectType(s), [None, 'start', None, 'stop', None, None])
-AssertionError: Lists differ: [None, None, None, None, None,... != [None, 'start', None, 'stop', ...
-
-First differing element 1:
-None
-start
-
-- [None, None, None, None, None, None]
-+ [None, 'start', None, 'stop', None, None]
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5711, in testRecurseA
-    self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 'Instrument', 'Part', 'Metadata', 'Part', 'Score', 'Part', 'Part', 'StaffGroup', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure'])
-AssertionError: Lists differ: ['Measure', 'Instrument', 'Par... != ['Measure', 'Instrument', 'Par...
-
-First differing element 4:
-Score
-Part
-
-  ['Measure',
-   'Instrument',
-   'Part',
-   'Metadata',
-+  'Part',
-   'Score',
--  'Part',
-   'Part',
-   'Part',
-   'StaffGroup',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure']
-
-Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.medren.convertHouseStyle
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/medren.py", line 1832, in convertHouseStyle
+AssertionError: Failed doctest test for music21.webapps.apps.setupURLCorpusParseApp
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 26, in setupURLCorpusParseApp
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/medren.py", line 1855, in music21.medren.convertHouseStyle
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 41, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
-    newGloria = medren.convertHouseStyle(gloria, durationScale = 2, barlineStyle = 'tick', tieTransfer = True)
+    (responseData, responseContentType) = processor.getOutput()
 Exception raised:
     Traceback (most recent call last):
       File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
-      File "<doctest music21.medren.convertHouseStyle[2]>", line 1, in <module>
-        newGloria = medren.convertHouseStyle(gloria, durationScale = 2, barlineStyle = 'tick', tieTransfer = True)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/medren.py", line 1865, in convertHouseStyle
-        scaleDurations(score, durationScale, inPlace = True)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/medren.py", line 1764, in scaleDurations
-        el.offset = el.offset * scalingNum
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/base.py", line 3105, in _getOffset
-        return self.sites.getOffsetBySite(None)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/base.py", line 926, in getOffsetBySite
-        return self.getOffsetBySiteId(siteId)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/base.py", line 1011, in getOffsetBySiteId
-        raise SitesException(errorMsg)
-    SitesException: Could not find the object with id 4330381232 in the Site marked with idKey None. 
-       object <music21.base.Sites object at 0x1021c5fb0>, definedContexts: {}
-       containedById = 4328834512
-
-
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.analysis.offsetTree.Verticality.beatStrength
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/offsetTree.py", line unknown line number, in beatStrength
-
+      File "<doctest music21.webapps.apps.setupURLCorpusParseApp[8]>", line 1, in <module>
+        (responseData, responseContentType) = processor.getOutput()
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/__init__.py", line 1133, in getOutput
+        (output, outputType) = eval(self.outputTemplate)(*argList)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/templates.py", line 75, in musicxmlFile
+        musicxmlString = m21ToString.fromMusic21Object(outputStream)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/m21ToString.py", line 50, in fromMusic21Object
+        classes = m21Object.classes
+    AttributeError: 'str' object has no attribute 'classes'
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/offsetTree.py", line ?, in music21.analysis.offsetTree.Verticality.beatStrength
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 42, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
-    verticality.beatStrength
+    responseContentType
 Exception raised:
     Traceback (most recent call last):
       File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
-      File "<doctest music21.analysis.offsetTree.Verticality.beatStrength[3]>", line 1, in <module>
-        verticality.beatStrength
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/offsetTree.py", line 540, in beatStrength
-        return self.startTimespans[0].beatStrength
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/offsetTree.py", line 195, in beatStrength
-        return self._element.beatStrength
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/base.py", line 4373, in _getBeatStrength
-        raise Music21ObjectException('this object does not have a TimeSignature in Sites')
-    Music21ObjectException: this object does not have a TimeSignature in Sites
+      File "<doctest music21.webapps.apps.setupURLCorpusParseApp[9]>", line 1, in <module>
+        responseContentType
+    NameError: name 'responseContentType' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 44, in music21.webapps.apps.setupURLCorpusParseApp
+Failed example:
+    converter.parse(responseData).flat.highestOffset
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.webapps.apps.setupURLCorpusParseApp[10]>", line 1, in <module>
+        converter.parse(responseData).flat.highestOffset
+    NameError: name 'responseData' is not defined
 
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 3651, in testWeightedHexatonicBluesA
+    self.assertEqual(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'], True)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 2029, in next
+    getNeighbor=getNeighbor
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 540, in nextPitch
+    getNeighbor = getNeighbor
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/intervalNetwork.py", line 1210, in nextPitch
+    p.octave = pitchOrigin.octave
+AttributeError: 'NoneType' object has no attribute 'octave'
 
 
 
@@ -185,10 +130,9 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
 xmlnode successfully ran 12 tests
-webapps_apps successfully ran 6 tests
 webapps___init__ successfully ran 14 tests
-webapps_templates successfully ran 9 tests
 volume successfully ran 20 tests
+webapps_templates successfully ran 9 tests
 voiceLeading successfully ran 64 tests
 vexflow___init__ successfully ran 28 tests
 trecento_trecentoCadence successfully ran 7 tests
@@ -197,32 +141,32 @@ webapps_commands successfully ran 10 tests
 trecento_polyphonicSnippet successfully ran 9 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
-trecento_capua successfully ran 9 tests
 trecento_tonality successfully ran 5 tests
 trecento___init__ successfully ran 3 tests
+trecento_capua successfully ran 9 tests
 tinyNotation successfully ran 11 tests
 tie successfully ran 7 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
-text successfully ran 23 tests
-test___init__ successfully ran 3 tests
 theoryAnalysis_theoryAnalyzer successfully ran 42 tests
+test___init__ successfully ran 3 tests
 tempo successfully ran 45 tests
 stream_streamStatus successfully ran 4 tests
 stream_makeNotation successfully ran 10 tests
+text successfully ran 23 tests
 spanner successfully ran 52 tests
 sieve successfully ran 40 tests
 serial successfully ran 47 tests
 stream___init__ successfully ran 145 tests
 search_segment successfully ran 7 tests
-search___init__ successfully ran 19 tests
 scala_scl___init__ successfully ran 3 tests
 scala___init__ successfully ran 12 tests
-scale successfully ran 90 tests
+search___init__ successfully ran 19 tests
 romanText_testFiles successfully ran 4 tests
 romanText_translate successfully ran 17 tests
 romanText___init__ successfully ran 45 tests
+romanText_clercqTemperley successfully ran 19 tests
 roman successfully ran 28 tests
 pitch successfully ran 94 tests
 noteworthy_translate successfully ran 21 tests
@@ -232,23 +176,24 @@ note successfully ran 49 tests
 musicxml_xmlHandler successfully ran 12 tests
 musicxml_toMxObjects successfully ran 37 tests
 musicxml_testPrimitive successfully ran 5 tests
-romanText_clercqTemperley successfully ran 19 tests
 musicxml_testFiles successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
+test_testStream successfully ran 206 tests
 repeat successfully ran 72 tests
 musicxml___init__ successfully ran 3 tests
 musicxml_m21ToString successfully ran 45 tests
 musedata_base40 successfully ran 9 tests
 musedata___init__ successfully ran 49 tests
-musicxml_fromMxObjects successfully ran 65 tests
+midi_translate successfully ran 47 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
-midi_translate successfully ran 47 tests
 musedata_translate successfully ran 16 tests
+meter successfully ran 107 tests
 metadata_primitives successfully ran 38 tests
 midi___init__ successfully ran 28 tests
-meter successfully ran 107 tests
+musicxml_fromMxObjects successfully ran 65 tests
 metadata___init__ successfully ran 18 tests
+medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
 lily_lilyObjects successfully ran 14 tests
 lily___init__ successfully ran 3 tests
@@ -264,8 +209,8 @@ humdrum_testFiles successfully ran 3 tests
 humdrum_spineParser successfully ran 32 tests
 humdrum_instruments successfully ran 8 tests
 humdrum___init__ successfully ran 3 tests
-metadata_bundles successfully ran 34 tests
 metadata_caching successfully ran 7 tests
+metadata_bundles successfully ran 34 tests
 harmony successfully ran 27 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
@@ -294,41 +239,42 @@ documentation_library_documenters successfully ran 28 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
 documentation___init__ successfully ran 3 tests
-features_jSymbolic successfully ran 86 tests
 derivation successfully ran 8 tests
 defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
 counterpoint___init__ successfully ran 3 tests
 corpus_virtual successfully ran 5 tests
-corpus_chorales successfully ran 9 tests
-corpus_corpora successfully ran 28 tests
-corpus___init__ successfully ran 17 tests
-converter successfully ran 37 tests
+features_jSymbolic successfully ran 86 tests
 features_native successfully ran 26 tests
-composition___init__ successfully ran 3 tests
-contour successfully ran 10 tests
-common successfully ran 57 tests
-clef successfully ran 28 tests
-chordTables successfully ran 17 tests
+corpus_corpora successfully ran 28 tests
+corpus_chorales successfully ran 9 tests
+corpus___init__ successfully ran 17 tests
+corpus_testCorpus successfully ran 25 tests
+composition_seeger successfully ran 3 tests
+converter successfully ran 37 tests
 composition_phasing successfully ran 5 tests
+composition___init__ successfully ran 3 tests
+clef successfully ran 28 tests
+common successfully ran 57 tests
+chordTables successfully ran 17 tests
+contour successfully ran 10 tests
+chord successfully ran 108 tests
 chant successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
-chord successfully ran 108 tests
-capella___init__ successfully ran 3 tests
-braille_text successfully ran 4 tests
-braille_translate successfully ran 7 tests
 classCache successfully ran 12 tests
+capella___init__ successfully ran 3 tests
+braille_translate successfully ran 7 tests
+braille_text successfully ran 4 tests
 braille_lookup successfully ran 3 tests
 braille_segment successfully ran 11 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
-braille_examples successfully ran 5 tests
-bar successfully ran 9 tests
 base successfully ran 112 tests
-audioSearch_transcriber successfully ran 4 tests
+bar successfully ran 9 tests
+braille_examples successfully ran 5 tests
 audioSearch_recording successfully ran 4 tests
-audioSearch_scoreFollower successfully ran 7 tests
+audioSearch_transcriber successfully ran 4 tests
 articulations successfully ran 29 tests
 audioSearch___init__ successfully ran 19 tests
 analysis_search successfully ran 4 tests
@@ -342,10 +288,11 @@ analysis_discrete successfully ran 31 tests
 analysis_reduction successfully ran 15 tests
 analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
+analysis_offsetTree successfully ran 49 tests
 abcFormat___init__ successfully ran 53 tests
 _version successfully ran 3 tests
-abcFormat_translate successfully ran 18 tests
 abcFormat_testFiles successfully ran 5 tests
+abcFormat_translate successfully ran 18 tests
 Not in Tree Error: vexflow.testShow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: vexflow.exporter is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.quodJactatur is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -379,10 +326,9 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -393,126 +339,68 @@ Not in Tree Error: analysis.phrasing is in the music21 directory but not importe
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
 
 -----------
-test_testStream had 0 ERRORS and 3 FAILURES in 206 tests:
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 3516, in testMakeTupletBracketsA
-    self.assertEqual(collectType(s), [None, None, None, 'startStop'])
-AssertionError: Lists differ: [None, None, None, None] != [None, None, None, 'startStop'...
-
-First differing element 3:
-None
-startStop
-
-- [None, None, None, None]
-?                    ^ ^^
-
-+ [None, None, None, 'startStop']
-?                    ^^^^^^^^ ^^
-
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 3549, in testMakeTupletBracketsB
-    self.assertEqual(collectType(s), [None, 'start', None, 'stop', None, None])
-AssertionError: Lists differ: [None, None, None, None, None,... != [None, 'start', None, 'stop', ...
-
-First differing element 1:
-None
-start
-
-- [None, None, None, None, None, None]
-+ [None, 'start', None, 'stop', None, None]
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5711, in testRecurseA
-    self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 'Instrument', 'Part', 'Metadata', 'Part', 'Score', 'Part', 'Part', 'StaffGroup', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure'])
-AssertionError: Lists differ: ['Measure', 'Instrument', 'Par... != ['Measure', 'Instrument', 'Par...
-
-First differing element 4:
-Score
-Part
-
-  ['Measure',
-   'Instrument',
-   'Part',
-   'Metadata',
-+  'Part',
-   'Score',
--  'Part',
-   'Part',
-   'Part',
-   'StaffGroup',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure',
-   'Measure']
-
-
------------
-medren had 0 ERRORS and 1 FAILURES in 30 tests:
+webapps_apps had 0 ERRORS and 1 FAILURES in 6 tests:
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.medren.convertHouseStyle
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/medren.py", line 1832, in convertHouseStyle
+AssertionError: Failed doctest test for music21.webapps.apps.setupURLCorpusParseApp
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 26, in setupURLCorpusParseApp
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/medren.py", line 1855, in music21.medren.convertHouseStyle
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 41, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
-    newGloria = medren.convertHouseStyle(gloria, durationScale = 2, barlineStyle = 'tick', tieTransfer = True)
+    (responseData, responseContentType) = processor.getOutput()
 Exception raised:
     Traceback (most recent call last):
       File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
-      File "<doctest music21.medren.convertHouseStyle[2]>", line 1, in <module>
-        newGloria = medren.convertHouseStyle(gloria, durationScale = 2, barlineStyle = 'tick', tieTransfer = True)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/medren.py", line 1865, in convertHouseStyle
-        scaleDurations(score, durationScale, inPlace = True)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/medren.py", line 1764, in scaleDurations
-        el.offset = el.offset * scalingNum
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/base.py", line 3105, in _getOffset
-        return self.sites.getOffsetBySite(None)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/base.py", line 926, in getOffsetBySite
-        return self.getOffsetBySiteId(siteId)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/base.py", line 1011, in getOffsetBySiteId
-        raise SitesException(errorMsg)
-    SitesException: Could not find the object with id 4330381232 in the Site marked with idKey None. 
-       object <music21.base.Sites object at 0x1021c5fb0>, definedContexts: {}
-       containedById = 4328834512
-
-
-
------------
-analysis_offsetTree had 0 ERRORS and 1 FAILURES in 49 tests:
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.analysis.offsetTree.Verticality.beatStrength
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/offsetTree.py", line unknown line number, in beatStrength
-
+      File "<doctest music21.webapps.apps.setupURLCorpusParseApp[8]>", line 1, in <module>
+        (responseData, responseContentType) = processor.getOutput()
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/__init__.py", line 1133, in getOutput
+        (output, outputType) = eval(self.outputTemplate)(*argList)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/templates.py", line 75, in musicxmlFile
+        musicxmlString = m21ToString.fromMusic21Object(outputStream)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/m21ToString.py", line 50, in fromMusic21Object
+        classes = m21Object.classes
+    AttributeError: 'str' object has no attribute 'classes'
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/offsetTree.py", line ?, in music21.analysis.offsetTree.Verticality.beatStrength
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 42, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
-    verticality.beatStrength
+    responseContentType
 Exception raised:
     Traceback (most recent call last):
       File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
-      File "<doctest music21.analysis.offsetTree.Verticality.beatStrength[3]>", line 1, in <module>
-        verticality.beatStrength
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/offsetTree.py", line 540, in beatStrength
-        return self.startTimespans[0].beatStrength
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/offsetTree.py", line 195, in beatStrength
-        return self._element.beatStrength
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/base.py", line 4373, in _getBeatStrength
-        raise Music21ObjectException('this object does not have a TimeSignature in Sites')
-    Music21ObjectException: this object does not have a TimeSignature in Sites
+      File "<doctest music21.webapps.apps.setupURLCorpusParseApp[9]>", line 1, in <module>
+        responseContentType
+    NameError: name 'responseContentType' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 44, in music21.webapps.apps.setupURLCorpusParseApp
+Failed example:
+    converter.parse(responseData).flat.highestOffset
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.webapps.apps.setupURLCorpusParseApp[10]>", line 1, in <module>
+        converter.parse(responseData).flat.highestOffset
+    NameError: name 'responseData' is not defined
 
+
+
+-----------
+scale had 1 ERRORS and 0 FAILURES in 90 tests:
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 3651, in testWeightedHexatonicBluesA
+    self.assertEqual(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'], True)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 2029, in next
+    getNeighbor=getNeighbor
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 540, in nextPitch
+    getNeighbor = getNeighbor
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/intervalNetwork.py", line 1210, in nextPitch
+    p.octave = pitchOrigin.octave
+AttributeError: 'NoneType' object has no attribute 'octave'
 
 -------------------------------------------------------------------------
-Ran 3924 tests in 356.4469 seconds
-Run at 2014-03-14 19:13:23
+Ran 3945 tests in 513.9021 seconds
+Run at 2014-03-14 22:26:08

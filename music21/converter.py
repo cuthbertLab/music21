@@ -464,7 +464,7 @@ class ConverterMusicXML(object):
         pfObj = PickleFilter(fp, self.forceSource)
         # fpDst here is the file path to load, which may or may not be
         # a pickled file
-        fpDst, writePickle, fpPickle = pfObj.status() # get status
+        fpDst, writePickle, fpPickle = pfObj.status() # get status @UnusedVariable
 
         formatSrc = common.findFormatFile(fp)
         # here we determine if we have pickled file or a musicxml file
