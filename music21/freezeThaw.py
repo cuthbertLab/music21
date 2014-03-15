@@ -96,6 +96,7 @@ import inspect
 import os
 import time
 import json
+import zlib
 
 from music21 import base
 from music21 import common
@@ -552,8 +553,8 @@ class StreamFreezer(StreamFreezeThawBase):
         N.B. jsonpickle is the better format for transporting from
         one computer to another, but still has some bugs.
         '''
-        if zipType is not None:
-            raise FreezeThawException("Cannot zip files yet...")
+        if zipType not in (None, 'zlib'):
+            raise FreezeThawException("Cannot zip files except zlib...")
 
         fmt = self.parseWriteFmt(fmt)
 
@@ -578,7 +579,10 @@ class StreamFreezer(StreamFreezeThawBase):
             # a negative protocal value will get the highest protocal;
             # this is generally desirable
             # packStream() returns a storage dictionary
-            pickleMod.dump(storage, f, protocol=-1)
+            pickleString = pickleMod.dumps(storage, protocol=-1)
+            if zipType == 'zlib':
+                pickleString = zlib.compress(pickleString)
+            f.write(pickleString)
             f.close()
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
@@ -713,6 +717,7 @@ class StreamThawer(StreamFreezeThawBase):
         streamObj.autoSort = False
 
         self.restoreElementsFromTuples(streamObj)
+        streamObj.sites.add(None, 0.0)
 
         self.restoreStreamStatusClient(streamObj)
 
@@ -796,6 +801,8 @@ class StreamThawer(StreamFreezeThawBase):
                     streamObj._insertCore(offset, e)
                 else:
                     streamObj._storeAtEndCore(e)
+                # add a None site as well...
+                e.sites.add(None, 0.0)
             del(streamObj._storedElementOffsetTuples)
             streamObj._elementsChanged()
 
@@ -854,7 +861,7 @@ class StreamThawer(StreamFreezeThawBase):
         else:
             return 'pickle'
 
-    def open(self, fp):
+    def open(self, fp, zipType=None):
         '''
         For a supplied file path to a pickled stream, unpickle
         '''
@@ -872,7 +879,14 @@ class StreamThawer(StreamFreezeThawBase):
         if fmt == 'pickle':
             #environLocal.printDebug(['opening fp', fp])
             f = open(fp, 'rb')
-            storage = pickleMod.load(f)
+            if zipType is None:
+                storage = pickleMod.load(f)
+            elif zipType == 'zlib':
+                compressedString = f.read()
+                uncompressed = zlib.decompress(compressedString)
+                storage = pickleMod.loads(uncompressed)
+            else:
+                raise FreezeThawException("Unknown zipType %s" % zipType)
             f.close()
         elif fmt == 'jsonpickle':
             f = open(fp, 'r')

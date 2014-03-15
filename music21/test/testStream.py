@@ -3512,7 +3512,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets()
+        s.makeTupletBrackets(inPlace = True)
         self.assertEqual(collectType(s), [None, None, None, 'startStop'])
         self.assertEqual(collectBracket(s), [None, None, None, False])
         #s.show()
@@ -3545,7 +3545,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets()
+        s.makeTupletBrackets(inPlace = True)
         self.assertEqual(collectType(s), [None, 'start', None, 'stop', None, None])
         #s.show()
 
@@ -3556,10 +3556,10 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets()
+        s.makeTupletBrackets(inPlace = True)
         # this is the correct type settings but this displays by dividing
         # into two brackets
-        self.assertEqual(collectType(s), [None, 'start', None, None, None, None, 'stop', None, None] )
+        self.assertEqual(collectType(s), [None, 'start', None, 'stop', 'start', None, 'stop', None, None] )
         #s.show()
 
         # case of tuplet ending the Stream
@@ -3569,7 +3569,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets()
+        s.makeTupletBrackets(inPlace = True)
         self.assertEqual(collectType(s), [None, None, None, 'start', None, 'stop'] )
         #s.show()
 
@@ -3581,7 +3581,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets()
+        s.makeTupletBrackets(inPlace = True)
         self.assertEqual(collectType(s), [None, 'startStop', None,  'startStop', None,  'startStop'])
         self.assertEqual(collectBracket(s), [None, False, None, False, None, False])
         #s.show()
@@ -3593,20 +3593,20 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets()
-        self.assertEqual(collectType(s), [None, 'start', None, None, None, 'stop', None])
+        s.makeTupletBrackets(inPlace = True)
+        self.assertEqual(collectType(s), [None, 'start', 'stop','start', None, 'stop', None])
         #s.show()
 
 
         # diverse groups that sum to a whole
         s = Stream()
-        qlList = [1, 1/3., 2/3., 1, 1/12., 1/3., 1/3., 1/12. ]
+        qlList = [1, 1/3., 2/3., 1, 1/6., 1/3., 1/3., 1/6. ]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets()
-        self.assertEqual(collectType(s), [None, 'start', 'stop', None, 'start', None, None, 'stop'] )
+        s.makeTupletBrackets(inPlace = True)
+        self.assertEqual(collectType(s), [None, 'start', 'stop', None, 'start', 'stop', 'start', 'stop'] )
         self.assertEqual(collectBracket(s), [None, True, True, None, True, True, True, True])
         #s.show()
 
@@ -3618,7 +3618,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets()
+        s.makeTupletBrackets(inPlace = True)
         self.assertEqual(collectType(s), [None, 'start', None, None, None, None, 'stop', None]  )
         self.assertEqual(collectBracket(s), [None, True, True, True, True, True, True, None] )
         #s.show()
@@ -3870,8 +3870,8 @@ class Test(unittest.TestCase):
         s = Stream()
         s.autoSort = False
 
-        n1 = note.Note('a')
-        n2 = note.Note('b')
+        n1 = note.Note('A')
+        n2 = note.Note('B')
 
         s.insert(100, n2) # add  'b' first
         s.insert(0, n1) # now n1 has a higher index than n2
@@ -3891,8 +3891,8 @@ class Test(unittest.TestCase):
         # test getElements sorting through .notesAndRests w/ autoSort
         s = Stream()
         s.autoSort = True
-        n1 = note.Note('a')
-        n2 = note.Note('b')
+        n1 = note.Note('A')
+        n2 = note.Note('B')
         s.insert(100, n2) # add  'b' first
         s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
         # if we get .notesAndRests, we are getting elements by class, and thus getting 
@@ -3912,8 +3912,8 @@ class Test(unittest.TestCase):
         # test __getitem__ calls w/ autoSort
         s = Stream()
         s.autoSort = False
-        n1 = note.Note('a')
-        n2 = note.Note('b')
+        n1 = note.Note('A')
+        n2 = note.Note('B')
         s.insert(100, n2) # add  'b' first
         s.insert(0, n1) # now n1 (A) has a higher index than n2 (B)
         self.assertEqual(s[0].name, 'B')
@@ -5705,11 +5705,28 @@ class Test(unittest.TestCase):
         self.assertEqual(len(rElements), 4)
 
 
-        s = corpus.parse('bwv66.6')
-        m1 = s[2][1] # cannot use parts here as breaks active site
-        rElements = m1.recurse(direction='upward')
-        self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 'Instrument', 'Part', 'Metadata', 'Part', 'Score', 'Part', 'Part', 'StaffGroup', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure'])
-        self.assertEqual(len(rElements), 18)
+#         s = corpus.parse('bwv66.6')
+#         m1 = s[2][1] # cannot use parts here as breaks active site
+#         rElements = m1.recurse(direction='upward')
+#         self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 
+#                                                                   'Instrument', 
+#                                                                   'Part', 
+#                                                                   'Metadata', 
+#                                                                   'Part', 
+#                                                                   'Score', 
+#                                                                   'Part', 
+#                                                                   'Part', 
+#                                                                   'StaffGroup', 
+#                                                                   'Measure', 
+#                                                                   'Measure', 
+#                                                                   'Measure', 
+#                                                                   'Measure', 
+#                                                                   'Measure', 
+#                                                                   'Measure', 
+#                                                                   'Measure', 
+#                                                                   'Measure', 
+#                                                                   'Measure'])
+#         self.assertEqual(len(rElements), 18)
 
 
 

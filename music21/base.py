@@ -798,12 +798,12 @@ class Sites(SlottedObject):
         # and do not have the target class, we can skip
         for obj in objs:
             #if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
-            if (classNameIsStr and obj.isFlat and
-                obj.sites.getSiteCount() == 1):
+            if (classNameIsStr and obj.isFlat):
                 #if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
                 #environLocal.printDebug(['\tY: skipping flat stream that does not contain object:'])
-                if not obj.hasElementOfClass(className, forceFlat=True):
-                    continue # skip, not in this stream
+                if obj.sites.getSiteCount() == 0: # is top level; no more to search...
+                    if not obj.hasElementOfClass(className, forceFlat=True):
+                        continue # skip, not in this stream
 
             # if after trying to match name, look in the defined contexts'
             # defined contexts [sic!]
@@ -1095,12 +1095,15 @@ class Sites(SlottedObject):
 
     def getSiteCount(self):
         '''
-        Return the number of non-dead sites, including None.  This does not
+        Return the number of non-dead sites, excluding the None site.  This does not
         unwrap weakrefs for performance.
         '''
         count = 0
         for idKey in self._locationKeys:
-            if self._definedContexts[idKey]['isDead']:
+            thisContext = self._definedContexts[idKey]
+            if thisContext['isDead'] is True:
+                continue
+            if thisContext['obj'] is None:
                 continue
             count += 1
         return count
@@ -2615,6 +2618,15 @@ class Music21Object(object):
 
         The `getElementMethod` is a string that selects which Stream method is used to
         get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted.
+
+
+        OMIT_FROM_DOCS
+
+        >>> s = corpus.parse('bwv66.6')
+        >>> noteA = s[1][2][0]
+        >>> noteA.getContextByClass('TimeSignature')
+        <music21.meter.TimeSignature 4/4>
+
         '''
         #if DEBUG_CONTEXT: print 'X: first call; looking for:', className, id(self), self
 
@@ -3102,7 +3114,10 @@ class Music21Object(object):
             return self.sites.getOffsetBySiteId(activeSiteId)
             #return self.sites.coordinates[activeSiteId]['offset']
         elif self.activeSite is None: # assume we want self
-            return self.sites.getOffsetBySite(None)
+            try:
+                return self.sites.getOffsetBySite(None)
+            except SitesException:
+                return 0.0 # might not have a None offset
         else:
             # try to look for it in all objects
             environLocal.printDebug(['doing a manual activeSite search: probably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%r)' % (id(self.activeSite), self._activeSiteId)])

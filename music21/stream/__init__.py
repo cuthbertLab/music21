@@ -6721,9 +6721,11 @@ class Stream(base.Music21Object):
 
     def _yieldElementsUpward(self, memo, streamsOnly=False,
                              skipDuplicates=True, classFilter=[]):
-        '''Yield all containers (Stream subclasses), including self, and going upward.
+        '''Y
+        ield all containers (Stream subclasses), including self, and going upward.
 
-        Note: on first call, a new, fresh memo list must be provided; otherwise, values are retained from one call to the next.
+        Note: on first call, a new, fresh memo list must be provided; 
+        otherwise, values are retained from one call to the next.
         '''
         # TODO: add support for filter list
         # TODO: add add end elements
@@ -6781,8 +6783,8 @@ class Stream(base.Music21Object):
                                 memo.append(id(e))
 
     # possible rename recurseList
-    def recurse(self, direction='downward', streamsOnly=False,
-        restoreActiveSites=True, skipDuplicates=True, classFilter=[]):
+    def recurse(self, streamsOnly=False,
+        restoreActiveSites=True, skipDuplicates=True, classFilter=[], direction='downward'):
         '''
         Iterate over a list of all Music21Objects contained in the Stream,
         starting with self, continuing with self's elements,
@@ -6795,13 +6797,13 @@ class Stream(base.Music21Object):
                 self._yieldElementsDownward(streamsOnly=streamsOnly,
                 restoreActiveSites=restoreActiveSites,
                 classFilter=classFilter)]
-        elif direction in ['upward']:
-            return [e for e in
-                self._yieldElementsUpward([], streamsOnly=streamsOnly,
-                skipDuplicates=skipDuplicates,
-                classFilter=classFilter)]
+#        elif direction in ['upward']:
+#            return [e for e in
+#                self._yieldElementsUpward([], streamsOnly=streamsOnly,
+#                skipDuplicates=skipDuplicates,
+#                classFilter=classFilter)]
         else:
-            raise StreamException('no such direction: %s' % direction)
+            raise StreamException('no such direction: %s (upward removed in v.1.8 -- use ._yieldElementsUpward())' % direction)
 
     def restoreActiveSites(self):
         '''
