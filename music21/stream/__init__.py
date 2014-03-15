@@ -3140,7 +3140,7 @@ class Stream(base.Music21Object):
                     nearestTrailSpan = span
         #environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
         if len(candidates) > 0:
-            candidates.sort() # TODO: this sort has side effects
+            candidates.sort() # TODO: this sort has side effects -- see icmc2011 -- sorting clef vs. note, etc.
             candidates[0][1].activeSite = self
             return candidates[0][1]
         else:
