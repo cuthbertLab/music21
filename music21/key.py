@@ -444,7 +444,7 @@ class KeySignature(base.Music21Object):
         a :class:`music21.pitch.Pitch` object that 
         names this key and the value of :attr:`~music21.key.KeySignature.mode`.
 
-        
+        The only applicable modes are 'minor' and all others (=Major)
        
         >>> key.KeySignature(-7).pitchAndMode
         (<music21.pitch.Pitch C->, None)
