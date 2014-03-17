@@ -40,21 +40,28 @@ Introduction (to be taken from the **Quick Start**)
 32. Dynamics
 33. Searching in and among Scores
 34. Voice leading
-35. Clefs and Articulations
-36. Instruments
-37. Scales
-38. Audio searching
-39. Species counterpoint
-40. Roman numeral analysis
-41. Composing algorithmic music
-42. Feature Extraction (1)
-43. Repeats
-44. Post tonal tools (2): Advanced and Xenakis Sieves
-45. Chord symbols
-46. Expressions
-47. Tempo
-48. Feature Extraction (2)
-49. Figured Bass
-50. MIDI -- advanced
-51. Medieval and Renaissance extensions
+35. Automatic Reduction with OffsetTrees
+36. Clefs and Articulations
+37. Instruments
+38. Scales
+39. Audio searching
+40. Species counterpoint
+41. Roman numeral analysis
+42. Composing algorithmic music
+43. Feature Extraction (1)
+44. Repeats
+45. Post tonal tools (2): Advanced and Xenakis Sieves
+46. Chord symbols
+47. Expressions
+48. Tempo
+49. Feature Extraction (2)
+50. Figured Bass
+51. MIDI -- advanced
+52. Medieval and Renaissance extensions
 
+
+In[ ]:
+
+.. code:: python
+
+    
