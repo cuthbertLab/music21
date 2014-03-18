@@ -1,66 +1,77 @@
 # -*- coding: utf-8 -*-
 
 '''
-Demos of research done on automatic reduction of chords in the Trecento repertory.
+Demos of research dene on automatic reduction of chords in the Trecento
+repertory.
 
 Used by Josiah and Myke for the ELVIS project
 '''
 from music21 import analysis, corpus, interval
 
-def countNGrams(part, nGramLength = 2):
-    stripped = part.stripTies(matchByPitch=True)
-    #stripped.show()
-    chords = stripped.flat.getElementsByClass('Chord')
-    #chords.show()
-    allNGrams = []
-    for i in range(len(chords) - nGramLength + 1):
-        #print chords[i]
-        # nGramLength = 2
-        lastBass = None
-        visType = []
-        for j in range(i, nGramLength+i):
-            c = chords[j]
-            bassPitch = min(c)
-            if lastBass is not None:
-                bassMelodicIntervalStr = interval.Interval(lastBass, bassPitch).directedName
-                #print bassMelodicIntervalStr
-                visType.append(bassMelodicIntervalStr)
-            lastBass = bassPitch
 
-            intervalString = None
-            if len(c) == 1:
-                intervalString = 'P1'
-            else:
-                intervalString = interval.Interval(c[0], c[1]).name
-                #print intervalString
-            visType.append(intervalString)
-        allNGrams.append(tuple(visType))         
-    return allNGrams
+def iterateChordsNwise(chords, n=2):
+    chordBuffer = []
+    for chord in chords:
+        if not chordBuffer or chord.pitches != chordBuffer[-1].pitches:
+            chordBuffer.append(chord)
+        if len(chordBuffer) == n:
+            yield(tuple(chordBuffer))
+            chordBuffer.pop(0)
+
+
+def chordToIntervalString(chord):
+    if len(chord) == 1:
+        intervalString = 'P1'
+    else:
+        intervalString = interval.Interval(chord[0], chord[1]).name
+    return intervalString
+
+
+def chordsToBassMelodictIntervalString(chordOne, chordTwo):
+    bassPitchOne = min(chordOne)
+    bassPitchTwo = min(chordTwo)
+    bassMelodicInterval = interval.Interval(bassPitchOne, bassPitchTwo)
+    bassMelodicIntervalString = bassMelodicInterval.directedName
+    return bassMelodicIntervalString
+
+
+def computeNGrams(part, nGramLength=2):
+    stripped = part.stripTies(matchByPitch=True)
+    allChords = tuple(stripped.flat.getElementsByClass('Chord'))
+    nGrams = []
+    for chords in iterateChordsNwise(allChords, n=nGramLength):
+        nGram = []
+        intervalString = chordToIntervalString(chords[0])
+        nGram.append(intervalString)
+        for chordOne, chordTwo in iterateChordsNwise(chords, n=2):
+            bassMelodicIntervalString = chordsToBassMelodictIntervalString(
+                chordOne, chordTwo)
+            nGram.append(bassMelodicIntervalString)
+            intervalString = chordToIntervalString(chordTwo)
+            nGram.append(intervalString)
+        nGrams.append(tuple(nGram))
+    return nGrams
+
 
 def hashNGrams(nGrams):
-    import operator
-    nGramDict = {}
-    for ng in nGrams:
-        if ng not in nGramDict:
-            nGramDict[ng] = 1
-        else:
-            nGramDict[ng] += 1
-    sorted_dict = sorted(nGramDict.iteritems(), key=operator.itemgetter(1))
-    return sorted_dict
+    import collections
+    nGramDict = collections.Counter()
+    for nGram in nGrams:
+        nGramDict[nGram] += 1
+    sortedDict = tuple(nGramDict.most_common())
+    return sortedDict
+
 
 if __name__ == '__main__':
     import pprint
-    f = 'PMFC_06_Giovanni-05_Donna_Gia_Fu_Leggiadra.xml'
-    score = corpus.parse('trecento/' + f).measures(1, 20)
+    filename = 'PMFC_06_Giovanni-05_Donna_Gia_Fu_Leggiadra.xml'
+    score = corpus.parse('trecento/' + filename).measures(1, 30)
+
     chordReducer = analysis.reduceChords.ChordReducer()
-    reduction = chordReducer(score).parts[-1]
-    nGrams = countNGrams(reduction)
+    reduction = chordReducer(score).parts[0]
+    nGrams = computeNGrams(reduction)
     pprint.pprint(hashNGrams(nGrams))
-    
+
     chordified = score.chordify()
-    nGrams = countNGrams(chordified)
+    nGrams = computeNGrams(chordified)
     pprint.pprint(hashNGrams(nGrams))
-
-
-
-
