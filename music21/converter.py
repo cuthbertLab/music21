@@ -1204,6 +1204,12 @@ class TestExternal(unittest.TestCase):
         a = ConverterMusicXML()
         a.parseData(mxString)
 
+    def testMusicXMLTabConversion(self):
+        from music21.musicxml import testFiles
+        mxString = testFiles.ALL[5] # @UndefinedVariable
+        a = ConverterMusicXML(False)
+        a.parseData(mxString)
+
     def testConversionMusicXml(self):
         c = stream.Score()
 

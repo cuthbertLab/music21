@@ -339,6 +339,7 @@ class StaffLayout(LayoutBase):
         self.staffNumber = None
         self.staffSize = None
         self.hidden = None  # True = hidden; False = shown; None = inherit
+        self.staffLines = None
 
         for key in keywords:
             if key.lower() == 'distance':
@@ -348,6 +349,8 @@ class StaffLayout(LayoutBase):
             elif key.lower() == 'staffsize':
                 if keywords[key] is not None:
                     self.staffSize = float(keywords[key])
+            elif key.lower() == 'stafflines':
+                self.staffLines = keywords[key]
             elif key.lower() == 'hidden':
                 if keywords[key] is not False and keywords[key] is not None:
                     self.hidden = True
@@ -1136,7 +1139,7 @@ class LayoutScore(stream.Opus):
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn("No measures found in pageId %d, systemId %d, staffId %d" % (pageId, systemId, staffId))
 
-        numStaffLines = 5  # should be taken from staff attributes
+        numStaffLines = 5  # TODO: should be taken from staff attributes
         numSpaces = numStaffLines - 1
         staffSizeBase = numSpaces * 10.0
         staffSizeDefinedLocally = False

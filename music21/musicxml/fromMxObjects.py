@@ -2070,6 +2070,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                         if stl.staffSize is None:
                             stl.staffSize = float(mxStaffDetails.staffSize)
                             foundMatch = True
+                        if stl.staffLines is None:
+                            stl.staffLines = float(mxStaffDetails.staffLines)
+                            foundMatch = True
                             
                         
                 if foundMatch is False:
@@ -2077,11 +2080,18 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                     try:
                         staffSize = float(mxStaffDetails.staffSize)
                     except TypeError:
-                        staffSize = None                    
+                        staffSize = None     
+                    
+                    staffLines = None
+                    try:
+                        staffLines = float(mxStaffDetails.staffLines)
+                    except TypeError:
+                        staffLines = 5     
+                                       
                     if mxStaffDetails._attr['number'] is not None:
-                        stl = layout.StaffLayout(staffSize = staffSize, staffNumber=int(mxStaffDetails._attr['number']))
+                        stl = layout.StaffLayout(staffSize = staffSize, staffLines = staffLines, staffNumber=int(mxStaffDetails._attr['number']))
                     else:
-                        stl = layout.StaffLayout(staffSize = staffSize)
+                        stl = layout.StaffLayout(staffSize = staffSize, staffLines = staffLines)
                     
                     if 'print-object' in mxStaffDetails._attr:
                         staffPrinted = mxStaffDetails._attr['print-object']
