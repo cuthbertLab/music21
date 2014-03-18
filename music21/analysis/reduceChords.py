@@ -390,8 +390,8 @@ class ChordReducer(object):
         Fills measure gaps in `tree`.
         '''
         for part, subtree in partwiseTrees.iteritems():
-            toRemove = []
-            toInsert = []
+            toRemove = set()
+            toInsert = set()
             for measureNumber, group in itertools.groupby(
                 subtree, lambda x: x.measureNumber):
                 group = list(group)
@@ -404,25 +404,27 @@ class ChordReducer(object):
                             )
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
-                        toInsert.append(newTimespan)
-                        toRemove.extend((timespanOne, timespanTwo))
+                        toInsert.add(newTimespan)
+                        toRemove.add(timespanOne)
+                        toRemove.add(timespanTwo)
                 if group[0].startOffset != group[0].measureStartOffset:
                     newTimespan = group[0].new(
                         beatStrength=1.0,
                         startOffset=group[0].measureStartOffset,
                         )
-                    toRemove.append(group[0])
-                    toInsert.append(newTimespan)
+                    toRemove.add(group[0])
+                    toInsert.add(newTimespan)
                     group[0] = newTimespan
                 if group[-1].stopOffset != group[-1].measureStopOffset:
                     newTimespan = group[-1].new(
                         stopOffset=group[-1].measureStopOffset,
                         )
-                    toRemove.append(group[-1])
-                    toInsert.append(newTimespan)
+                    toRemove.add(group[-1])
+                    toInsert.add(newTimespan)
                     group[-1] = newTimespan
             # The insertion list may contain timespans later marked for removal
             # Therefore insertion must occur before removals
+            toInsert.difference_update(toRemove)
             tree.insert(toInsert)
             tree.remove(toRemove)
             subtree.insert(toInsert)
