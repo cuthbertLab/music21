@@ -396,9 +396,10 @@ class ChordReducer(object):
         Fills inner measure gaps in `tree`.
         '''
         for part, subtree in partwiseTrees.iteritems():
-            timespans = [x for x in subtree]
+            toRemove = []
+            toInsert = []
             for measureNumber, group in itertools.groupby(
-                timespans, lambda x: x.measureNumber):
+                subtree, lambda x: x.measureNumber):
                 group = list(group)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
@@ -409,10 +410,13 @@ class ChordReducer(object):
                             )
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
-                        tree.remove((timespanOne, timespanTwo))
-                        subtree.remove((timespanOne, timespanTwo))
-                        tree.insert(newTimespan)
-                        subtree.insert(newTimespan)
+                        toInsert.append(newTimespan)
+                        toRemove.extend((timespanOne, timespanTwo))
+            # the insertion list may contain timespans later marked for removal
+            tree.insert(toInsert)
+            tree.remove(toRemove)
+            subtree.insert(toInsert)
+            subtree.remove(toRemove)
 
     def fillOuterMeasureGaps(self, tree, partwiseTrees):
         r'''
