@@ -77,49 +77,27 @@ class ChordReducer(object):
         from music21.analysis import offsetTree
         assert isinstance(inputScore, stream.Score)
 
-        #print 'A'
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
-        #print 'B'
         self.removeZeroDurationTimespans(tree)
-
-        #print 'C'
         self.splitByBass(tree)
-
-        #print 'D'
         self.removeVerticalDissonances(tree)
 
-        #print 'E'
         partwiseTrees = tree.toPartwiseOffsetTrees()
 
-        #print 'F'
         self.fillBassGaps(tree, partwiseTrees)
-
-        #print 'G'
         self.removeShortTimespans(tree, partwiseTrees, duration=0.5)
-
-        #print 'H'
         self.fillBassGaps(tree, partwiseTrees)
-
-        #print 'I'
         self.fillMeasureGaps(tree, partwiseTrees)
-
-        #print 'K'
         self.removeShortTimespans(tree, partwiseTrees, duration=1.0)
-
-        #print 'L'
         self.fillMeasureGaps(tree, partwiseTrees)
-
-        #print 'N'
         self.fillBassGaps(tree, partwiseTrees)
 
-        #print 'O'
-        partwiseReduction = tree.toPartwiseScore()
-
-        #print 'P'
+        reduction = stream.Score()
+        #partwiseReduction = tree.toPartwiseScore()
+        #for part in partwiseReduction:
+        #    reduction.append(part)
         chordifiedReduction = tree.toChordifiedScore()
-
-        # reduce chords in chordified reduction
         chordifiedPart = stream.Part()
         for measure in chordifiedReduction:
             reducedMeasure = self.reduceMeasureToNChords(
@@ -129,13 +107,11 @@ class ChordReducer(object):
                 trimBelow=0.25,
                 )
             chordifiedPart.append(reducedMeasure)
-
-        # clean up notation in all reduction parts
-        partwiseReduction.append(chordifiedPart)
-        for part in partwiseReduction:
+        reduction.append(chordifiedPart)
+        for part in reduction:
             self._applyTies(part)
 
-        return partwiseReduction
+        return reduction
 
     ### PRIVATE METHODS ###
 
