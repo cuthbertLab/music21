@@ -755,7 +755,7 @@ def updateTupletType(durationList):
     if isinstance(durationList, Duration): # if a Duration object alone
         durationList = [durationList] # put in list
     
-    import stream.makeNotation
+    import stream
     stream.makeNotation.makeTupletBrackets(durationList, inPlace = True)
 
 

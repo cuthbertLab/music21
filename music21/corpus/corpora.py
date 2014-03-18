@@ -326,8 +326,9 @@ class Corpus(object):
                     # avoids having the name come back with .mxl instead of
                     # .xmlrle
                     raise corpus.CorpusException(
-                        'Could not find an xml or mxl work that met this '
-                        'criterion: {0}'.format(workName))
+                        'Could not find an xml or mxl work that met this ' +
+                        'criterion: {0}'.format(workName) + 
+                        '. If you are searching for a file on disk, use "converter" instead of "corpus".')
             workList = corpus.getVirtualWorkList(
                 workName,
                 movementNumber,
@@ -337,8 +338,9 @@ class Corpus(object):
             filePath = workList[0]
         elif not len(workList):
             raise corpus.CorpusException(
-                'Could not find a work that met this criterion: {0}'.format(
-                    workName))
+                'Could not find a work that met this criterion: {0};'.format(
+                    workName) + 
+                'if you are searching for a file on disk, use "converter" instead of "corpus".')
         else:
             filePath = workList[0]
         streamObject = converter.parse(

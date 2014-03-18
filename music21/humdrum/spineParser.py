@@ -1932,6 +1932,11 @@ def hdStringToNote(contents):
     but contradicts the specification in
     http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#tuplets )
 
+    >>> storedFlavors = humdrum.spineParser.flavors['JRP'] # DOCS_HIDE
+
+    This is the default:
+    >>> humdrum.spineParser.flavors['JRP'] = False
+
     >>> n = humdrum.spineParser.hdStringToNote("6..fff")
     >>> n.duration.quarterLength
     1.166666...
@@ -1958,7 +1963,7 @@ def hdStringToNote(contents):
     >>> n.isGrace
     True
 
-    >>> humdrum.spineParser.flavors['JRP'] = False # DOCS_HIDE
+    >>> humdrum.spineParser.flavors['JRP'] = storedFlavors # DOCS_HIDE
 
     '''
 

@@ -539,11 +539,14 @@ class LanguageDetector(object):
         '''
         returns the code of the most likely language for a passage, works on unicode or ascii.
         current languages: en, fr, de, it, cn
-
         
         >>> ld = text.LanguageDetector()
         >>> ld.mostLikelyLanguage("Hello there, how are you doing today? I haven't seen you in a while.")
         'en'
+        >>> ld.mostLikelyLanguage("Ciao come stai? Sono molto lento oggi, ma non so perche.")
+        'it'
+
+
         '''
         excTrigram = Trigram(excerpt)
         maxLang = ""

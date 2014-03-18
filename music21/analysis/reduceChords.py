@@ -76,50 +76,42 @@ class ChordReducer(object):
         ):
         from music21.analysis import offsetTree
         assert isinstance(inputScore, stream.Score)
+
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
         self.removeZeroDurationTimespans(tree)
         self.splitByBass(tree)
-
         self.removeVerticalDissonances(tree)
-        self.fillBassGaps(tree)
 
-        self.removeShortTimespans(tree, duration=0.5)
-        self.fillBassGaps(tree)
-        self.fillOuterMeasureGaps(tree)
-        self.fillInnerMeasureGaps(tree)
+        partwiseTrees = tree.toPartwiseOffsetTrees()
 
-        #self._debug(tree)
+        self.fillBassGaps(tree, partwiseTrees)
+        self.removeShortTimespans(tree, partwiseTrees, duration=0.5)
+        self.fillBassGaps(tree, partwiseTrees)
+        self.fillMeasureGaps(tree, partwiseTrees)
+        self.removeShortTimespans(tree, partwiseTrees, duration=1.0)
+        self.fillMeasureGaps(tree, partwiseTrees)
+        self.fillBassGaps(tree, partwiseTrees)
 
-        self.removeShortTimespans(tree, duration=1.0)
-        self.fillOuterMeasureGaps(tree)
-        self.fillInnerMeasureGaps(tree)
-        self.fillBassGaps(tree)
-
-        #self.alignHockets(tree)
-
-        # convert offset trees into music21 scores
-        partwiseReduction = tree.toPartwiseScore()
+        reduction = stream.Score()
+        #partwiseReduction = tree.toPartwiseScore()
+        #for part in partwiseReduction:
+        #    reduction.append(part)
         chordifiedReduction = tree.toChordifiedScore()
-
-        # reduce chords in chordified reduction
         chordifiedPart = stream.Part()
         for measure in chordifiedReduction:
-        #    reducedMeasure = self.reduceMeasureToNChords(
-        #        measure,
-        #        numChords=3,
-        #        weightAlgorithm=self.qlbsmpConsonance,
-        #        trimBelow=0.25,
-        #        )
-        #    chordifiedPart.append(reducedMeasure)
-            chordifiedPart.append(measure)
-
-        # clean up notation in all reduction parts
-        partwiseReduction.append(chordifiedPart)
-        for part in partwiseReduction:
+            reducedMeasure = self.reduceMeasureToNChords(
+                measure,
+                numChords=3,
+                weightAlgorithm=self.qlbsmpConsonance,
+                trimBelow=0.25,
+                )
+            chordifiedPart.append(reducedMeasure)
+        reduction.append(chordifiedPart)
+        for part in reduction:
             self._applyTies(part)
 
-        return partwiseReduction
+        return reduction
 
     ### PRIVATE METHODS ###
 
@@ -232,7 +224,7 @@ class ChordReducer(object):
             #        ):
             #        continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for unused_part, timespans in horizontalities.iteritems():
+            for part, timespans in horizontalities.iteritems():
                 if len(timespans) < 2:
                     continue
                 elif timespans[0].pitches == timespans[1].pitches:
@@ -314,15 +306,15 @@ class ChordReducer(object):
         return presentPCs
 
     # TODO: Clean this up, remove duplicated code
-    def fillBassGaps(self, tree):
+    def fillBassGaps(self, tree, partwiseTrees):
         def procedure(timespan):
             verticality = tree.getVerticalityAt(timespan.startOffset)
             return verticality.bassTimespan
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+        for part, subtree in partwiseTrees.iteritems():
             timespans = [x for x in subtree]
             for bassTimespan, group in itertools.groupby(timespans, procedure):
                 group = list(group)
-                
+
                 if bassTimespan is None:
                     continue
 
@@ -335,19 +327,24 @@ class ChordReducer(object):
                         if startOffset < previousTimespan.stopOffset:
                             startOffset = previousTimespan.stopOffset
                     tree.remove(group[0])
+                    subtree.remove(group[0])
                     newTimespan = group[0].new(
                         beatStrength=beatStrength,
                         startOffset=startOffset,
                         )
                     tree.insert(newTimespan)
+                    subtree.insert(newTimespan)
                     group[0] = newTimespan
 
                 if group[-1].stopOffset < bassTimespan.stopOffset:
                     stopOffset = bassTimespan.stopOffset
+                    tree.remove(group[-1])
+                    subtree.remove(group[-1])
                     newTimespan = group[-1].new(
                         stopOffset=stopOffset,
                         )
                     tree.insert(newTimespan)
+                    subtree.insert(newTimespan)
                     group[-1] = newTimespan
 
                 for i in range(len(group) - 1):
@@ -360,16 +357,19 @@ class ChordReducer(object):
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
                         tree.remove((timespanOne, timespanTwo))
+                        subtree.remove((timespanOne, timespanTwo))
                         tree.insert(newTimespan)
+                        subtree.insert(newTimespan)
 
-    def fillInnerMeasureGaps(self, tree):
+    def fillMeasureGaps(self, tree, partwiseTrees):
         r'''
-        Fills inner measure gaps in `tree`.
+        Fills measure gaps in `tree`.
         '''
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
-            timespans = [x for x in subtree]
+        for part, subtree in partwiseTrees.iteritems():
+            toRemove = set()
+            toInsert = set()
             for measureNumber, group in itertools.groupby(
-                timespans, lambda x: x.measureNumber):
+                subtree, lambda x: x.measureNumber):
                 group = list(group)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
@@ -380,33 +380,31 @@ class ChordReducer(object):
                             )
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
-                        tree.remove((timespanOne, timespanTwo))
-                        tree.insert(newTimespan)
-
-    def fillOuterMeasureGaps(self, tree):
-        r'''
-        Fills outer measure gaps in `tree`.
-        '''
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
-            timespans = [x for x in subtree]
-            for measureNumber, group in itertools.groupby(
-                timespans, lambda x: x.measureNumber):
-                group = list(group)
+                        toInsert.add(newTimespan)
+                        toRemove.add(timespanOne)
+                        toRemove.add(timespanTwo)
                 if group[0].startOffset != group[0].measureStartOffset:
-                    tree.remove(group[0])
                     newTimespan = group[0].new(
                         beatStrength=1.0,
                         startOffset=group[0].measureStartOffset,
                         )
-                    tree.insert(newTimespan)
+                    toRemove.add(group[0])
+                    toInsert.add(newTimespan)
                     group[0] = newTimespan
                 if group[-1].stopOffset != group[-1].measureStopOffset:
-                    tree.remove(group[-1])
                     newTimespan = group[-1].new(
                         stopOffset=group[-1].measureStopOffset,
                         )
-                    tree.insert(newTimespan)
+                    toRemove.add(group[-1])
+                    toInsert.add(newTimespan)
                     group[-1] = newTimespan
+            # The insertion list may contain timespans later marked for removal
+            # Therefore insertion must occur before removals
+            toInsert.difference_update(toRemove)
+            tree.insert(toInsert)
+            tree.remove(toRemove)
+            subtree.insert(toInsert)
+            subtree.remove(toRemove)
 
     def fuseTimespansByPart(self, tree, part):
         def procedure(timespan):
@@ -417,7 +415,7 @@ class ChordReducer(object):
         subtree = mapping[part]
         timespans = [x for x in subtree]
         for key, group in itertools.groupby(timespans, procedure):
-            measureNumber, pitches = key
+            #measureNumber, pitches = key
             group = list(group)
             if len(group) == 1:
                 continue
@@ -565,7 +563,7 @@ class ChordReducer(object):
             if len(verticalities) < 3:
                 continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for unused_part, horizontality in horizontalities.iteritems():
+            for part, horizontality in horizontalities.iteritems():
                 if not horizontality.hasPassingTone and \
                     not horizontality.hasNeighborTone:
                     continue
@@ -578,7 +576,7 @@ class ChordReducer(object):
                 tree.remove((horizontality[0], horizontality[1]))
                 tree.insert(merged)
 
-    def removeShortTimespans(self, tree, duration=0.5):
+    def removeShortTimespans(self, tree, partwiseTrees, duration=0.5):
         r'''
         Removes timespans in `tree` shorter than `duration`.
 
@@ -595,8 +593,8 @@ class ChordReducer(object):
                 if bassTimespan.duration < duration:
                     bassTimespan = None
             return measureNumber, isShort, bassTimespan
-        timespansToRemove = []
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
+        for part, subtree in partwiseTrees.iteritems():
+            timespansToRemove = []
             for key, group in itertools.groupby(subtree, procedure):
                 measureNumber, isShort, bassTimespan = key
                 group = list(group)
@@ -620,7 +618,8 @@ class ChordReducer(object):
                             timespansToRemove.append(timespan)
                 else:
                     timespansToRemove.extend(group)
-        tree.remove(timespansToRemove)
+            tree.remove(timespansToRemove)
+            subtree.remove(timespansToRemove)
 
     def removeVerticalDissonances(self, tree):
         r'''

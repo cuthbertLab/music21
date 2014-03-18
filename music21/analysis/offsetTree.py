@@ -537,7 +537,10 @@ class Verticality(object):
             1.0
 
         '''
-        return self.startTimespans[0].beatStrength
+        thisParentage = self.startTimespans[0]
+        if self.startOffset == 1.0:
+            pass  # debugging; delete
+        return thisParentage.beatStrength
 
     @property
     def degreeOfOverlap(self):
@@ -1290,7 +1293,7 @@ class OffsetTree(object):
             for x in inputStream:
                 if isinstance(x, stream.Measure):
                     localParentage = currentParentage + (x,)
-                    measureStartOffset = x.offset
+                    measureStartOffset = x.getOffsetBySite(inputStream)
                     measureStopOffset = measureStartOffset + \
                         x.duration.quarterLength
                     for element in x:
@@ -1299,7 +1302,7 @@ class OffsetTree(object):
                             chord.Chord,
                             )):
                             continue
-                        elementOffset = element.offset
+                        elementOffset = element.getOffsetBySite(x)
                         startOffset = measureStartOffset + elementOffset
                         stopOffset = startOffset + element.quarterLength
                         parentage = Parentage(

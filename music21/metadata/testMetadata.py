@@ -213,7 +213,8 @@ class Test(unittest.TestCase):
                         },
                         "ambitus": {
                             "__attr__": {
-                                "_priority": 0
+                                "_priority": 0,
+                                "offset": 0.0
                             },
                             "__class__": "music21.interval.Interval"
                         },

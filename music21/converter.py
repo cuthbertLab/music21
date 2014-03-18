@@ -190,13 +190,14 @@ class ArchiveManager(object):
 
 #-------------------------------------------------------------------------------
 class PickleFilter(object):
-    '''Before opening a file path, this class can check if there is an up
-    to date version pickled and stored in the scratch directory.
-
-    If the user has not specified a scratch directory, a pickle path will
-    not be created.
     '''
-    def __init__(self, fp, forceSource=False):
+    Before opening a file path, this class checks to see if there is an up-to-date
+    version of the file pickled and stored in the scratch directory.
+    
+    If the user has not specified a scratch directory, or if forceSource is True
+    then a pickle path will not be created.
+    '''
+    def __init__(self, fp, forceSource=False, number=None):
         '''Provide a file path to check if there is pickled version.
 
         If forceSource is True, pickled files, if available, will not be
@@ -204,17 +205,38 @@ class PickleFilter(object):
         '''
         self.fp = fp
         self.forceSource = forceSource
+        self.number = number
         #environLocal.printDebug(['creating pickle filter'])
 
-    def _getPickleFp(self, directory):
+    def _getPickleFp(self, directory, zipType=None):
         if directory == None:
             raise ValueError
-        return os.path.join(directory, 'm21-' + common.getMd5(self.fp) + '.p')
+        if zipType is None:
+            extension = '.p'
+        else:
+            extension = '.pgz'
+        
+        if self.number is None:
+            return os.path.join(directory, 'm21-' + common.getMd5(self.fp) + extension)
+        else:
+            return os.path.join(directory, 'm21-' + common.getMd5(self.fp) + '-' + str(self.number) + extension)
 
     def status(self):
-        '''Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path.
+        '''
+        Given a file path specified with __init__, look for an up to date pickled 
+        version of this file path. If it exists, return its fp, otherwise return the 
+        original file path.
 
-        Return arguments are file path to load, boolean whether to write a pickle, and the file path of the pickle.
+        Return arguments are file path to load, boolean whether to write a pickle, and 
+        the file path of the pickle.
+        
+        Does not check that fp exists or create the pickle file.
+        
+        >>> fp = '/Users/Cuthbert/Desktop/musicFile.mxl'
+        >>> pickfilt = converter.PickleFilter(fp)
+        >>> #_DOCS_SHOW pickfilt.status()
+        ('/Users/Cuthbert/Desktop/musicFile.mxl', True, '/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T/music21/m21-18b8c5a5f07826bd67ea0f20462f0b8d.pgz')
+
         '''
         fpScratch = environLocal.getRootTempDir()
         m21Format = common.findFormatFile(self.fp)
@@ -229,8 +251,8 @@ class PickleFilter(object):
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None
-        else: # see which is more up to doate
-            fpPickle = self._getPickleFp(fpScratch)
+        else: # see which is more up to date
+            fpPickle = self._getPickleFp(fpScratch, zipType='gz')
             if not os.path.exists(fpPickle):
                 writePickle = True # if pickled file does not exist
                 fpLoad = self.fp
@@ -312,7 +334,6 @@ class ConverterTinyNotation(object):
         f.close()
         self.stream = tinyNotation.TinyNotationStream(tnStr)
 
-
 class ConverterNoteworthy(object):
     '''
     Simple class wrapper for parsing NoteworthyComposer data provided in a file or in a string.
@@ -368,7 +389,6 @@ class ConverterNoteworthy(object):
         '''
         self.stream = noteworthyTranslate.NoteworthyTranslator().parseFile(fp)
 
-
 class ConverterNoteworthyBinary(object):
     '''
     Simple class wrapper for parsing NoteworthyComposer binary data provided in a file or in a string.
@@ -388,7 +408,6 @@ class ConverterNoteworthyBinary(object):
 
     def parseFile(self, fp, number=None):
         self.stream = noteworthyBinary.NWCConverter().parseFile(fp)
-
 
 #-------------------------------------------------------------------------------
 class ConverterMusicXML(object):
@@ -445,7 +464,7 @@ class ConverterMusicXML(object):
         pfObj = PickleFilter(fp, self.forceSource)
         # fpDst here is the file path to load, which may or may not be
         # a pickled file
-        fpDst, writePickle, fpPickle = pfObj.status() # get status
+        fpDst, writePickle, fpPickle = pfObj.status() # get status @UnusedVariable
 
         formatSrc = common.findFormatFile(fp)
         # here we determine if we have pickled file or a musicxml file
@@ -509,10 +528,11 @@ class ConverterMusicXML(object):
 
         # only write pickle if we have parts defined
         if writePickle:
-            if fpPickle == None: # if original file cannot be found
-                raise ConverterException('attempting to write pickle but no file path is given')
-            environLocal.printDebug(['writing pickled file', fpPickle])
-            c.writePickle(fpPickle)
+            pass
+        #    if fpPickle == None: # if original file cannot be found
+        #        raise ConverterException('attempting to write pickle but no file path is given')
+        #    environLocal.printDebug(['writing pickled file', fpPickle])
+        #    c.writePickle(fpPickle)
 
         self.load()
 
@@ -750,41 +770,52 @@ class Converter(object):
 
     Not a subclass, but a wrapper for different converter objects based on format.
     '''
-
+    _DOC_ATTR = {'subConverter': 'a ConverterXXX object that will do the actual converting.',}
+    
     def __init__(self):
-        self._converter = None
+        self.subConverter = None
+        self._thawedStream = None # a stream object unthawed
 
-    def _setConverter(self, format, forceSource=False): # @ReservedAssignment
+    def setSubconverterFromFormat(self, format, forceSource=False): # @ReservedAssignment
+        '''
+        sets the .subConverter according to the format of `format`:
+        
+        >>> convObj = converter.Converter()
+        >>> convObj.setSubconverterFromFormat('humdrum')
+        >>> convObj.subConverter
+        <music21.converter.ConverterHumdrum object at 0x...>
+        '''
+        
         # assume for now that pickled files are always musicxml
         # this WILL change in the future
         if format is None:
             raise ConverterException('Did not find a format from the source file')
 
         if format in ['musicxml', 'pickle']:
-            self._converter = ConverterMusicXML(forceSource=forceSource)
+            self.subConverter = ConverterMusicXML(forceSource=forceSource)
         elif format == 'midi':
-            self._converter = ConverterMidi()
+            self.subConverter = ConverterMidi()
         elif format == 'humdrum':
-            self._converter = ConverterHumdrum()
+            self.subConverter = ConverterHumdrum()
         elif format.lower() in ['tinynotation']:
-            self._converter = ConverterTinyNotation()
+            self.subConverter = ConverterTinyNotation()
         elif format == 'abc':
-            self._converter = ConverterABC()
+            self.subConverter = ConverterABC()
         elif format == 'musedata':
-            self._converter = ConverterMuseData()
+            self.subConverter = ConverterMuseData()
         elif format == 'noteworthytext':
-            self._converter = ConverterNoteworthy()
+            self.subConverter = ConverterNoteworthy()
         elif format == 'noteworthy':
-            self._converter = ConverterNoteworthyBinary()
+            self.subConverter = ConverterNoteworthyBinary()
         elif format == 'capella':
-            self._converter = ConverterCapella()
+            self.subConverter = ConverterCapella()
 
         elif format == 'text': # based on extension
             # presently, all text files are treated as roman text
             # may need to handle various text formats
-            self._converter = ConverterRomanText()
+            self.subConverter = ConverterRomanText()
         elif format.lower() in ['romantext', 'rntxt']:
-            self._converter = ConverterRomanText()
+            self.subConverter = ConverterRomanText()
         else:
             raise ConverterException('no such format: %s' % format)
 
@@ -793,14 +824,14 @@ class Converter(object):
             raise ValueError
         return os.path.join(directory, 'm21-' + common.getMd5(url) + ext)
 
-    def parseFile(self, fp, number=None, format=None, forceSource=False): # @ReservedAssignment
+    def parseFileNoPickle(self, fp, number=None, format=None, forceSource=False): # @ReservedAssignment
         '''
         Given a file path, parse and store a music21 Stream.
 
-
         If format is None then look up the format from the file
         extension using `common.findFormatFile`.
-
+        
+        Does not use or store pickles
         '''
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):
@@ -816,11 +847,71 @@ class Converter(object):
                 useFormat = common.findFormatFile(fp)
                 if useFormat is None:
                     raise ConverterFileException('cannot find a format extensions for: %s' % fp)
-        self._setConverter(useFormat, forceSource=forceSource)
-        self._converter.parseFile(fp, number=number)
+        self.setSubconverterFromFormat(useFormat, forceSource=forceSource)
+        self.subConverter.parseFile(fp, number=number)
         self.stream.filePath = fp
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
+    
+    def getFormatFromFileExtension(self, fp):
+        '''
+        gets the format from a file extension.
+        '''
+        
+        # if the file path is to a directory, assume it is a collection of
+        # musedata parts
+        useFormat = None
+        if os.path.isdir(fp):
+            useFormat = 'musedata'
+        else:
+            useFormat = common.findFormatFile(fp)
+            if useFormat is None:
+                raise ConverterFileException('cannot find a format extensions for: %s' % fp)
+        return useFormat
+    
+    def parseFile(self, fp, number=None, format=None, forceSource=False, storePickle=True): # @ReservedAssignment
+        '''
+        Given a file path, parse and store a music21 Stream.
+
+        If format is None then look up the format from the file
+        extension using `common.findFormatFile`.
+        
+        Will load from a pickle unless forceSource is True
+        Will store as a pickle unless storePickle is False
+        '''
+        import freezeThaw
+        if not os.path.exists(fp):
+            raise ConverterFileException('no such file eists: %s' % fp)
+        useFormat = format
+
+        if useFormat is None:
+            useFormat = self.getFormatFromFileExtension(fp)
+        pfObj = PickleFilter(fp, forceSource, number)
+        unused_fpDst, writePickle, fpPickle = pfObj.status()
+        if writePickle is False and fpPickle is not None and forceSource is False:
+            environLocal.printDebug("Loading Pickled version")
+            self._thawedStream = thaw(fpPickle, zipType='zlib')
+            self.stream.filePath = fp
+            self.stream.fileNumber = number
+            self.stream.fileFormat = useFormat
+        else:
+            environLocal.printDebug("Loading original version")
+            self.parseFileNoPickle(fp, number, format, forceSource)
+            if writePickle is True and fpPickle is not None and storePickle is True:
+                # save the stream to disk...
+                environLocal.printDebug("Freezing Pickle")
+                s = self.stream
+                sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
+                sf.write(fp=fpPickle, zipType='zlib')
+                
+                environLocal.printDebug("Replacing self.stream")
+                # get a new stream
+                self._thawedStream = thaw(fpPickle, zipType='zlib')
+                self.stream.filePath = fp
+                self.stream.fileNumber = number
+                self.stream.fileFormat = useFormat
+
+            
 
     def parseData(self, dataStr, number=None, format=None, forceSource=False): # @ReservedAssignment
         '''
@@ -858,8 +949,8 @@ class Converter(object):
             else:
                 raise ConverterException('File not found or no such format found for: %s' % dataStr)
 
-        self._setConverter(useFormat)
-        self._converter.parseData(dataStr, number=number)
+        self.setSubconverterFromFormat(useFormat)
+        self.subConverter.parseData(dataStr, number=number)
 
 
     def parseURL(self, url, format=None, number=None): # @ReservedAssignment
@@ -921,8 +1012,8 @@ class Converter(object):
             useFormat = common.findFormatFile(fp)
         else:
             useFormat = format
-        self._setConverter(useFormat, forceSource=False)
-        self._converter.parseFile(fp, number=number)
+        self.setSubconverterFromFormat(useFormat, forceSource=False)
+        self.subConverter.parseFile(fp, number=number)
         self.stream.filePath = fp
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
@@ -938,7 +1029,6 @@ class Converter(object):
         Else, return (None, dataStr) where dataStr is the original untouched.
 
         Not case sensitive.
-
 
         >>> c = converter.Converter()
         >>> c.formatFromHeader('tinynotation: C4 E2')
@@ -965,9 +1055,15 @@ class Converter(object):
     # properties
 
     def _getStream(self):
-        '''All converters have to have a stream property or attribute.
         '''
-        return self._converter.stream
+        Returns the .subConverter.stream object.
+        '''
+        if self._thawedStream is not None:
+            return self._thawedStream
+        elif self.subConverter is not None:
+            return self.subConverter.stream
+        else:
+            return None
         # not _stream: please don't look in other objects' private variables;
         #              humdrum worked differently.
 
@@ -1089,7 +1185,7 @@ def parse(value, *args, **keywords):
 
 
 
-def freeze(streamObj, fmt=None, fp=None):
+def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
     '''Given a StreamObject and a file path, serialize and store the Stream to a file.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
@@ -1111,7 +1207,7 @@ def freeze(streamObj, fmt=None, fp=None):
     {3.0} <music21.note.Note F>
     >>> fp = converter.freeze(c, fmt='pickle')
     >>> #_DOCS_SHOW fp
-    '/tmp/music21/sjiwoe.p'
+    '/tmp/music21/sjiwoe.pgz'
 
     The file can then be "thawed" back into a Stream using the :func:`~music21.converter.thaw` method.
 
@@ -1124,11 +1220,11 @@ def freeze(streamObj, fmt=None, fp=None):
     {3.0} <music21.note.Note F>
     '''
     from music21 import freezeThaw
-    v = freezeThaw.StreamFreezer(streamObj)
-    return v.write(fmt=fmt, fp=fp) # returns fp
+    v = freezeThaw.StreamFreezer(streamObj, fastButUnsafe=fastButUnsafe)
+    return v.write(fmt=fmt, fp=fp, zipType=zipType) # returns fp
 
 
-def thaw(fp):
+def thaw(fp, zipType='zlib'):
     '''Given a file path of a serialized Stream, defrost the file into a Stream.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
@@ -1137,7 +1233,7 @@ def thaw(fp):
     '''
     from music21 import freezeThaw
     v = freezeThaw.StreamThawer()
-    v.open(fp)
+    v.open(fp, zipType=zipType)
     return v.stream
 
 
