@@ -412,7 +412,8 @@ class ChordReducer(object):
                         group[i + 1] = newTimespan
                         toInsert.append(newTimespan)
                         toRemove.extend((timespanOne, timespanTwo))
-            # the insertion list may contain timespans later marked for removal
+            # The insertion list may contain timespans later marked for removal
+            # Therefore insertion must occur before removals
             tree.insert(toInsert)
             tree.remove(toRemove)
             subtree.insert(toInsert)
@@ -423,29 +424,32 @@ class ChordReducer(object):
         Fills outer measure gaps in `tree`.
         '''
         for part, subtree in partwiseTrees.iteritems():
-            timespans = [x for x in subtree]
+            toRemove = []
+            toInsert = []
             for measureNumber, group in itertools.groupby(
-                timespans, lambda x: x.measureNumber):
+                subtree, lambda x: x.measureNumber):
                 group = list(group)
                 if group[0].startOffset != group[0].measureStartOffset:
-                    tree.remove(group[0])
-                    subtree.remove(group[0])
                     newTimespan = group[0].new(
                         beatStrength=1.0,
                         startOffset=group[0].measureStartOffset,
                         )
-                    tree.insert(newTimespan)
-                    subtree.insert(newTimespan)
+                    toRemove.append(group[0])
+                    toInsert.append(newTimespan)
                     group[0] = newTimespan
                 if group[-1].stopOffset != group[-1].measureStopOffset:
-                    tree.remove(group[-1])
-                    subtree.remove(group[-1])
                     newTimespan = group[-1].new(
                         stopOffset=group[-1].measureStopOffset,
                         )
-                    tree.insert(newTimespan)
-                    subtree.insert(newTimespan)
+                    toRemove.append(group[-1])
+                    toInsert.append(newTimespan)
                     group[-1] = newTimespan
+            # the insertion list may contain timespans later marked for removal
+            # Therefore insertion must occur before removals
+            tree.insert(toInsert)
+            tree.remove(toRemove)
+            subtree.insert(toInsert)
+            subtree.remove(toRemove)
 
     def fuseTimespansByPart(self, tree, part):
         def procedure(timespan):
