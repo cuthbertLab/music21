@@ -102,19 +102,13 @@ class ChordReducer(object):
         self.fillBassGaps(tree, partwiseTrees)
 
         #print 'I'
-        self.fillOuterMeasureGaps(tree, partwiseTrees)
-
-        #print 'J'
-        self.fillInnerMeasureGaps(tree, partwiseTrees)
+        self.fillMeasureGaps(tree, partwiseTrees)
 
         #print 'K'
         self.removeShortTimespans(tree, partwiseTrees, duration=1.0)
 
         #print 'L'
-        self.fillOuterMeasureGaps(tree, partwiseTrees)
-
-        #print 'M'
-        self.fillInnerMeasureGaps(tree, partwiseTrees)
+        self.fillMeasureGaps(tree, partwiseTrees)
 
         #print 'N'
         self.fillBassGaps(tree, partwiseTrees)
@@ -391,9 +385,9 @@ class ChordReducer(object):
                         tree.insert(newTimespan)
                         subtree.insert(newTimespan)
 
-    def fillInnerMeasureGaps(self, tree, partwiseTrees):
+    def fillMeasureGaps(self, tree, partwiseTrees):
         r'''
-        Fills inner measure gaps in `tree`.
+        Fills measure gaps in `tree`.
         '''
         for part, subtree in partwiseTrees.iteritems():
             toRemove = []
@@ -412,23 +406,6 @@ class ChordReducer(object):
                         group[i + 1] = newTimespan
                         toInsert.append(newTimespan)
                         toRemove.extend((timespanOne, timespanTwo))
-            # The insertion list may contain timespans later marked for removal
-            # Therefore insertion must occur before removals
-            tree.insert(toInsert)
-            tree.remove(toRemove)
-            subtree.insert(toInsert)
-            subtree.remove(toRemove)
-
-    def fillOuterMeasureGaps(self, tree, partwiseTrees):
-        r'''
-        Fills outer measure gaps in `tree`.
-        '''
-        for part, subtree in partwiseTrees.iteritems():
-            toRemove = []
-            toInsert = []
-            for measureNumber, group in itertools.groupby(
-                subtree, lambda x: x.measureNumber):
-                group = list(group)
                 if group[0].startOffset != group[0].measureStartOffset:
                     newTimespan = group[0].new(
                         beatStrength=1.0,
@@ -444,7 +421,7 @@ class ChordReducer(object):
                     toRemove.append(group[-1])
                     toInsert.append(newTimespan)
                     group[-1] = newTimespan
-            # the insertion list may contain timespans later marked for removal
+            # The insertion list may contain timespans later marked for removal
             # Therefore insertion must occur before removals
             tree.insert(toInsert)
             tree.remove(toRemove)
