@@ -1152,10 +1152,13 @@ class SelectFilePath(SelectFromList):
                     post.append(path1)
                     continue
                 #environLocal.printDebug(['_getDarwinApp: dir', path1])
-                for sub2 in os.listdir(path1):
-                    path2 = os.path.join(path1, sub2)
-                    if comparisonFunction(sub2):
-                        post.append(path2)
+                try:
+                    for sub2 in os.listdir(path1):
+                        path2 = os.path.join(path1, sub2)
+                        if comparisonFunction(sub2):
+                            post.append(path2)
+                except OSError:
+                    print "Could not read paths inside %s" % path1
             else:        
                 if comparisonFunction(sub1):
                     post.append(path1)
