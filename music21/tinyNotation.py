@@ -577,7 +577,6 @@ class HarmonyStream(TinyNotationStream):
     to include harmonies and lyrics encoded in a simple format.
     
     
-
     >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
     >>> michelle += "G4*E-*_these c_are A-_words G_that "
     >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
