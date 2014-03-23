@@ -27,7 +27,7 @@ class NGramJobHandler(object):
         jobQueue = multiprocessing.JoinableQueue()
         resultQueue = multiprocessing.Queue()
         workers = [NGramJobHandlerWorker(jobQueue, resultQueue)
-            for i in range(multiprocessing.cpu_count() * 2)]
+            for i in range(multiprocessing.cpu_count() / 2)]
         for worker in workers:
             worker.start()
         for job in jobs:
@@ -89,30 +89,57 @@ class NGramJob(base.SlottedObject):
 
     __slots__ = (
         'filename',
-        'chordifiedNGrams',
-        'reducedNGrams',
+        'jobNumber',
+        'jobTotal',
+        'results',
         )
 
     ### INITIALIZER ###
 
-    def __init__(self, filename):
+    def __init__(self, filename, jobNumber=0, jobTotal=0):
         self.filename = filename
-        self.chordifiedNGrams = None
-        self.reducedNGrams = None
+        self.jobNumber = jobNumber
+        self.jobTotal = jobTotal
+        self.results = {}
 
     ### SPECIAL METHODS ###
 
     def __call__(self):
-        score = corpus.parse('trecento/' + self.filename).measures(1, 30)
-        chordReducer = analysis.reduceChords.ChordReducer()
-        reduction = chordReducer(score).parts[0]
-        chordifiedNGrams = self.computeNGrams(reduction)
-        chordified = score.chordify()
-        reducedNGrams = self.computeNGrams(chordified)
-        self.chordifiedNGrams = chordifiedNGrams
-        self.reducedNGrams = reducedNGrams
+        score = corpus.parse(self.filename)
+        self.debug('PARSED')
+        chordifiedScore = score.chordify()
+        self.debug('CHORDIFIED')
+        try:
+            chordReducer = analysis.reduceChords.ChordReducer()
+            reducedScore = chordReducer(score).parts[0]
+        except AssertionError as e:
+            self.debug('REDUCTION ERROR')
+            print e
+            return
+        self.debug('REDUCED')
+        for i in range(1, 5):
+            ngrams = self.computeNGrams(reducedScore)
+            if 'chordified' not in self.results:
+                self.results['chordified'] = {}
+            self.results['chordified'][i] = ngrams
+            self.debug('NGRAMS: {}'.format(i))
+        for i in range(1, 5):
+            ngrams = self.computeNGrams(chordifiedScore)
+            if 'reduced' not in self.results:
+                self.results['reduced'] = {}
+            self.results['reduced'][i] = ngrams
+            self.debug('NGRAMS: {}'.format(i))
+        self.debug('DONE!')
 
     ### PUBLIC METHODS ###
+
+    def debug(self, message):
+        print '[{}/{}] {}: {}'.format(
+            self.jobNumber,
+            self.jobTotal,
+            self.filename,
+            message,
+            )
 
     def iterateChordsNwise(self, chords, n=2):
         chordBuffer = []
@@ -165,11 +192,41 @@ class NGramJob(base.SlottedObject):
 
 
 if __name__ == '__main__':
-    import pprint
-    filename = 'PMFC_06_Giovanni-05_Donna_Gia_Fu_Leggiadra.xml'
-    jobs = [NGramJob(filename)]
+    import os
+    import json
+    coreCorpus = corpus.CoreCorpus()
+    paths = [x for x in coreCorpus.getPaths() if 'trecento' in x]
+    paths = [os.path.join('trecento', os.path.split(x)[-1]) for x in paths]
+    jobs = []
+    jobTotal = len(paths)
+    for i, path in enumerate(paths):
+        job = NGramJob(
+            path,
+            jobNumber=i,
+            jobTotal=jobTotal,
+            )
+        jobs.append(job)
     processedJobs = NGramJobHandler.execute(jobs)
-    chordifiedNGrams = processedJobs[0].chordifiedNGrams
-    reducedNGrams = processedJobs[0].reducedNGrams
-    pprint.pprint(chordifiedNGrams)
-    pprint.pprint(reducedNGrams)
+    processedJobs.sort(key=lambda x: x.filename)
+    result = {}
+    failedJobs = []
+    for job in processedJobs:
+        if job.result:
+            result[job.filename] = job.result
+        else:
+            failedJobs.append(job)
+    formattedResult = json.dumps(
+        result,
+        indent=4,
+        separators=(',', ': '),
+        sort_keys=True,
+        )
+    formatted_result = 'ngrams = ' + formattedResult
+    outputDirectory = os.path.abspath(os.path.dirname(__file__))
+    outputFilename = os.path.join(outputDirectory, 'elvis_trecento_results.py')
+    with open(outputFilename, 'w') as f:
+        f.write(formattedResult)
+    if failedJobs:
+        print 'FAILURES:'
+        for failedJob in failedJobs:
+            print '\t{}'.format(failedJob.filename)
