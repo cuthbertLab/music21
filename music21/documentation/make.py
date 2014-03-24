@@ -21,7 +21,9 @@ from music21 import common
 try:
     import sphinx
 except ImportError:
-    raise ImportError("Sphinx is required to build documentation; download from http://sphinx-doc.org")
+    message = 'Sphinx is required to build documentation; '
+    message += 'download from http://sphinx-doc.org'
+    raise ImportError(message)
 
 
 def _print_usage():

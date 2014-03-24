@@ -272,7 +272,13 @@ You need to teach Eclipse that music21 should be considered a PyDev project. In
 the **Package Explorer** window, right-click on your music21 project and choose
 **Set as PyDev Project** from the **PyDev** submenu:
 
-..  image:: images/usingGit/eclipse__configure_pydev.png
+..  image:: images/usingGit/eclipse__configure_pydev__1.png
+
+You also need to tell PyDev that your project should be included in your Python
+path. If you don't do this, Python won't be able to find music21 at all.
+
+..  image:: images/usingGit/eclipse__configure_pydev__2.png
+
 
 
 Configuring the music21 Environment
