@@ -1,134 +1,124 @@
 Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
 AssertionError: Failed doctest test for music21.webapps.apps.setupURLCorpusParseApp
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 26, in setupURLCorpusParseApp
+  File "/Users/josiah/Documents/Development/music21base/music21/webapps/apps.py", line 26, in setupURLCorpusParseApp
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 41, in music21.webapps.apps.setupURLCorpusParseApp
+File "/Users/josiah/Documents/Development/music21base/music21/webapps/apps.py", line 41, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
     (responseData, responseContentType) = processor.getOutput()
 Exception raised:
     Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
       File "<doctest music21.webapps.apps.setupURLCorpusParseApp[8]>", line 1, in <module>
         (responseData, responseContentType) = processor.getOutput()
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/__init__.py", line 1133, in getOutput
+      File "/Users/josiah/Documents/Development/music21base/music21/webapps/__init__.py", line 1133, in getOutput
         (output, outputType) = eval(self.outputTemplate)(*argList)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/templates.py", line 75, in musicxmlFile
+      File "/Users/josiah/Documents/Development/music21base/music21/webapps/templates.py", line 75, in musicxmlFile
         musicxmlString = m21ToString.fromMusic21Object(outputStream)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/m21ToString.py", line 50, in fromMusic21Object
+      File "/Users/josiah/Documents/Development/music21base/music21/musicxml/m21ToString.py", line 50, in fromMusic21Object
         classes = m21Object.classes
     AttributeError: 'str' object has no attribute 'classes'
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 42, in music21.webapps.apps.setupURLCorpusParseApp
+File "/Users/josiah/Documents/Development/music21base/music21/webapps/apps.py", line 42, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
     responseContentType
 Exception raised:
     Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
       File "<doctest music21.webapps.apps.setupURLCorpusParseApp[9]>", line 1, in <module>
         responseContentType
     NameError: name 'responseContentType' is not defined
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 44, in music21.webapps.apps.setupURLCorpusParseApp
+File "/Users/josiah/Documents/Development/music21base/music21/webapps/apps.py", line 44, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
     converter.parse(responseData).flat.highestOffset
 Exception raised:
     Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
       File "<doctest music21.webapps.apps.setupURLCorpusParseApp[10]>", line 1, in <module>
         converter.parse(responseData).flat.highestOffset
     NameError: name 'responseData' is not defined
 
 
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 3651, in testWeightedHexatonicBluesA
-    self.assertEqual(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'], True)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 2029, in next
-    getNeighbor=getNeighbor
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 540, in nextPitch
-    getNeighbor = getNeighbor
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/intervalNetwork.py", line 1210, in nextPitch
-    p.octave = pitchOrigin.octave
-AttributeError: 'NoneType' object has no attribute 'octave'
-
 
 
 ---------------SUMMARY---------------------------------------------------
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/zipfileapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/wsgiapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/visualapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/urlqueryapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/urlapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/unifiedapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/jsonapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/featureinfo.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/server/featureapp.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/noteinfo/index.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/index.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/exceldiff.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/timeGraphs.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testSingleCoreAll.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testPerformance.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testLint.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testInstallation.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testExternal.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testDefault.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/multiprocessTest.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/xldate.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/timemachine.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/sheet.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/licences.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/formula.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/formatting.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/examples/xlrdnameAPIdemo.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/compdoc.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/biffh.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/webcolors.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/util.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/unpickler.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/tags.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/pickler.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/handlers.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/compat.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/largestAmbitus.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/trecento/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2011.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/smt2010.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/seaver_presentation_2008.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/seaverOct2009.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/runTrecentoCadence.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/nips2011.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/nemcog.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/monteverdi.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/misc2010.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/mgtaPart2.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/mgtaPart1.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/josquin/label_intervals.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/ismir2011.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/ismir2010.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/icmc2011.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/icmc2010.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/eschbeg.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/elvis_trecento.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/awsutility.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/mrjobaws/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/bhadley/HarmonyRealizer.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
-Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/zipfileapp.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/wsgiapp.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/visualapp.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/urlqueryapp.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/urlapp.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/unifiedapp.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/jsonapp.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/featureinfo.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/server/featureapp.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/archive/server/mod_python/noteinfo/index.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/archive/server/mod_python/index.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/trecento/exceldiff.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/test/timeGraphs.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/test/testSingleCoreAll.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/test/testPerformance.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/test/testLint.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/test/testInstallation.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/test/testExternal.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/test/testDefault.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/test/multiprocessTest.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/xldate.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/timemachine.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/sheet.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/licences.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/formula.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/formatting.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/examples/xlrdnameAPIdemo.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/compdoc.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/biffh.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/xlrd/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/webcolors.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/jsonpickle/util.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/jsonpickle/unpickler.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/jsonpickle/tags.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/jsonpickle/pickler.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/jsonpickle/handlers.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/jsonpickle/compat.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/jsonpickle/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/ext/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/trecento/largestAmbitus.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/trecento/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/smt2011.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/smt2010.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/seaver_presentation_2008.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/seaverOct2009.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/runTrecentoCadence.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/nips2011.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/nemcog.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/monteverdi.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/misc2010.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/mgtaPart2.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/mgtaPart1.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/josquin/label_intervals.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/ismir2011.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/ismir2010.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/icmc2011.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/icmc2010.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/eschbeg.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/elvis_trecento_results.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/elvis_trecento.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/bhadley/mrjobaws/awsutility.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/bhadley/mrjobaws/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/bhadley/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/bhadley/HarmonyRealizer.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/demos/__init__.py
+Skipped: /Users/josiah/Documents/Development/music21base/music21/configure.py
 xmlnode successfully ran 12 tests
 webapps___init__ successfully ran 14 tests
 volume successfully ran 20 tests
@@ -141,9 +131,9 @@ webapps_commands successfully ran 10 tests
 trecento_polyphonicSnippet successfully ran 9 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
+trecento_capua successfully ran 9 tests
 trecento_tonality successfully ran 5 tests
 trecento___init__ successfully ran 3 tests
-trecento_capua successfully ran 9 tests
 tinyNotation successfully ran 11 tests
 tie successfully ran 7 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
@@ -160,28 +150,27 @@ sieve successfully ran 40 tests
 serial successfully ran 47 tests
 stream___init__ successfully ran 145 tests
 search_segment successfully ran 7 tests
+scale successfully ran 90 tests
 scala_scl___init__ successfully ran 3 tests
 scala___init__ successfully ran 12 tests
 search___init__ successfully ran 19 tests
 romanText_testFiles successfully ran 4 tests
 romanText_translate successfully ran 17 tests
 romanText___init__ successfully ran 45 tests
-romanText_clercqTemperley successfully ran 19 tests
 roman successfully ran 28 tests
+romanText_clercqTemperley successfully ran 19 tests
 pitch successfully ran 94 tests
 noteworthy_translate successfully ran 21 tests
 noteworthy_binaryTranslate successfully ran 3 tests
 noteworthy___init__ successfully ran 3 tests
-note successfully ran 49 tests
-musicxml_xmlHandler successfully ran 12 tests
-musicxml_toMxObjects successfully ran 37 tests
-musicxml_testPrimitive successfully ran 5 tests
-musicxml_testFiles successfully ran 5 tests
-musicxml_mxObjects successfully ran 45 tests
 test_testStream successfully ran 206 tests
-repeat successfully ran 72 tests
-musicxml___init__ successfully ran 3 tests
+note successfully ran 49 tests
+musicxml_toMxObjects successfully ran 37 tests
+musicxml_mxObjects successfully ran 45 tests
+musicxml_xmlHandler successfully ran 12 tests
 musicxml_m21ToString successfully ran 45 tests
+musicxml___init__ successfully ran 3 tests
+repeat successfully ran 72 tests
 musedata_base40 successfully ran 9 tests
 musedata___init__ successfully ran 49 tests
 midi_translate successfully ran 47 tests
@@ -189,15 +178,16 @@ midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
 musedata_translate successfully ran 16 tests
 meter successfully ran 107 tests
+musicxml_fromMxObjects successfully ran 65 tests
 metadata_primitives successfully ran 38 tests
 midi___init__ successfully ran 28 tests
-musicxml_fromMxObjects successfully ran 65 tests
 metadata___init__ successfully ran 18 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
 lily_lilyObjects successfully ran 14 tests
 lily___init__ successfully ran 3 tests
 layout successfully ran 22 tests
+languageExcerpts_naturalLanguageObjects successfully ran 5 tests
 languageExcerpts_instrumentLookup successfully ran 3 tests
 languageExcerpts___init__ successfully ran 3 tests
 key successfully ran 19 tests
@@ -209,8 +199,8 @@ humdrum_testFiles successfully ran 3 tests
 humdrum_spineParser successfully ran 32 tests
 humdrum_instruments successfully ran 8 tests
 humdrum___init__ successfully ran 3 tests
-metadata_caching successfully ran 7 tests
 metadata_bundles successfully ran 34 tests
+metadata_caching successfully ran 7 tests
 harmony successfully ran 27 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
@@ -224,47 +214,44 @@ figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
 figuredBass_examples successfully ran 15 tests
 graph successfully ran 62 tests
-features_base successfully ran 27 tests
+features_jSymbolic successfully ran 86 tests
 features___init__ successfully ran 8 tests
 expressions successfully ran 26 tests
 exceptions21 successfully ran 3 tests
 environment successfully ran 27 tests
 editorial successfully ran 10 tests
-dynamics successfully ran 15 tests
+features_base successfully ran 27 tests
 duration successfully ran 66 tests
+dynamics successfully ran 15 tests
 documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
-documentation_library_extensions successfully ran 3 tests
-documentation_library_documenters successfully ran 28 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
+documentation_library_documenters successfully ran 28 tests
 documentation___init__ successfully ran 3 tests
 derivation successfully ran 8 tests
 defaults successfully ran 4 tests
-counterpoint_species successfully ran 27 tests
 counterpoint___init__ successfully ran 3 tests
+counterpoint_species successfully ran 27 tests
 corpus_virtual successfully ran 5 tests
-features_jSymbolic successfully ran 86 tests
 features_native successfully ran 26 tests
-corpus_corpora successfully ran 28 tests
 corpus_chorales successfully ran 9 tests
+corpus_corpora successfully ran 28 tests
 corpus___init__ successfully ran 17 tests
-corpus_testCorpus successfully ran 25 tests
-composition_seeger successfully ran 3 tests
-converter successfully ran 37 tests
 composition_phasing successfully ran 5 tests
 composition___init__ successfully ran 3 tests
-clef successfully ran 28 tests
 common successfully ran 57 tests
-chordTables successfully ran 17 tests
+clef successfully ran 28 tests
 contour successfully ran 10 tests
-chord successfully ran 108 tests
-chant successfully ran 12 tests
-capella_fromCapellaXML successfully ran 20 tests
+chordTables successfully ran 17 tests
 classCache successfully ran 12 tests
+chant successfully ran 12 tests
+chord successfully ran 108 tests
+capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
-braille_translate successfully ran 7 tests
 braille_text successfully ran 4 tests
+braille_translate successfully ran 7 tests
+converter successfully ran 37 tests
 braille_lookup successfully ran 3 tests
 braille_segment successfully ran 11 tests
 braille_basic successfully ran 24 tests
@@ -273,8 +260,9 @@ beam successfully ran 15 tests
 base successfully ran 112 tests
 bar successfully ran 9 tests
 braille_examples successfully ran 5 tests
-audioSearch_recording successfully ran 4 tests
 audioSearch_transcriber successfully ran 4 tests
+audioSearch_recording successfully ran 4 tests
+audioSearch_scoreFollower successfully ran 7 tests
 articulations successfully ran 29 tests
 audioSearch___init__ successfully ran 19 tests
 analysis_search successfully ran 4 tests
@@ -313,6 +301,8 @@ Not in Tree Error: test.testDocs is in the music21 directory but not imported in
 Not in Tree Error: test.testCoverage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.memoryUsage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musicxml.testPrimitive is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musicxml.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test03 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test02 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test01 is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -326,9 +316,11 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -341,66 +333,52 @@ Not in Tree Error:  is in the music21 directory but not imported in music21. Ski
 -----------
 webapps_apps had 0 ERRORS and 1 FAILURES in 6 tests:
 Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
 AssertionError: Failed doctest test for music21.webapps.apps.setupURLCorpusParseApp
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 26, in setupURLCorpusParseApp
+  File "/Users/josiah/Documents/Development/music21base/music21/webapps/apps.py", line 26, in setupURLCorpusParseApp
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 41, in music21.webapps.apps.setupURLCorpusParseApp
+File "/Users/josiah/Documents/Development/music21base/music21/webapps/apps.py", line 41, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
     (responseData, responseContentType) = processor.getOutput()
 Exception raised:
     Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
       File "<doctest music21.webapps.apps.setupURLCorpusParseApp[8]>", line 1, in <module>
         (responseData, responseContentType) = processor.getOutput()
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/__init__.py", line 1133, in getOutput
+      File "/Users/josiah/Documents/Development/music21base/music21/webapps/__init__.py", line 1133, in getOutput
         (output, outputType) = eval(self.outputTemplate)(*argList)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/templates.py", line 75, in musicxmlFile
+      File "/Users/josiah/Documents/Development/music21base/music21/webapps/templates.py", line 75, in musicxmlFile
         musicxmlString = m21ToString.fromMusic21Object(outputStream)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/musicxml/m21ToString.py", line 50, in fromMusic21Object
+      File "/Users/josiah/Documents/Development/music21base/music21/musicxml/m21ToString.py", line 50, in fromMusic21Object
         classes = m21Object.classes
     AttributeError: 'str' object has no attribute 'classes'
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 42, in music21.webapps.apps.setupURLCorpusParseApp
+File "/Users/josiah/Documents/Development/music21base/music21/webapps/apps.py", line 42, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
     responseContentType
 Exception raised:
     Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
       File "<doctest music21.webapps.apps.setupURLCorpusParseApp[9]>", line 1, in <module>
         responseContentType
     NameError: name 'responseContentType' is not defined
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/webapps/apps.py", line 44, in music21.webapps.apps.setupURLCorpusParseApp
+File "/Users/josiah/Documents/Development/music21base/music21/webapps/apps.py", line 44, in music21.webapps.apps.setupURLCorpusParseApp
 Failed example:
     converter.parse(responseData).flat.highestOffset
 Exception raised:
     Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+      File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
       File "<doctest music21.webapps.apps.setupURLCorpusParseApp[10]>", line 1, in <module>
         converter.parse(responseData).flat.highestOffset
     NameError: name 'responseData' is not defined
 
 
-
------------
-scale had 1 ERRORS and 0 FAILURES in 90 tests:
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 3651, in testWeightedHexatonicBluesA
-    self.assertEqual(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'], True)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 2029, in next
-    getNeighbor=getNeighbor
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/scale.py", line 540, in nextPitch
-    getNeighbor = getNeighbor
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/intervalNetwork.py", line 1210, in nextPitch
-    p.octave = pitchOrigin.octave
-AttributeError: 'NoneType' object has no attribute 'octave'
-
 -------------------------------------------------------------------------
-Ran 3945 tests in 513.9021 seconds
-Run at 2014-03-14 22:26:08
+Ran 3916 tests in 416.0176 seconds
+Run at 2014-03-24 16:44:29
