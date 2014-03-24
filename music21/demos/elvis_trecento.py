@@ -107,6 +107,10 @@ class NGramJob(base.SlottedObject):
     def __call__(self):
         score = corpus.parse(self.filename)
         self.debug('PARSED')
+        if 2 < len(score.parts):
+            self.debug('MORE THAN TWO PARTS')
+            self.results = None
+            return
         chordifiedScore = score.chordify()
         self.debug('CHORDIFIED')
         try:
@@ -118,13 +122,13 @@ class NGramJob(base.SlottedObject):
             return
         self.debug('REDUCED')
         for i in range(1, 5):
-            ngrams = self.computeNGrams(reducedScore)
+            ngrams = self.computeNGrams(reducedScore, nGramLength=i)
             if 'chordified' not in self.results:
                 self.results['chordified'] = {}
             self.results['chordified'][i] = ngrams
             self.debug('NGRAMS: {}'.format(i))
         for i in range(1, 5):
-            ngrams = self.computeNGrams(chordifiedScore)
+            ngrams = self.computeNGrams(chordifiedScore, nGramLength=i)
             if 'reduced' not in self.results:
                 self.results['reduced'] = {}
             self.results['reduced'][i] = ngrams
@@ -196,6 +200,7 @@ if __name__ == '__main__':
     import json
     coreCorpus = corpus.CoreCorpus()
     paths = [x for x in coreCorpus.getPaths() if 'trecento' in x]
+    paths = paths[:2]
     paths = [os.path.join('trecento', os.path.split(x)[-1]) for x in paths]
     jobs = []
     jobTotal = len(paths)
@@ -211,9 +216,9 @@ if __name__ == '__main__':
     result = {}
     failedJobs = []
     for job in processedJobs:
-        if job.result:
-            result[job.filename] = job.result
-        else:
+        if job.results:
+            result[job.filename] = job.results
+        elif job.results is not None:
             failedJobs.append(job)
     formattedResult = json.dumps(
         result,
