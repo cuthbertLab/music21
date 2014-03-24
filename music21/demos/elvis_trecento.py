@@ -121,17 +121,15 @@ class NGramJob(base.SlottedObject):
             print e
             return
         self.debug('REDUCED')
+        self.results['chordified'] = []
+        self.results['reduced'] = []
         for i in range(1, 5):
             ngrams = self.computeNGrams(reducedScore, nGramLength=i)
-            if 'chordified' not in self.results:
-                self.results['chordified'] = {}
-            self.results['chordified'][i] = ngrams
+            self.results['chordified'].append(ngrams)
             self.debug('NGRAMS: {}'.format(i))
         for i in range(1, 5):
             ngrams = self.computeNGrams(chordifiedScore, nGramLength=i)
-            if 'reduced' not in self.results:
-                self.results['reduced'] = {}
-            self.results['reduced'][i] = ngrams
+            self.results['reduced'].append(ngrams)
             self.debug('NGRAMS: {}'.format(i))
         self.debug('DONE!')
 
@@ -226,7 +224,7 @@ if __name__ == '__main__':
         separators=(',', ': '),
         sort_keys=True,
         )
-    formatted_result = 'ngrams = ' + formattedResult
+    formattedResult = 'ngrams = ' + formattedResult
     outputDirectory = os.path.abspath(os.path.dirname(__file__))
     outputFilename = os.path.join(outputDirectory, 'elvis_trecento_results.py')
     with open(outputFilename, 'w') as f:
