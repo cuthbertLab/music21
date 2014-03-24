@@ -198,7 +198,7 @@ if __name__ == '__main__':
     import json
     coreCorpus = corpus.CoreCorpus()
     paths = [x for x in coreCorpus.getPaths() if 'trecento' in x]
-    paths = paths[:2]
+    #paths = paths[:2]
     paths = [os.path.join('trecento', os.path.split(x)[-1]) for x in paths]
     jobs = []
     jobTotal = len(paths)
