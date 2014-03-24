@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Demos of research dene on automatic reduction of chords in the Trecento
+Demos of research done on automatic reduction of chords in the Trecento
 repertory.
 
 Used by Josiah and Myke for the ELVIS project
