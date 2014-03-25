@@ -1187,6 +1187,17 @@ class MidiFile(object):
         MidiTrack objects in self.tracks 
         into MIDI data and return it as a string.
         '''
+        midiStr = self.writeMThdStr()
+        for trk in self.tracks: 
+            midiStr = midiStr + trk.write() 
+        return midiStr 
+
+
+    def writeMThdStr(self): 
+        '''
+        Convert the information in self.ticksPerQuarterNote
+        into MIDI data and return it as a string.
+        '''
         division = self.ticksPerQuarterNote 
         # Don't handle ticksPerSecond yet, too confusing 
         if (division & 0x8000) != 0:
@@ -1194,10 +1205,7 @@ class MidiFile(object):
         midiStr = "MThd" + putNumber(6, 4) + putNumber(self.format, 2) 
         midiStr = midiStr + putNumber(len(self.tracks), 2) 
         midiStr = midiStr + putNumber(division, 2) 
-        for trk in self.tracks: 
-            midiStr = midiStr + trk.write() 
-        return midiStr 
-
+        return midiStr
 
 
 

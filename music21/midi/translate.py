@@ -1921,6 +1921,28 @@ def midiFilePathToStream(filePath, inputM21=None):
     mf.close()
     return midiFileToStream(mf, inputM21)
 
+
+def midiAsciiStringToBinaryString(midiFormat = 1, numTracks = 1, eventsList = None):
+    '''
+    Convert a string of Ascii midi data to a binary midi string.
+    '''
+    from music21 import midi as midiModule
+    mf = midiModule.MidiFile()
+    
+    mf.format = midiFormat
+    mf.tracks = numTracks
+
+    midiBinStr = ""
+    midiBinStr = midiBinStr + mf.writeMThdStr()
+    
+    for i in range(numTracks): 
+        trk = midiModule.MidiTrack(i)   # sets the MidiTrack index parameters
+        midiStrTrk = trk.read(eventsList[i])     # pass all the remaining string, reassing
+        mf.tracks.append(trk) 
+        
+    return midiBinStr
+
+
 def midiStringToStream(strData, inputM21):
     '''
     Convert a string of binary midi data to a Music21 stream.Score object.
