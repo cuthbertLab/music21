@@ -1296,8 +1296,14 @@ class TestExternal(unittest.TestCase):
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
-        mxString = testFiles.ALL[1] # @UndefinedVariable
-        a = ConverterMusicXML()
+        for mxString in testFiles.ALL:
+            a = ConverterMusicXML(False)
+            a.parseData(mxString)
+
+    def testMusicXMLTabConversion(self):
+        from music21.musicxml import testFiles
+        mxString = testFiles.ALL[5] # @UndefinedVariable
+        a = ConverterMusicXML(False)
         a.parseData(mxString)
 
     def testConversionMusicXml(self):
