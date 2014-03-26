@@ -1183,9 +1183,8 @@ class MidiFile(object):
     
     def writestr(self): 
         '''
-        Convert the information in self.ticksPerQuarterNote and the list of
-        MidiTrack objects in self.tracks 
-        into MIDI data and return it as a string.
+        Generate the MIDI data header and convert the list of
+        MidiTrack objects in self.tracks into MIDI data and return it as a string.
         '''
         midiStr = self.writeMThdStr()
         for trk in self.tracks: 
@@ -1196,7 +1195,7 @@ class MidiFile(object):
     def writeMThdStr(self): 
         '''
         Convert the information in self.ticksPerQuarterNote
-        into MIDI data and return it as a string.
+        into MIDI data header and return it as a string.
         '''
         division = self.ticksPerQuarterNote 
         # Don't handle ticksPerSecond yet, too confusing 
@@ -1226,6 +1225,22 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
+    def testWriteMThdStr(self):
+        '''
+        Convert a string of Ascii midi data to a binary midi string.
+        '''
+        from binascii import a2b_hex
+        mf = MidiFile()
+        trk = MidiTrack(0)
+        mf.format = 1
+        mf.tracks.append(trk)
+        mf.ticksPerQuarterNote = 960
+    
+        midiBinStr = ""
+        midiBinStr = midiBinStr + mf.writeMThdStr()
+        
+        self.assertEqual(midiBinStr, "MThd"+ a2b_hex("000000060001000103c0") )
 
     def testBasicImport(self):
 
