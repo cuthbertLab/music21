@@ -1922,24 +1922,66 @@ def midiFilePathToStream(filePath, inputM21=None):
     return midiFileToStream(mf, inputM21)
 
 
-def midiAsciiStringToBinaryString(midiFormat = 1, numTracks = 1, eventsList = None):
+def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tracksEventsList = None):
     '''
     Convert a string of Ascii midi data to a binary midi string.
+    
+    tracksEventsList contains a list of tracks which contain also a list of events.
+        asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00']
+    The format of one event is : 'aa bb cc dd'
+        aa = delta time to last event (integer or hex)
+        bb = Midi event type
+        cc = Note number (integer or hex)
+        dd = Velocity (integer or hex)
+    Example: 
+        >>> asciiMidiEventList = []
+        >>> asciiMidiEventList.append('0 90 31 15')
+        >>> midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
     
-    mf.format = midiFormat
-    mf.tracks = numTracks
+    numTracks = len(tracksEventsList)
+
+    if (numTracks == 1):
+        mf.format = 1
+    else:
+        mf.format = midiFormat
+        
+    mf.ticksPerQuarterNote = ticksPerQuarterNote
+
+    if (tracksEventsList != None):
+        for i in range(numTracks):
+            trk = midiModule.MidiTrack(i)   # sets the MidiTrack index parameters
+            for j in tracksEventsList[i]:
+                me = midiModule.MidiEvent(trk)
+                dt = midiModule.DeltaTime(trk)
+                
+                chunk_event_param = str(j).split(" ")
+
+                dt.channel = i
+                dt.time = int(chunk_event_param[0])
+
+                if (chunk_event_param[1] != "FF") :
+                    if (list(chunk_event_param[1])[0] == '8'):
+                        me.type = "NOTE_OFF"
+                    elif (list(chunk_event_param[1])[0] == '9'):
+                        me.type = "NOTE_ON"
+                else:
+                    pass    # Meta events are actually not supported
+                
+                me.channel = i
+                me.pitch = int(chunk_event_param[2])
+                me.velocity = int(chunk_event_param[3])
+                
+                trk.events.append(dt)
+                trk.events.append(me)
+                                
+            mf.tracks.append(trk) 
 
     midiBinStr = ""
-    midiBinStr = midiBinStr + mf.writeMThdStr()
+    midiBinStr = midiBinStr + mf.writestr()
     
-    for i in range(numTracks): 
-        trk = midiModule.MidiTrack(i)   # sets the MidiTrack index parameters
-        midiStrTrk = trk.read(eventsList[i])     # pass all the remaining string, reassing
-        mf.tracks.append(trk) 
-        
     return midiBinStr
 
 
@@ -2001,7 +2043,33 @@ class Test(unittest.TestCase):
     
     def runTest(self):
         pass
+    
+    def testMidiAsciiStringToBinaryString(self):
+        from binascii import a2b_hex
+        from music21 import stream
+        
+        asciiMidiEventList = []
+        asciiMidiEventList.append('0 90 31 15')
+        #asciiMidiEventList.append('3840 80 31 15')
+        
+        #asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00', '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', '0 90 3e 60', '1920 80 3e 00', '0 b0 7b 00', '0 90 24 60', '3840 80 24 00', '0 b0 7b 00']
+        
+        midiTrack = []
+        midiTrack.append(asciiMidiEventList)
+        #midiTrack.append(asciiMidiEventList)
+        #midiTrack.append(asciiMidiEventList)
+        
+        midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
+        
+        self.assertEqual(midiBinStr, "MThd"+ a2b_hex("000000060001000103c0") + "MTrk" + a2b_hex("00000004008f1f0f"))
 
+   #midiStream = stream.Part()
+    #midi.translate.midiStringToStream("", midiStream)
+ 
+        s = stream.Part()
+        s = midiStringToStream(midiBinStr, s)
+        s.show('text')
+        
     def testNote(self):
         from music21 import midi as midiModule
 
