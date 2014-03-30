@@ -1936,6 +1936,8 @@ def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tra
     Example: 
         >>> asciiMidiEventList = []
         >>> asciiMidiEventList.append('0 90 31 15')
+        >>> midiTrack = []
+        >>> midiTrack.append(asciiMidiEventList)
         >>> midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
         >>> s = stream.Stream()
         >>> s = midiStringToStream(midiBinStr, s)
