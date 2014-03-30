@@ -42,7 +42,8 @@ Vexflow generateCode() and fromObject() methods currently accept these modes.
 '''
 supportedDisplayModes = [
     'txt',
-    'html'
+    'html',
+    'jsbody'
 ]
 
 '''
@@ -587,6 +588,26 @@ def fromChord(thisChord, mode='txt'):
 
     ::
 
+        >>> print vexflow.fromChord(a, mode='jsbody')
+        var canvas = $('#music21canvas')[0];
+        var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+        var ctx = renderer.getContext();
+        var stave = new Vex.Flow.Stave(10,0,500);
+        stave.addClef('treble').setContext(ctx).draw();
+        var notes = [new Vex.Flow.StaveNote({keys: ["Cn/3", "Eb/3", "Gn/3", "Cn/4"], duration: "q"})];
+        var voice = new Vex.Flow.Voice({
+            num_beats: 1.0,
+            beat_value: 4,
+            resolution: Vex.Flow.RESOLUTION
+        });
+        voice.addTickables(notes);
+        var formatter = new Vex.Flow.Formatter()
+        formatter.joinVoices([voice])
+        formatter.format([voice], 500);
+        voice.draw(ctx, stave);
+
+    ::
+
         >>> print vexflow.fromChord(a, mode='html')
         <!DOCTYPE HTML>
         <html>
@@ -746,7 +767,7 @@ class VexflowObject(object):
         self.tieStart = False
         self.tieStop = False
         self.clef = clef
-        self.indent = "    "
+        self.indent = " "*4
         self.clefContext = None
         self.setBeamStatus()
         self.setTieStatus()
@@ -810,6 +831,26 @@ class VexflowObject(object):
 
         ::
 
+            >>> print v.generateCode('jsbody')
+            var canvas = $('#music21canvas')[0];
+            var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+            var ctx = renderer.getContext();
+            var stave = new Vex.Flow.Stave(10,0,500);
+            stave.addClef('treble').setContext(ctx).draw();
+            var notes = [new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})];
+            var voice = new Vex.Flow.Voice({
+                num_beats: 1.0,
+                beat_value: 4,
+                resolution: Vex.Flow.RESOLUTION
+            });
+            voice.addTickables(notes);
+            var formatter = new Vex.Flow.Formatter()
+            formatter.joinVoices([voice])
+            formatter.format([voice], 500);
+            voice.draw(ctx, stave);
+
+        ::
+
             >>> print v.generateCode('html')
             <!DOCTYPE HTML>
             <html>
@@ -850,31 +891,39 @@ class VexflowObject(object):
 
         if mode == 'txt':
             return self.vexflowCode()
+        elif mode == 'jsbody':
+            return self.jsBodyCode()
         elif mode == 'html':
-            indent = self.indent
-            result = htmlPreamble + vexflowPreamble
-            defaultStaff = staffString()
-            resultList = [indent * 3,
-                          defaultStaff + "\n",
-                          indent * 3,
-                          self.staveDefaultClefAddString(),
-                          indent * 3,
-                          "var notes = [" + self.vexflowCode() + "];\n",
-                          self.getVoiceString(self.originalObject.duration.quarterLength, currentIndentLevel=3),
-                          indent * 3,
-                          "voice.addTickables(notes);\n",
-                          indent * 3,
-                          "var formatter = new Vex.Flow.Formatter()\n",
-                          indent * 3,
-                          "formatter.joinVoices([voice])\n",
-                          indent * 3,
-                          "formatter.format([voice], " + str(defaultStaveWidth) + ");\n",
-                          indent * 3,
-                          "voice.draw(ctx, stave);"
-                          ]
-            result += ''.join(resultList)
+            result = htmlPreamble
+            result += self.jsBodyCode()
             result += htmlConclusion
             return result
+
+    def jsBodyCode(self):
+        indent = self.indent
+        result = vexflowPreamble
+        defaultStaff = staffString()
+        resultList = [indent * 3,
+                      defaultStaff + "\n",
+                      indent * 3,
+                      self.staveDefaultClefAddString(),
+                      indent * 3,
+                      "var notes = [" + self.vexflowCode() + "];\n",
+                      self.getVoiceString(self.originalObject.duration.quarterLength, currentIndentLevel=3),
+                      indent * 3,
+                      "voice.addTickables(notes);\n",
+                      indent * 3,
+                      "var formatter = new Vex.Flow.Formatter()\n",
+                      indent * 3,
+                      "formatter.joinVoices([voice])\n",
+                      indent * 3,
+                      "formatter.format([voice], " + str(defaultStaveWidth) + ");\n",
+                      indent * 3,
+                      "voice.draw(ctx, stave);"
+                      ]
+        result += ''.join(resultList)
+        return result
+ 
 
     def stemDirectionCode(self):
         '''
@@ -1339,6 +1388,8 @@ class VexflowVoice(object):
             self.originalMeasure = stream.Measure()
             self.originalFlat = self.originalMeasure.flat
 
+        self.indent = " "*4
+   
         self.params = params
         
         self._vexflowObjects = None
@@ -1526,9 +1577,10 @@ class VexflowVoice(object):
             myVoice.addTickables(myVoiceNotes);
 
         '''
-        return self.voiceCode() + '\n' + self.notesCode() + '\n' +\
-            str(self.voiceName) + '.addTickables(' + str(self.voiceName) + \
-            'Notes);'
+        return self.voiceCode() + '\n' +\
+               self.notesCode() + '\n' +\
+               str(self.voiceName) + '.addTickables(' + str(self.voiceName) + \
+               'Notes);'
 
     def getBeaming(self):
         '''
@@ -1571,10 +1623,10 @@ class VexflowVoice(object):
             thisBeam = theseBeams[index]
             thisBeamName = baseBeamName + str(index)
 
-            preamble += '\n' + ('    ' * indentation) + 'var ' + thisBeamName +\
+            preamble += '\n' + (self.indent*indentation) + 'var ' + thisBeamName +\
                 ' = new Vex.Flow.Beam('+noteGroupName+'.slice(' + str(thisBeam[0])+\
                 ',' + str(thisBeam[1]+1) + '));'
-            postamble += '\n' + ('    '*indentation) + thisBeamName + \
+            postamble += '\n' + (self.indent*indentation) + thisBeamName + \
                 '.setContext(' + str(contextName) + ').draw();'
 
         self._beamPreamble = preamble
@@ -1645,26 +1697,26 @@ class VexflowVoice(object):
                 #TODO: add support for multiple ties in a chord
                 thisTieName = baseTieName + str(index)
                 thisTieCode = ''.join([
-                    ('    ' * indentation),
+                    (self.indent * indentation),
                     'var ',
                     thisTieName,
                     ' = new Vex.Flow.StaveTie({\n',
-                    ('    ' * (indentation + 1)),
+                    (self.indent * (indentation + 1)),
                     'first_note: ',
                     noteGroupName,
                     '[' + str(tieStartIndex) + '],\n',
-                    ('    ' * (indentation + 1)),
+                    (self.indent * (indentation + 1)),
                     'last_note: ',
                     noteGroupName,
                     '[' + str(tieEndIndex) + '],\n',
-                    ('    ' * (indentation + 1)),
+                    (self.indent * (indentation + 1)),
                     'first_indices: [0],\n',
-                    ('    ' * (indentation + 1)),
+                    (self.indent * (indentation + 1)),
                     'last_indices: [0]\n',
-                    ('    ' * indentation),
+                    (self.indent * indentation),
                     '});',
                     '\n',
-                    ('    ' * indentation),
+                    (self.indent * indentation),
                     thisTieName,
                     '.setContext(',
                     str(contextName),
@@ -1688,30 +1740,54 @@ class VexflowVoice(object):
         '''
         Returns the vexflow code necessary to display this Voice in a browser
         as a string.
+        
+        ::
+
+        >>> m = stream.Measure()
+        >>> m.append(note.HalfNote("c4"))
+        >>> vfv = vexflow.VexflowVoice(m)
+        >>> print vfv.generateCode(mode="jsbody")
+        <BLANKLINE>
+                    var canvas = $('#music21canvas')[0];
+                    var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+                    var ctx = renderer.getContext();
+                    var stave = new Vex.Flow.Stave(10,0,500);
+                    stave.addClef('treble').setContext(ctx).draw();
+                    var music21Voice0 = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+        var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "h"})];
+        music21Voice0.addTickables(music21Voice0Notes);
+                    var formatter = new Vex.Flow.Formatter().joinVoices([music21Voice0]).format([music21Voice0], 500);
+                    music21Voice0.draw(ctx, stave);
+        <BLANKLINE>
         '''
         if mode == 'txt':
             return self.vexflowCode()
+        elif mode == 'jsbody':
+            return self.jsBodyCode()
         elif mode == 'html':
-            result = htmlPreamble + vexflowPreamble
-            defaultStaff = staffString()
-            result += "".join([
-                "            ",
-                defaultStaff,
-                "\n",
-                "            stave.addClef('",
-                str(defaultStaveClef),
-                "').setContext(ctx).draw();\n",
-                "            ",
-                self.vexflowCode()])
-            result += self.createBeamCode('ctx') +\
-                "\n            var formatter = new Vex.Flow.Formatter()." +\
-                "joinVoices(["+str(self.voiceName)+"]).format([" + \
-                str(self.voiceName)+"], "+str(defaultStaveWidth)+");\n            " +\
-                str(self.voiceName)+".draw(ctx, stave);\n"
-            result += self.drawBeamCode('ctx')
+            result = htmlPreamble
+            result += self.jsBodyCode()
             result += htmlConclusion
             return result
 
+    def jsBodyCode(self):
+        result = vexflowPreamble
+        defaultStaff = staffString()
+        result += "".join([
+            self.indent*3,
+            defaultStaff,
+            "\n",
+            self.indent*3 + "stave.addClef('",
+            str(defaultStaveClef),
+            "').setContext(ctx).draw();\n",
+            self.vexflowCode()])
+        result += self.createBeamCode('ctx') +\
+            "\n"+self.indent*3 + "var formatter = new Vex.Flow.Formatter()." +\
+            "joinVoices(["+str(self.voiceName)+"]).format([" + \
+            str(self.voiceName)+"], "+str(defaultStaveWidth)+");\n"+self.indent*3+\
+            str(self.voiceName)+".draw(ctx, stave);\n"
+        result += self.drawBeamCode('ctx')
+        return result 
 
 class VexflowStave(object):
     '''
@@ -1873,24 +1949,31 @@ class VexflowStave(object):
         '''
         if mode == 'txt':
             return self.vexflowCode()
+        elif mode == 'jsbody':
+            return self.jsBodyCode()
         elif mode == 'html':
-            result = htmlPreamble + vexflowPreamble
-            drawTheseVoices = []
-            drawTheseBeams = []
-            for thisVoice in self.vexflowVoices:
-                (beamPre, beamPost) = thisVoice.beamCode('ctx')
-                result += '\n' + thisVoice.generateCode('txt')
-                result += '\n' + beamPre
-                drawTheseVoices += [str(thisVoice.voiceName) + '.draw(ctx, ' + str(self.staveName) + ');\n']
-                if thisVoice.getBeaming():
-                    drawTheseBeams += [beamPost]
-
-            result += self.vexflowCode()
-            result += '\n' + str(self.staveName) + '.setContext(ctx).draw();'
-            result += '\n' + ''.join(drawTheseVoices) + '\n'
-            result += '\n'.join(drawTheseBeams)
+            result = htmlPreamble 
+            result += self.jsBodyCode()
             result += htmlConclusion
             return result
+
+    def jsBodyCode(self):
+        result = vexflowPreamble
+        drawTheseVoices = []
+        drawTheseBeams = []
+        for thisVoice in self.vexflowVoices:
+            (beamPre, beamPost) = thisVoice.beamCode('ctx')
+            result += '\n' + thisVoice.generateCode('txt')
+            result += '\n' + beamPre
+            drawTheseVoices += [str(thisVoice.voiceName) + '.draw(ctx, ' + str(self.staveName) + ');\n']
+            if thisVoice.getBeaming():
+                drawTheseBeams += [beamPost]
+
+        result += self.vexflowCode()
+        result += '\n' + str(self.staveName) + '.setContext(ctx).draw();'
+        result += '\n' + ''.join(drawTheseVoices) + '\n'
+        result += '\n'.join(drawTheseBeams)
+        return result
 
 class VexflowPart(object):
     '''
@@ -2079,22 +2162,27 @@ class VexflowPart(object):
         '''
         if mode=='txt':
             return self.vexflowCode
+        elif mode == 'jsbody':
+            return self.jsBodyCode()
         elif mode=='html':
             result = htmlCanvasPreamble + self.context.getCanvasHTML() + \
                 htmlCanvasPostamble + '\n'
-            result += self.context.getJSCode(indentation=3) + '\n'
-            result += self.vexflowCode + '\n'
-            for thisStave in self.staves:
-                for thisVoice in thisStave.vexflowVoices:
-                    result += str(thisVoice.voiceName) + '.draw(' + \
-                    self.context.contextName + ', ' + \
-                    str(thisStave.staveName) + ');\n' + \
-                    str(thisStave.staveName) + '.setContext(' + \
-                    self.context.contextName + ').draw();'
-
+            result += self.context.getCanvasCode(indentation=3) + '\n'
+            result += self.jsBodyCode()
             result += htmlConclusion
             return result
     
+    def jsBodyCode(self):
+        result = self.context.getRenderContextCode(indentation=3) + '\n'
+        result += self.vexflowCode + '\n'
+        for thisStave in self.staves:
+            for thisVoice in thisStave.vexflowVoices:
+                result += str(thisVoice.voiceName) + '.draw(' + \
+                self.context.contextName + ', ' + \
+                str(thisStave.staveName) + ');\n' + \
+                str(thisStave.staveName) + '.setContext(' + \
+                self.context.contextName + ').draw();'
+        return result
 
 
 class VexflowScore(object):
@@ -2145,6 +2233,69 @@ class VexflowScore(object):
         vexflowCode = self.context.getJSCode(indentation=3) + '\n'
         vexflowCode += self.partsCode
         return vexflowCode
+
+    def jsBodyCode(self):
+        vfc = self.vexflowCode() # sets too many other things currently, such as context
+        result = vfc + '\n'
+
+        tieCode = ''
+        partialTies = []
+        
+        for thisPart in self.vexflowParts:
+            for thisStave in thisPart.staves:
+                for thisVoice in thisStave.vexflowVoices:
+                    contextName = self.context.contextName
+                    (thisTieCode, thesePartialTies) = thisVoice.tieCode(contextName)
+                    thesePartialTies = [(thisPartialTie + [thisStave.getLineNum()]) for thisPartialTie in thesePartialTies]
+                    tieCode += '\n'
+                    tieCode += '\n'.join(thisTieCode)
+                    partialTies += thesePartialTies
+                    result += thisVoice.createBeamCode(contextName)
+                    result += str(thisVoice.voiceName) + '.draw(' + \
+                        contextName + ', ' + \
+                        str(thisStave.staveName) + ');\n' + \
+                        str(thisStave.staveName) + '.setContext(' + \
+                        contextName + ').draw();'
+                    result += thisVoice.drawBeamCode(contextName)
+
+        tieStart = True
+        thisTieStart = None
+        thisStartLineNum = None
+        tieNum = 0
+        for (thisTie, thisName, thisLineNum) in partialTies:
+            if tieStart:
+                thisTieStart = str(thisName)+'['+str(thisTie[0])+']'
+                thisStartLineNum = thisLineNum
+                tieStart = False
+            else:
+                thisTieEnd = str(thisName)+'['+str(thisTie[1])+']'
+
+                if thisTieStart == None or thisTieEnd == None:
+                    print 'uh oh... got mixed up somewhere'
+                    print partialTies
+                    print 'Ignoring'
+                    tieStart = True
+                    continue
+
+                thisTieName = self.context.contextName + 'Tie' + \
+                    str(tieNum)
+
+                if thisLineNum != thisStartLineNum:
+                    result +='\nvar '+thisTieName+'Start = new Vex.Flow.StaveTie({\n'+'first_note: '+thisTieStart+'\n});'
+                    result +='\nvar '+thisTieName+'End = new Vex.Flow.StaveTie({\n'+'last_note: '+thisTieEnd+'\n});'
+                    result += '\n'+thisTieName+'Start.setContext('+self.context.contextName+').draw();'
+                    result += '\n'+thisTieName+'End.setContext('+self.context.contextName+').draw();'
+                    tieStart = True
+                    continue
+
+                result +='\nvar '+thisTieName+' = new Vex.Flow.StaveTie({\n'+\
+                    'first_note: '+thisTieStart+',\nlast_note: '+thisTieEnd\
+                    +',\nfirst_indices: [0],\nlast_indices: [0]\n});'
+                result += '\n'+thisTieName+'.setContext('+\
+                    self.context.contextName+').draw();'
+                tieStart = True
+                
+        return result
     
     def generateCode(self, mode='txt'):
         '''
@@ -2152,72 +2303,15 @@ class VexflowScore(object):
         '''
         if mode == 'txt':
             return self.vexflowCode()
+        elif mode == 'jsbody':
+            return self.jsBodyCode()
         elif mode=='html':
-            vfc = self.vexflowCode() # sets too many other things currently, such as context
+            jsBody = self.jsBodyCode()
             result = htmlCanvasPreamble + str(self.context.getCanvasHTML()) + \
                 htmlCanvasPostamble + '\n'
-            result += vfc + '\n'
-
-            tieCode = ''
-            partialTies = []
-            
-            for thisPart in self.vexflowParts:
-                for thisStave in thisPart.staves:
-                    for thisVoice in thisStave.vexflowVoices:
-                        contextName = self.context.contextName
-                        (thisTieCode, thesePartialTies) = thisVoice.tieCode(contextName)
-                        thesePartialTies = [(thisPartialTie + [thisStave.getLineNum()]) for thisPartialTie in thesePartialTies]
-                        tieCode += '\n'
-                        tieCode += '\n'.join(thisTieCode)
-                        partialTies += thesePartialTies
-                        result += thisVoice.createBeamCode(contextName)
-                        result += str(thisVoice.voiceName) + '.draw(' + \
-                            contextName + ', ' + \
-                            str(thisStave.staveName) + ');\n' + \
-                            str(thisStave.staveName) + '.setContext(' + \
-                            contextName + ').draw();'
-                        result += thisVoice.drawBeamCode(contextName)
-
-            tieStart = True
-            thisTieStart = None
-            thisStartLineNum = None
-            tieNum = 0
-            for (thisTie, thisName, thisLineNum) in partialTies:
-                if tieStart:
-                    thisTieStart = str(thisName)+'['+str(thisTie[0])+']'
-                    thisStartLineNum = thisLineNum
-                    tieStart = False
-                else:
-                    thisTieEnd = str(thisName)+'['+str(thisTie[1])+']'
-
-                    if thisTieStart == None or thisTieEnd == None:
-                        print 'uh oh... got mixed up somewhere'
-                        print partialTies
-                        print 'Ignoring'
-                        tieStart = True
-                        continue
-
-                    thisTieName = self.context.contextName + 'Tie' + \
-                        str(tieNum)
-
-                    if thisLineNum != thisStartLineNum:
-                        result +='\nvar '+thisTieName+'Start = new Vex.Flow.StaveTie({\n'+'first_note: '+thisTieStart+'\n});'
-                        result +='\nvar '+thisTieName+'End = new Vex.Flow.StaveTie({\n'+'last_note: '+thisTieEnd+'\n});'
-                        result += '\n'+thisTieName+'Start.setContext('+self.context.contextName+').draw();'
-                        result += '\n'+thisTieName+'End.setContext('+self.context.contextName+').draw();'
-                        tieStart = True
-                        continue
-
-                    result +='\nvar '+thisTieName+' = new Vex.Flow.StaveTie({\n'+\
-                        'first_note: '+thisTieStart+',\nlast_note: '+thisTieEnd\
-                        +',\nfirst_indices: [0],\nlast_indices: [0]\n});'
-                    result += '\n'+thisTieName+'.setContext('+\
-                        self.context.contextName+').draw();'
-                    tieStart = True
-
+            result += jsBody
             result += htmlConclusion
             return result
-
 
 class VexflowContext(object):
     '''
@@ -2325,14 +2419,25 @@ class VexflowContext(object):
             self.generateHTML(applyAttributes=applyAttributes)
 
         return self.canvasHTML
+
+    def getCanvasCode(self, indentation=1, cache=True, applyAttributes=True):
+        if not cache or not self.canvasJSCode:
+            self.generateJS(applyAttributes=applyAttributes)
+        jsCode = self.canvasJSCode + '\n' + ('    ' * indentation)
+        return jsCode
+
+    def getRenderContextCode(self, indentation=1, cache=True, applyAttributes=True):
+        if not cache or not self.rendererCode or not self.contextCode:
+            self.generateJS(applyAttributes=applyAttributes)
+        jsCode = self.rendererCode + '\n' + ('    ' * indentation)
+        jsCode += self.contextCode + '\n' + ('    ' * indentation)
+        return jsCode
        
     def getJSCode(self, indentation=1, cache=True, applyAttributes=True):
         if not cache or not self.canvasJSCode or not self.rendererCode or not self.contextCode:
             self.generateJS(applyAttributes=applyAttributes)
-
-        jsCode = self.canvasJSCode + '\n' + ('    ' * indentation)
-        jsCode += self.rendererCode + '\n' + ('    ' * indentation)
-        jsCode += self.contextCode + '\n' + ('    ' * indentation)
+        jsCode = self.getCanvasCode(indentation, cache, applyAttributes)
+        jsCode += self.getRenderContextCode(indentation, cache, applyAttributes)
         return jsCode
 
     def setHeight(self, height):
