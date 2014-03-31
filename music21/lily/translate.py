@@ -2295,9 +2295,10 @@ class LilypondConverter(object):
             pass
         fileform = fileName + '.' + format
         if not os.path.exists(fileform):
+            # cannot find full path; try current directory
             fileend = os.path.basename(fileform)
             if not os.path.exists(fileend):
-                raise LilyTranslateException("cannot find " + fileend + " original file was " + fileName)
+                raise LilyTranslateException("cannot find " + fileend + " or the full path " + fileform + " original file was " + fileName)
             else:
                 fileform = fileend
         return fileform
