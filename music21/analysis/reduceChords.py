@@ -82,19 +82,41 @@ class ChordReducer(object):
 
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
+        if allowableChords is not None:
+            assert all(isinstance(x, chord.Chord) for x in allowableChords)
+            intervalClassSets = []
+            for chord in allowableChords:
+                intervalClassSet = self._getIntervalClassSet(chord.pitches)
+                intervalClassSets.append(intervalClassSet)
+            allowableChords = frozenset(intervalClassSets)
+
+        if forbiddenChords is not None:
+            assert all(isinstance(x, chord.Chord) for x in forbiddenChords)
+            intervalClassSets = []
+            for chord in allowableChords:
+                intervalClassSet = self._getIntervalClassSet(chord.pitches)
+                intervalClassSets.append(intervalClassSet)
+            forbiddenChords = frozenset(intervalClassSets)
+
         self.removeZeroDurationTimespans(tree)
         self.splitByBass(tree)
-        self.removeVerticalDissonances(tree)
+        self.removeVerticalDissonances(
+            tree=tree,
+            allowableChords=allowableChords,
+            forbiddenChords=forbiddenChords,
+            )
 
         partwiseTrees = tree.toPartwiseOffsetTrees()
 
         self.fillBassGaps(tree, partwiseTrees)
+
         self.removeShortTimespans(tree, partwiseTrees, duration=0.5)
         self.fillBassGaps(tree, partwiseTrees)
         self.fillMeasureGaps(tree, partwiseTrees)
+
         self.removeShortTimespans(tree, partwiseTrees, duration=1.0)
-        self.fillMeasureGaps(tree, partwiseTrees)
         self.fillBassGaps(tree, partwiseTrees)
+        self.fillMeasureGaps(tree, partwiseTrees)
 
         reduction = stream.Score()
         #partwiseReduction = tree.toPartwiseScore()
@@ -150,7 +172,7 @@ class ChordReducer(object):
                 if 6 < interval:
                     interval = 12 - interval
                 result.add(interval)
-        return result
+        return frozenset(result)
 
     def _iterateElementsPairwise(self, stream):
         elementBuffer = []
@@ -624,7 +646,12 @@ class ChordReducer(object):
             tree.remove(timespansToRemove)
             subtree.remove(timespansToRemove)
 
-    def removeVerticalDissonances(self, tree):
+    def removeVerticalDissonances(
+        self,
+        tree=None,
+        allowableChords=None,
+        forbiddenChords=None,
+        ):
         r'''
         Removes timespans in each dissonant verticality of `tree` whose pitches
         are above the lowest pitch in that verticality.
