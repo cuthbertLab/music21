@@ -22,7 +22,7 @@ from music21 import meter
 from music21 import note
 from music21 import pitch
 from music21 import stream
-from music21 import tie
+#from music21 import tie
 
 environLocal = environment.Environment('reduceChords')
 
@@ -245,7 +245,7 @@ class ChordReducer(object):
             #        ):
             #        continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for part, timespans in horizontalities.iteritems():
+            for unused_part, timespans in horizontalities.iteritems():
                 if len(timespans) < 2:
                     continue
                 elif timespans[0].pitches == timespans[1].pitches:
@@ -330,7 +330,7 @@ class ChordReducer(object):
         def procedure(timespan):
             verticality = tree.getVerticalityAt(timespan.startOffset)
             return verticality.bassTimespan
-        for part, subtree in partwiseTrees.iteritems():
+        for unused_part, subtree in partwiseTrees.iteritems():
             timespans = [x for x in subtree]
             for bassTimespan, group in itertools.groupby(timespans, procedure):
                 group = list(group)
@@ -385,11 +385,11 @@ class ChordReducer(object):
         r'''
         Fills measure gaps in `tree`.
         '''
-        for part, subtree in partwiseTrees.iteritems():
+        for unused_part, subtree in partwiseTrees.iteritems():
             toRemove = set()
             toInsert = set()
-            for measureNumber, group in itertools.groupby(
-                subtree, lambda x: x.measureNumber):
+            for unused_measureNumber, group in itertools.groupby(
+                              subtree, lambda x: x.measureNumber):
                 group = list(group)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
@@ -434,7 +434,7 @@ class ChordReducer(object):
         mapping = tree.toPartwiseOffsetTrees()
         subtree = mapping[part]
         timespans = [x for x in subtree]
-        for key, group in itertools.groupby(timespans, procedure):
+        for unused_key, group in itertools.groupby(timespans, procedure):
             #measureNumber, pitches = key
             group = list(group)
             if len(group) == 1:
@@ -583,10 +583,8 @@ class ChordReducer(object):
         Removes timespans containing passing and neighbor tones from `tree`.
         '''
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
-            if len(verticalities) < 3:
-                continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for part, horizontality in horizontalities.iteritems():
+            for unused_part, horizontality in horizontalities.iteritems():
                 if not horizontality.hasPassingTone and \
                     not horizontality.hasNeighborTone:
                     continue
@@ -616,10 +614,10 @@ class ChordReducer(object):
                 if bassTimespan.duration < duration:
                     bassTimespan = None
             return measureNumber, isShort, bassTimespan
-        for part, subtree in partwiseTrees.iteritems():
+        for unused_part, subtree in partwiseTrees.iteritems():
             timespansToRemove = []
             for key, group in itertools.groupby(subtree, procedure):
-                measureNumber, isShort, bassTimespan = key
+                unused_measureNumber, isShort, bassTimespan = key
                 group = list(group)
                 if not isShort:
                     continue
@@ -635,7 +633,7 @@ class ChordReducer(object):
                     counter = collections.Counter()
                     for timespan in group:
                         counter[timespan.pitches] += timespan.duration
-                    bestPitches, totalDuration = counter.most_common()[0]
+                    bestPitches, unused_totalDuration = counter.most_common()[0]
                     for timespan in group:
                         if timespan.pitches != bestPitches:
                             timespansToRemove.append(timespan)
