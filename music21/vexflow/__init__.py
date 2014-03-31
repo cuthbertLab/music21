@@ -23,6 +23,7 @@ Here's the hierarchy:
 '''
 
 import unittest
+import indent
 
 from music21 import common
 from music21 import exceptions21
@@ -256,15 +257,15 @@ Variables used in generating full HTML pages within which to view the VexFlow
 '''
 #vexflowGlobalCopy = "<script src='http://www.vexflow.com/vexflow.js'/></script>"
 vexflowGlobalCopy = "<script src='http://www.vexflow.com/support/vexflow-min.js'></script>"
-htmlCanvasPreamble = "".join([r'''<!DOCTYPE HTML>
+htmlCanvasPreamble = r"""<!DOCTYPE HTML>
 <html>
 <head>
     <meta name='author' content='Music21' />
     <script src='http://code.jquery.com/jquery-latest.js'></script>
-    ''', vexflowGlobalCopy, r'''
+    {vexflowGlobalCopy}
 </head>
 <body>
-'''])
+""".format(vexflowGlobalCopy=vexflowGlobalCopy)
 
 htmlPreamble = htmlCanvasPreamble + r'''    <canvas width="525" height="120" id='music21canvas'></canvas>
     <script>
@@ -277,11 +278,11 @@ htmlCanvasPostamble=r'''
         $(document).ready(function(){
 '''
 
-vexflowPreamble = r'''            
-            var canvas = $('#music21canvas')[0];
-            var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-            var ctx = renderer.getContext();
-'''
+vexflowPreamble = """\
+var canvas = $('#music21canvas')[0];
+var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+var ctx = renderer.getContext();
+"""
 
 htmlConclusion = r'''
         });
@@ -345,14 +346,10 @@ def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultSta
 
     '''
 
-    defaultStaff = "".join(
-            ['var ' + staveName + ' = new Vex.Flow.Stave(',
-             xPosStr,
-             ",",
-             yPosStr,
-             ",",
-             staffWidth,
-             ");"])
+    defaultStaff = "var {staveName} = new Vex.Flow.Stave({xPosStr},{yPosStr},{staffWidth});".format(staveName=staveName,
+                                                                                                      xPosStr=xPosStr,
+                                                                                                      yPosStr=yPosStr,
+                                                                                                      staffWidth=staffWidth)
     return defaultStaff
 
 
@@ -797,23 +794,18 @@ class VexflowObject(object):
             });
 
         '''
-        indent = self.indent
-        resultList = [
-                      indent * currentIndentLevel,
-                      "var " + voiceName + " = new Vex.Flow.Voice({\n",
-                      indent * (currentIndentLevel+1),
-                      "num_beats: " + str(numBeats) + ",\n",
-                      indent * (currentIndentLevel+1),
-                      "beat_value: 4,\n",
-                      indent * (currentIndentLevel+1),
-                      "resolution: Vex.Flow.RESOLUTION\n",
-                      indent * currentIndentLevel,
-                      "});\n"
-                      ]
-        return ''.join(resultList)
+        result = """\
+var {voiceName} = new Vex.Flow.Voice({{
+    num_beats: {numBeats},
+    beat_value: 4,
+    resolution: Vex.Flow.RESOLUTION
+}});\
+        """.format(voiceName=voiceName, 
+                   numBeats = str(numBeats))
+        return indent.indent(result, self.indent*currentIndentLevel)
 
     def staveDefaultClefAddString(self):
-        return "stave.addClef('" + str(defaultStaveClef) + "').setContext(ctx).draw();\n"
+        return "stave.addClef('{defaultStaveClef}').setContext(ctx).draw();".format(defaultStaveClef=defaultStaveClef)
 
     def generateCode(self, mode="txt"):
         '''
@@ -900,30 +892,21 @@ class VexflowObject(object):
             return result
 
     def jsBodyCode(self):
-        indent = self.indent
-        result = vexflowPreamble
-        defaultStaff = staffString()
-        resultList = [indent * 3,
-                      defaultStaff + "\n",
-                      indent * 3,
-                      self.staveDefaultClefAddString(),
-                      indent * 3,
-                      "var notes = [" + self.vexflowCode() + "];\n",
-                      self.getVoiceString(self.originalObject.duration.quarterLength, currentIndentLevel=3),
-                      indent * 3,
-                      "voice.addTickables(notes);\n",
-                      indent * 3,
-                      "var formatter = new Vex.Flow.Formatter()\n",
-                      indent * 3,
-                      "formatter.joinVoices([voice])\n",
-                      indent * 3,
-                      "formatter.format([voice], " + str(defaultStaveWidth) + ");\n",
-                      indent * 3,
-                      "voice.draw(ctx, stave);"
-                      ]
-        result += ''.join(resultList)
-        return result
- 
+        result = """
+{defaultStaff}
+{staveDefaultClef}
+var notes = [{vexflowCode}];
+{voiceString}
+voice.addTickables(notes);
+var formatter = new Vex.Flow.Formatter()
+formatter.joinVoices([voice])
+formatter.format([voice], {defaultStaveWidth});
+voice.draw(ctx, stave);""".format(defaultStaff=staffString(),
+                   staveDefaultClef=self.staveDefaultClefAddString(),
+                   vexflowCode=self.vexflowCode(),
+                   voiceString=self.getVoiceString(self.originalObject.duration.quarterLength, currentIndentLevel=0),
+                   defaultStaveWidth=defaultStaveWidth)
+        return vexflowPreamble + "\n" + result
 
     def stemDirectionCode(self):
         '''
@@ -1136,10 +1119,9 @@ class VexflowObject(object):
     
         thisPitchName = thisPitch.step
         thisPitchOctave = thisPitch.implicitOctave
-        thisKey = ''.join([thisPitchName,
-                           thisVexflowAccidental,
-                           "/",
-                           str(thisPitchOctave)])
+        thisKey = '{p}{a}/{o}'.format(p=thisPitchName,
+                                      a=thisVexflowAccidental,
+                                      o=str(thisPitchOctave))
         return thisKey
 
     def vexflowDuration(self):
@@ -1498,13 +1480,9 @@ class VexflowVoice(object):
 
         '''
         
-        return ''.join(['var ',
-                        str(self.voiceName),
-                        ' = new Vex.Flow.Voice({',
-                        'num_beats: ' + str(self.numBeats) + ', ',
-                        'beat_value: ' + str(self.beatValue) + ', ',
-                        'resolution: Vex.Flow.RESOLUTION});'])
-
+        return """var {vn} = new Vex.Flow.Voice({{num_beats: {nb}, beat_value: {bv}, resolution: Vex.Flow.RESOLUTION}});""".format(vn=str(self.voiceName),
+                                                                                                                                 nb=str(self.numBeats),
+                                                                                                                                 bv=str(self.beatValue))
     def vexflowObjects(self):
         '''
         Returns a list of all the ``notesAndRests`` in the ``originalMeasure``
@@ -1659,6 +1637,28 @@ class VexflowVoice(object):
         to which element [0][0] belongs.
             
         N.B. Bug: Only the first index of a chord is tied.
+        Returns a string that generates the code necessary to display this voice.
+
+        ::
+
+            >>> s = stream.Measure()
+            >>> n1 = note.Note('c4')
+            >>> n1.tie = tie.Tie("start")
+            >>> n2 = note.Note('c4')
+            >>> n2.tie = tie.Tie("stop")
+            >>> s.append(n1)
+            >>> s.append(n2)
+            >>> vfv = vexflow.VexflowVoice(s)
+            >>> vfv.voiceName = 'myVoice'
+            >>> print vfv.tieCode()[0][0]
+                var myVoiceTie0 = new Vex.Flow.StaveTie({
+                    first_note: myVoiceNotes[0],
+                    last_note: myVoiceNotes[1],
+                    first_indices: [0],
+                    last_indices: [0]
+                });
+                myVoiceTie0.setContext(ctx).draw();
+
         '''
         baseTieName = str(self.voiceName) + 'Tie'
         noteGroupName = str(self.voiceName) + 'Notes'
@@ -1696,33 +1696,20 @@ class VexflowVoice(object):
             if tieStartIndex != None and tieEndIndex != None:
                 #TODO: add support for multiple ties in a chord
                 thisTieName = baseTieName + str(index)
-                thisTieCode = ''.join([
-                    (self.indent * indentation),
-                    'var ',
-                    thisTieName,
-                    ' = new Vex.Flow.StaveTie({\n',
-                    (self.indent * (indentation + 1)),
-                    'first_note: ',
-                    noteGroupName,
-                    '[' + str(tieStartIndex) + '],\n',
-                    (self.indent * (indentation + 1)),
-                    'last_note: ',
-                    noteGroupName,
-                    '[' + str(tieEndIndex) + '],\n',
-                    (self.indent * (indentation + 1)),
-                    'first_indices: [0],\n',
-                    (self.indent * (indentation + 1)),
-                    'last_indices: [0]\n',
-                    (self.indent * indentation),
-                    '});',
-                    '\n',
-                    (self.indent * indentation),
-                    thisTieName,
-                    '.setContext(',
-                    str(contextName),
-                    ').draw();'
-                    ])
-                fullTies.append(thisTieCode)
+                thisTieCode = """\
+var {tn} = new Vex.Flow.StaveTie({{
+    first_note: {ngn}[{tsi}],
+    last_note: {ngn}[{tei}],
+    first_indices: [0],
+    last_indices: [0]
+}});
+{ttn}.setContext({cn}).draw();""".format(tn=thisTieName,
+                                         ngn=noteGroupName,
+                                         tsi=str(tieStartIndex),
+                                         tei=str(tieEndIndex),
+                                         ttn=thisTieName,
+                                         cn=str(contextName))
+                fullTies.append(indent.indent(thisTieCode,self.indent*indentation))
             else:
                 partialTies.append([theseTies[index], noteGroupName])
         return (fullTies, partialTies)
@@ -1747,15 +1734,15 @@ class VexflowVoice(object):
         >>> m.append(note.HalfNote("c4"))
         >>> vfv = vexflow.VexflowVoice(m)
         >>> print vfv.generateCode(mode="jsbody")
-        <BLANKLINE>
                     var canvas = $('#music21canvas')[0];
                     var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
                     var ctx = renderer.getContext();
                     var stave = new Vex.Flow.Stave(10,0,500);
                     stave.addClef('treble').setContext(ctx).draw();
                     var music21Voice0 = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
-        var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "h"})];
-        music21Voice0.addTickables(music21Voice0Notes);
+                    var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "h"})];
+                    music21Voice0.addTickables(music21Voice0Notes);
+        <BLANKLINE>
                     var formatter = new Vex.Flow.Formatter().joinVoices([music21Voice0]).format([music21Voice0], 500);
                     music21Voice0.draw(ctx, stave);
         <BLANKLINE>
@@ -1773,21 +1760,21 @@ class VexflowVoice(object):
     def jsBodyCode(self):
         result = vexflowPreamble
         defaultStaff = staffString()
-        result += "".join([
-            self.indent*3,
-            defaultStaff,
-            "\n",
-            self.indent*3 + "stave.addClef('",
-            str(defaultStaveClef),
-            "').setContext(ctx).draw();\n",
-            self.vexflowCode()])
-        result += self.createBeamCode('ctx') +\
-            "\n"+self.indent*3 + "var formatter = new Vex.Flow.Formatter()." +\
-            "joinVoices(["+str(self.voiceName)+"]).format([" + \
-            str(self.voiceName)+"], "+str(defaultStaveWidth)+");\n"+self.indent*3+\
-            str(self.voiceName)+".draw(ctx, stave);\n"
-        result += self.drawBeamCode('ctx')
-        return result 
+        result += """\
+{defaultStaff}
+stave.addClef('{defaultStaveClef}').setContext(ctx).draw();
+{vexflowCode}
+{beamCode}
+var formatter = new Vex.Flow.Formatter().joinVoices([{vn}]).format([{vn}], {defaultStaveWidth});
+{vn}.draw(ctx, stave);
+{drawBeamCode}""".format(defaultStaff=defaultStaff,
+                                 defaultStaveClef=str(defaultStaveClef),
+                                 vexflowCode=self.vexflowCode(),
+                                 beamCode=self.createBeamCode('ctx'),
+                                 vn=str(self.voiceName),
+                                 defaultStaveWidth=str(defaultStaveWidth),
+                                 drawBeamCode=self.drawBeamCode('ctx'))
+        return indent.indent(result, self.indent*3) 
 
 class VexflowStave(object):
     '''
