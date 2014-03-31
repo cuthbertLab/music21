@@ -86,16 +86,16 @@ class ChordReducer(object):
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)
             intervalClassSets = []
-            for chord in allowableChords:
-                intervalClassSet = self._getIntervalClassSet(chord.pitches)
+            for x in allowableChords:
+                intervalClassSet = self._getIntervalClassSet(x.pitches)
                 intervalClassSets.append(intervalClassSet)
             allowableChords = frozenset(intervalClassSets)
 
         if forbiddenChords is not None:
             assert all(isinstance(x, chord.Chord) for x in forbiddenChords)
             intervalClassSets = []
-            for chord in allowableChords:
-                intervalClassSet = self._getIntervalClassSet(chord.pitches)
+            for x in allowableChords:
+                intervalClassSet = self._getIntervalClassSet(x.pitches)
                 intervalClassSets.append(intervalClassSet)
             forbiddenChords = frozenset(intervalClassSets)
 
@@ -136,8 +136,8 @@ class ChordReducer(object):
         reduction.append(chordifiedPart)
 
         if closedPosition:
-            for chord in reduction.flat.getElementsByClass('Chord'):
-                chord.closedPosition(forceOctave=4, inPlace=True)
+            for x in reduction.flat.getElementsByClass('Chord'):
+                x.closedPosition(forceOctave=4, inPlace=True)
 
         return reduction
 
@@ -166,6 +166,8 @@ class ChordReducer(object):
                 if 6 < interval:
                     interval = 12 - interval
                 result.add(interval)
+        if 0 in result:
+            result.remove(0)
         return frozenset(result)
 
     def _iterateElementsPairwise(self, stream):
@@ -653,6 +655,7 @@ class ChordReducer(object):
             isConsonant = False
             pitches = verticality.pitchSet
             intervalClassSet = self._getIntervalClassSet(pitches)
+            #print verticality, intervalClassSet, allowableChords, forbiddenChords
             if allowableChords and intervalClassSet in allowableChords:
                 isConsonant = True
             if verticality.isConsonant:
@@ -660,7 +663,9 @@ class ChordReducer(object):
             if forbiddenChords and intervalClassSet in forbiddenChords:
                 isConsonant = False
             if isConsonant:
+                #print '\tCONSONANT'
                 continue
+            #print '\tNOT CONSONANT'
             pitchSet = verticality.pitchSet
             lowestPitch = min(pitchSet)
             for timespan in verticality.startTimespans:
@@ -717,12 +722,14 @@ class TestExternal(unittest.TestCase):
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
         #score = corpus.parse('PMFC_12_13').measures(1, 40)
-        score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 20)
+        score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 8)
 
         chordReducer = ChordReducer()
         reduction = chordReducer(
             score,
-            allowableChords=None,
+            allowableChords=(
+                chord.Chord("F#4 A4 C5"),
+                ),
             closedPosition=True,
             forbiddenChords=None,
             maximumNumberOfChords=3,
