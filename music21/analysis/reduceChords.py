@@ -645,7 +645,16 @@ class ChordReducer(object):
         are above the lowest pitch in that verticality.
         '''
         for verticality in tree.iterateVerticalities():
+            isConsonant = False
+            pitches = verticality.pitchSet
+            intervalClassSet = self._getIntervalClassSet(pitches)
+            if allowableChords and intervalClassSet in allowableChords:
+                isConsonant = True
             if verticality.isConsonant:
+                isConsonant = True
+            if forbiddenChords and intervalClassSet in forbiddenChords:
+                isConsonant = False
+            if isConsonant:
                 continue
             pitchSet = verticality.pitchSet
             lowestPitch = min(pitchSet)
