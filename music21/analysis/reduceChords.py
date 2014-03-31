@@ -73,25 +73,51 @@ class ChordReducer(object):
     def __call__(
         self,
         inputScore,
+        allowableChords=None,
+        closedPosition=False,
+        forbiddenChords=None,
+        maximumNumberOfChords=3,
         ):
         from music21.analysis import offsetTree
         assert isinstance(inputScore, stream.Score)
 
         tree = offsetTree.OffsetTree.fromScore(inputScore)
 
+        if allowableChords is not None:
+            assert all(isinstance(x, chord.Chord) for x in allowableChords)
+            intervalClassSets = []
+            for chord in allowableChords:
+                intervalClassSet = self._getIntervalClassSet(chord.pitches)
+                intervalClassSets.append(intervalClassSet)
+            allowableChords = frozenset(intervalClassSets)
+
+        if forbiddenChords is not None:
+            assert all(isinstance(x, chord.Chord) for x in forbiddenChords)
+            intervalClassSets = []
+            for chord in allowableChords:
+                intervalClassSet = self._getIntervalClassSet(chord.pitches)
+                intervalClassSets.append(intervalClassSet)
+            forbiddenChords = frozenset(intervalClassSets)
+
         self.removeZeroDurationTimespans(tree)
         self.splitByBass(tree)
-        self.removeVerticalDissonances(tree)
+        self.removeVerticalDissonances(
+            tree=tree,
+            allowableChords=allowableChords,
+            forbiddenChords=forbiddenChords,
+            )
 
         partwiseTrees = tree.toPartwiseOffsetTrees()
 
         self.fillBassGaps(tree, partwiseTrees)
+
         self.removeShortTimespans(tree, partwiseTrees, duration=0.5)
         self.fillBassGaps(tree, partwiseTrees)
         self.fillMeasureGaps(tree, partwiseTrees)
+
         self.removeShortTimespans(tree, partwiseTrees, duration=1.0)
-        self.fillMeasureGaps(tree, partwiseTrees)
         self.fillBassGaps(tree, partwiseTrees)
+        self.fillMeasureGaps(tree, partwiseTrees)
 
         reduction = stream.Score()
         #partwiseReduction = tree.toPartwiseScore()
@@ -102,27 +128,20 @@ class ChordReducer(object):
         for measure in chordifiedReduction:
             reducedMeasure = self.reduceMeasureToNChords(
                 measure,
-                numChords=3,
+                maximumNumberOfChords=maximumNumberOfChords,
                 weightAlgorithm=self.qlbsmpConsonance,
                 trimBelow=0.25,
                 )
             chordifiedPart.append(reducedMeasure)
         reduction.append(chordifiedPart)
-        for part in reduction:
-            self._applyTies(part)
+
+        if closedPosition:
+            for chord in reduction.flat.getElementsByClass('Chord'):
+                chord.closedPosition(forceOctave=4, inPlace=True)
 
         return reduction
 
     ### PRIVATE METHODS ###
-
-    def _applyTies(self, part):
-        for one, two in self._iterateElementsPairwise(part):
-            if one.isNote and two.isNote:
-                if one.pitch == two.pitch:
-                    one.tie = tie.Tie('start')
-            elif one.isChord and two.isChord:
-                if one.pitches == two.pitches:
-                    one.tie = tie.Tie('start')
 
     @staticmethod
     def _debug(tree):
@@ -147,7 +166,7 @@ class ChordReducer(object):
                 if 6 < interval:
                     interval = 12 - interval
                 result.add(interval)
-        return result
+        return frozenset(result)
 
     def _iterateElementsPairwise(self, stream):
         elementBuffer = []
@@ -305,7 +324,6 @@ class ChordReducer(object):
         self.numberOfElementsInMeasure = 0
         return presentPCs
 
-    # TODO: Clean this up, remove duplicated code
     def fillBassGaps(self, tree, partwiseTrees):
         def procedure(timespan):
             verticality = tree.getVerticalityAt(timespan.startOffset)
@@ -454,7 +472,7 @@ class ChordReducer(object):
     def reduceMeasureToNChords(
         self,
         measureObject,
-        numChords=1,
+        maximumNumberOfChords=1,
         weightAlgorithm=None,
         trimBelow=0.25,
         ):
@@ -492,14 +510,14 @@ class ChordReducer(object):
             measureObject,
             weightAlgorithm,
             )
-        if numChords > len(chordWeights):
-            numChords = len(chordWeights)
+        if maximumNumberOfChords > len(chordWeights):
+            maximumNumberOfChords = len(chordWeights)
         sortedChordWeights = sorted(
             chordWeights,
             key=chordWeights.get,
             reverse=True,
             )
-        maxNChords = sortedChordWeights[:numChords]
+        maxNChords = sortedChordWeights[:maximumNumberOfChords]
         if len(maxNChords) == 0:
             r = note.Rest()
             r.quarterLength = measureObject.duration.quarterLength
@@ -532,7 +550,7 @@ class ChordReducer(object):
                     currentGreedyChordNewLength = 0.0
                 currentGreedyChord = c
                 for n in c:
-                    n.tie = None
+                    #n.tie = None
                     if n.pitch.accidental is not None:
                         n.pitch.accidental.displayStatus = None
                 currentGreedyChordPCs = p
@@ -621,13 +639,27 @@ class ChordReducer(object):
             tree.remove(timespansToRemove)
             subtree.remove(timespansToRemove)
 
-    def removeVerticalDissonances(self, tree):
+    def removeVerticalDissonances(
+        self,
+        tree=None,
+        allowableChords=None,
+        forbiddenChords=None,
+        ):
         r'''
         Removes timespans in each dissonant verticality of `tree` whose pitches
         are above the lowest pitch in that verticality.
         '''
         for verticality in tree.iterateVerticalities():
+            isConsonant = False
+            pitches = verticality.pitchSet
+            intervalClassSet = self._getIntervalClassSet(pitches)
+            if allowableChords and intervalClassSet in allowableChords:
+                isConsonant = True
             if verticality.isConsonant:
+                isConsonant = True
+            if forbiddenChords and intervalClassSet in forbiddenChords:
+                isConsonant = False
+            if isConsonant:
                 continue
             pitchSet = verticality.pitchSet
             lowestPitch = min(pitchSet)
@@ -677,17 +709,24 @@ class TestExternal(unittest.TestCase):
     def testTrecentoMadrigal(self):
         from music21 import corpus
 
-        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 10)
         #score = corpus.parse('bach/bwv846').measures(1, 19)
-        score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
+        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
         #score = corpus.parse('PMFC_12_13').measures(1, 40)
+        score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 20)
 
         chordReducer = ChordReducer()
-        reduction = chordReducer(score)
+        reduction = chordReducer(
+            score,
+            allowableChords=None,
+            closedPosition=True,
+            forbiddenChords=None,
+            maximumNumberOfChords=3,
+            )
 
         for part in reduction:
             score.insert(0, part)
