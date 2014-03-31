@@ -74,6 +74,7 @@ class ChordReducer(object):
         self,
         inputScore,
         allowableChords=None,
+        closedPosition=False,
         forbiddenChords=None,
         maximumNumberOfChords=3,
         ):
@@ -133,6 +134,10 @@ class ChordReducer(object):
                 )
             chordifiedPart.append(reducedMeasure)
         reduction.append(chordifiedPart)
+
+        if closedPosition:
+            for chord in reduction.flat.getElementsByClass('Chord'):
+                chord.closedPosition(forceOctave=4, inPlace=True)
 
         return reduction
 
@@ -704,7 +709,7 @@ class TestExternal(unittest.TestCase):
     def testTrecentoMadrigal(self):
         from music21 import corpus
 
-        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 10)
+        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 10)
         #score = corpus.parse('bach/bwv846').measures(1, 19)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
@@ -712,9 +717,16 @@ class TestExternal(unittest.TestCase):
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
         #score = corpus.parse('PMFC_12_13').measures(1, 40)
+        score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 20)
 
         chordReducer = ChordReducer()
-        reduction = chordReducer(score)
+        reduction = chordReducer(
+            score,
+            allowableChords=None,
+            closedPosition=True,
+            forbiddenChords=None,
+            maximumNumberOfChords=3,
+            )
 
         for part in reduction:
             score.insert(0, part)
