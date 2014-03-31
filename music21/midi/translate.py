@@ -1921,6 +1921,83 @@ def midiFilePathToStream(filePath, inputM21=None):
     mf.close()
     return midiFileToStream(mf, inputM21)
 
+
+def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tracksEventsList = None):
+    '''
+    Convert Ascii midi data to a binary midi string.
+    
+    tracksEventsList contains a list of tracks which contain also a list of events.
+        asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00']
+    The format of one event is : 'aa bb cc dd'
+        aa = delta time to last event (integer)
+        bb = Midi event type
+        cc = Note number (hex)
+        dd = Velocity (integer)
+    Example: 
+        >>> asciiMidiEventList = []
+        >>> asciiMidiEventList.append('0 90 31 15')
+        >>> midiTrack = []
+        >>> midiTrack.append(asciiMidiEventList)
+        >>> midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
+        >>> s = stream.Stream()
+        >>> s = midiStringToStream(midiBinStr, s)
+        >>> s.show('text')
+        {0.0} <music21.stream.Part 65081200>
+            {0.0} <music21.note.Note G>                
+    '''
+    from music21 import midi as midiModule
+    mf = midiModule.MidiFile()
+    
+    numTracks = len(tracksEventsList)
+
+    if (numTracks == 1):
+        mf.format = 1
+    else:
+        mf.format = midiFormat
+        
+    mf.ticksPerQuarterNote = ticksPerQuarterNote
+
+    if (tracksEventsList != None):
+        for i in range(numTracks):
+            trk = midiModule.MidiTrack(i)   # sets the MidiTrack index parameters
+            for j in tracksEventsList[i]:
+                me = midiModule.MidiEvent(trk)
+                dt = midiModule.DeltaTime(trk)
+                
+                chunk_event_param = str(j).split(" ")
+
+                dt.channel = i + 1
+                dt.time = int(chunk_event_param[0])
+
+                me.channel = i + 1
+                me.pitch = int(chunk_event_param[2], 16)
+                me.velocity = int(chunk_event_param[3])
+
+                valid = False
+                if (chunk_event_param[1] != "FF") :
+                    if (list(chunk_event_param[1])[0] == '8'):
+                        me.type = "NOTE_OFF"
+                        valid = True
+                    elif (list(chunk_event_param[1])[0] == '9'):
+                        valid = True
+                        me.type = "NOTE_ON"
+                    else:
+                        environLocal.warn("Unsupported midi event: 0x%s" % (chunk_event_param[1]))     
+                else:
+                    environLocal.warn("Unsupported meta event: 0x%s" % (chunk_event_param[1])) 
+                                        
+                if valid == True:
+                    trk.events.append(dt)
+                    trk.events.append(me)
+                                
+            mf.tracks.append(trk) 
+
+    midiBinStr = ""
+    midiBinStr = midiBinStr + mf.writestr()
+    
+    return midiBinStr
+
+
 def midiStringToStream(strData, inputM21):
     '''
     Convert a string of binary midi data to a Music21 stream.Score object.
@@ -1979,6 +2056,27 @@ class Test(unittest.TestCase):
     
     def runTest(self):
         pass
+    
+    def testMidiAsciiStringToBinaryString(self):
+        from binascii import a2b_hex
+        
+        asciiMidiEventList = []
+        asciiMidiEventList.append('0 90 1f 15')
+        #asciiMidiEventList.append('3840 80 1f 15')
+        #asciiMidiEventList.append('0 b0 7b 00')
+        
+        #asciiMidiEventList = ['0 90 27 66', '3840 80 27 00']
+        #asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00', '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', '0 90 3e 60', '1920 80 3e 00', '0 b0 7b 00', '0 90 24 60', '3840 80 24 00', '0 b0 7b 00']
+        #asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00', '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', '0 90 3e 60', '1920 80 3e 00', '0 90 24 60', '3840 80 24 00']
+        
+        midiTrack = []
+        midiTrack.append(asciiMidiEventList)
+        #midiTrack.append(asciiMidiEventList)
+        #midiTrack.append(asciiMidiEventList)
+        
+        midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
+        
+        self.assertEqual(midiBinStr, "MThd"+ a2b_hex("000000060001000103c0") + "MTrk" + a2b_hex("0000000400901f0f")) 
 
     def testNote(self):
         from music21 import midi as midiModule
