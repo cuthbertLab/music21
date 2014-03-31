@@ -127,27 +127,16 @@ class ChordReducer(object):
         for measure in chordifiedReduction:
             reducedMeasure = self.reduceMeasureToNChords(
                 measure,
-                numChords=maximumNumberOfChords,
+                maximumNumberOfChords=maximumNumberOfChords,
                 weightAlgorithm=self.qlbsmpConsonance,
                 trimBelow=0.25,
                 )
             chordifiedPart.append(reducedMeasure)
         reduction.append(chordifiedPart)
-        #for part in reduction:
-        #    self._applyTies(part)
 
         return reduction
 
     ### PRIVATE METHODS ###
-
-    def _applyTies(self, part):
-        for one, two in self._iterateElementsPairwise(part):
-            if one.isNote and two.isNote:
-                if one.pitch == two.pitch:
-                    one.tie = tie.Tie('start')
-            elif one.isChord and two.isChord:
-                if one.pitches == two.pitches:
-                    one.tie = tie.Tie('start')
 
     @staticmethod
     def _debug(tree):
@@ -330,7 +319,6 @@ class ChordReducer(object):
         self.numberOfElementsInMeasure = 0
         return presentPCs
 
-    # TODO: Clean this up, remove duplicated code
     def fillBassGaps(self, tree, partwiseTrees):
         def procedure(timespan):
             verticality = tree.getVerticalityAt(timespan.startOffset)
@@ -479,7 +467,7 @@ class ChordReducer(object):
     def reduceMeasureToNChords(
         self,
         measureObject,
-        numChords=1,
+        maximumNumberOfChords=1,
         weightAlgorithm=None,
         trimBelow=0.25,
         ):
@@ -517,14 +505,14 @@ class ChordReducer(object):
             measureObject,
             weightAlgorithm,
             )
-        if numChords > len(chordWeights):
-            numChords = len(chordWeights)
+        if maximumNumberOfChords > len(chordWeights):
+            maximumNumberOfChords = len(chordWeights)
         sortedChordWeights = sorted(
             chordWeights,
             key=chordWeights.get,
             reverse=True,
             )
-        maxNChords = sortedChordWeights[:numChords]
+        maxNChords = sortedChordWeights[:maximumNumberOfChords]
         if len(maxNChords) == 0:
             r = note.Rest()
             r.quarterLength = measureObject.duration.quarterLength
