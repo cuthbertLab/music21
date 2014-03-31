@@ -495,21 +495,22 @@ class ChordReducer(object):
             ...     weightAlgorithm=cr.qlbsmpConsonance,
             ...     trimBelow=0.3)
             >>> newS.show('text')
+            {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.chord.Chord C4 E4 G4 C5>
 
         ::
 
-            >>> newS[0].quarterLength
+            >>> newS[-1].quarterLength
             4.0
 
         '''
         #from music21 import note
-        if measureObject.isFlat is False:
-            measureObject = measureObject.flat.notes
-        else:
-            measureObject = measureObject.notes
+        #if inputMeasure.isFlat is False:
+        #    measureObject = inputMeasure.flat.notes
+        #else:
+        #    measureObject = inputMeasure.notes
         chordWeights = self.computeMeasureChordWeights(
-            measureObject,
+            measureObject.flat.notes,
             weightAlgorithm,
             )
         if maximumNumberOfChords > len(chordWeights):
@@ -538,10 +539,12 @@ class ChordReducer(object):
         currentGreedyChordPCs = None
         currentGreedyChordNewLength = 0.0
         for c in measureObject:
-            if c.isNote:
+            if isinstance(c, note.Note):
                 p = tuple(c.pitch.pitchClass)
-            else:
+            elif isinstance(c, chord.Chord):
                 p = tuple(set([x.pitchClass for x in c.pitches]))
+            else:
+                continue
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
                 # keep this chord
                 if currentGreedyChord is None and c.offset != 0.0:
@@ -716,13 +719,14 @@ class TestExternal(unittest.TestCase):
 
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 10)
         #score = corpus.parse('bach/bwv846').measures(1, 19)
+        score = corpus.parse('bach/bwv66.6')
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
         #score = corpus.parse('PMFC_12_13').measures(1, 40)
-        score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 8)
+        #score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 8)
 
         chordReducer = ChordReducer()
         reduction = chordReducer(
