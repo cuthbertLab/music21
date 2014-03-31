@@ -20,6 +20,7 @@ from music21 import instrument
 from music21 import note
 from music21 import pitch
 from music21 import stream
+from music21 import tie
 
 
 class Parentage(object):
@@ -1859,6 +1860,13 @@ class OffsetTree(object):
                 assert 0 < quarterLength, verticality
                 if verticality.pitchSet:
                     element = chord.Chord(sorted(verticality.pitchSet))
+                    startElements = [x.element for x in
+                        verticality.startTimespans]
+                    ties = [x.tie for x in startElements if x.tie is not None]
+                    if any(x.type == 'start' for x in ties):
+                        element.tie = tie.Tie('start')
+                    elif any(x.type == 'continue' for x in ties):
+                        element.tie = tie.Tie('continue')
                 else:
                     element = note.Rest()
                 element.duration.quarterLength = quarterLength
@@ -1873,6 +1881,13 @@ class OffsetTree(object):
                 assert 0 < quarterLength, verticality
                 if verticality.pitchSet:
                     element = chord.Chord(sorted(verticality.pitchSet))
+                    startElements = [x.element for x in
+                        verticality.startTimespans]
+                    ties = [x.tie for x in startElements if x.tie is not None]
+                    if any(x.type == 'start' for x in ties):
+                        element.tie = tie.Tie('start')
+                    elif any(x.type == 'continue' for x in ties):
+                        element.tie = tie.Tie('continue')
                 else:
                     element = note.Rest()
                 element.duration.quarterLength = quarterLength

@@ -73,6 +73,9 @@ class ChordReducer(object):
     def __call__(
         self,
         inputScore,
+        allowableChords=None,
+        forbiddenChords=None,
+        maximumNumberOfChords=3,
         ):
         from music21.analysis import offsetTree
         assert isinstance(inputScore, stream.Score)
@@ -102,14 +105,14 @@ class ChordReducer(object):
         for measure in chordifiedReduction:
             reducedMeasure = self.reduceMeasureToNChords(
                 measure,
-                numChords=3,
+                numChords=maximumNumberOfChords,
                 weightAlgorithm=self.qlbsmpConsonance,
                 trimBelow=0.25,
                 )
             chordifiedPart.append(reducedMeasure)
         reduction.append(chordifiedPart)
-        for part in reduction:
-            self._applyTies(part)
+        #for part in reduction:
+        #    self._applyTies(part)
 
         return reduction
 
@@ -532,7 +535,7 @@ class ChordReducer(object):
                     currentGreedyChordNewLength = 0.0
                 currentGreedyChord = c
                 for n in c:
-                    n.tie = None
+                    #n.tie = None
                     if n.pitch.accidental is not None:
                         n.pitch.accidental.displayStatus = None
                 currentGreedyChordPCs = p
@@ -677,9 +680,9 @@ class TestExternal(unittest.TestCase):
     def testTrecentoMadrigal(self):
         from music21 import corpus
 
-        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 10)
         #score = corpus.parse('bach/bwv846').measures(1, 19)
-        score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
+        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
