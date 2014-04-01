@@ -5703,7 +5703,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Music21Object, ElementWrapper, Sites]
 
 
-def mainTest(*testClasses):
+def mainTest(*testClasses, **kwargs):
     '''
     Takes as its arguments modules (or a string 'noDocTest' or 'verbose')
     and runs all of these modules through a unittest suite
@@ -5741,10 +5741,18 @@ def mainTest(*testClasses):
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        optionflags = (
-            doctest.ELLIPSIS|
-            doctest.NORMALIZE_WHITESPACE|
-            doctest.REPORT_ONLY_FIRST_FAILURE)
+        failFast = bool(kwargs.get('failFast', True))
+        if failFast:
+            optionflags = (
+                doctest.ELLIPSIS |
+                doctest.NORMALIZE_WHITESPACE |
+                doctest.REPORT_ONLY_FIRST_FAILURE
+                )
+        else:
+            optionflags = (
+                doctest.ELLIPSIS |
+                doctest.NORMALIZE_WHITESPACE
+                )
         if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv:
             s1 = doctest.DocTestSuite(
                 '__main__',
