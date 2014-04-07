@@ -1136,7 +1136,6 @@ class OffsetTree(object):
     The second F# is an octave lower, so it wouldn't get merged even if adjacent
     notes were fused together (which they're not).
 
-    TODO: Change default iterator to iterateVerticalities()
     TODO: newBach.parts['Alto'].measure(7).show('text') should work.
     KeyError: 'provided key (Alto) does not match any id or group'
     '''
@@ -1437,9 +1436,7 @@ class OffsetTree(object):
     @staticmethod
     def extractMeasuresAndMeasureOffsets(inputScore):
         r'''
-        Extract a measure template from `inputScore`.
-
-        TODO: Remove, use measureTemplate in Stream
+        Extract a measure template and measure offset series from `inputScore`.
 
         ::
 
