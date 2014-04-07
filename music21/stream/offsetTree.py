@@ -1184,9 +1184,18 @@ class OffsetTree(object):
 
     class OffsetTreeNode(object):
         r'''
-        A node in an offset-tree.
+        A node in an OffsetTree.
 
-        Not for public use.
+        This class is only used by OffsetTree, and should not be instantiated
+        by hand. It stores a list of ElementTimespans, as well as various data
+        which describes the internal structure of the tree.
+
+            >>> startOffset = 1.0
+            >>> node = stream.offsetTree.OffsetTree.OffsetTreeNode(startOffset)
+
+        Please consult the wikipedia page for AVL tree
+        (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
+        description of how this works.
         '''
 
         ### CLASS VARIABLES ###
