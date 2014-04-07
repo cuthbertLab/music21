@@ -49,6 +49,7 @@ from music21 import tempo
 from music21 import environment
 
 import makeNotation
+import offsetTree
 import streamStatus
 
 _MOD = "stream.py"

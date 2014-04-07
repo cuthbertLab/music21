@@ -6,7 +6,6 @@ from music21.analysis import correlate
 from music21.analysis import discrete
 from music21.analysis import metrical
 from music21.analysis import neoRiemannian
-from music21.analysis import offsetTree
 from music21.analysis import patel
 from music21.analysis import reduction
 from music21.analysis import reduceChords

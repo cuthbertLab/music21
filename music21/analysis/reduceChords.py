@@ -81,7 +81,7 @@ class ChordReducer(object):
         from music21.stream import offsetTree
         assert isinstance(inputScore, stream.Score)
 
-        tree = offsetTree.OffsetTree.fromScore(inputScore)
+        tree = offsetTree.OffsetTree(sourceScore=inputScore)
 
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)
