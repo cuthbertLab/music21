@@ -1069,7 +1069,7 @@ class VerticalitySequence(collections.Sequence):
 
 class OffsetTree(object):
     r'''
-    An offset-tree.
+    A datastructure for efficiently slicing a score.
 
     This datastructure stores timespans: objects which implement both a
     `startOffset` and `stopOffset` property. It provides fast lookups of such
@@ -1159,6 +1159,17 @@ class OffsetTree(object):
 
     The second F# is an octave lower, so it wouldn't get merged even if adjacent
     notes were fused together (which they're not).
+
+    OffsetTree is an implementation of an extended AVL tree. AVL trees are
+    a type of binary tree, like Red-Black trees. AVL trees are very efficient
+    at insertion when the objects being inserted are already sorted - which is
+    usually the case with data extracted from a score. OffsetTree is an
+    extended AVL tree because each node in the tree keeps track of not just the
+    start offsets of ElementTimespans stored at that node, but also the
+    earliest and latest stop offset of all ElementTimespans stores at both that
+    node and all nodes which are children of that node. This lets us quickly
+    located ElementTimespans which overlap offsets or which are contained
+    within ranges.
 
     TODO: newBach.parts['Alto'].measure(7).show('text') should work.
     KeyError: 'provided key (Alto) does not match any id or group'
