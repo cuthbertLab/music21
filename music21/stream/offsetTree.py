@@ -1432,32 +1432,6 @@ class OffsetTree(object):
         newTree.insert([x for x in self])
         return newTree
 
-    @staticmethod
-    def extractMeasuresAndMeasureOffsets(inputScore):
-        r'''
-        Extract a measure template and measure offset series from `inputScore`.
-
-        ::
-
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.offsetTree.OffsetTree(score)
-            >>> result = tree.extractMeasuresAndMeasureOffsets(score)
-            >>> result[0]
-            <music21.stream.Part ...>
-
-        ::
-
-            >>> result[1]
-            [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 36.0]
-
-        '''
-        part = inputScore.parts[0]
-        outputScore = part.measureTemplate(
-            fillWithRests=False,
-            )
-        offsets = [x.offset for x in outputScore]
-        offsets.append(inputScore.duration.quarterLength)
-        return outputScore, offsets
 
     def findNextElementTimespanInSamePart(self, elementTimespan):
         '''
@@ -2089,10 +2063,15 @@ class OffsetTree(object):
 
         '''
         from music21 import stream
-        templateScore = self.sourceScore
-        if isinstance(templateScore, stream.Score):
-            templateScore, templateOffsets = \
-                self.extractMeasuresAndMeasureOffsets(templateScore)
+        sourceScore = self.sourceScore
+        if isinstance(sourceScore, stream.Stream):
+            templateOffsets = sorted(sourceScore.measureOffsetMap())
+            templateOffsets.append(sourceScore.duration.quarterLength)
+            if hasattr(sourceScore, 'parts') and len(sourceScore.parts) > 0:
+                templateScore = sourceScore.parts[0].measureTemplate(fillWithRests=False)
+            else:
+                templateScore = sourceScore.measureTemplate(fillWithRests=False)
+            
             tree = self.copy()
             tree.splitAt(templateOffsets)
             measureIndex = 0
@@ -2155,9 +2134,14 @@ class OffsetTree(object):
 
     def toPartwiseScore(self, templateScore=None):
         from music21 import stream
-        templateScore = self.sourceScore
-        templateScore, templateOffsets = \
-            self.extractMeasuresAndMeasureOffsets(templateScore)
+        sourceScore = self.sourceScore
+        templateOffsets = sorted(sourceScore.measureOffsetMap())
+        templateOffsets.append(sourceScore.duration.quarterLength)
+        if hasattr(sourceScore, 'parts') and len(sourceScore.parts) > 0:
+            templateScore = sourceScore.parts[0].measureTemplate(fillWithRests=False)
+        else:
+            templateScore = sourceScore.measureTemplate(fillWithRests=False)
+
         partMapping = collections.OrderedDict()
         outputScore = stream.Score()
         for part in self.allParts:
