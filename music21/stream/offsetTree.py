@@ -732,7 +732,6 @@ class Verticality(object):
         testChord = chord.Chord(pitchSet)
         return testChord
 
-
     @property
     def isConsonant(self):
         r'''
@@ -1563,10 +1562,6 @@ class OffsetTree(object):
         results = recurse(self._root, offset)
         results.sort(key=lambda x: (x.startOffset, x.stopOffset))
         return tuple(results)
-
-        tree = OffsetTree(sourceScore=inputScore)
-        tree.insert(elementTimespans)
-        return tree
 
     def getStartOffsetAfter(self, offset):
         r'''
