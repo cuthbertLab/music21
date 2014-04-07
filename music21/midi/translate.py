@@ -2010,7 +2010,7 @@ def midiStringToStream(strData, inputM21):
     return midiFileToStream(mf, inputM21)
 
 
-def midiFileToStream(mf, inputM21=None):
+def midiFileToStream(mf, inputM21=None, quantizePost=True):
     '''
     Convert a :class:`~music21.midi.base.MidiFile` object to a 
     :class:`~music21.stream.Stream` object.
@@ -2045,7 +2045,7 @@ def midiFileToStream(mf, inputM21=None):
         # create a stream for each tracks   
         # may need to check if tracks actually have event data
         midiTracksToStreams(mf.tracks, 
-            ticksPerQuarter=mf.ticksPerQuarterNote, inputM21=s)
+            ticksPerQuarter=mf.ticksPerQuarterNote, quantizePost=quantizePost, inputM21=s)
         #s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
 
     return s
