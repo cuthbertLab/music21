@@ -283,10 +283,7 @@ class ElementTimespan(object):
         return self._element.beatStrength
 
     @property
-    def duration(self):
-        '''
-        TODO: rename to quarterLength
-        '''
+    def quarterLength(self):
         return self.stopOffset - self.startOffset
 
     @property

@@ -607,11 +607,11 @@ class ChordReducer(object):
         '''
         def procedure(timespan):
             measureNumber = timespan.measureNumber
-            isShort = timespan.duration < duration
+            isShort = timespan.quarterLength < duration
             verticality = tree.getVerticalityAt(timespan.startOffset)
             bassTimespan = verticality.bassTimespan
             if bassTimespan is not None:
-                if bassTimespan.duration < duration:
+                if bassTimespan.quarterLength < duration:
                     bassTimespan = None
             return measureNumber, isShort, bassTimespan
         for unused_part, subtree in partwiseTrees.iteritems():
@@ -632,7 +632,7 @@ class ChordReducer(object):
                 if isEntireMeasure:
                     counter = collections.Counter()
                     for timespan in group:
-                        counter[timespan.pitches] += timespan.duration
+                        counter[timespan.pitches] += timespan.quarterLength
                     bestPitches, unused_totalDuration = counter.most_common()[0]
                     for timespan in group:
                         if timespan.pitches != bestPitches:
@@ -674,7 +674,7 @@ class ChordReducer(object):
                     tree.remove(timespan)
 
     def removeZeroDurationTimespans(self, tree):
-        zeroDurationTimespans = [x for x in tree if x.duration == 0]
+        zeroDurationTimespans = [x for x in tree if x.quarterLength == 0]
         tree.remove(zeroDurationTimespans)
 
     def splitByBass(self, tree):
