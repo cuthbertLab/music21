@@ -78,7 +78,7 @@ class ChordReducer(object):
         forbiddenChords=None,
         maximumNumberOfChords=3,
         ):
-        from music21.analysis import offsetTree
+        from music21.stream import offsetTree
         assert isinstance(inputScore, stream.Score)
 
         tree = offsetTree.OffsetTree.fromScore(inputScore)
@@ -341,7 +341,7 @@ class ChordReducer(object):
                 if bassTimespan.startOffset < group[0].startOffset:
                     beatStrength = bassTimespan.beatStrength
                     startOffset = bassTimespan.startOffset
-                    previousTimespan = tree.findPreviousParentageInSamePart(group[0])
+                    previousTimespan = tree.findPreviousElementTimespanInSamePart(group[0])
                     if previousTimespan is not None:
                         assert previousTimespan.stopOffset <= group[0].startOffset
                         if startOffset < previousTimespan.stopOffset:
