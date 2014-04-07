@@ -32,6 +32,31 @@ from music21 import tie
 from music21 import exceptions21
 
 
+#------------------------------------------------------------------------------
+
+
+def makeElement(verticality, quarterLength):
+    r'''
+    Makes an element from a verticality and quarterLength.
+    '''
+    if verticality.pitchSet:
+        element = chord.Chord(sorted(verticality.pitchSet))
+        startElements = [x.element for x in
+            verticality.startTimespans]
+        ties = [x.tie for x in startElements if x.tie is not None]
+        if any(x.type == 'start' for x in ties):
+            element.tie = tie.Tie('start')
+        elif any(x.type == 'continue' for x in ties):
+            element.tie = tie.Tie('continue')
+    else:
+        element = note.Rest()
+    element.duration.quarterLength = quarterLength
+    return element
+
+
+#------------------------------------------------------------------------------
+
+
 class ElementTimespan(object):
     r'''
     A span of time anchored to an element in a score.  The span of time may
@@ -1432,7 +1457,6 @@ class OffsetTree(object):
         newTree.insert([x for x in self])
         return newTree
 
-
     def findNextElementTimespanInSamePart(self, elementTimespan):
         '''
 
@@ -2062,6 +2086,7 @@ class OffsetTree(object):
         TODO: remove assert
 
         '''
+
         from music21 import stream
         sourceScore = self.sourceScore
         if isinstance(sourceScore, stream.Stream):
@@ -2071,7 +2096,6 @@ class OffsetTree(object):
                 templateScore = sourceScore.parts[0].measureTemplate(fillWithRests=False)
             else:
                 templateScore = sourceScore.measureTemplate(fillWithRests=False)
-            
             tree = self.copy()
             tree.splitAt(templateOffsets)
             measureIndex = 0
@@ -2084,18 +2108,7 @@ class OffsetTree(object):
                 verticality = self.getVerticalityAt(startOffset)
                 quarterLength = stopOffset - startOffset
                 assert 0 < quarterLength, verticality
-                if verticality.pitchSet:
-                    element = chord.Chord(sorted(verticality.pitchSet))
-                    startElements = [x.element for x in
-                        verticality.startTimespans]
-                    ties = [x.tie for x in startElements if x.tie is not None]
-                    if any(x.type == 'start' for x in ties):
-                        element.tie = tie.Tie('start')
-                    elif any(x.type == 'continue' for x in ties):
-                        element.tie = tie.Tie('continue')
-                else:
-                    element = note.Rest()
-                element.duration.quarterLength = quarterLength
+                element = makeElement(verticality, quarterLength)
                 templateScore[measureIndex].append(element)
             return templateScore
         else:
@@ -2105,18 +2118,7 @@ class OffsetTree(object):
                 verticality = self.getVerticalityAt(startOffset)
                 quarterLength = stopOffset - startOffset
                 assert 0 < quarterLength, verticality
-                if verticality.pitchSet:
-                    element = chord.Chord(sorted(verticality.pitchSet))
-                    startElements = [x.element for x in
-                        verticality.startTimespans]
-                    ties = [x.tie for x in startElements if x.tie is not None]
-                    if any(x.type == 'start' for x in ties):
-                        element.tie = tie.Tie('start')
-                    elif any(x.type == 'continue' for x in ties):
-                        element.tie = tie.Tie('continue')
-                else:
-                    element = note.Rest()
-                element.duration.quarterLength = quarterLength
+                element = makeElement(verticality, quarterLength)
                 elements.append(element)
             score = stream.Score()
             for element in elements:
