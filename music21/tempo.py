@@ -155,10 +155,10 @@ class TempoIndication(base.Music21Object):
 
 #-------------------------------------------------------------------------------
 class TempoText(TempoIndication):
-    '''    
+    '''
     >>> import music21
     >>> tm = music21.tempo.TempoText("adagio")
-    >>> print tm.text
+    >>> print(tm.text)
     adagio
     '''
     def __init__(self, text=None):

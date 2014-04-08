@@ -23,6 +23,11 @@ this module.
 import copy
 import unittest
 import sys
+if sys.version > '3':
+    python3 = True
+else:
+    python3 = False
+
 
 from music21 import base
 
@@ -48,9 +53,14 @@ from music21 import tempo
 
 from music21 import environment
 
-import makeNotation
-import offsetTree
-import streamStatus
+if python3:
+    from . import makeNotation # @UnresolvedImport
+    from . import offsetTree # @UnresolvedImport
+    from . import streamStatus
+else:
+    import makeNotation # @Reimport
+    import offsetTree # @Reimport
+    import streamStatus # @Reimport
 
 _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
@@ -7073,7 +7083,7 @@ class Stream(base.Music21Object):
         elif (durationObj is None):
             self._unlinkedDuration = None
         else: # need to permit Duration object assignment here
-            raise Exception, 'this must be a Duration object, not %s' % durationObj
+            raise Exception('this must be a Duration object, not %s' % durationObj)
 
     duration = property(_getDuration, _setDuration, doc='''
         Returns the total duration of the Stream, from the beginning of the stream until the end of the final element.

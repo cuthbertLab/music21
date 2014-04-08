@@ -12,11 +12,25 @@
 
 _all_ = ['mxObjects', 'm21ToString', 'toMxObjects', 'fromMxObjects', 'xmlHandler']
 
-import mxObjects
-import m21ToString
-import toMxObjects
-import fromMxObjects
-import xmlHandler
+import sys
+
+if sys.version > '3':
+    python3 = True
+else:
+    python3 = False
+
+if python3:
+    from . import mxObjects
+    from . import m21ToString
+    from . import toMxObjects
+    from . import fromMxObjects
+    from . import xmlHandler
+else:
+    import mxObjects # @Reimport
+    import m21ToString # @Reimport
+    import toMxObjects # @Reimport
+    import fromMxObjects # @Reimport
+    import xmlHandler # @Reimport
 #------------------------------------------------------------------------------
 # eof
 

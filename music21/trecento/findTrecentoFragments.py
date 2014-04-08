@@ -135,7 +135,7 @@ def searchForIntervals(notesStr):
     streamOpus = stream.Opus()
 
     for thisWork in ballataObj:
-        print thisWork.title
+        print(thisWork.title)
         for thisCadence in thisWork.snippets:
             if thisCadence is None:
                 continue
@@ -219,7 +219,7 @@ def audioVirelaiSearch():
     #searchScore.show()
     l = search.approximateNoteSearch(searchScore, virelaiCantuses)
     for i in l:
-        print i.metadata.title, i.matchProbability
+        print(i.metadata.title, i.matchProbability)
     l[0].show()
 
 def findSimilarGloriaParts():

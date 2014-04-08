@@ -8,6 +8,12 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
+#python3
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
+
 
 import collections
 import copy
@@ -753,15 +759,15 @@ def getPitches(pitchNames = ['C','E','G'], bassPitch = 'C3', maxPitch = 'C8'):
     >>> from music21 import pitch
     
     >>> pitches = segment.getPitches()
-    >>> print ', '.join([p.nameWithOctave for p in pitches])
+    >>> print(', '.join([p.nameWithOctave for p in pitches]))
     C3, E3, G3, C4, E4, G4, C5, E5, G5, C6, E6, G6, C7, E7, G7, C8
     
     >>> pitches = segment.getPitches(['G', 'B', 'D', 'F'], bassPitch = pitch.Pitch('B2'))
-    >>> print ', '.join([p.nameWithOctave for p in pitches])
+    >>> print(', '.join([p.nameWithOctave for p in pitches]))
     B2, D3, F3, G3, B3, D4, F4, G4, B4, D5, F5, G5, B5, D6, F6, G6, B6, D7, F7, G7, B7
     
     >>> pitches = segment.getPitches(['F##','A#','C#'], bassPitch = pitch.Pitch('A#3'))
-    >>> print ', '.join([p.nameWithOctave for p in pitches])
+    >>> print(', '.join([p.nameWithOctave for p in pitches]))
     A#3, C#4, F##4, A#4, C#5, F##5, A#5, C#6, F##6, A#6, C#7, F##7, A#7
     '''
     if isinstance(bassPitch, basestring):
@@ -825,9 +831,9 @@ def printRules(rulesList, maxLength = 4):
         if len(rule[1].__name__) >= MAX_SIZE:
             MAX_SIZE = len(rule[1].__name__) + 2
     if maxLength == 4:
-        print "{0:11}{1:{maxSize}}{2:30}{3}".format("Will run:", "Method:", "Keep solutions which return:", "Arguments:", maxSize = MAX_SIZE)
+        print("{0:11}{1:{maxSize}}{2:30}{3}".format("Will run:", "Method:", "Keep solutions which return:", "Arguments:", maxSize = MAX_SIZE))
     elif maxLength == 3:
-        print "{0:11}{1:{maxSize}}{2}".format("Will run:", "Method:", "Arguments:", maxSize = MAX_SIZE)     
+        print("{0:11}{1:{maxSize}}{2}".format("Will run:", "Method:", "Arguments:", maxSize = MAX_SIZE))
            
     for ruleIndex in range(len(rulesList)):
         ruleToPrint = None
@@ -848,7 +854,7 @@ def printRules(rulesList, maxLength = 4):
         elif maxLength == 3:
             (shouldRunMethod, method) = rulesList[ruleIndex][0:2]
             ruleToPrint = "{0:11}{1:{maxSize}}{2}".format(str(shouldRunMethod), method.__name__, argsString, maxSize = MAX_SIZE)
-        print ruleToPrint   
+        print(ruleToPrint)
 
 
 class SegmentException(exceptions21.Music21Exception):

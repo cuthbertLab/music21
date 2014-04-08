@@ -1142,7 +1142,7 @@ class OffsetTree(object):
 
         >>> for verticalities in tree.iterateVerticalitiesNwise(n=3):
         ...    horizontalities = tree.unwrapVerticalities(verticalities)
-        ...    for unused_part, horizontality in horizontalities.iteritems():
+        ...    for unused_part, horizontality in horizontalities.items():
         ...        if horizontality.hasNeighborTone:
         ...            merged = horizontality[0].new(
         ...               stopOffset=horizontality[2].stopOffset,
@@ -1986,7 +1986,7 @@ class OffsetTree(object):
                 if timespan.part not in unwrapped:
                     unwrapped[timespan.part] = []
                 unwrapped[timespan.part].append(timespan)
-        for part, unused_timespans in unwrapped.iteritems():
+        for part, unused_timespans in unwrapped.items():
             unwrapped[part] = Horizontality(timespans=unwrapped[part])
         return unwrapped
 

@@ -631,7 +631,7 @@ def _getOutliers():
     currentNum = BCI.currentNumber
     lengthDict = {}
     for chorale in BCI:
-        print currentNum
+        print(currentNum)
         
         if currentNum is not highestNum:
             currentNum = BCI.currentNumber
@@ -665,7 +665,7 @@ def _runExperiment():
     #currentNum = BCI.currentNumber
     for chorale in goodChorales: 
         
-        print currentNum
+        print(currentNum)
         
         currentNum +=1
           
@@ -677,7 +677,7 @@ def _runExperiment():
         
         '''
         if len(chorale.parts) is not 4:
-            print "chorale had too many parts"
+            print("chorale had too many parts")
             continue
         '''
         
@@ -686,10 +686,10 @@ def _runExperiment():
         '''
         length = len( chorale.measureOffsetMap() )
         if length < 10:
-            print "too short"
+            print("too short")
             continue
         elif length > 25:
-            print "too long"
+            print("too long")
             continue
         '''
         cf= ContourFinder(chorale)
@@ -697,13 +697,13 @@ def _runExperiment():
         ac.addPieceToContour(cf, 'tonality')
         ac.addPieceToContour(cf, 'spacing')
     
-    print ac.aggContours['dissonance']
-    print ac.aggContours['tonality']
-    print ac.aggContours['spacing']
+    print(ac.aggContours['dissonance'])
+    print(ac.aggContours['tonality'])
+    print(ac.aggContours['spacing'])
     
     for cType in ['spacing', 'tonality', 'dissonance']:
         
-        print "considering", cType, ": "
+        print("considering", cType, ": ")
         
         cf = ContourFinder()
         totalSuccesses = 0
@@ -727,9 +727,9 @@ def _runExperiment():
                 #print "GREAT SUCCESS!"
             else:
                 totalFailures += 1
-                print "failure: chorale " + goodChorales[j]  #index ", str(i)
+                print("failure: chorale " + goodChorales[j])  #index ", str(i)
         
-        print cType, ": totalSuccesses =", str(totalSuccesses), "totalFailures =", str(totalFailures)
+        print(cType, ": totalSuccesses =", str(totalSuccesses), "totalFailures =", str(totalFailures))
 
 def _plotChoraleContours():
     BCI = corpus.chorales.Iterator(1, 75, returnType='filename')
@@ -737,12 +737,12 @@ def _plotChoraleContours():
         s = corpus.parse(chorale)
         cf = ContourFinder(s)
         chorale = chorale[5:]
-        print chorale
+        print(chorale)
         #cf.plot('dissonance', fileName= chorale + 'dissonance', regression=False)
         try:
             cf.plot('tonality', fileName= chorale + 'tonality', regression=False)
         except:
-            print chorale
+            print(chorale)
             s.show()
             break
     pass

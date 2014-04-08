@@ -32,6 +32,12 @@ from music21 import environment
 _MOD = "chord.py"
 environLocal = environment.Environment(_MOD)
 
+#python3
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
+
 
 #-------------------------------------------------------------------------------
 
@@ -1562,7 +1568,7 @@ class Chord(note.NotRest):
 
         ::
 
-            >>> print cmaj.intervalFromChordStep(6)
+            >>> print(cmaj.intervalFromChordStep(6))
             None
 
         '''

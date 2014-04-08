@@ -12,19 +12,14 @@ import sys
 
 python_version = sys.version_info[:2] # e.g. version 2.4 -> (2, 4)
 
-CAN_PICKLE_ARRAY = python_version >= (2, 5)
-CAN_SUBCLASS_BUILTIN = python_version >= (2, 2)
+CAN_PICKLE_ARRAY = True
+CAN_SUBCLASS_BUILTIN = True 
 
 if sys.version.startswith("IronPython"):
     array_array = None
 else:
     from array import array as array_array
 
-if python_version < (2, 2):
-    class object:
-        pass
-    False = 0
-    True = 1
 
 def int_floor_div(x, y):
     return divmod(x, y)[0]
@@ -34,9 +29,3 @@ def intbool(x):
         return 1
     return 0
 
-if python_version < (2, 3):
-    def sum(sequence, start=0):
-        tot = start
-        for item in aseq:
-            tot += item
-        return tot

@@ -188,7 +188,7 @@ class Metadata(base.Music21Object):
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
         self._workIds = {}
-        for abbreviation, workId in self.workIdAbbreviationDict.iteritems():
+        for abbreviation, workId in self.workIdAbbreviationDict.items():
             #abbreviation = workIdToAbbreviation(id)
             if workId in keywords:
                 self._workIds[workId] = Text(keywords[workId])
@@ -212,7 +212,7 @@ class Metadata(base.Music21Object):
         definitions.
         '''
         match = None
-        for abbreviation, workId in self.workIdAbbreviationDict.iteritems():
+        for abbreviation, workId in self.workIdAbbreviationDict.items():
         #for id in WORK_IDS:
             #abbreviation = workIdToAbbreviation(id)
             if name == workId:
@@ -501,7 +501,7 @@ class Metadata(base.Music21Object):
         '''
         idStr = idStr.lower()
         match = False
-        for abbreviation, workId in self.workIdAbbreviationDict.iteritems():
+        for abbreviation, workId in self.workIdAbbreviationDict.items():
         #for id in WORK_IDS:
             #abbreviation = workIdToAbbreviation(id)
             if workId.lower() == idStr:

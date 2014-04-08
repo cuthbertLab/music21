@@ -281,7 +281,6 @@ def completeHexatonic(c):
         hexatonic_5 = P(hexatonic_4)
         hexatonicList = [hexatonic_1, hexatonic_2, hexatonic_3, hexatonic_4, hexatonic_5]
     return hexatonicList
-    print hexatonicList
             
 # correct spellings
 # all cycles

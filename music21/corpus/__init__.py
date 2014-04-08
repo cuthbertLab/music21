@@ -806,7 +806,7 @@ def uncompressMXL(filename, deleteOriginal=False):
 
 
 def getBachChorales(fileExtensions='xml'):
-    ur'''
+    r'''
     Return the file name of all Bach chorales.
 
     By default, only Bach Chorales in xml format are returned, because the
@@ -841,9 +841,8 @@ def getBachChorales(fileExtensions='xml'):
         u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
 
     '''
-    return corpora.CoreCorpus().getBachChorales(
-        fileExtensions=fileExtensions,
-        )
+    cc = corpora.CoreCorpus()
+    return cc.getBachChorales(fileExtensions=fileExtensions,)
 
 
 def getHandelMessiah(fileExtensions='md'):

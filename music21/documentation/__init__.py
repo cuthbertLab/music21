@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from library import *
+import sys
+
+if sys.version > '3':
+    from .library import * 
+else:
+    from library import *
 

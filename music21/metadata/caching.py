@@ -163,7 +163,7 @@ class MetadataCachingJob(object):
             else:
                 parsedObject = corpus.parse(
                     self.filePath, forceSource=True)
-        except Exception, e:
+        except Exception as e:
             environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
             environLocal.printDebug(traceback.format_exc())

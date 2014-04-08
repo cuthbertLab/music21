@@ -4,14 +4,23 @@
 # <p> Portions copyright © 2005-2006 Stephen John Machin, Lingfo Pty Ltd</p>
 # <p>This module is part of the xlrd package, which is released under a BSD-style licence.</p>
 ##
+from __future__ import print_function
 
 # 2007-04-22 SJM Remove experimental "trimming" facility.
+import sys
 
-from biffh import *
-from timemachine import *
-from struct import unpack
-from formula import dump_formula, decompile_formula, rangename2d
-from formatting import nearest_colour_index
+if sys.version > '3':
+    from .biffh import *
+    from .timemachine import *
+    from struct import unpack
+    from .formula import dump_formula, decompile_formula, rangename2d
+    from .formatting import nearest_colour_index
+else:
+    from biffh import *
+    from timemachine import *
+    from struct import unpack
+    from formula import dump_formula, decompile_formula, rangename2d
+    from formatting import nearest_colour_index
 import time
 
 DEBUG = 0
@@ -466,11 +475,11 @@ class Sheet(BaseObject):
                     if s_fmt_info:
                         s_cell_xf_indexes[rowx][rlen:] = aa('h', [-1]) * nextra
         self._fix_ragged_rows_time = time.time() - t0
-        if 0 and self.nrows:
-            avgrowlen = float(totrowlen) / self.nrows
-            print >> self.logfile, \
-                "sheet %d: avg row len %.1f; max row len %d" \
-                % (self.number, avgrowlen, self.ncols)
+        #if 0 and self.nrows:
+        #    avgrowlen = float(totrowlen) / self.nrows
+        #    print >> self.logfile, \
+        #        "sheet %d: avg row len %.1f; max row len %d" \
+        #        % (self.number, avgrowlen, self.ncols)
 
     def tidy_dimensions(self):
         if self.verbosity >= 3:
@@ -520,10 +529,10 @@ class Sheet(BaseObject):
                 if self.formatting_info:
                     self._cell_xf_indexes[rowx][colx] = xf_index
             except:
-                print >> self.logfile, "put_cell", rowx, colx
+                #print >> self.logfile, "put_cell", rowx, colx
                 raise
         except:
-            print >> self.logfile, "put_cell", rowx, colx
+#            print >> self.logfile, "put_cell", rowx, colx
             raise
 
     def put_blank_cell(self, rowx, colx, xf_index):
@@ -542,10 +551,10 @@ class Sheet(BaseObject):
                 self._cell_values[rowx][colx] = value
                 self._cell_xf_indexes[rowx][colx] = xf_index
             except:
-                print >> self.logfile, "put_cell", rowx, colx
+                #print >> self.logfile, "put_cell", rowx, colx
                 raise
         except:
-            print >> self.logfile, "put_cell", rowx, colx
+#            print >> self.logfile, "put_cell", rowx, colx
             raise
 
     def put_number_cell(self, rowx, colx, value, xf_index):
@@ -564,10 +573,10 @@ class Sheet(BaseObject):
                 if self.formatting_info:
                     self._cell_xf_indexes[rowx][colx] = xf_index
             except:
-                print >> self.logfile, "put_number_cell", rowx, colx
+                #print >> self.logfile, "put_number_cell", rowx, colx
                 raise
         except:
-            print >> self.logfile, "put_number_cell", rowx, colx
+#            print >> self.logfile, "put_number_cell", rowx, colx
             raise
 
     # === Methods after this line neither know nor care about how cells are stored.
@@ -637,10 +646,10 @@ class Sheet(BaseObject):
                 if not fmt_info: continue
                 rowx, bits1, bits2 = local_unpack('<H4xH4xi', data[0:16])
                 if not(0 <= rowx < self.utter_max_rows):
-                    print >> self.logfile, \
-                        "*** NOTE: ROW record has row index %d; " \
-                        "should have 0 <= rowx < %d -- record ignored!" \
-                        % (rowx, self.utter_max_rows)
+                    #print >> self.logfile, \
+                    #    "*** NOTE: ROW record has row index %d; " \
+                    #    "should have 0 <= rowx < %d -- record ignored!" \
+                    #    % (rowx, self.utter_max_rows)
                     continue
                 r = Rowinfo()
                 # Using upkbits() is far too slow on a file
@@ -678,7 +687,7 @@ class Sheet(BaseObject):
                         "**ROW %d %d %d\n",
                         self.number, rowx, r.xf_index)
                 if blah_rows:
-                    print >> self.logfile, 'ROW', rowx, bits1, bits2
+                    #print >> self.logfile, 'ROW', rowx, bits1, bits2
                     r.dump(self.logfile,
                         header="--- sh #%d, rowx=%d ---" % (self.number, rowx))
             elif rc & 0xff == XL_FORMULA: # 06, 0206, 0406
@@ -763,10 +772,10 @@ class Sheet(BaseObject):
                 if not(0 <= first_colx <= last_colx <= 256):
                     # Note: 256 instead of 255 is a common mistake.
                     # We silently ignore the non-existing 257th column in that case.
-                    print >> self.logfile, \
-                        "*** NOTE: COLINFO record has first col index %d, last %d; " \
-                        "should have 0 <= first <= last <= 255 -- record ignored!" \
-                        % (first_colx, last_colx)
+                    #print >> self.logfile, \
+                    #    "*** NOTE: COLINFO record has first col index %d, last %d; " \
+                    #    "should have 0 <= first <= last <= 255 -- record ignored!" \
+                    #    % (first_colx, last_colx)
                     del c
                     continue
                 upkbits(c, flags, (
@@ -793,12 +802,12 @@ class Sheet(BaseObject):
                     c.dump(self.logfile, header='===')
             elif rc == XL_DEFCOLWIDTH:
                 self.defcolwidth, = local_unpack("<H", data[:2])
-                if 0: print >> self.logfile, 'DEFCOLWIDTH', self.defcolwidth
+                #if 0: print >> self.logfile, 'DEFCOLWIDTH', self.defcolwidth
             elif rc == XL_STANDARDWIDTH:
                 if data_len != 2:
-                    print >> self.logfile, '*** ERROR *** STANDARDWIDTH', data_len, repr(data)
+                    print('*** ERROR *** STANDARDWIDTH', data_len, repr(data), file=self.logfile)
                 self.standardwidth, = local_unpack("<H", data[:2])
-                if 0: print >> self.logfile, 'STANDARDWIDTH', self.standardwidth
+                #if 0: print >> self.logfile, 'STANDARDWIDTH', self.standardwidth
             elif rc == XL_GCW:
                 if not fmt_info: continue # useless w/o COLINFO
                 assert data_len == 34
@@ -810,20 +819,20 @@ class Sheet(BaseObject):
                         gcw.append(bits & 1)
                         bits >>= 1
                 self.gcw = tuple(gcw)
-                if 0:
-                    showgcw = "".join(map(lambda x: "F "[x], gcw)).rstrip().replace(' ', '.')
-                    print "GCW:", showgcw
+#                 if 0:
+#                     showgcw = "".join(map(lambda x: "F "[x], gcw)).rstrip().replace(' ', '.')
+#                     print "GCW:", showgcw
             elif rc == XL_BLANK:
                 if not fmt_info: continue
                 rowx, colx, xf_index = local_unpack('<HHH', data[:6])
-                if 0: print >> self.logfile, "BLANK", rowx, colx, xf_index
+#                if 0: print >> self.logfile, "BLANK", rowx, colx, xf_index
                 self_put_blank_cell(rowx, colx, xf_index)
             elif rc == XL_MULBLANK: # 00BE
                 if not fmt_info: continue
                 mul_row, mul_first = local_unpack('<HH', data[0:4])
                 mul_last, = local_unpack('<H', data[-2:])
-                if 0:
-                    print >> self.logfile, "MULBLANK", mul_row, mul_first, mul_last
+#                if 0:
+#                    print >> self.logfile, "MULBLANK", mul_row, mul_first, mul_last
                 pos = 4
                 for colx in xrange(mul_first, mul_last+1):
                     xf_index, = local_unpack('<H', data[pos:pos+2])
@@ -849,7 +858,7 @@ class Sheet(BaseObject):
                         )
             elif rc == XL_EOF:
                 DEBUG = 0
-                if DEBUG: print >> self.logfile, "SHEET.READ: EOF"
+#                if DEBUG: print >> self.logfile, "SHEET.READ: EOF"
                 eof_found = 1
                 break
             elif rc == XL_OBJ:
@@ -857,14 +866,15 @@ class Sheet(BaseObject):
             elif rc in bofcodes: ##### EMBEDDED BOF #####
                 version, boftype = local_unpack('<HH', data[0:4])
                 if boftype != 0x20: # embedded chart
-                    print >> self.logfile, \
-                        "*** Unexpected embedded BOF (0x%04x) at offset %d: version=0x%04x type=0x%04x" \
-                        % (rc, bk._position - data_len - 4, version, boftype)
+                    pass
+                    #print >> self.logfile, \
+                    #    "*** Unexpected embedded BOF (0x%04x) at offset %d: version=0x%04x type=0x%04x" \
+                    #    % (rc, bk._position - data_len - 4, version, boftype)
                 while 1:
                     code, data_len, data = bk.get_record_parts()
                     if code == XL_EOF:
                         break
-                if DEBUG: print >> self.logfile, "---> found EOF"
+#                if DEBUG: print >> self.logfile, "---> found EOF"
             elif rc == XL_COUNTRY:
                 bk.handle_country(data)
             elif rc == XL_LABELRANGES:
@@ -880,13 +890,13 @@ class Sheet(BaseObject):
                 row1x, rownx, col1x, colnx, array_flags, tokslen = \
                     local_unpack("<HHBBBxxxxxH", data[:14])
                 if blah_formulas:
-                    print "ARRAY:", row1x, rownx, col1x, colnx, array_flags
+                    #print "ARRAY:", row1x, rownx, col1x, colnx, array_flags
                     dump_formula(bk, data[14:], tokslen, bv, reldelta=0, blah=1)
             elif rc == XL_SHRFMLA:
                 row1x, rownx, col1x, colnx, nfmlas, tokslen = \
                     local_unpack("<HHBBxBH", data[:10])
                 if blah_formulas:
-                    print "SHRFMLA (main):", row1x, rownx, col1x, colnx, nfmlas
+                    #print "SHRFMLA (main):", row1x, rownx, col1x, colnx, nfmlas
                     decompile_formula(bk, data[10:], tokslen, reldelta=0, blah=1)
             elif rc == XL_CONDFMT:
                 if not fmt_info: continue

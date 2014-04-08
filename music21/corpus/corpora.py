@@ -486,7 +486,7 @@ class CoreCorpus(Corpus):
         self,
         fileExtensions='xml',
         ):
-        ur'''
+        r'''
         Return the file name of all Bach chorales.
 
         By default, only Bach Chorales in xml format are returned, because the

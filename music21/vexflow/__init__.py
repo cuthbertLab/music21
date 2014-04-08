@@ -23,7 +23,13 @@ Here's the hierarchy:
 '''
 
 import unittest
-import indent
+
+import sys
+
+if sys.version > '3':
+    from . import indent
+else:
+    import indent # @Reimport
 
 from music21 import common
 from music21 import exceptions21
@@ -384,22 +390,22 @@ def fromObject(thisObject, mode='txt'):
 
     ::
     
-        >>> print vexflow.fromObject(note.Note('C4'))
+        >>> print(vexflow.fromObject(note.Note('C4')))
         new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
     
     ::
     
-        >>> print vexflow.fromObject(pitch.Pitch('C4'))
+        >>> print(vexflow.fromObject(pitch.Pitch('C4')))
         new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
     
     ::
 
-        >>> print vexflow.fromObject(note.Rest())
+        >>> print(vexflow.fromObject(note.Rest()))
         new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})
 
     ::
 
-        >>> print vexflow.fromObject(chord.Chord(['C4', 'E-4', 'G4']))
+        >>> print(vexflow.fromObject(chord.Chord(['C4', 'E-4', 'G4'])))
         new Vex.Flow.StaveNote({keys: ["Cn/4", "Eb/4", "Gn/4"], duration: "q"})
 
     ::
@@ -428,14 +434,14 @@ def fromObject(thisObject, mode='txt'):
 
     ::
 
-        >>> print vexflow.fromObject(measure1)
+        >>> print(vexflow.fromObject(measure1))
         var music21Voice0 = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
         var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
         music21Voice0.addTickables(music21Voice0Notes);
 
     ::
 
-        >>> print vexflow.fromObject(trebleVoice)
+        >>> print(vexflow.fromObject(trebleVoice))
         var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
         var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["En/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
         music21Voice0.addTickables(music21Voice0Notes);
@@ -466,7 +472,7 @@ def fromObject(thisObject, mode='txt'):
     elif 'Stream' in thisObject.classes:
         return fromStream(thisObject, mode)
     else:
-        raise Vexflow21UnsupportedException, 'Unsupported object type: ' + str(thisObject)
+        raise Vexflow21UnsupportedException('Unsupported object type: ' + str(thisObject))
 
 
 def fromScore(thisScore, mode='txt'):
@@ -480,7 +486,7 @@ def fromScore(thisScore, mode='txt'):
     
     '''
     if mode not in supportedDisplayModes:
-        raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
+        raise Vexflow21UnsupportedException('Unsupported mode: ' + str(mode))
 
     return VexflowScore(thisScore.makeNotation(inPlace=False)).generateCode(mode)
 
@@ -499,7 +505,7 @@ def fromStream(thisStream, mode='txt'):
 
     '''
     if mode not in supportedDisplayModes:
-        raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
+        raise Vexflow21UnsupportedException('Unsupported mode: ' + str(mode))
 
     theseParts = thisStream.getElementsByClass('Part')
     if len(theseParts) == 0:
@@ -513,12 +519,12 @@ def fromRest(thisRest, mode='txt'):
     :: 
 
         >>> a = note.Rest()
-        >>> print vexflow.fromRest(a, mode='txt')
+        >>> print(vexflow.fromRest(a, mode='txt'))
         new Vex.Flow.StaveNote({keys: ["b/4"], duration: "qr"})
 
     ::
 
-        >>> print vexflow.fromRest(a, mode='html')
+        >>> print(vexflow.fromRest(a, mode='html'))
         <!DOCTYPE HTML>
         <html>
         <head>
@@ -553,7 +559,7 @@ def fromRest(thisRest, mode='txt'):
 
     '''
     if mode not in supportedDisplayModes:
-        raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
+        raise Vexflow21UnsupportedException('Unsupported mode: ' + str(mode))
     return VexflowRest(thisRest).generateCode(mode)
 
 
@@ -563,13 +569,13 @@ def fromNote(thisNote, mode='txt'):
     
     ::
     
-        >>> print vexflow.fromNote(note.Note('C4'), mode='txt')
+        >>> print(vexflow.fromNote(note.Note('C4'), mode='txt'))
         new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"})
 
     See VexFlowNote.generateCode() for an example of mode='html'.
     '''
     if mode not in supportedDisplayModes:
-        raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
+        raise Vexflow21UnsupportedException('Unsupported mode: ' + str(mode))
     return VexflowNote(thisNote).generateCode(mode)
 
 
@@ -580,12 +586,12 @@ def fromChord(thisChord, mode='txt'):
     ::
 
         >>> a = chord.Chord(['C3', 'E-3', 'G3', 'C4'])
-        >>> print vexflow.fromChord(a, mode='txt')
+        >>> print(vexflow.fromChord(a, mode='txt'))
         new Vex.Flow.StaveNote({keys: ["Cn/3", "Eb/3", "Gn/3", "Cn/4"], duration: "q"})
 
     ::
 
-        >>> print vexflow.fromChord(a, mode='jsbody')
+        >>> print(vexflow.fromChord(a, mode='jsbody'))
         var canvas = $('#music21canvas')[0];
         var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
         var ctx = renderer.getContext();
@@ -605,7 +611,7 @@ def fromChord(thisChord, mode='txt'):
 
     ::
 
-        >>> print vexflow.fromChord(a, mode='html')
+        >>> print(vexflow.fromChord(a, mode='html'))
         <!DOCTYPE HTML>
         <html>
         <head>
@@ -640,7 +646,7 @@ def fromChord(thisChord, mode='txt'):
 
     '''
     if mode not in supportedDisplayModes:
-        raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
+        raise Vexflow21UnsupportedException('Unsupported mode: ' + str(mode))
     return VexflowChord(thisChord).generateCode(mode)
 
 
@@ -655,7 +661,7 @@ def fromPart(thisPart, mode='txt'):
 
     '''
     if mode not in supportedDisplayModes:
-        raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
+        raise Vexflow21UnsupportedException('Unsupported mode: ' + str(mode))
     return VexflowPart(thisPart.makeNotation(inPlace=False)).generateCode(mode)
 
 
@@ -668,7 +674,7 @@ def fromMeasure(thisMeasure, mode='txt'):
         >>> b = corpus.parse('bwv1.6.mxl')
         >>> m = b.parts[0].measures(0,1)[2]
         >>> d = vexflow.fromMeasure(m)
-        >>> print d
+        >>> print(d)
         var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
         var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
         music21Voice0.addTickables(music21Voice0Notes);
@@ -681,7 +687,7 @@ def fromMeasure(thisMeasure, mode='txt'):
     '''
 
     if mode not in supportedDisplayModes:
-        raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
+        raise Vexflow21UnsupportedException('Unsupported mode: ' + str(mode))
     
     notationMeasure = thisMeasure.makeNotation(inPlace=False)
     vfv = VexflowVoice(notationMeasure)
@@ -740,9 +746,9 @@ def vexflowClefFromClef(music21clef):
         in music21clef.classes:
         return 'treble'
     else:
-        raise VexFlowUnsupportedException, 'Vexflow only supports the ' +\
+        raise VexFlowUnsupportedException('Vexflow only supports the ' +\
             'following clefs: treble, bass, alto, tenor, percussion. ' +\
-            'Cannot parse ', music21clef
+            'Cannot parse ', music21clef)
 
 
 #-------------------------------------------------------------------------------
@@ -777,7 +783,7 @@ class VexflowObject(object):
         :: 
 
             >>> vo = vexflow.VexflowObject()
-            >>> print vo.getVoiceString(2.0).rstrip()
+            >>> print(vo.getVoiceString(2.0).rstrip())
                     var voice = new Vex.Flow.Voice({
                         num_beats: 2.0,
                         beat_value: 4,
@@ -786,7 +792,7 @@ class VexflowObject(object):
 
         ::
 
-            >>> print vo.getVoiceString(3.0, voiceName='myVoice', currentIndentLevel = 0).rstrip()
+            >>> print(vo.getVoiceString(3.0, voiceName='myVoice', currentIndentLevel = 0).rstrip())
             var myVoice = new Vex.Flow.Voice({
                 num_beats: 3.0,
                 beat_value: 4,
@@ -823,7 +829,7 @@ var {voiceName} = new Vex.Flow.Voice({{
 
         ::
 
-            >>> print v.generateCode('jsbody')
+            >>> print(v.generateCode('jsbody'))
             var canvas = $('#music21canvas')[0];
             var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
             var ctx = renderer.getContext();
@@ -843,7 +849,7 @@ var {voiceName} = new Vex.Flow.Voice({{
 
         ::
 
-            >>> print v.generateCode('html')
+            >>> print(v.generateCode('html'))
             <!DOCTYPE HTML>
             <html>
             <head>
@@ -878,8 +884,8 @@ var {voiceName} = new Vex.Flow.Voice({{
 
         '''
         if mode not in supportedDisplayModes:
-            raise Vexflow21UnsupportedException, "VexFlow doesn't support this "\
-                + "display mode yet. " + str(mode)
+            raise Vexflow21UnsupportedException("VexFlow doesn't support this "\
+                + "display mode yet. " + str(mode))
 
         if mode == 'txt':
             return self.vexflowCode()
@@ -1023,8 +1029,8 @@ voice.draw(ctx, stave);""".format(defaultStaff=staffString(),
                 thisVexflowAccidental =\
                      alterationToVexflowAccidental[pitch.accidental.alter]
             else:
-                raise VexFlowUnsupportedException, "VexFlow doesn't support "\
-                    + "this accidental type. " + str(pitch.accidental.fullName)
+                raise VexFlowUnsupportedException("VexFlow doesn't support "\
+                    + "this accidental type. " + str(pitch.accidental.fullName))
             
             return '.addAccidental(' + str(index) + ', new Vex.Flow.Accidental("' +\
                  thisVexflowAccidental + '"))'
@@ -1105,8 +1111,8 @@ voice.draw(ctx, stave);""".format(defaultStaff=staffString(),
                 thisVexflowAccidental =\
                      alterationToVexflowAccidental[thisAccidental.alter]
             else:
-                raise VexFlowUnsupportedException, "VexFlow doesn't support "\
-                    + "this accidental type. " + str(thisAccidental.fullName)
+                raise VexFlowUnsupportedException("VexFlow doesn't support "\
+                    + "this accidental type. " + str(thisAccidental.fullName))
         else:
             thisVexflowAccidental = 'n'
     
@@ -1151,8 +1157,8 @@ voice.draw(ctx, stave);""".format(defaultStaff=staffString(),
         if thisQuarterLength in vexflowQuarterLengthToDuration:
             return vexflowQuarterLengthToDuration[thisQuarterLength]
         else:
-            raise VexFlowUnsupportedException, "VexFlow doesn't support this "\
-                + "duration. " + str(m21Duration.fullName)
+            raise VexFlowUnsupportedException("VexFlow doesn't support this "\
+                + "duration. " + str(m21Duration.fullName))
 
 
 class VexflowNote(VexflowObject):
@@ -1363,7 +1369,7 @@ class VexflowVoice(object):
         if music21measure != None:
             if not ('Measure' in music21measure.classes or \
                 'Voice' in music21measure.classes):
-                raise TypeError, 'must pass a music21 Measure object'
+                raise TypeError('must pass a music21 Measure object')
             self.originalMeasure = music21measure
             self.originalFlat = music21measure.flat
         else:
@@ -1402,8 +1408,8 @@ class VexflowVoice(object):
         #Set the clef
         theseClefs = self.originalFlat.getElementsByClass('Clef')
         if len(theseClefs) > 1:
-            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
-                'multiple clefs in a single measure'
+            raise Vexflow21UnsupportedException('Vexflow cannot yet handle ' +\
+                'multiple clefs in a single measure')
         elif len(theseClefs) == 1:
             self.clefDisplayStatus = True
             self.clef = vexflowClefFromClef(theseClefs[0])
@@ -1418,16 +1424,16 @@ class VexflowVoice(object):
         #Set the key signature
         theseKeySignatures = self.originalFlat.getElementsByClass('KeySignature')
         if len(theseKeySignatures) > 1:
-            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
-                'multiple key signatures in a single measure'
+            raise Vexflow21UnsupportedException('Vexflow cannot yet handle ' +\
+                'multiple key signatures in a single measure')
         elif len(theseKeySignatures) == 1:
             self.keySignatureDisplayStatus = True
             if theseKeySignatures[0].sharps in vexflowSharpsToKeySignatures:
                 self.keySignature = \
                     vexflowSharpsToKeySignatures[theseKeySignatures[0].sharps]
             else:
-                raise VexFlowUnsupportedException, "VexFlow doesn't support this "+\
-                    'Key Signature:', theseKeySignatures[0]
+                raise VexFlowUnsupportedException("VexFlow doesn't support this "+\
+                    'Key Signature:', theseKeySignatures[0])
         else:
             if 'keySignature' in self.params:
                 self.keySignature = self.params['keySignature']
@@ -1442,8 +1448,8 @@ class VexflowVoice(object):
         #Set the time signature
         theseTimeSignatures = self.originalFlat.getElementsByClass('TimeSignature')
         if len(theseTimeSignatures) > 1:
-            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
-                'multiple time signatures in a single measure'
+            raise Vexflow21UnsupportedException('Vexflow cannot yet handle ' +\
+                'multiple time signatures in a single measure')
         elif len(theseTimeSignatures) == 1:
             self.numBeats = self.originalMeasure.highestTime
             self.beatValue = 4
@@ -1549,7 +1555,7 @@ class VexflowVoice(object):
             >>> s.append(note.Note('d4'))
             >>> vfv = vexflow.VexflowVoice(s)
             >>> vfv.voiceName = 'myVoice'
-            >>> print vfv.vexflowCode()
+            >>> print(vfv.vexflowCode())
             var myVoice = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
             var myVoiceNotes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "q"})];
             myVoice.addTickables(myVoiceNotes);
@@ -1650,7 +1656,7 @@ class VexflowVoice(object):
             >>> s.append(n2)
             >>> vfv = vexflow.VexflowVoice(s)
             >>> vfv.voiceName = 'myVoice'
-            >>> print vfv.tieCode()[0][0]
+            >>> print(vfv.tieCode()[0][0])
                 var myVoiceTie0 = new Vex.Flow.StaveTie({
                     first_note: myVoiceNotes[0],
                     last_note: myVoiceNotes[1],
@@ -1733,7 +1739,7 @@ var {tn} = new Vex.Flow.StaveTie({{
         >>> m = stream.Measure()
         >>> m.append(note.HalfNote("c4"))
         >>> vfv = vexflow.VexflowVoice(m)
-        >>> print vfv.generateCode(mode="jsbody")
+        >>> print(vfv.generateCode(mode="jsbody"))
                     var canvas = $('#music21canvas')[0];
                     var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
                     var ctx = renderer.getContext();
@@ -2258,9 +2264,9 @@ class VexflowScore(object):
                 thisTieEnd = str(thisName)+'['+str(thisTie[1])+']'
 
                 if thisTieStart == None or thisTieEnd == None:
-                    print 'uh oh... got mixed up somewhere'
-                    print partialTies
-                    print 'Ignoring'
+                    print('uh oh... got mixed up somewhere')
+                    print(partialTies)
+                    print('Ignoring')
                     tieStart = True
                     continue
 

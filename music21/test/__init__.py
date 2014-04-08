@@ -12,7 +12,12 @@ __all__ = [
     'testStream',
     ]
 
-import testStream
+import sys
+
+if sys.version > '3':
+    from . import testStream
+else:
+    import testStream # @Reimport
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 

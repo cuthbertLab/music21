@@ -4,10 +4,12 @@
 # Purpose:      Feature extractors base classes.
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
+from __future__ import print_function
 
 import unittest
 import os
@@ -655,7 +657,7 @@ class OutputTabOrange(OutputFormat):
         >>> ds = features.DataSet()
         >>> ds.addFeatureExtractors(f)
         >>> of = features.OutputTabOrange(ds)
-        >>> for x in of.getHeaderLines(): print x
+        >>> for x in of.getHeaderLines(): print(x)
         ['Identifier', 'Changes_of_Meter']
         ['string', 'discrete']
         ['meta', '']
@@ -663,7 +665,7 @@ class OutputTabOrange(OutputFormat):
         >>> ds = features.DataSet(classLabel='Composer')
         >>> ds.addFeatureExtractors(f)
         >>> of = features.OutputTabOrange(ds)
-        >>> for x in of.getHeaderLines(): print x
+        >>> for x in of.getHeaderLines(): print(x)
         ['Identifier', 'Changes_of_Meter', 'Composer']
         ['string', 'discrete', 'discrete']
         ['meta', '', 'class']
@@ -779,7 +781,7 @@ class OutputARFF(OutputFormat):
         >>> ds = features.DataSet(classLabel='Composer')
         >>> ds.addFeatureExtractors(f)
         >>> of = features.OutputARFF(ds)
-        >>> for x in of.getHeaderLines(): print x
+        >>> for x in of.getHeaderLines(): print(x)
         @RELATION Composer
         @ATTRIBUTE Identifier STRING
         @ATTRIBUTE Changes_of_Meter NUMERIC
@@ -1536,7 +1538,7 @@ class Test(unittest.TestCase):
         classifier = orange.BayesLearner(data)
         for i in range(len(data)):
             c = classifier(data[i])
-            print "original", data[i].getclass(), "BayesLearner:", c
+            print("original", data[i].getclass(), "BayesLearner:", c)
 
 
     def xtestClassifiersA(self):
@@ -1633,17 +1635,17 @@ class Test(unittest.TestCase):
         classifiers = [majority, bayes, tree, knn]
         
         # print the head
-        print "Possible classes:", data.domain.classVar.values
-        print "Original Class",
+        print("Possible classes:", data.domain.classVar.values)
+        print("Original Class", end=' ')
         for l in classifiers:
-            print "%-13s" % (l.name),
+            print("%-13s" % (l.name), end=' ')
         print
         
         for example in data:
-            print "(%-10s)  " % (example.getclass()),
+            print("(%-10s)  " % (example.getclass()), end=' ')
             for c in classifiers:
                 p = apply(c, [example, orange.GetProbabilities])
-                print "%5.3f        " % (p[0]),
+                print("%5.3f        " % (p[0]), end=' ')
             print
 
 
@@ -1655,7 +1657,7 @@ class Test(unittest.TestCase):
         #tree = orngTree.TreeLearner(data)
         for i in range(len(data)):
             p = tree(data[i], orange.GetProbabilities)
-            print "%d: %5.3f (originally %s)" % (i+1, p[1], data[i].getclass())
+            print("%d: %5.3f (originally %s)" % (i+1, p[1], data[i].getclass()))
 
         orngTree.printTxt(tree)
 

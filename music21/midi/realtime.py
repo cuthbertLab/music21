@@ -27,7 +27,10 @@ import unittest
 try:
     import cStringIO as stringIOModule
 except ImportError:
-    import StringIO as stringIOModule
+    try:
+        import StringIO as stringIOModule
+    except ImportError:
+        from io import StringIO as stringIOModule
 
 class StreamPlayerException(Music21Exception):
     pass
@@ -151,7 +154,7 @@ class TestExternal(unittest.TestCase):
         def busyCounter(timeList):
             timeCounter = timeList[0]
             timeCounter.times += timeCounter.updateTime
-            print "hi! waited %d milliseconds" % (timeCounter.times)
+            print("hi! waited %d milliseconds" % (timeCounter.times))
         
         class Mock():
             times = 0

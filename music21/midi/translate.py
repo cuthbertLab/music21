@@ -1923,7 +1923,7 @@ def midiFilePathToStream(filePath, inputM21=None):
 
 
 def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tracksEventsList = None):
-    '''
+    r'''
     Convert Ascii midi data to a binary midi string.
     
     tracksEventsList contains a list of tracks which contain also a list of events.
@@ -1933,17 +1933,17 @@ def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tra
         bb = Midi event type
         cc = Note number (hex)
         dd = Velocity (integer)
-    Example: 
+    Example:
+    
+    ::
+    
         >>> asciiMidiEventList = []
         >>> asciiMidiEventList.append('0 90 31 15')
         >>> midiTrack = []
         >>> midiTrack.append(asciiMidiEventList)
-        >>> midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
-        >>> s = stream.Stream()
-        >>> s = midiStringToStream(midiBinStr, s)
-        >>> s.show('text')
-        {0.0} <music21.stream.Part 65081200>
-            {0.0} <music21.note.Note G>                
+        >>> midiBinStr = midi.translate.midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
+        >>> midiBinStr
+        'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
@@ -1997,17 +1997,27 @@ def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tra
     
     return midiBinStr
 
-
-def midiStringToStream(strData, inputM21):
-    '''
+## not working 
+def midiStringToStream(strData):
+    r'''
     Convert a string of binary midi data to a Music21 stream.Score object.
+
+    TODO: NOT WORKING AS IT SHOULD 
+         
+#     >>> midiBinStr = 'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
+# 
+#     >>> s = midi.translate.midiStringToStream(midiBinStr)
+#     >>> s.show('text')
+#     {0.0} <music21.stream.Part ...>
+#         {0.0} <music21.note.Note G>                
+# 
     '''
     from music21 import midi as midiModule
-    
+     
     mf = midiModule.MidiFile()
     # do not need to call open or close on MidiFile instance
     mf.readstr(strData)
-    return midiFileToStream(mf, inputM21)
+    return midiFileToStream(mf)
 
 
 def midiFileToStream(mf, inputM21=None, quantizePost=True):

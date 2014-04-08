@@ -2236,7 +2236,7 @@ class TestExternal(unittest.TestCase):
 
         sortedList = sorted(figuresCache, key=figuresCache.get, reverse=True)
         for thisFigure in sortedList:
-            print thisFigure, figuresCache[thisFigure]
+            print(thisFigure, figuresCache[thisFigure])
 
         b.insert(0, c)
         b.show()

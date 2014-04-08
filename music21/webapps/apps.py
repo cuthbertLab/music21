@@ -17,11 +17,13 @@ It includes a set of applicationInitializers which augment agendas with data and
 specific to a given application as well as a set of commands specific to the various applications.
 
 '''
-
+import sys
 import unittest
 
-
-import templates
+if sys.version > '3':
+    from . import templates # @UnusedImport
+else:
+    import templates # @Reimport
 
 def setupURLCorpusParseApp(agenda):
     '''

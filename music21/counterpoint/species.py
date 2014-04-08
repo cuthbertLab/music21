@@ -1262,7 +1262,7 @@ class Test(unittest.TestCase):
         #  GGBC
         #  CDFF
         findPar5 = counterpoint1.findParallelFifths(stream1, stream2)
-        print findPar5
+        print(findPar5)
         
         assert findPar5 == 1
         assert n24.editorial.misc["Parallel Fifth"] == True

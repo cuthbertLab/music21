@@ -1136,7 +1136,7 @@ class MeterSequence(MeterTerminal):
                 if dMod < 1 or nMod <= 1:
                     break
                 seq = []
-                for j in range(nMod):
+                for j in range(int(nMod)):
                     seq.append('%s/%s' % (1, dMod))
                 opts.append(seq)
                 if nMod % 2 != 0: # if no longer even must stop

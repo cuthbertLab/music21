@@ -42,8 +42,11 @@ from music21 import tie
 currentStdOut = sys.stdout
 currentStdIn = sys.stdin
 currentStdErr = sys.stderr
-reload(sys)
-sys.setdefaultencoding('utf-8') # @UndefinedVariable
+try:
+    reload(sys)
+    sys.setdefaultencoding('utf-8') # @UndefinedVariable
+except NameError:
+    pass
 sys.stdout = currentStdOut
 sys.stdin = currentStdIn
 sys.stderr = currentStdErr
@@ -401,7 +404,7 @@ class CapellaImporter(object):
                 el = None
                 t = d.tagName
                 if t not in mapping:
-                    print "Unknown tag type: %s" % t
+                    print("Unknown tag type: %s" % t)
                 else:
                     el = mapping[t](d)
                     if isinstance(el, list): #barlineList returns a list
@@ -817,7 +820,7 @@ class CapellaImporter(object):
             denominator *= 2
         
         if 'tripartite' in tupletElement._attrs:
-            print "WE DON'T HANDLE TRIPARTITE YET! Email the file and a pdf so I can figure it out"
+            print("WE DON'T HANDLE TRIPARTITE YET! Email the file and a pdf so I can figure it out")
         
         tup = duration.Tuplet(numerator, denominator)
         return tup

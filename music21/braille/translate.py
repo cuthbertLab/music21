@@ -86,7 +86,7 @@ import unittest
 #------------------------------------------------------------------------------
 
 def objectToBraille(music21Obj, **keywords):
-    ur"""
+    u"""
 
     Translates an arbitrary object to braille.
 

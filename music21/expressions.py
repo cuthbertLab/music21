@@ -859,7 +859,7 @@ class TrillExtension(spanner.Spanner):
     >>> s.append(te) # can go anywhere in the Stream
     >>> te.getDurationBySite(s).quarterLength
     2.0
-    >>> print te
+    >>> print(te)
     <music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>
     '''
     # musicxml defines a start, stop, and a continue; will try to avoid continue

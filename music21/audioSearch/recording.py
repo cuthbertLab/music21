@@ -132,7 +132,7 @@ class TestExternal(unittest.TestCase):
         record one second of data and print 10 records
         '''
         sampleList = samplesFromRecording(seconds=1, storeFile=False)
-        print sampleList[30:40]
+        print(sampleList[30:40])
 
 
 #-------------------------------------------------------------------------------

@@ -24,8 +24,12 @@ import sys
 currentStdOut = sys.stdout
 currentStdIn = sys.stdin
 currentStdErr = sys.stderr
-reload(sys)
-sys.setdefaultencoding('utf-8') # @UndefinedVariable
+try:
+    reload(sys)
+    sys.setdefaultencoding('utf-8') # @UndefinedVariable
+except: # Python3
+    pass
+
 sys.stdout = currentStdOut
 sys.stdin = currentStdIn
 sys.stderr = currentStdErr
@@ -34,9 +38,11 @@ import copy
 import os
 import unittest
 
-import StringIO # this module is not supported in python3
+try:
+    import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
-
+except ImportError:
+    from io import StringIO
 
 try:
     import cPickle as pickleMod # much faster...
@@ -1183,7 +1189,7 @@ class Test(unittest.TestCase):
     def testStaffLines(self):
         # note: this import path will likel change
         from music21.musicxml import testFiles
-        data = testFiles.ALL[5] # TabFile
+        data = testFiles.ALL[5] # TabFile # @UndefinedVariable
         a = Document()
         a.read(data)
         self.assertEqual(a.score.componentList[0][0].attributesObj.staffDetailsList[0].staffLines, '6')

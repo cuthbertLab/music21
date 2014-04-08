@@ -466,7 +466,7 @@ class GeneralNote(base.Music21Object):
         'bye'
         >>> n1.lyrics[1].number
         3
-        >>> for lyr in n1.lyrics: print lyr.text
+        >>> for lyr in n1.lyrics: print(lyr.text)
         hello
         bye
 

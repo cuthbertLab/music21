@@ -42,6 +42,12 @@ SpineParsing consists of several steps.
 * Measures are searched for elements with voice groups and Voice objects are created
 
 '''
+#python3
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
+
 import unittest
 import math
 import re

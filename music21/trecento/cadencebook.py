@@ -46,7 +46,7 @@ class TrecentoSheet(object):
     
     >>> kyrieSheet = trecento.cadencebook.TrecentoSheet(sheetname = 'kyrie')
     >>> for thisKyrie in kyrieSheet:
-    ...     print thisKyrie.title
+    ...     print(thisKyrie.title)
     Questa Fanc.
     Kyrie Summe Clementissime
     Kyrie rondello
@@ -608,7 +608,7 @@ class TrecentoCadenceWork(object):
             if (thisVoice):
                 try:
                     returnBlock[i] = trecentoCadence.TrecentoCadenceStream(thisVoice, currentTimeSig)
-                except duration.DurationException, (value):
+                except duration.DurationException as value:
                     raise duration.DurationException("Problems in line %s: specifically %s" % (thisVoice,  value))
 #                except Exception, (value):
 #                    raise Exception("Unknown Problems in line %s: specifically %s" % (thisVoice,  value))
@@ -825,7 +825,7 @@ class TestExternal(unittest.TestCase):
         virelaisSheet = TrecentoSheet(sheetname = 'virelais')
         thisVirelai = virelaisSheet.makeWork(54)
         if thisVirelai.title != "":
-            print thisVirelai.title
+            print(thisVirelai.title)
             thisVirelai.incipit.show('musicxml')
     
     def xtestRondeaux(self):
@@ -835,7 +835,7 @@ class TestExternal(unittest.TestCase):
         rondeauxSheet = TrecentoSheet(sheetname = 'rondeaux')
         thisRondeaux = rondeauxSheet.makeWork(41)
         if thisRondeaux.title != "":
-            print thisRondeaux.title
+            print(thisRondeaux.title)
             thisRondeaux.incipit.show('musicxml')
     
     def xtestGloria(self):

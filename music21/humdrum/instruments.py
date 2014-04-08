@@ -273,7 +273,7 @@ class Test(unittest.TestCase):
             if 'Instrument' in x.classes:
                 foundInstruments.append(str(x))
         self.assertEqual(foundInstruments, ['Alto', 'Alto', 'Alto', 'Tenor', 'Alto', 'Bass', 'Tenor'])
-        print c.parts[1].flat.getInstrument()
+        print(c.parts[1].flat.getInstrument())
 
 if __name__ == '__main__':
     import music21

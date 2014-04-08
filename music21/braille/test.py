@@ -27,7 +27,7 @@ import unittest
 # Chapter 2: Eighth Notes, the Eighth Rest, and Other Basic Signs
 
 def example2_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_1(), inPlace=True, suppressOctaveMarks = True)
@@ -41,7 +41,7 @@ def example2_1():
     return bm
 
 def example2_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_2(), inPlace=True, suppressOctaveMarks = True)
@@ -60,7 +60,7 @@ def example2_2():
     return bm
 
 def example2_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_3(), inPlace=True, suppressOctaveMarks = True)
@@ -74,7 +74,7 @@ def example2_3():
     return bm
 
 def example2_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_4(), inPlace=True, suppressOctaveMarks = True)
@@ -89,7 +89,7 @@ def example2_4():
     return bm
 
 def example2_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_5(), inPlace=True, suppressOctaveMarks = True)
@@ -108,7 +108,7 @@ def example2_5():
     return bm
 
 def example2_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_6(), inPlace=True, suppressOctaveMarks = True)
@@ -122,7 +122,7 @@ def example2_6():
     return bm
 
 def example2_7():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_7(), inPlace=True, suppressOctaveMarks = True)
@@ -139,7 +139,7 @@ def example2_7():
 # Chapter 3: Quarter Notes, the Quarter Rest, and the Dot
 
 def example3_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_1(), inPlace=True, suppressOctaveMarks = True)
@@ -153,7 +153,7 @@ def example3_1():
     return bm
 
 def example3_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_2(), inPlace=True, suppressOctaveMarks = True)
@@ -167,7 +167,7 @@ def example3_2():
     return bm
 
 def example3_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_3(), inPlace=True, suppressOctaveMarks = True)
@@ -181,7 +181,7 @@ def example3_3():
     return bm
 
 def example3_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_4(), inPlace=True, suppressOctaveMarks = True)
@@ -195,7 +195,7 @@ def example3_4():
     return bm
 
 def example3_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_5(), inPlace=True, suppressOctaveMarks = True)
@@ -210,7 +210,7 @@ def example3_5():
     return bm
 
 def example3_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_6(), inPlace=True, suppressOctaveMarks = True)
@@ -227,7 +227,7 @@ def example3_6():
 # Chapter 4: Half Notes, the Half Rest, and the Tie
 
 def example4_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example4_1(), inPlace=True, suppressOctaveMarks = True)
@@ -239,7 +239,7 @@ def example4_1():
     return bm
 
 def example4_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example4_2(), inPlace=True, suppressOctaveMarks = True)
@@ -251,7 +251,7 @@ def example4_2():
     return bm    
 
 def example4_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example4_3(), inPlace=True, suppressOctaveMarks = True)
@@ -266,7 +266,7 @@ def example4_3():
     return bm
 
 def example4_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> measure1 = test.example4_4()[0]
@@ -280,7 +280,7 @@ def example4_4():
     return bm
 
 def example4_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> measure1 = test.example4_5()[0]
@@ -294,7 +294,7 @@ def example4_5():
     return bm
 
 def example4_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> bm = test.example4_6()
@@ -312,7 +312,7 @@ def example4_6():
     return bm
 
 def example4_7():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example4_7(), inPlace=True, suppressOctaveMarks = True)
@@ -330,7 +330,7 @@ def example4_7():
 # Transcriber-Added Signs
 
 def example5_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_1(), inPlace=True, suppressOctaveMarks = True)
@@ -342,7 +342,7 @@ def example5_1():
     return bm
 
 def example5_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_2(), inPlace=True, suppressOctaveMarks = True)
@@ -355,7 +355,7 @@ def example5_2():
     return bm
 
 def example5_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_3(), inPlace=True, suppressOctaveMarks = True)
@@ -367,7 +367,7 @@ def example5_3():
     return bm
 
 def example5_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_4(), inPlace=True, suppressOctaveMarks = True)
@@ -382,7 +382,7 @@ def example5_4():
     return bm
 
 def example5_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_5(), inPlace=True, suppressOctaveMarks = True)
@@ -396,7 +396,7 @@ def example5_5():
     return bm
 
 def example5_6():
-    ur"""
+    u"""
     NOTE: Breve note and breve rest are transcribed using method (b) on page 24.
 
     >>> from music21.braille import test
@@ -439,7 +439,7 @@ def example5_7c():
 # Chapter 6: Accidentals
 
 def example6_1():
-    ur"""
+    u"""
     >>> from music21.braille import basic
     >>> from music21 import note
     >>> print basic.noteToBraille(note.Note('C#4', quarterLength = 2.0), showOctave = False)
@@ -452,7 +452,7 @@ def example6_1():
     pass
 
 def example6_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example6_2()[0], inPlace=True, suppressOctaveMarks = True)
@@ -465,7 +465,7 @@ def example6_2():
     return bm
 
 def example6_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example6_3()[0], inPlace=True, suppressOctaveMarks = True)
@@ -480,7 +480,7 @@ def example6_3():
     return bm
 
 def example6_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example6_4()[0], inPlace=True, suppressOctaveMarks = True)
@@ -496,7 +496,7 @@ def example6_4():
     return bm
 
 def example6_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example6_5()[0], inPlace=True, suppressOctaveMarks = True)
@@ -511,7 +511,7 @@ def example6_5():
     return bm
 
 def example6_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_6(), inPlace=True, suppressOctaveMarks = True)
@@ -525,7 +525,7 @@ def example6_6():
     return bm
 
 def example6_7():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_7(), inPlace=True, suppressOctaveMarks = True)
@@ -541,7 +541,7 @@ def example6_7():
     return bm
 
 def example6_8():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_8(), inPlace=True, suppressOctaveMarks = True)
@@ -554,7 +554,7 @@ def example6_8():
     return bm
 
 def example6_9():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_9(), inPlace=True, suppressOctaveMarks = True)
@@ -568,7 +568,7 @@ def example6_9():
     return bm
 
 def example6_10():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_10(), inPlace=True, suppressOctaveMarks = True)
@@ -582,7 +582,7 @@ def example6_10():
     return bm
 
 def example6_11():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_11(), inPlace=True, suppressOctaveMarks = True)
@@ -596,7 +596,7 @@ def example6_11():
     return bm
 
 def example6_12():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_12(), inPlace=True, suppressOctaveMarks = True)
@@ -615,7 +615,7 @@ def example6_12():
 # Chapter 7: Octave Marks
 
 def example7_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_1(), inPlace=True)
@@ -635,7 +635,7 @@ def example7_1():
     return bm
 
 def example7_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_2(), inPlace=True)
@@ -653,7 +653,7 @@ def example7_2():
     return bm
     
 def example7_3a():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_3a()[0], inPlace=True)
@@ -666,7 +666,7 @@ def example7_3a():
     return bm
 
 def example7_3b():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_3b()[0], inPlace=True)
@@ -679,7 +679,7 @@ def example7_3b():
     return bm
 
 def example7_4a():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_4a()[0], inPlace=True)
@@ -692,7 +692,7 @@ def example7_4a():
     return bm
 
 def example7_4b():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_4b()[0], inPlace=True)
@@ -705,7 +705,7 @@ def example7_4b():
     return bm
 
 def example7_5a():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_5a()[0], inPlace=True)
@@ -718,7 +718,7 @@ def example7_5a():
     return bm
 
 def example7_5b():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_5b()[0], inPlace=True)
@@ -731,7 +731,7 @@ def example7_5b():
     return bm
 
 def example7_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> inPart = test.example7_6()
@@ -750,7 +750,7 @@ def example7_6():
     return bm
 
 def example7_7():
-    ur"""
+    u"""
     "Whenever the marking “8va” occurs in print over or under certain notes,
     these notes should be transcribed according to the octaves in which they
     are actually to be played." page 42, Braille Transcription Manual
@@ -769,7 +769,7 @@ def example7_7():
     return bm
 
 def example7_8():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_8(), inPlace=True)
@@ -783,7 +783,7 @@ def example7_8():
     return bm
 
 def example7_9():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_9(), inPlace=True)
@@ -797,7 +797,7 @@ def example7_9():
     return bm
     
 def example7_10():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> inPart = test.example7_10()
@@ -839,7 +839,7 @@ def example7_10():
     return bm
 
 def example7_11():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> inPart = test.example7_11()
@@ -876,7 +876,7 @@ def example7_11():
 # Chapter 8: The Music Heading: Signatures, Tempo, and Mood
 
 def example8_1a():
-    ur"""
+    u"""
     Flats.
 
     >>> from music21.braille import basic
@@ -899,7 +899,7 @@ def example8_1a():
     pass
     
 def example8_1b():
-    ur"""
+    u"""
     Sharps.
 
     >>> from music21.braille import basic
@@ -922,7 +922,7 @@ def example8_1b():
     pass
     
 def example8_2():
-    ur"""
+    u"""
     Time signatures with two numbers.
 
     >>> from music21.braille import basic
@@ -939,19 +939,19 @@ def example8_2():
     pass
 
 def example8_3():
-    ur"""
+    u"""
     Time signatures with one number. Not currently supported.
     """
     pass
 
 def example8_4():
-    ur"""
+    u"""
     Combined time signatures. Not currently supported.
     """
     pass
 
 def example8_5():
-    ur"""
+    u"""
     Common/cut time signatures.
 
     >>> from music21.braille import basic
@@ -964,7 +964,7 @@ def example8_5():
     pass
 
 def example8_6():
-    ur"""
+    u"""
     Combined key and time signatures.
 
     >>> from music21.braille import basic
@@ -997,7 +997,7 @@ def example8_6():
     pass
 
 def example8_7a():
-    ur"""
+    u"""
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> from music21 import meter
@@ -1014,7 +1014,7 @@ def example8_7a():
     pass
     
 def example8_8():
-    ur"""
+    u"""
     Metronome Markings
 
     >>> from music21.braille import basic
@@ -1025,7 +1025,7 @@ def example8_8():
     pass
 
 def example8_9():
-    ur"""
+    u"""
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> from music21 import meter
@@ -1037,7 +1037,7 @@ def example8_9():
     pass
     
 def example8_10():
-    ur"""
+    u"""
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> from music21 import meter
@@ -1052,7 +1052,7 @@ def example8_10():
     pass
 
 def drill8_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_1(), inPlace=True)
@@ -1068,7 +1068,7 @@ def drill8_1():
     return bm
 
 def drill8_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_2(), inPlace=True)
@@ -1089,7 +1089,7 @@ def drill8_2():
     return bm
 
 def drill8_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_3(), inPlace=True)
@@ -1110,7 +1110,7 @@ def drill8_3():
     return bm
 
 def drill8_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_4(), inPlace=True)
@@ -1125,7 +1125,7 @@ def drill8_4():
     return bm
 
 def drill8_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_5(), inPlace=True)
@@ -1151,7 +1151,7 @@ def drill8_5():
 # Chapter 9: Fingering
 
 def example9_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_1(), inPlace=True, showFirstMeasureNumber = False)
@@ -1169,7 +1169,7 @@ def example9_1():
     return bm
 
 def example9_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_2(), inPlace=True, showFirstMeasureNumber = False)
@@ -1188,7 +1188,7 @@ def example9_2():
     return bm
     
 def example9_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_3(), showFirstMeasureNumber = False)
@@ -1203,7 +1203,7 @@ def example9_3():
     return bm
 
 def example9_4a():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_4a(), inPlace=True, showFirstMeasureNumber = False)
@@ -1218,7 +1218,7 @@ def example9_4a():
     return bm
 
 def example9_4b():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_4b(), inPlace=True, showFirstMeasureNumber = False)
@@ -1232,7 +1232,7 @@ def example9_4b():
     return bm
 
 def example9_5a():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_5a(), inPlace=True, showFirstMeasureNumber = False)
@@ -1246,7 +1246,7 @@ def example9_5a():
     return bm
 
 def example9_5b():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_5b(), inPlace=True, showFirstMeasureNumber = False, upperFirstInNoteFingering = False)
@@ -1263,7 +1263,7 @@ def example9_5b():
     return bm
   
 def example9_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_6(), inPlace=True, showFirstMeasureNumber = False, upperFirstInNoteFingering = True)
@@ -1286,7 +1286,7 @@ def example9_6():
     return bm
 
 def drill9_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_1(), inPlace=True)
@@ -1321,7 +1321,7 @@ def drill9_1():
     return bm
 
 def drill9_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_2(), inPlace=True)
@@ -1369,7 +1369,7 @@ def drill9_2():
     return bm
 
 def drill9_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_3(), inPlace=True)
@@ -1426,7 +1426,7 @@ def drill9_3():
     return bm
     
 def drill9_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_4(), inPlace=True)
@@ -1485,7 +1485,7 @@ def drill9_4():
     return bm
 
 def drill9_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_5(), inPlace=True)
@@ -1550,7 +1550,7 @@ def drill9_5():
 # Parenthesis; Clef Signs
 
 def example10_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_1(), inPlace=True)
@@ -1615,7 +1615,7 @@ def example10_1():
     return bm
 
 def example10_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_2(), inPlace=True, dummyRestLength = 5, maxLineLength = 20)
@@ -1630,7 +1630,7 @@ def example10_2():
     return bm
 
 def example10_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_3(), inPlace=True, dummyRestLength = 10, maxLineLength = 21)
@@ -1645,7 +1645,7 @@ def example10_3():
     return bm
 
 def example10_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_4(), inPlace=True, dummyRestLength = 10)
@@ -1660,7 +1660,7 @@ def example10_4():
     return bm
     
 def example10_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_5(), inPlace=True)
@@ -1678,7 +1678,7 @@ def example10_5():
     return bm
 
 def example10_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_6(), inPlace=True)
@@ -1694,7 +1694,7 @@ def example10_6():
     return bm
 
 def example10_9():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_9(), inPlace=True, showClefSigns = False)
@@ -1712,7 +1712,7 @@ def example10_9():
     return bm
 
 def example10_10():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_10(), inPlace=True, showClefSigns = False)
@@ -1730,7 +1730,7 @@ def example10_10():
     return bm
 
 def drill10_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill10_2(), inPlace=True, cancelOutgoingKeySig = False)
@@ -1778,7 +1778,7 @@ def drill10_4():
 # Beginning of a Composition or Movement
 
 def example11_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example11_1(), inPlace=True, segmentBreaks = [(9, 0.0)])
@@ -1796,7 +1796,7 @@ def example11_1():
     return bm
 
 def example11_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example11_2(), inPlace=True, segmentBreaks = [(8, 3.0)])
@@ -1821,7 +1821,7 @@ def example11_2():
 # Chapter 12: Slurs (Phrasing)
 
 def example12_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_1(), inPlace=True, showFirstMeasureNumber = False)
@@ -1842,7 +1842,7 @@ def example12_1():
     return bm
 
 def example12_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_2(), inPlace=True, showFirstMeasureNumber = False, slurLongPhraseWithBrackets = False)
@@ -1860,7 +1860,7 @@ def example12_2():
     return bm
   
 def example12_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_3(), inPlace=True, showFirstMeasureNumber = False)
@@ -1878,7 +1878,7 @@ def example12_3():
     return bm
 
 def example12_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_4(), inPlace=True, showFirstMeasureNumber = False)
@@ -1894,7 +1894,7 @@ def example12_4():
     return bm
 
 def example12_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_5(), inPlace=True, showFirstMeasureNumber = False)
@@ -1913,7 +1913,7 @@ def example12_5():
     return bm
 
 def example12_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_6(), inPlace=True, showFirstMeasureNumber = False, showShortSlursAndTiesTogether = False)
@@ -1931,7 +1931,7 @@ def example12_6():
     return bm
   
 def example12_7():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_7(), inPlace=True, showFirstMeasureNumber = False)
@@ -1949,7 +1949,7 @@ def example12_7():
     return bm
 
 def example12_8():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_8(), inPlace=True, showFirstMeasureNumber = False)
@@ -1967,7 +1967,7 @@ def example12_8():
     return bm
 
 def example12_9():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_9(), inPlace=True, showFirstMeasureNumber = False)
@@ -1984,7 +1984,7 @@ def example12_9():
     return bm
 
 def example12_10():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_10(), inPlace=True, showFirstMeasureNumber = False)
@@ -2001,7 +2001,7 @@ def example12_10():
     return bm
 
 def example12_11():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_11(), inPlace=True, showFirstMeasureNumber = False)
@@ -2024,7 +2024,7 @@ def example12_11():
 # Chapter 13: Words, Abbreviations, Letters, and Phrases of Expression
 
 def example13_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_1(), inPlace=True)
@@ -2042,7 +2042,7 @@ def example13_1():
     return bm
 
 def example13_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_2(), inPlace=True)
@@ -2079,7 +2079,7 @@ def example13_3():
     return bm
 
 def example13_9():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_9(), inPlace=True, showFirstMeasureNumber = False)
@@ -2094,7 +2094,7 @@ def example13_9():
     return bm
 
 def example13_10():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_10(), inPlace=True, showFirstMeasureNumber = False)
@@ -2120,7 +2120,7 @@ def example13_11():
     return bm
 
 def example13_14():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_14(), inPlace=True, showFirstMeasureNumber = False)
@@ -2135,7 +2135,7 @@ def example13_14():
     return bm
 
 def example13_15():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_15(), inPlace=True, showFirstMeasureNumber = False)
@@ -2150,7 +2150,7 @@ def example13_15():
     return bm
 
 def example13_16():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_16(), inPlace=True, showFirstMeasureNumber = False)
@@ -2165,7 +2165,7 @@ def example13_16():
     return bm
 
 def example13_17():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_17(), inPlace=True, showFirstMeasureNumber = False)
@@ -2180,7 +2180,7 @@ def example13_17():
     return bm
 
 def example13_18():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_18(), inPlace=True)
@@ -2206,7 +2206,7 @@ def example13_19():
     return bm
 
 def example13_26():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_26(), inPlace=True)
@@ -2235,7 +2235,7 @@ def example13_26():
 # Chapter 14: Symbols of Expression and Execution
 
 def example14_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_1(), inPlace=True, showFirstMeasureNumber = False)
@@ -2253,7 +2253,7 @@ def example14_1():
     return bm
 
 def example14_2():
-    ur"""
+    u"""
     Doubling of Tenuto marking is demonstrated. Accent is used in place of Reversed Accent because music21
     doesn't support the latter.
 
@@ -2276,7 +2276,7 @@ def example14_2():
     return bm
 
 def example14_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_3(), inPlace=True)
@@ -2300,7 +2300,7 @@ def example14_3():
     return bm
 
 def example14_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_5(), inPlace=True, showFirstMeasureNumber = False)
@@ -2319,7 +2319,7 @@ def example14_5():
     return bm
 
 def example14_6():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_6(), inPlace=True, showFirstMeasureNumber = False)
@@ -2337,7 +2337,7 @@ def example14_6():
     return bm
 
 def example14_7():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_7(), inPlace=True, showFirstMeasureNumber = False)
@@ -2353,7 +2353,7 @@ def example14_7():
     return bm
 
 def example14_8():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_8(), inPlace=True, showFirstMeasureNumber = False)
@@ -2372,7 +2372,7 @@ def example14_8():
 # Chapter 15: Smaller Values and Regular Note-Grouping, the Music Comma
 
 def example15_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_1())
@@ -2392,7 +2392,7 @@ def example15_1():
     return bm
  
 def example15_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_2(), inPlace=True, showFirstMeasureNumber = False)
@@ -2406,7 +2406,7 @@ def example15_2():
     return bm
 
 def example15_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_3(), inPlace=True)
@@ -2421,7 +2421,7 @@ def example15_3():
     return bm
 
 def example15_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_4(), inPlace=True, showFirstMeasureNumber = False)
@@ -2434,7 +2434,7 @@ def example15_4():
     return bm
 
 def example15_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_5(), inPlace=True)
@@ -2455,7 +2455,7 @@ def example15_5():
     return bm
 
 def example15_6a():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_6a(), inPlace=True, showFirstMeasureNumber = False)
@@ -2469,7 +2469,7 @@ def example15_6a():
     return bm
 
 def example15_6b():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_6b(), inPlace=True, showFirstMeasureNumber = False)
@@ -2485,7 +2485,7 @@ def example15_6b():
     return bm
 
 def example15_7():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_7(), inPlace=True, showFirstMeasureNumber = False)
@@ -2498,7 +2498,7 @@ def example15_7():
     return bm
 
 def example15_8():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_8(), inPlace=True, showFirstMeasureNumber = False)
@@ -2511,7 +2511,7 @@ def example15_8():
     return bm
 
 def example15_9():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_9(), inPlace=True, showFirstMeasureNumber = False)
@@ -2534,7 +2534,7 @@ def example15_10():
     return bm
     
 def example15_11():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_11(), inPlace=True)
@@ -2559,7 +2559,7 @@ def example15_11():
 # Triplets
 # --------
 def example16_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example16_1(), inPlace=True, showFirstMeasureNumber = False)
@@ -2574,7 +2574,7 @@ def example16_1():
     return bm
 
 def example16_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example16_2(), inPlace=True, showFirstMeasureNumber = False)
@@ -2588,7 +2588,7 @@ def example16_2():
     return bm
 
 def example16_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example16_4(), inPlace=True, showFirstMeasureNumber = False)
@@ -2615,7 +2615,7 @@ def example16_6():
 # Chapter 17: Measure Repeats, Full-Measure In-Accords
 
 def example17_1():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example17_1(), inPlace=True, showFirstMeasureNumber=False)
@@ -2628,7 +2628,7 @@ def example17_1():
     return bm
 
 def example17_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example17_2(), inPlace=True, showFirstMeasureNumber=False)
@@ -2647,7 +2647,7 @@ def example17_2():
     return bm
 
 def example17_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example17_3(), inPlace=True, showFirstMeasureNumber=False)
@@ -2660,7 +2660,7 @@ def example17_3():
     return bm
 
 def example17_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example17_4(), inPlace=True, showFirstMeasureNumber=False)
@@ -2681,7 +2681,7 @@ def example17_4():
 # Chapter 24: Bar-over-Bar Format
 
 def example24_1a():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example24_1a(), inPlace=True, showHand = 'right', showHeading = True)
@@ -2695,7 +2695,7 @@ def example24_1a():
     return rightHand[0]
 
 def example24_1b():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example24_1b(), inPlace=True, showHand = 'left', showHeading = True)
@@ -2708,7 +2708,7 @@ def example24_1b():
     return leftHand[0]
 
 def example24_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> rightHand = test.example24_2()[0]
@@ -2730,7 +2730,7 @@ def example24_2():
     return keyboardPart
 
 def example24_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> rightHand = test.example24_3()[0]
@@ -2766,7 +2766,7 @@ def example24_3():
     return keyboardPart
 
 def example24_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> rightHand = test.example24_4()[0]
@@ -2824,7 +2824,7 @@ def example24_5():
 # Chapter 26: Interval Signs and Chords
 
 def example26_1a():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example26_1a(), inPlace=True, showHand = 'right', descendingChords = True)
@@ -2836,7 +2836,7 @@ def example26_1a():
     return m1
 
 def example26_1b():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example26_1b(), inPlace=True, showHand = 'left', descendingChords = False)
@@ -2848,7 +2848,7 @@ def example26_1b():
     return m1
 
 def example26_2():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> rightHand = test.example26_2()[0]
@@ -2876,7 +2876,7 @@ def example26_2():
     return keyboardPart
 
 def example26_3():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> rightHand = test.example26_3()[0]
@@ -2904,7 +2904,7 @@ def example26_3():
     return keyboardPart
 
 def example26_4():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> rightHand = test.example26_4()[0]
@@ -2932,7 +2932,7 @@ def example26_4():
     return keyboardPart
 
 def example26_5():
-    ur"""
+    u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> rightHand = test.example26_5()[0]

@@ -131,7 +131,7 @@ class NWCConverter(object):
         if fileVersionRaw in self.versionFromHex:
             self.version = self.versionFromHex[fileVersionRaw]
         else:
-            print "No Version Found! Most likely a newer version.  Using 2.01"
+            print("No Version Found! Most likely a newer version.  Using 2.01")
             self.version = 201 # most likely a newer version
         
         return self.version
@@ -163,7 +163,7 @@ class NWCConverter(object):
 
     def parseHeader(self):
         self.isValidNWCFile()
-        #print self.parsePosition
+        #print(self.parsePosition)
         self.fileVersion()
         #print self.version
         #print self.parsePosition
@@ -399,7 +399,7 @@ class NWCObject(object):
         p = self.parserParent
         objectType = p.readLEShort()
         if objectType > len(self.objMethods):
-            print "CAN'T HANDLE objectType %d" % objectType
+            print("CAN'T HANDLE objectType %d" % objectType)
             return
         if p.version >= 170:
             self.visible = p.byteToInt()
@@ -535,7 +535,7 @@ class NWCObject(object):
         p = self.parserParent
         self.type = 'Dynamic'
         if p.version < 170:
-            print "ughh. not yet"
+            print("ughh. not yet")
         else:
             self.pos = p.byteToInt()
             self.placement = p.byteToInt()
@@ -574,7 +574,7 @@ class NWCObject(object):
         self.type = 'Note'
         #print "Note at parse position: ", p.parsePosition
         if p.version < 170:
-            print "ughh. not yet"
+            print("ughh. not yet")
         else:
             self.duration = p.byteToInt()
             self.data2 = p.readBytes(3) #??
@@ -635,7 +635,7 @@ class NWCObject(object):
         p = self.parserParent
         self.type = 'Rest'
         if p.version <= 150:
-            print "igg..."
+            print("igg...")
         else:
             self.duration = p.byteToInt()
             self.data2 = p.readBytes(5)
@@ -658,7 +658,7 @@ class NWCObject(object):
             self.data1 = p.readBytes(8)
         if (p.version >= 200):
             if ((self.data1[7] & 0x40) != 0):
-                print "have stemLength info!"
+                print("have stemLength info!")
                 self.stemLength = p.byteToInt()
             else:
                     #print "attribute 2:", hex(self.attribute2)
@@ -670,7 +670,7 @@ class NWCObject(object):
         p = self.parserParent
         self.type = 'Pedal'
         if (p.version < 170):
-            print "uggh"
+            print("uggh")
         else:
             self.pos = p.byteToInt()
             self.placement = p.byteToInt()

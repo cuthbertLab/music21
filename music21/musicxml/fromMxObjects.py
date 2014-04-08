@@ -2587,7 +2587,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
                 pass
             # see http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
             message = "In measure (" + measureNumber + "): " + e.message
-            raise type(e), type(e)(message), sys.exc_info()[2]
+            raise type(e)(type(e)(message), sys.exc_info()[2])
         if t is not None:
             if lastTransposition is None and i == 0: # if this is the first
                 #environLocal.printDebug(['transposition', t])
@@ -2849,7 +2849,8 @@ def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
             import sys
             # see http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
             message = "For part number " + str(pNum + 1) + ", with Id (" + partId + "): " + e.message
-            raise type(e), type(e)(message), sys.exc_info()[2]
+            raise type(e)(type(e)(message), sys.exc_info()[2])
+
 
         # update dictionary to store music21 part
         m21PartIdDictionary[partId] = part

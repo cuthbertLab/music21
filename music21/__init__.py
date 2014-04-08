@@ -48,6 +48,12 @@ owners who have allowed them to be included with music21.
 # but: base must come first; in some cases other modules depend on 
 # definitions in base
 
+import sys
+if sys.version > '3':
+    python3 = True
+else:
+    python3 = False
+
 __all__ = [
     'base', 
     # sub folders
@@ -145,8 +151,12 @@ __all__ = [
 
 #-------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
-import base
-from base import *
+if python3:
+    from . import base # @UnresolvedImport
+    from .base import *
+else:
+    import base # @Reimport
+    from base import *
 #del(types)
 #del(sys)
 #del(imp)

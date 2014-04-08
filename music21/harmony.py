@@ -1014,7 +1014,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         >>> excerpt = score.measures(2, 3)
         >>> cs = []
         >>> for c in excerpt.chordify().flat.getElementsByClass(chord.Chord):
-        ...   print harmony.chordSymbolFigureFromChord(c)
+        ...   print(harmony.chordSymbolFigureFromChord(c))
         B-7
         E-maj7/B-
         B-7
@@ -1446,7 +1446,7 @@ class ChordSymbol(Harmony):
         ...     chordSymbolName = 'C' + s
         ...     h = harmony.ChordSymbol(chordSymbolName)
         ...     pitchNames = [str(p) for p in h.pitches]
-        ...     print "%-10s%s" % (chordSymbolName, "[" + (', '.join(pitchNames)) + "]")
+        ...     print("%-10s%s" % (chordSymbolName, "[" + (', '.join(pitchNames)) + "]"))
         C         [C3, E3, G3]
         Cm        [C3, E-3, G3]
         C+        [C3, E3, G#3]
@@ -2081,9 +2081,9 @@ class ChordSymbol(Harmony):
             ...   c = m.getElementsByClass(harmony.ChordSymbol)
             ...   if(len(c)):
             ...     chord = c[0].figure
-            ...     print chord.replace('-','b')
+            ...     print(chord.replace('-','b'))
             ...   else:
-            ...     print 'n.c.'
+            ...     print('n.c.')
             F
             G7
             C
@@ -2501,7 +2501,7 @@ class TestExternal(unittest.TestCase):
         s = stream.Stream()
 #        i = 0
         for x in chords:
-            # print x.pitchesu
+            # print(x.pitches)
             x.quarterLength = 0
             s.insert(x.offset, x)
             #i += 4
@@ -2561,7 +2561,7 @@ class TestExternal(unittest.TestCase):
             for m in mod:
                 for unused_key, val in chordKinds.items():
                     for harmony_type in val:
-                        print n + m + ',' + harmony_type, ChordSymbol(n + m + ',' + harmony_type).pitches
+                        print(n + m + ',' + harmony_type, ChordSymbol(n + m + ',' + harmony_type).pitches)
 
     def labelChordSymbols(self):
         '''
@@ -2584,7 +2584,7 @@ class TestExternal(unittest.TestCase):
             x = harmony.chordSymbolFigureFromChord(vs.getChord())
             if x  != 'Chord Symbol Cannot Be Identified':
                 vs.lyric = x.replace('-','b')
-            print x.replace('-','b')
+            print(x.replace('-','b'))
         '''
         Full, unmodified piece:
         Bb7

@@ -19,6 +19,11 @@ import urllib
 import re
 import math
 
+try:
+    from urllib import FancyURLopener # @UnusedImport
+except: # python3
+    from urllib.request import FancyURLopener # @UnresolvedImport @Reimport
+
 from music21.features import base as featuresModule
 from music21 import text
 
@@ -770,7 +775,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 #-------------------------------------------------------------------------------
 # metadata
 
-class URLOpenerUI(urllib.FancyURLopener):
+class URLOpenerUI(FancyURLopener):
     version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
 
 googleResultsRE = re.compile('([\d\,]+) results')

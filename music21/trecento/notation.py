@@ -193,7 +193,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
 
         >>> tTNN = trecento.notation.TinyTrecentoNotationNote(
         ...     '<f*o* g a[UR] g f(Mx)>')
-        >>> print [n.mensuralType for n in tTNN.note.notes]
+        >>> print([n.mensuralType for n in tTNN.note.notes])
         ['longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
 
     ::
@@ -609,7 +609,7 @@ def convertTrecentoStream(inpStream, inpDiv = None):
         convertedStream = stream.Stream()
 
     measuredStream = medren.breakMensuralStreamIntoBrevisLengths(inpStream, inpDiv)
-    print ''
+    print('')
 
     for e in measuredStream:
 
@@ -623,13 +623,13 @@ def convertTrecentoStream(inpStream, inpDiv = None):
             div = e
 
         elif e.isMeasure:
-            print '    Converting measure %s' % e.number
+            print('    Converting measure %s' % e.number)
             measureList = convertBrevisLength(e, convertedStream, inpDiv = div, measureNumOffset = offset)
             for m in measureList:
                 convertedStream.append(m)
 
         elif e.isStream:
-            print 'Converting stream %s' % e
+            print('Converting stream %s' % e)
             convertedPart = convertTrecentoStream(e, inpDiv = div)
             convertedStream.insert(0, convertedPart)
 
@@ -1041,7 +1041,7 @@ class TranslateBrevisLength(object):
         >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
         >>> unchangeableNoteLengths = TBL.getUnchangeableNoteLengths()
         >>> kldict = TBL.classifyUnknownNotesByType(unchangeableNoteLengths)
-        >>> print kldict['semibrevis']
+        >>> print(kldict['semibrevis'])
         [0, 4]
 
         '''
@@ -1957,20 +1957,20 @@ def testTinyTrecentoStream():
     TinySePerDureca.append(trecento.notation.TinyTrecentoNotationStream(upperString))
     TinySePerDureca.append(trecento.notation.TinyTrecentoNotationStream(lowerString))
 
-    print '''Length comparison
+    print('''Length comparison
     normal: %s
     tiny: %s
-    ''' % (len(SePerDureca.recurse()), len(TinySePerDureca.recurse()))
+    ''' % (len(SePerDureca.recurse()), len(TinySePerDureca.recurse())))
 
     for i in range(2):
         for j in range(len(SePerDureca[i+1])):
             if j < len(TinySePerDureca[i+1]):
-                print 'norm: %s' % SePerDureca[i+1][j]
-                print 'tiny: %s' % TinySePerDureca[i+1][j]
-                print ''
+                print('norm: %s' % SePerDureca[i+1][j])
+                print('tiny: %s' % TinySePerDureca[i+1][j])
+                print('')
             else:
-                print 'norm only: %s' % SePerDureca[i+1][j]
-                print ''
+                print('norm only: %s' % SePerDureca[i+1][j])
+                print('')
 
 class Test(unittest.TestCase):
 

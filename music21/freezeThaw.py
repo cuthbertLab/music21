@@ -102,7 +102,11 @@ from music21 import base
 from music21 import common
 from music21 import derivation
 from music21 import exceptions21
-from music21.ext import jsonpickle
+
+try:
+    from music21.ext import jsonpickle
+except:
+    pass
 
 from music21 import environment
 _MOD = "freezeThaw.py"

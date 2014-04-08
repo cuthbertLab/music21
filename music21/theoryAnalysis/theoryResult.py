@@ -240,7 +240,7 @@ class VerticalityNTupletTheoryResult(TheoryResult):
         '''
        
         if partNum != None:
-            print 'color...', partNum, self.partNumIdentified, self.vsnt.nTupletNum, self.vsnt.tnlsDict.keys()
+            print('color...', partNum, self.partNumIdentified, self.vsnt.nTupletNum, self.vsnt.tnlsDict.keys())
             if self.vsnt.nTupletNum == 3:                    
                 self.vsnt.tnlsDict[partNum].color(color) 
         elif self.partNumIdentified !=None:

@@ -26,10 +26,14 @@ from music21 import exceptions21
 from music21 import interval
 from music21.base import SlottedObject
 
-
 from music21 import environment
 _MOD = "pitch.py"
 environLocal = environment.Environment(_MOD)
+
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
 
 STEPREF = {
            'C' : 0,

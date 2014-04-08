@@ -8,6 +8,11 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+#python3
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
 
 
 '''
@@ -215,7 +220,7 @@ class TinyNotationStream(stream.Stream):
             tN = None
             try:
                 tN = self.getNote(thisNoteStr, parseStatus)
-            except duration.DurationException, (value):
+            except duration.DurationException as value:
                 raise duration.DurationException(str(value) + " in context " + str(thisNoteStr))
 #            except Exception, (value):
 #                raise Exception(str(value) + "in context " + str(thisNoteStr) + ": " + str(stringRep) )
@@ -259,7 +264,7 @@ class TinyNotationStream(stream.Stream):
 
         >>> from music21 import tinyNotation
         >>> dummy = reload(tinyNotation) # show before and after
-        >>> print tinyNotation.TinyNotationStream.regularExpressions
+        >>> print(tinyNotation.TinyNotationStream.regularExpressions)
         {'ENDBRAC': '\\}', 'QUAD': 'quad\\{', ...}
         >>> tns = tinyNotation.TinyNotationStream('3/4 d2 e4 f2 g4')
         >>> tinyNotation.TinyNotationStream.regularExpressions['ENDBRAC']

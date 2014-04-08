@@ -171,9 +171,9 @@ class ScoreLayout(LayoutBase):
 
 
         >>> sl = layout.ScoreLayout(scalingMillimeters = 2.0, scalingTenths=10)
-        >>> print sl.tenthsToMillimeters(10)
+        >>> print(sl.tenthsToMillimeters(10))
         2.0
-        >>> print sl.tenthsToMillimeters(17) # printing to round
+        >>> print(sl.tenthsToMillimeters(17)) # printing to round
         3.4
         '''
         if self.scalingMillimeters is None or self.scalingTenths is None:
@@ -550,7 +550,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     Each System has staves (layout.Staff objects) not parts, though Staff is a subclass of Part
 
     >>> secondStaff = firstSystem.staves[1]
-    >>> print len(secondStaff.getElementsByClass('Measure'))
+    >>> print(len(secondStaff.getElementsByClass('Measure')))
     5
     >>> secondStaff
     <music21.layout.Staff ...>
@@ -579,7 +579,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     for pageStartM, pageEndM in pageMeasureTuples:
         pageNumber += 1
         if printUpdates is True:
-            print "updating page", pageNumber
+            print("updating page", pageNumber)
         #thisPage = scoreIn.measures(pageStartM, pageEndM)
         #thisPage.__class__ = Page
         thisPage = Page()
@@ -617,7 +617,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 allStaffLayouts = p.flat.getElementsByClass('StaffLayout',returnStreamSubClass='list')
                 if len(allStaffLayouts) > 0:
                     #if len(allStaffLayouts) > 1:
-                    #    print "Got many staffLayouts"
+                    #    print("Got many staffLayouts")
                     p.staffLayout = allStaffLayouts[0]
 
             allSystemLayouts = thisSystem.flat.getElementsByClass('SystemLayout', returnStreamSubClass='list')
@@ -627,7 +627,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                     for attribute in ('distance', 'topDistance', 'leftMargin', 'rightMargin'):
                         if getattr(richestSystemLayout, attribute) is None and getattr(sl, attribute) is not None:
                             setattr(richestSystemLayout, attribute, getattr(sl, attribute))
-                    #print sl, sl.measureNumber
+                    #print(sl, sl.measureNumber)
                 thisSystem.systemLayout = richestSystemLayout
             elif len(allSystemLayouts) == 1:
                 thisSystem.systemLayout = allSystemLayouts[0]
@@ -1092,7 +1092,7 @@ class LayoutScore(stream.Opus):
 
         allStaffLayouts = firstMeasureOfStaff.getElementsByClass('StaffLayout', returnStreamSubClass='list')
         if len(allStaffLayouts) > 0:
-            #print "Got staffLayouts: "
+            #print("Got staffLayouts: ")
             for sltemp in allStaffLayouts:
                 distanceTemp = sltemp.distance
                 if distanceTemp is not None:
@@ -1146,11 +1146,11 @@ class LayoutScore(stream.Opus):
 
         allStaffLayouts = firstMeasureOfStaff.getElementsByClass('StaffLayout', returnStreamSubClass='list')
         if len(allStaffLayouts) > 0:
-            #print "Got staffLayouts: "
+            #print("Got staffLayouts: ")
             staffLayoutObj = allStaffLayouts[0]
             if staffLayoutObj.staffSize is not None:
                 staffSize = staffSizeBase * (staffLayoutObj.staffSize/100.0)
-                #print "Got staffHeight of %d for partId %d" % (staffHeight, partId)
+                #print("Got staffHeight of %d for partId %d" % (staffHeight, partId))
                 staffSizeDefinedLocally = True
 
         if staffSizeDefinedLocally is False:
@@ -1225,7 +1225,7 @@ class LayoutScore(stream.Opus):
         >>> pageId = 2  # last system, last page
         >>> while systemId is not None:
         ...    pageId, systemId = ls.getSystemBeforeThis(pageId, systemId)
-        ...    print (pageId, systemId),
+        ...    print(pageId, systemId),
         (2, 0) (1, 2) (1, 1) (1, 0) (0, 4) (0, 3) (0, 2) (0, 1) (0, 0) (None, None)
         '''
         if systemId > 0:
@@ -1395,7 +1395,7 @@ class LayoutScore(stream.Opus):
         allRetInfo = []
         for mNum in range(self.startMeasure, self.endMeasure + 1):
             if printUpdates is True: # so fast now that it's not needed
-                print "Doing measure ", mNum
+                print("Doing measure ", mNum)
             mList = []
             for staffNum in range(numStaves):
                 tupleInfo = self.getPositionForStaffMeasure(staffNum, mNum, returnFormat)
@@ -1530,7 +1530,7 @@ class Test(unittest.TestCase):
         for x in c.flat:
             if 'PageLayout' in x.classes:
                 retStr += str(x.pageNumber) + ": " + str(x.measureNumber) + ", "
-#        print retStr
+#        print(retStr)
         self.assertEqual(retStr, '1: 1, 2: 23, 3: 50, 4: 80, 5: 103, ')
 
 #-------------------------------------------------------------------------------

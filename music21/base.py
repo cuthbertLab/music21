@@ -45,13 +45,6 @@ under the module "base":
 
 '''
 
-#------------------------------------------------------------------------------
-# string and tuple must be the same
-from _version import __version__, __version_info__
-VERSION = __version_info__
-VERSION_STR = __version__
-#------------------------------------------------------------------------------
-
 import codecs
 import copy
 import doctest
@@ -60,8 +53,32 @@ import types
 import unittest
 #import uuid
 
+if sys.version > '3':
+    python3 = True
+else:
+    python3 = False
+    
+
+
+#------------------------------------------------------------------------------
+# string and tuple must be the same
+
+
+if python3:
+    basestring = str # @ReservedAssignment
+    from ._version import __version__, __version_info__ # @UnusedImport
+else:
+    from _version import __version__, __version_info__ # @Reimport
+VERSION = __version_info__
+VERSION_STR = __version__
+#------------------------------------------------------------------------------
+
+
 #-----all exceptions are in the exceptions21 package.
-from music21 import exceptions21
+if python3:
+    from . import exceptions21 # @UnusedImport
+else:
+    from music21 import exceptions21 # @Reimport
 Music21Exception = exceptions21.Music21Exception
 
 from music21 import common
@@ -147,7 +164,7 @@ class SlottedObject(object):
         return state
 
     def __setstate__(self, state):
-        for slot, value in state.iteritems():
+        for slot, value in state.items():
             setattr(self, slot, value)
 
 

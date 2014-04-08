@@ -151,26 +151,24 @@ class MetadataBundle(object):
 
     ::
 
-        >>> searchResults = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> searchResults = coreBundle.search('bach', field='composer')
         >>> searchResults
         <music21.metadata.bundles.MetadataBundle {21 entries}>
 
     ::
 
-        >>> searchResults.search('3/4')
+        >>> resultsEntries = searchResults.search('3/4')
+        >>> resultsEntries
         <music21.metadata.bundles.MetadataBundle {4 entries}>
 
     ::
 
-        >>> _[0]
+        >>> resultsEntries[0]
         <music21.metadata.bundles.MetadataEntry: bach_choraleAnalyses_riemenschneider007_rntxt>
 
     ::
 
-        >>> _.parse()
+        >>> resultsEntries[0].parse()
         <music21.stream.Score ...>
 
     A metadata bundle can be instantiated via its static methods
@@ -1559,7 +1557,7 @@ class MetadataBundle(object):
         environLocal.printDebug(['MetadataBundle: validating...'])
         invalidatedKeys = []
         validatedPaths = set()
-        for key, metadataEntry in self._metadataEntries.iteritems():
+        for key, metadataEntry in self._metadataEntries.items():
             # MetadataEntries for core corpus items use a relative path as
             # their source path, always starting with 'music21/corpus'.
             sourcePath = metadataEntry.sourcePath

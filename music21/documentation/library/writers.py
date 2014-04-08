@@ -10,7 +10,6 @@
 #-------------------------------------------------------------------------------
 
 import abc
-import json
 import os
 import re
 import subprocess
@@ -49,9 +48,9 @@ class ReSTWriter(object):
         if shouldWrite:
             with open(filePath, 'w') as f:
                 f.write(rst)
-            print '\tWROTE   {0}'.format(common.relativepath(filePath))
+            print('\tWROTE   {0}'.format(common.relativepath(filePath)))
         else:
-            print '\tSKIPPED {0}'.format(common.relativepath(filePath))
+            print('\tSKIPPED {0}'.format(common.relativepath(filePath)))
 
 
 class ModuleReferenceReSTWriter(ReSTWriter):
@@ -147,11 +146,11 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             nbConvertReturnCode = self._convertOneNotebook(ipythonNotebookFilePath)
             if nbConvertReturnCode is True:
                 self._cleanupNotebookAssets(ipythonNotebookFilePath)
-                print '\tWROTE   {0}'.format(common.relativepath(
-                    ipythonNotebookFilePath))
+                print('\tWROTE   {0}'.format(common.relativepath(
+                    ipythonNotebookFilePath)))
             else:
-                print '\tSKIPPED {0}'.format(common.relativepath(
-                    ipythonNotebookFilePath))
+                print('\tSKIPPED {0}'.format(common.relativepath(
+                    ipythonNotebookFilePath)))
 
     ### PRIVATE METHODS ###
 
@@ -267,7 +266,6 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
     def _runNBConvert(self, ipythonNotebookFilePath):
 #         import music21
-        from music21 import common
         #runDirectoryPath = common.getBuildDocFilePath()
         nbconvertPath = os.path.join(os.path.dirname(common.getSourceFilePath()),
                                      'ext', 'nbconvert', 'nbconvert.py')
@@ -285,43 +283,45 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         #subprocess.call(nbconvertCommand, shell=True, cwd=runDirectoryPath)
         subprocess.call(nbconvertCommand, shell=True)
 
-    def _processNotebook(self, ipythonNotebookFilePath):
-        from music21 import documentation # @UnresolvedImport
-        with open(ipythonNotebookFilePath, 'r') as f:
-            contents = f.read()
-            contentsAsJson = json.loads(contents)
-        directoryPath, unused_sep, baseName = ipythonNotebookFilePath.rpartition(
-            os.path.sep)
-        baseNameWithoutExtension = os.path.splitext(baseName)[0]
-        imageFilesDirectoryPath = os.path.join(
-            directoryPath,
-            '{0}_files'.format(baseNameWithoutExtension),
-            )
-        rstFilePath = os.path.join(
-            directoryPath,
-            '{0}.rst'.format(baseNameWithoutExtension),
-            )
-        lines, imageData = documentation.IPythonNotebookDocumenter(
-            contentsAsJson)()
-        rst = '\n'.join(lines)
-        self.write(rstFilePath, rst)
-        if not imageData:
-            return
-        if not os.path.exists(imageFilesDirectoryPath):
-            os.mkdir(imageFilesDirectoryPath)
-        for imageFileName, imageFileData in imageData.iteritems():
-            imageFilePath = os.path.join(
-                imageFilesDirectoryPath,
-                imageFileName,
-                )
-            shouldOverwriteImage = True
-            with open(imageFilePath, 'rb') as f:
-                oldImageFileData = f.read()
-                if oldImageFileData == imageFileData:
-                    shouldOverwriteImage = False
-            if shouldOverwriteImage:
-                with open(imageFilePath, 'wb') as f:
-                    f.write(imageFileData)
+
+## UNUSED
+#     def _processNotebook(self, ipythonNotebookFilePath):
+#         from music21 import documentation # @UnresolvedImport
+#         with open(ipythonNotebookFilePath, 'r') as f:
+#             contents = f.read()
+#             contentsAsJson = json.loads(contents)
+#         directoryPath, unused_sep, baseName = ipythonNotebookFilePath.rpartition(
+#             os.path.sep)
+#         baseNameWithoutExtension = os.path.splitext(baseName)[0]
+#         imageFilesDirectoryPath = os.path.join(
+#             directoryPath,
+#             '{0}_files'.format(baseNameWithoutExtension),
+#             )
+#         rstFilePath = os.path.join(
+#             directoryPath,
+#             '{0}.rst'.format(baseNameWithoutExtension),
+#             )
+#         lines, imageData = documentation.IPythonNotebookDocumenter(
+#             contentsAsJson)()
+#         rst = '\n'.join(lines)
+#         self.write(rstFilePath, rst)
+#         if not imageData:
+#             return
+#         if not os.path.exists(imageFilesDirectoryPath):
+#             os.mkdir(imageFilesDirectoryPath)
+#         for imageFileName, imageFileData in imageData.iteritems():
+#             imageFilePath = os.path.join(
+#                 imageFilesDirectoryPath,
+#                 imageFileName,
+#                 )
+#             shouldOverwriteImage = True
+#             with open(imageFilePath, 'rb') as f:
+#                 oldImageFileData = f.read()
+#                 if oldImageFileData == imageFileData:
+#                     shouldOverwriteImage = False
+#             if shouldOverwriteImage:
+#                 with open(imageFilePath, 'wb') as f:
+#                     f.write(imageFileData)
 
 
 if __name__ == '__main__':

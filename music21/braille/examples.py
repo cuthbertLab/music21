@@ -8,7 +8,7 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-ur"""
+u"""
 The melody to the "Happy Birthday" song, in G major and 3/4 time.
 
 

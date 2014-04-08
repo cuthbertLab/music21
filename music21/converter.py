@@ -556,7 +556,7 @@ class ConverterMidi(object):
         Calls midi.translate.midiStringToStream.
         '''
         from music21.midi import translate as midiTranslate
-        midiTranslate.midiStringToStream(strData, self._stream)
+        self._stream = midiTranslate.midiStringToStream(strData)
 
     def parseFile(self, fp, number=None):
         '''
@@ -890,7 +890,12 @@ class Converter(object):
         unused_fpDst, writePickle, fpPickle = pfObj.status()
         if writePickle is False and fpPickle is not None and forceSource is False:
             environLocal.printDebug("Loading Pickled version")
-            self._thawedStream = thaw(fpPickle, zipType='zlib')
+            try:
+                self._thawedStream = thaw(fpPickle, zipType='zlib')
+            except:
+                environLocal.warn("Could not parse pickle, %s ...rewriting" % fpPickle)
+                self.parseFileNoPickle(fp, number, format, forceSource)
+
             self.stream.filePath = fp
             self.stream.fileNumber = number
             self.stream.fileFormat = useFormat
@@ -1296,7 +1301,7 @@ class TestExternal(unittest.TestCase):
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
-        for mxString in testFiles.ALL:
+        for mxString in testFiles.ALL: # @UndefinedVariable
             a = ConverterMusicXML(False)
             a.parseData(mxString)
 
@@ -1330,7 +1335,7 @@ class TestExternal(unittest.TestCase):
             try:
                 unused_post = parseURL(url)
             except:
-                print url
+                print(url)
                 raise
 
     def testFreezer(self):

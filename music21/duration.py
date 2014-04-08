@@ -9,6 +9,14 @@
 # Copyright:    Copyright © 2008-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+from __future__ import print_function
+
+#python3
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
+
 '''
 The duration module contains  :class:`~music21.duration.Duration` objects
 (among other objects and functions).  Duration objects are a fundamental
@@ -755,7 +763,7 @@ def updateTupletType(durationList):
     if isinstance(durationList, Duration): # if a Duration object alone
         durationList = [durationList] # put in list
     
-    import stream
+    from music21 import stream
     stream.makeNotation.makeTupletBrackets(durationList, inPlace = True)
 
 
@@ -1197,7 +1205,7 @@ class DurationCommon(SlottedObject):
 #        return state
 #
 #    def __setstate__(self, state):
-#        for slot, value in state.iteritems():
+#        for slot, value in state.items():
 #            setattr(self, slot, value)
 
     ### PUBLIC METHODS ###
@@ -1285,7 +1293,6 @@ class DurationUnit(DurationCommon):
         '_qtrLength',
         '_tuplets',
         '_type',
-        'type',
         )
 
     ### INITIALIZER ###
@@ -2178,7 +2185,7 @@ class Duration(DurationCommon):
             try:
                 self.components = quarterLengthToDurations(self.quarterLength)
             except DurationException:
-                print ("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
+                print("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
                 raise
         self._componentsNeedUpdating = False
 
@@ -3840,8 +3847,8 @@ class Test(unittest.TestCase):
         j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
         x = j1.parts[0].getElementsByClass('Measure')[42]
         x._cache = {}
-        print x.duration
-        print x.duration.components
+        print(x.duration)
+        print(x.duration.components)
 
 
 #-------------------------------------------------------------------------------

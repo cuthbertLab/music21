@@ -14,8 +14,14 @@
 
 __all__ = ['translate', 'realtime', 'percussion']
 
-import realtime
-import percussion
+import sys
+
+if sys.version > '3':
+    from . import realtime
+    from . import percussion
+else:
+    import realtime # @Reimport
+    import percussion # @Reimport
 
 
 '''
@@ -32,7 +38,7 @@ see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 
 import unittest
 import unicodedata
-import sys, os, string, types
+import os, string
 import struct
 
 try:
@@ -300,11 +306,11 @@ class Enumeration(object):
         uniqueNames = [ ] 
         uniqueValues = [ ] 
         for x in enumList: 
-            if type(x) == types.TupleType: 
+            if type(x) == tuple: 
                 x, i = x 
-            if type(x) != types.StringType: 
+            if type(x) != str: 
                 raise EnumerationException("enum name is not a string: " + x)
-            if type(i) != types.IntType: 
+            if type(i) != int: 
                 raise EnumerationException("enum value is not an integer: " + i)
             if x in uniqueNames: 
                 raise EnumerationException("enum name is not unique: " + x)

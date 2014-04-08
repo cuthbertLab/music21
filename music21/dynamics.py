@@ -134,7 +134,7 @@ class Dynamic(base.Music21Object):
     >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
     >>> pp2.value
     'ppp'
-    >>> print '%.2f' % pp2.volumeScalar
+    >>> print('%.2f' % pp2.volumeScalar)
     0.15
     
     Dynamics can be placed anywhere in a stream.
@@ -252,7 +252,7 @@ class Dynamic(base.Music21Object):
 
         int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag 
 
-        >>> print musicxml.m21ToString.fromMusic21Object(d)
+        >>> print(musicxml.m21ToString.fromMusic21Object(d))
         <?xml...
         <direction>
             <direction-type>

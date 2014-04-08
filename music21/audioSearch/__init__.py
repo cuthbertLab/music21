@@ -56,15 +56,15 @@ def histogram(data,bins):
 
     >>> data = [1, 1, 4, 5, 6, 0, 8, 8, 8, 8, 8]
     >>> outputData, bins = audioSearch.histogram(data,8)
-    >>> print outputData
+    >>> print(outputData)
     [3, 0, 0, 1, 1, 1, 0, 5]
-    >>> print bins
+    >>> print(bins)
     [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
     >>> outputData, bins = audioSearch.histogram(data,4)
-    >>> print outputData
+    >>> print(outputData)
     [3, 1, 2, 5]
-    >>> print bins
+    >>> print(bins)
     [0, 2, 4, 6, 8]
     '''
     maxValue = max(data)
@@ -106,7 +106,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     >>> samps = numpy.fromstring(data, dtype=numpy.int16)
     >>> finalResult = audioSearch.autocorrelationFunction(samps, 44100)
     >>> wv.close()
-    >>> print finalResult
+    >>> print(finalResult)
     143.6276...
     '''
     if 'numpy' in base._missingImport or 'scipy' in base._missingImport or 'matplotlib' in base._missingImport:
@@ -153,7 +153,7 @@ def prepareThresholds(useScale=None):
 
     >>> l, p = audioSearch.prepareThresholds(scale.MajorScale('A3'))
     >>> for i in range(len(l)):
-    ...    print "%s < %.2f < %s" % (p[i], l[i], p[i+1])
+    ...    print("%s < %.2f < %s" % (p[i], l[i], p[i+1]))
     A3 < 0.86 < B3
     B3 < 0.53 < C#4
     C#4 < 0.16 < D4
@@ -221,7 +221,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
 
     >>> thresholds, pitches = audioSearch.prepareThresholds(scale.ChromaticScale('C4'))
     >>> for fq in [450, 510, 550, 600]:
-    ...      print audioSearch.normalizeInputFrequency(fq, thresholds, pitches)
+    ...      print(audioSearch.normalizeInputFrequency(fq, thresholds, pitches))
     (440.0, <music21.pitch.Pitch A4>)
     (523.25113..., <music21.pitch.Pitch C5>)
     (277.18263..., <music21.pitch.Pitch C#5>)
@@ -316,7 +316,6 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
         raise AudioSearchException("Cannot run getFrequenciesFromMicrophone without numpy installed")
 
     import numpy
-    from music21.audioSearch import recording
     environLocal.printDebug("* start recording")
     storedWaveSampleList = recording.samplesFromRecording(seconds=length,
                                                           storeFile=storeWaveFilename,
@@ -339,7 +338,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     >>> import os
     >>> readPath = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav'
     >>> freq = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
-    >>> print freq
+    >>> print(freq)
     [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
     '''
     if "numpy" in base._missingImport:
@@ -380,26 +379,26 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> readFile = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
     >>> frequencyList, pachelbelFileHandle, currentSample  = audioSearch.getFrequenciesFromPartialAudioFile(readFile, length=1.0)
     >>> for i in range(5):
-    ...     print frequencyList[i]
+    ...     print(frequencyList[i])
     143.627689055
     99.0835452019
     211.004784689
     4700.31347962
     767.827403482
-    >>> print currentSample  # should be near 44100, but probably not exact
+    >>> print(currentSample)  # should be near 44100, but probably not exact
     44032
 
     Now read the next 1 second...
 
     >>> frequencyList, pachelbelFileHandle, currentSample  = audioSearch.getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0, startSample = currentSample)
     >>> for i in range(5):
-    ...     print frequencyList[i]
+    ...     print(frequencyList[i])
     187.798213268
     238.263483185
     409.700397349
     149.958733396
     101.989786226
-    >>> print currentSample  # should be exactly double the previous
+    >>> print(currentSample)  # should be exactly double the previous
     88064
     '''
     if "numpy" in base._missingImport:
@@ -446,7 +445,7 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
     >>> freqFromAQList=[143.627689055,99.0835452019,211.004784689,4700.31347962,2197.9431119]
     >>> pitchesList = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.MajorScale('C4'))
     >>> for i in range(5):
-    ...     print pitchesList[i]
+    ...     print(pitchesList[i])
     146.832383959
     97.9988589954
     220.0
@@ -472,7 +471,7 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
 
     >>> inputPitches=[440, 440, 440, 440, 442, 443, 441, 470, 440, 441, 440, 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441, 440, 440, 440, 440, 440, 442, 443, 441, 440, 440]
     >>> result = audioSearch.smoothFrequencies(inputPitches)
-    >>> print result
+    >>> print(result)
     [440, 440, 440, 440, 445, 445, 446, 446, 442, 442, 441, 441, 434, 433, 432, 430, 436, 437, 438, 439, 439, 439, 439, 439, 439, 440, 440, 440, 440, 440, 440, 440]
     '''
     dpf = detectedPitchesFreq
@@ -530,9 +529,9 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
     >>> (notesList, durationList) = audioSearch.joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    >>> print notesList
+    >>> print(notesList)
     [<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>, ...]
-    >>> print durationList
+    >>> print(durationList)
     [72, 6, 14, 23, 34, 40, 27, 36, 35, 15, 17, 15, 6, 33, 22, 13, 16, 39, 35, 38, 27, 27, 27, 8]
     '''
     #initialization
@@ -783,9 +782,9 @@ def decisionProcess(partsList, notePrediction, beginningData,
     >>> lastNotePosition = 0
     >>> countdown = 0
     >>> positionInList, countdown = audioSearch.decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
-    >>> print positionInList
+    >>> print(positionInList)
     0
-    >>> print countdown # the result is 1 because the song used is completely different from the score!!
+    >>> print(countdown) # the result is 1 because the song used is completely different from the score!!
     1
     '''
     i = 0

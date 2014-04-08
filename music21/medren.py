@@ -379,7 +379,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> for mn in s:
         ...    if isinstance(mn, medren.GeneralMensuralNote):
         ...        mn.updateDurationFromMensuration(surroundingStream = s)
-        ...        print mn.duration.quarterLength
+        ...        print(mn.duration.quarterLength)
         1.0
         1.0
         1.0
@@ -994,13 +994,13 @@ class Ligature(base.Music21Object):
     >>> l1 = medren.Ligature(['A4','F4','G4','A4','B-4'])
     >>> l1.makeOblique(0)
     >>> l1.setStem(0, 'down', 'left')
-    >>> print [n.fullName for n in l1.notes]
+    >>> print([n.fullName for n in l1.notes])
     ['brevis A in octave 4 ', 'brevis F in octave 4 ', 'brevis G in octave 4 ', 'brevis A in octave 4 ', 'brevis B-flat in octave 4 ']
     >>>
     >>> l2 = medren.Ligature(['F4','G4','A4','B-4','D5'])
     >>> l2.setStem(4, 'down', 'left')
     >>> l2.setReverse(4, True)
-    >>> print [(n.mensuralType, n.pitch.nameWithOctave) for n in l2.notes]
+    >>> print([(n.mensuralType, n.pitch.nameWithOctave) for n in l2.notes])
     [('brevis', 'F4'), ('brevis', 'G4'), ('brevis', 'A4'), ('brevis', 'B-4'), ('longa', 'D5')]
     
     Note that ligatures cannot be displayed yet. 
@@ -1046,23 +1046,23 @@ class Ligature(base.Music21Object):
                      
                      
                      >>> l = medren.Ligature(['A4','B4'])
-                     >>> print [n.mensuralType for n in l.notes]
+                     >>> print([n.mensuralType for n in l.notes])
                      ['brevis', 'brevis']
                      >>> l.makeOblique(0)
-                     >>> print [n.mensuralType for n in l.notes]
+                     >>> print([n.mensuralType for n in l.notes])
                      ['longa', 'brevis']
                      >>> l = medren.Ligature(['B4','A4'])
-                     >>> print [n.mensuralType for n in l.notes]
+                     >>> print([n.mensuralType for n in l.notes])
                      ['longa', 'longa']
                      >>> l.makeOblique(0)
-                     >>> print [n.mensuralType for n in l.notes]
+                     >>> print([n.mensuralType for n in l.notes])
                      ['longa', 'brevis']
                      >>> l.setStem(0, 'down','left')
-                     >>> print [n.mensuralType for n in l.notes]
+                     >>> print([n.mensuralType for n in l.notes])
                      ['brevis', 'brevis']
                      >>> l = medren.Ligature(['G4','A4','B4','A4'])
                      >>> l.setStem(2, 'up','left')
-                     >>> print [n.mensuralType for n in l.notes]
+                     >>> print([n.mensuralType for n in l.notes])
                      ['brevis', 'brevis', 'semibrevis', 'semibrevis']
                      >>> l = medren.Ligature(['B4','A4','G4','A4','G4','A4','F4'])
                      >>> l.makeOblique(0)
@@ -1070,7 +1070,7 @@ class Ligature(base.Music21Object):
                      >>> l.setStem(2, 'down', 'left')
                      >>> l.setStem(4, 'up','left')
                      >>> l.setMaxima(6, True)
-                     >>> print [n.mensuralType for n in l.notes]
+                     >>> print([n.mensuralType for n in l.notes])
                      ['longa', 'brevis', 'longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
                      ''')
         
@@ -1715,10 +1715,10 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
             elif ('GeneralMensuralNote' in e.classes) and (e not in mensuralMeasure):
                 m = stream.Measure(number = measureNum)
                 if printUpdates is True:
-                    print 'Getting measure %s...' % measureNum
+                    print('Getting measure %s...' % measureNum)
                 mensuralMeasure = e._getSurroundingMeasure(mOrD, inpStream_copy)[0]
                 if printUpdates is True:               
-                    print 'mensuralMeasure %s' % mensuralMeasure
+                    print('mensuralMeasure %s' % mensuralMeasure)
                 for item in mensuralMeasure:
                     m.append(item)
                 newStream.append(m)
@@ -1894,12 +1894,12 @@ def cummingSchubertStrettoFuga(score):
             
         lastInterval = thisGeneric
     if score.title:
-        print score.title
+        print(score.title)
     
-    print "intv.\tcount\tpercent"
+    print("intv.\tcount\tpercent")
     for l in sorted(strettoKeys.keys()):
-        print ("%2d\t%3d\t%2d%%" % (l, strettoKeys[l], strettoKeys[l]*100/len(sn)-1))
-    print "\n"
+        print("%2d\t%3d\t%2d%%" % (l, strettoKeys[l], strettoKeys[l]*100/len(sn)-1))
+    print("\n")
         
 class MedRenException(exceptions21.Music21Exception):
     pass

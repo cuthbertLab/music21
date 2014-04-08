@@ -20,8 +20,13 @@ dictionarysharp = {1:"F", 2:"C", 3:"G", 4:"D", 5:"A", 6:"E", 7:"B"}
 dictionarybemol = {1:"B", 2:"E", 3:"A", 4:"D", 5:"G", 6:"C", 7:"F"}
 dictionaries = {"dictionaryNoteLength":dictionaryNoteLength, "dictionaryTreble":dictionaryTreble, "dictionaryAlto":dictionaryAlto, "dictionaryTenor":dictionaryTenor, "dictionaryBass":dictionaryBass, "dictionarysharp":dictionarysharp, "dictionarybemol":dictionarybemol}
 
-import translate
-import binaryTranslate
+import sys
+if sys.version > '3':
+    from . import translate
+    from . import binaryTranslate
+else:
+    import translate # @Reimport
+    import binaryTranslate # @Reimport
 
 
 #------------------------------------------------------------------------------

@@ -95,21 +95,34 @@ from music21 import clef #@UnusedImport
 from music21 import tempo #@UnusedImport
 from music21.theoryAnalysis import theoryAnalyzer #@UnusedImport
 
-# webapps imports
-import commands #@UnusedImport
-import templates #@UnusedImport
-import apps
+import sys
+
+if sys.version > '3':
+    from . import commands
+    from . import templates
+    from . import apps
+else:
+    # webapps imports
+    import commands #@UnusedImport @Reimport
+    import templates #@UnusedImport @Reimport
+    import apps # @Reimport
 
 # python library imports
 import json
 import zipfile #@UnusedImport
 import cgi
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse
 import re #@UnusedImport
 import sys
 import traceback
 
-import StringIO #@UnusedImport
+try:
+    import StringIO #@UnusedImport
+except:
+    from io import StringIO # @Reimport python3
 
 #-------------------------------------------------------------------------------
 

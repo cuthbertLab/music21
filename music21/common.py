@@ -25,6 +25,12 @@ import inspect
 
 from music21 import exceptions21
 
+#python3
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
+
 
 # define file extensions for various formats
 # keys are assumed to be formats
@@ -533,13 +539,13 @@ def nearestMultiple(n, unit):
     seven significant digits.
 
 
-    >>> print common.nearestMultiple(.25, .25)
+    >>> print(common.nearestMultiple(.25, .25))
     (0.25, 0.0)
-    >>> print common.nearestMultiple(.35, .25)
+    >>> print(common.nearestMultiple(.35, .25))
     (0.25, 0.1...)
 
     Note that this one also has an error of .1 but it's a positive error off of 0.5
-    >>> print common.nearestMultiple(.4, .25)
+    >>> print(common.nearestMultiple(.4, .25))
     (0.5, 0.1...)
 
 
@@ -673,12 +679,19 @@ def isStr(usrData):
     >>> common.isStr(u'flat')
     True
     """
-    if isinstance(usrData, basestring):
-#     if (isinstance(usrData, str) or
-#         isinstance(usrData, unicode)):
-        return True
-    else:
-        return False
+    #python3 compatibility
+    try:
+        if isinstance(usrData, basestring):
+    #     if (isinstance(usrData, str) or
+    #         isinstance(usrData, unicode)):
+            return True
+        else:
+            return False
+    except NameError:
+        if isinstance(usrData, str):
+            return True
+        else:
+            return False
 
 
 def isListLike(usrData):
@@ -1272,7 +1285,7 @@ def toRoman(num):
     if type(num) != type(1):
         raise TypeError("expected integer, got %s" % type(num))
     if not 0 < num < 4000:
-        raise ValueError, "Argument must be between 1 and 3999"
+        raise ValueError("Argument must be between 1 and 3999")
     ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
     nums = ('M',  'CM', 'D', 'CD','C', 'XC','L','XL','X','IX','V','IV','I')
     result = ""
@@ -1393,7 +1406,7 @@ def formatStr(msg, *arguments, **keywords):
 
 
     >>> a = common.formatStr('test', '1', 2, 3)
-    >>> print a
+    >>> print(a)
     test 1 2 3
     <BLANKLINE>
     '''
@@ -1536,6 +1549,7 @@ def getCorpusContentDirs():
     excludedNames = (
         'license.txt',
         'metadataCache',
+        '__pycache__',
         )
     for filename in os.listdir(directoryName):
         if filename.endswith(('.py', '.pyc')):
@@ -1806,9 +1820,9 @@ def findWeakRef(target):
         try:
             attr = getattr(target, attrName)
         except:
-            print 'exception on attribute access: %s' % attrName
+            print('exception on attribute access: %s' % attrName)
         if isWeakref(attr):
-            print 'found weakref', attr, attrName, 'of target:', target
+            print('found weakref', attr, attrName, 'of target:', target)
         if isinstance(attr, (list, tuple)):
             for x in attr:
                 findWeakRef(x)
@@ -1957,13 +1971,15 @@ class Iterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.index >= len(self.data):
             raise StopIteration
         post = self.data[self.index]
         self.index += 1
         return post
 
+    def next(self):
+        return self.__next__()
 
 
 #-------------------------------------------------------------------------------

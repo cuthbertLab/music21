@@ -47,7 +47,7 @@ class WindowedAnalysis(object):
         self.processor = analysisProcessor
         #environLocal.printDebug(self.processor)
         if 'Stream' not in streamObj.classes:
-            raise WindowedAnalysisException, 'non-stream provided as argument'
+            raise WindowedAnalysisException('non-stream provided as argument')
         self._srcStream = streamObj
         # store a windowed Stream, partitioned into bars of 1/4
         self._windowedStream = self._getMinimumWindowStream() 

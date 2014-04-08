@@ -130,8 +130,8 @@ class ModuleIterator(Iterator):
                         # Skip examining any other file or directory below
                         # this directory.
                         if self.verbose:
-                            print '\tIGNORED {0}/*'.format(
-                                common.relativepath(directoryPath))
+                            print('\tIGNORED {0}/*'.format(
+                                common.relativepath(directoryPath)))
                         directoryNames[:] = []
                         continue
                 except ImportError:
@@ -154,8 +154,8 @@ class ModuleIterator(Iterator):
                     if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE',
                         False):
                         if self.verbose:
-                            print '\tIGNORED {0}'.format(
-                                common.relativepath(filePath))
+                            print('\tIGNORED {0}'.format(
+                                common.relativepath(filePath)))
                         continue
                     yield module
                 except ImportError:

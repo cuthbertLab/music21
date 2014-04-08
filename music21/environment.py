@@ -10,7 +10,7 @@
 #               Project
 # License:      LGPL
 #------------------------------------------------------------------------------
-
+from __future__ import print_function
 
 '''
 The environment module describes an object for accessing and setting
@@ -138,7 +138,7 @@ class LocalCorporaSettings(xmlnode.XMLNodeList):
         >>> corpusB.append(environment.LocalCorpusPath(path='baz'))
         >>> localCorpora.append(corpusA)
         >>> localCorpora.append(corpusB)
-        >>> print localCorpora.xmlStr()
+        >>> print(localCorpora.xmlStr())
         <?xml version="1.0" encoding="utf-8"?>
         <localCorporaSettings>
           <localCorpusSettings name="A">
@@ -178,7 +178,7 @@ class LocalCorpusPath(xmlnode.XMLNode):
         >>> lcp = environment.LocalCorpusPath()
         >>> lcp.charData = 'testing'
         >>> lcs.append(lcp)
-        >>> print lcs.xmlStr()
+        >>> print(lcs.xmlStr())
         <?xml version="1.0" encoding="utf-8"?>
         <localCorpusSettings>
         <localCorpusPath>testing</localCorpusPath>
@@ -666,8 +666,8 @@ class _EnvironmentCore(object):
                 webbrowser.open(filePath)
                 return
             except:
-                print 'Cannot open webbrowser, sorry. Go to file://{}'.format(
-                    filePath)
+                print('Cannot open webbrowser, sorry. Go to file://{}'.format(
+                    filePath))
         else:
             environmentKey = None
             fpApp = None
@@ -688,7 +688,7 @@ class _EnvironmentCore(object):
                 if m21Format == 'braille':
                     with open(filePath, 'r') as f:
                         for line in f:
-                            print line,
+                            print(line, end="")
                         print
                     return
                 else:

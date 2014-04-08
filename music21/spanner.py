@@ -88,7 +88,7 @@ class Spanner(base.Music21Object):
     (1) it is just a normal element in the stream:
     
     >>> for e in s:
-    ...    print e
+    ...    print(e)
     <music21.note.Note C>
     <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
     <music21.note.Note D>
@@ -100,7 +100,7 @@ class Spanner(base.Music21Object):
     
     >>> spannerCollection = s.spanners # a stream object
     >>> for thisSpanner in spannerCollection:
-    ...     print thisSpanner
+    ...     print(thisSpanner)
     <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
 
 
@@ -143,7 +143,7 @@ class Spanner(base.Music21Object):
     ...    for thisSpanner in ss:
     ...       if 'Slur' in thisSpanner.classes:
     ...            if thisSpanner.isFirst(n):
-    ...                print n.nameWithOctave
+    ...                print(n.nameWithOctave)
     D4
     G4
     
@@ -152,7 +152,7 @@ class Spanner(base.Music21Object):
     
     >>> for thisSpanner in part1.spanners:
     ...     firstNote = thisSpanner.getSpannedElements()[0]
-    ...     print firstNote.nameWithOctave
+    ...     print(firstNote.nameWithOctave)
     D4
     G4
     
@@ -1295,7 +1295,7 @@ class Ottava(Spanner):
     >>> ottava.type = (8, 'down')
     >>> ottava.type
     '8vb'
-    >>> print ottava
+    >>> print(ottava)
     <music21.spanner.Ottava 8vb >
     '''
     def __init__(self, *arguments, **keywords):

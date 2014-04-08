@@ -615,11 +615,11 @@ class ClassDocumenter(ObjectDocumenter):
             >>> mapping = documenter.inheritedReadonlyPropertiesMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
-            ...     print '{0}:'.format(
-            ...         classDocumenter.referentPackagesystemPath)
+            ...     print('{0}:'.format(
+            ...         classDocumenter.referentPackagesystemPath))
             ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-            ...         print '- {0}'.format(
-            ...             attributeDocumenter.referentPackagesystemPath)
+            ...         print('- {0}'.format(
+            ...             attributeDocumenter.referentPackagesystemPath))
             ...
             music21.base.Music21Object:
             - music21.base.Music21Object.classes
@@ -657,11 +657,11 @@ class ClassDocumenter(ObjectDocumenter):
             >>> mapping = documenter.inheritedMethodsMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
-            ...     print '{0}:'.format(
-            ...         classDocumenter.referentPackagesystemPath)
+            ...     print('{0}:'.format(
+            ...         classDocumenter.referentPackagesystemPath))
             ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-            ...         print '- {0}'.format(
-            ...             attributeDocumenter.referentPackagesystemPath)
+            ...         print('- {0}'.format(
+            ...             attributeDocumenter.referentPackagesystemPath))
             ...
             music21.base.Music21Object:
             - music21.base.Music21Object.addContext
@@ -703,9 +703,9 @@ class ClassDocumenter(ObjectDocumenter):
             >>> mapping = documenter.inheritedReadwritePropertiesMapping
             >>> sortBy = lambda x: x.referentPackagesystemPath
             >>> for classDocumenter in sorted(mapping, key=sortBy):
-            ...     print '{0}:'.format(classDocumenter.referentPackagesystemPath)
+            ...     print('{0}:'.format(classDocumenter.referentPackagesystemPath))
             ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-            ...         print '- {0}'.format(attributeDocumenter.referentPackagesystemPath)
+            ...         print('- {0}'.format(attributeDocumenter.referentPackagesystemPath))
             ...
             music21.base.Music21Object:
             - music21.base.Music21Object.activeSite
@@ -1180,7 +1180,7 @@ class ModuleDocumenter(ObjectDocumenter):
 
         >>> for reference, referent in sorted(
         ...     documenter.namesMapping.iteritems()):
-        ...     print reference, referent
+        ...     print("%s %s" % (reference, referent))
         ...
         ContiguousSegmentOfNotes <music21.documentation.library.documenters.ClassDocumenter: music21.serial.ContiguousSegmentOfNotes>
         HistoricalTwelveToneRow <music21.documentation.library.documenters.ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
@@ -1303,7 +1303,7 @@ class ModuleDocumenter(ObjectDocumenter):
             >>> module = serial
             >>> documenter = documentation.ModuleDocumenter(module)
             >>> for classDocumenter in documenter.classDocumenters:
-            ...     print classDocumenter.referentPackagesystemPath
+            ...     print(classDocumenter.referentPackagesystemPath)
             ...
             music21.serial.ContiguousSegmentOfNotes
             music21.serial.HistoricalTwelveToneRow
@@ -1338,7 +1338,7 @@ class ModuleDocumenter(ObjectDocumenter):
             >>> module = serial
             >>> documenter = documentation.ModuleDocumenter(module)
             >>> for functionDocumenter in documenter.functionDocumenters:
-            ...     print functionDocumenter.referentPackagesystemPath
+            ...     print(functionDocumenter.referentPackagesystemPath)
             ...
             music21.serial.findMultisets
             music21.serial.findSegments
@@ -1384,7 +1384,8 @@ class ModuleDocumenter(ObjectDocumenter):
     def referentPackagesystemPath(self):
         if isinstance(self.referent.__name__, tuple):
             path = self.referent.__name__[0],
-        path = self.referent.__name__
+        else:
+            path = self.referent.__name__
         return path.replace('.__init__', '')
 
     @property

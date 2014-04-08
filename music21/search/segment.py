@@ -202,8 +202,8 @@ def indexScoreFilePaths(
     for filePath in scoreFilePaths:
         shortfp = filePath.split(os.sep)[-1]
         if giveUpdates is True:
-            print "Indexing %s (%d/%d)" % (
-                shortfp, scoreIndex, totalScores)
+            print("Indexing %s (%d/%d)" % (
+                shortfp, scoreIndex, totalScores))
         scoreIndex += 1
         try:
             if not os.path.isabs(filePath):
@@ -212,7 +212,7 @@ def indexScoreFilePaths(
                 scoreObj = converter.parse(filePath)
             scoreDict[shortfp] = indexScoreParts(scoreObj, *args, **kwds)
         except:
-            print "Failed on parse for: %s" % filePath
+            print("Failed on parse for: %s" % filePath)
     return scoreDict
 
 
@@ -311,8 +311,8 @@ def scoreSimilarity(
         thisScore = scoreDict[thisScoreKey]
         scoreIndex += 1 
         if giveUpdates is True:
-            print "Comparing {0} ({1}/{2})".format(
-                thisScoreKey, scoreIndex, totalScores)
+            print("Comparing {0} ({1}/{2})".format(
+                thisScoreKey, scoreIndex, totalScores))
         for pNum in range(len(thisScore)):
             for segmentNumber, thisSegment in enumerate(thisScore[pNum]['segmentList']):
                 if len(thisSegment) < minimumLength:

@@ -1386,7 +1386,7 @@ class Iterator(object):
                 if v in self._choraleList2.byTitle:
                     self._titleList.append(v)
                 else:
-                    print '%s will be skipped because it is not a recognized title' % v
+                    print('%s will be skipped because it is not a recognized title' % v)
         if self._titleList == []:
             self._titleList = None
 
@@ -1415,35 +1415,35 @@ class Iterator(object):
                     if v in self._choraleList2.byRiemenschneider:
                         self._numberList.append(v)
                     else:
-                        print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)
+                        print("%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem))
             elif self._numberingSystem is 'kalmus':
                 self._numberList = []
                 for v in sorted(value):
                     if v in self._choraleList2.byKalmus and v != 0:
                         self._numberList.append(v)
                     else:
-                        print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)
+                        print("%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem))
             elif self._numberingSystem is 'bwv':
                 self._numberList = []
                 for v in sorted(value):
                     if v in self._choraleList2.byBWV:
                         self._numberList.append(v)
                     else:
-                        print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)
+                        print("%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem))
             elif self._numberingSystem is 'budapest':
                 self._numberList = []
                 for v in sorted(value):
                     if v in self._choraleList1.byBudapest:
                         self._numberList.append(v)
                     else:
-                        print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)
+                        print("%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem))
             elif self._numberingSystem is 'baerenreiter':
                 self._numberList = []
                 for v in sorted(value):
                     if v in self._choraleList1.byBaerenreiter:
                         self._numberList.append(v)
                     else:
-                        print "%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem)
+                        print("%s will be skipped because it is not in the numberingSystem %s" % (v, self._numberingSystem))
 
             if self._numberList is None:
                 self.currentNumber = 0

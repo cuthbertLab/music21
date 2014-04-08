@@ -496,7 +496,7 @@ class TwelveToneRow(ToneRow):
         >>> len(src)
         12
         >>> s37 = serial.getHistoricalRowByName('RowSchoenbergOp37').matrix()
-        >>> print s37
+        >>> print(s37)
           0  B  7  8  3  1  2  A  6  5  4  9
           1  0  8  9  4  2  3  B  7  6  5  A
           5  4  0  1  8  6  7  3  B  A  9  2
@@ -950,7 +950,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
     ::
 
         >>> contiglist = serial.getContiguousSegmentsOfLength(s, 3, 'skipConsecutive', False)
-        >>> print contiglist
+        >>> print(contiglist)
         []
         
     On our first attempt, no contiguous segments of notes were found above because the inputStream has no measures -
@@ -974,8 +974,8 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
     ::
 
         >>> skipConsecutiveList = serial.getContiguousSegmentsOfLength(s, 3, 'skipConsecutive', False)
-        >>> print skipConsecutiveList
-        [<music21.serial.ContiguousSegmentOfNotes object ... 
+        >>> print(skipConsecutiveList)
+        [<music21.serial.ContiguousSegmentOfNotes object ...]
         >>> [instance.segment for instance in skipConsecutiveList]
         [[<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 
         [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>]]
@@ -1685,8 +1685,8 @@ def findSegments(inputStream, searchList, reps = 'skipConsecutive', includeChord
     
     >>> sc.insert(0, newpart)
     >>> GABandABC = serial.findSegments(sc, [[7, 9, 11], [9, 11, 0]], includeChords = False)
-    >>> print GABandABC
-    [<music21.serial.ContiguousSegmentOfNotes object...
+    >>> print(GABandABC)
+    [<music21.serial.ContiguousSegmentOfNotes object...]
     >>> len(GABandABC)
     2
     >>> GABandABC[0].segment, GABandABC[1].segment
@@ -1741,7 +1741,7 @@ def findSegments(inputStream, searchList, reps = 'skipConsecutive', includeChord
     __OMIT_FROM_DOCS__
     
     >>> for a in serial.findSegments(sc, [[7, -3, 11], [9, 11, 0]], includeChords = False):
-    ...    print a.matchedSegment
+    ...    print(a.matchedSegment)
     [7, -3, 11]
     [9, 11, 0]
     >>> len(serial.findSegments(sc, [[7, -3, 11], [9, 11, 0]], includeChords = False))
@@ -1948,7 +1948,7 @@ def findTransposedSegments(inputStream, searchList, reps = 'skipConsecutive', in
     
     >>> halfStepList = serial.findTransposedSegments(newpart, [[0, 1]], 'rowsOnly', includeChords = False)
     >>> L = [step.segment for step in halfStepList]
-    >>> print L
+    >>> print(L)
     [[<music21.note.Note E>, <music21.note.Note F>], [<music21.note.Note B>, <music21.note.Note C>]]
     >>> [step.startMeasureNumber for step in halfStepList]
     [1, 5]
@@ -2740,7 +2740,7 @@ def findTransposedMultisets(inputStream, searchList, reps = 'skipConsecutive', i
     
     >>> instanceList = serial.findTransposedMultisets(part, [[-9, -10, -11]], includeChords = False)
     >>> for instance in instanceList:
-    ...    print (instance.activeSegment, instance.startMeasureNumber, instance.matchedSegment)
+    ...    print(instance.activeSegment, instance.startMeasureNumber, instance.matchedSegment)
     ([2, 4, 3], 3, [-9, -10, -11])
     ([3, 4, 2], 5, [-9, -10, -11])
     ([0, 1, 2], 1, [-9, -10, -11])
@@ -3419,14 +3419,14 @@ def pcToToneRow(pcSet):
     {0.0} <music21.pitch.Pitch B->
     {0.0} <music21.pitch.Pitch B>
     >>> matrixObj = a.matrix()
-    >>> print matrixObj
+    >>> print(matrixObj)
       0  1  2  3  4  5  6  7  8  9  A  B
       B  0  1  2  3  4  5  6  7  8  9  A
     ...
 
     >>> a = serial.pcToToneRow([4,5,0,6,7,2,'a',8,9,1,'b',3])
     >>> matrixObj = a.matrix()
-    >>> print matrixObj
+    >>> print(matrixObj)
       0  1  8  2  3  A  6  4  5  9  7  B
       B  0  7  1  2  9  5  3  4  8  6  A
     ...

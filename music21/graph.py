@@ -464,7 +464,7 @@ class Graph(object):
     def _adjustAxisSpines(self, ax, leftBottom=False):
         '''Remove the right and left spines from the diagram
         '''
-        for loc, spine in ax.spines.iteritems():
+        for loc, spine in ax.spines.items():
             if loc in ['left','bottom']:
                 if leftBottom:
                     spine.set_color('none') # don't draw spine
@@ -797,7 +797,7 @@ class GraphColorGrid(Graph):
             ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000', antialiased=False)
 
             # remove spines from each bar plot; cause excessive thickness
-            for unused_loc, spine in ax.spines.iteritems():
+            for unused_loc, spine in ax.spines.items():
                 #spine.set_color('none') # don't draw spine
                 spine.set_linewidth(.3) 
                 spine.set_color('#000000') 
@@ -894,7 +894,7 @@ class GraphColorGridLegend(Graph):
             ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000')
             
             # remove spines from each bar plot; cause excessive thickness
-            for unused_loc, spine in ax.spines.iteritems():
+            for unused_loc, spine in ax.spines.items():
                 #spine.set_color('none') # don't draw spine
                 spine.set_linewidth(.3) 
                 spine.set_color('#000000') 

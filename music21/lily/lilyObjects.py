@@ -10,6 +10,11 @@
 #-------------------------------------------------------------------------------
 
 from __future__ import unicode_literals
+#python3
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
 
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the

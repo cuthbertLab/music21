@@ -1,4 +1,5 @@
 # -*- coding: cp1252 -*-
+from __future__ import print_function
 
 ##
 # Support module for the xlrd package.
@@ -13,7 +14,10 @@ DEBUG = 0
 
 from struct import unpack
 import sys
-from timemachine import *
+try:
+    from timemachine import *
+except:
+    from .timemachine import *
 
 class XLRDError(Exception):
     pass
@@ -38,7 +42,7 @@ class BaseObject(object):
         alist = self.__dict__.items()
         alist.sort()
         pad = " " * indent
-        if header is not None: print >> f, header
+        if header is not None: print (header, file=f)
         list_type = type([])
         dict_type = type({})
         for attr, value in alist:
@@ -49,9 +53,9 @@ class BaseObject(object):
             elif attr not in self._repr_these and (
                 isinstance(value, list_type) or isinstance(value, dict_type)
                 ):
-                print >> f, "%s%s: %s, len = %d" % (pad, attr, type(value), len(value))
+                print ("%s%s: %s, len = %d" % (pad, attr, type(value), len(value)), file=f)
             else:
-                print >> f, "%s%s: %r" % (pad, attr, value)
+                print ("%s%s: %r" % (pad, attr, value), file=f)
         if footer is not None: print >> f, footer
 
 FUN, FDT, FNU, FGE, FTX = range(5) # unknown, date, number, general, text
@@ -201,7 +205,7 @@ _cell_opcode_list = [
 _cell_opcode_dict = {}
 for _cell_opcode in _cell_opcode_list:
     _cell_opcode_dict[_cell_opcode] = 1
-is_cell_opcode = _cell_opcode_dict.has_key
+#is_cell_opcode = _cell_opcode_dict.has_key
 
 # def fprintf(f, fmt, *vargs): f.write(fmt % vargs)
 
@@ -492,8 +496,8 @@ def hex_char_dump(strg, ofs, dlen, base=0, fout=sys.stdout):
         substrg = strg[pos:endsub]
         lensub = endsub - pos
         if lensub <= 0 or lensub != len(substrg):
-            print '??? hex_char_dump: ofs=%d dlen=%d base=%d -> endpos=%d pos=%d endsub=%d substrg=%r' \
-                % (ofs, dlen, base, endpos, pos, endsub, substrg)
+            print('??? hex_char_dump: ofs=%d dlen=%d base=%d -> endpos=%d pos=%d endsub=%d substrg=%r' \
+                % (ofs, dlen, base, endpos, pos, endsub, substrg))
             break
         hexd = ''.join(["%02x " % ord(c) for c in substrg])
         chard = ''
@@ -503,7 +507,7 @@ def hex_char_dump(strg, ofs, dlen, base=0, fout=sys.stdout):
             elif not (' ' <= c <= '~'):
                 c = '?'
             chard += c
-        print >> fout, "%5d:      %-48s %s" % (base+pos-ofs, hexd, chard)
+        print("%5d:      %-48s %s" % (base+pos-ofs, hexd, chard), file=fout)
         pos = endsub
 
 def biff_dump(mem, stream_offset, stream_len, base=0, fout=sys.stdout):

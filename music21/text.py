@@ -571,7 +571,7 @@ class LanguageDetector(object):
         
         >>> ld = text.LanguageDetector()
         >>> for i in range(0, len(ld.languageCodes)):
-        ...    print i+1, ld.languageCodes[i]
+        ...    print(str(i+1) + " " +  ld.languageCodes[i])
         1 en
         2 fr
         3 it

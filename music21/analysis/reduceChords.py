@@ -145,15 +145,15 @@ class ChordReducer(object):
 
     @staticmethod
     def _debug(tree):
-        for part, subtree in tree.toPartwiseOffsetTrees().iteritems():
-            print part
+        for part, subtree in tree.toPartwiseOffsetTrees().items():
+            print(part)
             timespans = [x for x in subtree]
             for timespan in timespans:
-                print '\t', timespan
+                print('\t', timespan)
             overlap = subtree.maximumOverlap
             if 1 < overlap:
-                print part
-                raise Exception
+                print(part)
+                raise Exception()
 
     @staticmethod
     def _getIntervalClassSet(pitches):
@@ -245,7 +245,7 @@ class ChordReducer(object):
             #        ):
             #        continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for unused_part, timespans in horizontalities.iteritems():
+            for unused_part, timespans in horizontalities.items():
                 if len(timespans) < 2:
                     continue
                 elif timespans[0].pitches == timespans[1].pitches:
@@ -330,7 +330,7 @@ class ChordReducer(object):
         def procedure(timespan):
             verticality = tree.getVerticalityAt(timespan.startOffset)
             return verticality.bassTimespan
-        for unused_part, subtree in partwiseTrees.iteritems():
+        for unused_part, subtree in partwiseTrees.items():
             timespans = [x for x in subtree]
             for bassTimespan, group in itertools.groupby(timespans, procedure):
                 group = list(group)
@@ -385,7 +385,7 @@ class ChordReducer(object):
         r'''
         Fills measure gaps in `tree`.
         '''
-        for unused_part, subtree in partwiseTrees.iteritems():
+        for unused_part, subtree in partwiseTrees.items():
             toRemove = set()
             toInsert = set()
             for unused_measureNumber, group in itertools.groupby(
@@ -584,7 +584,7 @@ class ChordReducer(object):
         '''
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for unused_part, horizontality in horizontalities.iteritems():
+            for unused_part, horizontality in horizontalities.items():
                 if not horizontality.hasPassingTone and \
                     not horizontality.hasNeighborTone:
                     continue
@@ -614,7 +614,7 @@ class ChordReducer(object):
                 if bassTimespan.quarterLength < duration:
                     bassTimespan = None
             return measureNumber, isShort, bassTimespan
-        for unused_part, subtree in partwiseTrees.iteritems():
+        for unused_part, subtree in partwiseTrees.items():
             timespansToRemove = []
             for key, group in itertools.groupby(subtree, procedure):
                 unused_measureNumber, isShort, bassTimespan = key

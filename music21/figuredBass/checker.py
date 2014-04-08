@@ -80,7 +80,7 @@ def extractHarmonies(music21Stream):
     >>> from music21.figuredBass import checker
     >>> allHarmonies = checker.extractHarmonies(score)
     >>> for (offsets, notes) in sorted(allHarmonies.items()):
-    ...    print "{0:15}[{1:23}{2:23}{3:22}]".format(offsets, notes[0], notes[1], notes[2])
+    ...    print("{0:15}[{1:23}{2:23}{3:22}]".format(offsets, notes[0], notes[1], notes[2]))
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>  <music21.note.Note G> ]
@@ -118,7 +118,7 @@ def createOffsetMapping(music21Part):
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> for (offsets, notes) in sorted(offsetMapping.items()):
-    ...    print "{0:15}[{1:22}]".format(offsets, notes[0])
+    ...    print("{0:15}[{1:22}]".format(offsets, notes[0]))
     (0.0, 1.5)     [<music21.note.Note C> ]
     (1.5, 2.0)     [<music21.note.Note C> ]
     (2.0, 3.0)     [<music21.note.Note B->]
@@ -151,7 +151,7 @@ def correlateHarmonies(currentMapping, music21Part):
     >>> v1 = score[1]
     >>> newMapping = checker.correlateHarmonies(offsetMapping, v1)
     >>> for (offsets, notes) in sorted(newMapping.items()):
-    ...    print "{0:15}[{1:23}{2:21}]".format(offsets, notes[0], notes[1])
+    ...    print("{0:15}[{1:23}{2:21}]".format(offsets, notes[0], notes[1]))
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>]
@@ -250,7 +250,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         if len(debugInfo) == 2:
             debugInfo.append("No violations to report.")
         for lineInfo in debugInfo:
-            print lineInfo
+            print(lineInfo)
 
 def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
     '''
@@ -322,7 +322,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         if len(debugInfo) == 2:
             debugInfo.append("No violations to report.")
         for lineInfo in debugInfo:
-            print lineInfo
+            print(lineInfo)
 
 #-------------------------------------------------------------------------------
 # Single Possibility Rule-Checking Methods

@@ -59,7 +59,7 @@ class TonalityCounter(object):
     >>> threeBallata = cadencebook.BallataSheet()[15:18]
     >>> tc1 = trecento.tonality.TonalityCounter(threeBallata)
     >>> tc1.run() 
-    >>> print tc1.output
+    >>> print(tc1.output)
                         Bench'amar    C    D
                     Bench'I' serva    A    D
               Checc' a tte piaccia    B    D
@@ -269,7 +269,7 @@ def nonLandiniTonality(show = True):
     worksList = []
     for thisWork in ballataObj:
         if show == True:
-            print thisWork.title
+            print(thisWork.title)
         if thisWork.composer != "Landini" and thisWork.composer != ".":
             worksList.append(thisWork)
     tCounter = TonalityCounter(worksList, streamName = "T", cadenceName = "A")

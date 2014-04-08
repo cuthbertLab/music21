@@ -1417,21 +1417,21 @@ def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace
     
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, recurse = False)
     >>> for v in returnStream.parts[0].variants:
-    ...     print (v.offset, v.lengthType, v.replacementDuration)
+    ...     print(v.offset, v.lengthType, v.replacementDuration)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
     
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, variantNames = ['france'], recurse = True)
     >>> for v in returnStream.parts[0].variants:
-    ...     print (v.offset, v.lengthType, v.replacementDuration)
+    ...     print(v.offset, v.lengthType, v.replacementDuration)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
     
     >>> variant.makeAllVariantsReplacements(newStream, recurse = True, inPlace = True)
     >>> for v in newStream.parts[0].variants:
-    ...     print (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
+    ...     print(v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (4.0, 'replacement', 4.0, 4.0)
     (12.0, 'elongation', 4.0, 12.0)
     (20.0, 'deletion', 8.0, 4.0)
@@ -1488,7 +1488,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
     ...
     
     >>> for v in s.variants:
-    ...     print (v.offset, v.lengthType, v.replacementDuration)
+    ...     print(v.offset, v.lengthType, v.replacementDuration)
     (0.0, 'elongation', 4.0)
     (4.0, 'replacement', 4.0)
     (12.0, 'elongation', 4.0)
@@ -1513,7 +1513,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
     
     >>> variant._doVariantFixingOnStream(s, 'london')
     >>> for v in s.variants:
-    ...     print (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
+    ...     print(v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (0.0, 'elongation', 1.0, 5.0)
     (4.0, 'deletion', 5.0, 1.0)
     '''
@@ -1589,7 +1589,7 @@ def _getNextElements(s, v, numberOfElements = 1):
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
     >>> for v in mergedStream.variants:
     ...     returnElement = variant._getNextElements(mergedStream, v)
-    ...     print returnElement
+    ...     print(returnElement)
     <music21.stream.Measure 1 offset=0.0>
     <music21.stream.Measure 3 offset=8.0>
     
@@ -1609,7 +1609,7 @@ def _getNextElements(s, v, numberOfElements = 1):
     >>> s.insert(4.0, v2)
     >>> for v in s.variants:
     ...     returnElement = variant._getNextElements(s, v)
-    ...     print returnElement
+    ...     print(returnElement)
     <music21.note.Note E>
     <music21.note.Note G>
     '''
@@ -1668,7 +1668,7 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
     >>> for v in mergedStream.variants:
     ...     returnElement = variant._getPreviousElements(mergedStream, v)
-    ...     print returnElement
+    ...     print(returnElement)
     <music21.stream.Measure 1 offset=0.0>
     <music21.stream.Measure 2 offset=4.0>
     
@@ -1688,7 +1688,7 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     >>> s.insert(8.0, v2)
     >>> for v in s.variants:
     ...     returnElement = variant._getPreviousElements(s, v)
-    ...     print returnElement
+    ...     print(returnElement)
     <music21.note.Note A>
     <music21.note.Note B>
     '''
@@ -2146,7 +2146,7 @@ class Variant(base.Music21Object):
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note B>
         
-        >>> #print lily.translate.LilypondConverter().textFromMusic21Object(s)
+        >>> #print(lily.translate.LilypondConverter().textFromMusic21Object(s))
         >>> #s.show('lily.png')
 
         

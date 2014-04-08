@@ -70,12 +70,12 @@ def getObjectsWithEditorial(
         ...     listofNotes, "isPassingTone")
         >>> listofNotesWithEditorialComment = editorial.getObjectsWithEditorial(
         ...     listofNotes, "comment", listOfValues)
-        >>> print len(listofNotesWithEditorialisPassingTone)
+        >>> print(len(listofNotesWithEditorialisPassingTone))
         5
 
     ::
 
-        >>> print len(listofNotesWithEditorialComment)
+        >>> print(len(listofNotesWithEditorialComment))
         3
 
     '''
@@ -193,7 +193,7 @@ class NoteEditorial(SlottedObject):
             >>> n.editorial.ficta = pitch.Accidental("Sharp")
             >>> n.editorial.color = "blue"
             >>> n.editorial.hidden = True
-            >>> print n.editorial.lilyStart()
+            >>> print(n.editorial.lilyStart())
             \ficta \color "blue" \hideNotes
 
         '''

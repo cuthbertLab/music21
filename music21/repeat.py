@@ -52,7 +52,7 @@ class RepeatMark(object):
     >>> s.append(PartialRepeat())
     >>> repeats = s.getElementsByClass(repeat.RepeatMark)
     >>> if len(repeats) > 0:
-    ...    print "Stream has %d repeat(s) in it" % (len(repeats))
+    ...    print("Stream has %d repeat(s) in it" % (len(repeats)))
     Stream has 1 repeat(s) in it
     '''
     def __init__(self):

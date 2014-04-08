@@ -70,7 +70,7 @@ def applyCapuaToCadencebookWork(thisWork):
     >>> bOrigFN = bOrig.asScore().flat.notes
     >>> for i in range(len(bFN)):
     ...    if bFN[i].pitch != bOrigFN[i].pitch: 
-    ...        print bFN[i].pitch, bOrigFN[i].pitch
+    ...        print("%s %s" % (str(bFN[i].pitch), str(bOrigFN[i].pitch)))
     F#3 F3
     C#3 C3
     C#3 C3
@@ -785,18 +785,18 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
 
 #    
 #    >>> (totalDict, foundPieceOpus) = findCorrections(correctionType="Maj3", 2, 50)
-#    >>> print totalDict
+#    >>> print(totalDict)
 #    {'potentialChange': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, 'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82}
 #    >>> foundPieceOpus.show('lily.pdf')
     
 #    >>> (totalDict, foundPieceOpus) = findCorrections(correctionType="min6")
-#    >>> print totalDict
+#    >>> print(totalDict)
 #    {'potentialChange': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, 'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82}
 #    >>> foundPieceOpus.show('lily.pdf')
 
 #    >>> #_DOCS_SHOW (totalDict, foundPieceOpus) = trecento.capua.correctedMin6()
 #    >>> totalDict = {'potentialChange': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, 'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82} #_DOCS_HIDE
-#    >>> print totalDict
+#    >>> print(totalDict)
 #    {'alterAll': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, 'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82}
 #    >>> #_DOCS_SHOW foundPieceOpus.show('lily.pdf')
 
@@ -901,7 +901,7 @@ def improvedHarmony(startPiece = 2, endPiece = 459):
     
     
     >>> #_DOCS_SHOW trecento.capua.improvedHarmony()
-    >>> print "{'imperfCapua': 22, 'imperfIgnored': 155, 'perfCapua': 194, 'perfIgnored': 4057}" #_DOCS_HIDE
+    >>> print("{'imperfCapua': 22, 'imperfIgnored': 155, 'perfCapua': 194, 'perfIgnored': 4057}") #_DOCS_HIDE
     {'imperfCapua': 22, 'imperfIgnored': 155, 'perfCapua': 194, 'perfIgnored': 4057}
     '''
     
@@ -1192,14 +1192,14 @@ class TestSlow(unittest.TestCase):
 
     def testRuleFrequency(self):        
         import time
-        print time.ctime()
+        print(time.ctime())
         (num1, num2, num3, num4a, num4b) = ruleFrequency()
-        print time.ctime()
-        print num1
-        print num2
-        print num3
-        print num4a
-        print num4b
+        print(time.ctime())
+        print(num1)
+        print(num2)
+        print(num3)
+        print(num4a)
+        print(num4b)
         self.assertEqual(num4a,  57)
         self.assertEqual(num4b, 104)
 

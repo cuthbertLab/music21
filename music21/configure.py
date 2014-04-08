@@ -1158,7 +1158,7 @@ class SelectFilePath(SelectFromList):
                         if comparisonFunction(sub2):
                             post.append(path2)
                 except OSError:
-                    print "Could not read paths inside %s" % path1
+                    print("Could not read paths inside %s" % path1)
             else:        
                 if comparisonFunction(sub1):
                     post.append(path1)
@@ -1525,14 +1525,14 @@ class TestExternal(unittest.TestCase):
 
     def testSelectMusicXMLReader(self):
 
-        print 
+        print()
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = SelectMusicXMLReader()
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
 
 
-        print 
+        print()
         environLocal.printDebug(['starting: SelectMusicXMLReader(default=1)'])
         d = SelectMusicXMLReader(default=1)
         d.askUser()
@@ -1541,7 +1541,7 @@ class TestExternal(unittest.TestCase):
 
 
     def testOpenInBrowser(self):
-        print 
+        print()
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = AskOpenInBrowser('http://mit.edu/music21')
         d.askUser()
@@ -1550,7 +1550,7 @@ class TestExternal(unittest.TestCase):
 
 
     def testSelectMusicXMLReader2(self):
-        print 
+        print()
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = SelectMusicXMLReader()
         d.askUser()
@@ -1558,7 +1558,7 @@ class TestExternal(unittest.TestCase):
         d.performAction()
 
 
-        print 
+        print()
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = SelectMusicXMLReader()
         # force request to user by returning no valid results
