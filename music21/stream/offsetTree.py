@@ -2443,6 +2443,8 @@ class OffsetTreeException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------------------------------------------
+_DOC_ORDER = [OffsetTree, Verticality, Horizontality, ElementTimespan]
+
 
 
 class Test(unittest.TestCase):
