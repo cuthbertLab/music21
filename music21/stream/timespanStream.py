@@ -1207,25 +1207,33 @@ class TimespanStream(object):
         __slots__ = (
             '_balance',
             '_height',
+            '_indexLow',
+            '_indexHigh',
             '_leftChild',
+            '_payload',
             '_rightChild',
             '_startOffset',
-            '_earliestStopOffset',
-            '_latestStopOffset',
-            '_payload',
+            '_startIndex',
+            '_stopIndexHigh',
+            '_stopIndexLow',
+            '_stopOffsetHigh',
+            '_stopOffsetLow',
             )
 
         ### INITIALIZER ###
 
         def __init__(self, startOffset):
             self._balance = 0
-            self._earliestStopOffset = None
             self._height = 0
-            self._latestStopOffset = None
             self._leftChild = None
             self._payload = []
             self._rightChild = None
+            self._startIndex = 0
             self._startOffset = startOffset
+            self._stopIndexHigh = 0
+            self._stopIndexLow = 0
+            self._stopOffsetHigh = None
+            self._stopOffsetLow = None
 
         ### SPECIAL METHODS ###
 
@@ -1256,16 +1264,8 @@ class TimespanStream(object):
             return self._balance
 
         @property
-        def earliestStopOffset(self):
-            return self._earliestStopOffset
-
-        @property
         def height(self):
             return self._height
-
-        @property
-        def latestStopOffset(self):
-            return self._latestStopOffset
 
         @property
         def leftChild(self):
@@ -1290,8 +1290,28 @@ class TimespanStream(object):
             self._update()
 
         @property
+        def startIndex(self):
+            return self._startIndex
+
+        @property
         def startOffset(self):
             return self._startOffset
+
+        @property
+        def stopIndexHigh(self):
+            return self._stopIndexHigh
+
+        @property
+        def stopIndexLow(self):
+            return self._stopIndexLow
+
+        @property
+        def stopOffsetHigh(self):
+            return self._stopOffsetHigh
+
+        @property
+        def stopOffsetLow(self):
+            return self._stopOffsetLow
 
     ### INITIALIZER ###
 
@@ -1429,8 +1449,8 @@ class TimespanStream(object):
                 minimum = rightMinimum
             if maximum < rightMaximum:
                 maximum = rightMaximum
-        node._earliestStopOffset = minimum
-        node._latestStopOffset = maximum
+        node._stopOffsetLow = minimum
+        node._stopOffsetHigh = maximum
         return minimum, maximum
 
     ### PUBLIC METHODS ###
@@ -1516,7 +1536,7 @@ class TimespanStream(object):
         '''
         def recurse(node, offset):
             result = []
-            if node.earliestStopOffset <= offset <= node.latestStopOffset:
+            if node.stopOffsetLow <= offset <= node.stopOffsetHigh:
                 for timespan in node.payload:
                     if timespan.stopOffset == offset:
                         result.append(timespan)
@@ -1544,7 +1564,7 @@ class TimespanStream(object):
         def recurse(node, offset, indent=0):
             result = []
             if node is not None:
-                if node.startOffset < offset < node.latestStopOffset:
+                if node.startOffset < offset < node.stopOffsetHigh:
                     result.extend(recurse(node.leftChild, offset, indent + 1))
                     for timespan in node.payload:
                         if offset < timespan.stopOffset:
@@ -2274,8 +2294,8 @@ class TimespanStream(object):
                 if node.leftChild is not None:
                     result.update(recurse(node.leftChild))
                 result.add(node.startOffset)
-                result.add(node.earliestStopOffset)
-                result.add(node.latestStopOffset)
+                result.add(node.stopOffsetLow)
+                result.add(node.stopOffsetHigh)
                 if node.rightChild is not None:
                     result.update(recurse(node.rightChild))
             return result
@@ -2353,8 +2373,8 @@ class TimespanStream(object):
             if node is not None:
                 if node.leftChild is not None:
                     result.update(recurse(node.leftChild))
-                result.add(node.earliestStopOffset)
-                result.add(node.latestStopOffset)
+                result.add(node.stopOffsetLow)
+                result.add(node.stopOffsetHigh)
                 if node.rightChild is not None:
                     result.update(recurse(node.rightChild))
             return result
@@ -2392,7 +2412,7 @@ class TimespanStream(object):
             0.5
 
         '''
-        return self._root.earliestStopOffset
+        return self._root.stopOffsetLow
 
     @property
     def latestStartOffset(self):
@@ -2426,7 +2446,7 @@ class TimespanStream(object):
             36.0
 
         '''
-        return self._root.latestStopOffset
+        return self._root.stopOffsetHigh
 
     @property
     def maximumOverlap(self):
@@ -2510,9 +2530,9 @@ class Test(unittest.TestCase):
                 current_timespans_in_tree = [x for x in tree]
                 assert current_timespans_in_tree == current_timespans_in_list, \
                     (attempt, current_timespans_in_tree, current_timespans_in_list)
-                assert tree._root.earliestStopOffset == \
+                assert tree._root.stopOffsetLow == \
                     min(x.stopOffset for x in current_timespans_in_list)
-                assert tree._root.latestStopOffset == \
+                assert tree._root.stopOffsetHigh == \
                     max(x.stopOffset for x in current_timespans_in_list)
 
             random.shuffle(timespans)
@@ -2525,9 +2545,9 @@ class Test(unittest.TestCase):
                 assert current_timespans_in_tree == current_timespans_in_list, \
                     (attempt, current_timespans_in_tree, current_timespans_in_list)
                 if tree._root is not None:
-                    assert tree._root.earliestStopOffset == \
+                    assert tree._root.stopOffsetLow == \
                         min(x.stopOffset for x in current_timespans_in_list)
-                    assert tree._root.latestStopOffset == \
+                    assert tree._root.stopOffsetHigh == \
                         max(x.stopOffset for x in current_timespans_in_list)
 
 
