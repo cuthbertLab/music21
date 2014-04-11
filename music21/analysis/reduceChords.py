@@ -78,10 +78,10 @@ class ChordReducer(object):
         forbiddenChords=None,
         maximumNumberOfChords=3,
         ):
-        from music21.stream import offsetTree
+        from music21.stream import timespanStream
         assert isinstance(inputScore, stream.Score)
 
-        tree = offsetTree.OffsetTree(sourceScore=inputScore)
+        tree = timespanStream.TimespanStream(sourceScore=inputScore)
 
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)
@@ -107,7 +107,7 @@ class ChordReducer(object):
             forbiddenChords=forbiddenChords,
             )
 
-        partwiseTrees = tree.toPartwiseOffsetTrees()
+        partwiseTrees = tree.toPartwiseTimespanStreams()
 
         self.fillBassGaps(tree, partwiseTrees)
 
@@ -145,7 +145,7 @@ class ChordReducer(object):
 
     @staticmethod
     def _debug(tree):
-        for part, subtree in tree.toPartwiseOffsetTrees().items():
+        for part, subtree in tree.toPartwiseTimespanStreams().items():
             print(part)
             timespans = [x for x in subtree]
             for timespan in timespans:
@@ -235,7 +235,7 @@ class ChordReducer(object):
             bothPitches.update([x.nameWithOctave for x in onePitches])
             bothPitches.update([x.nameWithOctave for x in twoPitches])
             bothPitches = sorted([pitch.Pitch(x) for x in bothPitches])
-            #if not offsetTree.Verticality.pitchesAreConsonant(bothPitches):
+            #if not timespanStream.Verticality.pitchesAreConsonant(bothPitches):
             #    intervalClasses = self._getIntervalClassSet(bothPitches)
             #    if intervalClasses not in (
             #        frozenset([1, 3, 4]),
@@ -431,7 +431,7 @@ class ChordReducer(object):
             measureNumber = timespan.measureNumber
             pitches = timespan.pitches
             return measureNumber, pitches
-        mapping = tree.toPartwiseOffsetTrees()
+        mapping = tree.toPartwiseTimespanStreams()
         subtree = mapping[part]
         timespans = [x for x in subtree]
         for unused_key, group in itertools.groupby(timespans, procedure):
@@ -681,7 +681,7 @@ class ChordReducer(object):
         parts = tree.allParts
         for part in parts:
             self.fuseTimespansByPart(tree, part)
-        mapping = tree.toPartwiseOffsetTrees()
+        mapping = tree.toPartwiseTimespanStreams()
         bassPart = parts[-1]
         bassTree = mapping[bassPart]
         bassOffsets = bassTree.allOffsets
