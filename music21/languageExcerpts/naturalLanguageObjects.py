@@ -18,8 +18,6 @@ SUPPORTED_LANGUAGES = ["de","fr","it","du","es"]
 SUPPORTED_ACCIDENTALS = ["----","---","--","-","","#","##","###","####"]
 SUPPORTED_MICROTONES = ["A","B","C","D","E","F","G"]
 
-#hi
-
 def generateLanguageDictionary(languageString):
     
     #Helper method for toPitch
