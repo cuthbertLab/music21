@@ -1207,8 +1207,6 @@ class TimespanStream(object):
         __slots__ = (
             '_balance',
             '_height',
-            '_indexLow',
-            '_indexHigh',
             '_leftChild',
             '_payload',
             '_rightChild',
@@ -1278,6 +1276,10 @@ class TimespanStream(object):
 
         @property
         def payload(self):
+            r'''
+            A list of ElementTimespans starting at this node's start offset,
+            ordered by their stop offsets.
+            '''
             return self._payload
 
         @property
@@ -1432,26 +1434,35 @@ class TimespanStream(object):
                 return self._search(node.rightChild, startOffset)
         return None
 
-    def _updateOffsets(self, node):
+    def _update(self, node):
         if node is None:
             return
-        minimum = min(x.stopOffset for x in node.payload)
-        maximum = max(x.stopOffset for x in node.payload)
+        result = {}
+        stopOffsetLow = min(x.stopOffset for x in node.payload)
+        stopOffsetHigh = max(x.stopOffset for x in node.payload)
         if node.leftChild:
-            leftMinimum, leftMaximum = self._updateOffsets(node.leftChild)
-            if leftMinimum < minimum:
-                minimum = leftMinimum
-            if maximum < leftMaximum:
-                maximum = leftMaximum
+            leftResult = self._update(node.leftChild)
+            leftStopOffsetHigh = leftResult[0]
+            leftStopOffsetLow = leftResult[1]
+            if leftStopOffsetLow < stopOffsetLow:
+                stopOffsetLow = leftStopOffsetLow
+            if stopOffsetHigh < leftStopOffsetHigh:
+                stopOffsetHigh = leftStopOffsetHigh
         if node.rightChild:
-            rightMinimum, rightMaximum = self._updateOffsets(node.rightChild)
-            if rightMinimum < minimum:
-                minimum = rightMinimum
-            if maximum < rightMaximum:
-                maximum = rightMaximum
-        node._stopOffsetLow = minimum
-        node._stopOffsetHigh = maximum
-        return minimum, maximum
+            rightResult = self._update(node.rightChild)
+            rightStopOffsetHigh = rightResult[0]
+            rightStopOffsetLow = rightResult[1]
+            if rightStopOffsetLow < stopOffsetLow:
+                stopOffsetLow = rightStopOffsetLow
+            if stopOffsetHigh < rightStopOffsetHigh:
+                stopOffsetHigh = rightStopOffsetHigh
+        node._stopOffsetLow = stopOffsetLow
+        node._stopOffsetHigh = stopOffsetHigh
+        result = (
+            stopOffsetHigh,
+            stopOffsetLow,
+            )
+        return result
 
     ### PUBLIC METHODS ###
 
@@ -1683,7 +1694,7 @@ class TimespanStream(object):
             node = self._search(self._root, timespan.startOffset)
             node.payload.append(timespan)
             node.payload.sort(key=lambda x: x.stopOffset)
-        self._updateOffsets(self._root)
+        self._update(self._root)
 
     def iterateConsonanceBoundedVerticalities(self):
         r'''
@@ -2046,7 +2057,7 @@ class TimespanStream(object):
                 node.payload.remove(timespan)
             if not node.payload:
                 self._root = self._remove(self._root, timespan.startOffset)
-        self._updateOffsets(self._root)
+        self._update(self._root)
 
     def splitAt(self, offsets):
         r'''
