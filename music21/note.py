@@ -348,7 +348,6 @@ class GeneralNote(base.Music21Object):
         Created automatically as needed:
 
         >>> n = note.Note("C4")
-        >>> n._editorial
         >>> n.editorial
         <music21.editorial.NoteEditorial object at 0x...>
         >>> n.editorial.ficta = pitch.Accidental('sharp')

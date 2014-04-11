@@ -43,20 +43,24 @@ class Clef(base.Music21Object):
     Some clefs only represent the graphical element of the clef, 
     such as G clef, which is subclassed by TrebleClef() and FrenchViolinClef().
     
+    ::
     
-    
-    >>> tc = clef.TrebleClef()
-    >>> tc.sign
-    'G'
-    >>> tc.line
-    2
+        >>> tc = clef.TrebleClef()
+        >>> tc
+        <music21.clef.TrebleClef>
+        >>> tc.sign
+        'G'
+        >>> tc.line
+        2
         
     Most clefs also have a "lowest note" function which represents the
     :attr:`~music21.pitch.Pitch.diatonicNoteNum` of the note. (Where C4,C#4,C##4,C-4
     etc. = 29, all types of D4 = 30, etc.)
     
-    >>> tc.lowestLine
-    31
+    ::
+
+        >>> tc.lowestLine
+        31
     '''
     
     classSortOrder = 0
