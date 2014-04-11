@@ -1173,6 +1173,10 @@ class OffsetTree(object):
 
     TODO: newBach.parts['Alto'].measure(7).show('text') should work.
     KeyError: 'provided key (Alto) does not match any id or group'
+
+    TODO: Make work on any stream.
+
+    TODO: Doc examples for all functions, including privates.
     '''
 
     ### CLASS VARIABLES ###
@@ -1295,34 +1299,6 @@ class OffsetTree(object):
         self,
         sourceScore=None,
         ):
-        def recurse(inputStream, elementTimespans, currentElementTimespan):
-            for x in inputStream:
-                if isinstance(x, stream.Measure):
-                    localElementTimespan = currentElementTimespan + (x,)
-                    measureStartOffset = x.getOffsetBySite(inputStream)
-                    measureStopOffset = measureStartOffset + \
-                        x.duration.quarterLength
-                    for element in x:
-                        if not isinstance(element, (
-                            note.Note,
-                            chord.Chord,
-                            )):
-                            continue
-                        elementOffset = element.getOffsetBySite(x)
-                        startOffset = measureStartOffset + elementOffset
-                        stopOffset = startOffset + element.quarterLength
-                        elementTimespan = ElementTimespan(
-                            element,
-                            tuple(reversed(localElementTimespan)),
-                            measureStartOffset=measureStartOffset,
-                            measureStopOffset=measureStopOffset,
-                            startOffset=startOffset,
-                            stopOffset=stopOffset,
-                            )
-                        elementTimespans.append(elementTimespan)
-                elif isinstance(x, stream.Stream):
-                    localElementTimespan = currentElementTimespan + (x,)
-                    recurse(x, elementTimespans, localElementTimespan)
         from music21 import stream
         self._root = None
         if sourceScore is not None:
@@ -1331,11 +1307,11 @@ class OffsetTree(object):
                     sourceScore)
                 raise OffsetTreeException(message)
             elementTimespans = []
-            initialElementTimespan = (sourceScore,)
-            recurse(
+            initialParentage = (sourceScore,)
+            self.recurseStream(
                 sourceScore,
                 elementTimespans,
-                currentElementTimespan=initialElementTimespan,
+                currentParentage=initialParentage,
                 )
             self.insert(elementTimespans)
         self._sourceScore = sourceScore
@@ -1989,6 +1965,46 @@ class OffsetTree(object):
         for part, unused_timespans in unwrapped.items():
             unwrapped[part] = Horizontality(timespans=unwrapped[part])
         return unwrapped
+
+    def recurseStream(
+        self,
+        inputStream,
+        elementTimespans=None,
+        currentParentage=None,
+        ):
+        r'''
+        Recurses through `inputStream`, constructs ElementTimespans for each
+        non-stream pitched element found, and appends those ElementTimespans to
+        `elementTimespans`.
+        '''
+        from music21 import stream
+        for x in inputStream:
+            if isinstance(x, stream.Measure):
+                localElementTimespan = currentParentage + (x,)
+                measureStartOffset = x.getOffsetBySite(inputStream)
+                measureStopOffset = measureStartOffset + \
+                    x.duration.quarterLength
+                for element in x:
+                    if not isinstance(element, (
+                        note.Note,
+                        chord.Chord,
+                        )):
+                        continue
+                    elementOffset = element.getOffsetBySite(x)
+                    startOffset = measureStartOffset + elementOffset
+                    stopOffset = startOffset + element.quarterLength
+                    elementTimespan = ElementTimespan(
+                        element,
+                        tuple(reversed(localElementTimespan)),
+                        measureStartOffset=measureStartOffset,
+                        measureStopOffset=measureStopOffset,
+                        startOffset=startOffset,
+                        stopOffset=stopOffset,
+                        )
+                    elementTimespans.append(elementTimespan)
+            elif isinstance(x, stream.Stream):
+                localElementTimespan = currentParentage + (x,)
+                self.recurseStream(x, elementTimespans, localElementTimespan)
 
     def remove(self, timespans):
         r'''
