@@ -69,7 +69,7 @@ class Feature(object):
         if self.dimensions == 1:
             return # do nothing
         m = max(self.vector)
-        if max == 0:
+        if m == 0:
             return # do nothing
         scalar = 1. / m # get floating point scalar for speed
         temp = self._getVectors()
