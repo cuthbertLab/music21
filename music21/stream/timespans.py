@@ -57,6 +57,32 @@ def makeElement(verticality, quarterLength):
 #------------------------------------------------------------------------------
 
 
+class Timespan(object):
+    def __init__(self, startOffset, stopOffset):
+        if startOffset < stopOffset:
+            self.startOffset = startOffset
+            self.stopOffset = stopOffset
+        else:
+            self.startOffset = stopOffset
+            self.stopOffset = startOffset
+
+    def __eq__(self, expr):
+        if type(self) is type(expr):
+            if self.startOffset == expr.startOffset:
+                if self.stopOffset == expr.stopOffset:
+                    return True
+        return False
+
+    def __repr__(self):
+        return '<{} {} {}>'.format(
+            type(self).__name__,
+            self.startOffset,
+            self.stopOffset,
+            )
+
+#------------------------------------------------------------------------------
+
+
 class ElementTimespan(object):
     r'''
     A span of time anchored to an element in a score.  The span of time may
@@ -1365,8 +1391,72 @@ class TimespanCollection(object):
 
     ### SPECIAL METHODS ###
 
-    def __iter__(self):
+    def __getitem__(self, i):
+        r'''
+        Gets timespans by integer index or slice.
+
+        ::
+
+            >>> timespans = [
+            ...     stream.timespans.Timespan(0, 2),
+            ...     stream.timespans.Timespan(0, 9),
+            ...     stream.timespans.Timespan(1, 1),
+            ...     stream.timespans.Timespan(2, 3),
+            ...     stream.timespans.Timespan(3, 4),
+            ...     stream.timespans.Timespan(4, 9),
+            ...     stream.timespans.Timespan(5, 6),
+            ...     stream.timespans.Timespan(5, 8),
+            ...     stream.timespans.Timespan(6, 8),
+            ...     stream.timespans.Timespan(7, 7),
+            ...     ]
+            >>> tree = stream.timespans.TimespanCollection()
+            >>> tree.insert(timespans)
+
+        ::
+
+            >>> tree[0] 
+            <Timespan 0 2>
+
+        ::
+
+            >>> tree[-1]
+            <Timespan 7 7>
+
+        ::
+
+            >>> tree[2:5]
+            [<Timespan 1 1>, <Timespan 2 3>, <Timespan 3 4>]
+
+        ::
+
+            >>> tree[-100:-200]
+            []
+
+        ::
+
+            >>> for x in tree[:]:
+            ...     x
+            ...
+            <Timespan 0 2>
+            <Timespan 0 9>
+            <Timespan 1 1>
+            <Timespan 2 3>
+            <Timespan 3 4>
+            <Timespan 4 9>
+            <Timespan 5 6>
+            <Timespan 5 8>
+            <Timespan 6 8>
+            <Timespan 7 7>
+
         '''
+        if isinstance(i, int):
+            return self._getByInt(i)
+        elif isinstance(i, slice):
+            return self._getBySlice(i)
+        raise TypeError('Indices must be integers or slices, got {}'.format(i))
+
+    def __iter__(self):
+        r'''
         Iterates through all the elementTimespans in the offset tree.
         '''
 
@@ -1382,7 +1472,68 @@ class TimespanCollection(object):
                         yield timespan
         return recurse(self._root)
 
+    def __str__(self):
+        r'''
+        Gets string representation of the timespan collection.
+
+        Useful only for debugging its internal structure.
+        '''
+        if self._root is not None:
+            return self._root._debug()
+        return ''
+
     ### PRIVATE METHODS ###
+
+    def _getByInt(self, index):
+        def recurse(node, index):
+            if node.nodeStartIndex <= index < node.nodeStopIndex:
+                return node.payload[index - node.nodeStartIndex]
+            elif node.leftChild and index < node.nodeStartIndex:
+                return recurse(node.leftChild, index)
+            elif node.rightChild and node.nodeStopIndex <= index:
+                return recurse(node.rightChild, index)
+        if self._root is None:
+            raise IndexError
+        if index < 0:
+            index = self._root.subtreeStopIndex + index
+        if index < 0 or self._root.subtreeStopIndex <= index:
+            raise IndexError
+        return recurse(self._root, index)
+
+    def _getBySlice(self, i):
+        def recurse(node, start, stop):
+            result = []
+            if node is None:
+                return result
+            if start < node.nodeStartIndex and node.leftChild:
+                result.extend(recurse(node.leftChild, start, stop))
+            if start < node.nodeStopIndex and node.nodeStartIndex < stop:
+                nodeStart = start - node.nodeStartIndex
+                if nodeStart < 0:
+                    nodeStart = 0
+                nodeStop = stop - node.nodeStartIndex
+                result.extend(node.payload[nodeStart:nodeStop])
+            if node.nodeStopIndex <= stop and node.rightChild:
+                result.extend(recurse(node.rightChild, start, stop))
+            return result
+        if self._root is None:
+            return []
+        start, stop = i.start, i.stop
+        if start is not None:
+            if start < 0:
+                start = self._root.subtreeStopIndex + start
+            if start < 0:
+                start = 0
+        else:
+            start = 0
+        if stop is not None:
+            if stop < 0:
+                stop = self._root.subtreeStopIndex + stop
+            if stop < 0:
+                stop = 0
+        else:
+            stop = self._root.subtreeStopIndex
+        return recurse(self._root, start, stop)
 
     def _insert(self, node, startOffset):
         if node is None:
@@ -2554,40 +2705,40 @@ _DOC_ORDER = [TimespanCollection, Verticality, Horizontality, ElementTimespan]
 
 class Test(unittest.TestCase):
 
+    class Timespan(object):
+        def __init__(self, startOffset, stopOffset):
+            if startOffset < stopOffset:
+                self.startOffset = startOffset
+                self.stopOffset = stopOffset
+            else:
+                self.startOffset = stopOffset
+                self.stopOffset = startOffset
+
+        def __eq__(self, expr):
+            if type(self) is type(expr):
+                if self.startOffset == expr.startOffset:
+                    if self.stopOffset == expr.stopOffset:
+                        return True
+            return False
+
+        def __repr__(self):
+            return '<{} {} {}>'.format(
+                type(self).__name__,
+                self.startOffset,
+                self.stopOffset,
+                )
+
     def runTest(self):
         pass
 
     def testTimespanCollection(self):
 
-        class Timespan(object):
-            def __init__(self, startOffset, stopOffset):
-                if startOffset < stopOffset:
-                    self.startOffset = startOffset
-                    self.stopOffset = stopOffset
-                else:
-                    self.startOffset = stopOffset
-                    self.stopOffset = startOffset
-
-            def __eq__(self, expr):
-                if type(self) is type(expr):
-                    if self.startOffset == expr.startOffset:
-                        if self.stopOffset == expr.stopOffset:
-                            return True
-                return False
-
-            def __repr__(self):
-                return '<{} {} {}>'.format(
-                    type(self).__name__,
-                    self.startOffset,
-                    self.stopOffset,
-                    )
-
         for attempt in range(100):
-            starts = range(100)
-            stops = range(100)
+            starts = range(20)
+            stops = range(20)
             random.shuffle(starts)
             random.shuffle(stops)
-            timespans = [Timespan(start, stop)
+            timespans = [self.Timespan(start, stop)
                 for start, stop in zip(starts, stops)
                 ]
             tree = TimespanCollection()
@@ -2603,6 +2754,9 @@ class Test(unittest.TestCase):
                     min(x.stopOffset for x in current_timespans_in_list)
                 assert tree._root.stopOffsetHigh == \
                     max(x.stopOffset for x in current_timespans_in_list)
+                for i in range(len(current_timespans_in_tree)):
+                    assert current_timespans_in_list[i] == \
+                        current_timespans_in_tree[i]
 
             random.shuffle(timespans)
             while timespans:
@@ -2618,6 +2772,9 @@ class Test(unittest.TestCase):
                         min(x.stopOffset for x in current_timespans_in_list)
                     assert tree._root.stopOffsetHigh == \
                         max(x.stopOffset for x in current_timespans_in_list)
+                    for i in range(len(current_timespans_in_tree)):
+                        assert current_timespans_in_list[i] == \
+                            current_timespans_in_tree[i]
 
 
 if __name__ == "__main__":
