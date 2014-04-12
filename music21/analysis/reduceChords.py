@@ -81,7 +81,7 @@ class ChordReducer(object):
         from music21.stream import timespans
         assert isinstance(inputScore, stream.Score)
 
-        tree = timespans.TimespanStream(sourceScore=inputScore)
+        tree = timespans.TimespanCollection(sourceScore=inputScore)
 
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)
@@ -107,7 +107,7 @@ class ChordReducer(object):
             forbiddenChords=forbiddenChords,
             )
 
-        partwiseTrees = tree.toPartwiseTimespanStreams()
+        partwiseTrees = tree.toPartwiseTimespanCollections()
 
         self.fillBassGaps(tree, partwiseTrees)
 
@@ -145,7 +145,7 @@ class ChordReducer(object):
 
     @staticmethod
     def _debug(tree):
-        for part, subtree in tree.toPartwiseTimespanStreams().items():
+        for part, subtree in tree.toPartwiseTimespanCollections().items():
             print(part)
             timespans = [x for x in subtree]
             for timespan in timespans:
@@ -431,7 +431,7 @@ class ChordReducer(object):
             measureNumber = timespan.measureNumber
             pitches = timespan.pitches
             return measureNumber, pitches
-        mapping = tree.toPartwiseTimespanStreams()
+        mapping = tree.toPartwiseTimespanCollections()
         subtree = mapping[part]
         timespans = [x for x in subtree]
         for unused_key, group in itertools.groupby(timespans, procedure):
@@ -681,7 +681,7 @@ class ChordReducer(object):
         parts = tree.allParts
         for part in parts:
             self.fuseTimespansByPart(tree, part)
-        mapping = tree.toPartwiseTimespanStreams()
+        mapping = tree.toPartwiseTimespanCollections()
         bassPart = parts[-1]
         bassTree = mapping[bassPart]
         bassOffsets = bassTree.allOffsets

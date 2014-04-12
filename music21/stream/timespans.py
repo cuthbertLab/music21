@@ -68,7 +68,7 @@ class ElementTimespan(object):
     ElementTimespans give
     information about an element (such as a Note).  It knows
     its absolute position with respect to
-    the element passed into TimespanStream.  It contains information
+    the element passed into TimespanCollection.  It contains information
     about what measure it's in, what part it's in, etc.
 
     Example, getting a passing tone from a known location from a Bach chorale.
@@ -78,9 +78,9 @@ class ElementTimespan(object):
     ::
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.TimespanStream(score)
+        >>> tree = stream.timespans.TimespanCollection(score)
         >>> tree
-        <music21.stream.timespans.TimespanStream object at 0x...>
+        <music21.stream.timespans.TimespanCollection object at 0x...>
 
     Then get the verticality from offset 6.5, which is beat two-and-a-half of
     measure 2 (the piece is in 4/4 with a quarter-note pickup)
@@ -261,7 +261,7 @@ class ElementTimespan(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(0)
             >>> timespan = verticality.startTimespans[0]
             >>> timespan
@@ -319,7 +319,7 @@ class ElementTimespan(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> elementTimespan = verticality.startTimespans[0]
             >>> elementTimespan.element
@@ -343,7 +343,7 @@ class ElementTimespan(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> elementTimespan = verticality.startTimespans[0]
             >>> elementTimespan.measureNumber
@@ -368,7 +368,7 @@ class ElementTimespan(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> elementTimespan = verticality.startTimespans[0]
             >>> for x in elementTimespan.parentage:
@@ -398,7 +398,7 @@ class ElementTimespan(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> elementTimespan = verticality.startTimespans[0]
             >>> elementTimespan.partName
@@ -435,7 +435,7 @@ class ElementTimespan(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> elementTimespan = verticality.startTimespans[0]
             >>> elementTimespan.startOffset
@@ -453,7 +453,7 @@ class ElementTimespan(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> elementTimespan = verticality.startTimespans[0]
             >>> elementTimespan.stopOffset
@@ -557,7 +557,7 @@ class Verticality(object):
     ::
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.TimespanStream(score)
+        >>> tree = stream.timespans.TimespanCollection(score)
 
 
     Find the verticality at offset 6.5, or beat 2.5 of measure 2 (there's a one
@@ -661,7 +661,7 @@ class Verticality(object):
         startOffset=None,
         stopTimespans=None,
         ):
-        assert isinstance(timespanStream, (TimespanStream, type(None)))
+        assert isinstance(timespanStream, (TimespanCollection, type(None)))
         self._timespanStream = timespanStream
         self._startOffset = startOffset
         assert isinstance(startTimespans, tuple)
@@ -693,7 +693,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality
             <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -728,7 +728,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality.beatStrength
             1.0
@@ -765,7 +765,7 @@ class Verticality(object):
         ::
 
                 >>> score = corpus.parse('bwv66.6')
-                >>> tree = stream.timespans.TimespanStream(score)
+                >>> tree = stream.timespans.TimespanCollection(score)
                 >>> verticalities = list(tree.iterateVerticalities())
                 >>> for verticality in verticalities[:10]:
                 ...     print verticality, verticality.isConsonant
@@ -792,7 +792,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(7.0)
             >>> verticality.measureNumber
             2
@@ -808,7 +808,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality.nextStartOffset
             2.0
@@ -828,7 +828,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> print verticality
             <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -868,7 +868,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(0.5)
             >>> verticality.overlapTimespans
             (<ElementTimespan 0.0:1.0 <music21.note.Note E>>,)
@@ -884,7 +884,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> for pitch in sorted(verticality.pitchSet):
             ...     pitch
@@ -918,7 +918,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> for pitchClass in sorted(verticality.pitchClassSet):
             ...     pitchClass
@@ -942,7 +942,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> print verticality
             <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -982,7 +982,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality.startOffset
             1.0
@@ -998,7 +998,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> for timespan in verticality.startTimespans:
             ...     timespan
@@ -1019,7 +1019,7 @@ class Verticality(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> for timespan in verticality.stopTimespans:
             ...     timespan
@@ -1067,7 +1067,7 @@ class VerticalitySequence(collections.Sequence):
         pass
 
 
-class TimespanStream(object):
+class TimespanCollection(object):
     r'''
     A datastructure for efficiently slicing a score.
 
@@ -1082,7 +1082,7 @@ class TimespanStream(object):
     ::
 
         >>> bach = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.TimespanStream(bach)
+        >>> tree = stream.timespans.TimespanCollection(bach)
         >>> print tree.getVerticalityAt(17.0)
         <Verticality 17.0 {F#3 C#4 A4}>
 
@@ -1160,10 +1160,10 @@ class TimespanStream(object):
     The second F# is an octave lower, so it wouldn't get merged even if adjacent
     notes were fused together (which they're not).
 
-    TimespanStream is an implementation of an extended AVL tree. AVL trees are
+    TimespanCollection is an implementation of an extended AVL tree. AVL trees are
     a type of binary tree, like Red-Black trees. AVL trees are very efficient
     at insertion when the objects being inserted are already sorted - which is
-    usually the case with data extracted from a score. TimespanStream is an
+    usually the case with data extracted from a score. TimespanCollection is an
     extended AVL tree because each node in the tree keeps track of not just the
     start offsets of ElementTimespans stored at that node, but also the
     earliest and latest stop offset of all ElementTimespans stores at both that
@@ -1186,16 +1186,16 @@ class TimespanStream(object):
         '_sourceScore',
         )
 
-    class TimespanStreamNode(object):
+    class TimespanCollectionNode(object):
         r'''
-        A node in an TimespanStream.
+        A node in an TimespanCollection.
 
-        This class is only used by TimespanStream, and should not be instantiated
+        This class is only used by TimespanCollection, and should not be instantiated
         by hand. It stores a list of ElementTimespans, as well as various data
         which describes the internal structure of the tree.
 
             >>> startOffset = 1.0
-            >>> node = stream.timespans.TimespanStream.TimespanStreamNode(startOffset)
+            >>> node = stream.timespans.TimespanCollection.TimespanCollectionNode(startOffset)
 
         Please consult the wikipedia page for AVL tree
         (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
@@ -1352,7 +1352,7 @@ class TimespanStream(object):
             if not isinstance(sourceScore, stream.Score):
                 message = 'Score {!r}, must be an stream.Score object'.format(
                     sourceScore)
-                raise TimespanStreamException(message)
+                raise TimespanCollectionException(message)
             elementTimespans = []
             initialParentage = (sourceScore,)
             self.recurseStream(
@@ -1386,7 +1386,7 @@ class TimespanStream(object):
 
     def _insert(self, node, startOffset):
         if node is None:
-            return TimespanStream.TimespanStreamNode(startOffset)
+            return TimespanCollection.TimespanCollectionNode(startOffset)
         if startOffset < node.startOffset:
             node.leftChild = self._insert(node.leftChild, startOffset)
         elif node.startOffset < startOffset:
@@ -1531,7 +1531,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> newTree = tree.copy()
 
         '''
@@ -1545,7 +1545,7 @@ class TimespanStream(object):
 
         '''
         if not isinstance(elementTimespan, ElementTimespan):
-            raise TimespanStreamException("ElementTimespan %r, must be an ElementTimespan" % elementTimespan)
+            raise TimespanCollectionException("ElementTimespan %r, must be an ElementTimespan" % elementTimespan)
         verticality = self.getVerticalityAt(elementTimespan.startOffset)
         while verticality is not None:
             verticality = verticality.nextVerticality
@@ -1557,7 +1557,7 @@ class TimespanStream(object):
 
     def findPreviousElementTimespanInSamePart(self, elementTimespan):
         if not isinstance(elementTimespan, ElementTimespan):
-            raise TimespanStreamException("ElementTimespan %r, must be an ElementTimespan" % elementTimespan)
+            raise TimespanCollectionException("ElementTimespan %r, must be an ElementTimespan" % elementTimespan)
         verticality = self.getVerticalityAt(elementTimespan.startOffset)
         while verticality is not None:
             verticality = verticality.previousVerticality
@@ -1572,7 +1572,7 @@ class TimespanStream(object):
         Finds timespans in this offset-tree which start at `offset`.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> for timespan in tree.findTimespansStartingAt(0.5):
             ...     timespan
             ...
@@ -1592,7 +1592,7 @@ class TimespanStream(object):
         Finds timespans in this offset-tree which stop at `offset`.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> for timespan in tree.findTimespansStoppingAt(0.5):
             ...     timespan
             ...
@@ -1621,7 +1621,7 @@ class TimespanStream(object):
         Finds timespans in this offset-tree which overlap `offset`.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> for timespan in tree.findTimespansOverlapping(0.5):
             ...     timespan
             ...
@@ -1651,7 +1651,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> tree.getStartOffsetAfter(0.5)
             1.0
 
@@ -1684,7 +1684,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> tree.getStartOffsetBefore(100)
             35.0
 
@@ -1716,7 +1716,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> tree.getVerticalityAt(2.5)
             <Verticality 2.5 {G#3 B3 E4 B4}>
 
@@ -1761,7 +1761,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> for subsequence in tree.iterateConsonanceBoundedVerticalities():
             ...     print 'Subequence:'
             ...     for verticality in subsequence:
@@ -1856,7 +1856,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> iterator = tree.iterateVerticalities()
             >>> for _ in range(10):
             ...     iterator.next()
@@ -1925,7 +1925,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> iterator = tree.iterateVerticalitiesNwise(n=2)
             >>> for _ in range(4):
             ...     print iterator.next()
@@ -2007,7 +2007,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> iterator = tree.iterateVerticalitiesNwise()
             >>> verticalities = iterator.next()
             >>> unwrapped = tree.unwrapVerticalities(verticalities)
@@ -2125,7 +2125,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> tree.findTimespansStartingAt(0.1)
             ()
 
@@ -2177,7 +2177,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> chordifiedScore = tree.toChordifiedScore()
             >>> chordifiedScore.show('text')
             {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -2250,14 +2250,14 @@ class TimespanStream(object):
                 score.append(element)
             return score
 
-    def toPartwiseTimespanStreams(self):
-        partwiseTimespanStreams = {}
+    def toPartwiseTimespanCollections(self):
+        partwiseTimespanCollections = {}
         for part in self.allParts:
-            partwiseTimespanStreams[part] = TimespanStream()
+            partwiseTimespanCollections[part] = TimespanCollection()
         for elementTimespan in self:
-            partwiseTimespanStream = partwiseTimespanStreams[elementTimespan.part]
-            partwiseTimespanStream.insert(elementTimespan)
-        return partwiseTimespanStreams
+            partwiseTimespanCollection = partwiseTimespanCollections[elementTimespan.part]
+            partwiseTimespanCollection.insert(elementTimespan)
+        return partwiseTimespanCollections
 
     def toPartwiseScore(self, templateScore=None):
         from music21 import stream
@@ -2279,7 +2279,7 @@ class TimespanStream(object):
             partMapping[part] = newPart
             outputScore.append(newPart)
 
-        treeMapping = self.toPartwiseTimespanStreams()
+        treeMapping = self.toPartwiseTimespanCollections()
         for tree in treeMapping.values():
             #assert tree.maximumOverlap == 1
             silenceTimespans = []
@@ -2341,7 +2341,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> for offset in tree.allOffsets[:10]:
             ...     offset
             ...
@@ -2386,7 +2386,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> for offset in tree.allStartOffsets[:10]:
             ...     offset
             ...
@@ -2421,7 +2421,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> for offset in tree.allStopOffsets[:10]:
             ...     offset
             ...
@@ -2457,7 +2457,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> tree.earliestStartOffset
             0.0
 
@@ -2476,7 +2476,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> tree.earliestStopOffset
             0.5
 
@@ -2491,7 +2491,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> tree.latestStartOffset
             35.0
 
@@ -2510,7 +2510,7 @@ class TimespanStream(object):
         ::
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanStream(score)
+            >>> tree = stream.timespans.TimespanCollection(score)
             >>> tree.latestStopOffset
             36.0
 
@@ -2544,11 +2544,11 @@ class TimespanStream(object):
         return self._sourceScore
 
 
-class TimespanStreamException(exceptions21.Music21Exception):
+class TimespanCollectionException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------------------------------------------
-_DOC_ORDER = [TimespanStream, Verticality, Horizontality, ElementTimespan]
+_DOC_ORDER = [TimespanCollection, Verticality, Horizontality, ElementTimespan]
 
 
 
@@ -2557,7 +2557,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testTimespanStream(self):
+    def testTimespanCollection(self):
 
         class Timespan(object):
             def __init__(self, startOffset, stopOffset):
@@ -2590,7 +2590,7 @@ class Test(unittest.TestCase):
             timespans = [Timespan(start, stop)
                 for start, stop in zip(starts, stops)
                 ]
-            tree = TimespanStream()
+            tree = TimespanCollection()
 
             for i, timespan in enumerate(timespans):
                 tree.insert(timespan)
