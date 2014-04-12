@@ -1429,6 +1429,11 @@ class TimespanCollection(object):
 
         ::
 
+            >>> tree[-6:-3]
+            [<Timespan 3 4>, <Timespan 4 9>, <Timespan 5 6>]
+
+        ::
+
             >>> tree[-100:-200]
             []
 
@@ -1458,8 +1463,41 @@ class TimespanCollection(object):
     def __iter__(self):
         r'''
         Iterates through all the elementTimespans in the offset tree.
-        '''
 
+        ::
+
+            >>> timespans = [
+            ...     stream.timespans.Timespan(0, 2),
+            ...     stream.timespans.Timespan(0, 9),
+            ...     stream.timespans.Timespan(1, 1),
+            ...     stream.timespans.Timespan(2, 3),
+            ...     stream.timespans.Timespan(3, 4),
+            ...     stream.timespans.Timespan(4, 9),
+            ...     stream.timespans.Timespan(5, 6),
+            ...     stream.timespans.Timespan(5, 8),
+            ...     stream.timespans.Timespan(6, 8),
+            ...     stream.timespans.Timespan(7, 7),
+            ...     ]
+            >>> tree = stream.timespans.TimespanCollection()
+            >>> tree.insert(timespans)
+
+        ::
+
+            >>> for x in tree:
+            ...     x
+            ...
+            <Timespan 0 2>
+            <Timespan 0 9>
+            <Timespan 1 1>
+            <Timespan 2 3>
+            <Timespan 3 4>
+            <Timespan 4 9>
+            <Timespan 5 6>
+            <Timespan 5 8>
+            <Timespan 6 8>
+            <Timespan 7 7>
+
+        '''
         def recurse(node):
             if node is not None:
                 if node.leftChild is not None:
@@ -1471,6 +1509,44 @@ class TimespanCollection(object):
                     for timespan in recurse(node.rightChild):
                         yield timespan
         return recurse(self._root)
+
+    def __len__(self):
+        r'''Gets the length of the timespan collection.
+
+        :: 
+
+            >>> tree = stream.timespans.TimespanCollection()
+            >>> len(tree)
+            0
+
+        ::
+
+            >>> timespans = [
+            ...     stream.timespans.Timespan(0, 2),
+            ...     stream.timespans.Timespan(0, 9),
+            ...     stream.timespans.Timespan(1, 1),
+            ...     stream.timespans.Timespan(2, 3),
+            ...     stream.timespans.Timespan(3, 4),
+            ...     stream.timespans.Timespan(4, 9),
+            ...     stream.timespans.Timespan(5, 6),
+            ...     stream.timespans.Timespan(5, 8),
+            ...     stream.timespans.Timespan(6, 8),
+            ...     stream.timespans.Timespan(7, 7),
+            ...     ]
+            >>> tree.insert(timespans)
+            >>> len(tree)
+            10
+
+        ::
+
+            >>> tree.remove(timespans)
+            >>> len(tree)
+            0
+
+        '''
+        if self._root is None:
+            return 0
+        return self._root.subtreeStopIndex
 
     def __str__(self):
         r'''
