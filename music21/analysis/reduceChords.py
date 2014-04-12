@@ -78,10 +78,10 @@ class ChordReducer(object):
         forbiddenChords=None,
         maximumNumberOfChords=3,
         ):
-        from music21.stream import timespanStream
+        from music21.stream import timespans
         assert isinstance(inputScore, stream.Score)
 
-        tree = timespanStream.TimespanStream(sourceScore=inputScore)
+        tree = timespans.TimespanStream(sourceScore=inputScore)
 
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)

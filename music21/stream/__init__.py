@@ -55,11 +55,11 @@ from music21 import environment
 
 if python3:
     from . import makeNotation # @UnresolvedImport
-    from . import timespanStream # @UnresolvedImport
+    from . import timespans # @UnresolvedImport
     from . import streamStatus
 else:
     import makeNotation # @Reimport
-    import timespanStream # @Reimport
+    import timespans # @Reimport
     import streamStatus # @Reimport
 
 _MOD = "stream.py"
