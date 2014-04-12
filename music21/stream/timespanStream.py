@@ -1211,11 +1211,12 @@ class TimespanStream(object):
             '_payload',
             '_rightChild',
             '_startOffset',
-            '_startIndex',
-            '_stopIndexHigh',
-            '_stopIndexLow',
+            '_nodeStartIndex',
+            '_nodeStopIndex',
             '_stopOffsetHigh',
             '_stopOffsetLow',
+            '_subtreeStartIndex',
+            '_subtreeStopIndex',
             )
 
         ### INITIALIZER ###
@@ -1224,25 +1225,45 @@ class TimespanStream(object):
             self._balance = 0
             self._height = 0
             self._leftChild = None
+            self._nodeStartIndex = -1
+            self._nodeStopIndex = -1
             self._payload = []
             self._rightChild = None
-            self._startIndex = 0
             self._startOffset = startOffset
-            self._stopIndexHigh = 0
-            self._stopIndexLow = 0
             self._stopOffsetHigh = None
             self._stopOffsetLow = None
+            self._subtreeStartIndex = -1
+            self._subtreeStopIndex = -1
 
         ### SPECIAL METHODS ###
 
         def __repr__(self):
-            return '<{}: {} {}>'.format(
-                type(self).__name__,
+            return '<N: {} [{}:{}:{}:{}] {{{}}}>'.format(
                 self.startOffset,
-                self.payload,
+                self.subtreeStartIndex,
+                self.nodeStartIndex,
+                self.nodeStopIndex,
+                self.subtreeStopIndex,
+                len(self.payload),
                 )
 
         ### PRIVATE METHODS ###
+
+        def _debug(self):
+            return '\n'.join(self._getDebugPieces())
+
+        def _getDebugPieces(self):
+            result = []
+            result.append(repr(self))
+            if self.leftChild:
+                subresult = self.leftChild._getDebugPieces()
+                result.append('\tL: {}'.format(subresult[0]))
+                result.extend('\t' + x for x in subresult[1:])
+            if self.rightChild:
+                subresult = self.rightChild._getDebugPieces()
+                result.append('\tR: {}'.format(subresult[0]))
+                result.extend('\t' + x for x in subresult[1:])
+            return result
 
         def _update(self):
             leftHeight = -1
@@ -1275,6 +1296,14 @@ class TimespanStream(object):
             self._update()
 
         @property
+        def nodeStartIndex(self):
+            return self._nodeStartIndex
+
+        @property
+        def nodeStopIndex(self):
+            return self._nodeStopIndex
+
+        @property
         def payload(self):
             r'''
             A list of ElementTimespans starting at this node's start offset,
@@ -1292,20 +1321,8 @@ class TimespanStream(object):
             self._update()
 
         @property
-        def startIndex(self):
-            return self._startIndex
-
-        @property
         def startOffset(self):
             return self._startOffset
-
-        @property
-        def stopIndexHigh(self):
-            return self._stopIndexHigh
-
-        @property
-        def stopIndexLow(self):
-            return self._stopIndexLow
 
         @property
         def stopOffsetHigh(self):
@@ -1314,6 +1331,14 @@ class TimespanStream(object):
         @property
         def stopOffsetLow(self):
             return self._stopOffsetLow
+
+        @property
+        def subtreeStartIndex(self):
+            return self._subtreeStartIndex
+
+        @property
+        def subtreeStopIndex(self):
+            return self._subtreeStopIndex
 
     ### INITIALIZER ###
 
@@ -1434,35 +1459,66 @@ class TimespanStream(object):
                 return self._search(node.rightChild, startOffset)
         return None
 
-    def _update(self, node):
+    def _updateIndices(
+        self,
+        node,
+        ):
+        def recurse(
+            node,
+            parentStopIndex=None,
+            ):
+            if node is None:
+                return
+            if node.leftChild is not None:
+                recurse(
+                    node.leftChild,
+                    parentStopIndex=parentStopIndex,
+                    )
+                node._nodeStartIndex = node.leftChild.subtreeStopIndex
+                node._subtreeStartIndex = node.leftChild.subtreeStartIndex
+            elif parentStopIndex is None:
+                node._nodeStartIndex = 0
+                node._subtreeStartIndex = 0
+            else:
+                node._nodeStartIndex = parentStopIndex
+                node._subtreeStartIndex = parentStopIndex
+            node._nodeStopIndex = node.nodeStartIndex + len(node.payload)
+            node._subtreeStopIndex = node.nodeStopIndex
+            if node.rightChild is not None:
+                recurse(
+                    node.rightChild,
+                    parentStopIndex=node.nodeStopIndex,
+                    )
+                node._subtreeStopIndex = node.rightChild.subtreeStopIndex
+        recurse(node)
+
+    def _updateOffsets(
+        self,
+        node,
+        ):
         if node is None:
             return
-        result = {}
         stopOffsetLow = min(x.stopOffset for x in node.payload)
         stopOffsetHigh = max(x.stopOffset for x in node.payload)
         if node.leftChild:
-            leftResult = self._update(node.leftChild)
-            leftStopOffsetHigh = leftResult[0]
-            leftStopOffsetLow = leftResult[1]
-            if leftStopOffsetLow < stopOffsetLow:
-                stopOffsetLow = leftStopOffsetLow
-            if stopOffsetHigh < leftStopOffsetHigh:
-                stopOffsetHigh = leftStopOffsetHigh
+            leftChild = self._updateOffsets(
+                node.leftChild,
+                )
+            if leftChild.stopOffsetLow < stopOffsetLow:
+                stopOffsetLow = leftChild.stopOffsetLow
+            if stopOffsetHigh < leftChild.stopOffsetHigh:
+                stopOffsetHigh = leftChild.stopOffsetHigh
         if node.rightChild:
-            rightResult = self._update(node.rightChild)
-            rightStopOffsetHigh = rightResult[0]
-            rightStopOffsetLow = rightResult[1]
-            if rightStopOffsetLow < stopOffsetLow:
-                stopOffsetLow = rightStopOffsetLow
-            if stopOffsetHigh < rightStopOffsetHigh:
-                stopOffsetHigh = rightStopOffsetHigh
+            rightChild = self._updateOffsets(
+                node.rightChild,
+                )
+            if rightChild.stopOffsetLow < stopOffsetLow:
+                stopOffsetLow = rightChild.stopOffsetLow
+            if stopOffsetHigh < rightChild.stopOffsetHigh:
+                stopOffsetHigh = rightChild.stopOffsetHigh
         node._stopOffsetLow = stopOffsetLow
         node._stopOffsetHigh = stopOffsetHigh
-        result = (
-            stopOffsetHigh,
-            stopOffsetLow,
-            )
-        return result
+        return node
 
     ### PUBLIC METHODS ###
 
@@ -1694,7 +1750,8 @@ class TimespanStream(object):
             node = self._search(self._root, timespan.startOffset)
             node.payload.append(timespan)
             node.payload.sort(key=lambda x: x.stopOffset)
-        self._update(self._root)
+        self._updateIndices(self._root)
+        self._updateOffsets(self._root)
 
     def iterateConsonanceBoundedVerticalities(self):
         r'''
@@ -2057,7 +2114,8 @@ class TimespanStream(object):
                 node.payload.remove(timespan)
             if not node.payload:
                 self._root = self._remove(self._root, timespan.startOffset)
-        self._update(self._root)
+        self._updateIndices(self._root)
+        self._updateOffsets(self._root)
 
     def splitAt(self, offsets):
         r'''
