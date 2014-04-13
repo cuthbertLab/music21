@@ -1581,6 +1581,18 @@ class TimespanCollection(object):
             return 0
         return self._root.subtreeStopIndex
 
+    def __setitem__(self, i, new):
+        r'''
+        Sets timespans at index `i` to `new`.
+        '''
+        if isinstance(i, (int, slice)):
+            old = self[i]
+            self.remove(old)
+            self.insert(new)
+        else:
+            message = 'Indices must be ints or slices, got {}'.format(i)
+            raise TypeError(message)
+
     def __str__(self):
         r'''
         Gets string representation of the timespan collection.
