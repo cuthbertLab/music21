@@ -1454,10 +1454,43 @@ class TimespanCollection(object):
             <Timespan 7 7>
 
         '''
+        def recurseByIndex(node, index):
+            if node.nodeStartIndex <= index < node.nodeStopIndex:
+                return node.payload[index - node.nodeStartIndex]
+            elif node.leftChild and index < node.nodeStartIndex:
+                return recurseByIndex(node.leftChild, index)
+            elif node.rightChild and node.nodeStopIndex <= index:
+                return recurseByIndex(node.rightChild, index)
+
+        def recurseBySlice(node, start, stop):
+            result = []
+            if node is None:
+                return result
+            if start < node.nodeStartIndex and node.leftChild:
+                result.extend(recurseBySlice(node.leftChild, start, stop))
+            if start < node.nodeStopIndex and node.nodeStartIndex < stop:
+                nodeStart = start - node.nodeStartIndex
+                if nodeStart < 0:
+                    nodeStart = 0
+                nodeStop = stop - node.nodeStartIndex
+                result.extend(node.payload[nodeStart:nodeStop])
+            if node.nodeStopIndex <= stop and node.rightChild:
+                result.extend(recurseBySlice(node.rightChild, start, stop))
+            return result
         if isinstance(i, int):
-            return self._getByInt(i)
+            if self._root is None:
+                raise IndexError
+            if i < 0:
+                i = self._root.subtreeStopIndex + i
+            if i < 0 or self._root.subtreeStopIndex <= i:
+                raise IndexError
+            return recurseByIndex(self._root, i)
         elif isinstance(i, slice):
-            return self._getBySlice(i)
+            if self._root is None:
+                return []
+            indices = i.indices(self._root.subtreeStopIndex)
+            start, stop = indices[0], indices[1]
+            return recurseBySlice(self._root, start, stop)
         raise TypeError('Indices must be integers or slices, got {}'.format(i))
 
     def __iter__(self):
@@ -1559,43 +1592,6 @@ class TimespanCollection(object):
         return ''
 
     ### PRIVATE METHODS ###
-
-    def _getByInt(self, index):
-        def recurse(node, index):
-            if node.nodeStartIndex <= index < node.nodeStopIndex:
-                return node.payload[index - node.nodeStartIndex]
-            elif node.leftChild and index < node.nodeStartIndex:
-                return recurse(node.leftChild, index)
-            elif node.rightChild and node.nodeStopIndex <= index:
-                return recurse(node.rightChild, index)
-        if self._root is None:
-            raise IndexError
-        if index < 0:
-            index = self._root.subtreeStopIndex + index
-        if index < 0 or self._root.subtreeStopIndex <= index:
-            raise IndexError
-        return recurse(self._root, index)
-
-    def _getBySlice(self, i):
-        def recurse(node, start, stop):
-            result = []
-            if node is None:
-                return result
-            if start < node.nodeStartIndex and node.leftChild:
-                result.extend(recurse(node.leftChild, start, stop))
-            if start < node.nodeStopIndex and node.nodeStartIndex < stop:
-                nodeStart = start - node.nodeStartIndex
-                if nodeStart < 0:
-                    nodeStart = 0
-                nodeStop = stop - node.nodeStartIndex
-                result.extend(node.payload[nodeStart:nodeStop])
-            if node.nodeStopIndex <= stop and node.rightChild:
-                result.extend(recurse(node.rightChild, start, stop))
-            return result
-        if self._root is None:
-            return []
-        indices = i.indices(self._root.subtreeStopIndex)
-        return recurse(self._root, indices[0], indices[1])
 
     def _insert(self, node, startOffset):
         if node is None:
