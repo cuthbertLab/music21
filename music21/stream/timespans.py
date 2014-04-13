@@ -1594,22 +1594,8 @@ class TimespanCollection(object):
             return result
         if self._root is None:
             return []
-        start, stop = i.start, i.stop
-        if start is not None:
-            if start < 0:
-                start = self._root.subtreeStopIndex + start
-            if start < 0:
-                start = 0
-        else:
-            start = 0
-        if stop is not None:
-            if stop < 0:
-                stop = self._root.subtreeStopIndex + stop
-            if stop < 0:
-                stop = 0
-        else:
-            stop = self._root.subtreeStopIndex
-        return recurse(self._root, start, stop)
+        indices = i.indices(self._root.subtreeStopIndex)
+        return recurse(self._root, indices[0], indices[1])
 
     def _insert(self, node, startOffset):
         if node is None:
