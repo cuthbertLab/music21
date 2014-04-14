@@ -1584,6 +1584,33 @@ class TimespanCollection(object):
     def __setitem__(self, i, new):
         r'''
         Sets timespans at index `i` to `new`.
+
+        ::
+
+            >>> timespans = [
+            ...     stream.timespans.Timespan(0, 2),
+            ...     stream.timespans.Timespan(0, 9),
+            ...     stream.timespans.Timespan(1, 1),
+            ...     ]
+            >>> tree = stream.timespans.TimespanCollection()
+            >>> tree.insert(timespans)
+            >>> tree[0] = stream.timespans.Timespan(-1, 6)
+            >>> for x in tree:
+            ...     x
+            ...
+            <Timespan -1 6>
+            <Timespan 0 9>
+            <Timespan 1 1>
+
+        ::
+
+            >>> tree[1:] = [stream.timespans.Timespan(10, 20)]
+            >>> for x in tree:
+            ...     x
+            ...
+            <Timespan -1 6>
+            <Timespan 10 20>
+
         '''
         if isinstance(i, (int, slice)):
             old = self[i]
@@ -1597,7 +1624,37 @@ class TimespanCollection(object):
         r'''
         Gets string representation of the timespan collection.
 
-        Useful only for debugging its internal structure.
+        Useful only for debugging its internal node structure.
+
+        ::
+
+            >>> timespans = [
+            ...     stream.timespans.Timespan(0, 2),
+            ...     stream.timespans.Timespan(0, 9),
+            ...     stream.timespans.Timespan(1, 1),
+            ...     stream.timespans.Timespan(2, 3),
+            ...     stream.timespans.Timespan(3, 4),
+            ...     stream.timespans.Timespan(4, 9),
+            ...     stream.timespans.Timespan(5, 6),
+            ...     stream.timespans.Timespan(5, 8),
+            ...     stream.timespans.Timespan(6, 8),
+            ...     stream.timespans.Timespan(7, 7),
+            ...     ]
+            >>> tree = stream.timespans.TimespanCollection()
+            >>> tree.insert(timespans)
+        
+        ::
+
+            >>> print str(tree)
+            <N: 3 [0:4:5:10] {1}>
+                L: <N: 1 [0:2:3:4] {1}>
+                    L: <N: 0 [0:0:2:2] {2}>
+                    R: <N: 2 [3:3:4:4] {1}>
+                R: <N: 5 [5:6:8:10] {2}>
+                    L: <N: 4 [5:5:6:6] {1}>
+                    R: <N: 6 [8:8:9:10] {1}>
+                        R: <N: 7 [9:9:10:10] {1}>
+
         '''
         if self._root is not None:
             return self._root._debug()
