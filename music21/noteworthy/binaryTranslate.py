@@ -19,10 +19,88 @@ without his work.
 
 Translates .nwc into .nwctxt and then uses Jordi Guillen's .nwctxt translator to go from
 there to music21.
+
+BETA -- does not work for many file elements and is untested.
+
+Demo, showing the extent of problems.  The measure numbers are not set.  Lyrics are missing
+and the triplet in the AltoClef part is omitted.  This is very beta.  Much better would be to
+convert the file into .xml or .nwctxt first.
+
+::
+
+    >>> from music21 import *
+    >>> #_DOCS_SHOW c = converter.parse('/Users/cuthbert/desktop/cuthbert_test1.nwc')
+    >>> import os #_DOCS_HIDE
+    >>> c = converter.parse(common.getSourceFilePath() + os.path.sep + 'noteworthy' + os.path.sep + r'cuthbert_test1.nwc') #_DOCS_HIDE
+    >>> c.show('text')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note C>
+            {2.0} <music21.note.Note C>
+            {3.0} <music21.note.Note B>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note C>
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.5} <music21.note.Note G>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note G>
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.AltoClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note C#>
+            {3.0} <music21.note.Note D>
+            {4.0} <music21.note.Note E>
+        {5.0} <music21.stream.Measure 0 offset=5.0>
+            {0.0} <music21.note.Note E>
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note F>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note C>
+
 '''
 import struct
+from music21 import environment
+environLocal = environment.Environment("noteworthy.translate")
 
 class NWCConverter(object):
+    '''
+    A converter object for binary .nwc files.  Do not normally use directly; use converter.parse.
+    
+    >>> fp = '/Users/cuthbert/test.nwc'
+    >>> nwcc = noteworthy.binaryTranslate.NWCConverter(fp=fp)
+    >>> nwcc
+    <music21.noteworthy.binaryTranslate.NWCConverter object at 0x...>
+    >>> nwcc.fp
+    '/Users/cuthbert/test.nwc'
+    >>> nwcc.fileContents is None
+    True
+    >>> nwcc.parsePosition
+    0
+    >>> nwcc.version # version of nwc file to be parsed
+    200
+    >>> nwcc.numberOfStaves
+    0
+    >>> nwcc.staves
+    []
+    '''
+    
     def __init__(self, *args, **keywords):
         if 'fp' in keywords:
             self.fp = keywords['fp']
@@ -35,6 +113,20 @@ class NWCConverter(object):
         self.staves = []
     
     def parseFile(self, fp = None):
+        '''
+        Parse a file (calls .toStream)
+        
+        >>> #_DOCS_SHOW fp = '/Users/cuthbert/desktop/cuthbert_test1.nwc'
+        >>> import os #_DOCS_HIDE
+        >>> fp = common.getSourceFilePath() + os.path.sep + 'noteworthy' + os.path.sep + r'cuthbert_test1.nwc' #_DOCS_HIDE
+        >>> nwcc = noteworthy.binaryTranslate.NWCConverter(fp=fp)
+        >>> nwcc.fileContents
+        >>> streamObj = nwcc.parseFile()
+        >>> len(nwcc.fileContents) # binary
+        1139
+        >>> streamObj
+        <music21.stream.Score ...>
+        '''
         if fp is None:
             fp = self.fp
         with open(fp, 'rb') as f:
@@ -43,14 +135,39 @@ class NWCConverter(object):
         return self.toStream()
     
     def parseString(self, stringIn = None):
+        '''
+        same as parseFile but takes a string of binary data instead.
+        '''
+        
         self.fileContents = stringIn
         self.parse()
         return self.toStream()
-                
 
     def readLEShort(self, updateParsePosition = True):
         '''
-        read a little-endian short value to an integer
+        Helper module: read a little-endian short value to an integer
+        
+        >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
+        >>> nwcc.fileContents = '\x02\x01\x03\x01'
+        >>> nwcc.parsePosition
+        0
+        >>> nwcc.readLEShort()
+        258
+        >>> nwcc.parsePosition
+        2
+        >>> nwcc.readLEShort()
+        259
+        >>> nwcc.parsePosition
+        4
+        
+        Or to not update the parsePosition, send False:
+        >>> nwcc.parsePosition = 0
+        >>> nwcc.readLEShort(False)
+        258
+        >>> nwcc.readLEShort(False)
+        258
+        >>> nwcc.parsePosition
+        0
         '''
         fc = self.fileContents
         pp = self.parsePosition
@@ -339,7 +456,11 @@ class NWCStaff(object):
         lyrics = []
         for i in range(self.numberOfLyrics):
             syllables = []
-            lyricBlockSize = p.readLEShort()
+            try:
+                lyricBlockSize = p.readLEShort()
+            except struct.error:
+                lyricBlockSize = 0
+                environLocal.warn("Could not read lyrics. Trying with zero length.")
             #print "lyric block size: ", lyricBlockSize
             if lyricBlockSize > 0:
                 unused_lyricSize = p.readLEShort()
@@ -758,7 +879,8 @@ class NWCObject(object):
                   tempoVariation, dynamicVariation, performance, text, restChordMember]
 
 if __name__ == '__main__':
-    pass
+    import music21
+    music21.mainTest()
     #fp = '/Users/cuthbert/Desktop/395.nwc'
     #fp = 'http://www.cpdl.org/brianrussell/358.nwc'
     #from music21 import converter
