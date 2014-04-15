@@ -442,7 +442,12 @@ class ElementTimespan(object):
             1
 
         '''
-        return self.parentage[0].measureNumber
+        from music21 import stream
+        for x in self.parentage:
+            if not isinstance(x, stream.Measure):
+                continue
+            return x.measureNumber
+        return None
 
     @property
     def measureStartOffset(self):
