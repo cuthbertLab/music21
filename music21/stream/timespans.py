@@ -3039,7 +3039,7 @@ class Test(unittest.TestCase):
             stops = range(20)
             random.shuffle(starts)
             random.shuffle(stops)
-            timespans = [self.Timespan(start, stop)
+            timespans = [Timespan(start, stop)
                 for start, stop in zip(starts, stops)
                 ]
             tree = TimespanCollection()
