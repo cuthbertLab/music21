@@ -93,10 +93,10 @@ def recurseStream(
             startOffset = measureStartOffset + startOffset
         stopOffset = startOffset + element.quarterLength
         elementTimespan = ElementTimespan(
-            element,
-            tuple(reversed(currentParentage)),
+            element=element,
             measureStartOffset=measureStartOffset,
             measureStopOffset=measureStopOffset,
+            parentage=tuple(reversed(currentParentage)),
             startOffset=startOffset,
             stopOffset=stopOffset,
             )
@@ -250,7 +250,7 @@ class ElementTimespan(object):
         '_element',
         '_measureStartOffset',
         '_measureStopOffset',
-        '_elementTimespan',
+        '_parentage',
         '_startOffset',
         '_stopOffset',
         )
@@ -260,23 +260,22 @@ class ElementTimespan(object):
     def __init__(
         self,
         element=None,
-        elementTimespan=None,
         beatStrength=None,
-        startOffset=None,
-        stopOffset=None,
         measureStartOffset=None,
         measureStopOffset=None,
+        parentage=None,
+        startOffset=None,
+        stopOffset=None,
         ):
-        from music21 import stream
+        #from music21 import stream
         self._element = element
-        if elementTimespan is not None:
-            assert len(elementTimespan), elementTimespan
-            elementTimespan = tuple(elementTimespan)
-            assert isinstance(elementTimespan[0], stream.Measure), \
-                elementTimespan[0]
-            assert isinstance(elementTimespan[-1], stream.Score), \
-                elementTimespan[-1]
-        self._elementTimespan = elementTimespan
+        if parentage is not None:
+            parentage = tuple(parentage)
+            #assert isinstance(parentage[0], stream.Measure), \
+            #    parentage[0]
+            #assert isinstance(parentage[-1], stream.Score), \
+            #    parentage[-1]
+        self._parentage = parentage
         if beatStrength is not None:
             beatStrength = float(beatStrength)
         self._beatStrength = beatStrength
@@ -345,11 +344,11 @@ class ElementTimespan(object):
         if stopOffset is None:
             stopOffset = self.stopOffset
         return type(self)(
-            element,
-            self.parentage,
             beatStrength=beatStrength,
+            element=element,
             measureStartOffset=measureStartOffset,
             measureStopOffset=measureStopOffset,
+            parentage=self.parentage,
             startOffset=startOffset,
             stopOffset=stopOffset,
             )
@@ -429,13 +428,6 @@ class ElementTimespan(object):
         return self._element
 
     @property
-    def lyric(self):
-        r'''
-        The elementTimespan's element's lyric.
-        '''
-        return self._element.lyric
-
-    @property
     def measureNumber(self):
         r'''
         The measure number of the measure containing the element.
@@ -479,7 +471,7 @@ class ElementTimespan(object):
             <music21.stream.Score ...>
 
         '''
-        return self._elementTimespan
+        return self._parentage
 
     @property
     def part(self):
