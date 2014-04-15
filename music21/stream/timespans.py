@@ -833,8 +833,6 @@ class Verticality(object):
     def degreeOfOverlap(self):
         '''
         Counts the number of things sounding at this moment
-
-        TODO: rename to numberOfSoundingElements... or cardinality
         '''
 
         return len(self.startTimespans) + len(self.overlapTimespans)
@@ -1267,15 +1265,13 @@ class TimespanCollection(object):
     TODO: newBach.parts['Alto'].measure(7).show('text') should work.
     KeyError: 'provided key (Alto) does not match any id or group'
 
-    TODO: Make work on any stream.
-
     TODO: Doc examples for all functions, including privates.
     '''
 
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '_root',
+        '_rootNode',
         '_sourceScore',
         )
 
@@ -1440,7 +1436,7 @@ class TimespanCollection(object):
         sourceScore=None,
         ):
         from music21 import stream
-        self._root = None
+        self._rootNode = None
         if sourceScore is not None:
             if not isinstance(sourceScore, stream.Score):
                 message = 'Score {!r}, must be an stream.Score object'.format(
@@ -1578,19 +1574,19 @@ class TimespanCollection(object):
                 result.extend(recurseBySlice(node.rightChild, start, stop))
             return result
         if isinstance(i, int):
-            if self._root is None:
+            if self._rootNode is None:
                 raise IndexError
             if i < 0:
-                i = self._root.subtreeStopIndex + i
-            if i < 0 or self._root.subtreeStopIndex <= i:
+                i = self._rootNode.subtreeStopIndex + i
+            if i < 0 or self._rootNode.subtreeStopIndex <= i:
                 raise IndexError
-            return recurseByIndex(self._root, i)
+            return recurseByIndex(self._rootNode, i)
         elif isinstance(i, slice):
-            if self._root is None:
+            if self._rootNode is None:
                 return []
-            indices = i.indices(self._root.subtreeStopIndex)
+            indices = i.indices(self._rootNode.subtreeStopIndex)
             start, stop = indices[0], indices[1]
-            return recurseBySlice(self._root, start, stop)
+            return recurseBySlice(self._rootNode, start, stop)
         raise TypeError('Indices must be integers or slices, got {}'.format(i))
 
     def __iter__(self):
@@ -1641,7 +1637,7 @@ class TimespanCollection(object):
                 if node.rightChild is not None:
                     for timespan in recurse(node.rightChild):
                         yield timespan
-        return recurse(self._root)
+        return recurse(self._rootNode)
 
     def __len__(self):
         r'''Gets the length of the timespan collection.
@@ -1677,9 +1673,9 @@ class TimespanCollection(object):
             0
 
         '''
-        if self._root is None:
+        if self._rootNode is None:
             return 0
-        return self._root.subtreeStopIndex
+        return self._rootNode.subtreeStopIndex
 
     def __setitem__(self, i, new):
         r'''
@@ -1756,8 +1752,8 @@ class TimespanCollection(object):
                         R: <N: 7 [9:9:10:10] {1}>
 
         '''
-        if self._root is not None:
-            return self._root._debug()
+        if self._rootNode is not None:
+            return self._rootNode._debug()
         return ''
 
     ### PRIVATE METHODS ###
@@ -2038,7 +2034,7 @@ class TimespanCollection(object):
 
         '''
         results = []
-        node = self._search(self._root, offset)
+        node = self._search(self._rootNode, offset)
         if node is not None:
             results.extend(node.payload)
         return tuple(results)
@@ -2068,7 +2064,7 @@ class TimespanCollection(object):
                 if node.rightChild is not None:
                     result.extend(recurse(node.rightChild, offset))
             return result
-        results = recurse(self._root, offset)
+        results = recurse(self._rootNode, offset)
         results.sort(key=lambda x: (x.startOffset, x.stopOffset))
         return tuple(results)
 
@@ -2096,7 +2092,7 @@ class TimespanCollection(object):
                 elif offset <= node.startOffset:
                     result.extend(recurse(node.leftChild, offset, indent + 1))
             return result
-        results = recurse(self._root, offset)
+        results = recurse(self._rootNode, offset)
         results.sort(key=lambda x: (x.startOffset, x.stopOffset))
         return tuple(results)
 
@@ -2127,7 +2123,7 @@ class TimespanCollection(object):
             elif offset < node.startOffset:
                 result = recurse(node.leftChild, offset) or node
             return result
-        result = recurse(self._root, offset)
+        result = recurse(self._rootNode, offset)
         if result is None:
             return None
         return result.startOffset
@@ -2160,7 +2156,7 @@ class TimespanCollection(object):
             elif offset <= node.startOffset and node.leftChild:
                 result = recurse(node.leftChild, offset)
             return result
-        result = recurse(self._root, offset)
+        result = recurse(self._rootNode, offset)
         if result is None:
             return None
         return result.startOffset
@@ -2238,7 +2234,7 @@ class TimespanCollection(object):
             not hasattr(timespan, 'stopOffset'):
             message = 'Must have startOffset and stopOffset.'
             raise TimespanCollectionException(message)
-        node = self._search(self._root, timespan.startOffset)
+        node = self._search(self._rootNode, timespan.startOffset)
         if node is None or timespan not in node.payload:
             raise ValueError('{} not in timespan collection.'.format(timespan))
         index = node.payload.index(timespan) + node.nodeStartIndex
@@ -2256,12 +2252,12 @@ class TimespanCollection(object):
         for timespan in timespans:
             assert hasattr(timespan, 'startOffset'), timespan
             assert hasattr(timespan, 'stopOffset'), timespan
-            self._root = self._insert(self._root, timespan.startOffset)
-            node = self._search(self._root, timespan.startOffset)
+            self._rootNode = self._insert(self._rootNode, timespan.startOffset)
+            node = self._search(self._rootNode, timespan.startOffset)
             node.payload.append(timespan)
             node.payload.sort(key=lambda x: x.stopOffset)
-        self._updateIndices(self._root)
-        self._updateOffsets(self._root)
+        self._updateIndices(self._rootNode)
+        self._updateOffsets(self._rootNode)
 
     def iterateConsonanceBoundedVerticalities(self):
         r'''
@@ -2521,15 +2517,15 @@ class TimespanCollection(object):
         for timespan in timespans:
             assert hasattr(timespan, 'startOffset'), timespan
             assert hasattr(timespan, 'stopOffset'), timespan
-            node = self._search(self._root, timespan.startOffset)
+            node = self._search(self._rootNode, timespan.startOffset)
             if node is None:
                 return
             if timespan in node.payload:
                 node.payload.remove(timespan)
             if not node.payload:
-                self._root = self._remove(self._root, timespan.startOffset)
-        self._updateIndices(self._root)
-        self._updateOffsets(self._root)
+                self._rootNode = self._remove(self._rootNode, timespan.startOffset)
+        self._updateIndices(self._rootNode)
+        self._updateOffsets(self._rootNode)
 
     def splitAt(self, offsets):
         r'''
@@ -2841,7 +2837,7 @@ class TimespanCollection(object):
                 if node.rightChild is not None:
                     result.update(recurse(node.rightChild))
             return result
-        return tuple(sorted(recurse(self._root)))
+        return tuple(sorted(recurse(self._rootNode)))
 
     @property
     def allParts(self):
@@ -2884,7 +2880,7 @@ class TimespanCollection(object):
                 if node.rightChild is not None:
                     result.extend(recurse(node.rightChild))
             return result
-        return tuple(recurse(self._root))
+        return tuple(recurse(self._rootNode))
 
     @property
     def allStopOffsets(self):
@@ -2920,7 +2916,7 @@ class TimespanCollection(object):
                 if node.rightChild is not None:
                     result.update(recurse(node.rightChild))
             return result
-        return tuple(sorted(recurse(self._root)))
+        return tuple(sorted(recurse(self._rootNode)))
 
     @property
     def earliestStartOffset(self):
@@ -2939,7 +2935,7 @@ class TimespanCollection(object):
             if node.leftChild is not None:
                 return recurse(node.leftChild)
             return node.startOffset
-        return recurse(self._root)
+        return recurse(self._rootNode)
 
     @property
     def earliestStopOffset(self):
@@ -2954,7 +2950,7 @@ class TimespanCollection(object):
             0.5
 
         '''
-        return self._root.stopOffsetLow
+        return self._rootNode.stopOffsetLow
 
     @property
     def latestStartOffset(self):
@@ -2973,7 +2969,7 @@ class TimespanCollection(object):
             if node.rightChild is not None:
                 return recurse(node._rightChild)
             return node.startOffset
-        return recurse(self._root)
+        return recurse(self._rootNode)
 
     @property
     def latestStopOffset(self):
@@ -2988,7 +2984,7 @@ class TimespanCollection(object):
             36.0
 
         '''
-        return self._root.stopOffsetHigh
+        return self._rootNode.stopOffsetHigh
 
     @property
     def maximumOverlap(self):
@@ -3073,9 +3069,9 @@ class Test(unittest.TestCase):
                 current_timespans_in_tree = [x for x in tree]
                 assert current_timespans_in_tree == current_timespans_in_list, \
                     (attempt, current_timespans_in_tree, current_timespans_in_list)
-                assert tree._root.stopOffsetLow == \
+                assert tree._rootNode.stopOffsetLow == \
                     min(x.stopOffset for x in current_timespans_in_list)
-                assert tree._root.stopOffsetHigh == \
+                assert tree._rootNode.stopOffsetHigh == \
                     max(x.stopOffset for x in current_timespans_in_list)
                 for i in range(len(current_timespans_in_tree)):
                     assert current_timespans_in_list[i] == \
@@ -3090,10 +3086,10 @@ class Test(unittest.TestCase):
                 current_timespans_in_tree = [x for x in tree]
                 assert current_timespans_in_tree == current_timespans_in_list, \
                     (attempt, current_timespans_in_tree, current_timespans_in_list)
-                if tree._root is not None:
-                    assert tree._root.stopOffsetLow == \
+                if tree._rootNode is not None:
+                    assert tree._rootNode.stopOffsetLow == \
                         min(x.stopOffset for x in current_timespans_in_list)
-                    assert tree._root.stopOffsetHigh == \
+                    assert tree._rootNode.stopOffsetHigh == \
                         max(x.stopOffset for x in current_timespans_in_list)
                     for i in range(len(current_timespans_in_tree)):
                         assert current_timespans_in_list[i] == \
