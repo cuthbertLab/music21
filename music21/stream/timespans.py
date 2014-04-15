@@ -54,6 +54,80 @@ def makeElement(verticality, quarterLength):
     return element
 
 
+def recurseStream(
+    inputStream,
+    currentParentage=None,
+    ):
+    r'''
+    Recurses through `inputStream`, constructs ElementTimespans for each
+    non-stream pitched element found, and appends those ElementTimespans to
+    `elementTimespans`.
+    '''
+    from music21 import stream
+    if currentParentage is None:
+        currentParentage = (inputStream,)
+    result = []
+    for element in inputStream:
+        if isinstance(element, stream.Stream):
+            localParentage = currentParentage + (element,)
+            subresult = recurseStream(element, localParentage)
+            result.extend(subresult)
+            continue
+        if not isinstance(element, (
+            note.Note,
+            chord.Chord,
+            )):
+            continue
+        if isinstance(currentParentage[-1], stream.Measure) and \
+            1 < len(currentParentage):
+            measure = currentParentage[-1]
+            measureParent = currentParentage[-2]
+            measureStartOffset = measure.getOffsetBySite(measureParent)
+            measureStopOffset = measureStartOffset + \
+                measure.duration.quarterLength
+        else:
+            measureStartOffset = None
+            measureStopOffset = None
+        startOffset = element.getOffsetBySite(currentParentage[-1])
+        if measureStartOffset is not None:
+            startOffset = measureStartOffset + startOffset
+        stopOffset = startOffset + element.quarterLength
+        elementTimespan = ElementTimespan(
+            element,
+            tuple(reversed(currentParentage)),
+            measureStartOffset=measureStartOffset,
+            measureStopOffset=measureStopOffset,
+            startOffset=startOffset,
+            stopOffset=stopOffset,
+            )
+        result.append(elementTimespan)
+    return result
+
+
+def streamToTimespanCollection(inputStream):
+    r'''
+    Recurses through a score and constructs a timespan colleciton.
+
+    ::
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = stream.timespans.streamToTimespanCollection(score)
+        >>> for x in tree[:5]:
+        ...     x
+        ...
+        <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
+        <ElementTimespan 0.0:0.5 <music21.note.Note A>>
+        <ElementTimespan 0.0:0.5 <music21.note.Note A>>
+        <ElementTimespan 0.0:1.0 <music21.note.Note E>>
+        <ElementTimespan 0.5:1.0 <music21.note.Note B>>
+
+    '''
+    elementTimespans = recurseStream(inputStream)
+    tree = TimespanCollection()
+    tree.insert(elementTimespans)
+    return tree
+
+
 #------------------------------------------------------------------------------
 
 
@@ -2457,7 +2531,7 @@ class TimespanCollection(object):
         from music21 import stream
         for x in inputStream:
             if isinstance(x, stream.Measure):
-                localElementTimespan = currentParentage + (x,)
+                localParentage = currentParentage + (x,)
                 measureStartOffset = x.getOffsetBySite(inputStream)
                 measureStopOffset = measureStartOffset + \
                     x.duration.quarterLength
@@ -2472,7 +2546,7 @@ class TimespanCollection(object):
                     stopOffset = startOffset + element.quarterLength
                     elementTimespan = ElementTimespan(
                         element,
-                        tuple(reversed(localElementTimespan)),
+                        tuple(reversed(localParentage)),
                         measureStartOffset=measureStartOffset,
                         measureStopOffset=measureStopOffset,
                         startOffset=startOffset,
