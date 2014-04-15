@@ -3029,29 +3029,6 @@ class TimespanCollectionException(exceptions21.Music21Exception):
 
 class Test(unittest.TestCase):
 
-    class Timespan(object):
-        def __init__(self, startOffset, stopOffset):
-            if startOffset < stopOffset:
-                self.startOffset = startOffset
-                self.stopOffset = stopOffset
-            else:
-                self.startOffset = stopOffset
-                self.stopOffset = startOffset
-
-        def __eq__(self, expr):
-            if type(self) is type(expr):
-                if self.startOffset == expr.startOffset:
-                    if self.stopOffset == expr.stopOffset:
-                        return True
-            return False
-
-        def __repr__(self):
-            return '<{} {} {}>'.format(
-                type(self).__name__,
-                self.startOffset,
-                self.stopOffset,
-                )
-
     def runTest(self):
         pass
 
