@@ -1216,9 +1216,9 @@ class TimespanCollection(object):
         r'''
         A node in an TimespanCollection.
 
-        This class is only used by TimespanCollection, and should not be instantiated
-        by hand. It stores a list of ElementTimespans, as well as various data
-        which describes the internal structure of the tree.
+        This class is only used by TimespanCollection, and should not be
+        instantiated by hand. It stores a list of ElementTimespans, as well as
+        various data which describes the internal structure of the tree.
 
             >>> startOffset = 1.0
             >>> node = stream.timespans.TimespanCollection.TimespanCollectionNode(startOffset)
@@ -1702,6 +1702,13 @@ class TimespanCollection(object):
     ### PRIVATE METHODS ###
 
     def _insert(self, node, startOffset):
+        r'''
+        Inserts a node at `startOffset` in the subtree rooted on `node`.
+
+        Used internally by TimespanCollection.
+
+        Returns a node.
+        '''
         if node is None:
             return TimespanCollection.TimespanCollectionNode(startOffset)
         if startOffset < node.startOffset:
@@ -1711,6 +1718,13 @@ class TimespanCollection(object):
         return self._rebalance(node)
 
     def _rebalance(self, node):
+        r'''
+        Rebalances the subtree rooted at `node`.
+
+        Used internally by TimespanCollection.
+
+        Returns a node.
+        '''
         if node is not None:
             if 1 < node.balance:
                 if 0 <= node.rightChild.balance:
@@ -1726,6 +1740,13 @@ class TimespanCollection(object):
         return node
 
     def _remove(self, node, startOffset):
+        r'''
+        Removes a node at `startOffset` in the subtree rooted on `node`.
+
+        Used internally by TimespanCollection.
+
+        Returns a node.
+        '''
         if node is not None:
             if node.startOffset == startOffset:
                 if node.leftChild and node.rightChild:
@@ -1745,28 +1766,64 @@ class TimespanCollection(object):
         return self._rebalance(node)
 
     def _rotateLeftLeft(self, node):
+        r'''
+        Rotates a node left twice.
+
+        Used internally by TimespanCollection during tree rebalancing.
+
+        Returns a node.
+        '''
         nextNode = node.leftChild
         node.leftChild = nextNode.rightChild
         nextNode.rightChild = node
         return nextNode
 
     def _rotateLeftRight(self, node):
+        r'''
+        Rotates a node right twice.
+
+        Used internally by TimespanCollection during tree rebalancing.
+
+        Returns a node.
+        '''
         node.leftChild = self._rotateRightRight(node.leftChild)
         nextNode = self._rotateLeftLeft(node)
         return nextNode
 
     def _rotateRightLeft(self, node):
+        r'''
+        Rotates a node right, then left.
+
+        Used internally by TimespanCollection during tree rebalancing.
+
+        Returns a node.
+        '''
         node.rightChild = self._rotateLeftLeft(node.rightChild)
         nextNode = self._rotateRightRight(node)
         return nextNode
 
     def _rotateRightRight(self, node):
+        r'''
+        Rotates a node left, then right.
+
+        Used internally by TimespanCollection during tree rebalancing.
+
+        Returns a node.
+        '''
         nextNode = node.rightChild
         node.rightChild = nextNode.leftChild
         nextNode.leftChild = node
         return nextNode
 
     def _search(self, node, startOffset):
+        r'''
+        Searches for a node whose startOffset is `startOffset` in the subtree
+        rooted on `node`.
+
+        Used internally by TimespanCollection.
+
+        Returns a node.
+        '''
         if node is not None:
             if node.startOffset == startOffset:
                 return node
@@ -1780,6 +1837,15 @@ class TimespanCollection(object):
         self,
         node,
         ):
+        r'''
+        Traverses the tree structure and updates cached indices which keep
+        track of the index of the timespans stored at each node, and of the
+        maximum and minimum indices of the subtrees rooted at each node.
+
+        Used internally by TimespanCollection.
+
+        Returns none.
+        '''
         def recurse(
             node,
             parentStopIndex=None,
@@ -1813,6 +1879,14 @@ class TimespanCollection(object):
         self,
         node,
         ):
+        r'''
+        Traverses the tree structure and updates cached maximum and minimum
+        stop offset values for the subtrees rooted at each node.
+
+        Used internaly by TimespanCollection.
+
+        Returns a node.
+        '''
         if node is None:
             return
         stopOffsetLow = min(x.stopOffset for x in node.payload)
