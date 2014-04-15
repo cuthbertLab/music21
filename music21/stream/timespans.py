@@ -2369,62 +2369,6 @@ class TimespanCollection(object):
                 if len(verticalities) == n:
                     yield VerticalitySequence(reversed(verticalities))
 
-    @staticmethod
-    def unwrapVerticalities(verticalities):
-        r'''
-        Unwraps a sequence of `Verticality` objects into a dictionary of
-        `Part`:`Horizontality` key/value pairs.
-
-        ::
-
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanCollection(score)
-            >>> iterator = tree.iterateVerticalitiesNwise()
-            >>> verticalities = iterator.next()
-            >>> unwrapped = tree.unwrapVerticalities(verticalities)
-            >>> for part in sorted(unwrapped,
-            ...     key=lambda x: x.getInstrument().partName,
-            ...     ):
-            ...     print part
-            ...     horizontality = unwrapped[part]
-            ...     for timespan in horizontality:
-            ...         print '\t', timespan
-            ...
-            <music21.stream.Part Alto>
-                <ElementTimespan 0.0:1.0 <music21.note.Note E>>
-                <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
-            <music21.stream.Part Bass>
-                <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-                <ElementTimespan 0.5:1.0 <music21.note.Note G#>>
-                <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
-            <music21.stream.Part Soprano>
-                <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
-                <ElementTimespan 0.5:1.0 <music21.note.Note B>>
-                <ElementTimespan 1.0:2.0 <music21.note.Note A>>
-            <music21.stream.Part Tenor>
-                <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-                <ElementTimespan 0.5:1.0 <music21.note.Note B>>
-                <ElementTimespan 1.0:2.0 <music21.note.Note C#>>
-
-        '''
-        unwrapped = {}
-        for timespan in verticalities[0].overlapTimespans:
-            if timespan.part not in unwrapped:
-                unwrapped[timespan.part] = []
-            unwrapped[timespan.part].append(timespan)
-        for timespan in verticalities[0].startTimespans:
-            if timespan.part not in unwrapped:
-                unwrapped[timespan.part] = []
-            unwrapped[timespan.part].append(timespan)
-        for verticality in verticalities[1:]:
-            for timespan in verticality.startTimespans:
-                if timespan.part not in unwrapped:
-                    unwrapped[timespan.part] = []
-                unwrapped[timespan.part].append(timespan)
-        for part, unused_timespans in unwrapped.items():
-            unwrapped[part] = Horizontality(timespans=unwrapped[part])
-        return unwrapped
-
     def recurseStream(
         self,
         inputStream,
@@ -2701,6 +2645,62 @@ class TimespanCollection(object):
 
         return outputScore
 
+    @staticmethod
+    def unwrapVerticalities(verticalities):
+        r'''
+        Unwraps a sequence of `Verticality` objects into a dictionary of
+        `Part`:`Horizontality` key/value pairs.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = stream.timespans.TimespanCollection(score)
+            >>> iterator = tree.iterateVerticalitiesNwise()
+            >>> verticalities = iterator.next()
+            >>> unwrapped = tree.unwrapVerticalities(verticalities)
+            >>> for part in sorted(unwrapped,
+            ...     key=lambda x: x.getInstrument().partName,
+            ...     ):
+            ...     print part
+            ...     horizontality = unwrapped[part]
+            ...     for timespan in horizontality:
+            ...         print '\t', timespan
+            ...
+            <music21.stream.Part Alto>
+                <ElementTimespan 0.0:1.0 <music21.note.Note E>>
+                <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
+            <music21.stream.Part Bass>
+                <ElementTimespan 0.0:0.5 <music21.note.Note A>>
+                <ElementTimespan 0.5:1.0 <music21.note.Note G#>>
+                <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
+            <music21.stream.Part Soprano>
+                <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
+                <ElementTimespan 0.5:1.0 <music21.note.Note B>>
+                <ElementTimespan 1.0:2.0 <music21.note.Note A>>
+            <music21.stream.Part Tenor>
+                <ElementTimespan 0.0:0.5 <music21.note.Note A>>
+                <ElementTimespan 0.5:1.0 <music21.note.Note B>>
+                <ElementTimespan 1.0:2.0 <music21.note.Note C#>>
+
+        '''
+        unwrapped = {}
+        for timespan in verticalities[0].overlapTimespans:
+            if timespan.part not in unwrapped:
+                unwrapped[timespan.part] = []
+            unwrapped[timespan.part].append(timespan)
+        for timespan in verticalities[0].startTimespans:
+            if timespan.part not in unwrapped:
+                unwrapped[timespan.part] = []
+            unwrapped[timespan.part].append(timespan)
+        for verticality in verticalities[1:]:
+            for timespan in verticality.startTimespans:
+                if timespan.part not in unwrapped:
+                    unwrapped[timespan.part] = []
+                unwrapped[timespan.part].append(timespan)
+        for part, unused_timespans in unwrapped.items():
+            unwrapped[part] = Horizontality(timespans=unwrapped[part])
+        return unwrapped
+
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -2915,12 +2915,13 @@ class TimespanCollection(object):
         return self._sourceScore
 
 
+#------------------------------------------------------------------------------
+
+
 class TimespanCollectionException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------------------------------------------
-_DOC_ORDER = [TimespanCollection, Verticality, Horizontality, ElementTimespan]
-
 
 
 class Test(unittest.TestCase):
@@ -2995,6 +2996,21 @@ class Test(unittest.TestCase):
                     for i in range(len(current_timespans_in_tree)):
                         assert current_timespans_in_list[i] == \
                             current_timespans_in_tree[i]
+
+
+#------------------------------------------------------------------------------
+
+
+_DOC_ORDER = (
+    TimespanCollection,
+    Verticality,
+    Horizontality,
+    Timespan,
+    ElementTimespan,
+    )
+
+
+#------------------------------------------------------------------------------
 
 
 if __name__ == "__main__":
