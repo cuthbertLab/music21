@@ -195,7 +195,8 @@ class ElementTimespan(object):
     a note.  The notes are arranged from lowest to highest.
 
 
-    We can find all the elementTimespans that start exactly at 6.5.  There's one.
+    We can find all the elementTimespans that start exactly at 6.5. There's
+    one.
 
     ::
 
@@ -205,7 +206,8 @@ class ElementTimespan(object):
         >>> elementTimespan
         <ElementTimespan 6.5:7.0 <music21.note.Note D>>
 
-    What can we do with a elementTimespan?  We can get its Part object or the Part object name
+    What can we do with a elementTimespan? We can get its Part object or the
+    Part object name
 
     ::
 
@@ -223,8 +225,8 @@ class ElementTimespan(object):
         >>> elementTimespan.measureStartOffset
         5.0
 
-    The position in the measure is given by subtracting that
-    from the .startOffset:
+    The position in the measure is given by subtracting that from the
+    .startOffset:
 
     ::
 
@@ -237,10 +239,8 @@ class ElementTimespan(object):
         >>> elementTimespan.element
         <music21.note.Note D>
 
-    These are not dynamic, so changing the Score object does not change
-    the measureNumber, beatStrength, etc.
-
-
+    These are not dynamic, so changing the Score object does not change the
+    measureNumber, beatStrength, etc.
     '''
 
     ### CLASS VARIABLES ###
@@ -704,8 +704,8 @@ class Verticality(object):
     (There is also a previousVerticality, but not a previousStartOffset)
 
     What we just demonstrated is actually very powerful: a Verticality keeps a
-    record of exactly where it is in the timespanStream -- scores can be recreated
-    with this information.
+    record of exactly where it is in the timespanStream -- scores can be
+    recreated with this information.
 
     Getting back to the task at hand, we can find all the elementTimespans (and
     from there the elements) that start at exactly 6.5.  There's one, it's a
@@ -736,8 +736,6 @@ class Verticality(object):
 
         >>> verticality.stopTimespans
         (<ElementTimespan 6.0:6.5 <music21.note.Note E>>,)
-
-
 
     '''
 
@@ -1189,7 +1187,7 @@ class TimespanCollection(object):
     All offsets are assumed to be relative to the score's origin.
 
 
-    Example:  How many moments in Bach are consonant and how many are dissonant:
+    Example: How many moments in Bach are consonant and how many are dissonant:
 
     ::
 
@@ -1204,11 +1202,12 @@ class TimespanCollection(object):
         (34, 17)
 
 
-    So 1/3 of the vertical moments in Bach are dissonant!  But is this an accurate
-    perception? Let's sum up the total consonant duration vs. dissonant duration.
+    So 1/3 of the vertical moments in Bach are dissonant!  But is this an
+    accurate perception? Let's sum up the total consonant duration vs.
+    dissonant duration.
 
-    Do it again pairwise to figure out the length (actually this won't include the last
-    element)
+    Do it again pairwise to figure out the length (actually this won't include
+    the last element)
 
     ::
 
@@ -1257,19 +1256,21 @@ class TimespanCollection(object):
         {1.5} <music21.note.Note F#>
         {2.0} <music21.note.Note C#>
 
-    The second F# is an octave lower, so it wouldn't get merged even if adjacent
-    notes were fused together (which they're not).
+    The second F# is an octave lower, so it wouldn't get merged even if
+    adjacent notes were fused together (which they're not).
 
-    TimespanCollection is an implementation of an extended AVL tree. AVL trees are
-    a type of binary tree, like Red-Black trees. AVL trees are very efficient
-    at insertion when the objects being inserted are already sorted - which is
-    usually the case with data extracted from a score. TimespanCollection is an
-    extended AVL tree because each node in the tree keeps track of not just the
-    start offsets of ElementTimespans stored at that node, but also the
-    earliest and latest stop offset of all ElementTimespans stores at both that
-    node and all nodes which are children of that node. This lets us quickly
-    located ElementTimespans which overlap offsets or which are contained
-    within ranges.
+    ..  note::
+
+        TimespanCollection is an implementation of an extended AVL tree. AVL
+        trees are a type of binary tree, like Red-Black trees. AVL trees are
+        very efficient at insertion when the objects being inserted are already
+        sorted - which is usually the case with data extracted from a score.
+        TimespanCollection is an extended AVL tree because each node in the
+        tree keeps track of not just the start offsets of ElementTimespans
+        stored at that node, but also the earliest and latest stop offset of
+        all ElementTimespans stores at both that node and all nodes which are
+        children of that node. This lets us quickly located ElementTimespans
+        which overlap offsets or which are contained within ranges.
 
     TODO: newBach.parts['Alto'].measure(7).show('text') should work.
     KeyError: 'provided key (Alto) does not match any id or group'
@@ -2004,7 +2005,9 @@ class TimespanCollection(object):
 
         '''
         if not isinstance(elementTimespan, ElementTimespan):
-            raise TimespanCollectionException("ElementTimespan %r, must be an ElementTimespan" % elementTimespan)
+            message = 'ElementTimespan {!r}, must be an ElementTimespan'.format(
+                elementTimespan)
+            raise TimespanCollectionException(message)
         verticality = self.getVerticalityAt(elementTimespan.startOffset)
         while verticality is not None:
             verticality = verticality.nextVerticality
@@ -2016,7 +2019,9 @@ class TimespanCollection(object):
 
     def findPreviousElementTimespanInSamePart(self, elementTimespan):
         if not isinstance(elementTimespan, ElementTimespan):
-            raise TimespanCollectionException("ElementTimespan %r, must be an ElementTimespan" % elementTimespan)
+            message = 'ElementTimespan {!r}, must be an ElementTimespan'.format(
+                elementTimespan)
+            raise TimespanCollectionException(message)
         verticality = self.getVerticalityAt(elementTimespan.startOffset)
         while verticality is not None:
             verticality = verticality.previousVerticality
@@ -2635,9 +2640,11 @@ class TimespanCollection(object):
             templateOffsets = sorted(sourceScore.measureOffsetMap())
             templateOffsets.append(sourceScore.duration.quarterLength)
             if hasattr(sourceScore, 'parts') and len(sourceScore.parts) > 0:
-                templateScore = sourceScore.parts[0].measureTemplate(fillWithRests=False)
+                templateScore = sourceScore.parts[0].measureTemplate(
+                    fillWithRests=False)
             else:
-                templateScore = sourceScore.measureTemplate(fillWithRests=False)
+                templateScore = sourceScore.measureTemplate(
+                    fillWithRests=False)
             tree = self.copy()
             tree.splitAt(templateOffsets)
             measureIndex = 0
@@ -2682,10 +2689,11 @@ class TimespanCollection(object):
         templateOffsets = sorted(sourceScore.measureOffsetMap())
         templateOffsets.append(sourceScore.duration.quarterLength)
         if hasattr(sourceScore, 'parts') and len(sourceScore.parts) > 0:
-            templateScore = sourceScore.parts[0].measureTemplate(fillWithRests=False)
+            templateScore = sourceScore.parts[0].measureTemplate(
+                fillWithRests=False)
         else:
-            templateScore = sourceScore.measureTemplate(fillWithRests=False)
-
+            templateScore = sourceScore.measureTemplate(
+                fillWithRests=False)
         partMapping = collections.OrderedDict()
         outputScore = stream.Score()
         for part in self.allParts:
