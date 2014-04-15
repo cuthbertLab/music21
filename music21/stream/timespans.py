@@ -1391,6 +1391,45 @@ class TimespanCollection(object):
 
     ### SPECIAL METHODS ###
 
+    def __contains__(self, timespan):
+        r'''
+        Is true when timespan collection contains `timespan`.
+
+        ::
+
+            >>> timespans = [
+            ...     stream.timespans.Timespan(0, 2),
+            ...     stream.timespans.Timespan(0, 9),
+            ...     stream.timespans.Timespan(1, 1),
+            ...     stream.timespans.Timespan(2, 3),
+            ...     stream.timespans.Timespan(3, 4),
+            ...     stream.timespans.Timespan(4, 9),
+            ...     stream.timespans.Timespan(5, 6),
+            ...     stream.timespans.Timespan(5, 8),
+            ...     stream.timespans.Timespan(6, 8),
+            ...     stream.timespans.Timespan(7, 7),
+            ...     ]
+            >>> tree = stream.timespans.TimespanCollection()
+            >>> tree.insert(timespans)
+
+        ::
+
+            >>> timespans[0] in tree
+            True
+
+        ::
+
+            >>> stream.timespans.Timespan(-200, 1000) in tree
+            False
+
+        '''
+        if not hasattr(timespan, 'startOffset') or \
+            not hasattr(timespan, 'stopOffset'):
+            message = 'Must have startOffset and stopOffset.'
+            raise TimespanCollectionException(message)
+        candidates = self.findTimespansStartingAt(timespan.startOffset)
+        return timespan in candidates
+
     def __getitem__(self, i):
         r'''
         Gets timespans by integer index or slice.
@@ -1414,7 +1453,7 @@ class TimespanCollection(object):
 
         ::
 
-            >>> tree[0] 
+            >>> tree[0]
             <Timespan 0 2>
 
         ::
@@ -1546,7 +1585,7 @@ class TimespanCollection(object):
     def __len__(self):
         r'''Gets the length of the timespan collection.
 
-        :: 
+        ::
 
             >>> tree = stream.timespans.TimespanCollection()
             >>> len(tree)
@@ -1642,7 +1681,7 @@ class TimespanCollection(object):
             ...     ]
             >>> tree = stream.timespans.TimespanCollection()
             >>> tree.insert(timespans)
-        
+
         ::
 
             >>> print str(tree)
@@ -2011,6 +2050,60 @@ class TimespanCollection(object):
             stopTimespans=stopTimespans,
             )
         return verticality
+
+    def index(self, timespan):
+        r'''
+        Gets index of `timespan` in tree.
+
+        ::
+
+            >>> timespans = [
+            ...     stream.timespans.Timespan(0, 2),
+            ...     stream.timespans.Timespan(0, 9),
+            ...     stream.timespans.Timespan(1, 1),
+            ...     stream.timespans.Timespan(2, 3),
+            ...     stream.timespans.Timespan(3, 4),
+            ...     stream.timespans.Timespan(4, 9),
+            ...     stream.timespans.Timespan(5, 6),
+            ...     stream.timespans.Timespan(5, 8),
+            ...     stream.timespans.Timespan(6, 8),
+            ...     stream.timespans.Timespan(7, 7),
+            ...     ]
+            >>> tree = stream.timespans.TimespanCollection()
+            >>> tree.insert(timespans)
+
+        ::
+
+            >>> for timespan in timespans:
+            ...     print timespan, tree.index(timespan)
+            ...
+            <Timespan 0 2> 0
+            <Timespan 0 9> 1
+            <Timespan 1 1> 2
+            <Timespan 2 3> 3
+            <Timespan 3 4> 4
+            <Timespan 4 9> 5
+            <Timespan 5 6> 6
+            <Timespan 5 8> 7
+            <Timespan 6 8> 8
+            <Timespan 7 7> 9
+
+        ::
+
+            >>> tree.index(stream.timespans.Timespan(-100, 100))
+            Traceback (most recent call last):
+            ValueError: <Timespan -100 100> not in timespan collection.
+
+        '''
+        if not hasattr(timespan, 'startOffset') or \
+            not hasattr(timespan, 'stopOffset'):
+            message = 'Must have startOffset and stopOffset.'
+            raise TimespanCollectionException(message)
+        node = self._search(self._root, timespan.startOffset)
+        if node is None or timespan not in node.payload:
+            raise ValueError('{} not in timespan collection.'.format(timespan))
+        index = node.payload.index(timespan) + node.nodeStartIndex
+        return index
 
     def insert(self, timespans):
         r'''
