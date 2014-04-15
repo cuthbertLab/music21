@@ -60,8 +60,8 @@ def recurseStream(
     ):
     r'''
     Recurses through `inputStream`, constructs ElementTimespans for each
-    non-stream pitched element found, and appends those ElementTimespans to
-    `elementTimespans`.
+    non-stream pitched element found, and returns all constructed 
+    ElementTimespans.
     '''
     from music21 import stream
     if currentParentage is None:
@@ -106,7 +106,7 @@ def recurseStream(
 
 def streamToTimespanCollection(inputStream):
     r'''
-    Recurses through a score and constructs a timespan colleciton.
+    Recurses through a score and constructs a timespan collection.
 
     ::
 
@@ -1453,14 +1453,8 @@ class TimespanCollection(object):
                 message = 'Score {!r}, must be an stream.Score object'.format(
                     sourceScore)
                 raise TimespanCollectionException(message)
-            elementTimespans = []
-            initialParentage = (sourceScore,)
-            self.recurseStream(
-                sourceScore,
-                elementTimespans,
-                currentParentage=initialParentage,
-                )
-            self.insert(elementTimespans)
+            timespans = recurseStream(sourceScore)
+            self.insert(timespans)
         self._sourceScore = sourceScore
 
     ### SPECIAL METHODS ###
@@ -2516,46 +2510,6 @@ class TimespanCollection(object):
                     verticalities.append(previousVerticality)
                 if len(verticalities) == n:
                     yield VerticalitySequence(reversed(verticalities))
-
-    def recurseStream(
-        self,
-        inputStream,
-        elementTimespans=None,
-        currentParentage=None,
-        ):
-        r'''
-        Recurses through `inputStream`, constructs ElementTimespans for each
-        non-stream pitched element found, and appends those ElementTimespans to
-        `elementTimespans`.
-        '''
-        from music21 import stream
-        for x in inputStream:
-            if isinstance(x, stream.Measure):
-                localParentage = currentParentage + (x,)
-                measureStartOffset = x.getOffsetBySite(inputStream)
-                measureStopOffset = measureStartOffset + \
-                    x.duration.quarterLength
-                for element in x:
-                    if not isinstance(element, (
-                        note.Note,
-                        chord.Chord,
-                        )):
-                        continue
-                    elementOffset = element.getOffsetBySite(x)
-                    startOffset = measureStartOffset + elementOffset
-                    stopOffset = startOffset + element.quarterLength
-                    elementTimespan = ElementTimespan(
-                        element,
-                        tuple(reversed(localParentage)),
-                        measureStartOffset=measureStartOffset,
-                        measureStopOffset=measureStopOffset,
-                        startOffset=startOffset,
-                        stopOffset=stopOffset,
-                        )
-                    elementTimespans.append(elementTimespan)
-            elif isinstance(x, stream.Stream):
-                localElementTimespan = currentParentage + (x,)
-                self.recurseStream(x, elementTimespans, localElementTimespan)
 
     def remove(self, timespans):
         r'''
