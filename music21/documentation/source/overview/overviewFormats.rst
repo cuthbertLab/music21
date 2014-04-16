@@ -161,7 +161,7 @@ URL.
 ::
 
     >>> from music21 import *
-    >>> s = converter.parse('http://www.musedata.org/cgi-bin/mddata?composer=corelli&edition=chry&genre=trio/op1&work=op1n08&format=stage2&movement=01')
+    >>> s = converter.parse('http://www.musedata.org/cgi-bin/mddata?composer=corelli&edition=chry&genre=trio/op1&work=op1n08&format=stage2&movement=01') # doctest: +SKIP
 
 If a directory or zipped archive is passed to the
 :func:`music21.converter.parse` function, the contained files will be treated

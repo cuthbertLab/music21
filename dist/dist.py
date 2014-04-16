@@ -16,21 +16,19 @@ To do a release,
 
 1. update the VERSION in _version.py and the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
 2. run test/multiprocessTest.py
-3. run test/test.py (normally not necessary,because it's slower and mostly duplicates multiprocessTest, but should be done before making a release), 
-4. then test/testDocumentation
-5. then test/testSerialization
-6. If all tests pass, run `corpus.cacheMetadata(['core'])`, 
+3. If all tests pass, run `corpus.cacheMetadata(['core'])`, 
+4. run test/test.py (normally not necessary,because it's slower and mostly duplicates multiprocessTest, but should be done before making a release), 
+5. then test/testDocumentation
+6. then test/testSerialization
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
 9. run documentation/upload [not via eclipse] or upload via ssh.
 
 [*] you will need IPython (pip or easy_install) and pandoc (.dmg) installed
 
-10. and finally this file. (you'll need your GoogleCode password and will need to enter it THREE times; if you
-enter it wrong there will be a delay of 10-20 seconds.  If you enter it right, there will be a delay of
-several minutes while the code uploads.)
+10. and finally this file. 
 
-11. Update "Featured" on GoogleCode
+11. Create a new release on GitHub and upload the FIVE files created here.
 
 12. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking edit and augment
 the version number and the download URL.
@@ -111,6 +109,7 @@ class Distributor(object):
                 fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.12-intel.exe', '.win32.exe')
                 if fpNew != fp:
                     os.rename(fp, fpNew)
                 self.fpWin = fpNew
@@ -342,6 +341,6 @@ if __name__ == '__main__':
     d.buildNoCorpus = True
     d.build()
     d.updatePaths()
-    d.uploadGoogleCode()
+    #d.uploadGoogleCode()
     #d.uploadGoogleCodeOneFile(d.fpTar)
     #d.uploadPyPi()

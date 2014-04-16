@@ -28,7 +28,7 @@ if __name__ == '__main__':
     
     # this needs to be on level higher then the level of the source
     #DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
-    remoteHost = 'linux.mit.edu'
+    remoteHost = 'athena.dialup.mit.edu'
     remoteDir = '/afs/athena.mit.edu/org/m/music21/doc/'
     #tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
     

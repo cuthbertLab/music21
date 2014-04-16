@@ -33,7 +33,7 @@ available after importing music21.
 ::
 
     >>> music21.VERSION_STR
-    '1.8.0'
+    '1.8.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
