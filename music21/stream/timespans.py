@@ -1537,9 +1537,11 @@ class TimespanCollection(object):
 
     def __init__(
         self,
+        timespans=None,
         ):
-        from music21 import stream
         self._rootNode = None
+        if timespans is not None:
+            self.insert(timespans)   
 
     ### SPECIAL METHODS ###
 
