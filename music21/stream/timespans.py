@@ -1587,8 +1587,8 @@ class TimespanCollection(object):
         timespans=None,
         ):
         self._rootNode = None
-        if timespans is not None:
-            self.insert(timespans)
+        #if timespans and timespans is not None:
+        #    self.insert(timespans)
 
     ### SPECIAL METHODS ###
 
@@ -2468,8 +2468,9 @@ class TimespanCollection(object):
             hasattr(timespans, 'stopOffset'):
             timespans = [timespans]
         for timespan in timespans:
-            assert hasattr(timespan, 'startOffset'), timespan
-            assert hasattr(timespan, 'stopOffset'), timespan
+            if not hasattr(timespan, 'startOffset') or \
+                not hasattr(timespan, 'stopOffset'):
+                continue
             self._rootNode = self._insert(self._rootNode, timespan.startOffset)
             node = self._search(self._rootNode, timespan.startOffset)
             node.payload.append(timespan)
