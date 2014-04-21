@@ -1473,14 +1473,29 @@ class TimespanCollection(object):
 
         @property
         def balance(self):
+            r'''
+            The difference in heights of the two subtree rooted on this node.
+
+            This property is used to help balance the AVL tree.
+            '''
             return self._balance
 
         @property
         def height(self):
+            r'''
+            The height of the subtree rooted on this node.
+
+            This property is used to help balance the AVL tree.
+            '''
             return self._height
 
         @property
         def leftChild(self):
+            r'''
+            The left child of this node.
+
+            Setting the left child triggers a node update.
+            '''
             return self._leftChild
 
         @leftChild.setter
@@ -1490,10 +1505,18 @@ class TimespanCollection(object):
 
         @property
         def nodeStartIndex(self):
+            r'''
+            The timespan start index of only those timespans stored in this
+            node.
+            '''
             return self._nodeStartIndex
 
         @property
         def nodeStopIndex(self):
+            r'''
+            The timespan stop index of only those timespans stored in this
+            node.
+            '''
             return self._nodeStopIndex
 
         @property
@@ -1506,6 +1529,11 @@ class TimespanCollection(object):
 
         @property
         def rightChild(self):
+            r'''
+            The right child of this node.
+
+            Setting the right child triggers a node update.
+            '''
             return self._rightChild
 
         @rightChild.setter
@@ -1515,22 +1543,41 @@ class TimespanCollection(object):
 
         @property
         def startOffset(self):
+            r'''
+            The start offset of this node.
+            '''
             return self._startOffset
 
         @property
         def stopOffsetHigh(self):
+            r'''
+            The highest stop offset of any timespan in any node nof the subtree
+            rooted on this node.
+            '''
             return self._stopOffsetHigh
 
         @property
         def stopOffsetLow(self):
+            r'''
+            The lowest stop offset of any timespan in any node of the subtree
+            rooted on this node.
+            '''
             return self._stopOffsetLow
 
         @property
         def subtreeStartIndex(self):
+            r'''
+            The lowest timespan start index of any timespan in any node of the
+            subtree rooted on this node.
+            '''
             return self._subtreeStartIndex
 
         @property
         def subtreeStopIndex(self):
+            r'''
+            The highest timespan stop index of any timespan in any node of the
+            subtree rooted on this node.
+            '''
             return self._subtreeStopIndex
 
     ### INITIALIZER ###
@@ -1541,7 +1588,7 @@ class TimespanCollection(object):
         ):
         self._rootNode = None
         if timespans is not None:
-            self.insert(timespans)   
+            self.insert(timespans)
 
     ### SPECIAL METHODS ###
 
