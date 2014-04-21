@@ -60,7 +60,7 @@ def recurseStream(
     ):
     r'''
     Recurses through `inputStream`, constructs ElementTimespans for each
-    non-stream pitched element found, and returns all constructed 
+    non-stream pitched element found, and returns all constructed
     ElementTimespans.
     '''
     from music21 import stream
@@ -126,6 +126,105 @@ def streamToTimespanCollection(inputStream):
     tree = TimespanCollection()
     tree.insert(elementTimespans)
     return tree
+
+
+def timespansToPartwiseStream(timespans, templateStream=None):
+    from music21 import stream
+    treeMapping = timespans.toPartwiseTimespanCollections()
+    outputScore = stream.Score()
+    for part in templateStream.parts:
+        partwiseTimespans = treeMapping.get(part, None)
+        if partwiseTimespans is None:
+            continue
+        outputPart = timespansToChordifiedStream(partwiseTimespans, part)
+        outputScore.append(outputPart)
+    return outputScore
+
+
+def timespansToChordifiedStream(timespans, templateStream=None):
+    r'''
+    Creates a score from the ElementTimespan objects stored in this
+    offset-tree.
+
+    A "template" score may be used to provide measure and time-signature
+    information.
+
+    ::
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = stream.timespans.TimespanCollection(score)
+        >>> chordifiedScore = stream.timespans.timespansToChordifiedStream(
+        ...     tree, templateStream=score)
+        >>> chordifiedScore.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.chord.Chord A3 E4 C#5>
+            {0.5} <music21.chord.Chord G#3 B3 E4 B4>
+        {1.0} <music21.stream.Measure 1 offset=1.0>
+            {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+            {1.0} <music21.chord.Chord G#3 B3 E4 B4>
+            {2.0} <music21.chord.Chord A3 E4 C#5>
+            {3.0} <music21.chord.Chord G#3 B3 E4 E5>
+        {5.0} <music21.stream.Measure 2 offset=5.0>
+            {0.0} <music21.chord.Chord A3 E4 C#5>
+            {0.5} <music21.chord.Chord C#3 E4 A4 C#5>
+            {1.0} <music21.chord.Chord E3 E4 G#4 B4>
+            {1.5} <music21.chord.Chord E3 D4 G#4 B4>
+            {2.0} <music21.chord.Chord A2 C#4 E4 A4>
+            {3.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
+        {9.0} <music21.stream.Measure 3 offset=9.0>
+            {0.0} <music21.layout.SystemLayout>
+            {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+            {0.5} <music21.chord.Chord B2 D4 G#4 B4>
+            {1.0} <music21.chord.Chord C#3 C#4 E#4 G#4>
+            {1.5} <music21.chord.Chord C#3 B3 E#4 G#4>
+            {2.0} <music21.chord.Chord F#2 A3 C#4 F#4>
+            {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+        ...
+
+    '''
+    from music21 import stream
+    if not isinstance(timespans, TimespanCollection):
+        raise TimespanCollectionException
+    if isinstance(templateStream, stream.Stream):
+        templateOffsets = sorted(templateStream.measureOffsetMap())
+        templateOffsets.append(templateStream.duration.quarterLength)
+        if hasattr(templateStream, 'parts') and len(templateStream.parts) > 0:
+            outputStream = templateStream.parts[0].measureTemplate(
+                fillWithRests=False)
+        else:
+            outputStream = templateStream.measureTemplate(
+                fillWithRests=False)
+        timespans = timespans.copy()
+        timespans.splitAt(templateOffsets)
+        measureIndex = 0
+        allOffsets = timespans.allOffsets + tuple(templateOffsets)
+        allOffsets = sorted(set(allOffsets))
+        for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
+            while templateOffsets[1] <= startOffset:
+                templateOffsets.pop(0)
+                measureIndex += 1
+            verticality = timespans.getVerticalityAt(startOffset)
+            quarterLength = stopOffset - startOffset
+            assert 0 < quarterLength, verticality
+            element = makeElement(verticality, quarterLength)
+            outputStream[measureIndex].append(element)
+        return outputStream
+    else:
+        allOffsets = timespans.allOffsets
+        elements = []
+        for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
+            verticality = timespans.getVerticalityAt(startOffset)
+            quarterLength = stopOffset - startOffset
+            assert 0 < quarterLength, verticality
+            element = makeElement(verticality, quarterLength)
+            elements.append(element)
+        outputStream = stream.Score()
+        for element in elements:
+            outputStream.append(element)
+        return outputStream
 
 
 #------------------------------------------------------------------------------
@@ -1247,9 +1346,9 @@ class TimespanCollection(object):
         ...            tree.insert(merged)
         >>> newBach = tree.toPartwiseScore()
         >>> newBach.parts[1].measure(7).show('text')
-        {0.0} <music21.note.Note F#>
-        {1.5} <music21.note.Note F#>
-        {2.0} <music21.note.Note C#>
+        {0.0} <music21.chord.Chord F#4>
+        {1.5} <music21.chord.Chord F#3>
+        {2.0} <music21.chord.Chord C#4>
 
     The second F# is an octave lower, so it wouldn't get merged even if
     adjacent notes were fused together (which they're not).
@@ -2627,126 +2726,21 @@ class TimespanCollection(object):
 
         '''
 
-        from music21 import stream
-        sourceScore = self.sourceScore
-        if isinstance(sourceScore, stream.Stream):
-            templateOffsets = sorted(sourceScore.measureOffsetMap())
-            templateOffsets.append(sourceScore.duration.quarterLength)
-            if hasattr(sourceScore, 'parts') and len(sourceScore.parts) > 0:
-                templateScore = sourceScore.parts[0].measureTemplate(
-                    fillWithRests=False)
-            else:
-                templateScore = sourceScore.measureTemplate(
-                    fillWithRests=False)
-            tree = self.copy()
-            tree.splitAt(templateOffsets)
-            measureIndex = 0
-            allOffsets = tree.allOffsets + tuple(templateOffsets)
-            allOffsets = sorted(set(allOffsets))
-            for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
-                while templateOffsets[1] <= startOffset:
-                    templateOffsets.pop(0)
-                    measureIndex += 1
-                verticality = self.getVerticalityAt(startOffset)
-                quarterLength = stopOffset - startOffset
-                assert 0 < quarterLength, verticality
-                element = makeElement(verticality, quarterLength)
-                templateScore[measureIndex].append(element)
-            return templateScore
-        else:
-            allOffsets = self.allOffsets
-            elements = []
-            for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
-                verticality = self.getVerticalityAt(startOffset)
-                quarterLength = stopOffset - startOffset
-                assert 0 < quarterLength, verticality
-                element = makeElement(verticality, quarterLength)
-                elements.append(element)
-            score = stream.Score()
-            for element in elements:
-                score.append(element)
-            return score
+        return timespansToChordifiedStream(self, self.sourceScore)
 
     def toPartwiseTimespanCollections(self):
         partwiseTimespanCollections = {}
         for part in self.allParts:
             partwiseTimespanCollections[part] = TimespanCollection()
         for elementTimespan in self:
-            partwiseTimespanCollection = partwiseTimespanCollections[elementTimespan.part]
+            partwiseTimespanCollection = partwiseTimespanCollections[
+                elementTimespan.part]
             partwiseTimespanCollection.insert(elementTimespan)
         return partwiseTimespanCollections
 
-    def toPartwiseScore(self, templateScore=None):
-        from music21 import stream
-        sourceScore = self.sourceScore
-        templateOffsets = sorted(sourceScore.measureOffsetMap())
-        templateOffsets.append(sourceScore.duration.quarterLength)
-        if hasattr(sourceScore, 'parts') and len(sourceScore.parts) > 0:
-            templateScore = sourceScore.parts[0].measureTemplate(
-                fillWithRests=False)
-        else:
-            templateScore = sourceScore.measureTemplate(
-                fillWithRests=False)
-        partMapping = collections.OrderedDict()
-        outputScore = stream.Score()
-        for part in self.allParts:
-            newPart = stream.Part()
-            for measure in templateScore:
-                newMeasure = copy.deepcopy(measure)
-                newPart.insert(measure.offset, newMeasure)
-            partMapping[part] = newPart
-            outputScore.append(newPart)
-
-        treeMapping = self.toPartwiseTimespanCollections()
-        for tree in treeMapping.values():
-            #assert tree.maximumOverlap == 1
-            silenceTimespans = []
-            previousOffset = 0
-            for timespan in tree:
-                if timespan.startOffset != previousOffset:
-                    silenceTimespan = ElementTimespan(
-                        startOffset=previousOffset,
-                        stopOffset=timespan.startOffset,
-                        )
-                    silenceTimespans.append(silenceTimespan)
-                previousOffset = timespan.stopOffset
-            if previousOffset != max(templateOffsets):
-                silenceTimespan = ElementTimespan(
-                    startOffset=previousOffset,
-                    stopOffset=max(templateOffsets),
-                    )
-                silenceTimespans.append(silenceTimespan)
-            tree.insert(silenceTimespans)
-            tree.splitAt(templateOffsets)
-
-        for oldPart in partMapping:
-            tree = treeMapping[oldPart]
-            part = partMapping[oldPart]
-            for timespan in treeMapping[oldPart]:
-                startOffset = timespan.startOffset
-                stopOffset = timespan.stopOffset
-                quarterLength = stopOffset - startOffset
-                assert 0 < quarterLength, timespan
-                if timespan.element is not None:
-                    pitches = timespan.pitches
-                    if len(pitches) == 1:
-                        element = note.Note(pitches[0])
-                    elif 1 < len(pitches):
-                        element = chord.Chord(sorted(pitches))
-                    else:
-                        raise Exception('How did we get here?')
-                else:
-                    element = note.Rest()
-                element.quarterLength = quarterLength
-                measureIndex = bisect.bisect(templateOffsets, startOffset) - 1
-                measureOffset = templateOffsets[measureIndex]
-                measure = part[measureIndex]
-                measureInternalOffset = startOffset - measureOffset
-                measure.insert(measureInternalOffset, element)
-            clef = part.bestClef(allowTreble8vb=True)
-            part.insert(0, clef)
-
-        return outputScore
+    def toPartwiseScore(self, templateStream=None):
+        templateStream = self.sourceScore
+        return timespansToPartwiseStream(self, templateStream=templateStream)
 
     @staticmethod
     def unwrapVerticalities(verticalities):
