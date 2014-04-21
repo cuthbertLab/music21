@@ -2132,7 +2132,43 @@ class TimespanCollection(object):
         return newTree
 
     def findNextElementTimespanInSamePart(self, elementTimespan):
-        '''
+        r'''
+        Finds next element timespan in the same part as `elementTimespan`.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = stream.timespans.streamToTimespanCollection(score)
+            >>> timespan = tree[0]
+            >>> timespan
+            <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
+
+        ::
+
+            >>> timespan.part
+            <music21.stream.Part Soprano>
+
+        ::
+
+            >>> timespan = tree.findNextElementTimespanInSamePart(timespan)
+            >>> timespan
+            <ElementTimespan 0.5:1.0 <music21.note.Note B>>
+
+        ::
+
+            >>> timespan.part
+            <music21.stream.Part Soprano>
+
+        ::
+
+            >>> timespan = tree.findNextElementTimespanInSamePart(timespan)
+            >>> timespan
+            <ElementTimespan 1.0:2.0 <music21.note.Note A>>
+
+        ::
+
+            >>> timespan.part
+            <music21.stream.Part Soprano>
 
         '''
         if not isinstance(elementTimespan, ElementTimespan):
@@ -2149,6 +2185,45 @@ class TimespanCollection(object):
                     return nextElementTimespan
 
     def findPreviousElementTimespanInSamePart(self, elementTimespan):
+        r'''
+        Finds next element timespan in the same part as `elementTimespan`.
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = stream.timespans.streamToTimespanCollection(score)
+            >>> timespan = tree[-1]
+            >>> timespan
+            <ElementTimespan 35.0:36.0 <music21.note.Note F#>>
+
+        ::
+
+            >>> timespan.part
+            <music21.stream.Part Bass>
+
+        ::
+
+            >>> timespan = tree.findPreviousElementTimespanInSamePart(timespan)
+            >>> timespan
+            <ElementTimespan 34.0:35.0 <music21.note.Note B>>
+
+        ::
+
+            >>> timespan.part
+            <music21.stream.Part Bass>
+
+        ::
+
+            >>> timespan = tree.findPreviousElementTimespanInSamePart(timespan)
+            >>> timespan
+            <ElementTimespan 33.0:34.0 <music21.note.Note D>>
+
+        ::
+
+            >>> timespan.part
+            <music21.stream.Part Bass>
+
+        '''
         if not isinstance(elementTimespan, ElementTimespan):
             message = 'ElementTimespan {!r}, must be an ElementTimespan'.format(
                 elementTimespan)
