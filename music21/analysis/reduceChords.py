@@ -81,7 +81,7 @@ class ChordReducer(object):
         from music21.stream import timespans
         assert isinstance(inputScore, stream.Score)
 
-        tree = timespans.TimespanCollection(sourceScore=inputScore)
+        tree = timespans.streamToTimespanCollection(inputScore)
 
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)
@@ -123,7 +123,10 @@ class ChordReducer(object):
         #partwiseReduction = tree.toPartwiseScore()
         #for part in partwiseReduction:
         #    reduction.append(part)
-        chordifiedReduction = tree.toChordifiedScore()
+        chordifiedReduction = timespans.timespansToChordifiedStream(
+            tree,
+            templateStream=inputScore,
+            )
         chordifiedPart = stream.Part()
         for measure in chordifiedReduction:
             reducedMeasure = self.reduceMeasureToNChords(

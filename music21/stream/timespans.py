@@ -128,19 +128,6 @@ def streamToTimespanCollection(inputStream):
     return tree
 
 
-def timespansToPartwiseStream(timespans, templateStream=None):
-    from music21 import stream
-    treeMapping = timespans.toPartwiseTimespanCollections()
-    outputScore = stream.Score()
-    for part in templateStream.parts:
-        partwiseTimespans = treeMapping.get(part, None)
-        if partwiseTimespans is None:
-            continue
-        outputPart = timespansToChordifiedStream(partwiseTimespans, part)
-        outputScore.append(outputPart)
-    return outputScore
-
-
 def timespansToChordifiedStream(timespans, templateStream=None):
     r'''
     Creates a score from the ElementTimespan objects stored in this
@@ -225,6 +212,19 @@ def timespansToChordifiedStream(timespans, templateStream=None):
         for element in elements:
             outputStream.append(element)
         return outputStream
+
+
+def timespansToPartwiseStream(timespans, templateStream=None):
+    from music21 import stream
+    treeMapping = timespans.toPartwiseTimespanCollections()
+    outputScore = stream.Score()
+    for part in templateStream.parts:
+        partwiseTimespans = treeMapping.get(part, None)
+        if partwiseTimespans is None:
+            continue
+        outputPart = timespansToChordifiedStream(partwiseTimespans, part)
+        outputScore.append(outputPart)
+    return outputScore
 
 
 #------------------------------------------------------------------------------
@@ -1344,7 +1344,8 @@ class TimespanCollection(object):
         ...            tree.remove(horizontality[1])
         ...            tree.remove(horizontality[2])
         ...            tree.insert(merged)
-        >>> newBach = tree.toPartwiseScore()
+        >>> newBach = stream.timespans.timespansToPartwiseStream(
+        ...     tree, templateStream=bach)
         >>> newBach.parts[1].measure(7).show('text')
         {0.0} <music21.chord.Chord F#4>
         {1.5} <music21.chord.Chord F#3>
@@ -2681,53 +2682,6 @@ class TimespanCollection(object):
                 shards = overlap.splitAt(offset)
                 self.insert(shards)
 
-    def toChordifiedScore(self):
-        r'''
-        Creates a score from the ElementTimespan objects stored in this offset-tree.
-
-        A "template" score may be used to provide measure and time-signature
-        information.
-
-        ::
-
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.TimespanCollection(score)
-            >>> chordifiedScore = tree.toChordifiedScore()
-            >>> chordifiedScore.show('text')
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
-                {0.0} <music21.meter.TimeSignature 4/4>
-                {0.0} <music21.chord.Chord A3 E4 C#5>
-                {0.5} <music21.chord.Chord G#3 B3 E4 B4>
-            {1.0} <music21.stream.Measure 1 offset=1.0>
-                {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-                {1.0} <music21.chord.Chord G#3 B3 E4 B4>
-                {2.0} <music21.chord.Chord A3 E4 C#5>
-                {3.0} <music21.chord.Chord G#3 B3 E4 E5>
-            {5.0} <music21.stream.Measure 2 offset=5.0>
-                {0.0} <music21.chord.Chord A3 E4 C#5>
-                {0.5} <music21.chord.Chord C#3 E4 A4 C#5>
-                {1.0} <music21.chord.Chord E3 E4 G#4 B4>
-                {1.5} <music21.chord.Chord E3 D4 G#4 B4>
-                {2.0} <music21.chord.Chord A2 C#4 E4 A4>
-                {3.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
-            {9.0} <music21.stream.Measure 3 offset=9.0>
-                {0.0} <music21.layout.SystemLayout>
-                {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-                {0.5} <music21.chord.Chord B2 D4 G#4 B4>
-                {1.0} <music21.chord.Chord C#3 C#4 E#4 G#4>
-                {1.5} <music21.chord.Chord C#3 B3 E#4 G#4>
-                {2.0} <music21.chord.Chord F#2 A3 C#4 F#4>
-                {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-            ...
-
-        TODO: remove assert
-
-        '''
-
-        return timespansToChordifiedStream(self, self.sourceScore)
-
     def toPartwiseTimespanCollections(self):
         partwiseTimespanCollections = {}
         for part in self.allParts:
@@ -2737,10 +2691,6 @@ class TimespanCollection(object):
                 elementTimespan.part]
             partwiseTimespanCollection.insert(elementTimespan)
         return partwiseTimespanCollections
-
-    def toPartwiseScore(self, templateStream=None):
-        templateStream = self.sourceScore
-        return timespansToPartwiseStream(self, templateStream=templateStream)
 
     @staticmethod
     def unwrapVerticalities(verticalities):
