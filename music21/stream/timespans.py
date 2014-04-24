@@ -19,11 +19,10 @@ users won't need to worry about.
 '''
 
 
-import bisect
 import collections
-import copy
 import random
 import unittest
+import weakref
 from music21 import chord
 from music21 import instrument
 from music21 import note
@@ -1376,6 +1375,7 @@ class TimespanCollection(object):
     ### CLASS VARIABLES ###
 
     __slots__ = (
+        '_parents',
         '_rootNode',
         )
 
@@ -1586,6 +1586,7 @@ class TimespanCollection(object):
         self,
         timespans=None,
         ):
+        self._parents = weakref.WeakSet()
         self._rootNode = None
         #if timespans and timespans is not None:
         #    self.insert(timespans)
@@ -1630,6 +1631,9 @@ class TimespanCollection(object):
             raise TimespanCollectionException(message)
         candidates = self.findTimespansStartingAt(timespan.startOffset)
         return timespan in candidates
+
+    def __eq__(self, expr):
+        return id(self) == id(expr)
 
     def __getitem__(self, i):
         r'''
@@ -1733,6 +1737,9 @@ class TimespanCollection(object):
             return recurseBySlice(self._rootNode, start, stop)
         raise TypeError('Indices must be integers or slices, got {}'.format(i))
 
+    def __hash__(self):
+        return hash((type(self), id(self)))
+
     def __iter__(self):
         r'''
         Iterates through all the elementTimespans in the offset tree.
@@ -1820,6 +1827,9 @@ class TimespanCollection(object):
         if self._rootNode is None:
             return 0
         return self._rootNode.subtreeStopIndex
+
+    def __ne__(self, expr):
+        return not self == expr
 
     def __setitem__(self, i, new):
         r'''
@@ -2111,6 +2121,9 @@ class TimespanCollection(object):
         node._stopOffsetLow = stopOffsetLow
         node._stopOffsetHigh = stopOffsetHigh
         return node
+
+    def _updateParents(self):
+        pass
 
     ### PUBLIC METHODS ###
 
@@ -2464,6 +2477,8 @@ class TimespanCollection(object):
 
         TODO: remove asserts...
         '''
+        initialStartOffset = self.startOffset
+        initialStopOffset = self.stopOffset
         if hasattr(timespans, 'startOffset') and \
             hasattr(timespans, 'stopOffset'):
             timespans = [timespans]
@@ -2475,8 +2490,13 @@ class TimespanCollection(object):
             node = self._search(self._rootNode, timespan.startOffset)
             node.payload.append(timespan)
             node.payload.sort(key=lambda x: x.stopOffset)
+            if isinstance(timespan, TimespanCollection):
+                timespan._parents.add(self)
         self._updateIndices(self._rootNode)
         self._updateOffsets(self._rootNode)
+        if (self.startOffset != initialStartOffset) or \
+            (self.stopOffset != initialStopOffset):
+            self._updateParents()
 
     def iterateConsonanceBoundedVerticalities(self):
         r'''
@@ -2730,6 +2750,8 @@ class TimespanCollection(object):
         TODO: remove assert
 
         '''
+        initialStartOffset = self.startOffset
+        initialStopOffset = self.stopOffset
         if hasattr(timespans, 'startOffset') and \
             hasattr(timespans, 'stopOffset'):
             timespans = [timespans]
@@ -2743,8 +2765,13 @@ class TimespanCollection(object):
                 node.payload.remove(timespan)
             if not node.payload:
                 self._rootNode = self._remove(self._rootNode, timespan.startOffset)
+            if isinstance(timespan, TimespanCollection):
+                timespan._parents.remove(self)
         self._updateIndices(self._rootNode)
         self._updateOffsets(self._rootNode)
+        if (self.startOffset != initialStartOffset) or \
+            (self.stopOffset != initialStopOffset):
+            self._updateParents()
 
     def splitAt(self, offsets):
         r'''
@@ -2998,7 +3025,8 @@ class TimespanCollection(object):
             if node.leftChild is not None:
                 return recurse(node.leftChild)
             return node.startOffset
-        return recurse(self._rootNode)
+        if self._rootNode is not None:
+            return recurse(self._rootNode)
 
     @property
     def earliestStopOffset(self):
@@ -3013,7 +3041,8 @@ class TimespanCollection(object):
             0.5
 
         '''
-        return self._rootNode.stopOffsetLow
+        if self._rootNode is not None:
+            return self._rootNode.stopOffsetLow
 
     @property
     def latestStartOffset(self):
@@ -3032,7 +3061,8 @@ class TimespanCollection(object):
             if node.rightChild is not None:
                 return recurse(node._rightChild)
             return node.startOffset
-        return recurse(self._rootNode)
+        if self._rootNode is not None:
+            return recurse(self._rootNode)
 
     @property
     def latestStopOffset(self):
@@ -3047,7 +3077,8 @@ class TimespanCollection(object):
             36.0
 
         '''
-        return self._rootNode.stopOffsetHigh
+        if self._rootNode is not None:
+            return self._rootNode.stopOffsetHigh
 
     @property
     def maximumOverlap(self):
@@ -3070,6 +3101,14 @@ class TimespanCollection(object):
             elif degreeOfOverlap < overlap:
                 overlap = degreeOfOverlap
         return overlap
+
+    @property
+    def startOffset(self):
+        return self.earliestStartOffset
+
+    @property
+    def stopOffset(self):
+        return self.latestStopOffset
 
 
 #------------------------------------------------------------------------------
