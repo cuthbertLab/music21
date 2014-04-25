@@ -734,8 +734,8 @@ class Stream(base.Music21Object):
     @property
     def derivationChain(self):
         '''
-        Return a list Streams that this Stream was derved from. This provides a
-        way to obtain all Streams that this element passed through, such as
+        Return a list Streams that this Stream was derived from. This provides
+        a way to obtain all Streams that this element passed through, such as
         those created by :meth:`~music21.stream.Stream.getElementsByClass` or
         :attr:`~music21.stream.Stream.flat`.
 
@@ -747,16 +747,7 @@ class Stream(base.Music21Object):
         >>> s3.derivationChain == [s2, s1]
         True
         '''
-        post = []
-        focus = self
-        while True:
-            # keep deriving until we get None; then return what we have
-            rd = focus._derivation.origin
-            if rd is None:  # nothing more to derive
-                break
-            post.append(rd)
-            focus = rd
-        return post
+        return self.derivation.derivationChain
 
     @property
     def derivesFrom(self):
@@ -820,11 +811,7 @@ class Stream(base.Music21Object):
         >>> s2.derivesFrom == s1
         True
         '''
-        chain = self.derivationChain
-        if len(chain):
-            return chain[-1]
-        else:
-            return None
+        return self.derivation.rootDerivation
 
     def hasElement(self, obj):
         '''

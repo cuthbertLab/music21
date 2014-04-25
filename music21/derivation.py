@@ -160,6 +160,15 @@ class Derivation(SlottedObject):
             self._client = common.wrapWeakref(client)
 
     @property
+    def derivationChain(self):
+        result = []
+        origin = self.origin
+        while origin is not None:
+            result.append(origin)
+            origin = origin.derivation.origin 
+        return result
+    
+    @property
     def method(self):
         '''
         Returns the string of the method that was used to generate this
@@ -229,6 +238,15 @@ class Derivation(SlottedObject):
             self._originId = id(origin)
             self._origin = origin
             #self._origin = common.wrapWeakref(origin)
+
+    @property
+    def rootDerivation(self):
+        chain = self.derivationChain
+        if len(chain):
+            return chain[-1]
+        else:
+            return None
+
 
 
 #------------------------------------------------------------------------------
