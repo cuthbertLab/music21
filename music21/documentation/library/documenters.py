@@ -633,11 +633,11 @@ class ClassDocumenter(ObjectDocumenter):
             - music21.stream.Stream.beatStr
             - music21.stream.Stream.beatStrength
             - music21.stream.Stream.derivation
-            - music21.stream.Stream.derivationChain
             - music21.stream.Stream.flat
             - music21.stream.Stream.highestOffset
             - music21.stream.Stream.highestTime
             - music21.stream.Stream.isGapless
+            - music21.stream.Stream.lowestOffset
 
         '''
 
@@ -713,8 +713,6 @@ class ClassDocumenter(ObjectDocumenter):
             - music21.base.Music21Object.priority
             music21.stream.Stream:
             - music21.stream.Stream.atSoundingPitch
-            - music21.stream.Stream.derivationMethod
-            - music21.stream.Stream.derivesFrom
             - music21.stream.Stream.duration
             - music21.stream.Stream.elements
             - music21.stream.Stream.finalBarline
@@ -769,7 +767,6 @@ class ClassDocumenter(ObjectDocumenter):
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivation>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivationChain>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.flat>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
@@ -779,7 +776,6 @@ class ClassDocumenter(ObjectDocumenter):
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.offsetMap>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.rootDerivation>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
@@ -805,8 +801,6 @@ class ClassDocumenter(ObjectDocumenter):
             ...     prop
             ...
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.atSoundingPitch>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivationMethod>
-            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivesFrom>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.duration>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.elements>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
