@@ -329,12 +329,11 @@ class KeySignature(base.Music21Object):
     '''
     A KeySignature object specifies the signature to be used for a piece; it takes
     in zero, one, or two arguments.  The first argument is an int giving the number of sharps,
-    or if negative the number of flats.  The second argument (deprecated -- do not use)
+    or if negative the number of flats.  The second argument (deprecated Jan 2014 -- do not use)
     specifies the mode of the piece ('major', 'minor', or None for unknown).
     
     If you are starting with the name of a key, see the :class:`~music21.key.Key` object.
 
-    
 
     >>> A = key.KeySignature(3)
     >>> A

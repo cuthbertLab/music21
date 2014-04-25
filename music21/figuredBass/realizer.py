@@ -644,7 +644,7 @@ class Realization(object):
 
         for segmentIndex in range(1, len(self._segmentList)-1):
             currMovements = self._segmentList[segmentIndex].movements
-            for counter_progIndex in range(len(progressions)):
+            for unused_progIndex in range(len(progressions)):
                 prog = progressions.pop(0)
                 possibB = prog[-1]
                 for possibC in currMovements[possibB]:
@@ -796,7 +796,7 @@ class Realization(object):
         for music21Part in sol0:
             allSols.append(music21Part)
         
-        for counter_solution in range(1, amountToGenerate):
+        for unused_counter_solution in range(1, amountToGenerate):
             solX = self.generateRandomRealization()
             for partIndex in range(len(solX)):
                 for music21Measure in solX[partIndex]:

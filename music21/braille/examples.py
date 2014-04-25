@@ -68,7 +68,7 @@ The exposition to movement 1 of Mozart's K545.
 
 
 >>> from music21 import corpus
->>> mozart = corpus.parseWork('k545')
+>>> mozart = corpus.parse('k545')
 >>> #_DOCS_SHOW mozart.show('braille')
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠁⠀⠅⠜⠄⠜⠁⠇⠇⠑⠛⠗⠕⠨⠝⠫⠳⠀⠐⠺⠄⠉⠽⠉⠵⠹⠧⠀⠨⠎⠳⠰⠹⠀⠀⠀⠀⠀⠀

@@ -72,6 +72,7 @@ from music21.romanText import translate as romanTextTranslate
 from music21.noteworthy import binaryTranslate as noteworthyBinary # @UnresolvedImport
 from music21.noteworthy import translate as noteworthyTranslate
 
+from music21 import _version
 from music21 import environment
 _MOD = 'converter.py'
 environLocal = environment.Environment(_MOD)
@@ -217,9 +218,9 @@ class PickleFilter(object):
             extension = '.pgz'
         
         if self.number is None:
-            return os.path.join(directory, 'm21-' + common.getMd5(self.fp) + extension)
+            return os.path.join(directory, 'm21-' + _version.__version__ + '-' + common.getMd5(self.fp) + extension)
         else:
-            return os.path.join(directory, 'm21-' + common.getMd5(self.fp) + '-' + str(self.number) + extension)
+            return os.path.join(directory, 'm21-' + _version.__version__ + '-' + common.getMd5(self.fp) + '-' + str(self.number) + extension)
 
     def status(self):
         '''
@@ -453,7 +454,8 @@ class ConverterMusicXML(object):
         self.load()
 
     def parseFile(self, fp, number=None):
-        '''Open from a file path; check to see if there is a pickled
+        '''
+        Open from a file path; check to see if there is a pickled
         version available and up to date; if so, open that, otherwise
         open source.
         '''
@@ -822,7 +824,7 @@ class Converter(object):
     def _getDownloadFp(self, directory, ext, url):
         if directory == None:
             raise ValueError
-        return os.path.join(directory, 'm21-' + common.getMd5(url) + ext)
+        return os.path.join(directory, 'm21-' + _version.__version__ + '-' + common.getMd5(url) + ext)
 
     def parseFileNoPickle(self, fp, number=None, format=None, forceSource=False): # @ReservedAssignment
         '''
@@ -894,6 +896,7 @@ class Converter(object):
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
             except:
                 environLocal.warn("Could not parse pickle, %s ...rewriting" % fpPickle)
+                os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource)
 
             self.stream.filePath = fp

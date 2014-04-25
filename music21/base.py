@@ -46,6 +46,7 @@ under the module "base":
 '''
 
 import codecs
+import collections
 import copy
 import doctest
 import sys
@@ -139,8 +140,9 @@ class Music21ObjectException(exceptions21.Music21Exception):
 class ElementException(exceptions21.Music21Exception):
     pass
 
-
 #------------------------------------------------------------------------------
+# private metaclass...
+_SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority','classSortOrder','isGrace','insertIndex'])
 
 
 class SlottedObject(object):
@@ -266,7 +268,27 @@ class Groups(SlottedObject, list):
 
 
 #------------------------------------------------------------------------------
+class Site(SlottedObject):
+    '''
+    a single Site (container, parent, reference, etc.) stored inside the Sites object.
+    '''
+    ### CLASS VARIABLES ###
 
+    __slots__ = (
+        'class',
+        'globalInsertIndex',
+        'insertIndex',
+        'isDead',
+        'obj',
+        'offset',
+        )
+
+    def __init__(self):
+        self.isDead = False
+
+    ### INITIALIZER ###
+
+_singletonCounter = common.SingletonCounter()
 
 class Sites(SlottedObject):
     '''
@@ -288,10 +310,10 @@ class Sites(SlottedObject):
         '_lastID',
         '_lastOffset',
         '_locationKeys',
-        '_timeIndex',
+        '_siteIndex',
         'containedById',
         )
-
+    
     ### INITIALIZER ###
 
     def __init__(self, containedById=None):
@@ -300,9 +322,11 @@ class Sites(SlottedObject):
         # store idKeys in lists for easy access
         # the same key may be both in locationKeys and contextKeys
         self._locationKeys = []
-        # store an index of numbers for tagging the time of defined contexts;
+
+        # store an index of numbers for tagging the order of creation of defined contexts;
         # this is used to be able to discern the order of context as added
-        self._timeIndex = 0
+        self._siteIndex = 0
+        
         # pass a reference to the object that contains this
         self.containedById = containedById
         # cache for performance
@@ -368,13 +392,13 @@ class Sites(SlottedObject):
             if post['offset'] is not None:
                 locations.append(idKey)  # if offset not None, a location
 
-            post['time'] = singleContextDict['time']  # assume still valid
+            post['siteIndex'] = singleContextDict['siteIndex']  # assume still valid
             post['class'] = singleContextDict['class']
             post['isDead'] = False
             new._definedContexts[idKey] = post
 
         new._locationKeys = locations
-        new._timeIndex = self._timeIndex  # keep for coherency
+        new._siteIndex = self._siteIndex  # keep for coherency
         return new
 
     def __len__(self):
@@ -415,13 +439,13 @@ class Sites(SlottedObject):
             >>> aSites.add(aObj)
             >>> aSites.add(bObj)
             >>> k = aSites._keysByTime()
-            >>> aSites._definedContexts[k[0]]['time'] > aSites._definedContexts[k[1]]['time'] > aSites._definedContexts[k[2]]['time']
+            >>> aSites._definedContexts[k[0]]['siteIndex'] > aSites._definedContexts[k[1]]['siteIndex'] > aSites._definedContexts[k[2]]['siteIndex']
             True
 
         '''
         post = []
         for key in self._definedContexts:
-            post.append((self._definedContexts[key]['time'], key))
+            post.append((self._definedContexts[key]['siteIndex'], key))
         post.sort()
         if newFirst:
             post.reverse()
@@ -466,9 +490,9 @@ class Sites(SlottedObject):
         `offset` can also be the term `highestTime` which is the highest
         available time in the obj (used for ``streamObj.append(el)``)
 
-        The `timeValue` argument is used to store the time (in seconds after
-        Jan 1, 1970) when this object was added to locations. If set to `None`,
-        then the current time is used.
+        The `timeValue` argument is used to store the time as an int
+        (in milliseconds after Jan 1, 1970) when this object was added to locations. 
+        If set to `None`, then the current time is used.
 
         `idKey` stores the id() of the obj.  If `None`, then id(obj) is used.
 
@@ -513,11 +537,10 @@ class Sites(SlottedObject):
         singleContextDict['class'] = classString
         singleContextDict['isDead'] = False  # store to access w/o unwrapping
         # time is a numeric count, not a real time measure
-        if timeValue is None:
-            singleContextDict['time'] = self._timeIndex
-            self._timeIndex += 1  # increment for next usage
-        else:
-            singleContextDict['time'] = timeValue
+        singleContextDict['siteIndex'] = self._siteIndex
+        self._siteIndex += 1  # increment for next usage
+        singleContextDict['globalSiteIndex'] = _singletonCounter() # increments
+        ##
         if not updateNotAdd:  # add new/missing information to dictionary
             self._definedContexts[idKey] = singleContextDict
 
@@ -2121,32 +2144,14 @@ class Music21Object(object):
         '''
         return self.sites.setAttrByName(attrName, value)
 
-    def addContext(self, obj):
-        '''
-        Add an object to the :class:`~music21.base.Sites` object.
-        For adding a location, use :meth:`~music21.base.Music21Object.addLocation`.
-
-        DEPRECATED -- use self.sites.add()
-
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     attr1 = 234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 'test'
-        >>> a = music21.Music21Object()
-        >>> a.sites.add(aObj)
-        >>> a.getContextAttr('attr1')
-        'test'
-        '''
-        return self.sites.add(obj)
-
     def hasContext(self, obj):
         '''
         Return a Boolean if an object reference is stored
         in the object's Sites object.
 
         This checks both all locations as well as all sites.
+
+        DEPRECATED: use hasSite() instead.  April 2014.
 
         >>> import music21
         >>> class Mock(music21.Music21Object):
@@ -2167,56 +2172,6 @@ class Music21Object(object):
                 return True
         return False
 
-    def addLocation(self, site, offset):
-        '''
-
-        DEPRECATED: use self.sites.add(site, offset)
-
-        Add a location to the :class:`~music21.base.Sites` object.
-        The supplied object is a reference to the object (the site) that
-        contains an offset of this object.  For example, if this
-        Music21Object was Note, the site would be a Stream (or Stream
-        subclass) and the offset would be a number for the offset.
-
-        This is only for advanced location method and is not a complete
-        or sufficient way to add an object to a Stream.
-
-        >>> from music21 import note, stream
-        >>> s = stream.Stream()
-        >>> n = note.Note('E-5')
-        >>> n.sites.add(s, 10)
-        '''
-        self.sites.add(site, offset)
-
-    def getSites(self, idExclude=None):
-        '''
-        DEPRECATED: use self.sites.getSites() instead...
-
-        Return a list of all objects that store
-        a location for this object. Will include None,
-        the default empty site placeholder.
-
-        If `idExclude` is provided, matching site ids will not be returned.
-
-        >>> from music21 import note, stream
-        >>> s1 = stream.Stream()
-        >>> s2 = stream.Stream()
-        >>> n = note.Note()
-        >>> s1.append(n)
-        >>> s2.append(n)
-        >>> n.getSites() == [None, s1, s2]
-        True
-        '''
-        return self.sites.getSites(idExclude=idExclude)
-
-    def getSiteIds(self):
-        '''
-        DEPRECATED: use self.sites.getSiteIds() instead.
-
-        Return a list of all site Ids, or the
-        id() value of the sites of this object.
-        '''
-        return self.sites.getSiteIds()
 
     def hasSite(self, other):
         '''
@@ -2292,32 +2247,6 @@ class Music21Object(object):
 #            if id(obj) in dstIds:
 #                post.append(obj)
 #        return post
-
-    def hasSpannerSite(self):
-        '''
-        DEPRECATED: use self.sites.hasSpannerSite()
-
-        Return True if this object is found in
-        any Spanner (i.e. has any spanners attached).
-        This is determined by looking
-        for a SpannerStorage Stream class as a Site.
-
-
-        >>> n1 = note.Note()
-        >>> n2 = note.Note()
-        >>> n3 = note.Note()
-        >>> sp1 = spanner.Slur(n1, n2)
-        >>> n1.getSpannerSites() == [sp1]
-        True
-        >>> sp2 = spanner.Slur(n2, n1)
-        >>> n1.hasSpannerSite()
-        True
-        >>> n2.hasSpannerSite()
-        True
-        >>> n3.hasSpannerSite()
-        False
-        '''
-        return self.sites.hasSpannerSite()
 
     def getSpannerSites(self, spannerClassList = None):
         '''
@@ -2409,18 +2338,19 @@ class Music21Object(object):
         This is determined by looking
         for a VariantStorage Stream class as a Site.
 
+        DEPRECATED April 2014, v. 1.9 -- use el.sites.hasVariantSite() instead
 
         >>> n1 = note.Note()
         >>> n2 = note.Note()
         >>> n3 = note.Note()
         >>> v1 = variant.Variant([n1, n2])
-        >>> n1.hasSpannerSite()
+        >>> n1.sites.hasSpannerSite()
         False
-        >>> n1.hasVariantSite()
+        >>> n1.sites.hasVariantSite()
         True
-        >>> n2.hasVariantSite()
+        >>> n2.sites.hasVariantSite()
         True
-        >>> n3.hasVariantSite()
+        >>> n3.sites.hasVariantSite()
         False
         '''
         return self.sites.hasVariantSite()
@@ -3266,6 +3196,95 @@ class Music21Object(object):
         which is safer.
         ''')
 
+    @property
+    def sortTuple(self):
+        '''
+        Returns a collections.NamedTuple called SortTuple(atEnd, offset, priority, classSortOrder, 
+        isGrace, insertIndex)
+        which contains the six elements necessary to determine the sort order of any set of
+        objects in a Stream. 
+        
+        1) atEnd = {0, 1}; Elements specified to always stay at the end of a stream (``stream.storeAtEnd``) 
+        sort after normal elements.
+        
+        2) offset = float; Offset (with respect to the active site) is the next and most
+        important parameter in determining the order of elements in a stream (the note on beat 1
+        has offset 0.0, while the note on beat 2 might have offset 1.0). 
+        
+        3) priority = int or float; Priority is a
+        user-specified property (default 0) that can set the order of elements which have the same
+        offset (for instance, two Parts both at offset 0.0). 
+        
+        4) classSortOrder = int or float; ClassSortOrder
+        is the third level of comparison that gives an ordering to elements with different classes,
+        ensuring, for instance that Clefs (classSortOrder = 0) sort before Notes (classSortOrder = 20).
+        
+        5) isGrace = {0, 1}; grace notes sort after normal notes
+        
+        6) The last tie breaker is the creation time (insertIndex) of the site object 
+        represented by the activeSite.
+        
+        >>> n = note.Note()
+        >>> n.offset = 4.0
+        >>> n.priority = -3
+        >>> n.sortTuple
+        SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, isGrace=0, insertIndex=0)
+        >>> st = n.sortTuple
+
+        Check that all these values are the same as above...
+        
+        >>> st.offset == n.offset
+        True
+        >>> st.priority == n.priority
+        True
+        
+        An object's classSortOrder comes from the Class object itself:
+        
+        >>> st.classSortOrder == note.Note.classSortOrder
+        True
+        
+        Inserting the note into the Stream will set the insertIndex.  Most implementations of
+        music21 will use a global counter rather than an actual timer.  Note that this is a
+        last resort, but useful for things such as mutiple Parts inserted in order.  It changes
+        with each run, so we can't display it here...
+        
+        >>> s = stream.Stream()
+        >>> s.insert(n)
+        >>> n.sortTuple
+        SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, isGrace=0, insertIndex=...)
+        >>> nInsertIndex = n.sortTuple.insertIndex
+        
+        If we create another nearly identical note, the insertIndex will be different:
+        
+        >>> n2 = note.Note()
+        >>> n2.offset = 4.0
+        >>> n2.priority = -3
+        >>> s.insert(n2)
+        >>> n2InsertIndex = n2.sortTuple.insertIndex
+        >>> n2InsertIndex > nInsertIndex
+        True
+        '''
+        if self.offset == 'highestTime':
+            offset = 0.0
+            atEnd = 1
+        else:
+            offset = self.offset
+            atEnd = 0
+            
+        if self.isGrace:
+            isGrace = 1
+        else:
+            isGrace = 0
+            
+        if (self._activeSiteId is not None and
+            self.sites.hasSiteId(self._activeSiteId)):
+            ## TODO -- expose a single Site so _definedContexts is not needed here.
+            insertIndex = self.sites._definedContexts[self._activeSiteId]['globalSiteIndex']
+        else:
+            insertIndex = 0
+        
+        return _SortTuple(atEnd, offset, self.priority, self.classSortOrder, isGrace, insertIndex)
+        
     def _getDuration(self):
         '''
         Gets the DurationObject of the object or None
@@ -3299,7 +3318,6 @@ class Music21Object(object):
 
     isGrace = property(_getIsGrace, doc='''
         Return True or False if this music21 object has a GraceDuration.
-
 
         >>> n = note.Note()
         >>> n.isGrace
@@ -3339,7 +3357,7 @@ class Music21Object(object):
         to have Elements that appear non-priority set elements.
 
         In case of tie, there are defined class sort orders defined in
-        `music21.base.CLASS_SORT_ORDER`.  For instance, a key signature
+        `music21.base.classSortOrder`.  For instance, a key signature
         change appears before a time signature change before a
         note at the same offset.  This produces the familiar order of
         materials at the start of a musical score.

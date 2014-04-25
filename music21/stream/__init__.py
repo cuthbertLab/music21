@@ -381,11 +381,16 @@ class Stream(base.Music21Object):
     def __getitem__(self, key):
         '''Get a Music21Object from the Stream using a variety of keys or indices.
 
-        If an int is given, the Music21Object at the index is returned. If the Stream is sorted (if isSorted is True), the elements are returned in order.
+        If an int is given, the Music21Object at the index is returned. If the Stream is sorted 
+        (if isSorted is True), the elements are returned in order.
 
-        If a class name is given (as a string or name), :meth:`~music21.stream.Stream.getElementsByClass` is used to return a Stream of the elements that match the requested class.
+        If a class name is given (as a string or name), 
+        :meth:`~music21.stream.Stream.getElementsByClass` is used to return a Stream of the 
+        elements that match the requested class.
 
-        If a string is given, :meth:`~music21.stream.Stream.getElementById` first, then (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to collect and return elements as a Stream.
+        If a string is given, :meth:`~music21.stream.Stream.getElementById` first, then 
+        (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to 
+        collect and return elements as a Stream.
 
 
         >>> a = stream.Stream()
@@ -422,7 +427,8 @@ class Stream(base.Music21Object):
                 try:
                     match = self.elements[key]
                 except IndexError:
-                    raise StreamException('attempting to access index %s while elements is of size %s' % (key, len(self.elements)))
+                    raise StreamException('attempting to access index %s while elements is of size %s' % 
+                                          (key, len(self.elements)))
             # setting active site as cautionary measure
             match.activeSite = self
             return match
@@ -433,7 +439,8 @@ class Stream(base.Music21Object):
             try:
                 found = self.__class__()
             except TypeError:
-                raise StreamException("Error in defining class: %r.  Stream subclasses and Music21Objects cannot have required arguments in __init__" % self.__class__)
+                raise StreamException("Error in defining class: %r. " + 
+                                      "Stream subclasses and Music21Objects cannot have required arguments in __init__" % self.__class__)
             for e in self.elements[key]:
                 found.insert(e.getOffsetBySite(self), e)
             # each insert calls this; does not need to be done here
@@ -1280,7 +1287,7 @@ class Stream(base.Music21Object):
                 if e.isSpanner:
                     continue # we never update Spanners
                 # update based on id of old object, and ref to new object
-                if e.hasSpannerSite():
+                if e.sites.hasSpannerSite():
                     #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
                     # this will clear and replace the proper locations on
                     # the SpannerStorage Stream
@@ -1307,7 +1314,7 @@ class Stream(base.Music21Object):
 #                 # if we find an obj tt has a variant site, it is pointing
 #                 # to an old variant, not the newly copied ones; now, we need
 #                 # to re-sync it with the variants in the VariantBundle
-#                 if e.hasVariantSite():
+#                 if e.sites.hasVariantSite():
 #                     # will scan each known variant over all elements
 #                     # this possible by optimized by selecting just a relevent
 #                     # time region
@@ -6052,6 +6059,7 @@ class Stream(base.Music21Object):
         '''
         # trust if this is sorted: do not sort again
         # experimental
+        import random
         if (not self.isSorted and self._mutable) or force:
             #environLocal.printDebug(['sorting _elements, _endElements'])
             self._elements.sort(
@@ -6060,6 +6068,7 @@ class Stream(base.Music21Object):
                     or cmp(x.priority, y.priority)
                     or cmp(x.classSortOrder, y.classSortOrder)
                     or cmp(not x.isGrace, not y.isGrace) # sort graces first
+                    #or cmp(random.randint(1,30), random.randint(1,30))
                 )
             self._endElements.sort(
                 cmp=lambda x, y: cmp(x.priority, y.priority) or
@@ -7810,7 +7819,7 @@ class Stream(base.Music21Object):
             # all new/old pairs
             for e in post.semiFlat:
                 # update based on last id, new object
-                if e.hasSpannerSite:
+                if e.sites.hasSpannerSite():
                     spannerBundle.replaceSpannedElement(e._idLastDeepCopyOf, e)
 
         return post
@@ -11621,7 +11630,7 @@ class Score(Stream):
         # all new/old pairs
         for e in post.semiFlat:
             # update based on last id, new object
-            if e.hasSpannerSite():
+            if e.sites.hasSpannerSite():
                 spannerBundle.replaceSpannedElement(e._idLastDeepCopyOf, e)
         return post
 
