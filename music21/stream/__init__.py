@@ -764,11 +764,11 @@ class Stream(base.Music21Object):
         >>> s2.derivesFrom == s1
         True
         '''
-        return self._derivation.origin
+        return self.derivation.origin
 
     @derivesFrom.setter
     def derivesFrom(self, target):
-        self._derivation.origin = target
+        self.derivation.origin = target
 
     @property
     def derivationMethod(self):
@@ -791,34 +791,19 @@ class Stream(base.Music21Object):
         >>> s1m1.derivationMethod
         'getElementsByClass'
         '''
-        return self._derivation.method
+        return self.derivation.method
 
     @derivationMethod.setter
     def derivationMethod(self, method):
-        self._derivation.method = method
-
-    @property
-    def rootDerivation(self):
-        r'''
-        Return a reference to the oldest source of this Stream; that is, chain
-        calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a
-        Stream that cannot be further derived.
-
-        >>> s1 = stream.Stream()
-        >>> s1.repeatAppend(note.Note(), 10)
-        >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('Note')
-        >>> s2.derivesFrom == s1
-        True
-        '''
-        return self.derivation.rootDerivation
+        self.derivation.method = method
 
     def hasElement(self, obj):
         '''
-        Return True if an element, provided as an argument, is contained in this Stream.
+        Return True if an element, provided as an argument, is contained in
+        this Stream.
 
-        This method is based on object equivalence, not parameter equivalence of different objects.
-
+        This method is based on object equivalence, not parameter equivalence
+        of different objects.
 
         >>> s = stream.Stream()
         >>> n1 = note.Note('g')

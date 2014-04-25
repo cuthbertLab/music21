@@ -5506,29 +5506,29 @@ class Test(unittest.TestCase):
         self.assertEqual(p1.flat.notesAndRests.derivesFrom.derivesFrom is p1, True)
         
         # can use rootDerivation to get there faster
-        self.assertEqual(p1.flat.notesAndRests.rootDerivation is p1, True)
+        self.assertEqual(p1.flat.notesAndRests.derivation.rootDerivation is p1, True)
         
         # this does not work because are taking an item via in index
         # value, and this Measure is not derived from a Part
         self.assertEqual(p1.getElementsByClass(
-            'Measure')[3].flat.notesAndRests.rootDerivation is p1, False)
+            'Measure')[3].flat.notesAndRests.derivation.rootDerivation is p1, False)
         
         # the root here is the Measure 
         self.assertEqual(p1.getElementsByClass(
-            'Measure')[3].flat.notesAndRests.rootDerivation is p1.getElementsByClass(
+            'Measure')[3].flat.notesAndRests.derivation.rootDerivation is p1.getElementsByClass(
             'Measure')[3], True)
 
         m4 = p1.measure(4)
-        self.assertTrue(m4.flat.notesAndRests.rootDerivation is p1)
+        self.assertTrue(m4.flat.notesAndRests.derivation.rootDerivation is p1)
         
         # part is the root derivation of a measures() call
         mRange = p1.measures(4, 6)
-        self.assertEqual(mRange.rootDerivation, p1)
-        self.assertEqual(mRange.flat.notesAndRests.rootDerivation, p1)
+        self.assertEqual(mRange.derivation.rootDerivation, p1)
+        self.assertEqual(mRange.flat.notesAndRests.derivation.rootDerivation, p1)
 
 
         self.assertEqual(s.flat.getElementsByClass(
-            'Rest').rootDerivation is s, True) 
+            'Rest').derivation.rootDerivation is s, True) 
         
         # we cannot use the activeSite to get the Part from the Measure, as
         # the activeSite was set when doing the getElementsByClass operation

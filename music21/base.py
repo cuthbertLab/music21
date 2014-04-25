@@ -3682,9 +3682,9 @@ class Music21Object(object):
             #environLocal.printDebug(['_getDerivationHierarchy(): activeSite found:', candidate])
             if candidate is None: # nothing more to derive
                 # if this is a Stream, we might find a root derivation
-                if hasattr(focus, 'rootDerivation'):
+                if hasattr(focus, 'derivation'):
                     #environLocal.printDebug(['_getDerivationHierarchy(): found rootDerivation:', focus.rootDerivation])
-                    alt = focus.rootDerivation
+                    alt = focus.derivation.rootDerivation
                     if alt is None:
                         return post
                     else:
