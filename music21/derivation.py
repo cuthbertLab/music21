@@ -191,24 +191,18 @@ class Derivation(SlottedObject):
     def method(self):
         '''
         Returns the string of the method that was used to generate this
-        Stream.  Note that it's identical to the property derivationMethod on a
-        Stream, so no need for any but the most advanced usages.
+        Stream.
 
         ::
 
             >>> s = stream.Stream()
-            >>> s.derivationMethod is None
-            True
-
-        ::
-
-            >>> s.derivationMethod is s.derivation.method
+            >>> s.derivation.method is None
             True
 
         ::
 
             >>> sNotes = s.notes
-            >>> sNotes.derivationMethod
+            >>> sNotes.derivation.method
             'notes'
 
         '''
@@ -227,24 +221,24 @@ class Derivation(SlottedObject):
             >>> s.append(clef.TrebleClef())
             >>> s.append(note.Note())
             >>> sNotes = s.notes
-            >>> sNotes._derivation
+            >>> sNotes.derivation
             <music21.derivation.Derivation object at 0x...>
 
         ::
 
-            >>> derived = sNotes._derivation
-            >>> derived.getMethod()
+            >>> sNotes.derivation.method
+            >>> derived.method
             'notes'
 
         ::
 
-            >>> derived.setMethod('blah')
-            >>> derived.getMethod()
+            >>> derived.method = 'blah'
+            >>> derived.method
             'blah'
 
         ::
 
-            >>> sNotes.derivationMethod
+            >>> sNotes.derivation.method
             'blah'
 
         '''
