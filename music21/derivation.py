@@ -36,19 +36,19 @@ class Derivation(SlottedObject):
         >>> s1 = stream.Stream()
         >>> s2 = stream.Stream()
         >>> d1 = derivation.Derivation(s1)
-        >>> d1.setAncestor(s2)
-        >>> d1.getAncestor() is s2
+        >>> d1.setOrigin(s2)
+        >>> d1.getOrigin() is s2
         True
 
     ::
 
-        >>> d1.getContainer() is s1
+        >>> d1.getClient() is s1
         True
 
     ::
 
         >>> d2 = copy.deepcopy(d1)
-        >>> d2.getAncestor() is s2
+        >>> d2.getOrigin() is s2
         True
 
     ::
@@ -62,53 +62,51 @@ class Derivation(SlottedObject):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '_ancestor',
-        '_ancestorId',
-        '_container',
-        '_containerId',
+        '_origin',
+        '_originId',
+        '_client',
+        '_clientId',
         '_method',
         )
 
     ### INITIALIZER ###
 
-    def __init__(self, container=None):
+    # TODO: Rename `client` to `client`
+    # TODO: Rename `origin` to `origin`
+    def __init__(self, client=None):
         # store a reference to the Stream that has this Derivation object as a property
-        self._container = None
-        self._containerId = None  # store id to optimize w/o unwrapping
+        self._client = None
+        self._clientId = None  # store id to optimize w/o unwrapping
         self._method = None
-        # ancestor should be stored as a weak ref
-        self._ancestor = None
-        self._ancestorId = None  # store id to optimize w/o unwrapping
-        # set container; can handle None
-        self.setContainer(container)
+        # origin should be stored as a weak ref
+        self._origin = None
+        self._originId = None  # store id to optimize w/o unwrapping
+        # set client; can handle None
+        self.setClient(client)
 
     ### SPECIAL METHODS ###
 
     def __deepcopy__(self, memo=None):
         '''
         Manage deepcopying by creating a new reference to the same object. If
-        the ancestor no longer exists, than ancestor is set to None
+        the origin no longer exists, than origin is set to None
         '''
         new = self.__class__()
-        new.setContainer(self.getContainer())
-        new.setAncestor(self.getAncestor())
+        new.setClient(self.getClient())
+        new.setOrigin(self.getOrigin())
         return new
 
     ### PUBLIC METHODS ###
 
-    def getAncestor(self):
-        return self._ancestor
-        #return common.unwrapWeakref(self._ancestor)
-
-    def getContainer(self):
-        return common.unwrapWeakref(self._container)
+    def getClient(self):
+        return common.unwrapWeakref(self._client)
 
     def getMethod(self):
         '''
         Returns the string of the method that was used to generate this
-        Stream.  Note that it's identical to the property derivationMethod on a 
+        Stream.  Note that it's identical to the property derivationMethod on a
         Stream, so no need for any but the most advanced usages.
-        
+
         >>> s = stream.Stream()
         >>> s.derivationMethod is s._derivation.getMethod()
         True
@@ -122,31 +120,25 @@ class Derivation(SlottedObject):
         '''
         return self._method
 
-    def setAncestor(self, ancestor):
-        # for now, ancestor is not a weak ref
-        if ancestor is None:
-            self._ancestorId = None
-            self._ancestor = None
-        else:
-            self._ancestorId = id(ancestor)
-            self._ancestor = ancestor
-            #self._ancestor = common.wrapWeakref(ancestor)
+    def getOrigin(self):
+        return self._origin
+        #return common.unwrapWeakref(self._origin)
 
-    def setContainer(self, container):
-        # container is the Stream that this derivation lives on
-        if container is None:
-            self._containerId = None
-            self._container = None
+    def setClient(self, client):
+        # client is the Stream that this derivation lives on
+        if client is None:
+            self._clientId = None
+            self._client = None
         else:
-            self._containerId = id(container)
-            self._container = common.wrapWeakref(container)
+            self._clientId = id(client)
+            self._client = common.wrapWeakref(client)
 
     def setMethod(self, method):
         '''
         Sets a string identifying how the object was derived.
-        
+
         Some examples are 'getElementsByClass' etc.
-        
+
         >>> s = stream.Stream()
         >>> s.append(clef.TrebleClef())
         >>> s.append(note.Note())
@@ -165,39 +157,51 @@ class Derivation(SlottedObject):
         '''
         self._method = method
 
+    def setOrigin(self, origin):
+        # for now, origin is not a weak ref
+        if origin is None:
+            self._originId = None
+            self._origin = None
+        else:
+            self._originId = id(origin)
+            self._origin = origin
+            #self._origin = common.wrapWeakref(origin)
+
     def unwrapWeakref(self):
         '''
         Unwrap any and all weakrefs stored.
+
+        Necessary for pickling operations.
 
         ::
 
             >>> s1 = stream.Stream()
             >>> s2 = stream.Stream()
-            >>> d1 = derivation.Derivation(s1) # sets container
-            >>> d1.setAncestor(s2)
-            >>> common.isWeakref(d1._container)
+            >>> d1 = derivation.Derivation(s1) # sets client
+            >>> d1.setOrigin(s2)
+            >>> common.isWeakref(d1._client)
             True
 
         ::
 
             >>> d1.unwrapWeakref()
-            >>> common.isWeakref(d1._container)
+            >>> common.isWeakref(d1._client)
             False
 
         '''
-        #environLocal.printDebug(['derivation pre unwrap: self._container', self._container])
-        post = common.unwrapWeakref(self._container)
-        self._container = post
-        #environLocal.printDebug(['derivation post unwrap: self._container', self._container])
+        #environLocal.printDebug(['derivation pre unwrap: self._client', self._client])
+        post = common.unwrapWeakref(self._client)
+        self._client = post
+        #environLocal.printDebug(['derivation post unwrap: self._client', self._client])
 
     def wrapWeakref(self):
         '''Wrap all stored objects with weakrefs.
         '''
-        if not common.isWeakref(self._container):
+        if not common.isWeakref(self._client):
             # update id in case it has changed
-            self._containerId = id(self._container)
-            post = common.wrapWeakref(self._container)
-            self._container = post
+            self._clientId = id(self._client)
+            post = common.wrapWeakref(self._client)
+            self._client = post
 
 
 #------------------------------------------------------------------------------

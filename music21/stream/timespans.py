@@ -1588,8 +1588,8 @@ class TimespanCollection(object):
         ):
         self._parents = weakref.WeakSet()
         self._rootNode = None
-        #if timespans and timespans is not None:
-        #    self.insert(timespans)
+        if timespans and timespans is not None:
+            self.insert(timespans)
 
     ### SPECIAL METHODS ###
 

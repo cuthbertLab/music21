@@ -727,12 +727,12 @@ class Stream(base.Music21Object):
 
         See :class:`~music21.derivation.Derivation` for more information.
         '''
-        self._derivation.setAncestor(target)
+        self._derivation.setOrigin(target)
 
     def _getDerivation(self):
         '''Return a reference to the Stream that created this Stream, if such a Stream exists.
         '''
-        return self._derivation.getAncestor()
+        return self._derivation.getOrigin()
 
     derivesFrom = property(_getDerivation, _setDerivation,
         doc = '''
@@ -754,7 +754,7 @@ class Stream(base.Music21Object):
         focus = self
         while True:
             # keep deriving until we get None; then return what we have
-            rd = focus._derivation.getAncestor()
+            rd = focus._derivation.getOrigin()
             if rd is None: # nothing more to derive
                 break
             post.append(rd)
@@ -1307,7 +1307,7 @@ class Stream(base.Music21Object):
             elif name == '_derivation':
                 # keep the old ancestor but need to update the container
                 newValue = copy.deepcopy(self._derivation)
-                newValue.setContainer(new)
+                newValue.setClient(new)
                 setattr(new, name, newValue)
             elif name == '_cache' or name == 'analysisData':
                 continue # skip for now
@@ -6372,8 +6372,8 @@ class Stream(base.Music21Object):
         sNew._derivation = derivation.Derivation()
         # unwrapping a weak ref here
         # get common container and ancestor
-        sNew._derivation.setContainer(sf._derivation.getContainer())
-        sNew.derivesFrom = sf._derivation.getAncestor()
+        sNew._derivation.setClient(sf._derivation.getClient())
+        sNew.derivesFrom = sf._derivation.getOrigin()
         sNew.derivationMethod = 'flat'
         # create a new, independent cache instance in the flat representation
         sNew._cache = {} #common.DefaultHash()

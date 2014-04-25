@@ -5545,12 +5545,12 @@ class Test(unittest.TestCase):
         s1Flat = s1.flat
         self.assertEqual(s1Flat.derivesFrom is s1, True)
         # check what the derivation object thinks its container is
-        self.assertEqual(s1Flat._derivation.getContainer() is s1Flat, True)
+        self.assertEqual(s1Flat._derivation.getClient() is s1Flat, True)
 
         s2  = copy.deepcopy(s1Flat)
         self.assertEqual(s2.derivesFrom is s1, True)
         # check low level attrbiutes
-        self.assertEqual(s2._derivation.getContainer() is s2, True)
+        self.assertEqual(s2._derivation.getClient() is s2, True)
 
 
 
