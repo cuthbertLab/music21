@@ -722,49 +722,22 @@ class Stream(base.Music21Object):
         #s._elementsChanged()
         return s
 
-    def _setDerivation(self, target):
-        '''Manually set the Stream that this Stream was derived from. This operation is generally completed automatically.
-
-        See :class:`~music21.derivation.Derivation` for more information.
+    @property
+    def derivation(self):
         '''
-        self._derivation.origin = target
-
-    def _getDerivation(self):
-        '''Return a reference to the Stream that created this Stream, if such a Stream exists.
+        Return the Derivation object for this stream.
         '''
-        return self._derivation.origin
+        if self._derivation is None:
+            self._derivation = derivation.Derivation(client=self)
+        return self._derivation
 
-    derivesFrom = property(_getDerivation, _setDerivation,
-        doc = '''
-        Return or Set a reference to the Stream that created this Stream, if such a Stream exists.
-
-        See :class:`~music21.derivation.Derivation` for more information.
-
-
-        >>> s1 = stream.Stream()
-        >>> s1.repeatAppend(note.Note(), 10)
-        >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('Note')
-        >>> s2.derivesFrom == s1
-        True
-        ''')
-
-    def _getDerivationChain(self):
-        post = []
-        focus = self
-        while True:
-            # keep deriving until we get None; then return what we have
-            rd = focus._derivation.origin
-            if rd is None: # nothing more to derive
-                break
-            post.append(rd)
-            focus = rd
-        return post
-
-    derivationChain = property(_getDerivationChain,
-        doc = '''
-        Return a list Streams that this Stream was derved from. This provides a way to obtain all Streams that this element passed through, such as those created by :meth:`~music21.stream.Stream.getElementsByClass` or :attr:`~music21.stream.Stream.flat`.
-
+    @property
+    def derivationChain(self):
+        '''
+        Return a list Streams that this Stream was derved from. This provides a
+        way to obtain all Streams that this element passed through, such as
+        those created by :meth:`~music21.stream.Stream.getElementsByClass` or
+        :attr:`~music21.stream.Stream.flat`.
 
         >>> s1 = stream.Stream()
         >>> s1.repeatAppend(note.Note(), 10)
@@ -773,19 +746,25 @@ class Stream(base.Music21Object):
         >>> s3 = s2.getElementsByClass('Note')
         >>> s3.derivationChain == [s2, s1]
         True
-        ''')
+        '''
+        post = []
+        focus = self
+        while True:
+            # keep deriving until we get None; then return what we have
+            rd = focus._derivation.origin
+            if rd is None:  # nothing more to derive
+                break
+            post.append(rd)
+            focus = rd
+        return post
 
+    @property
+    def derivesFrom(self):
+        r'''
+        Return or Set a reference to the Stream that created this Stream, if
+        such a Stream exists.
 
-    def _getRootDerivation(self):
-        chain = self._getDerivationChain()
-        if len(chain) > 0:
-            return self._getDerivationChain()[-1]
-        else:
-            return None
-
-    rootDerivation = property(_getRootDerivation,
-        doc = '''Return a reference to the oldest source of this Stream; that is, chain calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a Stream that cannot be further derived.
-
+        See :class:`~music21.derivation.Derivation` for more information.
 
         >>> s1 = stream.Stream()
         >>> s1.repeatAppend(note.Note(), 10)
@@ -793,24 +772,22 @@ class Stream(base.Music21Object):
         >>> s2 = s1.getElementsByClass('Note')
         >>> s2.derivesFrom == s1
         True
-        ''')
+        '''
+        return self._derivation.origin
 
-    def _getDerivationMethod(self):
-        return self._derivation.method
+    @derivesFrom.setter
+    def derivesFrom(self, target):
+        self._derivation.origin = target
 
-    def _setDerivationMethod(self, method):
-        self._derivation.method = method
+    @property
+    def derivationMethod(self):
+        r'''
+        Returns or sets a string representing how this stream was derived from
+        another Stream.
 
-    derivationMethod = property(_getDerivationMethod, _setDerivationMethod,
-        doc='''
-        Returns or sets a string representing how
-        this stream was derived from another Stream.
-
-        There are currently no limitations on this string.
-        This might change.
+        There are currently no limitations on this string.  This might change.
 
         For instance:
-
 
         >>> s1 = converter.parse("C2 D2", "2/4")
         >>> s1m = s1.makeMeasures()
@@ -822,7 +799,32 @@ class Stream(base.Music21Object):
         >>> s1m1.derivationMethod = 'getElementsByClass'
         >>> s1m1.derivationMethod
         'getElementsByClass'
-        ''')
+        '''
+        return self._derivation.method
+
+    @derivationMethod.setter
+    def derivationMethod(self, method):
+        self._derivation.method = method
+
+    @property
+    def rootDerivation(self):
+        r'''
+        Return a reference to the oldest source of this Stream; that is, chain
+        calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a
+        Stream that cannot be further derived.
+
+        >>> s1 = stream.Stream()
+        >>> s1.repeatAppend(note.Note(), 10)
+        >>> s1.repeatAppend(note.Rest(), 10)
+        >>> s2 = s1.getElementsByClass('Note')
+        >>> s2.derivesFrom == s1
+        True
+        '''
+        chain = self.derivationChain
+        if len(chain):
+            return chain[-1]
+        else:
+            return None
 
     def hasElement(self, obj):
         '''

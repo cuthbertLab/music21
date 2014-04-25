@@ -632,12 +632,12 @@ class ClassDocumenter(ObjectDocumenter):
             - music21.stream.Stream.beatDuration
             - music21.stream.Stream.beatStr
             - music21.stream.Stream.beatStrength
+            - music21.stream.Stream.derivation
             - music21.stream.Stream.derivationChain
             - music21.stream.Stream.flat
             - music21.stream.Stream.highestOffset
             - music21.stream.Stream.highestTime
             - music21.stream.Stream.isGapless
-            - music21.stream.Stream.lowestOffset
 
         '''
 
@@ -768,6 +768,7 @@ class ClassDocumenter(ObjectDocumenter):
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
+            <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivation>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.derivationChain>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.flat>
             <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
@@ -1310,6 +1311,7 @@ class ModuleDocumenter(ObjectDocumenter):
             music21.serial.ToneRow
             music21.serial.TwelveToneMatrix
             music21.serial.TwelveToneRow
+
         '''
         result = []
         classDocumenters = {}
