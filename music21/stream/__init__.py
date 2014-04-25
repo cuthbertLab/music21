@@ -298,7 +298,7 @@ class Stream(base.Music21Object):
 
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
-        self._derivation = derivation.Derivation(self)
+        self._derivation = None
 
         self._unlinkedDuration = None
 
@@ -730,72 +730,6 @@ class Stream(base.Music21Object):
         if self._derivation is None:
             self._derivation = derivation.Derivation(client=self)
         return self._derivation
-
-    @property
-    def derivationChain(self):
-        '''
-        Return a list Streams that this Stream was derived from. This provides
-        a way to obtain all Streams that this element passed through, such as
-        those created by :meth:`~music21.stream.Stream.getElementsByClass` or
-        :attr:`~music21.stream.Stream.flat`.
-
-        >>> s1 = stream.Stream()
-        >>> s1.repeatAppend(note.Note(), 10)
-        >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('GeneralNote')
-        >>> s3 = s2.getElementsByClass('Note')
-        >>> s3.derivationChain == [s2, s1]
-        True
-        '''
-        return self.derivation.derivationChain
-
-#    @property
-#    def derivesFrom(self):
-#        r'''
-#        Return or Set a reference to the Stream that created this Stream, if
-#        such a Stream exists.
-#
-#        See :class:`~music21.derivation.Derivation` for more information.
-#
-#        >>> s1 = stream.Stream()
-#        >>> s1.repeatAppend(note.Note(), 10)
-#        >>> s1.repeatAppend(note.Rest(), 10)
-#        >>> s2 = s1.getElementsByClass('Note')
-#        >>> s2.derivesFrom == s1
-#        True
-#        '''
-#        return self.derivation.origin
-#
-#    @derivesFrom.setter
-#    def derivesFrom(self, target):
-#        self.derivation.origin = target
-#
-#    @property
-#    def derivationMethod(self):
-#        r'''
-#        Returns or sets a string representing how this stream was derived from
-#        another Stream.
-#
-#        There are currently no limitations on this string.  This might change.
-#
-#        For instance:
-#
-#        >>> s1 = converter.parse("C2 D2", "2/4")
-#        >>> s1m = s1.makeMeasures()
-#        >>> s1m1 = s1m.measure(1)
-#        >>> s1m1.derivesFrom is s1m
-#        True
-#        >>> s1m1.derivationMethod
-#        'measure'
-#        >>> s1m1.derivationMethod = 'getElementsByClass'
-#        >>> s1m1.derivationMethod
-#        'getElementsByClass'
-#        '''
-#        return self.derivation.method
-#
-#    @derivationMethod.setter
-#    def derivationMethod(self, method):
-#        self.derivation.method = method
 
     def hasElement(self, obj):
         '''
@@ -1278,10 +1212,11 @@ class Stream(base.Music21Object):
                 # keep a reference, not a deepcopy
                 setattr(new, name, self.flattenedRepresentationOf)
             elif name == '_derivation':
-                # keep the old ancestor but need to update the container
-                newValue = copy.deepcopy(self._derivation)
-                newValue.client = new
-                setattr(new, name, newValue)
+                # keep the old ancestor but need to update the client
+                if self._derivation is not None:
+                    newValue = copy.deepcopy(self._derivation)
+                    newValue.client = new
+                    setattr(new, name, newValue)
             elif name == '_cache' or name == 'analysisData':
                 continue # skip for now
             elif name == '_elements':
@@ -6346,7 +6281,7 @@ class Stream(base.Music21Object):
         # unwrapping a weak ref here
         # get common container and ancestor
         sNew._derivation.client = sf._derivation.client
-        sNew.derivesFrom = sf._derivation.origin
+        sNew.derivation.origin = sf._derivation.origin
         sNew.derivation.method = 'flat'
         # create a new, independent cache instance in the flat representation
         sNew._cache = {} #common.DefaultHash()

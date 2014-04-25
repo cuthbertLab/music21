@@ -5497,7 +5497,7 @@ class Test(unittest.TestCase):
         self.assertEqual(p1FlatNotes.derivation.origin is p1Flat, True)
         self.assertEqual(p1FlatNotes.derivation.origin is p1, False)
         
-        self.assertEqual(p1FlatNotes.derivationChain, [p1Flat, p1])
+        self.assertEqual(p1FlatNotes.derivation.derivationChain, [p1Flat, p1])
 
 
         # we cannot do this, as each call to flat produces a new Stream
@@ -5562,7 +5562,7 @@ class Test(unittest.TestCase):
         pMeasures = p1.measures(3, 10)
         pMeasuresFlat = pMeasures.flat
         pMeasuresFlatNotes = pMeasuresFlat.notesAndRests
-        self.assertEqual(pMeasuresFlatNotes.derivationChain, [pMeasuresFlat, pMeasures, p1])
+        self.assertEqual(pMeasuresFlatNotes.derivation.derivationChain, [pMeasuresFlat, pMeasures, p1])
 
 
 

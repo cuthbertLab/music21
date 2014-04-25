@@ -31,8 +31,8 @@ def derivationMethod(function):
     @functools.wraps(function)
     def wrapper(self, *args, **kwargs):
         result = function(self, *args, **kwargs)
-        result.derivesFrom = self
-        result.derivationMethod = function.__name__
+        result.derivation.origin = self
+        result.derivation.method = function.__name__
         return result
     return wrapper
 
@@ -100,7 +100,7 @@ class Derivation(SlottedObject):
         Manage deepcopying by creating a new reference to the same object. If
         the origin no longer exists, than origin is set to None
         '''
-        new = self.__class__()
+        new = type(self)()
         new.client = self.client
         new.origin = self.origin
         return new
