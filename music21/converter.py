@@ -514,7 +514,7 @@ class ConverterMusicXML(object):
         self._mxScore = c.score
         #print self._mxScore
         # check that we have parts
-        if len(self._mxScore) == 0:
+        if self._mxScore is None or len(self._mxScore) == 0:
             raise ConverterException('score from file path (%s) no parts defined' % fp)
 
         # movement titles can be stored in more than one place in musicxml
