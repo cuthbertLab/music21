@@ -727,12 +727,12 @@ class Stream(base.Music21Object):
 
         See :class:`~music21.derivation.Derivation` for more information.
         '''
-        self._derivation.setOrigin(target)
+        self._derivation.origin = target
 
     def _getDerivation(self):
         '''Return a reference to the Stream that created this Stream, if such a Stream exists.
         '''
-        return self._derivation.getOrigin()
+        return self._derivation.origin
 
     derivesFrom = property(_getDerivation, _setDerivation,
         doc = '''
@@ -754,7 +754,7 @@ class Stream(base.Music21Object):
         focus = self
         while True:
             # keep deriving until we get None; then return what we have
-            rd = focus._derivation.getOrigin()
+            rd = focus._derivation.origin
             if rd is None: # nothing more to derive
                 break
             post.append(rd)
@@ -795,12 +795,11 @@ class Stream(base.Music21Object):
         True
         ''')
 
-
     def _getDerivationMethod(self):
-        return self._derivation.getMethod()
+        return self._derivation.method
 
     def _setDerivationMethod(self, method):
-        self._derivation.setMethod(method)
+        self._derivation.method = method
 
     derivationMethod = property(_getDerivationMethod, _setDerivationMethod,
         doc='''
@@ -1307,7 +1306,7 @@ class Stream(base.Music21Object):
             elif name == '_derivation':
                 # keep the old ancestor but need to update the container
                 newValue = copy.deepcopy(self._derivation)
-                newValue.setClient(new)
+                newValue.client = new
                 setattr(new, name, newValue)
             elif name == '_cache' or name == 'analysisData':
                 continue # skip for now
@@ -6372,8 +6371,8 @@ class Stream(base.Music21Object):
         sNew._derivation = derivation.Derivation()
         # unwrapping a weak ref here
         # get common container and ancestor
-        sNew._derivation.setClient(sf._derivation.getClient())
-        sNew.derivesFrom = sf._derivation.getOrigin()
+        sNew._derivation.client = sf._derivation.client
+        sNew.derivesFrom = sf._derivation.origin
         sNew.derivationMethod = 'flat'
         # create a new, independent cache instance in the flat representation
         sNew._cache = {} #common.DefaultHash()
