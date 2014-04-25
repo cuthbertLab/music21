@@ -446,8 +446,8 @@ def makeMeasures(
     # create a stream of measures to contain the offsets range defined
     # create as many measures as needed to fit in oMax
     post = s.__class__()
-    post.derivesFrom = s
-    post.derivationMethod = 'makeMeasures'
+    post.derivation.origin = s
+    post.derivation.method = 'makeMeasures'
 
     o = 0.0  # initial position of first measure is assumed to be zero
     measureCount = 0

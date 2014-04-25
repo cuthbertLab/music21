@@ -749,53 +749,53 @@ class Stream(base.Music21Object):
         '''
         return self.derivation.derivationChain
 
-    @property
-    def derivesFrom(self):
-        r'''
-        Return or Set a reference to the Stream that created this Stream, if
-        such a Stream exists.
-
-        See :class:`~music21.derivation.Derivation` for more information.
-
-        >>> s1 = stream.Stream()
-        >>> s1.repeatAppend(note.Note(), 10)
-        >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('Note')
-        >>> s2.derivesFrom == s1
-        True
-        '''
-        return self.derivation.origin
-
-    @derivesFrom.setter
-    def derivesFrom(self, target):
-        self.derivation.origin = target
-
-    @property
-    def derivationMethod(self):
-        r'''
-        Returns or sets a string representing how this stream was derived from
-        another Stream.
-
-        There are currently no limitations on this string.  This might change.
-
-        For instance:
-
-        >>> s1 = converter.parse("C2 D2", "2/4")
-        >>> s1m = s1.makeMeasures()
-        >>> s1m1 = s1m.measure(1)
-        >>> s1m1.derivesFrom is s1m
-        True
-        >>> s1m1.derivationMethod
-        'measure'
-        >>> s1m1.derivationMethod = 'getElementsByClass'
-        >>> s1m1.derivationMethod
-        'getElementsByClass'
-        '''
-        return self.derivation.method
-
-    @derivationMethod.setter
-    def derivationMethod(self, method):
-        self.derivation.method = method
+#    @property
+#    def derivesFrom(self):
+#        r'''
+#        Return or Set a reference to the Stream that created this Stream, if
+#        such a Stream exists.
+#
+#        See :class:`~music21.derivation.Derivation` for more information.
+#
+#        >>> s1 = stream.Stream()
+#        >>> s1.repeatAppend(note.Note(), 10)
+#        >>> s1.repeatAppend(note.Rest(), 10)
+#        >>> s2 = s1.getElementsByClass('Note')
+#        >>> s2.derivesFrom == s1
+#        True
+#        '''
+#        return self.derivation.origin
+#
+#    @derivesFrom.setter
+#    def derivesFrom(self, target):
+#        self.derivation.origin = target
+#
+#    @property
+#    def derivationMethod(self):
+#        r'''
+#        Returns or sets a string representing how this stream was derived from
+#        another Stream.
+#
+#        There are currently no limitations on this string.  This might change.
+#
+#        For instance:
+#
+#        >>> s1 = converter.parse("C2 D2", "2/4")
+#        >>> s1m = s1.makeMeasures()
+#        >>> s1m1 = s1m.measure(1)
+#        >>> s1m1.derivesFrom is s1m
+#        True
+#        >>> s1m1.derivationMethod
+#        'measure'
+#        >>> s1m1.derivationMethod = 'getElementsByClass'
+#        >>> s1m1.derivationMethod
+#        'getElementsByClass'
+#        '''
+#        return self.derivation.method
+#
+#    @derivationMethod.setter
+#    def derivationMethod(self, method):
+#        self.derivation.method = method
 
     def hasElement(self, obj):
         '''
@@ -2482,8 +2482,8 @@ class Stream(base.Music21Object):
             found = Stream()
 
         if returnList is False:
-            found.derivesFrom = self
-            found.derivationMethod = 'getElementsByClass'
+            found.derivation.origin = self
+            found.derivation.method = 'getElementsByClass'
             # passing on auto sort status may or may not be what is needed here
             found.autoSort = self.autoSort
 
@@ -2574,8 +2574,8 @@ class Stream(base.Music21Object):
                 found = Stream()
         else:
             found = Stream()
-        found.derivesFrom = self
-        found.derivationMethod = 'getElementsNotOfClass'
+        found.derivation.origin = self
+        found.derivation.method = 'getElementsNotOfClass'
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, list):
@@ -2630,8 +2630,8 @@ class Stream(base.Music21Object):
             groupFilterList = [groupFilterList]
 
         returnStream = self.__class__()
-        returnStream.derivesFrom = self
-        returnStream.derivationMethod = 'getElementsByGroup'
+        returnStream.derivation.origin = self
+        returnStream.derivation.method = 'getElementsByGroup'
 
         # need both _elements and _endElements
         # must handle independently b/c inserting
@@ -2945,8 +2945,8 @@ class Stream(base.Music21Object):
                 zeroLengthSearch = True
 
         found = self.__class__()
-        found.derivesFrom = self
-        found.derivationMethod = 'getElementsByOffset'
+        found.derivation.origin = self
+        found.derivation.method = 'getElementsByOffset'
 
         # need both _elements and _endElements
         for e in self.elements:
@@ -3375,8 +3375,8 @@ class Stream(base.Music21Object):
 
         '''
         returnObj = self.__class__()
-        returnObj.derivesFrom = self
-        returnObj.derivationMethod = 'measures'
+        returnObj.derivation.origin = self
+        returnObj.derivation.method = 'measures'
         returnObj.mergeAttributes(self) # get id and groups
         srcObj = self
 
@@ -3598,8 +3598,8 @@ class Stream(base.Music21Object):
                 return None
             else:
                 m = s.getElementsByClass('Measure')[0]
-                m.derivesFrom = self # set to self, not s
-                m.derivationMethod = 'measure'
+                m.derivation.origin = self # set to self, not s
+                m.derivation.method = 'measure'
                 return m
         else:
             #environLocal.printDebug(['got not measures from getElementsByClass'])
@@ -4094,8 +4094,8 @@ class Stream(base.Music21Object):
         if len(post) == 0 and searchContext:
             # returns a single value
             post = self.__class__()
-            post.derivesFrom = self
-            post.derivationMethod = 'getTimeSignatures'
+            post.derivation.origin = self
+            post.derivation.method = 'getTimeSignatures'
 
             # sort by time to search the most recent objects
             obj = self.getContextByClass('TimeSignature', sortByCreationTime=sortByCreationTime)
@@ -4647,8 +4647,8 @@ class Stream(base.Music21Object):
             display = self.__class__()
         else:
             display = forceOutputClass()
-        display.derivesFrom = self
-        display.derivationMethod = 'extractContext'
+        display.derivation.origin = self
+        display.derivation.method = 'extractContext'
 
         found = None
         foundOffset = 0
@@ -4815,8 +4815,8 @@ class Stream(base.Music21Object):
             #returnObj = Stream()
             #returnObj = self.__class__() # for output
             returnObj = copy.deepcopy(self)
-            returnObj.derivesFrom = self
-            returnObj.derivationMethod = 'makeChords'
+            returnObj.derivation.origin = self
+            returnObj.derivation.method = 'makeChords'
         else:
             returnObj = self
 
@@ -6263,11 +6263,11 @@ class Stream(base.Music21Object):
         # problems that self.__class__() does
         sNew = copy.copy(self)
         sNew._derivation = derivation.Derivation(sNew)
-        sNew.derivesFrom = self
+        sNew._derivation.origin = self
         if retainContainers:
-            sNew.derivationMethod = 'semiFlat'
+            sNew.derivation.method = 'semiFlat'
         else:
-            sNew.derivationMethod = 'flat'
+            sNew.derivation.method = 'flat'
 
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
@@ -6347,7 +6347,7 @@ class Stream(base.Music21Object):
         # get common container and ancestor
         sNew._derivation.client = sf._derivation.client
         sNew.derivesFrom = sf._derivation.origin
-        sNew.derivationMethod = 'flat'
+        sNew.derivation.method = 'flat'
         # create a new, independent cache instance in the flat representation
         sNew._cache = {} #common.DefaultHash()
         sNew._elements = []
@@ -8342,7 +8342,7 @@ class Stream(base.Music21Object):
         if 'notes' not in self._cache or self._cache['notes'] is None:
             self._cache['notes'] = self.getElementsByClass('NotRest',
                                         returnStreamSubClass=False)
-            self._cache['notes'].derivationMethod = 'notes'
+            self._cache['notes'].derivation.method = 'notes'
         return self._cache['notes']
 
 

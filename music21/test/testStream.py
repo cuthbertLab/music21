@@ -5474,36 +5474,36 @@ class Test(unittest.TestCase):
         
         s3 = s1.getElementsByClass('GeneralNote')
         self.assertEqual(len(s3), 20)
-        #environLocal.printDebug(['s3.derivesFrom', s3.derivesFrom])
-        self.assertEqual(s3.derivesFrom is s1, True)
-        self.assertEqual(s3.derivesFrom is not s2, True)
+        #environLocal.printDebug(['s3.derivation.origin', s3.derivation.origin])
+        self.assertEqual(s3.derivation.origin is s1, True)
+        self.assertEqual(s3.derivation.origin is not s2, True)
         
         s4 = s3.getElementsByClass('Chord')
         self.assertEqual(len(s4), 10)
-        self.assertEqual(s4.derivesFrom is s3, True)
+        self.assertEqual(s4.derivation.origin is s3, True)
         
         
         # test imported and flat
         s = corpus.parse('bach/bwv66.6')
         p1 = s.parts[0]
         # the part is not derived from anything yet
-        self.assertEqual(p1.derivesFrom, None)
+        self.assertEqual(p1.derivation.origin, None)
         
         p1Flat = p1.flat
-        self.assertEqual(p1.flat.derivesFrom is p1, True)
-        self.assertEqual(p1.flat.derivesFrom is s, False)
+        self.assertEqual(p1.flat.derivation.origin is p1, True)
+        self.assertEqual(p1.flat.derivation.origin is s, False)
         
         p1FlatNotes = p1Flat.notesAndRests
-        self.assertEqual(p1FlatNotes.derivesFrom is p1Flat, True)
-        self.assertEqual(p1FlatNotes.derivesFrom is p1, False)
+        self.assertEqual(p1FlatNotes.derivation.origin is p1Flat, True)
+        self.assertEqual(p1FlatNotes.derivation.origin is p1, False)
         
         self.assertEqual(p1FlatNotes.derivationChain, [p1Flat, p1])
 
 
         # we cannot do this, as each call to flat produces a new Stream
-        self.assertEqual(p1.flat.notesAndRests.derivesFrom is p1.flat, False)
+        self.assertEqual(p1.flat.notesAndRests.derivation.origin is p1.flat, False)
         # chained calls to .derives from can be used
-        self.assertEqual(p1.flat.notesAndRests.derivesFrom.derivesFrom is p1, True)
+        self.assertEqual(p1.flat.notesAndRests.derivation.origin.derivation.origin is p1, True)
         
         # can use rootDerivation to get there faster
         self.assertEqual(p1.flat.notesAndRests.derivation.rootDerivation is p1, True)
@@ -5543,12 +5543,12 @@ class Test(unittest.TestCase):
         s1 = stream.Stream()
         s1.repeatAppend(note.Note(), 10)
         s1Flat = s1.flat
-        self.assertEqual(s1Flat.derivesFrom is s1, True)
+        self.assertEqual(s1Flat.derivation.origin is s1, True)
         # check what the derivation object thinks its container is
         self.assertEqual(s1Flat._derivation.client is s1Flat, True)
 
         s2  = copy.deepcopy(s1Flat)
-        self.assertEqual(s2.derivesFrom is s1, True)
+        self.assertEqual(s2.derivation.origin is s1, True)
         # check low level attrbiutes
         self.assertEqual(s2._derivation.client is s2, True)
 
@@ -5572,21 +5572,21 @@ class Test(unittest.TestCase):
         s1 = stream.Stream()
         s1.repeatAppend(note.Note(), 10)
         s1Flat = s1.flat
-        self.assertEqual(s1Flat.derivesFrom is s1, True)
-        self.assertEqual(s1Flat.derivationMethod is 'flat', True)
+        self.assertEqual(s1Flat.derivation.origin is s1, True)
+        self.assertEqual(s1Flat.derivation.method is 'flat', True)
 
         s1Elements = s1Flat.getElementsByClass('Note')
-        self.assertEqual(s1Elements.derivationMethod is 'getElementsByClass', True)
+        self.assertEqual(s1Elements.derivation.method is 'getElementsByClass', True)
 
 
         s1 = converter.parse("C2 D2", "2/4")
         s1m = s1.makeMeasures()
-        self.assertEqual(s1m.derivationMethod, 'makeMeasures')
+        self.assertEqual(s1m.derivation.method, 'makeMeasures')
         s1m1 = s1m.measure(1)
-        self.assertEqual(s1m1.derivesFrom is s1m, True)
-        self.assertEqual(s1m1.derivationMethod, 'measure')
-        s1m1.derivationMethod = 'getElementsByClass' 
-        self.assertEqual(s1m1.derivationMethod, 'getElementsByClass')
+        self.assertEqual(s1m1.derivation.origin is s1m, True)
+        self.assertEqual(s1m1.derivation.method, 'measure')
+        s1m1.derivation.method = 'getElementsByClass' 
+        self.assertEqual(s1m1.derivation.method, 'getElementsByClass')
 
 
     def testDerivationHierarchyA(self):
