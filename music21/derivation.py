@@ -161,13 +161,32 @@ class Derivation(SlottedObject):
 
     @property
     def derivationChain(self):
+        '''
+        Return a list Streams that this Derivation's client Stream was derived
+        from. This provides a way to obtain all Streams that the client passed
+        through, such as those created by
+        :meth:`~music21.stream.Stream.getElementsByClass` or
+        :attr:`~music21.stream.Stream.flat`.
+
+        ::
+
+            >>> s1 = stream.Stream()
+            >>> s1.repeatAppend(note.Note(), 10)
+            >>> s1.repeatAppend(note.Rest(), 10)
+            >>> s2 = s1.getElementsByClass('GeneralNote')
+            >>> s3 = s2.getElementsByClass('Note')
+            >>> s3.derivation.derivationChain == [s2, s1]
+            True
+
+        '''
+
         result = []
         origin = self.origin
         while origin is not None:
             result.append(origin)
-            origin = origin.derivation.origin 
+            origin = origin.derivation.origin
         return result
-    
+
     @property
     def method(self):
         '''
@@ -175,16 +194,23 @@ class Derivation(SlottedObject):
         Stream.  Note that it's identical to the property derivationMethod on a
         Stream, so no need for any but the most advanced usages.
 
-        >>> s = stream.Stream()
-        >>> s.derivationMethod is s._derivation.method
-        True
-        >>> s.derivationMethod is None
-        True
-        >>> sNotes = s.notes
-        >>> sNotes.derivationMethod
-        'notes'
-        >>> sNotes._derivation.method
-        'notes'
+        ::
+
+            >>> s = stream.Stream()
+            >>> s.derivationMethod is None
+            True
+
+        ::
+
+            >>> s.derivationMethod is s.derivation.method
+            True
+
+        ::
+
+            >>> sNotes = s.notes
+            >>> sNotes.derivationMethod
+            'notes'
+
         '''
         return self._method
 
@@ -241,6 +267,23 @@ class Derivation(SlottedObject):
 
     @property
     def rootDerivation(self):
+        r'''
+        Return a reference to the oldest source of this Stream; that is, chain
+        calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a
+        Stream that cannot be further derived.
+
+        ::
+
+            >>> s1 = stream.Stream()
+            >>> s1.repeatAppend(note.Note(), 10)
+            >>> s1.repeatAppend(note.Rest(), 10)
+            >>> s2 = s1.getElementsByClass('GeneralNote')
+            >>> s3 = s2.getElementsByClass('Note')
+            >>> s3.derivation.rootDerivation is s1
+            True
+
+        '''
+
         chain = self.derivationChain
         if len(chain):
             return chain[-1]
