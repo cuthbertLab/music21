@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         convertIPythonNotebooksToReST.py
-# Purpose:      music21 documentation IPython notebook to ReST converter
+# Name:         documentation/library/documenters.py
+# Purpose:      music21 documentation helper classes for proper formatting
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
 
@@ -627,6 +627,7 @@ class ClassDocumenter(ObjectDocumenter):
             - music21.base.Music21Object.fullyQualifiedClasses
             - music21.base.Music21Object.isGrace
             - music21.base.Music21Object.measureNumber
+            - music21.base.Music21Object.sortTuple
             music21.stream.Stream:
             - music21.stream.Stream.beat
             - music21.stream.Stream.beatDuration
@@ -664,16 +665,16 @@ class ClassDocumenter(ObjectDocumenter):
             ...             attributeDocumenter.referentPackagesystemPath))
             ...
             music21.base.Music21Object:
-            - music21.base.Music21Object.addContext
-            - music21.base.Music21Object.addLocation
             - music21.base.Music21Object.findAttributeInHierarchy
             - music21.base.Music21Object.getAllContextsByClass
             - music21.base.Music21Object.getContextAttr
             - music21.base.Music21Object.getContextByClass
             - music21.base.Music21Object.getOffsetBySite
-            - music21.base.Music21Object.getSiteIds
-            - music21.base.Music21Object.getSites
             - music21.base.Music21Object.getSpannerSites
+            - music21.base.Music21Object.hasContext
+            - music21.base.Music21Object.hasSite
+            - music21.base.Music21Object.hasVariantSite
+            - music21.base.Music21Object.isClassOrSubclass
             music21.stream.Stream:
             - music21.stream.Stream.activateVariants
             - music21.stream.Stream.addGroupForElements
