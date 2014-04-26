@@ -1762,7 +1762,7 @@ class Variant(base.Music21Object):
     {0.0} <music21.note.Note C>
     '''
 
-    classSortOrder = 0  # variants should always come first?
+    classSortOrder = stream.Stream.classSortOrder - 2  # variants should always come first?
     isVariant = True
 
     # this copies the init of Streams

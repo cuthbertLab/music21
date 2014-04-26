@@ -98,6 +98,7 @@ environLocal = environment.Environment(_MOD)
 
 
 class LayoutBase(base.Music21Object):
+    classSortOrder = -10
     def __init__(self, *args, **keywords):
         base.Music21Object.__init__(self)
 

@@ -627,7 +627,6 @@ class ClassDocumenter(ObjectDocumenter):
             - music21.base.Music21Object.fullyQualifiedClasses
             - music21.base.Music21Object.isGrace
             - music21.base.Music21Object.measureNumber
-            - music21.base.Music21Object.sortTuple
             music21.stream.Stream:
             - music21.stream.Stream.beat
             - music21.stream.Stream.beatDuration

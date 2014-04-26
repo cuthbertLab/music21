@@ -40,12 +40,12 @@ class PolyphonicSnippet(stream.Score):
 
     ::
 
-        >>> ps.elements[1] is cantus
+        >>> ps.parts[0] is cantus
         True
 
     ::
 
-        >>> ps.elements[1].classes
+        >>> ps.parts[0].classes
         ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'object']
 
     ::

@@ -169,9 +169,9 @@ def metadataToString(music21Metadata):
     >>> from music21.braille import translate
     >>> from music21 import corpus
     >>> corelli = corpus.parse("corelli")
-    >>> corelli[0].__class__
+    >>> corelli.getElementsByClass('Metadata')[0].__class__
     <class 'music21.metadata.Metadata'>
-    >>> print translate.metadataToString(corelli[0])
+    >>> print translate.metadataToString(corelli.getElementsByClass('Metadata')[0])
     Movement Name: [Movement 1]
     Movement Number: 1
     Number: 3

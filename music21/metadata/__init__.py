@@ -102,7 +102,7 @@ class Metadata(base.Music21Object):
 
     ### CLASS VARIABLES ###
 
-    classSortOrder = -10
+    classSortOrder = -30
 
     # used for the search() methods to determine what attributes
     # are made available by default; add more as properties/import

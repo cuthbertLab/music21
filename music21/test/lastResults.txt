@@ -1,189 +1,33 @@
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 1694, in testBasic
-    self.assertEqual(sg1.getOffsetsBySite(s), [0.0, 0.0])
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 630, in getOffsetsBySite
-    if idSite in c.getSiteIds():
-AttributeError: 'Part' object has no attribute 'getSiteIds'
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 1934, in testRepeatBracketC
-    self.assertEqual(rb1.getOffsetsBySite(p), [4.0, 8.0])
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 630, in getOffsetsBySite
-    if idSite in c.getSiteIds():
-AttributeError: 'Measure' object has no attribute 'getSiteIds'
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 2025, in testRepeatBracketD
-    self.assertEqual(rb3.getOffsetsBySite(p), [20.0, 28.0])
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 630, in getOffsetsBySite
-    if idSite in c.getSiteIds():
-AttributeError: 'Measure' object has no attribute 'getSiteIds'
-
-Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.spanner.Spanner.getOffsetsBySite
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 613, in getOffsetsBySite
+AssertionError: Failed doctest test for music21.trecento.polyphonicSnippet.PolyphonicSnippet
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 22, in PolyphonicSnippet
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 623, in music21.spanner.Spanner.getOffsetsBySite
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 38, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
 Failed example:
-    sp.getOffsetsBySite(s)
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.spanner.Spanner.getOffsetsBySite[6]>", line 1, in <module>
-        sp.getOffsetsBySite(s)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 630, in getOffsetsBySite
-        if idSite in c.getSiteIds():
-    AttributeError: 'Note' object has no attribute 'getSiteIds'
-
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/roman.py", line 1939, in testYieldRemoveA
-    for site in e.getSites():
-AttributeError: 'KeySignature' object has no attribute 'getSites'
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/roman.py", line 1990, in testYieldRemoveC
-    self.assertEqual(s[1][0] in s[1][0][3].getSites(), True)
-AttributeError: 'RomanNumeral' object has no attribute 'getSites'
-
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.documentation.library.documenters.ClassDocumenter.inheritedMethodsMapping
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line unknown line number, in inheritedMethodsMapping
-
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line ?, in music21.documentation.library.documenters.ClassDocumenter.inheritedMethodsMapping
-Failed example:
-    for classDocumenter in sorted(mapping, key=sortBy):
-        print('{0}:'.format(
-            classDocumenter.referentPackagesystemPath))
-        for attributeDocumenter in mapping[classDocumenter][:10]:
-            print('- {0}'.format(
-                attributeDocumenter.referentPackagesystemPath))
+    ps.elements
 Expected:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.addContext
-    - music21.base.Music21Object.addLocation
-    - music21.base.Music21Object.findAttributeInHierarchy
-    - music21.base.Music21Object.getAllContextsByClass
-    - music21.base.Music21Object.getContextAttr
-    - music21.base.Music21Object.getContextByClass
-    - music21.base.Music21Object.getOffsetBySite
-    - music21.base.Music21Object.getSiteIds
-    - music21.base.Music21Object.getSites
-    - music21.base.Music21Object.getSpannerSites
-    music21.stream.Stream:
-    - music21.stream.Stream.activateVariants
-    - music21.stream.Stream.addGroupForElements
-    - music21.stream.Stream.allPlayingWhileSounding
-    - music21.stream.Stream.analyze
-    - music21.stream.Stream.append
-    - music21.stream.Stream.attachIntervalsBetweenStreams
-    - music21.stream.Stream.attachMelodicIntervals
-    - music21.stream.Stream.attributeCount
-    - music21.stream.Stream.augmentOrDiminish
-    - music21.stream.Stream.beatAndMeasureFromOffset
+    (<music21.stream.Part C>, <music21.stream.Part T>, <music21.metadata.Metadata object at 0x...>)
 Got:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.findAttributeInHierarchy
-    - music21.base.Music21Object.getAllContextsByClass
-    - music21.base.Music21Object.getContextAttr
-    - music21.base.Music21Object.getContextByClass
-    - music21.base.Music21Object.getOffsetBySite
-    - music21.base.Music21Object.getSpannerSites
-    - music21.base.Music21Object.hasContext
-    - music21.base.Music21Object.hasSite
-    - music21.base.Music21Object.hasVariantSite
-    - music21.base.Music21Object.isClassOrSubclass
-    music21.stream.Stream:
-    - music21.stream.Stream.activateVariants
-    - music21.stream.Stream.addGroupForElements
-    - music21.stream.Stream.allPlayingWhileSounding
-    - music21.stream.Stream.analyze
-    - music21.stream.Stream.append
-    - music21.stream.Stream.attachIntervalsBetweenStreams
-    - music21.stream.Stream.attachMelodicIntervals
-    - music21.stream.Stream.attributeCount
-    - music21.stream.Stream.augmentOrDiminish
-    - music21.stream.Stream.beatAndMeasureFromOffset
-
-
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.documentation.library.documenters.ClassDocumenter.inheritedReadonlyPropertiesMapping
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line unknown line number, in inheritedReadonlyPropertiesMapping
-
+    (<music21.metadata.Metadata object at 0x1035db690>, <music21.stream.Part C>, <music21.stream.Part T>)
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line ?, in music21.documentation.library.documenters.ClassDocumenter.inheritedReadonlyPropertiesMapping
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 43, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
 Failed example:
-    for classDocumenter in sorted(mapping, key=sortBy):
-        print('{0}:'.format(
-            classDocumenter.referentPackagesystemPath))
-        for attributeDocumenter in mapping[classDocumenter][:10]:
-            print('- {0}'.format(
-                attributeDocumenter.referentPackagesystemPath))
+    ps.elements[0] is cantus
 Expected:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.classes
-    - music21.base.Music21Object.derivationHierarchy
-    - music21.base.Music21Object.fullyQualifiedClasses
-    - music21.base.Music21Object.isGrace
-    - music21.base.Music21Object.measureNumber
-    music21.stream.Stream:
-    - music21.stream.Stream.beat
-    - music21.stream.Stream.beatDuration
-    - music21.stream.Stream.beatStr
-    - music21.stream.Stream.beatStrength
-    - music21.stream.Stream.derivation
-    - music21.stream.Stream.flat
-    - music21.stream.Stream.highestOffset
-    - music21.stream.Stream.highestTime
-    - music21.stream.Stream.isGapless
-    - music21.stream.Stream.lowestOffset
+    True
 Got:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.classes
-    - music21.base.Music21Object.derivationHierarchy
-    - music21.base.Music21Object.fullyQualifiedClasses
-    - music21.base.Music21Object.isGrace
-    - music21.base.Music21Object.measureNumber
-    - music21.base.Music21Object.sortTuple
-    music21.stream.Stream:
-    - music21.stream.Stream.beat
-    - music21.stream.Stream.beatDuration
-    - music21.stream.Stream.beatStr
-    - music21.stream.Stream.beatStrength
-    - music21.stream.Stream.derivation
-    - music21.stream.Stream.flat
-    - music21.stream.Stream.highestOffset
-    - music21.stream.Stream.highestTime
-    - music21.stream.Stream.isGapless
-    - music21.stream.Stream.lowestOffset
-
-
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.classCache.Repository.insertIntoStream
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/classCache.py", line 84, in insertIntoStream
-
+    False
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/classCache.py", line 97, in music21.classCache.Repository.insertIntoStream
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 48, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
 Failed example:
-    len(n1.getSites()) # does not add a site (2 streams, 1 None)
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.classCache.Repository.insertIntoStream[8]>", line 1, in <module>
-        len(n1.getSites()) # does not add a site (2 streams, 1 None)
-    AttributeError: 'Note' object has no attribute 'getSites'
+    ps.elements[0].classes
+Expected:
+    ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'object']
+Got:
+    ['Metadata', 'Music21Object', 'object']
 
 
 
@@ -271,7 +115,6 @@ vexflow___init__ successfully ran 30 tests
 trecento_trecentoCadence successfully ran 7 tests
 webapps_commands successfully ran 10 tests
 variant successfully ran 34 tests
-trecento_polyphonicSnippet successfully ran 9 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
 trecento_capua successfully ran 9 tests
@@ -282,47 +125,50 @@ tie successfully ran 7 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
-theoryAnalysis_theoryAnalyzer successfully ran 42 tests
-test___init__ successfully ran 3 tests
 text successfully ran 23 tests
+test___init__ successfully ran 3 tests
 tempo successfully ran 45 tests
+theoryAnalysis_theoryAnalyzer successfully ran 42 tests
 stream_streamStatus successfully ran 4 tests
 stream_makeNotation successfully ran 10 tests
 stream_timespans successfully ran 58 tests
+spanner successfully ran 52 tests
 stream___init__ successfully ran 141 tests
 sieve successfully ran 40 tests
 serial successfully ran 47 tests
 search_segment successfully ran 7 tests
-scale successfully ran 90 tests
-test_testStream successfully ran 206 tests
+search___init__ successfully ran 19 tests
 scala_scl___init__ successfully ran 3 tests
 scala___init__ successfully ran 12 tests
+scale successfully ran 90 tests
 romanText_testFiles successfully ran 4 tests
-search___init__ successfully ran 19 tests
+test_testStream successfully ran 206 tests
 romanText___init__ successfully ran 45 tests
 romanText_translate successfully ran 17 tests
+roman successfully ran 27 tests
 pitch successfully ran 94 tests
 noteworthy_translate successfully ran 21 tests
-romanText_clercqTemperley successfully ran 19 tests
 noteworthy_binaryTranslate successfully ran 7 tests
 noteworthy___init__ successfully ran 3 tests
 note successfully ran 49 tests
-musicxml_toMxObjects successfully ran 37 tests
 musicxml_xmlHandler successfully ran 13 tests
+musicxml_toMxObjects successfully ran 37 tests
+romanText_clercqTemperley successfully ran 19 tests
 musicxml_mxObjects successfully ran 45 tests
+musicxml_testPrimitive successfully ran 5 tests
 repeat successfully ran 72 tests
 musicxml___init__ successfully ran 3 tests
 musicxml_m21ToString successfully ran 45 tests
 musedata_base40 successfully ran 9 tests
+musicxml_fromMxObjects successfully ran 65 tests
 musedata___init__ successfully ran 49 tests
-midi_translate successfully ran 49 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
 musedata_translate successfully ran 16 tests
+midi___init__ successfully ran 29 tests
 meter successfully ran 107 tests
 metadata_primitives successfully ran 38 tests
-midi___init__ successfully ran 29 tests
-musicxml_fromMxObjects successfully ran 65 tests
+midi_translate successfully ran 49 tests
 metadata___init__ successfully ran 18 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
@@ -342,20 +188,20 @@ humdrum_spineParser successfully ran 32 tests
 humdrum_instruments successfully ran 8 tests
 humdrum___init__ successfully ran 3 tests
 metadata_bundles successfully ran 34 tests
-metadata_caching successfully ran 7 tests
 harmony successfully ran 27 tests
+metadata_caching successfully ran 7 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
+freezeThaw successfully ran 28 tests
 figuredBass_realizer successfully ran 12 tests
 figuredBass_possibility successfully ran 20 tests
-freezeThaw successfully ran 28 tests
 figuredBass_notation successfully ran 15 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
-figuredBass_examples successfully ran 15 tests
 graph successfully ran 62 tests
+figuredBass_examples successfully ran 15 tests
 features_base successfully ran 27 tests
 features___init__ successfully ran 8 tests
 expressions successfully ran 26 tests
@@ -367,58 +213,62 @@ duration successfully ran 65 tests
 documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
 documentation_library_extensions successfully ran 3 tests
+documentation_library_documenters successfully ran 28 tests
 features_native successfully ran 26 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
 documentation___init__ successfully ran 3 tests
 derivation successfully ran 9 tests
 defaults successfully ran 4 tests
-counterpoint___init__ successfully ran 3 tests
 counterpoint_species successfully ran 27 tests
+counterpoint___init__ successfully ran 3 tests
 corpus_virtual successfully ran 5 tests
+features_jSymbolic successfully ran 86 tests
 corpus_corpora successfully ran 28 tests
 corpus_chorales successfully ran 9 tests
-features_jSymbolic successfully ran 86 tests
 corpus___init__ successfully ran 17 tests
-composition_phasing successfully ran 5 tests
+converter successfully ran 37 tests
+contour successfully ran 10 tests
 composition___init__ successfully ran 3 tests
 common successfully ran 57 tests
 clef successfully ran 28 tests
-contour successfully ran 10 tests
+corpus_testCorpus successfully ran 25 tests
+composition_phasing successfully ran 5 tests
 chordTables successfully ran 17 tests
-converter successfully ran 37 tests
 chant successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
-braille_text successfully ran 4 tests
 braille_translate successfully ran 7 tests
-braille_segment successfully ran 11 tests
-braille_lookup successfully ran 3 tests
+braille_text successfully ran 4 tests
 chord successfully ran 108 tests
+classCache successfully ran 12 tests
+braille_lookup successfully ran 3 tests
+braille_segment successfully ran 11 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
 braille_examples successfully ran 5 tests
-base successfully ran 109 tests
 bar successfully ran 9 tests
-audioSearch_recording successfully ran 4 tests
 audioSearch_transcriber successfully ran 4 tests
+base successfully ran 109 tests
+audioSearch_recording successfully ran 4 tests
 articulations successfully ran 29 tests
 audioSearch___init__ successfully ran 19 tests
-braille_test successfully ran 151 tests
 analysis_search successfully ran 4 tests
+analysis_windowed successfully ran 9 tests
 analysis_reduceChords successfully ran 7 tests
+braille_test successfully ran 151 tests
 analysis_patel successfully ran 6 tests
 analysis_neoRiemannian successfully ran 10 tests
 analysis_metrical successfully ran 6 tests
-analysis_discrete successfully ran 31 tests
-analysis_windowed successfully ran 9 tests
-analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
+analysis_reduction successfully ran 15 tests
+analysis_discrete successfully ran 31 tests
+analysis___init__ successfully ran 3 tests
 abcFormat___init__ successfully ran 53 tests
 _version successfully ran 3 tests
-analysis_reduction successfully ran 15 tests
 abcFormat_translate successfully ran 18 tests
+abcFormat_testFiles successfully ran 5 tests
 Not in Tree Error: vexflow.testShow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: vexflow.exporter is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: trecento.quodJactatur is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -439,7 +289,6 @@ Not in Tree Error: test.testDocs is in the music21 directory but not imported in
 Not in Tree Error: test.testCoverage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.memoryUsage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: musicxml.testPrimitive is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musicxml.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test03 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test02 is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -454,7 +303,6 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -466,208 +314,42 @@ Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 d
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: abcFormat.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
 
 -----------
-spanner had 3 ERRORS and 1 FAILURES in 52 tests:
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 1694, in testBasic
-    self.assertEqual(sg1.getOffsetsBySite(s), [0.0, 0.0])
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 630, in getOffsetsBySite
-    if idSite in c.getSiteIds():
-AttributeError: 'Part' object has no attribute 'getSiteIds'
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 1934, in testRepeatBracketC
-    self.assertEqual(rb1.getOffsetsBySite(p), [4.0, 8.0])
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 630, in getOffsetsBySite
-    if idSite in c.getSiteIds():
-AttributeError: 'Measure' object has no attribute 'getSiteIds'
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 2025, in testRepeatBracketD
-    self.assertEqual(rb3.getOffsetsBySite(p), [20.0, 28.0])
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 630, in getOffsetsBySite
-    if idSite in c.getSiteIds():
-AttributeError: 'Measure' object has no attribute 'getSiteIds'
-
+trecento_polyphonicSnippet had 0 ERRORS and 1 FAILURES in 9 tests:
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.spanner.Spanner.getOffsetsBySite
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 613, in getOffsetsBySite
+AssertionError: Failed doctest test for music21.trecento.polyphonicSnippet.PolyphonicSnippet
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 22, in PolyphonicSnippet
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 623, in music21.spanner.Spanner.getOffsetsBySite
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 38, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
 Failed example:
-    sp.getOffsetsBySite(s)
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.spanner.Spanner.getOffsetsBySite[6]>", line 1, in <module>
-        sp.getOffsetsBySite(s)
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 630, in getOffsetsBySite
-        if idSite in c.getSiteIds():
-    AttributeError: 'Note' object has no attribute 'getSiteIds'
-
-
-
------------
-roman had 2 ERRORS and 0 FAILURES in 28 tests:
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/roman.py", line 1939, in testYieldRemoveA
-    for site in e.getSites():
-AttributeError: 'KeySignature' object has no attribute 'getSites'
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/roman.py", line 1990, in testYieldRemoveC
-    self.assertEqual(s[1][0] in s[1][0][3].getSites(), True)
-AttributeError: 'RomanNumeral' object has no attribute 'getSites'
-
-
------------
-documentation_library_documenters had 0 ERRORS and 2 FAILURES in 28 tests:
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.documentation.library.documenters.ClassDocumenter.inheritedMethodsMapping
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line unknown line number, in inheritedMethodsMapping
-
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line ?, in music21.documentation.library.documenters.ClassDocumenter.inheritedMethodsMapping
-Failed example:
-    for classDocumenter in sorted(mapping, key=sortBy):
-        print('{0}:'.format(
-            classDocumenter.referentPackagesystemPath))
-        for attributeDocumenter in mapping[classDocumenter][:10]:
-            print('- {0}'.format(
-                attributeDocumenter.referentPackagesystemPath))
+    ps.elements
 Expected:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.addContext
-    - music21.base.Music21Object.addLocation
-    - music21.base.Music21Object.findAttributeInHierarchy
-    - music21.base.Music21Object.getAllContextsByClass
-    - music21.base.Music21Object.getContextAttr
-    - music21.base.Music21Object.getContextByClass
-    - music21.base.Music21Object.getOffsetBySite
-    - music21.base.Music21Object.getSiteIds
-    - music21.base.Music21Object.getSites
-    - music21.base.Music21Object.getSpannerSites
-    music21.stream.Stream:
-    - music21.stream.Stream.activateVariants
-    - music21.stream.Stream.addGroupForElements
-    - music21.stream.Stream.allPlayingWhileSounding
-    - music21.stream.Stream.analyze
-    - music21.stream.Stream.append
-    - music21.stream.Stream.attachIntervalsBetweenStreams
-    - music21.stream.Stream.attachMelodicIntervals
-    - music21.stream.Stream.attributeCount
-    - music21.stream.Stream.augmentOrDiminish
-    - music21.stream.Stream.beatAndMeasureFromOffset
+    (<music21.stream.Part C>, <music21.stream.Part T>, <music21.metadata.Metadata object at 0x...>)
 Got:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.findAttributeInHierarchy
-    - music21.base.Music21Object.getAllContextsByClass
-    - music21.base.Music21Object.getContextAttr
-    - music21.base.Music21Object.getContextByClass
-    - music21.base.Music21Object.getOffsetBySite
-    - music21.base.Music21Object.getSpannerSites
-    - music21.base.Music21Object.hasContext
-    - music21.base.Music21Object.hasSite
-    - music21.base.Music21Object.hasVariantSite
-    - music21.base.Music21Object.isClassOrSubclass
-    music21.stream.Stream:
-    - music21.stream.Stream.activateVariants
-    - music21.stream.Stream.addGroupForElements
-    - music21.stream.Stream.allPlayingWhileSounding
-    - music21.stream.Stream.analyze
-    - music21.stream.Stream.append
-    - music21.stream.Stream.attachIntervalsBetweenStreams
-    - music21.stream.Stream.attachMelodicIntervals
-    - music21.stream.Stream.attributeCount
-    - music21.stream.Stream.augmentOrDiminish
-    - music21.stream.Stream.beatAndMeasureFromOffset
-
-
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.documentation.library.documenters.ClassDocumenter.inheritedReadonlyPropertiesMapping
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line unknown line number, in inheritedReadonlyPropertiesMapping
-
+    (<music21.metadata.Metadata object at 0x1035db690>, <music21.stream.Part C>, <music21.stream.Part T>)
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line ?, in music21.documentation.library.documenters.ClassDocumenter.inheritedReadonlyPropertiesMapping
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 43, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
 Failed example:
-    for classDocumenter in sorted(mapping, key=sortBy):
-        print('{0}:'.format(
-            classDocumenter.referentPackagesystemPath))
-        for attributeDocumenter in mapping[classDocumenter][:10]:
-            print('- {0}'.format(
-                attributeDocumenter.referentPackagesystemPath))
+    ps.elements[0] is cantus
 Expected:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.classes
-    - music21.base.Music21Object.derivationHierarchy
-    - music21.base.Music21Object.fullyQualifiedClasses
-    - music21.base.Music21Object.isGrace
-    - music21.base.Music21Object.measureNumber
-    music21.stream.Stream:
-    - music21.stream.Stream.beat
-    - music21.stream.Stream.beatDuration
-    - music21.stream.Stream.beatStr
-    - music21.stream.Stream.beatStrength
-    - music21.stream.Stream.derivation
-    - music21.stream.Stream.flat
-    - music21.stream.Stream.highestOffset
-    - music21.stream.Stream.highestTime
-    - music21.stream.Stream.isGapless
-    - music21.stream.Stream.lowestOffset
+    True
 Got:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.classes
-    - music21.base.Music21Object.derivationHierarchy
-    - music21.base.Music21Object.fullyQualifiedClasses
-    - music21.base.Music21Object.isGrace
-    - music21.base.Music21Object.measureNumber
-    - music21.base.Music21Object.sortTuple
-    music21.stream.Stream:
-    - music21.stream.Stream.beat
-    - music21.stream.Stream.beatDuration
-    - music21.stream.Stream.beatStr
-    - music21.stream.Stream.beatStrength
-    - music21.stream.Stream.derivation
-    - music21.stream.Stream.flat
-    - music21.stream.Stream.highestOffset
-    - music21.stream.Stream.highestTime
-    - music21.stream.Stream.isGapless
-    - music21.stream.Stream.lowestOffset
-
-
-
------------
-classCache had 0 ERRORS and 1 FAILURES in 12 tests:
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.classCache.Repository.insertIntoStream
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/classCache.py", line 84, in insertIntoStream
-
+    False
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/classCache.py", line 97, in music21.classCache.Repository.insertIntoStream
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 48, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
 Failed example:
-    len(n1.getSites()) # does not add a site (2 streams, 1 None)
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.classCache.Repository.insertIntoStream[8]>", line 1, in <module>
-        len(n1.getSites()) # does not add a site (2 streams, 1 None)
-    AttributeError: 'Note' object has no attribute 'getSites'
+    ps.elements[0].classes
+Expected:
+    ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'object']
+Got:
+    ['Metadata', 'Music21Object', 'object']
 
 
 -------------------------------------------------------------------------
-Ran 3926 tests in 453.7529 seconds
-Run at 2014-04-26 01:02:33
+Ran 3960 tests in 420.5439 seconds
+Run at 2014-04-26 02:48:55

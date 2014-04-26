@@ -127,7 +127,7 @@ class TextExpression(Expression, text.TextFormat):
     '''
 
     # always need to be first, before even clefs
-    classSortOrder = -10
+    classSortOrder = -30
 
     def __init__(self, content=None):
         Expression.__init__(self)

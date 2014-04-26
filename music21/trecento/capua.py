@@ -573,22 +573,27 @@ def compareThreeFictas(srcStream1, srcStream2):
     srcStream2.attachIntervalsBetweenStreams(srcStream1)
     
     for note1 in srcStream1.notes:
-        note1.editorial.misc['normal-harmonicInterval'] = note1.editorial.harmonicInterval.name
+        if (hasattr(note1.editorial.harmonicInterval, 'name')):
+            note1.editorial.misc['normal-harmonicInterval'] = note1.editorial.harmonicInterval.name
 
         if "pmfc-ficta" in note1.editorial.misc:
             pmfcFictaToAccidental(note1)
             note1.editorial.harmonicInterval.reinit()
-            note1.editorial.misc['pmfc-harmonicInterval'] = note1.editorial.harmonicInterval.name
+            if (hasattr(note1.editorial.harmonicInterval, 'name')):
+                note1.editorial.misc['pmfc-harmonicInterval'] = note1.editorial.harmonicInterval.name
             restoreAccidental(note1)
         else:
-            note1.editorial.misc['pmfc-harmonicInterval'] = note1.editorial.harmonicInterval.name
+            if (hasattr(note1.editorial.harmonicInterval, 'name')):
+                note1.editorial.misc['pmfc-harmonicInterval'] = note1.editorial.harmonicInterval.name
         if "capua-ficta" in note1.editorial.misc:
             capuaFictaToAccidental(note1)
             note1.editorial.harmonicInterval.reinit()
-            note1.editorial.misc['capua-harmonicInterval'] = note1.editorial.harmonicInterval.name
+            if (hasattr(note1.editorial.harmonicInterval, 'name')):
+                note1.editorial.misc['capua-harmonicInterval'] = note1.editorial.harmonicInterval.name
             restoreAccidental(note1)
         else:
-            note1.editorial.misc['capua-harmonicInterval'] = note1.editorial.harmonicInterval.name
+            if (hasattr(note1.editorial.harmonicInterval, 'name')):
+                note1.editorial.misc['capua-harmonicInterval'] = note1.editorial.harmonicInterval.name
 
 
 def compareSrcStreamCapuaToEditor(srcStream1):

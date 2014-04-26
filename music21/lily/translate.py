@@ -1742,11 +1742,11 @@ class LilypondConverter(object):
 
         >>> print lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0]
         \new Staff  = london... { { \times 1/2 {\startStaff \clef "treble"
+              a' 4
+              a' 4
+              a' 4
+              a' 4
               \clef "treble"
-              a' 4
-              a' 4
-              a' 4
-              a' 4
               | %{ end measure 1 %}
               a' 1
               | %{ end measure 2 %}
@@ -1940,11 +1940,11 @@ class LilypondConverter(object):
         >>> lpPrefixCompositeMusicVariant = lpc.lyPrefixCompositeMusicFromVariant(v, replacedElements)
         >>> print lpPrefixCompositeMusicVariant
         \new Staff  = londonpx { {\startStaff \clef "treble"
-            \clef "treble"
             a' 4.
             b' 8
             c' 4
             d' 4
+            \clef "treble"
             | %{ end measure 1 %}
              \stopStaff}
            }

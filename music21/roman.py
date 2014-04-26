@@ -1979,20 +1979,6 @@ class Test(unittest.TestCase):
                 e.activeSite.remove(e)
         self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
 
-    def testYieldRemoveC(self):
-        from music21 import corpus
-        s = corpus.parse('madrigal.5.8.rntxt')
-        # first measure's active site is the Part
-        self.assertEqual(id(s[1][0].activeSite), id(s[1]))
-        # first rn's active site is the Measure
-        self.assertEqual(id(s[1][0][2].activeSite), id(s[1][0]))
-        self.assertEqual(id(s[1][0][3].activeSite), id(s[1][0]))
-        self.assertEqual(s[1][0] in s[1][0][3].sites.getSites(), True)
-        for e in s._yieldElementsDownward(streamsOnly=False):
-            if 'KeySignature' in e.classes:
-                e.activeSite.remove(e)
-        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
-
     def testScaleDegreesA(self):
         from music21 import roman
         k = key.Key('f#')  # 3-sharps minor

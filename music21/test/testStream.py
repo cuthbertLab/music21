@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -194,7 +194,9 @@ class TestExternal(unittest.TestCase):
 
 
     def testCanons(self):
-        '''A test of creating a canon with shifted presentations of a source melody. This also demonstrates 
+        '''
+        A test of creating a canon with shifted presentations of a source melody. 
+        This also demonstrates 
         the addition of rests to parts that start late or end early.
 
         The addition of rests happens with makeRests(), which is called in 
@@ -5659,8 +5661,8 @@ class Test(unittest.TestCase):
 
         # try imported
         s = corpus.parse('madrigal.5.8.rntxt')
-        p = s[1]
-        m = p[0]
+        p = s[1]  # for test, not .parts
+        m = p[2]  # for test, not .getElementsByClass('Measure')
         rn = m[2]
 
         self.assertEqual(id(rn.activeSite), id(m))
@@ -5669,7 +5671,7 @@ class Test(unittest.TestCase):
 
         s1 = copy.deepcopy(s)
         p1 = s1[1]
-        m1 = p1[0]
+        m1 = p1[2]
         rn1 = m1[2]
 
         self.assertEqual(id(rn1.activeSite), id(m1))
@@ -7022,7 +7024,7 @@ class Test(unittest.TestCase):
         # this works just fine
         #s.show()
 
-        match = [str(e) for e in s.pitches]
+        match = [str(e.pitch) for e in s.notes]
         self.assertEqual(match, ['G3', 'D#4', 'A4'])
 
         #s.sort()
@@ -7062,7 +7064,7 @@ class Test(unittest.TestCase):
         s.append(chord.Chord(['f4', 'c5'], quarterLength=2))
         
         gc3 = chord.Chord(['f#4', 'c#5'], quarterLength=.5)
-        gc3.duration = gc2.duration.getGraceDuration()
+        gc3.duration = gc3.duration.getGraceDuration()
         s.append(gc3)        
 
         s.append(chord.Chord(['e4', 'b4'], quarterLength=1))

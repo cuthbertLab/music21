@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2008-2014 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ available after importing music21.
 ::
 
     >>> music21.VERSION_STR
-    '1.9.1'
+    '1.9.2'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -142,7 +142,7 @@ class ElementException(exceptions21.Music21Exception):
 
 #------------------------------------------------------------------------------
 # private metaclass...
-_SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority','classSortOrder','isGrace','insertIndex'])
+_SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority','classSortOrder','isNotGrace','insertIndex'])
 
 
 class SlottedObject(object):
@@ -2875,11 +2875,15 @@ class Music21Object(object):
 
     def _adjacencySearch(self, classFilterList=None, ascend=True,
         beginNearest=True, flattenLocalSites=False):
-        '''Get the next or previous element if this element is in a Stream.
+        '''
+        Get the next or previous element if this element is in a Stream.
 
-        If this element is in multiple Streams, the first next element found in any site will be returned. If not found no next element is found in any site, the flat representation of all sites of each immediate site are searched.
+        If this element is in multiple Streams, the first next element found in any 
+        site will be returned. If not found no next element is found in any site, the flat 
+        representation of all sites of each immediate site are searched.
 
-        If `beginNearest` is True, sites will be searched from the element nearest to the caller and then outward.
+        If `beginNearest` is True, sites will be searched from the element nearest to the 
+        caller and then outward.
         '''
         if classFilterList is not None:
             if not common.isListLike(classFilterList):
@@ -2910,7 +2914,7 @@ class Music21Object(object):
                 memo[id(s)] = None # add to dict, value does not matter
 
             if id(s) in firstSites:
-                if flattenLocalSites:
+                if flattenLocalSites is True:
                     if s.isFlat:
                         target = s
                     else:
@@ -3225,11 +3229,10 @@ class Music21Object(object):
         which is safer.
         ''')
 
-    @property
-    def sortTuple(self):
+    def sortTuple(self, useSite=None):
         '''
         Returns a collections.NamedTuple called SortTuple(atEnd, offset, priority, classSortOrder, 
-        isGrace, insertIndex)
+        isNotGrace, insertIndex)
         which contains the six elements necessary to determine the sort order of any set of
         objects in a Stream. 
         
@@ -3240,7 +3243,7 @@ class Music21Object(object):
         important parameter in determining the order of elements in a stream (the note on beat 1
         has offset 0.0, while the note on beat 2 might have offset 1.0). 
         
-        3) priority = int or float; Priority is a
+        3) priority = int; Priority is a
         user-specified property (default 0) that can set the order of elements which have the same
         offset (for instance, two Parts both at offset 0.0). 
         
@@ -3248,7 +3251,7 @@ class Music21Object(object):
         is the third level of comparison that gives an ordering to elements with different classes,
         ensuring, for instance that Clefs (classSortOrder = 0) sort before Notes (classSortOrder = 20).
         
-        5) isGrace = {0, 1}; grace notes sort after normal notes
+        5) isNotGrace = {0, 1}; 0 = grace, 1 = normal. Grace notes sort before normal notes
         
         6) The last tie breaker is the creation time (insertIndex) of the site object 
         represented by the activeSite.
@@ -3256,9 +3259,9 @@ class Music21Object(object):
         >>> n = note.Note()
         >>> n.offset = 4.0
         >>> n.priority = -3
-        >>> n.sortTuple
-        SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, isGrace=0, insertIndex=0)
-        >>> st = n.sortTuple
+        >>> n.sortTuple()
+        SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, isNotGrace=1, insertIndex=0)
+        >>> st = n.sortTuple()
 
         Check that all these values are the same as above...
         
@@ -3279,9 +3282,9 @@ class Music21Object(object):
         
         >>> s = stream.Stream()
         >>> s.insert(n)
-        >>> n.sortTuple
-        SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, isGrace=0, insertIndex=...)
-        >>> nInsertIndex = n.sortTuple.insertIndex
+        >>> n.sortTuple()
+        SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, isNotGrace=1, insertIndex=...)
+        >>> nInsertIndex = n.sortTuple().insertIndex
         
         If we create another nearly identical note, the insertIndex will be different:
         
@@ -3289,31 +3292,39 @@ class Music21Object(object):
         >>> n2.offset = 4.0
         >>> n2.priority = -3
         >>> s.insert(n2)
-        >>> n2InsertIndex = n2.sortTuple.insertIndex
+        >>> n2InsertIndex = n2.sortTuple().insertIndex
         >>> n2InsertIndex > nInsertIndex
         True
         '''
-        if self.offset == 'highestTime':
+        if useSite is False: # False or a Site; since None is a valid site, default is False
+            foundOffset = self.offset
+        else:
+            foundOffset = self.getOffsetBySite(useSite)
+        
+        if foundOffset == 'highestTime':
             offset = 0.0
             atEnd = 1
         else:
-            offset = self.offset
+            offset = foundOffset
             atEnd = 0
             
         if self.isGrace:
-            isGrace = 1
+            isNotGrace = 0
         else:
-            isGrace = 0
-            
-        if (self._activeSiteId is not None and
-            self.sites.hasSiteId(self._activeSiteId)):
+            isNotGrace = 1
+        
+        if (useSite is not False and
+                self.sites.hasSiteId(id(useSite))):
+            insertIndex = self.sites._definedContexts[id(useSite)].globalSiteIndex
+        elif (self._activeSiteId is not None and
+                 self.sites.hasSiteId(self._activeSiteId)):
             ## TODO -- expose a single Site so _definedContexts is not needed here.
             insertIndex = self.sites._definedContexts[self._activeSiteId].globalSiteIndex
         else:
             insertIndex = 0
         
-        return _SortTuple(atEnd, offset, self.priority, self.classSortOrder, isGrace, insertIndex)
-        
+        return _SortTuple(atEnd, offset, self.priority, self.classSortOrder, isNotGrace, insertIndex)
+         
     def _getDuration(self):
         '''
         Gets the DurationObject of the object or None
@@ -5735,9 +5746,7 @@ class Test(unittest.TestCase):
         # iterating at the Measure level, showing usage of flattenLocalSites
         measures = s.parts[0].getElementsByClass('Measure')
         self.assertEqual(measures[3].previous(), measures[2])
-
-        self.assertEqual(measures[3].previous(), measures[2])
-        self.assertEqual(measures[3].previous(flattenLocalSites=True), measures[2].notes[-1])
+        self.assertEqual(measures[3].previous(flattenLocalSites=True), measures[2][-1])
 
         self.assertEqual(measures[3].next(), measures[4])
         self.assertEqual(measures[3].next('Note', flattenLocalSites=True), measures[3].notes[0])

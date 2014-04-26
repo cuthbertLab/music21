@@ -346,7 +346,7 @@ class TextBox(base.Music21Object, TextFormat):
         :width: 600
 
     '''
-    classSortOrder = -11 # text expressions are -10
+    classSortOrder = -31 # text expressions are -30
 
     def __init__(self, content=None, x=500, y=500):
         base.Music21Object.__init__(self)

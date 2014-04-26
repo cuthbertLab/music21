@@ -5,9 +5,10 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
 '''
@@ -227,6 +228,7 @@ class Stream(base.Music21Object):
 
     >>> c1 = clef.TrebleClef()
     >>> c1.offset = 0.0
+    >>> c1.priority = -1
     >>> n1 = note.EighthNote("E-6")
     >>> n1.offset = 1.0
     >>> p1 = stream.Part()
@@ -247,6 +249,7 @@ class Stream(base.Music21Object):
     # forms of checking class
     isStream = True
     isMeasure = False
+    classSortOrder = -20
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['append', 'insert', 'insertAndShift',
@@ -3657,8 +3660,10 @@ class Stream(base.Music21Object):
                 m.removeByClass(['GeneralNote', 'Stream', 'Dynamic', 'Expression'])
 
             if fillWithRests:
+                if self.id == 'Soprano':
+                    pass
                 # quarterLength duration will be appropriate to pickup
-                m.insert(0, note.Rest(quarterLength=ql))
+                m.insert(0.0, note.Rest(quarterLength=ql))
         return measureTemplate
 
     def measureOffsetMap(self, classFilterList=None):
@@ -4306,10 +4311,10 @@ class Stream(base.Music21Object):
         >>> qj.measures(1,2).show('text')
         {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
         {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
             {0.0} <music21.key.KeySignature of 1 flat, mode major>
             {0.0} <music21.meter.TimeSignature 2/4>
-            {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.note.Note C>
             {1.5} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
@@ -4324,10 +4329,10 @@ class Stream(base.Music21Object):
         >>> qj2.measures(1,2).show('text')
         {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
         {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
             {0.0} <music21.key.KeySignature of 3 flats>
             {0.0} <music21.meter.TimeSignature 2/4>
-            {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.note.Note B->
             {1.5} <music21.note.Note A->
         {2.0} <music21.stream.Measure 2 offset=2.0>
@@ -6064,21 +6069,23 @@ class Stream(base.Music21Object):
         '''
         # trust if this is sorted: do not sort again
         # experimental
-        import random
         if (not self.isSorted and self._mutable) or force:
             #environLocal.printDebug(['sorting _elements, _endElements'])
-            self._elements.sort(
-                cmp=lambda x, y: cmp(
-                    x.getOffsetBySite(self), y.getOffsetBySite(self))
-                    or cmp(x.priority, y.priority)
-                    or cmp(x.classSortOrder, y.classSortOrder)
-                    or cmp(not x.isGrace, not y.isGrace) # sort graces first
-                    #or cmp(random.randint(1,30), random.randint(1,30))
-                )
-            self._endElements.sort(
-                cmp=lambda x, y: cmp(x.priority, y.priority) or
-                    cmp(x.classSortOrder, y.classSortOrder)
-                )
+#             self._elements.sort(
+#                 cmp=lambda x, y: cmp(
+#                     x.getOffsetBySite(self), y.getOffsetBySite(self))
+#                     or cmp(x.priority, y.priority)
+#                     or cmp(x.classSortOrder, y.classSortOrder)
+#                     or cmp(not x.isGrace, not y.isGrace) # sort graces first
+#                     #or cmp(random.randint(1,30), random.randint(1,30))
+#                 )
+#             self._endElements.sort(
+#                 cmp=lambda x, y: cmp(x.priority, y.priority) or
+#                     cmp(x.classSortOrder, y.classSortOrder)
+#                 )
+            self._elements.sort(key=lambda x: x.sortTuple(self))
+            self._endElements.sort(key=lambda x: x.sortTuple(self))
+
             # as sorting changes order, elements have changed;
             # need to clear cache, but flat status is the same
             self._elementsChanged(updateIsFlat=False, clearIsSorted=False)
@@ -6552,10 +6559,10 @@ class Stream(base.Music21Object):
         >>> s.insert(0, p2)
         >>> sf = s.semiFlat
         >>> sf.elements
-        (<music21.stream.Part part1>, <music21.note.Note C>, <music21.stream.Part part2>, <music21.note.Note D>)
+        (<music21.stream.Part part1>, <music21.stream.Part part2>, <music21.note.Note C>, <music21.note.Note D>)
         >>> sf[0]
         <music21.stream.Part part1>
-        >>> sf[1]
+        >>> sf[2]
         <music21.note.Note C>
         >>> sf[0][0]
         <music21.note.Note C>
@@ -9117,7 +9124,7 @@ class Stream(base.Music21Object):
                     except:
                         pass
                     if interval1 is not None:
-                        break
+                        break # inner loop
 
     def attachMelodicIntervals(self):
         '''For each element in self, creates an interval.Interval object in the element's

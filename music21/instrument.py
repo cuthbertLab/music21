@@ -122,7 +122,7 @@ class Instrument(base.Music21Object):
     be better to subclass.
     '''
     
-    classSortOrder = 1
+    classSortOrder = -25
 
     def __init__(self):
         base.Music21Object.__init__(self)

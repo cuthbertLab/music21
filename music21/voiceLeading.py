@@ -1014,12 +1014,18 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
     >>> c = corpus.parse('bach/bwv66.6')
     >>> n1 = c.flat.getElementsByClass(note.Note)[0]
     >>> voiceLeading.getVerticalityFromObject(n1, c)
-    <music21.voiceLeading.Verticality contentDict={0: [<music21.clef.TrebleClef>, <music21.instrument.Instrument P1: Soprano: Instrument 1>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C#>], 1: [<music21.clef.TrebleClef>, <music21.instrument.Instrument P2: Alto: Instrument 2>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note E>], 2: [<music21.clef.BassClef>, <music21.instrument.Instrument P3: Tenor: Instrument 3>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>], 3: [<music21.clef.BassClef>, <music21.instrument.Instrument P4: Bass: Instrument 4>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>]}
+    <music21.voiceLeading.Verticality contentDict={0: [<music21.instrument.Instrument P1: Soprano: Instrument 1>, <music21.clef.TrebleClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C#>], 
+              1: [<music21.instrument.Instrument P2: Alto: Instrument 2>, <music21.clef.TrebleClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note E>],
+              2: [<music21.instrument.Instrument P3: Tenor: Instrument 3>, <music21.clef.BassClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>], 
+              3: [<music21.instrument.Instrument P4: Bass: Instrument 4>, <music21.clef.BassClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>]}
 
     for getting things at the beginning of scores, probably better to use a classFilterList:
 
     >>> voiceLeading.getVerticalityFromObject(n1, c, classFilterList = [note.Note, chord.Chord, note.Rest])
-    <music21.voiceLeading.Verticality contentDict={0: [<music21.note.Note C#>], 1: [<music21.note.Note E>], 2: [<music21.note.Note A>], 3: [<music21.note.Note A>]}
+    <music21.voiceLeading.Verticality contentDict={0: [<music21.note.Note C#>], 
+              1: [<music21.note.Note E>], 
+              2: [<music21.note.Note A>], 
+              3: [<music21.note.Note A>]}
     '''
     offsetOfObject =  music21Obj.getOffsetBySite(scoreObjectIsFrom.flat)
 

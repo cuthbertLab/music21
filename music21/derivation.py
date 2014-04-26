@@ -4,8 +4,9 @@
 # Purpose:      Class for storing and managing Stream-based derivations
 #
 # Authors:      Christopher Ariza
+#               Josiah Oberholtzer
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2011-2014 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL
 #------------------------------------------------------------------------------
@@ -43,11 +44,18 @@ class Derivation(SlottedObject):
 
     ::
 
-        >>> import copy
         >>> s1 = stream.Stream()
-        >>> s2 = stream.Stream()
+        >>> s1.id = "DerivedStream"
         >>> d1 = derivation.Derivation(s1)
+
+        >>> s2 = stream.Stream()
+        >>> s2.id = "OriginalStream"
+
+        
+        >>> d1.method = 'manual'
         >>> d1.origin = s2
+        >>> d1
+        <Derivation of <music21.stream.Stream DerivedStream> from <music21.stream.Stream OriginalStream> via "manual">
         >>> d1.origin is s2
         True
 
@@ -58,6 +66,7 @@ class Derivation(SlottedObject):
 
     ::
 
+        >>> import copy
         >>> d2 = copy.deepcopy(d1)
         >>> d2.origin is s2
         True
@@ -67,6 +76,25 @@ class Derivation(SlottedObject):
         >>> d1.method = 'measure'
         >>> d1.method
         'measure'
+        
+    Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
+    
+    ::
+
+        >>> import gc  # Garbage collection...
+        >>> del(s2)
+        >>> unused = gc.collect()  # ensure Garbage collection is run
+        >>> d1
+        <Derivation of <music21.stream.Stream DerivedStream> from <music21.stream.Stream OriginalStream> via "measure">
+
+
+    But deleting the client stream changes the Derivation, since client is held by weak ref:
+
+    ::
+        >>> del(s1)
+        >>> unused = gc.collect()  # ensure Garbage collection is run
+        >>> d1
+        <Derivation of None from <music21.stream.Stream OriginalStream> via "measure">
 
     '''
 
@@ -104,6 +132,17 @@ class Derivation(SlottedObject):
         new.client = self.client
         new.origin = self.origin
         return new
+
+    def __repr__(self):
+        '''
+        representation of the Derivation
+        '''
+        return '<%(class)s of %(client)s from %(origin)s via "%(method)s">' % {
+                        'class': self.__class__.__name__,
+                        'client': self.client,
+                        'origin': self.origin,
+                        'method': self.method
+                                }
 
     ### PUBLIC METHODS ###
 
