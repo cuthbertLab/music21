@@ -646,11 +646,11 @@ class Test(unittest.TestCase):
         a = converter.parse(thisWork)
 
         b = a[3][10:20]
-        environLocal.printDebug(['b', b, b.getSiteIds()])
+        environLocal.printDebug(['b', b, b.sites.getSiteIds()])
         c = a[3][20:30]
-        environLocal.printDebug(['c', c, c.getSiteIds()])
+        environLocal.printDebug(['c', c, c.sites.getSiteIds()])
         d = a[3][30:40]
-        environLocal.printDebug(['d', d, d.getSiteIds()])
+        environLocal.printDebug(['d', d, d.sites.getSiteIds()])
 
         s2 = Stream()
         environLocal.printDebug(['s2', s2, id(s2)])
@@ -1700,7 +1700,7 @@ class Test(unittest.TestCase):
         post = s1.flat.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
-        self.assertEqual(s3 in s1.getSites(), True)
+        self.assertEqual(s3 in s1.sites.getSites(), True)
         s1Measures = s1.makeMeasures()
         #print s1Measures[0].clef
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
@@ -2008,13 +2008,13 @@ class Test(unittest.TestCase):
         s1 = Stream()
         s1.insert(n1)
 
-        #environLocal.printDebug(['n1.siteIds after one insertion', n1, n1.getSites(), n1.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds after one insertion', n1, n1.getSites(), n1.sites.getSiteIds()])
 
 
         s2 = Stream()
         s2.insert(s1)
 
-        #environLocal.printDebug(['n1.siteIds after container insertion', n1, n1.getSites(), n1.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds after container insertion', n1, n1.getSites(), n1.sites.getSiteIds()])
 
         s2Flat = s2.flat
 
@@ -2022,7 +2022,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['s2', s2, id(s2)])    
         #environLocal.printDebug(['s2flat', s2Flat, id(s2Flat)])
 
-        #environLocal.printDebug(['n1.siteIds', n1, n1.getSites(), n1.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds', n1, n1.getSites(), n1.sites.getSiteIds()])
 
         # previously, one of these raised an error
         unused_s3 = copy.deepcopy(s2Flat)
@@ -4689,7 +4689,7 @@ class Test(unittest.TestCase):
             p1.append(n)
 
         p2 = stream.Part()
-        for p, ql in [(None, 2), ('d3',1), ('d#3',1), (None, 2), ('e5',2), (None, 2)]:
+        for p, ql in [(None, 2), ('c#3',1), ('d#3',1), (None, 2), ('e-5',2), (None, 2)]:
             if p == None:
                 n = note.Rest()
             else:
@@ -4721,7 +4721,8 @@ class Test(unittest.TestCase):
             'Rest')), 3)
 
         # calling this on a flattened version
-        scoreChords = score.flat.makeChords()
+        scoreFlat = score.flat
+        scoreChords = scoreFlat.makeChords()
         self.assertEqual(len(scoreChords.flat.getElementsByClass(
             'Chord')), 3)
         self.assertEqual(len(scoreChords.flat.getElementsByClass(
@@ -4735,7 +4736,7 @@ class Test(unittest.TestCase):
             'Rest')), 2)
 
         self.assertEqual(str(scoreChordify.getElementsByClass(
-            'Chord')[0].pitches), '(<music21.pitch.Pitch D2>, <music21.pitch.Pitch D3>)')
+            'Chord')[0].pitches), '(<music21.pitch.Pitch D2>, <music21.pitch.Pitch C#3>)')
         self.assertEqual(str(scoreChordify.getElementsByClass(
             'Chord')[1].pitches), '(<music21.pitch.Pitch D2>, <music21.pitch.Pitch D#3>)')
 
@@ -7356,6 +7357,8 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
+    #import sys
+    #sys.argv.append('ChordifyRests')
     music21.mainTest(Test)
 
 

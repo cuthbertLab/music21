@@ -1199,6 +1199,8 @@ class Stream(base.Music21Object):
         new = self.__class__()
         old = self
         for name in self.__dict__:
+            #if 'Score' in old.__class__.__name__:
+            #    environLocal.warn('%r, %r, %s' % (old, new, name))
             if name.startswith('__'):
                 continue
             attrValue = getattr(self, name)
@@ -1245,6 +1247,8 @@ class Stream(base.Music21Object):
                     # get the old offset from the activeSite Stream
                     # user here to provide new offset
                     new._storeAtEndCore(copy.deepcopy(e, memo))
+            elif name == 'id' and type(old.id) == int:
+                pass
             else:
                 try:
                     deeplyCopiedObject = copy.deepcopy(attrValue, memo)
@@ -1991,7 +1995,7 @@ class Stream(base.Music21Object):
         self._elementsChanged(updateIsFlat=updateIsFlat)
 
         if allTargetSites:
-            for site in target.getSites():
+            for site in target.sites.getSites():
                 # each site must be a Stream
                 if site is None or site is self:
                     continue
@@ -2895,8 +2899,9 @@ class Stream(base.Music21Object):
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
-            offset = e.getOffsetBySite(self)
+                
             dur = e.duration
+            offset = e.getOffsetBySite(self)
             offset = common.cleanupFloat(offset)
 
             if offset > offsetEnd:  # anything that ends after the span is definitely out

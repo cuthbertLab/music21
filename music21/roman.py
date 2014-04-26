@@ -1936,7 +1936,7 @@ class Test(unittest.TestCase):
             targetCount,
             )
         for e in s2.flat.getElementsByClass('KeySignature'):
-            for site in e.getSites():
+            for site in e.sites.getSites():
                 if site is not None:
                     site.remove(e)
         #s2.show()
@@ -1987,7 +1987,7 @@ class Test(unittest.TestCase):
         # first rn's active site is the Measure
         self.assertEqual(id(s[1][0][2].activeSite), id(s[1][0]))
         self.assertEqual(id(s[1][0][3].activeSite), id(s[1][0]))
-        self.assertEqual(s[1][0] in s[1][0][3].getSites(), True)
+        self.assertEqual(s[1][0] in s[1][0][3].sites.getSites(), True)
         for e in s._yieldElementsDownward(streamsOnly=False):
             if 'KeySignature' in e.classes:
                 e.activeSite.remove(e)

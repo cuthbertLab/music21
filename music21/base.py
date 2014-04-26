@@ -33,7 +33,7 @@ available after importing music21.
 ::
 
     >>> music21.VERSION_STR
-    '1.9.0'
+    '1.9.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -275,9 +275,9 @@ class Site(SlottedObject):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        'class',
-        'globalInsertIndex',
-        'insertIndex',
+        'classString',
+        'globalSiteIndex',
+        'siteIndex',
         'isDead',
         'obj',
         'offset',
@@ -377,28 +377,37 @@ class Sites(SlottedObject):
         locations = []  # self._locationKeys[:]
         #environLocal.printDebug(['Sites.__deepcopy__', 'self._definedContexts.keys()', self._definedContexts.keys()])
         for idKey in self._definedContexts:
-            singleContextDict = self._definedContexts[idKey]
-            if singleContextDict['isDead']:
+            oldSite = self._definedContexts[idKey]
+            if oldSite.isDead:
                 continue  # do not copy dead references
-            post = {}
-            post['obj'] = singleContextDict['obj']  # already a weak ref
-
+            newSite = Site()
+            newSite.obj = oldSite.obj
+            if oldSite.obj is None:
+                newIdKey = None
+            else:
+                newIdKey = id(common.unwrapWeakref(newSite.obj))
+                #if newIdKey != idKey and oldSite.obj != None:
+                #    print "WHOA! %s %s" % (newIdKey, idKey)
             # not copying the offset in deepcopying means that
             # the old site becomes a context, not a site
             # this is still experimental
-            # post['offset'] = None
+            # post.offset = None
+            newSite.offset = oldSite.offset
+            if newSite.offset is not None:
+                locations.append(newIdKey)  # if offset not None, a location
 
-            post['offset'] = singleContextDict['offset']
-            if post['offset'] is not None:
-                locations.append(idKey)  # if offset not None, a location
-
-            post['siteIndex'] = singleContextDict['siteIndex']  # assume still valid
-            post['class'] = singleContextDict['class']
-            post['isDead'] = False
-            new._definedContexts[idKey] = post
+            newSite.siteIndex = oldSite.siteIndex
+            newSite.globalSiteIndex = _singletonCounter()
+            newSite.classString = oldSite.classString
+            newSite.isDead = False
+            ### debug
+            #originalObj = common.unwrapWeakref(post.obj)
+            #if id(originalObj) != idKey and originalObj is not None:
+            #    print idKey, id(originalObj)
+            new._definedContexts[newIdKey] = newSite
 
         new._locationKeys = locations
-        new._siteIndex = self._siteIndex  # keep for coherency
+        new._siteIndex = self._siteIndex  # keep to stay coherent
         return new
 
     def __len__(self):
@@ -439,13 +448,13 @@ class Sites(SlottedObject):
             >>> aSites.add(aObj)
             >>> aSites.add(bObj)
             >>> k = aSites._keysByTime()
-            >>> aSites._definedContexts[k[0]]['siteIndex'] > aSites._definedContexts[k[1]]['siteIndex'] > aSites._definedContexts[k[2]]['siteIndex']
+            >>> aSites._definedContexts[k[0]].siteIndex > aSites._definedContexts[k[1]].siteIndex > aSites._definedContexts[k[2]].siteIndex
             True
 
         '''
         post = []
         for key in self._definedContexts:
-            post.append((self._definedContexts[key]['siteIndex'], key))
+            post.append((self._definedContexts[key].siteIndex, key))
         post.sort()
         if newFirst:
             post.reverse()
@@ -511,6 +520,8 @@ class Sites(SlottedObject):
         updateNotAdd = False
         if idKey in self._definedContexts:
             updateNotAdd = True
+            #if idKey is not None:
+            #    print "Updating idKey %s for object %s" % (idKey, id(obj))
 
         if offset is not None:  # a location, not a context
             if idKey not in self._locationKeys:
@@ -528,18 +539,23 @@ class Sites(SlottedObject):
             objRef = self._prepareObject(obj)
 
         if updateNotAdd is True:
+            #if obj is not None and id(obj) != idKey:
+            #    print("RED ALERT!")
             singleContextDict = self._definedContexts[idKey]
         else:
-            singleContextDict = {}
+            singleContextDict = Site()
+            #if id(obj) != idKey and obj is not None:
+            #    print "Houston, we have a problem %r" % obj
 
-        singleContextDict['obj'] = objRef  # a weak ref
-        singleContextDict['offset'] = offset  # offset can be None for contexts
-        singleContextDict['class'] = classString
-        singleContextDict['isDead'] = False  # store to access w/o unwrapping
+        singleContextDict.obj = objRef  # a weak ref
+        singleContextDict.offset = offset  # offset can be None for contexts
+        singleContextDict.classString = classString
+        # default
+        # singleContextDict.isDead = False  # store to access w/o unwrapping
         # time is a numeric count, not a real time measure
-        singleContextDict['siteIndex'] = self._siteIndex
+        singleContextDict.siteIndex = self._siteIndex
         self._siteIndex += 1  # increment for next usage
-        singleContextDict['globalSiteIndex'] = _singletonCounter() # increments
+        singleContextDict.globalSiteIndex = _singletonCounter() # increments
         ##
         if not updateNotAdd:  # add new/missing information to dictionary
             self._definedContexts[idKey] = singleContextDict
@@ -621,17 +637,17 @@ class Sites(SlottedObject):
         for key in keys:
             singleContextDict = self._definedContexts[key]
             # check for None object; default location, not a weakref, keep
-            if singleContextDict['obj'] is None:
+            if singleContextDict.obj is None:
                 if not excludeNone:
-                    post.append(singleContextDict['obj'])
+                    post.append(singleContextDict.obj)
             elif WEAKREF_ACTIVE:
-                obj = common.unwrapWeakref(singleContextDict['obj'])
+                obj = common.unwrapWeakref(singleContextDict.obj)
                 if obj is None:  # dead ref
-                    singleContextDict['isDead'] = True
+                    singleContextDict.isDead = True
                 else:
                     post.append(obj)
             else:
-                post.append(singleContextDict['obj'])
+                post.append(singleContextDict.obj)
 
         # remove dead references
 #         if autoPurge:
@@ -882,9 +898,9 @@ class Sites(SlottedObject):
         # need to check if these is weakref
         #if common.isWeakref(dict['obj']):
         if WEAKREF_ACTIVE:
-            return common.unwrapWeakref(singleContextDict['obj'])
+            return common.unwrapWeakref(singleContextDict.obj)
         else:
-            return singleContextDict['obj']
+            return singleContextDict.obj
 
     def getOffsetByObjectMatch(self, obj):
         '''
@@ -916,16 +932,16 @@ class Sites(SlottedObject):
         '''
         for idKey in self._definedContexts:
             singleContextDict = self._definedContexts[idKey]
-            if singleContextDict['isDead']: # cal alway skip
+            if singleContextDict.isDead: # always skip
                 continue
             # must unwrap references before comparison
             #if common.isWeakref(dict['obj']):
             if WEAKREF_ACTIVE:
-                compareObj = common.unwrapWeakref(singleContextDict['obj'])
+                compareObj = common.unwrapWeakref(singleContextDict.obj)
             else:
-                compareObj = singleContextDict['obj']
+                compareObj = singleContextDict.obj
             if compareObj is None: # mark isDead for later removal
-                singleContextDict['isDead'] = True
+                singleContextDict.isDead = True
                 continue
             if id(compareObj) == id(obj):
                 #environLocal.printDebug(['found object as site', obj, id(obj), 'idKey', idKey])
@@ -1001,17 +1017,17 @@ class Sites(SlottedObject):
 
             >>> idBSite = id(bSite)
             >>> del(bSite)
-            >>> aLocations._definedContexts[idBSite]['obj']
+            >>> aLocations._definedContexts[idBSite].obj
             <weakref at 0x...; dead>
 
         ::
 
-            >>> aLocations._definedContexts[idBSite]['obj'] is None
+            >>> aLocations._definedContexts[idBSite].obj is None
             False
 
         ::
 
-            >>> common.unwrapWeakref(aLocations._definedContexts[idBSite]['obj']) is None
+            >>> common.unwrapWeakref(aLocations._definedContexts[idBSite].obj) is None
             True
 
         ::
@@ -1034,9 +1050,9 @@ class Sites(SlottedObject):
 #        if idKey == self._lastID:
 #            return self._lastOffset
         try:
-            value = self._definedContexts[idKey]['offset']
-            if WEAKREF_ACTIVE and strictDeadCheck is True and self._definedContexts[idKey]['obj'] is not None:
-                obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+            value = self._definedContexts[idKey].offset
+            if WEAKREF_ACTIVE and strictDeadCheck is True and self._definedContexts[idKey].obj is not None:
+                obj = common.unwrapWeakref(self._definedContexts[idKey].obj)
                 if obj is None:
                     #if self._definedContexts[idKey]['isDead'] is True: # not good enough
                     errorMsg = "Could not find the object with id %s in the Site marked with idKey %s (was there, now site is dead). " % (id(self), idKey)
@@ -1054,9 +1070,9 @@ class Sites(SlottedObject):
             if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
                 raise SitesException('attempted to set a bound offset with a string attribute that is not supported: %s' % value)
             if WEAKREF_ACTIVE:
-                obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+                obj = common.unwrapWeakref(self._definedContexts[idKey].obj)
             else:
-                obj = self._definedContexts[idKey]['obj']
+                obj = self._definedContexts[idKey].obj
             # offset value is an attribute string
             # canot cache these values as may change outside of definedcontexts
             return getattr(obj, value)
@@ -1119,10 +1135,10 @@ class Sites(SlottedObject):
         match = None
         for siteId in self._definedContexts:
             # might need to use almost equals here
-            if self._definedContexts[siteId]['offset'] == offset:
-                if self._definedContexts[siteId]['isDead']:
+            if self._definedContexts[siteId].offset == offset:
+                if self._definedContexts[siteId].isDead:
                     return None
-                match = self._definedContexts[siteId]['obj']
+                match = self._definedContexts[siteId].obj
                 break
         if WEAKREF_ACTIVE:
             if match is None: # this is a dead erfs
@@ -1141,9 +1157,9 @@ class Sites(SlottedObject):
         count = 0
         for idKey in self._locationKeys:
             thisContext = self._definedContexts[idKey]
-            if thisContext['isDead'] is True:
+            if thisContext.isDead is True:
                 continue
-            if thisContext['obj'] is None:
+            if thisContext.obj is None:
                 continue
             count += 1
         return count
@@ -1204,11 +1220,11 @@ class Sites(SlottedObject):
                 if idKey in idExclude:
                     continue
             try:
-                objRef = self._definedContexts[idKey]['obj']
+                objRef = self._definedContexts[idKey].obj
             except KeyError:
                 raise SitesException('no such site: %s' % idKey)
             # skip dead references
-            if self._definedContexts[idKey]['isDead']:
+            if self._definedContexts[idKey].isDead:
                 continue
             if idKey is None:
                 if not excludeNone:
@@ -1218,7 +1234,7 @@ class Sites(SlottedObject):
             else:
                 obj = common.unwrapWeakref(objRef)
                 if obj is None:
-                    self._definedContexts[idKey]['isDead'] = True
+                    self._definedContexts[idKey].isDead = True
                     continue
                 post.append(obj)
         return post
@@ -1255,11 +1271,11 @@ class Sites(SlottedObject):
             className = common.classToClassStr(className)
 
         for idKey in self._locationKeys:
-            if self._definedContexts[idKey]['isDead']:
+            if self._definedContexts[idKey].isDead:
                 continue
-            classStr = self._definedContexts[idKey]['class']
+            classStr = self._definedContexts[idKey].classString
             if classStr == className:
-                objRef = self._definedContexts[idKey]['obj']
+                objRef = self._definedContexts[idKey].obj
                 if not WEAKREF_ACTIVE: # leave None alone
                     obj = objRef
                 else:
@@ -1302,9 +1318,9 @@ class Sites(SlottedObject):
         by looking for a SpannerStorage Stream class as a Site.
         '''
         for idKey in self._locationKeys:
-            if self._definedContexts[idKey]['isDead']:
+            if self._definedContexts[idKey].isDead:
                 continue
-            if self._definedContexts[idKey]['class'] == 'SpannerStorage':
+            if self._definedContexts[idKey].classString == 'SpannerStorage':
                 return True
         return False
 
@@ -1314,9 +1330,9 @@ class Sites(SlottedObject):
         by looking for a VariantStorage Stream class as a Site.
         '''
         for idKey in self._locationKeys:
-            if self._definedContexts[idKey]['isDead']:
+            if self._definedContexts[idKey].isDead:
                 continue
-            if self._definedContexts[idKey]['class'] == 'VariantStorage':
+            if self._definedContexts[idKey].classString == 'VariantStorage':
                 return True
         return False
 
@@ -1387,22 +1403,22 @@ class Sites(SlottedObject):
             for idKey in self._locationKeys:
                 if idKey is None:
                     continue
-                if self._definedContexts[idKey]['isDead']:
+                if self._definedContexts[idKey].isDead:
                     continue  # already marked
                 if WEAKREF_ACTIVE:
                     obj = common.unwrapWeakref(
-                        self._definedContexts[idKey]['obj'])
+                        self._definedContexts[idKey].obj)
                 else:
-                    obj = self._definedContexts[idKey]['obj']
+                    obj = self._definedContexts[idKey].obj
                 if obj is None: # if None, it no longer exists
-                    self._definedContexts[idKey]['isDead'] = True
+                    self._definedContexts[idKey].isDead = True
         # use previously set isDead entry, so as not to
         # unwrap all references
         remove = []
         for idKey in self._locationKeys:
             if idKey is None:
                 continue
-            if self._definedContexts[idKey]['isDead']:
+            if self._definedContexts[idKey].isDead:
                 remove.append(idKey)
         for idKey in remove:
             # this call changes the ._locationKeys list, and thus must be
@@ -1493,7 +1509,10 @@ class Sites(SlottedObject):
             raise SitesException('trying to remove None idKey is not allowed')
 
         #environLocal.printDebug(['removeById', idKey, 'self._definedContexts.keys()', self._definedContexts.keys()])
-        del self._definedContexts[idKey]
+        try:
+            del self._definedContexts[idKey]
+        except KeyError:
+            pass # could already be gone...
         if idKey in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(idKey))
 
@@ -1562,7 +1581,7 @@ class Sites(SlottedObject):
             siteId = id(site)
         # will raise an index error if the siteId does not exist
         try:
-            self._definedContexts[siteId]['offset'] = value
+            self._definedContexts[siteId].offset = value
             self._lastID = siteId
             self._lastOffset = value
         except KeyError:
@@ -1576,7 +1595,7 @@ class Sites(SlottedObject):
         The `siteId` parameter can be None.
         '''
         try:
-            self._definedContexts[siteId]['offset'] = value
+            self._definedContexts[siteId].offset = value
             self._lastID = siteId
             self._lastOffset = value
         except KeyError:
@@ -1600,18 +1619,18 @@ class Sites(SlottedObject):
 
         ::
 
-            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
+            >>> common.isWeakref(aSites._definedContexts[id(aObj)].obj)
             True
 
         ::
 
             >>> aSites.unwrapWeakref()
-            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
+            >>> common.isWeakref(aSites._definedContexts[id(aObj)].obj)
             False
 
         ::
 
-            >>> common.isWeakref(aSites._definedContexts[id(bObj)]['obj'])
+            >>> common.isWeakref(aSites._definedContexts[id(bObj)].obj)
             False
 
         '''
@@ -1623,13 +1642,13 @@ class Sites(SlottedObject):
         for idKey in self._definedContexts:
             if WEAKREF_ACTIVE:
             #if common.isWeakref(self._definedContexts[idKey]['obj']):
-                target = self._definedContexts[idKey]['obj']
+                target = self._definedContexts[idKey].obj
                 if target is None:
                     continue
                 if common.isWeakref(target):
                     #environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
                     target = common.unwrapWeakref(target)
-                    self._definedContexts[idKey]['obj'] = target
+                    self._definedContexts[idKey].obj = target
 
     def wrapWeakref(self):
         '''
@@ -1647,22 +1666,22 @@ class Sites(SlottedObject):
             >>> aSites.add(bObj)
             >>> aSites.unwrapWeakref()
             >>> aSites.wrapWeakref()
-            >>> common.isWeakref(aSites._definedContexts[id(aObj)]['obj'])
+            >>> common.isWeakref(aSites._definedContexts[id(aObj)].obj)
             True
 
         ::
 
-            >>> common.isWeakref(aSites._definedContexts[id(bObj)]['obj'])
+            >>> common.isWeakref(aSites._definedContexts[id(bObj)].obj)
             True
 
         '''
         for idKey in self._definedContexts:
-            if self._definedContexts[idKey]['obj'] is None:
+            if self._definedContexts[idKey].obj is None:
                 continue  # always skip None
-            if not common.isWeakref(self._definedContexts[idKey]['obj']):
-                #environLocal.printDebug(['wrapping:', self._definedContexts[idKey]['obj']])
-                post = common.wrapWeakref(self._definedContexts[idKey]['obj'])
-                self._definedContexts[idKey]['obj'] = post
+            if not common.isWeakref(self._definedContexts[idKey].obj):
+                #environLocal.printDebug(['wrapping:', self._definedContexts[idKey].obj)
+                post = common.wrapWeakref(self._definedContexts[idKey].obj)
+                self._definedContexts[idKey].obj = post
 
 
 #------------------------------------------------------------------------------
@@ -2375,6 +2394,14 @@ class Music21Object(object):
         True
         '''
         if not self.sites.isSite(site):
+#             self.sites.isSite(site)
+#             for s in self.sites._definedContexts:
+#                 # DEBUG!
+#                 print s,
+#                 ts = self.sites._definedContexts[s]
+#                 print ts.obj,
+#                 print common.unwrapWeakref(ts.obj)
+                
             raise Music21ObjectException('supplied site (%s) is not a site in this object: %s' % (site, self))
         #environLocal.printDebug(['removed location by site:', 'self', self, 'site', site])
         self.sites.remove(site)
@@ -3067,7 +3094,8 @@ class Music21Object(object):
                 return 0.0 # might not have a None offset
         else:
             # try to look for it in all objects
-            environLocal.printDebug(['doing a manual activeSite search: probably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%r)' % (id(self.activeSite), self._activeSiteId)])
+            environLocal.printDebug(['doing a manual activeSite search: probably means that ' + 
+                                     'id(self.activeSite) (%s) is not equal to self._activeSiteId (%r)' % (id(self.activeSite), self._activeSiteId)])
             #environLocal.printDebug(['activeSite', self.activeSite, 'self.sites.hasSiteId(activeSiteId)', self.sites.hasSiteId(activeSiteId)])
             #environLocal.printDebug(['self.hasSite(self.activeSite)', self.hasSite(self.activeSite)])
 
@@ -3076,7 +3104,8 @@ class Music21Object(object):
             return offset
 
             #environLocal.printDebug(['self.sites', self.sites._definedContexts])
-        raise Exception('request within %s for offset cannot be made with activeSite of %s (id: %s)' % (self.__class__, self.activeSite, activeSiteId))
+        raise Exception('request within %s for offset cannot be made with activeSite of %s (id: %s)' % 
+                        (self.__class__, self.activeSite, activeSiteId) )
 
     def _setOffset(self, value):
         '''
@@ -3279,7 +3308,7 @@ class Music21Object(object):
         if (self._activeSiteId is not None and
             self.sites.hasSiteId(self._activeSiteId)):
             ## TODO -- expose a single Site so _definedContexts is not needed here.
-            insertIndex = self.sites._definedContexts[self._activeSiteId]['globalSiteIndex']
+            insertIndex = self.sites._definedContexts[self._activeSiteId].globalSiteIndex
         else:
             insertIndex = 0
         

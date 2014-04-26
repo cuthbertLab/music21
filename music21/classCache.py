@@ -94,7 +94,7 @@ class Repository(object):
         >>> r.insertIntoStream(s2, s1)
         >>> [(e, e.getOffsetBySite(s2)) for e in s2]
         [(<music21.note.Note C>, 30.0)]
-        >>> len(n1.getSites()) # does not add a site (2 streams, 1 None)
+        >>> len(n1.sites.getSites()) # does not add a site (2 streams, 1 None)
         3
         '''
 #         for e in self.elements:
