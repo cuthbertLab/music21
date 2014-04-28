@@ -337,7 +337,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 # define presented order in documentation
 
-_DOC_ORDER = []
+_DOC_ORDER = [Derivation]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

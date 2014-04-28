@@ -11,13 +11,9 @@ __all__ = ['checker',
            'segment']
 
 import sys
+from music21.ext import six
 
-if sys.version > '3':
-    python3 = True
-else:
-    python3 = False
-
-if python3:
+if six.PY3:
     from . import checker
     from . import examples
     from . import notation

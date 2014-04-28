@@ -561,7 +561,8 @@ class _EnvironmentCore(object):
         return self._keysToPaths
 
     def getRefKeys(self):
-        return self._ref.keys()
+        # list() is for python3 compatibility
+        return list(self._ref.keys())
 
     def getRootTempDir(self):
         if self._ref['directoryScratch'] is None:

@@ -54,32 +54,28 @@ import types
 import unittest
 #import uuid
 
-if sys.version > '3':
-    python3 = True
-else:
-    python3 = False
-    
-
+from music21.ext import six
 
 #------------------------------------------------------------------------------
 # string and tuple must be the same
 
 
-if python3:
+if six.PY3:
     basestring = str # @ReservedAssignment
-    from ._version import __version__, __version_info__ # @UnusedImport
-else:
-    from _version import __version__, __version_info__ # @Reimport
+
+from music21._version import __version__, __version_info__
 VERSION = __version_info__
 VERSION_STR = __version__
 #------------------------------------------------------------------------------
-
+__all__ = ['Music21Exception', 'VERSION', 'VERSION_STR', 'SitesException', 'Music21ObjectException',
+           'ElementException', 'SlottedObject', 'Groups', 'Site', 'Sites',
+           'Music21Object','ElementWrapper','mainTest']
+## N.B. for eclipse "all" import working, we need to list this separately in "music21/__init__.py"
+##      so make sure to update in both places
 
 #-----all exceptions are in the exceptions21 package.
-if python3:
-    from . import exceptions21 # @UnusedImport
-else:
-    from music21 import exceptions21 # @Reimport
+from music21 import exceptions21
+
 Music21Exception = exceptions21.Music21Exception
 
 from music21 import common
@@ -4715,6 +4711,7 @@ class ElementWrapper(Music21Object):
         a and b store either the same object OR objects that are equal.
         In other words, it is essentially the same object in a different context
 
+        >>> import copy
         >>> import music21
         >>> from music21 import note
 
@@ -5488,9 +5485,8 @@ class Test(unittest.TestCase):
             '<music21.tempo.MetronomeMark lento 16th=50>')
 
     def testElementWrapperOffsetAccess(self):
-        import music21
         from music21 import stream, meter
-
+        from music21 import base
         class Mock(object): pass
 
         s = stream.Stream()
@@ -5498,7 +5494,7 @@ class Test(unittest.TestCase):
         storage = []
         for i in range(0,2):
             mock = Mock()
-            el = music21.ElementWrapper(mock)
+            el = base.ElementWrapper(mock)
             storage.append(el)
             s.insert(i, el)
 
@@ -5512,7 +5508,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.getOffsetByElement(storage[1]), 1.0)
 
     def testGetActiveSiteTimeSignature(self):
-        import music21
+        from music21 import base
         from music21 import stream, meter
         class Wave_read(object): #_DOCS_HIDE
             def getnchannels(self): return 2 #_DOCS_HIDE
@@ -5524,7 +5520,7 @@ class Test(unittest.TestCase):
         for i in range(0,6):
             soundFile = Wave_read() #_DOCS_HIDE
             #el = music21.Music21Object() #
-            el = music21.ElementWrapper(soundFile)
+            el = base.ElementWrapper(soundFile)
             storage.append(el)
             #print el
             self.assertEqual(el.obj, soundFile)

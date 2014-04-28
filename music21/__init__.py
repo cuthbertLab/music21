@@ -48,11 +48,6 @@ owners who have allowed them to be included with music21.
 # but: base must come first; in some cases other modules depend on 
 # definitions in base
 
-import sys
-if sys.version > '3':
-    python3 = True
-else:
-    python3 = False
 
 __all__ = [
     'base', 
@@ -151,12 +146,24 @@ __all__ = [
 
 #-------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
-if python3:
-    from . import base # @UnresolvedImport
-    from .base import *
-else:
-    import base # @Reimport
-    from base import *
+from music21 import base
+from music21.base import VERSION
+from music21.base import VERSION_STR
+from music21.base import Music21Exception
+from music21.base import SitesException
+from music21.base import Music21ObjectException
+from music21.base import ElementException
+from music21.base import SlottedObject
+from music21.base import Groups
+from music21.base import Site
+from music21.base import Sites
+from music21.base import Music21Object
+from music21.base import ElementWrapper
+from music21.base import mainTest
+
+
+from music21.base import mainTest
+from music21.base import *
 #del(types)
 #del(sys)
 #del(imp)

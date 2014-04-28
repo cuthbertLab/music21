@@ -154,20 +154,11 @@ ydelta_       None                                               Not needed.
 __ALL__ = ['spineParser', 'instruments', 'testFiles']
 
 import sys
-if sys.version > '3':
-    python3 = True
-else:
-    python3 = False
 
-if python3:
-    from . import spineParser
-    from . import testFiles
-    from . import instruments
-else:
-    import spineParser # @Reimport
-    import testFiles # @Reimport
-    import instruments # @Reimport
-#import questions
+from music21.humdrum import instruments
+from music21.humdrum import spineParser
+from music21.humdrum import testFiles
+
 
 def parseFile(filename):
     '''

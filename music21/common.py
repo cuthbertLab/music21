@@ -1387,16 +1387,23 @@ def sortFilesRecent(fileList):
 
 
 def getMd5(value=None):
-    '''Return a string from an md5 haslib
+    '''
+    Return an md5 hash from a string.  If no value is given then
+    the current time plus a random number is encoded.
 
 
     >>> common.getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6'
+
     '''
     if value == None:
         value = str(time.time()) + str(random.random())
     m = hashlib.md5()
-    m.update(value)
+    try:
+        m.update(value)
+    except TypeError: # unicode...
+        m.update(value.encode('UTF-8'))
+    
     return m.hexdigest()
 
 

@@ -37,7 +37,7 @@ DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do
 '''
 
 
-import os, sys, tarfile, zipfile
+import hashlib, os, sys, tarfile, zipfile
 
 from music21 import base
 from music21 import common
@@ -281,56 +281,81 @@ class Distributor(object):
         #os.system('cd %s; %s setup.py bdist_egg upload' % 
         #        (self.fpPackageDir, PY))
 
-    def uploadGoogleCodeOneFile(self, fp):
-        '''Upload distributions to Google code. Requires googlecode_upload.py script from: 
-        http://code.google.com/p/support/source/browse/trunk/scripts/googlecode_upload.py
-        '''
-        import googlecode_upload # placed in site-packages
+#     def uploadGoogleCodeOneFile(self, fp):
+#         '''Upload distributions to Google code. Requires googlecode_upload.py script from: 
+#         http://code.google.com/p/support/source/browse/trunk/scripts/googlecode_upload.py
+#         
+#         As of January 2014, googleCode no longer accepts uploads so this method is no longer used.
+# 
+#         '''
+#         import googlecode_upload # placed in site-packages
+# 
+#         summary = self.version
+#         project = 'music21'
+#         user = 'cuthbert@gmail.com'
+# 
+#         if fp.endswith('.tar.gz'):
+#             labels = ['OpSys-All', 'Featured', 'Type-Archive']
+#         elif fp.endswith('.exe'):
+#             labels = ['OpSys-Windows', 'Featured', 'Type-Installer']
+#         elif fp.endswith('.egg'):
+#             labels = ['OpSys-All', 'Featured', 'Type-Archive']
+#         
+#         print(['starting GoogleCode upload of:', fp])
+#         status, reason, unused_url = googlecode_upload.upload_find_auth(fp, 
+#                         project, summary, labels, user)
+#         print([status, reason])
+# 
+# 
+#     def uploadGoogleCode(self):
+#         '''
+#         Upload each file to googleCode.
+#         
+#         As of January 2014, googleCode no longer accepts uploads so this method is no longer used.
+#         '''
+# #         for fp in [self.fpTar, self.fpEgg, self.fpWin, 
+# #             self.fpTarNoCorpus, self.fpEggNoCorpus]:
+#         if self.buildNoCorpus is True:
+#             fileList = (
+#                 self.fpEggNoCorpus,
+#                 self.fpTarNoCorpus,
+#                 self.fpWin,
+#                 self.fpEgg,
+#                 self.fpTar,
+#                 )
+#         else:
+#             fileList = (
+#                 self.fpWin,
+#                 self.fpEgg,
+#                 self.fpTar,
+#                 )
+#         
+#         for fp in fileList:
+#             self.uploadGoogleCodeOneFile(fp)
 
-        summary = self.version
-        project = 'music21'
-        user = 'cuthbert@gmail.com'
-
-        if fp.endswith('.tar.gz'):
-            labels = ['OpSys-All', 'Featured', 'Type-Archive']
-        elif fp.endswith('.exe'):
-            labels = ['OpSys-Windows', 'Featured', 'Type-Installer']
-        elif fp.endswith('.egg'):
-            labels = ['OpSys-All', 'Featured', 'Type-Archive']
-        
-        print(['starting GoogleCode upload of:', fp])
-        status, reason, unused_url = googlecode_upload.upload_find_auth(fp, 
-                        project, summary, labels, user)
-        print([status, reason])
-
-
-    def uploadGoogleCode(self):
-        '''
-        Upload each file to googleCode.
-        '''
-#         for fp in [self.fpTar, self.fpEgg, self.fpWin, 
-#             self.fpTarNoCorpus, self.fpEggNoCorpus]:
-        if self.buildNoCorpus is True:
-            fileList = (
-                self.fpEggNoCorpus,
-                self.fpTarNoCorpus,
-                self.fpWin,
-                self.fpEgg,
-                self.fpTar,
-                )
+    def md5ForFile(self, path, hexReturn=True):
+        if hexReturn:
+            return hashlib.md5(open(path, 'rb').read()).hexdigest()
         else:
-            fileList = (
-                self.fpWin,
-                self.fpEgg,
-                self.fpTar,
-                )
-        
-        for fp in fileList:
-            self.uploadGoogleCodeOneFile(fp)
+            return hashlib.md5(open(path, 'rb').read()).digest()
 
+    def getMD5Path(self):
+        '''
+        for PyPi
+        '''
+        gitHubPath = "https://github.com"
+        user = "cuthbertLab"
+        package = "music21"
+        releaseDownload = "releases/download"
+        version = "v" + self.version
+        filename = "music21-" + self.version + ".tar.gz"
 
-
-
+        fullUrl = "/".join([gitHubPath, user, package, releaseDownload, version, filename])
+        md5Prefix = "#md5="
+        md5Source = self.md5ForFile(self.fpTar)
+        hashedUrl = "".join([fullUrl, md5Prefix, md5Source])
+        print(hashedUrl)
+        return hashedUrl
 
     
 
@@ -341,6 +366,5 @@ if __name__ == '__main__':
     d.buildNoCorpus = True
     d.build()
     d.updatePaths()
-    #d.uploadGoogleCode()
-    #d.uploadGoogleCodeOneFile(d.fpTar)
+    d.getMD5Path()
     #d.uploadPyPi()

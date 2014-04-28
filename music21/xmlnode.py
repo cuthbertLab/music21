@@ -101,7 +101,7 @@ class XMLNode(object):
         >>> a._getAttributes()
         []
         '''
-        return self._attr.items()
+        return list(self._attr.items())
 
 
     def _getComponents(self):

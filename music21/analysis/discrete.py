@@ -646,6 +646,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         solution, unused_color = self.process(sStream.flat, storeAlternatives=True)
         # assign best solution
         k = self._solutionToObject(solution)
+        if k.alternateInterpretations is None:
+            k.alternateInterpretations = []
+            
         for sol in self._alternativeSolutions:
             # append each additional interpretation
             k.alternateInterpretations.append(self._solutionToObject(sol))

@@ -22,42 +22,43 @@ Introduction (to be taken from the **Quick Start**)
 14. Time Signatures
 15. Key Signatures and Keys
 16. Intervals
-17. More durations: Complex, ties, and tuplets
-18. Environment
-19. Basic Analysis Tools
-20. Advanced Meter topics
-21. Graphing
-22. Searching for Files and Metadata
-23. Making a local corpus
-24. Post tonal tools (1)
-25. Bars and Layout
-26. Repeats
-27. FreezeThaw
-28. Slurs
-29. Spanners
-30. Ossias, Variants, and musicDiff
-31. TinyNotation (2): Expanding and subclassing
+17. Derivations
+18. More durations: Complex, ties, and tuplets
+19. Environment
+20. Basic Analysis Tools
+21. Advanced Meter topics
+22. Graphing
+23. Searching for Files and Metadata
+24. Making a local corpus
+25. Post tonal tools (1)
+26. Bars and Layout
+27. Repeats
+28. FreezeThaw
+29. Slurs
+30. Spanners
+31. Ossias, Variants, and musicDiff
 32. Dynamics
 33. Searching in and among Scores
 34. Voice leading
 35. Automatic Reduction with OffsetTrees
-36. Clefs and Articulations
-37. Instruments
-38. Scales
-39. Audio searching
-40. Species counterpoint
-41. Roman numeral analysis
-42. Composing algorithmic music
-43. Feature Extraction (1)
-44. Repeats
-45. Post tonal tools (2): Advanced and Xenakis Sieves
-46. Chord symbols
-47. Expressions
-48. Tempo
-49. Feature Extraction (2)
-50. Figured Bass
-51. MIDI -- advanced
-52. Medieval and Renaissance extensions
+36. TinyNotation (2): Expanding and subclassing
+37. Clefs and Articulations
+38. Instruments
+39. Scales
+40. Audio searching
+41. Species counterpoint
+42. Roman numeral analysis
+43. Composing algorithmic music
+44. Feature Extraction (1)
+45. Repeats
+46. Post tonal tools (2): Advanced and Xenakis Sieves
+47. Chord symbols
+48. Expressions
+49. Tempo
+50. Feature Extraction (2)
+51. Figured Bass
+52. MIDI -- advanced
+53. Medieval and Renaissance extensions
 
 
 In[ ]:

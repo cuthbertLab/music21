@@ -24,10 +24,6 @@ from music21.romanText import testFiles
 import unittest
 import re
 import codecs
-#try:
-#    import StringIO # python 2 
-#except:
-#    from io import StringIO # python3 (also in python 2.6+)
 
 from music21 import common
 from music21 import exceptions21

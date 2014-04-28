@@ -15,14 +15,9 @@
 __all__ = ['translate', 'realtime', 'percussion']
 
 import sys
-
-if sys.version > '3':
-    from . import realtime
-    from . import percussion
-else:
-    import realtime # @Reimport
-    import percussion # @Reimport
-
+from music21.midi import realtime
+from music21.midi import percussion
+from music21.ext.six import StringIO
 
 '''
 Objects and tools for processing MIDI data.  Converts from MIDI files to
@@ -40,11 +35,6 @@ import unittest
 import unicodedata
 import os, string
 import struct
-
-try:
-    import StringIO # python 2 
-except ImportError:
-    from io import StringIO # python3 (also in python 2.6+)
 
 from music21 import common
 from music21 import exceptions21
@@ -1111,9 +1101,8 @@ class MidiFile(object):
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
 
-        >>> import StringIO  # in python3.0 use "from io import StringIO"
-        
-        >>> fileLikeOpen = StringIO.StringIO()
+        >>> from music21.ext.six import StringIO        
+        >>> fileLikeOpen = StringIO()
         >>> mf = midi.MidiFile()
         >>> mf.openFileLike(fileLikeOpen)
         >>> mf.close()
@@ -1270,7 +1259,7 @@ class Test(unittest.TestCase):
         #self.assertEqual(mf.writestr(), None)
 
         # try to write contents
-        fileLikeOpen = StringIO.StringIO()
+        fileLikeOpen = StringIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1289,7 +1278,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = StringIO.StringIO()
+        fileLikeOpen = StringIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1308,7 +1297,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = StringIO.StringIO()
+        fileLikeOpen = StringIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1326,7 +1315,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = StringIO.StringIO()
+        fileLikeOpen = StringIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1433,7 +1422,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
         
-        fileLikeOpen = StringIO.StringIO()
+        fileLikeOpen = StringIO()
         #mf.open('/src/music21/music21/midi/out.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()
@@ -1520,7 +1509,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
         
-        fileLikeOpen = StringIO.StringIO()
+        fileLikeOpen = StringIO()
         #mf.open('/_scratch/test.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()

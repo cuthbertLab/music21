@@ -1,33 +1,133 @@
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.trecento.polyphonicSnippet.PolyphonicSnippet
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 22, in PolyphonicSnippet
+AssertionError: Failed doctest test for music21.spanner.Spanner.__deepcopy__
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 246, in __deepcopy__
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 38, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 258, in music21.spanner.Spanner.__deepcopy__
 Failed example:
-    ps.elements
-Expected:
-    (<music21.stream.Part C>, <music21.stream.Part T>, <music21.metadata.Metadata object at 0x...>)
-Got:
-    (<music21.metadata.Metadata object at 0x1035db690>, <music21.stream.Part C>, <music21.stream.Part T>)
+    sp2 = copy.deepcopy(sp1)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[4]>", line 1, in <module>
+        sp2 = copy.deepcopy(sp1)
+    NameError: name 'copy' is not defined
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 43, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 259, in music21.spanner.Spanner.__deepcopy__
 Failed example:
-    ps.elements[0] is cantus
-Expected:
-    True
-Got:
-    False
+    len(sp2.spannedElements)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[5]>", line 1, in <module>
+        len(sp2.spannedElements)
+    NameError: name 'sp2' is not defined
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 48, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 261, in music21.spanner.Spanner.__deepcopy__
 Failed example:
-    ps.elements[0].classes
-Expected:
-    ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'object']
-Got:
-    ['Metadata', 'Music21Object', 'object']
+    sp1 is sp2
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[6]>", line 1, in <module>
+        sp1 is sp2
+    NameError: name 'sp2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 263, in music21.spanner.Spanner.__deepcopy__
+Failed example:
+    sp2[0] is sp1[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[7]>", line 1, in <module>
+        sp2[0] is sp1[0]
+    NameError: name 'sp2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 265, in music21.spanner.Spanner.__deepcopy__
+Failed example:
+    sp2[2] is sp1[2]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[8]>", line 1, in <module>
+        sp2[2] is sp1[2]
+    NameError: name 'sp2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 269, in music21.spanner.Spanner.__deepcopy__
+Failed example:
+    sp2[0] is n1
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[10]>", line 1, in <module>
+        sp2[0] is n1
+    NameError: name 'sp2' is not defined
+
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1427, in testBasicExport
+    fileLikeOpen = StringIO.StringIO()
+AttributeError: type object '_io.StringIO' has no attribute 'StringIO'
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1264, in testBasicImport
+    fileLikeOpen = StringIO.StringIO()
+AttributeError: type object '_io.StringIO' has no attribute 'StringIO'
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1514, in testWritePitchBendA
+    fileLikeOpen = StringIO.StringIO()
+AttributeError: type object '_io.StringIO' has no attribute 'StringIO'
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.midi.MidiFile.openFileLike
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1103, in openFileLike
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1107, in music21.midi.MidiFile.openFileLike
+Failed example:
+    fileLikeOpen = StringIO.StringIO()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.midi.MidiFile.openFileLike[1]>", line 1, in <module>
+        fileLikeOpen = StringIO.StringIO()
+    AttributeError: type object '_io.StringIO' has no attribute 'StringIO'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1109, in music21.midi.MidiFile.openFileLike
+Failed example:
+    mf.openFileLike(fileLikeOpen)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.midi.MidiFile.openFileLike[3]>", line 1, in <module>
+        mf.openFileLike(fileLikeOpen)
+    NameError: name 'fileLikeOpen' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1110, in music21.midi.MidiFile.openFileLike
+Failed example:
+    mf.close()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.midi.MidiFile.openFileLike[4]>", line 1, in <module>
+        mf.close()
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1124, in close
+        self.file.close()
+    AttributeError: 'NoneType' object has no attribute 'close'
 
 
 
@@ -68,6 +168,7 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/x
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/biffh.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/webcolors.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/six.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/util.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/unpickler.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/tags.py
@@ -115,11 +216,12 @@ vexflow___init__ successfully ran 30 tests
 trecento_trecentoCadence successfully ran 7 tests
 webapps_commands successfully ran 10 tests
 variant successfully ran 34 tests
+trecento_polyphonicSnippet successfully ran 9 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
 trecento_capua successfully ran 9 tests
-trecento_tonality successfully ran 5 tests
 trecento___init__ successfully ran 3 tests
+trecento_tonality successfully ran 5 tests
 tinyNotation successfully ran 11 tests
 tie successfully ran 7 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
@@ -132,7 +234,6 @@ theoryAnalysis_theoryAnalyzer successfully ran 42 tests
 stream_streamStatus successfully ran 4 tests
 stream_makeNotation successfully ran 10 tests
 stream_timespans successfully ran 58 tests
-spanner successfully ran 52 tests
 stream___init__ successfully ran 141 tests
 sieve successfully ran 40 tests
 serial successfully ran 47 tests
@@ -142,9 +243,9 @@ scala_scl___init__ successfully ran 3 tests
 scala___init__ successfully ran 12 tests
 scale successfully ran 90 tests
 romanText_testFiles successfully ran 4 tests
+romanText_translate successfully ran 17 tests
 test_testStream successfully ran 206 tests
 romanText___init__ successfully ran 45 tests
-romanText_translate successfully ran 17 tests
 roman successfully ran 27 tests
 pitch successfully ran 94 tests
 noteworthy_translate successfully ran 21 tests
@@ -155,17 +256,16 @@ musicxml_xmlHandler successfully ran 13 tests
 musicxml_toMxObjects successfully ran 37 tests
 romanText_clercqTemperley successfully ran 19 tests
 musicxml_mxObjects successfully ran 45 tests
-musicxml_testPrimitive successfully ran 5 tests
 repeat successfully ran 72 tests
+musicxml_testPrimitive successfully ran 5 tests
 musicxml___init__ successfully ran 3 tests
 musicxml_m21ToString successfully ran 45 tests
 musedata_base40 successfully ran 9 tests
 musicxml_fromMxObjects successfully ran 65 tests
 musedata___init__ successfully ran 49 tests
+musedata_translate successfully ran 16 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
-musedata_translate successfully ran 16 tests
-midi___init__ successfully ran 29 tests
 meter successfully ran 107 tests
 metadata_primitives successfully ran 38 tests
 midi_translate successfully ran 49 tests
@@ -178,7 +278,7 @@ layout successfully ran 22 tests
 languageExcerpts_naturalLanguageObjects successfully ran 9 tests
 languageExcerpts_instrumentLookup successfully ran 3 tests
 languageExcerpts___init__ successfully ran 3 tests
-key successfully ran 19 tests
+key successfully ran 20 tests
 ipython21___init__ successfully ran 3 tests
 intervalNetwork successfully ran 57 tests
 interval successfully ran 55 tests
@@ -186,22 +286,22 @@ instrument successfully ran 22 tests
 humdrum_testFiles successfully ran 3 tests
 humdrum_spineParser successfully ran 32 tests
 humdrum_instruments successfully ran 8 tests
-humdrum___init__ successfully ran 3 tests
 metadata_bundles successfully ran 34 tests
+humdrum___init__ successfully ran 3 tests
 harmony successfully ran 27 tests
-metadata_caching successfully ran 7 tests
+freezeThaw successfully ran 28 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
-freezeThaw successfully ran 28 tests
 figuredBass_realizer successfully ran 12 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
+graph successfully ran 62 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
-graph successfully ran 62 tests
 figuredBass_examples successfully ran 15 tests
+features_jSymbolic successfully ran 86 tests
 features_base successfully ran 27 tests
 features___init__ successfully ran 8 tests
 expressions successfully ran 26 tests
@@ -213,61 +313,64 @@ duration successfully ran 65 tests
 documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
 documentation_library_extensions successfully ran 3 tests
-documentation_library_documenters successfully ran 28 tests
 features_native successfully ran 26 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
+documentation_library_documenters successfully ran 28 tests
 documentation___init__ successfully ran 3 tests
-derivation successfully ran 9 tests
 defaults successfully ran 4 tests
-counterpoint_species successfully ran 27 tests
+derivation successfully ran 9 tests
 counterpoint___init__ successfully ran 3 tests
+counterpoint_species successfully ran 27 tests
 corpus_virtual successfully ran 5 tests
-features_jSymbolic successfully ran 86 tests
-corpus_corpora successfully ran 28 tests
 corpus_chorales successfully ran 9 tests
 corpus___init__ successfully ran 17 tests
+corpus_corpora successfully ran 28 tests
 converter successfully ran 37 tests
+composition_seeger successfully ran 3 tests
 contour successfully ran 10 tests
 composition___init__ successfully ran 3 tests
 common successfully ran 57 tests
 clef successfully ran 28 tests
-corpus_testCorpus successfully ran 25 tests
 composition_phasing successfully ran 5 tests
 chordTables successfully ran 17 tests
+classCache successfully ran 12 tests
 chant successfully ran 12 tests
+chord successfully ran 108 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
 braille_translate successfully ran 7 tests
 braille_text successfully ran 4 tests
-chord successfully ran 108 tests
-classCache successfully ran 12 tests
-braille_lookup successfully ran 3 tests
 braille_segment successfully ran 11 tests
+braille_lookup successfully ran 3 tests
+braille_examples successfully ran 5 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
-braille_examples successfully ran 5 tests
+base successfully ran 109 tests
 bar successfully ran 9 tests
 audioSearch_transcriber successfully ran 4 tests
-base successfully ran 109 tests
+audioSearch_scoreFollower successfully ran 7 tests
+audioSearch_repetitionGame successfully ran 3 tests
 audioSearch_recording successfully ran 4 tests
+braille_test successfully ran 151 tests
+audioSearch_omrfollow successfully ran 3 tests
 articulations successfully ran 29 tests
 audioSearch___init__ successfully ran 19 tests
 analysis_search successfully ran 4 tests
 analysis_windowed successfully ran 9 tests
 analysis_reduceChords successfully ran 7 tests
-braille_test successfully ran 151 tests
+analysis_phrasing successfully ran 3 tests
 analysis_patel successfully ran 6 tests
 analysis_neoRiemannian successfully ran 10 tests
 analysis_metrical successfully ran 6 tests
-analysis_correlate successfully ran 6 tests
 analysis_reduction successfully ran 15 tests
 analysis_discrete successfully ran 31 tests
 analysis___init__ successfully ran 3 tests
+analysis_correlate successfully ran 6 tests
+abcFormat_translate successfully ran 18 tests
 abcFormat___init__ successfully ran 53 tests
 _version successfully ran 3 tests
-abcFormat_translate successfully ran 18 tests
 abcFormat_testFiles successfully ran 5 tests
 Not in Tree Error: vexflow.testShow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: vexflow.exporter is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -303,53 +406,153 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
+Silent test fail for /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/metadata/caching.py: Run separately!
 
 -----------
-trecento_polyphonicSnippet had 0 ERRORS and 1 FAILURES in 9 tests:
+spanner had 0 ERRORS and 1 FAILURES in 52 tests:
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.trecento.polyphonicSnippet.PolyphonicSnippet
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 22, in PolyphonicSnippet
+AssertionError: Failed doctest test for music21.spanner.Spanner.__deepcopy__
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 246, in __deepcopy__
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 38, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 258, in music21.spanner.Spanner.__deepcopy__
 Failed example:
-    ps.elements
-Expected:
-    (<music21.stream.Part C>, <music21.stream.Part T>, <music21.metadata.Metadata object at 0x...>)
-Got:
-    (<music21.metadata.Metadata object at 0x1035db690>, <music21.stream.Part C>, <music21.stream.Part T>)
+    sp2 = copy.deepcopy(sp1)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[4]>", line 1, in <module>
+        sp2 = copy.deepcopy(sp1)
+    NameError: name 'copy' is not defined
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 43, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 259, in music21.spanner.Spanner.__deepcopy__
 Failed example:
-    ps.elements[0] is cantus
-Expected:
-    True
-Got:
-    False
+    len(sp2.spannedElements)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[5]>", line 1, in <module>
+        len(sp2.spannedElements)
+    NameError: name 'sp2' is not defined
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/trecento/polyphonicSnippet.py", line 48, in music21.trecento.polyphonicSnippet.PolyphonicSnippet
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 261, in music21.spanner.Spanner.__deepcopy__
 Failed example:
-    ps.elements[0].classes
-Expected:
-    ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'object']
-Got:
-    ['Metadata', 'Music21Object', 'object']
+    sp1 is sp2
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[6]>", line 1, in <module>
+        sp1 is sp2
+    NameError: name 'sp2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 263, in music21.spanner.Spanner.__deepcopy__
+Failed example:
+    sp2[0] is sp1[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[7]>", line 1, in <module>
+        sp2[0] is sp1[0]
+    NameError: name 'sp2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 265, in music21.spanner.Spanner.__deepcopy__
+Failed example:
+    sp2[2] is sp1[2]
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[8]>", line 1, in <module>
+        sp2[2] is sp1[2]
+    NameError: name 'sp2' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/spanner.py", line 269, in music21.spanner.Spanner.__deepcopy__
+Failed example:
+    sp2[0] is n1
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.spanner.Spanner.__deepcopy__[10]>", line 1, in <module>
+        sp2[0] is n1
+    NameError: name 'sp2' is not defined
+
+
+
+-----------
+midi___init__ had 3 ERRORS and 1 FAILURES in 29 tests:
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1427, in testBasicExport
+    fileLikeOpen = StringIO.StringIO()
+AttributeError: type object '_io.StringIO' has no attribute 'StringIO'
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1264, in testBasicImport
+    fileLikeOpen = StringIO.StringIO()
+AttributeError: type object '_io.StringIO' has no attribute 'StringIO'
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1514, in testWritePitchBendA
+    fileLikeOpen = StringIO.StringIO()
+AttributeError: type object '_io.StringIO' has no attribute 'StringIO'
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.midi.MidiFile.openFileLike
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1103, in openFileLike
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1107, in music21.midi.MidiFile.openFileLike
+Failed example:
+    fileLikeOpen = StringIO.StringIO()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.midi.MidiFile.openFileLike[1]>", line 1, in <module>
+        fileLikeOpen = StringIO.StringIO()
+    AttributeError: type object '_io.StringIO' has no attribute 'StringIO'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1109, in music21.midi.MidiFile.openFileLike
+Failed example:
+    mf.openFileLike(fileLikeOpen)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.midi.MidiFile.openFileLike[3]>", line 1, in <module>
+        mf.openFileLike(fileLikeOpen)
+    NameError: name 'fileLikeOpen' is not defined
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1110, in music21.midi.MidiFile.openFileLike
+Failed example:
+    mf.close()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.midi.MidiFile.openFileLike[4]>", line 1, in <module>
+        mf.close()
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/__init__.py", line 1124, in close
+        self.file.close()
+    AttributeError: 'NoneType' object has no attribute 'close'
 
 
 -------------------------------------------------------------------------
-Ran 3960 tests in 420.5439 seconds
-Run at 2014-04-26 02:48:55
+Ran 3948 tests in 830.4905 seconds
+Run at 2014-04-28 11:27:18

@@ -15,34 +15,33 @@ Converts musicxml xml text to the intermediate mxObjects format.
 from music21.musicxml import mxObjects as musicxmlMod
 
 import sys
+from music21.ext import six
 
 # in order for sax parsing to properly handle unicode strings w/ unicode chars
 # stored in StringIO.StringIO, this update is necessary
 # http://stackoverflow.com/questions/857597/setting-the-encoding-for-sax-parser-in-python
 
 # N.B. Without this change reload(sys) breaks IDLE!
-currentStdOut = sys.stdout
-currentStdIn = sys.stdin
-currentStdErr = sys.stderr
-try:
-    reload(sys)
-    sys.setdefaultencoding('utf-8') # @UndefinedVariable
-except: # Python3
-    pass
-
-sys.stdout = currentStdOut
-sys.stdin = currentStdIn
-sys.stderr = currentStdErr
+if six.PY2:
+    currentStdOut = sys.stdout
+    currentStdIn = sys.stdin
+    currentStdErr = sys.stderr
+    try:
+        reload(sys)
+        sys.setdefaultencoding('utf-8') # @UndefinedVariable
+    except: # Python3
+        pass
+    
+    sys.stdout = currentStdOut
+    sys.stdin = currentStdIn
+    sys.stderr = currentStdErr
 
 import copy
 import os
 import unittest
 
-try:
-    import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
-except ImportError:
-    from io import StringIO
+from music21.ext.six import StringIO
 
 try:
     import cPickle as pickleMod # much faster...
@@ -1034,7 +1033,7 @@ class Document(object):
 
         if not isFile:
             # StringIO.StringIO is supposed to handle unicode
-            fileLikeOpen = StringIO.StringIO(fileLike)
+            fileLikeOpen = StringIO(fileLike)
 
         else: # TODO: should this be codecs.open()?
             fileLikeOpen = open(fileLike)
@@ -1324,8 +1323,9 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     # this is a temporary hack to get encoding working right
     # this may not be the best way to do this
-    reload(sys)
-    sys.setdefaultencoding("utf-8") # @UndefinedVariable
+    if six.PY2:
+        reload(sys)
+        sys.setdefaultencoding("utf-8") # @UndefinedVariable
 
     import music21
     music21.mainTest(Test)

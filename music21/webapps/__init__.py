@@ -116,13 +116,9 @@ try:
 except ImportError:
     from urllib import parse as urlparse
 import re #@UnusedImport
-import sys
 import traceback
 
-try:
-    import StringIO #@UnusedImport
-except:
-    from io import StringIO # @Reimport python3
+from music21.ext.six import StringIO
 
 #-------------------------------------------------------------------------------
 
@@ -200,9 +196,9 @@ def ModWSGIApplication(environ, start_response):
     The request to the application should have the following structures:
 
     
-    >>> import StringIO
+    >>> from music21.ext.six import StringIO
     >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
-    >>> wsgiInput = StringIO.StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
+    >>> wsgiInput = StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
     >>> wsgiInput.write('{"dataDict":{"a":{"data":3}},"returnDict":{"a":"int"}}')
     >>> wsgiInput.seek(0)
     >>> environ['wsgi.input'] = wsgiInput
@@ -255,18 +251,22 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     they are specified more than once (e.g. ``?b=3&b=4`` will yeld ``['3', '4']`` as the value of b
     
     
-    >>> import StringIO
-    >>> requestInput = StringIO.StringIO() # requestInput should be buffer from the server application. Using StringIO for demonstration
+    requestInput should be buffer from the server application. Using StringIO for demonstration
+    
+    >>> from music21.ext.six import StringIO
+    >>> requestInput = StringIO()
     >>> requestInput.write('{"dataDict":{"a":{"data":3}}}')
     >>> requestInput.seek(0)
     >>> environ = {"QUERY_STRING":"b=3"}
     >>> agenda = webapps.makeAgendaFromRequest(requestInput, environ, 'application/json')
     >>> agenda
-    {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 'returnDict': {}, 'commandList': []} 
+    {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 
+     'returnDict': {}, 'commandList': []} 
     >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4"}
     >>> agenda2 = webapps.makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
     >>> agenda2
-    {'dataDict': {'a': {'data': '2'}, 'b': {'data': ['3', '4']}}, 'returnDict': {}, 'commandList': []}
+    {'dataDict': {'a': {'data': '2'}, 'b': {'data': ['3', '4']}}, 
+     'returnDict': {}, 'commandList': []}
 
     '''
     

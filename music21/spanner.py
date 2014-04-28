@@ -249,7 +249,7 @@ class Spanner(base.Music21Object):
         SpannedElements linked in this Spanner must be manually re-set, likely using the 
         replaceSpannedElement() method.
 
-        
+        >>> import copy
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()

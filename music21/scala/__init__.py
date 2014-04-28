@@ -43,10 +43,6 @@ For most people you'll want to do something like this:
 import os
 import unittest
 import math, codecs
-#try:
-#    import StringIO # python 2 
-#except:
-#    from io import StringIO # python3 (also in python 2.6+)
 
 
 from music21 import common

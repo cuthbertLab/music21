@@ -24,11 +24,6 @@ this module.
 import copy
 import unittest
 import sys
-if sys.version > '3':
-    python3 = True
-else:
-    python3 = False
-
 
 from music21 import base
 
@@ -52,17 +47,12 @@ from music21 import tie
 from music21 import repeat
 from music21 import tempo
 
+
+from music21.stream import makeNotation
+from music21.stream import streamStatus
+from music21.stream import timespans
+
 from music21 import environment
-
-if python3:
-    from . import makeNotation # @UnresolvedImport
-    from . import timespans # @UnresolvedImport
-    from . import streamStatus
-else:
-    import makeNotation # @Reimport
-    import timespans # @Reimport
-    import streamStatus # @Reimport
-
 _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
 
@@ -106,7 +96,7 @@ class StreamIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         # calling .elements here will sort if autoSort = True
         # thus, this does not need to sort or check autoSort status
         if self.index >= self.streamLength:
@@ -127,6 +117,8 @@ class StreamIterator(object):
         self.index += 1
         return post
 
+    next = __next__ # python2
+    
     def __getitem__(self, key):
         '''
         if you are in the iterator, you should still be able to request other items...uses self.srcStream.__getitem__
@@ -143,12 +135,13 @@ class StreamIterator(object):
         >>> try:
         ...     while True:
         ...         n = sI.next()
-        ...         print (n, sI[0])
+        ...         printer = (repr(n), repr(sI[0]))
+        ...         print(printer)
         ... except StopIteration:
         ...     pass
-        (<music21.note.Note F#>, <music21.note.Note F#>)
-        (<music21.note.Note C>, <music21.note.Note F#>)
-        (<music21.note.Note C>, <music21.note.Note F#>)
+        ('<music21.note.Note F#>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
         >>> sI.srcStream is None
         True
 
@@ -215,7 +208,7 @@ class Stream(base.Music21Object):
     >>> s1.duration.quarterLength
     3.0
     >>> for thisNote in s1.notes:
-    ...     print thisNote.octave
+    ...     print(thisNote.octave)
     ...
     4
     5
@@ -953,7 +946,7 @@ class Stream(base.Music21Object):
         corrected after object removal. It is more efficient to pass a list of objects than to call remove on
         each object individually if shiftOffsets is True.
 
-
+        >>> import copy
         >>> s = stream.Stream()
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('g#')
@@ -3535,7 +3528,7 @@ class Stream(base.Music21Object):
 
         Getting a non-existent measure should return None, but it doesnt!
 
-        #>>> print a.measure(0)
+        #>>> print(a.measure(0))
         #None
         '''
         # we must be able to obtain a measure from this (not a flat)
@@ -3959,7 +3952,7 @@ class Stream(base.Music21Object):
                 else:
                     focus.transpose(trans, inPlace=True,
                                     classFilterList=classFilterList)
-            #print key, i.transposition
+            #print(key, i.transposition)
         return returnObj
 
     def toSoundingPitch(self, inPlace=True):
@@ -5021,9 +5014,9 @@ class Stream(base.Music21Object):
             >>> cc2 = s.chordify(addPartIdAsGroup=True)
             >>> csharpDflatChord = cc2[2]
             >>> for p in csharpDflatChord.pitches:
-            ...     print p, p.groups
-            C#4 ['part1']
-            D-4 ['part2']
+            ...     print(str(p), p.groups)
+            ('C#4', ['part1'])
+            ('D-4', ['part2'])
 
         ::
 
@@ -5730,19 +5723,19 @@ class Stream(base.Music21Object):
                 element.duration = duration.Duration()
             elements.append(element)
 
-        #print elements[-1], qLenTotal, elements[-1].duration
-        # print _MOD, elements
+        #print(elements[-1], qLenTotal, elements[-1].duration)
+        # print(_MOD, elements)
         for i in range(len(elements)-1):
-            #print i, len(elements)
+            #print(i, len(elements))
             span = elements[i+1].getOffsetBySite(self) - elements[i].getOffsetBySite(self)
             elements[i].duration.quarterLength = span
 
         # handle last element
-        #print elements[-1], qLenTotal, elements[-1].duration
+        #print(elements[-1], qLenTotal, elements[-1].duration)
         if len(elements) != 0:
             elements[-1].duration.quarterLength = (qLenTotal -
                         elements[-1].getOffsetBySite(self))
-            #print elements[-1], elements[-1].duration
+            #print(elements[-1], elements[-1].duration)
         return returnObj
 
 
@@ -6874,7 +6867,7 @@ class Stream(base.Music21Object):
                     candidateOffset = (e.getOffsetBySite(self) +
                                    e.duration.quarterLength)
                 except:
-                    #print self, e, id(e), e.offset, e.getSites()
+                    #print(self, e, id(e), e.offset, e.getSites())
                     raise
                 if candidateOffset > highestTimeSoFar:
                     highestTimeSoFar = candidateOffset
@@ -8784,7 +8777,7 @@ class Stream(base.Music21Object):
                 if j == i: # index numbers
                     continue # do not compare to self
                 dst = durSpanSorted[j]
-                # print src, dst, self._durSpanOverlap(src, dst, includeEndBoundary)
+                # print(src, dst, self._durSpanOverlap(src, dst, includeEndBoundary))
 
                 # if start times are the same
                 if common.almostEquals(src[0], dst[0]):
@@ -8809,13 +8802,13 @@ class Stream(base.Music21Object):
 
         post = {}
         for i in range(len(layeringMap)):
-            # print 'examining i:', i
+            # print('examining i:', i)
             indices = layeringMap[i]
             if len(indices) > 0:
                 srcOffset = flatStream[i].offset
                 srcElementObj = flatStream[i]
                 dstOffset = None
-                # print 'found indices', indices
+                # print('found indices', indices)
                 # check indices
                 for j in indices: # indices of other elements tt overlap
                     elementObj = flatStream[j]
@@ -8834,7 +8827,7 @@ class Stream(base.Music21Object):
                     if dstOffset is None:
                         dstOffset = srcOffset
                     if store:
-                        # print 'storing offset', dstOffset
+                        # print('storing offset', dstOffset)
                         if dstOffset not in post:
                             post[dstOffset] = [] # create dictionary entry
                         post[dstOffset].append(elementObj)
@@ -8852,9 +8845,9 @@ class Stream(base.Music21Object):
                         dstOffset = srcOffset
                     if dstOffset not in post:
                         post[dstOffset] = [] # create dictionary entry
-                    # print 'storing offset', dstOffset
+                    # print('storing offset', dstOffset)
                     post[dstOffset].append(srcElementObj)
-        #print post
+        #print(post)
         return post
 
 
@@ -9060,7 +9053,7 @@ class Stream(base.Music21Object):
         >>> st2 = stream.Stream()
         >>> st1.append([note.QuarterNote(), note.HalfNote(), note.QuarterNote()])
         >>> st2.append([note.HalfNote(), note.QuarterNote(), note.QuarterNote()])
-        >>> print st1.simultaneousAttacks(st2)
+        >>> print(st1.simultaneousAttacks(st2))
         [0.0, 3.0]
         '''
         stream1Offsets = self.groupElementsByOffset()
@@ -9101,8 +9094,8 @@ class Stream(base.Music21Object):
         >>> s2 = converter.parse('g4 e8 d c4   a2 r2', '7/4')
         >>> s1.attachIntervalsBetweenStreams(s2)
         >>> for n in s1.notes:
-        ...     if n.editorial.harmonicInterval is None: print "None" # if other voice had a rest...
-        ...     else: print n.editorial.harmonicInterval.directedName
+        ...     if n.editorial.harmonicInterval is None: print("None") # if other voice had a rest...
+        ...     else: print(n.editorial.harmonicInterval.directedName)
         P12
         M2
         M-2
@@ -9134,8 +9127,8 @@ class Stream(base.Music21Object):
         >>> s1 = converter.parse('C4 d8 e f# g A2 d2', '7/4')
         >>> s1.attachMelodicIntervals()
         >>> for n in s1.notes:
-        ...     if n.editorial.melodicInterval is None: print None
-        ...     else: print n.editorial.melodicInterval.directedName
+        ...     if n.editorial.melodicInterval is None: print("None")
+        ...     else: print(n.editorial.melodicInterval.directedName)
         None
         M9
         M2
@@ -9152,8 +9145,8 @@ class Stream(base.Music21Object):
         >>> s.append(note.Note('D'))
         >>> s.attachMelodicIntervals()
         >>> for n in s.notes:
-        ...     if n.editorial.melodicInterval is None: print None # if other voice had a rest...
-        ...     else: print n.editorial.melodicInterval.directedName
+        ...     if n.editorial.melodicInterval is None: print("None") # if other voice had a rest...
+        ...     else: print(n.editorial.melodicInterval.directedName)
         None
         M2
         None
@@ -10926,7 +10919,7 @@ class Measure(Stream):
         An already-obtained Duration object can be supplied with the `barDuration`
         optional argument.
 
-
+        >>> import copy
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> n = note.Note()
@@ -10957,7 +10950,7 @@ class Measure(Stream):
         Calling this method will overwrite any previously set `paddingLeft` value,
         based on the current TimeSignature-derived `barDuration` attribute.
 
-
+        >>> import copy
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> n = note.Note()
@@ -11332,7 +11325,7 @@ class Measure(Stream):
 
         >>> b = bar.Barline('final')
         >>> m = stream.Measure()
-        >>> print m.rightBarline
+        >>> print(m.rightBarline)
         None
         >>> m.rightBarline = b
         >>> m.rightBarline.style
@@ -11537,7 +11530,7 @@ class Score(Stream):
         >>> partStream['Alto']
         <music21.stream.Part Alto>
         >>> for p in partStream:
-        ...     print p.id
+        ...     print(p.id)
         Soprano
         Alto
         Tenor

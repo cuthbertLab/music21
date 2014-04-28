@@ -881,7 +881,7 @@ class Converter(object):
         Will load from a pickle unless forceSource is True
         Will store as a pickle unless storePickle is False
         '''
-        import freezeThaw
+        from music21 import freezeThaw
         if not os.path.exists(fp):
             raise ConverterFileException('no such file eists: %s' % fp)
         useFormat = format

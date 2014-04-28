@@ -13,6 +13,7 @@
 
 import abc
 import os
+from music21.ext import six
 
 from music21 import common
 from music21 import converter
@@ -82,7 +83,8 @@ class Corpus(object):
         '''
         from music21 import corpus
         matched = []
-        rootDirectoryPath = unicode(rootDirectoryPath)
+        if six.PY2:
+            rootDirectoryPath = unicode(rootDirectoryPath)
         for rootDirectory, directoryNames, filenames in os.walk(
             rootDirectoryPath):
             if '.svn' in directoryNames:
