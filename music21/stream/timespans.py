@@ -92,59 +92,13 @@ def recurseStream(
     inputStream,
     currentParentage=None,
     initialOffset=0,
+    flatten=False,
     ):
     r'''
     Recurses through `inputStream`, constructs ElementTimespans for each
     non-stream pitched element found, and returns all constructed
     ElementTimespans.
     '''
-    from music21 import stream
-    if currentParentage is None:
-        currentParentage = (inputStream,)
-    result = []
-    for element in inputStream:
-        if isinstance(element, stream.Stream):
-            localParentage = currentParentage + (element,)
-            subresult = recurseStream(element, localParentage)
-            result.extend(subresult)
-            continue
-        if not isinstance(element, (
-            note.Note,
-            chord.Chord,
-            )):
-            continue
-        if isinstance(currentParentage[-1], stream.Measure) and \
-            1 < len(currentParentage):
-            measure = currentParentage[-1]
-            measureParent = currentParentage[-2]
-            parentStartOffset = measure.getOffsetBySite(measureParent)
-            parentStopOffset = parentStartOffset + \
-                measure.duration.quarterLength
-        else:
-            parentStartOffset = None
-            parentStopOffset = None
-        startOffset = element.getOffsetBySite(currentParentage[-1])
-        if parentStartOffset is not None:
-            startOffset = parentStartOffset + startOffset
-        startOffset += initialOffset
-        stopOffset = startOffset + element.quarterLength
-        elementTimespan = ElementTimespan(
-            element=element,
-            parentStartOffset=parentStartOffset,
-            parentStopOffset=parentStopOffset,
-            parentage=tuple(reversed(currentParentage)),
-            startOffset=startOffset,
-            stopOffset=stopOffset,
-            )
-        result.append(elementTimespan)
-    return result
-
-
-def recurseStream2(
-    inputStream,
-    currentParentage=None,
-    initialOffset=0,
-    ):
     from music21 import spanner
     from music21 import stream
     if currentParentage is None:
@@ -157,17 +111,26 @@ def recurseStream2(
         startOffset += initialOffset
         if isinstance(element, stream.Stream):
             localParentage = currentParentage + (element,)
-            subresult = recurseStream2(
+            subresult = recurseStream(
                 element,
                 localParentage,
                 initialOffset=startOffset,
+                flatten=flatten,
                 )
-            result.insert(subresult)
+            if flatten:
+                result.insert(subresult[:])
+            else:
+                result.insert(subresult)
         else:
+            parentStartOffset = initialOffset
+            parentStopOffset = initialOffset + \
+                currentParentage[-1].duration.quarterLength
             stopOffset = startOffset + element.duration.quarterLength
             elementTimespan = ElementTimespan(
                 element=element,
                 parentage=tuple(reversed(currentParentage)),
+                parentStartOffset=parentStartOffset,
+                parentStopOffset=parentStopOffset,
                 startOffset=startOffset,
                 stopOffset=stopOffset,
                 )
@@ -175,7 +138,7 @@ def recurseStream2(
     return result
 
 
-def streamToTimespanCollection(inputStream, initialOffset=0):
+def streamToTimespanCollection(inputStream, flatten=True):
     r'''
     Recurses through a score and constructs a timespan collection.
 
@@ -187,16 +150,18 @@ def streamToTimespanCollection(inputStream, initialOffset=0):
         ...     x
         ...
         <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
         <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
         <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
 
     '''
-    elementTimespans = recurseStream(inputStream, initialOffset=initialOffset)
-    tree = TimespanCollection()
-    tree.insert(elementTimespans)
-    return tree
+    result = recurseStream(
+        inputStream,
+        initialOffset=0.,
+        flatten=flatten,
+        )
+    return result
 
 
 def timespansToChordifiedStream(timespans, templateStream=None):
@@ -2615,10 +2580,16 @@ class TimespanCollection(object):
             self._updateParents(initialStartOffset)
 
     def _insertTimespan(self, timespan):
+        def key(x):
+            if hasattr(x, 'element'):
+                return x.element.sortTuple()
+            elif isinstance(x, TimespanCollection) and x.source is not None:
+                return x.source.sortTuple()
+            return x.stopOffset
         self._rootNode = self._insert(self._rootNode, timespan.startOffset)
         node = self._search(self._rootNode, timespan.startOffset)
         node.payload.append(timespan)
-        node.payload.sort(key=lambda x: x.stopOffset)
+        node.payload.sort(key=key)
         if isinstance(timespan, TimespanCollection):
             timespan._parents.add(self)
 
