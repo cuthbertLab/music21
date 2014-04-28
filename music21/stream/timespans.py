@@ -77,11 +77,14 @@ def makeElement(verticality, quarterLength):
         element = chord.Chord(sorted(verticality.pitchSet))
         startElements = [x.element for x in
             verticality.startTimespans]
-        ties = [x.tie for x in startElements if x.tie is not None]
-        if any(x.type == 'start' for x in ties):
-            element.tie = tie.Tie('start')
-        elif any(x.type == 'continue' for x in ties):
-            element.tie = tie.Tie('continue')
+        try:
+            ties = [x.tie for x in startElements if x.tie is not None]
+            if any(x.type == 'start' for x in ties):
+                element.tie = tie.Tie('start')
+            elif any(x.type == 'continue' for x in ties):
+                element.tie = tie.Tie('continue')
+        except AttributeError:
+            pass
     else:
         element = note.Rest()
     element.duration.quarterLength = quarterLength
@@ -93,6 +96,7 @@ def recurseStream(
     currentParentage=None,
     initialOffset=0,
     flatten=False,
+    pitchedOnly=True,
     ):
     r'''
     Recurses through `inputStream`, constructs ElementTimespans for each
@@ -116,12 +120,16 @@ def recurseStream(
                 localParentage,
                 initialOffset=startOffset,
                 flatten=flatten,
+                pitchedOnly=pitchedOnly,
                 )
             if flatten:
                 result.insert(subresult[:])
             else:
                 result.insert(subresult)
         else:
+            prototype = (note.Note, chord.Chord)
+            if pitchedOnly and not isinstance(element, prototype):
+                continue
             parentStartOffset = initialOffset
             parentStopOffset = initialOffset + \
                 currentParentage[-1].duration.quarterLength
@@ -138,7 +146,7 @@ def recurseStream(
     return result
 
 
-def streamToTimespanCollection(inputStream, flatten=True):
+def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
     r'''
     Recurses through a score and constructs a timespan collection.
 
@@ -160,6 +168,7 @@ def streamToTimespanCollection(inputStream, flatten=True):
         inputStream,
         initialOffset=0.,
         flatten=flatten,
+        pitchedOnly=pitchedOnly,
         )
     return result
 
@@ -315,7 +324,7 @@ class ElementTimespan(object):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = stream.timespans.streamToTimespanCollection(score)
         >>> tree
-        <TimespanCollection {165} (0.0 to 36.0)>
+        <TimespanCollection {165} (0.0 to 36.0) <music21.stream.Score ...>>
 
     Then get the verticality from offset 6.5, which is beat two-and-a-half of
     measure 2 (the piece is in 4/4 with a quarter-note pickup)
@@ -1129,15 +1138,14 @@ class Verticality(object):
         pitchSet = set()
         for elementTimespan in self.startTimespans:
             element = elementTimespan.element
-            pitches = [x.nameWithOctave for x in element.pitches]
-            pitchSet.update(pitches)
+            if hasattr(element, 'pitches'):
+                pitches = [x.nameWithOctave for x in element.pitches]
+                pitchSet.update(pitches)
         for elementTimespan in self.overlapTimespans:
             element = elementTimespan.element
-            pitches = [x.nameWithOctave for x in element.pitches]
-#             for p in pitches:
-#                 if p.tie is None:
-#                     p.tie = tie.Tie('stop')
-            pitchSet.update(pitches)
+            if hasattr(element, 'pitches'):
+                pitches = [x.nameWithOctave for x in element.pitches]
+                pitchSet.update(pitches)
         pitchSet = set([pitch.Pitch(x) for x in pitchSet])
         return pitchSet
 
