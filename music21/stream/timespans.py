@@ -34,6 +34,23 @@ from music21 import exceptions21
 #------------------------------------------------------------------------------
 
 
+# TODO: Test with scores with Voices:
+#       cpebach/h186
+
+# TODO: Make simple example score to use in all internals
+#       based off of two-part, two-measures-each
+def makeExampleScore():
+    from music21 import stream
+    score = stream.Score()
+    partA = stream.Part()
+    partB = stream.Part()
+    measureA1 = stream.Measure()
+    measureA2 = stream.Measure()
+    measureB1 = stream.Measure()
+    measureB2 = stream.Measure()
+    return score
+
+
 def makeElement(verticality, quarterLength):
     r'''
     Makes an element from a verticality and quarterLength.
@@ -56,6 +73,7 @@ def makeElement(verticality, quarterLength):
 def recurseStream(
     inputStream,
     currentParentage=None,
+    initialOffset=0,
     ):
     r'''
     Recurses through `inputStream`, constructs ElementTimespans for each
@@ -81,20 +99,21 @@ def recurseStream(
             1 < len(currentParentage):
             measure = currentParentage[-1]
             measureParent = currentParentage[-2]
-            measureStartOffset = measure.getOffsetBySite(measureParent)
-            measureStopOffset = measureStartOffset + \
+            parentStartOffset = measure.getOffsetBySite(measureParent)
+            parentStopOffset = parentStartOffset + \
                 measure.duration.quarterLength
         else:
-            measureStartOffset = None
-            measureStopOffset = None
+            parentStartOffset = None
+            parentStopOffset = None
         startOffset = element.getOffsetBySite(currentParentage[-1])
-        if measureStartOffset is not None:
-            startOffset = measureStartOffset + startOffset
+        if parentStartOffset is not None:
+            startOffset = parentStartOffset + startOffset
+        startOffset += initialOffset
         stopOffset = startOffset + element.quarterLength
         elementTimespan = ElementTimespan(
             element=element,
-            measureStartOffset=measureStartOffset,
-            measureStopOffset=measureStopOffset,
+            parentStartOffset=parentStartOffset,
+            parentStopOffset=parentStopOffset,
             parentage=tuple(reversed(currentParentage)),
             startOffset=startOffset,
             stopOffset=stopOffset,
@@ -103,7 +122,46 @@ def recurseStream(
     return result
 
 
-def streamToTimespanCollection(inputStream):
+def recurseStream2(
+    inputStream,
+    currentParentage=None,
+    initialOffset=0,
+    ):
+    from music21 import spanner
+    from music21 import stream
+    if currentParentage is None:
+        currentParentage = (inputStream,)
+    result = TimespanCollection()
+    for element in inputStream:
+        if isinstance(element, spanner.Spanner):
+            continue
+        startOffset = element.getOffsetBySite(currentParentage[-1])
+        print currentParentage
+        if isinstance(element, stream.Stream):
+            print '{}C: {}'.format('\t' * len(currentParentage), element)
+            localParentage = currentParentage + (element,)
+            subresult = recurseStream2(
+                element,
+                localParentage,
+                initialOffset=startOffset,
+                )
+            print subresult
+            result.insert(subresult)
+        else:
+            print '{}L: {}'.format('\t' * len(currentParentage), element)
+            startOffset += initialOffset
+            stopOffset = startOffset + element.duration.quarterLength
+            elementTimespan = ElementTimespan(
+                element=element,
+                parentage=tuple(reversed(currentParentage)),
+                startOffset=startOffset,
+                stopOffset=stopOffset,
+                )
+            result.insert(elementTimespan)
+    return result
+
+
+def streamToTimespanCollection(inputStream, initialOffset=0):
     r'''
     Recurses through a score and constructs a timespan collection.
 
@@ -121,7 +179,7 @@ def streamToTimespanCollection(inputStream):
         <ElementTimespan 0.5:1.0 <music21.note.Note B>>
 
     '''
-    elementTimespans = recurseStream(inputStream)
+    elementTimespans = recurseStream(inputStream, initialOffset=initialOffset)
     tree = TimespanCollection()
     tree.insert(elementTimespans)
     return tree
@@ -320,7 +378,7 @@ class ElementTimespan(object):
 
         >>> elementTimespan.measureNumber
         2
-        >>> elementTimespan.measureStartOffset
+        >>> elementTimespan.parentStartOffset
         5.0
 
     The position in the measure is given by subtracting that from the
@@ -328,7 +386,7 @@ class ElementTimespan(object):
 
     ::
 
-        >>> elementTimespan.startOffset - elementTimespan.measureStartOffset
+        >>> elementTimespan.startOffset - elementTimespan.parentStartOffset
         1.5
 
 
@@ -346,8 +404,8 @@ class ElementTimespan(object):
     __slots__ = (
         '_beatStrength',
         '_element',
-        '_measureStartOffset',
-        '_measureStopOffset',
+        '_parentStartOffset',
+        '_parentStopOffset',
         '_parentage',
         '_startOffset',
         '_stopOffset',
@@ -359,8 +417,8 @@ class ElementTimespan(object):
         self,
         element=None,
         beatStrength=None,
-        measureStartOffset=None,
-        measureStopOffset=None,
+        parentStartOffset=None,
+        parentStopOffset=None,
         parentage=None,
         startOffset=None,
         stopOffset=None,
@@ -385,14 +443,14 @@ class ElementTimespan(object):
         self._stopOffset = stopOffset
         if startOffset is not None and stopOffset is not None:
             assert startOffset <= stopOffset, (startOffset, stopOffset)
-        if measureStartOffset is not None:
-            measureStartOffset = float(measureStartOffset)
-        self._measureStartOffset = measureStartOffset
-        if measureStopOffset is not None:
-            measureStopOffset = float(measureStopOffset)
-        self._measureStopOffset = measureStopOffset
-        if measureStartOffset is not None and measureStopOffset is not None:
-            assert measureStartOffset <= measureStopOffset
+        if parentStartOffset is not None:
+            parentStartOffset = float(parentStartOffset)
+        self._parentStartOffset = parentStartOffset
+        if parentStopOffset is not None:
+            parentStopOffset = float(parentStopOffset)
+        self._parentStopOffset = parentStopOffset
+        if parentStartOffset is not None and parentStopOffset is not None:
+            assert parentStartOffset <= parentStopOffset
 
     ### SPECIAL METHODS ###
 
@@ -425,18 +483,18 @@ class ElementTimespan(object):
         self,
         beatStrength=None,
         element=None,
-        measureStartOffset=None,
-        measureStopOffset=None,
+        parentStartOffset=None,
+        parentStopOffset=None,
         startOffset=None,
         stopOffset=None,
         ):
         if beatStrength is None:
             beatStrength = self.beatStrength
         element = element or self.element
-        if measureStartOffset is None:
-            measureStartOffset = self.measureStartOffset
-        if measureStopOffset is None:
-            measureStopOffset = self.measureStopOffset
+        if parentStartOffset is None:
+            parentStartOffset = self.parentStartOffset
+        if parentStopOffset is None:
+            parentStopOffset = self.parentStopOffset
         if startOffset is None:
             startOffset = self.startOffset
         if stopOffset is None:
@@ -444,8 +502,8 @@ class ElementTimespan(object):
         return type(self)(
             beatStrength=beatStrength,
             element=element,
-            measureStartOffset=measureStartOffset,
-            measureStopOffset=measureStopOffset,
+            parentStartOffset=parentStartOffset,
+            parentStopOffset=parentStopOffset,
             parentage=self.parentage,
             startOffset=startOffset,
             stopOffset=stopOffset,
@@ -548,12 +606,12 @@ class ElementTimespan(object):
         return None
 
     @property
-    def measureStartOffset(self):
-        return self._measureStartOffset
+    def parentStartOffset(self):
+        return self._parentStartOffset
 
     @property
-    def measureStopOffset(self):
-        return self._measureStopOffset
+    def parentStopOffset(self):
+        return self._parentStopOffset
 
     @property
     def parentage(self):
@@ -1881,6 +1939,18 @@ class TimespanCollection(object):
             raise TypeError(message)
 
     def __str__(self):
+        result = []
+        result.append(repr(self))
+        for x in self:
+            subresult = str(x).splitlines()
+            subresult = ['\t' + x for x in subresult]
+            result.extend(subresult)
+        result = '\n'.join(result)
+        return result
+
+    ### PRIVATE METHODS ###
+
+    def _debug(self):
         r'''
         Gets string representation of the timespan collection.
 
@@ -1905,7 +1975,7 @@ class TimespanCollection(object):
 
         ::
 
-            >>> print str(tree)
+            >>> print(tree._debug())
             <N: 3 [0:4:5:10] {1}>
                 L: <N: 1 [0:2:3:4] {1}>
                     L: <N: 0 [0:0:2:2] {2}>
@@ -1919,8 +1989,6 @@ class TimespanCollection(object):
         if self._rootNode is not None:
             return self._rootNode._debug()
         return ''
-
-    ### PRIVATE METHODS ###
 
     def _insert(self, node, startOffset):
         r'''
