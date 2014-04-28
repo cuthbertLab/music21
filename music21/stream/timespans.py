@@ -278,7 +278,7 @@ class ElementTimespan(object):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = stream.timespans.streamToTimespanCollection(score)
         >>> tree
-        <music21.stream.timespans.TimespanCollection object at 0x...>
+        <TimespanCollection {165} 0.0:36.0>
 
     Then get the verticality from offset 6.5, which is beat two-and-a-half of
     measure 2 (the piece is in 4/4 with a quarter-note pickup)
@@ -1375,6 +1375,7 @@ class TimespanCollection(object):
     ### CLASS VARIABLES ###
 
     __slots__ = (
+        '__weakref__',
         '_parents',
         '_rootNode',
         )
@@ -1398,14 +1399,15 @@ class TimespanCollection(object):
         ### CLASS VARIABLES ###
 
         __slots__ = (
+            '__weakref__',
             '_balance',
             '_height',
             '_leftChild',
+            '_nodeStartIndex',
+            '_nodeStopIndex',
             '_payload',
             '_rightChild',
             '_startOffset',
-            '_nodeStartIndex',
-            '_nodeStopIndex',
             '_stopOffsetHigh',
             '_stopOffsetLow',
             '_subtreeStartIndex',
@@ -1831,6 +1833,14 @@ class TimespanCollection(object):
     def __ne__(self, expr):
         return not self == expr
 
+    def __repr__(self):
+        return '<{} {{{}}} {}:{}>'.format(
+            type(self).__name__,
+            len(self),
+            self.startOffset,
+            self.stopOffset,
+            )
+
     def __setitem__(self, i, new):
         r'''
         Sets timespans at index `i` to `new`.
@@ -2122,8 +2132,22 @@ class TimespanCollection(object):
         node._stopOffsetHigh = stopOffsetHigh
         return node
 
-    def _updateParents(self):
-        pass
+    def _updateParents(self, oldStartOffset, visitedParents=None):
+        if visitedParents is None:
+            visitedParents = set()
+        for parent in self._parents:
+            if parent is None or parent in visitedParents:
+                continue
+            visitedParents.add(parent)
+            parentStartOffset = parent.startOffset
+            parent._removeTimespan(self, oldStartOffset=oldStartOffset)
+            parent._insertTimespan(self)
+            parent._updateIndices(parent._rootNode)
+            parent._updateOffsets(parent._rootNode)
+            parent._updateParents(
+                parentStartOffset,
+                visitedParents=visitedParents,
+                )
 
     ### PUBLIC METHODS ###
 
@@ -2486,17 +2510,20 @@ class TimespanCollection(object):
             if not hasattr(timespan, 'startOffset') or \
                 not hasattr(timespan, 'stopOffset'):
                 continue
-            self._rootNode = self._insert(self._rootNode, timespan.startOffset)
-            node = self._search(self._rootNode, timespan.startOffset)
-            node.payload.append(timespan)
-            node.payload.sort(key=lambda x: x.stopOffset)
-            if isinstance(timespan, TimespanCollection):
-                timespan._parents.add(self)
+            self._insertTimespan(timespan)
         self._updateIndices(self._rootNode)
         self._updateOffsets(self._rootNode)
         if (self.startOffset != initialStartOffset) or \
             (self.stopOffset != initialStopOffset):
-            self._updateParents()
+            self._updateParents(initialStartOffset)
+
+    def _insertTimespan(self, timespan):
+        self._rootNode = self._insert(self._rootNode, timespan.startOffset)
+        node = self._search(self._rootNode, timespan.startOffset)
+        node.payload.append(timespan)
+        node.payload.sort(key=lambda x: x.stopOffset)
+        if isinstance(timespan, TimespanCollection):
+            timespan._parents.add(self)
 
     def iterateConsonanceBoundedVerticalities(self):
         r'''
@@ -2758,20 +2785,26 @@ class TimespanCollection(object):
         for timespan in timespans:
             assert hasattr(timespan, 'startOffset'), timespan
             assert hasattr(timespan, 'stopOffset'), timespan
-            node = self._search(self._rootNode, timespan.startOffset)
-            if node is None:
-                return
-            if timespan in node.payload:
-                node.payload.remove(timespan)
-            if not node.payload:
-                self._rootNode = self._remove(self._rootNode, timespan.startOffset)
-            if isinstance(timespan, TimespanCollection):
-                timespan._parents.remove(self)
+            self._removeTimespan(timespan)
         self._updateIndices(self._rootNode)
         self._updateOffsets(self._rootNode)
         if (self.startOffset != initialStartOffset) or \
             (self.stopOffset != initialStopOffset):
-            self._updateParents()
+            self._updateParents(initialStartOffset)
+
+    def _removeTimespan(self, timespan, oldStartOffset=None):
+        startOffset = timespan.startOffset
+        if oldStartOffset is not None:
+            startOffset = oldStartOffset
+        node = self._search(self._rootNode, startOffset)
+        if node is None:
+            return
+        if timespan in node.payload:
+            node.payload.remove(timespan)
+        if not node.payload:
+            self._rootNode = self._remove(self._rootNode, startOffset)
+        if isinstance(timespan, TimespanCollection):
+            timespan._parents.remove(self)
 
     def splitAt(self, offsets):
         r'''
@@ -3027,6 +3060,7 @@ class TimespanCollection(object):
             return node.startOffset
         if self._rootNode is not None:
             return recurse(self._rootNode)
+        return float('-inf')
 
     @property
     def earliestStopOffset(self):
@@ -3043,6 +3077,7 @@ class TimespanCollection(object):
         '''
         if self._rootNode is not None:
             return self._rootNode.stopOffsetLow
+        return float('inf')
 
     @property
     def latestStartOffset(self):
@@ -3063,6 +3098,7 @@ class TimespanCollection(object):
             return node.startOffset
         if self._rootNode is not None:
             return recurse(self._rootNode)
+        return float('-inf')
 
     @property
     def latestStopOffset(self):
@@ -3079,6 +3115,7 @@ class TimespanCollection(object):
         '''
         if self._rootNode is not None:
             return self._rootNode.stopOffsetHigh
+        return float('inf')
 
     @property
     def maximumOverlap(self):
@@ -3139,36 +3176,48 @@ class Test(unittest.TestCase):
 
             for i, timespan in enumerate(timespans):
                 tree.insert(timespan)
-                current_timespans_in_list = list(sorted(timespans[:i + 1],
+                currentTimespansInList = list(sorted(timespans[:i + 1],
                     key=lambda x: (x.startOffset, x.stopOffset)))
-                current_timespans_in_tree = [x for x in tree]
-                assert current_timespans_in_tree == current_timespans_in_list, \
-                    (attempt, current_timespans_in_tree, current_timespans_in_list)
+                currentTimespansInTree = [x for x in tree]
+                currentStartOffset = min(
+                    x.startOffset for x in currentTimespansInList)
+                currentStopOffset = max(
+                    x.stopOffset for x in currentTimespansInList)
+                assert currentTimespansInTree == currentTimespansInList, \
+                    (attempt, currentTimespansInTree, currentTimespansInList)
                 assert tree._rootNode.stopOffsetLow == \
-                    min(x.stopOffset for x in current_timespans_in_list)
+                    min(x.stopOffset for x in currentTimespansInList)
                 assert tree._rootNode.stopOffsetHigh == \
-                    max(x.stopOffset for x in current_timespans_in_list)
-                for i in range(len(current_timespans_in_tree)):
-                    assert current_timespans_in_list[i] == \
-                        current_timespans_in_tree[i]
+                    max(x.stopOffset for x in currentTimespansInList)
+                assert tree.startOffset == currentStartOffset
+                assert tree.stopOffset == currentStopOffset
+                for i in range(len(currentTimespansInTree)):
+                    assert currentTimespansInList[i] == \
+                        currentTimespansInTree[i]
 
             random.shuffle(timespans)
             while timespans:
                 timespan = timespans.pop()
-                current_timespans_in_list = sorted(timespans,
+                currentTimespansInList = sorted(timespans,
                     key=lambda x: (x.startOffset, x.stopOffset))
                 tree.remove(timespan)
-                current_timespans_in_tree = [x for x in tree]
-                assert current_timespans_in_tree == current_timespans_in_list, \
-                    (attempt, current_timespans_in_tree, current_timespans_in_list)
+                currentTimespansInTree = [x for x in tree]
+                assert currentTimespansInTree == currentTimespansInList, \
+                    (attempt, currentTimespansInTree, currentTimespansInList)
                 if tree._rootNode is not None:
+                    currentStartOffset = min(
+                        x.startOffset for x in currentTimespansInList)
+                    currentStopOffset = max(
+                        x.stopOffset for x in currentTimespansInList)
                     assert tree._rootNode.stopOffsetLow == \
-                        min(x.stopOffset for x in current_timespans_in_list)
+                        min(x.stopOffset for x in currentTimespansInList)
                     assert tree._rootNode.stopOffsetHigh == \
-                        max(x.stopOffset for x in current_timespans_in_list)
-                    for i in range(len(current_timespans_in_tree)):
-                        assert current_timespans_in_list[i] == \
-                            current_timespans_in_tree[i]
+                        max(x.stopOffset for x in currentTimespansInList)
+                    assert tree.startOffset == currentStartOffset
+                    assert tree.stopOffset == currentStopOffset
+                    for i in range(len(currentTimespansInTree)):
+                        assert currentTimespansInList[i] == \
+                            currentTimespansInTree[i]
 
 
 #------------------------------------------------------------------------------
