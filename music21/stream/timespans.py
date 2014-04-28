@@ -31,23 +31,41 @@ from music21 import tie
 from music21 import exceptions21
 
 
+def fraction(expr):
+    import fractions
+    quotient, remainder = divmod(float(expr), 1.)
+    remainder = fractions.Fraction(remainder).limit_denominator(100)
+    if quotient:
+        if remainder:
+            return '{} {}'.format(int(quotient), remainder)
+        else:
+            return str(int(quotient))
+    else:
+        if remainder:
+            str(remainder)
+    return str(0)
+
+
 #------------------------------------------------------------------------------
 
 
-# TODO: Test with scores with Voices:
-#       cpebach/h186
-
-# TODO: Make simple example score to use in all internals
-#       based off of two-part, two-measures-each
+# TODO: Test with scores with Voices: cpebach/h186
+# TODO: Make simple example score to use in all internals docstrings
 def makeExampleScore():
     from music21 import stream
     score = stream.Score()
     partA = stream.Part()
     partB = stream.Part()
+    score.append(partA)
+    score.append(partB)
     measureA1 = stream.Measure()
     measureA2 = stream.Measure()
+    partA.append(measureA1)
+    partA.append(measureA2)
     measureB1 = stream.Measure()
     measureB2 = stream.Measure()
+    partB.append(measureB1)
+    partB.append(measureB2)
     return score
 
 
@@ -131,25 +149,21 @@ def recurseStream2(
     from music21 import stream
     if currentParentage is None:
         currentParentage = (inputStream,)
-    result = TimespanCollection()
+    result = TimespanCollection(source=currentParentage[-1])
     for element in inputStream:
         if isinstance(element, spanner.Spanner):
             continue
         startOffset = element.getOffsetBySite(currentParentage[-1])
-        print currentParentage
+        startOffset += initialOffset
         if isinstance(element, stream.Stream):
-            print '{}C: {}'.format('\t' * len(currentParentage), element)
             localParentage = currentParentage + (element,)
             subresult = recurseStream2(
                 element,
                 localParentage,
                 initialOffset=startOffset,
                 )
-            print subresult
             result.insert(subresult)
         else:
-            print '{}L: {}'.format('\t' * len(currentParentage), element)
-            startOffset += initialOffset
             stopOffset = startOffset + element.duration.quarterLength
             elementTimespan = ElementTimespan(
                 element=element,
@@ -172,11 +186,11 @@ def streamToTimespanCollection(inputStream, initialOffset=0):
         >>> for x in tree[:5]:
         ...     x
         ...
-        <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
-        <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-        <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-        <ElementTimespan 0.0:1.0 <music21.note.Note E>>
-        <ElementTimespan 0.5:1.0 <music21.note.Note B>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+        <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
+        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
 
     '''
     elementTimespans = recurseStream(inputStream, initialOffset=initialOffset)
@@ -336,7 +350,7 @@ class ElementTimespan(object):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = stream.timespans.streamToTimespanCollection(score)
         >>> tree
-        <TimespanCollection {165} 0.0:36.0>
+        <TimespanCollection {165} (0.0 to 36.0)>
 
     Then get the verticality from offset 6.5, which is beat two-and-a-half of
     measure 2 (the piece is in 4/4 with a quarter-note pickup)
@@ -357,10 +371,13 @@ class ElementTimespan(object):
     ::
 
         >>> verticality.startTimespans
-        (<ElementTimespan 6.5:7.0 <music21.note.Note D>>,)
+        (<ElementTimespan (6.5 to 7.0) <music21.note.Note D>>,)
+
+    ::
+
         >>> elementTimespan = verticality.startTimespans[0]
         >>> elementTimespan
-        <ElementTimespan 6.5:7.0 <music21.note.Note D>>
+        <ElementTimespan (6.5 to 7.0) <music21.note.Note D>>
 
     What can we do with a elementTimespan? We can get its Part object or the
     Part object name
@@ -455,7 +472,7 @@ class ElementTimespan(object):
     ### SPECIAL METHODS ###
 
     def __repr__(self):
-        return '<{} {}:{} {!r}>'.format(
+        return '<{} ({} to {}) {!r}>'.format(
             type(self).__name__,
             self.startOffset,
             self.stopOffset,
@@ -520,20 +537,20 @@ class ElementTimespan(object):
             >>> verticality = tree.getVerticalityAt(0)
             >>> timespan = verticality.startTimespans[0]
             >>> timespan
-            <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
 
         ::
 
             >>> for shard in timespan.splitAt(0.25):
             ...     shard
             ...
-            <ElementTimespan 0.0:0.25 <music21.note.Note C#>>
-            <ElementTimespan 0.25:0.5 <music21.note.Note C#>>
+            <ElementTimespan (0.0 to 0.25) <music21.note.Note C#>>
+            <ElementTimespan (0.25 to 0.5) <music21.note.Note C#>>
 
         ::
 
             >>> timespan.splitAt(1000)
-            (<ElementTimespan 0.0:0.5 <music21.note.Note C#>>,)
+            (<ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>,)
 
         '''
 
@@ -869,7 +886,7 @@ class Verticality(object):
     ::
 
         >>> verticality.startTimespans
-        (<ElementTimespan 6.5:7.0 <music21.note.Note D>>,)
+        (<ElementTimespan (6.5 to 7.0) <music21.note.Note D>>,)
 
 
     And we can get all the elementTimespans that were already sounding at the
@@ -878,9 +895,9 @@ class Verticality(object):
     ::
 
         >>> verticality.overlapTimespans
-        (<ElementTimespan 6.0:7.0 <music21.note.Note B>>,
-         <ElementTimespan 6.0:7.0 <music21.note.Note G#>>,
-         <ElementTimespan 6.0:7.0 <music21.note.Note E>>)
+        (<ElementTimespan (6.0 to 7.0) <music21.note.Note B>>,
+         <ElementTimespan (6.0 to 7.0) <music21.note.Note G#>>,
+         <ElementTimespan (6.0 to 7.0) <music21.note.Note E>>)
 
     And we can get all the things that stop right at this moment.  It's the E
     in the tenor preceding the passing tone D:
@@ -888,7 +905,7 @@ class Verticality(object):
     ::
 
         >>> verticality.stopTimespans
-        (<ElementTimespan 6.0:6.5 <music21.note.Note E>>,)
+        (<ElementTimespan (6.0 to 6.5) <music21.note.Note E>>,)
 
     '''
 
@@ -952,7 +969,7 @@ class Verticality(object):
         ::
 
             >>> verticality.bassTimespan
-            <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
+            <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
 
         '''
         pitches = sorted(self.pitchSet)
@@ -1120,7 +1137,7 @@ class Verticality(object):
             >>> tree = stream.timespans.streamToTimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(0.5)
             >>> verticality.overlapTimespans
-            (<ElementTimespan 0.0:1.0 <music21.note.Note E>>,)
+            (<ElementTimespan (0.0 to 1.0) <music21.note.Note E>>,)
 
         '''
         return self._overlapTimespans
@@ -1252,10 +1269,10 @@ class Verticality(object):
             >>> for timespan in verticality.startTimespans:
             ...     timespan
             ...
-            <ElementTimespan 1.0:2.0 <music21.note.Note A>>
-            <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
-            <ElementTimespan 1.0:2.0 <music21.note.Note C#>>
-            <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
+            <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
+            <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
+            <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
+            <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
 
         '''
         return self._startTimespans
@@ -1273,10 +1290,10 @@ class Verticality(object):
             >>> for timespan in verticality.stopTimespans:
             ...     timespan
             ...
-            <ElementTimespan 0.0:1.0 <music21.note.Note E>>
-            <ElementTimespan 0.5:1.0 <music21.note.Note B>>
-            <ElementTimespan 0.5:1.0 <music21.note.Note B>>
-            <ElementTimespan 0.5:1.0 <music21.note.Note G#>>
+            <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
+            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+            <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
 
         '''
         return self._stopTimespans
@@ -1436,6 +1453,7 @@ class TimespanCollection(object):
         '__weakref__',
         '_parents',
         '_rootNode',
+        '_source',
         )
 
     class TimespanCollectionNode(object):
@@ -1645,11 +1663,13 @@ class TimespanCollection(object):
     def __init__(
         self,
         timespans=None,
+        source=None,
         ):
         self._parents = weakref.WeakSet()
         self._rootNode = None
         if timespans and timespans is not None:
             self.insert(timespans)
+        self._source = source
 
     ### SPECIAL METHODS ###
 
@@ -1892,12 +1912,21 @@ class TimespanCollection(object):
         return not self == expr
 
     def __repr__(self):
-        return '<{} {{{}}} {}:{}>'.format(
-            type(self).__name__,
-            len(self),
-            self.startOffset,
-            self.stopOffset,
-            )
+        if self.source is None:
+            return '<{} {{{}}} ({!r} to {!r})>'.format(
+                type(self).__name__,
+                len(self),
+                self.startOffset,
+                self.stopOffset,
+                )
+        else:
+            return '<{} {{{}}} ({!r} to {!r}) {!r}>'.format(
+                type(self).__name__,
+                len(self),
+                self.startOffset,
+                self.stopOffset,
+                self.source,
+                )
 
     def __setitem__(self, i, new):
         r'''
@@ -2246,7 +2275,7 @@ class TimespanCollection(object):
             >>> tree = stream.timespans.streamToTimespanCollection(score)
             >>> timespan = tree[0]
             >>> timespan
-            <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
 
         ::
 
@@ -2257,7 +2286,7 @@ class TimespanCollection(object):
 
             >>> timespan = tree.findNextElementTimespanInSamePart(timespan)
             >>> timespan
-            <ElementTimespan 0.5:1.0 <music21.note.Note B>>
+            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
 
         ::
 
@@ -2268,7 +2297,7 @@ class TimespanCollection(object):
 
             >>> timespan = tree.findNextElementTimespanInSamePart(timespan)
             >>> timespan
-            <ElementTimespan 1.0:2.0 <music21.note.Note A>>
+            <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
 
         ::
 
@@ -2299,7 +2328,7 @@ class TimespanCollection(object):
             >>> tree = stream.timespans.streamToTimespanCollection(score)
             >>> timespan = tree[-1]
             >>> timespan
-            <ElementTimespan 35.0:36.0 <music21.note.Note F#>>
+            <ElementTimespan (35.0 to 36.0) <music21.note.Note F#>>
 
         ::
 
@@ -2310,7 +2339,7 @@ class TimespanCollection(object):
 
             >>> timespan = tree.findPreviousElementTimespanInSamePart(timespan)
             >>> timespan
-            <ElementTimespan 34.0:35.0 <music21.note.Note B>>
+            <ElementTimespan (34.0 to 35.0) <music21.note.Note B>>
 
         ::
 
@@ -2321,7 +2350,7 @@ class TimespanCollection(object):
 
             >>> timespan = tree.findPreviousElementTimespanInSamePart(timespan)
             >>> timespan
-            <ElementTimespan 33.0:34.0 <music21.note.Note D>>
+            <ElementTimespan (33.0 to 34.0) <music21.note.Note D>>
 
         ::
 
@@ -2351,9 +2380,9 @@ class TimespanCollection(object):
             >>> for timespan in tree.findTimespansStartingAt(0.5):
             ...     timespan
             ...
-            <ElementTimespan 0.5:1.0 <music21.note.Note B>>
-            <ElementTimespan 0.5:1.0 <music21.note.Note B>>
-            <ElementTimespan 0.5:1.0 <music21.note.Note G#>>
+            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+            <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
 
         '''
         results = []
@@ -2371,9 +2400,9 @@ class TimespanCollection(object):
             >>> for timespan in tree.findTimespansStoppingAt(0.5):
             ...     timespan
             ...
-            <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
-            <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-            <ElementTimespan 0.0:0.5 <music21.note.Note A>>
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
 
         '''
         def recurse(node, offset):
@@ -2400,7 +2429,7 @@ class TimespanCollection(object):
             >>> for timespan in tree.findTimespansOverlapping(0.5):
             ...     timespan
             ...
-            <ElementTimespan 0.0:1.0 <music21.note.Note E>>
+            <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
 
         '''
         def recurse(node, offset, indent=0):
@@ -2891,10 +2920,10 @@ class TimespanCollection(object):
             >>> for timespan in tree.findTimespansOverlapping(0.1):
             ...     timespan
             ...
-            <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
-            <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-            <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-            <ElementTimespan 0.0:1.0 <music21.note.Note E>>
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+            <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
 
         ::
 
@@ -2902,10 +2931,10 @@ class TimespanCollection(object):
             >>> for timespan in tree.findTimespansStartingAt(0.1):
             ...     timespan
             ...
-            <ElementTimespan 0.1:0.5 <music21.note.Note C#>>
-            <ElementTimespan 0.1:0.5 <music21.note.Note A>>
-            <ElementTimespan 0.1:0.5 <music21.note.Note A>>
-            <ElementTimespan 0.1:1.0 <music21.note.Note E>>
+            <ElementTimespan (0.1 to 0.5) <music21.note.Note C#>>
+            <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>
+            <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>
+            <ElementTimespan (0.1 to 1.0) <music21.note.Note E>>
 
         ::
 
@@ -2956,20 +2985,20 @@ class TimespanCollection(object):
             ...         print '\t', timespan
             ...
             <music21.stream.Part Alto>
-                <ElementTimespan 0.0:1.0 <music21.note.Note E>>
-                <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
+                <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
+                <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
             <music21.stream.Part Bass>
-                <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-                <ElementTimespan 0.5:1.0 <music21.note.Note G#>>
-                <ElementTimespan 1.0:2.0 <music21.note.Note F#>>
+                <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+                <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
+                <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
             <music21.stream.Part Soprano>
-                <ElementTimespan 0.0:0.5 <music21.note.Note C#>>
-                <ElementTimespan 0.5:1.0 <music21.note.Note B>>
-                <ElementTimespan 1.0:2.0 <music21.note.Note A>>
+                <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+                <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+                <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
             <music21.stream.Part Tenor>
-                <ElementTimespan 0.0:0.5 <music21.note.Note A>>
-                <ElementTimespan 0.5:1.0 <music21.note.Note B>>
-                <ElementTimespan 1.0:2.0 <music21.note.Note C#>>
+                <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+                <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+                <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
 
         '''
         unwrapped = {}
@@ -3206,6 +3235,14 @@ class TimespanCollection(object):
             elif degreeOfOverlap < overlap:
                 overlap = degreeOfOverlap
         return overlap
+
+    @property
+    def source(self):
+        return self._source
+
+    @source.setter
+    def source(self, expr):
+        self._source = expr
 
     @property
     def startOffset(self):
