@@ -64,7 +64,7 @@ def dynamicStrFromDecimal(n):
     >>> dynamics.dynamicStrFromDecimal(1)
     'fff'
     '''
-    if n <= 0:
+    if n is None or n <= 0:
         return 'n'
     elif n < .11:
         return 'pppp'

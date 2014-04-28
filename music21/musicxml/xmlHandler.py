@@ -1033,7 +1033,10 @@ class Document(object):
 
         if not isFile:
             # StringIO.StringIO is supposed to handle unicode
-            fileLikeOpen = StringIO(fileLike)
+            try:
+                fileLikeOpen = StringIO(fileLike)
+            except TypeError:
+                raise
 
         else: # TODO: should this be codecs.open()?
             fileLikeOpen = open(fileLike)
@@ -1088,10 +1091,10 @@ class Document(object):
 
     def reprTest(self):
         '''Basic display for testing'''
-        print('+'*20 + ' ' + self.getBestTitle())
-        print(self.score)
+        print(('+'*20 + ' ' + self.getBestTitle()))
+        print((self.score))
         print()
-        print(self.score.toxml(None, None, 1))
+        print((self.score.toxml(None, None, 1)))
 
     #---------------------------------------------------------------------------
     def write(self, fp):

@@ -128,8 +128,8 @@ class ClassCache(object):
         >>> s1.repeatAppend(note.Rest(), 4)
         >>> cc = classCache.ClassCache()
         >>> cc.load(s1)
-        >>> cc.repositories.keys()
-        ['Note', 'Rest', 'NotRest', 'GeneralNote']
+        >>> sorted(list(cc.repositories.keys()))
+        ['GeneralNote', 'NotRest', 'Note', 'Rest']
         '''
         self.parent = srcStream # store this to get offsets later
         #environLocal.printDebug(['loading parent:', srcStream])

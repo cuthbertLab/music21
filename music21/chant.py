@@ -21,6 +21,7 @@ from music21 import exceptions21
 from music21 import note
 from music21 import stream
 
+from music21.ext import six
 
 from music21 import environment
 _MOD = "chant.py"
@@ -245,7 +246,7 @@ class GregorianNote(note.Note):
             else:
                 raise ChantException("note is too high for the clef (%s), choose a higher one" % str(useClef))
         else:
-            return unichr(asciiNote)
+            return six.unichr(asciiNote) # unichr on python2; chr python3
 
 
     def _getFill(self):

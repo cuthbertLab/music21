@@ -1219,7 +1219,7 @@ class MeterSequence(MeterTerminal):
         if n % 3 == 0 and n > 3:
             nMod = n / 3
             seq = []
-            for j in range(n/3):
+            for j in range(int(n/3)):
                 seq.append('%s/%s' % (3, d))
             opts.append(seq)
         # odd meters with common groupings
@@ -2867,7 +2867,7 @@ class TimeSignature(base.Music21Object):
             self.beamSequence.partition(3) # divide into three groups
 
         elif self.numerator in [6,9,12,15,18,21]:
-            self.beamSequence.partition([3] * (self.numerator / 3))
+            self.beamSequence.partition([3] * int(self.numerator / 3))
         else:
             pass # doing nothing will beam all together
         #environLocal.printDebug('default beam partitions set to: %s' % self.beamSequence)

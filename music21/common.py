@@ -1411,7 +1411,6 @@ def formatStr(msg, *arguments, **keywords):
     '''Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
-
     >>> a = common.formatStr('test', '1', 2, 3)
     >>> print(a)
     test 1 2 3
@@ -1429,7 +1428,34 @@ def formatStr(msg, *arguments, **keywords):
     else: # catch all others
         return ' '.join(msg)+'\n'
 
-
+def strTrimFloat(floatNum, maxNum = 4):
+    '''
+    returns a string from a float that is at most maxNum of
+    decimial digits long, but never less than 1.
+    
+    >>> common.strTrimFloat(42.3333333333)
+    '42.3333'
+    >>> common.strTrimFloat(42.3333333333, 2)
+    '42.33'
+    >>> common.strTrimFloat(6.66666666666666, 2)
+    '6.67'
+    >>> common.strTrimFloat(2.0)
+    '2.0'
+    >>> common.strTrimFloat(-5)
+    '-5.0'
+    '''
+    # variables called "off" because originally designed for offsets
+    offBuildString = r'%.' + str(maxNum) + 'f'
+    off = offBuildString % floatNum
+    offDecimal = off.index('.')
+    offLen = len(off)
+    for i in range(offLen - 1, offDecimal + 1, -1):
+        if off[i] != '0':
+            break
+        else:
+            offLen = offLen - 1
+    off = off[0:offLen]
+    return off
 
 def dirPartitioned(obj, skipLeading=['__']):
     '''Given an object, return three lists of names: methods, attributes, and properties.

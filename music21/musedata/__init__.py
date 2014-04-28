@@ -550,7 +550,7 @@ class MuseDataRecordIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.index >= len(self.src):
             raise StopIteration
         # add one b/c end is inclusive
@@ -558,6 +558,7 @@ class MuseDataRecordIterator(object):
         self.index += 1
         return mdr
 
+    next = __next__ #py2
 
 #-------------------------------------------------------------------------------
 class MuseDataMeasure(object):
@@ -698,7 +699,7 @@ class MuseDataMeasureIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.index >= len(self.boundaries):
             raise StopIteration
         start, end = self.boundaries[self.index]
@@ -707,6 +708,7 @@ class MuseDataMeasureIterator(object):
         self.index += 1
         return mdm
 
+    next = __next__ # py2
 
 #-------------------------------------------------------------------------------
 class MuseDataPart(object):

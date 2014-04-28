@@ -860,7 +860,7 @@ class StreamThawer(StreamFreezeThawBase):
     def parseOpenFmt(self, storage):
         '''Look at the file and determine the format
         '''
-        if storage.startswith('{"m21Version": {"py/tuple"'):
+        if storage.startswith(b'{"m21Version": {"py/tuple"'):
             return 'jsonpickle'
         else:
             return 'pickle'

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -4430,7 +4430,7 @@ class TestExternal(unittest.TestCase):
         for i in range(30):
             chordRaw = []
             for i in range(random.choice([3, 4, 5, 6, 7, 8])):
-                pc = random.choice(range(0, 12))
+                pc = random.choice(list(range(0, 12))) # py3
                 if pc not in chordRaw:
                     chordRaw.append(pc)
             c = Chord(chordRaw)
@@ -4958,7 +4958,7 @@ class Test(unittest.TestCase):
         sc = scale.WholeToneScale()
         s = stream.Stream()
         for i in range(7):
-            tiePos = range(i + 1)
+            tiePos = list(range(i + 1)) # py3 = list
             c = sc.getChord('c4', 'c5', quarterLength=1)
             for pos in tiePos:
                 c.setTie(tie.Tie('start'), c.pitches[pos])

@@ -1440,13 +1440,15 @@ class SpineCollection(object):
         self.iterIndex = len(self.spines) - 1
         return self
 
-    def next(self):
+    def __next__(self):
         '''Returns the current spine and decrements the iteration index.'''
         if self.iterIndex < 0:
             raise StopIteration
         thisSpine = self.spines[self.iterIndex]
         self.iterIndex -= 1
         return thisSpine
+
+    next = __next__ # py2
 
     def addSpine(self, streamClass = stream.Part):
         '''

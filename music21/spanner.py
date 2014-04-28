@@ -1523,7 +1523,7 @@ class Line(Spanner):
         return self._endHeight
 
     def _setEndHeight(self, value):
-        if not common.isNum(value) and value >= 0:
+        if not common.isNum(value) and value is not None and value >= 0:
             raise SpannerException('not a valid value: %s' % value)
         self._endHeight = value
 
@@ -1536,7 +1536,7 @@ class Line(Spanner):
         return self._startHeight
 
     def _setStartHeight(self, value):
-        if not common.isNum(value) and value >= 0:
+        if not common.isNum(value) and value is not None and value >= 0:
             raise SpannerException('not a valid value: %s' % value)
         self._startHeight = value
 

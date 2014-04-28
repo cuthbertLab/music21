@@ -111,7 +111,7 @@ class Barline(base.Music21Object):
     
     Note that the barline style 'ticked' only is displayed correctly in Finale and Finale Notepad.
     '''
-    validStyles = barStyleDict.keys()
+    validStyles = list(barStyleDict.keys())
 
     _style = None
     _pause = None  # can be music21.expressions.Fermata object

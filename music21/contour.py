@@ -264,14 +264,14 @@ class ContourFinder(object):
         >>> mycontour = { 0.0: 1.0, 3.0: 0.5, 6.0: 0.8, 9.0: 0.3, 12.0: 0.15, 
         ...            15.0: 0.13, 18.0: 0.4, 21.0: 0.6 }
         >>> res = contour.ContourFinder()._normalizeContour(mycontour, 100)
-        >>> resKeys = res.keys()
+        >>> resKeys = list(res.keys())
         >>> resKeys.sort()
-        >>> contourKeys = mycontour.keys()
+        >>> contourKeys = list(mycontour.keys())
         >>> contourKeys.sort()
         >>> len(contourKeys) == len(resKeys)
         True
         >>> x = True
-        >>> for i in range( len(contourKeys)):
+        >>> for i in range(len(contourKeys)):
         ...    if mycontour[contourKeys[i]] != res[resKeys[i]]:
         ...        x = False
         >>> x
@@ -281,7 +281,7 @@ class ContourFinder(object):
         >>> 0.0 in res
         True
         '''
-        myKeys = contourDict.keys()
+        myKeys = list(contourDict.keys())
         myKeys.sort()
         numKeys = len(myKeys)
         
@@ -345,16 +345,16 @@ class ContourFinder(object):
         >>> res = contour.ContourFinder().randomize(myDict)
         >>> res == myDict
         False
-        >>> sorted(res.keys()) == sorted(myDict.keys())
+        >>> sorted(list(res.keys())) == sorted(list(myDict.keys()))
         True
-        >>> sorted(res.values()) == sorted(myDict.values())
+        >>> sorted(list(res.values())) == sorted(list(myDict.values()))
         True         
         
         '''
         res = {}
         
-        myKeys = contourDict.keys()
-        myValues = contourDict.values()
+        myKeys = list(contourDict.keys())
+        myValues = list(contourDict.values())
         
         random.shuffle(myKeys)
         

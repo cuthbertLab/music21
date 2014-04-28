@@ -57,6 +57,7 @@ from music21 import common
 from music21 import humdrum
 from music21 import stream
 from music21 import tinyNotation
+from music21.ext import six
 
 from music21.capella import fromCapellaXML
 
@@ -97,19 +98,39 @@ class ConverterFileException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class ArchiveManager(object):
-    '''Before opening a file path, this class can check if this is an archived file collection, such as a .zip or or .mxl file. This will return the data from the archive.
+    r'''Before opening a file path, this class can check if this is an 
+    archived file collection, such as a .zip or or .mxl file. This will return the 
+    data from the archive.
+    
+    >>> fnCorpus = corpus.getWork('opus18no1/movement3', fileExtensions=('.xml',))
+    
+    This is likely a unicode string
+    
+    >>> #_DOCS_SHOW fnCorpus
+    >>> '/Users/cuthbert/Documents/music21/corpus/beethoven/opus18no1/movement3.mxl' #_DOCS_HIDE
+    '/Users/cuthbert/Documents/music21/corpus/beethoven/opus18no1/movement3.mxl'
+    >>> am = converter.ArchiveManager(fnCorpus)
+    >>> am.isArchive()
+    True
+    >>> am.getNames()
+    ['movement3.xml', 'META-INF/container.xml']
+    >>> data = am.getData()
+    >>> data[0:70]
+    '<?xml version="1.0" standalone="no"?>\r\n<!DOCTYPE score-partwise PUBLIC'
     '''
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
 
     def __init__(self, fp, archiveType='zip'):
-        '''Only archive type supported now is zip.
+        '''Only archive type supported now is zip. But .mxl is zip...
         '''
         self.fp = fp
         self.archiveType = archiveType
 
     def isArchive(self):
-        '''Return True or False if the filepath is an archive of the supplied archiveType.
+        '''
+        Return True or False if the filepath is an 
+        archive of the supplied archiveType.
         '''
         if self.archiveType == 'zip':
             # some .md files can be zipped
@@ -140,9 +161,11 @@ class ArchiveManager(object):
 
 
     def getData(self, name=None, dataFormat='musicxml' ):
-        '''Return data from the archive by name. If no name is given, a default may be available.
+        '''Return data from the archive by name. If no name is given, 
+        a default may be available.
 
-        For 'musedata' format this will be a list of strings. For 'musicxml' this will be a single string.
+        For 'musedata' format this will be a list of strings. 
+        For 'musicxml' this will be a single string.
         '''
         if self.archiveType == 'zip':
             f = zipfile.ZipFile(self.fp, 'r')
@@ -159,6 +182,8 @@ class ArchiveManager(object):
                         continue
                     if subFp.endswith('.xml'):
                         post = f.read(subFp)
+                        if six.PY3:
+                            post = post.decode(encoding='UTF-8')
                         break
 
             elif name == None and dataFormat == 'musedata':
@@ -173,7 +198,10 @@ class ArchiveManager(object):
                     component = f.open(subFp, 'rU')
                     lines = component.readlines()
                     #environLocal.printDebug(['subFp', subFp, len(lines)])
-                    post.append(''.join(lines))
+                    if six.PY2:
+                        post.append(''.join(lines))
+                    else:
+                        post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
 
                     # note: the following methods do not properly employ
                     # universal new lines; this is a python problem:
@@ -182,9 +210,11 @@ class ArchiveManager(object):
                     #post.append(f.read(subFp, 'U'))
                     #msg.append('\n/END\n')
 
+
             f.close()
         else:
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
+
 
         return post
 
@@ -210,17 +240,21 @@ class PickleFilter(object):
         #environLocal.printDebug(['creating pickle filter'])
 
     def _getPickleFp(self, directory, zipType=None):
+        import sys
         if directory == None:
             raise ValueError
         if zipType is None:
             extension = '.p'
         else:
             extension = '.pgz'
+        pythonVersion = 'py' + str(sys.version_info[0]) + '.' + str(sys.version_info[1])
+
+        baseName = '-'.join(['m21', _version.__version__, pythonVersion, common.getMd5(self.fp)])
+        if self.number is not None:
+            baseName += '-' + str(self.number)
+        baseName += extension
         
-        if self.number is None:
-            return os.path.join(directory, 'm21-' + _version.__version__ + '-' + common.getMd5(self.fp) + extension)
-        else:
-            return os.path.join(directory, 'm21-' + _version.__version__ + '-' + common.getMd5(self.fp) + '-' + str(self.number) + extension)
+        return os.path.join(directory, baseName)
 
     def status(self):
         '''
@@ -283,11 +317,30 @@ class ConverterHumdrum(object):
 
     #---------------------------------------------------------------------------
     def parseData(self, humdrumString, number=None):
-        '''Open Humdrum data from a string
+        '''Open Humdrum data from a string -- calls humdrum.parseData()
 
         >>> humdata = '**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-'
         >>> c = converter.ConverterHumdrum()
+        >>> c.stream is None
+        True
         >>> s = c.parseData(humdata)
+        >>> c.stream.show('text')
+        {0.0} <music21.stream.Part spine_0>
+            {0.0} <music21.humdrum.spineParser.MiscTandem **kern humdrum control>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.meter.TimeSignature 2/4>
+                {0.0} <music21.note.Rest rest>
+                {0.166666666667} <music21.note.Note G#>
+                {0.333333333333} <music21.note.Note F#>
+                {0.5} <music21.note.Note E>
+                {0.666666666667} <music21.note.Note C#>
+                {0.833333333333} <music21.note.Note F>
+                {1.0} <music21.note.Rest rest>
+                {1.16666666667} <music21.note.Note D>
+                {1.33333333333} <music21.note.Note E->
+                {1.5} <music21.note.Note G>
+                {1.66666666667} <music21.note.Note E->
+                {1.83333333333} <music21.note.Note D>        
         '''
         self.data = humdrum.parseData(humdrumString)
         #self.data.stream.makeNotation()
@@ -296,7 +349,13 @@ class ConverterHumdrum(object):
         return self.data
 
     def parseFile(self, filepath, number=None):
-        '''Open Humdram data from a file path.'''
+        '''
+        Open Humdram data from a file path.
+        
+        Calls humdrum.parseFile on filepath.
+        
+        Number is ignored here.
+        '''
         self.data = humdrum.parseFile(filepath)
         #self.data.stream.makeNotation()
 
@@ -305,7 +364,9 @@ class ConverterHumdrum(object):
 
 #-------------------------------------------------------------------------------
 class ConverterTinyNotation(object):
-    '''Simple class wrapper for parsing TinyNotation data provided in a file or in a string.
+    '''
+    Simple class wrapper for parsing TinyNotation data provided in a file or 
+    in a string.
     '''
 
     def __init__(self):
@@ -317,7 +378,19 @@ class ConverterTinyNotation(object):
 
         >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
         >>> c = converter.ConverterTinyNotation()
+        >>> c.stream is None
+        True
         >>> s = c.parseData(tnData)
+        >>> c.stream.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note E>
+        {1.0} <music21.note.Rest rest>
+        {2.0} <music21.note.Note F#>
+        {3.0} <music21.note.Note G>
+        {4.0} <music21.note.Note B->
+        {4.33333333333} <music21.note.Note A>
+        {4.66666666667} <music21.note.Note G>
+        {5.0} <music21.note.Note C>        
         '''
         if common.isStr(tnData):
             tnStr = tnData
@@ -337,17 +410,18 @@ class ConverterTinyNotation(object):
 
 class ConverterNoteworthy(object):
     '''
-    Simple class wrapper for parsing NoteworthyComposer data provided in a file or in a string.
+    Simple class wrapper for parsing NoteworthyComposer data provided in a 
+    file or in a string.
 
     Gets data with the file format .nwctxt
 
-    Users should not need this routine.  The basic format is
+    Users should not need this routine.  The basic format is converter.parse("file.nwctxt")
 
 
     >>> import os #_DOCS_HIDE
     >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
     >>> paertPath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
-    >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
+    >>> #_DOCS_SHOW paertPath = converter.parse(r'd:/desktop/arvo_part_o_weisheit.nwctxt')
     >>> paertStream = converter.parse(paertPath)
     >>> len(paertStream.parts)
     4
@@ -473,11 +547,11 @@ class ConverterMusicXML(object):
         m21Format = common.findFormatFile(fpDst)
         pickleError = False
 
-        c = musicxmlHandler.Document()
+        musxmlDocument = musicxmlHandler.Document()
         if m21Format == 'pickle':
             environLocal.printDebug(['opening pickled file', fpDst])
             try:
-                c.openPickle(fpDst)
+                musxmlDocument.openPickle(fpDst)
             except (ImportError, EOFError):
                 msg = 'pickled file (%s) is damaged; a new file will be created.' % fpDst
                 pickleError = True
@@ -488,13 +562,13 @@ class ConverterMusicXML(object):
                 else:
                     raise ConverterException(msg)
             # check if this pickle is up to date
-            if (hasattr(c.score, 'm21Version') and
-                c.score.m21Version >= musicxmlHandler.musicxmlMod.VERSION_MINIMUM):
+            if (hasattr(musxmlDocument.score, 'm21Version') and
+                musxmlDocument.score.m21Version >= musicxmlHandler.musicxmlMod.VERSION_MINIMUM):
                 pass
                 #environLocal.printDebug(['pickled file version is compatible', c.score.m21Version])
             else:
                 try:
-                    environLocal.printDebug(['pickled file version is not compatible', c.score.m21Version])
+                    environLocal.printDebug(['pickled file version is not compatible', musxmlDocument.score.m21Version])
                 except (AttributeError, TypeError):
                     # some old pickles have no versions
                     pass
@@ -508,12 +582,13 @@ class ConverterMusicXML(object):
             # here, we can see if this is a mxl or similar archive
             arch = ArchiveManager(fpDst)
             if arch.isArchive():
-                c.read(arch.getData())
+                archData = arch.getData()
+                musxmlDocument.read(archData)
             else: # its a file path or a raw musicxml string
-                c.open(fpDst)
+                musxmlDocument.open(fpDst)
 
         # get mxScore object from .score attribute
-        self._mxScore = c.score
+        self._mxScore = musxmlDocument.score
         #print self._mxScore
         # check that we have parts
         if self._mxScore is None or len(self._mxScore) == 0:
@@ -1005,10 +1080,16 @@ class Converter(object):
 
         directory = environLocal.getRootTempDir()
         dst = self._getDownloadFp(directory, ext, url)
+        if (hasattr(urllib, 'urlretrieve')): 
+            # python 2
+            urlretrieve = urllib.urlretrieve
+        else: #python3
+            urlretrieve = urllib.request.urlretrieve # @UndefinedVariable
+        
         if not os.path.exists(dst):
             try:
                 environLocal.printDebug(['downloading to:', dst])
-                fp, unused_headers = urllib.urlretrieve(url, filename=dst)
+                fp, unused_headers = urlretrieve(url, filename=dst)
             except IOError:
                 raise ConverterException('cannot access file: %s' % url)
         else:

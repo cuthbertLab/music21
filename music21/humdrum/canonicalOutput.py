@@ -155,8 +155,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {1.0} <music21.note.Note G#>
 <Stream id=spine_9 offset=0.0 obj="[<music21.note.Note B#>, <musi...">
   {0.0} <music21.note.Note B#>
-  {0.333333333333} <music21.note.Note C#>
-  {0.666666666667} <music21.note.Note B#>
+  {0.3333} <music21.note.Note C#>
+  {0.6667} <music21.note.Note B#>
   {1.0} <music21.note.Note A#>
   {2.0} <music21.note.Note B#>
   {2.5} <music21.note.Note C#>
@@ -172,8 +172,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
   {1.0} <music21.note.Note G#>
 <Stream id=spine_13 offset=0.0 obj="[<music21.note.Note D#>, <musi...">
   {0.0} <music21.note.Note D#>
-  {0.333333333333} <music21.note.Note F#>
-  {0.666666666667} <music21.note.Note E>
+  {0.3333} <music21.note.Note F#>
+  {0.6667} <music21.note.Note E>
   {1.0} <music21.note.Note D#>
 <Stream id=spine_14 offset=0.0 obj="[<MEASURE Measure 5 offset=0.0...">
   <MEASURE Measure 5 offset=0.0>
@@ -182,8 +182,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.0} <music21.note.Note G#>
 <Stream id=spine_15 offset=0.0 obj="[<music21.note.Note B#>, <musi...">
   {0.0} <music21.note.Note B#>
-  {0.333333333333} <music21.note.Note C#>
-  {0.666666666667} <music21.note.Note B#>
+  {0.3333} <music21.note.Note C#>
+  {0.6667} <music21.note.Note B#>
   {1.0} <music21.note.Note A#>
   {2.0} <music21.note.Note B#>
   {2.5} <music21.note.Note C#>
@@ -215,8 +215,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.5} <music21.chord.Chord C#4 G#4>
   <MEASURE Measure 8 offset=3.0>
     {0.0} <music21.chord.Chord D#4 G#4>
-    {0.333333333333} <music21.chord.Chord F#4 G#4>
-    {0.666666666667} <music21.chord.Chord E4 G#4>
+    {0.3333} <music21.chord.Chord F#4 G#4>
+    {0.6667} <music21.chord.Chord E4 G#4>
     {1.0} <music21.chord.Chord D#4 G#4>
   <MEASURE Measure 0 offset=5.0>
     {0.0} <music21.humdrum.MiscTandem *>A humdrum control>
@@ -239,8 +239,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.0} <music21.note.Note G#>
   <MEASURE Measure 12 offset=15.0>
     {0.0} <music21.note.Note E>
-    {0.333333333333} <music21.note.Note F#>
-    {0.666666666667} <music21.note.Note G#>
+    {0.3333} <music21.note.Note F#>
+    {0.6667} <music21.note.Note G#>
     {1.0} <music21.note.Note C#>
     {2.5} <music21.note.Note C##>
   <MEASURE Measure 13 offset=18.0>
@@ -287,8 +287,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.5} <music21.note.Note G#>
   <MEASURE Measure 20 offset=39.0>
     {0.0} <music21.note.Note C##>
-    {0.333333333333} <music21.note.Note A#>
-    {0.666666666667} <music21.note.Note B#>
+    {0.3333} <music21.note.Note A#>
+    {0.6667} <music21.note.Note B#>
     {1.0} <music21.note.Note C#>
     {2.0} <music21.note.Note B#>
     {2.5} <music21.note.Note G#>
@@ -337,8 +337,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.0} <music21.note.Note G#>
   <MEASURE Measure 28 offset=63.0>
     {0.0} <music21.note.Note E>
-    {0.333333333333} <music21.note.Note F#>
-    {0.666666666667} <music21.note.Note G#>
+    {0.3333} <music21.note.Note F#>
+    {0.6667} <music21.note.Note G#>
     {1.0} <music21.note.Note C#>
     {2.5} <music21.note.Note C##>
   <MEASURE Measure 29 offset=66.0>
@@ -384,8 +384,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {1.0} <music21.note.Note E>
 <Stream id=spine_21 offset=0.0 obj="[<music21.note.Note B#>, <musi...">
   {0.0} <music21.note.Note B#>
-  {0.333333333333} <music21.note.Note C#>
-  {0.666666666667} <music21.note.Note B#>
+  {0.3333} <music21.note.Note C#>
+  {0.6667} <music21.note.Note B#>
   {1.0} <music21.note.Note A#>
   {2.0} <music21.note.Rest rest>
 <Stream id=spine_22 offset=0.0 obj="[<music21.chord.Chord G#2 D#3>...">
@@ -674,8 +674,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {1.0} <music21.note.Note G#>
 <Stream id=spine_48 offset=0.0 obj="[<music21.note.Note B#>, <musi...">
   {0.0} <music21.note.Note B#>
-  {0.333333333333} <music21.note.Note C#>
-  {0.666666666667} <music21.note.Note B#>
+  {0.3333} <music21.note.Note C#>
+  {0.6667} <music21.note.Note B#>
   {1.0} <music21.note.Note A#>
   {2.0} <music21.note.Note B#>
   {2.5} <music21.note.Note C#>
@@ -691,8 +691,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
   {1.0} <music21.note.Note G#>
 <Stream id=spine_52 offset=0.0 obj="[<music21.note.Note D#>, <musi...">
   {0.0} <music21.note.Note D#>
-  {0.333333333333} <music21.note.Note F#>
-  {0.666666666667} <music21.note.Note E>
+  {0.3333} <music21.note.Note F#>
+  {0.6667} <music21.note.Note E>
   {1.0} <music21.note.Note D#>
 <Stream id=spine_53 offset=0.0 obj="[<MEASURE Measure 53 offset=0....">
   <MEASURE Measure 53 offset=0.0>
@@ -701,8 +701,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.0} <music21.note.Note G#>
 <Stream id=spine_54 offset=0.0 obj="[<music21.note.Note B#>, <musi...">
   {0.0} <music21.note.Note B#>
-  {0.333333333333} <music21.note.Note C#>
-  {0.666666666667} <music21.note.Note B#>
+  {0.3333} <music21.note.Note C#>
+  {0.6667} <music21.note.Note B#>
   {1.0} <music21.note.Note A#>
   {2.0} <music21.note.Note B#>
   {2.5} <music21.note.Note C#>
@@ -734,8 +734,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.5} <music21.chord.Chord C#4 G#4>
   <MEASURE Measure 56 offset=3.0>
     {0.0} <music21.chord.Chord D#4 G#4>
-    {0.333333333333} <music21.chord.Chord F#4 G#4>
-    {0.666666666667} <music21.chord.Chord E4 G#4>
+    {0.3333} <music21.chord.Chord F#4 G#4>
+    {0.6667} <music21.chord.Chord E4 G#4>
     {1.0} <music21.chord.Chord D#4 G#4>
     {2.0} <music21.note.Note G#>
   <MEASURE Measure 57 offset=6.0>
@@ -756,8 +756,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.0} <music21.note.Note G#>
   <MEASURE Measure 60 offset=15.0>
     {0.0} <music21.note.Note E>
-    {0.333333333333} <music21.note.Note F#>
-    {0.666666666667} <music21.note.Note G#>
+    {0.3333} <music21.note.Note F#>
+    {0.6667} <music21.note.Note G#>
     {1.0} <music21.note.Note C#>
     {2.5} <music21.note.Note C##>
   <MEASURE Measure 61 offset=18.0>
@@ -792,15 +792,15 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {2.0} <music21.note.Note E>
   <MEASURE Measure 67 offset=36.0>
     {0.0} <music21.note.Note G#>
-    {0.333333333333} <music21.note.Note A>
-    {0.666666666667} <music21.note.Rest rest>
-    {0.833333333333} <music21.note.Note G#>
+    {0.3333} <music21.note.Note A>
+    {0.6667} <music21.note.Rest rest>
+    {0.8333} <music21.note.Note G#>
     {1.0} <music21.note.Note D#>
     {2.0} <music21.note.Note G#>
   <MEASURE Measure 68 offset=39.0>
     {0.0} <music21.note.Note E>
-    {0.333333333333} <music21.note.Note F#>
-    {0.666666666667} <music21.note.Note G#>
+    {0.3333} <music21.note.Note F#>
+    {0.6667} <music21.note.Note G#>
     {1.0} <music21.note.Note C#>
     {2.5} <music21.note.Note C##>
   <MEASURE Measure 69 offset=42.0>
@@ -825,8 +825,8 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {0.0} <music21.note.Note C#>
 <Stream id=spine_60 offset=0.0 obj="[<music21.note.Note B#>, <musi...">
   {0.0} <music21.note.Note B#>
-  {0.333333333333} <music21.note.Note C#>
-  {0.666666666667} <music21.note.Note B#>
+  {0.3333} <music21.note.Note C#>
+  {0.6667} <music21.note.Note B#>
   {1.0} <music21.note.Note A#>
   {2.0} <music21.note.Rest rest>
 <Stream id=spine_61 offset=0.0 obj="[<music21.chord.Chord G#2 D#3>...">

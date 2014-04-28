@@ -109,8 +109,8 @@ class TinyNotationStream(stream.Stream):
     {2.0} <music21.note.Note F#>
     {3.0} <music21.note.Note G>
     {4.0} <music21.note.Note B->
-    {4.33333333333} <music21.note.Note A>
-    {4.66666666667} <music21.note.Note G>
+    {4.3333} <music21.note.Note A>
+    {4.6667} <music21.note.Note G>
     {5.0} <music21.note.Note C>
     {6.0} <music21.note.Note C>
 
@@ -275,7 +275,7 @@ class TinyNotationStream(stream.Stream):
             if isinstance(regexpValue, basestring):
                 self.regularExpressions[regexpName] = re.compile(regexpValue) 
             setattr(self, regexpName, self.regularExpressions[regexpName])
-        
+       
     def getNote(self, stringRep, storedDict = None):
         '''
         called out so as to be subclassable, returns a 

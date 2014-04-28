@@ -20,9 +20,11 @@ import random
 #import music21 # needed to properly do isinstance checking
 
 from music21 import base
+from music21 import common
 from music21 import exceptions21
 from music21 import environment
-from music21 import common
+
+#from music21.ext import six
 
 _MOD = "text.py"  
 environLocal = environment.Environment(_MOD)
@@ -537,8 +539,8 @@ class LanguageDetector(object):
 
     def mostLikelyLanguage(self, excerpt):
         '''
-        returns the code of the most likely language for a passage, works on unicode or ascii.
-        current languages: en, fr, de, it, cn
+        returns the code of the most likely language for a passage, works on 
+        unicode or ascii. current languages: en, fr, de, it, cn
         
         >>> ld = text.LanguageDetector()
         >>> ld.mostLikelyLanguage("Hello there, how are you doing today? I haven't seen you in a while.")
@@ -649,7 +651,7 @@ class Trigram(object):
             for line in excerpt:
                 try:
                     line = unicode(line, 'utf8') # just in case
-                except UnicodeDecodeError:
+                except (UnicodeDecodeError, NameError): # no unicode in Py3
                     continue # skip this line
                 for letter in line.strip() + u' ':
                     d = self.lut.setdefault(pair, {})

@@ -147,7 +147,7 @@ class MetadataBundle(object):
         >>> from music21 import corpus, metadata
         >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
         >>> coreBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
 
     ::
 
@@ -206,7 +206,7 @@ class MetadataBundle(object):
     ::
 
         >>> coreBundle.read()
-        <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
 
     Additionally, any two metadata bundles can be operated on together as
     though they were sets, allowing us to build up more complex searches:
@@ -774,7 +774,7 @@ class MetadataBundle(object):
             >>> from music21 import metadata
             >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
             >>> coreBundle
-            <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+            <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
 
         ::
 

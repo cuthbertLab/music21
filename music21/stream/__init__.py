@@ -2088,7 +2088,7 @@ class Stream(base.Music21Object):
         msg = []
         insertSpaces = 4
         for element in thisStream:
-            off = str(element.getOffsetBySite(thisStream))
+            off = common.strTrimFloat(element.getOffsetBySite(thisStream))            
             if addIndent:
                 indent = " " * prefixSpaces
             else:

@@ -5856,7 +5856,7 @@ def mainTest(*testClasses, **kwargs):
         testClasses = [] # remove cases
     for t in testClasses:
         if not isinstance(t, basestring):
-            if displayNames:
+            if displayNames is True:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
                     print('Unit Test Method: %s' % tName)
             if runThisTest is not None:
@@ -5873,13 +5873,23 @@ def mainTest(*testClasses, **kwargs):
                     getattr(tObj, runThisTest)()
                     runAllTests = False
                     break
+                else:
+                    print('Could not find named test method: %s, running all tests' % runThisTest)
 
             # normally operation collects all tests
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
             s1.addTests(s2)
 
 
-    if runAllTests:
+    if runAllTests is True:
+        if six.PY3: # correct "M21Exception" to "...M21Exception"
+            for dtc in s1: # Suite to DocTestCase
+                if hasattr(dtc, '_dt_test'):
+                    dt = dtc._dt_test # DocTest
+                    for example in dt.examples:
+                        if example.exc_msg is not None and len(example.exc_msg) > 0:
+                            example.exc_msg = "..." + example.exc_msg[1:]
+                        
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity
         unused_testResult = runner.run(s1)

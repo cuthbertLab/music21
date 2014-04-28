@@ -2508,7 +2508,7 @@ def forteIndexToInversionsAvailable(card, index):
     >>> chordTables.forteIndexToInversionsAvailable(3,6)
     [0]
     '''
-    if card not in range(1,13):
+    if card not in list(range(1,13)):
         raise ChordTablesException('cardinality %s not valod' % card)
     if index < 1 or index > TNMAX[card]:
         raise ChordTablesException('index %s not valod' % index)
@@ -2547,7 +2547,7 @@ def _validateAddress(address):
     else:
         inversion = None
 
-    if card not in range(1,13):
+    if card not in list(range(1,13)):
         raise ChordTablesException('cardinality %s not valid' % card)
 
     # using TN mode for all comparions
@@ -2730,7 +2730,7 @@ class Test(unittest.TestCase):
     def testScRef(self):
         for key, value in SCREF.items():
             self.assertEqual(len(key), 3)
-            if value.keys() != []:
+            if list(value.keys()) != []:
                 # if we have keys, make sure that name is one of them
                 self.assertEqual('name' in value, True)
 
@@ -2774,7 +2774,7 @@ _DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest()
 
 
 #------------------------------------------------------------------------------

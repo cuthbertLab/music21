@@ -18,6 +18,7 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 
+from music21.ext import six
 
 #------------------------------------------------------------------------------
 
@@ -240,7 +241,7 @@ class Date(object):
         ::
 
             >>> import datetime
-            >>> dt = datetime.datetime(2005, 02, 01)
+            >>> dt = datetime.datetime(2005, 2, 1)
             >>> dt
             datetime.datetime(2005, 2, 1, 0, 0)
 
@@ -779,7 +780,7 @@ class Text(object):
 
     def __str__(self):
         # print type(self._data)
-        if isinstance(self._data, unicode):
+        if isinstance(self._data, six.text_type): #unicode in PY2, str in PY3
             # not sure if this should be wrapped in in str() call
             return self._data.encode('utf-8')
         else:
