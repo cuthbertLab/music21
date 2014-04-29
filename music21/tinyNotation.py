@@ -262,12 +262,12 @@ class TinyNotationStream(stream.Stream):
         will replace p and b+ with `re.compile` versions of the
         same and make `self.PUNCTUS = re.compile('p')`, etc.
 
-        >>> from music21 import tinyNotation
-        >>> dummy = reload(tinyNotation) # show before and after
-        >>> print(tinyNotation.TinyNotationStream.regularExpressions)
+         from music21 import tinyNotation
+         dummy = reload(tinyNotation) # show before and after
+         print(tinyNotation.TinyNotationStream.regularExpressions)
         {'ENDBRAC': '\\}', 'QUAD': 'quad\\{', ...}
-        >>> tns = tinyNotation.TinyNotationStream('3/4 d2 e4 f2 g4')
-        >>> tinyNotation.TinyNotationStream.regularExpressions['ENDBRAC']
+         tns = tinyNotation.TinyNotationStream('3/4 d2 e4 f2 g4')
+         tinyNotation.TinyNotationStream.regularExpressions['ENDBRAC']
         <_sre.SRE_Pattern object at 0x...>
         '''
         for regexpName in self.regularExpressions:
@@ -636,7 +636,7 @@ class Test(unittest.TestCase):
     def compactNoteInfo(self, note):
         '''
         A debugging info tool, returning information about a note
-        E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
+        E- E 4 flat 16th 0.1667 & is a tuplet (in fact STOPS the tuplet)
         '''
         ret = ""
         if (note.isNote is True):
@@ -650,7 +650,7 @@ class Test(unittest.TestCase):
         if (note.tie is not None):
             ret += " (Tie: " + note.tie.type + ")"
         ret += " " + note.duration.type
-        ret += " " + str(note.duration.quarterLength)
+        ret += " " + common.strTrimFloat(note.duration.quarterLength)
         if len(note.duration.tuplets) > 0:
             ret += " & is a tuplet"
             if note.duration.tuplets[0].type == "start":
@@ -678,24 +678,24 @@ class Test(unittest.TestCase):
         #l1 = d1.quarterLength
         self.assertAlmostEquals(st.duration.quarterLength, 6.0)
         
-        ret += "Total duration of Stream: " + str(st.duration.quarterLength) + "\n"
+        ret += "Total duration of Stream: " + common.strTrimFloat(st.duration.quarterLength) + "\n"
         canonical = '''
 E E 4 half 2.0
 F# F 4 sharp eighth 0.5
 rest eighth 0.5
 F F 4 eighth 0.5
-G G 4 16th 0.166666666667 & is a tuplet (in fact STARTS the tuplet)
-F F 4 16th 0.166666666667 & is a tuplet
-E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
+G G 4 16th 0.1667 & is a tuplet (in fact STARTS the tuplet)
+F F 4 16th 0.1667 & is a tuplet
+E- E 4 flat 16th 0.1667 & is a tuplet (in fact STOPS the tuplet)
 D D 4 eighth 0.5
 C C 4 eighth 0.5
 B B 3 eighth 0.5
-D D 4 16th 0.166666666667 & is a tuplet (in fact STARTS the tuplet)
-C C 4 16th 0.166666666667 & is a tuplet
-B B 3 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
+D D 4 16th 0.1667 & is a tuplet (in fact STARTS the tuplet)
+C C 4 16th 0.1667 & is a tuplet
+B B 3 16th 0.1667 & is a tuplet (in fact STOPS the tuplet)
 Total duration of Stream: 6.0
 '''
-        self.assertTrue(common.basicallyEqual(canonical, ret))
+        self.assertTrue(common.basicallyEqual(canonical, ret), ret)
     
     def testConvert(self):
         st1 = TinyNotationStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')

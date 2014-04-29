@@ -903,8 +903,10 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         MedRenException: a flag may not be added to an upstem of note type minima
         >>> r_1.setStem('down')
         >>> r_1.setFlag('down', 'left')
-        >>> r_1.getFlags()
-        {'down': 'left', 'up': None}
+        >>> r_1.getFlags()['down']
+        'left'
+        >>> r_1.getFlags()['up'] is None
+        True
         >>> r_2 = medren.MensuralNote('A', 'semiminima')
         >>> r_2.getFlags()
         {'up': 'right'}

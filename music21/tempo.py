@@ -203,7 +203,7 @@ class TempoText(TempoIndication):
 
         >>> import music21
         >>> tm = music21.tempo.TempoText("adagio")
-        >>> print tm.text
+        >>> print(tm.text)
         adagio
         >>> tm.getTextExpression()
         <music21.expressions.TextExpression "adagio">
@@ -311,7 +311,7 @@ class MetronomeMark(TempoIndication):
     <music21.duration.Duration 2.0>
     >>> a.referent.type
     'half'
-    >>> print a.text
+    >>> print(a.text)
     slow
 
 
@@ -329,7 +329,7 @@ class MetronomeMark(TempoIndication):
 
 
     >>> tm2 = tempo.MetronomeMark(number=208)
-    >>> print tm2.text
+    >>> print(tm2.text)
     prestissimo
     >>> tm2.referent
     <music21.duration.Duration 1.0>
@@ -340,9 +340,9 @@ class MetronomeMark(TempoIndication):
 
 
     >>> marking = u'très vite'
-    >>> print marking
+    >>> print(marking)
     très vite
-    >>> print tempo.defaultTempoValues[marking]
+    >>> print(tempo.defaultTempoValues[marking])
     144
     >>> tm2 = tempo.MetronomeMark(marking)
     >>> tm2.text.endswith('vite')
@@ -461,7 +461,7 @@ class MetronomeMark(TempoIndication):
         >>> mm.text == None 
         True
         >>> mm.text = 'medium fast'
-        >>> print mm.text
+        >>> print(mm.text)
         medium fast
         ''')
 
@@ -1119,7 +1119,7 @@ def interpolateElements(element1, element2, sourceStream,
     
     >>> tempo.interpolateElements(element1, element2, sourceStream, destinationStream, autoAdd = False)
     >>> for el in [eA, eB, eC]:
-    ...    print el.getOffsetBySite(destinationStream)
+    ...    print(el.getOffsetBySite(destinationStream))
     21.625
     22.75
     23.875
@@ -1138,7 +1138,7 @@ def interpolateElements(element1, element2, sourceStream,
     >>> destStream2.insert(50.5, element2)
     >>> tempo.interpolateElements(element1, element2, sourceStream, destStream2)
     >>> for el in [eA, eB, eC]:
-    ...    print el.getOffsetBySite(destStream2)
+    ...    print("%.1f" % (el.getOffsetBySite(destStream2),))
     20.2
     30.3
     40.4

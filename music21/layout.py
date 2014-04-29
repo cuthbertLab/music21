@@ -180,7 +180,7 @@ class ScoreLayout(LayoutBase):
         if self.scalingMillimeters is None or self.scalingTenths is None:
             return 0.0
         millimetersPerTenth = float(self.scalingMillimeters)/self.scalingTenths
-        return millimetersPerTenth * tenths
+        return round(millimetersPerTenth * tenths, 6)
 
 
 #-------------------------------------------------------------------------------
@@ -676,7 +676,7 @@ def getRegionMeasureNumbers(scoreIn, region='Page'):
             measureStartList.append(plMeasureNumber)
             measureEndList.append(plMeasureNumber - 1)
     measureEndList.append(lastMeasureNumber)
-    measureList = zip(measureStartList, measureEndList)
+    measureList = list(zip(measureStartList, measureEndList))
     return measureList
 
 class LayoutScore(stream.Opus):
@@ -1226,7 +1226,7 @@ class LayoutScore(stream.Opus):
         >>> pageId = 2  # last system, last page
         >>> while systemId is not None:
         ...    pageId, systemId = ls.getSystemBeforeThis(pageId, systemId)
-        ...    print(pageId, systemId),
+        ...    (pageId, systemId)
         (2, 0) (1, 2) (1, 1) (1, 0) (0, 4) (0, 3) (0, 2) (0, 1) (0, 0) (None, None)
         '''
         if systemId > 0:

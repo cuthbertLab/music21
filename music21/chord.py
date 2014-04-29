@@ -2887,7 +2887,7 @@ class Chord(note.NotRest):
 
         ::
 
-            >>> print cchord.semitonesFromChordStep(6) # will return None
+            >>> print(cchord.semitonesFromChordStep(6)) # will return None
             None
 
         ::
@@ -2903,7 +2903,7 @@ class Chord(note.NotRest):
 
         ::
 
-            >>> print achord.semitonesFromChordStep(2) # will return None
+            >>> print(achord.semitonesFromChordStep(2)) # will return None
             None
 
         '''
@@ -3067,7 +3067,7 @@ class Chord(note.NotRest):
             >>> secondD4 = c2.pitches[1]
             >>> c2.setStemDirection('double', secondD4)
             >>> for i in [0,1]:
-            ...    print c2.getStemDirection(c2.pitches[i])
+            ...    print(c2.getStemDirection(c2.pitches[i]))
             ...
             unspecified
             double
@@ -3114,7 +3114,7 @@ class Chord(note.NotRest):
             >>> secondD4 = c2.pitches[1]
             >>> c2.setTie('start', secondD4)
             >>> for i in [0,1]:
-            ...    print c2.getTie(c2.pitches[i])
+            ...    print(c2.getTie(c2.pitches[i]))
             ...
             None
             <music21.tie.Tie start>
@@ -3174,8 +3174,7 @@ class Chord(note.NotRest):
         '''
         newChord = copy.deepcopy(self)
         #tempChordNotes = newChord.pitches
-        pitches = sorted(newChord.pitches,
-            cmp=lambda x, y: cmp(x.ps, y.ps))
+        pitches = sorted(newChord.pitches, key=lambda x: x.ps)
         newChord.pitches = pitches
         return newChord
 
@@ -3206,9 +3205,7 @@ class Chord(note.NotRest):
             returnObj = self
         else:
             returnObj = copy.deepcopy(self)
-        pitches = sorted(returnObj.pitches,
-            cmp=lambda x, y: cmp(x.diatonicNoteNum, y.diatonicNoteNum)
-                or cmp(x.ps, y.ps))
+        pitches = sorted(returnObj.pitches, key=lambda x: (x.diatonicNoteNum, x.ps))
         # must re-assign altered list, as a new list is created
         returnObj.pitches = pitches
         return returnObj
@@ -3220,8 +3217,7 @@ class Chord(note.NotRest):
         but below it in (most) just intonation types.
         '''
         newChord = copy.deepcopy(self)
-        pitches = sorted(newChord.pitches,
-            cmp=lambda x, y: cmp(x.frequency, y.frequency))
+        pitches = sorted(newChord.pitches, key=lambda x: x.frequency)
         newChord.pitches = pitches
         return newChord
 
@@ -3333,7 +3329,7 @@ class Chord(note.NotRest):
 
         ::
 
-            >>> for p in a.pitches: print a.getColor(p)
+            >>> for p in a.pitches: print(a.getColor(p))
             #235409
             #ff0000
             #235409

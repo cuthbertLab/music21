@@ -475,7 +475,7 @@ class StreamFreezer(StreamFreezeThawBase):
         4
         >>> for streamElement in [s, m, m2, v._stream]:
         ...    if id(streamElement) not in allIds:
-        ...        print "this should not happen...", allIds, id(streamElement)
+        ...        print("this should not happen...", allIds, id(streamElement))
 
         N.B. with variants:
 

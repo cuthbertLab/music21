@@ -1364,7 +1364,7 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     >>> interval._getSpecifierFromGenericChromatic(cInterval, dInterval)
     Traceback (most recent call last):
     IntervalException: cannot get a specifier for a note with this many semitones off of Major: 8
-    '''
+    '''        
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
 
@@ -1378,7 +1378,13 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
         # all normal intervals
         theseSemis  = cInt.undirected
     # round out microtones
-    semisRounded = int(round(theseSemis))
+    # fix python3 rounding...
+    if cInt.undirected > 0:
+        roundingError = 0.0001
+    else:
+        roundingError = -0.0001
+    
+    semisRounded = int(round(theseSemis + roundingError)) # python3 rounding
     if gInt.perfectable:
         try:
             specifier = perfSpecifiers[perfOffset + semisRounded - normalSemis]
@@ -1442,6 +1448,10 @@ def intervalFromGenericAndChromatic(gInt, cInt):
     <music21.interval.Interval dd5>
     >>> interval.intervalFromGenericAndChromatic(-2, -2)
     <music21.interval.Interval M-2>
+
+    >>> interval.intervalFromGenericAndChromatic(1, 0.5)
+    <music21.interval.Interval A1 (-50c)>
+
     '''
     if common.isNum(gInt):
         gInt = GenericInterval(gInt)

@@ -1251,7 +1251,7 @@ class Expander(object):
                 else: # otherwise get the last start index
                     barRepeatIndices = range(startIndices[-1], i+1)
                     break
-        return barRepeatIndices
+        return list(barRepeatIndices)
 
 
     def _getEndRepeatBar(self, streamObj, index):
@@ -1912,7 +1912,7 @@ class RepeatFinder(object):
             s2 = self.s.parts[0]
 
         
-        mOffsets = s2.measureOffsetMap().keys()
+        mOffsets = list(s2.measureOffsetMap().keys())
         mOffsets.sort()
         if len(mOffsets) < 3:
             raise InsufficientLengthException("Cannot determine length of pickup given fewer than 3 measures")
@@ -2016,7 +2016,7 @@ class RepeatFinder(object):
         
         #mlists is now one list for the whole stream, containing a tuple with the hashed measure over each part,
         # i.e. mlists = [(part1_measure1_hash, part2_measure1_hash, ...), (part1_measure2_hash, part2_measure2_hash, ... ), ... ]
-        mlists = zip(*mlists)
+        mlists = list(zip(*mlists))
         
         tempDict = {}   #maps the measure-hashes to the lowest examined measure number with that hash.   
         res = []
@@ -2186,7 +2186,7 @@ class RepeatFinder(object):
             for i in mList[m]:
                 self._getSimiliarMeasuresHelper(mList, m, i, res, useful)   #add correct value to res
         
-        for k in res.keys():
+        for k in list(res.keys()):
             if not useful[k]:
                 del res[k]  
                         
@@ -2681,8 +2681,10 @@ class RepeatFinder(object):
                 return x[0][0]-y[0][0]
             else:
                 return x[1][0] - y[1][0]
+
+        mGroups = sorted(mGroups, key=lambda x: (-1 * len(x[0]), x[0][0], x[1][0]))
             
-        mGroups = sorted(mGroups, cmp=myComp)
+        #mGroups = sorted(mGroups, cmp=myComp)
         
         if inPlace:
             s = self.s
@@ -2800,8 +2802,8 @@ class RepeatFinder(object):
             else:
                 return x[1][0] - y[1][0]
             
-        mGroups = sorted(mGroups, cmp=aGoodOrder)
-        
+        #mGroups = sorted(mGroups, cmp=aGoodOrder)
+        mGroups = sorted(mGroups, key=lambda x: (-1 * len(x[0]), x[0][0], x[1][0]))
         return mGroups
             
 

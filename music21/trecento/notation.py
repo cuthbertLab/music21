@@ -290,7 +290,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
                 try:
                     tTN = self.getNote(ns, storedDict)
                     objList.append(tTN.note)
-                except TrecentoNotationException, (value):
+                except TrecentoNotationException as value:
                     raise TrecentoNotationException('%s in context %s' % (value, ns))
 
         for obj in objList:

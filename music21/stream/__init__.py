@@ -10321,7 +10321,7 @@ class Stream(base.Music21Object):
                 classList = ["Measure"])
             if measuresToCheck != []:
                 for m in measuresToCheck:
-                    if m.number > highestMeasure:
+                    if highestMeasure is None or m.number > highestMeasure:
                         highestMeasure = m.number
             else:
                 highestMeasure = 0

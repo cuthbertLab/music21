@@ -406,7 +406,7 @@ def _lcm(a, b):
     60
     """
     # // forces integer style division (no remainder)
-    return abs(a*b) / _gcd(a,b) 
+    return abs(a*b) // _gcd(a,b) 
 
 def _lcmRecurse(filterList):
     '''Given a list of values, find the LCM of all the values by iteratively looking doing an LCM comparison to the values in the list.
@@ -1847,7 +1847,7 @@ class PitchSieve(object):
 #             environLocal.printDebug('failed to generates a z with period:', self.sieveObject.period())
         p = self.sieveObject.period()
         if p < 999999999:
-            z = range(p+1)
+            z = list(range(p+1))
         else: # to big to get z as list of values
             z = None
 

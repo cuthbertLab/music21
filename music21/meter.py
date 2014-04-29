@@ -189,7 +189,7 @@ def fractionToSlashMixed(fList):
         # look at previous fration and determin if denominator is the same
 
         match = None
-        search = range(0,len(pre))
+        search = list(range(0,len(pre)))
         search.reverse() # go backwards
         for j in search:
             if pre[j][1] == d:
@@ -252,7 +252,7 @@ def fractionSum(fList):
         for i in range(len(nList)):
             nSrc = nList[i]
             dSrc = dList[i]
-            scalar = d / dSrc
+            scalar = d // dSrc
             nShift.append(nSrc*scalar)
         return (sum(nShift), d)
 
@@ -414,8 +414,8 @@ def bestTimeSignature(meas):
 
     #simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
     denom = common.euclidGCD(numerator, denominator)
-    numerator = numerator / denom
-    denominator = denominator / denom
+    numerator = numerator // denom
+    denominator = denominator // denom
 
     # simplifies rare time signatures like 16/16 and 1/1 to 4/4
     if numerator == denominator and numerator not in [2,4]:
@@ -952,7 +952,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a = meter.MeterSequence('4/4', 2)
         >>> for x in a:
-        ...     print repr(x)
+        ...     print(repr(x))
         <MeterTerminal 1/2>
         <MeterTerminal 1/2>
         '''
@@ -1050,16 +1050,16 @@ class MeterSequence(MeterTerminal):
         if opts is None:
             opts = []
         if d > validDenominators[0] and n % 2 == 0:
-            nMod = n / 2
-            dMod = d / 2
+            nMod = n // 2
+            dMod = d // 2
             while True:
                 if dMod < validDenominators[0]:
                     break
                 opts.append(['%s/%s' % (nMod, dMod)])
                 if nMod % 2 != 0: # no longer even
                     break
-                dMod = dMod / 2
-                nMod = nMod / 2
+                dMod = dMod // 2
+                nMod = nMod // 2
         return opts
 
     def _divisionOptionsAdditiveMultiplesDownward(self, n, d, opts=None):
@@ -1101,7 +1101,7 @@ class MeterSequence(MeterTerminal):
         if n > 3 and n % 2 == 0:
             div = 2
             i = div
-            nMod = n / div
+            nMod = n // div
             while True:
                 if nMod <= 1:
                     break
@@ -1110,7 +1110,7 @@ class MeterSequence(MeterTerminal):
                     seq.append('%s/%s' % (nMod, d))
                 if seq not in opts:  # may be cases defined elsewhere
                     opts.append(seq)
-                nMod = nMod / div
+                nMod = nMod // div
                 i *= div
         return opts
 
@@ -1129,9 +1129,9 @@ class MeterSequence(MeterTerminal):
             opts = []
             # divided additive multiples
         # if given 4/4, get 2/4+2/4
-        if n % 2 == 0 and d / 2 >= 1:
-            nMod = n / 2
-            dMod = d / 2
+        if n % 2 == 0 and d // 2 >= 1:
+            nMod = n // 2
+            dMod = d // 2
             while True:
                 if dMod < 1 or nMod <= 1:
                     break
@@ -1141,8 +1141,8 @@ class MeterSequence(MeterTerminal):
                 opts.append(seq)
                 if nMod % 2 != 0: # if no longer even must stop
                     break
-                dMod = dMod / 2
-                nMod = nMod / 2
+                dMod = dMod // 2
+                nMod = nMod // 2
         return opts
 
     def _divisionOptionsAdditiveMultiplesUpward(self, n, d, opts=None):
@@ -2412,7 +2412,7 @@ class MeterSequence(MeterTerminal):
         start = None
         end = None
         for i in range(len(self)):
-            #print i, iMatch, self[i]
+            #print(i, iMatch, self[i])
             if i == iMatch:
                 start = pos
                 end = pos + self[i].duration.quarterLength
@@ -3975,7 +3975,7 @@ class TimeSignature(base.Music21Object):
 
         >>> c = corpus.parse('bwv1.6')
         >>> for m in c.parts[0].getElementsByClass('Measure'):
-        ...     print m.number, m.getContextByClass('TimeSignature').getOffsetFromBeat(4.5) - m.paddingLeft
+        ...     print("%s %s" % (m.number, m.getContextByClass('TimeSignature').getOffsetFromBeat(4.5) - m.paddingLeft))
         0 0.5
         1 3.5
         2 3.5
@@ -4588,6 +4588,15 @@ class Test(unittest.TestCase):
             '5<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
             '6<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>',
             ])
+
+    def testBestTimeSignature(self):
+        from music21 import converter, stream
+        s6 = converter.parse('C4 D16.', format='tinyNotation')
+        m6 = stream.Measure()
+        for el in s6:
+            m6.insert(el.offset, el)
+        ts6 = bestTimeSignature(m6)
+        self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 11/32>')
 
 
 #------------------------------------------------------------------------------

@@ -1098,7 +1098,7 @@ class Pitch(base.Music21Object):
     >>> anyGsharp = pitch.Pitch("G#")
     >>> anyGsharp.octave is None
     True
-    >>> print anyGsharp.transpose("P8")
+    >>> print(anyGsharp.transpose("P8"))
     G#
 
     Sometimes we need an octave for a `Pitch` even if it's not
@@ -1564,7 +1564,6 @@ class Pitch(base.Music21Object):
     def getCentShiftFromMidi(self):
         '''Get cent deviation of this pitch from MIDI pitch.
 
-
         >>> p = pitch.Pitch('c~4')
         >>> p.midi # midi values automatically round up
         61
@@ -1842,7 +1841,7 @@ class Pitch(base.Music21Object):
 
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20
-        >>> print '%.1f' % p._getPs()
+        >>> print('%.1f' % p._getPs())
         60.2
 
 
@@ -1866,7 +1865,11 @@ class Pitch(base.Music21Object):
         '''
         see docs below, under property midi
         '''
-        roundedPS = int(round(self.ps))
+        def schoolYardRounding(x, d=0):
+            p = 10 ** d
+            return float(math.floor((x * p) + math.copysign(0.5, x)))/p
+        
+        roundedPS = int(schoolYardRounding(self.ps))
         if roundedPS > 127:
             value = (12 * 9) + (roundedPS % 12)
             if value < (127-12):
@@ -2435,15 +2438,15 @@ class Pitch(base.Music21Object):
         Ases is used instead of the also acceptable Asas.
 
 
-        >>> print pitch.Pitch('B-').german
+        >>> print(pitch.Pitch('B-').german)
         B
-        >>> print pitch.Pitch('B').german
+        >>> print(pitch.Pitch('B').german)
         H
-        >>> print pitch.Pitch('E-').german
+        >>> print(pitch.Pitch('E-').german)
         Es
-        >>> print pitch.Pitch('C#').german
+        >>> print(pitch.Pitch('C#').german)
         Cis
-        >>> print pitch.Pitch('A--').german
+        >>> print(pitch.Pitch('A--').german)
         Ases
         >>> p1 = pitch.Pitch('C')
         >>> p1.accidental = pitch.Accidental('half-sharp')
@@ -2453,9 +2456,9 @@ class Pitch(base.Music21Object):
 
         Note these rarely used pitches:
 
-        >>> print pitch.Pitch('B--').german
+        >>> print(pitch.Pitch('B--').german)
         Heses
-        >>> print pitch.Pitch('B#').german
+        >>> print(pitch.Pitch('B#').german)
         His
     ''')
 
@@ -2489,15 +2492,15 @@ class Pitch(base.Music21Object):
         (Microtones and Quartertones raise an error).
 
 
-        >>> print pitch.Pitch('B-').dutch
+        >>> print(pitch.Pitch('B-').dutch)
         Bes
-        >>> print pitch.Pitch('B').dutch
+        >>> print(pitch.Pitch('B').dutch)
         B
-        >>> print pitch.Pitch('E-').dutch
+        >>> print(pitch.Pitch('E-').dutch)
         Es
-        >>> print pitch.Pitch('C#').dutch
+        >>> print(pitch.Pitch('C#').dutch)
         Cis
-        >>> print pitch.Pitch('A--').dutch
+        >>> print(pitch.Pitch('A--').dutch)
         Ases
         >>> p1 = pitch.Pitch('C')
         >>> p1.accidental = pitch.Accidental('half-sharp')
@@ -2541,15 +2544,15 @@ class Pitch(base.Music21Object):
         (Microtones and Quartertones raise an error).
 
 
-        >>> print pitch.Pitch('B-').italian
+        >>> print(pitch.Pitch('B-').italian)
         si bemolle
-        >>> print pitch.Pitch('B').italian
+        >>> print(pitch.Pitch('B').italian)
         si
-        >>> print pitch.Pitch('E-9').italian
+        >>> print(pitch.Pitch('E-9').italian)
         mi bemolle
-        >>> print pitch.Pitch('C#').italian
+        >>> print(pitch.Pitch('C#').italian)
         do diesis
-        >>> print pitch.Pitch('A--4').italian
+        >>> print(pitch.Pitch('A--4').italian)
         la doppio bemolle
         >>> p1 = pitch.Pitch('C')
         >>> p1.accidental = pitch.Accidental('half-sharp')
@@ -2559,9 +2562,9 @@ class Pitch(base.Music21Object):
 
         Note these rarely used pitches:
 
-        >>> print pitch.Pitch('E####').italian
+        >>> print(pitch.Pitch('E####').italian)
         mi quadruplo diesis
-        >>> print pitch.Pitch('D---').italian
+        >>> print(pitch.Pitch('D---').italian)
         re triplo bemolle
     ''')
 
@@ -2624,13 +2627,13 @@ class Pitch(base.Music21Object):
         (Microtones and Quartertones raise an error).
 
 
-        >>> print pitch.Pitch('B-').spanish
+        >>> print(pitch.Pitch('B-').spanish)
         si bèmol
-        >>> print pitch.Pitch('E-').spanish
+        >>> print(pitch.Pitch('E-').spanish)
         mi bèmol
-        >>> print pitch.Pitch('C#').spanish
+        >>> print(pitch.Pitch('C#').spanish)
         do sostenido
-        >>> print pitch.Pitch('A--').spanish
+        >>> print(pitch.Pitch('A--').spanish)
         la doble bèmol
         >>> p1 = pitch.Pitch('C')
         >>> p1.accidental = pitch.Accidental('half-sharp')
@@ -2640,9 +2643,9 @@ class Pitch(base.Music21Object):
 
         Note these rarely used pitches:
 
-        >>> print pitch.Pitch('B--').spanish
+        >>> print(pitch.Pitch('B--').spanish)
         si doble bèmol
-        >>> print pitch.Pitch('B#').spanish
+        >>> print(pitch.Pitch('B#').spanish)
         si sostenido
     ''')
 
@@ -2702,15 +2705,15 @@ class Pitch(base.Music21Object):
         do is used instead of the also acceptable ut.
 
 
-        >>> print pitch.Pitch('B-').french
+        >>> print(pitch.Pitch('B-').french)
         si bémol
-        >>> print pitch.Pitch('B').french
+        >>> print(pitch.Pitch('B').french)
         si
-        >>> print pitch.Pitch('E-').french
+        >>> print(pitch.Pitch('E-').french)
         mi bémol
-        >>> print pitch.Pitch('C#').french
+        >>> print(pitch.Pitch('C#').french)
         do dièse
-        >>> print pitch.Pitch('A--').french
+        >>> print(pitch.Pitch('A--').french)
         la double bémol
         >>> p1 = pitch.Pitch('C')
         >>> p1.accidental = pitch.Accidental('half-sharp')
@@ -2817,8 +2820,10 @@ class Pitch(base.Music21Object):
 
         Or we can iterate over a list of the next 8 odd harmonics:
 
+        >>> allHarmonics = ""
         >>> for i in [9,11,13,15,17,19,21,23]:
-        ...     print p.getHarmonic(i),
+        ...     allHarmonics += " " + str(p.getHarmonic(i))
+        >>> print(allHarmonics)
         B7(+4c) D~8(+1c) F~8(-9c) G#8(-12c) B-8(+5c) C9(-2c) C#~9(+21c) E`9(-22c)
 
         Microtonally adjusted notes also generate harmonics:

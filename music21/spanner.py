@@ -71,8 +71,7 @@ class Spanner(base.Music21Object):
     
     We can iterate over a spanner to get the contexts:
     
-    >>> for n in sp1:
-    ...    print(n),
+    >>> print(" ".join([repr(n) for n in sp1]))
     <music21.note.Note C> <music21.note.Note D> <music21.note.Note E>
     
     Now we put the notes and the spanner into a Stream object.  Note that
@@ -1223,7 +1222,7 @@ class RepeatBracket(Spanner):
             # assume defined a range with a dash; assumed inclusive
             if '-' in value:
                 start, end = value.split('-')
-                self._numberRange = range(int(start), int(end)+1)
+                self._numberRange = list(range(int(start), int(end)+1))
                 self._numberSpanIsAdjacent = False
                 self._numberSpanIsContiguous = True
 
@@ -2190,7 +2189,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         #s.insert(n1.offset, dynamics.Dynamic('fff'))
-        n2 = s.notes[len(s.notes) / 2]
+        n2 = s.notes[len(s.notes) // 2]
         #s.insert(n2.offset, dynamics.Dynamic('ppp'))
         n3 = s.notes[-1]
         #s.insert(n3.offset, dynamics.Dynamic('ff'))
@@ -2212,7 +2211,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
-        n2 = s.notes[len(s.notes) / 2]
+        n2 = s.notes[len(s.notes) // 2]
         n3 = s.notes[-1]
         sp1 = spanner.Line(n1, n2, startTick='up', lineType='dotted')
         sp2 = spanner.Line(n2, n3, startTick='down', lineType='dashed',
@@ -2262,7 +2261,7 @@ class Test(unittest.TestCase):
 
         # note: this does not suppor glissandi between non-adjacent notes
         n1 = s.notes[0]
-        n2 = s.notes[len(s.notes) / 2]
+        n2 = s.notes[len(s.notes) // 2]
         n3 = s.notes[-1]
         sp1 = spanner.Glissando(n1, n2)
         sp2 = spanner.Glissando(n2, n3)
@@ -2308,7 +2307,7 @@ class Test(unittest.TestCase):
 # 
 #         # note: musedata presently does not support these
 #         n1 = s.notes[0]
-#         n2 = s.notes[len(s.notes) / 2]
+#         n2 = s.notes[len(s.notes) // 2]
 #         n3 = s.notes[-1]
 #         sp1 = spanner.DashedLine(n1, n2)
 #         sp2 = spanner.DashedLine(n2, n3)

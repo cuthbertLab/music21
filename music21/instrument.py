@@ -31,6 +31,8 @@ from music21 import common
 from music21 import interval
 from music21 import pitch
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = "instrument.py"
 environLocal = environment.Environment(_MOD)
@@ -91,7 +93,7 @@ def bundleInstruments(streamIn, inPlace = False):
     >>> s2 = instrument.unbundleInstruments(s)
     >>> s3 = instrument.bundleInstruments(s2)
     >>> for test in s3:
-    ...     print test.storedInstrument
+    ...     print(test.storedInstrument)
     Bass Drum
     Bass Drum
     Cowbell
@@ -1655,7 +1657,10 @@ def fromString(instrumentString):
     bestName = None
     for substring in allCombinations:
         try:
-            englishName = instrumentLookup.allToBestName[unicode(substring.lower())]
+            if six.PY2:
+                englishName = instrumentLookup.allToBestName[unicode(substring.lower())]
+            else:
+                englishName = instrumentLookup.allToBestName[substring.lower()]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
             thisInstClass = globals()[className]        
             thisInstClassParentClasses = [parentcls.__name__ for parentcls in thisInstClass.mro()]
@@ -1684,7 +1689,10 @@ def fromString(instrumentString):
     # Second task: Determine appropriate transposition (if any)
     for substring in allCombinations:
         try:
-            bestPitch = instrumentLookup.pitchFullNameToName[unicode(substring.lower())]
+            if six.PY2:
+                bestPitch = instrumentLookup.pitchFullNameToName[unicode(substring.lower())]
+            else:
+                bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
             bestInterval = instrumentLookup.transposition[bestName][bestPitch]
             bestInstrument.transposition = interval.Interval(bestInterval)
             break

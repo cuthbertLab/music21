@@ -981,7 +981,7 @@ def makeTupletBrackets(s, inPlace=False):
     durationUnitList = []
     
     # legacy -- works on lists not just streams...
-    if isinstance(s, types.ListType) or isinstance(s, types.TupleType):
+    if isinstance(s, list) or isinstance(s, tuple):
         for thisDuration in s:
             if isinstance(thisDuration, duration.Duration):
                 for c in thisDuration.components:

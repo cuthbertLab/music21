@@ -453,7 +453,7 @@ def realizeVolume(srcStream, setAbsoluteVelocity=False,
         # extend durations of all dynamics
         # doing this in place as this is a destructive operation
         boundaries = flatSrc.extendDurationAndGetBoundaries('Dynamic', inPlace=True)
-        bKeys = boundaries.keys()
+        bKeys = list(boundaries.keys())
         bKeys.sort() # sort
 
     # assuming stream is sorted

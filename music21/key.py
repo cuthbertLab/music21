@@ -392,6 +392,10 @@ class KeySignature(base.Music21Object):
         # cache altered pitches
         self._alteredPitchesCached = []
 
+    def __hash__(self):
+        hashTuple = (self._sharps, self._mode, tuple(self._alteredPitches))
+        return hash(hashTuple)
+    
     #---------------------------------------------------------------------------
     def _attributesChanged(self):
         '''Clear the altered pitches cache'''
@@ -883,6 +887,10 @@ class Key(KeySignature, scale.DiatonicScale):
 
         # store an ordered list of alternative Key objects
         self.alternateInterpretations = None
+
+    def __hash__(self):
+        hashTuple = (self.tonic, self.mode)
+        return hash(hashTuple)
 
     def __repr__(self):
         return "<music21.key.Key of %s>" % self.__str__()

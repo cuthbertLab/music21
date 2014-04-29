@@ -19,6 +19,7 @@ from music21 import pitch
 from music21 import key
 from music21 import scale
 from music21.figuredBass import notation
+from music21.ext import six
 
 scaleModes = {'major' : scale.MajorScale,
               'minor' : scale.MinorScale,
@@ -170,9 +171,14 @@ class FiguredBassScale(object):
         maxPitch = convertToPitch(maxPitch)
         pitchNames = self.getPitchNames(bassPitch, notationString)
         iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
-        iter2 = itertools.imap(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
-        iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
-        iter4 = itertools.ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
+        if six.PY3:
+            iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
+            iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2) # @UndefinedVariable
+            iter4 = itertools.filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3) # @UndefinedVariable
+        else:
+            iter2 = itertools.imap(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
+            iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
+            iter4 = itertools.ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
         allPitches = list(iter4)
         allPitches.sort()
         return allPitches

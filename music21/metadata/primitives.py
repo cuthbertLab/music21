@@ -790,7 +790,7 @@ class Text(object):
                 # not sure if this should be wrapped in in str() call
                 return self._data.encode('utf-8')
             else:
-                return self._data
+                return str(self._data)
 
     ### PUBLIC PROPERTIES ###
 

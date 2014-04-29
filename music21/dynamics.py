@@ -312,10 +312,16 @@ class Crescendo(DynamicWedge):
 
     >>> from music21 import dynamics
     >>> d = dynamics.Crescendo()
-    >>> d.getStartParameters()
-    {'spread': 0, 'type': 'crescendo'}
-    >>> d.getEndParameters()
-    {'spread': 15, 'type': 'stop'}
+    >>> d.getStartParameters()['spread']
+    0
+    >>> d.getStartParameters()['type']
+    'crescendo'
+
+    >>> d.getEndParameters()['spread']
+    15
+    >>> d.getEndParameters()['type']
+    'stop'
+
     '''
     def __init__(self, *arguments, **keywords):
         DynamicWedge.__init__(self, *arguments, **keywords)

@@ -561,7 +561,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     while len(streams) < len(variantNames): # Removes extra names
         variantNames.pop
     
-    zipped = zip(streams,variantNames)
+    zipped = list(zip(streams,variantNames))
     
     for s,variantName in zipped[1:]:
         if returnObj.highestTime != s.highestTime:
@@ -1402,7 +1402,7 @@ def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace
     it will perform this action on the stream itself; otherwise it will return a modified copy. If recurse is True, this
     method will work on variants within container objects within the stream (like parts).
     
-    
+    >>> from __future__ import print_function
     >>> #                                         *                                            *                                *
     >>> s = converter.parse("      d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
     >>> s2 = converter.parse("     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4    f1", "4/4")
@@ -1417,21 +1417,21 @@ def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace
     
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, recurse = False)
     >>> for v in returnStream.parts[0].variants:
-    ...     print(v.offset, v.lengthType, v.replacementDuration)
+    ...     (v.offset, v.lengthType, v.replacementDuration)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
     
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, variantNames = ['france'], recurse = True)
     >>> for v in returnStream.parts[0].variants:
-    ...     print(v.offset, v.lengthType, v.replacementDuration)
+    ...     (v.offset, v.lengthType, v.replacementDuration)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
     
     >>> variant.makeAllVariantsReplacements(newStream, recurse = True, inPlace = True)
     >>> for v in newStream.parts[0].variants:
-    ...     print(v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
+    ...     (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (4.0, 'replacement', 4.0, 4.0)
     (12.0, 'elongation', 4.0, 12.0)
     (20.0, 'deletion', 8.0, 4.0)
@@ -1488,7 +1488,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
     ...
     
     >>> for v in s.variants:
-    ...     print(v.offset, v.lengthType, v.replacementDuration)
+    ...     (v.offset, v.lengthType, v.replacementDuration)
     (0.0, 'elongation', 4.0)
     (4.0, 'replacement', 4.0)
     (12.0, 'elongation', 4.0)
@@ -1513,7 +1513,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
     
     >>> variant._doVariantFixingOnStream(s, 'london')
     >>> for v in s.variants:
-    ...     print(v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
+    ...     (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (0.0, 'elongation', 1.0, 5.0)
     (4.0, 'deletion', 5.0, 1.0)
     '''
@@ -2504,5 +2504,5 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test) #TestExternal)
     

@@ -1553,7 +1553,8 @@ class ConcreteScale(Scale):
             if common.isStr(maxPitch):
                 maxPitch = pitch.Pitch(maxPitch)
             
-            if minPitch > maxPitch and direction is None:
+            if minPitch is not None and maxPitch is not None and \
+                   minPitch > maxPitch and direction is None:
                 reverse = True
                 (minPitch, maxPitch) = (maxPitch, minPitch)
             elif direction == DIRECTION_DESCENDING:

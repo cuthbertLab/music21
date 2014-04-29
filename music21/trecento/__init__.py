@@ -1,4 +1,4 @@
-__all__ = ['cadencebook', 'capua', 'findTrecentoFragments', 'notation','tonality']
+__all__ = ['cadencebook', 'capua', 'findTrecentoFragments', 'notation', 'tonality']
 
 # this is necessary to get these names available with a 
 # from music21 import * import statement
@@ -10,7 +10,7 @@ if sys.version > '3':
 #     from . import cadencebook
 #     from . import capua
 #     from . import findTrecentoFragments
-#     from . import notation
+    from . import notation
 #     from . import tonality
 else:
     import cadencebook # @Reimport

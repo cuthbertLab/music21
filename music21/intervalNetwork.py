@@ -291,6 +291,10 @@ class Node(object):
         # node weight might be used to indicate importance of scale positions
         self.weight = weight
 
+    def __hash__(self):
+        hashTuple = (self.id, self.degree, self.weight)
+        return hash(hashTuple)
+
     def __eq__(self, other):
         ''' 
         Nodes are equal if everything in the object.__dict__ is equal.
@@ -1983,8 +1987,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         where any pitch is between C2 and F4
 
         >>> pitchList = net.realizePitchByDegree('G', 5, [1, 2, 5], 'c2', 'f4')
-        >>> for p in pitchList:
-        ...     print p,
+        >>> print(' '.join([str(p) for p in pitchList]))
         C2 D2 G2 C3 D3 G3 C4 D4
 
         There are no networks based on the major scale's edge-list where 
@@ -2037,7 +2040,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         # and x is count of values at that degree
         degreeCount = {} # degree, count pairs
         # sorting nodes will help, but not insure, proper positioning
-        nKeys = self._nodes.keys()
+        nKeys = list(self._nodes.keys())
         nKeys.sort()
         for nId in nKeys:
             n = self._nodes[nId]
@@ -2414,7 +2417,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         # brut force approach might make multiple attempts to realize
 
         # TODO: possibly cache results
-        for counter in range(10):
+        for unused_counter in range(10):
             realizedPitch, realizedNode = self.realize(
                 pitchReference=pitchReference, 
                 nodeId=nodeId, 
@@ -2891,8 +2894,8 @@ class Test(unittest.TestCase):
         net = BoundIntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
 
-        self.assertEqual(net._edges.keys(), [0, 1, 2, 3, 4, 5, 6])
-        self.assertEqual(sorted(net._nodes.keys()), [0, 1, 2, 3, 4, 5, 'terminusHigh', 'terminusLow'])
+        self.assertEqual(list(net._edges.keys()), [0, 1, 2, 3, 4, 5, 6])
+        self.assertEqual(sorted(list(net._nodes.keys())), [0, 1, 2, 3, 4, 5, 'terminusHigh', 'terminusLow'])
 
         self.assertEqual(repr(net._nodes[0]), "<music21.intervalNetwork.Node id=0>")
         self.assertEqual(repr(net._nodes['terminusLow']), "<music21.intervalNetwork.Node id='terminusLow'>")
