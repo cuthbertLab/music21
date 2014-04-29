@@ -148,12 +148,14 @@ def recurseStream(
 
 def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
     r'''
-    Recurses through a score and constructs a timespan collection.
+    Recurses through a score and constructs a :class:`~music21.stream.timespans.TimespanCollection`.
 
     ::
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = stream.timespans.streamToTimespanCollection(score)
+        >>> tree
+        <TimespanCollection {165} (0.0 to 36.0) <music21.stream.Score ...>>
         >>> for x in tree[:5]:
         ...     x
         ...
@@ -163,6 +165,27 @@ def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
         <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
         <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
 
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=False, pitchedOnly=False)
+
+        Each of these has 11 elements -- mainly the Measures
+        
+        >>> for x in tree:
+        ...     x
+        ...
+        <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
+        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
+        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Alto>>
+        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
+        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Bass>>
+        
+        >>> tenorElTs = tree[3]
+        >>> tenorElTs
+        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
+        >>> tenorElTs.source 
+        <music21.stream.Part Tenor>
+        >>> tenorElTs.source is score[3]
+        True
+        
     '''
     result = recurseStream(
         inputStream,
