@@ -2038,6 +2038,8 @@ class TimespanCollection(object):
         Used internally by TimespanCollection.
 
         Returns a node.
+
+        TODO: Remove Assert
         '''
         if node is not None:
             if 1 < node.balance:
@@ -2592,7 +2594,6 @@ class TimespanCollection(object):
         r'''
         Inserts `timespans` into this offset-tree.
 
-        TODO: remove asserts...
         '''
         initialStartOffset = self.startOffset
         initialStopOffset = self.stopOffset
@@ -2843,11 +2844,11 @@ class TimespanCollection(object):
                 <Verticality 33.5 {D3 B3 C#4 F#4}>
                 ]>
 
-
-        TODO: remove assert
         '''
         n = int(n)
-        assert 0 < n
+        if (n<=0):
+            raise TimespanException("The number of verticalities in the group must be at " +
+                                    "least one. Got %s" % n)
         if reverse:
             for verticality in self.iterateVerticalities(reverse=True):
                 verticalities = [verticality]
@@ -3256,7 +3257,8 @@ class TimespanCollection(object):
 
 
 #------------------------------------------------------------------------------
-
+class TimespanException(exceptions21.Music21Exception):
+    pass
 
 class TimespanCollectionException(exceptions21.Music21Exception):
     pass
@@ -3270,7 +3272,9 @@ class Test(unittest.TestCase):
         pass
 
     def testTimespanCollection(self):
-
+        '''
+        todo -- use self.assertX -- better failure messages
+        '''
         for attempt in range(100):
             starts = range(20)
             stops = range(20)
