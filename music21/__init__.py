@@ -160,9 +160,6 @@ from music21.base import Sites
 from music21.base import Music21Object
 from music21.base import ElementWrapper
 from music21.base import mainTest
-
-
-from music21.base import mainTest
 from music21.base import *
 #del(types)
 #del(sys)

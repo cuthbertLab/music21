@@ -24,6 +24,7 @@ import random
 import inspect
 
 from music21 import exceptions21
+from music21.ext import six
 
 #python3
 try:
@@ -178,7 +179,7 @@ def findFormat(fmt):
     '''
     # make lower case, as some lilypond processing used upper case
     fmt = fmt.lower().strip()
-    for key in fileExtensions:
+    for key in sorted(list(fileExtensions)):
         if fmt.startswith('.'):
             fmt = fmt[1:] # strip .
         if fmt == key or fmt in fileExtensions[key]['input']:
@@ -718,7 +719,7 @@ def isListLike(usrData):
 
 def isIterable(usrData):
     """
-    Returns True if is the object can be iter'd over
+    Returns True if is the object can be iter'd over and is NOT a string
 
 
     >>> common.isIterable([5, 10])
@@ -731,6 +732,9 @@ def isIterable(usrData):
     True
     """
     if hasattr(usrData, "__iter__"):
+        if six.PY3:
+            if isinstance(usrData, str) or isinstance(usrData, bytes):
+                return False
         return True
     else:
         return False
@@ -739,18 +743,26 @@ def isIterable(usrData):
 def toUnicode(usrStr):
     '''Convert this tring to a uncode string; if already a unicode string, do nothing.
 
-
     >>> common.toUnicode('test')
     u'test'
     >>> common.toUnicode(u'test')
     u'test'
     '''
-    try:
-        usrStr = unicode(usrStr, 'utf-8')
-    # some documentation may already be in unicode; if so, a TypeException will be raised
-    except TypeError: #TypeError: decoding Unicode is not supported
-        pass
-    return usrStr
+    if six.PY3:
+        if not isinstance(usrStr, str):
+            try:
+                return usrStr.decode('utf-8')
+            except TypeError:
+                return usrStr
+        else:
+            return usrStr
+    else:
+        try:
+            usrStr = unicode(usrStr, 'utf-8')
+        # some documentation may already be in unicode; if so, a TypeException will be raised
+        except TypeError: #TypeError: decoding Unicode is not supported
+            pass
+        return usrStr
 
 
 def classToClassStr(classObj):
@@ -1064,7 +1076,6 @@ def euclidGCD(a, b):
 def approximateGCD(values, grain=1e-4):
     '''Given a list of values, find the lowest common divisor of floating point values.
 
-
     >>> common.approximateGCD([2.5,10, .25])
     0.25
     >>> common.approximateGCD([2.5,10])
@@ -1077,14 +1088,14 @@ def approximateGCD(values, grain=1e-4):
     1.0
     >>> common.approximateGCD([2,5,10,.25])
     0.25
-    >>> str(common.approximateGCD([1/3.,2/3.]))
-    '0.333333333333'
-    >>> str(common.approximateGCD([5/3.,2/3.,4]))
-    '0.333333333333'
-    >>> str(common.approximateGCD([5/3.,2/3.,5]))
-    '0.333333333333'
-    >>> str(common.approximateGCD([5/3.,2/3.,5/6.,3/6.]))
-    '0.166666666667'
+    >>> common.strTrimFloat(common.approximateGCD([1/3.,2/3.]))
+    '0.3333'
+    >>> common.strTrimFloat(common.approximateGCD([5/3.,2/3.,4]))
+    '0.3333'
+    >>> common.strTrimFloat(common.approximateGCD([5/3.,2/3.,5]))
+    '0.3333'
+    >>> common.strTrimFloat(common.approximateGCD([5/3.,2/3.,5/6.,3/6.]))
+    '0.1667'
 
     '''
     lowest = float(min(values))
@@ -1133,7 +1144,7 @@ def approximateGCD(values, grain=1e-4):
 def _lcm(a, b):
     """find lowest common multiple of a,b"""
     # // forcers integer style division (no remainder)
-    return abs(a*b) / euclidGCD(a,b)
+    return abs(a*b) // euclidGCD(a,b)
 
 def lcm(filterList):
     '''
@@ -1280,7 +1291,7 @@ def toRoman(num):
 
     >>> common.toRoman("hi")
     Traceback (most recent call last):
-    TypeError: expected integer, got <type 'str'>
+    TypeError: expected integer, got <... 'str'>
     '''
     if type(num) != type(1):
         raise TypeError("expected integer, got %s" % type(num))
@@ -1422,7 +1433,21 @@ def formatStr(msg, *arguments, **keywords):
         formatType = None
 
     msg = [msg] + list(arguments)
-    msg = [str(x) for x in msg]
+    if six.PY3:
+        for i in range(len(msg)):
+            x = msg[i]
+            if isinstance(x, bytes): 
+                msg[i] = x.decode('utf-8')
+            if not isinstance(x, str):
+                try:
+                    msg[i] = repr(x)
+                except TypeError:
+                    try:
+                        msg[i] = x.decode('utf-8')
+                    except AttributeError:
+                        msg[i] = ""
+    else:
+        msg = [str(x) for x in msg]
     if formatType == 'block':
         return '\n*** '.join(msg)+'\n'
     else: # catch all others
@@ -1921,11 +1946,11 @@ def normalizeFilename(name):
     normalize it so that it is POSIX compliant (except for the limit
     on length).
 
-    Takes in a string or unicode string and returns a normal string.
+    Takes in a string or unicode string and returns a string (unicode in Py3)
+    without any accented characters.
 
-
-    >>> common.normalizeFilename(u'03-Niccolò all\\'lessandra.not really.xml')
-    '03-Niccolo_all_lessandra_not_really.xml'
+    >>> common.normalizeFilename(u'03-Niccolò all’lessandra.not really.xml')
+    '03-Niccolo_alllessandra_not_really.xml'
     '''
     import unicodedata
     extension = None
@@ -1935,10 +1960,14 @@ def normalizeFilename(name):
         extension = str(name[lenName - 4:])
         name = name[:lenName -4]
 
-    if isinstance(name, str):
+    if isinstance(name, str) and six.PY2:
         name = unicode(name)
 
-    name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
+    name = unicodedata.normalize('NFKD', name)
+    if six.PY2:
+        name = name.encode('ascii', 'ignore')
+    else:
+        name = name.encode('ascii', 'ignore').decode('UTF-8')
     name = re.sub('[^\w-]', '_', name).strip()
     if extension is not None:
         name += extension

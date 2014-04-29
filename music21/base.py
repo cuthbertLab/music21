@@ -3762,6 +3762,9 @@ class Music21Object(object):
         ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"]
         ''')
 
+
+
+
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True,
         addTies=True, displayTiedAccidentals=False, delta=1e-06):
         '''
@@ -5889,6 +5892,12 @@ def mainTest(*testClasses, **kwargs):
                     for example in dt.examples:
                         if example.exc_msg is not None and len(example.exc_msg) > 0:
                             example.exc_msg = "..." + example.exc_msg[1:]
+                        elif (example.want is not None and
+                                example.want.startswith('u\'')):
+                                    # probably a unicode example:
+                                    # simplistic, since (u'hi', u'bye')
+                                    # won't be caught, but saves a lot of anguish
+                                example.want = example.want[1:]
                         
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity

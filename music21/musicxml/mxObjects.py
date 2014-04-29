@@ -23,6 +23,8 @@ from music21 import common
 from music21 import exceptions21
 from music21 import xmlnode
 
+#from music21.ext import six
+
 from music21 import environment
 _MOD = 'musicxml.py'
 environLocal = environment.Environment(_MOD)

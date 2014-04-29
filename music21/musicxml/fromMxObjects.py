@@ -2586,8 +2586,13 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
             except:
                 pass
             # see http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
-            message = "In measure (" + measureNumber + "): " + e.message
-            raise type(e)(type(e)(message), sys.exc_info()[2])
+            execInfoTuple = sys.exc_info()
+            if hasattr(e, 'message'):
+                emessage = e.message
+            else:
+                emessage = execInfoTuple[0].__name__ + " : " #+ execInfoTuple[1].__name__
+            message = "In measure (" + measureNumber + "): " + emessage
+            raise type(e)(type(e)(message), execInfoTuple[2])
         if t is not None:
             if lastTransposition is None and i == 0: # if this is the first
                 #environLocal.printDebug(['transposition', t])
@@ -2848,8 +2853,14 @@ def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
         except Exception as e:
             import sys
             # see http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
-            message = "For part number " + str(pNum + 1) + ", with Id (" + partId + "): " + e.message
-            raise type(e)(type(e)(message), sys.exc_info()[2])
+            execInfoTuple = sys.exc_info()
+            if hasattr(e, 'message'):
+                emessage = e.message
+            else:
+                emessage = str(execInfoTuple[1])
+            
+            message = "For part number " + str(pNum + 1) + ", with Id (" + partId + "): " + emessage
+            raise type(e)(type(e)(message), execInfoTuple[2])
 
 
         # update dictionary to store music21 part

@@ -996,7 +996,6 @@ class Handler(xml.sax.ContentHandler):
     #---------------------------------------------------------------------------
     def getContent(self):
         #environLocal.printDebug(["self._mxObjs['part-list']", self._mxObjs['part-list']])
-
         self._mxObjs['score'].partListObj = self._mxObjs['part-list']
         self._mxObjs['score'].componentList = self._parts
         return self._mxObjs['score']

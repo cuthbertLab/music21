@@ -330,17 +330,17 @@ class ConverterHumdrum(object):
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.meter.TimeSignature 2/4>
                 {0.0} <music21.note.Rest rest>
-                {0.166666666667} <music21.note.Note G#>
-                {0.333333333333} <music21.note.Note F#>
+                {0.1667} <music21.note.Note G#>
+                {0.3333} <music21.note.Note F#>
                 {0.5} <music21.note.Note E>
-                {0.666666666667} <music21.note.Note C#>
-                {0.833333333333} <music21.note.Note F>
+                {0.6667} <music21.note.Note C#>
+                {0.8333} <music21.note.Note F>
                 {1.0} <music21.note.Rest rest>
-                {1.16666666667} <music21.note.Note D>
-                {1.33333333333} <music21.note.Note E->
+                {1.1667} <music21.note.Note D>
+                {1.3333} <music21.note.Note E->
                 {1.5} <music21.note.Note G>
-                {1.66666666667} <music21.note.Note E->
-                {1.83333333333} <music21.note.Note D>        
+                {1.6667} <music21.note.Note E->
+                {1.8333} <music21.note.Note D>        
         '''
         self.data = humdrum.parseData(humdrumString)
         #self.data.stream.makeNotation()
@@ -388,8 +388,8 @@ class ConverterTinyNotation(object):
         {2.0} <music21.note.Note F#>
         {3.0} <music21.note.Note G>
         {4.0} <music21.note.Note B->
-        {4.33333333333} <music21.note.Note A>
-        {4.66666666667} <music21.note.Note G>
+        {4.3333} <music21.note.Note A>
+        {4.6667} <music21.note.Note G>
         {5.0} <music21.note.Note C>        
         '''
         if common.isStr(tnData):
@@ -1648,7 +1648,6 @@ class Test(unittest.TestCase):
     def testConversionMXArticulations(self):
         from music21 import note
         from music21.musicxml import testPrimitive
-        from music21.musicxml import m21ToString
 
         mxString = testPrimitive.articulations01
         a = parse(mxString)
@@ -1664,9 +1663,6 @@ class Test(unittest.TestCase):
         for i in range(len(notes)):
             post.append(str(notes[i].articulations[0].__class__))
         self.assertEqual(post, match)
-
-        # try to go the other way
-        post = m21ToString.fromMusic21Object(a)
         #a.show()
 
     def testConversionMXKey(self):

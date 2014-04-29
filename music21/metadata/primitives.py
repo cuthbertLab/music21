@@ -780,11 +780,17 @@ class Text(object):
 
     def __str__(self):
         # print type(self._data)
-        if isinstance(self._data, six.text_type): #unicode in PY2, str in PY3
-            # not sure if this should be wrapped in in str() call
-            return self._data.encode('utf-8')
-        else:
-            return str(self._data)
+        if six.PY3:
+            if isinstance(self._data, bytes):
+                return self._data.decode('UTF-8')
+            else:
+                return self._data
+        else:      
+            if isinstance(self._data, str): #unicode in PY2, str in PY3
+                # not sure if this should be wrapped in in str() call
+                return self._data.encode('utf-8')
+            else:
+                return self._data
 
     ### PUBLIC PROPERTIES ###
 
@@ -817,7 +823,6 @@ class Text(object):
 
         ::
 
-            >>> from music21 import metadata
             >>> td = metadata.Text('Ale is Dear, The', 'en')
             >>> str(td)
             'Ale is Dear, The'
@@ -835,7 +840,7 @@ class Text(object):
 
         '''
         from music21 import text
-        return text.prependArticle(self.__str__(), self._language)
+        return text.prependArticle(str(self), self._language)
 
 
 #------------------------------------------------------------------------------
@@ -953,7 +958,7 @@ class Contributor(object):
 
         ::
 
-            >>> a.age().days / 365
+            >>> a.age().days // 365
             56
 
         '''
@@ -1223,7 +1228,7 @@ class Test(unittest.TestCase):
         text.language = 'en'
         jsf = freezeThaw.JSONFreezer(text)
         jsonDict = json.loads(jsf.json)
-        self.assertEqual(jsonDict['__attr__'].keys(), [u'_language', u'_data'])
+        self.assertEqual(sorted(list(jsonDict['__attr__'].keys())), [u'_data', u'_language'])
 
         textNew = metadata.primitives.Text()
         jst = freezeThaw.JSONThawer(textNew)

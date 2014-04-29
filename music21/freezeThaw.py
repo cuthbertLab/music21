@@ -108,6 +108,8 @@ try:
 except:
     pass
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
@@ -875,7 +877,7 @@ class StreamThawer(StreamFreezeThawBase):
             directory = environLocal.getRootTempDir()
             fp = os.path.join(directory, fp)
 
-        f = open(fp, 'r')
+        f = open(fp, 'rb')
         fileData = f.read() # TODO: do not read entire file
         f.close()
 
@@ -1323,8 +1325,10 @@ class JSONFreezer(JSONFreezeThawBase):
             return True
         if isinstance(possiblyFreezeable, (list, tuple, dict)):
             return False
-        if isinstance(possiblyFreezeable, (int, str, unicode, float)):
+        if six.PY2 and isinstance(possiblyFreezeable, (int, str, unicode, float)):
             return False
+        elif six.PY3 and isinstance(possiblyFreezeable, (int, str, bytes, float)):
+            return False 
 
         if hasattr(possiblyFreezeable, 'fullyQualifiedClasses'):
             fqClassList = possiblyFreezeable.fullyQualifiedClasses
