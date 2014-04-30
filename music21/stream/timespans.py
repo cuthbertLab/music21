@@ -23,15 +23,19 @@ import collections
 import random
 import unittest
 import weakref
+
 from music21 import chord
+from music21 import exceptions21
 from music21 import instrument
 from music21 import note
 from music21 import pitch
 from music21 import tie
-from music21 import exceptions21
 
 
-def fraction(expr):
+#------------------------------------------------------------------------------
+
+
+def _fraction(expr):
     import fractions
     quotient, remainder = divmod(float(expr), 1.)
     remainder = fractions.Fraction(remainder).limit_denominator(100)
@@ -52,20 +56,56 @@ def fraction(expr):
 # TODO: Test with scores with Voices: cpebach/h186
 # TODO: Make simple example score to use in all internals docstrings
 def makeExampleScore():
+    r'''
+    Makes example score for use in stream-to-timespan conversion docs.
+
+    ::
+
+        >>> score = stream.timespans.makeExampleScore()
+        >>> score.show('text')
+        {0.0} <music21.stream.Part ...>
+            {0.0} <music21.instrument.Instrument PartA: : >
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.BassClef>
+                {0.0} <music21.meter.TimeSignature 2/4>
+                {0.0} <music21.note.Note C>
+                {1.0} <music21.note.Note D>
+            {2.0} <music21.stream.Measure 2 offset=2.0>
+                {0.0} <music21.note.Note E>
+                {1.0} <music21.note.Note F>
+                {2.0} <music21.bar.Barline style=final>
+        {4.0} <music21.stream.Part ...>
+            {0.0} <music21.instrument.Instrument PartB: : >
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.BassClef>
+                {0.0} <music21.meter.TimeSignature 2/4>
+                {0.0} <music21.note.Note C>
+            {2.0} <music21.stream.Measure 2 offset=2.0>
+                {0.0} <music21.note.Note G>
+                {2.0} <music21.bar.Barline style=final>
+
+    '''
+    from music21 import converter
     from music21 import stream
-    score = stream.Score()
+    streamA = converter.parse('tinynotation: 2/4 C4 D E F')
+    streamB = converter.parse('tinynotation: 2/4 C2 G')
+    streamA.makeMeasures(inPlace=True)
+    streamB.makeMeasures(inPlace=True)
     partA = stream.Part()
+    for x in streamA:
+        partA.append(x)
+    instrumentA = partA.getInstrument()
+    instrumentA.partId = 'PartA'
+    partA.insert(0, instrumentA)
     partB = stream.Part()
+    for x in streamB:
+        partB.append(x)
+    instrumentB = partB.getInstrument()
+    instrumentB.partId = 'PartB'
+    partB.insert(0, instrumentB)
+    score = stream.Score()
     score.append(partA)
     score.append(partB)
-    measureA1 = stream.Measure()
-    measureA2 = stream.Measure()
-    partA.append(measureA1)
-    partA.append(measureA2)
-    measureB1 = stream.Measure()
-    measureB2 = stream.Measure()
-    partB.append(measureB1)
-    partB.append(measureB2)
     return score
 
 
@@ -148,7 +188,8 @@ def recurseStream(
 
 def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
     r'''
-    Recurses through a score and constructs a :class:`~music21.stream.timespans.TimespanCollection`.
+    Recurses through a score and constructs a
+    :class:`~music21.stream.timespans.TimespanCollection`.
 
     ::
 
@@ -165,10 +206,16 @@ def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
         <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
         <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
 
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=False, pitchedOnly=False)
+    ::
 
-        Each of these has 11 elements -- mainly the Measures
-        
+        >>> tree = stream.timespans.streamToTimespanCollection(
+        ...     score,
+        ...     flatten=False,
+        ...     pitchedOnly=False,
+        ...     )
+
+    Each of these has 11 elements -- mainly the Measures
+
         >>> for x in tree:
         ...     x
         ...
@@ -177,15 +224,23 @@ def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
         <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Alto>>
         <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
         <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Bass>>
-        
-        >>> tenorElTs = tree[3]
-        >>> tenorElTs
+
+    ::
+
+        >>> tenorElements = tree[3]
+        >>> tenorElements
         <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
-        >>> tenorElTs.source 
+
+    ::
+
+        >>> tenorElements.source
         <music21.stream.Part Tenor>
-        >>> tenorElTs.source is score[3]
+
+    ::
+
+        >>> tenorElements.source is score[3]
         True
-        
+
     '''
     result = recurseStream(
         inputStream,
@@ -813,6 +868,9 @@ class Horizontality(collections.Sequence):
         return False
 
 
+#------------------------------------------------------------------------------
+
+
 class Verticality(object):
     r'''
     A collection of information about elements that are sounding at a given
@@ -1329,6 +1387,214 @@ class VerticalitySequence(collections.Sequence):
         pass
 
 
+
+#------------------------------------------------------------------------------
+
+
+class _TimespanCollectionNode(object):
+    r'''
+    A node in an TimespanCollection.
+
+    This class is only used by TimespanCollection, and should not be
+    instantiated by hand. It stores a list of ElementTimespans, as well as
+    various data which describes the internal structure of the tree.
+
+        >>> startOffset = 1.0
+        >>> node = stream.timespans._TimespanCollectionNode(startOffset)
+
+    Please consult the wikipedia page for AVL tree
+    (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
+    description of how this works.
+    '''
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '__weakref__',
+        '_balance',
+        '_height',
+        '_leftChild',
+        '_nodeStartIndex',
+        '_nodeStopIndex',
+        '_payload',
+        '_rightChild',
+        '_startOffset',
+        '_stopOffsetHigh',
+        '_stopOffsetLow',
+        '_subtreeStartIndex',
+        '_subtreeStopIndex',
+        )
+
+    ### INITIALIZER ###
+
+    def __init__(self, startOffset):
+        self._balance = 0
+        self._height = 0
+        self._leftChild = None
+        self._nodeStartIndex = -1
+        self._nodeStopIndex = -1
+        self._payload = []
+        self._rightChild = None
+        self._startOffset = startOffset
+        self._stopOffsetHigh = None
+        self._stopOffsetLow = None
+        self._subtreeStartIndex = -1
+        self._subtreeStopIndex = -1
+
+    ### SPECIAL METHODS ###
+
+    def __repr__(self):
+        return '<N: {} [{}:{}:{}:{}] {{{}}}>'.format(
+            self.startOffset,
+            self.subtreeStartIndex,
+            self.nodeStartIndex,
+            self.nodeStopIndex,
+            self.subtreeStopIndex,
+            len(self.payload),
+            )
+
+    ### PRIVATE METHODS ###
+
+    def _debug(self):
+        return '\n'.join(self._getDebugPieces())
+
+    def _getDebugPieces(self):
+        result = []
+        result.append(repr(self))
+        if self.leftChild:
+            subresult = self.leftChild._getDebugPieces()
+            result.append('\tL: {}'.format(subresult[0]))
+            result.extend('\t' + x for x in subresult[1:])
+        if self.rightChild:
+            subresult = self.rightChild._getDebugPieces()
+            result.append('\tR: {}'.format(subresult[0]))
+            result.extend('\t' + x for x in subresult[1:])
+        return result
+
+    def _update(self):
+        leftHeight = -1
+        rightHeight = -1
+        if self.leftChild is not None:
+            leftHeight = self.leftChild.height
+        if self.rightChild is not None:
+            rightHeight = self.rightChild.height
+        self._height = max(leftHeight, rightHeight) + 1
+        self._balance = rightHeight - leftHeight
+        return self.height
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def balance(self):
+        r'''
+        The difference in heights of the two subtree rooted on this node.
+
+        This property is used to help balance the AVL tree.
+        '''
+        return self._balance
+
+    @property
+    def height(self):
+        r'''
+        The height of the subtree rooted on this node.
+
+        This property is used to help balance the AVL tree.
+        '''
+        return self._height
+
+    @property
+    def leftChild(self):
+        r'''
+        The left child of this node.
+
+        Setting the left child triggers a node update.
+        '''
+        return self._leftChild
+
+    @leftChild.setter
+    def leftChild(self, node):
+        self._leftChild = node
+        self._update()
+
+    @property
+    def nodeStartIndex(self):
+        r'''
+        The timespan start index of only those timespans stored in this
+        node.
+        '''
+        return self._nodeStartIndex
+
+    @property
+    def nodeStopIndex(self):
+        r'''
+        The timespan stop index of only those timespans stored in this
+        node.
+        '''
+        return self._nodeStopIndex
+
+    @property
+    def payload(self):
+        r'''
+        A list of ElementTimespans starting at this node's start offset,
+        ordered by their stop offsets.
+        '''
+        return self._payload
+
+    @property
+    def rightChild(self):
+        r'''
+        The right child of this node.
+
+        Setting the right child triggers a node update.
+        '''
+        return self._rightChild
+
+    @rightChild.setter
+    def rightChild(self, node):
+        self._rightChild = node
+        self._update()
+
+    @property
+    def startOffset(self):
+        r'''
+        The start offset of this node.
+        '''
+        return self._startOffset
+
+    @property
+    def stopOffsetHigh(self):
+        r'''
+        The highest stop offset of any timespan in any node nof the subtree
+        rooted on this node.
+        '''
+        return self._stopOffsetHigh
+
+    @property
+    def stopOffsetLow(self):
+        r'''
+        The lowest stop offset of any timespan in any node of the subtree
+        rooted on this node.
+        '''
+        return self._stopOffsetLow
+
+    @property
+    def subtreeStartIndex(self):
+        r'''
+        The lowest timespan start index of any timespan in any node of the
+        subtree rooted on this node.
+        '''
+        return self._subtreeStartIndex
+
+    @property
+    def subtreeStopIndex(self):
+        r'''
+        The highest timespan stop index of any timespan in any node of the
+        subtree rooted on this node.
+        '''
+        return self._subtreeStopIndex
+
+
+
 class TimespanCollection(object):
     r'''
     A datastructure for efficiently slicing a score.
@@ -1451,208 +1717,6 @@ class TimespanCollection(object):
         '_rootNode',
         '_source',
         )
-
-    class TimespanCollectionNode(object):
-        r'''
-        A node in an TimespanCollection.
-
-        This class is only used by TimespanCollection, and should not be
-        instantiated by hand. It stores a list of ElementTimespans, as well as
-        various data which describes the internal structure of the tree.
-
-            >>> startOffset = 1.0
-            >>> node = stream.timespans.TimespanCollection.TimespanCollectionNode(startOffset)
-
-        Please consult the wikipedia page for AVL tree
-        (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
-        description of how this works.
-        '''
-
-        ### CLASS VARIABLES ###
-
-        __slots__ = (
-            '__weakref__',
-            '_balance',
-            '_height',
-            '_leftChild',
-            '_nodeStartIndex',
-            '_nodeStopIndex',
-            '_payload',
-            '_rightChild',
-            '_startOffset',
-            '_stopOffsetHigh',
-            '_stopOffsetLow',
-            '_subtreeStartIndex',
-            '_subtreeStopIndex',
-            )
-
-        ### INITIALIZER ###
-
-        def __init__(self, startOffset):
-            self._balance = 0
-            self._height = 0
-            self._leftChild = None
-            self._nodeStartIndex = -1
-            self._nodeStopIndex = -1
-            self._payload = []
-            self._rightChild = None
-            self._startOffset = startOffset
-            self._stopOffsetHigh = None
-            self._stopOffsetLow = None
-            self._subtreeStartIndex = -1
-            self._subtreeStopIndex = -1
-
-        ### SPECIAL METHODS ###
-
-        def __repr__(self):
-            return '<N: {} [{}:{}:{}:{}] {{{}}}>'.format(
-                self.startOffset,
-                self.subtreeStartIndex,
-                self.nodeStartIndex,
-                self.nodeStopIndex,
-                self.subtreeStopIndex,
-                len(self.payload),
-                )
-
-        ### PRIVATE METHODS ###
-
-        def _debug(self):
-            return '\n'.join(self._getDebugPieces())
-
-        def _getDebugPieces(self):
-            result = []
-            result.append(repr(self))
-            if self.leftChild:
-                subresult = self.leftChild._getDebugPieces()
-                result.append('\tL: {}'.format(subresult[0]))
-                result.extend('\t' + x for x in subresult[1:])
-            if self.rightChild:
-                subresult = self.rightChild._getDebugPieces()
-                result.append('\tR: {}'.format(subresult[0]))
-                result.extend('\t' + x for x in subresult[1:])
-            return result
-
-        def _update(self):
-            leftHeight = -1
-            rightHeight = -1
-            if self.leftChild is not None:
-                leftHeight = self.leftChild.height
-            if self.rightChild is not None:
-                rightHeight = self.rightChild.height
-            self._height = max(leftHeight, rightHeight) + 1
-            self._balance = rightHeight - leftHeight
-            return self.height
-
-        ### PUBLIC PROPERTIES ###
-
-        @property
-        def balance(self):
-            r'''
-            The difference in heights of the two subtree rooted on this node.
-
-            This property is used to help balance the AVL tree.
-            '''
-            return self._balance
-
-        @property
-        def height(self):
-            r'''
-            The height of the subtree rooted on this node.
-
-            This property is used to help balance the AVL tree.
-            '''
-            return self._height
-
-        @property
-        def leftChild(self):
-            r'''
-            The left child of this node.
-
-            Setting the left child triggers a node update.
-            '''
-            return self._leftChild
-
-        @leftChild.setter
-        def leftChild(self, node):
-            self._leftChild = node
-            self._update()
-
-        @property
-        def nodeStartIndex(self):
-            r'''
-            The timespan start index of only those timespans stored in this
-            node.
-            '''
-            return self._nodeStartIndex
-
-        @property
-        def nodeStopIndex(self):
-            r'''
-            The timespan stop index of only those timespans stored in this
-            node.
-            '''
-            return self._nodeStopIndex
-
-        @property
-        def payload(self):
-            r'''
-            A list of ElementTimespans starting at this node's start offset,
-            ordered by their stop offsets.
-            '''
-            return self._payload
-
-        @property
-        def rightChild(self):
-            r'''
-            The right child of this node.
-
-            Setting the right child triggers a node update.
-            '''
-            return self._rightChild
-
-        @rightChild.setter
-        def rightChild(self, node):
-            self._rightChild = node
-            self._update()
-
-        @property
-        def startOffset(self):
-            r'''
-            The start offset of this node.
-            '''
-            return self._startOffset
-
-        @property
-        def stopOffsetHigh(self):
-            r'''
-            The highest stop offset of any timespan in any node nof the subtree
-            rooted on this node.
-            '''
-            return self._stopOffsetHigh
-
-        @property
-        def stopOffsetLow(self):
-            r'''
-            The lowest stop offset of any timespan in any node of the subtree
-            rooted on this node.
-            '''
-            return self._stopOffsetLow
-
-        @property
-        def subtreeStartIndex(self):
-            r'''
-            The lowest timespan start index of any timespan in any node of the
-            subtree rooted on this node.
-            '''
-            return self._subtreeStartIndex
-
-        @property
-        def subtreeStopIndex(self):
-            r'''
-            The highest timespan stop index of any timespan in any node of the
-            subtree rooted on this node.
-            '''
-            return self._subtreeStopIndex
 
     ### INITIALIZER ###
 
@@ -2024,7 +2088,7 @@ class TimespanCollection(object):
         Returns a node.
         '''
         if node is None:
-            return TimespanCollection.TimespanCollectionNode(startOffset)
+            return _TimespanCollectionNode(startOffset)
         if startOffset < node.startOffset:
             node.leftChild = self._insert(node.leftChild, startOffset)
         elif node.startOffset < startOffset:

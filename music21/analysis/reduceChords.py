@@ -406,17 +406,17 @@ class ChordReducer(object):
                         toInsert.add(newTimespan)
                         toRemove.add(timespanOne)
                         toRemove.add(timespanTwo)
-                if group[0].startOffset != group[0].measureStartOffset:
+                if group[0].startOffset != group[0].parentStartOffset:
                     newTimespan = group[0].new(
                         beatStrength=1.0,
-                        startOffset=group[0].measureStartOffset,
+                        startOffset=group[0].parentStartOffset,
                         )
                     toRemove.add(group[0])
                     toInsert.add(newTimespan)
                     group[0] = newTimespan
-                if group[-1].stopOffset != group[-1].measureStopOffset:
+                if group[-1].stopOffset != group[-1].parentStopOffset:
                     newTimespan = group[-1].new(
-                        stopOffset=group[-1].measureStopOffset,
+                        stopOffset=group[-1].parentStopOffset,
                         )
                     toRemove.add(group[-1])
                     toInsert.add(newTimespan)
@@ -625,8 +625,8 @@ class ChordReducer(object):
                 if not isShort:
                     continue
                 isEntireMeasure = False
-                if group[0].startOffset == group[0].measureStartOffset:
-                    if group[-1].stopOffset == group[0].measureStopOffset:
+                if group[0].startOffset == group[0].parentStartOffset:
+                    if group[-1].stopOffset == group[0].parentStopOffset:
                         isEntireMeasure = True
                 if bassTimespan is not None:
                     if group[0].startOffset == bassTimespan.startOffset:
