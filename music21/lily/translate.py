@@ -168,10 +168,15 @@ class LilypondConverter(object):
 
         command = self.LILYEXEC + ' --version'
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-        versionString = proc.stdout.readline()
-        versionString = versionString.split()[-1]
-        versionString = versionString.strip()
-        versionPieces = versionString.split('.')
+        versionString = proc.stdout.readline()       
+        try:
+            versionString = versionString.split()[-1]
+            versionString = versionString.strip()
+            versionPieces = versionString.split('.')
+        except Exception:
+            raise LilyTranslateException("Cannot find a copy of Lilypond installed on your system. " +
+                                         "Please be sure it is installed.")
+        
         self.majorVersion = versionPieces[0]
         self.minorVersion = versionPieces[1]
 
