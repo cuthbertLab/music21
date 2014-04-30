@@ -1578,7 +1578,7 @@ class _TimespanCollectionNode(object):
             3
 
         ::
-            
+
             >>> tree._rootNode.rightChild.height
             2
 
@@ -1622,7 +1622,7 @@ class _TimespanCollectionNode(object):
             <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
                 L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
                 R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-        
+
         '''
         return self._leftChild
 
@@ -1723,7 +1723,7 @@ class _TimespanCollectionNode(object):
                 L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
                 R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
                     R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-        
+
         ::
 
             >>> print(tree._rootNode.rightChild.rightChild._debug())
@@ -1842,16 +1842,19 @@ class TimespanCollection(object):
 
     ::
 
-        >>> totalCons = 0
-        >>> totalDiss = 0
+        >>> totalConsonances = 0
+        >>> totalDissonances = 0
         >>> for v in tree.iterateVerticalities():
         ...     if v.toChord().isConsonant():
-        ...        totalCons += 1
+        ...        totalConsonances += 1
         ...     else:
-        ...        totalDiss += 1
-        >>> (totalCons, totalDiss)
-        (34, 17)
+        ...        totalDissonances += 1
+        ...
 
+    ::
+
+        >>> (totalConsonances, totalDissonances)
+        (34, 17)
 
     So 1/3 of the vertical moments in Bach are dissonant!  But is this an
     accurate perception? Let's sum up the total consonant duration vs.
@@ -1862,15 +1865,22 @@ class TimespanCollection(object):
 
     ::
 
-        >>> durCons = 0
-        >>> durDiss = 0
-        >>> for v1, v2 in tree.iterateVerticalitiesNwise(n=2):
-        ...     vDurationQL = v2.startOffset - v1.startOffset
-        ...     if v1.toChord().isConsonant():
-        ...        durCons += vDurationQL
+        >>> totalConsonanceDuration = 0
+        >>> totalDissonanceDuration = 0
+        >>> iterator = tree.iterateVerticalitiesNwise(n=2)
+        >>> for verticality1, verticality2 in iterator:
+        ...     startOffset1 = verticality1.startOffset
+        ...     startOffset2 = verticality2.startOffset
+        ...     quarterLength = startOffset2 - startOffset1
+        ...     if verticality1.toChord().isConsonant():
+        ...        totalConsonanceDuration += quarterLength
         ...     else:
-        ...        durDiss += vDurationQL
-        >>> (durCons, durDiss)
+        ...        totalDissonanceDuration += quarterLength
+        ...
+
+    ::
+
+        >>> (totalConsonanceDuration, totalDissonanceDuration)
         (25.5, 9.5)
 
     Remove neighbor tones from the Bach chorale:
@@ -1901,8 +1911,14 @@ class TimespanCollection(object):
         ...            tree.remove(horizontality[1])
         ...            tree.remove(horizontality[2])
         ...            tree.insert(merged)
+        ...
+
+    ::
+
         >>> newBach = stream.timespans.timespansToPartwiseStream(
-        ...     tree, templateStream=bach)
+        ...     tree,
+        ...     templateStream=bach,
+        ...     )
         >>> newBach.parts[1].measure(7).show('text')
         {0.0} <music21.chord.Chord F#4>
         {1.5} <music21.chord.Chord F#3>
@@ -1922,7 +1938,9 @@ class TimespanCollection(object):
         stored at that node, but also the earliest and latest stop offset of
         all ElementTimespans stores at both that node and all nodes which are
         children of that node. This lets us quickly located ElementTimespans
-        which overlap offsets or which are contained within ranges.
+        which overlap offsets or which are contained within ranges of offsets.
+        This also means that the contents of a TimespanCollection are always
+        sorted.
 
     TODO: newBach.parts['Alto'].measure(7).show('text') should work.
     KeyError: 'provided key (Alto) does not match any id or group'
