@@ -175,7 +175,8 @@ class LilypondConverter(object):
             versionPieces = versionString.split('.')
         except Exception:
             raise LilyTranslateException("Cannot find a copy of Lilypond installed on your system. " +
-                                         "Please be sure it is installed.")
+                                         "Please be sure it is installed. And that your " +
+                                         "environment.UserSettings['lilypondPath'] is set to find it.")
         
         self.majorVersion = versionPieces[0]
         self.minorVersion = versionPieces[1]
