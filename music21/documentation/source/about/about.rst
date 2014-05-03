@@ -73,11 +73,16 @@ Their contributions and generosity are greatly appreciated.
 * `Donald Byrd`_, researcher on University of Indiana who created a schema for computer-aided musicology 
   (along with the source of all sorts of examples of how music notation is difficult).
 
-* `Jack Campin`_ has kindly given permission to distribute his ABC editions of the Aird Collection, the Northumbrian Minstrelsy, and the Colonial and Civil War American Fife Music Collection. 
+* `Jack Campin`_ has kindly given permission to distribute his ABC editions of the Aird 
+  Collection, the Northumbrian Minstrelsy, and the Colonial and Civil War American 
+  Fife Music Collection. 
 
-* `John Chambers`_ has provided ABC editions to distribute with music21, including the Aird Collection, the O'Neill's Music of Ireland Collection, and Ryan's Mammoth Collection of fiddle tunes.
+* `John Chambers`_ has provided ABC editions to distribute with music21, including the 
+  Aird Collection, the O'Neill's Music of Ireland Collection, and Ryan's Mammoth Collection 
+  of fiddle tunes.
 
-* `Laura E. Conrad`_ has kindly given permission to distribute her ABC editions of renaissance polyphony from Serpent Publications.
+* `Laura E. Conrad`_ has kindly given permission to distribute her ABC editions of 
+  renaissance polyphony from Serpent Publications.
 
 * `Ewa Dahlig-Turek`_ has kindly given permission to distribute the Essen folksong database with music21.
 
@@ -85,9 +90,11 @@ Their contributions and generosity are greatly appreciated.
 
 * `Margaret Greentree`_ kindly gave permission for distribution of her edited collection 
   of the Bach chorales in MusicXML format as part of the music21 corpus. 
-  Her website contains all these chorales in additional formats.  Any discoveries we make regarding these chorales are done in her memory.
+  Her website contains all these chorales in additional formats.  Any discoveries we make 
+  regarding these chorales are done in her memory.
 
-* `Walter B. Hewlett`_ and The Center for Computer Assisted Research in the Humanities (CCARH) have kindly given permission for distribution of musedata encoded files.
+* `Walter B. Hewlett`_ and The Center for Computer Assisted Research in the Humanities (CCARH) 
+  have kindly given permission for distribution of musedata encoded files.
 
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
 
@@ -98,6 +105,9 @@ Their contributions and generosity are greatly appreciated.
 * `Seymour Shlien`_ has kindly given permission to distribute his ABC encodings of the Essen folksong database with music21.
 
 * `Bryen Travis`_ has kindly gave permission to use his collection of Bach MIDI data in music21.
+
+* `Project Gutenberg`_ houses public domain music, including the quartets of Beethoven, 
+  Haydn, and Mozart, in musicxml format which we have been able to include in music21.
 
 .. _Donald Byrd: http://www.informatics.indiana.edu/donbyrd/CMNExtremes.htm
 .. _Laura E. Conrad: http://www.serpentpublications.org/
@@ -112,6 +122,7 @@ Their contributions and generosity are greatly appreciated.
 .. _Manuel Op de Coul: http://www.huygens-fokker.org/scala
 .. _John Chambers: http://trillian.mit.edu/~jc/music/book
 .. _Jack Campin: http://www.campin.me.uk/
+.. _Project Gutenberg: http://www.gutenberg.org/browse/categories/4
 
 
 
