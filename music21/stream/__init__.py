@@ -2876,6 +2876,56 @@ class Stream(base.Music21Object):
         >>> len(s.getElementsByOffset(0.0, mustBeginInSpan=False))
         3
 
+        OMIT_FROM_DOCS
+        
+        Same test as above, but with floats
+        
+        >>> out1 = st1.getElementsByOffset(2.0)
+        >>> len(out1)
+        1
+        >>> out1[0].step
+        'D'
+        >>> out2 = st1.getElementsByOffset(1.0, 3.0)
+        >>> len(out2)
+        1
+        >>> out2[0].step
+        'D'
+        >>> out3 = st1.getElementsByOffset(1.0, 3.0, mustFinishInSpan = True)
+        >>> len(out3)
+        0
+        >>> out3b = st1.getElementsByOffset(0.0, 3.001, mustFinishInSpan = True)
+        >>> len(out3b)
+        1
+        >>> out3b[0].step
+        'C'
+        >>> out3b = st1.getElementsByOffset(1.0, 3.001, mustFinishInSpan = True, mustBeginInSpan=False)
+        >>> len(out3b)
+        1
+        >>> out3b[0].step
+        'C'
+
+
+        >>> out4 = st1.getElementsByOffset(1.0, 2.0)
+        >>> len(out4)
+        1
+        >>> out4[0].step
+        'D'
+        >>> out5 = st1.getElementsByOffset(1.0, 2.0, includeEndBoundary = False)
+        >>> len(out5)
+        0
+        >>> out6 = st1.getElementsByOffset(1.0, 2.0, includeEndBoundary = False, mustBeginInSpan = False)
+        >>> len(out6)
+        1
+        >>> out6[0].step
+        'C'
+        >>> out7 = st1.getElementsByOffset(1.0, 3.0, mustBeginInSpan = False)
+        >>> len(out7)
+        2
+        >>> [el.step for el in out7]
+        ['C', 'D']
+
+        
+
         '''
         if offsetEnd is None:
             offsetEnd = offsetStart
@@ -2927,6 +2977,7 @@ class Stream(base.Music21Object):
 
             if mustFinishInSpan is True:
                 if elementEnd > offsetEnd:
+                    #environLocal.warn([elementEnd, offsetEnd, e])
                     continue
                 if includeEndBoundary is False:
                     # we include the end boundary if the search is zeroLength -- otherwise nothing can be retrieved
