@@ -31,6 +31,8 @@ from music21 import note
 from music21 import pitch
 from music21 import tie
 
+from music21 import environment
+environLocal = environment.Environment("stream.timespans")
 
 #------------------------------------------------------------------------------
 
@@ -635,11 +637,16 @@ class ElementTimespan(object):
         information from the old elementTimespan but change the start offset to
         reflect that of another timespan.
         '''
+        from music21 import meter
         if self._beatStrength is not None:
             return self._beatStrength
         elif self._element is None:
             return None
-        return self._element.beatStrength
+        try:
+            return self._element.beatStrength
+        except meter.MeterException as e:
+            environLocal.warn("Could not get a beatStrength from %r: %s" % (self._element, e))
+            return None
 
     @property
     def quarterLength(self):
