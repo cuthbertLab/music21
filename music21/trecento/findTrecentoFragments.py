@@ -35,7 +35,7 @@ class IntervalSearcher(object):
                 if genI1 != genI2:
                     break
             else:
-                for colorNote in range(i, self.intervalLength):
+                for colorNote in range(i, i + self.intervalLength):
                     ## does not exactly work because of rests, oh well
                     cmpStream.notesAndRests[colorNote].editorial.color = "blue"
                 return True
