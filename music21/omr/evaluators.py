@@ -85,16 +85,25 @@ def autoCorrelationBestMeasure(inputScore):
     achieve for the flagged measures. If a piece has low rhythmic similarity in general, then
     there's no way for a correct match to be found within the unflagged measures in the piece.
     
-    takes in a stream.Score
+    takes in a stream.Score.
     
-    >>> c = converter.parse(omr.correctors.K525omrShortPath)
+
+    >>> c = converter.parse(omr.correctors.K525omrShortPath) # first 21 measures
     >>> totalUnflagged, totalUnflaggedWithMatches = omr.evaluators.autoCorrelationBestMeasure(c)
-    >>> totalUnflagged
-    71
-    >>> totalUnflaggedWithMatches
-    55
+    >>> (totalUnflagged, totalUnflaggedWithMatches)
+    (71, 64)
     >>> print( float(totalUnflaggedWithMatches) / totalUnflagged )
-    0.77...
+    0.901...
+    
+    
+    Schoenberg has low autoCorrelation.
+    
+    >>> c = corpus.parse('schoenberg/opus19/movement6')
+    >>> totalUnflagged, totalUnflaggedWithMatches = omr.evaluators.autoCorrelationBestMeasure(c)
+    >>> (totalUnflagged, totalUnflaggedWithMatches)
+    (18, 6)
+    >>> print( float(totalUnflaggedWithMatches) / totalUnflagged )
+    0.333...
     
     '''
     ss = correctors.SingleScore(inputScore)
@@ -102,20 +111,36 @@ def autoCorrelationBestMeasure(inputScore):
     
     totalMeasures = 0
     totalMatches = 0
+    
+    singleParts = ss.singleParts
+    
     for pNum, pHashArray in enumerate(allHashes):
-        incorrectIndices = ss.singleParts[pNum].getIncorrectMeasureIndices()
+        incorrectIndices = singleParts[pNum].getIncorrectMeasureIndices()
         for i, mHash in enumerate(pHashArray):
             if i in incorrectIndices:
                 continue
             
             totalMeasures += 1
             match = False
+            
+            ## horizontal search...
             for j, nHash in enumerate(pHashArray):
                 if i == j:
                     continue
                 if mHash == nHash:
                     match = True
                     break
+                
+            ## vertical search...
+            if match is False:
+                for otherPNum in range(len(singleParts)):
+                    if otherPNum == pNum:
+                        continue
+                    otherHash = allHashes[otherPNum][i]
+                    if otherHash == mHash:
+                        match = True
+                        break 
+                
             if match is True:
                 totalMatches += 1
     return (totalMeasures, totalMatches)
