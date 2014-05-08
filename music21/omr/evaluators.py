@@ -1,6 +1,15 @@
-'''
-@author: Maura Church, April 2014
-'''
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         omr/evaluators.py
+# Purpose:      music21 module for evaluating correcting of output from OMR software
+#
+# Authors:      Maura Church
+#               Michael Scott Cuthbert
+#
+# Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 
 '''
 This module takes two XML files and displays the number of measures that 
