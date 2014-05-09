@@ -2031,7 +2031,9 @@ class Stream(base.Music21Object):
 
         # use quarterLength as start time
         targets = sLeft.getElementsByOffset(quarterLength, sLeft.highestTime,
-            includeEndBoundary=True, mustFinishInSpan=False, includeElementsThatEndAtStart=False,
+            includeEndBoundary=True, 
+            mustFinishInSpan=False, 
+            includeElementsThatEndAtStart=False,
             mustBeginInSpan=False)
 
         targetSplit = []
@@ -2845,6 +2847,23 @@ class Stream(base.Music21Object):
         2
         >>> [el.step for el in out7]
         ['C', 'D']
+        
+        
+        Note, that elements that end at the start offset are included if mustBeginInSpan is False
+        
+        >>> out8 = st1.getElementsByOffset(2, 4, mustBeginInSpan = False)
+        >>> len(out8)
+        2
+        >>> [el.step for el in out8]
+        ['C', 'D']
+
+        To change this behavior set includeElementsThatEndAtStart=False
+
+        >>> out9 = st1.getElementsByOffset(2, 4, mustBeginInSpan = False, includeElementsThatEndAtStart = False)
+        >>> len(out9)
+        1
+        >>> [el.step for el in out9]
+        ['D']
 
 
 
@@ -9321,7 +9340,10 @@ class Stream(base.Music21Object):
         elEnd = elOffset + el.quarterLength
 
         if elEnd != elOffset: # i.e. not zero length
-            otherElements = self.getElementsByOffset(elOffset, elEnd, mustBeginInSpan = False, includeEndBoundary=False, includeElementsThatEndAtStart=False)
+            otherElements = self.getElementsByOffset(elOffset, elEnd, 
+                                                     mustBeginInSpan = False, 
+                                                     includeEndBoundary=False, 
+                                                     includeElementsThatEndAtStart=False)
         else:
             otherElements = self.getElementsByOffset(elOffset, mustBeginInSpan = False)
 
