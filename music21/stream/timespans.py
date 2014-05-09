@@ -366,13 +366,24 @@ def timespansToPartwiseStream(timespans, templateStream=None):
 
 
 class Timespan(object):
-    def __init__(self, startOffset, stopOffset):
-        if startOffset < stopOffset:
-            self.startOffset = startOffset
-            self.stopOffset = stopOffset
-        else:
-            self.startOffset = stopOffset
-            self.stopOffset = startOffset
+    r'''
+    A span of time, with a start offset and stop offset.
+
+    Useful for demonstating various properties of the timespan-collection class
+    family.
+
+    ::
+
+        >>> timespan = stream.timespans.Timespan(-1.5, 3.25)
+        >>> print(timespan)
+        <Timespan -1.5 3.25>
+
+    '''
+
+    def __init__(self, startOffset=float('-inf'), stopOffset=float('inf')):
+        startOffset, stopOffset = sorted((startOffset, stopOffset))
+        self.startOffset = startOffset
+        self.stopOffset = stopOffset
 
     def __eq__(self, expr):
         if type(self) is type(expr):
@@ -546,10 +557,76 @@ class ElementTimespan(object):
     ### PUBLIC METHODS ###
 
     def mergeWith(self, elementTimespan):
-        assert isinstance(elementTimespan, type(self))
-        assert (self.stopOffset == elementTimespan.startOffset) or \
-            (elementTimespan.stopOffset == self.startOffset)
-        assert self.pitches == elementTimespan.pitches
+        r'''
+        Merges two consecutive like-pitched element timespans, keeping
+        score-relevant information from the first of the two, such as its
+        Music21 Element, and any beatstrength information.
+
+        This is useful when using timespans to perform score reduction.
+
+        Let's demonstate merging some contiguous E's in the alto part of a Bach
+        chorale:
+
+        ::
+
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = stream.timespans.streamToTimespanCollection(score)
+            >>> timespan_one = tree[12]
+            >>> print(timespan_one)
+            <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
+
+        ::
+
+            >>> print(timespan_one).part
+            <music21.stream.Part Alto>
+
+        ::
+
+            >>> timespan_two = tree.findNextElementTimespanInSamePart(
+            ...     timespan_one)
+            >>> print(timespan_two)
+            <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
+
+        ::
+
+            >>> merged = timespan_one.mergeWith(timespan_two)
+            >>> print(merged)
+            <ElementTimespan (2.0 to 4.0) <music21.note.Note E>>
+
+        ::
+
+            >>> merged.part is timespan_one.part
+            True
+
+        ::
+
+            >>> merged.beatStrength == timespan_one.beatStrength
+            True
+
+        Attempting to merge timespans which are not contiguous, or which do not
+        have identical pitches will result in error:
+
+        ::
+
+            >>> tree[0].mergeWith(tree[50])
+            Traceback (most recent call last):
+            ...
+            TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
+
+        '''
+        if not isinstance(elementTimespan, type(self)):
+            message = 'Cannot merge {} with {}: wrong types'.format(
+                self, elementTimespan)
+            raise TimespanException(message)
+        if not ((self.stopOffset == elementTimespan.startOffset) or
+            (elementTimespan.stopOffset == self.startOffset)):
+            message = 'Cannot merge {} with {}: not contiguous'.format(
+                self, elementTimespan)
+            raise TimespanException(message)
+        if self.pitches != elementTimespan.pitches:
+            message = 'Cannot merge {} with {}: different pitches'.format(
+                self, elementTimespan)
+            raise TimespanException(message)
         if self.startOffset < elementTimespan.startOffset:
             mergedElementTimespan = self.new(
                 stopOffset=elementTimespan.stopOffset,
