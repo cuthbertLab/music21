@@ -151,9 +151,14 @@ def recurseStream(
     pitchedOnly=True,
     ):
     r'''
-    Recurses through `inputStream`, constructs ElementTimespans for each
-    non-stream pitched element found, and returns all constructed
-    ElementTimespans.
+    Recurses through `inputStream`, and constructs TimespanCollections for each
+    encountered substream and ElementTimespans for each encountered non-stream
+    element.
+
+    If `pitchedOnly` is true, `recurseStream` only constructs ElementTimespans
+    for pitched non-stream elements.
+
+    This is used internally by `streamToTimespanCollection`.
     '''
     from music21 import spanner
     from music21 import stream
@@ -3606,6 +3611,18 @@ class TimespanCollection(object):
 
     @property
     def maximumOverlap(self):
+        '''
+        The maximum number of timespans overlapping at any given moment in this
+        timespan collection.
+
+        ::
+        
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = stream.timespans.streamToTimespanCollection(score)
+            >>> tree.maximumOverlap
+            4
+
+        '''
         overlap = None
         for verticality in self.iterateVerticalities():
             degreeOfOverlap = verticality.degreeOfOverlap
@@ -3617,6 +3634,22 @@ class TimespanCollection(object):
 
     @property
     def minimumOverlap(self):
+        '''
+        The minimum number of timespans overlapping at any given moment in this
+        timespan collection.
+
+        In a tree created from a monophonic stream, the minimumOverlap will
+        probably be either zero or one.
+
+        ::
+        
+            >>> score = corpus.parse('bwv66.6')
+            >>> tree = stream.timespans.streamToTimespanCollection(
+            ...     score, flatten=False)
+            >>> tree[0].minimumOverlap
+            1
+
+        '''
         overlap = None
         for verticality in self.iterateVerticalities():
             degreeOfOverlap = verticality.degreeOfOverlap
