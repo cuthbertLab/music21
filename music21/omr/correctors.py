@@ -9,8 +9,6 @@
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-
-from music21 import converter
 import math
 import difflib
 import copy
@@ -26,136 +24,6 @@ K525omrShortPath = pathName + os.sep + 'k525OMRShort.xml'
 K525groundTruthShortPath = pathName + os.sep + 'k525GTShort.xml'
 
 debug = False
-
-class OmrGroundTruthPair(object):
-    '''
-    Takes in a path to the OMR
-    and a path to the groundTruth 
-    and their corresponding hash arrays if any
-    '''
-    def __init__(self, omr=None, ground=None):
-        self.omrPath = omr
-        self.groundPath = ground
-        self.omrScore = self.getOmrScore()
-        self.groundScore = self.getGroundScore()
-    
-    def parseAll(self):
-        self.omrScore = self.getOmrScore()
-        self.groundScore = self.getGroundScore()
-    
-    def hashAll(self):
-        self.omrScore.getAllHashes()
-        self.groundScore.getAllHashes()
-    
-    def getOmrScore(self):
-        '''
-        Returns a ScoreCorrector object of the OMR score
-        
-         >>> omrPath = omr.correctors.K525omrShortPath
-         >>> ground = omr.correctors.K525groundTruthShortPath
-         >>> omrGTP = omr.correctors.OmrGroundTruthPair(omr=omrPath, ground=ground)
-         >>> ssOMR = omrGTP.getOmrScore()
-         >>> ssOMR
-         <music21.omr.correctors.ScoreCorrector object at 0x...>
-        '''
-        if (debug is True):
-            print('parsing OMR score')
-        m21omrScore = converter.parse(self.omrPath)
-
-        return ScoreCorrector(m21omrScore)
-
-    def getGroundScore(self):
-        '''
-        Returns a ScoreCorrector object of the Ground truth score
-        
-         >>> omrPath = omr.correctors.K525omrShortPath
-         >>> ground = omr.correctors.K525groundTruthShortPath
-         >>> omrGTP = omr.correctors.OmrGroundTruthPair(omr=omrPath, ground=ground)
-         >>> ssGT = omrGTP.getGroundScore()
-         >>> ssGT
-         <music21.omr.correctors.ScoreCorrector object at 0x...>
-        '''
-        if debug is True:
-            print('parsing Ground Truth score')
-        m21groundScore = converter.parse(self.groundPath)
-        
-        return ScoreCorrector(m21groundScore)
-    
-    def getDifferencesBetweenAlignedScores(self):
-        '''
-        Returns the number of differences (int) between
-        two scores with aligned indices
-        '''
-        self.numberOfDifferences = 0        
-        aList = self.omrScore.getAllHashes()
-        bList = self.groundScore.getAllHashes()
-        for i in range(len(aList)):
-            for j in range(min(len(aList[i]), len(bList[i]))):
-                a = aList[i][j]
-                b = bList[i][j]
-                s = difflib.SequenceMatcher(None, a, b) 
-                ratio = s.ratio()
-                measureErrors = (1-ratio) * len(a)
-                self.numberOfDifferences += measureErrors
-        return self.numberOfDifferences
-    
-    def substCost(self, x,y):
-        if x == y: return 0
-        else: return 2
-    def insertCost(self, x):
-        return 1
-    def deleteCost(self, x):
-        return 1
-
-    def minEditDist(self, target, source):
-        '''
-        Computes the min edit distance from target to source. Figure 3.25 
-        '''
-        
-        n = len(target)
-        m = len(source)
-    
-        distance = [[0 for i in range(m+1)] for j in range(n+1)]
-    
-        for i in range(1,n+1):
-            distance[i][0] = distance[i-1][0] + self.insertCost(target[i-1])
-    
-        for j in range(1,m+1):
-            distance[0][j] = distance[0][j-1] + self.deleteCost(source[j-1])
-    
-        for i in range(1,n+1):
-            for j in range(1,m+1):
-                distance[i][j] = min(distance[i-1][j]+1,
-                                     distance[i][j-1]+1,
-                                     distance[i-1][j-1]+self.substCost(source[j-1],target[i-1]))
-        return distance[n][m]
-    
-    def getDifferences(self):
-        '''
-        Returns the number of differences (float) between
-        the two scores 
-        
-        This function is based on the James H. Martin's minimum edit distance,
-        http://www.cs.colorado.edu/~martin/csci5832/edit-dist-blurb.html
-        
-        >>> omrPath = omr.correctors.K525omrShortPath
-        >>> ground = omr.correctors.K525groundTruthShortPath
-        >>> omrGTP = omr.correctors.OmrGroundTruthPair(omr=omrPath, ground=ground)
-        >>> differences = omrGTP.getDifferences()
-        >>> differences
-        32
-        '''
-        self.numberOfDifferences = 0        
-        aList = self.omrScore.getAllHashes()
-        bList = self.groundScore.getAllHashes()
-        for i in range(len(aList)):
-            a = aList[i]
-            b = bList[i]
-            measureErrors = self.minEditDist(a, b)
-            self.numberOfDifferences += measureErrors
-        return self.numberOfDifferences
-
-
 
 class ScoreCorrector(object):
     '''
@@ -350,19 +218,73 @@ class ScoreCorrector(object):
     def substituteOneMeasureContentsForAnother(self, sourceHorizontalIndex, sourceVerticalIndex, destinationHorizontalIndex, destinationVerticalIndex):
         '''
         Takes a destination measure, deletes its contents, and replaces them 
-        with the contents of a source measure.
-        The destination measure is in the set F of flagged measures (has incorrect number of beats)
+        with the contents of a source measure but retains as many pitches as possible
+        
+        The destination measure would normally be in the set F of flagged measures 
+        (having an incorrect number of beats)
         while the source measure is in the set C of correcting measures. 
         
-        >>> omrPath = omr.correctors.K525omrShortPath
-        >>> ground = omr.correctors.K525groundTruthShortPath
-        >>> omrGTP = omr.correctors.OmrGroundTruthPair(omr=omrPath, ground=ground)
-        >>> ssOMR = omrGTP.getOmrScore()
-        >>> ssOMR
-        <music21.omr.correctors.ScoreCorrector object at 0x...>
-        >>> ssOMR.substituteOneMeasureContentsForAnother(3, 3, 2, 2)
-        >>> # ssOMR.score.show()
+        >>> s = corpus.parse('bwv66.6').measures(1,2)
+        >>> s.show('text')
+        {0.0} <music21.stream.Part Soprano>
+            ...
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note A>
+                {1.0} <music21.note.Note B>
+                {2.0} <music21.note.Note C#>
+                {3.0} <music21.note.Note E>
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.note.Note C#>
+                {1.0} <music21.note.Note B>
+                {2.0} <music21.note.Note A>
+                {3.0} <music21.note.Note C#>
+        {0.0} <music21.stream.Part Alto>
+             ...
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note F#>
+                {1.0} <music21.note.Note E>
+                {2.0} <music21.note.Note E>
+                {3.0} <music21.note.Note E>
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.note.Note E>
+                {0.5} <music21.note.Note A>
+                {1.0} <music21.note.Note G#>
+                {2.0} <music21.note.Note E>
+                {3.0} <music21.note.Note G#>
+        ...
 
+        Replace part 1, measure 2 (index 1) with part 0, measure 1 (index 0) while retaining
+        as many pitches as possible. The eighth-notes will become quarters:
+        
+        >>> scOMR = omr.correctors.ScoreCorrector(s)
+        >>> scOMR.substituteOneMeasureContentsForAnother(0, 0, 1, 1)
+        >>> s2 = scOMR.score
+        >>> s2.show('text')
+        {0.0} <music21.stream.Part Soprano>
+            ...
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note A>
+                {1.0} <music21.note.Note B>
+                {2.0} <music21.note.Note C#>
+                {3.0} <music21.note.Note E>
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.note.Note C#>
+                {1.0} <music21.note.Note B>
+                {2.0} <music21.note.Note A>
+                {3.0} <music21.note.Note C#>
+        {0.0} <music21.stream.Part Alto>
+             ...
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note F#>
+                {1.0} <music21.note.Note E>
+                {2.0} <music21.note.Note E>
+                {3.0} <music21.note.Note E>
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.note.Note E>
+                {1.0} <music21.note.Note A>
+                {2.0} <music21.note.Note G#>
+                {3.0} <music21.note.Note E>
+        ...
         '''      
 
         incorrectMeasure = self.singleParts[destinationVerticalIndex].measureStream[destinationHorizontalIndex] # Measure object

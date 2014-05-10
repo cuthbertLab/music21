@@ -3509,34 +3509,8 @@ class Stream(base.Music21Object):
                     newOffset = oldOffset - startOffset
                     returnObj._insertCore(newOffset, m)
 
-
-    #                 mNew = Measure()
-    #                 mNew.mergeAttributes(m)
-    #                 # replace any spanner associations with this measure
-    #                 if len(spannerBundle) > 0:
-    #                     spannerBundle.replaceSpannedElement(m, mNew)
-    #                 # active sites get mangled somewhere
-    #                 m.restoreActiveSites()
-    #                 # will only set on first time through
-    #                 if startMeasureNew is None:
-    #                     startMeasureNew = mNew
-    #
-    #                 # transfer elements to the new measure; these are not copies
-    #                 # this might contain voices and/or spanners
-    #                 for e in m._elements:
-    #                     mNew.insert(e) # NOTE: cannot use _insertCore here
-    #                 for e in m._endElements:
-    #                     #mNew.storeAtEnd(e)
-    #                     mNew._storeAtEndCore(e)
-    #
-    #                 # subtract the offset of the first measure
-    #                 # this will be zero in the first usage
-    #                 newOffset = oldOffset - startOffset
-    #                 returnObj._insertCore(newOffset, mNew)
-    #                 mNew._elementsChanged()
-    #                 #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
-
         # manipulate startMeasure to add desired context objects
+        changedObjects = False
         for className in collect:
             # first, see if it is in this Measure
             if startMeasure is None or startMeasure.hasElementOfClass(className):
@@ -3545,8 +3519,12 @@ class Stream(base.Music21Object):
             # placing missing objects in outer container, not Measure
             found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
             if found is not None:
+                if startMeasure is not None:
+                    found.priority = startMeasure.priority - 1
+                    # TODO: This should not change global priority on found, but
+                    # instead priority, like offset, should be a per-site attribute
                 returnObj._insertCore(0, found)
-
+                changedObjects = True
             # search the flat caller stream, which is usually a Part
             # need to search self, as we ne need to get the instrument
 #             found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
@@ -3562,7 +3540,9 @@ class Stream(base.Music21Object):
 #
 #         # as we have inserted elements, need to call
 #         startMeasureNew._elementsChanged()
-
+        if changedObjects:
+            returnObj._elementsChanged()
+            
         if gatherSpanners:
             for sp in spannerBundle:
                 # can use old offsets of spanners, even though components
