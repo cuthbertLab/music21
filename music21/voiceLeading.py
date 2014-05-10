@@ -42,6 +42,11 @@ from music21 import key
 from music21 import note
 from music21 import chord
 
+try:
+    import enum # @UnresolvedImport
+except ImportError:
+    from music21.ext import enum # enum34 backport
+
 #from music21 import harmony can't do this either
 #from music21 import roman Can't import roman because of circular
 #    importing issue with counterpoint.py and figuredbass
@@ -50,6 +55,14 @@ from music21 import chord
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
 intervalCache = []
+
+class MotionType(str, enum.Enum):
+    parallel = 'Parallel'
+    contrary = 'Contrary'
+    oblique = 'Oblique'
+    antiParallel = 'Anti-Parallel'
+    similar = 'Similar'
+    noMotion = 'No Motion'
 
 #-------------------------------------------------------------------------------
 class VoiceLeadingQuartet(base.Music21Object):
@@ -233,9 +246,17 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def motionType(self):
         '''
-        returns the type of motion ('Oblique', 'Parallel', 'Similar', 'Contrary', 'Anti-Parallel'
-        'No Motion') that
-        exists in this voice leading quartet
+        returns the type of motion from the MotionType Enum object 
+        that exists in this voice leading quartet
+
+        >>> for mt in voiceLeading.MotionType:
+        ...     print(repr(mt))
+        <MotionType.antiParallel: 'Anti-Parallel'>
+        <MotionType.contrary: 'Contrary'>
+        <MotionType.noMotion: 'No Motion'>
+        <MotionType.oblique: 'Oblique'>
+        <MotionType.parallel: 'Parallel'>
+        <MotionType.similar: 'Similar'>
 
         >>> n1 = note.Note('D4')
         >>> n2 = note.Note('E4')
@@ -243,7 +264,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> m2 = note.Note('B4')
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.motionType()
-        'Similar'
+        <MotionType.similar: 'Similar'>
 
         >>> n1 = note.Note('A4')
         >>> n2 = note.Note('C5')
@@ -251,21 +272,25 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> m2 = note.Note('F4')
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.motionType()
-        'Parallel'
+        <MotionType.parallel: 'Parallel'>
+        >>> print(vl.motionType())
+        MotionType.parallel
+        >>> vl.motionType() == 'Parallel'
+        True
         '''
         motionType = ''
         if self.obliqueMotion():
-            motionType = 'Oblique'
+            motionType = MotionType.oblique
         elif self.parallelMotion():
-            motionType = 'Parallel'
+            motionType = MotionType.parallel
         elif self.similarMotion():
-            motionType = 'Similar'
+            motionType = MotionType.similar
         elif self.contraryMotion():
-            motionType = 'Contrary'
+            motionType = MotionType.contrary
         elif self.antiParallelMotion():
-            motionType = 'Anti-Parallel'
+            motionType = MotionType.antiParallel
         elif self.noMotion():
-            motionType = 'No Motion'
+            motionType = MotionType.noMotion
         return motionType
 
     def noMotion(self):
@@ -1982,7 +2007,7 @@ class Test(unittest.TestCase):
         import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
+            for skip in ['_', '__', 'Test', 'Exception', 'MotionType']:
                 if part.startswith(skip) or part.endswith(skip):
                     match = True
             if match:

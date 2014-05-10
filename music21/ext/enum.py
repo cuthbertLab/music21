@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore
 """
 Python Enumerations
 

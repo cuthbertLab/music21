@@ -1874,8 +1874,8 @@ def identifyMotionType(score, partNum1 = None, partNum2 = None, color = None, di
     'Similar Motion in measure 1: Part 1 moves from F# to E while part 2 moves from C to B'
     '''
     
-    testFunction = lambda vlq: vlq.motionType()
-    textFunction = lambda vlq, pn1, pn2: (vlq.motionType() + ' Motion in measure '+ str(vlq.v1n1.measureNumber) +": " \
+    testFunction = lambda vlq: vlq.motionType().value
+    textFunction = lambda vlq, pn1, pn2: (vlq.motionType().value + ' Motion in measure '+ str(vlq.v1n1.measureNumber) +": " \
                  + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name)  if vlq.motionType() != "No Motion" else 'No motion'
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
