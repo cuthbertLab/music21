@@ -49,37 +49,37 @@ class OmrGroundTruthPair(object):
     
     def getOmrScore(self):
         '''
-        Returns a SingleScore object of the OMR score
+        Returns a ScoreCorrector object of the OMR score
         
          >>> omrPath = omr.correctors.K525omrShortPath
          >>> ground = omr.correctors.K525groundTruthShortPath
          >>> omrGTP = omr.correctors.OmrGroundTruthPair(omr=omrPath, ground=ground)
          >>> ssOMR = omrGTP.getOmrScore()
          >>> ssOMR
-         <music21.omr.correctors.SingleScore object at 0x...>
+         <music21.omr.correctors.ScoreCorrector object at 0x...>
         '''
         if (debug is True):
             print('parsing OMR score')
         m21omrScore = converter.parse(self.omrPath)
 
-        return SingleScore(m21omrScore)
+        return ScoreCorrector(m21omrScore)
 
     def getGroundScore(self):
         '''
-        Returns a SingleScore object of the Ground truth score
+        Returns a ScoreCorrector object of the Ground truth score
         
          >>> omrPath = omr.correctors.K525omrShortPath
          >>> ground = omr.correctors.K525groundTruthShortPath
          >>> omrGTP = omr.correctors.OmrGroundTruthPair(omr=omrPath, ground=ground)
          >>> ssGT = omrGTP.getGroundScore()
          >>> ssGT
-         <music21.omr.correctors.SingleScore object at 0x...>
+         <music21.omr.correctors.ScoreCorrector object at 0x...>
         '''
         if debug is True:
             print('parsing Ground Truth score')
         m21groundScore = converter.parse(self.groundPath)
         
-        return SingleScore(m21groundScore)
+        return ScoreCorrector(m21groundScore)
     
     def getDifferencesBetweenAlignedScores(self):
         '''
@@ -157,7 +157,7 @@ class OmrGroundTruthPair(object):
 
 
 
-class SingleScore(object):
+class ScoreCorrector(object):
     '''
     takes in a music21.stream.Score object and runs OMR correction on it.    
     '''
@@ -169,7 +169,24 @@ class SingleScore(object):
         for p in range(len(score.parts)):
             self.singleParts.append(self.getSinglePart(p))
             #this is an array of SinglePart objects
-        
+    def run(self):
+        '''
+        Run all known models for OMR correction on
+        this score
+        '''
+        return self.runPriorModel()
+    
+    def runPriorModel(self):
+        '''
+        run the horizontal and vertical correction models
+        on the score.  Returns the new self.score object.
+        '''
+        correctingArrayHorizontalAllParts = self.runHorizontalCorrectionModel()
+        correctingArrayVerticalAllParts = self.runVerticalCorrectionModel()
+        self.generateCorrectedScore(correctingArrayHorizontalAllParts,
+                                   correctingArrayVerticalAllParts)
+        return self.score
+    
     def getAllHashes(self):
         '''
         Returns an array of arrays, each of which is the hashed notes for a part
@@ -188,7 +205,7 @@ class SingleScore(object):
         >>> s = stream.Score()
         >>> s.insert(0, p1)
         >>> s.insert(0, p2)
-        >>> ss = omr.correctors.SingleScore(s)
+        >>> ss = omr.correctors.ScoreCorrector(s)
         >>> ss.getAllHashes()
         [['Z[', 'Z['], ['PPPP', 'PPPP']]
         '''
@@ -206,8 +223,17 @@ class SingleScore(object):
         return SinglePart(self.score.parts[pn], pn)
 
     def runHorizontalCorrectionModel(self):
+        '''
+        runs for sp in self.singleParts:
+            sp.runHorizontalCorrectionModel()
+            
+        returns correctingArrayAllParts
+        '''
+        correctingArrayAllParts = []
         for sp in self.singleParts:
-            sp.runHorizontalCorrectionModel() 
+            correctingArrayOnePart = sp.runHorizontalCorrectionModel() 
+            correctingArrayAllParts.append(correctingArrayOnePart)
+        return correctingArrayAllParts
     
     def getMeasureSlice(self, i):
         '''
@@ -215,7 +241,7 @@ class SingleScore(object):
         
         >>> omrPath = omr.correctors.K525omrShortPath
         >>> omrScore = converter.parse(omrPath)
-        >>> ssOMR = omr.correctors.SingleScore(omrScore)
+        >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> ssOMR.getMeasureSlice(4)
         <music21.omr.correctors.MeasureSlice object at 0x...>
         '''
@@ -240,9 +266,9 @@ class SingleScore(object):
         
         >>> omrPath = omr.correctors.K525omrShortPath
         >>> omrScore = converter.parse(omrPath)
-        >>> ssOMR = omr.correctors.SingleScore(omrScore)
+        >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> ssOMR
-        <music21.omr.correctors.SingleScore object at 0x...>
+        <music21.omr.correctors.ScoreCorrector object at 0x...>
         >>> ssOMR.getAllIncorrectMeasures()
         [[1, 3, 9, 10, 12, 17, 20], [2, 12, 14, 17], [1, 9], []]
         '''
@@ -277,7 +303,7 @@ class SingleScore(object):
         
         >>> omrPath = omr.correctors.K525omrShortPath
         >>> omrScore = converter.parse(omrPath)
-        >>> ssOMR = omr.correctors.SingleScore(omrScore)
+        >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> allDists = ssOMR.getVerticalProbabilityDistributionSinglePart(1)
         >>> ["%0.3f" % p for p in allDists]
         ['0.571', '1.000', '0.667', '0.714']
@@ -333,7 +359,7 @@ class SingleScore(object):
         >>> omrGTP = omr.correctors.OmrGroundTruthPair(omr=omrPath, ground=ground)
         >>> ssOMR = omrGTP.getOmrScore()
         >>> ssOMR
-        <music21.omr.correctors.SingleScore object at 0x...>
+        <music21.omr.correctors.ScoreCorrector object at 0x...>
         >>> ssOMR.substituteOneMeasureContentsForAnother(3, 3, 2, 2)
         >>> # ssOMR.score.show()
 
@@ -360,7 +386,7 @@ class SingleScore(object):
                                
     def runVerticalCorrectionModel(self): 
         '''
-        Runs a basic vertical correction model on a SingleScore object.
+        Runs a basic vertical correction model on a ScoreCorrector object.
         That is, for each flagged measure, this method replaces the rhythm in that flagged measure
         with the rhythm of a measure with the least difference. 
         '''
@@ -634,9 +660,9 @@ class MeasureSlice(object):
         '''
         >>> omrPath = omr.correctors.K525omrShortPath
         >>> omrScore = converter.parse(omrPath)
-        >>> ssOMR = omr.correctors.SingleScore(omrScore)
+        >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> ssOMR
-        <music21.omr.correctors.SingleScore object at 0x...>
+        <music21.omr.correctors.ScoreCorrector object at 0x...>
         >>> measureSlice = ssOMR.getMeasureSlice(2)
         >>> measureSlice
         <music21.omr.correctors.MeasureSlice object at 0x...>
@@ -657,7 +683,7 @@ class MeasureSlice(object):
         
         >>> omrPath = omr.correctors.K525omrShortPath
         >>> omrScore = converter.parse(omrPath)
-        >>> ssOMR = omr.correctors.SingleScore(omrScore)
+        >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> measureSlice = ssOMR.getMeasureSlice(2)
         >>> measureSlice
         <music21.omr.correctors.MeasureSlice object at 0x...>
@@ -1177,4 +1203,8 @@ class MeasureHash(object):
     
 if __name__ == '__main__':
     import music21
+#     s = converter.parse(K525omrFilePath)
+#     ss = ScoreCorrector(s)
+#     s2 = ss.run()
+#     s2.show()
     music21.mainTest()

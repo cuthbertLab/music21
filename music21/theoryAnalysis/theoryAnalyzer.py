@@ -301,8 +301,6 @@ def getVLQs(score, partNum1, partNum2):
     '''
     extracts and returns a list of the :class:`~music21.voiceLeading.VoiceLeadingQuartet` 
     objects present between partNum1 and partNum2 in the score
-    
-    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()

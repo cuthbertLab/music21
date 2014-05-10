@@ -233,7 +233,8 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def motionType(self):
         '''
-        returns the type of motion ('Oblique', 'Parallel', 'Similar', 'Contrary') that
+        returns the type of motion ('Oblique', 'Parallel', 'Similar', 'Contrary', 'Anti-Parallel'
+        'No Motion') that
         exists in this voice leading quartet
 
         >>> n1 = note.Note('D4')
@@ -348,9 +349,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.similarMotion()
         True
-
         '''
-
         if self.noMotion():
             return False
         else:

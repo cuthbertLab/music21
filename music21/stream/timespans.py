@@ -314,7 +314,7 @@ def timespansToChordifiedStream(timespans, templateStream=None):
     '''
     from music21 import stream
     if not isinstance(timespans, TimespanCollection):
-        raise TimespanCollectionException
+        raise TimespanCollectionException('Needs a TimespanCollection to run')
     if isinstance(templateStream, stream.Stream):
         templateOffsets = sorted(templateStream.measureOffsetMap())
         templateOffsets.append(templateStream.duration.quarterLength)
@@ -374,7 +374,7 @@ class Timespan(object):
     r'''
     A span of time, with a start offset and stop offset.
 
-    Useful for demonstating various properties of the timespan-collection class
+    Useful for demonstrating various properties of the timespan-collection class
     family.
 
     ::
@@ -569,7 +569,7 @@ class ElementTimespan(object):
 
         This is useful when using timespans to perform score reduction.
 
-        Let's demonstate merging some contiguous E's in the alto part of a Bach
+        Let's demonstrate merging some contiguous E's in the alto part of a Bach
         chorale:
 
         ::

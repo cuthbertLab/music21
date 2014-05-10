@@ -74,6 +74,7 @@ def runMain(omrPath, groundTruthPath, originalDifferences = None, runOnePart=Fal
     print "new difference in scores", newNumberOfDifferences
     print "number of incorrect measures", numberOfIncorrectMeasures
     print "total number of measures", numberOfTotalMeasures
+    s.score.show()
   
 def autoCorrelationBestMeasure(inputScore):
     '''
@@ -149,8 +150,8 @@ if __name__ == '__main__':
     import music21
     music21.mainTest()
     
-    omrFilePath = correctors.pathName + os.sep + 'k525OMRMvt1.xml'
-    groundTruthFilePath = correctors.pathName + os.sep + 'k525GTMvt1.xml'
+    omrFilePath = correctors.K525omrShortPath
+    groundTruthFilePath = correctors.K525groundTruthShortPath
     #omrFilePath = '/Users/cuthbert/Desktop/SchubertOMR.xml'
     #groundTruthFilePath = '/Users/cuthbert/Dropbox/Vladimir_Myke/schubert unvoll all_fixed.xml'
     
