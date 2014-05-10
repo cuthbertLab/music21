@@ -1090,7 +1090,8 @@ class Document(object):
 
     def reprTest(self):
         '''Basic display for testing'''
-        print(('+'*20 + ' ' + self.getBestTitle()))
+        bestTitle = self.getBestTitle() or ""
+        print(('+'*20 + ' ' + bestTitle))
         print((self.score))
         print()
         print((self.score.toxml(None, None, 1)))
@@ -1330,7 +1331,7 @@ if __name__ == "__main__":
         sys.setdefaultencoding("utf-8") # @UndefinedVariable
 
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof
