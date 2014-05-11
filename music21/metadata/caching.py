@@ -141,6 +141,7 @@ class MetadataCachingJob(object):
         import gc
         self.results = []
         parsedObject = self._parseFilePath()
+        environLocal.printDebug('Got ParsedObject %r' % parsedObject)
         if parsedObject is not None:
             if 'Opus' in parsedObject.classes:
                 self._parseOpus(parsedObject)

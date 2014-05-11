@@ -984,7 +984,7 @@ class LayoutScore(stream.Opus):
 
 
         Tests for a score with PartStaff objects:
-        >>> lt = corpus.parse('demos/layoutTestMore.xml', forceSource=True)
+        >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> ls.getPositionForStaff(0, 0, 0)
         (0.0, 40.0)
@@ -1111,7 +1111,7 @@ class LayoutScore(stream.Opus):
         if True makes the effective size 0.0 -- see getStaffHiddenAttribute
 
 
-        >>> lt = corpus.parse('demos/layoutTest.xml', forceSource=True)
+        >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> ls.getStaffSizeFromLayout(0, 0, 0)
         40.0
@@ -1170,7 +1170,7 @@ class LayoutScore(stream.Opus):
         defined, recursively search through previous staves until one is found.
 
 
-        >>> lt = corpus.parse('demos/layoutTestMore.xml', forceSource=True)
+        >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> ls.getStaffHiddenAttribute(0, 0, 0)
         False
@@ -1220,7 +1220,7 @@ class LayoutScore(stream.Opus):
         This test score has five systems on the first page, three on the second, and two on the third
 
 
-        >>> lt = corpus.parse('demos/layoutTestMore.xml', forceSource=True)
+        >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> systemId = 1
         >>> pageId = 2  # last system, last page
@@ -1525,7 +1525,7 @@ class Test(unittest.TestCase):
 
     def xtestGetPageMeasureNumbers(self):
         from music21 import corpus
-        c = corpus.parse('luca/gloria', forceSource=True).parts[0]
+        c = corpus.parse('luca/gloria').parts[0]
         #c.show('text')
         retStr = ""
         for x in c.flat:
