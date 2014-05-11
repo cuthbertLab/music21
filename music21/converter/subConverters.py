@@ -31,16 +31,27 @@ class SubConverterException(exceptions21.Music21Exception):
 
 class SubConverter(object):
     '''
-    Class wrapper for parsing data.  All other Converter types should inherit from this and
-    have ways of dealing with various dataformats.
+    Class wrapper for parsing data or outputting data.  
+    
+    All other Converter types should inherit from this and
+    have ways of dealing with various data formats.
     
     Attributes that should be set: 
     
         readBinary = True or False (default False)
+        registerFormats = tuple of formats that can be handled; eg: ('musicxml',)
+        registerShowFormats = tuple of format calls that can be handled in .show() and .write()
+        registerInputExtensions = tuple of input extensions that should be handled in converter
+        registerOutputExtensions = tuple of output extensions that can be written. Order matters:
+            the first will be used in calls to .write()
         canBePickled = True or False (default True; does not do anything yet)
     '''
     readBinary = False
     canBePickled = True
+    registerFormats = ()
+    registerShowFormats = ()
+    registerInputExtensions = ()
+    registerOutputExtensions = ()
     
     def __init__(self):
         self._stream = stream.Score()
@@ -78,11 +89,37 @@ class SubConverter(object):
         Returns or sets the stream in the converter.  Must be defined for subconverter to work.
         ''')
 
+class ConverterLilypond(SubConverter):
+    registerFormats = ('lilypond', 'lily')
+    registerOutputExtensions = ('ly',)
 
+class ConverterBraille(SubConverter):
+    registerFormats = ('braille',)
+    registerOutputExtensions = ('txt',)
+    
+class ConverterVexflow(SubConverter):
+    registerFormats = ('vexflow',)
+    registerOutputExtensions = ('html',)
+
+class ConverterText(SubConverter):
+    registerFormats = ('text','txt','t')
+    registerOutputExtensions = ('txt',)
+
+class ConverterTextLine(SubConverter):
+    registerFormats = ('textline',)
+    registerOutputExtensions = ('txt',)
+
+class ConverterScala(SubConverter):
+    registerFormats = ('scala',)
+    registerInputExtensions = ('scl',)
+    registerOutputExtensions = ('scl',)
 #-------------------------------------------------------------------------------
 class ConverterHumdrum(SubConverter):
     '''Simple class wrapper for parsing Humdrum data provided in a file or in a string.
     '''
+    registerFormats = ('humdrum',)
+    registerInputExtensions = ('krn',)
+
     #---------------------------------------------------------------------------
     def parseData(self, humdrumString, number=None):
         '''Open Humdrum data from a string -- calls humdrum.parseData()
@@ -136,6 +173,8 @@ class ConverterTinyNotation(SubConverter):
     Simple class wrapper for parsing TinyNotation data provided in a file or 
     in a string.
     '''
+    registerFormats = ('tinynotation',)
+    registerInputExtensions = ('tntxt', 'tinynotation')
     #---------------------------------------------------------------------------
     def parseData(self, tnData, number=None):
         '''Open TinyNotation data from a string or list
@@ -185,6 +224,9 @@ class ConverterNoteworthy(SubConverter):
     For developers: see the documentation for :meth:`parseData` and :meth:`parseFile`
     to see the low-level usage.
     '''
+    registerFormats = ('noteworthytext',)
+    registerInputExtensions = ('nwctxt',)
+
     #---------------------------------------------------------------------------
     def parseData(self, nwcData):
         r'''Open Noteworthy data from a string or list
@@ -227,6 +269,8 @@ class ConverterNoteworthyBinary(SubConverter):
     Users should not need this routine.  Call converter.parse directly
     '''
     readBinary = True
+    registerFormats = ('noteworthy',)
+    registerInputExtensions = ('nwc', )
     #---------------------------------------------------------------------------
     def parseData(self, nwcData):
         from music21.noteworthy import binaryTranslate as noteworthyBinary 
@@ -241,7 +285,10 @@ class ConverterNoteworthyBinary(SubConverter):
 class ConverterMusicXML(SubConverter):
     '''Converter for MusicXML
     '''
-
+    registerFormats = ('musicxml','xml')
+    registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
+    registerOutputExtensions = ('xml', 'mxl')
+    
     def __init__(self):
         self._mxScore = None # store the musicxml object representation
         SubConverter.__init__(self)
@@ -324,6 +371,10 @@ class ConverterMidi(SubConverter):
     Simple class wrapper for parsing MIDI.
     '''
     readBinary = True
+    registerFormats = ('midi',)
+    registerInputExtensions = ('mid', 'midi')
+    registerOutputExtensions = ('mid', )
+    
     def parseData(self, strData, number=None):
         '''
         Get MIDI data from a binary string representation.
@@ -343,13 +394,14 @@ class ConverterMidi(SubConverter):
         midiTranslate.midiFilePathToStream(fp, self.stream)
 
 
-
-
 #-------------------------------------------------------------------------------
 class ConverterABC(SubConverter):
     '''
     Simple class wrapper for parsing ABC.
     '''
+    registerFormats = ('abc',)
+    registerInputExtensions = ('abc',)
+    
     def parseData(self, strData, number=None):
         '''
         Get ABC data, as token list, from a string representation.
@@ -398,6 +450,9 @@ class ConverterABC(SubConverter):
 class ConverterRomanText(SubConverter):
     '''Simple class wrapper for parsing roman text harmonic definitions.
     '''
+    registerFormats = ('romantext', 'rntext')
+    registerInputExtensions = ('rntxt', 'rntext', 'romantext', 'rtxt')
+    
 
     def parseData(self, strData, number=None):
         '''
@@ -429,6 +484,9 @@ class ConverterCapella(SubConverter):
     '''
     Simple class wrapper for parsing Capella .capx XML files.  See capella/fromCapellaXML.
     '''
+    registerFormats = ('capella',)
+    registerInputExtensions = ('capx',)
+    
     def parseData(self, strData, number=None):
         '''
         parse a data stream of uncompessed capella xml
@@ -455,6 +513,8 @@ class ConverterCapella(SubConverter):
 class ConverterMuseData(SubConverter):
     '''Simple class wrapper for parsing MuseData.
     '''
+    registerFormats = ('musedata',)
+    registerInputExtensions = ('md', 'musedata', 'zip')
 
     def parseData(self, strData, number=None):
         '''Get musedata from a string representation.

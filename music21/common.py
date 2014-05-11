@@ -114,10 +114,72 @@ def getMissingImportStr(modNameList):
         return 'Certain music21 functions might need these optional packages: %s; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html' % ', '.join(modNameList)
 
 #-------------------------------------------------------------------------------
+_subconverterCachedList = []
+
+def subConverterList():
+    '''
+    returns a list of subconverter classes available to music21
+    in converter/subConverters, including the stub SubConverter class
+    
+    >>> for sc in common.subConverterList():
+    ...    sc
+    <class 'music21.converter.subConverters.ConverterABC'>
+    <class 'music21.converter.subConverters.ConverterBraille'>
+    <class 'music21.converter.subConverters.ConverterCapella'>
+    <class 'music21.converter.subConverters.ConverterHumdrum'>
+    <class 'music21.converter.subConverters.ConverterLilypond'>
+    <class 'music21.converter.subConverters.ConverterMidi'>
+    <class 'music21.converter.subConverters.ConverterMuseData'>
+    <class 'music21.converter.subConverters.ConverterMusicXML'>
+    <class 'music21.converter.subConverters.ConverterNoteworthy'>
+    <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>
+    <class 'music21.converter.subConverters.ConverterRomanText'>
+    <class 'music21.converter.subConverters.ConverterScala'>
+    <class 'music21.converter.subConverters.ConverterText'>
+    <class 'music21.converter.subConverters.ConverterTextLine'>
+    <class 'music21.converter.subConverters.ConverterTinyNotation'>
+    <class 'music21.converter.subConverters.ConverterVexflow'>
+    <class 'music21.converter.subConverters.SubConverter'>    '''
+    from music21.converter import subConverters
+    import types
+    if len(_subconverterCachedList) > 0:
+        return _subconverterCachedList
+    for i in sorted(list(subConverters.__dict__)):
+        name = getattr(subConverters, i)
+        if callable(name) and not isinstance(name, types.FunctionType):
+            if hasattr(name, 'registerFormats'):     
+                _subconverterCachedList.append(name)
+    return _subconverterCachedList
+
+def findSubConverterForFormat(fmt):
+    '''
+    return a converter.subConverter.SubConverter subclass
+    for a given format -- this is a music21 format name,
+    not a file extension. Or returns None
+    
+    >>> common.findSubConverterForFormat('musicxml')
+    <class 'music21.converter.subConverters.ConverterMusicXML'>
+    
+    >>> common.findSubConverterForFormat('text')
+    <class 'music21.converter.subConverters.ConverterText'>
+
+    Some subconverters have format aliases
+
+    >>> common.findSubConverterForFormat('t')
+    <class 'music21.converter.subConverters.ConverterText'>
+    
+    '''
+    fmt = fmt.lower().strip()
+    for sc in subConverterList():
+        formats = sc.registerFormats
+        if fmt in formats:
+            return sc
+
 def findFormat(fmt):
     '''
     Given a format defined either by a format name or
-    an extension, return the format name as well as the output exensions.
+    an extension, return the format name as well as 
+    the output exensions.
 
     Note that .mxl and .mx are only considered MusicXML input formats.
 
@@ -128,14 +190,10 @@ def findFormat(fmt):
     ('musicxml', '.xml')
     >>> common.findFormat('musicxml')
     ('musicxml', '.xml')
-    >>> common.findFormat('jpeg')
-    ('jpeg', '.jpg')
     >>> common.findFormat('lily')
     ('lilypond', '.ly')
-    >>> common.findFormat('jpeg')
-    ('jpeg', '.jpg')
     >>> common.findFormat('humdrum')
-    ('humdrum', '.krn')
+    ('humdrum', None)
     >>> common.findFormat('txt')
     ('text', '.txt')
     >>> common.findFormat('textline')
@@ -143,7 +201,7 @@ def findFormat(fmt):
     >>> common.findFormat('midi')
     ('midi', '.mid')
     >>> common.findFormat('abc')
-    ('abc', '.abc')
+    ('abc', None)
     >>> common.findFormat('scl')
     ('scala', '.scl')
     >>> common.findFormat('braille')
@@ -151,24 +209,29 @@ def findFormat(fmt):
     >>> common.findFormat('vexflow')
     ('vexflow', '.html')
     >>> common.findFormat('capx')
-    ('capella', '.capx')
-    >>> common.findFormat('png')
-    ('musicxml.png', '.png')
-    >>> common.findFormat('ipython')
-    ('ipython', '.png')
-    >>> common.findFormat('ipython.png')
-    ('ipython', '.png')
-    >>> common.findFormat('musicxml.png')
-    ('musicxml.png', '.png')
+    ('capella', None)
+
+    >>> common.findFormat('mx')
+    ('musicxml', '.xml')
+
+    
+    #     >>> common.findFormat('png')
+    #     ('musicxml.png', '.png')
+    #     >>> common.findFormat('ipython')
+    #     ('ipython', '.png')
+    #     >>> common.findFormat('ipython.png')
+    #     ('ipython', '.png')
+    #     >>> common.findFormat('musicxml.png')
+    #     ('musicxml.png', '.png')
 
 
     Works the same whether you have a leading dot or not:
 
 
     >>> common.findFormat('md')
-    ('musedata', '.md')
+    ('musedata', None)
     >>> common.findFormat('.md')
-    ('musedata', '.md')
+    ('musedata', None)
 
 
     If you give something we can't deal with, returns a Tuple of None, None:
@@ -179,43 +242,105 @@ def findFormat(fmt):
     '''
     # make lower case, as some lilypond processing used upper case
     fmt = fmt.lower().strip()
-    for key in sorted(list(fileExtensions)):
-        if fmt.startswith('.'):
-            fmt = fmt[1:] # strip .
-        if fmt == key or fmt in fileExtensions[key]['input']:
-            # add leading dot to extension on output
-            return key, '.' + fileExtensions[key]['output']
-    return None, None # if no match found
+    if fmt.startswith('.'):
+        fmt = fmt[1:] # strip .
+    foundSc = None
+    for sc in subConverterList():
+        extensions = sc.registerInputExtensions
+        for ext in extensions:
+            if fmt == ext:
+                foundSc = sc
+                break
+        formats = sc.registerFormats
+        for scFormat in formats:
+            if fmt == scFormat:
+                foundSc = sc
+                break
+    if foundSc is None:
+        return (None, None)
+    else:
+        if len(foundSc.registerFormats) > 0:
+            firstFormat = foundSc.registerFormats[0]
+        else:
+            firstFormat = None
+        if len(foundSc.registerOutputExtensions) > 0:
+            firstOutput = '.' + foundSc.registerOutputExtensions[0]
+        else:
+            firstOutput = None
+            
+        return firstFormat, firstOutput
+    
+#     for key in sorted(list(fileExtensions)):
+#         if fmt.startswith('.'):
+#             fmt = fmt[1:] # strip .
+#         if fmt == key or fmt in fileExtensions[key]['input']:
+#             # add leading dot to extension on output
+#             return key, '.' + fileExtensions[key]['output']
+#     return None, None # if no match found
 
 
 def findInputExtension(fmt):
-    '''Given an input format, find and return all possible input extensions.
-
+    '''
+    Given an input format or music21 format, find and return all possible 
+    input extensions.
 
     >>> a = common.findInputExtension('musicxml')
     >>> a
-    ['.xml', '.mxl', '.mx']
-    >>> a = common.findInputExtension('mx')
-    >>> a
-    ['.xml', '.mxl', '.mx']
+    ('.xml', '.mxl', '.mx', '.musicxml')
     >>> a = common.findInputExtension('humdrum')
     >>> a
-    ['.krn']
+    ('.krn',)
     >>> common.findInputExtension('musedata')
-    ['.md', '.musedata', '.zip']
+    ('.md', '.musedata', '.zip')
+    
+    mx is not a music21 format but it is a file format
+    
+    >>> common.findInputExtension('mx')
+    ('.xml', '.mxl', '.mx', '.musicxml')
+    
+    Leading dots don't matter...
+    
+    >>> common.findInputExtension('.mx')
+    ('.xml', '.mxl', '.mx', '.musicxml')
+
+
+    blah is neither
+    
+    >>> common.findInputExtension('blah') is None
+    True
+    
+    
     '''
-    fmt = findFormat(fmt)[0]
-    if fmt == None:
-        raise Exception('no match to format: %s' % fmt)
-    post = []
-    for ext in fileExtensions[fmt]['input']:
-        if not ext.startswith('.'):
-            ext = '.'+ext # must have a leading dot
-        post.append(ext)
-    return post
+    fmt = fmt.lower().strip()    
+    if fmt.startswith('.'):
+        fmt = fmt[1:] # strip .
+
+    sc = findSubConverterForFormat(fmt)
+    if sc is None:
+        # file extension
+        post = []
+        for sc in subConverterList():
+            if fmt not in sc.registerInputExtensions:
+                continue
+            for ext in sc.registerInputExtensions:
+                if not ext.startswith('.'):
+                    ext = '.' + ext
+                post.append(ext)
+            if len(post) > 0:
+                return tuple(post)
+        return None
+    else:
+        # music21 format
+        post = []
+        for ext in sc.registerInputExtensions:
+            if not ext.startswith('.'):
+                ext = '.' + ext
+            post.append(ext)
+        return tuple(post)
 
 def findFormatFile(fp):
-    '''Given a file path (relative or absolute) return the format
+    '''
+    Given a file path (relative or absolute) return the format
 
 
     >>> common.findFormatFile('test.xml')
@@ -224,10 +349,6 @@ def findFormatFile(fp):
     'musicxml'
     >>> common.findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
     'musicxml'
-
-    Windows drive + pickle
-    >>> common.findFormatFile('d:/long/file/path/test.p')
-    'pickle'
 
     On a windows networked filesystem
     >>> common.findFormatFile('\\\\long\\file\\path\\test.krn')
@@ -248,15 +369,12 @@ def findFormatExtFile(fp):
     >>> common.findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')
     ('musicxml', '.xml')
 
-    >>> common.findFormatExtFile('test.mus')
-    ('finale', '.mus')
-
     >>> common.findFormatExtFile('test')
     (None, None)
 
-    Windows drive + pickle
-    >>> common.findFormatExtFile('d:/long/file/path/test.p')
-    ('pickle', '.p')
+    Windows drive
+    >>> common.findFormatExtFile('d:/long/file/path/test.xml')
+    ('musicxml', '.xml')
 
     On a windows networked filesystem
     >>> common.findFormatExtFile('\\\\long\\file\\path\\test.krn')

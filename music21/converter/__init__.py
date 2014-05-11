@@ -299,31 +299,19 @@ class Converter(object):
     def __init__(self):
         self.subConverter = None
         self._thawedStream = None # a stream object unthawed
+        self._converterFormats = {}
 
-    converterFormats = {'musicxml' : subConverters.ConverterMusicXML,
-                        'midi'     : subConverters.ConverterMidi,
-                        'humdrum'  : subConverters.ConverterHumdrum,
-                        'tinynotation': subConverters.ConverterTinyNotation,
-                        'abc'      : subConverters.ConverterABC,
-                        'musedata' : subConverters.ConverterMuseData,
-                        'noteworthytext': subConverters.ConverterNoteworthy,
-                        'noteworthy' : subConverters.ConverterNoteworthyBinary,
-                        'capella' : subConverters.ConverterCapella,
-                        'text' : subConverters.ConverterRomanText,
-                        'romantext': subConverters.ConverterRomanText,
-                        'rntext': subConverters.ConverterRomanText,
-                        }
-
-    def setSubconverterFromFormat(self, converterFormat, forceSource=False): 
+    def getSubConverterFormats(self):
         '''
-        sets the .subConverter according to the format of `converterFormat`:
-        
-        >>> convObj = converter.Converter()
-        >>> for x in sorted(list(convObj.converterFormats.keys())):
-        ...     x, convObj.converterFormats[x]
+        >>> scf = converter.Converter().getSubConverterFormats()
+        >>> for x in sorted(list(scf.keys())):
+        ...     x, scf[x]
         ('abc', <class 'music21.converter.subConverters.ConverterABC'>)
+        ('braille', <class 'music21.converter.subConverters.ConverterBraille'>)
         ('capella', <class 'music21.converter.subConverters.ConverterCapella'>)
         ('humdrum', <class 'music21.converter.subConverters.ConverterHumdrum'>)
+        ('lily', <class 'music21.converter.subConverters.ConverterLilypond'>)
+        ('lilypond', <class 'music21.converter.subConverters.ConverterLilypond'>)
         ('midi', <class 'music21.converter.subConverters.ConverterMidi'>)
         ('musedata', <class 'music21.converter.subConverters.ConverterMuseData'>)
         ('musicxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
@@ -331,9 +319,45 @@ class Converter(object):
         ('noteworthytext', <class 'music21.converter.subConverters.ConverterNoteworthy'>)
         ('rntext', <class 'music21.converter.subConverters.ConverterRomanText'>)
         ('romantext', <class 'music21.converter.subConverters.ConverterRomanText'>)
-        ('text', <class 'music21.converter.subConverters.ConverterRomanText'>)
+        ('scala', <class 'music21.converter.subConverters.ConverterScala'>)
+        ('t', <class 'music21.converter.subConverters.ConverterText'>)
+        ('text', <class 'music21.converter.subConverters.ConverterText'>)
+        ('textline', <class 'music21.converter.subConverters.ConverterTextLine'>)
         ('tinynotation', <class 'music21.converter.subConverters.ConverterTinyNotation'>)
-       
+        ('txt', <class 'music21.converter.subConverters.ConverterText'>)
+        ('vexflow', <class 'music21.converter.subConverters.ConverterVexflow'>)
+        ('xml', <class 'music21.converter.subConverters.ConverterMusicXML'>)       '''
+        import types
+        if len(self._converterFormats) > 0:
+            return self._converterFormats
+        for i in subConverters.__dict__:
+            name = getattr(subConverters, i)
+            if callable(name) and not isinstance(name, types.FunctionType):
+                if hasattr(name, 'registerFormats'):
+                    formatsTuple = name.registerFormats
+                    for f in formatsTuple:
+                        self._converterFormats[f] = name
+        return self._converterFormats
+            
+#     converterFormats = {'musicxml' : subConverters.ConverterMusicXML,
+#                         'midi'     : subConverters.ConverterMidi,
+#                         'humdrum'  : subConverters.ConverterHumdrum,
+#                         'tinynotation': subConverters.ConverterTinyNotation,
+#                         'abc'      : subConverters.ConverterABC,
+#                         'musedata' : subConverters.ConverterMuseData,
+#                         'noteworthytext': subConverters.ConverterNoteworthy,
+#                         'noteworthy' : subConverters.ConverterNoteworthyBinary,
+#                         'capella' : subConverters.ConverterCapella,
+#                         'text' : subConverters.ConverterRomanText,
+#                         'romantext': subConverters.ConverterRomanText,
+#                         'rntext': subConverters.ConverterRomanText,
+#                         }
+
+    def setSubconverterFromFormat(self, converterFormat, forceSource=False): 
+        '''
+        sets the .subConverter according to the format of `converterFormat`:
+        
+        >>> convObj = converter.Converter()       
         >>> convObj.setSubconverterFromFormat('humdrum')
         >>> convObj.subConverter
         <music21.converter.subConverters.ConverterHumdrum object at 0x...>
@@ -341,9 +365,10 @@ class Converter(object):
         if converterFormat is None:
             raise ConverterException('Did not find a format from the source file')
         converterFormat = converterFormat.lower()
-        if converterFormat not in self.converterFormats: 
+        scf = self.getSubConverterFormats()
+        if converterFormat not in scf: 
             raise ConverterException('no converter available for format: %s' % format)
-        subConverterClass = self.converterFormats[converterFormat]
+        subConverterClass = scf[converterFormat]
         self.subConverter = subConverterClass()
 
     def _getDownloadFp(self, directory, ext, url):
