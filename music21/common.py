@@ -35,33 +35,33 @@ except:
 
 # define file extensions for various formats
 # keys are assumed to be formats
-fileExtensions = {
-    'abc' : {'input': ['abc'], 'output': 'abc'},
-    'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
-    'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
-    'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
-    'musicxml.png' : {'input': ['png'], 'output': 'png'},
-    'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
-    'tinynotation' : {'input': ['tntxt', 'tinynotation'], 'output': 'tntxt'},
-     # note: this is setting .zip as default mapping to musedata
-    'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
-    'noteworthy': {'input': ['nwc'], 'output': 'nwc'},
-    'noteworthytext': {'input': ['nwctxt'], 'output': 'nwctxt'},
-    'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
-    'finale' : {'input': ['mus'], 'output': 'mus'},
-    'humdrum' : {'input': ['krn'], 'output': 'krn'},
-    'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
-    'png'  : {'input': ['png', 'lily.png', 'lilypond.png'], 'output': 'png'},
-    'pdf'  : {'input': ['pdf', 'lily.pdf', 'lilypond.pdf'], 'output': 'pdf'},
-    'svg'  : {'input': ['svg', 'lily.svg', 'lilypond.svg'], 'output': 'svg'},
-    'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
-    'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
-    'scala' : {'input': ['scl'], 'output': 'scl'},
-    'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
-    'vexflow' : {'input' : ['vexflowDoesNotWork'], 'output': 'html'},
-    'capella' : {'input': ['capx'], 'output': 'capx'},
-    'ipython' : {'input': ['ipython.png'], 'output': 'png'},
-}
+# fileExtensions = {
+#     'abc' : {'input': ['abc'], 'output': 'abc'},
+#     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
+#     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
+#     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
+#     'musicxml.png' : {'input': ['png'], 'output': 'png'},
+#     'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
+#     'tinynotation' : {'input': ['tntxt', 'tinynotation'], 'output': 'tntxt'},
+#      # note: this is setting .zip as default mapping to musedata
+#     'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
+#     'noteworthy': {'input': ['nwc'], 'output': 'nwc'},
+#     'noteworthytext': {'input': ['nwctxt'], 'output': 'nwctxt'},
+#     'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
+#     'finale' : {'input': ['mus'], 'output': 'mus'},
+#     'humdrum' : {'input': ['krn'], 'output': 'krn'},
+#     'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
+#     'png'  : {'input': ['png', 'lily.png', 'lilypond.png'], 'output': 'png'},
+#     'pdf'  : {'input': ['pdf', 'lily.pdf', 'lilypond.pdf'], 'output': 'pdf'},
+#     'svg'  : {'input': ['svg', 'lily.svg', 'lilypond.svg'], 'output': 'svg'},
+#     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
+#     'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
+#     'scala' : {'input': ['scl'], 'output': 'scl'},
+#     'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
+#     'vexflow' : {'input' : ['vexflowDoesNotWork'], 'output': 'html'},
+#     'capella' : {'input': ['capx'], 'output': 'capx'},
+#     'ipython' : {'input': ['ipython.png'], 'output': 'png'},
+# }
 
 
 
@@ -415,8 +415,9 @@ def findFormatExtURL(url):
     elif 'format=stage2' in url or 'format=stage1' in url:
         ext = '.md'
     else: # check for file that ends in all known input extensions
-        for key in fileExtensions:
-            for extSample in fileExtensions[key]['input']:
+        for sc in subConverterList():
+            inputTypes = sc.registerInputExtensions            
+            for extSample in inputTypes:
                 if url.endswith('.' + extSample):
                     ext = '.' + extSample
                     break

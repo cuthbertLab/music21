@@ -17,6 +17,7 @@ parseData method that sets self.stream
 # Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property.
 import os
 
+from music21.ext import six
 from music21 import common
 from music21 import stream
 from music21 import exceptions21
@@ -45,6 +46,9 @@ class SubConverter(object):
         registerOutputExtensions = tuple of output extensions that can be written. Order matters:
             the first will be used in calls to .write()
         canBePickled = True or False (default True; does not do anything yet)
+        codecWrite = True or False (default False) if codecs need to be used to write
+        stringEncoding = string (default 'utf-8') if codecWrite is True, what encoding to use
+
     '''
     readBinary = False
     canBePickled = True
@@ -52,6 +56,8 @@ class SubConverter(object):
     registerShowFormats = ()
     registerInputExtensions = ()
     registerOutputExtensions = ()
+    codecWrite = False
+    stringEncoding='utf-8'
     
     def __init__(self):
         self._stream = stream.Score()
@@ -88,31 +94,129 @@ class SubConverter(object):
     stream = property(_getStream, _setStream, doc='''
         Returns or sets the stream in the converter.  Must be defined for subconverter to work.
         ''')
+    
+    def checkShowAbility(self, **keywords):
+        '''
+        return bool on whether the *system* is
+        equipped to show in this format.
+        
+        Default True. Might be False if, say
+        a Lilypond converter is used and Lilypond
+        is not installed.
+        '''
+        return True
 
+    def show(self, obj, fmt, fp=None, subformats=None, **keywords):
+        pass
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        dataStr = repr(obj)
+        self.writeDataStream(fp, dataStr)
+        return fp
+    
+    def writeDataStream(self, fp, dataStr):
+        if self.readBinary is False:
+            writeFlags = 'w'
+        else:
+            writeFlags = 'wb'
+        
+        if self.codecWrite is False:
+            with open(fp, writeFlags) as f:
+                f.write(dataStr)
+        else:
+            import codecs
+            f = codecs.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+            f.write(dataStr)
+            f.close()
+            
 class ConverterLilypond(SubConverter):
     registerFormats = ('lilypond', 'lily')
-    registerOutputExtensions = ('ly',)
+    registerOutputExtensions = ('ly','png','pdf','svg')
+    codecWrite = True
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        from music21 import lily
+        conv = lily.translate.LilypondConverter()
+        if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+            conv.coloredVariants = True
+            
+        if subformats is not None and 'pdf' in subformats:
+            conv.loadFromMusic21Object(obj)
+            convertedFilePath = conv.createPDF(fp)        
+            return convertedFilePath
+
+        elif subformats is not None and 'png' in subformats:
+            conv.loadFromMusic21Object(obj)
+            convertedFilePath = conv.createPNG(fp)
+            if 'ipython' in subformats:
+                from music21.ipython21 import objects as ipythonObjects
+                ipo = ipythonObjects.IPythonPNGObject(convertedFilePath)
+                return ipo
+            else:
+                return convertedFilePath
+            
+        elif subformats is not None and 'svg' in subformats:
+            if fp.endswith('.svg'):
+                fp = fp[:-4] 
+            conv.loadFromMusic21Object(obj)
+            convertedFilePath = conv.createSVG(fp)
+            return convertedFilePath
+        
+        else:
+            dataStr = conv.textFromMusic21Object(obj).encode('utf-8')
+            self.writeDataStream(fp, dataStr)
+            return fp
+
+    def show(self,obj, fmt, fp=None, subformats=None, **keywords):
+        pass
 
 class ConverterBraille(SubConverter):
     registerFormats = ('braille',)
     registerOutputExtensions = ('txt',)
+    codecWrite = True
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        from music21 import braille
+        dataStr = braille.translate.objectToBraille(obj)
+        self.writeDataStream(fp, dataStr)
+        return fp
+    
     
 class ConverterVexflow(SubConverter):
     registerFormats = ('vexflow',)
     registerOutputExtensions = ('html',)
 
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        from music21 import vexflow
+        dataStr = vexflow.fromObject(obj, mode='html')
+        self.writeDataStream(fp, dataStr)
+        return fp
+
+
 class ConverterText(SubConverter):
     registerFormats = ('text','txt','t')
     registerOutputExtensions = ('txt',)
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        dataStr = obj._reprText()
+        self.writeDataStream(fp, dataStr)
+        return fp
 
 class ConverterTextLine(SubConverter):
     registerFormats = ('textline',)
     registerOutputExtensions = ('txt',)
 
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        dataStr = obj._reprTextLine()
+        self.writeDataStream(fp, dataStr)
+        return fp
+
+
 class ConverterScala(SubConverter):
     registerFormats = ('scala',)
     registerInputExtensions = ('scl',)
     registerOutputExtensions = ('scl',)
+    
 #-------------------------------------------------------------------------------
 class ConverterHumdrum(SubConverter):
     '''Simple class wrapper for parsing Humdrum data provided in a file or in a string.
@@ -362,8 +466,44 @@ class ConverterMusicXML(SubConverter):
                 self._mxScore.set('movementTitle', fn)
         self.load()
 
+    def runThroughMusescore(self, fp, **keywords):
+        import sys
+        musescoreFile = environLocal['musescoreDirectPNGPath']
+        if musescoreFile == "":
+            raise SubConverterException("To create PNG files directly from MusicXML you need to download MuseScore")
+        elif not os.path.exists(musescoreFile):
+            raise SubConverterException("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescoreFile)
 
+        fpOut = fp[0:len(fp) - 3]
+        fpOut += "png"
+        musescoreRun = musescoreFile + " " + fp + " -o " + fpOut
+        if 'dpi' in keywords:
+            musescoreRun += " -r " + str(keywords['dpi'])
+        if common.runningUnderIPython():
+            musescoreRun += " -r 72"
 
+        storedStrErr = sys.stderr
+        if six.PY2:
+            from StringIO import StringIO # @UnusedImport
+        else:
+            from io import StringIO # @Reimport
+        fileLikeOpen = StringIO()
+        sys.stderr = fileLikeOpen
+        os.system(musescoreRun)
+        fileLikeOpen.close()
+        sys.stderr = storedStrErr
+
+        fp = fpOut[0:len(fpOut) - 4] + "-1.png"
+        return fp
+    
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        from music21.musicxml import m21ToString
+        dataStr = m21ToString.fromMusic21Object(obj)
+        self.writeDataStream(fp, dataStr)        
+        
+        if subformats is not None and 'png' in subformats:
+            fp = self.runThroughMusescore(fp, **keywords)
+        return fp
 
 #-------------------------------------------------------------------------------
 class ConverterMidi(SubConverter):
@@ -392,6 +532,15 @@ class ConverterMidi(SubConverter):
         '''
         from music21.midi import translate as midiTranslate
         midiTranslate.midiFilePathToStream(fp, self.stream)
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        from music21.midi import translate as midiTranslate
+        mf = midiTranslate.music21ObjectToMidiFile(obj)
+        mf.open(fp, 'wb') # write binary
+        mf.write()
+        mf.close()
+        return fp
+
 
 
 #-------------------------------------------------------------------------------

@@ -3483,130 +3483,129 @@ class Music21Object(object):
             fmt = fmt[1:]
 
         fileFormat, ext = common.findFormat(fmt)
-        if fileFormat not in common.VALID_WRITE_FORMATS:
-            if fileFormat is None:
-                raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
-            else:
-                raise Music21ObjectException('cannot support showing in this format yet: %s' % fileFormat)
-
-
         if fileFormat is None:
-            raise Music21ObjectException('bad format (%s) provided to write()' % fmt)
+            raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
 
-        if fileFormat == 'musicxml.png':
-            ext = '.xml' # temporary change
+        formatSubs = fileFormat.split('.')
+        fileFormat = formatSubs[0]
+        subFormats = formatSubs[1:]
 
         if fp is None:
             fp = environLocal.getTempFile(ext)
+        
+        scClass = common.findSubConverterForFormat(fileFormat)
+        formatWriter = scClass()
+        return formatWriter.write(self, fileFormat, fp, subFormats, **keywords)
 
-        if fileFormat in ['text', 'textline', 'musicxml', 'musicxml.png', 'vexflow', 'vexflow.html']:
-            if fileFormat == 'text':
-                dataStr = self._reprText()
-            elif fileFormat == 'textline':
-                dataStr = self._reprTextLine()
-
-            # musicxml, musicxml.png, etc.
-            elif fileFormat.startswith('musicxml'):
-                from music21.musicxml import m21ToString
-                dataStr = m21ToString.fromMusic21Object(self)
-            elif fileFormat.startswith('vexflow'):
-                import music21.vexflow
-                dataStr = music21.vexflow.fromObject(self, mode='html')
-
-            f = open(fp, 'w')
-            f.write(dataStr)
-            f.close()
-
-            if fileFormat == 'musicxml.png':
-                # HACK
-                import os
-                musescoreFile = environLocal['musescoreDirectPNGPath']
-                if musescoreFile == "":
-                    raise Music21Exception("To create PNG files directly from MusicXML you need to download MuseScore")
-                elif not os.path.exists(musescoreFile):
-                    raise Music21Exception("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescoreFile)
-
-                fpOut = fp[0:len(fp) - 3]
-                fpOut += "png"
-                musescoreRun = musescoreFile + " " + fp + " -o " + fpOut
-                if 'dpi' in keywords:
-                    musescoreRun += " -r " + str(keywords['dpi'])
-                if common.runningUnderIPython():
-                    musescoreRun += " -r 72"
-
-                storedStrErr = sys.stderr
-                import StringIO
-                fileLikeOpen = StringIO.StringIO()
-                sys.stderr = fileLikeOpen
-                os.system(musescoreRun)
-                fileLikeOpen.close()
-                sys.stderr = storedStrErr
-
-                fp = fpOut[0:len(fpOut) - 4] + "-1.png"
-
-            return fp
-
-        elif fileFormat in ['braille', 'lily', 'lilypond']:
-            if fileFormat in ['lilypond', 'lily']:
-                import music21.lily.translate
-                conv = music21.lily.translate.LilypondConverter()
-                if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-                    conv.coloredVariants = True
-                dataStr = conv.textFromMusic21Object(self).encode('utf-8')
-
-            elif fileFormat == 'braille':
-                import music21.braille
-                dataStr = music21.braille.translate.objectToBraille(self)
-
-            f = codecs.open(fp, mode='w', encoding='utf-8')
-            f.write(dataStr)
-            f.close()
-            return fp
-
-        elif fileFormat == 'midi':
-            # returns a midi.MidiFile object
-            from music21.midi import translate as midiTranslate
-            mf = midiTranslate.music21ObjectToMidiFile(self)
-            mf.open(fp, 'wb') # write binary
-            mf.write()
-            mf.close()
-            return fp
-
-        elif fileFormat in ['pdf', 'lily.pdf',]:
-            if fp.endswith('.pdf'):
-                fp = fp[:-4]
-            from music21.lily import translate as lilyTranslate
-            conv = lilyTranslate.LilypondConverter()
-            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-                conv.coloredVariants = True
-            conv.loadFromMusic21Object(self)
-            return conv.createPDF(fp)
-        elif fileFormat in ['png', 'lily.png','ipython','ipython.png']:
-            if fp.endswith('.png'):
-                fp = fp[:-4]
-            from music21.lily import translate as lilyTranslate # @Reimport
-            conv = lilyTranslate.LilypondConverter()
-            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-                conv.coloredVariants = True
-            conv.loadFromMusic21Object(self)
-            convertedFilePath = conv.createPNG(fp)
-            if fileFormat in ['ipython','ipython.png']:
-                from music21.ipython21 import objects as ipythonObjects
-                ipo = ipythonObjects.IPythonPNGObject(convertedFilePath)
-                return ipo
-            else:
-                return convertedFilePath
-        elif fileFormat in ['svg', 'lily.svg']:
-            if fp.endswith('.svg'):
-                fp = fp[:-4]
-            from music21.lily import translate as lilyTranslate # @Reimport
-            conv = lilyTranslate.LilypondConverter()
-            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-                conv.coloredVariants = True
-            conv.loadFromMusic21Object(self)
-            return conv.createSVG(fp)
-        else:
-            raise Music21ObjectException('cannot yet support writing in the %s format' % fileFormat)
+# 
+#         if fileFormat in ['text', 'textline', 'musicxml', 'vexflow']:
+#             if fileFormat == 'text':
+#                 dataStr = self._reprText()
+#             elif fileFormat == 'textline':
+#                 dataStr = self._reprTextLine()
+# 
+#             # musicxml, musicxml.png, etc.
+#             elif fileFormat.startswith('musicxml'):
+#                 from music21.musicxml import m21ToString
+#                 dataStr = m21ToString.fromMusic21Object(self)
+#             elif fileFormat.startswith('vexflow'):
+#                 import music21.vexflow
+#                 dataStr = music21.vexflow.fromObject(self, mode='html')
+# 
+#             f = open(fp, 'w')
+#             f.write(dataStr)
+#             f.close()
+# 
+#             if fileFormat == 'musicxml.png':
+#                 # HACK
+#                 import os
+#                 musescoreFile = environLocal['musescoreDirectPNGPath']
+#                 if musescoreFile == "":
+#                     raise Music21Exception("To create PNG files directly from MusicXML you need to download MuseScore")
+#                 elif not os.path.exists(musescoreFile):
+#                     raise Music21Exception("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescoreFile)
+# 
+#                 fpOut = fp[0:len(fp) - 3]
+#                 fpOut += "png"
+#                 musescoreRun = musescoreFile + " " + fp + " -o " + fpOut
+#                 if 'dpi' in keywords:
+#                     musescoreRun += " -r " + str(keywords['dpi'])
+#                 if common.runningUnderIPython():
+#                     musescoreRun += " -r 72"
+# 
+#                 storedStrErr = sys.stderr
+#                 import StringIO
+#                 fileLikeOpen = StringIO.StringIO()
+#                 sys.stderr = fileLikeOpen
+#                 os.system(musescoreRun)
+#                 fileLikeOpen.close()
+#                 sys.stderr = storedStrErr
+# 
+#                 fp = fpOut[0:len(fpOut) - 4] + "-1.png"
+# 
+#             return fp
+# 
+#         elif fileFormat in ['braille', 'lily', 'lilypond']:
+#             if fileFormat in ['lilypond', 'lily']:
+#                 import music21.lily.translate
+#                 conv = music21.lily.translate.LilypondConverter()
+#                 if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+#                     conv.coloredVariants = True
+#                 dataStr = conv.textFromMusic21Object(self).encode('utf-8')
+# 
+#             elif fileFormat == 'braille':
+#                 import music21.braille
+#                 dataStr = music21.braille.translate.objectToBraille(self)
+# 
+#             f = codecs.open(fp, mode='w', encoding='utf-8')
+#             f.write(dataStr)
+#             f.close()
+#             return fp
+# 
+#         elif fileFormat == 'midi':
+#             # returns a midi.MidiFile object
+#             from music21.midi import translate as midiTranslate
+#             mf = midiTranslate.music21ObjectToMidiFile(self)
+#             mf.open(fp, 'wb') # write binary
+#             mf.write()
+#             mf.close()
+#             return fp
+# 
+#         elif fileFormat in ['pdf', 'lily.pdf',]:
+#             if fp.endswith('.pdf'):
+#                 fp = fp[:-4]
+#             from music21.lily import translate as lilyTranslate
+#             conv = lilyTranslate.LilypondConverter()
+#             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+#                 conv.coloredVariants = True
+#             conv.loadFromMusic21Object(self)
+#             return conv.createPDF(fp)
+#         elif fileFormat in ['png', 'lily.png','ipython','ipython.png']:
+#             if fp.endswith('.png'):
+#                 fp = fp[:-4]
+#             from music21.lily import translate as lilyTranslate # @Reimport
+#             conv = lilyTranslate.LilypondConverter()
+#             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+#                 conv.coloredVariants = True
+#             conv.loadFromMusic21Object(self)
+#             convertedFilePath = conv.createPNG(fp)
+#             if fileFormat in ['ipython','ipython.png']:
+#                 from music21.ipython21 import objects as ipythonObjects
+#                 ipo = ipythonObjects.IPythonPNGObject(convertedFilePath)
+#                 return ipo
+#             else:
+#                 return convertedFilePath
+#         elif fileFormat in ['svg', 'lily.svg']:
+#             if fp.endswith('.svg'):
+#                 fp = fp[:-4]
+#             from music21.lily import translate as lilyTranslate # @Reimport
+#             conv = lilyTranslate.LilypondConverter()
+#             if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+#                 conv.coloredVariants = True
+#             conv.loadFromMusic21Object(self)
+#             return conv.createSVG(fp)
+#         else:
+#             raise Music21ObjectException('cannot yet support writing in the %s format' % fileFormat)
 
     def _reprText(self):
         '''
@@ -3649,7 +3648,7 @@ class Music21Object(object):
 
         if fmt is None: # get setting in environment
             if common.runningUnderIPython():
-                fmt = 'ipython'
+                fmt = 'lilypond.ipython.png'
             else:
                 fmt = environLocal['showFormat']
         if not common.isStr(fmt):
