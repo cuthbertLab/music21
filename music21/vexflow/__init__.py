@@ -26,7 +26,7 @@ import unittest
 
 
 from music21.vexflow import indent
-from music21.vexflow import toM21p
+from music21.vexflow import toMusic21j
 
 from music21 import common
 from music21 import exceptions21
