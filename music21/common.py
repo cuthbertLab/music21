@@ -1649,7 +1649,7 @@ def getSourceFilePath():
     import music21
     fpMusic21 = music21.__path__[0] # list, get first item
     # use corpus as a test case
-    if 'corpus' not in os.listdir(fpMusic21):
+    if 'stream' not in os.listdir(fpMusic21):
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
     return fpMusic21
 

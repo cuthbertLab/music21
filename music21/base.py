@@ -44,8 +44,6 @@ under the module "base":
     <class 'music21.base.Music21Object'>
 
 '''
-
-import codecs
 import collections
 import copy
 import doctest
@@ -1817,9 +1815,6 @@ class Music21Object(object):
 
         if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
-
-        # only for an output format
-        self._overriddenLily = None
 
     def mergeAttributes(self, other):
         '''

@@ -36,6 +36,10 @@ environLocal = environment.Environment(_MOD)
 
 
 validDenominators = [1, 2, 4, 8, 16, 32, 64, 128] # in order
+beamableDurationTypes = (duration.typeFromNumDict[8],
+            duration.typeFromNumDict[16], duration.typeFromNumDict[32],
+            duration.typeFromNumDict[64], duration.typeFromNumDict[128])
+
 # also [pow(2,x) for x in range(8)]
 MIN_DENOMINATOR_TYPE = '128th'
 
@@ -885,10 +889,10 @@ class MeterSequence(MeterTerminal):
         self._overriddenDuration = None
         self._levelListCache = {}
 
-        # this atribute is only used in MeterTermainals, and note
+        # this attribute is only used in MeterTermainals, and note
         # in MeterSequences; a MeterSequences weight is based solely
         # on the sum of its components
-        del self._weight
+        ### del self._weight -- no -- screws up pickling -- cannot del a slotted object
 
         # store whether this meter was provided as a summed nuemerator
         self.summedNumerator = False
@@ -2744,10 +2748,6 @@ class TimeSignature(base.Music21Object):
         # creates .displaySequence, .beamSequence, .beatSequence, .accentSequence
         self.load(value, partitionRequest)
 
-        self._beamableDurationTypes = [duration.typeFromNumDict[8],
-            duration.typeFromNumDict[16], duration.typeFromNumDict[32],
-            duration.typeFromNumDict[64], duration.typeFromNumDict[128]]
-
     def _getRatioString(self):
         '''
         returns a simple string representing the time signature ratio:
@@ -3480,7 +3480,7 @@ class TimeSignature(base.Music21Object):
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
             dur = durList[i]
-            if dur.type not in self._beamableDurationTypes:
+            if dur.type not in beamableDurationTypes:
                 beamsList.append(None) # placeholder
             elif srcStream is not None and srcStream[i].isRest is True:
                 beamsList.append(None) # placeholder
@@ -3495,7 +3495,7 @@ class TimeSignature(base.Music21Object):
 
         #environLocal.printDebug(['beamsList', beamsList])
         # iter over each beams line, from top to bottom (1 thourgh 5)
-        for depth in range(len(self._beamableDurationTypes)):
+        for depth in range(len(beamableDurationTypes)):
             beamNumber = depth + 1 # increment to count from 1 not 0
             pos = measureStartOffset # assume we are always starting at offset w/n this meter (Jose)
             for i in range(len(durList)):

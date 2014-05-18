@@ -54,7 +54,7 @@ class TrecentoCadenceStream(tinyNotation.TinyNotationStream):
         try:
             tcN = TrecentoCadenceNote(stringRep, storedDict)
             return tcN
-        except tinyNotation.TinyNotationException, inst:
+        except tinyNotation.TinyNotationException as inst:
             raise tinyNotation.TinyNotationException(inst.args[0] + "\nLarger context: " + self.stringRep)
 
 class TrecentoCadenceNote(tinyNotation.TinyNotationNote):

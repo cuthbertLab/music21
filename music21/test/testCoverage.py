@@ -5,10 +5,13 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 from __future__ import unicode_literals
+
+
+# sudo easy_install coverage
 
 try:
     import coverage
@@ -16,13 +19,13 @@ except ImportError:
     coverage = None
     
 import music21
-from music21.test import test as testModule
+from music21.test import testSingleCoreAll as testModule
 #from music21 import bar
 #import webbrowser
 
 def runCoverage(show=True):
     if coverage is None:
-        raise music21.Music21Exception("Cannot run test.testCoverage unless the coverage Python library is installed")
+        raise music21.Music21Exception("Cannot run test.testCoverage unless the coverage Python library is installed; sudo easy_install coverage")
     
     cov = coverage.coverage()
     cov.start()

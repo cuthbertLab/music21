@@ -1,74 +1,7 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2008 John Paulett (john -at- paulett.org)
-# All rights reserved.
-#
-# This software is licensed as described in the file COPYING, which
-# you should have received as part of this distribution.
+from jsonpickle.compat import PY32
 
-"""Python library for serializing any arbitrary object graph into JSON.
-It can take almost any Python object and turn the object into JSON.
-Additionally, it can reconstitute the object back into Python.
-
-    >>> import jsonpickle
-    >>> from samples import Thing
-
-Create an object.
-
-    >>> obj = Thing('A String')
-    >>> print obj.name
-    A String
-
-Use jsonpickle to transform the object into a JSON string.
-
-    >>> pickled = jsonpickle.encode(obj)
-    >>> print pickled
-    {"py/object": "samples.Thing", "name": "A String", "child": null}
-
-Use jsonpickle to recreate a Python object from a JSON string
-
-    >>> unpickled = jsonpickle.decode(pickled)
-    >>> str(unpickled.name)
-    'A String'
-
-.. warning::
-
-    Loading a JSON string from an untrusted source represents a potential
-    security vulnerability.  jsonpickle makes no attempt to sanitize the input.
-
-The new object has the same type and data, but essentially is now a copy of
-the original.
-
-    >>> obj == unpickled
-    False
-    >>> obj.name == unpickled.name
-    True
-    >>> type(obj) == type(unpickled)
-    True
-
-If you will never need to load (regenerate the Python class from JSON), you can
-pass in the keyword unpicklable=False to prevent extra information from being
-added to JSON.
-
-    >>> oneway = jsonpickle.encode(obj, unpicklable=False)
-    >>> print oneway
-    {"name": "A String", "child": null}
-
-"""
-
-from music21.ext.jsonpickle.pickler import Pickler
-from music21.ext.jsonpickle.unpickler import Unpickler
-
-__version__ = '0.4.0'
-__all__ = ('encode', 'decode')
-
-SUPPORTED_BACKENDS = ('json',
-                      'simplejson',
-                      'demjson',
-                      'django.util.simplejson')
-
-class JSONPluginMgr(object):
-    """The JSONPluginMgr handles encoding and decoding.
+class JSONBackend(object):
+    """Manages encoding and decoding using various backends.
 
     It tries these modules in this order:
         simplejson, json, demjson
@@ -78,7 +11,9 @@ class JSONPluginMgr(object):
     demjson is the most permissive backend and is tried last.
 
     """
-    def __init__(self):
+    def __init__(self, fallthrough=True):
+        ## Whether we should fallthrough to the next backend
+        self._fallthrough = fallthrough
         ## The names of backends that have been successfully imported
         self._backend_names = []
 
@@ -100,15 +35,13 @@ class JSONPluginMgr(object):
         ## Whether we've loaded any backends successfully
         self._verified = False
 
-        ## Try loading simplejson and demjson
-        self.load_backend('simplejson', 'dumps', 'loads', ValueError)
+        if not PY32:
+            self.load_backend('simplejson', 'dumps', 'loads', ValueError)
         self.load_backend('json', 'dumps', 'loads', ValueError)
         self.load_backend('demjson', 'encode', 'decode', 'JSONDecodeError')
-
-        ## Experimental support
         self.load_backend('jsonlib', 'write', 'read', 'ReadError')
         self.load_backend('yajl', 'dumps', 'loads', ValueError)
-        
+        self.load_backend('ujson', 'dumps', 'loads', ValueError)
 
     def _verify(self):
         """Ensures that we've loaded at least one JSON backend."""
@@ -118,13 +51,30 @@ class JSONPluginMgr(object):
                              'following:\n'
                              '    python2.6, simplejson, or demjson')
 
+    def enable_fallthrough(self, enable):
+        """
+        Disable jsonpickle's fallthrough-on-error behavior
+
+        By default, jsonpickle tries the next backend when decoding or
+        encoding using a backend fails.
+
+        This can make it difficult to force jsonpickle to use a specific
+        backend, and catch errors, because the error will be suppressed and
+        may not be raised by the subsequent backend.
+
+        Calling `enable_backend(False)` will make jsonpickle immediately
+        re-raise any exceptions raised by the backends.
+
+        """
+        self._fallthrough = enable
+
     def load_backend(self, name, encode_name, decode_name, decode_exc):
         """
         Load a JSON backend by name.
 
         This method loads a backend and sets up references to that
         backend's encode/decode functions and exception classes.
-        
+
         :param encode_name: is the name of the backend's encode method.
           The method should take an object and return a string.
         :param decode_name: names the backend's method for the reverse
@@ -134,7 +84,7 @@ class JSONPluginMgr(object):
           to the appropriate exception class itself.  If it is a name,
           then the assumption is that an exception class of that name
           can be found in the backend module's namespace.
-            
+
         """
         try:
             ## Load the JSON backend
@@ -197,6 +147,11 @@ class JSONPluginMgr(object):
 
         """
         self._verify()
+
+        if not self._fallthrough:
+            name = self._backend_names[0]
+            return self.backend_encode(name, obj)
+
         for idx, name in enumerate(self._backend_names):
             try:
                 optargs, optkwargs = self._encoder_options[name]
@@ -207,6 +162,12 @@ class JSONPluginMgr(object):
                 if idx == len(self._backend_names) - 1:
                     raise
 
+    def backend_encode(self, name, obj):
+        optargs, optkwargs = self._encoder_options[name]
+        encoder_kwargs = optkwargs.copy()
+        encoder_args = (obj,) + tuple(optargs)
+        return self._encoders[name](*encoder_args, **encoder_kwargs)
+
     def decode(self, string):
         """
         Attempt to decode an object from a JSON string.
@@ -216,14 +177,22 @@ class JSONPluginMgr(object):
 
         """
         self._verify()
+
+        if not self._fallthrough:
+            name = self._backend_names[0]
+            return self.backend_decode(name, string)
+
         for idx, name in enumerate(self._backend_names):
             try:
-                return self._decoders[name](string)
-            except self._decoder_exceptions[name], e:
+                return self.backend_decode(name, string)
+            except self._decoder_exceptions[name] as e:
                 if idx == len(self._backend_names) - 1:
                     raise e
                 else:
                     pass # and try a more forgiving encoder, e.g. demjson
+
+    def backend_decode(self, name, string):
+        return self._decoders[name](string)
 
     def set_preferred_backend(self, name):
         """
@@ -233,7 +202,7 @@ class JSONPluginMgr(object):
         before any other backend.
 
         For example::
-        
+
             set_preferred_backend('simplejson')
 
         If the backend is not one of the built-in jsonpickle backends
@@ -259,7 +228,7 @@ class JSONPluginMgr(object):
         the appropriate backend's encode method.
 
         For example::
-        
+
             set_encoder_options('simplejson', sort_keys=True, indent=4)
             set_encoder_options('demjson', compactly=False)
 
@@ -268,58 +237,3 @@ class JSONPluginMgr(object):
 
         """
         self._encoder_options[name] = (args, kwargs)
-
-# Initialize a JSONPluginMgr
-json = JSONPluginMgr()
-
-# Export specific JSONPluginMgr methods into the jsonpickle namespace
-set_preferred_backend = json.set_preferred_backend
-set_encoder_options = json.set_encoder_options
-load_backend = json.load_backend
-remove_backend = json.remove_backend
-
-
-def encode(value, unpicklable=True, max_depth=None):
-    """
-    Return a JSON formatted representation of value, a Python object.
-
-    The keyword argument 'unpicklable' defaults to True.
-    If set to False, the output will not contain the information
-    necessary to turn the JSON data back into Python objects.
-
-    The keyword argument 'max_depth' defaults to None.
-    If set to a non-negative integer then jsonpickle will not recurse
-    deeper than 'max_depth' steps into the object.  Anything deeper
-    than 'max_depth' is represented using a Python repr() of the object.
-
-    >>> encode('my string')
-    '"my string"'
-    >>> encode(36)
-    '36'
-
-    >>> encode({'foo': True})
-    '{"foo": true}'
-
-    >>> encode({'foo': True}, max_depth=0)
-    '"{\\'foo\\': True}"'
-
-    >>> encode({'foo': True}, max_depth=1)
-    '{"foo": "True"}'
-
-
-    """
-    j = Pickler(unpicklable=unpicklable,
-                max_depth=max_depth)
-    return json.encode(j.flatten(value))
-
-def decode(string):
-    """
-    Convert a JSON string into a Python object.
-
-    >>> str(decode('"my string"'))
-    'my string'
-    >>> decode('36')
-    36
-    """
-    j = Unpickler()
-    return j.restore(json.decode(string))

@@ -122,7 +122,10 @@ class SubConverter(object):
         
         if self.codecWrite is False:
             with open(fp, writeFlags) as f:
-                f.write(dataStr)
+                try:
+                    f.write(dataStr)
+                except TypeError as te:
+                    raise SubConverterException("Could not convert %r : %r" % (dataStr, te))
         else:
             import codecs
             f = codecs.open(fp, mode=writeFlags, encoding=self.stringEncoding)
@@ -187,7 +190,8 @@ class ConverterVexflow(SubConverter):
     registerOutputExtensions = ('html',)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
-        from music21 import vexflow
+        #from music21 import vexflow
+        from music21.vexflow import toMusic21j as vexflow
         dataStr = vexflow.fromObject(obj, mode='html')
         self.writeDataStream(fp, dataStr)
         return fp

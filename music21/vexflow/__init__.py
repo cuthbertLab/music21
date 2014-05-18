@@ -24,12 +24,9 @@ Here's the hierarchy:
 
 import unittest
 
-import sys
 
-if sys.version > '3':
-    from . import indent
-else:
-    import indent # @Reimport
+from music21.vexflow import indent
+from music21.vexflow import toM21p
 
 from music21 import common
 from music21 import exceptions21

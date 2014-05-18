@@ -159,6 +159,19 @@ class Dynamic(base.Music21Object):
     0.90
     
     
+    Custom dynamics are possible:
+    
+    >>> myDyn = dynamics.Dynamic('rfzsfmp')
+    >>> myDyn.value
+    'rfzsfmp'
+    >>> print(myDyn.volumeScalar)
+    None
+    >>> myDyn.volumeScalar = 0.87
+    >>> myDyn.volumeScalar
+    0.87
+    
+    
+    
     
     Dynamics can be placed anywhere in a stream.
     
@@ -260,7 +273,7 @@ class Dynamic(base.Music21Object):
 
     def _setVolumeScalar(self, value):
         # we can manually set this to be anything, overriding defaults
-        if common.isNum(value) and 0 >= value <= 1:
+        if common.isNum(value) and 0 <= value <= 1:
             self._volumeScalar = value
         else:
             raise DynamicException('cannot set as volume scalar to: %s', value)
@@ -275,6 +288,13 @@ class Dynamic(base.Music21Object):
         >>> d.volumeScalar
         0.55...
 
+        >>> d.volumeScalar = 0.1
+        >>> d.volumeScalar
+        0.1
+        >>> d.value
+        'mf'
+        
+
         int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag 
 
         >>> print(musicxml.m21ToString.fromMusic21Object(d))
@@ -286,7 +306,7 @@ class Dynamic(base.Music21Object):
               </dynamics>
             </direction-type>
             <offset>0</offset>
-            <sound dynamics="69"/>
+            <sound dynamics="12"/>
         </direction>...
         ''')
 
