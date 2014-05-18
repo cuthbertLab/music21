@@ -49,8 +49,8 @@ class VexflowPickler(object):
     def __init__(self):
         self.defaults = {
             'pickleOutput' : '{"py/object": "hello"}',
-            'm21URI' : 'https://web.mit.edu/music21/music21j/src/music21',
-            'requireURI' :'https://web.mit.edu/music21/music21j/ext/require/require.js',
+            'm21URI' : 'http://web.mit.edu/music21/music21j/src/music21',
+            'requireURI' :'http://web.mit.edu/music21/music21j/ext/require/require.js',
             'callback' :'streamObj.renderOptions.events.resize = "reflow";\nstreamObj.appendNewCanvas();'
         }
 
