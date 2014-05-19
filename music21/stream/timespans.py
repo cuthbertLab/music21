@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespanStream.py
+# Name:         timespans.py
 # Purpose:      Tools for grouping notes and chords into a searchable tree
 #               organized by start and stop offsets
 #
@@ -18,7 +18,6 @@ This is a lower-level tool that for now at least normal music21
 users won't need to worry about.
 '''
 
-
 import collections
 import random
 import unittest
@@ -33,6 +32,7 @@ from music21 import tie
 
 from music21 import environment
 environLocal = environment.Environment("stream.timespans")
+
 
 #------------------------------------------------------------------------------
 
@@ -143,7 +143,7 @@ def makeElement(verticality, quarterLength):
     return element
 
 
-def recurseStream(
+def _recurseStream(
     inputStream,
     currentParentage=None,
     initialOffset=0,
@@ -155,7 +155,7 @@ def recurseStream(
     encountered substream and ElementTimespans for each encountered non-stream
     element.
 
-    If `pitchedOnly` is true, `recurseStream` only constructs ElementTimespans
+    If `pitchedOnly` is true, `_recurseStream` only constructs ElementTimespans
     for pitched non-stream elements.
 
     This is used internally by `streamToTimespanCollection`.
@@ -172,7 +172,7 @@ def recurseStream(
         startOffset += initialOffset
         if isinstance(element, stream.Stream):
             localParentage = currentParentage + (element,)
-            subresult = recurseStream(
+            subresult = _recurseStream(
                 element,
                 localParentage,
                 initialOffset=startOffset,
@@ -259,7 +259,7 @@ def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
         True
 
     '''
-    result = recurseStream(
+    result = _recurseStream(
         inputStream,
         initialOffset=0.,
         flatten=flatten,
