@@ -887,92 +887,6 @@ class ElementTimespan(object):
 #------------------------------------------------------------------------------
 
 
-class Horizontality(collections.Sequence):
-    r'''
-    A horizontality of consecutive elementTimespan objects.
-    '''
-
-    ### CLASS VARIABLES ###
-
-    __slots__ = (
-        '_timespans',
-        )
-
-    ### INITIALIZER ###
-
-    def __init__(self,
-        timespans=None,
-        ):
-        assert isinstance(timespans, collections.Sequence)
-        assert len(timespans)
-        assert all(hasattr(x, 'startOffset') and hasattr(x, 'stopOffset')
-            for x in timespans)
-        self._timespans = tuple(timespans)
-
-    ### SPECIAL METHODS ###
-
-    def __getitem__(self, item):
-        return self._timespans[item]
-
-    def __len__(self):
-        return len(self._timespans)
-
-    def __repr__(self):
-        pitch_strings = []
-        for x in self:
-            string = '({},)'.format(', '.join(
-                y.nameWithOctave for y in x.pitches))
-            pitch_strings.append(string)
-        return '<{}: {}>'.format(
-            type(self).__name__,
-            ' '.join(pitch_strings),
-            )
-
-    ### PROPERTIES ###
-
-    @property
-    def hasPassingTone(self):
-        r'''
-        Is true if the horizontality contains a passing tone.
-        '''
-        if len(self) < 3:
-            return False
-        elif not all(len(x.pitches) for x in self):
-            return False
-        pitches = (
-            self[0].pitches[0],
-            self[1].pitches[0],
-            self[2].pitches[0],
-            )
-        if pitches[0] < pitches[1] < pitches[2]:
-            return True
-        elif pitches[0] > pitches[1] > pitches[2]:
-            return True
-        return False
-
-    @property
-    def hasNeighborTone(self):
-        r'''
-        Is true if the horizontality contains a neighbor tone.
-        '''
-        if len(self) < 3:
-            return False
-        elif not all(len(x.pitches) for x in self):
-            return False
-        pitches = (
-            self[0].pitches[0],
-            self[1].pitches[0],
-            self[2].pitches[0],
-            )
-        if pitches[0] == pitches[2]:
-            if abs(pitches[1].ps - pitches[0].ps) < 3:
-                return True
-        return False
-
-
-#------------------------------------------------------------------------------
-
-
 class Verticality(object):
     r'''
     A collection of information about elements that are sounding at a given
@@ -3396,6 +3310,7 @@ class TimespanCollection(object):
                 <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
 
         '''
+        from music21.stream import timespanAnalysis
         unwrapped = {}
         for timespan in verticalities[0].overlapTimespans:
             if timespan.part not in unwrapped:
@@ -3411,7 +3326,10 @@ class TimespanCollection(object):
                     unwrapped[timespan.part] = []
                 unwrapped[timespan.part].append(timespan)
         for part, unused_timespans in unwrapped.items():
-            unwrapped[part] = Horizontality(timespans=unwrapped[part])
+            horizontality = timespanAnalysis.Horizontality(
+                timespans=unwrapped[part],
+                )
+            unwrapped[part] = horizontality
         return unwrapped
 
     ### PUBLIC PROPERTIES ###
@@ -3761,7 +3679,6 @@ class Test(unittest.TestCase):
 _DOC_ORDER = (
     TimespanCollection,
     Verticality,
-    Horizontality,
     Timespan,
     ElementTimespan,
     )
