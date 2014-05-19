@@ -51,6 +51,7 @@ from music21 import tempo
 from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import timespans
+from music21.stream import timespanAnalysis
 
 from music21 import environment
 _MOD = "stream.py"
