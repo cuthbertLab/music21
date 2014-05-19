@@ -600,6 +600,43 @@ class Verticality(object):
 #------------------------------------------------------------------------------
 
 
+class VerticalitySequence(collections.Sequence):
+    r'''
+    A segment of verticalities.
+    '''
+
+    ### INITIALIZER ###
+
+    def __init__(self, verticalities):
+        self._verticalities = tuple(verticalities)
+
+    ### SPECIAL METHODS ###
+
+    def __getitem__(self, item):
+        return self._verticalities[item]
+
+    def __len__(self):
+        return len(self._verticalities)
+
+    def __repr__(self):
+        string = '<VerticalitySequence: [\n\t{}\n\t]>'.format(
+            ',\n\t'.join(repr(x) for x in self))
+        return string
+
+    ### PUBLIC METHODS ###
+
+    def hasNeighborTone(self, partIdentifier, unaccentedOnly=False):
+        assert len(self) == 3
+        pass
+
+    def hasPassingTone(self, partIdentifier, unaccentedOnly=False):
+        assert len(self) == 3
+        pass
+
+
+#------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
