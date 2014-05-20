@@ -318,6 +318,15 @@ def getVLQs(score, partNum1, partNum2):
     >>> len(theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1))
     2
     '''
+    from music21.stream import timespans
+    tsCol = timespans.streamToTimespanCollection(score)
+    allVLQs = []
+    for v in tsCol.iterateVerticalities():
+        vlqs = v.getAllVoiceLeadingQuartets(partPairNumbers=[(partNum1, partNum2)])
+        for vlq in vlqs:
+            vlq.key = getKeyAtMeasure(score, vlq.v1n1.measureNumber)
+        allVLQs.extend(vlqs)
+    return allVLQs
     # Caches the list of VLQs once they have been computed
     # for a specified set of partNums
     vlqCacheKey = str(partNum1) + "," + str(partNum2)

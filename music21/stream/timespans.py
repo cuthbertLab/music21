@@ -2649,6 +2649,8 @@ class TimespanCollection(object):
         return self.latestStopOffset
 
 
+
+
 #------------------------------------------------------------------------------
 
 
@@ -2726,6 +2728,9 @@ class Test(unittest.TestCase):
                     for i in range(len(currentTimespansInTree)):
                         assert currentTimespansInList[i] == \
                             currentTimespansInTree[i]
+
+
+        
 
 
 #------------------------------------------------------------------------------

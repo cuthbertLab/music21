@@ -602,10 +602,104 @@ class Verticality(object):
     def timespanCollection(self):
         return self._timespanCollection
 
-    def getAllVoiceLeadingQuartets(self, includeRests = True, includeOblique = True, includeNoMotion=False):
-        self.getPairedMotion(includeRests=includeRests, includeNoMotion=includeNoMotion)
+    def getAllVoiceLeadingQuartets(self, includeRests = True, includeOblique = True, 
+                                   includeNoMotion=False, returnObjects=True, partPairNumbers=None):
+        '''
+        >>> c = corpus.parse('luca/gloria').measures(1,8)
+        >>> tsCol = stream.timespans.streamToTimespanCollection(c)
+        >>> verticality22 = tsCol.getVerticalityAt(22.0)
         
-    def getPairedMotion(self, includeRests = True, includeNoMotion=False):
+        >>> from pprint import pprint as pp
+        >>> for vlq in verticality22.getAllVoiceLeadingQuartets():
+        ...     pp(vlq)
+        <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E> , v1n2=<music21.note.Note F>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note C>  
+        <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E> , v1n2=<music21.note.Note F>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note A>  
+        <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G> , v1n2=<music21.note.Note C>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note A>  
+
+        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(includeRests = False):
+        ...     pp(vlq)
+        <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E> , v1n2=<music21.note.Note F>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note A>  
+
+        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(includeOblique=False):
+        ...     pp(vlq)
+        <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E> , v1n2=<music21.note.Note F>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note C>  
+
+        >>> verticality22.getAllVoiceLeadingQuartets(includeOblique=False, includeRests=False)
+        []
+
+
+        Raw output
+        
+        >>> for vlqRaw in verticality22.getAllVoiceLeadingQuartets(returnObjects=False):
+        ...     pp(vlqRaw)
+        ((<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>,
+          <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>),
+         (<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>,
+          <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>))
+        ((<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>,
+          <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>),
+         (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>,
+          <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>))
+        ((<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>,
+          <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>),
+         (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>,
+          <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>))
+          
+        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0,1)]):
+        ...     pp(vlq)
+        <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E> , v1n2=<music21.note.Note F>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note C>          
+        
+        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0,2),(1,2)]):
+        ...     pp(vlq)
+        <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E> , v1n2=<music21.note.Note F>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note A>  
+        <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G> , v1n2=<music21.note.Note C>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note A>          
+        
+        '''
+        import itertools
+        from music21.voiceLeading import VoiceLeadingQuartet
+        pairedMotionList = self.getPairedMotion(includeRests=includeRests, includeOblique=includeOblique)
+        allQuartets = itertools.combinations(pairedMotionList, 2)
+        filteredList = []
+        
+        verticalityStreamParts = self.timespanCollection.source.parts
+        
+        
+        for thisQuartet in allQuartets:
+            if includeNoMotion is False:
+                if (thisQuartet[0][0].pitches == thisQuartet[0][1].pitches and
+                    thisQuartet[1][0].pitches == thisQuartet[1][1].pitches):
+                    continue
+                if partPairNumbers is not None:
+                    isAppropriate = False
+                    for pp in partPairNumbers:
+                        thisQuartetTopPart = thisQuartet[0][0].part
+                        thisQuartetBottomPart = thisQuartet[1][0].part
+                        if (((verticalityStreamParts[pp[0]] == thisQuartetTopPart) or
+                            (verticalityStreamParts[pp[0]] == thisQuartetBottomPart)) and 
+                            ((verticalityStreamParts[pp[1]] == thisQuartetTopPart) or
+                            (verticalityStreamParts[pp[1]] == thisQuartetBottomPart))  
+                            ):
+                            isAppropriate = True
+                            break
+                    if (isAppropriate is False):
+                        continue
+                
+                
+                if returnObjects is False:
+                    filteredList.append(thisQuartet)
+                else:
+                    n11 = thisQuartet[0][0].element
+                    n12 = thisQuartet[0][1].element
+                    n21 = thisQuartet[1][0].element
+                    n22 = thisQuartet[1][1].element
+                    vlq = VoiceLeadingQuartet(n11, n12, n21, n22)
+                    filteredList.append(vlq)
+        
+        return filteredList
+        
+        
+        
+    def getPairedMotion(self, includeRests=True, includeOblique=True):
         '''
         Get a list of two-element tuples that are in the same part [TODO: or containing stream??]
         and which move here.
@@ -617,6 +711,7 @@ class Verticality(object):
         ...     print(pm)
         (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
         (<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>, <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>)
+        (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>, <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>)
         
         Note that the second one contains a one-beat rest at 21.0-22.0; so includeRests = False will
         get rid of that:
@@ -624,23 +719,21 @@ class Verticality(object):
         >>> for pm in verticality22.getPairedMotion(includeRests=False):
         ...     print(pm)
         (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>, <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>)
         
         
-        There's also noMotion happening in one voice... we can include that
+        Oblique here means a pair that does not move (it could be called noMotion, because there's no motion
+        here in a two-note pair, but we still call it includeOblique so it's consistent with
+        getAllVoiceLeadingQuartets).
         
-        >>> for pm in verticality22.getPairedMotion(includeNoMotion=True):
+        >>> for pm in verticality22.getPairedMotion(includeOblique=False):
         ...     print(pm)
         (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
         (<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>, <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>)
-        (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>, <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>)
 
-        >>> for pm in verticality22.getPairedMotion(includeNoMotion=True, includeRests=False):
+        >>> for pm in verticality22.getPairedMotion(includeOblique=False, includeRests=False):
         ...     print(pm)
         (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
-        (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>, <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>)
-
-        
-        
         '''
         stopTss = self.stopTimespans
         startTss = self.startTimespans
@@ -649,15 +742,18 @@ class Verticality(object):
                 
         for startingTs in startTss:
             previousTs = self._timespanCollection.findPreviousElementTimespanInSamePart(startingTs)
+            if previousTs is None:
+                continue  # first not in piece in this part...
+            
             if includeRests is False:
                 if previousTs not in stopTss:
                     continue
-            if includeNoMotion is False and startingTs.pitches == previousTs.pitches:
+            if includeOblique is False and startingTs.pitches == previousTs.pitches:
                 continue            
             tsTuple = (previousTs, startingTs)
             allPairedMotions.append(tsTuple)
         
-        if includeNoMotion is True:
+        if includeOblique is True:
             for overlapTs in overlapTss:
                 tsTuple = (overlapTs, overlapTs)
                 allPairedMotions.append(tsTuple)
