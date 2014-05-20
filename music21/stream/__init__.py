@@ -5001,6 +5001,38 @@ class Stream(base.Music21Object):
         returnObj._elementsChanged()
         return returnObj
 
+    def asTimespans(self, classList=None, recurse=True):
+        r'''
+        Convert stream to a stream.timespans.TimespanCollection instance, a
+        highly optimized data structure for searching through elements and
+        offsets.
+
+        ::
+
+            >>> score = stream.timespans.makeExampleScore()
+            >>> timespanColl = score.asTimespans()
+            >>> print(timespanColl)
+            <TimespanCollection {12} (0.0 to 8.0) <music21.stream.Score ...>>
+                <ElementTimespan (0.0 to 1.0) <music21.note.Note C>>
+                <ElementTimespan (0.0 to 2.0) <music21.note.Note C>>
+                <ElementTimespan (1.0 to 2.0) <music21.note.Note D>>
+                <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
+                <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
+                <ElementTimespan (3.0 to 4.0) <music21.note.Note F>>
+                <ElementTimespan (4.0 to 5.0) <music21.note.Note G>>
+                <ElementTimespan (4.0 to 6.0) <music21.note.Note E>>
+                <ElementTimespan (5.0 to 6.0) <music21.note.Note A>>
+                <ElementTimespan (6.0 to 7.0) <music21.note.Note B>>
+                <ElementTimespan (6.0 to 8.0) <music21.note.Note D>>
+                <ElementTimespan (7.0 to 8.0) <music21.note.Note C>>
+
+        '''
+        from music21.stream import timespans
+        return timespans.streamToTimespanCollection(
+            self,
+            classList=classList,
+            flatten=recurse,
+            )
 
     def chordify(self, addTies=True, displayTiedAccidentals=False,
         addPartIdAsGroup=False, removeRedundantPitches=True,

@@ -203,7 +203,7 @@ def _recurseStream(
 
 
 def streamToTimespanCollection(
-    inputStream, 
+    inputStream,
     flatten=True,
     classList=None,
     ):
@@ -2230,7 +2230,7 @@ class TimespanCollection(object):
         from music21.stream import timespanAnalysis
         n = int(n)
         if (n<=0):
-            message = "The number of verticalities in the group must be at " 
+            message = "The number of verticalities in the group must be at "
             message += "least one. Got {}".format(n)
             raise TimespanException(message)
         if reverse:
@@ -2596,7 +2596,7 @@ class TimespanCollection(object):
         timespan collection.
 
         ::
-        
+
             >>> score = corpus.parse('bwv66.6')
             >>> tree = stream.timespans.streamToTimespanCollection(score)
             >>> tree.maximumOverlap
@@ -2622,7 +2622,7 @@ class TimespanCollection(object):
         probably be either zero or one.
 
         ::
-        
+
             >>> score = corpus.parse('bwv66.6')
             >>> tree = stream.timespans.streamToTimespanCollection(
             ...     score, flatten=False)
@@ -2654,8 +2654,6 @@ class TimespanCollection(object):
     @property
     def stopOffset(self):
         return self.latestStopOffset
-
-
 
 
 #------------------------------------------------------------------------------
@@ -2735,9 +2733,6 @@ class Test(unittest.TestCase):
                     for i in range(len(currentTimespansInTree)):
                         assert currentTimespansInList[i] == \
                             currentTimespansInTree[i]
-
-
-        
 
 
 #------------------------------------------------------------------------------
