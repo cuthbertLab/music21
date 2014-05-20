@@ -598,6 +598,71 @@ class Verticality(object):
         '''
         return self._stopTimespans
 
+    def getAllVoiceLeadingQuartets(self, includeRests = True, includeOblique = True, includeNoMotion=False):
+        self.getPairedMotion(includeRests=includeRests, includeNoMotion=includeNoMotion)
+        
+    def getPairedMotion(self, includeRests = True, includeNoMotion=False):
+        '''
+        Get a list of two-element tuples that are in the same part [TODO: or containing stream??]
+        and which move here.
+        
+        >>> c = corpus.parse('luca/gloria').measures(1,8)
+        >>> tsCol = stream.timespans.streamToTimespanCollection(c)
+        >>> verticality22 = tsCol.getVerticalityAt(22.0)
+        >>> for pm in verticality22.getPairedMotion():
+        ...     print(pm)
+        (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        (<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>, <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>)
+        
+        Note that the second one contains a one-beat rest at 21.0-22.0; so includeRests = False will
+        get rid of that:
+        
+        >>> for pm in verticality22.getPairedMotion(includeRests=False):
+        ...     print(pm)
+        (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        
+        
+        There's also noMotion happening in one voice... we can include that
+        
+        >>> for pm in verticality22.getPairedMotion(includeNoMotion=True):
+        ...     print(pm)
+        (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        (<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>, <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>)
+        (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>, <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>)
+
+        >>> for pm in verticality22.getPairedMotion(includeNoMotion=True, includeRests=False):
+        ...     print(pm)
+        (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>, <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>)
+
+        
+        
+        '''
+        stopTss = self.stopTimespans
+        startTss = self.startTimespans
+        overlapTss = self.overlapTimespans
+        allPairedMotions = []
+                
+        for startingTs in startTss:
+            previousTs = self._timespanStream.findPreviousElementTimespanInSamePart(startingTs)
+            if includeRests is False:
+                if previousTs not in stopTss:
+                    continue
+            if includeNoMotion is False and startingTs.pitches == previousTs.pitches:
+                continue            
+            tsTuple = (previousTs, startingTs)
+            allPairedMotions.append(tsTuple)
+        
+        if includeNoMotion is True:
+            for overlapTs in overlapTss:
+                tsTuple = (overlapTs, overlapTs)
+                allPairedMotions.append(tsTuple)
+        
+        return allPairedMotions
+        
+                
+        
+
 
 #------------------------------------------------------------------------------
 
