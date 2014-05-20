@@ -147,7 +147,7 @@ def _recurseStream(
     currentParentage=None,
     initialOffset=0,
     flatten=False,
-    pitchedOnly=True,
+    classList=None,
     ):
     r'''
     Recurses through `inputStream`, and constructs TimespanCollections for each
@@ -161,30 +161,30 @@ def _recurseStream(
     '''
     from music21 import spanner
     from music21 import stream
+    from music21 import variant
     if currentParentage is None:
         currentParentage = (inputStream,)
     result = TimespanCollection(source=currentParentage[-1])
     for element in inputStream:
-        if isinstance(element, spanner.Spanner):
-            continue
         startOffset = element.getOffsetBySite(currentParentage[-1])
         startOffset += initialOffset
-        if isinstance(element, stream.Stream):
+        if isinstance(element, stream.Stream) and \
+            not isinstance(element, spanner.Spanner) and \
+            not isinstance(element, variant.Variant):
             localParentage = currentParentage + (element,)
             subresult = _recurseStream(
                 element,
                 localParentage,
                 initialOffset=startOffset,
                 flatten=flatten,
-                pitchedOnly=pitchedOnly,
+                classList=classList,
                 )
             if flatten:
                 result.insert(subresult[:])
             else:
                 result.insert(subresult)
         else:
-            prototype = (note.Note, chord.Chord)
-            if pitchedOnly and not isinstance(element, prototype):
+            if classList and not isinstance(element, classList):
                 continue
             parentStartOffset = initialOffset
             parentStopOffset = initialOffset + \
@@ -202,7 +202,11 @@ def _recurseStream(
     return result
 
 
-def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
+def streamToTimespanCollection(
+    inputStream, 
+    flatten=True,
+    classList=None,
+    ):
     r'''
     Recurses through a score and constructs a
     :class:`~music21.stream.timespans.TimespanCollection`.
@@ -227,7 +231,7 @@ def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
         >>> tree = stream.timespans.streamToTimespanCollection(
         ...     score,
         ...     flatten=False,
-        ...     pitchedOnly=False,
+        ...     classList=(),
         ...     )
 
     Each of these has 11 elements -- mainly the Measures
@@ -240,6 +244,7 @@ def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
         <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Alto>>
         <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
         <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Bass>>
+        <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
 
     ::
 
@@ -258,11 +263,13 @@ def streamToTimespanCollection(inputStream, flatten=True, pitchedOnly=True):
         True
 
     '''
+    if classList is None:
+        classList = (note.Note, chord.Chord)
     result = _recurseStream(
         inputStream,
         initialOffset=0.,
         flatten=flatten,
-        pitchedOnly=pitchedOnly,
+        classList=classList,
         )
     return result
 

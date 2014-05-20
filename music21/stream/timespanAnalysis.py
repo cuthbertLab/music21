@@ -111,6 +111,16 @@ class Horizontality(collections.Sequence):
                 return True
         return False
 
+    @property
+    def hasNoMotion(self):
+        pitchSets = set()
+        for x in self:
+            pitchSets.add(tuple(x.pitches))
+        if len(pitchSets) == 1:
+            return True
+        return False
+
+
 
 #------------------------------------------------------------------------------
 
