@@ -5027,12 +5027,16 @@ class Stream(base.Music21Object):
                 <ElementTimespan (7.0 to 8.0) <music21.note.Note C>>
 
         '''
-        from music21.stream import timespans
-        return timespans.streamToTimespanCollection(
-            self,
-            classList=classList,
-            flatten=recurse,
-            )
+        hashedAttributes = hash( (tuple(classList or () ), recurse) ) 
+        cacheKey = "timespanCollection" + str(hashedAttributes)
+        if cacheKey not in self._cache or self._cache[cacheKey] is None:
+            hashedTSC = timespans.streamToTimespanCollection(
+                self,
+                classList=classList,
+                flatten=recurse,
+                )
+            self._cache[cacheKey] = hashedTSC
+        return self._cache[cacheKey]
 
     def chordify(self, addTies=True, displayTiedAccidentals=False,
         addPartIdAsGroup=False, removeRedundantPitches=True,
