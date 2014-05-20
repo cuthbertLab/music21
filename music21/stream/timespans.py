@@ -2383,25 +2383,8 @@ class TimespanCollection(object):
 
         '''
         from music21.stream import timespanAnalysis
-        unwrapped = {}
-        for timespan in verticalities[0].overlapTimespans:
-            if timespan.part not in unwrapped:
-                unwrapped[timespan.part] = []
-            unwrapped[timespan.part].append(timespan)
-        for timespan in verticalities[0].startTimespans:
-            if timespan.part not in unwrapped:
-                unwrapped[timespan.part] = []
-            unwrapped[timespan.part].append(timespan)
-        for verticality in verticalities[1:]:
-            for timespan in verticality.startTimespans:
-                if timespan.part not in unwrapped:
-                    unwrapped[timespan.part] = []
-                unwrapped[timespan.part].append(timespan)
-        for part, unused_timespans in unwrapped.items():
-            horizontality = timespanAnalysis.Horizontality(
-                timespans=unwrapped[part],
-                )
-            unwrapped[part] = horizontality
+        sequence = timespanAnalysis.VerticalitySequence(verticalities)
+        unwrapped = sequence.unwrap()
         return unwrapped
 
     ### PUBLIC PROPERTIES ###
