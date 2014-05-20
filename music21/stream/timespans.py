@@ -1903,7 +1903,7 @@ class TimespanCollection(object):
         stopTimespans = self.findTimespansStoppingAt(offset)
         overlapTimespans = self.findTimespansOverlapping(offset)
         verticality = timespanAnalysis.Verticality(
-            timespanStream=self,
+            timespanCollection=self,
             overlapTimespans=overlapTimespans,
             startTimespans=startTimespans,
             startOffset=offset,

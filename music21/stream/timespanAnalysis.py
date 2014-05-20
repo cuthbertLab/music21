@@ -173,7 +173,7 @@ class Verticality(object):
     (There is also a previousVerticality, but not a previousStartOffset)
 
     What we just demonstrated is actually very powerful: a Verticality keeps a
-    record of exactly where it is in the timespanStream -- scores can be
+    record of exactly where it is in the timespanCollection -- scores can be
     recreated with this information.
 
     Getting back to the task at hand, we can find all the elementTimespans (and
@@ -211,7 +211,7 @@ class Verticality(object):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '_timespanStream',
+        '_timespanCollection',
         '_overlapTimespans',
         '_startTimespans',
         '_startOffset',
@@ -222,7 +222,7 @@ class Verticality(object):
 
     def __init__(
         self,
-        timespanStream=None,
+        timespanCollection=None,
         overlapTimespans=None,
         startTimespans=None,
         startOffset=None,
@@ -230,8 +230,8 @@ class Verticality(object):
         ):
         from music21.stream import timespans
         prototype = (timespans.TimespanCollection, type(None))
-        assert isinstance(timespanStream, prototype)
-        self._timespanStream = timespanStream
+        assert isinstance(timespanCollection, prototype)
+        self._timespanCollection = timespanCollection
         self._startOffset = startOffset
         assert isinstance(startTimespans, tuple)
         assert isinstance(stopTimespans, (tuple, type(None)))
@@ -381,7 +381,7 @@ class Verticality(object):
             2.0
 
         '''
-        tree = self._timespanStream
+        tree = self._timespanCollection
         if tree is None:
             return None
         startOffset = tree.getStartOffsetAfter(self.startOffset)
@@ -419,7 +419,7 @@ class Verticality(object):
             <Verticality 3.0 {A3 E4 C#5}>
 
         '''
-        tree = self._timespanStream
+        tree = self._timespanCollection
         if tree is None:
             return None
         startOffset = tree.getStartOffsetAfter(self.startOffset)
@@ -532,7 +532,7 @@ class Verticality(object):
             <Verticality 0.0 {A3 E4 C#5}>
 
         '''
-        tree = self._timespanStream
+        tree = self._timespanCollection
         if tree is None:
             return None
         startOffset = tree.getStartOffsetBefore(self.startOffset)
@@ -598,6 +598,10 @@ class Verticality(object):
         '''
         return self._stopTimespans
 
+    @property
+    def timespanCollection(self):
+        return self._timespanCollection
+
     def getAllVoiceLeadingQuartets(self, includeRests = True, includeOblique = True, includeNoMotion=False):
         self.getPairedMotion(includeRests=includeRests, includeNoMotion=includeNoMotion)
         
@@ -644,7 +648,7 @@ class Verticality(object):
         allPairedMotions = []
                 
         for startingTs in startTss:
-            previousTs = self._timespanStream.findPreviousElementTimespanInSamePart(startingTs)
+            previousTs = self._timespanCollection.findPreviousElementTimespanInSamePart(startingTs)
             if includeRests is False:
                 if previousTs not in stopTss:
                     continue
