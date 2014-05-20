@@ -2567,7 +2567,7 @@ class Music21Object(object):
         The methods searches both Sites as well as associated objects
         to find a matching class. Returns None if not match is found.
 
-        The a reference to the caller is required to find the offset of the
+        A reference to the caller is required to find the offset of the
         object of the caller. This is needed for serialReverseSearch.
 
         The caller may be a Sites reference from a lower-level object.
