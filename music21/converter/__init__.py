@@ -499,8 +499,29 @@ class Converter(object):
 
             if useFormat is not None:
                 pass
-            elif dataStr.startswith('<?xml') or dataStr.startswith('musicxml:'):
+            elif dataStr.startswith('<?xml'):
+                # MusicXML or MEI? We have to parse the file to know.
+                import imp
+
+                # use the faster library if possible (won't be possible on Jython, PyPy, etc.)
+                try:
+                    import xml.etree.cElementTree as ET
+                except ImportError:
+                    import xml.etree.ElementTree as ET
+
+                # we'll check the root tag to determine file type
+                tree = ET.fromstring(dataStr)
+                root_tag = tree.getroot().tag
+                if (root_tag == '{http://www.music-encoding.org/ns/mei}mei' or
+                    root_tag == 'mei'):
+                    useFormat = 'mei'
+                else:
+                    useFormat = 'musicxml'
+
+            elif dataStr.startswith('musicxml:'):
                 useFormat = 'musicxml'
+            elif dataStr.startswith('mei:'):
+                useFormat = 'mei'
             elif dataStr.startswith('MThd') or dataStr.startswith('midi:'):
                 useFormat = 'midi'
             elif dataStr.startswith('!!!') or dataStr.startswith('**') or dataStr.startswith('humdrum:'):
