@@ -10,10 +10,10 @@
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
 
-
 import unittest
 
 from music21 import environment
+from music21 import common
 from music21.base import SlottedObject
 
 environLocal = environment.Environment(__file__)
@@ -42,9 +42,10 @@ class StreamStatus(SlottedObject):
     ### INITIALIZER ###
 
     def __init__(self, client=None):
+        self._client = common.wrapWeakref(client)
+        
         self._accidentals = None
         self._beams = None
-        self._client = client
         self._concertPitch = None
         self._dirty = None
         self._enharmonics = None
@@ -85,7 +86,7 @@ class StreamStatus(SlottedObject):
 
     @property
     def client(self):
-        return self._client
+        return common.unwrapWeakref(self._client)
 
     @property
     def beams(self):

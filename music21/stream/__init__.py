@@ -465,7 +465,8 @@ class Stream(base.Music21Object):
                 raise KeyError('provided class (%s) does not match any contained Objects' % key)
 
 
-#     def __del__(self):
+#    def __del__(self):
+#        self.cache = {}
 #         #environLocal.printDebug(['calling __del__ from Stream', self])
 #         # this is experimental
 #         # this did not offer improvements, and raised a number of errors

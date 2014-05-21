@@ -680,11 +680,11 @@ class ClassDocumenter(ObjectDocumenter):
             - music21.stream.Stream.allPlayingWhileSounding
             - music21.stream.Stream.analyze
             - music21.stream.Stream.append
+            - music21.stream.Stream.asTimespans
             - music21.stream.Stream.attachIntervalsBetweenStreams
             - music21.stream.Stream.attachMelodicIntervals
             - music21.stream.Stream.attributeCount
             - music21.stream.Stream.augmentOrDiminish
-            - music21.stream.Stream.beatAndMeasureFromOffset
 
         '''
         return self._inheritedMethodsMapping
@@ -740,11 +740,11 @@ class ClassDocumenter(ObjectDocumenter):
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.allPlayingWhileSounding>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.analyze>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.append>
+            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.asTimespans>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.attachIntervalsBetweenStreams>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.attachMelodicIntervals>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.attributeCount>
             <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.augmentOrDiminish>
-            <music21.documentation.library.documenters.MethodDocumenter: music21.stream.Stream.beatAndMeasureFromOffset>
 
         '''
         return self._methods
