@@ -6939,9 +6939,11 @@ class Stream(base.Music21Object):
         47.0
         '''
 #         environLocal.printDebug(['_getHighestTime', 'isSorted', self.isSorted, self])
-        if 'HighestTime' in self._cache and self._cache["HighestTime"] is not None:
-            pass  # return cache unaltered
-        elif len(self._elements) == 0:
+        # remove cache -- durations might change...
+        #if 'HighestTime' in self._cache and self._cache["HighestTime"] is not None:
+        #    pass  # return cache unaltered
+        #elif len(self._elements) == 0:
+        if len(self._elements) == 0:
             self._cache["HighestTime"] = 0.0
             return 0.0
         else:
@@ -7072,9 +7074,9 @@ class Stream(base.Music21Object):
         '''
         if self._unlinkedDuration is not None:
             return self._unlinkedDuration
-        elif 'Duration' in self._cache and self._cache["Duration"] is not None:
+        #elif 'Duration' in self._cache and self._cache["Duration"] is not None:
             #environLocal.printDebug(['returning cached duration'])
-            return self._cache["Duration"]
+        #    return self._cache["Duration"]
         else:
             #environLocal.printDebug(['creating new duration based on highest time'])
             self._cache["Duration"] = duration.Duration()

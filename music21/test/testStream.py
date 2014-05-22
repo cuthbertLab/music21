@@ -1558,44 +1558,45 @@ class Test(unittest.TestCase):
     def testContextNestedB(self):
         '''Testing getting clefs from higher-level streams
         '''
-        s1 = Stream()
-        s2 = Stream()
+        sInner = Stream()
         n1 = note.Note()
+        sInner.append(n1) # this is the model of a stream with a single part
+
+        sOuter = Stream()
+        sOuter.append(sInner)
         c1 = clef.AltoClef()
-        
-        s1.append(n1) # this is the model of a stream with a single part
-        s2.append(s1)
-        s2.insert(0, c1)
+        sOuter.insert(0, c1)
         
         # this works fine
-        post = s1.getContextByClass(clef.Clef)
+        post = sInner.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        # if we flatten s1, we cannot still get the clef: why?
-        s1Flat = s1.flat
-        # but it has s2 has a context
-        self.assertEqual(s1Flat.hasContext(s2), True)
-        #environLocal.printDebug(['sites.get() of s1Flat', s1Flat.sites.get()])
-        #environLocal.printDebug(['sites._definedContexts of s1Flat', s1Flat.sites._definedContexts])
+        # if we flatten sInner, we cannot still get the clef: why?
+        sInnerFlat = sInner.flat
+        # but it has sOuter has a context
+        self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+        #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
+        #environLocal.printDebug(['sites._definedContexts of sInnerFlat', sInnerFlat.sites._definedContexts])
 
 
-        self.assertEqual(s1Flat.hasContext(s2), True)
+        self.assertEqual(sInnerFlat.hasContext(sOuter), True)
 
         # this returns the proper dictionary entry
         #environLocal.printDebug(
-        #    ['s1Flat.sites._definedContexts[id(s1)', s1Flat.sites._definedContexts[id(s2)]])
+        #    ['sInnerFlat.sites._definedContexts[id(sInner)', sInnerFlat.sites._definedContexts[id(sOuter)]])
         # we can extract out the same reference
-        unused_s2Out = s1Flat.sites.getById(id(s2))
+        unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
 
         # this works
-        post = s1Flat.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        post = sInnerFlat.getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
 
-        # this will only work if the callerFirst is manually set to s1Flat
-        # otherwise, this interprets the DefinedContext object as the first 
-        # caller
-        post = s1Flat.sites.getByClass(clef.Clef, callerFirst=s1Flat)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        # 2014 April -- timeSpans version -- not needed...
+        ## this will only work if the callerFirst is manually set to sInnerFlat
+        ## otherwise, this interprets the DefinedContext object as the first 
+        ## caller
+        #post = sInnerFlat.sites.getByClass(clef.Clef, callerFirst=sInnerFlat)
+        #self.assertEqual(isinstance(post, clef.AltoClef), True)
 
 
 
@@ -1648,23 +1649,23 @@ class Test(unittest.TestCase):
 
         s1 = Stream()
         s2 = Stream()
-        s3 = Stream()
+        sOuter = Stream()
         s1.append(n1)
         s2.append(n2)
-        s3.insert(0, s1)
-        s3.insert(0, s2)
+        sOuter.insert(0, s1)
+        sOuter.insert(0, s2)
         
-        self.assertEqual(s1.activeSite, s3)
+        self.assertEqual(s1.activeSite, sOuter)
 
-        s3.insert(0, clef.AltoClef())
+        sOuter.insert(0, clef.AltoClef())
         # both output parts have alto clefs
         #s3.show()
 
         # get clef form higher level stream; only option
-        self.assertEqual(s1.activeSite, s3)
+        self.assertEqual(s1.activeSite, sOuter)
         post = s1.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
-        self.assertEqual(s1.activeSite, s3)
+        self.assertEqual(s1.activeSite, sOuter)
 
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
@@ -1693,16 +1694,16 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         # once we create a deepcopy of s1, it is no longer connected to 
-        # its parent if purge orphans and it is not in s3
+        # its parent if purge orphans and it is not in sOuter
         s1FlatCopy = copy.deepcopy(s1.flat)
         self.assertEqual(len(s1FlatCopy.getClefs(returnDefault=False)), 1)
         post = s1FlatCopy.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
 
         post = s1.flat.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
-        self.assertEqual(s3 in s1.sites.getSites(), True)
+        self.assertEqual(sOuter in s1.sites.getSites(), True)
         s1Measures = s1.makeMeasures()
         #print s1Measures[0].clef
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
@@ -1713,7 +1714,7 @@ class Test(unittest.TestCase):
 
         # try making a deep copy of s3
 
-        s3copy = copy.deepcopy(s3)
+        s3copy = copy.deepcopy(sOuter)
         #s1Measures = s3copy[0].makeMeasures()
 
         # TODO: had to comment out with changes to getElementAtOrBefore

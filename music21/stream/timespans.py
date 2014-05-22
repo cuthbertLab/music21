@@ -37,18 +37,31 @@ environLocal = environment.Environment("stream.timespans")
 #------------------------------------------------------------------------------
 
 
-def _fraction(expr):
+def mixedNumeral(expr, limitDenominator=100):
+    '''
+    Returns a string representing a mixedNumeral form of a number
+    
+    >>> stream.timespans.mixedNumeral(1.333333)
+    '1 1/3'
+    >>> stream.timespans.mixedNumeral(0.333333)
+    '1/3'
+    
+    >>> stream.timespans.mixedNumeral(2.0001)
+    '2'
+    >>> stream.timespans.mixedNumeral(2.0001, limitDenominator=10000)
+    '2 1/10000'
+    '''
     import fractions
     quotient, remainder = divmod(float(expr), 1.)
-    remainder = fractions.Fraction(remainder).limit_denominator(100)
+    remainderFrac = fractions.Fraction(remainder).limit_denominator(limitDenominator)
     if quotient:
-        if remainder:
-            return '{} {}'.format(int(quotient), remainder)
+        if remainderFrac:
+            return '{} {}'.format(int(quotient), remainderFrac)
         else:
             return str(int(quotient))
     else:
-        if remainder:
-            str(remainder)
+        if remainderFrac != 0:
+            return str(remainderFrac)
     return str(0)
 
 
@@ -124,6 +137,8 @@ def makeExampleScore():
 def makeElement(verticality, quarterLength):
     r'''
     Makes an element from a verticality and quarterLength.
+    
+    TODO: DOCS!
     '''
     if verticality.pitchSet:
         element = chord.Chord(sorted(verticality.pitchSet))
@@ -166,7 +181,9 @@ def _recurseStream(
     if currentParentage is None:
         currentParentage = (inputStream,)
     result = TimespanCollection(source=currentParentage[-1])
-    for element in inputStream:
+    # do this to avoid munging activeSites
+    inputStreamElements = inputStream._elements + inputStream._endElements
+    for element in inputStreamElements:
         startOffset = element.getOffsetBySite(currentParentage[-1])
         startOffset += initialOffset
         if isinstance(element, stream.Stream) and \
@@ -185,7 +202,7 @@ def _recurseStream(
             else:
                 result.insert(subresult)
         else:
-            if classList and not isinstance(element, classList):
+            if classList and not element.isClassOrSubclass(classList):
                 continue
             parentStartOffset = initialOffset
             parentStopOffset = initialOffset + \
@@ -319,6 +336,7 @@ def timespansToChordifiedStream(timespans, templateStream=None):
             {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
         ...
 
+    TODO: Remove assert
     '''
     from music21 import stream
     if not isinstance(timespans, TimespanCollection):
@@ -363,6 +381,9 @@ def timespansToChordifiedStream(timespans, templateStream=None):
 
 
 def timespansToPartwiseStream(timespans, templateStream=None):
+    '''
+    todo docs
+    '''
     from music21 import stream
     treeMapping = timespans.toPartwiseTimespanCollections()
     outputScore = stream.Score()
@@ -528,6 +549,9 @@ class ElementTimespan(object):
         startOffset=None,
         stopOffset=None,
         ):
+        '''
+        TODO: replace assert w/ meaningful messages.
+        '''
         #from music21 import stream
         self._element = element
         if parentage is not None:
@@ -659,6 +683,9 @@ class ElementTimespan(object):
         startOffset=None,
         stopOffset=None,
         ):
+        '''
+        TODO: Docs and Tests
+        '''
         if beatStrength is None:
             beatStrength = self.beatStrength
         element = element or self.element
@@ -726,6 +753,8 @@ class ElementTimespan(object):
         elementTimespans based on old ones, and want to maintain pitch
         information from the old elementTimespan but change the start offset to
         reflect that of another timespan.
+        
+        TODO: Tests
         '''
         from music21 import meter
         if self._beatStrength is not None:
@@ -740,6 +769,10 @@ class ElementTimespan(object):
 
     @property
     def quarterLength(self):
+        '''
+        TODO: Tests that show a case where this might be different from the quarterLength
+        of the element.
+        '''
         return self.stopOffset - self.startOffset
 
     @property
@@ -800,9 +833,8 @@ class ElementTimespan(object):
             >>> tree = score.asTimespans()
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> elementTimespan = verticality.startTimespans[0]
-            >>> for x in elementTimespan.parentage:
-            ...     x
-            ...
+            >>> for streamSite in elementTimespan.parentage:
+            ...     streamSite
             <music21.stream.Measure 1 offset=1.0>
             <music21.stream.Part Soprano>
             <music21.stream.Score ...>
@@ -812,6 +844,18 @@ class ElementTimespan(object):
 
     @property
     def part(self):
+        '''
+        find the object in the parentage that is a Part object:
+        
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> elementTimespan = verticality.startTimespans[2]
+        >>> elementTimespan
+        <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
+        >>> elementTimespan.part
+        <music21.stream.Part Tenor>
+        '''
         from music21 import stream
         for x in self.parentage:
             if not isinstance(x, stream.Part):
@@ -833,6 +877,8 @@ class ElementTimespan(object):
             >>> elementTimespan.partName
             u'Soprano'
 
+        TODO: remove and see if something better can be done with elementTimespan.part's Part object
+        
         '''
         part = self.part
         if part is None:
@@ -848,6 +894,8 @@ class ElementTimespan(object):
         Gets the pitches of the element wrapped by this elementTimespan.
 
         This treats notes as chords.
+        
+        TODO: tests, examples of usage.
         '''
         result = []
         if hasattr(self.element, 'pitches'):
@@ -1159,6 +1207,10 @@ class TimespanCollection(object):
 
         '''
         def recurseByIndex(node, index):
+            '''
+            todo: tests...
+            
+            '''
             if node.nodeStartIndex <= index < node.nodeStopIndex:
                 return node.payload[index - node.nodeStartIndex]
             elif node.leftChild and index < node.nodeStartIndex:
@@ -1790,15 +1842,17 @@ class TimespanCollection(object):
         '''
         def recurse(node, offset):
             result = []
-            if node.stopOffsetLow <= offset <= node.stopOffsetHigh:
-                for timespan in node.payload:
-                    if timespan.stopOffset == offset:
-                        result.append(timespan)
-                if node.leftChild is not None:
-                    result.extend(recurse(node.leftChild, offset))
-                if node.rightChild is not None:
-                    result.extend(recurse(node.rightChild, offset))
+            if node is not None: # could happen in an empty TimespanCollection
+                if node.stopOffsetLow <= offset <= node.stopOffsetHigh:
+                    for timespan in node.payload:
+                        if timespan.stopOffset == offset:
+                            result.append(timespan)
+                    if node.leftChild is not None:
+                        result.extend(recurse(node.leftChild, offset))
+                    if node.rightChild is not None:
+                        result.extend(recurse(node.rightChild, offset))
             return result
+        
         results = recurse(self._rootNode, offset)
         results.sort(key=lambda x: (x.startOffset, x.stopOffset))
         return tuple(results)
@@ -1902,10 +1956,24 @@ class TimespanCollection(object):
 
         ::
 
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = score.asTimespans()
+            >>> bach = corpus.parse('bwv66.6')
+            >>> tree = bach.asTimespans()
             >>> tree.getVerticalityAt(2.5)
             <Verticality 2.5 {G#3 B3 E4 B4}>
+
+            Verticalities outside the range still return a Verticality, but it might be empty...
+
+            >>> tree.getVerticalityAt(2000)
+            <Verticality 2000 {}>
+            
+            
+            Test that it still works if the tree is empty...
+            
+            >>> tree = bach.asTimespans(classList=(instrument.Tuba,))
+            >>> tree
+            <TimespanCollection {0} (-inf to inf) <music21.stream.Score ...>>
+            >>> tree.getVerticalityAt(5.0)
+            <Verticality 5.0 {}>           
 
         Return verticality.
         '''

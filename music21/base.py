@@ -2502,6 +2502,91 @@ class Music21Object(object):
 #         '''
 #         self.sites.removeNonContainedLocations()
 
+    def getPOSTTIMESPANSContextByClass(self, className, serialReverseSearch=True,
+            callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
+            memo=None):
+        '''
+        >>> c = corpus.parse('bwv66.6')
+        >>> n = c.parts[2].measure(4).notes[0]
+        >>> n.getContextByClass(meter.TimeSignature)
+        <music21.meter.TimeSignature 4/4>
+        
+        getElementMethod can be 'getElementAtOrBefore' or 'getElementBeforeOffset'
+        '''
+        def checkVerticalityForElement(verticality):
+            '''
+            checks to see if an element is in the verticality.
+            '''
+            if verticality is None:
+                return None
+            if len(verticality.startTimespans) > 0:
+                return verticality.startTimespans[0].element
+            elif len(verticality.overlapTimespans) > 0:
+                return verticality.overlapTimespans[0].element
+            elif len(verticality.overlapTimespans) > 0:
+                return verticality.overlapTimespans[0].element
+            
+        def recurseSiteSearch(elementWithSites, 
+                              priorityTarget=None, 
+                              sortByCreationTime=False, 
+                              getElementMethod='getElementAtOrBefore',
+                              serialReverseSearch=True):
+            allSites = elementWithSites.sites.get(sortByCreationTime=sortByCreationTime,
+                priorityTarget=priorityTarget, excludeNone=True)
+            for thisSite in allSites:
+                elementOffset = elementWithSites.getOffsetBySite(thisSite)
+                #print thisSite
+                #print thisSite.asTimespans()
+                siteTimespan = thisSite.asTimespans(classList=(className,))
+                if elementWithSites not in thisSite._elements and elementWithSites not in thisSite._endElements:                    
+                    pass # location, not site...should not check, but can recurse...
+                else:
+                    if getElementMethod == 'getElementAtOrBefore':
+                        previousVerticality = siteTimespan.getVerticalityAtOrBefore(elementOffset)
+                    else: # if getElementMethod == 'getElementBeforeOffset':
+                        previousVerticality = siteTimespan.getVerticalityAt(elementOffset).previousVerticality
+                    foundElement = checkVerticalityForElement(previousVerticality)
+                    if foundElement is not None:
+                        return foundElement
+                if serialReverseSearch:
+                    foundElementFromRecursion = recurseSiteSearch(thisSite, 
+                                                                  priorityTarget=priorityTarget, 
+                                                                  sortByCreationTime=sortByCreationTime, 
+                                                                  getElementMethod=getElementMethod,
+                                                                  serialReverseSearch=serialReverseSearch)
+                if foundElementFromRecursion is not None:
+                    return foundElementFromRecursion
+                
+        if getElementMethod not in ('getElementAtOrBefore', 'getElementBeforeOffset'):
+            raise Music21ObjectException('cannot get element with requested method: %s' % getElementMethod)
+
+        if prioritizeActiveSite:
+            priorityTarget = self.activeSite
+        else:
+            priorityTarget = None
+        context = recurseSiteSearch(self, 
+                                 priorityTarget=priorityTarget, 
+                                 sortByCreationTime=sortByCreationTime, 
+                                 getElementMethod=getElementMethod,
+                                 serialReverseSearch=serialReverseSearch
+                                 )
+        if context is None: # still no match
+            # this will call this method on all defined contexts, including
+            # locations (one of which must be the activeSite)
+            # if this is a stream, this will be the next level up, recursing
+            # a reference to the callerFirst is continuall passed
+            if memo is None:
+                memo = {}
+            context = self.sites.getByClass(className,
+                   serialReverseSearch=serialReverseSearch,
+                   sortByCreationTime=sortByCreationTime,
+                   # make the priorityTarget the activeSite, meaning we search
+                   # this object first
+                   prioritizeActiveSite=prioritizeActiveSite,
+                   priorityTarget=priorityTarget,  getElementMethod=getElementMethod, memo=memo)
+
+        return context
+
     def getContextByClass(self, className, serialReverseSearch=True,
             callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
             memo=None):
@@ -2627,7 +2712,6 @@ class Music21Object(object):
             # can get the offset from within this Stream of the caller
             # first, see if this element is even in this Stream
             getOffsetOfCaller = False
-            skipGetOffsetOfCaller = False
             #if (hasattr(self, "elements") and callerFirst is not None):
             #if self.isStream and callerFirst is not None:
 
@@ -2660,16 +2744,15 @@ class Music21Object(object):
                 semiFlat = self._getFlatOrSemiFlat(retainContainers=True)
 
                 # see if this element is in this Stream;
-                if not skipGetOffsetOfCaller:
-                    if semiFlat.hasElement(callerFirst):
-                        getOffsetOfCaller = True
-                    else:
-                        #if (hasattr(callerFirst, 'flattenedRepresentationOf') and callerFirst.flattenedRepresentationOf is not None):
-                        if (callerFirst.isStream and
-                            callerFirst.flattenedRepresentationOf is not None):
-                            if semiFlat.hasElement(
-                                callerFirst.flattenedRepresentationOf):
-                                getOffsetOfCaller = True
+                if semiFlat.hasElement(callerFirst):
+                    getOffsetOfCaller = True
+                else:
+                    #if (hasattr(callerFirst, 'flattenedRepresentationOf') and callerFirst.flattenedRepresentationOf is not None):
+                    if (callerFirst.isStream and
+                        callerFirst.flattenedRepresentationOf is not None):
+                        if semiFlat.hasElement(
+                            callerFirst.flattenedRepresentationOf):
+                            getOffsetOfCaller = True
 
             if getOffsetOfCaller:
                 # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
@@ -4205,6 +4288,8 @@ class Music21Object(object):
         if self.activeSite is not None and self.activeSite.isMeasure:
             #environLocal.printDebug(['found activeSite as Measure, using for offset'])
             offsetLocal = self.getOffsetBySite(self.activeSite)
+            if includeMeasurePadding:
+                offsetLocal += self.activeSite.paddingLeft
         else:
             #environLocal.printDebug(['did not find activeSite as Measure, doing context search', 'self.activeSite', self.activeSite])
             # testing sortByCreationTime == true; this may be necessary
@@ -5589,22 +5674,23 @@ class Test(unittest.TestCase):
         self.assertEqual([n.seconds for n in s.notes], [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25])
 
         # adding notes based on seconds
-        s = stream.Stream()
-        s.insert(0, tempo.MetronomeMark(number=120))
-        s.append(note.Note())
-        s.notes[0].seconds = 2.0
-        self.assertEqual(s.notes[0].quarterLength, 4.0)
+        s2 = stream.Stream()
+        s2.insert(0, tempo.MetronomeMark(number=120))
+        s2.append(note.Note())
+        s2.notes[0].seconds = 2.0
+        self.assertEqual(s2.notes[0].quarterLength, 4.0)
+        self.assertEqual(s2.duration.quarterLength, 4.0)
 
-        s.append(note.Note())
-        s.notes[1].seconds = 0.5
-        self.assertEqual(s.notes[1].quarterLength, 1.0)
-        self.assertEqual(s.duration.quarterLength, 5.0)
+        s2.append(note.Note('C4', type='half'))
+        s2.notes[1].seconds = 0.5
+        self.assertEqual(s2.notes[1].quarterLength, 1.0)
+        self.assertEqual(s2.duration.quarterLength, 5.0)
 
-        s.append(tempo.MetronomeMark(number=30))
-        s.append(note.Note())
-        s.notes[2].seconds = 0.5
-        self.assertEqual(s.notes[2].quarterLength, 0.25)
-        self.assertEqual(s.duration.quarterLength, 5.25)
+        s2.append(tempo.MetronomeMark(number=30))
+        s2.append(note.Note())
+        s2.notes[2].seconds = 0.5
+        self.assertEqual(s2.notes[2].quarterLength, 0.25)
+        self.assertEqual(s2.duration.quarterLength, 5.25)
 
 #     def testWeakElementWrapper(self):
 #         from music21 import note
