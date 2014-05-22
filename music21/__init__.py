@@ -50,7 +50,8 @@ owners who have allowed them to be included with music21.
 
 
 __all__ = [
-    'base', 
+    'base',
+    'sites', # important 
     # sub folders
     'abcFormat', 
     'analysis', 

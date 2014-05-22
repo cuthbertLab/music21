@@ -39,14 +39,14 @@ def fromObject(thisObject, mode='txt'):
     'id": ..., "_duration": null, "py/object": "music21.stream.Stream", "streamStatus": {"py/object": "music' + 
     '21.stream.streamStatus.StreamStatus", "_enharmonics": null, "_dirty": null, "_concertPitch": null, "_accidenta' + 
     'ls": null, "_ties": null, "_rests": null, "_ornaments": null, "_client": null, "_beams": null, "_measures": nu' + 
-    'll}, "sites": {"py/object": "music21.base.Sites", "_lastOffset": null, "_siteIndex": 1, "_definedContexts": {}' + 
+    'll}, "sites": {"py/object": "music21.base.Sites", "_lastOffset": null, "_siteIndex": 1, "siteDict": {}' + 
     ', "_lastID": -1, "containedById": ..., "_locationKeys": []}, "py/seq": [], "isFlat": true, "autoSort": ' + 
     'true, "_storedElementOffsetTuples": [{"py/tuple": [{"lyrics": [], "_notehead": "normal", "_volume": {"py/objec' + 
     't": "music21.volume.Volume", "_parent": {"py/id": 6}, "velocityIsRelative": true, "_cachedRealized": null, "_v' + 
     'elocity": null}, "_activeSite": null, "xPosition": null, "_priority": 0, "pitch": {"py/object": "music21.pitch' + 
     '.Pitch", "_octave": 4, "groups": {"py/object": "music21.base.Groups", "py/seq": []}, "_activeSiteId": null, "_' + 
     'overridden_freq440": null, "_step": "C", "sites": {"py/object": "music21.base.Sites", "_lastOffset": null, "_s' + 
-    'iteIndex": 1, "_definedContexts": {"None": {"py/object": "music21.base.Site", "obj": null, "globalSiteIndex": ' + 
+    'iteIndex": 1, "siteDict": {"None": {"py/object": "music21.base.Site", "obj": null, "globalSiteIndex": ' + 
     '98, "classString": null, "siteIndex": 0, "isDead": false, "offset": 0.0}}, "_lastID": -1, "containedById": ...' + 
     '..., "_locationKeys": [null]}, "implicitAccidental": false, "_classes": null, "_activeSite": null, "_accid' + 
     'ental": {"py/object": "music21.pitch.Accidental", "_modifier": "#", "_alter": 1.0, "displayLocation": "normal"' + 

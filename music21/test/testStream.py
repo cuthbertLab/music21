@@ -1580,7 +1580,7 @@ class Test(unittest.TestCase):
 #         # but it has sOuter has a context
 #         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
 #         #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
-#         #environLocal.printDebug(['sites._definedContexts of sInnerFlat', sInnerFlat.sites._definedContexts])
+#         #environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites._definedContexts])
 # 
 # 
 #         self.assertEqual(sInnerFlat.hasContext(sOuter), True)

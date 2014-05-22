@@ -813,7 +813,7 @@ class StreamThawer(StreamFreezeThawBase):
                 e._stream._elementsChanged()
                 e._cache = {}
                 #for el in e._stream.flat:
-                #    print el, el.offset, el.sites._definedContexts
+                #    print el, el.offset, el.sites.siteDict
             elif e.isSpanner:
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e.spannedElements)
@@ -1891,14 +1891,14 @@ class Test(unittest.TestCase):
         n2 = c[1]
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         sf.setupSerializationScaffold()
-        for dummy in n1.sites._definedContexts:
+        for dummy in n1.sites.siteDict:
             pass
             #print idKey
-            #print n1.sites._definedContexts[idKey]['obj']
-        for dummy in n2.sites._definedContexts:
+            #print n1.sites.siteDict[idKey]['obj']
+        for dummy in n2.sites.siteDict:
             pass
             #print idKey
-            #print n2.sites._definedContexts[idKey]['obj']
+            #print n2.sites.siteDict[idKey]['obj']
 
         dummy_data = pickleMod.dumps(c, protocol=-1)
 
