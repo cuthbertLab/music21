@@ -2502,7 +2502,7 @@ class Music21Object(object):
 #         '''
 #         self.sites.removeNonContainedLocations()
 
-    def getPOSTTIMESPANSContextByClass(self, className, serialReverseSearch=True,
+    def xgetContextByClass(self, className, serialReverseSearch=True,
             callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
             memo=None):
         '''
@@ -4597,7 +4597,10 @@ class Music21Object(object):
             raise Music21ObjectException('this object does not have a TempoIndication in Sites')
         mm = ti.getSoundingMetronomeMark()
         self.duration = mm.secondsToDuration(value)
-
+        for s in self.sites.getSites(excludeNone=True):
+            if self in s._elements:
+                s._elementsChanged() # highest time is changed.
+    
     def _getSeconds(self):
         # do not search of duration is zero
         if self.duration is None or self.duration.quarterLength == 0.0:
