@@ -155,7 +155,6 @@ from music21.base import Music21Exception
 from music21.base import SitesException
 from music21.base import Music21ObjectException
 from music21.base import ElementException
-from music21.base import SlottedObject
 from music21.base import Groups
 from music21.base import Site
 from music21.base import Sites

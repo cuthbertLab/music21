@@ -66,7 +66,7 @@ VERSION = __version_info__
 VERSION_STR = __version__
 #------------------------------------------------------------------------------
 __all__ = ['Music21Exception', 'VERSION', 'VERSION_STR', 'SitesException', 'Music21ObjectException',
-           'ElementException', 'SlottedObject', 'Groups', 'Site', 'Sites',
+           'ElementException', 'Groups', 'Site', 'Sites',
            'Music21Object','ElementWrapper','mainTest']
 ## N.B. for eclipse "all" import working, we need to list this separately in "music21/__init__.py"
 ##      so make sure to update in both places
@@ -138,37 +138,11 @@ class ElementException(exceptions21.Music21Exception):
 # private metaclass...
 _SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority','classSortOrder','isNotGrace','insertIndex'])
 
-
-class SlottedObject(object):
-    r'''
-    Provides template for classes implementing slots.
-    '''
-    
-    ### CLASS VARIABLES ###
-
-    __slots__ = ()
-
-    ### SPECIAL METHODS ###
-
-    def __getstate__(self):
-        state = {}
-        slots = set()
-        for cls in self.__class__.mro():
-            slots.update(getattr(cls, '__slots__', ()))
-        for slot in slots:
-            state[slot] = getattr(self, slot, None)
-        return state
-
-    def __setstate__(self, state):
-        for slot, value in state.items():
-            setattr(self, slot, value)
-
-
 #------------------------------------------------------------------------------
 # make subclass of set once that is defined properly
 
 
-class Groups(SlottedObject, list):
+class Groups(common.SlottedObject, list):
     '''
     Groups is a list of strings used to identify associations that an element
     might have.
@@ -262,7 +236,7 @@ class Groups(SlottedObject, list):
 
 
 #------------------------------------------------------------------------------
-class Site(SlottedObject):
+class Site(common.SlottedObject):
     '''
     a single Site (container, parent, reference, etc.) stored inside the Sites object.
     '''
@@ -284,7 +258,7 @@ class Site(SlottedObject):
 
 _singletonCounter = common.SingletonCounter()
 
-class Sites(SlottedObject):
+class Sites(common.SlottedObject):
     '''
     An object, stored within a Music21Object, that stores (weak) references to
     a collection of objects that may be contextually relevant to this object.
@@ -966,6 +940,9 @@ class Sites(SlottedObject):
             >>> aLocations.getOffsetBySite(bSite)
             121.5
 
+
+        The object might not actually be in the _elements for the site object, because
+        it may be a deep copy, etc. but the number is still returned.
         '''
         # NOTE: this is a performance critical operation
         siteId = None

@@ -1559,10 +1559,12 @@ class Test(unittest.TestCase):
         '''Testing getting clefs from higher-level streams
         '''
         sInner = Stream()
+        sInner.id = 'innerStream'
         n1 = note.Note()
         sInner.append(n1) # this is the model of a stream with a single part
 
         sOuter = Stream()
+        sOuter.id = 'outerStream'
         sOuter.append(sInner)
         c1 = clef.AltoClef()
         sOuter.insert(0, c1)
@@ -1573,19 +1575,21 @@ class Test(unittest.TestCase):
 
         # if we flatten sInner, we cannot still get the clef: why?
         sInnerFlat = sInner.flat
-        # but it has sOuter has a context
-        self.assertEqual(sInnerFlat.hasContext(sOuter), True)
-        #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
-        #environLocal.printDebug(['sites._definedContexts of sInnerFlat', sInnerFlat.sites._definedContexts])
+        sInnerFlat.id = 'sInnerFlat'
 
-
-        self.assertEqual(sInnerFlat.hasContext(sOuter), True)
-
-        # this returns the proper dictionary entry
-        #environLocal.printDebug(
-        #    ['sInnerFlat.sites._definedContexts[id(sInner)', sInnerFlat.sites._definedContexts[id(sOuter)]])
-        # we can extract out the same reference
-        unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
+#         # but it has sOuter has a context
+#         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+#         #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
+#         #environLocal.printDebug(['sites._definedContexts of sInnerFlat', sInnerFlat.sites._definedContexts])
+# 
+# 
+#         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+# 
+#         # this returns the proper dictionary entry
+#         #environLocal.printDebug(
+#         #    ['sInnerFlat.sites._definedContexts[id(sInner)', sInnerFlat.sites._definedContexts[id(sOuter)]])
+#         # we can extract out the same reference
+#         unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
 
         # this works
         post = sInnerFlat.getContextByClass(clef.Clef)
@@ -7360,8 +7364,8 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    #import sys
-    #sys.argv.append('ChordifyRests')
+    import sys
+    sys.argv.append('testContextNestedB')
     music21.mainTest(Test)
 
 

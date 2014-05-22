@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 import unittest
 from music21 import exceptions21
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 
 
 #------------------------------------------------------------------------------

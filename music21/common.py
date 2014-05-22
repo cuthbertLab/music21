@@ -2138,6 +2138,30 @@ class SingletonCounter(object):
         _singletonCounter['value'] += 1
         return post
 
+#-------------------------------------------------------------------------------
+class SlottedObject(object):
+    r'''
+    Provides template for classes implementing slots.
+    '''
+    
+    ### CLASS VARIABLES ###
+
+    __slots__ = ()
+
+    ### SPECIAL METHODS ###
+
+    def __getstate__(self):
+        state = {}
+        slots = set()
+        for cls in self.__class__.mro():
+            slots.update(getattr(cls, '__slots__', ()))
+        for slot in slots:
+            state[slot] = getattr(self, slot, None)
+        return state
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
 
 
 #-------------------------------------------------------------------------------

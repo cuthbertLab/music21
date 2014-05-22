@@ -27,7 +27,7 @@ from music21 import common
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 _MOD = 'meter.py'
 environLocal = environment.Environment(_MOD)
 

@@ -9,7 +9,7 @@ Used by Josiah and Myke for the ELVIS project
 import multiprocessing
 import pickle
 from music21 import analysis
-from music21 import base
+from music21 import common
 from music21 import corpus
 from music21 import interval
 
@@ -83,7 +83,7 @@ class NGramJobHandlerWorker(multiprocessing.Process):
         return
 
 
-class NGramJob(base.SlottedObject):
+class NGramJob(common.SlottedObject):
 
     ### CLASS VARIABLES ###
 

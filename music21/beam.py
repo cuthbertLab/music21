@@ -90,7 +90,7 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 
 
 class BeamException(exceptions21.Music21Exception):

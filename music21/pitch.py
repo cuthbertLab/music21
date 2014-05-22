@@ -24,7 +24,7 @@ from music21 import common
 from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 
 from music21 import environment
 _MOD = "pitch.py"
@@ -1625,8 +1625,10 @@ class Pitch(base.Music21Object):
 
 
     def convertQuarterTonesToMicrotones(self, inPlace=True):
-        '''Convert any quarter tone Accidentals to Microtones.
+        '''
+        Convert any quarter tone Accidentals to Microtones.
 
+        tilde is the symbol for half-sharp, so G#~ is G three-quarters sharp.
 
         >>> p = pitch.Pitch('G#~')
         >>> str(p), p.microtone
@@ -4674,14 +4676,13 @@ class Test(unittest.TestCase):
 
     def testAccidentalsCautionary(self):
         '''
-        a nasty test from Jose about octave leaps, cautionaryNotImmediateRepeat = False
-        and key signature conflicts
+        a nasty test from Jose Cabal-Ugaz about octave leaps, cautionaryNotImmediateRepeat = False
+        and key signature conflicts.
         '''
         from music21 import tinyNotation, key
-        bm = tinyNotation.TinyNotationStream("fn1 fn1 e-8 e'-8 fn4 en4 e'n4", "4/4")
+        bm = tinyNotation.TinyNotationStream("4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4")
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        bm.flat.notes
         assert(bm.flat.notes[0].accidental.name == 'natural')     # Fn
         assert(bm.flat.notes[0].accidental.displayStatus is True)
         assert(bm.flat.notes[1].accidental.name == 'natural')     # Fn

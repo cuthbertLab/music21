@@ -31,7 +31,7 @@ from music21 import pitch
 from music21 import beam
 from music21 import tie
 from music21 import volume
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 
 
 from music21 import environment

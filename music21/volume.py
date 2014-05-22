@@ -19,7 +19,7 @@ import unittest
 
 from music21 import exceptions21
 from music21 import common
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 
 from music21 import environment
 _MOD = "volume.py"
