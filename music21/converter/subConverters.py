@@ -526,7 +526,7 @@ class ConverterMidi(SubConverter):
         Calls midi.translate.midiStringToStream.
         '''
         from music21.midi import translate as midiTranslate
-        self._stream = midiTranslate.midiStringToStream(strData)
+        self.stream = midiTranslate.midiStringToStream(strData)
 
     def parseFile(self, fp, number=None):
         '''
@@ -569,10 +569,10 @@ class ConverterABC(SubConverter):
         # set to stream
         if abcHandler.definesReferenceNumbers():
             # this creates an Opus object, not a Score object
-            self._stream = abcFormat.translate.abcToStreamOpus(abcHandler,
+            self.stream = abcFormat.translate.abcToStreamOpus(abcHandler,
                 number=number)
         else: # just one work
-            abcFormat.translate.abcToStreamScore(abcHandler, self._stream)
+            abcFormat.translate.abcToStreamScore(abcHandler, self.stream)
 
     def parseFile(self, fp, number=None):
         '''Get MIDI data from a file path. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
@@ -593,11 +593,11 @@ class ConverterABC(SubConverter):
         if abcHandler.definesReferenceNumbers():
             # this creates a Score or Opus object, depending on if a number
             # is given
-            self._stream = abcFormat.translate.abcToStreamOpus(abcHandler,
+            self.stream = abcFormat.translate.abcToStreamOpus(abcHandler,
                            number=number)
         # just get a single work
         else:
-            abcFormat.translate.abcToStreamScore(abcHandler, self._stream)
+            abcFormat.translate.abcToStreamScore(abcHandler, self.stream)
 
 
 class ConverterRomanText(SubConverter):

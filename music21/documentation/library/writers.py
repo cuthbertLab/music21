@@ -182,7 +182,9 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
         sends AssertionError if ipythonNotebookFilePath does not exist.
         '''
-
+        if '-checkpoint' in ipythonNotebookFilePath:
+            return False
+        
         assert os.path.exists(ipythonNotebookFilePath)
         notebookFileNameWithoutExtension = os.path.splitext(
             os.path.basename(ipythonNotebookFilePath))[0]

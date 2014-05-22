@@ -2403,7 +2403,7 @@ class Music21Object(object):
 
     def removeLocationBySiteId(self, siteId):
         '''
-        DEPRECATED -- use sites.removeById and set activeSite manually.
+        DEPRECATED since at least April 2014 -- use sites.removeById and set activeSite manually.
 
         Remove a location in the
         :class:`~music21.base.Sites` object by id.
