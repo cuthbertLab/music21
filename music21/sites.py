@@ -542,7 +542,7 @@ class Sites(common.SlottedObject):
             except AttributeError:
                 pass
 
-    def getByClass(self, className, serialReverseSearch=True, callerFirst=None,
+    def getObjByClass(self, className, serialReverseSearch=True, callerFirst=None,
              sortByCreationTime=False, prioritizeActiveSite=False,
              priorityTarget=None, getElementMethod='getElementAtOrBefore',
              memo=None):
@@ -550,8 +550,8 @@ class Sites(common.SlottedObject):
         Return the most recently added reference based on className.  Class
         name can be a string or the class name.
 
-        This will recursively search the defined contexts of existing defined
-        contexts.
+        This will recursively search the sitesDicts of objects in Site objects in 
+        the siteDict.
 
         The `callerFirst` parameters is simply used to pass a reference of the
         first caller; this is necessary if we are looking within a Stream for a
@@ -575,15 +575,14 @@ class Sites(common.SlottedObject):
             >>> bObj = Mock()
             >>> aSites = music21.Sites()
             >>> aSites.add(aObj)
-            >>> #time.sleep(.05)
             >>> aSites.add(bObj)
             >>> # we get the most recently added object first
-            >>> aSites.getByClass('Mock', sortByCreationTime=True) == bObj
+            >>> aSites.getObjByClass('Mock', sortByCreationTime=True) == bObj
             True
         
         ::
 
-            >>> aSites.getByClass(Mock, sortByCreationTime=True) == bObj
+            >>> aSites.getObjByClass(Mock, sortByCreationTime=True) == bObj
             True
 
         OMIT_FROM_DOCS
@@ -592,7 +591,7 @@ class Sites(common.SlottedObject):
         #if DEBUG_CONTEXT: print 'Y: first call'
         # in general, this should not be the first caller, as this method
         # is called from a Music21Object, not directly on the Sites
-        # isntance. Nontheless, if this is the first caller, it is the first
+        # instance. Nonetheless, if this is the first caller, it is the first
         # caller.
         if callerFirst is None:  # this is the first caller
             callerFirst = self  # set Sites as caller first
@@ -609,7 +608,7 @@ class Sites(common.SlottedObject):
             priorityTarget=priorityTarget,
             excludeNone=True,
             )
-        #printMemo(memo, 'getByClass() called: looking at %s sites' % len(objs))
+        #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
         classNameIsStr = common.isStr(className)
         for obj in objs:
             #environLocal.printDebug(['memo', memo])
@@ -627,7 +626,7 @@ class Sites(common.SlottedObject):
         # if we could be sure that these objs do not have their own locations
         # and do not have the target class, we can skip
         for obj in objs:
-            #if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
+            #if DEBUG_CONTEXT: print '\tY: getObjByClass: iterating objs:', id(obj), obj
             if (classNameIsStr and obj.isFlat):
                 #if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
                 #environLocal.printDebug(['\tY: skipping flat stream that does not contain object:'])
@@ -722,7 +721,7 @@ class Sites(common.SlottedObject):
                 return self.getOffsetBySiteId(idKey) #dict['offset']
         raise SitesException('an entry for this object (%s) is not stored in Sites' % obj)
 
-    def getOffsetBySite(self, site):
+    def getOffsetBySite(self, siteObj):
         '''
         For a given site return this Sites's offset in it. The None site is
         permitted. The id() of the site is used to find the offset.
@@ -752,8 +751,8 @@ class Sites(common.SlottedObject):
         '''
         # NOTE: this is a performance critical operation
         siteId = None
-        if site is not None:
-            siteId = id(site)
+        if siteObj is not None:
+            siteId = id(siteObj)
         try:
             # will raise a key error if not found
             return self.getOffsetBySiteId(siteId)
@@ -965,8 +964,8 @@ class Sites(common.SlottedObject):
 
     def getSites(self, idExclude=None, excludeNone=False):
         '''
-        Get all defined contexts that are locations. Note that this unwraps
-        all sites from weakrefs and is thus an expensive operation.
+        Get all Site objects in .siteDict that are locations. 
+        Note that this unwraps all sites from weakrefs and is thus an expensive operation.
 
         ::
         
@@ -1016,9 +1015,10 @@ class Sites(common.SlottedObject):
                 post.append(obj)
         return post
 
-    def getSitesByClass(self, className):
+    def getSiteObjectsByClass(self, className):
         '''
-        Return sites that match the provided class.
+        Return a list of unwrapped Site.obj (generally a Stream) 
+        that matches the provided class.
 
         Input can be either a Class object or a string
 
@@ -1034,12 +1034,12 @@ class Sites(common.SlottedObject):
             >>> aSites.add(aObj, 234)
             >>> aSites.add(bObj, 3000)
             >>> aSites.add(cObj, 200)
-            >>> aSites.getSitesByClass(Mock) == [aObj, bObj]
+            >>> aSites.getSiteObjectsByClass(Mock) == [aObj, bObj]
             True
 
         ::
 
-            >>> aSites.getSitesByClass('Stream') == [cObj]
+            >>> aSites.getSiteObjectsByClass('Stream') == [cObj]
             True
 
         '''
@@ -1115,7 +1115,8 @@ class Sites(common.SlottedObject):
 
     def isSite(self, obj):
         '''
-        Given an object, determine if it is a site stored in this Sites. This
+        Given an object, determine if it is an object in a Site stored in this 
+        Sites's siteDict. This
         will return False if the object is simply a context and not a location.
 
         ::

@@ -174,6 +174,12 @@ def _recurseStream(
     for pitched non-stream elements.
 
     This is used internally by `streamToTimespanCollection`.
+
+    flatten can be::
+    
+        True (default; inserts the contents of the Stream at offsets like flat),
+        False (inserts TimespanCollections for Streams),
+        'semiFlat' (does both)
     '''
     from music21 import spanner
     from music21 import stream
@@ -186,6 +192,8 @@ def _recurseStream(
     for element in inputStreamElements:
         startOffset = element.getOffsetBySite(currentParentage[-1])
         startOffset += initialOffset
+        
+        wasStream = False
         if isinstance(element, stream.Stream) and \
             not isinstance(element, spanner.Spanner) and \
             not isinstance(element, variant.Variant):
@@ -197,11 +205,12 @@ def _recurseStream(
                 flatten=flatten,
                 classList=classList,
                 )
-            if flatten:
+            if flatten is not False: # True or semiFlat
                 result.insert(subresult[:])
             else:
                 result.insert(subresult)
-        else:
+            wasStream = True
+        if wasStream is False or flatten=='semiFlat':
             if classList and not element.isClassOrSubclass(classList):
                 continue
             parentStartOffset = initialOffset
@@ -619,10 +628,11 @@ class ElementTimespan(object):
 
         ::
 
-            >>> timespan_two = tree.findNextElementTimespanInSamePart(
+            >>> timespan_two = tree.findNextElementTimespanInSameStreamByClass(
             ...     timespan_one)
             >>> print(timespan_two)
             <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
+            
 
         ::
 
@@ -649,6 +659,18 @@ class ElementTimespan(object):
             Traceback (most recent call last):
             ...
             TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
+
+        This is probably not what you want to do: get the next element timespan in
+        the same score:
+
+        :: 
+        
+            >>> timespan_twoWrong = tree.findNextElementTimespanInSameStreamByClass(
+            ...     timespan_one, classList=(stream.Score,))
+            >>> print(timespan_twoWrong)
+            <ElementTimespan (3.0 to 4.0) <music21.note.Note C#>>
+            >>> print(timespan_twoWrong.part)
+            <music21.stream.Part Soprano>
 
         '''
         if not isinstance(elementTimespan, type(self)):
@@ -807,12 +829,13 @@ class ElementTimespan(object):
             1
 
         '''
-        from music21 import stream
-        for x in self.parentage:
-            if not isinstance(x, stream.Measure):
-                continue
-            return x.measureNumber
-        return None
+        return self.element.measureNumber
+        #from music21 import stream
+        #for x in self.parentage:
+        #    if not isinstance(x, stream.Measure):
+        #        continue
+        #    return x.measureNumber
+        #return None
 
     @property
     def parentStartOffset(self):
@@ -842,6 +865,41 @@ class ElementTimespan(object):
         '''
         return self._parentage
 
+    def getParentageByClass(self, classList=None):
+        '''
+        returns that is the first parentage that has this classList.
+        default stream.Part
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> score.id = 'bach'
+        >>> tree = score.asTimespans()
+        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> elementTimespan = verticality.startTimespans[2]
+        >>> elementTimespan
+        <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
+        >>> elementTimespan.getParentageByClass(classList=(stream.Part,))
+        <music21.stream.Part Tenor>
+        >>> elementTimespan.getParentageByClass(classList=(stream.Measure,))
+        <music21.stream.Measure 1 offset=1.0>
+        >>> elementTimespan.getParentageByClass(classList=(stream.Score,))
+        <music21.stream.Score bach>
+
+        The closest parent is returned in case of a multiple list...
+
+        >>> searchTuple = (stream.Voice, stream.Measure, stream.Part)
+        >>> elementTimespan.getParentageByClass(classList=searchTuple)
+        <music21.stream.Measure 1 offset=1.0>
+
+        '''
+        from music21 import stream
+        if classList is None:
+            classList = (stream.Part,)
+        for parent in self.parentage:
+            for c in classList:
+                if isinstance(parent, c):
+                    return parent
+        return None
+
     @property
     def part(self):
         '''
@@ -857,11 +915,7 @@ class ElementTimespan(object):
         <music21.stream.Part Tenor>
         '''
         from music21 import stream
-        for x in self.parentage:
-            if not isinstance(x, stream.Part):
-                continue
-            return x
-        return None
+        return self.getParentageByClass(classList=(stream.Part,))
 
     @property
     def partName(self):
@@ -1700,9 +1754,11 @@ class TimespanCollection(object):
         newTree.insert([x for x in self])
         return newTree
 
-    def findNextElementTimespanInSamePart(self, elementTimespan):
+    def findNextElementTimespanInSameStreamByClass(self, elementTimespan, classList=None):
         r'''
-        Finds next element timespan in the same part as `elementTimespan`.
+        Finds next element timespan in the same stream class as `elementTimespan`.
+        
+        Default classList is (stream.Part, )
 
         ::
 
@@ -1719,7 +1775,7 @@ class TimespanCollection(object):
 
         ::
 
-            >>> timespan = tree.findNextElementTimespanInSamePart(timespan)
+            >>> timespan = tree.findNextElementTimespanInSameStreamByClass(timespan)
             >>> timespan
             <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
 
@@ -1730,7 +1786,7 @@ class TimespanCollection(object):
 
         ::
 
-            >>> timespan = tree.findNextElementTimespanInSamePart(timespan)
+            >>> timespan = tree.findNextElementTimespanInSameStreamByClass(timespan)
             >>> timespan
             <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
 
@@ -1750,10 +1806,10 @@ class TimespanCollection(object):
             if verticality is None:
                 return None
             for nextElementTimespan in verticality.startTimespans:
-                if nextElementTimespan.part is elementTimespan.part:
+                if nextElementTimespan.getParentageByClass(classList) is elementTimespan.getParentageByClass(classList):
                     return nextElementTimespan
 
-    def findPreviousElementTimespanInSamePart(self, elementTimespan):
+    def findPreviousElementTimespanInSameStreamByClass(self, elementTimespan, classList=None):
         r'''
         Finds next element timespan in the same part as `elementTimespan`.
 
@@ -1772,7 +1828,7 @@ class TimespanCollection(object):
 
         ::
 
-            >>> timespan = tree.findPreviousElementTimespanInSamePart(timespan)
+            >>> timespan = tree.findPreviousElementTimespanInSameStreamByClass(timespan)
             >>> timespan
             <ElementTimespan (34.0 to 35.0) <music21.note.Note B>>
 
@@ -1783,7 +1839,7 @@ class TimespanCollection(object):
 
         ::
 
-            >>> timespan = tree.findPreviousElementTimespanInSamePart(timespan)
+            >>> timespan = tree.findPreviousElementTimespanInSameStreamByClass(timespan)
             >>> timespan
             <ElementTimespan (33.0 to 34.0) <music21.note.Note D>>
 
@@ -1803,7 +1859,7 @@ class TimespanCollection(object):
             if verticality is None:
                 return None
             for previousElementTimespan in verticality.startTimespans:
-                if previousElementTimespan.part is elementTimespan.part:
+                if previousElementTimespan.getParentageByClass(classList) is elementTimespan.getParentageByClass(classList):
                     return previousElementTimespan
 
     def findTimespansStartingAt(self, offset):
@@ -1882,6 +1938,9 @@ class TimespanCollection(object):
                     result.extend(recurse(node.leftChild, offset, indent + 1))
             return result
         results = recurse(self._rootNode, offset)
+        #if len(results) > 0 and hasattr(results[0], 'element'):
+        #    results.sort(key=lambda x: (x.startOffset, x.stopOffset, x.element.sortTuple()[1:]))
+        #else:
         results.sort(key=lambda x: (x.startOffset, x.stopOffset))
         return tuple(results)
 
@@ -2402,24 +2461,26 @@ class TimespanCollection(object):
 
         ::
 
-            >>> for timespan in tree.findTimespansOverlapping(0.1):
-            ...     timespan
+            >>> for elementTimespan in tree.findTimespansOverlapping(0.1):
+            ...     elementTimespan, elementTimespan.part.id
             ...
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-            <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
+            (<ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>, u'Soprano')
+            (<ElementTimespan (0.0 to 0.5) <music21.note.Note A>>, u'Tenor')
+            (<ElementTimespan (0.0 to 0.5) <music21.note.Note A>>, u'Bass')
+            (<ElementTimespan (0.0 to 1.0) <music21.note.Note E>>, u'Alto')
 
+
+        
         ::
 
             >>> tree.splitAt(0.1)
-            >>> for timespan in tree.findTimespansStartingAt(0.1):
-            ...     timespan
+            >>> for elementTimespan in tree.findTimespansStartingAt(0.1):
+            ...     elementTimespan, elementTimespan.part.id
             ...
-            <ElementTimespan (0.1 to 0.5) <music21.note.Note C#>>
-            <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>
-            <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>
-            <ElementTimespan (0.1 to 1.0) <music21.note.Note E>>
+            (<ElementTimespan (0.1 to 0.5) <music21.note.Note C#>>, u'Soprano')
+            (<ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, u'Tenor')
+            (<ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, u'Bass')
+            (<ElementTimespan (0.1 to 1.0) <music21.note.Note E>>, u'Alto')
 
         ::
 
@@ -2745,6 +2806,23 @@ class TimespanCollection(object):
         # uses weakrefs so that garbage collection on the stream cache is possible...
         self._sourceRepr = repr(expr)
         self._source = common.wrapWeakref(expr)
+
+    @property
+    def element(self):
+        '''
+        defined so a TimespanCollection can be used like an ElementTimespan
+        
+        TODO: Look at subclassing or at least deriving from a common base...
+        '''
+        return common.unwrapWeakref(self._source)
+        
+    @element.setter
+    def element(self, expr):
+        # uses weakrefs so that garbage collection on the stream cache is possible...
+        self._sourceRepr = repr(expr)
+        self._source = common.wrapWeakref(expr)
+
+
 
     @property
     def startOffset(self):

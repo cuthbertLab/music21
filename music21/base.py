@@ -741,6 +741,7 @@ class Music21Object(object):
         '''
         Return True if other is a site in this Music21Object
 
+        Matches on id(other)
 
         >>> s = stream.Stream()
         >>> n = note.Note()
@@ -878,7 +879,7 @@ class Music21Object(object):
         D shares a slur with C
         E shares a slur with C
         '''
-        found = self.sites.getSitesByClass('SpannerStorage')
+        found = self.sites.getSiteObjectsByClass('SpannerStorage')
         post = []
         if spannerClassList is not None:
             if not common.isListLike(spannerClassList):
@@ -1056,10 +1057,11 @@ class Music21Object(object):
 #         '''
 #         self.sites.removeNonContainedLocations()
 
-    def xgetContextByClass(self, className, serialReverseSearch=True,
+    def _xgetContextByClass(self, className, serialReverseSearch=True,
             callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
             memo=None):
         '''
+        Not working attempt to use Timespans instead for speed...
         >>> c = corpus.parse('bwv66.6')
         >>> n = c.parts[2].measure(4).notes[0]
         >>> n.getContextByClass(meter.TimeSignature)
@@ -1067,7 +1069,7 @@ class Music21Object(object):
         
         getElementMethod can be 'getElementAtOrBefore' or 'getElementBeforeOffset'
         '''
-        def checkVerticalityForElement(verticality):
+        def extractElementFromVerticality(verticality):
             '''
             checks to see if an element is in the verticality.
             '''
@@ -1084,32 +1086,43 @@ class Music21Object(object):
                               priorityTarget=None, 
                               sortByCreationTime=False, 
                               getElementMethod='getElementAtOrBefore',
-                              serialReverseSearch=True):
+                              serialReverseSearch=True,
+                              memo=memo):
             allSites = elementWithSites.sites.get(sortByCreationTime=sortByCreationTime,
                 priorityTarget=priorityTarget, excludeNone=True)
             for thisSite in allSites:
-                elementOffset = elementWithSites.getOffsetBySite(thisSite)
+                try:
+                    elementOffset = elementWithSites.getOffsetBySite(thisSite)
+                except SitesException:
+                    continue
                 #print thisSite
                 #print thisSite.asTimespans()
                 siteTimespan = thisSite.asTimespans(classList=(className,))
+                isGhostLocation = False #
                 if elementWithSites not in thisSite._elements and elementWithSites not in thisSite._endElements:                    
-                    pass # location, not site...should not check, but can recurse...
-                else:
-                    if getElementMethod == 'getElementAtOrBefore':
-                        previousVerticality = siteTimespan.getVerticalityAtOrBefore(elementOffset)
-                    else: # if getElementMethod == 'getElementBeforeOffset':
-                        previousVerticality = siteTimespan.getVerticalityAt(elementOffset).previousVerticality
-                    foundElement = checkVerticalityForElement(previousVerticality)
-                    if foundElement is not None:
-                        return foundElement
+                    isGhostLocation = True  # location, not site...
+                        # should eventually not check, but not yet...
+
+                if getElementMethod == 'getElementAtOrBefore':
+                    previousVerticality = siteTimespan.getVerticalityAtOrBefore(elementOffset)
+                else: # if getElementMethod == 'getElementBeforeOffset':
+                    previousVerticality = siteTimespan.getVerticalityAt(elementOffset).previousVerticality
+                foundElement = extractElementFromVerticality(previousVerticality)
+                
+                if foundElement is not None:
+                    return foundElement
+                
                 if serialReverseSearch:
                     foundElementFromRecursion = recurseSiteSearch(thisSite, 
                                                                   priorityTarget=priorityTarget, 
                                                                   sortByCreationTime=sortByCreationTime, 
                                                                   getElementMethod=getElementMethod,
-                                                                  serialReverseSearch=serialReverseSearch)
+                                                                  serialReverseSearch=serialReverseSearch,
+                                                                  memo=memo)
                 if foundElementFromRecursion is not None:
                     return foundElementFromRecursion
+            return None  
+                    
                 
         if getElementMethod not in ('getElementAtOrBefore', 'getElementBeforeOffset'):
             raise Music21ObjectException('cannot get element with requested method: %s' % getElementMethod)
@@ -1122,16 +1135,17 @@ class Music21Object(object):
                                  priorityTarget=priorityTarget, 
                                  sortByCreationTime=sortByCreationTime, 
                                  getElementMethod=getElementMethod,
-                                 serialReverseSearch=serialReverseSearch
+                                 serialReverseSearch=serialReverseSearch,
+                                 memo=memo,
                                  )
-        if context is None: # still no match
+        if context is None: # still no match after searching all sites...
             # this will call this method on all defined contexts, including
             # locations (one of which must be the activeSite)
             # if this is a stream, this will be the next level up, recursing
             # a reference to the callerFirst is continuall passed
             if memo is None:
                 memo = {}
-            context = self.sites.getByClass(className,
+            context = self.sites.getObjByClass(className,
                    serialReverseSearch=serialReverseSearch,
                    sortByCreationTime=sortByCreationTime,
                    # make the priorityTarget the activeSite, meaning we search
@@ -1139,8 +1153,249 @@ class Music21Object(object):
                    prioritizeActiveSite=prioritizeActiveSite,
                    priorityTarget=priorityTarget,  getElementMethod=getElementMethod, memo=memo)
 
-        return context
+        if context is None: #
+            if hasattr(self, 'derivationHierarchy') and self.derivationHierarchy is not None:
+                for thisDerivedStream in self.derivationHierarchy:
+                    context = thisDerivedStream.getContextByClass(className,                                                                   
+                                 prioritizeActiveSite=prioritizeActiveSite, 
+                                 sortByCreationTime=sortByCreationTime, 
+                                 getElementMethod=getElementMethod,
+                                 serialReverseSearch=serialReverseSearch
+                                 )
+                    if context is not None:
+                        break
 
+        return context
+    def _ygetContextByClass(self, className, serialReverseSearch=True,
+            callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
+            memo=None):
+        '''
+        not working attempt no 2 to use timespans for speed...
+        '''
+        def checkVerticalityForElement(verticality, element):
+            '''
+            checks to see if an element is in the verticality.startTimespans
+            '''
+            if verticality is None:
+                return False
+            
+            for elTS in verticality.startTimespans:
+                if elTS.element is element:
+                    return True
+            return False
+
+        def extractElementFromVerticality(verticality):
+            if verticality is None:
+                return None
+            if len(verticality.startTimespans) > 0:
+                return verticality.startTimespans[0].element
+            elif len(verticality.overlapTimespans) > 0:
+                return verticality.overlapTimespans[0].element
+            elif len(verticality.overlapTimespans) > 0:
+                return verticality.overlapTimespans[0].element
+            
+
+        #if DEBUG_CONTEXT: print 'X: first call; looking for:', className, id(self), self
+
+        #environLocal.printDebug(['call getContextByClass from:', self, 'activeSite:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
+
+        # this method will be called recursively on all object levels, ascending
+        # thus, to do serial reverse search we need to
+        # look at activeSite.flat and track back to first encountered class match
+        if prioritizeActiveSite:
+            priorityTarget = self.activeSite
+        else:
+            priorityTarget = None
+
+        if callerFirst is None: # this is the first caller
+            callerFirst = self
+        elif isinstance(callerFirst, Sites):
+            # if caller first is Sites, nothing to do here
+            return None
+
+        if memo is None:
+            memo = {} # initialize
+            #if DEBUG_CONTEXT: print 'X: creating new memo'
+        #printMemo(memo, 'getContextByClass called by: %s %s' % (id(self), self))
+        #if DEBUG_CONTEXT: print 'X: memo:', [(key, memo[key]) for key in memo]
+
+        post = None
+        # first, if this obj is a Stream, we see if the class exists at or
+        # before where the offsetOfCaller
+
+        #if DEBUG_CONTEXT: print '\tX: entering if serialReverseSearch'
+        if serialReverseSearch:
+            # if this is a Stream and we have a caller, see if we
+            # can get the offset from within this Stream of the caller
+            # first, see if this element is even in this Stream
+            #if (hasattr(self, "elements") and callerFirst is not None):
+            #if self.isStream and callerFirst is not None:
+
+#             if (self.isStream and callerFirst is not None and not
+#                 isinstance(callerFirst, Sites)):
+            offsetOfCaller = None
+
+            if (self.isStream and callerFirst is not None):
+                
+                # memo check above is needed for string operational contexts
+                # where cached semiFlat generation raises an error
+
+                # find the offset of the callerFirst
+                # if this is a Stream, we need to find the offset relative
+                # to this Stream; it may only be available within a semiFlat
+                # representaiton
+
+                # this semiFlat name will be used in the getOffsetOfCaller
+                # branch below
+
+                #environLocal.printDebug(['getContextByClass, serialReverseSearch', 'requesting semi flat from self:', self, id(self)])
+
+                #if DEBUG_CONTEXT: print '\tX: getting semiFlat because self is Stream'
+
+                # using the cached semiFlat here can lead to an ever-
+                # increasing number of sites in the outermost semiflat
+                # lower level containers each gain a new site (self here)
+                # for example, each Measure in a Part that caches a semiflat
+                # each Measure will have a new site for every call; thus
+                # we delete the semiflat here used after every call
+                #semiFlat = self.semiFlat
+                siteTimespan = self.asTimespans(classList=(callerFirst.classes[0],), recurse='semiFlat')
+#                 if getElementMethod == 'getElementAtOrBefore':
+#                     previousVerticality = siteTimespan.getVerticalityAtOrBefore(elementOffset)
+#                 else: # if getElementMethod == 'getElementBeforeOffset':
+#                     previousVerticality = siteTimespan.getVerticalityAt(elementOffset).previousVerticality
+#                 foundElement = checkVerticalityForElement(previousVerticality)
+
+                for el in siteTimespan:
+                    if hasattr(el, 'element') and el.element is callerFirst:
+                        offsetOfCaller = el.startOffset
+                        break
+                    elif hasattr(el, 'source') and el.source is callerFirst:
+                        offsetOfCaller = el.startOffset
+#                     if checkVerticalityForElement(verticality, callerFirst):
+#                         offsetOfCaller = verticality.startOffset
+                        break
+                
+                if offsetOfCaller is None:
+                    #if (hasattr(callerFirst, 'flattenedRepresentationOf') and callerFirst.flattenedRepresentationOf is not None):
+                    if (callerFirst.isStream and
+                        callerFirst.flattenedRepresentationOf is not None):
+                        ## change to all in derivationHierarchy
+                        flatRep = callerFirst.flattenedRepresentationOf
+                        for el in siteTimespan:
+                            if hasattr(el, 'element') and el.element is flatRep:
+                                offsetOfCaller = el.startOffset
+                                break
+                            elif hasattr(el, 'source') and el.source is flatRep:
+                                offsetOfCaller = el.startOffset
+        #                     if checkVerticalityForElement(verticality, callerFirst):
+        #                         offsetOfCaller = verticality.startOffset
+                                break
+
+            # if the offset has been found, get element at or before
+            # this offset
+            if offsetOfCaller is not None:
+                # NOTE: if there are two elements of the same class here
+                # we are getting based only sort order, which may not be
+                # what we want
+                siteTimespan = self.asTimespans(classList=(className,), recurse=False)
+                if getElementMethod == 'getElementAtOrBefore':
+                    previousVerticality = siteTimespan.getVerticalityAtOrBefore(offsetOfCaller)
+                elif getElementMethod == 'getElementBeforeOffset':
+                    previousVerticality = siteTimespan.getVerticalityAt(offsetOfCaller).previousVerticality
+                else:
+                    raise Music21ObjectException('cannot get element with requested method: %s' % getElementMethod)
+                post = extractElementFromVerticality(previousVerticality)
+
+                if post is None:
+                    # same thing, but with recurse...
+                    siteTimespan = self.asTimespans(classList=(className,) )
+                    if getElementMethod == 'getElementAtOrBefore':
+                        previousVerticality = siteTimespan.getVerticalityAtOrBefore(offsetOfCaller)
+                    elif getElementMethod == 'getElementBeforeOffset':
+                        previousVerticality = siteTimespan.getVerticalityAt(offsetOfCaller).previousVerticality
+                    else:
+                        raise Music21ObjectException('cannot get element with requested method: %s' % getElementMethod)
+                    post = extractElementFromVerticality(previousVerticality)
+
+            #environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
+
+
+        #if DEBUG_CONTEXT: print '\tX: about to call getObjByClass'
+        if post is None: # still no match
+            # this will call this method on all defined contexts, including
+            # locations (one of which must be the activeSite)
+            # if this is a stream, this will be the next level up, recursing
+            # a reference to the callerFirst is continuall passed
+            post = self.sites.getObjByClass(className,
+                   serialReverseSearch=serialReverseSearch,
+                   callerFirst=callerFirst, 
+                   sortByCreationTime=sortByCreationTime,
+                   # make the priorityTarget the activeSite, meaning we search
+                   # this object first
+                   prioritizeActiveSite=prioritizeActiveSite,
+                   priorityTarget=priorityTarget,  
+                   getElementMethod=getElementMethod, 
+                   memo=memo)
+
+        # if we have a Stream, store the results
+#         if self.isStream and isinstance(className, str):
+#             if self._cache['contextCache'] is None:
+#                 self._cache['contextCache'] = contextCache.ContextCache()
+#             self._cache['contextCache'].add(className, callerFirst,
+#                                             getElementMethod, post)
+
+        return post
+
+    def _getContextByClass(self, className, serialReverseSearch=True,
+            callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
+            memo=None):
+        def extractElementFromVerticality(verticality):
+            if verticality is None:
+                return None
+            if len(verticality.startTimespans) > 0:
+                return verticality.startTimespans[0].element
+            elif len(verticality.overlapTimespans) > 0:
+                return verticality.overlapTimespans[0].element
+            elif len(verticality.overlapTimespans) > 0:
+                return verticality.overlapTimespans[0].element
+
+        def findElInTimespanCollection(ts, offsetStart):
+            if getElementMethod == 'getElementAtOrBefore':
+                vert = ts.getVerticalityAtOrBefore(offsetStart)
+            elif getElementMethod == 'getElementBeforeOffset':
+                vert = ts.getVerticalityAt(offsetStart).previousVerticality
+
+            if vert is not None:
+                el = extractElementFromVerticality(vert)
+                if el is not None and el.isClassOrSubclass(className):
+                    return el
+            return None
+
+        if not common.isListLike(className):
+            className = (className,)
+            
+        for searchPlace in self.yieldSiteSearchOrder():
+            site = searchPlace[0]
+            if site.isClassOrSubclass(className):
+                return site
+            offsetStart = searchPlace[1]
+            searchType = searchPlace[2]
+            if searchType == 'elementsOnly' or searchType == 'elementsFirst':
+                tsNotFlat = site.asTimespans(classList=className, recurse=False)
+                el = findElInTimespanCollection(tsNotFlat, offsetStart)
+                if el is not None:
+                    return el
+            if searchType != 'elementsOnly':
+                tsFlat = site.asTimespans(classList=className, recurse=True)
+                el = findElInTimespanCollection(tsFlat, offsetStart)
+                if el is not None:
+                    return el
+        
+            
+            
+        
+        
     def getContextByClass(self, className, serialReverseSearch=True,
             callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
             memo=None):
@@ -1153,6 +1408,7 @@ class Music21Object(object):
 
         >>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
         >>> s2 = s1.makeMeasures()
+        >>> s2.__class__ = stream.Part
         >>> s2.show('t')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
@@ -1251,7 +1507,7 @@ class Music21Object(object):
             return None
 
         if memo is None:
-            memo = {} # intialize
+            memo = {} # initialize
             #if DEBUG_CONTEXT: print 'X: creating new memo'
         #printMemo(memo, 'getContextByClass called by: %s %s' % (id(self), self))
         #if DEBUG_CONTEXT: print 'X: memo:', [(key, memo[key]) for key in memo]
@@ -1359,13 +1615,13 @@ class Music21Object(object):
                 # on successive calls
                 del semiFlat
 
-        #if DEBUG_CONTEXT: print '\tX: about to call getByClass'
+        #if DEBUG_CONTEXT: print '\tX: about to call getObjByClass'
         if post is None: # still no match
             # this will call this method on all defined contexts, including
             # locations (one of which must be the activeSite)
             # if this is a stream, this will be the next level up, recursing
             # a reference to the callerFirst is continuall passed
-            post = self.sites.getByClass(className,
+            post = self.sites.getObjByClass(className,
                    serialReverseSearch=serialReverseSearch,
                    callerFirst=callerFirst, sortByCreationTime=sortByCreationTime,
                    # make the priorityTarget the activeSite, meaning we search
@@ -1952,7 +2208,81 @@ class Music21Object(object):
             insertIndex = 0
         
         return _SortTuple(atEnd, offset, self.priority, self.classSortOrder, isNotGrace, insertIndex)
-         
+    
+    def yieldSiteSearchOrder(self, callerFirst=None, memo=None, offsetAppend=0.0):
+        '''
+        >>> c = corpus.parse('bwv66.6')
+        >>> c.id = 'bach'
+        >>> n = c[2][4][2]
+        >>> n
+        <music21.note.Note G#>
+        >>> for y in n.yieldSiteSearchOrder():
+        ...      print(y)
+        (<music21.stream.Measure 3 offset=9.0>, 0.5, 'elementsFirst')
+        (<music21.stream.Part Alto>, 9.5, 'flatten')
+        (<music21.stream.Score bach>, 9.5, 'elementsOnly')
+        >>> m = c[2][4]
+        >>> m
+        <music21.stream.Measure 3 offset=9.0>
+        >>> for y in m.yieldSiteSearchOrder():
+        ...      print(y)
+        (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
+        (<music21.stream.Part Alto>, 9.0, 'flatten')
+        (<music21.stream.Score bach>, 9.0, 'elementsOnly')
+        
+        >>> import copy
+        >>> m2 = copy.deepcopy(m)
+        >>> m2.number = 3333
+        >>> for y in m2.yieldSiteSearchOrder():
+        ...      print(y)
+        (<music21.stream.Measure 3333 offset=9.0>, 0.0, 'elementsFirst')
+        (<music21.stream.Part Alto>, 9.0, 'flatten')
+        (<music21.stream.Score bach>, 9.0, 'elementsOnly')
+        
+        >>> m3 = c.parts[1].measure(3)
+        >>> for y in m3.yieldSiteSearchOrder():
+        ...      print(y)
+        (<music21.stream.Measure 3 offset=0.0>, 0.0, 'elementsFirst')
+        (<music21.stream.Part Alto>, 9.0, 'flatten')
+        (<music21.stream.Stream ...>, 9.0, 'elementsFirst')
+        (<music21.stream.Score bach>, 9.0, 'elementsOnly')
+
+        this third one might be a problem...
+        '''
+        from music21 import stream
+        neverRecurseStreams = (stream.Score, stream.Opus)
+        recurseFirstStreams = (stream.Voice, stream.Part)                
+
+        def recurseTypeFromStream(st):
+            getType = 'elementsFirst'
+            for sc in neverRecurseStreams:
+                if isinstance(st, sc):
+                    getType = 'elementsOnly'
+            for sc in recurseFirstStreams:
+                if isinstance(st, sc):
+                    getType = 'flatten'
+            return getType
+        
+        if memo is None:
+            memo = []
+        if callerFirst is None:
+            callerFirst = self
+            if self.isStream:
+                getType = recurseTypeFromStream(self)
+                yield(self, 0.0, getType)
+
+        for siteObj in self.sites.get(priorityTarget=self.activeSite, excludeNone=True):
+            if 'SpannerStorage' in siteObj.classes:
+                continue
+            offsetInStream = self.getOffsetBySite(siteObj) + offsetAppend
+            getType = recurseTypeFromStream(siteObj)
+            yield (siteObj, offsetInStream, getType)
+            for x in siteObj.yieldSiteSearchOrder(callerFirst=callerFirst,
+                                                  memo=memo,
+                                                  offsetAppend=offsetInStream):
+                yield x
+
+    #------------------------------------------------------------------
     def _getDuration(self):
         '''
         Gets the DurationObject of the object or None
@@ -3664,21 +3994,28 @@ class Test(unittest.TestCase):
 
     def testSitesClef(self):
         from music21 import note, stream, clef
-        s1 = stream.Stream()
-        s2 = stream.Stream()
+        sOuter = stream.Stream()
+        sOuter.id = 'sOuter'
+        sInner = stream.Stream()
+        sInner.id = 'sInner'
+                
         n = note.Note()
-        s2.append(n)
-        s1.append(s2)
+        sInner.append(n)
+        sOuter.append(sInner)
+        
+        tss = sOuter.asTimespans(classList=(sInner.classes[0],), recurse='semiFlat')
+        tss
+
         # append clef to outer stream
-        s1.insert(0, clef.AltoClef())
-        pre = s1.getElementAtOrBefore(0, [clef.Clef])
+        sOuter.insert(0, clef.AltoClef())
+        pre = sOuter.getElementAtOrBefore(0, [clef.Clef])
         self.assertEqual(isinstance(pre, clef.AltoClef), True)
 
         # we should be able to find a clef from the lower-level stream
-        post = s2.getContextByClass(clef.Clef)
+        post = sInner.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        post = s2.getClefs(clef.Clef)
+        post = sInner.getClefs(clef.Clef)
         self.assertEqual(isinstance(post[0], clef.AltoClef), True)
 
     def testSitesPitch(self):
@@ -4518,6 +4855,8 @@ def mainTest(*testClasses, **kwargs):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
+    #import sys
+    #sys.argv.append('testSitesClef')
     mainTest(Test)
 
 

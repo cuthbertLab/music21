@@ -4189,6 +4189,8 @@ class Stream(base.Music21Object):
 
     def bestClef(self, allowTreble8vb = False):
         '''
+        TODO: Move to Clef
+        
         Returns the clef that is the best fit for notes and chords found in this Stream.
 
         This does not automatically get a flat representation of the Stream.
@@ -6741,16 +6743,18 @@ class Stream(base.Music21Object):
                         yield e
 
 
-    def _yieldElementsUpward(self, memo, streamsOnly=False,
+    def _yieldElementsUpward(self, memo=None, streamsOnly=False,
                              skipDuplicates=True, classFilter=[]):
-        '''Y
-        ield all containers (Stream subclasses), including self, and going upward.
+        '''
+        Yield all containers (Stream subclasses), including self, and going upward.
 
         Note: on first call, a new, fresh memo list must be provided; 
         otherwise, values are retained from one call to the next.
         '''
         # TODO: add support for filter list
         # TODO: add add end elements
+        if memo is None:
+            memo = []
 
         # must exclude spanner storage, as might be found
         if id(self) not in memo and 'SpannerStorage' not in self.classes:

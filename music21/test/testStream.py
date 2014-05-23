@@ -1580,14 +1580,14 @@ class Test(unittest.TestCase):
 #         # but it has sOuter has a context
 #         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
 #         #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
-#         #environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites._definedContexts])
+#         #environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
 # 
 # 
 #         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
 # 
 #         # this returns the proper dictionary entry
 #         #environLocal.printDebug(
-#         #    ['sInnerFlat.sites._definedContexts[id(sInner)', sInnerFlat.sites._definedContexts[id(sOuter)]])
+#         #    ['sInnerFlat.sites.siteDict[id(sInner)', sInnerFlat.sites.siteDict[id(sOuter)]])
 #         # we can extract out the same reference
 #         unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
 
@@ -1599,7 +1599,7 @@ class Test(unittest.TestCase):
         ## this will only work if the callerFirst is manually set to sInnerFlat
         ## otherwise, this interprets the DefinedContext object as the first 
         ## caller
-        #post = sInnerFlat.sites.getByClass(clef.Clef, callerFirst=sInnerFlat)
+        #post = sInnerFlat.sites.getObjByClass(clef.Clef, callerFirst=sInnerFlat)
         #self.assertEqual(isinstance(post, clef.AltoClef), True)
 
 
@@ -1646,14 +1646,20 @@ class Test(unittest.TestCase):
 
 
     def testContextNestedD(self):
-        '''Testing getting clefs from higher-level streams
+        '''
+        Testing getting clefs from higher-level streams
         '''
         n1 = note.Note()
         n2 = note.Note()
 
         s1 = Stream()
+        s1.id = 's1'
         s2 = Stream()
+        s2.id = 's2'
+
         sOuter = Stream()
+        sOuter.id = 'sOuter'
+
         s1.append(n1)
         s2.append(n2)
         sOuter.insert(0, s1)
@@ -1668,6 +1674,7 @@ class Test(unittest.TestCase):
         # get clef form higher level stream; only option
         self.assertEqual(s1.activeSite, sOuter)
         post = s1.getClefs()[0]
+        
         self.assertEqual(isinstance(post, clef.AltoClef), True)
         self.assertEqual(s1.activeSite, sOuter)
 
@@ -1676,7 +1683,7 @@ class Test(unittest.TestCase):
         
         # now we in sort a clef in s2; s2 will get this clef first
         s2.insert(0, clef.TenorClef())
-        # only second part should ahve tenor clef
+        # only second part should have tenor clef
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.TenorClef), True)
 
@@ -1698,13 +1705,16 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         # once we create a deepcopy of s1, it is no longer connected to 
-        # its parent if purge orphans and it is not in sOuter
-        s1FlatCopy = copy.deepcopy(s1.flat)
+        # its parent if we purge orphans and it is not in sOuter
+        s1Flat = s1.flat
+        s1Flat.id = 's1Flat'
+        s1FlatCopy = copy.deepcopy(s1Flat)
+        s1FlatCopy.id = 's1FlatCopy'
         self.assertEqual(len(s1FlatCopy.getClefs(returnDefault=False)), 1)
-        post = s1FlatCopy.getClefs()[0]
+        post = s1FlatCopy.getClefs(returnDefault=False)[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
 
-        post = s1.flat.getClefs()[0]
+        post = s1Flat.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
         self.assertEqual(sOuter in s1.sites.getSites(), True)
@@ -3070,7 +3080,6 @@ class Test(unittest.TestCase):
 
         #s.show()
         unused_post = m21ToString.fromMusic21Object(s)
-
 
     def testYieldContainers(self):
         from music21 import stream
@@ -4914,10 +4923,10 @@ class Test(unittest.TestCase):
 
         # these test prove that getting a semiFlat stream does not change the
         # activeSite
-        junk = s1.sites.getByClass(meter.TimeSignature)
+        junk = s1.sites.getObjByClass(meter.TimeSignature)
         self.assertEqual(s1.activeSite, s2)
 
-        junk = s1.sites.getByClass(clef.Clef)
+        junk = s1.sites.getObjByClass(clef.Clef)
         self.assertEqual(s1.activeSite, s2)
 
         junk = s1.getContextByClass('Clef')
@@ -7365,7 +7374,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     import sys
-    sys.argv.append('testContextNestedB')
+    sys.argv.append('testContextNestedD')
     music21.mainTest(Test)
 
 
