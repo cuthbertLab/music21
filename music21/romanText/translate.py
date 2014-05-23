@@ -209,7 +209,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
         raise RomanTextTranslateException('the source section cannot overlap with the destination section')
 
     measures = []
-    for mPast in p.getElementsByClass('Measure'):
+    for mPast in p.getElementsByClass('Measure', returnStreamSubClass='list'):
         if mPast.number in range(targetStart, targetEnd +1):
             try:
                 m = copy.deepcopy(mPast)

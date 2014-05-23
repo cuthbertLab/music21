@@ -321,10 +321,18 @@ def getVLQs(score, partNum1, partNum2):
     from music21.stream import timespans
     tsCol = timespans.streamToTimespanCollection(score)
     allVLQs = []
+    defaultKey = None
+    
     for v in tsCol.iterateVerticalities():
         vlqs = v.getAllVoiceLeadingQuartets(partPairNumbers=[(partNum1, partNum2)])
         for vlq in vlqs:
-            vlq.key = getKeyAtMeasure(score, vlq.v1n1.measureNumber)
+            newKey = vlq.v1n1.getContextByClass('KeySignature')
+            if newKey is None:
+                if defaultKey is None:
+                    defaultKey = score.analyze('key')
+                newKey = defaultKey
+            vlq.key = newKey
+            #vlq.key = getKeyAtMeasure(score, vlq.v1n1.measureNumber)
         allVLQs.extend(vlqs)
     return allVLQs
     # Caches the list of VLQs once they have been computed
