@@ -1347,7 +1347,7 @@ class Music21Object(object):
 
         return post
 
-    def _getContextByClass(self, className, serialReverseSearch=True,
+    def getContextByClass(self, className, serialReverseSearch=True,
             callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
             memo=None):
         def extractElementFromVerticality(verticality):
@@ -1369,13 +1369,30 @@ class Music21Object(object):
             if vert is not None:
                 el = extractElementFromVerticality(vert)
                 if el is not None and el.isClassOrSubclass(className):
+                    # latter should not be necessary...
                     return el
             return None
+
+        def findElInTimespanColNoRecurse(ts, offsetStart):
+            # goes through each, but should be fast because
+            # only contains containers and elements with the
+            # proper classes...
+            if getElementMethod == 'getElementAtOrBefore':
+                offsetStart += 0.0001
+            while offsetStart is not None: # redundant, but useful...
+                offsetStart = ts.getStartOffsetBefore(offsetStart)
+                if offsetStart is None:
+                    return None
+                startTimespans = ts.findTimespansStartingAt(offsetStart)
+                for el in startTimespans:
+                    if hasattr(el, 'source'):
+                        continue
+                    return el.element
 
         if not common.isListLike(className):
             className = (className,)
             
-        for searchPlace in self.yieldSiteSearchOrder():
+        for searchPlace in self.yieldSiteSearchOrder(sortByCreationTime=sortByCreationTime):
             site = searchPlace[0]
             if site.isClassOrSubclass(className):
                 return site
@@ -1383,7 +1400,7 @@ class Music21Object(object):
             searchType = searchPlace[2]
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 tsNotFlat = site.asTimespans(classList=className, recurse=False)
-                el = findElInTimespanCollection(tsNotFlat, offsetStart)
+                el = findElInTimespanColNoRecurse(tsNotFlat, offsetStart)
                 if el is not None:
                     return el
             if searchType != 'elementsOnly':
@@ -1396,7 +1413,7 @@ class Music21Object(object):
             
         
         
-    def getContextByClass(self, className, serialReverseSearch=True,
+    def _getContextByClass(self, className, serialReverseSearch=True,
             callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
             memo=None):
         '''
@@ -2209,7 +2226,8 @@ class Music21Object(object):
         
         return _SortTuple(atEnd, offset, self.priority, self.classSortOrder, isNotGrace, insertIndex)
     
-    def yieldSiteSearchOrder(self, callerFirst=None, memo=None, offsetAppend=0.0):
+    def yieldSiteSearchOrder(self, callerFirst=None, memo=None, offsetAppend=0.0, sortByCreationTime=False,
+                             priorityTarget=None):
         '''
         >>> c = corpus.parse('bwv66.6')
         >>> c.id = 'bach'
@@ -2244,10 +2262,61 @@ class Music21Object(object):
         ...      print(y)
         (<music21.stream.Measure 3 offset=0.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
-        (<music21.stream.Stream ...>, 9.0, 'elementsFirst')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
+        (<music21.stream.Stream ...>, 9.0, 'elementsFirst')
 
-        this third one might be a problem...
+        
+        
+        Sorting order:
+        
+        >>> p1 = stream.Part()
+        >>> p1.id = 'p1'
+        >>> m1 = stream.Measure()
+        >>> m1.number = 1
+        >>> n = note.Note()
+        >>> m1.append(n)
+        >>> p1.append(m1)
+        >>> for y in n.yieldSiteSearchOrder():
+        ...     print(y[0])
+        <music21.stream.Measure 1 offset=0.0>
+        <music21.stream.Part p1>
+
+        >>> p2 = stream.Part()
+        >>> p2.id = 'p2'
+        >>> m2 = stream.Measure()
+        >>> m2.number = 2
+        >>> m2.append(n)
+        >>> p2.append(m2)
+        
+        
+        Now the keys could appear in any order!  To fix set priorityTarget to activeSite
+        
+        >>> for y in n.yieldSiteSearchOrder(priorityTarget=n.activeSite):
+        ...     print(y[0])
+        <music21.stream.Measure 2 offset=0.0>
+        <music21.stream.Part p2>
+        <music21.stream.Measure 1 offset=0.0>
+        <music21.stream.Part p1>
+
+
+        Or sort by creationTime...
+        
+        
+        >>> for y in n.yieldSiteSearchOrder(sortByCreationTime = True):
+        ...     print(y[0])
+        <music21.stream.Measure 2 offset=0.0>
+        <music21.stream.Part p2>
+        <music21.stream.Measure 1 offset=0.0>
+        <music21.stream.Part p1>
+
+        oldest first...
+
+        >>> for y in n.yieldSiteSearchOrder(sortByCreationTime = 'reverse'):
+        ...     print(y[0])
+        <music21.stream.Measure 1 offset=0.0>
+        <music21.stream.Part p1>
+        <music21.stream.Measure 2 offset=0.0>
+        <music21.stream.Part p2>
         '''
         from music21 import stream
         neverRecurseStreams = (stream.Score, stream.Opus)
@@ -2271,7 +2340,9 @@ class Music21Object(object):
                 getType = recurseTypeFromStream(self)
                 yield(self, 0.0, getType)
 
-        for siteObj in self.sites.get(priorityTarget=self.activeSite, excludeNone=True):
+        for siteObj in self.sites.get(priorityTarget=priorityTarget,
+                                      sortByCreationTime=sortByCreationTime,
+                                      excludeNone=True):
             if 'SpannerStorage' in siteObj.classes:
                 continue
             offsetInStream = self.getOffsetBySite(siteObj) + offsetAppend
@@ -2279,7 +2350,9 @@ class Music21Object(object):
             yield (siteObj, offsetInStream, getType)
             for x in siteObj.yieldSiteSearchOrder(callerFirst=callerFirst,
                                                   memo=memo,
-                                                  offsetAppend=offsetInStream):
+                                                  offsetAppend=offsetInStream,
+                                                  sortByCreationTime=sortByCreationTime,
+                                                  priorityTarget=priorityTarget):
                 yield x
 
     #------------------------------------------------------------------

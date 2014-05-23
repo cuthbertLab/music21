@@ -2025,9 +2025,9 @@ class Stream(base.Music21Object):
             keySignatures = sLeft.getKeySignatures(searchContext=searchContext)
             if len(keySignatures) > 0:
                 sRight.keySignature = copy.deepcopy(keySignatures[0])
-            clefs = sLeft.getClefs(searchContext=searchContext)
-            if len(clefs) > 0:
-                sRight.clef = copy.deepcopy(clefs[0])
+            endClef = sLeft.getContextByClass('Clef')
+            if endClef > 0:
+                sRight.clef = copy.deepcopy(endClef)
 
         if (quarterLength > sLeft.highestTime): # nothing to do
             return sLeft, sRight
@@ -3801,13 +3801,13 @@ class Stream(base.Music21Object):
         for className in classFilterList:
             if className in [Measure or 'Measure']: # do not redo
                 continue
-            for e in self.getElementsByClass(className):
+            for e in self.getElementsByClass(className, returnStreamSubClass='list'):
                 #environLocal.printDebug(['calling measure offsetMap(); e:', e])
                 # NOTE: if this is done on Notes, this can take an extremely
                 # long time to process
                 # -1 here is a reverse sort, where oldest objects are returned
                 # first
-                m = e.getContextByClass(Measure, sortByCreationTime=-1,
+                m = e.getContextByClass('Measure', sortByCreationTime=-1,
                     prioritizeActiveSite=False)
                 if m is None:
                     continue

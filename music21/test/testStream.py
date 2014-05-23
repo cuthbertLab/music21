@@ -1342,6 +1342,7 @@ class Test(unittest.TestCase):
         # count
 
         m1 = a.parts[0].getElementsByClass('Measure')[1]
+        #m1.show('text')
         mOffsetMap = m1.measureOffsetMap(note.Note)
         # offset here is that of measure that originally contained this note
         #environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
@@ -1636,9 +1637,9 @@ class Test(unittest.TestCase):
         #  self.assertEqual(s2.getOffsetByElement(s1.flat), None)  == 0.0
 
 
-        # this does not work; the clef is in s2; its not in a context of s2
+        # this did not work before; the clef is in s2; its not in a context of s2
         post = s2.getContextByClass(clef.Clef)
-        self.assertEqual(post, None)
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         # we can find the clef from the flat version of 21
         post = s1.flat.getContextByClass(clef.Clef)
@@ -1652,12 +1653,12 @@ class Test(unittest.TestCase):
         n1 = note.Note()
         n2 = note.Note()
 
-        s1 = Stream()
+        s1 = Part()
         s1.id = 's1'
-        s2 = Stream()
+        s2 = Part()
         s2.id = 's2'
 
-        sOuter = Stream()
+        sOuter = Score()
         sOuter.id = 'sOuter'
 
         s1.append(n1)
@@ -1688,7 +1689,9 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, clef.TenorClef), True)
 
         # but stream s1 should get the alto clef still
-        post = s1.getClefs()[0]
+        #print list(s1.yieldSiteSearchOrder())
+        post = s1.getContextByClass('Clef')
+        #print post
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         # s2 flat gets the tenor clef; it was inserted in it
@@ -7373,8 +7376,10 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    import sys
-    sys.argv.append('testContextNestedD')
+    #import sys
+    #'testContextNestedC'
+    #'testContextNestedD'
+    #sys.argv.append('testContextNestedD')
     music21.mainTest(Test)
 
 

@@ -352,7 +352,8 @@ class Sites(common.SlottedObject):
         The `locationsTrail` option forces locations to come after all other defined contexts.
 
         The `sortByCreationTime` option will sort objects by creation time,
-        where most-recently assigned objects are returned first.
+        where most-recently assigned objects are returned first. Can be [False, other], [True, 1] or
+        ['reverse', -1]
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
 

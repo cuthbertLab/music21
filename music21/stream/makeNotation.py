@@ -413,10 +413,14 @@ def makeMeasures(
     # presently, this only gets the first clef
     # may need to store a clefStream and access changes in clefs
     # as is done with meterStream
-    clefStream = srcObj.getClefs(searchActiveSite=True,
-                    searchContext=searchContext,
-                    returnDefault=True)
-    clefObj = clefStream[0]
+    #clefStream = srcObj.getClefs(searchActiveSite=True,
+    #                searchContext=searchContext,
+    #                returnDefault=True)
+    #clefObj = clefStream[0]
+    #del clefStream
+    clefObj = srcObj.getContextByClass('Clef') 
+    if clefObj is None:
+        clefObj = srcObj.bestClef()
 
     #environLocal.printDebug([
     #    'makeMeasures(): first clef found after copying and flattening',
@@ -578,7 +582,6 @@ def makeMeasures(
 
     # clean up temporary streams to avoid extra site accumulation
     del srcObj
-    del clefStream
 
     # set barlines if necessary
     lastIndex = len(post.getElementsByClass('Measure')) - 1

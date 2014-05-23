@@ -1993,7 +1993,7 @@ class TimespanCollection(object):
             >>> tree.getStartOffsetBefore(0) is None
             True
 
-        Return none if no preceding offset exists.
+        Return None if no preceding offset exists.
         '''
         def recurse(node, offset):
             if node is None:
@@ -2478,9 +2478,9 @@ class TimespanCollection(object):
             ...     elementTimespan, elementTimespan.part.id
             ...
             (<ElementTimespan (0.1 to 0.5) <music21.note.Note C#>>, u'Soprano')
+            (<ElementTimespan (0.1 to 1.0) <music21.note.Note E>>, u'Alto')
             (<ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, u'Tenor')
             (<ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, u'Bass')
-            (<ElementTimespan (0.1 to 1.0) <music21.note.Note E>>, u'Alto')
 
         ::
 
