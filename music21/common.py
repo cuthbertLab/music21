@@ -22,6 +22,8 @@ import time
 import hashlib
 import random
 import inspect
+import weakref
+
 
 from music21 import exceptions21
 from music21.ext import six
@@ -1927,11 +1929,9 @@ def wrapWeakref(referent):
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects; also prevents wrapping the unwrapable "None" type, etc.
     '''
-    import weakref
     #if type(referent) is weakref.ref:
 #     if isinstance(referent, weakref.ref):
 #         return referent
-
     try:
         return weakref.ref(referent)
     # if referent is None, will raise a TypeError
@@ -1962,7 +1962,6 @@ def unwrapWeakref(referent):
     >>> common.unwrapWeakref(a2.strong) is common.unwrapWeakref(a2.weak)
     True
     '''
-    import weakref
     if type(referent) is weakref.ref:
         return referent()
     else:

@@ -879,7 +879,7 @@ class Music21Object(object):
         D shares a slur with C
         E shares a slur with C
         '''
-        found = self.sites.getSiteObjectsByClass('SpannerStorage')
+        found = self.sites.getSitesByClass('SpannerStorage')
         post = []
         if spannerClassList is not None:
             if not common.isListLike(spannerClassList):

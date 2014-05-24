@@ -1016,7 +1016,7 @@ class Sites(common.SlottedObject):
                 post.append(obj)
         return post
 
-    def getSiteObjectsByClass(self, className):
+    def getSitesByClass(self, className):
         '''
         Return a list of unwrapped site from siteDict.site [SiteRef.site] (generally a Stream) 
         that matches the provided class.
@@ -1035,12 +1035,12 @@ class Sites(common.SlottedObject):
             >>> aSites.add(aObj, 234)
             >>> aSites.add(bObj, 3000)
             >>> aSites.add(cObj, 200)
-            >>> aSites.getSiteObjectsByClass(Mock) == [aObj, bObj]
+            >>> aSites.getSitesByClass(Mock) == [aObj, bObj]
             True
 
         ::
 
-            >>> aSites.getSiteObjectsByClass('Stream') == [cObj]
+            >>> aSites.getSitesByClass('Stream') == [cObj]
             True
 
         '''
