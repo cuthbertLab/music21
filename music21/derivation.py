@@ -115,7 +115,7 @@ class Derivation(SlottedObject):
         self._client = None
         self._clientId = None  # store id to optimize w/o unwrapping
         self._method = None
-        # origin should be stored as a weak ref
+        # origin should be stored as a weak ref -- the place where it came from.
         self._origin = None
         self._originId = None  # store id to optimize w/o unwrapping
         # set client; can handle None

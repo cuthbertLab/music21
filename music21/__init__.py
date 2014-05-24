@@ -92,7 +92,6 @@ __all__ = [
     'chant',
     'chord',
     'chordTables', 
-    'classCache',
     'clef',
     'common',
     'configure',

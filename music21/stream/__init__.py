@@ -29,7 +29,6 @@ from music21 import base
 
 from music21 import bar
 from music21 import common
-#from music21 import classCache
 from music21 import clef
 from music21 import chord
 from music21 import defaults
@@ -2451,15 +2450,6 @@ class Stream(base.Music21Object):
         if returnList is False:
             found.isSorted = self.isSorted
 
-        # to use class cache, class must be provided as a string,
-        # and there must be only one class
-#         if canUseClassCache:
-#             if self._cache['classCache'] is None:
-#                 self._cache['classCache'] = classCache.ClassCache()
-#                 self._cache['classCache'].load(self)
-#             found = self._cache['classCache'].getElementsByClass(found,
-#                                               classFilterList)
-#             return found
 
         #found.show('t')
         # need both _elements and _endElements
