@@ -640,6 +640,8 @@ class _EnvironmentCore(object):
 
     def launch(self, fmt, filePath, options='', app=None):
         # see common.fileExtensions for format names
+        environmentKey = None
+
         m21Format, unused_ext = common.findFormat(fmt)
         if m21Format == 'lilypond':
             environmentKey = 'lilypondPath'

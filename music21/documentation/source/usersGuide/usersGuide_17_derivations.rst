@@ -1,7 +1,6 @@
+.. _usersGuide_17_derivations:
 .. code:: python
 
-    # ignore this
-    %load_ext music21.ipython21.ipExtension
 
 User's Guide: Chapter 17: Derivations
 =====================================
@@ -42,8 +41,6 @@ visualized as follows:
 
    Figure 37.3: Derivation representation
 
-
-In[ ]:
 
 .. code:: python
 

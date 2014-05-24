@@ -2628,12 +2628,6 @@ class Duration(DurationCommon):
             # lengths should be the same as it was before
             self.updateQuarterLength()
 
-    def show(self, format='musicxml'): # format is okay here... @ReservedAssignment
-        '''
-        Same as Music21Object.show().
-        '''
-        environLocal.launch(format, self.write(format))
-
     def splitDotGroups(self):
         '''
         splits a dotGroup-duration (of 1 component) into a new duration of two
@@ -2709,27 +2703,6 @@ class Duration(DurationCommon):
                 # be updated when this property is called
                 self._qtrLength += dur.quarterLength
         self._quarterLengthNeedsUpdating = False
-
-    def write(self, format='musicxml', fp=None): # format is okay here @ReservedAssignment
-        '''
-        As in Music21Object.write: Writes a file in the given format (musicxml by default)
-
-        A None file path will result in temporary file.
-        '''
-        foundFormat, ext = common.findFormat(format)
-        if foundFormat is None:
-            raise DurationException('bad format (%s) provided to write()' % format)
-        elif foundFormat == 'musicxml':
-            from music21.musicxml import m21ToString
-            if fp is None:
-                fp = environLocal.getTempFile(ext)
-            dataStr = m21ToString.fromDuration(self)
-        else:
-            raise DurationException('cannot support writing in this format, %s yet' % foundFormat)
-        f = open(fp, 'w')
-        f.write(dataStr)
-        f.close()
-        return fp
 
     ### PUBLIC PROPERTIES ###
 
@@ -3557,9 +3530,12 @@ class TestExternal(unittest.TestCase):
 
 
     def testSingle(self):
+        from music21 import note
         a = Duration()
         a.quarterLength = 2.66666
-        a.show()
+        n = note.Note()
+        n.duration = a
+        n.show()
 
     def testBasic(self):
         import random

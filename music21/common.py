@@ -179,9 +179,12 @@ def findSubConverterForFormat(fmt):
 
 def findFormat(fmt):
     '''
-    Given a format defined either by a format name or
-    an extension, return the format name as well as 
+    Given a format defined either by a format name, abbreviation, or
+    an extension, return the regularized format name as well as 
     the output exensions.
+    
+    May 2014 -- All but the first element of the tuple are deprecated for use, since
+    the extension can vary by subconverter (e.g., lily.png)
 
     Note that .mxl and .mx are only considered MusicXML input formats.
 
@@ -193,6 +196,8 @@ def findFormat(fmt):
     >>> common.findFormat('musicxml')
     ('musicxml', '.xml')
     >>> common.findFormat('lily')
+    ('lilypond', '.ly')
+    >>> common.findFormat('lily.png')
     ('lilypond', '.ly')
     >>> common.findFormat('humdrum')
     ('humdrum', None)
@@ -217,10 +222,11 @@ def findFormat(fmt):
     ('musicxml', '.xml')
 
     
-    #     >>> common.findFormat('png')
-    #     ('musicxml.png', '.png')
-    #     >>> common.findFormat('ipython')
-    #     ('ipython', '.png')
+    #>>> common.findFormat('png')
+    #('musicxml.png', '.png')
+    
+    #>>> common.findFormat('ipython')
+    #('ipython', '.png')
     #     >>> common.findFormat('ipython.png')
     #     ('ipython', '.png')
     #     >>> common.findFormat('musicxml.png')
@@ -247,17 +253,30 @@ def findFormat(fmt):
     if fmt.startswith('.'):
         fmt = fmt[1:] # strip .
     foundSc = None
+    
+    formatList = fmt.split('.')
+    fmt = formatList[0]
+    if len(formatList) > 1:
+        unused_subformats = formatList[1:]
+    else:
+        unused_subformats = []
+        
     for sc in subConverterList():
         extensions = sc.registerInputExtensions
         for ext in extensions:
             if fmt == ext:
                 foundSc = sc
                 break
-        formats = sc.registerFormats
+        if foundSc is not None:
+            break
+        formats = sc.registerFormats        
         for scFormat in formats:
             if fmt == scFormat:
                 foundSc = sc
                 break
+        if foundSc is not None:
+            break
+
     if foundSc is None:
         return (None, None)
     else:

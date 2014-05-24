@@ -1,10 +1,12 @@
+.. _usersGuide_99_Table_of_Contents:
 User's Guide, Table of Contents
 ===============================
 
 This is the table of contents for the eventual User's Guide, where
 topics will be linked and added as the topics are written:
 
-Introduction (to be taken from the **Quick Start**)
+:ref:`Introduction <usersGuide_00_introduction>` (to be taken from the
+**Quick Start**)
 
 1.  Installing (sigh!)
 2.  Notes
@@ -60,8 +62,6 @@ Introduction (to be taken from the **Quick Start**)
 52. MIDI -- advanced
 53. Medieval and Renaissance extensions
 
-
-In[ ]:
 
 .. code:: python
 

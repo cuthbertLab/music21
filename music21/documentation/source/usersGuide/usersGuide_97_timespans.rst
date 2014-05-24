@@ -1,7 +1,6 @@
+.. _usersGuide_97_timespans:
 .. code:: python
 
-    # ignore this
-    %load_ext music21.ipython21.ipExtension
 
 .. code:: python
 
@@ -477,8 +476,6 @@ Test previousVerticality with Rest
     	<ElementTimespan (81.0 to 81.0) <music21.meter.TimeSignature 2/4>>
     	<ElementTimespan (185.0 to 185.0) <music21.meter.TimeSignature 6/8>>
     	<ElementTimespan (275.0 to 275.0) <music21.meter.TimeSignature 3/4>>
-
-In[ ]:
 
 .. code:: python
 

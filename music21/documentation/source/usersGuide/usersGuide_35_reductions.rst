@@ -1,3 +1,4 @@
+.. _usersGuide_35_reductions:
 .. code:: python
 
     %load_ext music21.ipython21.ipExtension
@@ -2179,8 +2180,6 @@
 
     <IPython.zmq.zmqshell.ZMQInteractiveShell at 0x104a22190>
 
-
-In[ ]:
 
 .. code:: python
 

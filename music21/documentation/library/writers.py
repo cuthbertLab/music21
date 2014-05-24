@@ -206,10 +206,10 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         self._runNBConvert(ipythonNotebookFilePath)
         with open(rstFilePath, 'r') as f:
             oldLines = f.read().splitlines()
-        ipythonPromptPattern = re.compile('^In\[\d+\]:')
+        ipythonPromptPattern = re.compile('^In\[[\d ]+\]:')
         mangledInternalReference = re.compile(
-            r'\:(class|ref|func|meth)\:\`\`(.*?)\`\`')
-        newLines = []
+            r'\:(class|ref|func|meth)\:\`\`?(.*?)\`\`?')
+        newLines = ['.. _' + notebookFileNameWithoutExtension + ":"]
         currentLineNumber = 0
         while currentLineNumber < len(oldLines):
             currentLine = oldLines[currentLineNumber]
@@ -229,6 +229,9 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 else:
                     newLines.append(currentLine)
                 currentLineNumber += 1
+            elif "# ignore this" in currentLine:
+                currentLineNumber += 2  #  # ignore this
+                                        #  %load_ext music21.ipython21.ipExtension
             # Otherwise, nothing special to do, just add the line to our results:
             else:
                 # fix cases of inline :class:`~music21.stream.Stream` being

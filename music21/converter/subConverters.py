@@ -16,6 +16,7 @@ parseData method that sets self.stream
 #-------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property.
 import os
+import unittest
 
 from music21.ext import six
 from music21 import common
@@ -56,6 +57,8 @@ class SubConverter(object):
     registerShowFormats = ()
     registerInputExtensions = ()
     registerOutputExtensions = ()
+    registerOutputSubformatExtensions = None
+    
     codecWrite = False
     stringEncoding='utf-8'
     
@@ -106,8 +109,25 @@ class SubConverter(object):
         '''
         return True
 
-    def show(self, obj, fmt, fp=None, subformats=None, **keywords):
-        pass
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
+        environLocal.launch(fmt, returnedFilePath, app=app)
+
+    def getExtensionForFormatOrSubformats(self, fmt=None, subformats=None):
+        exts = self.registerOutputExtensions
+        if len(exts) == 0:
+            raise SubConverterException("Cannot show or write -- no output extension")
+        ext = exts[0]
+        if self.registerOutputSubformatExtensions is not None and subformats is not None:
+            joinedSubformats = '.'.join(subformats)
+            if joinedSubformats in self.registerOutputSubformatExtensions:
+                ext = self.registerOutputSubformatExtensions[joinedSubformats]
+        return "." + ext
+
+    def getTemporaryFile(self, fmt=None, subformats=None):
+        ext = self.getExtensionForFormatOrSubformats(fmt, subformats)
+        fp = environLocal.getTempFile(ext)
+        return fp
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         dataStr = repr(obj)
@@ -115,6 +135,9 @@ class SubConverter(object):
         return fp
     
     def writeDataStream(self, fp, dataStr):
+        if fp is None:
+            fp = self.getTemporaryFile()
+
         if self.readBinary is False:
             writeFlags = 'w'
         else:
@@ -131,10 +154,15 @@ class SubConverter(object):
             f = codecs.open(fp, mode=writeFlags, encoding=self.stringEncoding)
             f.write(dataStr)
             f.close()
+        return fp
+    
             
 class ConverterLilypond(SubConverter):
     registerFormats = ('lilypond', 'lily')
     registerOutputExtensions = ('ly','png','pdf','svg')
+    registerOutputSubformatExtensions = {'png': 'png',
+                                         'pdf': 'pdf',
+                                         'svg': ''} # sic!
     codecWrite = True
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
@@ -159,19 +187,25 @@ class ConverterLilypond(SubConverter):
                 return convertedFilePath
             
         elif subformats is not None and 'svg' in subformats:
-            if fp.endswith('.svg'):
-                fp = fp[:-4] 
             conv.loadFromMusic21Object(obj)
             convertedFilePath = conv.createSVG(fp)
             return convertedFilePath
         
         else:
             dataStr = conv.textFromMusic21Object(obj).encode('utf-8')
-            self.writeDataStream(fp, dataStr)
+            fp = self.writeDataStream(fp, dataStr)
             return fp
 
-    def show(self,obj, fmt, fp=None, subformats=None, **keywords):
-        pass
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        if subformats is None or len(subformats) == 0:
+            subformats = ['png']
+        returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
+        if subformats is not None and len(subformats) > 0:
+            outFormat = subformats[0]
+        else:
+            outFormat = 'png'
+        environLocal.launch(outFormat, returnedFilePath, app=app)
+
 
 class ConverterBraille(SubConverter):
     registerFormats = ('braille',)
@@ -181,9 +215,8 @@ class ConverterBraille(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         from music21 import braille
         dataStr = braille.translate.objectToBraille(obj)
-        self.writeDataStream(fp, dataStr)
+        fp = self.writeDataStream(fp, dataStr)
         return fp
-    
     
 class ConverterVexflow(SubConverter):
     registerFormats = ('vexflow',)
@@ -198,6 +231,10 @@ class ConverterVexflow(SubConverter):
 
 
 class ConverterText(SubConverter):
+    '''
+    standard text presentation has line breaks, is printed.
+    '''
+    
     registerFormats = ('text','txt','t')
     registerOutputExtensions = ('txt',)
 
@@ -205,8 +242,19 @@ class ConverterText(SubConverter):
         dataStr = obj._reprText()
         self.writeDataStream(fp, dataStr)
         return fp
+    
+    def show(self, obj, *args, **keywords):
+        print(obj._reprText())
 
 class ConverterTextLine(SubConverter):
+    '''
+    a text line compacts the complete recursive representation into a
+    single line of text; most for debugging. returned, not printed
+    
+    >>> s = corpus.parse('bwv66.6')
+    >>> s.measures(1,4).show('textline')
+    u'{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>...' 
+    '''
     registerFormats = ('textline',)
     registerOutputExtensions = ('txt',)
 
@@ -214,6 +262,9 @@ class ConverterTextLine(SubConverter):
         dataStr = obj._reprTextLine()
         self.writeDataStream(fp, dataStr)
         return fp
+
+    def show(self, obj, *args, **keywords):
+        return obj._reprTextLine()
 
 
 class ConverterScala(SubConverter):
@@ -503,7 +554,7 @@ class ConverterMusicXML(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         from music21.musicxml import m21ToString
         dataStr = m21ToString.fromMusic21Object(obj)
-        self.writeDataStream(fp, dataStr)        
+        fp = self.writeDataStream(fp, dataStr)        
         
         if subformats is not None and 'png' in subformats:
             fp = self.runThroughMusescore(fp, **keywords)
@@ -539,6 +590,8 @@ class ConverterMidi(SubConverter):
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         from music21.midi import translate as midiTranslate
+        if fp is None:
+            fp = self.getTemporaryFile()
         mf = midiTranslate.music21ObjectToMidiFile(obj)
         mf.open(fp, 'wb') # write binary
         mf.write()
@@ -723,6 +776,39 @@ class ConverterMuseData(SubConverter):
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 
+class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+        
+    def testSimpleTextShow(self):
+        from music21 import stream, note
+        n = note.Note()
+        s = stream.Stream()
+        s.append(n)
+        unused_x = s.show('textLine')
+
+    def testWriteLilypond(self):
+        from music21 import stream, note
+        n = note.Note()
+        n.duration.type = 'whole'
+        s = stream.Stream()
+        s.append(n)
+        #s.show('lily.png')
+        print s.write('lily.png')
+        
+class TestExternal(unittest.TestCase):
+    def runTest(self):
+        pass
+        
+    def testXMLShow(self):
+        from music21 import corpus
+        c = corpus.parse('bwv66.6')
+        c.show() # musicxml
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    import sys
+    #sys.argv.append('SimpleTextShow')
+    music21.mainTest(Test, 'noDocTest')

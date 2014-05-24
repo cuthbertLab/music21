@@ -2016,20 +2016,17 @@ class Music21Object(object):
         elif fmt.startswith('.'):
             fmt = fmt[1:]
 
-        fileFormat, ext = common.findFormat(fmt)
-        if fileFormat is None:
+        regularizedConverterFormat, unused_ext = common.findFormat(fmt)
+        if regularizedConverterFormat is None:
             raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
 
-        formatSubs = fileFormat.split('.')
-        fileFormat = formatSubs[0]
-        subFormats = formatSubs[1:]
+        formatSubs = fmt.split('.')
+        fmt = formatSubs[0]
+        subformats = formatSubs[1:]
 
-        if fp is None:
-            fp = environLocal.getTempFile(ext)
-        
-        scClass = common.findSubConverterForFormat(fileFormat)
+        scClass = common.findSubConverterForFormat(regularizedConverterFormat)
         formatWriter = scClass()
-        return formatWriter.write(self, fileFormat, fp, subFormats, **keywords)
+        return formatWriter.write(self, regularizedConverterFormat, fp, subformats, **keywords)
 
 # 
 #         if fileFormat in ['text', 'textline', 'musicxml', 'vexflow']:
@@ -2179,80 +2176,46 @@ class Music21Object(object):
         '''
         # note that all formats here must be defined in
         # common.VALID_SHOW_FORMATS
-
         if fmt is None: # get setting in environment
             if common.runningUnderIPython():
-                fmt = 'lilypond.ipython.png'
+                fmt = 'lily.png'
             else:
                 fmt = environLocal['showFormat']
-        if not common.isStr(fmt):
-            raise Music21ObjectException('format must be a string, not whatever this is: %s' % fmt)
+        elif fmt.startswith('.'):
+            fmt = fmt[1:]
+        regularizedConverterFormat, unused_ext = common.findFormat(fmt)
+        if regularizedConverterFormat is None:
+            raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
 
-        fileFormat, unused_ext = common.findFormat(fmt)
-        if fileFormat not in common.VALID_SHOW_FORMATS:
-            raise Music21ObjectException('cannot support showing in this format yet: %s' % fileFormat)
+        formatSubs = fmt.split('.')
+        fmt = formatSubs[0]
+        subformats = formatSubs[1:]
 
-        # standard text presentation has line breaks, is printed
-        if fileFormat == 'text':
-            print(self._reprText())
-        # a text line compacts the complete recursive representation into a
-        # single line of text; most for debugging. returned, not printed
-        elif fileFormat == 'textline':
-            return self._reprTextLine()
+        scClass = common.findSubConverterForFormat(regularizedConverterFormat)
+        formatWriter = scClass()
+        return formatWriter.show(self, regularizedConverterFormat, app=app, subformats=subformats, **keywords)
+    
+    
 
-        # TODO: these need to be updated to write files
-        # TODO: the lilypondFormat is not yet consulted
-        elif fmt in ['lily.pdf', 'pdf']:
-            #return self.lily.showPDF()
-            import music21.lily.translate
-            conv = music21.lily.translate.LilypondConverter()
-            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-                conv.coloredVariants = True
-            conv.loadFromMusic21Object(self)
-            environLocal.launch('pdf', conv.createPDF(), app=app)
-        elif fmt in ['lily.png', 'png', 'lily', 'lilypond']:
-            # TODO check that these use environLocal
-            from music21.lily import translate as lilyTranslate
-            conv = lilyTranslate.LilypondConverter()
-            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-                conv.coloredVariants = True
-            conv.loadFromMusic21Object(self)
-            return conv.showPNG()
-        elif fmt in ['lily.svg', 'svg']:
-            # TODO check that these use environLocal
-            from music21.lily import translate as lilyTranslate # @Reimport
-            conv = lilyTranslate.LilypondConverter()
-            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-                conv.coloredVariants = True
-            conv.loadFromMusic21Object(self)
-            return conv.showSVG()
-        elif fmt in ['ipython','ipython.png']:
-            # same as write... ipython %load_ext ipython21/ipExtension.py takes care of this.
-            return self.write(fileFormat)
+#         if fmt in ['ipython','ipython.png']:
+#             # same as write... ipython %load_ext ipython21/ipExtension.py takes care of this.
+#             return self.write(fileFormat)
 
-        elif fmt in ['musicxml', 'midi']: # a format that writes a file
-            returnedFilePath = self.write(fileFormat)
-            environLocal.launch(fileFormat, returnedFilePath, app=app)
-        elif fmt in ['musicxml.png']:
-            returnedFilePath = self.write(fileFormat)
-            if common.runningUnderIPython():
-                from music21.ipython21 import objects as ipythonObjects
-                ipo = ipythonObjects.IPythonPNGObject(returnedFilePath)
-                return ipo
-            else:
-                environLocal.launch(fileFormat, returnedFilePath, app=app)
-
-
-        elif fmt == 'braille':
-            returnedFilePath = self.write(fileFormat)
-            environLocal.launch(fileFormat, returnedFilePath, app=app)
-
-        elif fmt.startswith('vexflow'):
-            returnedFilePath = self.write(fileFormat)
-            environLocal.launch(fileFormat, returnedFilePath, app=app)
-
-        else:
-            raise Music21ObjectException('no such show format is supported:', fmt)
+#         elif fmt in ['musicxml.png']:
+#             returnedFilePath = self.write(fileFormat)
+#             if common.runningUnderIPython():
+#                 from music21.ipython21 import objects as ipythonObjects
+#                 ipo = ipythonObjects.IPythonPNGObject(returnedFilePath)
+#                 return ipo
+#             else:
+#                 environLocal.launch(fileFormat, returnedFilePath, app=app)
+# 
+#         elif fmt.startswith('vexflow'):
+#             returnedFilePath = self.write(fileFormat)
+#             environLocal.launch(fileFormat, returnedFilePath, app=app)
+# 
+#         else:
+#             raise Music21ObjectException('no such show format is supported:', fmt)
 
     #--------------------------------------------------------------------------
     # duration manipulation, processing, and splitting

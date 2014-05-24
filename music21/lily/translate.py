@@ -2408,7 +2408,8 @@ class LilypondConverter(object):
 
     def showSVG(self, fileName = None):
         '''
-        create a SVG file from self.topLevelObject, show it with your svg reader (often Internet Explorer on PC)
+        create a SVG file from self.topLevelObject, show it with your svg reader (often Internet Explorer/
+        WebBrowser on PC)
         and return the filepath of the file.
 
         most users will just call stream.Stream.show('lily.png') on a stream.

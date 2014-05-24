@@ -1,3 +1,4 @@
+.. _installIPython:
 Using ``music21`` with the iPython Notebook
 ===========================================
 

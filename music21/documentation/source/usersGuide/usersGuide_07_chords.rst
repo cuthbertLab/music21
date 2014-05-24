@@ -1,11 +1,10 @@
+.. _usersGuide_07_chords:
 User's Guide, Chapter 7: Chords
 ===============================
 
 
 .. code:: python
 
-    # ignore this
-    %load_ext music21.ipython21.ipExtension
 
 Chords, as the name might suggest, are objects that combine multiple
 :class:`~music21.pitch.Pitch` objects on a single stem. They can be
@@ -16,7 +15,7 @@ pitch names you want in the chord:
 .. code:: python
 
     from music21 import *
-    cMinor = chord.Chord(["C4","G4","E-5"])
+    cMinor = chord.Chord(["C4","G4","E-5"]) 
 
 ``Note`` and ``Chord`` objects, since both are subclasses of the
 :class:`~music21.note.GeneralNote` object share many features in
@@ -25,7 +24,6 @@ common:
 .. code:: python
 
     cMinor.duration.type = 'half'
-    
     cMinor.quarterLength
 
 

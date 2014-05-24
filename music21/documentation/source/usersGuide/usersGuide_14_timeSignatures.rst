@@ -1,3 +1,4 @@
+.. _usersGuide_14_timeSignatures:
 User's Guide: Chapter 14: Time Signatures
 =========================================
 
@@ -17,8 +18,6 @@ notes and a ``TimeSignature`` object.
 
 .. code:: python
 
-    # ignore this
-    %load_ext music21.ipython21.ipExtension
 
 .. code:: python
 

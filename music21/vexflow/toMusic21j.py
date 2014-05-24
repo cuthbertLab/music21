@@ -17,7 +17,14 @@ import unittest
 from music21 import freezeThaw
 from music21 import stream
 
-def fromObject(thisObject, mode='txt'):
+supportedDisplayModes = [
+    'html',
+    'jsbody',
+    'json'
+]
+
+
+def fromObject(thisObject, mode='html'):
     '''
     returns a string of data for a given Music21Object such as a Score, Note, etc. that
     can be displayed in a browser using the music21j package.  Called by .show('vexflow').
@@ -39,36 +46,7 @@ def fromObject(thisObject, mode='txt'):
     'id": ..., "_duration": null, "py/object": "music21.stream.Stream", "streamStatus": {"py/object": "music' + 
     '21.stream.streamStatus.StreamStatus", "_enharmonics": null, "_dirty": null, "_concertPitch": null, "_accidenta' + 
     'ls": null, "_ties": null, "_rests": null, "_ornaments": null, "_client": null, "_beams": null, "_measures": nu' + 
-    'll}, "sites": {"py/object": "music21.base.Sites", "_lastOffset": null, "_siteIndex": 1, "siteDict": {}' + 
-    ', "_lastID": -1, "containedById": ..., "_locationKeys": []}, "py/seq": [], "isFlat": true, "autoSort": ' + 
-    'true, "_storedElementOffsetTuples": [{"py/tuple": [{"lyrics": [], "_notehead": "normal", "_volume": {"py/objec' + 
-    't": "music21.volume.Volume", "_parent": {"py/id": 6}, "velocityIsRelative": true, "_cachedRealized": null, "_v' + 
-    'elocity": null}, "_activeSite": null, "xPosition": null, "_priority": 0, "pitch": {"py/object": "music21.pitch' + 
-    '.Pitch", "_octave": 4, "groups": {"py/object": "music21.base.Groups", "py/seq": []}, "_activeSiteId": null, "_' + 
-    'overridden_freq440": null, "_step": "C", "sites": {"py/object": "music21.base.Sites", "_lastOffset": null, "_s' + 
-    'iteIndex": 1, "siteDict": {"None": {"py/object": "music21.base.Site", "obj": null, "globalSiteIndex": ' + 
-    '98, "classString": null, "siteIndex": 0, "isDead": false, "offset": 0.0}}, "_lastID": -1, "containedById": ...' + 
-    '..., "_locationKeys": [null]}, "implicitAccidental": false, "_classes": null, "_activeSite": null, "_accid' + 
-    'ental": {"py/object": "music21.pitch.Accidental", "_modifier": "#", "_alter": 1.0, "displayLocation": "normal"' + 
-    ', "_displayType": "normal", "displaySize": "full", "_name": "sharp", "_displayStatus": null, "displayStyle": "' + 
-    'normal"}, "hideObjectOnPrint": false, "_priority": 0, "fundamental": null, "id": ..., "_microtone": {"p' + 
-    'y/object": "music21.pitch.Microtone", "_harmonicShift": 1, "_centShift": 0}, "defaultOctave": 4, "_idLastDeepC' + 
-    'opyOf": ..., "_fullyQualifiedClasses": null, "_duration": {"py/id": 8}, "xPosition": null}, "expression' + 
-    's": [], "id": ..., "_duration": {"py/object": "music21.duration.Duration", "_componentsNeedUpdating": f' + 
-    'alse, "_cachedIsLinked": true, "_qtrLength": 1.0, "_components": [{"py/object": "music21.duration.DurationUnit' + 
-    '", "_type": "quarter", "_componentsNeedUpdating": false, "_qtrLength": 1.0, "_tuplets": {"py/tuple": []}, "_li' + 
-    'nk": true, "_typeNeedsUpdating": false, "_quarterLengthNeedsUpdating": false, "_dots": [0]}], "_typeNeedsUpdat' + 
-    'ing": false, "_quarterLengthNeedsUpdating": false, "linkage": "tie"}, "py/object": "music21.note.Note", "_note' + 
-    'headParenthesis": false, "sites": {"py/object": "music21.base.Sites", "_lastOffset": null, "_siteIndex": 6, "_' + 
-    'definedContexts": {}, "_lastID": -1, "containedById": ..., "_locationKeys": []}, "_editorial": null, "t' + 
-    'ie": null, "_noteheadFill": "default", "beams": {"py/object": "music21.beam.Beams", "feathered": false, "beams' + 
-    'List": []}, "_classes": ["Note", "NotRest", "GeneralNote", "Music21Object", "object"], "groups": {"py/object":' + 
-    ' "music21.base.Groups", "py/seq": []}, "_fullyQualifiedClasses": null, "articulations": [], "_activeSiteId": n' + 
-    'ull, "hideObjectOnPrint": false, "_stemDirection": "unspecified", "_idLastDeepCopyOf": ...}, 0.0]}], "_' + 
-    'atSoundingPitch": "unknown", "_classes": ["Stream", "Music21Object", "object"], "groups": {"py/object": "music' + 
-    '21.base.Groups", "py/seq": []}, "_fullyQualifiedClasses": null, "isSorted": false, "hideObjectOnPrint": false,' + 
-    ' "_activeSiteId": null, "flattenedRepresentationOf": null, "_endElements": [], "_derivation": {"py/object": "m' + 
-    'usic21.derivation.Derivation", "_clientId": null, "_client": null, "_originId": null, "_origin": null, "_metho' + 
+    ...
     'd": null}, "definesExplicitSystemBreaks": false, "_idLastDeepCopyOf": ...}}';
                 var jpc = new music21.jsonPickle.Converter();
                 streamObj = jpc.run(pickleIn);
@@ -119,7 +97,7 @@ class VexflowPickler(object):
 
     
         
-    def fromObject(self, thisObject, mode='txt'):
+    def fromObject(self, thisObject, mode='html'):
         if (thisObject.isStream is False):
             retStream = stream.Stream()
             retStream.append(thisObject)
@@ -134,7 +112,7 @@ class VexflowPickler(object):
             allJSONList.append('\'' + jsonString[i:i+chunkSize] + '\'')
         return ' + \n    '.join(allJSONList)
     
-    def fromStream(self,thisStream, mode='txt'):
+    def fromStream(self,thisStream, mode='html'):
         if (thisStream.metadata is not None and thisStream.metadata.title != ""):
             title = thisStream.metadata.title
         else:

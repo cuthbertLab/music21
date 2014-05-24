@@ -1,3 +1,4 @@
+.. _usersGuide_09_chordify:
 User's Guide: Chapter 9: Chordify
 =================================
 
@@ -8,8 +9,6 @@ that is happening in the score. Take this short chorale by Bach:
 
 .. code:: python
 
-    # ignore this
-    %load_ext music21.ipython21.ipExtension
 
 .. code:: python
 
