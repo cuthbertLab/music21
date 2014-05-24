@@ -1,4 +1,4 @@
-from jsonpickle.compat import PY32
+from jsonpickle.compat import PY32 # @UnresolvedImport
 
 class JSONBackend(object):
     """Manages encoding and decoding using various backends.

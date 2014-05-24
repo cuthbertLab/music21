@@ -26,8 +26,8 @@ import time
 import collections
 import decimal
 
-from jsonpickle import util
-from jsonpickle.compat import unicode
+from jsonpickle import util # @UnresolvedImport
+from jsonpickle.compat import unicode # @UnresolvedImport
 
 
 class Registry(object):
