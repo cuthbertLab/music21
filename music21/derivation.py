@@ -143,44 +143,17 @@ class Derivation(SlottedObject):
                         'origin': self.origin,
                         'method': self.method
                                 }
+    ## unwrap weakref for pickling
+
+    def __getstate__(self):
+        self._client = common.unwrapWeakref(self._client)
+        return SlottedObject.__getstate__(self)
+
+    def __setstate__(self, state):
+        SlottedObject.__setstate__(self, state)
+        self._client = common.wrapWeakref(self._client)
 
     ### PUBLIC METHODS ###
-
-    def wrapWeakref(self):
-        '''Wrap all stored objects with weakrefs.
-        '''
-        if not common.isWeakref(self._client):
-            # update id in case it has changed
-            self._clientId = id(self._client)
-            post = common.wrapWeakref(self._client)
-            self._client = post
-
-    def unwrapWeakref(self):
-        '''
-        Unwrap any and all weakrefs stored.
-
-        Necessary for pickling operations.
-
-        ::
-
-            >>> s1 = stream.Stream()
-            >>> s2 = stream.Stream()
-            >>> d1 = derivation.Derivation(s1) # sets client
-            >>> d1.origin = s2
-            >>> common.isWeakref(d1._client)
-            True
-
-        ::
-
-            >>> d1.unwrapWeakref()
-            >>> common.isWeakref(d1._client)
-            False
-
-        '''
-        #environLocal.printDebug(['derivation pre unwrap: self._client', self._client])
-        post = common.unwrapWeakref(self._client)
-        self._client = post
-        #environLocal.printDebug(['derivation post unwrap: self._client', self._client])
 
     ### PUBLIC PROPERTIES ###
 

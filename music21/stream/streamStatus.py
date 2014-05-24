@@ -23,6 +23,34 @@ environLocal = environment.Environment(__file__)
 
 
 class StreamStatus(SlottedObject):
+    '''
+    An object that stores the current notation state for the client stream.
+    
+    Separates out tasks such as whether notation has been made, etc.
+    
+    >>> s = stream.Stream()
+    >>> ss = s.streamStatus
+    >>> ss
+    <music21.stream.streamStatus.StreamStatus object at 0x...>
+    >>> s.streamStatus.client is s
+    True
+
+    Copying of StreamStatus and surrounding Streams
+
+    >>> import copy
+    >>> ss2 = copy.deepcopy(ss)
+    >>> ss2.client is None
+    True
+    
+    >>> s2 = copy.deepcopy(s)
+    >>> s2.streamStatus
+    <music21.stream.streamStatus.StreamStatus object at 0x...>
+    >>> s2.streamStatus is ss
+    False
+    >>> s2.streamStatus.client is s2
+    True
+    '''
+
 
     ### CLASS VARIABLES ###
 
@@ -42,8 +70,7 @@ class StreamStatus(SlottedObject):
     ### INITIALIZER ###
 
     def __init__(self, client=None):
-        self._client = common.wrapWeakref(client)
-        
+        self._client = None
         self._accidentals = None
         self._beams = None
         self._concertPitch = None
@@ -53,6 +80,34 @@ class StreamStatus(SlottedObject):
         self._ornaments = None
         self._rests = None
         self._ties = None
+        self.client = client
+
+
+    ## SPECIAL METHODS ###
+    def __deepcopy__(self, memo=None):
+        '''
+        Manage deepcopying by creating a new reference to the same object. If
+        the origin no longer exists, than origin is set to None
+        '''
+        new = type(self)()
+        for x in self.__slots__:
+            if x == '_client':
+                new._client = None
+            else:
+                setattr(new, x, getattr(self, x))
+            
+        return new
+
+
+    ## unwrap weakref for pickling
+
+    def __getstate__(self):
+        self._client = common.unwrapWeakref(self._client)
+        return SlottedObject.__getstate__(self)
+
+    def __setstate__(self, state):
+        SlottedObject.__setstate__(self, state)
+        self._client = common.wrapWeakref(self._client)
 
     ### PUBLIC METHODS ###
 
@@ -87,6 +142,11 @@ class StreamStatus(SlottedObject):
     @property
     def client(self):
         return common.unwrapWeakref(self._client)
+    @client.setter
+    def client(self, client):
+        # client is the Stream that this status lives on
+        self._client = common.wrapWeakref(client)
+
 
     @property
     def beams(self):

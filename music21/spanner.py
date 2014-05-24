@@ -314,24 +314,6 @@ class Spanner(base.Music21Object):
         # base method to perform purge on the Sream
         self.spannedElements.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
-            
-    def unwrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.unwrapWeakref(self)
-        # for contained objects that have weak refs
-        #environLocal.printDebug(['spanner unwrapping contained stream'])
-        self.spannedElements.unwrapWeakref()
-        # this presently is not a weakref but in case of future changes
-
-    def wrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.wrapWeakref(self)
-        self.spannedElements.wrapWeakref()
-
 
 #    def freezeIds(self):
 #        base.Music21Object.freezeIds(self)

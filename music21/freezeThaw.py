@@ -205,9 +205,8 @@ class StreamFreezer(StreamFreezeThawBase):
 
 
 
-    >>> sf2 = freezeThaw.StreamFreezer(c.parts[0]) # do not reuse StreamFreezers
+    >>> sf2 = freezeThaw.StreamFreezer(c) # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
-    
     >>> st2 = freezeThaw.StreamThawer()
     >>> st2.openStr(data2)
     >>> s3 = st.stream
@@ -278,7 +277,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamObj = self.stream
             if streamObj is None:
                 raise FreezeThawException("You need to pass in a stream when creating to work")
-        allEls = streamObj.recurse(restoreActiveSites=False)
+        allEls = streamObj.recurse(restoreActiveSites=False) # might not work when recurse yields...
         if self.topLevel is True:
             self.findActiveStreamIdsInHierarchy(streamObj)
 
@@ -302,10 +301,9 @@ class StreamFreezer(StreamFreezeThawBase):
                     )
                 subSF.setupSerializationScaffold()
             elif el.isStream:
-                self.removeStreamStatusClient(el)
+                self.removeStreamStatusClient(el)  # removing seems to create problems for jsonPickle with Spanners
 
-        self.removeStreamStatusClient(streamObj)
-
+        self.removeStreamStatusClient(streamObj) # removing seems to create problems for jsonPickle with Spanners
         self.setupStoredElementOffsetTuples(streamObj)
 
         if self.topLevel is True:
@@ -322,6 +320,7 @@ class StreamFreezer(StreamFreezeThawBase):
         '''
         if hasattr(streamObj, 'streamStatus'):
             streamObj.streamStatus._client = None
+
 
     def recursiveClearSites(self, startObj):
         '''
@@ -774,8 +773,6 @@ class StreamThawer(StreamFreezeThawBase):
         '''
         After rebuilding this Stream from pickled storage, prepare this as a normal `Stream`.
 
-        Calls `wrapWeakRef` and `unFreezeIds` for the `Stream` and each sub-`Stream`.
-
         If streamObj is None, runs it on the embedded stream
 
         >>> from music21 import freezeThaw
@@ -802,8 +799,8 @@ class StreamThawer(StreamFreezeThawBase):
         self.restoreElementsFromTuples(streamObj)
         streamObj.sites.add(None, 0.0)
 
-        self.restoreStreamStatusClient(streamObj)
-
+        self.restoreStreamStatusClient(streamObj) # removing seems to create problems for jsonPickle with Spanners
+        
         allEls = self.findAllM21Objects(streamObj)
 
         for e in allEls:
@@ -820,9 +817,8 @@ class StreamThawer(StreamFreezeThawBase):
                 subSF.teardownSerializationScaffold(e.spannedElements)
                 e.spannedElements._elementsChanged()
                 e._cache = {}
-            elif e.isStream:
-                self.restoreStreamStatusClient(e)
-
+            elif e.isStream: 
+                self.restoreStreamStatusClient(e) # removing seems to create problems for jsonPickle with Spanners
 
             #self.thawIds(e)
             #e.wrapWeakref()
@@ -1799,6 +1795,9 @@ class JSONThawer(JSONFreezeThawBase):
 #------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
+    def runTest(self):
+        pass
+
     def testSimpleFreezeThaw(self):
         from music21 import stream, note
         s = stream.Stream()
@@ -2056,6 +2055,19 @@ class Test(unittest.TestCase):
 #
 #        self.assertEqual(hasattr(d, 'json'), True)
 
+    def testJSONPickleSpanner(self):
+        from music21 import converter, note, stream, spanner
+        n1 = note.Note('C')
+        n2 = note.Note('D')
+        s1 = stream.Stream()
+        sp = spanner.Line([n1, n2])
+        s1.insert(0, sp)
+        s1.append(n1)
+        s1.append(n2)
+        frozen = converter.freezeStr(s1, 'jsonPickle')
+        #print frozen
+        unused_thawed = converter.thawStr(frozen)
+        
 
     def testPickleMidi(self):
         from music21 import converter
@@ -2072,7 +2084,11 @@ class Test(unittest.TestCase):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    base.mainTest(Test)
+    import music21
+    #import sys
+    #sys.argv.append('testJSONPickleSpanner')
+    music21.mainTest(Test)
+    
 
 
 #------------------------------------------------------------------------------

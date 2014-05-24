@@ -1224,6 +1224,15 @@ class Stream(base.Music21Object):
                     newValue = copy.deepcopy(self._derivation)
                     newValue.client = new
                     setattr(new, name, newValue)
+            elif name == 'streamStatus':
+                # update the client
+                if self.streamStatus is not None:
+                    #storedClient = self.streamStatus.client # should be self
+                    #self.streamStatus.client = None
+                    newValue = copy.deepcopy(self.streamStatus)
+                    newValue.client = new
+                    setattr(new, name, newValue)
+                    #self.streamStatus.client = storedClient
             elif name == '_cache' or name == 'analysisData':
                 continue # skip for now
             elif name == '_elements':
@@ -1235,8 +1244,10 @@ class Stream(base.Music21Object):
                     # user here to provide new offset
                     #new.insert(e.getOffsetBySite(old), newElement,
                     #           ignoreSort=True)
-                    new._insertCore(e.getOffsetBySite(old),
-                                copy.deepcopy(e, memo),
+                    offset = e.getOffsetBySite(old)
+                    newElement = copy.deepcopy(e, memo)
+                    new._insertCore(offset,
+                                newElement,
                                 ignoreSort=True)
             elif name == '_endElements':
                 # must manually add elements to
@@ -2131,31 +2142,6 @@ class Stream(base.Music21Object):
         return self._recurseRepr(self, addBreaks=False, addIndent=False)
 
 
-
-    #---------------------------------------------------------------------------
-    # temporary storage
-    def unwrapWeakref(self):
-        '''
-        Overridden method for unwrapping all Weakrefs.
-        '''
-        self._derivation.unwrapWeakref()
-        # for contained objects that have weak refs
-        # this presently is not a weakref but in case of future changes
-#         if common.isWeakref(self.flattenedRepresentationOf):
-#             post = common.unwrapWeakref(objRef)
-#             self.flattenedRepresentationOf = post
-
-
-    def wrapWeakref(self):
-        '''
-        Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        if self._derivation is not None:
-            self._derivation.wrapWeakref()
-#         if not common.isWeakref(self.flattenedRepresentationOf):
-#             post = common.wrapWeakref(objRef)
-#             self.flattenedRepresentationOf = post
 
     #---------------------------------------------------------------------------
     # display methods; in the same manner as show() and write()
