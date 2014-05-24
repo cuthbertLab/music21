@@ -2194,28 +2194,6 @@ class Music21Object(object):
         scClass = common.findSubConverterForFormat(regularizedConverterFormat)
         formatWriter = scClass()
         return formatWriter.show(self, regularizedConverterFormat, app=app, subformats=subformats, **keywords)
-    
-    
-
-#         if fmt in ['ipython','ipython.png']:
-#             # same as write... ipython %load_ext ipython21/ipExtension.py takes care of this.
-#             return self.write(fileFormat)
-
-#         elif fmt in ['musicxml.png']:
-#             returnedFilePath = self.write(fileFormat)
-#             if common.runningUnderIPython():
-#                 from music21.ipython21 import objects as ipythonObjects
-#                 ipo = ipythonObjects.IPythonPNGObject(returnedFilePath)
-#                 return ipo
-#             else:
-#                 environLocal.launch(fileFormat, returnedFilePath, app=app)
-# 
-#         elif fmt.startswith('vexflow'):
-#             returnedFilePath = self.write(fileFormat)
-#             environLocal.launch(fileFormat, returnedFilePath, app=app)
-# 
-#         else:
-#             raise Music21ObjectException('no such show format is supported:', fmt)
 
     #--------------------------------------------------------------------------
     # duration manipulation, processing, and splitting

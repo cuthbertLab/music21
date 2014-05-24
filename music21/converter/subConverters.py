@@ -58,6 +58,7 @@ class SubConverter(object):
     registerInputExtensions = ()
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = None
+    launchKey = None
     
     codecWrite = False
     stringEncoding='utf-8'
@@ -109,9 +110,42 @@ class SubConverter(object):
         '''
         return True
 
+    def launch(self, filePath, fmt=None, options='', app=None, key=None):
+        if fmt is None and len(self.registerShowFormats) > 0:
+            fmt = self.registerShowFormats[0]    
+        if app is None:
+            if key is not None:
+                app = environLocal._ref[key]
+            elif self.launchKey is not None:
+                app = environLocal._ref[self.launchKey]
+            else:
+                app = environLocal.formatToApp(fmt)
+
+        platform = common.getPlatform()
+        if app is None:
+            if platform == 'win':
+                # no need to specify application here:
+                # windows starts the program based on the file extension
+                cmd = 'start %s' % (filePath)
+            elif platform == 'darwin':
+                cmd = 'open %s %s' % (options, filePath)
+            else:
+                raise SubConverterException(
+                    "Cannot find a valid application path for format {}. "
+                    "Specify this in your Environment by calling "
+                    "environment.set({!r}, 'pathToApplication')".format(
+                        self.registerFormats[0], self.launchKey))
+        elif platform == 'win':  # note extra set of quotes!
+            cmd = '""%s" %s "%s""' % (app, options, filePath)
+        elif platform == 'darwin':
+            cmd = 'open -a"%s" %s %s' % (app, options, filePath)
+        elif platform == 'nix':
+            cmd = '%s %s %s' % (app, options, filePath)
+        os.system(cmd)
+
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
-        environLocal.launch(fmt, returnedFilePath, app=app)
+        self.launch(returnedFilePath, fmt=fmt, app=app)
 
     def getExtensionForFormatOrSubformats(self, fmt=None, subformats=None):
         exts = self.registerOutputExtensions
@@ -204,7 +238,9 @@ class ConverterLilypond(SubConverter):
             outFormat = subformats[0]
         else:
             outFormat = 'png'
-        environLocal.launch(outFormat, returnedFilePath, app=app)
+        if app is None:
+            app = environLocal.formatToApp(outFormat)
+        self.launch(returnedFilePath, app=app)
 
 
 class ConverterBraille(SubConverter):
@@ -226,7 +262,7 @@ class ConverterVexflow(SubConverter):
         #from music21 import vexflow
         from music21.vexflow import toMusic21j as vexflow
         dataStr = vexflow.fromObject(obj, mode='html')
-        self.writeDataStream(fp, dataStr)
+        fp = self.writeDataStream(fp, dataStr)
         return fp
 
 
@@ -563,7 +599,7 @@ class ConverterMusicXML(SubConverter):
 #-------------------------------------------------------------------------------
 class ConverterMidi(SubConverter):
     '''
-    Simple class wrapper for parsing MIDI.
+    Simple class wrapper for parsing MIDI and sending MIDI data out.
     '''
     readBinary = True
     registerFormats = ('midi',)
@@ -604,6 +640,8 @@ class ConverterMidi(SubConverter):
 class ConverterABC(SubConverter):
     '''
     Simple class wrapper for parsing ABC.
+    
+    Input only
     '''
     registerFormats = ('abc',)
     registerInputExtensions = ('abc',)
@@ -788,14 +826,6 @@ class Test(unittest.TestCase):
         s.append(n)
         unused_x = s.show('textLine')
 
-    def testWriteLilypond(self):
-        from music21 import stream, note
-        n = note.Note()
-        n.duration.type = 'whole'
-        s = stream.Stream()
-        s.append(n)
-        #s.show('lily.png')
-        print s.write('lily.png')
         
 class TestExternal(unittest.TestCase):
     def runTest(self):
@@ -806,9 +836,18 @@ class TestExternal(unittest.TestCase):
         c = corpus.parse('bwv66.6')
         c.show() # musicxml
 
+    def testWriteLilypond(self):
+        from music21 import stream, note
+        n = note.Note()
+        n.duration.type = 'whole'
+        s = stream.Stream()
+        s.append(n)
+        s.show('lily.png')
+        print s.write('lily.png')
+
 
 if __name__ == '__main__':
     import music21
-    import sys
+    #import sys
     #sys.argv.append('SimpleTextShow')
-    music21.mainTest(Test, 'noDocTest')
+    music21.mainTest(Test)

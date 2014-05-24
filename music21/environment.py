@@ -638,7 +638,37 @@ class _EnvironmentCore(object):
     def keys(self):
         return self._ref.keys() + ['localCorpusPath']
 
+    def formatToKey(self, m21Format):
+        environmentKey = None
+        if m21Format == 'lilypond':
+            environmentKey = 'lilypondPath'
+        elif m21Format in ('png', 'jpeg'):
+            environmentKey = 'graphicsPath'
+        elif m21Format == 'svg':
+            environmentKey = 'vectorPath'
+        elif m21Format == 'pdf':
+            environmentKey = 'pdfPath'
+        elif m21Format == 'musicxml':
+            environmentKey = 'musicxmlPath'
+        elif m21Format == 'midi':
+            environmentKey = 'midiPath'
+        elif m21Format == 'braille':
+            environmentKey = 'braillePath'
+        return environmentKey
+
+    def formatToApp(self, m21Format):
+        environmentKey = self.formatToKey(m21Format)
+        if environmentKey is not None:
+            if environmentKey not in self._ref:
+                raise EnvironmentException(environmentKey + " is not set in UserSettings. ")
+            return self._ref[environmentKey]
+        return None
+
     def launch(self, fmt, filePath, options='', app=None):
+        '''
+        DEPRECATED May 24 -- call Launch on SubConverter
+        '''
+        
         # see common.fileExtensions for format names
         environmentKey = None
 
@@ -1007,6 +1037,12 @@ class Environment(object):
 
         '''
         return _environStorage['instance'].keys()
+
+    def formatToApp(self, m21Format):
+        return _environStorage['instance'].formatToApp(m21Format)
+
+    def formatToKey(self, m21Format):
+        return _environStorage['instance'].formatToKey(m21Format)
 
     def launch(self, fmt, filePath, options='', app=None):
         '''
