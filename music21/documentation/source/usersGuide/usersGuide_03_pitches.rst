@@ -82,15 +82,6 @@ Notice that at the command line, just printing the variable name
 gives you the representation `<music21.pitch.Pitch C##4>`.  You
 can also get this by typing `repr(p2)`.
 
-As with nearly all music21 objects, we can call 
-:meth:`~music21.base.Music21Object.show` method to display 
-this Pitch in our `musicxml` reader:
-
->>> p2.show()  # doctest: +SKIP
-
-.. image:: images/usersGuide/03_pitches-01.*
-    :width: 600
-
 So, there's really nothing new about `Pitch` objects
 that you didn't already know from learning about `Notes`. So
 why the two different objects?  It turns out, they are so
@@ -134,12 +125,10 @@ AttributeError: 'Note' object has no attribute 'spanish'
 
 So far, it looks like `Pitch` objects can do everything `Note`
 objects can do and more.  So why do we need `Note` objects?
-It's because they also have `Duration` attributes[\*], as we'll see
-in the next section.
+It's because they also have `Duration` attributes, as we'll see
+in the next section. Without a `Duration` attribute, you cannot put
+an object into a Measure or show it on your screen.
 
-    [\*] (*Technically, `Pitch` objects also have durations, but
-    they're not nearly as powerful as `Note` durations, so
-    just pretend you never heard me say anything about them.*)
     
 Carving time with Duration objects
 -------------------------------------

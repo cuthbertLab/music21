@@ -391,7 +391,7 @@ corresponding metadata bundle:
 
     >>> coreCorpus = corpus.CoreCorpus()
     >>> coreCorpus.metadataBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
 
 Music21 also provides a handful of convenience methods for getting metadata
 bundles associated with the *virtual*, *local* or *core* corpora:
@@ -429,7 +429,7 @@ files automatically when they're manually instantiated.
 ::
 
     >>> coreBundle.read()
-    <music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
 
 
 
@@ -442,7 +442,7 @@ Metadata bundles can be written to and read from disk.
 
     >>> coreBundle = metadata.MetadataBundle('core')
     >>> coreBundle.read()
-	<music21.metadata.bundles.MetadataBundle 'core': {14956 entries}>
+	<music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
 
 ::
 
