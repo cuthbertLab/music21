@@ -44,6 +44,8 @@ class Volume(SlottedObject):
     ::
 
         >>> v = volume.Volume()
+        
+        
 
     '''
 
@@ -93,6 +95,14 @@ class Volume(SlottedObject):
 
     def __repr__(self):
         return "<music21.volume.Volume realized=%s>" % round(self.realized, 2)
+
+    def __getstate__(self):
+        self._parent = common.unwrapWeakref(self._parent)
+        return SlottedObject.__getstate__(self)
+
+    def __setstate__(self, state):
+        SlottedObject.__setstate__(self, state)
+        self._parent = common.wrapWeakref(self._parent)
 
     ### PUBLIC METHODS ###
 

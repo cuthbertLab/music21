@@ -48,6 +48,7 @@ def fromMusic21Object(m21Object):
     and is the most important function here.
     '''
     classes = m21Object.classes
+    
     if 'Measure' in classes: # must go before Stream
         return fromMeasure(m21Object)
     elif 'Stream' in classes:

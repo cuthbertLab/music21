@@ -176,7 +176,23 @@ class StreamFreezer(StreamFreezeThawBase):
     {6.0} <music21.note.Note G->
     {7.0} <music21.note.Note G>
 
+    >>> sf2 = freezeThaw.StreamFreezer(s) # do not reuse StreamFreezers
+    >>> data2 = sf2.writeStr(fmt='jsonpickle')
 
+    >>> st2 = freezeThaw.StreamThawer()
+    >>> st2.openStr(data2)
+    >>> s2 = st2.stream
+    >>> s2.show('t')
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note D->
+    {2.0} <music21.note.Note D>
+    {3.0} <music21.note.Note E->
+    {4.0} <music21.note.Note E>
+    {5.0} <music21.note.Note F>
+    {6.0} <music21.note.Note G->
+    {7.0} <music21.note.Note G>
+    
+    
     >>> c = corpus.parse('luca/gloria')
     >>> sf = freezeThaw.StreamFreezer(c)
     >>> data = sf.writeStr(fmt='pickle')
@@ -189,9 +205,9 @@ class StreamFreezer(StreamFreezeThawBase):
 
 
 
-    >>> sf2 = freezeThaw.StreamFreezer(c) # do not reuse StreamFreezers
+    >>> sf2 = freezeThaw.StreamFreezer(c.parts[0]) # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
-
+    
     >>> st2 = freezeThaw.StreamThawer()
     >>> st2.openStr(data2)
     >>> s3 = st.stream
@@ -224,8 +240,8 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s.append(n)
         >>> sf = freezeThaw.StreamFreezer(s)
         >>> #_DOCS_SHOW sf.packStream()
-        >>> print("{'m21Version': (1, 9, 2), 'stream': <music21.stream.Stream 4391393680>}") #_DOCS_HIDE
-        {'m21Version': (1, 9, 2), 'stream': <music21.stream.Stream 4391393680>}
+        >>> print("{'m21Version': (1, 9, 3), 'stream': <music21.stream.Stream 4391393680>}") #_DOCS_HIDE
+        {'m21Version': (1, 9, 3), 'stream': <music21.stream.Stream 4391393680>}
         
         '''
         # do all things necessary to setup the stream
@@ -262,7 +278,6 @@ class StreamFreezer(StreamFreezeThawBase):
             streamObj = self.stream
             if streamObj is None:
                 raise FreezeThawException("You need to pass in a stream when creating to work")
-        self.unwrapVolumeWeakrefs(streamObj)
         allEls = streamObj.recurse(restoreActiveSites=False)
         if self.topLevel is True:
             self.findActiveStreamIdsInHierarchy(streamObj)
@@ -576,20 +591,6 @@ class StreamFreezer(StreamFreezeThawBase):
         self.streamIds = streamIds
         return streamIds
 
-    def unwrapVolumeWeakrefs(self, streamObj = None):
-        '''
-        note.Note().volume._parent stores a weakRef -- unwrap it for pickling.
-        '''
-        if streamObj is None:
-            streamObj = self.stream
-        for n in streamObj.recurse():
-            if 'NotRest' not in n.classes:
-                continue
-            if hasattr(n, 'volume') and n.volume is not None and n.volume._parent is not None:
-                n.volume._parent = common.unwrapWeakref(n.volume._parent)
-                if 'Chord' in n.classes:
-                    for el in n:
-                        el.volume._parent = common.unwrapWeakref(el.volume._parent)
 
     #---------------------------------------------------------------------------
     def parseWriteFmt(self, fmt):
@@ -827,7 +828,6 @@ class StreamThawer(StreamFreezeThawBase):
             #e.wrapWeakref()
 
         # restore to whatever it was
-        self.wrapVolumeWeakrefs(streamObj)
         streamObj.autoSort = storedAutoSort
         streamObj._elementsChanged()
 
@@ -898,23 +898,6 @@ class StreamThawer(StreamFreezeThawBase):
     def restoreStreamStatusClient(self, streamObj):
         if hasattr(streamObj, 'streamStatus'):
             streamObj.streamStatus._client = streamObj
-
-    def wrapVolumeWeakrefs(self, streamObj = None):
-        '''
-        note.Note().volume._parent should store a weakRef -- wrap it after unpickling.
-        '''
-        if streamObj is None:
-            streamObj = self.stream
-        for n in streamObj.recurse():
-            if 'NotRest' not in n.classes:
-                continue
-            if hasattr(n, 'volume') and n.volume is not None and n.volume._parent is not None:
-                n.volume._parent = common.wrapWeakref(n.volume._parent)
-                if 'Chord' in n.classes:
-                    for el in n:
-                        el.volume._parent = common.wrapWeakref(el.volume._parent)
-
-
 
 
     def unpackStream(self, storage):
@@ -1095,7 +1078,7 @@ class JSONFreezeThawBase(object):
             ],
         
         'music21.pitch.Pitch': [
-            '_accidental', '_microtone', '_octave', '_priority', '_step',              
+            '_accidental', '_microtone', '_octave', '_step', 
             ],
         'music21.stream.Stream': ['__INHERIT__',
                                   '_atSoundingPitch',
@@ -1591,7 +1574,6 @@ class JSONFreezer(JSONFreezeThawBase):
                   "__class__": "music21.pitch.Microtone"
                 }, 
                 "_octave": 5, 
-                "_priority": 0, 
                 "_step": "D"
               }, 
               "__class__": "music21.pitch.Pitch"
@@ -1601,7 +1583,7 @@ class JSONFreezer(JSONFreezeThawBase):
           "__version__": [
             1, 
             9, 
-            2
+            3
           ]
         }
         '''

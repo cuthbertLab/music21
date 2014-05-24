@@ -2301,8 +2301,8 @@ class Duration(DurationCommon):
     def clear(self):
         '''
         Permit all components to be removed.
-        (It is not clear yet if this is needed)
-
+        (It is not clear yet if this is needed:
+             yes! for zero duration!)
 
         >>> a = duration.Duration()
         >>> a.quarterLength = 4
@@ -3102,6 +3102,8 @@ class Duration(DurationCommon):
         if self._qtrLength != value:
             if isinstance(value, int):
                 value = float(value)
+            if value == 0.0 and self.isLinked is True:
+                self.clear()
             self._qtrLength = value
             self._componentsNeedUpdating = True
             self._quarterLengthNeedsUpdating = False

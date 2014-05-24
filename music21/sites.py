@@ -30,7 +30,7 @@ class SitesException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 class SiteRef(common.SlottedObject):
     '''
-    a single Site (container, parent, reference, etc.) stored inside the Sites object.
+    a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
 
     A very simple object.
     
@@ -39,12 +39,28 @@ class SiteRef(common.SlottedObject):
     
     >>> st = stream.Stream()
     >>> st.id = 'hi'
+    
     >>> s = sites.SiteRef()
     >>> s.classString = st.classes[0]
-    >>> s.site = common.wrapWeakref(st)
+    >>> s.site = st
     >>> s.offset = 20.0
     >>> s.isDead
     False
+
+    If you call s.site, you always get an object out, but internally, there's a .siteWeakref that
+    stores a weakref to the site.
+
+    >>> s.site
+    <music21.stream.Stream hi>
+    >>> s.siteWeakref
+    <weakref at 0x...; to 'Stream' at 0x...>
+    
+    
+    OMIT_FROM_DOCS
+    if you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
+    the site.
+    
+    
     '''
     ### CLASS VARIABLES ###
 
@@ -53,14 +69,22 @@ class SiteRef(common.SlottedObject):
         'globalSiteIndex',
         'siteIndex',
         'isDead',
-        'site',
+        'siteWeakref',
         'offset',
         )
+    ### INITIALIZER ###
 
     def __init__(self):
         self.isDead = False
+    
+    def _getAndUnwrapSite(self):
+        # should set isDead?
+        return common.unwrapWeakref(self.siteWeakref)
+    
+    def _setAndWrapSite(self, site):
+        self.siteWeakref = common.wrapWeakref(site)
 
-    ### INITIALIZER ###
+    site = property(_getAndUnwrapSite, _setAndWrapSite)
 
 _singletonCounter = common.SingletonCounter()
 
@@ -159,7 +183,7 @@ class Sites(common.SlottedObject):
             if oldSite.site is None:
                 newIdKey = None
             else:
-                newIdKey = id(common.unwrapWeakref(newSite.site))
+                newIdKey = id(newSite.site)
                 #if newIdKey != idKey and oldSite.site != None:
                 #    print "WHOA! %s %s" % (newIdKey, idKey)
             # not copying the offset in deepcopying means that
@@ -175,7 +199,7 @@ class Sites(common.SlottedObject):
             newSite.classString = oldSite.classString
             newSite.isDead = False
             ### debug
-            #originalObj = common.unwrapWeakref(post.site)
+            #originalObj = post.site
             #if id(originalObj) != idKey and originalObj is not None:
             #    print idKey, id(originalObj)
             new.siteDict[newIdKey] = newSite
@@ -234,20 +258,6 @@ class Sites(common.SlottedObject):
             post.reverse()
         return [k for unused_time, k in post]
 
-    def _prepareObject(self, obj):
-        '''
-        Prepare an object for storage.
-        May be stored as a standard reference or as a weak reference.
-        '''
-        # can have this perform differently based on domain
-        if obj is None:  # leave None alone
-            return obj
-        elif WEAKREF_ACTIVE:
-            return common.wrapWeakref(obj)
-        # a normal reference, return unaltered
-        else:
-            return obj
-
     ### PUBLIC METHODS ###
 
     def add(self, obj, offset=None, timeValue=None, idKey=None, classString=None):
@@ -305,12 +315,9 @@ class Sites(common.SlottedObject):
         # __deepcopy__ no longer call this method, so we can assume that
         # we will not get weakrefs
 
-        objRef = None
-
         if obj is not None:
             if classString is None:
                 classString = obj.classes[0]  # get most current class
-            objRef = self._prepareObject(obj)
 
         if updateNotAdd is True:
             #if obj is not None and id(obj) != idKey:
@@ -321,7 +328,7 @@ class Sites(common.SlottedObject):
             #if id(obj) != idKey and obj is not None:
             #    print "Houston, we have a problem %r" % obj
 
-        siteRef.site = objRef  # a weak ref
+        siteRef.site = obj  # stores a weakRef
         siteRef.offset = offset  # offset can be None for contexts
         siteRef.classString = classString
         # default
@@ -346,8 +353,7 @@ class Sites(common.SlottedObject):
     def get(self, locationsTrail=False, sortByCreationTime=False,
             priorityTarget=None, excludeNone=False):
         '''
-        Get references; unwrap from weakrefs; order, based
-        on dictionary keys, is from most recently added to least recently added.
+        Get references; order, based on dictionary keys, is from most recently added to least recently added.
 
         The `locationsTrail` option forces locations to come after all other defined contexts.
 
@@ -412,17 +418,15 @@ class Sites(common.SlottedObject):
         for key in keys:
             siteRef = self.siteDict[key]
             # check for None object; default location, not a weakref, keep
-            if siteRef.site is None:
+            if siteRef.siteWeakref is None:
                 if not excludeNone:
                     post.append(siteRef.site)
-            elif WEAKREF_ACTIVE:
-                obj = common.unwrapWeakref(siteRef.site)
+            else:
+                obj = siteRef.site
                 if obj is None:  # dead ref
                     siteRef.isDead = True
                 else:
                     post.append(obj)
-            else:
-                post.append(siteRef.site)
 
         # remove dead references
 #         if autoPurge:
@@ -663,18 +667,15 @@ class Sites(common.SlottedObject):
 #                 break
         return post
 
-    def getById(self, id):  # id is okay here @ReservedAssignment
+    def getById(self, siteId):
         '''
         Return the object specified by an id.
         Used for testing and debugging.
         '''
-        siteRef = self.siteDict[id]
+        siteRef = self.siteDict[siteId]
         # need to check if these is weakref
         #if common.isWeakref(dict['obj']):
-        if WEAKREF_ACTIVE:
-            return common.unwrapWeakref(siteRef.site)
-        else:
-            return siteRef.site
+        return siteRef.site
 
     def getOffsetByObjectMatch(self, obj):
         '''
@@ -710,10 +711,7 @@ class Sites(common.SlottedObject):
                 continue
             # must unwrap references before comparison
             #if common.isWeakref(dict['obj']):
-            if WEAKREF_ACTIVE:
-                compareObj = common.unwrapWeakref(siteRef.site)
-            else:
-                compareObj = siteRef.site
+            compareObj = siteRef.site
             if compareObj is None: # mark isDead for later removal
                 siteRef.isDead = True
                 continue
@@ -777,12 +775,12 @@ class Sites(common.SlottedObject):
             >>> cSite = Mock()
             >>> dSite = Mock()
             >>> eSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 0)
-            >>> aLocations.add(cSite) # a context
-            >>> aLocations.add(bSite, 234) # can add at same offset or a different one
-            >>> aLocations.add(dSite) # a context
-            >>> aLocations.getOffsetBySiteId(id(bSite))
+            >>> sitesObj = music21.Sites()
+            >>> sitesObj.add(aSite, 0)
+            >>> sitesObj.add(cSite) # a context
+            >>> sitesObj.add(bSite, 234) # can add at same offset or a different one
+            >>> sitesObj.add(dSite) # a context
+            >>> sitesObj.getOffsetBySiteId(id(bSite))
             234
 
         If strictDeadCheck is False (default) we can still retrieve the context
@@ -794,32 +792,32 @@ class Sites(common.SlottedObject):
 
             >>> idBSite = id(bSite)
             >>> del(bSite)
-            >>> aLocations.siteDict[idBSite].site
+            >>> sitesObj.siteDict[idBSite].siteWeakref
             <weakref at 0x...; dead>
 
         ::
 
-            >>> aLocations.siteDict[idBSite].site is None
+            >>> sitesObj.siteDict[idBSite].siteWeakref is None
             False
 
         ::
 
-            >>> common.unwrapWeakref(aLocations.siteDict[idBSite].site) is None
+            >>> sitesObj.siteDict[idBSite].site is None
             True
 
         ::
         
-            >>> aLocations.getOffsetBySiteId(idBSite, strictDeadCheck = False) # default
+            >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = False) # default
             234
 
         With this, you'll get an exception:
 
         ::
 
-            >>> aLocations.getOffsetBySiteId(idBSite, strictDeadCheck = True)
+            >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = True)
             Traceback (most recent call last):
             SitesException: Could not find the object with id ... in the Site marked with idKey ... (was there, now site is dead).
-            object <music21.sites.Sites object at 0x...>, definedContexts: {...}
+            object <music21.sites.Sites object at 0x...>, sitesDict: {...}
             containedById = ...
 
         '''
@@ -828,30 +826,27 @@ class Sites(common.SlottedObject):
 #            return self._lastOffset
         try:
             value = self.siteDict[idKey].offset
-            if WEAKREF_ACTIVE and strictDeadCheck is True and self.siteDict[idKey].site is not None:
-                obj = common.unwrapWeakref(self.siteDict[idKey].site)
+            if WEAKREF_ACTIVE and strictDeadCheck is True and self.siteDict[idKey].siteWeakref is not None:
+                obj = self.siteDict[idKey].site
                 if obj is None:
                     #if self.siteDict[idKey]['isDead'] is True: # not good enough
                     errorMsg = "Could not find the object with id %s in the Site marked with idKey %s (was there, now site is dead). " % (id(self), idKey)
-                    errorMsg += "\n   object %r, definedContexts: %r" % (self, self.siteDict)
+                    errorMsg += "\n   object %r, sitesDict: %r" % (self, self.siteDict)
                     errorMsg += "\n   containedById = %r" % (self.containedById)
                     raise SitesException(errorMsg)
 
         except KeyError:
             errorMsg = "Could not find the object with id %s in the Site marked with idKey %s. " % (id(self), idKey)
-            errorMsg += "\n   object %r, definedContexts: %r" % (self, self.siteDict)
+            errorMsg += "\n   object %r, sitesDict: %r" % (self, self.siteDict)
             errorMsg += "\n   containedById = %d" % (self.containedById)
             raise SitesException(errorMsg)
         # stored string are assummed to be attributes of the stored object
         if isinstance(value, str):
             if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
                 raise SitesException('attempted to set a bound offset with a string attribute that is not supported: %s' % value)
-            if WEAKREF_ACTIVE:
-                obj = common.unwrapWeakref(self.siteDict[idKey].site)
-            else:
-                obj = self.siteDict[idKey].site
+            obj = self.siteDict[idKey].site
             # offset value is an attribute string
-            # canot cache these values as may change outside of definedcontexts
+            # cannot cache these values as may change outside of siteDict
             return getattr(obj, value)
         # if value is not a string, it is a numerical offset
         self._lastID = idKey
@@ -872,12 +867,12 @@ class Sites(common.SlottedObject):
             >>> bSite = Mock()
             >>> cSite = Mock()
             >>> dSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 0)
-            >>> aLocations.add(cSite) # a context
-            >>> aLocations.add(bSite, 234) # can add at same offset or another
-            >>> aLocations.add(dSite) # a context
-            >>> aLocations.getOffsets()
+            >>> sitesObj = music21.Sites()
+            >>> sitesObj.add(aSite, 0)
+            >>> sitesObj.add(cSite) # a context -- no offset
+            >>> sitesObj.add(bSite, 234) # can add at same offset or another
+            >>> sitesObj.add(dSite) # a context -- no offset
+            >>> sitesObj.getOffsets()
             [0, 234]
 
         '''
@@ -901,10 +896,10 @@ class Sites(common.SlottedObject):
             >>> aSite = Mock()
             >>> bSite = Mock()
             >>> cSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 23)
-            >>> aLocations.add(bSite, 23121.5)
-            >>> aSite == aLocations.getSiteByOffset(23)
+            >>> sitesObj = music21.Sites()
+            >>> sitesObj.add(aSite, 23)
+            >>> sitesObj.add(bSite, 23121.5)
+            >>> aSite is sitesObj.getSiteByOffset(23)
             True
 
         '''
@@ -917,14 +912,7 @@ class Sites(common.SlottedObject):
                     return None
                 match = self.siteDict[siteId].site
                 break
-        if WEAKREF_ACTIVE:
-            if match is None: # this is a dead erfs
-                return match
-            elif not common.isWeakref(match):
-                raise SitesException('site on coordinates is not a weak ref: %s' % match)
-            return common.unwrapWeakref(match)
-        else:
-            return match
+        return match
 
     def getSiteCount(self):
         '''
@@ -936,7 +924,7 @@ class Sites(common.SlottedObject):
             siteRef = self.siteDict[idKey]
             if siteRef.isDead is True:
                 continue
-            if siteRef.site is None:
+            if siteRef.siteWeakref is None:
                 continue
             count += 1
         return count
@@ -1384,88 +1372,6 @@ class Sites(common.SlottedObject):
         except KeyError:
             raise SitesException('an entry for this object (%s) is not stored in Sites' % siteId)
 
-    def unwrapWeakref(self, purgeLocations=True):
-        '''
-        Unwrap any and all weakrefs stored.
-
-        ::
-
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> aSites = sites.Sites()
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> common.isWeakref(aSites.get()[0]) # unwrapping happens
-            False
-
-        ::
-
-            >>> common.isWeakref(aSites.siteDict[id(aObj)].site)
-            True
-
-        ::
-
-            >>> aSites.unwrapWeakref()
-            >>> common.isWeakref(aSites.siteDict[id(aObj)].site)
-            False
-
-        ::
-
-            >>> common.isWeakref(aSites.siteDict[id(bObj)].site)
-            False
-
-        '''
-        if purgeLocations is True:
-            # might not be needed if you know they are all alive.
-            self.purgeLocations(rescanIsDead=True)
-
-        #environLocal.printDebug(['self', self, 'self.siteDict.keys()', self.siteDict.keys()])
-        for idKey in self.siteDict:
-            if WEAKREF_ACTIVE:
-            #if common.isWeakref(self.siteDict[idKey]['obj']):
-                target = self.siteDict[idKey].site
-                if target is None:
-                    continue
-                if common.isWeakref(target):
-                    #environLocal.printDebug(['unwrapping:', self.siteDict[idKey]['obj']])
-                    target = common.unwrapWeakref(target)
-                    self.siteDict[idKey].site = target
-
-    def wrapWeakref(self):
-        '''
-        Wrap all stored objects with weakrefs.
-
-        ::
-
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> aSites = sites.Sites()
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> aSites.unwrapWeakref()
-            >>> aSites.wrapWeakref()
-            >>> common.isWeakref(aSites.siteDict[id(aObj)].site)
-            True
-
-        ::
-
-            >>> common.isWeakref(aSites.siteDict[id(bObj)].site)
-            True
-
-        '''
-        for idKey in self.siteDict:
-            if self.siteDict[idKey].site is None:
-                continue  # always skip None
-            if not common.isWeakref(self.siteDict[idKey].site):
-                #environLocal.printDebug(['wrapping:', self.siteDict[idKey].site)
-                post = common.wrapWeakref(self.siteDict[idKey].site)
-                self.siteDict[idKey].site = post
-
 
 class Test(unittest.TestCase):
     def testSites(self):
@@ -1476,11 +1382,15 @@ class Test(unittest.TestCase):
         n = note.Note()
         m.append(n)
 
-        n.pitch.sites.add(m)
-        n.pitch.sites.add(n)
-        self.assertEqual(n.pitch.getContextAttr('number'), 34)
-        n.pitch.setContextAttr('lyric',
-                               n.pitch.getContextAttr('number'))
+        n2 = note.Note()
+        n2.sites.add(m)
+        
+        c = clef.Clef()
+        c.sites.add(n)
+        
+        self.assertEqual(n2.getContextAttr('number'), 34)
+        c.setContextAttr('lyric',
+                               n2.getContextAttr('number'))
         # converted to a string now
         self.assertEqual(n.lyric, '34')
 

@@ -2140,8 +2140,6 @@ class Stream(base.Music21Object):
         Overridden method for unwrapping all Weakrefs.
         '''
         self._derivation.unwrapWeakref()
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
         # this presently is not a weakref but in case of future changes
 #         if common.isWeakref(self.flattenedRepresentationOf):
@@ -2154,7 +2152,6 @@ class Stream(base.Music21Object):
         Overridden method for unwrapping all Weakrefs.
         '''
         # call base method: this gets defined contexts and active site
-        base.Music21Object.wrapWeakref(self)
         if self._derivation is not None:
             self._derivation.wrapWeakref()
 #         if not common.isWeakref(self.flattenedRepresentationOf):
@@ -8490,18 +8487,6 @@ class Stream(base.Music21Object):
 
         >>> len(a.pitches)
         104
-
-        Pitch objects are also retrieved when stored directly on a Stream.
-
-
-        >>> pitch1 = pitch.Pitch()
-        >>> st1 = stream.Stream()
-        >>> st1.append(pitch1)
-        >>> foundPitches = st1.pitches
-        >>> len(foundPitches)
-        1
-        >>> foundPitches[0] is pitch1
-        True
 
         Chords get their pitches found as well:
 

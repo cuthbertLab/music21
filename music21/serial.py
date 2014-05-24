@@ -108,7 +108,11 @@ class ToneRow(stream.Stream):
         
         if self.row != None:
             for pc in self.row:
-                self.append(pitch.Pitch(pc))
+                n = note.Note()
+                n.duration.quarterLength = 0.0
+                n.pitch = pitch.Pitch(pc)
+                n.pitch.octave = None
+                self.append(n)
     
         
     def pitchClasses(self):
@@ -127,7 +131,7 @@ class ToneRow(stream.Stream):
         
         '''
         
-        pitchlist = [p.pitchClass for p in self]
+        pitchlist = [n.pitch.pitchClass for n in self]
         return pitchlist
     
     def noteNames(self):
@@ -184,9 +188,9 @@ class ToneRow(stream.Stream):
         >>> a = serial.pcToToneRow(range(0,11))
         >>> type(a)
         <class 'music21.serial.ToneRow'>
-        >>> p = pitch.Pitch()
-        >>> p.pitchClass = 11
-        >>> a.append(p)
+        >>> n = note.Note()
+        >>> n.pitch.pitchClass = 11
+        >>> a.append(n)
         >>> a = a.makeTwelveToneRow()
         ...
         >>> type(a)
@@ -195,9 +199,11 @@ class ToneRow(stream.Stream):
         pcSet = self.pitchClasses()
         a = TwelveToneRow()
         for thisPc in pcSet:
-            p = pitch.Pitch()
-            p.pitchClass = thisPc
-            a.append(p)
+            n = note.Note()
+            n.duration.quarterLength = 0.0
+            n.pitch.pitchClass = thisPc
+            n.pitch.octave = None
+            a.append(n)
         return a
 
     def isSameRow(self, row):
@@ -502,17 +508,17 @@ class TwelveToneRow(ToneRow):
           5  4  0  1  8  6  7  3  B  A  9  2
           4  3  B  0  7  5  6  2  A  9  8  1
         ...
-        >>> [str(e) for e in s37[0]]
+        >>> [str(e.pitch) for e in s37[0]]
         ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A']
 
         
         '''        
         # note: do not want to return a TwelveToneRow() type, as this will
         # add again the same pitches to the elements list twice. 
-        p = self.getElementsByClass(pitch.Pitch, returnStreamSubClass=False)
+        noteList = self.getElementsByClass('Note', returnStreamSubClass='list')
 
-        i = [(12-x.pitchClass) % 12 for x in p]
-        matrix = [[(x.pitchClass+t) % 12 for x in p] for t in i]
+        i = [(12-x.pitch.pitchClass) % 12 for x in noteList]
+        matrix = [[(x.pitch.pitchClass+t) % 12 for x in noteList] for t in i]
 
         matrixObj = TwelveToneMatrix()
         i = 0
@@ -522,9 +528,11 @@ class TwelveToneRow(ToneRow):
             rowObject.elements = []
             rowObject.id = 'row-' + str(i)
             for p in row: # iterate over pitch class values
-                pObj = pitch.Pitch()
-                pObj.pitchClass = p
-                rowObject.append(pObj)
+                n = note.Note()
+                n.duration.quarterLength = 0.0
+                n.pitch.pitchClass = p
+                n.pitch.octave = None
+                rowObject.append(n)
             matrixObj.insert(0, rowObject)
         
 
@@ -3406,18 +3414,18 @@ def pcToToneRow(pcSet):
     
     >>> a = serial.pcToToneRow(range(12))
     >>> a.show('text')
-    {0.0} <music21.pitch.Pitch C>
-    {0.0} <music21.pitch.Pitch C#>
-    {0.0} <music21.pitch.Pitch D>
-    {0.0} <music21.pitch.Pitch E->
-    {0.0} <music21.pitch.Pitch E>
-    {0.0} <music21.pitch.Pitch F>
-    {0.0} <music21.pitch.Pitch F#>
-    {0.0} <music21.pitch.Pitch G>
-    {0.0} <music21.pitch.Pitch G#>
-    {0.0} <music21.pitch.Pitch A>
-    {0.0} <music21.pitch.Pitch B->
-    {0.0} <music21.pitch.Pitch B>
+    {0.0} <music21.note.Note C>
+    {0.0} <music21.note.Note C#>
+    {0.0} <music21.note.Note D>
+    {0.0} <music21.note.Note E->
+    {0.0} <music21.note.Note E>
+    {0.0} <music21.note.Note F>
+    {0.0} <music21.note.Note F#>
+    {0.0} <music21.note.Note G>
+    {0.0} <music21.note.Note G#>
+    {0.0} <music21.note.Note A>
+    {0.0} <music21.note.Note B->
+    {0.0} <music21.note.Note B>
     >>> matrixObj = a.matrix()
     >>> print(matrixObj)
       0  1  2  3  4  5  6  7  8  9  A  B
@@ -3441,18 +3449,15 @@ def pcToToneRow(pcSet):
     
     if len(pcSet) == 12:
         a = TwelveToneRow()
-        for thisPc in pcSet:
-            p = pitch.Pitch()
-            p.pitchClass = thisPc
-            a.append(p)
-        return a
     else:
         a = ToneRow()
-        for thisPc in pcSet:
-            p = pitch.Pitch()
-            p.pitchClass = thisPc
-            a.append(p)
-        return a
+    for thisPc in pcSet:
+        n = note.Note()
+        n.duration.quarterLength = 0.0
+        n.pitch.pitchClass = thisPc
+        n.pitch.octave = None
+        a.append(n)
+    return a
     
 def rowToMatrix(p):
     '''

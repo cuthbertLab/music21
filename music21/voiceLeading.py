@@ -144,21 +144,29 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.key.Key of G major>
         ''')
 
+    def _setVoiceNote(self, value, which):
+        if value is None:
+            setattr(self, which, None)
+        elif common.isStr(value):
+            setattr(self, which, note.Note(value)) 
+        else:
+            try:
+                if 'Note' in value.classes:
+                    setattr(self, which, value)
+                elif 'Pitch' in value.classes:
+                    n = note.Note()
+                    n.duration.quarterLength = 0.0
+                    n.pitch = value
+                    setattr(self, which, n)
+            except:
+                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+
     def _getv1n1(self):
         return self._v1n1
 
     def _setv1n1(self, value):
-        if value is None:
-            self._v1n1 = None
-        elif common.isStr(value):
-            self._v1n1 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._v1n1 = value
-            except:
-                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
-
+        self._setVoiceNote(value, '_v1n1')
+        
     v1n1 = property(_getv1n1, _setv1n1, doc='''
         set note1 for voice 1
 
@@ -171,16 +179,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         return self._v1n2
 
     def _setv1n2(self, value):
-        if value is None:
-            self._v1n2 = None
-        elif common.isStr(value):
-            self._v1n2 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._v1n2 = value
-            except:
-                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+        self._setVoiceNote(value, '_v1n2')
 
     v1n2 = property(_getv1n2, _setv1n2, doc='''
         set note 2 for voice 1
@@ -196,16 +195,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         return self._v2n1
 
     def _setv2n1(self, value):
-        if value is None:
-            self._v2n1 = None
-        elif common.isStr(value):
-            self._v2n1 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._v2n1 = value
-            except:
-                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+        self._setVoiceNote(value, '_v2n1')
 
     v2n1 = property(_getv2n1, _setv2n1, doc='''
         set note 1 for voice 2
@@ -219,16 +209,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         return self._v2n2
 
     def _setv2n2(self, value):
-        if value is None:
-            self._v2n2 = None
-        elif common.isStr(value):
-            self._v2n2 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._v2n2 = value
-            except:
-                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+        self._setVoiceNote(value, '_v2n2')
 
     v2n2 = property(_getv2n2, _setv2n2, doc='''
         set note 2 for voice 2

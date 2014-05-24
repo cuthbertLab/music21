@@ -9,12 +9,12 @@
 
 import sys
 
-import jsonpickle.util as util
-import jsonpickle.tags as tags
-import jsonpickle.handlers as handlers
+import jsonpickle.util as util # @UnresolvedImport
+import jsonpickle.tags as tags # @UnresolvedImport
+import jsonpickle.handlers as handlers # @UnresolvedImport
 
-from jsonpickle.compat import set
-from jsonpickle.backend import JSONBackend
+from jsonpickle.compat import set # @UnresolvedImport
+from jsonpickle.backend import JSONBackend # @UnresolvedImport
 
 
 def decode(string, backend=None, context=None, keys=False, reset=True,
@@ -96,8 +96,11 @@ class Unpickler(object):
             restore = self._restore_dict
         else:
             restore = lambda x: x
-        return restore(obj)
-
+        try:
+            return restore(obj)
+        except IndexError as e:
+            raise e # for testing
+        
     def _restore_id(self, obj):
         return self._objs[obj[tags.ID]]
 

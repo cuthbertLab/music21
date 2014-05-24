@@ -33,7 +33,7 @@ available after importing music21.
 ::
 
     >>> music21.VERSION_STR
-    '1.9.2'
+    '1.9.3'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -1996,62 +1996,6 @@ class Music21Object(object):
         ElementException: priority values must be integers.
         ''')
 
-    #--------------------------------------------------------------------------
-    # temporary storage setup routines; public interface
-
-    def unwrapWeakref(self):
-        '''
-        Public interface to operation on Sites.
-
-        NOTE: Any Music21Object subclass that
-        contains private Streams (like Spanner and Variant) must
-        override these methods.
-
-        >>> import music21
-        >>> aM21Obj = music21.Music21Object()
-        >>> bM21Obj = music21.Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0
-        >>> aM21Obj.sites.add(bM21Obj, 50)
-        >>> aM21Obj.activeSite = bM21Obj
-        >>> aM21Obj.unwrapWeakref()
-
-        '''
-        #environLocal.printDebug(['Music21Object: unwrapWeakref on:', self])
-
-        self.purgeOrphans()
-
-        # this purgesLocations too
-        self.sites.unwrapWeakref()
-        # doing direct access; not using property activeSite, as filters
-        # through global sites.WEAKREF_ACTIVE setting
-        if self._activeSite is not None:
-            self._activeSite = common.unwrapWeakref(self._activeSite)
-
-        #environLocal.printDebug(['   self._activeSite:', self._activeSite])
-
-    def wrapWeakref(self):
-        '''
-        Public interface to operation on Sites.
-
-        >>> import music21
-        >>> aM21Obj = music21.Music21Object()
-        >>> bM21Obj = music21.Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0
-        >>> aM21Obj.sites.add(bM21Obj, 50)
-        >>> aM21Obj.activeSite = bM21Obj
-        >>> aM21Obj.unwrapWeakref()
-        >>> aM21Obj.wrapWeakref()
-        '''
-        self.sites.wrapWeakref()
-
-        # doing direct access; not using property activeSite, as filters
-        # through global sites.WEAKREF_ACTIVE setting
-        self._activeSite = common.wrapWeakref(self._activeSite)
-        # this is done both here and in unfreezeIds()
 
     #--------------------------------------------------------------------------
     # display and writing

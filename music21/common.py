@@ -1983,7 +1983,6 @@ def isWeakref(referent):
     >>> common.isWeakref(common.wrapWeakref(a1))
     True
     '''
-    import weakref
     if type(referent) is weakref.ref:
         return True
     return False

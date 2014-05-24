@@ -599,6 +599,8 @@ class Accidental(SlottedObject):
     def __init__(self, specifier='natural'):
         #base.Music21Object.__init__(self)
 
+        # since not a Music21Object
+
         # managed by properties
         self._displayType = "normal" # always, never, unless-repeated, even-tied
         self._displayStatus = None # None, True, False
@@ -755,6 +757,21 @@ class Accidental(SlottedObject):
 
     def __repr__(self):
         return '<accidental %s>' % self.name
+
+    ### REMOVED METHODS ####
+    def show(self, *args, **kws):
+        from music21 import note
+        environLocal.warn("as of v.1.9., Pitches are not Music21Objects. Do not call show on them; this method will go away in 2.0")
+        n = note.Note()
+        n.pitch = self
+        n.show(*args, **kws)
+    
+    def write(self, *args, **kws):
+        from music21 import note
+        environLocal.warn("as of v.1.9., Pitches are not Music21Objects. Do not call write on them; this method will go away in 2.0")
+        n = note.Note()
+        n.pitch = self
+        n.write(*args, **kws)
 
     ### PUBLIC METHODS ###
 
@@ -1031,14 +1048,13 @@ class Accidental(SlottedObject):
 
 
 #-------------------------------------------------------------------------------
-class Pitch(base.Music21Object):
+class Pitch(object):
     '''
-    A fundamental `Music21Object` that represents a single pitch.
+    A fundamental object that represents a single pitch.
 
     `Pitch` objects are most often created by passing in a note name
     (C, D, E, F, G, A, B), an optional accidental (one or more "#"s or "-"s,
     where "-" means flat), and an optional octave number:
-
 
     >>> highEflat = pitch.Pitch('E-6')
     >>> highEflat.name
@@ -1208,6 +1224,10 @@ class Pitch(base.Music21Object):
     False
     >>> pitch.Pitch("C#5") < pitch.Pitch("D-5")
     False
+    
+    
+    Pitches used to be `Music21Object` subclasses, so they retain some of the attributes there
+    such as .classes and .groups, but they don't have Duration or Sites objects
     '''
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german', 'french', 'spanish', 'italian','dutch']
@@ -1219,10 +1239,13 @@ class Pitch(base.Music21Object):
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
     def __init__(self, name=None, **keywords):
+        self.classes = [x.__name__ for x in self.__class__.mro()] 
+        self.groups = base.Groups()
+
         if isinstance(name, type(self)):
             name = name.nameWithOctave
 
-        base.Music21Object.__init__(self, **keywords)
+        #base.Music21Object.__init__(self, **keywords)
 
         # this should not be set, as will be updated when needed
         self._step = defaults.pitchStep # this is only the pitch step
@@ -4331,18 +4354,6 @@ class Pitch(base.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-
-
-class TestExternal(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
-    def testSingle(self):
-        a = Pitch()
-        a.name = 'c#'
-        a.show()
-
 
 class Test(unittest.TestCase):
 
