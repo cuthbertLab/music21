@@ -157,7 +157,7 @@ from music21.base import SitesException
 from music21.base import Music21ObjectException
 from music21.base import ElementException
 from music21.base import Groups
-from music21.base import Site
+from music21.base import SiteRef
 from music21.base import Sites
 from music21.base import Music21Object
 from music21.base import ElementWrapper

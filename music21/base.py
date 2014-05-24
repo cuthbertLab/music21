@@ -66,7 +66,7 @@ VERSION = __version_info__
 VERSION_STR = __version__
 #------------------------------------------------------------------------------
 __all__ = ['Music21Exception', 'VERSION', 'VERSION_STR', 'SitesException', 'Music21ObjectException',
-           'ElementException', 'Groups', 'Site', 'Sites',
+           'ElementException', 'Groups', 'SiteRef', 'Sites',
            'Music21Object','ElementWrapper','mainTest']
 ## N.B. for eclipse "all" import working, we need to list this separately in "music21/__init__.py"
 ##      so make sure to update in both places
@@ -76,7 +76,7 @@ from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
 
-from music21.sites import Site # @UnusedImport
+from music21.sites import SiteRef # @UnusedImport
 from music21.sites import Sites
 from music21.sites import SitesException
 
