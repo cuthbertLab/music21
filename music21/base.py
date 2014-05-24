@@ -2178,7 +2178,7 @@ class Music21Object(object):
         # common.VALID_SHOW_FORMATS
         if fmt is None: # get setting in environment
             if common.runningUnderIPython():
-                fmt = 'lily.png'
+                fmt = 'ipython.lilypond.png'
             else:
                 fmt = environLocal['showFormat']
         elif fmt.startswith('.'):

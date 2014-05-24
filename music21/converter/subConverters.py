@@ -190,7 +190,26 @@ class SubConverter(object):
             f.close()
         return fp
     
-            
+class ConverterIPython(SubConverter):
+    registerFormats = ('ipython',)
+    registerOutputExtensions = ()
+    registerOutputSubformatExtensions = {'lilypond': 'ly'}
+    
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        if subformats is None:
+            subformats = ['lilypond','png']
+        helperFormat = subformats[0]
+        helperSubformats = subformats[1:]
+        from music21 import converter
+        helperConverter = converter.Converter()
+        helperConverter.setSubconverterFromFormat(helperFormat)
+        helperSubConverter = helperConverter.subConverter
+        fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
+        if helperSubformats[0] == 'png':
+            from music21.ipython21 import objects as ipythonObjects
+            ipo = ipythonObjects.IPythonPNGObject(fp)
+            return ipo
+                
 class ConverterLilypond(SubConverter):
     registerFormats = ('lilypond', 'lily')
     registerOutputExtensions = ('ly','png','pdf','svg')

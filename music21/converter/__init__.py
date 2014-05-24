@@ -443,7 +443,7 @@ class Converter(object):
 #                         'rntext': subConverters.ConverterRomanText,
 #                         }
 
-    def setSubconverterFromFormat(self, converterFormat, forceSource=False): 
+    def setSubconverterFromFormat(self, converterFormat): 
         '''
         sets the .subConverter according to the format of `converterFormat`:
         
@@ -483,7 +483,7 @@ class Converter(object):
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fp)
 
-        self.setSubconverterFromFormat(useFormat, forceSource=forceSource)
+        self.setSubconverterFromFormat(useFormat)
         self.subConverter.parseFile(fp, number=number)
         self.stream.filePath = fp
         self.stream.fileNumber = number
@@ -660,7 +660,7 @@ class Converter(object):
             useFormat = common.findFormatFile(fp)
         else:
             useFormat = format
-        self.setSubconverterFromFormat(useFormat, forceSource=False)
+        self.setSubconverterFromFormat(useFormat)
         self.subConverter.parseFile(fp, number=number)
         self.stream.filePath = fp
         self.stream.fileNumber = number
