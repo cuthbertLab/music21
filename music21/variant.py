@@ -1827,33 +1827,6 @@ class Variant(base.Music21Object):
         self._stream.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
-    def unwrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.unwrapWeakref(self)
-        # for contained objects that have weak refs
-        self._stream.unwrapWeakref()
-        # this presently is not a weakref but in case of future changes
-
-
-    def wrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.wrapWeakref(self)
-        self._stream.wrapWeakref()
-
-
-#    def freezeIds(self):
-#        base.Music21Object.freezeIds(self)
-#        self._stream.freezeIds()
-#
-#    def unfreezeIds(self):
-#        base.Music21Object.unfreezeIds(self)
-#        self._stream.unfreezeIds()
-
-
     def __repr__(self):
         return "<music21.variant.%s object of length %s>" % \
             (self.__class__.__name__, str(self.containedHighestTime))

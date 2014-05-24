@@ -66,10 +66,10 @@ import sys, os
 from music21 import common
 sys.path.append(common.getSourceFilePath() + os.path.sep + 'ext')
 
-from jsonpickle import pickler
-from jsonpickle import unpickler
-from jsonpickle.backend import JSONBackend
-from jsonpickle.version import VERSION
+from jsonpickle import pickler # @UnresolvedImport
+from jsonpickle import unpickler # @UnresolvedImport
+from jsonpickle.backend import JSONBackend # @UnresolvedImport
+from jsonpickle.version import VERSION  # @UnresolvedImport
 
 # ensure built-in handlers are loaded
 __import__('jsonpickle.handlers')

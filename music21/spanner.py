@@ -315,15 +315,6 @@ class Spanner(base.Music21Object):
         self.spannedElements.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
-#    def freezeIds(self):
-#        base.Music21Object.freezeIds(self)
-#        self.spannedElements.freezeIds()
-#
-#    def unfreezeIds(self):
-#        base.Music21Object.unfreezeIds(self)
-#        self.spannedElements.unfreezeIds()
-
-
     def getSpannerStorageId(self):
         '''Return the object id of the SpannerStorage object
         '''
