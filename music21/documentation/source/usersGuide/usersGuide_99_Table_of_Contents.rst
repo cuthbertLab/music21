@@ -8,23 +8,23 @@ topics will be linked and added as the topics are written:
 :ref:`Introduction <usersGuide_00_introduction>` (to be taken from the
 **Quick Start**)
 
-1.  Installing (sigh!)
-2.  Notes
-3.  Pitches, Durations, Notes again
-4.  Basic Streams
-5.  Lists of Lists
-6.  Nested Streams and Basic Hierarchies
+1.  :ref:`Installing <usersGuide_01_installing>`
+2.  :ref:`Notes <usersGuide_02_notes>`
+3.  :ref:`Pitches, Durations, Notes again <usersGuide_03_pitches>`
+4.  :ref:`Basic Streams <usersGuide_04_stream1>`
+5.  :ref:`Lists of Lists <usersGuide_05_listsOfLists>`
+6.  :ref:`Nested Streams and Basic Hierarchies <usersGuide_06_stream2>`
 7.  :ref:`Chords <usersGuide_07_chords>`
 8.  Configuring MusicXML reader. Making files
-9.  Chordify
+9.  :ref:`Chordify <usersGuide_09_chordify>`
 10. File formats (1)
-11. Corpus Studies
+11. :ref:`Corpus Studies <usersGuide_11_corpusSearching>`
 12. Recursive Streams, inPlace, and deepcopy
 13. Chorales as a corpus
-14. Time Signatures
+14. :ref:`Time Signatures <usersGuide_14_timeSignatures>`
 15. Key Signatures and Keys
 16. Intervals
-17. Derivations
+17. :ref:`Derivations <usersGuide_17_derivations>`
 18. More durations: Complex, ties, and tuplets
 19. Environment
 20. Basic Analysis Tools

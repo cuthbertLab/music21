@@ -253,10 +253,12 @@ spaceless objects like* `Clefs`, *Kim Kardashian's marriages,
 etc.  We'll get to it later)*
 
 The :meth:`~music21.base.Music21Object.show` method 
-will show that weird `2.25` Duration, giving it a square `Notehead`
-and putting it at `C4` so you can see it: 
+will show that weird `2.25` Duration.  We have to first assign it to a note:
 
->>> dottedQuarter.show()    # doctest: +SKIP
+>>> n = note.Note()
+>>> n.duration = dottedQuarter
+>>> n.notehead = 'square' # just for fun...
+>>> n.show()    # doctest: +SKIP
 
 .. image:: images/usersGuide/overviewNotes-02.*
     :width: 600
