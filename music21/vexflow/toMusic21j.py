@@ -231,6 +231,8 @@ class VexflowPickler(object):
         data = sf.writeStr(fmt='jsonpickle')
         dataSplit = self.splitLongJSON(data)
         if mode == 'json':
+            return data
+        elif mode == 'jsonSplit':
             return dataSplit
         elif mode == 'jsbody':
             return self.getJSBody(dataSplit)

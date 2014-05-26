@@ -2178,7 +2178,10 @@ class Music21Object(object):
         # common.VALID_SHOW_FORMATS
         if fmt is None: # get setting in environment
             if common.runningUnderIPython():
-                fmt = 'ipython.lilypond.png'
+                try:
+                    fmt = environLocal['ipythonShowFormat']
+                except environment.EnvironmentException:
+                    fmt = 'ipython.vexflow'
             else:
                 fmt = environLocal['showFormat']
         elif fmt.startswith('.'):

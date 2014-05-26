@@ -47,9 +47,7 @@ method using the ``('text')`` argument.
         {2.0} <music21.note.Note F#>
         {3.0} <music21.note.Note B->
 
-.. code:: python
-
-    
+As Chapter 4 noted, there's
 
 Recursion in Streams
 --------------------

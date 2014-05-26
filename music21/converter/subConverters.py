@@ -194,10 +194,32 @@ class ConverterIPython(SubConverter):
     registerFormats = ('ipython',)
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
+    def vfshow(self, s):
+        import random
+        from music21.vexflow import toMusic21j
+        from IPython.display import HTML
+        vfp = toMusic21j.VexflowPickler()
+        vfp.mode = 'jsonSplit'
+        outputCode = vfp.fromObject(s)
+        idName = 'canvasDiv' + str(random.randint(0, 10000))
+        htmlBlock = '<div id="' + idName + '"><canvas/></div>'
+        js = '''
+        <script>
+             data = ''' + outputCode + ''';       
+             var jpc = new music21.jsonPickle.Converter();
+             var streamObj = jpc.run(data);
+             streamObj.replaceLastCanvas("#''' + idName + '''");
+        </script>
+        '''
+        return HTML(htmlBlock + js)
     
-    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):    
         if subformats is None:
-            subformats = ['lilypond','png']
+            subformats = ['vexflow']
+        
+        if len(subformats) > 0 and subformats[0] == 'vexflow':
+            return self.vfshow(obj)
+            #subformats = ['lilypond','png']
         helperFormat = subformats[0]
         helperSubformats = subformats[1:]
         from music21 import converter

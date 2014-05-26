@@ -469,13 +469,11 @@ class _EnvironmentCore(object):
         # path to MuseScore (if not the musicxmlPath...)
         # for direct creation of PNG from MusicXML
         self._ref['musescoreDirectPNGPath'] = None
-
         self._ref['showFormat'] = 'musicxml'
-
         self._ref['writeFormat'] = 'musicxml'
+        self._ref['ipythonShowFormat'] = 'ipython.vexflow'
 
         self._ref['autoDownload'] = 'ask'
-
         self._ref['debug'] = 0
 
         # printing of missing import warnings
@@ -961,6 +959,7 @@ class Environment(object):
             'debug'
             'directoryScratch'
             'graphicsPath'
+            'ipythonShowFormat'
             'lilypondBackend'
             'lilypondFormat'
             'lilypondPath'
@@ -1018,6 +1017,7 @@ class Environment(object):
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
         'lilypondPath'
@@ -1159,6 +1159,7 @@ class UserSettings(object):
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
         'lilypondPath'
@@ -1361,6 +1362,7 @@ def set(key, value):  # okay to override set here: @ReservedAssignment
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
         'lilypondPath'
@@ -1414,6 +1416,7 @@ def get(key):
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
         'lilypondPath'
@@ -1492,6 +1495,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
+  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
@@ -1522,6 +1526,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
+  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
@@ -1573,6 +1578,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
+  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>

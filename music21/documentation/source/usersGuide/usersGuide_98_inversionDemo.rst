@@ -184,7 +184,3 @@
 
 .. image:: usersGuide_98_inversionDemo_files/_fig_15.png
 
-
-.. code:: python
-
-    
