@@ -158,6 +158,76 @@ def makeElement(verticality, quarterLength):
     return element
 
 
+def _recurseStreamMulti(
+    inputStream,
+    currentParentage=None,
+    initialOffset=0,
+    flatten=False,
+    classLists=None,
+    ):
+    r'''
+    Recurses through `inputStream`, and constructs TimespanCollections for each
+    encountered substream and ElementTimespans for each encountered non-stream
+    element.
+
+    `classLists` should be a sequence of valid inputs for `isinstance()`. One
+    TimespanCollection will be constructed for each element in `classLists`, in
+    a single optimized pass through the `inputStream`.
+
+    This is used internally by `streamToTimespanCollection`.
+    '''
+    from music21 import spanner
+    from music21 import stream
+    from music21 import variant
+    if currentParentage is None:
+        currentParentage = (inputStream,)
+    results = [
+        TimespanCollection(source=currentParentage[-1])
+        for x in classLists
+        ]
+    # do this to avoid munging activeSites
+    inputStreamElements = inputStream._elements + inputStream._endElements
+    for element in inputStreamElements:
+        startOffset = element.getOffsetBySite(currentParentage[-1])
+        startOffset += initialOffset
+        wasStream = False
+        if isinstance(element, stream.Stream) and \
+            not isinstance(element, spanner.Spanner) and \
+            not isinstance(element, variant.Variant):
+            localParentage = currentParentage + (element,)
+            subresults = _recurseStreamMulti(
+                element,
+                localParentage,
+                initialOffset=startOffset,
+                flatten=flatten,
+                classLists=classLists,
+                )
+            for result, subresult in zip(results, subresults):
+                if flatten is not False: # True or semiFlat
+                    result.insert(subresult[:])
+                else:
+                    result.insert(subresult)
+            wasStream = True
+        if not wasStream or flatten == 'semiFlat':
+            parentStartOffset = initialOffset
+            parentStopOffset = initialOffset + \
+                currentParentage[-1].duration.quarterLength
+            stopOffset = startOffset + element.duration.quarterLength
+            for result, classList in zip(results, classLists):
+                if classList and not element.isClassOrSubclass(classList):
+                    continue
+                elementTimespan = ElementTimespan(
+                    element=element,
+                    parentage=tuple(reversed(currentParentage)),
+                    parentStartOffset=parentStartOffset,
+                    parentStopOffset=parentStopOffset,
+                    startOffset=startOffset,
+                    stopOffset=stopOffset,
+                    )
+                result.insert(elementTimespan)
+    return results
+
+
 def _recurseStream(
     inputStream,
     currentParentage=None,
@@ -170,16 +240,7 @@ def _recurseStream(
     encountered substream and ElementTimespans for each encountered non-stream
     element.
 
-    If `pitchedOnly` is true, `_recurseStream` only constructs ElementTimespans
-    for pitched non-stream elements.
-
     This is used internally by `streamToTimespanCollection`.
-
-    flatten can be::
-    
-        True (default; inserts the contents of the Stream at offsets like flat),
-        False (inserts TimespanCollections for Streams),
-        'semiFlat' (does both)
     '''
     from music21 import spanner
     from music21 import stream
@@ -192,7 +253,6 @@ def _recurseStream(
     for element in inputStreamElements:
         startOffset = element.getOffsetBySite(currentParentage[-1])
         startOffset += initialOffset
-        
         wasStream = False
         if isinstance(element, stream.Stream) and \
             not isinstance(element, spanner.Spanner) and \
@@ -210,7 +270,7 @@ def _recurseStream(
             else:
                 result.insert(subresult)
             wasStream = True
-        if wasStream is False or flatten=='semiFlat':
+        if not wasStream or flatten=='semiFlat':
             if classList and not element.isClassOrSubclass(classList):
                 continue
             parentStartOffset = initialOffset
@@ -292,7 +352,7 @@ def streamToTimespanCollection(
 
     '''
     if classList is None:
-        classList = (note.Note, chord.Chord)
+        classList = ((note.Note, chord.Chord),)
     result = _recurseStream(
         inputStream,
         initialOffset=0.,

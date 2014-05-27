@@ -947,7 +947,7 @@ class Music21Object(object):
 #                 ts = self.sites.siteDict[s]
 #                 print ts.obj,
 #                 print common.unwrapWeakref(ts.obj)
-                
+
             raise Music21ObjectException('supplied site (%s) is not a site in this object: %s' % (site, self))
         #environLocal.printDebug(['removed location by site:', 'self', self, 'site', site])
         self.sites.remove(site)
@@ -1057,15 +1057,21 @@ class Music21Object(object):
 #         '''
 #         self.sites.removeNonContainedLocations()
 
-    def getContextByClass(self, className, serialReverseSearch=True,
-            callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore',
-            memo=None):
+    def getContextByClass(
+        self,
+        className,
+        callerFirst=None,
+        getElementMethod='getElementAtOrBefore',
+        memo=None,
+        prioritizeActiveSite=True,
+        serialReverseSearch=True,
+        sortByCreationTime=False,
+        ):
         '''
-        A very powerful method in music21 of fundamental importance:
-        Returns the element matching the className that is closest to this
-        element in its current hierarchy.  For instance, take this stream of
-        changing time signatures:
-
+        A very powerful method in music21 of fundamental importance: Returns
+        the element matching the className that is closest to this element in
+        its current hierarchy.  For instance, take this stream of changing time
+        signatures:
 
         >>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
         >>> s2 = s1.makeMeasures()
@@ -1089,7 +1095,6 @@ class Music21Object(object):
             {0.0} <music21.note.Note C>
             {1.0} <music21.bar.Barline style=final>
 
-
         Let's get the last two notes of the piece, the B and high c:
 
         >>> c = s2.measure(4).notes[0]
@@ -1108,38 +1113,39 @@ class Music21Object(object):
 
         Doing what we just did wouldn't be hard to do with other methods,
         though `getContextByClass` makes it easier.  But the time signature
-        context for b would be much harder to get without this method, since
-        in order to do it, it searches backwards within the measure, finds that
-        there's nothing there.  It goes to the previous measure and searches that
-        one backwards until it gets the proper TimeSignature of 2/4:
+        context for b would be much harder to get without this method, since in
+        order to do it, it searches backwards within the measure, finds that
+        there's nothing there.  It goes to the previous measure and searches
+        that one backwards until it gets the proper TimeSignature of 2/4:
 
         >>> b.getContextByClass('TimeSignature')
         <music21.meter.TimeSignature 2/4>
 
         The method is smart enough to stop when it gets to the beginning of the
-        part.  This is all you need to know for most uses.  The rest of the docs
-        are for advanced uses:
+        part.  This is all you need to know for most uses.  The rest of the
+        docs are for advanced uses:
 
-        The methods searches both Sites as well as associated objects
-        to find a matching class. Returns None if not match is found.
+        The methods searches both Sites as well as associated objects to find a
+        matching class. Returns None if not match is found.
 
-        A reference to the caller is required to find the offset of the
-        object of the caller. This is needed for serialReverseSearch.
+        A reference to the caller is required to find the offset of the object
+        of the caller. This is needed for serialReverseSearch.
 
-        The caller may be a Sites reference from a lower-level object.
-        If so, we can access the location of that lower-level object. However,
-        if we need a flat representation, the caller needs to be the source
-        Stream, not its Sites reference.
+        The caller may be a Sites reference from a lower-level object.  If so,
+        we can access the location of that lower-level object. However, if we
+        need a flat representation, the caller needs to be the source Stream,
+        not its Sites reference.
 
-        The `callerFirst` is the first object from which this method
-        was called. This is needed in order to determine the final offset from which to search.
+        The `callerFirst` is the first object from which this method was
+        called. This is needed in order to determine the final offset from
+        which to search.
 
         The `prioritizeActiveSite` parameter searches the object's activeSite
         before any other object. By default this is True
 
-        The `getElementMethod` is a string that selects which Stream method is used to
-        get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted.
-
+        The `getElementMethod` is a string that selects which Stream method is
+        used to get elements for searching. The strings 'getElementAtOrBefore'
+        and 'getElementBeforeOffset' are currently accepted.
 
         OMIT_FROM_DOCS
 
@@ -1155,20 +1161,17 @@ class Music21Object(object):
                 return verticality.startTimespans[0].element
             elif len(verticality.overlapTimespans) > 0:
                 return verticality.overlapTimespans[0].element
-            elif len(verticality.overlapTimespans) > 0:
-                return verticality.overlapTimespans[0].element
 
         def findElInTimespanCollection(ts, offsetStart):
             if getElementMethod == 'getElementAtOrBefore':
-                vert = ts.getVerticalityAtOrBefore(offsetStart)
+                verticality = ts.getVerticalityAtOrBefore(offsetStart)
             elif getElementMethod == 'getElementBeforeOffset':
-                vert = ts.getVerticalityAt(offsetStart).previousVerticality
-
-            if vert is not None:
-                el = extractElementFromVerticality(vert)
-                if el is not None and el.isClassOrSubclass(className):
+                verticality = ts.getVerticalityAt(offsetStart).previousVerticality
+            if verticality is not None:
+                element = extractElementFromVerticality(verticality)
+                if element is not None and element.isClassOrSubclass(className):
                     # latter should not be necessary...
-                    return el
+                    return element
             return None
 
         def findElInTimespanColNoRecurse(ts, offsetStart):
@@ -1182,15 +1185,16 @@ class Music21Object(object):
                 if offsetStart is None:
                     return None
                 startTimespans = ts.findTimespansStartingAt(offsetStart)
-                for el in startTimespans:
-                    if hasattr(el, 'source'):
+                for element in startTimespans:
+                    if hasattr(element, 'source'):
                         continue
-                    return el.element
+                    return element.element
 
         if not common.isListLike(className):
             className = (className,)
-            
-        for searchPlace in self.yieldSiteSearchOrder(sortByCreationTime=sortByCreationTime):
+
+        for searchPlace in self.yieldSiteSearchOrder(
+            sortByCreationTime=sortByCreationTime):
             site = searchPlace[0]
             if site.isClassOrSubclass(className):
                 return site
@@ -1206,15 +1210,15 @@ class Music21Object(object):
                 el = findElInTimespanCollection(tsFlat, offsetStart)
                 if el is not None:
                     return el
-        
- 
+
+
     def getAllContextsByClass(self, className, found=None, idFound=None,
                              memo=None):
         '''
         Search both Sites as well as associated
         objects to find all matching classes.
         Returns [] if not match is found.
-        
+
         DEPRECATED possibly May 2014: Not sure if it works well...
         '''
         if memo is None:
@@ -1334,11 +1338,11 @@ class Music21Object(object):
         '''
         Get the next or previous element if this element is in a Stream.
 
-        If this element is in multiple Streams, the first next element found in any 
-        site will be returned. If not found no next element is found in any site, the flat 
+        If this element is in multiple Streams, the first next element found in any
+        site will be returned. If not found no next element is found in any site, the flat
         representation of all sites of each immediate site are searched.
 
-        If `beginNearest` is True, sites will be searched from the element nearest to the 
+        If `beginNearest` is True, sites will be searched from the element nearest to the
         caller and then outward.
         '''
         if classFilterList is not None:
@@ -1554,7 +1558,7 @@ class Music21Object(object):
                 return 0.0 # might not have a None offset
         else:
             # try to look for it in all objects
-            environLocal.printDebug(['doing a manual activeSite search: probably means that ' + 
+            environLocal.printDebug(['doing a manual activeSite search: probably means that ' +
                                      'id(self.activeSite) (%s) is not equal to self._activeSiteId (%r)' % (id(self.activeSite), self._activeSiteId)])
             #environLocal.printDebug(['activeSite', self.activeSite, 'self.sites.hasSiteId(activeSiteId)', self.sites.hasSiteId(activeSiteId)])
             #environLocal.printDebug(['self.hasSite(self.activeSite)', self.hasSite(self.activeSite)])
@@ -1564,7 +1568,7 @@ class Music21Object(object):
             return offset
 
             #environLocal.printDebug(['self.sites', self.sites.siteDict])
-        raise Exception('request within %s for offset cannot be made with activeSite of %s (id: %s)' % 
+        raise Exception('request within %s for offset cannot be made with activeSite of %s (id: %s)' %
                         (self.__class__, self.activeSite, activeSiteId) )
 
     def _setOffset(self, value):
@@ -1687,31 +1691,31 @@ class Music21Object(object):
 
     def sortTuple(self, useSite=None):
         '''
-        Returns a collections.NamedTuple called SortTuple(atEnd, offset, priority, classSortOrder, 
+        Returns a collections.NamedTuple called SortTuple(atEnd, offset, priority, classSortOrder,
         isNotGrace, insertIndex)
         which contains the six elements necessary to determine the sort order of any set of
-        objects in a Stream. 
-        
-        1) atEnd = {0, 1}; Elements specified to always stay at the end of a stream (``stream.storeAtEnd``) 
+        objects in a Stream.
+
+        1) atEnd = {0, 1}; Elements specified to always stay at the end of a stream (``stream.storeAtEnd``)
         sort after normal elements.
-        
+
         2) offset = float; Offset (with respect to the active site) is the next and most
         important parameter in determining the order of elements in a stream (the note on beat 1
-        has offset 0.0, while the note on beat 2 might have offset 1.0). 
-        
+        has offset 0.0, while the note on beat 2 might have offset 1.0).
+
         3) priority = int; Priority is a
         user-specified property (default 0) that can set the order of elements which have the same
-        offset (for instance, two Parts both at offset 0.0). 
-        
+        offset (for instance, two Parts both at offset 0.0).
+
         4) classSortOrder = int or float; ClassSortOrder
         is the third level of comparison that gives an ordering to elements with different classes,
         ensuring, for instance that Clefs (classSortOrder = 0) sort before Notes (classSortOrder = 20).
-        
+
         5) isNotGrace = {0, 1}; 0 = grace, 1 = normal. Grace notes sort before normal notes
-        
-        6) The last tie breaker is the creation time (insertIndex) of the site object 
+
+        6) The last tie breaker is the creation time (insertIndex) of the site object
         represented by the activeSite.
-        
+
         >>> n = note.Note()
         >>> n.offset = 4.0
         >>> n.priority = -3
@@ -1720,30 +1724,30 @@ class Music21Object(object):
         >>> st = n.sortTuple()
 
         Check that all these values are the same as above...
-        
+
         >>> st.offset == n.offset
         True
         >>> st.priority == n.priority
         True
-        
+
         An object's classSortOrder comes from the Class object itself:
-        
+
         >>> st.classSortOrder == note.Note.classSortOrder
         True
-        
+
         Inserting the note into the Stream will set the insertIndex.  Most implementations of
         music21 will use a global counter rather than an actual timer.  Note that this is a
         last resort, but useful for things such as mutiple Parts inserted in order.  It changes
         with each run, so we can't display it here...
-        
+
         >>> s = stream.Stream()
         >>> s.insert(n)
         >>> n.sortTuple()
         SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, isNotGrace=1, insertIndex=...)
         >>> nInsertIndex = n.sortTuple().insertIndex
-        
+
         If we create another nearly identical note, the insertIndex will be different:
-        
+
         >>> n2 = note.Note()
         >>> n2.offset = 4.0
         >>> n2.priority = -3
@@ -1756,19 +1760,19 @@ class Music21Object(object):
             foundOffset = self.offset
         else:
             foundOffset = self.getOffsetBySite(useSite)
-        
+
         if foundOffset == 'highestTime':
             offset = 0.0
             atEnd = 1
         else:
             offset = foundOffset
             atEnd = 0
-            
+
         if self.isGrace:
             isNotGrace = 0
         else:
             isNotGrace = 1
-        
+
         if (useSite is not False and
                 self.sites.hasSiteId(id(useSite))):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
@@ -1778,9 +1782,9 @@ class Music21Object(object):
             insertIndex = self.sites.siteDict[self._activeSiteId].globalSiteIndex
         else:
             insertIndex = 0
-        
+
         return _SortTuple(atEnd, offset, self.priority, self.classSortOrder, isNotGrace, insertIndex)
-    
+
     def yieldSiteSearchOrder(self, callerFirst=None, memo=None, offsetAppend=0.0, sortByCreationTime=False,
                              priorityTarget=None):
         '''
@@ -1802,7 +1806,7 @@ class Music21Object(object):
         (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
-        
+
         >>> import copy
         >>> m2 = copy.deepcopy(m)
         >>> m2.number = 3333
@@ -1811,7 +1815,7 @@ class Music21Object(object):
         (<music21.stream.Measure 3333 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
-        
+
         >>> m3 = c.parts[1].measure(3)
         >>> for y in m3.yieldSiteSearchOrder():
         ...      print(y)
@@ -1820,10 +1824,10 @@ class Music21Object(object):
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
         (<music21.stream.Stream ...>, 9.0, 'elementsFirst')
 
-        
-        
+
+
         Sorting order:
-        
+
         >>> p1 = stream.Part()
         >>> p1.id = 'p1'
         >>> m1 = stream.Measure()
@@ -1842,10 +1846,10 @@ class Music21Object(object):
         >>> m2.number = 2
         >>> m2.append(n)
         >>> p2.append(m2)
-        
-        
+
+
         Now the keys could appear in any order!  To fix set priorityTarget to activeSite
-        
+
         >>> for y in n.yieldSiteSearchOrder(priorityTarget=n.activeSite):
         ...     print(y[0])
         <music21.stream.Measure 2 offset=0.0>
@@ -1855,8 +1859,8 @@ class Music21Object(object):
 
 
         Or sort by creationTime...
-        
-        
+
+
         >>> for y in n.yieldSiteSearchOrder(sortByCreationTime = True):
         ...     print(y[0])
         <music21.stream.Measure 2 offset=0.0>
@@ -1875,7 +1879,7 @@ class Music21Object(object):
         '''
         from music21 import stream
         neverRecurseStreams = (stream.Score, stream.Opus)
-        recurseFirstStreams = (stream.Voice, stream.Part)                
+        recurseFirstStreams = (stream.Voice, stream.Part)
 
         def recurseTypeFromStream(st):
             getType = 'elementsFirst'
@@ -1886,7 +1890,7 @@ class Music21Object(object):
                 if isinstance(st, sc):
                     getType = 'flatten'
             return getType
-        
+
         if memo is None:
             memo = []
         if callerFirst is None:
@@ -2028,13 +2032,13 @@ class Music21Object(object):
         formatWriter = scClass()
         return formatWriter.write(self, regularizedConverterFormat, fp, subformats, **keywords)
 
-# 
+#
 #         if fileFormat in ['text', 'textline', 'musicxml', 'vexflow']:
 #             if fileFormat == 'text':
 #                 dataStr = self._reprText()
 #             elif fileFormat == 'textline':
 #                 dataStr = self._reprTextLine()
-# 
+#
 #             # musicxml, musicxml.png, etc.
 #             elif fileFormat.startswith('musicxml'):
 #                 from music21.musicxml import m21ToString
@@ -2042,11 +2046,11 @@ class Music21Object(object):
 #             elif fileFormat.startswith('vexflow'):
 #                 import music21.vexflow
 #                 dataStr = music21.vexflow.fromObject(self, mode='html')
-# 
+#
 #             f = open(fp, 'w')
 #             f.write(dataStr)
 #             f.close()
-# 
+#
 #             if fileFormat == 'musicxml.png':
 #                 # HACK
 #                 import os
@@ -2055,7 +2059,7 @@ class Music21Object(object):
 #                     raise Music21Exception("To create PNG files directly from MusicXML you need to download MuseScore")
 #                 elif not os.path.exists(musescoreFile):
 #                     raise Music21Exception("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescoreFile)
-# 
+#
 #                 fpOut = fp[0:len(fp) - 3]
 #                 fpOut += "png"
 #                 musescoreRun = musescoreFile + " " + fp + " -o " + fpOut
@@ -2063,7 +2067,7 @@ class Music21Object(object):
 #                     musescoreRun += " -r " + str(keywords['dpi'])
 #                 if common.runningUnderIPython():
 #                     musescoreRun += " -r 72"
-# 
+#
 #                 storedStrErr = sys.stderr
 #                 import StringIO
 #                 fileLikeOpen = StringIO.StringIO()
@@ -2071,11 +2075,11 @@ class Music21Object(object):
 #                 os.system(musescoreRun)
 #                 fileLikeOpen.close()
 #                 sys.stderr = storedStrErr
-# 
+#
 #                 fp = fpOut[0:len(fpOut) - 4] + "-1.png"
-# 
+#
 #             return fp
-# 
+#
 #         elif fileFormat in ['braille', 'lily', 'lilypond']:
 #             if fileFormat in ['lilypond', 'lily']:
 #                 import music21.lily.translate
@@ -2083,16 +2087,16 @@ class Music21Object(object):
 #                 if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
 #                     conv.coloredVariants = True
 #                 dataStr = conv.textFromMusic21Object(self).encode('utf-8')
-# 
+#
 #             elif fileFormat == 'braille':
 #                 import music21.braille
 #                 dataStr = music21.braille.translate.objectToBraille(self)
-# 
+#
 #             f = codecs.open(fp, mode='w', encoding='utf-8')
 #             f.write(dataStr)
 #             f.close()
 #             return fp
-# 
+#
 #         elif fileFormat == 'midi':
 #             # returns a midi.MidiFile object
 #             from music21.midi import translate as midiTranslate
@@ -2101,7 +2105,7 @@ class Music21Object(object):
 #             mf.write()
 #             mf.close()
 #             return fp
-# 
+#
 #         elif fileFormat in ['pdf', 'lily.pdf',]:
 #             if fp.endswith('.pdf'):
 #                 fp = fp[:-4]
@@ -3000,7 +3004,7 @@ class Music21Object(object):
         for s in self.sites.getSites(excludeNone=True):
             if self in s._elements:
                 s._elementsChanged() # highest time is changed.
-    
+
     def _getSeconds(self):
         # do not search of duration is zero
         if self.duration is None or self.duration.quarterLength == 0.0:
@@ -3514,11 +3518,11 @@ class Test(unittest.TestCase):
         sOuter.id = 'sOuter'
         sInner = stream.Stream()
         sInner.id = 'sInner'
-                
+
         n = note.Note()
         sInner.append(n)
         sOuter.append(sInner)
-        
+
         tss = sOuter.asTimespans(classList=(sInner.classes[0],), recurse='semiFlat')
         tss
 
@@ -4363,7 +4367,7 @@ def mainTest(*testClasses, **kwargs):
                                     # simplistic, since (u'hi', u'bye')
                                     # won't be caught, but saves a lot of anguish
                                 example.want = example.want[1:]
-                        
+
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity
         unused_testResult = runner.run(s1)
