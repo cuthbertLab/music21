@@ -17,3 +17,4 @@ Users Guide
    usersGuide_11_corpusSearching
    usersGuide_14_timeSignatures
    usersGuide_17_derivations
+   usersGuide_54_extendingConverter

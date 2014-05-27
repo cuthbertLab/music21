@@ -1097,7 +1097,7 @@ def allFeaturesAsList(streamInput):
     
     
     >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
-    >>> s = converter.parse('c4 d e2', '4/4') #_DOCS_HIDE
+    >>> s = converter.parse('tinynotation: 4/4 c4 d e2') #_DOCS_HIDE
     >>> f = features.allFeaturesAsList(s)
     >>> f[1][0:3]
     [[1], [0.6899992497638124], [2]]

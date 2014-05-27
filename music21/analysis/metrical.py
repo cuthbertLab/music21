@@ -89,7 +89,7 @@ def thomassenMelodicAccent(streamIn):
     Example from Thomassen, figure 5:
     
     
-    >>> s = converter.parse('c4 c c d e d d', '7/4')
+    >>> s = converter.parse('tinynotation: 7/4 c4 c c d e d d')
     >>> analysis.metrical.thomassenMelodicAccent(s.flat.notes)
     >>> for n in s.flat.notes:
     ...    print n.pitch.nameWithOctave, n.melodicAccent

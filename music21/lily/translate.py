@@ -530,12 +530,12 @@ class LilypondConverter(object):
         Creates a series of Spacer objects for the measures in a Stream Part.
 
 
-        >>> m1 = stream.Measure(converter.parse("a2.", "3/4"))
-        >>> m2 = stream.Measure(converter.parse("b2.", "3/4"))
-        >>> m3 = stream.Measure(converter.parse("a1", "4/4"))
-        >>> m4 = stream.Measure(converter.parse("b1", "4/4"))
-        >>> m5 = stream.Measure(converter.parse("c1", "4/4"))
-        >>> m6 = stream.Measure(converter.parse("a4 b1", "5/4"))
+        >>> m1 = stream.Measure(converter.parse("tinynotation: 3/4 a2."))
+        >>> m2 = stream.Measure(converter.parse("tinynotation: 3/4 b2."))
+        >>> m3 = stream.Measure(converter.parse("tinynotation: 4/4 a1"))
+        >>> m4 = stream.Measure(converter.parse("tinynotation: 4/4 b1"))
+        >>> m5 = stream.Measure(converter.parse("tinynotation: 4/4 c1"))
+        >>> m6 = stream.Measure(converter.parse("tinynotation: 5/4 a4 b1"))
         >>> streamIn = stream.Stream([m1, m2, m3, m4, m5, m6])
         >>> lpc = lily.translate.LilypondConverter()
         >>> print lpc.getLySpacersFromStream(streamIn)
@@ -1698,11 +1698,11 @@ class LilypondConverter(object):
         r'''
 
 
-        >>> s1 = converter.parse("a4 a a a  a1", "4/4")
-        >>> s2 = converter.parse("b4 b b b", "4/4")
-        >>> s3 = converter.parse("c4 c c c", "4/4")
-        >>> s4 = converter.parse("d4 d d d", "4/4")
-        >>> s5 = converter.parse("e4 e e e  f f f f  g g g g  a a a a  b b b b", "4/4")
+        >>> s1 = converter.parse("tinynotation: 4/4 a4 a a a  a1")
+        >>> s2 = converter.parse("tinynotation: 4/4 b4 b b b")
+        >>> s3 = converter.parse("tinynotation: 4/4 c4 c c c")
+        >>> s4 = converter.parse("tinynotation: 4/4 d4 d d d")
+        >>> s5 = converter.parse("tinynotation: 4/4 e4 e e e  f f f f  g g g g  a a a a  b b b b")
 
         >>> for s in [ s1, s2, s3, s4, s5]:
         ...     s.makeMeasures(inPlace = True)
@@ -1932,11 +1932,11 @@ class LilypondConverter(object):
         r'''
 
 
-        >>> pstream = converter.parse("a4 b c d   e4 f g a", "4/4")
+        >>> pstream = converter.parse("tinynotation: 4/4 a4 b c d   e4 f g a")
         >>> pstream.makeMeasures(inPlace = True)
         >>> p = stream.Part(pstream)
         >>> p.id = 'p1'
-        >>> vstream = converter.parse("a4. b8 c4 d", "4/4")
+        >>> vstream = converter.parse("tinynotation: 4/4 a4. b8 c4 d")
         >>> vstream.makeMeasures(inPlace = True)
         >>> v = variant.Variant(vstream)
         >>> v.groups = ['london']

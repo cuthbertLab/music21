@@ -504,7 +504,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''
         
         >>> ks = analysis.discrete.KrumhanslSchmuckler()
-        >>> s = converter.parse('b-4 e- f g-', '4/4')
+        >>> s = converter.parse('tinynotation: 4/4 b-4 e- f g-')
         >>> ks._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor', s)
         <music21.pitch.Pitch F>
         >>> ks._bestKeyEnharmonic(pitch.Pitch('f-'), 'major', s)
@@ -1328,9 +1328,9 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         p = KrumhanslSchmuckler()
-        s1 = converter.parse('c4 d e f g a b c   c#4 d# e# f#', '4/4')
-        s2 = converter.parse('c#4 d# e# f#  f g a b- c d e f', '4/4')
-        s3 = converter.parse('c4 d e f g a b c   c#4 d# e# f#  c#4 d# e# f#  f g a b- c d e f', '4/4')
+        s1 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#')
+        s2 = converter.parse('tinynotation: 4/4 c#4 d# e# f#  f g a b- c d e f')
+        s3 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#  c#4 d# e# f#  f g a b- c d e f')
 
         #self.assertEqual(p._getPitchClassDistribution(s1), [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 

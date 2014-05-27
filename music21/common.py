@@ -129,6 +129,7 @@ def subConverterList():
     <class 'music21.converter.subConverters.ConverterBraille'>
     <class 'music21.converter.subConverters.ConverterCapella'>
     <class 'music21.converter.subConverters.ConverterHumdrum'>
+    <class 'music21.converter.subConverters.ConverterIPython'>
     <class 'music21.converter.subConverters.ConverterLilypond'>
     <class 'music21.converter.subConverters.ConverterMidi'>
     <class 'music21.converter.subConverters.ConverterMuseData'>
@@ -183,11 +184,13 @@ def findFormat(fmt):
     an extension, return the regularized format name as well as 
     the output exensions.
     
-    May 2014 -- All but the first element of the tuple are deprecated for use, since
+    DEPRECATED May 2014 -- moving to converter
+
+    
+    All but the first element of the tuple are deprecated for use, since
     the extension can vary by subconverter (e.g., lily.png)
 
     Note that .mxl and .mx are only considered MusicXML input formats.
-
 
     >>> common.findFormat('mx')
     ('musicxml', '.xml')
@@ -200,7 +203,7 @@ def findFormat(fmt):
     >>> common.findFormat('lily.png')
     ('lilypond', '.ly')
     >>> common.findFormat('humdrum')
-    ('humdrum', None)
+    ('humdrum', '.krn')
     >>> common.findFormat('txt')
     ('text', '.txt')
     >>> common.findFormat('textline')
@@ -208,7 +211,7 @@ def findFormat(fmt):
     >>> common.findFormat('midi')
     ('midi', '.mid')
     >>> common.findFormat('abc')
-    ('abc', None)
+    ('abc', '.abc')
     >>> common.findFormat('scl')
     ('scala', '.scl')
     >>> common.findFormat('braille')
@@ -216,7 +219,7 @@ def findFormat(fmt):
     >>> common.findFormat('vexflow')
     ('vexflow', '.html')
     >>> common.findFormat('capx')
-    ('capella', None)
+    ('capella', '.capx')
 
     >>> common.findFormat('mx')
     ('musicxml', '.xml')
@@ -237,9 +240,9 @@ def findFormat(fmt):
 
 
     >>> common.findFormat('md')
-    ('musedata', None)
+    ('musedata', '.md')
     >>> common.findFormat('.md')
-    ('musedata', None)
+    ('musedata', '.md')
 
 
     If you give something we can't deal with, returns a Tuple of None, None:
@@ -248,48 +251,23 @@ def findFormat(fmt):
     (None, None)
 
     '''
-    # make lower case, as some lilypond processing used upper case
-    fmt = fmt.lower().strip()
-    if fmt.startswith('.'):
-        fmt = fmt[1:] # strip .
-    foundSc = None
-    
-    formatList = fmt.split('.')
-    fmt = formatList[0]
-    if len(formatList) > 1:
-        unused_subformats = formatList[1:]
-    else:
-        unused_subformats = []
-        
-    for sc in subConverterList():
-        extensions = sc.registerInputExtensions
-        for ext in extensions:
-            if fmt == ext:
-                foundSc = sc
-                break
-        if foundSc is not None:
-            break
-        formats = sc.registerFormats        
-        for scFormat in formats:
-            if fmt == scFormat:
-                foundSc = sc
-                break
-        if foundSc is not None:
-            break
-
-    if foundSc is None:
+    from music21 import converter
+    c = converter.Converter()
+    fileformat = c.regularizeFormat(fmt)
+    if fileformat is None:
         return (None, None)
+    scf = c.getSubConverterFormats()
+    sc = scf[fileformat]
+
+        
+    if len(sc.registerOutputExtensions) > 0:
+        firstOutput = '.' + sc.registerOutputExtensions[0]
+    elif len(sc.registerInputExtensions) > 0:
+        firstOutput = '.' + sc.registerInputExtensions[0]
     else:
-        if len(foundSc.registerFormats) > 0:
-            firstFormat = foundSc.registerFormats[0]
-        else:
-            firstFormat = None
-        if len(foundSc.registerOutputExtensions) > 0:
-            firstOutput = '.' + foundSc.registerOutputExtensions[0]
-        else:
-            firstOutput = None
+        firstOutput = None
             
-        return firstFormat, firstOutput
+    return fileformat, firstOutput
     
 #     for key in sorted(list(fileExtensions)):
 #         if fmt.startswith('.'):
@@ -302,6 +280,8 @@ def findFormat(fmt):
 
 def findInputExtension(fmt):
     '''
+    DEPRECATED May 2014 -- moving to converter
+    
     Given an input format or music21 format, find and return all possible 
     input extensions.
 
@@ -362,6 +342,8 @@ def findInputExtension(fmt):
 def findFormatFile(fp):
     '''
     Given a file path (relative or absolute) return the format
+    
+    DEPRECATED May 2014 -- moving to converter
 
 
     >>> common.findFormatFile('test.xml')
@@ -382,6 +364,7 @@ def findFormatFile(fp):
 def findFormatExtFile(fp):
     '''Given a file path (relative or absolute) find format and extension used (not the output extension)
 
+    DEPRECATED May 2014 -- moving to converter
 
     >>> common.findFormatExtFile('test.mx')
     ('musicxml', '.mx')
@@ -410,6 +393,8 @@ def findFormatExtFile(fp):
 
 def findFormatExtURL(url):
     '''Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
+
+    DEPRECATED May 2014 -- moving to converter
 
 
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'

@@ -92,7 +92,7 @@ def objectToBraille(music21Obj, **keywords):
 
     >>> from music21.braille import translate
     >>> from music21 import tinyNotation
-    >>> samplePart = tinyNotation.TinyNotationStream("C4 D16 E F G# r4 e2.", "3/4")
+    >>> samplePart = tinyNotation.TinyNotationStream("3/4 C4 D16 E F G# r4 e2.")
     >>> #_DOCS_SHOW samplePart.show()
 
 

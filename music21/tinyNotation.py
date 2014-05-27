@@ -94,12 +94,14 @@ class TinyNotationStream(stream.Stream):
     '''
     A TinyNotationStream takes in a string representation 
     similar to Lilypond format
-    but simplified somewhat and an optional time signature 
-    string (or TimeSignature object).
+    but simplified somewhat. 
+    
+    Can also take in an optional time signature 
+    string (or TimeSignature object) as a second argument, but this is
+    mostly for historical reasons.
     
     
     Example in 3/4:
-    
     
     >>> stream1 = tinyNotation.TinyNotationStream("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
     >>> stream1.show('text')

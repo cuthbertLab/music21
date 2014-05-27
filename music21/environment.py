@@ -542,6 +542,21 @@ class _EnvironmentCore(object):
     ### PUBLIC METHODS ###
 
     def getDefaultRootTempDir(self):
+        '''
+        returns whatever tempfile.gettempdir() returns plus 'music21'.
+        
+        Creates the subdirectory if it doesn't exist:
+        
+        >>> import tempfile
+        >>> t = tempfile.gettempdir()
+        >>> #_DOCS_SHOW t
+        '/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T'
+
+        >>> import os
+        >>> e = environment.Environment()
+        >>> e.getDefaultRootTempDir() == os.path.join(t, 'music21')
+        True
+        '''
         # this returns the root temp dir; this does not create a new dir
         dstDir = os.path.join(tempfile.gettempdir(), 'music21')
         # if this path already exists, we have nothing more to do
@@ -556,13 +571,45 @@ class _EnvironmentCore(object):
             return dstDir
 
     def getKeysToPaths(self):
+        '''
+        Find all keys that refer to paths
+        
+        >>> e = environment.Environment()
+        >>> for i in e.getKeysToPaths():
+        ...     #_DOCS_SHOW print(i)
+        ...     pass #_DOCS_HIDE
+
+        braillePath
+        graphicsPath
+        lilypondPath
+        ...
+        '''
         return self._keysToPaths
 
     def getRefKeys(self):
+        '''
+        Find all keys (in any order)...
+        
+        >>> e = environment.Environment()
+        >>> for i in e.getRefKeys():
+        ...     #_DOCS_SHOW print(i)
+        ...     pass #_DOCS_HIDE
+
+        lilypondBackend
+        pdfPath
+        lilypondVersion
+        graphicsPath
+        ...
+        '''
         # list() is for python3 compatibility
         return list(self._ref.keys())
 
     def getRootTempDir(self):
+        '''
+        gets either the directory in key 'directoryScratch' or self.getDefaultRootTempDir
+        
+        Returns an exception if directoryScratch is defined but does not exist.
+        '''
         if self._ref['directoryScratch'] is None:
             return self.getDefaultRootTempDir()
         # check that the user-specified directory exists
@@ -637,6 +684,34 @@ class _EnvironmentCore(object):
         return self._ref.keys() + ['localCorpusPath']
 
     def formatToKey(self, m21Format):
+        '''
+        Finds the appropriate key to the file/app that can launch the given format:
+        
+        >>> e = environment.Environment()
+        >>> e.formatToKey('lilypond')
+        'lilypondPath'
+        >>> e.formatToKey('png')
+        'graphicsPath'
+        >>> e.formatToKey('jpeg')
+        'graphicsPath'
+        >>> e.formatToKey('svg')
+        'vectorPath'
+        >>> e.formatToKey('pdf')
+        'pdfPath'
+        >>> e.formatToKey('musicxml')
+        'musicxmlPath'
+        >>> e.formatToKey('midi')
+        'midiPath'
+        >>> e.formatToKey('braille')
+        'braillePath'
+
+        returns None if there is no key for this format (whether the format exists or not...)
+
+        >>> e.formatToKey('ipython') is None  # actual format
+        True
+        >>> e.formatToKey('adobePhotoshop') is None # not a music21 format
+        True
+        '''
         environmentKey = None
         if m21Format == 'lilypond':
             environmentKey = 'lilypondPath'
@@ -666,26 +741,10 @@ class _EnvironmentCore(object):
         '''
         DEPRECATED May 24 -- call Launch on SubConverter
         '''
-        
         # see common.fileExtensions for format names
-        environmentKey = None
-
         m21Format, unused_ext = common.findFormat(fmt)
-        if m21Format == 'lilypond':
-            environmentKey = 'lilypondPath'
-        elif m21Format in ['png', 'jpeg']:
-            environmentKey = 'graphicsPath'
-        elif m21Format in ['svg']:
-            environmentKey = 'vectorPath'
-        elif m21Format in ['pdf']:
-            environmentKey = 'pdfPath'
-        elif m21Format == 'musicxml':
-            environmentKey = 'musicxmlPath'
-        elif m21Format == 'midi':
-            environmentKey = 'midiPath'
-        elif m21Format == 'braille':
-            environmentKey = 'braillePath'
-        elif m21Format == 'vexflow':
+        environmentKey = self.formatToKey(m21Format)
+        if m21Format == 'vexflow':
             try:
                 import webbrowser
                 if filePath.find('\\') != -1:
@@ -699,14 +758,14 @@ class _EnvironmentCore(object):
             except:
                 print('Cannot open webbrowser, sorry. Go to file://{}'.format(
                     filePath))
-        else:
-            environmentKey = None
-            fpApp = None
-        if environmentKey is not None:
-            fpApp = self._ref[environmentKey]
-        # substitute app provided via argument
         if app is not None:
+            # substitute app provided via argument
             fpApp = app
+        elif environmentKey is not None:
+            fpApp = self._ref[environmentKey]
+        else:
+            fpApp = None
+
         platform = common.getPlatform()
         if fpApp is None:
             if platform == 'win':

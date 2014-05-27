@@ -4569,12 +4569,12 @@ class Test(unittest.TestCase):
 
     def testMixedDurationBeams2(self):
         from music21 import tinyNotation
-        bm = tinyNotation.TinyNotationStream('b8 c16 r e. d32', '3/8')
+        bm = tinyNotation.TinyNotationStream('3/8 b8 c16 r e. d32')
         bm2 = bm.makeNotation()
         beamList = [n.beams for n in bm2.flat.notes]
         self.assertEqual(repr(beamList), '[<music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>, <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>/<music21.beam.Beam 3/partial/left>>]')
 
-        bm = tinyNotation.TinyNotationStream("b16 c' b a g f# g r", '2/4')
+        bm = tinyNotation.TinyNotationStream("2/4 b16 c' b a g f# g r")
         bm2 = bm.makeNotation()
         beamList = [n.beams for n in bm2.flat.notes]
         beamListRepr = [str(i) + repr(beamList[i]) for i in range(len(beamList))]

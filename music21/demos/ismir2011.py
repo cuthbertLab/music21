@@ -293,7 +293,7 @@ def wekaCommands():
 ### FIGURED BASS PAPER ###
 
 def tinyNotationBass():
-    bass1 = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
+    bass1 = tinyNotation.TinyNotationStream('4/4 C4 D8_6 E8_6 F4 G4_7 c1')
     #bass1.show('lily.png')
     fbLine1 = figuredBass.realizer.figuredBassFromStream(bass1)
     fbLine1.showAllRealizations()

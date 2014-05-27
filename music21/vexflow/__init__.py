@@ -447,7 +447,7 @@ def fromObject(thisObject, mode='txt'):
 
         >>> #print vexflow.fromObject(soprano)
         >>> #print vexflow.fromObject(bwv666)
-        >>> #print vexflow.fromObject(tinyNotation.TinyNotationStream("E4 r f# g=lastG b-8 a g c4~ c", "3/4"), mode='txt') 
+        >>> #print vexflow.fromObject(tinyNotation.TinyNotationStream("3/4 E4 r f# g=lastG b-8 a g c4~ c"), mode='txt') 
 
     '''
     if 'Note' in thisObject.classes:

@@ -61,8 +61,5 @@ topics will be linked and added as the topics are written:
 51. Figured Bass
 52. MIDI -- advanced
 53. Medieval and Renaissance extensions
+54. :ref:`Extending Converter with New Formats <usersGuide_54_extendingConverter>`
 
-
-.. code:: python
-
-    
