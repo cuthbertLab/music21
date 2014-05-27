@@ -1537,21 +1537,38 @@ class Line(Spanner):
 
 
 class Glissando(Spanner):
-    '''A between two Notes specifying a glissando or similar alteration. Different line types can be specified. 
     '''
-    def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
+    A spanner between two :class:`~music21.note.Note` objects that specifyies a glissando or
+    similar alteration. The default line type is ``'wavy'``, but you can specify any of the
+    following line types:
 
-        self._lineType = 'wavy'
-        self._label = None
+    - ``'solid'``
+    - ``'dashed'``
+    - ``'dotted'``
+    - ``'wavy'``
+
+    For more information, refer to the :meth:`Spanner.__init__` documentation.
+    '''
+
+    _VALID_LINE_TYPES = {'solid': None, 'dashed': None, 'dotted': None, 'wavy': None}
+    # The "in" test in _setLineType() is now O(1); if _VALID_LINE_TYPES were a list or tuple,
+    # it would be O(n). A dict does take more memory, though.
+
+    def __init__(self, *arguments, **keywords):
+        super(Glissando, self).__init__(*arguments, **keywords)
 
         if 'lineType' in keywords:
-            self.lineType = keywords['lineType'] # use property
+            self.lineType = keywords['lineType']  # property setter checks validity
+        else:
+            self.lineType = 'wavy'
+
         if 'label' in keywords: 
-            self.label = keywords['label'] # use property
+            self.label = keywords['label']
+        else:
+            self.label = None
 
     def __repr__(self):
-        msg = Spanner.__repr__(self)
+        msg = super(Glissando, self).__repr__()
         msg = msg.replace(self._reprHead, '<music21.spanner.BracketLine ')
         return msg
 
@@ -1559,14 +1576,12 @@ class Glissando(Spanner):
         return self._lineType
 
     def _setLineType(self, value):
-        if value.lower() not in ['solid', 'dashed', 'dotted', 'wavy']:
+        if value.lower() not in Glissando._VALID_LINE_TYPES:
             raise SpannerException('not a valid value: %s' % value)
         self._lineType = value.lower()
 
-    lineType = property(_getLineType, _setLineType, doc='''
-        Get or set the lineType property.
-        ''')
-
+    lineType = property(_getLineType, _setLineType, doc='''Get or set the lineType property.
+                        :raises: :exc:`SpannerException` if you try to set an invalid lineType.''')
 
     def _getLabel(self):
         return self._label
@@ -1574,9 +1589,7 @@ class Glissando(Spanner):
     def _setLabel(self, value):
         self._label = value
 
-    label = property(_getLabel, _setLabel, doc='''
-        Get or set the label property.
-        ''')
+    label = property(_getLabel, _setLabel, doc='Get or set the label property.')
 
 
 # class DashedLine(Spanner):
@@ -2230,9 +2243,9 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         for i, n in enumerate(s.notes):
-            n.transpose(i + (i%2*12), inPlace=True)
+            n.transpose(i + (i % 2 * 12), inPlace=True)
 
-        # note: this does not suppor glissandi between non-adjacent notes
+        # note: this does not support glissandi between non-adjacent notes
         n1 = s.notes[0]
         n2 = s.notes[len(s.notes) // 2]
         n3 = s.notes[-1]
@@ -2241,7 +2254,6 @@ class Test(unittest.TestCase):
         sp2.lineType = 'dashed'
         s.append(sp1)
         s.append(sp2)
-        #s.show()
         raw = m21ToString.fromMusic21Object(s)
         self.assertEqual(raw.count('<glissando'), 4)
         self.assertEqual(raw.count('line-type="dashed"'), 2)        
@@ -2254,21 +2266,25 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         for i, n in enumerate(s.notes):
-            n.transpose(i + (i%2*12), inPlace=True)
+            n.transpose(i + (i % 2 * 12), inPlace=True)
 
-        # note: this does not suppor glissandi between non-adjacent notes
+        # note: this does not support glissandi between non-adjacent notes
         n1 = s.notes[0]
         n2 = s.notes[1]
         sp1 = spanner.Glissando(n1, n2)
         sp1.lineType = 'solid'
         sp1.label = 'gliss.'
         s.append(sp1)
-
-        #s.show()
         raw = m21ToString.fromMusic21Object(s)
         self.assertEqual(raw.count('<glissando'), 2)
         self.assertEqual(raw.count('line-type="solid"'), 2)        
-        self.assertEqual(raw.count('>gliss.<'), 1)        
+        self.assertEqual(raw.count('>gliss.<'), 1)
+
+
+    def testGlissandoC(self):
+        # ensure invalid "lineType" values are rejected
+        sp1 = Glissando()
+        self.assertRaises(SpannerException, sp1._setLineType, 'fun line')
 
 
 #     def testDashedLineA(self):
