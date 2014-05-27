@@ -581,10 +581,14 @@ def musicXMLTypeToType(value):
     '''
     Utility function to convert a MusicXML duration type to an music21 duration type.
     
-    Only changes 'long' to 'longa'.
+    Changes 'long' to 'longa' and deals with a Guitar Pro 5.2 bug in MusicXML
+    export, that exports a 32nd note with the type '32th'.
+
     
     >>> musicxml.fromMxObjects.musicXMLTypeToType('long')
     'longa'
+    >>> musicxml.fromMxObjects.musicXMLTypeToType('32th')
+    '32nd'
     >>> musicxml.fromMxObjects.musicXMLTypeToType('quarter')
     'quarter'
     >>> musicxml.fromMxObjects.musicXMLTypeToType(None)
@@ -595,6 +599,8 @@ def musicXMLTypeToType(value):
     if value not in duration.typeToDuration:
         if value == 'long':
             return 'longa'
+        elif value == '32th':
+            return '32nd'
         else:
             raise FromMxObjectsException('found unknown MusicXML type: %s' % value)
     else:
