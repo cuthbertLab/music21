@@ -2267,8 +2267,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                 #environLocal.printDebug(['found mxEndingObj', mxEndingObj, 'm', m]) 
                 # get all incomplete spanners of the appropriate class that are
                 # not complete
-                rbSpanners = spannerBundle.getByClassComplete(
-                            'RepeatBracket', False)
+                rbSpanners = spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
                 # if we have no complete bracket objects, must start a new one
                 if len(rbSpanners) == 0:
                     # create with this measure as the object

@@ -1792,7 +1792,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     #environLocal.printDebug(['measureToMx(): m.isSorted:', m.isSorted, 'm._mutable', m._mutable, 'len(spannerBundle)', len(spannerBundle)])
     if spannerBundle is not None:
         # get all spanners that have this measure as a component    
-        rbSpanners = spannerBundle.getBySpannedElementAndClass(m, 'RepeatBracket')
+        rbSpanners = spannerBundle.getBySpannedElement(m).getByClass('RepeatBracket')
     else:
         rbSpanners = [] # for size comparison
 
