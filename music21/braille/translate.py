@@ -199,7 +199,7 @@ def measureToBraille(music21Measure, **keywords):
     Translates a :class:`~music21.stream.Measure` to braille.
     
     >>> p = stream.Part()
-    >>> p.append(note.WholeNote('C4'))
+    >>> p.append(note.Note('C4', type='whole'))
     >>> p.makeMeasures(inPlace=True)
     >>> p.show('t')
     {0.0} <music21.stream.Measure 1 offset=0.0>

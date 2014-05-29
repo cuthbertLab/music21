@@ -2357,8 +2357,8 @@ class Test(unittest.TestCase):
         m2 = stream.Measure()
         m1.number = 1
         m2.number = 2
-        n1 = note.WholeNote("C#4")
-        n2 = note.WholeNote("D#4")
+        n1 = note.Note("C#4", type='whole')
+        n2 = note.Note("D#4", type='whole')
         m1.insert(0, n1)
         m2.insert(0, n2)
         p.append(m1)

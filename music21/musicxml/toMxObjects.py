@@ -142,7 +142,7 @@ def tempoIndicationToMx(ti):
     '''Given a music21 MetronomeMark or MetricModulation, produce a musicxml Metronome tag wrapped in a <direction> tag.
 
     
-    >>> mm = tempo.MetronomeMark("slow", 40, note.HalfNote())
+    >>> mm = tempo.MetronomeMark("slow", 40, note.Note(type='half'))
     >>> mxList = musicxml.toMxObjects.tempoIndicationToMx(mm)
     >>> mxList
     [<direction <direction-type <metronome parentheses=no <beat-unit charData=half> <per-minute charData=40>>> <sound tempo=80.0>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]

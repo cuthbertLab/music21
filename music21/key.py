@@ -570,11 +570,11 @@ class KeySignature(base.Music21Object):
         
         >>> s1 = stream.Stream()
         >>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
-        >>> s1.append(note.HalfNote("C"))
-        >>> s1.append(note.HalfNote("E-"))
+        >>> s1.append(note.Note('C', type='half'))
+        >>> s1.append(note.Note('E-', type='half'))
         >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
-        >>> s1.append(note.WholeNote("A"))
-        >>> s1.append(note.WholeNote("F#"))
+        >>> s1.append(note.Note("A", type='whole'))
+        >>> s1.append(note.Note("F#", type='whole'))
         >>> #_DOCS_SHOW s1.show()
 
         .. image:: images/keyAccidentalByStep_Before.*
@@ -600,8 +600,8 @@ class KeySignature(base.Music21Object):
                 
         Test to make sure there are not linked accidentals (fixed bug 22 Nov. 2010)
         
-        >>> nB1 = note.WholeNote("B")
-        >>> nB2 = note.WholeNote("B")
+        >>> nB1 = note.Note("B", type='whole')
+        >>> nB2 = note.Note("B", type='whole')
         >>> s1.append(nB1)
         >>> s1.append(nB2)
         >>> for n in s1.notes:

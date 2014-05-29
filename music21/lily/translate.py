@@ -406,7 +406,7 @@ class LilypondConverter(object):
         >>> p2.append(variant.Variant(name = 'rome'))
         >>> for i in range(4):
         ...    m = stream.Measure()
-        ...    n = note.WholeNote('D4')
+        ...    n = note.Note('D4', type='whole')
         ...    m.append(n)
         ...    p1.append(m)
         ...    p2.append(copy.deepcopy(m))
@@ -2487,11 +2487,11 @@ class TestExternal(unittest.TestCase):
         from music21 import stream
         s = stream.Score()
         p = stream.Part()
-        p.append(note.WholeNote("B4"))
+        p.append(note.Note("B4", type='whole'))
         p.staffLines = 1
         s.insert(0, p)
         p2 = stream.Part()
-        p2.append(note.WholeNote("B4"))
+        p2.append(note.Note("B4", type='whole'))
         p2.staffLines = 7
         s.insert(0, p2)
         s.show('lily.png')

@@ -55,7 +55,7 @@ class Wildcard(m21Base.Music21Object):
     >>> wc1 = search.Wildcard()
     >>> wc1.pitch = pitch.Pitch("C")
     >>> st1 = stream.Stream()
-    >>> st1.append(note.HalfNote("D"))
+    >>> st1.append(note.Note("D", type='half'))
     >>> st1.append(wc1)    
     '''
     def __init__(self):

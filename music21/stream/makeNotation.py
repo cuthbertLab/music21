@@ -13,7 +13,6 @@
 #------------------------------------------------------------------------------
 
 import copy
-import types
 import unittest
 
 from music21 import common
@@ -227,9 +226,9 @@ def makeMeasures(
     ::
 
         >>> sSrc = stream.Stream()
-        >>> sSrc.append(note.QuarterNote('C4'))
-        >>> sSrc.append(note.QuarterNote('D4'))
-        >>> sSrc.append(note.QuarterNote('E4'))
+        >>> sSrc.append(note.Note('C4', type='quarter'))
+        >>> sSrc.append(note.Note('D4', type='quarter'))
+        >>> sSrc.append(note.Note('E4', type='quarter'))
         >>> sMeasures = sSrc.makeMeasures()
         >>> sMeasures.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1111,11 +1110,11 @@ def realizeOrnaments(s):
         >>> s1 = stream.Stream()
         >>> m1 = stream.Measure()
         >>> m1.timeSignature = meter.TimeSignature("4/4")
-        >>> n1 = note.WholeNote("C4")
+        >>> n1 = note.Note("C4", type='whole')
         >>> n1.expressions.append(expressions.Mordent())
         >>> m1.append(n1)
         >>> m2 = stream.Measure()
-        >>> n2 = note.WholeNote("D4")
+        >>> n2 = note.Note("D4", type='whole')
         >>> m2.append(n2)
         >>> s1.append(m1)
         >>> s1.append(m2)

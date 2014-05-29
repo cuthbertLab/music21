@@ -1019,7 +1019,7 @@ def example8_8():
 
     >>> from music21.braille import basic
     >>> from music21 import tempo
-    >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.HalfNote()))
+    >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.Note(type='half')))
     ⠝⠶⠼⠓⠚
     """
     pass
@@ -1031,7 +1031,7 @@ def example8_9():
     >>> from music21 import meter
     >>> from music21 import tempo
     >>> print basic.transcribeHeading(key.KeySignature(-3), meter.TimeSignature("12/8"), tempo.TempoText("Andante"),
-    ... tempo.MetronomeMark(number = 132, referent = note.EighthNote()))
+    ... tempo.MetronomeMark(number = 132, referent = note.Note(type='eighth')))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠲⠀⠙⠶⠼⠁⠉⠃⠀⠣⠣⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀
     """
     pass
@@ -1063,7 +1063,7 @@ def drill8_1():
     bm = tinyNotation.TinyNotationStream("a2 g8 f8 e4 d4 e4 f8 g8 a4 g4 c'8 b8 a4 g4 f4. e8 d2\
     c4 e4 a4 e'4 e'4 d'4 c'8 b8 a4 a'4 g'8 f'8 e'4 d'4 c'4 a8 b8 c'2", "c")
     bm.insert(0, tempo.TempoText("Andante maestoso"))
-    bm.insert(0, tempo.MetronomeMark(number=92, referent=note.QuarterNote()))
+    bm.insert(0, tempo.MetronomeMark(number=92, referent=note.Note(type='quarter')))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return bm
 
@@ -1139,7 +1139,7 @@ def drill8_5():
     e'-2 c'4 f4 d'2 b-4 b-4 c'2 b-4 c'4 d'4 b-4 c'4 d'4 b-4 c'4 b-4 a4 b-2", "cut")
     bm.insert(0, key.KeySignature(-2))
     bm.insert(0, tempo.TempoText("Ben marcato"))
-    bm.insert(0, tempo.MetronomeMark(number=112, referent=note.HalfNote()))
+    bm.insert(0, tempo.MetronomeMark(number=112, referent=note.Note(type='half')))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(5)
     bm[0].padAsAnacrusis()
@@ -1438,7 +1438,7 @@ def drill9_4():
     bm = tinyNotation.TinyNotationStream("E8 D# E F# D# BB4 E G8 G F# G A B B4 BB BB8 DD GG BB GG BB E4 G F#8\
     E BB G E BB E4 EE EE8 EE4 r8 EE8 EE DD EE EE EE EE EE EE EE4 EE8 EE4~ EE8 r8 r", "5/8")
     bm.insert(0, key.KeySignature(1))
-    bm.insert(0, tempo.MetronomeMark(number = 100, referent = note.QuarterNote()))
+    bm.insert(0, tempo.MetronomeMark(number = 100, referent = note.Note(type='quarter')))
     bm.insert(0, tempo.TempoText("Not too fast"))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     # measure 1 fingerings

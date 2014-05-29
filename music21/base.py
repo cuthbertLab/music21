@@ -510,9 +510,9 @@ class Music21Object(object):
         for the object.  Very similar to Perl's @ISA array:
 
 
-        >>> q = note.QuarterNote()
+        >>> q = note.Note()
         >>> q.classes
-        ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
+        ['Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
 
         Having quick access to these things as strings makes it easier to do comparisons:
 
@@ -548,9 +548,9 @@ class Music21Object(object):
         for the object.  Very similar to Perl's @ISA array:
 
 
-        >>> q = note.QuarterNote()
+        >>> q = note.Note()
         >>> q.fullyQualifiedClasses
-        ['music21.note.QuarterNote', 'music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 'music21.base.Music21Object', '__builtin__.object']
+        ['music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 'music21.base.Music21Object', '__builtin__.object']
         ''')
 
     #--------------------------------------------------------------------------
@@ -2979,7 +2979,7 @@ class Music21Object(object):
         hypothetical following measures:
 
 
-        >>> n = note.QuarterNote("E--3")
+        >>> n = note.Note('E--3', type='quarter')
         >>> s = stream.Stream()
         >>> s.insert(0.0, meter.TimeSignature('2/2'))
         >>> s.repeatAppend(n, 12)
@@ -3626,7 +3626,7 @@ class Test(unittest.TestCase):
         #match = []
         self.assertEqual([e.beatStrength for e in s.notes], [1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25])
 
-        n = note.QuarterNote("E--3")
+        n = note.Note('E--3', type='quarter')
         s = stream.Stream()
         s.insert(0.0, meter.TimeSignature('2/2'))
         s.repeatAppend(n, 12)

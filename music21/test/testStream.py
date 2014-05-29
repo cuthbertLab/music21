@@ -51,7 +51,7 @@ class TestExternal(unittest.TestCase):
         ts = meter.TimeSignature("3/4")
         
         b = Stream()
-        q = note.QuarterNote()
+        q = note.Note(type='quarter')
         q.octave = 5
         b.repeatInsert(q, [0,1,2,3])
         
@@ -67,7 +67,7 @@ class TestExternal(unittest.TestCase):
         ts = meter.TimeSignature("3/8")
         
         b = Stream()
-        q = note.EighthNote()
+        q = note.Note(type='eighth')
 
         dur1 = duration.Duration()
         dur1.type = "eighth"
@@ -322,10 +322,10 @@ class Test(unittest.TestCase):
         p2 = Part()
         p2.id = "p2"
 
-        n1 = note.HalfNote("C")
-        n2 = note.QuarterNote("D")
-        n3 = note.QuarterNote("E")
-        n4 = note.HalfNote("F")
+        n1 = note.Note('C', type='half')
+        n2 = note.Note('D', type='quarter')
+        n3 = note.Note('E', type='quarter')
+        n4 = note.Note('F', type='half')
         n1.id = "n1"
         n2.id = "n2"
         n3.id = "n3"
@@ -575,7 +575,7 @@ class Test(unittest.TestCase):
 
     def testStreamDuration(self):
         a = Stream()
-        q = note.QuarterNote()
+        q = note.Note(type='quarter')
         a.repeatInsert(q, [0,1,2,3])
         self.assertEqual(a.highestOffset, 3)
         self.assertEqual(a.highestTime, 4)
@@ -2278,8 +2278,8 @@ class Test(unittest.TestCase):
         p1 = stream.Part()
         m1 = stream.Measure()
         m1.append(meter.TimeSignature('4/4'))
-        m1.append(note.HalfNote('C#'))
-        m1.append(note.HalfNote('C#'))
+        m1.append(note.Note('C#', type='half'))
+        m1.append(note.Note('C#', type='half'))
         m1.rightBarline = 'final'
         p1.append(m1)
         p1.makeNotation(inPlace=True)
@@ -5626,9 +5626,9 @@ class Test(unittest.TestCase):
     def testMakeMeasuresTimeSignatures(self):
         from music21 import stream
         sSrc = stream.Stream()
-        sSrc.append(note.QuarterNote('C4'))
-        sSrc.append(note.QuarterNote('D4'))
-        sSrc.append(note.QuarterNote('E4'))
+        sSrc.append(note.Note('C4', type='quarter'))
+        sSrc.append(note.Note('D4', type='quarter'))
+        sSrc.append(note.Note('E4', type='quarter'))
         sMeasures = sSrc.makeMeasures()
         # added 4/4 here as default
         self.assertEqual(str(sMeasures[0].timeSignature), '<music21.meter.TimeSignature 4/4>')

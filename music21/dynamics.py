@@ -177,8 +177,8 @@ class Dynamic(base.Music21Object):
     
     
     >>> s = stream.Stream()
-    >>> s.insert(0, note.HalfNote('E-4'))
-    >>> s.insert(2, note.HalfNote('F#5'))
+    >>> s.insert(0, note.Note('E-4', type='half'))
+    >>> s.insert(2, note.Note('F#5', type='half'))
     >>> s.insert(0, dynamics.Dynamic('pp'))
     >>> s.insert(1, dynamics.Dynamic('mf'))
     >>> s.insert(3, dynamics.Dynamic('fff'))

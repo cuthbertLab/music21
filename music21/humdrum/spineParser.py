@@ -1068,11 +1068,11 @@ class HumdrumSpine(object):
         >>> m1 = stream.Measure()
         >>> m1.number = 1
         >>> s1.append(m1)
-        >>> s1.append(note.QuarterNote('C4'))
+        >>> s1.append(note.Note('C4', type='quarter'))
         >>> m2 = stream.Measure()
         >>> m2.number = 2
         >>> s1.append(m2)
-        >>> s1.append(note.HalfNote('D4'))
+        >>> s1.append(note.Note('D4', type='half'))
         >>> s1.show('text')
         {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.stream.Measure 1 offset=0.0>

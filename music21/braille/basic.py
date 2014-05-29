@@ -336,7 +336,7 @@ def metronomeMarkToBraille(music21MetronomeMark):
 
     >>> from music21.braille import basic
     >>> from music21 import tempo
-    >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.HalfNote()))
+    >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.Note(type='half')))
     ⠝⠶⠼⠓⠚
     >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 135, referent = note.Note(quarterLength = 0.5)))
     ⠙⠶⠼⠁⠉⠑
@@ -785,7 +785,7 @@ def transcribeHeading(music21KeySignature = None, music21TimeSignature = None, m
     >>> from music21 import note
     >>> from music21 import tempo
     >>> print basic.transcribeHeading(key.KeySignature(5), meter.TimeSignature('3/8'), tempo.TempoText("Allegretto"),
-    ... tempo.MetronomeMark(number = 135, referent = note.EighthNote()))
+    ... tempo.MetronomeMark(number = 135, referent = note.Note(type='eighth')))
     ⠀⠀⠀⠀⠀⠀⠀⠠⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠲⠀⠙⠶⠼⠁⠉⠑⠀⠼⠑⠩⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀
     >>> print basic.transcribeHeading(key.KeySignature(-2), meter.TimeSignature('common'),
     ... tempo.TempoText("Lento assai, cantante e tranquillo"), None)

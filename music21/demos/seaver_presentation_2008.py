@@ -18,19 +18,8 @@ and earlier history can be found there.
 '''
 
 import music21
-from music21 import note
-from music21.note import Note
-from music21.note import QuarterNote
-from music21 import stream
-from music21.stream import Stream
-from music21 import lily
-from music21 import tinyNotation
 from music21.tinyNotation import TinyNotationStream
 from music21.meter import TimeSignature
-from music21 import clef
-from music21 import trecento
-from music21.trecento import cadencebook
-from music21.trecento import capua
 
 
 def createEasyScale():
@@ -54,8 +43,8 @@ def createOrphee():
     tempo = moderato, timeSig = cut time
     random = randomly generated melody from rolling dice.
     '''
-    random = " g4 b-8 b-16 b- b-32 b- b-64 e- r32 r8 r4"
-    random2 = " g4 a-8 a-8 d'-16 b16 a-16 c'16 c'4 c'8 g8 e-8 f8 f4 a-4"
+    #random = " g4 b-8 b-16 b- b-32 b- b-64 e- r32 r8 r4"
+    #random2 = " g4 a-8 a-8 d'-16 b16 a-16 c'16 c'4 c'8 g8 e-8 f8 f4 a-4"
     random3 = " f4 g4. a8 a4. d'8 b4 a4 c'4 r4 c'4. c'8 g8 e-8 f4 f4 a-2."
     
     section = "g4 g2 c'4 c'2 b4 b8 c' c'2. g4 a-2 g4 "

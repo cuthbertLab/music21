@@ -1734,7 +1734,7 @@ var {tn} = new Vex.Flow.StaveTie({{
         ::
 
         >>> m = stream.Measure()
-        >>> m.append(note.HalfNote("c4"))
+        >>> m.append(note.Note('c4', type='half'))
         >>> vfv = vexflow.VexflowVoice(m)
         >>> print(vfv.generateCode(mode="jsbody"))
                     var canvas = $('#music21canvas')[0];

@@ -204,8 +204,8 @@ class Stream(base.Music21Object):
 
 
     >>> s1 = stream.Stream()
-    >>> s1.append(note.HalfNote('C#4'))
-    >>> s1.append(note.QuarterNote('D5'))
+    >>> s1.append(note.Note('C#4', type='half'))
+    >>> s1.append(note.Note('D5', type='quarter'))
     >>> s1.duration.quarterLength
     3.0
     >>> for thisNote in s1.notes:
@@ -223,7 +223,7 @@ class Stream(base.Music21Object):
     >>> c1 = clef.TrebleClef()
     >>> c1.offset = 0.0
     >>> c1.priority = -1
-    >>> n1 = note.EighthNote("E-6")
+    >>> n1 = note.Note("E-6", type='eighth')
     >>> n1.offset = 1.0
     >>> p1 = stream.Part()
     >>> p1.offset = 0.0
@@ -1858,7 +1858,7 @@ class Stream(base.Music21Object):
         contiguous objects; you can't shift things that are separated, as this
         following FAILED example shows.
 
-        >>> n1 = note.HalfNote('G')
+        >>> n1 = note.Note('G', type='half')
         >>> st4 = stream.Stream()
         >>> st4.repeatAppend(n1, 3)
         >>> st4.insertAndShift([2.0, note.Note('e'), 4.0, note.Note('f')])
@@ -4596,10 +4596,10 @@ class Stream(base.Music21Object):
         returns a new Stream.
 
 
-        >>> qn = note.QuarterNote()
+        >>> qn = note.Note(type='quarter')
         >>> qtrStream = stream.Stream()
         >>> qtrStream.repeatInsert(qn, [0, 1, 2, 3, 4, 5])
-        >>> hn = note.HalfNote()
+        >>> hn = note.Note(type='half')
         >>> hn.name = "B-"
         >>> qtrStream.append(hn)
         >>> qtrStream.repeatInsert(qn, [8, 9, 10, 11])
@@ -4677,7 +4677,7 @@ class Stream(base.Music21Object):
         >>> p1.insert(4, note.Note("C#"))
         >>> p1.insert(5.3, note.Rest())
         >>> p2 = stream.Part()
-        >>> p2.insert(2.12, note.HalfNote("D-"))
+        >>> p2.insert(2.12, note.Note('D-', type='half'))
         >>> p2.insert(5.5, note.Rest())
         >>> s.insert(0, p1)
         >>> s.insert(0, p2)
@@ -4735,9 +4735,9 @@ class Stream(base.Music21Object):
 
 
         >>> p1 = stream.Part()
-        >>> p1.append([note.QuarterNote("C4"), note.QuarterNote("D4"), note.QuarterNote("E4"), note.QuarterNote("B2")])
+        >>> p1.append([note.Note('C4', type='quarter'), note.Note('D4', type='quarter'), note.Note('E4', type='quarter'), note.Note('B2', type='quarter')])
         >>> p2 = stream.Part()
-        >>> p2.append([note.HalfNote("C#5"), note.QuarterNote("E#5"), chord.Chord(["E4","G5","C#7"])])
+        >>> p2.append([note.Note('C#5', type='half'), note.Note('E#5', type='quarter'), chord.Chord(["E4","G5","C#7"])])
         >>> sc1 = stream.Score()
         >>> sc1.insert(0, p1)
         >>> sc1.insert(0, p2)
@@ -5059,7 +5059,7 @@ class Stream(base.Music21Object):
             >>> p1.insert(5.3, note.Rest())
             >>> p2 = stream.Part()
             >>> p2.id = 'part2'
-            >>> p2.insert(2.12, note.HalfNote("D-4"))
+            >>> p2.insert(2.12, note.Note('D-4', type='half'))
             >>> p2.insert(5.5, note.Rest())
             >>> s.insert(0, p1)
             >>> s.insert(0, p2)
@@ -5374,7 +5374,7 @@ class Stream(base.Music21Object):
         are no voices.
 
 
-        >>> n1 = note.QuarterNote()
+        >>> n1 = note.Note(type='quarter')
         >>> c1 = clef.AltoClef()
         >>> n2 = note.HalfNote()
         >>> s1 = stream.Stream()
@@ -5735,7 +5735,7 @@ class Stream(base.Music21Object):
         False, this returns a modified deep copy.
 
         >>> stream1 = stream.Stream()
-        >>> n = note.QuarterNote()
+        >>> n = note.Note(type='quarter')
         >>> n.duration.quarterLength
         1.0
         >>> stream1.repeatInsert(n, [0, 10, 20, 30, 40])
@@ -6874,7 +6874,7 @@ class Stream(base.Music21Object):
 
         >>> stream1 = stream.Stream()
         >>> for offset in [0, 4, 8]:
-        ...     n = note.WholeNote('G#')
+        ...     n = note.Note('G#', type='whole')
         ...     stream1.insert(offset, n)
         >>> stream1.highestOffset
         8.0
@@ -7082,7 +7082,7 @@ class Stream(base.Music21Object):
 
 
         >>> a = stream.Stream()
-        >>> q = note.QuarterNote()
+        >>> q = note.Note(type='quarter')
         >>> a.repeatInsert(q, [0,1,2,3])
         >>> a.highestOffset
         3.0
@@ -7345,7 +7345,7 @@ class Stream(base.Music21Object):
 
 
         >>> mm1 = tempo.MetronomeMark(number=120)
-        >>> n1 = note.QuarterNote()
+        >>> n1 = note.Note(type='quarter')
         >>> c1 = clef.AltoClef()
         >>> n2 = note.HalfNote()
         >>> s1 = stream.Stream()
@@ -9107,8 +9107,8 @@ class Stream(base.Music21Object):
 
         >>> st1 = stream.Stream()
         >>> st2 = stream.Stream()
-        >>> st1.append([note.QuarterNote(), note.HalfNote(), note.QuarterNote()])
-        >>> st2.append([note.HalfNote(), note.QuarterNote(), note.QuarterNote()])
+        >>> st1.append([note.Note(type='quarter'), note.Note(type='half'), note.Note(type='quarter')])
+        >>> st2.append([note.Note(type='half'), note.Note(type='quarter'), note.Note(type='quarter')])
         >>> print(st1.simultaneousAttacks(st2))
         [0.0, 3.0]
         '''
@@ -11086,7 +11086,7 @@ class Measure(Stream):
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.barDuration
         <music21.duration.Duration 3.0>
-        >>> m.repeatAppend(note.QuarterNote(), 5)
+        >>> m.repeatAppend(note.Note(type='quarter'), 5)
         >>> m.barDuration
         <music21.duration.Duration 3.0>
         >>> m.duration
@@ -11202,7 +11202,7 @@ class Measure(Stream):
         The `.clef` appears in a `.show()` or other call
         just like any other element
 
-        >>> m.append(note.WholeNote('D#'))
+        >>> m.append(note.Note('D#', type='whole'))
         >>> m.show('text')
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.note.Note D#>
