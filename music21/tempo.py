@@ -51,7 +51,7 @@ defaultTempoValues = {
      'moderate': 92,
      'allegretto': 108,
      'animato': 120,
-     'allegro moderator': 128, # need number
+     'allegro moderato': 128, # need number
      'allegro': 132,
      'fast': 132,
      'schnell': 132,

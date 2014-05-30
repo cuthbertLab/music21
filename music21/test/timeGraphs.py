@@ -136,7 +136,8 @@ class TestTimeIsmir(M21CallTest):
 
 class TestMakeMeasures(CallTest):
     def __init__(self):
-        import music21
+        import music21.stream
+        import music21.note
         self.s = music21.stream.Stream()
         for i in range(10):
             n = music21.note.Note()
@@ -148,7 +149,8 @@ class TestMakeMeasures(CallTest):
 
 class TestMakeTies(CallTest):
     def __init__(self):
-        import music21
+        import music21.stream
+        import music21.note
 
         self.s = music21.stream.Stream()
         for i in range(100):
@@ -163,7 +165,9 @@ class TestMakeTies(CallTest):
 
 class TestMakeBeams(CallTest):
     def __init__(self):
-        import music21
+        import music21.stream
+        import music21.note
+
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -177,7 +181,9 @@ class TestMakeBeams(CallTest):
 
 class TestMakeAccidentals(CallTest):
     def __init__(self):
-        import music21
+        import music21.stream
+        import music21.note
+
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -191,7 +197,9 @@ class TestMakeAccidentals(CallTest):
 
 class TestMusicXMLOutput(CallTest):
     def __init__(self):
-        import music21
+        import music21.stream
+        import music21.note
+
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -237,8 +245,8 @@ class TestABCImport(M21CallTest):
 class TestMetadataBundle(CallTest):
 
     def __init__(self):
-        from music21.corpus import base
-        self.base = base
+        from music21 import corpus
+        self.base = corpus
 
     def testFocus(self):
         # this opens and instantiates the metad
@@ -293,11 +301,11 @@ class TestMusicXMLObjectTypeChecking(CallTest):
         self.count = 100000
         # all objects that would be found in a Measure
         for i in range(self.count):
-            self.objs.append(musicxml.Note())
+            self.objs.append(musicxml.mxObjects.Note())
         for i in range(self.count):
-            self.objs.append(musicxml.Backup())
+            self.objs.append(musicxml.mxObjects.Backup())
         for i in range(self.count):
-            self.objs.append(musicxml.Forward())
+            self.objs.append(musicxml.mxObjects.Forward())
 
     def testFocus(self):
         # note: this shows that using isinstance() is much faster than 
@@ -308,11 +316,11 @@ class TestMusicXMLObjectTypeChecking(CallTest):
         b = []
         f = []
 #         for obj in self.objs:
-#             if isinstance(obj, musicxml.Note):
+#             if isinstance(obj, musicxml.mxObjects.Note):
 #                 n.append(obj)
-#             elif isinstance(obj, musicxml.Backup):
+#             elif isinstance(obj, musicxml.mxObjects.Backup):
 #                 b.append(obj)
-#             elif isinstance(obj, musicxml.Forward):
+#             elif isinstance(obj, musicxml.mxObjects.Forward):
 #                 f.append(obj)
 
         for obj in self.objs:
@@ -542,6 +550,16 @@ class TestImportCorpus3(CallTest):
         import music21
         bc = music21.corpus.parse('bach/bwv1.6') #@UndefinedVariable @UnusedVariable
 
+class TestRomantextParse(CallTest):
+    def __init__(self):
+        from music21 import converter
+        from music21.romanText import testFiles as tf
+        self.converter = converter
+        self.tf = tf
+        
+    def testFocus(self):
+        self.converter.parse(self.tf.monteverdi_3_13) 
+
 
 #-------------------------------------------------------------------------------
 # handler
@@ -581,10 +599,10 @@ class CallGraph:
         #self.callTest = TestTimeMozart
         #self.callTest = TestTimeIsmir
         #self.callTest = TestGetContextByClassB
-        self.callTest = TestMeasuresB
+        #self.callTest = TestMeasuresB
         #self.callTest = TestImportCorpus
         #self.callTest = TestImportCorpus3
-
+        self.callTest = TestRomantextParse
         #self.callTest = TestImportStar
 
         # common to all call tests. 

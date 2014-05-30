@@ -16,7 +16,7 @@ demonstrated by Dmitri Tymoczko.
 __all__ = ['clercqTemperly', 'translate', 'testFiles']
 from music21.romanText import clercqTemperley
 from music21.romanText import testFiles
-
+# TODO: Move to an Objects file and then import translate!
 
 
 #from __future__ import unicode_literals

@@ -898,15 +898,33 @@ class Key(KeySignature, scale.DiatonicScale):
     def __str__(self):
         # string representation needs to be complete, as is used
         # for metadata comparisons
+        tonic = self.tonicPitchNameWithCase
+        return "%s %s" % (tonic, self.mode)
+
+    @property
+    def tonicPitchNameWithCase(self):
+        '''
+        Return the pitch name as a string with the proper case (upper = major; lower = minor)
+        
+        Useful, but simple:
+        
+        >>> k = key.Key("c#")
+        >>> k.tonicPitchNameWithCase
+        'c#'
+        >>> k = key.Key("B")
+        >>> k.tonicPitchNameWithCase
+        'B'
+        >>> k.mode = 'minor'
+        >>> k.tonicPitchNameWithCase
+        'b'
+        '''
         tonic = self.tonic
         if self.mode == 'major':
             tonic = tonic.name.upper()
         elif self.mode == 'minor':
             tonic = tonic.name.lower()
-        return "%s %s" % (tonic, self.mode)
-
-
-
+        return tonic
+    
     def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
         if self.alternateInterpretations is None or len(self.alternateInterpretations) == 0:

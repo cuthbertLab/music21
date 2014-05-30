@@ -202,7 +202,7 @@ class Harmony(chord.Chord):
         # assign the values accordingly
         if self._bass == None:
             self.bass(self._root)
-        if self._figure is not None or self._root or self._bass:
+        if self._figure is not None or self._root or self._bass:            
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
 
@@ -218,6 +218,18 @@ class Harmony(chord.Chord):
                 )
 
     ### PRIVATE METHODS ###
+    def _parseFigure(self):
+        '''
+        subclass this in extensions (SO WHY IS IT PRIVATE???)
+        '''
+        return
+    
+    def _updatePitches(self):
+        '''
+        subclass this in extensions (SO WHY IS IT PRIVATE???)
+        '''
+        return
+
 
     def _updateBasedOnXMLInput(self, keywords):
         '''
@@ -1378,6 +1390,9 @@ def removeChordSymbols(chordType):
 
 
 #---------------------------------------------------------------------------
+realizerScaleCache = {}
+
+#---------------------------------------------------------------------------
 
 
 class ChordSymbol(Harmony):
@@ -1802,20 +1817,26 @@ class ChordSymbol(Harmony):
 
     def _notationString(self):
         '''returns NotationString of ChordSymbolObject which dictates which scale
-        degrees and how those scale degrees are altered in this chord'''
+        degrees and how those scale degrees are altered in this chord.
+        
+        >>> h = harmony.ChordSymbol('F-dim7')
+        >>> h._notationString()
+        '1,-3,-5,--7'
+        '''
         notationString = ""
 
         kind = self.chordKind
  
         if kind in CHORD_TYPES:
-            notationString= getNotationStringGivenChordType(kind)
+            notationString = getNotationStringGivenChordType(kind)
         else:
-            notationString= ''
+            notationString = ''
       
         degrees = notationString.replace(',', ' ')
         self._degreesList = degrees.split()
 
         return notationString
+
 
     def _parseFigure(self):
         '''
@@ -1827,7 +1848,6 @@ class ChordSymbol(Harmony):
         #remove spaces from prelim Figure...
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
-
         #Get Root:
         if ',' in prelimFigure:
             root = prelimFigure[0:prelimFigure.index(',')]
@@ -1852,9 +1872,7 @@ class ChordSymbol(Harmony):
             self.bass(bass)
             remaining = st.replace(m2.group(), '')   #remove the root and bass from the string and any additions/omitions/alterations/
 
-
         st = self._getKindFromShortHand(remaining)
-        
         # 'add', 'alter' and 'omit' in the chordString is kinda broken, not a high
         # priority since there is no well defined nomenclature
         if 'add' in remaining:
@@ -1924,6 +1942,8 @@ class ChordSymbol(Harmony):
 
     def _updatePitches(self):
         '''
+        TODO: EXTREMELY SLOW!
+        
         Calculate the pitches in the chord symbol and update all associated
         variables, including bass, root, inversion and chord:
 
@@ -1989,7 +2009,12 @@ class ChordSymbol(Harmony):
             return
 
         # create figured bass scale with root as scale
-        fbScale = realizerScale.FiguredBassScale(self._root, 'major') 
+        scaleInitTuple = (self._root.name, 'major')
+        if scaleInitTuple in realizerScaleCache:
+            fbScale = realizerScaleCache[scaleInitTuple]
+        else:
+            fbScale = realizerScale.FiguredBassScale(self._root, 'major') 
+            realizerScaleCache[scaleInitTuple] = fbScale
         # render in the 3rd octave by default
         self._root.octave = 3 
 

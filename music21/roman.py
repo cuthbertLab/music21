@@ -44,6 +44,7 @@ ENDWITHFLAT_RE = re.compile('[b\-]$')
 _scaleCache = {}
 _keyCache = {}
 
+
 figureShorthands = {
     '53': '',
     '3': '',
@@ -1608,7 +1609,7 @@ class RomanNumeral(harmony.Harmony):
                 keyOrScale = _keyCache[keyOrScale]
             else:
                 keyOrScale = key.Key(keyOrScale)
-                _keyCache[keyOrScale] = keyOrScale
+                _keyCache[keyOrScale.name] = keyOrScale
         elif keyOrScale is not None:
             #environLocal.printDebug(['got keyOrScale', keyOrScale])
             try:

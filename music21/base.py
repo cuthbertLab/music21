@@ -435,7 +435,7 @@ class Music21Object(object):
             if name.startswith('__'):
                 continue
 
-            part = getattr(self, name)
+            value = getattr(self, name)
             # attributes that require special handling
             if name == '_activeSite':
                 #environLocal.printDebug([self, 'copying activeSite weakref', self._activeSite])
@@ -445,17 +445,17 @@ class Music21Object(object):
                 #pass
             elif name == 'id':
                 # if the id of this source is set to its obj ide, do not copy
-                if part != id(self):
-                    newValue = copy.deepcopy(part, memo)
+                if value != id(self):
+                    newValue = copy.deepcopy(value, memo)
                     setattr(new, name, newValue)
             # use sites own __deepcopy__, but set contained by id
             elif name == 'sites':
-                newValue = copy.deepcopy(part, memo)
+                newValue = copy.deepcopy(value, memo)
                 #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
             else: # use copy.deepcopy, will call __deepcopy__ if available
-                newValue = copy.deepcopy(part, memo)
+                newValue = copy.deepcopy(value, memo)
                 #setattr() will call the set method of a named property.
                 setattr(new, name, newValue)
 

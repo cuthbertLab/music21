@@ -291,50 +291,6 @@ class Chord(note.NotRest):
 
     ### SPECIAL METHODS ###
 
-#    def __eq__(self, other):
-#        '''
-#        A music21 chord object is equal to another object if that object is also a chord,
-#        if the chords have the same number of notes, the same articulation, the same ties (if any),
-#        the same duration, and the same pitches.
-#
-#
-#        >>> c1 = chord.Chord(['c', 'e', 'g#'])
-#        >>> c2 = chord.Chord(['c', 'e', 'g#'])
-#        >>> c1 == c2
-#        True
-#        >>> c2.duration.quarterLength = 2.0
-#        >>> c1 == c2
-#        False
-#
-#
-#        Notes and Chords return False
-#
-#        >>> n1 = note.Note('c')
-#        >>> c1 == n1
-#        False
-#        '''
-#
-#        if isinstance(other, Chord):
-#            if len(self._notes) == len(other._notes):
-#                for i in range(len(self._notes)):
-#                    if self._notes[i] != other._notes[i]:
-#                        return False
-#                if self.duration == other.duration:
-#                    if (sorted(list(set(self.articulations))) ==
-#                        sorted(list(set(other.articulations)))):
-#                        # Tie objects if present compare only type
-#                        if self.tie == other.tie:
-#                            return True
-#                        else:
-#                            return False
-#                    else:
-#                        return False
-#                else:
-#                    return False
-#            else:
-#                return False
-#        else:
-#            return False
 
     def __getitem__(self, key):
         '''Get item makes access pitch components for the Chord easier
@@ -362,29 +318,14 @@ class Chord(note.NotRest):
         return common.Iterator(self._notes)
 
     def __len__(self):
-        '''Return the length of components in the chord.
-
+        '''
+        Return the length of components in the chord.
 
         >>> c = chord.Chord(['c', 'e', 'g'])
         >>> len(c)
         3
         '''
         return len(self._notes)
-
-#    def __ne__(self, other):
-#        '''
-#        Inequality.
-#
-#        >>> c1 = chord.Chord(['c', 'e', 'g#'])
-#        >>> c2 = chord.Chord(['c', 'e', 'g#'])
-#        >>> c1 != c2
-#        False
-#        >>> c2.duration.quarterLength = 2.0
-#        >>> c1 != c2
-#        True
-#
-#        '''
-#        return not self.__eq__(other)
 
     def __repr__(self):
         allPitches = []
@@ -714,7 +655,7 @@ class Chord(note.NotRest):
             return True
         return False
 
-    def bass(self, newbass=0, find=True):
+    def bass(self, newbass=None, find=True):
         '''
         Return the bass Pitch or set it to the given Pitch:
 
@@ -2345,15 +2286,30 @@ class Chord(note.NotRest):
         True
 
 
-        Spelling and inversions matter
-
+        Spelling matters:
 
         >>> c2 = chord.Chord(['A-4','C5','G-6'])
         >>> c2.isItalianAugmentedSixth()
         False
+        
+        So does inversion:
+        
         >>> c3 = chord.Chord(['F#4','C5','A-6'])
         >>> c3.isItalianAugmentedSixth()
         False
+        >>> c4 = chord.Chord(['C5','A-5','F#6'])
+        >>> c4.isItalianAugmentedSixth()
+        False
+
+        If inversions don't matter to you, put the chord in another inversion:
+        
+        >>> import copy
+        >>> c5 = copy.deepcopy(c4)
+        >>> c5.inversion(1)
+        >>> c5.isItalianAugmentedSixth()
+        True
+        
+
 
 
         If doubling rules are turned on then only the tonic can be doubled:

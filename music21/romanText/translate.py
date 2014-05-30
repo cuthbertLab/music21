@@ -522,6 +522,20 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     #                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
     #                                        asrc = 'b' + asrc
                                 rn = roman.RomanNumeral(asrc, copy.deepcopy(kCurrent))
+                                
+                                # surprisingly, not faster... and more dangerous
+                                #rn = roman.RomanNumeral(asrc, kCurrent)
+                                ## SLOWEST!!!
+                                #rn = roman.RomanNumeral(asrc, kCurrent.tonicPitchNameWithCase)                                
+                                
+                                #>>> from timeit import timeit as t
+                                #>>> t('roman.RomanNumeral("IV", "c#")', 'from music21 import roman', number=1000)
+                                #45.75
+                                #>>> t('roman.RomanNumeral("IV", k)', 'from music21 import roman, key; k = key.Key("c#")', number=1000)
+                                #16.09
+                                #>>> t('roman.RomanNumeral("IV", copy.deepcopy(k))', 'from music21 import roman, key; import copy; k = key.Key("c#")', number=1000)
+                                #22.49
+                                                              
                                 if setKeyChangeToken is True:
                                     rn.followsKeyChange = True
                                     setKeyChangeToken = False
@@ -1126,9 +1140,12 @@ if __name__ == "__main__":
     import music21
     #from music21 import converter
     #r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
+    #import time
+    #t = time.time()
     #import sys
-    #sys.argv.append('testSecondaryInCopyMultiple')
-    music21.mainTest(Test, TestSlow)
+    #sys.argv.append('MeasureCopyingA')
+    music21.mainTest(Test)
+    #print(time.time() - t)
 
 
 #------------------------------------------------------------------------------
