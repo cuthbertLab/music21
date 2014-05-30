@@ -2862,6 +2862,39 @@ class Chord(note.NotRest):
             >>> print(achord.semitonesFromChordStep(2)) # will return None
             None
 
+
+        Test whether this strange chord gets the B# as 0 semitones:
+        
+        :: 
+            >>> c = chord.Chord(['C4','E4','G4','B#4'])
+            >>> c.semitonesFromChordStep(7)
+            0
+
+        If testRoot is set to a Pitch object then that note is used as the root of the chord
+        regardless of anything else that might be considered.
+        
+        A-minor: 1st inversion.
+        
+        ::
+            >>> aMin = chord.Chord(['C4','E4','A4'])
+            >>> aMin.semitonesFromChordStep(3)
+            3
+            >>> aMin.semitonesFromChordStep(5)
+            7
+
+        C6 chord, jazz like, root position:
+        
+        ::
+            >>> cPitch = pitch.Pitch('C4')
+            >>> c6 = aMin  # renaming for clarity
+            >>> c6.semitonesFromChordStep(3, testRoot = cPitch)
+            4
+            >>> c6.semitonesFromChordStep(5, testRoot = cPitch) is None
+            True
+            >>> c6.semitonesFromChordStep(6, testRoot = cPitch)
+            9
+            
+
         '''
         tempInt = self.intervalFromChordStep(chordStep, testRoot)
         if tempInt is None:
@@ -4090,6 +4123,13 @@ class Chord(note.NotRest):
             >>> bDim7_2ndInv = chord.Chord(['F2','A-3','B4','D5'])
             >>> bDim7_2ndInv.seventh
             <music21.pitch.Pitch A-3>
+
+        Test whether this strange chord gets the B# not the C or something else:
+        
+        :: 
+            >>> c = chord.Chord(['C4','E4','G4','B#4'])
+            >>> c.seventh
+            <music21.pitch.Pitch B#4>
 
         '''
         return self.getChordStep(7)

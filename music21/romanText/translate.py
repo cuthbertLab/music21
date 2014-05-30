@@ -209,7 +209,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
         raise RomanTextTranslateException('the source section cannot overlap with the destination section')
 
     measures = []
-    for mPast in p.getElementsByClass('Measure', returnStreamSubClass='list'):
+    for mPast in p.getElementsByClass('Measure'):
         if mPast.number in range(targetStart, targetEnd +1):
             try:
                 m = copy.deepcopy(mPast)
@@ -316,6 +316,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     prefixLyric = ''
 
     repeatEndings = {}
+    rnKeyCache = {}
 
     for t in rtHandler.tokens:
         try:
@@ -357,7 +358,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
             elif t.isMeasure():
                 # environLocal.printDebug(['handling measure token:', t])
-    
+                #if t.number[0] % 10 == 0:
+                #    print "at number " + str(t.number[0])
                 if t.variantNumber is not None:
                     # environLocal.printDebug(['skipping variant: %s' % t])
                     continue
@@ -386,26 +388,28 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                         previousRn = newRn
                         mFill.append(newRn)
                         appendMeasureToRepeatEndingsDict(lastMeasureToken, mFill, repeatEndings, i)
-                        p.append(mFill)
+                        p._appendCore(mFill)
                     lastMeasureNumber = t.number[0] - 1
                     lastMeasureToken = t
 
                 # create a new measure or copy a past measure
                 if len(t.number) == 1 and t.isCopyDefinition: # if not a range
+                    p._elementsChanged()
                     m, kCurrent = _copySingleMeasure(t, p, kCurrent)
-                    p.append(m)
+                    p._appendCore(m)
                     lastMeasureNumber = m.number
                     lastMeasureToken = t
-                    romans = m.getElementsByClass(roman.RomanNumeral)
+                    romans = m.getElementsByClass(roman.RomanNumeral, returnStreamSubClass='list')
                     if len(romans) > 0:
                         previousRn = romans[-1] 
 
                 elif len(t.number) > 1:
+                    p._elementsChanged()
                     measures, kCurrent = _copyMultipleMeasures(t, p, kCurrent)
-                    p.append(measures)
+                    p.append(measures) # appendCore does not work with list
                     lastMeasureNumber = measures[-1].number
                     lastMeasureToken = t
-                    romans = measures[-1].getElementsByClass(roman.RomanNumeral)
+                    romans = measures[-1].getElementsByClass(roman.RomanNumeral, returnStreamSubClass='list')
                     if len(romans) > 0:
                         previousRn = romans[-1]
 
@@ -444,9 +448,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
                             # insert at beginning of measure if at beginning -- for things like pickups.
                             if m.number < 2:
-                                m.insert(0, kCurrent)
+                                m._insertCore(0, kCurrent)
                             else:
-                                m.insert(o, kCurrent)
+                                m._insertCore(o, kCurrent)
                             foundAKeySignatureSoFar = True
                             setKeyChangeToken = True
     
@@ -457,9 +461,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
                             #insert at beginning of measure if at beginning -- for things like pickups.
                             if m.number < 2:
-                                m.insert(0, thisSig)
+                                m._insertCore(0, thisSig)
                             else:
-                                m.insert(o, thisSig)
+                                m._insertCore(o, thisSig)
                             foundAKeySignatureSoFar = True
     
                         elif isinstance(a, romanTextModule.RTAnalyticKey):
@@ -491,7 +495,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 firstChord.tie = tie.Tie('stop')
                                 previousRn = firstChord
                                 previousChordInMeasure = firstChord
-                                m.insert(0, firstChord)
+                                m._insertCore(0, firstChord)
                             pivotChordPossible = False
 
                         elif isinstance(a, romanTextModule.RTNoChord):
@@ -508,7 +512,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                         raise RomanTextTranslateException('too many notes in this measure: %s' % t.src)
                                     previousChordInMeasure.quarterLength = newQL                                                          
                                 prefixLyric = ""
-                                m.insert(o, rn)
+                                m._insertCore(o, rn)
                                 previousChordInMeasure = rn
                                 previousRn = rn
                                 pivotChordPossible = False
@@ -521,8 +525,14 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     #                                if asrc.lower().startswith('vi'): #vi or vii w/ or w/o o
     #                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
     #                                        asrc = 'b' + asrc
-                                rn = roman.RomanNumeral(asrc, copy.deepcopy(kCurrent))
-                                
+                                cacheTuple = (asrc, kCurrent.tonicPitchNameWithCase)
+                                if cacheTuple in rnKeyCache:
+                                    #print "Got a match: " + str(cacheTuple)
+                                    rn = copy.deepcopy(rnKeyCache[cacheTuple])
+                                else:
+                                    #print "No match for: " + str(cacheTuple)
+                                    rn = roman.RomanNumeral(asrc, copy.deepcopy(kCurrent))
+                                    rnKeyCache[cacheTuple] = rn
                                 # surprisingly, not faster... and more dangerous
                                 #rn = roman.RomanNumeral(asrc, kCurrent)
                                 ## SLOWEST!!!
@@ -559,7 +569,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 
                                 rn.addLyric(prefixLyric + a.src)
                                 prefixLyric = ""
-                                m.insert(o, rn)
+                                m._insertCore(o, rn)
                                 previousChordInMeasure = rn
                                 previousRn = rn
                                 pivotChordPossible = True
@@ -575,32 +585,34 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                     m.leftBarline = bar.Repeat(direction='start')
                                 else:
                                     rtt = RomanTextUnprocessedToken(a)
-                                    m.insert(o, rtt)
+                                    m._insertCore(o, rtt)
                             elif tsCurrent is not None and (tsCurrent.barDuration.quarterLength == o or i == numberOfAtoms - 1):
                                 if isinstance(a, romanTextModule.RTRepeatStop):
                                     m.rightBarline = bar.Repeat(direction='end')
                                 else:
                                     rtt = RomanTextUnprocessedToken(a)
-                                    m.insert(o, rtt)
+                                    m._insertCore(o, rtt)
                             else: # mid measure repeat signs
                                 rtt = RomanTextUnprocessedToken(a)
-                                m.insert(o, rtt)
+                                m._insertCore(o, rtt)
 
                         else:
                             rtt = RomanTextUnprocessedToken(a)
-                            m.insert(o, rtt)
+                            m._insertCore(o, rtt)
                             #environLocal.warn("Got an unknown token: %r" % a)
                     
                     # may need to adjust duration of last chord added
                     if tsCurrent is not None:
                         previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
-                    p.append(m)
+                    m._elementsChanged()
+                    p._appendCore(m)
 
         except Exception:
             import traceback
             tracebackMessage = traceback.format_exc()
             raise RomanTextTranslateException("At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber, t, tracebackMessage))
 
+    p._elementsChanged()
     fixPickupMeasure(p)
     p.makeBeams(inPlace=True)
     p.makeAccidentals(inPlace=True)
@@ -1144,7 +1156,7 @@ if __name__ == "__main__":
     #t = time.time()
     #import sys
     #sys.argv.append('MeasureCopyingA')
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestSlow)
     #print(time.time() - t)
 
 
