@@ -206,7 +206,7 @@ class Spanner(base.Music21Object):
     def __init__(self, *arguments, **keywords):
         base.Music21Object.__init__(self)
 
-        self._cache = {} #common.DefaultHash()    
+        self._cache = {}     
 
         # store this so subclasses can replace
         if self.__module__ != '__main__':
@@ -463,7 +463,7 @@ class Spanner(base.Music21Object):
         self.spannedElements._elementsChanged()
         # always clear cache
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
     def hasSpannedElement(self, spannedElement):  
         '''Return True if this Spanner has the spannedElement.'''
@@ -515,7 +515,7 @@ class Spanner(base.Music21Object):
 
         # always clear cache
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
         #environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old), 'id(new)', id(new)])
 
@@ -697,7 +697,7 @@ class SpannerBundle(object):
     Not to be confused with SpannerStorage.
     '''
     def __init__(self, *arguments, **keywords):
-        self._cache = {} #common.DefaultHash()    
+        self._cache = {}     
         self._storage = [] # a simple List, not a Stream
         for arg in arguments:
             if common.isListLike(arg):
@@ -725,7 +725,7 @@ class SpannerBundle(object):
         '''
         self._storage.append(other)
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
     def __len__(self):
         return len(self._storage)
@@ -757,7 +757,7 @@ class SpannerBundle(object):
         else:
             raise SpannerBundleException('cannot match object for removal: %s' % item)
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
@@ -940,7 +940,7 @@ class SpannerBundle(object):
                 #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
     def getByClass(self, className):
         '''

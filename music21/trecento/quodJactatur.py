@@ -82,7 +82,6 @@ def reverse(self, inPlace = False,
             returnObj = stream.Part()
 
 
-        #currentContexts = common.DefaultHash()
         sf = self.flat
         for myEl in sf:
             if isinstance(myEl, classesToMove):

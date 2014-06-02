@@ -8,6 +8,7 @@ from music21.humdrum import *
 import music21.note
 import music21.pitch
 import music21.stream
+from collections import defaultdict
 
 
 def simple1():
@@ -47,8 +48,8 @@ def simple3():
     
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
     measureStream = converter.parse(testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
-    rhythmicHash = common.DefaultHash(default = list, callDefault = True )
-
+    rhythmicHash = defaultdict(list) 
+    
     for thisMeasure in measureStream:
         if not common.almostEquals(thisMeasure.duration.quarterLength, 3.0):
             continue
@@ -96,7 +97,7 @@ def displayChopinRhythms():
     
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
     measureStream = converter.parse(testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
-    rhythmicHash = {} #common.DefaultHash(default = list, callDefault = True )
+    rhythmicHash = {} 
 
     def lsort(keyname):
         return len(rhythmicHash[keyname])

@@ -533,7 +533,7 @@ class Stream(base.Music21Object):
             if keepIndex and 'index' in self._cache:
                 indexCache = self._cache['index']
             # alway clear cache when elements have changed
-            self._cache = {} #common.DefaultHash()
+            self._cache = {}
             if keepIndex:
                 self._cache['index'] = indexCache
 
@@ -6284,7 +6284,7 @@ class Stream(base.Music21Object):
 
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
-        sNew._cache = {} #common.DefaultHash()
+        sNew._cache = {} 
         sNew._elements = []
         sNew._endElements = []
         sNew._elementsChanged()
@@ -6362,7 +6362,7 @@ class Stream(base.Music21Object):
         sNew.derivation.origin = sf._derivation.origin
         sNew.derivation.method = 'flat'
         # create a new, independent cache instance in the flat representation
-        sNew._cache = {} #common.DefaultHash()
+        sNew._cache = {}
         sNew._elements = []
         sNew._endElements = []
         sNew._elementsChanged() # clear caches

@@ -284,7 +284,7 @@ class TinyNotationStream(stream.Stream):
         :class:`~music21.tinyNotation.TinyNotationNote` object
         '''
         if storedDict is None:
-            storedDict = common.DefaultHash()
+            storedDict = {}
         return TinyNotationNote(stringRep, storedDict)
 
 
@@ -463,14 +463,16 @@ class TinyNotationNote(object):
         if (self.TYPE.search(stringRep)):
             typeNum = self.TYPE.search(stringRep).group(1)
             if (typeNum == "0"): ## special case = full measure + fermata
-                noteObj.duration = storedDict['barDuration']
+                if 'barDuration' in storedDict:
+                    noteObj.duration = storedDict['barDuration']
                 newFerm = expressions.Fermata()
                 noteObj.expressions.append(newFerm)
             else:
                 noteObj.duration.type = duration.typeFromNumDict[int(typeNum)]
         else:
-            noteObj.duration = copy.deepcopy(storedDict['lastDuration'])
-            usedLastDuration = True
+            if 'lastDuration' in storedDict:
+                noteObj.duration = copy.deepcopy(storedDict['lastDuration'])
+                usedLastDuration = True
             if (noteObj.duration.tuplets):
                 noteObj.duration.tuplets[0].type = ""
                 # if it continues a tuplet it cannot be start; maybe end

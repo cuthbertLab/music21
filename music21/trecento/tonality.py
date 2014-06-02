@@ -25,9 +25,7 @@ too often.
 import unittest
 
 from music21.trecento import cadencebook
-from music21.common import DefaultHash
-
-ph = lambda h = {}: DefaultHash(h, default = False)
+from collections import defaultdict
 
 class TonalityCounter(object):
     '''
@@ -92,7 +90,10 @@ class TonalityCounter(object):
         streamName = self.streamName
         allScores = stream.Opus()
         
-        myDict = ph({'A': ph(), 'B': ph(), 'C': ph(), 'D': ph(), 'E': ph(), 'F': ph(), 'G': ph()})
+        myDict = {'A': defaultdict(lambda:False), 'B': defaultdict(lambda:False), 
+                  'C': defaultdict(lambda:False), 'D': defaultdict(lambda:False), 
+                  'E': defaultdict(lambda:False), 'F': defaultdict(lambda:False), 
+                  'G': defaultdict(lambda:False)}
         for thisWork in self.worksList:
             incip = thisWork.incipit
             

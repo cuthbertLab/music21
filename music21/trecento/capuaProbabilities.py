@@ -5,6 +5,7 @@ Module to determine how often we would expect to have Francesco\'s cadences happ
 
 from music21 import common, note
 from music21.trecento import cadencebook
+from collections import defaultdict
 #import random
 
 #def getRandomIncipitNote(p):
@@ -45,8 +46,8 @@ def getLandiniRandomStart(i):
 def countCadencePercentages():
     ballatas = cadencebook.BallataSheet()
     totalPieces = 0.0
-    firstNoteTotal = common.DefaultHash(default = 0)
-    lastNoteTotal = common.DefaultHash(default = 0)
+    firstNoteTotal = defaultdict(lambda:0)
+    lastNoteTotal = defaultdict(lambda:0) 
     
     for thisWork in ballatas:
         incipit = thisWork.incipit

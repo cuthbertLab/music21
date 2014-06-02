@@ -483,6 +483,36 @@ def cleanupFloat(floatNum, maxDenominator=1000):
         floatNum).limit_denominator(maxDenominator)
     return float(f)
 
+#------------------------------------------------------------------------------
+# Number methods...
+
+
+def mixedNumeral(expr, limitDenominator=100):
+    '''
+    Returns a string representing a mixedNumeral form of a number
+    
+    >>> stream.timespans.mixedNumeral(1.333333)
+    '1 1/3'
+    >>> stream.timespans.mixedNumeral(0.333333)
+    '1/3'
+    
+    >>> stream.timespans.mixedNumeral(2.0001)
+    '2'
+    >>> stream.timespans.mixedNumeral(2.0001, limitDenominator=10000)
+    '2 1/10000'
+    '''
+    import fractions
+    quotient, remainder = divmod(float(expr), 1.)
+    remainderFrac = fractions.Fraction(remainder).limit_denominator(limitDenominator)
+    if quotient:
+        if remainderFrac:
+            return '{} {}'.format(int(quotient), remainderFrac)
+        else:
+            return str(int(quotient))
+    else:
+        if remainderFrac != 0:
+            return str(remainderFrac)
+    return str(0)
 
 def roundToHalfInteger(num):
     '''Given a floating-point number, round to the nearest half-integer.
@@ -1815,106 +1845,28 @@ def getPackageData():
 
     return match
 
+#-----------------------------
+# match collections, defaultdict()
 
-#-------------------------------------------------------------------------------
-
-
-'''The following are a set of objects with more relaxed behaviors for quicker writing.
-
-Most of these objects behave more like perl; for Python converts.
-
-A set of quick and dirty objects to make coding a bit easier for people who have
-been coding in perl for years.  Prevents things like KeyErrors, etc.  Tradeoff
-is that typos of keys etc. are harder to detect (and some run speed tradeoff I'm sure).
-Advantage is coding time and fewer type errors while coding.
-'''
-
-class DefaultHash(dict):
-    '''A replacement for dictionaries that behave a bit more like perl hashes.
-    No more KeyErrors. The difference between DefaultHash and defaultdict is that the
-    Dict values come first in the definition and that default can be set to
-    None (which it is) or to any object.
-
-    If you want a factory that makes hashes with a particular different default, use:
-
-        falsehash = lambda h = None: common.DefaultHash(h, default = False)
-        a = falsehash({"A": falsehash(), "B": falsehash()})
-        print(a["A"]["hi"]) # returns False
-
-    there's probably a way to use this to create a data structure
-    of arbitrary dimensionality, though it escapes this author.
-
-    if callDefault is True then the default is called:
-
-        common.DefaultHash(default = list, callDefault = True)
-
-    will create a new List for each element
+class defaultlist(list):
     '''
-    def __init__(self, dictIn = None, default=None, callDefault=False):
-        if dictIn:
-            dict.__init__(self, dictIn)
-        else:
-            dict.__init__(self)
-        self.default = default
-        self.callDefault = callDefault
-
-    def __getitem__(self, key):
-        # NOTE: this is perforamnce critical method and should be as fast as
-        # possible
-        try:
-            return dict.__getitem__(self, key)
-        except KeyError:
-            if not self.callDefault:
-                return self.default
-            else:
-                dict.__setitem__(self, key, self.default())
-                return dict.__getitem__(self, key)
-
-    def __len__(self):
-        return dict.__len__(self)
-
-    def get(self, key, *args):
-        if not args:
-            if self.callDefault is False:
-                args = (self.default,)
-            else:
-                args = (self.default(),)
-        return dict.get(self, key, *args)
-
-
-class defList(list):
-    '''A replacement for lists that behave a bit more like perl arrays. No more ListErrors.
-        '''
-
-    def __init__(self, value = None, default = None, callDefault = False):
-        if value:
-            list.__init__(self, value)
-        else:
-            list.__init__(self)
-        self.default = default
-        self.callDefault = callDefault
-
-    def __getitem__(self, item):
-        try:
-            return list.__getitem__(self, item)
-        except IndexError:
-            if self.callDefault is False:
-                return self.default
-            else:
-                list.__setitem__(self, item, self.default())
-                return list.__getitem__(self, item)
-
-    def __setitem__(self, item, value):
-        try:
-            return list.__setitem__(self, item, value)
-        except IndexError:
-            lnow = len(self)
-            for i in range(lnow, item):
-                if self.callDefault is False:
-                    self.append(self.default)
-                else:
-                    self.append(self.default())
-            self.append(value)
+    Call a function for every time something is missing:
+    
+    >>> a = common.defaultlist(lambda:True)
+    >>> a[5]
+    True    
+    '''
+    def __init__(self, fx):
+        self._fx = fx
+    def _fill(self, index):
+        while len(self) <= index:
+            self.append(self._fx())
+    def __setitem__(self, index, value):
+        self._fill(index)
+        list.__setitem__(self, index, value)
+    def __getitem__(self, index):
+        self._fill(index)
+        return list.__getitem__(self, index)
 
 
 #-----------------------------

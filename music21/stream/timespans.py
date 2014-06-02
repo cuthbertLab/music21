@@ -36,38 +36,6 @@ environLocal = environment.Environment("stream.timespans")
 
 #------------------------------------------------------------------------------
 
-
-def mixedNumeral(expr, limitDenominator=100):
-    '''
-    Returns a string representing a mixedNumeral form of a number
-    
-    >>> stream.timespans.mixedNumeral(1.333333)
-    '1 1/3'
-    >>> stream.timespans.mixedNumeral(0.333333)
-    '1/3'
-    
-    >>> stream.timespans.mixedNumeral(2.0001)
-    '2'
-    >>> stream.timespans.mixedNumeral(2.0001, limitDenominator=10000)
-    '2 1/10000'
-    '''
-    import fractions
-    quotient, remainder = divmod(float(expr), 1.)
-    remainderFrac = fractions.Fraction(remainder).limit_denominator(limitDenominator)
-    if quotient:
-        if remainderFrac:
-            return '{} {}'.format(int(quotient), remainderFrac)
-        else:
-            return str(int(quotient))
-    else:
-        if remainderFrac != 0:
-            return str(remainderFrac)
-    return str(0)
-
-
-#------------------------------------------------------------------------------
-
-
 # TODO: Test with scores with Voices: cpebach/h186
 # TODO: Make simple example score to use in all internals docstrings
 def makeExampleScore():
@@ -182,8 +150,7 @@ def _recurseStreamMulti(
     if currentParentage is None:
         currentParentage = (inputStream,)
     results = [
-        TimespanCollection(source=currentParentage[-1])
-        for x in classLists
+        TimespanCollection(source=currentParentage[-1]) for _ in classLists
         ]
     # do this to avoid munging activeSites
     inputStreamElements = inputStream._elements + inputStream._endElements

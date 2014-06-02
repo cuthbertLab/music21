@@ -17,6 +17,7 @@ import collections
 import itertools
 import unittest
 from music21 import chord
+from music21 import exceptions21
 from music21 import environment
 from music21 import meter
 from music21 import note
@@ -55,7 +56,8 @@ def testMeasureStream1():
 
 
 #------------------------------------------------------------------------------
-
+class ChordReducerException(exceptions21.Music21Exception):
+    pass
 
 class ChordReducer(object):
     r'''
@@ -79,7 +81,8 @@ class ChordReducer(object):
         maximumNumberOfChords=3,
         ):
         from music21.stream import timespans
-        assert isinstance(inputScore, stream.Score)
+        if 'Score' not in inputScore.classes:
+            raise ChordReducerException("Must be called on a stream.Score")
 
         tree = timespans.streamToTimespanCollection(inputScore)
 
