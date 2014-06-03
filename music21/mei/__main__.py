@@ -317,9 +317,11 @@ _DOC_ORDER = [noteFromElement]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(TestThings,
-                     TestAttrTranslators,
-                     TestNoteFromElement)
+    import test_main
+    music21.mainTest(test_main.TestThings,
+                     test_main.TestAttrTranslators,
+                     test_main.TestNoteFromElement,
+                     )
 
 #------------------------------------------------------------------------------
 # eof

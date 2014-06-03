@@ -11,6 +11,7 @@
 '''
 Tests for :mod:`music21.mei.__main__`.
 '''
+# pylint: disable=protected-access
 
 from music21.ext import six
 
@@ -27,6 +28,14 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ETree
 
+from music21 import pitch
+from music21 import note
+from music21 import duration
+from music21 import articulations
+
+# Importing from __main__.py
+import music21.mei.__main__ as main
+
 
 
 class TestThings(unittest.TestCase):
@@ -36,7 +45,7 @@ class TestThings(unittest.TestCase):
         'safePitch(): when ``name`` is a valid pitch name'
         name = 'D#6'
         expected = pitch.Pitch('D#6')
-        actual = safePitch(name)
+        actual = main.safePitch(name)
         self.assertEqual(expected.name, actual.name)
         self.assertEqual(expected.accidental, actual.accidental)
         self.assertEqual(expected.octave, actual.octave)
@@ -45,17 +54,17 @@ class TestThings(unittest.TestCase):
         'safePitch(): when ``name`` is not a valid pitch name'
         name = ''
         expected = pitch.Pitch()
-        actual = safePitch(name)
+        actual = main.safePitch(name)
         self.assertEqual(expected.name, actual.name)
         self.assertEqual(expected.accidental, actual.accidental)
         self.assertEqual(expected.octave, actual.octave)
 
     def testMakeDuration(self):
         'makeDuration(): just a couple of things'
-        self.assertEqual(2.0, makeDuration(2.0, 0).quarterLength)
-        self.assertEqual(3.0, makeDuration(2.0, 1).quarterLength)
-        self.assertEqual(3.5, makeDuration(2, 2).quarterLength) # "base" as int---should work
-        self.assertEqual(3.999998092651367, makeDuration(2.0, 20).quarterLength)
+        self.assertEqual(2.0, main.makeDuration(2.0, 0).quarterLength)
+        self.assertEqual(3.0, main.makeDuration(2.0, 1).quarterLength)
+        self.assertEqual(3.5, main.makeDuration(2, 2).quarterLength) # "base" as int---should work
+        self.assertEqual(3.999998092651367, main.makeDuration(2.0, 20).quarterLength)
 
 
 
@@ -69,7 +78,7 @@ class TestAttrTranslators(unittest.TestCase):
         name = 'numbers'
         mapping = {'one': 1, 'two': 2, 'three': 3}
         expected = 2
-        actual = _attrTranslator(attr, name, mapping)
+        actual = main._attrTranslator(attr, name, mapping)
         self.assertEqual(expected, actual)
 
     def testAttrTranslator2(self):
@@ -78,96 +87,96 @@ class TestAttrTranslators(unittest.TestCase):
         name = 'numbers'
         mapping = {'one': 1, 'two': 2, 'three': 3}
         expected = 'Unexpected value for "numbers" attribute: four'
-        self.assertRaises(MeiValueError, _attrTranslator, attr, name, mapping)
+        self.assertRaises(main.MeiValueError, main._attrTranslator, attr, name, mapping)
         try:
-            _attrTranslator(attr, name, mapping)
-        except MeiValueError as mvErr:
+            main._attrTranslator(attr, name, mapping)
+        except main.MeiValueError as mvErr:
             self.assertEqual(expected, mvErr.message)
 
-    @mock.patch('__main__._attrTranslator')
+    @mock.patch('music21.mei.__main__._attrTranslator')
     def testAccidental(self, mockTrans):
         '''_accidentalFromAttr(): ensure proper arguments to _attrTranslator'''
         attr = 's'
-        _accidentalFromAttr(attr)
-        mockTrans.assert_called_once_with(attr, 'accid', _ACCID_ATTR_DICT)
+        main._accidentalFromAttr(attr)
+        mockTrans.assert_called_once_with(attr, 'accid', main._ACCID_ATTR_DICT)
 
-    @mock.patch('__main__._attrTranslator')
+    @mock.patch('music21.mei.__main__._attrTranslator')
     def testDuration(self, mockTrans):
         '''_qlDurationFromAttr(): ensure proper arguments to _attrTranslator'''
         attr = 's'
-        _qlDurationFromAttr(attr)
-        mockTrans.assert_called_once_with(attr, 'dur', _DUR_ATTR_DICT)
+        main._qlDurationFromAttr(attr)
+        mockTrans.assert_called_once_with(attr, 'dur', main._DUR_ATTR_DICT)
 
-    @mock.patch('__main__._attrTranslator')
+    @mock.patch('music21.mei.__main__._attrTranslator')
     def testArticulation1(self, mockTrans):
         '''_articulationFromAttr(): ensure proper arguments to _attrTranslator'''
         attr = 'marc'
         mockTrans.return_value = 5
         expected = (5,)
-        actual = _articulationFromAttr(attr)
-        mockTrans.assert_called_once_with(attr, 'artic', _ARTIC_ATTR_DICT)
+        actual = main._articulationFromAttr(attr)
+        mockTrans.assert_called_once_with(attr, 'artic', main._ARTIC_ATTR_DICT)
         self.assertEqual(expected, actual)
 
-    @mock.patch('__main__._attrTranslator')
+    @mock.patch('music21.mei.__main__._attrTranslator')
     def testArticulation2(self, mockTrans):
         '''_articulationFromAttr(): proper handling of "marc-stacc"'''
         attr = 'marc-stacc'
-        mockTrans.side_effect = MeiValueError()
+        mockTrans.side_effect = main.MeiValueError()
         expected = (articulations.StrongAccent, articulations.Staccato)
-        actual = _articulationFromAttr(attr)
-        mockTrans.assert_called_once_with(attr, 'artic', _ARTIC_ATTR_DICT)
+        actual = main._articulationFromAttr(attr)
+        mockTrans.assert_called_once_with(attr, 'artic', main. _ARTIC_ATTR_DICT)
         self.assertEqual(expected, actual)
 
-    @mock.patch('__main__._attrTranslator')
+    @mock.patch('music21.mei.__main__._attrTranslator')
     def testArticulation3(self, mockTrans):
         '''_articulationFromAttr(): proper handling of "ten-stacc"'''
         attr = 'ten-stacc'
-        mockTrans.side_effect = MeiValueError()
+        mockTrans.side_effect = main.MeiValueError()
         expected = (articulations.Tenuto, articulations.Staccato)
-        actual = _articulationFromAttr(attr)
-        mockTrans.assert_called_once_with(attr, 'artic', _ARTIC_ATTR_DICT)
+        actual = main._articulationFromAttr(attr)
+        mockTrans.assert_called_once_with(attr, 'artic', main._ARTIC_ATTR_DICT)
         self.assertEqual(expected, actual)
 
-    @mock.patch('__main__._attrTranslator')
+    @mock.patch('music21.mei.__main__._attrTranslator')
     def testArticulation4(self, mockTrans):
         '''_articulationFromAttr(): proper handling of not-found'''
         attr = 'garbage'
         expected = 'error message'
-        mockTrans.side_effect = MeiValueError(expected)
-        self.assertRaises(MeiValueError, _articulationFromAttr, attr)
-        mockTrans.assert_called_once_with(attr, 'artic', _ARTIC_ATTR_DICT)
+        mockTrans.side_effect = main.MeiValueError(expected)
+        self.assertRaises(main.MeiValueError, main._articulationFromAttr, attr)
+        mockTrans.assert_called_once_with(attr, 'artic', main._ARTIC_ATTR_DICT)
         try:
-            _articulationFromAttr(attr)
-        except MeiValueError as mvErr:
+            main._articulationFromAttr(attr)
+        except main.MeiValueError as mvErr:
             self.assertEqual(expected, mvErr.message)
 
-    @mock.patch('__main__._articulationFromAttr')
+    @mock.patch('music21.mei.__main__._articulationFromAttr')
     def testArticList1(self, mockArtic):
         '''_makeArticList(): properly handles single-articulation lists'''
         attr = 'acc'
         mockArtic.return_value = ['accent']
         expected = ['accent']
-        actual = _makeArticList(attr)
+        actual = main._makeArticList(attr)
         self.assertEqual(expected, actual)
 
-    @mock.patch('__main__._articulationFromAttr')
+    @mock.patch('music21.mei.__main__._articulationFromAttr')
     def testArticList2(self, mockArtic):
         '''_makeArticList(): properly handles multi-articulation lists'''
         attr = 'acc stacc marc'
         mockReturns = [['accent'], ['staccato'], ['marcato']]
         mockArtic.side_effect = lambda x: mockReturns.pop(0)
         expected = ['accent', 'staccato', 'marcato']
-        actual = _makeArticList(attr)
+        actual = main._makeArticList(attr)
         self.assertEqual(expected, actual)
 
-    @mock.patch('__main__._articulationFromAttr')
+    @mock.patch('music21.mei.__main__._articulationFromAttr')
     def testArticList3(self, mockArtic):
         '''_makeArticList(): properly handles the compound articulations'''
         attr = 'acc marc-stacc marc'
         mockReturns = [['accent'], ['marcato', 'staccato'], ['marcato']]
         mockArtic.side_effect = lambda *x: mockReturns.pop(0)
         expected = ['accent', 'marcato', 'staccato', 'marcato']
-        actual = _makeArticList(attr)
+        actual = main._makeArticList(attr)
         self.assertEqual(expected, actual)
 
 
@@ -191,7 +200,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
         mockNote.return_value = mock.MagicMock(spec_set=note.Note, name='note return')
         expected = mockNote.return_value
-        actual = noteFromElement(elem)
+        actual = main.noteFromElement(elem)
         self.assertEqual(expected, actual)
         mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
         self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
@@ -206,7 +215,7 @@ class TestNoteFromElement(unittest.TestCase):
         attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1'}
         for key in attribDict:
             elem.set(key, attribDict[key])
-        actual = noteFromElement(elem)
+        actual = main.noteFromElement(elem)
         self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
@@ -221,7 +230,7 @@ class TestNoteFromElement(unittest.TestCase):
         attribDict = {'pname': 'D', 'accid': 'n', 'oct': '2', 'dur': '4'}
         for key in attribDict:
             elem.set(key, attribDict[key])
-        actual = noteFromElement(elem)
+        actual = main.noteFromElement(elem)
         self.assertEqual('D2', actual.nameWithOctave)
         self.assertEqual(1.0, actual.quarterLength)
         self.assertEqual(0, actual.duration.dots)
@@ -243,7 +252,7 @@ class TestNoteFromElement(unittest.TestCase):
         # NB: this can't use 'spec_set' because the "id" attribute is part of Music21Object, note Note
         mockNote.return_value = mock.MagicMock(spec=note.Note, name='note return')
         expected = mockNote.return_value
-        actual = noteFromElement(elem)
+        actual = main.noteFromElement(elem)
         self.assertEqual(expected, actual)
         mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
         self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
