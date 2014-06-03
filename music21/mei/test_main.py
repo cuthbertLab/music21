@@ -121,20 +121,18 @@ class TestAttrTranslators(unittest.TestCase):
     def testArticulation2(self, mockTrans):
         '''_articulationFromAttr(): proper handling of "marc-stacc"'''
         attr = 'marc-stacc'
-        mockTrans.side_effect = main.MeiValueError()
         expected = (articulations.StrongAccent, articulations.Staccato)
         actual = main._articulationFromAttr(attr)
-        mockTrans.assert_called_once_with(attr, 'artic', main. _ARTIC_ATTR_DICT)
+        self.assertEqual(0, mockTrans.call_count)
         self.assertEqual(expected, actual)
 
     @mock.patch('music21.mei.__main__._attrTranslator')
     def testArticulation3(self, mockTrans):
         '''_articulationFromAttr(): proper handling of "ten-stacc"'''
         attr = 'ten-stacc'
-        mockTrans.side_effect = main.MeiValueError()
         expected = (articulations.Tenuto, articulations.Staccato)
         actual = main._articulationFromAttr(attr)
-        mockTrans.assert_called_once_with(attr, 'artic', main._ARTIC_ATTR_DICT)
+        self.assertEqual(0, mockTrans.call_count)
         self.assertEqual(expected, actual)
 
     @mock.patch('music21.mei.__main__._attrTranslator')

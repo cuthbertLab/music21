@@ -193,16 +193,12 @@ def _articulationFromAttr(attr):
         ``'ten-stacc'``. These return ``(StrongAccent, Staccato)`` and ``(Tenuto, Staccato)``,
         respectively.
     '''
-    try:
-        post = (_attrTranslator(attr, 'artic', _ARTIC_ATTR_DICT),)
-    except MeiValueError as valErr:
-        if 'marc-stacc' == attr:
-            post = (articulations.StrongAccent, articulations.Staccato)
-        elif 'ten-stacc' == attr:
-            post = (articulations.Tenuto, articulations.Staccato)
-        else:
-            raise valErr
-    return post
+    if 'marc-stacc' == attr:
+        return (articulations.StrongAccent, articulations.Staccato)
+    elif 'ten-stacc' == attr:
+        return (articulations.Tenuto, articulations.Staccato)
+    else:
+        return (_attrTranslator(attr, 'artic', _ARTIC_ATTR_DICT),)
 
 
 def _makeArticList(attr):
