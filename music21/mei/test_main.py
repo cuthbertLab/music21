@@ -28,6 +28,7 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ETree
 
+from music21 import base  # DEBUG
 from music21 import pitch
 from music21 import note
 from music21 import duration
@@ -193,7 +194,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedElemOrder = [mock.call('pname', ''), mock.call('accid'), mock.call('oct', ''),
                              mock.call('dur'), mock.call('dots', 0)]
-        expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
         elemReturns = ['D', 's', '2', '4', '1']
         elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
         mockNote.return_value = mock.MagicMock(spec_set=note.Note, name='note return')
@@ -203,7 +204,7 @@ class TestNoteFromElement(unittest.TestCase):
         mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
         self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
 
-    def testIntegration1(self):
+    def testIntegration1a(self):
         '''
         noteFromElement(): all the elements that go in Note.__init__()...
                            'id', 'pname', 'accid', 'oct', 'dur', 'dots'
@@ -218,7 +219,7 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
 
-    def testIntegration2(self):
+    def testIntegration1b(self):
         '''
         noteFromElement(): all the elements that go in Note.__init__()...
                            'id', 'pname', 'accid', 'oct', 'dur', 'dots'
@@ -241,8 +242,9 @@ class TestNoteFromElement(unittest.TestCase):
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
         elem = mock.MagicMock()
-        expectedElemOrder = [mock.ANY for _ in xrange(5)]  # not testing the calls from testUnit1()
+        expectedElemOrder = [mock.ANY for _ in xrange(5)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call('id'), mock.call('id')])
+        expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         expectedId = 42
         elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
                        expectedId, expectedId]  # xml:id for this test
@@ -255,3 +257,19 @@ class TestNoteFromElement(unittest.TestCase):
         mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
         self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
         self.assertEqual(expectedId, actual.id)
+
+    def testIntegration2(self):
+        '''
+        noteFromElement(): all the elements that go in Note.__init__()...
+                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+        (corresponds to testUnit2() with real Note and real ElementTree.Element)
+        '''
+        elem = ETree.Element('note')
+        attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1', 'id': 42}
+        for key in attribDict:
+            elem.set(key, attribDict[key])
+        actual = main.noteFromElement(elem)
+        self.assertEqual('D#2', actual.nameWithOctave)
+        self.assertEqual(1.5, actual.quarterLength)
+        self.assertEqual(1, actual.duration.dots)
+        self.assertEqual(42, actual.id)
