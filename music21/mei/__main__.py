@@ -296,13 +296,11 @@ def noteFromElement(elem):
                      duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
 
-    # add the xml:id
     if elem.get('id') is not None:
         post.id = elem.get('id')
 
-    ## add articulations as possible
-    #if 'artic' in elem.attrib:
-        #post.articulations = _makeArticList(elem.attrib['artic'])
+    if elem.get('artic') is not None:
+        post.articulations = _makeArticList(elem.get('artic'))
 
     return post
 

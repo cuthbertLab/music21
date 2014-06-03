@@ -273,3 +273,42 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
         self.assertEqual(42, actual.id)
+
+    @mock.patch('music21.note.Note')
+    def testUnit3(self, mockNote):
+        '''
+        noteFromElement(): all the elements that go in Note.__init__()...
+                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+        (mostly-unit test; only mock out Note and the ElementTree.Element)
+        '''
+        elem = mock.MagicMock()
+        expectedElemOrder = [mock.ANY for _ in xrange(6)]  # not testing the calls from previous unit tests
+        expectedElemOrder.extend([mock.call('artic'), mock.call('artic')])
+        elemArtic = 'stacc'
+        elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
+                       None,  # the xml:id attribute
+                       elemArtic, elemArtic]  # value of "artic", for this test
+        elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
+        mockNote.return_value = mock.MagicMock(spec=note.Note, name='note return')
+        expected = mockNote.return_value
+        actual = main.noteFromElement(elem)
+        self.assertEqual(expected, actual)
+        mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
+        self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
+        self.assertSequenceEqual([articulations.Staccato], actual.articulations)
+
+    def testIntegration3(self):
+        '''
+        noteFromElement(): all the elements that go in Note.__init__()...
+                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+        (corresponds to testUnit2() with real Note and real ElementTree.Element)
+        '''
+        elem = ETree.Element('note')
+        attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1', 'artic': 'stacc'}
+        for key in attribDict:
+            elem.set(key, attribDict[key])
+        actual = main.noteFromElement(elem)
+        self.assertEqual('D#2', actual.nameWithOctave)
+        self.assertEqual(1.5, actual.quarterLength)
+        self.assertEqual(1, actual.duration.dots)
+        self.assertEqual([articulations.Staccato], actual.articulations)
