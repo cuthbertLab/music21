@@ -218,7 +218,7 @@ def noteFromElement(elem):
     '''
     <note> is a single pitched event.
 
-    In MEI 2013: pg.382 (396 in PDF)
+    In MEI 2013: pg.382 (396 in PDF) (MEI.shared module)
 
     Attributes Implemented:
     =======================
@@ -228,10 +228,10 @@ def noteFromElement(elem):
     - dur, from att.duration.musical: (via _qlDurationFromAttr())
     - dots, from att.augmentdots: [0..4]
     - xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - artic, a list from att.articulation: (via _articulationFromAttr())
 
     Attributes In Progress:
     =======================
-    - artic, a list from att.articulation: (via _articulationFromAttr())
 
     Attributes not Implemented:
     ===========================
