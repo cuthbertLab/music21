@@ -305,9 +305,63 @@ def noteFromElement(elem):
     return post
 
 
+def restFromElement(elem):
+    '''
+    <rest/> is a non-sounding event found in the source being transcribed
+
+    In MEI 2013: pg.424 (438 in PDF) (MEI.shared module)
+
+    Attributes Implemented:
+    =======================
+    - xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - dur, from att.duration.musical: (via _qlDurationFromAttr())
+    - dots, from att.augmentdots: [0..4]
+
+    Attributes In Progress:
+    =======================
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+    att.facsimile (@facs)
+    att.rest.log (att.event (att.timestamp.musical (@tstamp))
+                            (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+                            (att.staffident (@staff))
+                            (att.layerident (@layer)))
+                 (att.fermatapresent (@fermata))
+                 (att.tupletpresent (@tuplet))
+                 (att.rest.log.cmn (att.beamed (@beam)))
+    att.rest.vis (att.altsym (@altsym))
+                 (att.color (@color))
+                 (att.enclosingchars (@enclose))
+                 (att.relativesize (@size))
+                 (att.rest.vis.cmn)
+                 (att.rest.vis.mensural (@spaces))
+                 (att.staffloc (@loc))
+                 (att.staffloc.pitched (@ploc, @oloc))
+                 (att.visualoffset (att.visualoffset.ho (@ho))
+                                   (att.visualoffset.to (@to))
+                                   (att.visualoffset.vo (@vo)))
+                 (att.xy (@x, @y))
+    att.rest.ges (att.duration.performed (@dur.ges))
+                 (att.instrumentident (@instr))
+                 (att.rest.ges.mensural (att.duration.ratio (@num, @numbase)))
+    att.rest.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                 (att.alignment (@when)))
+
+    May Contain:
+    ============
+    None.
+    '''
+    post = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0))))
+
+    if elem.get('id') is not None:
+        post.id = elem.get('id')
+
+    return post
 
 #------------------------------------------------------------------------------
-_DOC_ORDER = [noteFromElement]
+_DOC_ORDER = [noteFromElement, restFromElement]
 
 if __name__ == "__main__":
     import music21
@@ -315,6 +369,7 @@ if __name__ == "__main__":
     music21.mainTest(test_main.TestThings,
                      test_main.TestAttrTranslators,
                      test_main.TestNoteFromElement,
+                     test_main.TestRestFromElement,
                      )
 
 #------------------------------------------------------------------------------
