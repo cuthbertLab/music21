@@ -188,7 +188,7 @@ class TestNoteFromElement(unittest.TestCase):
     def testUnit1(self, mockNote):
         '''
         noteFromElement(): all the elements that go in Note.__init__()...
-                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+                           'pname', 'accid', 'oct', 'dur', 'dots'
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
         elem = mock.MagicMock()
@@ -207,7 +207,7 @@ class TestNoteFromElement(unittest.TestCase):
     def testIntegration1a(self):
         '''
         noteFromElement(): all the elements that go in Note.__init__()...
-                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+                           'pname', 'accid', 'oct', 'dur', 'dots'
         (corresponds to testUnit1() with real Note and real ElementTree.Element)
         '''
         elem = ETree.Element('note')
@@ -222,7 +222,7 @@ class TestNoteFromElement(unittest.TestCase):
     def testIntegration1b(self):
         '''
         noteFromElement(): all the elements that go in Note.__init__()...
-                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+                           'pname', 'accid', 'oct', 'dur', 'dots'
         (this has different arguments than testIntegration2())
         '''
         elem = ETree.Element('note')
@@ -237,8 +237,7 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.note.Note')
     def testUnit2(self, mockNote):
         '''
-        noteFromElement(): all the elements that go in Note.__init__()...
-                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+        noteFromElement(): adds "id"
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
         elem = mock.MagicMock()
@@ -260,8 +259,7 @@ class TestNoteFromElement(unittest.TestCase):
 
     def testIntegration2(self):
         '''
-        noteFromElement(): all the elements that go in Note.__init__()...
-                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+        noteFromElement(): adds "id"
         (corresponds to testUnit2() with real Note and real ElementTree.Element)
         '''
         elem = ETree.Element('note')
@@ -277,8 +275,7 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.note.Note')
     def testUnit3(self, mockNote):
         '''
-        noteFromElement(): all the elements that go in Note.__init__()...
-                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+        noteFromElement(): adds "artic"
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
         elem = mock.MagicMock()
@@ -299,8 +296,7 @@ class TestNoteFromElement(unittest.TestCase):
 
     def testIntegration3(self):
         '''
-        noteFromElement(): all the elements that go in Note.__init__()...
-                           'id', 'pname', 'accid', 'oct', 'dur', 'dots'
+        noteFromElement(): adds "artic"
         (corresponds to testUnit2() with real Note and real ElementTree.Element)
         '''
         elem = ETree.Element('note')
