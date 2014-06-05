@@ -114,6 +114,7 @@ __all__ = [
     'key', 
     'layout',
     'medren',
+    'mei',
     'metadata',
     'meter', 
     'note', 
