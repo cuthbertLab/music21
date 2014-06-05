@@ -63,9 +63,17 @@ from music21 import environment
 _MOD = 'converter/__init__.py'
 environLocal = environment.Environment(_MOD)
 
+# use the faster library if possible (won't be possible on Jython, PyPy, etc.)
+try:
+    import xml.etree.cElementTree as ETree
+except ImportError:
+    import xml.etree.ElementTree as ETree
 
-
-
+# mock library from testing---in Python 3 it's part of the standard library
+if six.PY2:
+    import mock
+else:
+    from unittest import mock
 
 #-------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
@@ -500,20 +508,15 @@ class Converter(object):
             if useFormat is not None:
                 pass
             elif dataStr.startswith('<?xml'):
-                # MusicXML or MEI? We have to parse the file to know.
-                import imp
-
-                # use the faster library if possible (won't be possible on Jython, PyPy, etc.)
-                try:
-                    import xml.etree.cElementTree as ET
-                except ImportError:
-                    import xml.etree.ElementTree as ET
-
                 # we'll check the root tag to determine file type
-                tree = ET.fromstring(dataStr)
-                root_tag = tree.getroot().tag
-                if (root_tag == '{http://www.music-encoding.org/ns/mei}mei' or
-                    root_tag == 'mei'):
+                rootTag = ETree.fromstring(dataStr)
+                if isinstance(rootTag, ETree.ElementTree):
+                    rootTag = rootTag.getroot().tag
+                    print('it\'s an ElementTree!')  # DEBUG
+                else:  # DEBUG
+                    print("it's not an ElementTree!")  # DEBUG
+
+                if (rootTag == '{http://www.music-encoding.org/ns/mei}mei' or rootTag == 'mei'):
                     useFormat = 'mei'
                 else:
                     useFormat = 'musicxml'
@@ -668,6 +671,7 @@ class Converter(object):
         <class 'music21.converter.subConverters.ConverterHumdrum'>
         <class 'music21.converter.subConverters.ConverterIPython'>
         <class 'music21.converter.subConverters.ConverterLilypond'>
+        <class 'music21.converter.subConverters.ConverterMEI'>
         <class 'music21.converter.subConverters.ConverterMidi'>
         <class 'music21.converter.subConverters.ConverterMuseData'>
         <class 'music21.converter.subConverters.ConverterMusicXML'>
@@ -705,6 +709,7 @@ class Converter(object):
         ('ipython', <class 'music21.converter.subConverters.ConverterIPython'>)
         ('lily', <class 'music21.converter.subConverters.ConverterLilypond'>)
         ('lilypond', <class 'music21.converter.subConverters.ConverterLilypond'>)
+        ('mei', <class 'music21.converter.subConverters.ConverterMEI'>)
         ('midi', <class 'music21.converter.subConverters.ConverterMidi'>)
         ('musedata', <class 'music21.converter.subConverters.ConverterMuseData'>)
         ('musicxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
