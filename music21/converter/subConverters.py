@@ -855,6 +855,61 @@ class ConverterMuseData(SubConverter):
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 
+
+class ConverterMEI(SubConverter):
+    '''
+    Converter for MEI. You must use an ".mei" file extension for MEI files because music21 will
+    parse ".xml" files as MusicXML.
+    '''
+
+    registerFormats = ('mei',)
+    registerInputExtensions = ('mei',)
+    # NOTE: we're only working on import for now
+    #registerShowFormats = ('mei',)
+    #registerOutputExtensions = ('mei',)
+
+    def __init__(self):
+        SubConverter.__init__(self)
+
+    def parseData(self, dataString, number=None):
+        '''
+        Convert a string with an MEI document into its corresponding music21 elements.
+
+        :param str dataString: The string with XML to convert.
+        :param NoneType number: Unused in this class. Default is ``None``.
+
+        :returns: The music21 objects corresponding to the MEI file.
+        :rtype: :class:`~music21.stream.Stream` or subclass
+        '''
+        from music21 import mei
+        if dataString.startswith('mei:'):
+            self._stream = mei.convertFromString(dataString[4:])
+        else:
+            self._stream = mei.convertFromString(dataString)
+        return self._stream
+
+    def checkShowAbility(self, **keywords):
+        '''
+        MEI export is not yet implemented.
+        '''
+        return False
+
+    def launch(self, filePath, fmt=None, options='', app=None, key=None):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+    def getTemporaryFile(self, fmt=None, subformats=None):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+    def writeDataStream(self, fp, dataStr):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+
 class Test(unittest.TestCase):
     
     def runTest(self):
@@ -866,6 +921,30 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(n)
         unused_x = s.show('textLine')
+
+    def testImportMei1(self):
+        # when the string starts with "mei:"
+        if six.PY2:
+            import mock
+        else:
+            from unittest import mock
+        with mock.patch('music21.mei') as mock_mei:
+            from music21 import mei
+            testConverter = ConverterMEI()
+            testConverter.parseData('mei: <?xml><mei><note/></mei>')
+            mock_mei.convertFromString.assert_called_once_with(' <?xml><mei><note/></mei>')
+
+    def testImportMei2(self):
+        # when the string doesn't start with "mei:"
+        if six.PY2:
+            import mock
+        else:
+            from unittest import mock
+        with mock.patch('music21.mei') as mock_mei:
+            from music21 import mei
+            testConverter = ConverterMEI()
+            testConverter.parseData('<?xml><mei><note/></mei>')
+            mock_mei.convertFromString.assert_called_once_with('<?xml><mei><note/></mei>')
 
         
 class TestExternal(unittest.TestCase):
@@ -885,6 +964,7 @@ class TestExternal(unittest.TestCase):
         s.append(n)
         s.show('lily.png')
         print s.write('lily.png')
+
 
 
 if __name__ == '__main__':
