@@ -27,6 +27,7 @@ from music21 import note
 from music21 import duration
 from music21 import articulations
 from music21 import pitch
+from music21 import stream
 
 
 #------------------------------------------------------------------------------
@@ -45,15 +46,35 @@ class MeiTagError(exceptions21.Music21Exception):
 
 # Stuff
 #------------------------------------------------------------------------------
-#def convertFromString(dataStr):
-    #'''
-    #Convert a string from MEI markup to music21 objects.
+def convertFromString(dataStr):
+    '''
+    Convert a string from MEI markup to music21 objects.
 
-    #:parameter str dataStr: A string with MEI markup.
-    #:returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
-    #:rtype: :class:`music21.stream.Stream`
-    #'''
-    #pass
+    :parameter str dataStr: A string with MEI markup.
+    :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
+    :rtype: :class:`music21.stream.Stream`
+    '''
+    ETree.register_namespace('mei', 'http://www.music-encoding.org/ns/mei')
+    documentRoot = ETree.fromstring(dataStr)
+    if 'mei' != documentRoot.tag:
+        raise MeiTagError('Root tag is should be <mei>, not <%s>.' % documentRoot.tag)
+    # NOTE: this is obviously not proper document structure---there *should* be many levels of things before a <note>
+    parsed = []
+    foundTheRoot = False  # when the <mei> tag is discovered
+    for eachTag in documentRoot.iter():
+        if 'note' == eachTag.tag:
+            parsed.append(noteFromElement(eachTag))
+        elif 'rest' == eachTag.tag:
+            parsed.append(restFromElement(eachTag))
+        elif 'mei' == eachTag.tag:
+            if not foundTheRoot:
+                foundTheRoot = True
+            else:
+                raise MeiTagError('Found multiple <mei> tags')
+        else:
+            raise MeiTagError('what garbage is this?!: %s' % eachTag.tag)
+
+    return stream.Score(parsed)
 
 
 def safePitch(name):
