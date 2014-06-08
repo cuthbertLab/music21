@@ -491,17 +491,16 @@ def mixedNumeral(expr, limitDenominator=100):
     '''
     Returns a string representing a mixedNumeral form of a number
     
-    >>> stream.timespans.mixedNumeral(1.333333)
+    >>> common.mixedNumeral(1.333333)
     '1 1/3'
-    >>> stream.timespans.mixedNumeral(0.333333)
+    >>> common.mixedNumeral(0.333333)
     '1/3'
     
-    >>> stream.timespans.mixedNumeral(2.0001)
+    >>> common.mixedNumeral(2.0001)
     '2'
-    >>> stream.timespans.mixedNumeral(2.0001, limitDenominator=10000)
+    >>> common.mixedNumeral(2.0001, limitDenominator=10000)
     '2 1/10000'
     '''
-    import fractions
     quotient, remainder = divmod(float(expr), 1.)
     remainderFrac = fractions.Fraction(remainder).limit_denominator(limitDenominator)
     if quotient:
@@ -1474,24 +1473,19 @@ def ordinalAbbreviation(value, plural=False):
     'ths'
 
     '''
-    valueStr = str(value)
-    if value in [1]:
-        post = 'st'
-    elif value in [0, 4, 5, 6, 7, 8, 9, 11, 12, 13]:
+    valueHundreths = value % 100
+    if valueHundreths in [11, 12, 13]:
         post = 'th'
-    elif value in [2]:
-        post = 'nd'
-    elif value in [3]:
-        post = 'rd'
-    # test strings if not matched here
-    elif valueStr[-1] in ['1']:
-        post = 'st'
-    elif valueStr[-1] in ['2']:
-        post = 'nd'
-    elif valueStr[-1] in ['3']:
-        post = 'rd'
-    elif valueStr[-1] in ['0', '4', '5', '6', '7', '8', '9']:
-        post = 'th'
+    else:
+        valueMod = value % 10;        
+        if valueMod == 1:
+            post = 'st'
+        elif valueMod in [0, 4, 5, 6, 7, 8, 9]:
+            post = 'th'
+        elif valueMod == 2:
+            post = 'nd'
+        elif valueMod == 3:
+            post = 'rd'
 
     if post != 'st' and plural:
         post += 's'
