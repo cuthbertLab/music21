@@ -1107,7 +1107,7 @@ class TestExternal(unittest.TestCase):
         #{0.0} <music21.stream.Part Electric Guitar>
         #    {0.0} <music21.instrument.Instrument P0: Electric Guitar: >
         #    {0.0} <music21.stream.Measure 0 offset=0.0>
-        #        {0.0} <music21.layout.StaffLayout distance None, staffNumber None, staffSize None, staffLines 6.0>
+        #        {0.0} <music21.layout.StaffLayout distance None, staffNumber None, staffSize None, staffLines 6>
         #        {0.0} <music21.clef.TabClef>
         #        {0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
         #        {0.0} <music21.key.KeySignature of no sharps or flats, mode major>
