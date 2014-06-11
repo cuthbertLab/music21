@@ -849,7 +849,7 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
     >>> from music21.braille import segment
     >>> from music21 import spanner
     >>> from music21 import tinyNotation
-    >>> short = tinyNotation.TinyNotationStream("c4 d e","3/4")
+    >>> short = tinyNotation.TinyNotationStream("3/4 c4 d e")
     >>> s1 = spanner.Slur(short.notes[0],short.notes[-1])
     >>> short.append(s1)
     >>> short.show("text")
@@ -873,7 +873,7 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
     sign is put before the last note.
     
     
-    >>> long = tinyNotation.TinyNotationStream("c8 d e f g a","3/4")
+    >>> long = tinyNotation.TinyNotationStream("3/4 c8 d e f g a")
     >>> s2 = spanner.Slur(long.notes[0],long.notes[-1])
     >>> long.append(s2)
     >>> long.show("text")
@@ -991,7 +991,7 @@ def getRawSegments(music21Part, segmentBreaks=SEGMENT_SEGMENTBREAKS):
     
     
     >>> from music21 import tinyNotation
-    >>> tn = tinyNotation.TinyNotationStream("c4 c c e e e g g g c'2.","3/4")
+    >>> tn = tinyNotation.TinyNotationStream("3/4 c4 c c e e e g g g c'2.")
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
     >>> tn.show("text")
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1137,7 +1137,7 @@ def extractBrailleElements(music21Measure):
     >>> from music21.braille import segment
     >>> from music21 import spanner
     >>> from music21 import tinyNotation
-    >>> tn = tinyNotation.TinyNotationStream("c16 c c c d d d d", "2/4")
+    >>> tn = tinyNotation.TinyNotationStream("2/4 c16 c c c d d d d")
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
     >>> measure = tn[0]
     >>> measure.append(spanner.Slur(measure.notes[0],measure.notes[-1]))
@@ -1209,7 +1209,7 @@ def prepareBeamedNotes(music21Measure):
 
     >>> from music21.braille import segment
     >>> from music21 import tinyNotation
-    >>> tn = tinyNotation.TinyNotationStream("c16 c c c d d d d", "2/4")
+    >>> tn = tinyNotation.TinyNotationStream("2/4 c16 c c c d d d d")
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
     >>> tn.show("text")
     {0.0} <music21.stream.Measure 1 offset=0.0>

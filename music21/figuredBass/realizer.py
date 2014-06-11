@@ -73,7 +73,7 @@ def figuredBassFromStream(streamPart):
     way of converting from a notated version of a figured bass (such as in a MusicXML file) to 
     a realized version of the same line.
     
-    >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
+    >>> s = tinyNotation.TinyNotationStream('4/4 C4 D8_6 E8_6 F4 G4_7 c1')
     >>> fb = figuredBass.realizer.figuredBassFromStream(s)
     >>> fbRules = figuredBass.rules.Rules()
     >>> fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]

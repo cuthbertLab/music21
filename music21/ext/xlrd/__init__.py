@@ -1,15 +1,17 @@
-# -*- coding: cp1252 -*-
-from __future__ import print_function
-__VERSION__ = "0.6.1" # 2007-06-10
+from os import path
 
-# <p>Copyright © 2005-2007 Stephen John Machin, Lingfo Pty Ltd</p>
+from .info import __VERSION__
+
+# <p>Copyright (c) 2005-2012 Stephen John Machin, Lingfo Pty Ltd</p>
 # <p>This module is part of the xlrd package, which is released under a
 # BSD-style licence.</p>
 
-import sys
+from . import licences
 
 ##
-# <p><b>A Python module for extracting data from MS Excel ™ spreadsheet files.
+# <p><b>A Python module for extracting data from MS Excel (TM) spreadsheet files.
+# <br /><br />
+# Version 0.7.4 -- April 2012
 # </b></p>
 #
 # <h2>General information</h2>
@@ -23,7 +25,7 @@ import sys
 # The latest version is available from OpenOffice.org in
 # <a href=http://sc.openoffice.org/excelfileformat.pdf> PDF format</a>
 # and
-# <a href=http://sc.openoffice.org/excelfileformat.sxw> XML format.</a>
+# <a href=http://sc.openoffice.org/excelfileformat.odt> ODT format.</a>
 # Small portions of the OOo docs are reproduced in this
 # document. A study of the OOo docs is recommended for those who wish a
 # deeper understanding of the Excel file layout than the xlrd docs can provide.
@@ -52,7 +54,7 @@ import sys
 # <small>
 # <p>If the CODEPAGE record is missing (possible if the file was created
 # by third-party software), xlrd will assume that the encoding is ascii, and keep going.
-# If the actual encoding is not ascii, a UnicodeDecodeError exception will be raised and 
+# If the actual encoding is not ascii, a UnicodeDecodeError exception will be raised and
 # you will need to determine the encoding yourself, and tell xlrd:
 # <pre>
 #     book = xlrd.open_workbook(..., encoding_override="cp1252")
@@ -134,7 +136,7 @@ import sys
 # <p>For further information, please refer to the documentation for the xldate_* functions.</p>
 #
 # <h3> Named references, constants, formulas, and macros</h3>
-#  
+#
 # <p>
 # A name is used to refer to a cell, a group of cells, a constant
 # value, a formula, or a macro. Usually the scope of a name is global
@@ -234,7 +236,8 @@ import sys
 # <ul>
 #   <li>Rich text i.e. strings containing partial <b>bold</b> <i>italic</i>
 #       and <u>underlined</u> text, change of font inside a string, etc.
-#       See OOo docs s3.4 and s3.2</li>
+#       See OOo docs s3.4 and s3.2.
+#       <i> Rich text is included in version 0.7.2</i></li>
 #   <li>Asian phonetic text (known as "ruby"), used for Japanese furigana. See OOo docs
 #       s3.4.2 (p15)</li>
 #   <li>Conditional formatting. See OOo docs
@@ -248,45 +251,80 @@ import sys
 #       are inappropriate. Note that this does not affect users who are copying XLS
 #       files, only those who are visually rendering cells.</li>
 # </ul>
+#
+# <h3>Loading worksheets on demand</h3>
+#
+# <p>This feature, new in version 0.7.1, is governed by the on_demand argument
+# to the open_workbook() function and allows saving memory and time by loading
+# only those sheets that the caller is interested in, and releasing sheets
+# when no longer required.</p>
+#
+# <p>on_demand=False (default): No change. open_workbook() loads global data
+# and all sheets, releases resources no longer required (principally the
+# str or mmap object containing the Workbook stream), and returns.</p>
+#
+# <p>on_demand=True and BIFF version < 5.0: A warning message is emitted,
+# on_demand is recorded as False, and the old process is followed.</p>
+#
+# <p>on_demand=True and BIFF version >= 5.0: open_workbook() loads global
+# data and returns without releasing resources. At this stage, the only
+# information available about sheets is Book.nsheets and Book.sheet_names().</p>
+#
+# <p>Book.sheet_by_name() and Book.sheet_by_index() will load the requested
+# sheet if it is not already loaded.</p>
+#
+# <p>Book.sheets() will load all/any unloaded sheets.</p>
+#
+# <p>The caller may save memory by calling
+# Book.unload_sheet(sheet_name_or_index) when finished with the sheet.
+# This applies irrespective of the state of on_demand.</p>
+#
+# <p>The caller may re-load an unloaded sheet by calling Book.sheet_by_xxxx()
+#  -- except if those required resources have been released (which will
+# have happened automatically when on_demand is false). This is the only
+# case where an exception will be raised.</p>
+#
+# <p>The caller may query the state of a sheet:
+# Book.sheet_loaded(sheet_name_or_index) -> a bool</p>
+#
+# <p> Book.release_resources() may used to save memory and close
+# any memory-mapped file before proceding to examine already-loaded
+# sheets. Once resources are released, no further sheets can be loaded.</p>
+#
+# <p> When using on-demand, it is advisable to ensure that
+# Book.release_resources() is always called even if an exception
+# is raised in your own code; otherwise if the input file has been
+# memory-mapped, the mmap.mmap object will not be closed and you will
+# not be able to access the physical file until your Python process
+# terminates. This can be done by calling Book.release_resources()
+# explicitly in the finally suite of a try/finally block.
+# New in xlrd 0.7.2: the Book object is a "context manager", so if
+# using Python 2.5 or later, you can wrap your code in a "with"
+# statement.</p>
 ##
 
-# 2007-04-22 SJM Removed antique undocumented Book.get_name_dict method.
-# 2007-05-21 SJM If no CODEPAGE record in pre-8.0 file, assume ascii and keep going.
+import sys, zipfile, pprint
+from . import timemachine
+from .biffh import (
+    XLRDError,
+    biff_text_from_num,
+    error_text_from_code,
+    XL_CELL_BLANK,
+    XL_CELL_TEXT,
+    XL_CELL_BOOLEAN,
+    XL_CELL_ERROR,
+    XL_CELL_EMPTY,
+    XL_CELL_DATE,
+    XL_CELL_NUMBER
+    )
+from .formula import * # is constrained by __all__
+from .book import Book, colname #### TODO #### formula also has `colname` (restricted to 256 cols)
+from .sheet import empty_cell
+from .xldate import XLDateError, xldate_as_tuple
 
-try:
-    from timemachine import *
-    from biffh import *
-    from struct import unpack
-    import sheet
-    import compdoc
-    from xldate import xldate_as_tuple, XLDateError
-    from formula import *
-    import formatting
-
-except:
-    from .timemachine import *
-    from .biffh import *
-    from struct import unpack
-    from . import sheet
-    from . import compdoc
-    from .xldate import xldate_as_tuple, XLDateError
-    from .formula import *
-    from . import formatting
-import sys
-import time
 if sys.version.startswith("IronPython"):
     # print >> sys.stderr, "...importing encodings"
     import encodings
-
-empty_cell = sheet.empty_cell # for exposure to the world ...
-
-DEBUG = 0
-
-USE_FANCY_CD = 1
-
-TOGGLE_GC = 0
-import gc
-# gc.set_debug(gc.DEBUG_STATS)
 
 try:
     import mmap
@@ -294,31 +332,6 @@ try:
 except ImportError:
     MMAP_AVAILABLE = 0
 USE_MMAP = MMAP_AVAILABLE
-
-MY_EOF = 0xF00BAAA # not a 16-bit number
-
-SUPPORTED_VERSIONS = (80, 70, 50, 45, 40, 30)
-
-code_from_builtin_name = {
-    u"Consolidate_Area": u"\x00",
-    u"Auto_Open":        u"\x01",
-    u"Auto_Close":       u"\x02",
-    u"Extract":          u"\x03",
-    u"Database":         u"\x04",
-    u"Criteria":         u"\x05",
-    u"Print_Area":       u"\x06",
-    u"Print_Titles":     u"\x07",
-    u"Recorder":         u"\x08",
-    u"Data_Form":        u"\x09",
-    u"Auto_Activate":    u"\x0A",
-    u"Auto_Deactivate":  u"\x0B",
-    u"Sheet_Title":      u"\x0C",
-    u"_FilterDatabase":  u"\x0D",
-    }
-builtin_name_from_code = {}
-for _bin, _bic in code_from_builtin_name.items():
-    builtin_name_from_code[_bic] = _bin
-del _bin, _bic
 
 ##
 #
@@ -330,11 +343,6 @@ del _bin, _bic
 #
 # @param verbosity Increases the volume of trace material written to the logfile.
 #
-# @param pickleable Default is true. In Python 2.4 or earlier, setting to false
-# will cause use of array.array objects which save some memory but can't be pickled.
-# In Python 2.5, array.arrays are used unconditionally. Note: if you have large files that
-# you need to read multiple times, it can be much faster to cPickle.dump() the xlrd.Book object
-# once, and use cPickle.load() multiple times.
 # @param use_mmap Whether to use the mmap module is determined heuristically.
 # Use this arg to override the result. Current heuristic: mmap is used if it exists.
 #
@@ -357,68 +365,88 @@ del _bin, _bic
 # XF information is available for each cell.
 # <br /> -- New in version 0.6.1
 #
+# @param on_demand Governs whether sheets are all loaded initially or when demanded
+# by the caller. Please refer back to the section "Loading worksheets on demand" for details.
+# <br /> -- New in version 0.7.1
+#
+# @param ragged_rows False (the default) means all rows are padded out with empty cells so that all
+# rows have the same size (Sheet.ncols). True means that there are no empty cells at the ends of rows.
+# This can result in substantial memory savings if rows are of widely varying sizes. See also the
+# Sheet.row_len() method.
+# <br /> -- New in version 0.7.2
+#
 # @return An instance of the Book class.
 
 def open_workbook(filename=None,
-    logfile=sys.stdout, verbosity=0, pickleable=True, use_mmap=USE_MMAP,
+    logfile=sys.stdout,
+    verbosity=0,
+    use_mmap=USE_MMAP,
     file_contents=None,
     encoding_override=None,
     formatting_info=False,
+    on_demand=False,
+    ragged_rows=False,
     ):
-    t0 = time.clock()
-    if TOGGLE_GC:
-        orig_gc_enabled = gc.isenabled()
-        if orig_gc_enabled:
-            gc.disable()
-    bk = Book(
-        filename=filename, file_contents=file_contents,
-        logfile=logfile, verbosity=verbosity, pickleable=pickleable, use_mmap=use_mmap,
+    peeksz = 4
+    if file_contents:
+        peek = file_contents[:peeksz]
+    else:
+        f = open(filename, "rb")
+        peek = f.read(peeksz)
+        f.close()
+    if peek == b"PK\x03\x04": # a ZIP file
+        if file_contents:
+            zf = zipfile.ZipFile(timemachine.BYTES_IO(file_contents))
+        else:
+            zf = zipfile.ZipFile(filename)
+        component_names = zf.namelist()
+        if verbosity:
+            logfile.write('ZIP component_names:\n')
+            pprint.pprint(component_names, logfile)
+        if 'xl/workbook.xml' in component_names:
+            from . import xlsx
+            bk = xlsx.open_workbook_2007_xml(
+                zf,
+                component_names,
+                logfile=logfile,
+                verbosity=verbosity,
+                use_mmap=use_mmap,
+                formatting_info=formatting_info,
+                on_demand=on_demand,
+                ragged_rows=ragged_rows,
+                )
+            return bk
+        if 'xl/workbook.bin' in component_names:
+            raise XLRDError('Excel 2007 xlsb file; not supported')
+        if 'content.xml' in component_names:
+            raise XLRDError('Openoffice.org ODS file; not supported')
+        raise XLRDError('ZIP file contents not a known type of workbook')
+
+    from . import book
+    bk = book.open_workbook_xls(
+        filename=filename,
+        logfile=logfile,
+        verbosity=verbosity,
+        use_mmap=use_mmap,
+        file_contents=file_contents,
         encoding_override=encoding_override,
         formatting_info=formatting_info,
+        on_demand=on_demand,
+        ragged_rows=ragged_rows,
         )
-    t1 = time.clock()
-    bk.load_time_stage_1 = t1 - t0
-    biff_version = bk.getbof(XL_WORKBOOK_GLOBALS)
-    if not biff_version:
-        raise XLRDError("Can't determine file's BIFF version")
-    if biff_version not in SUPPORTED_VERSIONS:
-        raise XLRDError(
-            "BIFF version %s is not supported"
-            % biff_text_from_num[biff_version]
-            )
-    bk.biff_version = biff_version
-    if biff_version <= 40:
-        # no workbook globals, only 1 worksheet
-        bk.fake_globals_get_sheet()
-    elif biff_version == 45:
-        # worksheet(s) embedded in global stream
-        bk.parse_globals()
-    else:
-        bk.parse_globals()
-        bk.get_sheets()
-    bk.nsheets = len(bk._sheet_list)
-    if biff_version == 45 and bk.nsheets > 1:
-        fprintf(bk.logfile,
-            "*** WARNING: Excel 4.0 workbook (.XLW) file contains %d worksheets.\n"
-            "*** Book-level data will be that of the last worksheet.\n",
-            bk.nsheets
-            )
-    bk.release_resources()
-    if TOGGLE_GC:
-        if orig_gc_enabled:
-            gc.enable()
-    t2 = time.clock()
-    bk.load_time_stage_2 = t2 - t1
     return bk
 
 ##
-# For debugging: dump the file's BIFF records in char & hex.
+# For debugging: dump an XLS file's BIFF records in char & hex.
 # @param filename The path to the file to be dumped.
 # @param outfile An open file, to which the dump is written.
+# @param unnumbered If true, omit offsets (for meaningful diffs).
 
-def dump(filename, outfile=sys.stdout):
-    bk = Book(filename)
-    biff_dump(bk.mem, bk.base, bk.stream_len, 0, outfile)
+def dump(filename, outfile=sys.stdout, unnumbered=False):
+    from .biffh import biff_dump
+    bk = Book()
+    bk.biff2_8_load(filename=filename, logfile=outfile, )
+    biff_dump(bk.mem, bk.base, bk.stream_len, 0, outfile, unnumbered)
 
 ##
 # For debugging and analysis: summarise the file's BIFF records.
@@ -427,1085 +455,7 @@ def dump(filename, outfile=sys.stdout):
 # @param outfile An open file, to which the summary is written.
 
 def count_records(filename, outfile=sys.stdout):
-    bk = Book(filename)
+    from .biffh import biff_count_records
+    bk = Book()
+    bk.biff2_8_load(filename=filename, logfile=outfile, )
     biff_count_records(bk.mem, bk.base, bk.stream_len, outfile)
-
-##
-# Information relating to a named reference, formula, macro, etc.
-# <br> -- New in version 0.6.0
-# <br> -- <i>Name information is <b>not</b> extracted from files older than
-# Excel 5.0 (Book.biff_version < 50)</i>
-
-class Name(BaseObject):
-
-    _repr_these = ['stack']
-    book = None # parent
-
-    ##
-    # 0 = Visible; 1 = Hidden
-    hidden = 0
-
-    ##
-    # 0 = Command macro; 1 = Function macro. Relevant only if macro == 1
-    func = 0
-
-    ##
-    # 0 = Sheet macro; 1 = VisualBasic macro. Relevant only if macro == 1
-    vbasic = 0
-
-    ##
-    # 0 = Standard name; 1 = Macro name
-    macro = 0
-
-    ##
-    # 0 = Simple formula; 1 = Complex formula (array formula or user defined)<br>
-    # <i>No examples have been sighted.</i>
-    complex = 0
-
-    ##
-    # 0 = User-defined name; 1 = Built-in name
-    # (common examples: Print_Area, Print_Titles; see OOo docs for full list)
-    builtin = 0
-
-    ##
-    # Function group. Relevant only if macro == 1; see OOo docs for values.
-    funcgroup = 0
-
-    ##
-    # 0 = Formula definition; 1 = Binary data<br> <i>No examples have been sighted.</i>
-    binary = 0
-
-    ##
-    # The index of this object in book.name_obj_list
-    name_index = 0
-
-    ##
-    # A Unicode string. If builtin, decoded as per OOo docs.
-    name = u""
-
-    ##
-    # An 8-bit string.
-    raw_formula = ""
-
-    ##
-    # -1: The name is global (visible in all calculation sheets).<br>
-    # -2: The name belongs to a macro sheet or VBA sheet.<br>
-    # -3: The name is invalid.<br>
-    # 0 <= scope < book.nsheets: The name is local to the sheet whose index is scope.
-    scope = -1
-
-    ##
-    # The result of evaluating the formula, if any.
-    # If no formula, or evaluation of the formula encountered problems,
-    # the result is None. Otherwise the result is a single instance of the
-    # Operand class.
-    #
-    result = None
-
-    ##
-    # This is a convenience method for the frequent use case where the name
-    # refers to a single cell.
-    # @return An instance of the Cell class.
-    # @throws XLRDError The name is not a constant absolute reference
-    # to a single cell.
-    def cell(self):
-        res = self.result
-        if res:
-            # result should be an instance of the Operand class
-            kind = res.kind
-            value = res.value
-            if kind == oREF and len(value) == 1:
-                ref3d = value[0]
-                if (0 <= ref3d.shtxlo == ref3d.shtxhi - 1
-                and      ref3d.rowxlo == ref3d.rowxhi - 1
-                and      ref3d.colxlo == ref3d.colxhi - 1):
-                    sh = self.book.sheet_by_index(ref3d.shtxlo)
-                    return sh.cell(ref3d.rowxlo, ref3d.colxlo)
-        self.dump(self.book.logfile,
-            header="=== Dump of Name object ===",
-            footer="======= End of dump =======",
-            )
-        raise XLRDError("Not a constant absolute reference to a single cell")
-
-##
-# Contents of a "workbook".
-# <p>WARNING: You don't call this class yourself. You use the Book object that
-# was returned when you called xlrd.open_workbook("myfile.xls").</p>
-
-class Book(BaseObject):
-
-    ##
-    # The number of worksheets in the workbook.
-    nsheets = 0
-
-    ##
-    # Which date system was in force when this file was last saved.<br>
-    #    0 => 1900 system (the Excel for Windows default).<br>
-    #    1 => 1904 system (the Excel for Macintosh default).<br>
-    datemode = 0 # In case it's not specified in the file.
-
-    ##
-    # Version of BIFF (Binary Interchange File Format) used to create the file.
-    # Latest is 8.0 (represented here as 80), introduced with Excel 97.
-    # Earliest supported by this module: 3.0 (represented as 30).
-    biff_version = 0
-
-    ##
-    # List containing a Name object for each NAME record in the workbook.
-    # <br> -- New in version 0.6.0
-    name_obj_list = []
-
-    ##
-    # An integer denoting the character set used for strings in this file.
-    # For BIFF 8 and later, this will be 1200, meaning Unicode; more precisely, UTF_16_LE.
-    # For earlier versions, this is used to derive the appropriate Python encoding
-    # to be used to convert to Unicode.
-    # Examples: 1252 -> 'cp1252', 10000 -> 'mac_roman'
-    codepage = None
-
-    ##
-    # The encoding that was derived from the codepage.
-    encoding = None
-
-    ##
-    # A tuple containing the (telephone system) country code for:<br>
-    #    [0]: the user-interface setting when the file was created.<br>
-    #    [1]: the regional settings.<br>
-    # Example: (1, 61) meaning (USA, Australia).
-    # This information may give a clue to the correct encoding for an unknown codepage.
-    # For a long list of observed values, refer to the OpenOffice.org documentation for
-    # the COUNTRY record.
-    countries = (0, 0)
-
-    ##
-    # What (if anything) is recorded as the name of the last user to save the file.
-    user_name = u''
-
-    ##
-    # A list of Font class instances, each corresponding to a FONT record.
-    # <br /> -- New in version 0.6.1
-    font_list = []
-
-    ##
-    # A list of XF class instances, each corresponding to an XF record.
-    # <br /> -- New in version 0.6.1
-    xf_list = []
-
-    ##
-    # A list of Format objects, each corresponding to a FORMAT record, in
-    # the order that they appear in the input file.
-    # It does <i>not</i> contain builtin formats.
-    # If you are creating an output file using (for example) pyExcelerator,
-    # use this list.
-    # The collection to be used for all visual rendering purposes is format_map.
-    # <br /> -- New in version 0.6.1
-    format_list = []
-
-    ##
-    # The mapping from XF.format_key to Format object.
-    # <br /> -- New in version 0.6.1
-    format_map = {}
-
-    ##
-    # This provides access via name to the extended format information for
-    # both built-in styles and user-defined styles.<br />
-    # It maps <i>name</i> to (<i>built_in</i>, <i>xf_index</i>), where:<br />
-    # <i>name</i> is either the name of a user-defined style,
-    # or the name of one of the built-in styles. Known built-in names are
-    # Normal, RowLevel_1 to RowLevel_7,
-    # ColLevel_1 to ColLevel_7, Comma, Currency, Percent, "Comma [0]",
-    # "Currency [0]", Hyperlink, and "Followed Hyperlink".<br />
-    # <i>built_in</i> 1 = built-in style, 0 = user-defined<br />
-    # <i>xf_index</i> is an index into Book.xf_list.<br />
-    # References: OOo docs s6.99 (STYLE record); Excel UI Format/Style
-    # <br /> -- New in version 0.6.1
-    style_name_map = {}
-
-    ##
-    # This provides definitions for colour indexes. Please refer to the
-    # above section "The Palette; Colour Indexes" for an explanation
-    # of how colours are represented in Excel.<br />
-    # Colour indexes into the palette map into (red, green, blue) tuples.
-    # "Magic" indexes e.g. 0x7FFF map to None.
-    # <i>colour_map</i> is what you need if you want to render cells on screen or in a PDF
-    # file. If you are writing an output XLS file, use <i>palette_record</i>.
-    # <br /> -- New in version 0.6.1
-    colour_map = {}
-
-    ##
-    # If the user has changed any of the colours in the standard palette, the XLS
-    # file will contain a PALETTE record with 56 (16 for Excel 4.0 and earlier)
-    # RGB values in it, and this list will be e.g. [(r0, b0, g0), ..., (r55, b55, g55)].
-    # Otherwise this list will be empty. This is what you need if you are
-    # writing an output XLS file. If you want to render cells on screen or in a PDF
-    # file, use colour_map.
-    # <br /> -- New in version 0.6.1
-    palette_record = []
-
-    ##
-    # Time in seconds to extract the XLS image as a contiguous string (or mmap equivalent).
-    load_time_stage_1 = -1.0
-
-    ##
-    # Time in seconds to parse the data from the contiguous string (or mmap equivalent).
-    load_time_stage_2 = -1.0
-
-    ##
-    # @return A list of all sheets in the book.
-    def sheets(self):
-        return self._sheet_list
-    ##
-    # @param sheetx Sheet index in range(nsheets)
-    # @return An object of the Sheet class
-    def sheet_by_index(self, sheetx):
-        return self._sheet_list[sheetx]
-
-    ##
-    # @param sheet_name Name of sheet required
-    # @return An object of the Sheet class
-    def sheet_by_name(self, sheet_name):
-        try:
-            sheetx = self._sheet_names.index(sheet_name)
-        except ValueError:
-            raise XLRDError('No sheet named <%r>' % sheet_name)
-        return self._sheet_list[sheetx]
-
-    ##
-    # @return A list of the names of the sheets in the book.
-    def sheet_names(self):
-        return self._sheet_names[:]
-
-    ##
-    # A mapping from (lower_case_name, scope) to a single Name object.
-    # <br> -- New in version 0.6.0
-    name_and_scope_map = {}
-
-    ##
-    # A mapping from lower_case_name to a list of Name objects. The list is
-    # sorted in scope order. Typically there will be one item (of global scope)
-    # in the list.
-    # <br> -- New in version 0.6.0
-    name_map = {}
-
-    def __init__(self, filename=None, file_contents=None,
-        logfile=sys.stdout, verbosity=0, pickleable=True, use_mmap=USE_MMAP,
-        encoding_override=None,
-        formatting_info=False,
-        ):
-        # DEBUG = 0
-        self.logfile = logfile
-        self.verbosity = verbosity
-        self.pickleable = pickleable
-        self.use_mmap = use_mmap
-        self.encoding_override = encoding_override
-        self.formatting_info = formatting_info
-        self._sheet_list = []
-        self._sheet_names = []
-        self._sheet_visibility = [] # from BOUNDSHEET record
-        self.nsheets = 0
-        self._sh_abs_posn = [] # sheet's absolute position in the stream
-        self._sharedstrings = []
-        self.raw_user_name = False
-        self._sheethdr_count = 0 # BIFF 4W only
-        self.builtinfmtcount = -1 # unknown as yet. BIFF 3, 4S, 4W
-        self.initialise_format_info()
-        self._all_sheets_count = 0 # includes macro & VBA sheets
-        self._supbook_count = 0
-        self._supbook_locals_inx = None
-        self._all_sheets_map = [] # maps an all_sheets index to a calc-sheets index (or -1)
-        self._externsheet_info = []
-        self._externsheet_type_b57 = []
-        self._extnsht_name_from_num = {}
-        self._sheet_num_from_name = {}
-        self._extnsht_count = 0
-        self.name_obj_list = []
-        self.colour_map = {}
-        self.palette_record = []
-        self.xf_list = []
-        self.style_name_map = {}
-
-        need_close_filestr = 0
-        if not file_contents:
-            if python_version < (2, 2) and self.use_mmap:
-                # need to open for update
-                open_mode = "r+b"
-            else:
-                open_mode = "rb"
-            retry = False
-            try:
-                f = open(filename, open_mode)
-            except IOError:
-                e, v = sys.exc_info()[:2]
-                if open_mode == "r+b" \
-                and (v.errno == 13 or v.strerror == "Permission denied"):
-                    # Maybe the file is read-only
-                    retry = True
-                    self.use_mmap = False
-                else:
-                    raise
-            if retry:
-                f = open(filename, "rb")
-            if self.use_mmap:
-                f.seek(0, 2) # EOF
-                size = f.tell()
-                f.seek(0, 0) # BOF
-                if python_version < (2, 2):
-                    filestr = mmap.mmap(f.fileno(), size)
-                else:
-                    filestr = mmap.mmap(f.fileno(), size, access=mmap.ACCESS_READ)
-                need_close_filestr = 1
-                self.stream_len = size
-            else:
-                filestr = f.read()
-                self.stream_len = len(filestr)
-            f.close()
-        else:
-            filestr = file_contents
-            self.stream_len = len(file_contents)
-
-        self.base = 0
-        if filestr[:8] != compdoc.SIGNATURE:
-            # got this one at the antique store
-            self.mem = filestr
-        else:
-            cd = compdoc.CompDoc(filestr)
-            if USE_FANCY_CD:
-                for qname in [u'Workbook', u'Book']:
-                    self.mem, self.base, self.stream_len = cd.locate_named_stream(qname)
-                    if self.mem: break
-                else:
-                    raise XLRDError("Can't find workbook in OLE2 compound document")
-            else:
-                for qname in [u'Workbook', u'Book']:
-                    self.mem = cd.get_named_stream(qname)
-                    if self.mem: break
-                else:
-                    raise XLRDError("Can't find workbook in OLE2 compound document")
-                self.stream_len = len(self.mem)
-            del cd
-            if self.mem is not filestr:
-                if need_close_filestr:
-                    filestr.close()
-                del filestr
-        self._position = self.base
-        if DEBUG:
-            print ("mem: %s, base: %d, len: %d" % (type(self.mem), self.base, self.stream_len), file=self.logfile)
-
-    def initialise_format_info(self):
-        # needs to be done once per sheet for BIFF 4W :-(
-        self.format_map = {}
-        self.format_list = []
-        self.xfcount = 0
-        self.actualfmtcount = 0 # number of FORMAT records seen so far
-        self._xf_index_to_xl_type_map = {}
-        self.xf_list = []
-        self.font_list = []
-
-    def release_resources(self):
-        del self.mem
-        del self._sharedstrings
-
-    def get2bytes(self):
-        pos = self._position
-        buff_two = self.mem[pos:pos+2]
-        lenbuff = len(buff_two)
-        self._position += lenbuff
-        if lenbuff < 2:
-            return MY_EOF
-        lo, hi = buff_two
-        return (ord(hi) << 8) | ord(lo)
-
-    def get_record_parts(self):
-        pos = self._position
-        mem = self.mem
-        code, length = unpack('<HH', mem[pos:pos+4])
-        pos += 4
-        data = mem[pos:pos+length]
-        self._position = pos + length
-        return (code, length, data)
-
-    def get_record_parts_conditional(self, reqd_record):
-        pos = self._position
-        mem = self.mem
-        code, length = unpack('<HH', mem[pos:pos+4])
-        if code != reqd_record:
-            return (None, 0, '')
-        pos += 4
-        data = mem[pos:pos+length]
-        self._position = pos + length
-        return (code, length, data)
-
-    def get_sheet(self, sh_number):
-        _unused_biff_version = self.getbof(XL_WORKSHEET)
-        # assert biff_version == self.biff_version ### FAILS
-        # Have an example where book is v7 but sheet reports v8!!!
-        # It appears to work OK if the sheet version is ignored.
-        # Confirmed by Daniel Rentz: happens when Excel does "save as"
-        # creating an old version file; ignore version details on sheet BOF.
-        sh = sheet.Sheet(self,
-                self._position,
-                self._sheet_names[sh_number],
-                sh_number,
-                )
-        sh.read(self)
-        return sh
-
-    def get_sheets(self):
-        # DEBUG = 0
-        #if DEBUG: print >> self.logfile, "GET_SHEETS:", self._sheet_names, self._sh_abs_posn
-        for sheetno in xrange(len(self._sheet_names)):
-            #if DEBUG: print >> self.logfile, "GET_SHEETS: sheetno =", sheetno, self._sheet_names, self._sh_abs_posn
-            newposn = self._sh_abs_posn[sheetno]
-            self.position(newposn)
-            sht = self.get_sheet(sheetno)
-            self._sheet_list.append(sht)
-
-    def fake_globals_get_sheet(self): # for BIFF 4.0 and earlier
-        formatting.initialise_book(self)
-        fake_sheet_name = u'Sheet 1'
-        self._sheet_names = [fake_sheet_name]
-        self._sh_abs_posn = [0]
-        self._sheet_visibility = [0] # one sheet, visible
-        self.get_sheets()
-
-    def handle_boundsheet(self, data):
-        # DEBUG = 1
-        bv = self.biff_version
-        if DEBUG:
-            fprintf(self.logfile, "BOUNDSHEET: bv=%d data %r\n", bv, data);
-        if bv == 45: # BIFF4W
-            #### Not documented in OOo docs ...
-            # In fact, the *only* data is the name of the sheet.
-            sheet_name = unpack_string(data, 0, self.encoding, lenlen=1)
-            visibility = 0
-            sheet_type = XL_BOUNDSHEET_WORKSHEET # guess, patch later
-            if len(self._sh_abs_posn) == 0:
-                abs_posn = self._sheetsoffset + self.base
-                # Note (a) this won't be used
-                # (b) it's the position of the SHEETHDR record
-                # (c) add 11 to get to the worksheet BOF record
-            else:
-                abs_posn = -1 # unknown
-        else:
-            offset, visibility, sheet_type = unpack('<iBB', data[0:6])
-            abs_posn = offset + self.base # because global BOF is always at posn 0 in the stream
-            if bv < BIFF_FIRST_UNICODE:
-                sheet_name = unpack_string(data, 6, self.encoding, lenlen=1)
-            else:
-                sheet_name = unpack_unicode(data, 6, lenlen=1)
-
-        if DEBUG or self.verbosity >= 2:
-            fprintf(self.logfile,
-                "BOUNDSHEET: inx=%d vis=%r sheet_name=%r abs_posn=%d sheet_type=0x%02x\n",
-                self._all_sheets_count, visibility, sheet_name, abs_posn, sheet_type)
-        self._all_sheets_count += 1
-        if sheet_type != XL_BOUNDSHEET_WORKSHEET:
-            self._all_sheets_map.append(-1)
-            descr = {
-                1: 'Macro sheet',
-                2: 'Chart',
-                6: 'Visual Basic module',
-                }.get(sheet_type, 'UNKNOWN')
-
-            fprintf(self.logfile,
-                "NOTE *** Ignoring non-worksheet data named %r (type 0x%02x = %s)\n",
-                sheet_name, sheet_type, descr)
-        else:
-            snum = len(self._sheet_names)
-            self._all_sheets_map.append(snum)
-            self._sheet_names.append(sheet_name)
-            self._sh_abs_posn.append(abs_posn)
-            self._sheet_visibility.append(visibility)
-            self._sheet_num_from_name[sheet_name] = snum
-
-    def handle_builtinfmtcount(self, data):
-        ### N.B. This count appears to be utterly useless.
-        # DEBUG = 1
-        builtinfmtcount = unpack('<H', data[0:2])[0]
-        if DEBUG: fprintf(self.logfile, "BUILTINFMTCOUNT: %r\n", builtinfmtcount)
-        self.builtinfmtcount = builtinfmtcount
-
-    def derive_encoding(self):
-        if self.encoding_override:
-            self.encoding = self.encoding_override
-        elif self.codepage is None:
-            if self.biff_version < 80:
-                fprintf(self.logfile,
-                    "*** No CODEPAGE record, no encoding_override: will use 'ascii'\n")
-                self.encoding = 'ascii'
-            else:
-                self.codepage = 1200 # utf16le
-                if self.verbosity >= 2:
-                    fprintf(self.logfile, "*** No CODEPAGE record; assuming 1200 (utf_16_le)\n")
-        else:
-            codepage = self.codepage
-            if codepage in encoding_from_codepage:
-                encoding = encoding_from_codepage[codepage]
-            elif 300 <= codepage <= 1999:
-                encoding = 'cp' + str(codepage)
-            else:
-                encoding = 'unknown_codepage_' + str(codepage)
-            if DEBUG or self.verbosity:
-                fprintf(self.logfile, "CODEPAGE: codepage %r -> encoding %r\n", codepage, encoding)
-            self.encoding = encoding
-        if self.codepage != 1200: # utf_16_le
-            # If we don't have a codec that can decode ASCII into Unicode,
-            # we're well & truly stuffed -- let the punter know ASAP.
-            try:
-                _unused = unicode('trial', self.encoding)
-            except:
-                ei = sys.exc_info()[:2]
-                fprintf(self.logfile,
-                    "ERROR *** codepage %d -> encoding %r -> %s: %s\n",
-                    self.codepage, self.encoding, ei[0].__name__.split(".")[-1], ei[1])
-                raise
-        if self.raw_user_name:
-            strg = unpack_string(self.user_name, 0, self.encoding, lenlen=1)
-            strg = strg.rstrip()
-            # if DEBUG:
-            #     print "CODEPAGE: user name decoded from %r to %r" % (self.user_name, strg)
-            self.user_name = strg
-            self.raw_user_name = False
-
-    def handle_codepage(self, data):
-        # DEBUG = 0
-        codepage = unpack('<H', data[0:2])[0]
-        self.codepage = codepage
-        self.derive_encoding()
-
-    def handle_country(self, data):
-        countries = unpack('<HH', data[0:4])
-        #if self.verbosity: print >> self.logfile, "Countries:", countries
-        # Note: in BIFF7 and earlier, country record was put (redundantly?) in each worksheet.
-        assert self.countries == (0, 0) or self.countries == countries
-        self.countries = countries
-
-    def handle_datemode(self, data):
-        datemode = unpack('<H', data[0:2])[0]
-        if DEBUG or self.verbosity:
-            fprintf(self.logfile, "DATEMODE: datemode %r\n", datemode)
-        assert datemode in (0, 1)
-        self.datemode = datemode
-
-    def handle_externsheet(self, data):
-        self._extnsht_count += 1 # for use as a 1-based index
-        blah = DEBUG or self.verbosity >= 2
-        if self.biff_version >= 80:
-            num_refs = unpack("<H", data[0:2])[0]
-            pos = 2
-            for k in xrange(num_refs):
-                info = unpack("<HHH", data[pos:pos+6])
-                ref_recordx, ref_first_sheetx, ref_last_sheetx = info
-                self._externsheet_info.append(info)
-                pos += 6
-                if blah:
-                    fprintf(
-                        self.logfile,
-                        "EXTERNSHEET(b8): k = %2d, record = %2d, first_sheet = %5d, last sheet = %5d\n",
-                        k, ref_recordx, ref_first_sheetx, ref_last_sheetx,
-                        )
-        else:
-            nc, ty = unpack("<BB", data[:2])
-#             if blah:
-#                 print "EXTERNSHEET(b7-):"
-#                 hex_char_dump(data, 0, len(data))
-#                 msg = {
-#                     1: "Encoded URL",
-#                     2: "Current sheet!!",
-#                     3: "Specific sheet in own doc't",
-#                     4: "Nonspecific sheet in own doc't!!",
-#                     }.get(ty, "Not encoded")
-#                 print "   %3d chars, type is %d (%s)" % (nc, ty, msg)
-            if ty == 3:
-                sheet_name = unicode(data[2:nc+2], self.encoding)
-                self._extnsht_name_from_num[self._extnsht_count] = sheet_name
-#                if blah: print self._extnsht_name_from_num
-            if not (1 <= ty <= 4):
-                ty = 0
-            self._externsheet_type_b57.append(ty)
-
-    def handle_filepass(self, _unused_data):
-        raise XLRDError("Workbook is encrypted")
-
-    def handle_name(self, data):
-        blah = DEBUG or self.verbosity >= 2
-        bv = self.biff_version
-        if bv < 50:
-            return
-        # print
-        # hex_char_dump(data, 0, len(data))
-        (
-        option_flags, kb_shortcut, name_len, fmla_len, extsht_index, sheet_index,
-        menu_text_len, description_text_len, help_topic_text_len, status_bar_text_len,
-        ) = unpack("<HBBHHH4B", data[0:14])
-        nobj = Name()
-        nobj.book = self ### CIRCULAR ###
-        name_index = len(self.name_obj_list)
-        nobj.name_index = name_index
-        self.name_obj_list.append(nobj)
-        nobj.option_flags = option_flags
-        for attr, mask, nshift in (
-            ('hidden', 1, 0),
-            ('func', 2, 1),
-            ('vbasic', 4, 2),
-            ('macro', 8, 3),
-            ('complex', 0x10, 4),
-            ('builtin', 0x20, 5),
-            ('funcgroup', 0xFC0, 6),
-            ('binary', 0x1000, 12),
-            ):
-            setattr(nobj, attr, (option_flags & mask) >> nshift)
-
-        macro_flag = " M"[nobj.macro]
-        if bv < 80:
-            internal_name, pos = unpack_string_update_pos(data, 14, self.encoding, known_len=name_len)
-        else:
-            internal_name, pos = unpack_unicode_update_pos(data, 14, known_len=name_len)
-        nobj.extn_sheet_num = extsht_index
-        nobj.excel_sheet_index = sheet_index
-        nobj.scope = None # patched up in the names_epilogue() method
-#         if blah:
-#             print "NAME[%d]:%s oflags=%d, name_len=%d, fmla_len=%d, extsht_index=%d, sheet_index=%d, name=%r" \
-#                 % (name_index, macro_flag, option_flags, name_len,
-#                 fmla_len, extsht_index, sheet_index, internal_name)
-        name = internal_name
-        if nobj.builtin:
-            name = builtin_name_from_code.get(name, "??Unknown??")
-#            if blah: print "    builtin: %s" % name
-        nobj.name = name
-        nobj.raw_formula = data[pos:]
-        nobj.basic_formula_len = fmla_len
-        nobj.evaluated = 0
-        if blah:
-            nobj.dump(
-                self.logfile,
-                header="--- handle_name: name[%d] ---" % name_index,
-                footer="-------------------",
-                )
-
-    def names_epilogue(self):
-        blah = self.verbosity >= 2
-        f = self.logfile
-        if blah:
-            #print >> f, "+++++ names_epilogue +++++"
-            #print >> f, "_all_sheets_map", self._all_sheets_map
-            #print >> f, "_extnsht_name_from_num", self._extnsht_name_from_num
-            #print >> f, "_sheet_num_from_name", self._sheet_num_from_name
-            pass
-        num_names = len(self.name_obj_list)
-        for namex in range(num_names):
-            nobj = self.name_obj_list[namex]
-            # Convert from excel_sheet_index to scope.
-            # This is done here because in BIFF7 and earlier, the
-            # BOUNDSHEET records (from which _all_sheets_map is derived)
-            # come after the NAME records.
-            if self.biff_version >= 80:
-                sheet_index = nobj.excel_sheet_index
-                if sheet_index == 0:
-                    intl_sheet_index = -1 # global
-                elif 1 <= sheet_index <= len(self._all_sheets_map):
-                    intl_sheet_index = self._all_sheets_map[sheet_index-1]
-                    if intl_sheet_index == -1: # maps to a macro or VBA sheet
-                        intl_sheet_index = -2 # valid sheet reference but not useful
-                else:
-                    # huh?
-                    intl_sheet_index = -3 # invalid
-            elif 50 <= self.biff_version <= 70:
-                sheet_index = nobj.extn_sheet_num
-                if sheet_index == 0:
-                    intl_sheet_index = -1 # global
-                else:
-                    sheet_name = self._extnsht_name_from_num[sheet_index]
-                    intl_sheet_index = self._sheet_num_from_name.get(sheet_name, -2)
-            nobj.scope = intl_sheet_index
-
-        for namex in range(num_names):
-            nobj = self.name_obj_list[namex]
-            # Parse the formula ...
-            if nobj.macro or nobj.binary: continue
-            if nobj.evaluated: continue
-            evaluate_name_formula(self, nobj, namex, blah=blah)
-
-        if self.verbosity >= 2:
-            pass
-            #print >> f, "---------- name object dump ----------"
-            #for namex in range(num_names):
-            #    nobj = self.name_obj_list[namex]
-            #    nobj.dump(f, header="--- name[%d] ---" % namex)
-            #print >> f, "--------------------------------------"
-        #
-        # Build some dicts for access to the name objects
-        #
-        name_and_scope_map = {} # (name.lower(), scope): Name_object
-        name_map = {}           # name.lower() : list of Name_objects (sorted in scope order)
-        for namex in range(num_names):
-            nobj = self.name_obj_list[namex]
-            name_lcase = nobj.name.lower()
-            key = (name_lcase, nobj.scope)
-            if key in name_and_scope_map:
-                raise XLRDError(
-                    'Duplicate entry %r in name_and_scope_map' % (key, ))
-            name_and_scope_map[key] = nobj
-            if name_lcase in name_map:
-                name_map[name_lcase].append((nobj.scope, nobj))
-            else:
-                name_map[name_lcase] = [(nobj.scope, nobj)]
-        for key in name_map.keys():
-            alist = name_map[key]
-            alist.sort()
-            name_map[key] = [x[1] for x in alist]
-        self.name_and_scope_map = name_and_scope_map
-        self.name_map = name_map
-
-    def handle_obj(self, data):
-        # Not doing much handling at all.
-        # Worrying about embedded (BOF ... EOF) substreams is done elsewhere.
-        # DEBUG = 1
-        obj_type, obj_id = unpack('<HI', data[4:10])
-        # if DEBUG: print "---> handle_obj type=%d id=0x%08x" % (obj_type, obj_id)
-
-    def handle_supbook(self, data):
-        blah = DEBUG or self.verbosity >= 2
-        if 0:
-#            print "SUPBOOK:"
-            hex_char_dump(data, 0, len(data))
-        num_sheets = unpack("<H", data[0:2])[0]
-        sbn = self._supbook_count
-        self._supbook_count += 1
-        if data[2:4] == "\x01\x04":
-            self._supbook_locals_inx = self._supbook_count - 1
-#             if blah:
-#                 print "SUPBOOK[%d]: internal 3D refs; %d sheets" % (sbn, num_sheets)
-#                 print "    _all_sheets_map", self._all_sheets_map
-            return
-        if data[0:4] == "\x01\x00\x01\x3A":
-#             if blah: print "SUPBOOK[%d]: add-in functions" % sbn
-            return
-        url, pos = unpack_unicode_update_pos(data, 2, lenlen=2)
-        if num_sheets == 0:
-#             if blah: print "SUPBOOK[%d]: DDE/OLE document = %r" % (sbn, url)
-            return
-#         if blah: print "SUPBOOK[%d]: url = %r" % (sbn, url)
-        sheet_names = []
-        for x in range(num_sheets):
-            shname, pos = unpack_unicode_update_pos(data, pos, lenlen=2)
-            sheet_names.append(shname)
-#            if blah: print "    sheet %d: %r" % (x, shname)
-
-    def handle_sheethdr(self, data):
-        # This a BIFF 4W special.
-        # The SHEETHDR record is followed by a (BOF ... EOF) substream containing
-        # a worksheet.
-        # DEBUG = 0
-        sheet_len = unpack('<i', data[:4])[0]
-        sheet_name = unpack_string(data, 4, self.encoding, lenlen=1)
-        sheetno = self._sheethdr_count
-        assert sheet_name == self._sheet_names[sheetno]
-        self._sheethdr_count += 1
-        BOF_posn = self._position
-        posn = BOF_posn - 4 - len(data)
-        #if DEBUG: print >> self.logfile, 'SHEETHDR %d at posn %d: len=%d name=%r' % (sheetno, posn, sheet_len, sheet_name)
-        self.initialise_format_info()
-        sht = self.get_sheet(sheetno)
-        #if DEBUG: print >> self.logfile, 'SHEETHDR: posn after get_sheet() =', self._position
-        self.position(BOF_posn + sheet_len)
-        self._sheet_list.append(sht)
-
-    def handle_sheetsoffset(self, data):
-        # DEBUG = 0
-        posn = unpack('<i', data)[0]
-        #if DEBUG: print >> self.logfile, 'SHEETSOFFSET:', posn
-        self._sheetsoffset = posn
-
-    def handle_sst(self, data):
-        # DEBUG = 1
-        if DEBUG:
-            #print >> self.logfile, "SST Processing"
-            t0 = time.time()
-        nbt = len(data)
-        strlist = [data]
-        uniquestrings = unpack('<i', data[4:8])[0]
-        if DEBUG  or self.verbosity >= 2:
-            fprintf(self.logfile, "SST: unique strings: %d\n", uniquestrings)
-        while 1:
-            code, nb, data = self.get_record_parts_conditional(XL_CONTINUE)
-            if code is None:
-                break
-            nbt += nb
-            if DEBUG >= 2:
-                fprintf(self.logfile, "CONTINUE: adding %d bytes to SST -> %d\n", nb, nbt)
-            strlist.append(data)
-        self._sharedstrings = unpack_SST_table(strlist, uniquestrings)
-        if DEBUG:
-            t1 = time.time()
-            #print >> self.logfile, "SST processing took %.2f seconds" % (t1 - t0, )
-
-    def handle_writeaccess(self, data):
-        # DEBUG = 0
-        if self.biff_version < 80:
-            if not self.encoding:
-                self.raw_user_name = True
-                self.user_name = data
-                return
-            strg = unpack_string(data, 0, self.encoding, lenlen=1)
-        else:
-            strg = unpack_unicode(data, 0, lenlen=2)
-        #if DEBUG: print >> self.logfile, "WRITEACCESS: %d bytes; raw=%d %r" % (len(data), self.raw_user_name, strg)
-        strg = strg.rstrip()
-        self.user_name = strg
-
-    def parse_globals(self):
-        # DEBUG = 0
-        # self.position(self._own_bof) # no need to position, just start reading (after the BOF)
-        formatting.initialise_book(self)
-        while 1:
-            rc, length, data = self.get_record_parts()
-#            if DEBUG: print "parse_globals: record code is 0x%04x" % rc
-            if rc == XL_SST:
-                self.handle_sst(data)
-            elif rc == XL_FONT or rc == XL_FONT_B3B4:
-                self.handle_font(data)
-            elif rc == XL_FORMAT: # XL_FORMAT2 is BIFF <= 3.0, can't appear in globals
-                self.handle_format(data)
-            elif rc == XL_XF:
-                self.handle_xf(data)
-            elif rc ==  XL_BOUNDSHEET:
-                self.handle_boundsheet(data)
-            elif rc == XL_DATEMODE:
-                self.handle_datemode(data)
-            elif rc == XL_CODEPAGE:
-                self.handle_codepage(data)
-            elif rc == XL_COUNTRY:
-                self.handle_country(data)
-            elif rc == XL_EXTERNSHEET:
-                self.handle_externsheet(data)
-            elif rc == XL_FILEPASS:
-                self.handle_filepass(data)
-            elif rc == XL_WRITEACCESS:
-                self.handle_writeaccess(data)
-            elif rc == XL_SHEETSOFFSET:
-                self.handle_sheetsoffset(data)
-            elif rc == XL_SHEETHDR:
-                self.handle_sheethdr(data)
-            elif rc == XL_SUPBOOK:
-                self.handle_supbook(data)
-            elif rc == XL_NAME:
-                self.handle_name(data)
-            elif rc == XL_PALETTE:
-                self.handle_palette(data)
-            elif rc == XL_STYLE:
-                self.handle_style(data)
-            elif rc & 0xff == 9:
-                pass
-                #print >> self.logfile, "*** Unexpected BOF at posn %d: 0x%04x len=%d data=%r" \
-                #    % (self._position - length - 4, rc, length, data)
-            elif rc ==  XL_EOF:
-                self.xf_epilogue()
-                self.names_epilogue()
-                self.palette_epilogue()
-                if not self.encoding:
-                    self.derive_encoding()
-                if self.biff_version == 45:
-                    pass
-                    # DEBUG = 0
-#                    if DEBUG: print "global EOF: position", self._position
-                    # if DEBUG:
-                    #     pos = self._position - 4
-                    #     print repr(self.mem[pos:pos+40])
-                return
-            else:
-                # if DEBUG:
-                #     print "parse_globals: ignoring record code 0x%04x" % rc
-                pass
-
-    def position(self, pos):
-        self._position = pos
-
-    def read(self, pos, length):
-        data = self.mem[pos:pos+length]
-        self._position = pos + len(data)
-        return data
-
-    def getbof(self, rqd_stream):
-        # DEBUG = 1
-        # if DEBUG: print >> self.logfile, "getbof(): position", self._position
-        #if DEBUG: print >> self.logfile, "reqd: 0x%04x" % rqd_stream
-        savpos = self._position
-        opcode = self.get2bytes()
-        if opcode == MY_EOF:
-            raise XLRDError('Expected BOF record; met end of file')
-        if opcode not in bofcodes:
-            raise XLRDError('Expected BOF record; found 0x%04x' % opcode)
-        length = self.get2bytes()
-        if length == MY_EOF:
-            raise XLRDError('Incomplete BOF record[1]; met end of file')
-        if length < boflen[opcode] or length > 20:
-            raise XLRDError(
-                'Invalid length (%d) for BOF record type 0x%04x'
-                % (length, opcode))
-        data = self.read(self._position, length);
-        #if DEBUG: print >> self.logfile, "\ngetbof(): data=%r" % data
-        if len(data) < length:
-            raise XLRDError('Incomplete BOF record[2]; met end of file')
-        version1 = opcode >> 8
-        version2, streamtype = unpack('<HH', data[0:4])
-        #if DEBUG:
-        #    print >> self.logfile, "getbof(): op=0x%04x version2=0x%04x streamtype=0x%04x" \
-        #        % (opcode, version2, streamtype)
-        bof_offset = self._position - 4 - length
-        #if DEBUG:
-        #    print >> self.logfile, "getbof(): BOF found at offset %d; savpos=%d" \
-        #        % (bof_offset, savpos)
-        version = build = year = 0
-        if version1 == 0x08:
-            build, year = unpack('<HH', data[4:8])
-            if version2 == 0x0600:
-                version = 80
-            elif version2 == 0x0500:
-                if year < 1994 or build in (2412, 3218, 3321):
-                    version = 50
-                else:
-                    version = 70
-            else:
-                # dodgy one, created by a 3rd-party tool
-                version = {
-                    0x0000: 2,
-                    0x0007: 2,
-                    0x0200: 2,
-                    0x0300: 3,
-                    0x0400: 4,
-                    }.get(version2, 0) * 10
-        elif version1 in (0x04, 0x02, 0x00):
-            version = {0x04: 40, 0x02: 30, 0x00: 20}[version1]
-
-        if version == 40 and streamtype == XL_WORKBOOK_GLOBALS_4W:
-            version = 45 # i.e. 4W
-
-#         if DEBUG or self.verbosity >= 2:
-#             print >> self.logfile, \
-#                 "BOF: op=0x%04x vers=0x%04x stream=0x%04x buildid=%d buildyr=%d -> BIFF%d" \
-#                 % (opcode, version2, streamtype, build, year, version)
-        got_globals = streamtype == XL_WORKBOOK_GLOBALS or (
-            version == 45 and streamtype == XL_WORKBOOK_GLOBALS_4W)
-        if (rqd_stream == XL_WORKBOOK_GLOBALS and got_globals) or streamtype == rqd_stream:
-            return version
-        if version < 50 and streamtype == XL_WORKSHEET:
-            return version
-        if version >= 50 and streamtype == 0x0100:
-            raise XLRDError("Workspace file -- no spreadsheet data")
-        raise XLRDError(
-            'BOF not workbook/worksheet: op=0x%04x vers=0x%04x strm=0x%04x build=%d year=%d -> BIFF%d' \
-            % (opcode, version2, streamtype, build, year, version)
-            )
-
-# === helper functions
-
-def expand_cell_address(inrow, incol):
-    # Ref : OOo docs, "4.3.4 Cell Addresses in BIFF8"
-    outrow = inrow
-    if incol & 0x8000:
-        if outrow >= 32768:
-            outrow -= 65536
-        relrow = 1
-    else:
-        relrow = 0
-    outcol = incol & 0xFF
-    if incol & 0x4000:
-        if outcol >= 128:
-            outcol -= 256
-        relcol = 1
-    else:
-        relcol = 0
-    return outrow, outcol, relrow, relcol
-
-def colname(x, _A2Z="ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
-    assert 0 <= x <= 255
-    if x <= 25:
-        return _A2Z[x]
-    else:
-        quot, rem = divmod(x, 26)
-        return _A2Z[quot-1] + _A2Z[rem]
-
-def display_cell_address(rowx, colx, relrow, relcol):
-    if relrow:
-        rowpart = "(*%s%d)" % ("+-"[rowx < 0], abs(rowx))
-    else:
-        rowpart = "$%d" % (rowx+1,)
-    if relcol:
-        colpart = "(*%s%d)" % ("+-"[colx < 0], abs(colx))
-    else:
-        colpart = "$" + colname(colx)
-    return colpart + rowpart
-
-def unpack_SST_table(datatab, nstrings):
-    "Return list of strings"
-    datainx = 0
-    ndatas = len(datatab)
-    data = datatab[0]
-    datalen = len(data)
-    pos = 8
-    strings = []
-    strappend = strings.append
-    local_unpack = unpack
-    local_min = min
-    local_ord = ord
-    latin_1 = "latin_1"
-    for _unused_i in xrange(nstrings):
-        nchars = local_unpack('<H', data[pos:pos+2])[0]
-        pos += 2
-        options = local_ord(data[pos])
-        pos += 1
-        rtsz = 0
-        if options & 0x08: # richtext
-            rtsz = 4 * local_unpack('<H', data[pos:pos+2])[0]
-            pos += 2
-        if options & 0x04: # phonetic
-            rtsz += local_unpack('<i', data[pos:pos+4])[0]
-            pos += 4
-        accstrg = u''
-        charsgot = 0
-        while 1:
-            charsneed = nchars - charsgot
-            if options & 0x01:
-                # Uncompressed UTF-16
-                charsavail = local_min((datalen - pos) >> 1, charsneed)
-                rawstrg = data[pos:pos+2*charsavail]
-                # if DEBUG: print "SST U16: nchars=%d pos=%d rawstrg=%r" % (nchars, pos, rawstrg)
-                try:
-                    accstrg += unicode(rawstrg, "utf_16_le")
-                except:
-                    # print "SST U16: nchars=%d pos=%d rawstrg=%r" % (nchars, pos, rawstrg)
-                    # Probable cause: dodgy data e.g. unfinished surrogate pair.
-                    # E.g. file unicode2.xls in pyExcelerator's examples has cells containing
-                    # unichr(i) for i in range(0x100000)
-                    # so this will include 0xD800 etc
-                    raise
-                pos += 2*charsavail
-            else:
-                # Note: this is COMPRESSED (not ASCII!) encoding!!!
-                charsavail = local_min(datalen - pos, charsneed)
-                rawstrg = data[pos:pos+charsavail]
-                # if DEBUG: print "SST CMPRSD: nchars=%d pos=%d rawstrg=%r" % (nchars, pos, rawstrg)
-                accstrg += unicode(rawstrg, latin_1)
-                pos += charsavail
-            charsgot += charsavail
-            if charsgot == nchars:
-                break
-            datainx += 1
-            data = datatab[datainx]
-            datalen = len(data)
-            options = local_ord(data[0])
-            pos = 1
-        pos += rtsz # size of richtext & phonetic stuff to skip
-        # also allow for the rich text etc being split ...
-        if pos >= datalen:
-            # adjust to correct position in next record
-            pos = pos - datalen
-            datainx += 1
-            if datainx < ndatas:
-                data = datatab[datainx]
-                datalen = len(data)
-            else:
-                assert _unused_i == nstrings - 1
-        strappend(accstrg)
-    return strings

@@ -518,7 +518,7 @@ class NoteworthyTranslator(object):
         
         
         >>> measureIn = stream.Measure()
-        >>> measureIn.append(note.HalfNote("C#4"))
+        >>> measureIn.append(note.Note("C#4", type='half'))
         
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = measureIn

@@ -22,6 +22,8 @@ import time
 import hashlib
 import random
 import inspect
+import weakref
+
 
 from music21 import exceptions21
 from music21.ext import six
@@ -35,33 +37,33 @@ except:
 
 # define file extensions for various formats
 # keys are assumed to be formats
-fileExtensions = {
-    'abc' : {'input': ['abc'], 'output': 'abc'},
-    'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
-    'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
-    'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
-    'musicxml.png' : {'input': ['png'], 'output': 'png'},
-    'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
-    'tinynotation' : {'input': ['tntxt', 'tinynotation'], 'output': 'tntxt'},
-     # note: this is setting .zip as default mapping to musedata
-    'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
-    'noteworthy': {'input': ['nwc'], 'output': 'nwc'},
-    'noteworthytext': {'input': ['nwctxt'], 'output': 'nwctxt'},
-    'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
-    'finale' : {'input': ['mus'], 'output': 'mus'},
-    'humdrum' : {'input': ['krn'], 'output': 'krn'},
-    'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
-    'png'  : {'input': ['png', 'lily.png', 'lilypond.png'], 'output': 'png'},
-    'pdf'  : {'input': ['pdf', 'lily.pdf', 'lilypond.pdf'], 'output': 'pdf'},
-    'svg'  : {'input': ['svg', 'lily.svg', 'lilypond.svg'], 'output': 'svg'},
-    'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
-    'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
-    'scala' : {'input': ['scl'], 'output': 'scl'},
-    'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
-    'vexflow' : {'input' : ['vexflowDoesNotWork'], 'output': 'html'},
-    'capella' : {'input': ['capx'], 'output': 'capx'},
-    'ipython' : {'input': ['ipython.png'], 'output': 'png'},
-}
+# fileExtensions = {
+#     'abc' : {'input': ['abc'], 'output': 'abc'},
+#     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
+#     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
+#     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
+#     'musicxml.png' : {'input': ['png'], 'output': 'png'},
+#     'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
+#     'tinynotation' : {'input': ['tntxt', 'tinynotation'], 'output': 'tntxt'},
+#      # note: this is setting .zip as default mapping to musedata
+#     'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
+#     'noteworthy': {'input': ['nwc'], 'output': 'nwc'},
+#     'noteworthytext': {'input': ['nwctxt'], 'output': 'nwctxt'},
+#     'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
+#     'finale' : {'input': ['mus'], 'output': 'mus'},
+#     'humdrum' : {'input': ['krn'], 'output': 'krn'},
+#     'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
+#     'png'  : {'input': ['png', 'lily.png', 'lilypond.png'], 'output': 'png'},
+#     'pdf'  : {'input': ['pdf', 'lily.pdf', 'lilypond.pdf'], 'output': 'pdf'},
+#     'svg'  : {'input': ['svg', 'lily.svg', 'lilypond.svg'], 'output': 'svg'},
+#     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
+#     'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
+#     'scala' : {'input': ['scl'], 'output': 'scl'},
+#     'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
+#     'vexflow' : {'input' : ['vexflowDoesNotWork'], 'output': 'html'},
+#     'capella' : {'input': ['capx'], 'output': 'capx'},
+#     'ipython' : {'input': ['ipython.png'], 'output': 'png'},
+# }
 
 
 
@@ -114,13 +116,81 @@ def getMissingImportStr(modNameList):
         return 'Certain music21 functions might need these optional packages: %s; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html' % ', '.join(modNameList)
 
 #-------------------------------------------------------------------------------
+_subconverterCachedList = []
+
+def subConverterList():
+    '''
+    returns a list of subconverter classes available to music21
+    in converter/subConverters, including the stub SubConverter class
+    
+    >>> for sc in common.subConverterList():
+    ...    sc
+    <class 'music21.converter.subConverters.ConverterABC'>
+    <class 'music21.converter.subConverters.ConverterBraille'>
+    <class 'music21.converter.subConverters.ConverterCapella'>
+    <class 'music21.converter.subConverters.ConverterHumdrum'>
+    <class 'music21.converter.subConverters.ConverterIPython'>
+    <class 'music21.converter.subConverters.ConverterLilypond'>
+    <class 'music21.converter.subConverters.ConverterMidi'>
+    <class 'music21.converter.subConverters.ConverterMuseData'>
+    <class 'music21.converter.subConverters.ConverterMusicXML'>
+    <class 'music21.converter.subConverters.ConverterNoteworthy'>
+    <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>
+    <class 'music21.converter.subConverters.ConverterRomanText'>
+    <class 'music21.converter.subConverters.ConverterScala'>
+    <class 'music21.converter.subConverters.ConverterText'>
+    <class 'music21.converter.subConverters.ConverterTextLine'>
+    <class 'music21.converter.subConverters.ConverterTinyNotation'>
+    <class 'music21.converter.subConverters.ConverterVexflow'>
+    <class 'music21.converter.subConverters.SubConverter'>    '''
+    from music21.converter import subConverters
+    import types
+    if len(_subconverterCachedList) > 0:
+        return _subconverterCachedList
+    for i in sorted(list(subConverters.__dict__)):
+        name = getattr(subConverters, i)
+        if callable(name) and not isinstance(name, types.FunctionType):
+            if hasattr(name, 'registerFormats'):     
+                _subconverterCachedList.append(name)
+    return _subconverterCachedList
+
+def findSubConverterForFormat(fmt):
+    '''
+    return a converter.subConverter.SubConverter subclass
+    for a given format -- this is a music21 format name,
+    not a file extension. Or returns None
+    
+    >>> common.findSubConverterForFormat('musicxml')
+    <class 'music21.converter.subConverters.ConverterMusicXML'>
+    
+    >>> common.findSubConverterForFormat('text')
+    <class 'music21.converter.subConverters.ConverterText'>
+
+    Some subconverters have format aliases
+
+    >>> common.findSubConverterForFormat('t')
+    <class 'music21.converter.subConverters.ConverterText'>
+    
+    '''
+    fmt = fmt.lower().strip()
+    for sc in subConverterList():
+        formats = sc.registerFormats
+        if fmt in formats:
+            return sc
+
 def findFormat(fmt):
     '''
-    Given a format defined either by a format name or
-    an extension, return the format name as well as the output exensions.
+    Given a format defined either by a format name, abbreviation, or
+    an extension, return the regularized format name as well as 
+    the output exensions.
+    
+    DEPRECATED May 2014 -- moving to converter
+
+    
+    All but the first element of the tuple are deprecated for use, since
+    the extension can vary by subconverter (e.g., lily.png)
 
     Note that .mxl and .mx are only considered MusicXML input formats.
-
 
     >>> common.findFormat('mx')
     ('musicxml', '.xml')
@@ -128,12 +198,10 @@ def findFormat(fmt):
     ('musicxml', '.xml')
     >>> common.findFormat('musicxml')
     ('musicxml', '.xml')
-    >>> common.findFormat('jpeg')
-    ('jpeg', '.jpg')
     >>> common.findFormat('lily')
     ('lilypond', '.ly')
-    >>> common.findFormat('jpeg')
-    ('jpeg', '.jpg')
+    >>> common.findFormat('lily.png')
+    ('lilypond', '.ly')
     >>> common.findFormat('humdrum')
     ('humdrum', '.krn')
     >>> common.findFormat('txt')
@@ -152,14 +220,20 @@ def findFormat(fmt):
     ('vexflow', '.html')
     >>> common.findFormat('capx')
     ('capella', '.capx')
-    >>> common.findFormat('png')
-    ('musicxml.png', '.png')
-    >>> common.findFormat('ipython')
-    ('ipython', '.png')
-    >>> common.findFormat('ipython.png')
-    ('ipython', '.png')
-    >>> common.findFormat('musicxml.png')
-    ('musicxml.png', '.png')
+
+    >>> common.findFormat('mx')
+    ('musicxml', '.xml')
+
+    
+    #>>> common.findFormat('png')
+    #('musicxml.png', '.png')
+    
+    #>>> common.findFormat('ipython')
+    #('ipython', '.png')
+    #     >>> common.findFormat('ipython.png')
+    #     ('ipython', '.png')
+    #     >>> common.findFormat('musicxml.png')
+    #     ('musicxml.png', '.png')
 
 
     Works the same whether you have a leading dot or not:
@@ -177,45 +251,99 @@ def findFormat(fmt):
     (None, None)
 
     '''
-    # make lower case, as some lilypond processing used upper case
-    fmt = fmt.lower().strip()
-    for key in sorted(list(fileExtensions)):
-        if fmt.startswith('.'):
-            fmt = fmt[1:] # strip .
-        if fmt == key or fmt in fileExtensions[key]['input']:
-            # add leading dot to extension on output
-            return key, '.' + fileExtensions[key]['output']
-    return None, None # if no match found
+    from music21 import converter
+    c = converter.Converter()
+    fileformat = c.regularizeFormat(fmt)
+    if fileformat is None:
+        return (None, None)
+    scf = c.getSubConverterFormats()
+    sc = scf[fileformat]
+
+        
+    if len(sc.registerOutputExtensions) > 0:
+        firstOutput = '.' + sc.registerOutputExtensions[0]
+    elif len(sc.registerInputExtensions) > 0:
+        firstOutput = '.' + sc.registerInputExtensions[0]
+    else:
+        firstOutput = None
+            
+    return fileformat, firstOutput
+    
+#     for key in sorted(list(fileExtensions)):
+#         if fmt.startswith('.'):
+#             fmt = fmt[1:] # strip .
+#         if fmt == key or fmt in fileExtensions[key]['input']:
+#             # add leading dot to extension on output
+#             return key, '.' + fileExtensions[key]['output']
+#     return None, None # if no match found
 
 
 def findInputExtension(fmt):
-    '''Given an input format, find and return all possible input extensions.
-
+    '''
+    DEPRECATED May 2014 -- moving to converter
+    
+    Given an input format or music21 format, find and return all possible 
+    input extensions.
 
     >>> a = common.findInputExtension('musicxml')
     >>> a
-    ['.xml', '.mxl', '.mx']
-    >>> a = common.findInputExtension('mx')
-    >>> a
-    ['.xml', '.mxl', '.mx']
+    ('.xml', '.mxl', '.mx', '.musicxml')
     >>> a = common.findInputExtension('humdrum')
     >>> a
-    ['.krn']
+    ('.krn',)
     >>> common.findInputExtension('musedata')
-    ['.md', '.musedata', '.zip']
+    ('.md', '.musedata', '.zip')
+    
+    mx is not a music21 format but it is a file format
+    
+    >>> common.findInputExtension('mx')
+    ('.xml', '.mxl', '.mx', '.musicxml')
+    
+    Leading dots don't matter...
+    
+    >>> common.findInputExtension('.mx')
+    ('.xml', '.mxl', '.mx', '.musicxml')
+
+
+    blah is neither
+    
+    >>> common.findInputExtension('blah') is None
+    True
+    
+    
     '''
-    fmt = findFormat(fmt)[0]
-    if fmt == None:
-        raise Exception('no match to format: %s' % fmt)
-    post = []
-    for ext in fileExtensions[fmt]['input']:
-        if not ext.startswith('.'):
-            ext = '.'+ext # must have a leading dot
-        post.append(ext)
-    return post
+    fmt = fmt.lower().strip()    
+    if fmt.startswith('.'):
+        fmt = fmt[1:] # strip .
+
+    sc = findSubConverterForFormat(fmt)
+    if sc is None:
+        # file extension
+        post = []
+        for sc in subConverterList():
+            if fmt not in sc.registerInputExtensions:
+                continue
+            for ext in sc.registerInputExtensions:
+                if not ext.startswith('.'):
+                    ext = '.' + ext
+                post.append(ext)
+            if len(post) > 0:
+                return tuple(post)
+        return None
+    else:
+        # music21 format
+        post = []
+        for ext in sc.registerInputExtensions:
+            if not ext.startswith('.'):
+                ext = '.' + ext
+            post.append(ext)
+        return tuple(post)
 
 def findFormatFile(fp):
-    '''Given a file path (relative or absolute) return the format
+    '''
+    Given a file path (relative or absolute) return the format
+    
+    DEPRECATED May 2014 -- moving to converter
 
 
     >>> common.findFormatFile('test.xml')
@@ -224,10 +352,6 @@ def findFormatFile(fp):
     'musicxml'
     >>> common.findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
     'musicxml'
-
-    Windows drive + pickle
-    >>> common.findFormatFile('d:/long/file/path/test.p')
-    'pickle'
 
     On a windows networked filesystem
     >>> common.findFormatFile('\\\\long\\file\\path\\test.krn')
@@ -240,6 +364,7 @@ def findFormatFile(fp):
 def findFormatExtFile(fp):
     '''Given a file path (relative or absolute) find format and extension used (not the output extension)
 
+    DEPRECATED May 2014 -- moving to converter
 
     >>> common.findFormatExtFile('test.mx')
     ('musicxml', '.mx')
@@ -248,15 +373,12 @@ def findFormatExtFile(fp):
     >>> common.findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')
     ('musicxml', '.xml')
 
-    >>> common.findFormatExtFile('test.mus')
-    ('finale', '.mus')
-
     >>> common.findFormatExtFile('test')
     (None, None)
 
-    Windows drive + pickle
-    >>> common.findFormatExtFile('d:/long/file/path/test.p')
-    ('pickle', '.p')
+    Windows drive
+    >>> common.findFormatExtFile('d:/long/file/path/test.xml')
+    ('musicxml', '.xml')
 
     On a windows networked filesystem
     >>> common.findFormatExtFile('\\\\long\\file\\path\\test.krn')
@@ -271,6 +393,8 @@ def findFormatExtFile(fp):
 
 def findFormatExtURL(url):
     '''Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
+
+    DEPRECATED May 2014 -- moving to converter
 
 
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
@@ -297,8 +421,9 @@ def findFormatExtURL(url):
     elif 'format=stage2' in url or 'format=stage1' in url:
         ext = '.md'
     else: # check for file that ends in all known input extensions
-        for key in fileExtensions:
-            for extSample in fileExtensions[key]['input']:
+        for sc in subConverterList():
+            inputTypes = sc.registerInputExtensions            
+            for extSample in inputTypes:
                 if url.endswith('.' + extSample):
                     ext = '.' + extSample
                     break
@@ -358,6 +483,35 @@ def cleanupFloat(floatNum, maxDenominator=1000):
         floatNum).limit_denominator(maxDenominator)
     return float(f)
 
+#------------------------------------------------------------------------------
+# Number methods...
+
+
+def mixedNumeral(expr, limitDenominator=100):
+    '''
+    Returns a string representing a mixedNumeral form of a number
+    
+    >>> common.mixedNumeral(1.333333)
+    '1 1/3'
+    >>> common.mixedNumeral(0.333333)
+    '1/3'
+    
+    >>> common.mixedNumeral(2.0001)
+    '2'
+    >>> common.mixedNumeral(2.0001, limitDenominator=10000)
+    '2 1/10000'
+    '''
+    quotient, remainder = divmod(float(expr), 1.)
+    remainderFrac = fractions.Fraction(remainder).limit_denominator(limitDenominator)
+    if quotient:
+        if remainderFrac:
+            return '{} {}'.format(int(quotient), remainderFrac)
+        else:
+            return str(int(quotient))
+    else:
+        if remainderFrac != 0:
+            return str(remainderFrac)
+    return str(0)
 
 def roundToHalfInteger(num):
     '''Given a floating-point number, round to the nearest half-integer.
@@ -1319,24 +1473,19 @@ def ordinalAbbreviation(value, plural=False):
     'ths'
 
     '''
-    valueStr = str(value)
-    if value in [1]:
-        post = 'st'
-    elif value in [0, 4, 5, 6, 7, 8, 9, 11, 12, 13]:
+    valueHundreths = value % 100
+    if valueHundreths in [11, 12, 13]:
         post = 'th'
-    elif value in [2]:
-        post = 'nd'
-    elif value in [3]:
-        post = 'rd'
-    # test strings if not matched here
-    elif valueStr[-1] in ['1']:
-        post = 'st'
-    elif valueStr[-1] in ['2']:
-        post = 'nd'
-    elif valueStr[-1] in ['3']:
-        post = 'rd'
-    elif valueStr[-1] in ['0', '4', '5', '6', '7', '8', '9']:
-        post = 'th'
+    else:
+        valueMod = value % 10;        
+        if valueMod == 1:
+            post = 'st'
+        elif valueMod in [0, 4, 5, 6, 7, 8, 9]:
+            post = 'th'
+        elif valueMod == 2:
+            post = 'nd'
+        elif valueMod == 3:
+            post = 'rd'
 
     if post != 'st' and plural:
         post += 's'
@@ -1530,7 +1679,7 @@ def getSourceFilePath():
     import music21
     fpMusic21 = music21.__path__[0] # list, get first item
     # use corpus as a test case
-    if 'corpus' not in os.listdir(fpMusic21):
+    if 'stream' not in os.listdir(fpMusic21):
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
     return fpMusic21
 
@@ -1690,106 +1839,28 @@ def getPackageData():
 
     return match
 
+#-----------------------------
+# match collections, defaultdict()
 
-#-------------------------------------------------------------------------------
-
-
-'''The following are a set of objects with more relaxed behaviors for quicker writing.
-
-Most of these objects behave more like perl; for Python converts.
-
-A set of quick and dirty objects to make coding a bit easier for people who have
-been coding in perl for years.  Prevents things like KeyErrors, etc.  Tradeoff
-is that typos of keys etc. are harder to detect (and some run speed tradeoff I'm sure).
-Advantage is coding time and fewer type errors while coding.
-'''
-
-class DefaultHash(dict):
-    '''A replacement for dictionaries that behave a bit more like perl hashes.
-    No more KeyErrors. The difference between DefaultHash and defaultdict is that the
-    Dict values come first in the definition and that default can be set to
-    None (which it is) or to any object.
-
-    If you want a factory that makes hashes with a particular different default, use:
-
-        falsehash = lambda h = None: common.DefaultHash(h, default = False)
-        a = falsehash({"A": falsehash(), "B": falsehash()})
-        print(a["A"]["hi"]) # returns False
-
-    there's probably a way to use this to create a data structure
-    of arbitrary dimensionality, though it escapes this author.
-
-    if callDefault is True then the default is called:
-
-        common.DefaultHash(default = list, callDefault = True)
-
-    will create a new List for each element
+class defaultlist(list):
     '''
-    def __init__(self, dictIn = None, default=None, callDefault=False):
-        if dictIn:
-            dict.__init__(self, dictIn)
-        else:
-            dict.__init__(self)
-        self.default = default
-        self.callDefault = callDefault
-
-    def __getitem__(self, key):
-        # NOTE: this is perforamnce critical method and should be as fast as
-        # possible
-        try:
-            return dict.__getitem__(self, key)
-        except KeyError:
-            if not self.callDefault:
-                return self.default
-            else:
-                dict.__setitem__(self, key, self.default())
-                return dict.__getitem__(self, key)
-
-    def __len__(self):
-        return dict.__len__(self)
-
-    def get(self, key, *args):
-        if not args:
-            if self.callDefault is False:
-                args = (self.default,)
-            else:
-                args = (self.default(),)
-        return dict.get(self, key, *args)
-
-
-class defList(list):
-    '''A replacement for lists that behave a bit more like perl arrays. No more ListErrors.
-        '''
-
-    def __init__(self, value = None, default = None, callDefault = False):
-        if value:
-            list.__init__(self, value)
-        else:
-            list.__init__(self)
-        self.default = default
-        self.callDefault = callDefault
-
-    def __getitem__(self, item):
-        try:
-            return list.__getitem__(self, item)
-        except IndexError:
-            if self.callDefault is False:
-                return self.default
-            else:
-                list.__setitem__(self, item, self.default())
-                return list.__getitem__(self, item)
-
-    def __setitem__(self, item, value):
-        try:
-            return list.__setitem__(self, item, value)
-        except IndexError:
-            lnow = len(self)
-            for i in range(lnow, item):
-                if self.callDefault is False:
-                    self.append(self.default)
-                else:
-                    self.append(self.default())
-            self.append(value)
+    Call a function for every time something is missing:
+    
+    >>> a = common.defaultlist(lambda:True)
+    >>> a[5]
+    True    
+    '''
+    def __init__(self, fx):
+        self._fx = fx
+    def _fill(self, index):
+        while len(self) <= index:
+            self.append(self._fx())
+    def __setitem__(self, index, value):
+        self._fill(index)
+        list.__setitem__(self, index, value)
+    def __getitem__(self, index):
+        self._fill(index)
+        return list.__getitem__(self, index)
 
 
 #-----------------------------
@@ -1806,13 +1877,11 @@ def pitchList(pitchList):
 def wrapWeakref(referent):
     '''
     utility function that wraps objects as weakrefs but does not wrap
-    already wrapped objects
+    already wrapped objects; also prevents wrapping the unwrapable "None" type, etc.
     '''
-    import weakref
     #if type(referent) is weakref.ref:
 #     if isinstance(referent, weakref.ref):
 #         return referent
-
     try:
         return weakref.ref(referent)
     # if referent is None, will raise a TypeError
@@ -1843,7 +1912,6 @@ def unwrapWeakref(referent):
     >>> common.unwrapWeakref(a2.strong) is common.unwrapWeakref(a2.weak)
     True
     '''
-    import weakref
     if type(referent) is weakref.ref:
         return referent()
     else:
@@ -1865,7 +1933,6 @@ def isWeakref(referent):
     >>> common.isWeakref(common.wrapWeakref(a1))
     True
     '''
-    import weakref
     if type(referent) is weakref.ref:
         return True
     return False
@@ -2019,6 +2086,30 @@ class SingletonCounter(object):
         _singletonCounter['value'] += 1
         return post
 
+#-------------------------------------------------------------------------------
+class SlottedObject(object):
+    r'''
+    Provides template for classes implementing slots.
+    '''
+    
+    ### CLASS VARIABLES ###
+
+    __slots__ = ()
+
+    ### SPECIAL METHODS ###
+
+    def __getstate__(self):
+        state = {}
+        slots = set()
+        for cls in self.__class__.mro():
+            slots.update(getattr(cls, '__slots__', ()))
+        for slot in slots:
+            state[slot] = getattr(self, slot, None)
+        return state
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
 
 
 #-------------------------------------------------------------------------------

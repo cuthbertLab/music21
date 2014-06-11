@@ -1,11 +1,10 @@
+.. _usersGuide_98_inversionDemo:
 .. code:: python
 
     from music21 import *
 
 .. code:: python
 
-    # ignore this
-    %load_ext music21.ipython21.ipExtension
 
 .. code:: python
 
@@ -43,7 +42,7 @@
     chord1.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_02.png
+.. image:: usersGuide_98_inversionDemo_files/_fig_03.png
 
 
 .. code:: python
@@ -55,7 +54,7 @@
     chord1.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_04.png
+.. image:: usersGuide_98_inversionDemo_files/_fig_05.png
 
 
 .. code:: python
@@ -115,7 +114,7 @@
     s.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_08.png
+.. image:: usersGuide_98_inversionDemo_files/_fig_09.png
 
 
 .. code:: python
@@ -134,7 +133,7 @@
     s.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_10.png
+.. image:: usersGuide_98_inversionDemo_files/_fig_11.png
 
 
 .. code:: python
@@ -153,7 +152,7 @@
     s.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_12.png
+.. image:: usersGuide_98_inversionDemo_files/_fig_13.png
 
 
 .. code:: python
@@ -183,10 +182,12 @@
     s.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_15.png
+.. image:: usersGuide_98_inversionDemo_files/_fig_16.png
 
 
-In[ ]:
+.. code:: python
+
+    
 
 .. code:: python
 

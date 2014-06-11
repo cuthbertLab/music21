@@ -45,8 +45,8 @@ def pitchedPhase(cycles=None, show=False):
 
     '''
 
-    sSrc = converter.parse("""E16 F# B c# d F# E c# B F# d c# 
-                              E16 F# B c# d F# E c# B F# d c#""", '12/16')
+    sSrc = converter.parse("""tinynotation: 12/16 E16 F# B c# d F# E c# B F# d c# 
+                              E16 F# B c# d F# E c# B F# d c#""")
     sPost = stream.Score()
     sPost.title = 'phasing experiment'
     sPost.insert(0, stream.Part())
@@ -83,7 +83,7 @@ def partPari(show = True):
     s = stream.Score()
     cminor = key.Key('c')
     #real Paert
-    main = converter.parse("E-1 C D E- F G F E- D C D E- G A- F G E- F G F E- D F G c B- c G A- B- c B- A- B- G c e- d c d c B- A- G F E- F G c E- F G E- D E- F E- D C E- G F E- C F E- D C E- D C D C~ C", '4/4')
+    main = converter.parse("tinynotation: 4/4 E-1 C D E- F G F E- D C D E- G A- F G E- F G F E- D F G c B- c G A- B- c B- A- B- G c e- d c d c B- A- G F E- F G c E- F G E- D E- F E- D C E- G F E- C F E- D C E- D C D C~ C")
     
     # fake Paert
     #main = converter.parse("E-1 F G A- G F c d e- G A- F E- D d e- c B- A- c d A- G F G F A- B- A- c d A- B- c B- A- G F G F E-~ E-", '4/4')

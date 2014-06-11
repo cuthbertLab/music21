@@ -94,12 +94,14 @@ class TinyNotationStream(stream.Stream):
     '''
     A TinyNotationStream takes in a string representation 
     similar to Lilypond format
-    but simplified somewhat and an optional time signature 
-    string (or TimeSignature object).
+    but simplified somewhat. 
+    
+    Can also take in an optional time signature 
+    string (or TimeSignature object) as a second argument, but this is
+    mostly for historical reasons.
     
     
     Example in 3/4:
-    
     
     >>> stream1 = tinyNotation.TinyNotationStream("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
     >>> stream1.show('text')
@@ -282,7 +284,7 @@ class TinyNotationStream(stream.Stream):
         :class:`~music21.tinyNotation.TinyNotationNote` object
         '''
         if storedDict is None:
-            storedDict = common.DefaultHash()
+            storedDict = {}
         return TinyNotationNote(stringRep, storedDict)
 
 
@@ -461,14 +463,16 @@ class TinyNotationNote(object):
         if (self.TYPE.search(stringRep)):
             typeNum = self.TYPE.search(stringRep).group(1)
             if (typeNum == "0"): ## special case = full measure + fermata
-                noteObj.duration = storedDict['barDuration']
+                if 'barDuration' in storedDict:
+                    noteObj.duration = storedDict['barDuration']
                 newFerm = expressions.Fermata()
                 noteObj.expressions.append(newFerm)
             else:
                 noteObj.duration.type = duration.typeFromNumDict[int(typeNum)]
         else:
-            noteObj.duration = copy.deepcopy(storedDict['lastDuration'])
-            usedLastDuration = True
+            if 'lastDuration' in storedDict:
+                noteObj.duration = copy.deepcopy(storedDict['lastDuration'])
+                usedLastDuration = True
             if (noteObj.duration.tuplets):
                 noteObj.duration.tuplets[0].type = ""
                 # if it continues a tuplet it cannot be start; maybe end

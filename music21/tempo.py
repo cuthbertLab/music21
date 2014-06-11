@@ -51,7 +51,7 @@ defaultTempoValues = {
      'moderate': 92,
      'allegretto': 108,
      'animato': 120,
-     'allegro moderator': 128, # need number
+     'allegro moderato': 128, # need number
      'allegro': 132,
      'fast': 132,
      'schnell': 132,
@@ -304,7 +304,7 @@ class MetronomeMark(TempoIndication):
     
     
     
-    >>> a = tempo.MetronomeMark("slow", 40, note.HalfNote())
+    >>> a = tempo.MetronomeMark("slow", 40, note.Note(type='half'))
     >>> a.number
     40
     >>> a.referent
@@ -1088,8 +1088,8 @@ def interpolateElements(element1, element2, sourceStream,
     
     >>> sourceStream = stream.Stream()
     >>> destinationStream = stream.Stream()
-    >>> element1 = note.QuarterNote("C4")
-    >>> element2 = note.QuarterNote("G4")
+    >>> element1 = note.Note('C4', type='quarter')
+    >>> element2 = note.Note('G4', type='quarter')
     >>> sourceStream.insert(10, element1)
     >>> destinationStream.insert(20.5, element1)
     >>> sourceStream.insert(14, element2)
@@ -1101,9 +1101,9 @@ def interpolateElements(element1, element2, sourceStream,
     and destinationStream, as in:
     
     
-    >>> eA = note.QuarterNote("D4")
-    >>> eB = note.QuarterNote("E4")
-    >>> eC = note.QuarterNote("F4")
+    >>> eA = note.Note('D4', type='quarter')
+    >>> eB = note.Note('E4', type='quarter')
+    >>> eC = note.Note('F4', type='quarter')
     >>> sourceStream.insert(11, eA)
     >>> sourceStream.insert(12, eB)
     >>> sourceStream.insert(13, eC)
@@ -1221,7 +1221,7 @@ class Test(unittest.TestCase):
 
 
     def testSetup(self):
-        MM1 = MetronomeMark(number=60, referent=note.QuarterNote())
+        MM1 = MetronomeMark(number=60, referent=note.Note(type='quarter'))
         self.assertEqual(MM1.number, 60)
 
         TM1 = TempoText("Lebhaft")

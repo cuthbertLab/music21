@@ -131,18 +131,54 @@ class Dynamic(base.Music21Object):
     loudest (see dynamicStrFromDecimal() above)
     
     
-    >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
-    >>> pp2.value
+    >>> ppp = dynamics.Dynamic(0.15) # on 0 to 1 scale
+    >>> ppp.value
     'ppp'
-    >>> print('%.2f' % pp2.volumeScalar)
+    >>> print('%.2f' % ppp.volumeScalar)
     0.15
+    
+    
+    Note that we got lucky last time because the dynamic 0.15 exactly corresponds
+    to what we've considered the default for 'ppp'.  Here we assign 0.98 which
+    is close to the 0.9 that is the default for 'fff' -- but the 0.98 will
+    be retained in the .volumeScalar
+    
+    >>> loud = dynamics.Dynamic(0.98) # on 0 to 1 scale
+    >>> loud.value
+    'fff'
+    >>> print('%.2f' % loud.volumeScalar)
+    0.98
+    
+    Transferring the .value ('fff') to a new Dynamic object will set the volumeScalar
+    back to 0.9
+    
+    >>> loud2 = dynamics.Dynamic(loud.value)
+    >>> loud2.value
+    'fff'
+    >>> print('%.2f' % loud2.volumeScalar)
+    0.90
+    
+    
+    Custom dynamics are possible:
+    
+    >>> myDyn = dynamics.Dynamic('rfzsfmp')
+    >>> myDyn.value
+    'rfzsfmp'
+    >>> print(myDyn.volumeScalar)
+    None
+    >>> myDyn.volumeScalar = 0.87
+    >>> myDyn.volumeScalar
+    0.87
+    
+    
+    
     
     Dynamics can be placed anywhere in a stream.
     
     
     >>> s = stream.Stream()
-    >>> s.insert(0, note.HalfNote('E-4'))
-    >>> s.insert(2, note.HalfNote('F#5'))
+    >>> s.insert(0, note.Note('E-4', type='half'))
+    >>> s.insert(2, note.Note('F#5', type='half'))
     >>> s.insert(0, dynamics.Dynamic('pp'))
     >>> s.insert(1, dynamics.Dynamic('mf'))
     >>> s.insert(3, dynamics.Dynamic('fff'))
@@ -180,16 +216,18 @@ class Dynamic(base.Music21Object):
     def __init__(self, value=None):
         base.Music21Object.__init__(self)
 
-        if not common.isStr(value):
-            # assume it is a number, try to convert
-            self.value = dynamicStrFromDecimal(value)
-        else:
-            self.value = value # will use property
-
         # the scalar is used to calculate the final output of a note
         # under this dynamic. if this property is set, it will override 
         # use of a default. 
         self._volumeScalar = None
+
+
+        if not common.isStr(value):
+            # assume it is a number, try to convert
+            self._volumeScalar = value
+            self.value = dynamicStrFromDecimal(value)
+        else:
+            self.value = value # will use property
 
         # for position, as musicxml, all units are in tenths of interline space
         # position is needed as default positions are often incorrect
@@ -235,7 +273,7 @@ class Dynamic(base.Music21Object):
 
     def _setVolumeScalar(self, value):
         # we can manually set this to be anything, overriding defaults
-        if common.isNum(value) and 0 >= value <= 1:
+        if common.isNum(value) and 0 <= value <= 1:
             self._volumeScalar = value
         else:
             raise DynamicException('cannot set as volume scalar to: %s', value)
@@ -250,6 +288,13 @@ class Dynamic(base.Music21Object):
         >>> d.volumeScalar
         0.55...
 
+        >>> d.volumeScalar = 0.1
+        >>> d.volumeScalar
+        0.1
+        >>> d.value
+        'mf'
+        
+
         int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag 
 
         >>> print(musicxml.m21ToString.fromMusic21Object(d))
@@ -261,7 +306,7 @@ class Dynamic(base.Music21Object):
               </dynamics>
             </direction-type>
             <offset>0</offset>
-            <sound dynamics="69"/>
+            <sound dynamics="12"/>
         </direction>...
         ''')
 

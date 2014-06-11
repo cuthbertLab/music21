@@ -42,6 +42,11 @@ from music21 import key
 from music21 import note
 from music21 import chord
 
+try:
+    import enum # @UnresolvedImport
+except ImportError:
+    from music21.ext import enum # enum34 backport
+
 #from music21 import harmony can't do this either
 #from music21 import roman Can't import roman because of circular
 #    importing issue with counterpoint.py and figuredbass
@@ -50,6 +55,14 @@ from music21 import chord
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
 intervalCache = []
+
+class MotionType(str, enum.Enum):
+    parallel = 'Parallel'
+    contrary = 'Contrary'
+    oblique = 'Oblique'
+    antiParallel = 'Anti-Parallel'
+    similar = 'Similar'
+    noMotion = 'No Motion'
 
 #-------------------------------------------------------------------------------
 class VoiceLeadingQuartet(base.Music21Object):
@@ -131,21 +144,29 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.key.Key of G major>
         ''')
 
+    def _setVoiceNote(self, value, which):
+        if value is None:
+            setattr(self, which, None)
+        elif common.isStr(value):
+            setattr(self, which, note.Note(value)) 
+        else:
+            try:
+                if 'Note' in value.classes:
+                    setattr(self, which, value)
+                elif 'Pitch' in value.classes:
+                    n = note.Note()
+                    n.duration.quarterLength = 0.0
+                    n.pitch = value
+                    setattr(self, which, n)
+            except:
+                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+
     def _getv1n1(self):
         return self._v1n1
 
     def _setv1n1(self, value):
-        if value is None:
-            self._v1n1 = None
-        elif common.isStr(value):
-            self._v1n1 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._v1n1 = value
-            except:
-                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
-
+        self._setVoiceNote(value, '_v1n1')
+        
     v1n1 = property(_getv1n1, _setv1n1, doc='''
         set note1 for voice 1
 
@@ -158,16 +179,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         return self._v1n2
 
     def _setv1n2(self, value):
-        if value is None:
-            self._v1n2 = None
-        elif common.isStr(value):
-            self._v1n2 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._v1n2 = value
-            except:
-                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+        self._setVoiceNote(value, '_v1n2')
 
     v1n2 = property(_getv1n2, _setv1n2, doc='''
         set note 2 for voice 1
@@ -183,16 +195,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         return self._v2n1
 
     def _setv2n1(self, value):
-        if value is None:
-            self._v2n1 = None
-        elif common.isStr(value):
-            self._v2n1 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._v2n1 = value
-            except:
-                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+        self._setVoiceNote(value, '_v2n1')
 
     v2n1 = property(_getv2n1, _setv2n1, doc='''
         set note 1 for voice 2
@@ -206,16 +209,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         return self._v2n2
 
     def _setv2n2(self, value):
-        if value is None:
-            self._v2n2 = None
-        elif common.isStr(value):
-            self._v2n2 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._v2n2 = value
-            except:
-                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+        self._setVoiceNote(value, '_v2n2')
 
     v2n2 = property(_getv2n2, _setv2n2, doc='''
         set note 2 for voice 2
@@ -233,8 +227,17 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def motionType(self):
         '''
-        returns the type of motion ('Oblique', 'Parallel', 'Similar', 'Contrary') that
-        exists in this voice leading quartet
+        returns the type of motion from the MotionType Enum object 
+        that exists in this voice leading quartet
+
+        >>> for mt in voiceLeading.MotionType:
+        ...     print(repr(mt))
+        <MotionType.antiParallel: 'Anti-Parallel'>
+        <MotionType.contrary: 'Contrary'>
+        <MotionType.noMotion: 'No Motion'>
+        <MotionType.oblique: 'Oblique'>
+        <MotionType.parallel: 'Parallel'>
+        <MotionType.similar: 'Similar'>
 
         >>> n1 = note.Note('D4')
         >>> n2 = note.Note('E4')
@@ -242,7 +245,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> m2 = note.Note('B4')
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.motionType()
-        'Similar'
+        <MotionType.similar: 'Similar'>
 
         >>> n1 = note.Note('A4')
         >>> n2 = note.Note('C5')
@@ -250,21 +253,25 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> m2 = note.Note('F4')
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.motionType()
-        'Parallel'
+        <MotionType.parallel: 'Parallel'>
+        >>> print(vl.motionType())
+        MotionType.parallel
+        >>> vl.motionType() == 'Parallel'
+        True
         '''
         motionType = ''
         if self.obliqueMotion():
-            motionType = 'Oblique'
+            motionType = MotionType.oblique
         elif self.parallelMotion():
-            motionType = 'Parallel'
+            motionType = MotionType.parallel
         elif self.similarMotion():
-            motionType = 'Similar'
+            motionType = MotionType.similar
         elif self.contraryMotion():
-            motionType = 'Contrary'
+            motionType = MotionType.contrary
         elif self.antiParallelMotion():
-            motionType = 'Anti-Parallel'
+            motionType = MotionType.antiParallel
         elif self.noMotion():
-            motionType = 'No Motion'
+            motionType = MotionType.noMotion
         return motionType
 
     def noMotion(self):
@@ -348,9 +355,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.similarMotion()
         True
-
         '''
-
         if self.noMotion():
             return False
         else:
@@ -1983,7 +1988,7 @@ class Test(unittest.TestCase):
         import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
+            for skip in ['_', '__', 'Test', 'Exception', 'MotionType']:
                 if part.startswith(skip) or part.endswith(skip):
                     match = True
             if match:

@@ -102,8 +102,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     dst.leftBarline = bLeft
                 if mh.leftBarToken.isRepeatBracket():
                     # get any open spanners of RepeatBracket type
-                    rbSpanners = spannerBundle.getByClassComplete(
-                                'RepeatBracket', False)
+                    rbSpanners = spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
                     # this indication is most likely an opening, as ABC does
                     # not encode second ending ending boundaries
                     # we can still check thought:
@@ -135,8 +134,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     # bracket is open (even if just assigned above) we need
                     # to close it now.
                     # presently, now r bar conditions start a repeat bracket
-                    rbSpanners = spannerBundle.getByClassComplete(
-                                'RepeatBracket', False)
+                    rbSpanners = spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
                     if len(rbSpanners) > 0:
                         rb = rbSpanners[0] # get RepeatBracket
                         rb.addSpannedElements(dst)

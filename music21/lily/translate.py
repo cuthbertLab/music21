@@ -406,7 +406,7 @@ class LilypondConverter(object):
         >>> p2.append(variant.Variant(name = 'rome'))
         >>> for i in range(4):
         ...    m = stream.Measure()
-        ...    n = note.WholeNote('D4')
+        ...    n = note.Note('D4', type='whole')
         ...    m.append(n)
         ...    p1.append(m)
         ...    p2.append(copy.deepcopy(m))
@@ -530,12 +530,12 @@ class LilypondConverter(object):
         Creates a series of Spacer objects for the measures in a Stream Part.
 
 
-        >>> m1 = stream.Measure(converter.parse("a2.", "3/4"))
-        >>> m2 = stream.Measure(converter.parse("b2.", "3/4"))
-        >>> m3 = stream.Measure(converter.parse("a1", "4/4"))
-        >>> m4 = stream.Measure(converter.parse("b1", "4/4"))
-        >>> m5 = stream.Measure(converter.parse("c1", "4/4"))
-        >>> m6 = stream.Measure(converter.parse("a4 b1", "5/4"))
+        >>> m1 = stream.Measure(converter.parse("tinynotation: 3/4 a2."))
+        >>> m2 = stream.Measure(converter.parse("tinynotation: 3/4 b2."))
+        >>> m3 = stream.Measure(converter.parse("tinynotation: 4/4 a1"))
+        >>> m4 = stream.Measure(converter.parse("tinynotation: 4/4 b1"))
+        >>> m5 = stream.Measure(converter.parse("tinynotation: 4/4 c1"))
+        >>> m6 = stream.Measure(converter.parse("tinynotation: 5/4 a4 b1"))
         >>> streamIn = stream.Stream([m1, m2, m3, m4, m5, m6])
         >>> lpc = lily.translate.LilypondConverter()
         >>> print lpc.getLySpacersFromStream(streamIn)
@@ -1698,11 +1698,11 @@ class LilypondConverter(object):
         r'''
 
 
-        >>> s1 = converter.parse("a4 a a a  a1", "4/4")
-        >>> s2 = converter.parse("b4 b b b", "4/4")
-        >>> s3 = converter.parse("c4 c c c", "4/4")
-        >>> s4 = converter.parse("d4 d d d", "4/4")
-        >>> s5 = converter.parse("e4 e e e  f f f f  g g g g  a a a a  b b b b", "4/4")
+        >>> s1 = converter.parse("tinynotation: 4/4 a4 a a a  a1")
+        >>> s2 = converter.parse("tinynotation: 4/4 b4 b b b")
+        >>> s3 = converter.parse("tinynotation: 4/4 c4 c c c")
+        >>> s4 = converter.parse("tinynotation: 4/4 d4 d d d")
+        >>> s5 = converter.parse("tinynotation: 4/4 e4 e e e  f f f f  g g g g  a a a a  b b b b")
 
         >>> for s in [ s1, s2, s3, s4, s5]:
         ...     s.makeMeasures(inPlace = True)
@@ -1932,11 +1932,11 @@ class LilypondConverter(object):
         r'''
 
 
-        >>> pstream = converter.parse("a4 b c d   e4 f g a", "4/4")
+        >>> pstream = converter.parse("tinynotation: 4/4 a4 b c d   e4 f g a")
         >>> pstream.makeMeasures(inPlace = True)
         >>> p = stream.Part(pstream)
         >>> p.id = 'p1'
-        >>> vstream = converter.parse("a4. b8 c4 d", "4/4")
+        >>> vstream = converter.parse("tinynotation: 4/4 a4. b8 c4 d")
         >>> vstream.makeMeasures(inPlace = True)
         >>> v = variant.Variant(vstream)
         >>> v.groups = ['london']
@@ -2408,7 +2408,8 @@ class LilypondConverter(object):
 
     def showSVG(self, fileName = None):
         '''
-        create a SVG file from self.topLevelObject, show it with your svg reader (often Internet Explorer on PC)
+        create a SVG file from self.topLevelObject, show it with your svg reader (often Internet Explorer/
+        WebBrowser on PC)
         and return the filepath of the file.
 
         most users will just call stream.Stream.show('lily.png') on a stream.
@@ -2486,11 +2487,11 @@ class TestExternal(unittest.TestCase):
         from music21 import stream
         s = stream.Score()
         p = stream.Part()
-        p.append(note.WholeNote("B4"))
+        p.append(note.Note("B4", type='whole'))
         p.staffLines = 1
         s.insert(0, p)
         p2 = stream.Part()
-        p2.append(note.WholeNote("B4"))
+        p2.append(note.Note("B4", type='whole'))
         p2.staffLines = 7
         s.insert(0, p2)
         s.show('lily.png')

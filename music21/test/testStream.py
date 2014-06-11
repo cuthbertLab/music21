@@ -51,7 +51,7 @@ class TestExternal(unittest.TestCase):
         ts = meter.TimeSignature("3/4")
         
         b = Stream()
-        q = note.QuarterNote()
+        q = note.Note(type='quarter')
         q.octave = 5
         b.repeatInsert(q, [0,1,2,3])
         
@@ -67,7 +67,7 @@ class TestExternal(unittest.TestCase):
         ts = meter.TimeSignature("3/8")
         
         b = Stream()
-        q = note.EighthNote()
+        q = note.Note(type='eighth')
 
         dur1 = duration.Duration()
         dur1.type = "eighth"
@@ -322,10 +322,10 @@ class Test(unittest.TestCase):
         p2 = Part()
         p2.id = "p2"
 
-        n1 = note.HalfNote("C")
-        n2 = note.QuarterNote("D")
-        n3 = note.QuarterNote("E")
-        n4 = note.HalfNote("F")
+        n1 = note.Note('C', type='half')
+        n2 = note.Note('D', type='quarter')
+        n3 = note.Note('E', type='quarter')
+        n4 = note.Note('F', type='half')
         n1.id = "n1"
         n2.id = "n2"
         n3.id = "n3"
@@ -575,7 +575,7 @@ class Test(unittest.TestCase):
 
     def testStreamDuration(self):
         a = Stream()
-        q = note.QuarterNote()
+        q = note.Note(type='quarter')
         a.repeatInsert(q, [0,1,2,3])
         self.assertEqual(a.highestOffset, 3)
         self.assertEqual(a.highestTime, 4)
@@ -1342,6 +1342,7 @@ class Test(unittest.TestCase):
         # count
 
         m1 = a.parts[0].getElementsByClass('Measure')[1]
+        #m1.show('text')
         mOffsetMap = m1.measureOffsetMap(note.Note)
         # offset here is that of measure that originally contained this note
         #environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
@@ -1558,44 +1559,49 @@ class Test(unittest.TestCase):
     def testContextNestedB(self):
         '''Testing getting clefs from higher-level streams
         '''
-        s1 = Stream()
-        s2 = Stream()
+        sInner = Stream()
+        sInner.id = 'innerStream'
         n1 = note.Note()
+        sInner.append(n1) # this is the model of a stream with a single part
+
+        sOuter = Stream()
+        sOuter.id = 'outerStream'
+        sOuter.append(sInner)
         c1 = clef.AltoClef()
-        
-        s1.append(n1) # this is the model of a stream with a single part
-        s2.append(s1)
-        s2.insert(0, c1)
+        sOuter.insert(0, c1)
         
         # this works fine
-        post = s1.getContextByClass(clef.Clef)
+        post = sInner.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        # if we flatten s1, we cannot still get the clef: why?
-        s1Flat = s1.flat
-        # but it has s2 has a context
-        self.assertEqual(s1Flat.hasContext(s2), True)
-        #environLocal.printDebug(['sites.get() of s1Flat', s1Flat.sites.get()])
-        #environLocal.printDebug(['sites._definedContexts of s1Flat', s1Flat.sites._definedContexts])
+        # if we flatten sInner, we cannot still get the clef: why?
+        sInnerFlat = sInner.flat
+        sInnerFlat.id = 'sInnerFlat'
 
-
-        self.assertEqual(s1Flat.hasContext(s2), True)
-
-        # this returns the proper dictionary entry
-        #environLocal.printDebug(
-        #    ['s1Flat.sites._definedContexts[id(s1)', s1Flat.sites._definedContexts[id(s2)]])
-        # we can extract out the same reference
-        unused_s2Out = s1Flat.sites.getById(id(s2))
+#         # but it has sOuter has a context
+#         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+#         #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
+#         #environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
+# 
+# 
+#         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+# 
+#         # this returns the proper dictionary entry
+#         #environLocal.printDebug(
+#         #    ['sInnerFlat.sites.siteDict[id(sInner)', sInnerFlat.sites.siteDict[id(sOuter)]])
+#         # we can extract out the same reference
+#         unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
 
         # this works
-        post = s1Flat.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        post = sInnerFlat.getContextByClass(clef.Clef)
+        self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
 
-        # this will only work if the callerFirst is manually set to s1Flat
-        # otherwise, this interprets the DefinedContext object as the first 
-        # caller
-        post = s1Flat.sites.getByClass(clef.Clef, callerFirst=s1Flat)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        # 2014 April -- timeSpans version -- not needed...
+        ## this will only work if the callerFirst is manually set to sInnerFlat
+        ## otherwise, this interprets the DefinedContext object as the first 
+        ## caller
+        #post = sInnerFlat.sites.getObjByClass(clef.Clef, callerFirst=sInnerFlat)
+        #self.assertEqual(isinstance(post, clef.AltoClef), True)
 
 
 
@@ -1631,9 +1637,9 @@ class Test(unittest.TestCase):
         #  self.assertEqual(s2.getOffsetByElement(s1.flat), None)  == 0.0
 
 
-        # this does not work; the clef is in s2; its not in a context of s2
+        # this did not work before; the clef is in s2; its not in a context of s2
         post = s2.getContextByClass(clef.Clef)
-        self.assertEqual(post, None)
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         # we can find the clef from the flat version of 21
         post = s1.flat.getContextByClass(clef.Clef)
@@ -1641,42 +1647,51 @@ class Test(unittest.TestCase):
 
 
     def testContextNestedD(self):
-        '''Testing getting clefs from higher-level streams
+        '''
+        Testing getting clefs from higher-level streams
         '''
         n1 = note.Note()
         n2 = note.Note()
 
-        s1 = Stream()
-        s2 = Stream()
-        s3 = Stream()
+        s1 = Part()
+        s1.id = 's1'
+        s2 = Part()
+        s2.id = 's2'
+
+        sOuter = Score()
+        sOuter.id = 'sOuter'
+
         s1.append(n1)
         s2.append(n2)
-        s3.insert(0, s1)
-        s3.insert(0, s2)
+        sOuter.insert(0, s1)
+        sOuter.insert(0, s2)
         
-        self.assertEqual(s1.activeSite, s3)
+        self.assertEqual(s1.activeSite, sOuter)
 
-        s3.insert(0, clef.AltoClef())
+        sOuter.insert(0, clef.AltoClef())
         # both output parts have alto clefs
         #s3.show()
 
         # get clef form higher level stream; only option
-        self.assertEqual(s1.activeSite, s3)
+        self.assertEqual(s1.activeSite, sOuter)
         post = s1.getClefs()[0]
+        
         self.assertEqual(isinstance(post, clef.AltoClef), True)
-        self.assertEqual(s1.activeSite, s3)
+        self.assertEqual(s1.activeSite, sOuter)
 
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
         
         # now we in sort a clef in s2; s2 will get this clef first
         s2.insert(0, clef.TenorClef())
-        # only second part should ahve tenor clef
+        # only second part should have tenor clef
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.TenorClef), True)
 
         # but stream s1 should get the alto clef still
-        post = s1.getClefs()[0]
+        #print list(s1.yieldSiteSearchOrder())
+        post = s1.getContextByClass('Clef')
+        #print post
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         # s2 flat gets the tenor clef; it was inserted in it
@@ -1693,16 +1708,19 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         # once we create a deepcopy of s1, it is no longer connected to 
-        # its parent if purge orphans and it is not in s3
-        s1FlatCopy = copy.deepcopy(s1.flat)
+        # its parent if we purge orphans and it is not in sOuter
+        s1Flat = s1.flat
+        s1Flat.id = 's1Flat'
+        s1FlatCopy = copy.deepcopy(s1Flat)
+        s1FlatCopy.id = 's1FlatCopy'
         self.assertEqual(len(s1FlatCopy.getClefs(returnDefault=False)), 1)
-        post = s1FlatCopy.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        post = s1FlatCopy.getClefs(returnDefault=False)[0]
+        self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
 
-        post = s1.flat.getClefs()[0]
+        post = s1Flat.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
-        self.assertEqual(s3 in s1.sites.getSites(), True)
+        self.assertEqual(sOuter in s1.sites.getSites(), True)
         s1Measures = s1.makeMeasures()
         #print s1Measures[0].clef
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
@@ -1713,7 +1731,7 @@ class Test(unittest.TestCase):
 
         # try making a deep copy of s3
 
-        s3copy = copy.deepcopy(s3)
+        s3copy = copy.deepcopy(sOuter)
         #s1Measures = s3copy[0].makeMeasures()
 
         # TODO: had to comment out with changes to getElementAtOrBefore
@@ -2260,8 +2278,8 @@ class Test(unittest.TestCase):
         p1 = stream.Part()
         m1 = stream.Measure()
         m1.append(meter.TimeSignature('4/4'))
-        m1.append(note.HalfNote('C#'))
-        m1.append(note.HalfNote('C#'))
+        m1.append(note.Note('C#', type='half'))
+        m1.append(note.Note('C#', type='half'))
         m1.rightBarline = 'final'
         p1.append(m1)
         p1.makeNotation(inPlace=True)
@@ -2301,7 +2319,7 @@ class Test(unittest.TestCase):
         tests to make sure that Accidental display status is correct after a tie.
         '''
         from music21 import tinyNotation
-        bm = tinyNotation.TinyNotationStream("c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", "4/4")
+        bm = tinyNotation.TinyNotationStream("4/4 c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8")
         bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
@@ -2311,7 +2329,7 @@ class Test(unittest.TestCase):
 
 
         # add another B-flat just after the tied one...
-        bm = tinyNotation.TinyNotationStream("c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", "4/4")
+        bm = tinyNotation.TinyNotationStream("4/4 c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8")
         bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
@@ -3065,7 +3083,6 @@ class Test(unittest.TestCase):
 
         #s.show()
         unused_post = m21ToString.fromMusic21Object(s)
-
 
     def testYieldContainers(self):
         from music21 import stream
@@ -3861,7 +3878,7 @@ class Test(unittest.TestCase):
 
     def testMeasuresAndMakeMeasures(self):
         from music21 import converter
-        s = converter.parse('g8 e f g e f g a', '2/8')
+        s = converter.parse('tinynotation: 2/8 g8 e f g e f g a')
         sSub = s.measures(3,3)  
         self.assertEqual(str(sSub.pitches), "[<music21.pitch.Pitch E4>, <music21.pitch.Pitch F4>]")
         #sSub.show()
@@ -4909,10 +4926,10 @@ class Test(unittest.TestCase):
 
         # these test prove that getting a semiFlat stream does not change the
         # activeSite
-        junk = s1.sites.getByClass(meter.TimeSignature)
+        junk = s1.sites.getObjByClass(meter.TimeSignature)
         self.assertEqual(s1.activeSite, s2)
 
-        junk = s1.sites.getByClass(clef.Clef)
+        junk = s1.sites.getObjByClass(clef.Clef)
         self.assertEqual(s1.activeSite, s2)
 
         junk = s1.getContextByClass('Clef')
@@ -5582,7 +5599,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s1Elements.derivation.method is 'getElementsByClass', True)
 
 
-        s1 = converter.parse("C2 D2", "2/4")
+        s1 = converter.parse("tinyNotation: 4/4 C2 D2")
         s1m = s1.makeMeasures()
         self.assertEqual(s1m.derivation.method, 'makeMeasures')
         s1m1 = s1m.measure(1)
@@ -5609,9 +5626,9 @@ class Test(unittest.TestCase):
     def testMakeMeasuresTimeSignatures(self):
         from music21 import stream
         sSrc = stream.Stream()
-        sSrc.append(note.QuarterNote('C4'))
-        sSrc.append(note.QuarterNote('D4'))
-        sSrc.append(note.QuarterNote('E4'))
+        sSrc.append(note.Note('C4', type='quarter'))
+        sSrc.append(note.Note('D4', type='quarter'))
+        sSrc.append(note.Note('E4', type='quarter'))
         sMeasures = sSrc.makeMeasures()
         # added 4/4 here as default
         self.assertEqual(str(sMeasures[0].timeSignature), '<music21.meter.TimeSignature 4/4>')
@@ -7360,7 +7377,9 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #import sys
-    #sys.argv.append('ChordifyRests')
+    #'testContextNestedC'
+    #'testContextNestedD'
+    #sys.argv.append('testContextNestedD')
     music21.mainTest(Test)
 
 

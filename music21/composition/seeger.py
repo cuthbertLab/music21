@@ -10,8 +10,6 @@ from music21 import stream
 
 
 import copy
-row = converter.parse('d8 e f e- f# a a- g d- c', '2/2')
-rowNotes = row.notes
 
 def lowerLines():
     restLengths = [0, 16, 12, 11, 10, 7, 6, 7, 6, 5, 4, 3, 8, 10, 12, 14, 16, 17, 18, 19, 20]
@@ -83,4 +81,6 @@ def lowerLines():
     myRow.show()
 
 if __name__ == '__main__':
+    row = converter.parse('tinynotation: 2/2 d8 e f e- f# a a- g d- c')
+    rowNotes = row.notes
     lowerLines()

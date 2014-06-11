@@ -992,15 +992,15 @@ class Test(unittest.TestCase):
     def testLandiniCadence(self):
         from music21 import converter, features
 
-        s = converter.parse(['f#4 f# e g2', '3/4'])
+        s = converter.parse('tinynotation: 3/4 f#4 f# e g2')
         fe = features.native.LandiniCadence(s)
         self.assertEqual(fe.extract().vector[0], 1)        
         
-        s = converter.parse(['f#4 f# f# g2', '3/4'])
+        s = converter.parse('tinynotation: 3/4 f#4 f# f# g2')
         fe = features.native.LandiniCadence(s)
         self.assertEqual(fe.extract().vector[0], 0)        
 
-        s = converter.parse(['f#4 e a g2', '3/4'])
+        s = converter.parse('tinynotation: 3/4 f#4 e a g2')
         fe = features.native.LandiniCadence(s)
         self.assertEqual(fe.extract().vector[0], 0)        
 

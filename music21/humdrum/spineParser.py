@@ -520,7 +520,7 @@ class HumdrumDataCollection(object):
 
         # currentSpineList is a list of currently active
         # spines ordered from left to right.
-        currentSpineList = common.defList(default = None)
+        currentSpineList = common.defaultlist(lambda:None)
         spineCollection = SpineCollection()
 
         # go through the event collections line by line
@@ -529,8 +529,7 @@ class HumdrumDataCollection(object):
             for j in range(0, maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
 
-                if thisEvent is not None:  # something there
-                    # defList ensures that something will be returned
+                if thisEvent is not None:  # something there                
                     currentSpine = currentSpineList[j]
                     if currentSpine is None:
                         ## first event after a None = new spine because
@@ -549,12 +548,13 @@ class HumdrumDataCollection(object):
             # thus, this is illegal.  The C#4 will be ignored:
             # *x     *x     C#4
             if thisEventCollection.spinePathData is True:
-                newSpineList = common.defList()
+                newSpineList = common.defaultlist(lambda:None)
                 mergerActive = False
                 exchangeActive = False
                 for j in range(0, maxSpines):
                     thisEvent = protoSpines[j].eventList[i]
                     currentSpine = currentSpineList[j]
+                    
                     if thisEvent is None and currentSpine is not None:
                         ## should this happen?
                         newSpineList.append(currentSpine)
@@ -1068,11 +1068,11 @@ class HumdrumSpine(object):
         >>> m1 = stream.Measure()
         >>> m1.number = 1
         >>> s1.append(m1)
-        >>> s1.append(note.QuarterNote('C4'))
+        >>> s1.append(note.Note('C4', type='quarter'))
         >>> m2 = stream.Measure()
         >>> m2.number = 2
         >>> s1.append(m2)
-        >>> s1.append(note.HalfNote('D4'))
+        >>> s1.append(note.Note('D4', type='half'))
         >>> s1.show('text')
         {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1825,6 +1825,7 @@ class SpineCollection(object):
 
     # TODO: append global comments and have a way of recalling them
 
+    
 class EventCollection(object):
     '''
     An EventCollection is a time slice of all events that have
@@ -1859,8 +1860,8 @@ class EventCollection(object):
     [<music21.humdrum.spineParser.SpineEvent D4>, <music21.humdrum.spineParser.SpineEvent pp>]
     '''
     def __init__(self, maxSpines = 0):
-        self.events = common.defList()
-        self.lastEvents = common.defList()
+        self.events = common.defaultlist(lambda:None)
+        self.lastEvents = common.defaultlist(lambda:None)
         self.maxSpines = maxSpines
         self.spinePathData = False
                 ## true if the line contains data about changing spinePaths

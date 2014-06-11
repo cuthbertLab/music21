@@ -1,7 +1,6 @@
+.. _usersGuide_00_introduction:
 .. code:: python
 
-    # ignore this
-    %load_ext music21.ipython21.ipExtension
 
 User's Guide: Introduction
 ==========================

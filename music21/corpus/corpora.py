@@ -37,7 +37,7 @@ class Corpus(object):
 
     _allExtensions = (
         common.findInputExtension('abc') +
-        common.findInputExtension('lily') +
+        common.findInputExtension('capella') +
         common.findInputExtension('midi') +
         common.findInputExtension('musicxml') +
         common.findInputExtension('musedata') +
@@ -120,13 +120,13 @@ class Corpus(object):
             ...     extension
             ...
             '.abc'
-            '.ly'
-            '.lily'
+            '.capx'
             '.mid'
             '.midi'
             '.xml'
             '.mxl'
             '.mx'
+            '.musicxml'
             '.md'
             '.musedata'
             '.zip'
@@ -156,7 +156,11 @@ class Corpus(object):
         elif expandExtensions:
             expandedExtensions = []
             for extension in fileExtensions:
-                expandedExtensions += common.findInputExtension(extension)
+                allInputExtensions = common.findInputExtension(extension)
+                if allInputExtensions is None:
+                    pass
+                else:
+                    expandedExtensions += allInputExtensions
             return expandedExtensions
         return fileExtensions
 

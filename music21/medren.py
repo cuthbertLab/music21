@@ -1940,8 +1940,8 @@ class TestExternal(unittest.TestCase):
         s = stream.Stream()
         m = meter.TimeSignature('4/4')
         s.append(m)
-        n1 = note.WholeNote('C4')
-        n2 = note.HalfNote('D4')
+        n1 = note.Note('C4', type='whole')
+        n2 = note.Note('D4', type='half')
         n1.duration.unlink()
         n1.duration.quarterLength = 2.0
         s.append([n1, n2])

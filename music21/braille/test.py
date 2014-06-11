@@ -35,8 +35,8 @@ def example2_1():
     ⠼⠁⠀⠓⠭⠋⠀⠛⠭⠊⠀⠓⠭⠛⠀⠋⠭⠭⠀⠋⠭⠙⠀⠑⠭⠛⠀⠋⠭⠑⠀⠙⠭⠭⠀⠑⠭⠛
     ⠀⠀⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅
     """
-    bm = tinyNotation.TinyNotationStream("g8 r8 e8 f8 r8 a8 g8 r8 f8 e8 r8 r8 e8 r8 c8 d8 r8 f8 e8 r8 d8 c8 r8 r8 \
-    d8 r8 f8 e8 r8 g8 f8 g8 a8 g8 r8 r8 a8 r8 f8 g8 r8 e8 f8 e8 d8 c8 r8 r8", "3/8")
+    bm = tinyNotation.TinyNotationStream("3/8 g8 r8 e8 f8 r8 a8 g8 r8 f8 e8 r8 r8 e8 r8 c8 d8 r8 f8 e8 r8 d8 c8 r8 r8 \
+    d8 r8 f8 e8 r8 g8 f8 g8 a8 g8 r8 r8 a8 r8 f8 g8 r8 e8 f8 e8 d8 c8 r8 r8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return bm
 
@@ -49,8 +49,8 @@ def example2_2():
     ⠼⠚⠀⠑⠀⠑⠙⠚⠑⠀⠙⠚⠊⠙⠀⠚⠊⠓⠚⠀⠊⠊⠑⠭⠀⠋⠋⠓⠋⠀⠑⠋⠓⠚⠀⠑⠙⠚⠊
     ⠀⠀⠓⠓⠓⠭⠣⠅
     """
-    bm = tinyNotation.TinyNotationStream("r8 r8 r8 d8 d8 c8 B8 d8 c8 B8 A8 c8 B8 A8 G8 B8 A8 A8 D8 r8 E8 E8 G8 E8 \
-    D8 E8 G8 B8 d8 c8 B8 A8 G8 G8 G8 r8", "4/8")
+    bm = tinyNotation.TinyNotationStream("4/8 r8 r8 r8 d8 d8 c8 B8 d8 c8 B8 A8 c8 B8 A8 G8 B8 A8 A8 D8 r8 E8 E8 G8 E8 \
+    D8 E8 G8 B8 d8 c8 B8 A8 G8 G8 G8 r8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     for unused_numRest in range(3):
         bm[0].pop(2)
@@ -68,8 +68,8 @@ def example2_3():
     ⠼⠁⠀⠋⠋⠀⠓⠊⠀⠓⠛⠀⠋⠓⠀⠛⠋⠀⠑⠛⠀⠋⠙⠀⠑⠭⠀⠋⠋⠀⠛⠛⠀⠓⠊⠀⠚⠙
     ⠀⠀⠊⠛⠀⠋⠑⠀⠙⠚⠀⠙⠭⠣⠅
     """
-    bm = tinyNotation.TinyNotationStream("e8 e8 g8 a8 g8 f8 e8 g8 f8 e8 d8 f8 e8 c8 d8 r8 e8 e8 f8 f8 g8 a8 b8 c'8 \
-    a8 f8 e8 d8 c8 B8 c8 r8", "2/8")
+    bm = tinyNotation.TinyNotationStream("2/8 e8 e8 g8 a8 g8 f8 e8 g8 f8 e8 d8 f8 e8 c8 d8 r8 e8 e8 f8 f8 g8 a8 b8 c'8 \
+    a8 f8 e8 d8 c8 B8 c8 r8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return bm
 
@@ -82,8 +82,8 @@ def example2_4():
     ⠼⠁⠀⠊⠙⠋⠀⠑⠙⠚⠀⠙⠭⠚⠀⠊⠭⠭⠀⠚⠚⠙⠀⠑⠙⠚⠀⠊⠭⠊⠀⠚⠭⠭⠣⠅⠄
     ⠀⠀⠊⠋⠊⠀⠙⠚⠊⠀⠊⠚⠙⠀⠑⠭⠭⠀⠋⠑⠙⠀⠚⠋⠚⠀⠊⠭⠊⠀⠊⠭⠭⠣⠅
     """
-    bm = tinyNotation.TinyNotationStream("A8 c8 e8 d8 c8 B8 c8 r8 B8 A8 r8 r8 B8 B8 c8 d8 c8 B8 A8 r8 A8 B8 r8 r8 \
-    A8 E8 A8 c8 B8 A8 A8 B8 c8 d8 r8 r8 e8 d8 c8 B8 E8 B8 A8 r8 A8 A8 r8 r8", "3/8")
+    bm = tinyNotation.TinyNotationStream("3/8 A8 c8 e8 d8 c8 B8 c8 r8 B8 A8 r8 r8 B8 B8 c8 d8 c8 B8 A8 r8 A8 B8 r8 r8 \
+    A8 E8 A8 c8 B8 A8 A8 B8 c8 d8 r8 r8 e8 d8 c8 B8 E8 B8 A8 r8 A8 A8 r8 r8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[7].rightBarline = bar.Barline('double')
     return bm
@@ -97,8 +97,8 @@ def example2_5():
     ⠼⠚⠀⠑⠋⠀⠛⠙⠊⠙⠀⠑⠙⠊⠙⠀⠊⠙⠊⠓⠀⠋⠓⠛⠭⠀⠑⠋⠛⠑⠀⠙⠑⠋⠛⠀⠓⠋⠙⠋
     ⠀⠀⠛⠭⠣⠅
     """
-    bm = tinyNotation.TinyNotationStream("r8 r8 d'8 e'8 f'8 c'8 a8 c'8 d'8 c'8 a8 c'8 a8 c'8 a8 g8 e8 g8 f8 r8 \
-    d8 e8 f8 d8 c8 d8 e8 f8 g8 e8 c8 e8 f8 r8", "4/8")
+    bm = tinyNotation.TinyNotationStream("4/8 r8 r8 d'8 e'8 f'8 c'8 a8 c'8 d'8 c'8 a8 c'8 a8 c'8 a8 g8 e8 g8 f8 r8 \
+    d8 e8 f8 d8 c8 d8 e8 f8 g8 e8 c8 e8 f8 r8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     for unused_numRest in range(2):
         bm[0].pop(2)
@@ -1019,7 +1019,7 @@ def example8_8():
 
     >>> from music21.braille import basic
     >>> from music21 import tempo
-    >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.HalfNote()))
+    >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.Note(type='half')))
     ⠝⠶⠼⠓⠚
     """
     pass
@@ -1031,7 +1031,7 @@ def example8_9():
     >>> from music21 import meter
     >>> from music21 import tempo
     >>> print basic.transcribeHeading(key.KeySignature(-3), meter.TimeSignature("12/8"), tempo.TempoText("Andante"),
-    ... tempo.MetronomeMark(number = 132, referent = note.EighthNote()))
+    ... tempo.MetronomeMark(number = 132, referent = note.Note(type='eighth')))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠲⠀⠙⠶⠼⠁⠉⠃⠀⠣⠣⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀
     """
     pass
@@ -1063,7 +1063,7 @@ def drill8_1():
     bm = tinyNotation.TinyNotationStream("a2 g8 f8 e4 d4 e4 f8 g8 a4 g4 c'8 b8 a4 g4 f4. e8 d2\
     c4 e4 a4 e'4 e'4 d'4 c'8 b8 a4 a'4 g'8 f'8 e'4 d'4 c'4 a8 b8 c'2", "c")
     bm.insert(0, tempo.TempoText("Andante maestoso"))
-    bm.insert(0, tempo.MetronomeMark(number=92, referent=note.QuarterNote()))
+    bm.insert(0, tempo.MetronomeMark(number=92, referent=note.Note(type='quarter')))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return bm
 
@@ -1139,7 +1139,7 @@ def drill8_5():
     e'-2 c'4 f4 d'2 b-4 b-4 c'2 b-4 c'4 d'4 b-4 c'4 d'4 b-4 c'4 b-4 a4 b-2", "cut")
     bm.insert(0, key.KeySignature(-2))
     bm.insert(0, tempo.TempoText("Ben marcato"))
-    bm.insert(0, tempo.MetronomeMark(number=112, referent=note.HalfNote()))
+    bm.insert(0, tempo.MetronomeMark(number=112, referent=note.Note(type='half')))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(5)
     bm[0].padAsAnacrusis()
@@ -1438,7 +1438,7 @@ def drill9_4():
     bm = tinyNotation.TinyNotationStream("E8 D# E F# D# BB4 E G8 G F# G A B B4 BB BB8 DD GG BB GG BB E4 G F#8\
     E BB G E BB E4 EE EE8 EE4 r8 EE8 EE DD EE EE EE EE EE EE EE4 EE8 EE4~ EE8 r8 r", "5/8")
     bm.insert(0, key.KeySignature(1))
-    bm.insert(0, tempo.MetronomeMark(number = 100, referent = note.QuarterNote()))
+    bm.insert(0, tempo.MetronomeMark(number = 100, referent = note.Note(type='quarter')))
     bm.insert(0, tempo.TempoText("Not too fast"))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     # measure 1 fingerings

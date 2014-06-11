@@ -188,9 +188,9 @@ class PolyphonicSnippet(stream.Score):
         in the parts
         
         
-        >>> s1 = stream.Part([note.WholeNote()])
-        >>> s2 = stream.Part([note.HalfNote()])
-        >>> s3 = stream.Part([note.QuarterNote()])
+        >>> s1 = stream.Part([note.Note(type='whole')])
+        >>> s2 = stream.Part([note.Note(type='half')])
+        >>> s3 = stream.Part([note.Note(type='quarter')])
         >>> fiveExcelRows = [s1, s2, s3, '', '2/2']
         >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet(fiveExcelRows)
         >>> ps.findLongestCadence()
@@ -211,11 +211,9 @@ class PolyphonicSnippet(stream.Score):
         '''
         returns the number of measures short that each stream is compared to the longest stream.
         
-        
-        
-        >>> s1 = stream.Part([note.WholeNote()])
-        >>> s2 = stream.Part([note.HalfNote()])
-        >>> s3 = stream.Part([note.QuarterNote()])
+        >>> s1 = stream.Part([note.Note(type='whole')])
+        >>> s2 = stream.Part([note.Note(type='half')])
+        >>> s3 = stream.Part([note.Note(type='quarter')])
         >>> fiveExcelRows = [s1, s2, s3, '', '1/2']
         >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet(fiveExcelRows)
         >>> ps.findLongestCadence()
@@ -248,11 +246,11 @@ class Incipit(PolyphonicSnippet):
         
         >>> ts = meter.TimeSignature('1/4')
         >>> s1 = stream.Part([ts])
-        >>> s1.repeatAppend(note.QuarterNote(), 4)
+        >>> s1.repeatAppend(note.Note(type='quarter'), 4)
         >>> s2 = stream.Part([ts])
-        >>> s2.repeatAppend(note.QuarterNote(), 2)
+        >>> s2.repeatAppend(note.Note(type='quarter'), 2)
         >>> s3 = stream.Part([ts])
-        >>> s3.repeatAppend(note.QuarterNote(), 1)
+        >>> s3.repeatAppend(note.Note(type='quarter'), 1)
         >>> fiveExcelRows = [s1, s2, s3, '', '1/4']
         >>> ps = trecento.polyphonicSnippet.Incipit(fiveExcelRows)
         >>> ps.backPadLine(s2)
@@ -314,11 +312,11 @@ class FrontPaddedSnippet(PolyphonicSnippet):
         
         >>> ts = meter.TimeSignature('1/4')
         >>> s1 = stream.Part([ts])
-        >>> s1.repeatAppend(note.QuarterNote(), 4)
+        >>> s1.repeatAppend(note.Note(type='quarter'), 4)
         >>> s2 = stream.Part([ts])
-        >>> s2.repeatAppend(note.QuarterNote(), 2)
+        >>> s2.repeatAppend(note.Note(type='quarter'), 2)
         >>> s3 = stream.Part([ts])
-        >>> s3.repeatAppend(note.QuarterNote(), 1)
+        >>> s3.repeatAppend(note.Note(type='quarter'), 1)
         >>> fiveExcelRows = [s1, s2, s3, '', '1/4']
         >>> ps = trecento.polyphonicSnippet.FrontPaddedSnippet(fiveExcelRows)
         >>> ps.frontPadLine(s2)

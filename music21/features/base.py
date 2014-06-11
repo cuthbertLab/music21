@@ -1097,7 +1097,7 @@ def allFeaturesAsList(streamInput):
     
     
     >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
-    >>> s = converter.parse('c4 d e2', '4/4') #_DOCS_HIDE
+    >>> s = converter.parse('tinynotation: 4/4 c4 d e2') #_DOCS_HIDE
     >>> f = features.allFeaturesAsList(s)
     >>> f[1][0:3]
     [[1], [0.6899992497638124], [2]]
@@ -1183,7 +1183,7 @@ def extractorById(idOrList, library=['jSymbolic', 'native']):
 
     
     >>> s = stream.Stream()
-    >>> s.append(pitch.Pitch('a4'))
+    >>> s.append(note.Note('A4'))
     >>> fe = features.extractorById('p20')(s) # call class
     >>> fe.extract().vector
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
@@ -1200,7 +1200,7 @@ def vectorById(streamObj, vectorId, library=['jSymbolic', 'native']):
 
     
     >>> s = stream.Stream()
-    >>> s.append(pitch.Pitch('a4'))
+    >>> s.append(note.Note('A4'))
     >>> features.vectorById(s, 'p20')
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
     '''

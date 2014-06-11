@@ -18,7 +18,7 @@ import random
 
 def rhythmLine(baseNote = None, minLength = 8.0, maxProbability = 0.5):
     if baseNote is None:
-        baseNote = note.QuarterNote()
+        baseNote = note.Note(type='quarter')
     newStream = stream.Part()
     while newStream.duration.quarterLength < minLength:
         currentProbability = (newStream.duration.quarterLength / minLength) * maxProbability

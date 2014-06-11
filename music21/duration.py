@@ -72,7 +72,7 @@ import copy
 
 from music21 import common
 from music21 import exceptions21
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 
 from music21 import environment
 _MOD = "duration.py"
@@ -1132,11 +1132,11 @@ class Tuplet(object):
         numNormal = self.numberNotesNormal
         #dur = self.durationActual
 
-        if numActual in [3] and numNormal in [2]:
+        if numActual == 3 and numNormal == 2:
             return 'Triplet'
-        elif numActual in [5] and numNormal in [4, 2]:
+        elif numActual == 5 and numNormal in (4, 2):
             return 'Quintuplet'
-        elif numActual in [6] and numNormal in [4]:
+        elif numActual == 6 and numNormal == 4:
             return 'Sextuplet'
         ordStr = common.ordinalAbbreviation(numNormal, plural=True)
         return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
@@ -2301,8 +2301,8 @@ class Duration(DurationCommon):
     def clear(self):
         '''
         Permit all components to be removed.
-        (It is not clear yet if this is needed)
-
+        (It is not clear yet if this is needed:
+             yes! for zero duration!)
 
         >>> a = duration.Duration()
         >>> a.quarterLength = 4
@@ -2628,12 +2628,6 @@ class Duration(DurationCommon):
             # lengths should be the same as it was before
             self.updateQuarterLength()
 
-    def show(self, format='musicxml'): # format is okay here... @ReservedAssignment
-        '''
-        Same as Music21Object.show().
-        '''
-        environLocal.launch(format, self.write(format))
-
     def splitDotGroups(self):
         '''
         splits a dotGroup-duration (of 1 component) into a new duration of two
@@ -2709,27 +2703,6 @@ class Duration(DurationCommon):
                 # be updated when this property is called
                 self._qtrLength += dur.quarterLength
         self._quarterLengthNeedsUpdating = False
-
-    def write(self, format='musicxml', fp=None): # format is okay here @ReservedAssignment
-        '''
-        As in Music21Object.write: Writes a file in the given format (musicxml by default)
-
-        A None file path will result in temporary file.
-        '''
-        foundFormat, ext = common.findFormat(format)
-        if foundFormat is None:
-            raise DurationException('bad format (%s) provided to write()' % format)
-        elif foundFormat == 'musicxml':
-            from music21.musicxml import m21ToString
-            if fp is None:
-                fp = environLocal.getTempFile(ext)
-            dataStr = m21ToString.fromDuration(self)
-        else:
-            raise DurationException('cannot support writing in this format, %s yet' % foundFormat)
-        f = open(fp, 'w')
-        f.write(dataStr)
-        f.close()
-        return fp
 
     ### PUBLIC PROPERTIES ###
 
@@ -3102,6 +3075,8 @@ class Duration(DurationCommon):
         if self._qtrLength != value:
             if isinstance(value, int):
                 value = float(value)
+            if value == 0.0 and self.isLinked is True:
+                self.clear()
             self._qtrLength = value
             self._componentsNeedUpdating = True
             self._quarterLengthNeedsUpdating = False
@@ -3555,9 +3530,12 @@ class TestExternal(unittest.TestCase):
 
 
     def testSingle(self):
+        from music21 import note
         a = Duration()
         a.quarterLength = 2.66666
-        a.show()
+        n = note.Note()
+        n.duration = a
+        n.show()
 
     def testBasic(self):
         import random

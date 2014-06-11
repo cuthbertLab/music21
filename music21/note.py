@@ -31,7 +31,7 @@ from music21 import pitch
 from music21 import beam
 from music21 import tie
 from music21 import volume
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 
 
 from music21 import environment
@@ -320,6 +320,7 @@ class GeneralNote(base.Music21Object):
         if (self.duration.quarterLength == 0 and
             len(self.duration._components) == 0):
             self.duration.addDurationUnit(duration.DurationUnit('quarter'))
+            self.duration.updateQuarterLength()
 
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
@@ -881,9 +882,6 @@ class Note(NotRest):
     # Accepts an argument for pitch
     def __init__(self, *arguments, **keywords):
         NotRest.__init__(self, **keywords)
-        if 'duration' not in keywords:
-            keywords['duration'] = self.duration
-
         if len(arguments) > 0:
             if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
@@ -1044,7 +1042,10 @@ class Note(NotRest):
 
     accidental = property(_getAccidental, _setAccidental,
         doc = '''
-        Return or set the :class:`~music21.pitch.Accidental` object from the :class:`~music21.pitch.Pitch` object.
+        Return or set the :class:`~music21.pitch.Accidental` object 
+        from the :class:`~music21.pitch.Pitch` object.
+
+        DEPRECATED May 2014: use n.pitch.accidental instead        
         ''')
 
 
@@ -1065,7 +1066,13 @@ class Note(NotRest):
         self.pitch.frequency = value
 
     frequency = property(_getFrequency, _setFrequency,
-        doc = '''Return or set the frequency from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.frequency`.
+        doc = '''
+        Return or set the frequency from 
+        the :class:`~music21.pitch.Pitch` object. 
+        
+        See :attr:`~music21.pitch.Pitch.frequency`.
+        
+        DEPRECATED May 2014: use n.pitch.frequency instead
         ''')
 
     def _getOctave(self):
@@ -1095,13 +1102,20 @@ class Note(NotRest):
         self.pitch.midi = value
 
     midi = property(_getMidi, _setMidi,
-        doc = '''Return or set the numerical MIDI pitch representation from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.midi`.
+        doc = '''
+        Return or set the numerical MIDI pitch 
+        representation from the 
+        :class:`~music21.pitch.Pitch` object. 
+        
+        See :attr:`~music21.pitch.Pitch.midi`.
+        
+        DEPRECATED May 2014: use n.pitch.midi instead
         ''')
 
 
     def _getPs(self):
         '''
-        Returns the note's midi number.
+        Returns the note's midi as a float number.
 
         C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
 
@@ -1119,7 +1133,15 @@ class Note(NotRest):
         self.pitch.ps = value
 
     ps = property(_getPs, _setPs,
-        doc = '''Return or set the numerical pitch space representation from the :class:`music21.pitch.Pitch` object. See :attr:`music21.pitch.Pitch.ps`.
+        doc = '''
+        Return or set the numerical pitch space 
+        representation from the 
+        :class:`music21.pitch.Pitch` object. 
+        
+        See :attr:`music21.pitch.Pitch.ps`.
+        
+        DEPRECATED May 2014: use n.pitch.ps instead
+
         ''')
 
 
@@ -1130,7 +1152,13 @@ class Note(NotRest):
         self.pitch.microtone = value
 
     microtone = property(_getMicrotone, _setMicrotone,
-        doc = '''Return or set the microtone value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.microtone`.''')
+        doc = '''Return or set the microtone value from the 
+        :class:`~music21.pitch.Pitch` object. 
+        
+        See :attr:`~music21.pitch.Pitch.microtone`.
+        
+        DEPRECATED May 2014: use n.pitch.microtone instead
+        ''')
 
 
     def _getPitchClass(self):
@@ -1151,13 +1179,14 @@ class Note(NotRest):
     pitchClass = property(_getPitchClass, _setPitchClass,
         doc = '''Return or set the pitch class from the :class:`~music21.pitch.Pitch` object.
         See :attr:`music21.pitch.Pitch.pitchClass`.
+
+        DEPRECATED May 2014: use n.pitch.pitchClass instead
         ''')
 
 
     def _getPitchClassString(self):
         '''
         Return pitch class string, replacing 10 and 11 as needed.
-
 
         >>> d = note.Note()
         >>> d.pitch = pitch.Pitch('b')
@@ -1168,8 +1197,6 @@ class Note(NotRest):
 
     def _setPitchClassString(self, value):
         '''
-
-
         >>> d = note.Note()
         >>> d.pitch = pitch.Pitch('b')
         >>> d.pitchClassString = 'a'
@@ -1179,7 +1206,14 @@ class Note(NotRest):
         self.pitch.pitchClassString = value
 
     pitchClassString = property(_getPitchClassString, _setPitchClassString,
-        doc = '''Return or set the pitch class string from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.pitchClassString`.
+        doc = '''
+        Return or set the pitch class string 
+        from the :class:`~music21.pitch.Pitch` 
+        object. 
+        
+        See :attr:`~music21.pitch.Pitch.pitchClassString`.
+        
+        DEPRECATED May 2014: use n.pitch.pitchClassString instead
         ''')
 
 
@@ -1214,7 +1248,6 @@ class Note(NotRest):
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord`.
 
-
         >>> n = note.Note('g#')
         >>> n.nameWithOctave
         'G#'
@@ -1230,7 +1263,11 @@ class Note(NotRest):
 
 
     def transpose(self, value, inPlace=False):
-        '''Transpose the Note by the user-provided value. If the value is an integer, the transposition is treated in half steps. If the value is a string, any Interval string specification can be provided.
+        '''
+        Transpose the Note by the user-provided 
+        value. If the value is an integer, the transposition is treated in half steps. 
+        
+        If the value is a string, any Interval string specification can be provided.
 
 
         >>> a = note.Note('g4')
@@ -1276,7 +1313,8 @@ class Note(NotRest):
         return ''.join(msg)
 
     fullName = property(_getFullName,
-        doc = '''Return the most complete representation of this Note, providing duration and pitch information.
+        doc = '''
+        Return the most complete representation of this Note, providing duration and pitch information.
 
 
         >>> n = note.Note('A-', quarterLength=1.5)
@@ -1301,6 +1339,8 @@ class EighthNote(Note):
     '''
     A simple way of creating an eighth note (used in testing and docs mostly)
     Most eighth notes are not `EighthNote` objects
+
+    DEPRECATED May 2014: use Note(type='eighth') instead
     '''
     def __init__(self, *arguments, **keywords):
         Note.__init__(self, *arguments, **keywords)
@@ -1313,6 +1353,8 @@ class QuarterNote(Note):
 
     N.B. the default `Note` object is a quarter note, so this is only
     needed for explicitly stating that a note is a quarter note.
+
+    DEPRECATED May 2014: use Note(type='quarter') instead
     '''
     def __init__(self, *arguments, **keywords):
         Note.__init__(self, *arguments, **keywords)
@@ -1321,7 +1363,9 @@ class QuarterNote(Note):
 class HalfNote(Note):
     '''
     A simple way of creating a half note (used in testing and docs mostly)
-    Most half notes are not `HalfNote` objects
+    Most half notes are not `HalfNote` objects.
+
+    DEPRECATED May 2014: use Note(type='half') instead
     '''
     def __init__(self, *arguments, **keywords):
         Note.__init__(self, *arguments, **keywords)
@@ -1331,6 +1375,8 @@ class WholeNote(Note):
     '''
     A simple way of creating a whole note (used in testing and docs mostly)
     Most whole notes are not `WholeNote` objects
+
+    DEPRECATED May 2014: use Note(type='whole') instead
     '''
     def __init__(self, *arguments, **keywords):
         Note.__init__(self, *arguments, **keywords)
@@ -1396,6 +1442,11 @@ class Rest(GeneralNote):
     >>> r.duration.quarterLength = 2.0
     >>> r.duration.type
     'half'
+    
+    All Rests have the name property 'rest':
+    
+    >>> r.name
+    'rest'
     '''
     isNote = False
     isUnpitched = False
@@ -1912,8 +1963,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Note,  WholeNote, HalfNote, QuarterNote,
-              EighthNote, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
+_DOC_ORDER = [Note, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

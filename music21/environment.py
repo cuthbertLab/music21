@@ -469,13 +469,11 @@ class _EnvironmentCore(object):
         # path to MuseScore (if not the musicxmlPath...)
         # for direct creation of PNG from MusicXML
         self._ref['musescoreDirectPNGPath'] = None
-
         self._ref['showFormat'] = 'musicxml'
-
         self._ref['writeFormat'] = 'musicxml'
+        self._ref['ipythonShowFormat'] = 'ipython.vexflow'
 
         self._ref['autoDownload'] = 'ask'
-
         self._ref['debug'] = 0
 
         # printing of missing import warnings
@@ -544,6 +542,21 @@ class _EnvironmentCore(object):
     ### PUBLIC METHODS ###
 
     def getDefaultRootTempDir(self):
+        '''
+        returns whatever tempfile.gettempdir() returns plus 'music21'.
+        
+        Creates the subdirectory if it doesn't exist:
+        
+        >>> import tempfile
+        >>> t = tempfile.gettempdir()
+        >>> #_DOCS_SHOW t
+        '/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T'
+
+        >>> import os
+        >>> e = environment.Environment()
+        >>> e.getDefaultRootTempDir() == os.path.join(t, 'music21')
+        True
+        '''
         # this returns the root temp dir; this does not create a new dir
         dstDir = os.path.join(tempfile.gettempdir(), 'music21')
         # if this path already exists, we have nothing more to do
@@ -558,13 +571,45 @@ class _EnvironmentCore(object):
             return dstDir
 
     def getKeysToPaths(self):
+        '''
+        Find all keys that refer to paths
+        
+        >>> e = environment.Environment()
+        >>> for i in e.getKeysToPaths():
+        ...     #_DOCS_SHOW print(i)
+        ...     pass #_DOCS_HIDE
+
+        braillePath
+        graphicsPath
+        lilypondPath
+        ...
+        '''
         return self._keysToPaths
 
     def getRefKeys(self):
+        '''
+        Find all keys (in any order)...
+        
+        >>> e = environment.Environment()
+        >>> for i in e.getRefKeys():
+        ...     #_DOCS_SHOW print(i)
+        ...     pass #_DOCS_HIDE
+
+        lilypondBackend
+        pdfPath
+        lilypondVersion
+        graphicsPath
+        ...
+        '''
         # list() is for python3 compatibility
         return list(self._ref.keys())
 
     def getRootTempDir(self):
+        '''
+        gets either the directory in key 'directoryScratch' or self.getDefaultRootTempDir
+        
+        Returns an exception if directoryScratch is defined but does not exist.
+        '''
         if self._ref['directoryScratch'] is None:
             return self.getDefaultRootTempDir()
         # check that the user-specified directory exists
@@ -638,16 +683,43 @@ class _EnvironmentCore(object):
     def keys(self):
         return self._ref.keys() + ['localCorpusPath']
 
-    def launch(self, fmt, filePath, options='', app=None):
-        # see common.fileExtensions for format names
-        m21Format, unused_ext = common.findFormat(fmt)
+    def formatToKey(self, m21Format):
+        '''
+        Finds the appropriate key to the file/app that can launch the given format:
+        
+        >>> e = environment.Environment()
+        >>> e.formatToKey('lilypond')
+        'lilypondPath'
+        >>> e.formatToKey('png')
+        'graphicsPath'
+        >>> e.formatToKey('jpeg')
+        'graphicsPath'
+        >>> e.formatToKey('svg')
+        'vectorPath'
+        >>> e.formatToKey('pdf')
+        'pdfPath'
+        >>> e.formatToKey('musicxml')
+        'musicxmlPath'
+        >>> e.formatToKey('midi')
+        'midiPath'
+        >>> e.formatToKey('braille')
+        'braillePath'
+
+        returns None if there is no key for this format (whether the format exists or not...)
+
+        >>> e.formatToKey('ipython') is None  # actual format
+        True
+        >>> e.formatToKey('adobePhotoshop') is None # not a music21 format
+        True
+        '''
+        environmentKey = None
         if m21Format == 'lilypond':
             environmentKey = 'lilypondPath'
-        elif m21Format in ['png', 'jpeg']:
+        elif m21Format in ('png', 'jpeg'):
             environmentKey = 'graphicsPath'
-        elif m21Format in ['svg']:
+        elif m21Format == 'svg':
             environmentKey = 'vectorPath'
-        elif m21Format in ['pdf']:
+        elif m21Format == 'pdf':
             environmentKey = 'pdfPath'
         elif m21Format == 'musicxml':
             environmentKey = 'musicxmlPath'
@@ -655,7 +727,24 @@ class _EnvironmentCore(object):
             environmentKey = 'midiPath'
         elif m21Format == 'braille':
             environmentKey = 'braillePath'
-        elif m21Format == 'vexflow':
+        return environmentKey
+
+    def formatToApp(self, m21Format):
+        environmentKey = self.formatToKey(m21Format)
+        if environmentKey is not None:
+            if environmentKey not in self._ref:
+                raise EnvironmentException(environmentKey + " is not set in UserSettings. ")
+            return self._ref[environmentKey]
+        return None
+
+    def launch(self, fmt, filePath, options='', app=None):
+        '''
+        DEPRECATED May 24 -- call Launch on SubConverter
+        '''
+        # see common.fileExtensions for format names
+        m21Format, unused_ext = common.findFormat(fmt)
+        environmentKey = self.formatToKey(m21Format)
+        if m21Format == 'vexflow':
             try:
                 import webbrowser
                 if filePath.find('\\') != -1:
@@ -669,14 +758,14 @@ class _EnvironmentCore(object):
             except:
                 print('Cannot open webbrowser, sorry. Go to file://{}'.format(
                     filePath))
-        else:
-            environmentKey = None
-            fpApp = None
-        if environmentKey is not None:
-            fpApp = self._ref[environmentKey]
-        # substitute app provided via argument
         if app is not None:
+            # substitute app provided via argument
             fpApp = app
+        elif environmentKey is not None:
+            fpApp = self._ref[environmentKey]
+        else:
+            fpApp = None
+
         platform = common.getPlatform()
         if fpApp is None:
             if platform == 'win':
@@ -929,6 +1018,7 @@ class Environment(object):
             'debug'
             'directoryScratch'
             'graphicsPath'
+            'ipythonShowFormat'
             'lilypondBackend'
             'lilypondFormat'
             'lilypondPath'
@@ -986,6 +1076,7 @@ class Environment(object):
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
         'lilypondPath'
@@ -1005,6 +1096,12 @@ class Environment(object):
 
         '''
         return _environStorage['instance'].keys()
+
+    def formatToApp(self, m21Format):
+        return _environStorage['instance'].formatToApp(m21Format)
+
+    def formatToKey(self, m21Format):
+        return _environStorage['instance'].formatToKey(m21Format)
 
     def launch(self, fmt, filePath, options='', app=None):
         '''
@@ -1121,6 +1218,7 @@ class UserSettings(object):
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
         'lilypondPath'
@@ -1323,6 +1421,7 @@ def set(key, value):  # okay to override set here: @ReservedAssignment
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
         'lilypondPath'
@@ -1376,6 +1475,7 @@ def get(key):
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
         'lilypondPath'
@@ -1454,6 +1554,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
+  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
@@ -1484,6 +1585,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
+  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
@@ -1535,6 +1637,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
+  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>

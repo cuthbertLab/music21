@@ -1,7 +1,6 @@
+.. _usersGuide_17_derivations:
 .. code:: python
 
-    # ignore this
-    %load_ext music21.ipython21.ipExtension
 
 User's Guide: Chapter 17: Derivations
 =====================================
@@ -9,7 +8,7 @@ User's Guide: Chapter 17: Derivations
 Suppose you have a ``music21`` score that was organized something like
 this:
 
-.. figure:: files/graphicalRepresentation/music21_hierarchy.jpg
+.. figure:: graphicalRepresentation/music21_hierarchy.jpg
    :alt: Figure 17.1: Score hierarchy
 
    Figure 17.1: Score hierarchy
@@ -24,10 +23,10 @@ The simplest way of getting at all these objects is with the
 representation so that only the non-stream elements (the pink ovals)
 remain in the score:
 
-.. figure:: files/graphicalRepresentation/music21_flat.jpg
-   :alt: Figure 37.2: Flat Score
+.. figure:: graphicalRepresentation/music21_flat.jpg
+   :alt: Figure 17.2: Flat Score
 
-   Figure 37.2: Flat Score
+   Figure 17.2: Flat Score
 
 
 This should be a review from previous chapters in the User's Guide. This
@@ -37,13 +36,11 @@ we will call ``s.flat`` or ``sf``. The relationship between the two is
 called a ``Derivation``. Symbolically, this representation can be
 visualized as follows:
 
-.. figure:: files/graphicalRepresentation/music21_derivation.jpg
-   :alt: Figure 37.3: Derivation representation
+.. figure:: graphicalRepresentation/music21_derivation.jpg
+   :alt: Figure 17.3: Derivation representation
 
-   Figure 37.3: Derivation representation
+   Figure 17.3: Derivation representation
 
-
-In[ ]:
 
 .. code:: python
 

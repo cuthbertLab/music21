@@ -184,6 +184,21 @@ class Spanner(base.Music21Object):
     
     >>> sp1.spannedElements.spannerParent == sp1
     True
+
+
+    Spanners have a `.completeStatus` attribute which can be used to find out if
+    all spanned elements have been added yet. It's up to the processing agent to
+    set this, but it could be useful in deciding where to append a spanner.
+    
+    >>> sp1.completeStatus
+    False
+    
+    When we're done adding elements:
+    
+    >>> sp1.completeStatus = True
+    
+    
+
     '''
     # this class attribute provides performance optimized class selection
     isSpanner = True 
@@ -191,7 +206,7 @@ class Spanner(base.Music21Object):
     def __init__(self, *arguments, **keywords):
         base.Music21Object.__init__(self)
 
-        self._cache = {} #common.DefaultHash()    
+        self._cache = {}     
 
         # store this so subclasses can replace
         if self.__module__ != '__main__':
@@ -314,33 +329,6 @@ class Spanner(base.Music21Object):
         # base method to perform purge on the Sream
         self.spannedElements.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
-            
-    def unwrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.unwrapWeakref(self)
-        # for contained objects that have weak refs
-        #environLocal.printDebug(['spanner unwrapping contained stream'])
-        self.spannedElements.unwrapWeakref()
-        # this presently is not a weakref but in case of future changes
-
-    def wrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.wrapWeakref(self)
-        self.spannedElements.wrapWeakref()
-
-
-#    def freezeIds(self):
-#        base.Music21Object.freezeIds(self)
-#        self.spannedElements.freezeIds()
-#
-#    def unfreezeIds(self):
-#        base.Music21Object.unfreezeIds(self)
-#        self.spannedElements.unfreezeIds()
-
 
     def getSpannerStorageId(self):
         '''Return the object id of the SpannerStorage object
@@ -475,7 +463,7 @@ class Spanner(base.Music21Object):
         self.spannedElements._elementsChanged()
         # always clear cache
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
     def hasSpannedElement(self, spannedElement):  
         '''Return True if this Spanner has the spannedElement.'''
@@ -527,7 +515,7 @@ class Spanner(base.Music21Object):
 
         # always clear cache
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
         #environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old), 'id(new)', id(new)])
 
@@ -705,9 +693,11 @@ class SpannerBundle(object):
 
     If a Stream or Stream subclass is provided as an argument, 
     all Spanners on this Stream will be accumulated herein. 
+    
+    Not to be confused with SpannerStorage.
     '''
     def __init__(self, *arguments, **keywords):
-        self._cache = {} #common.DefaultHash()    
+        self._cache = {}     
         self._storage = [] # a simple List, not a Stream
         for arg in arguments:
             if common.isListLike(arg):
@@ -729,9 +719,13 @@ class SpannerBundle(object):
         self._pendingSpannedElementAssignment = []
 
     def append(self, other):
+        '''
+        adds a Spanner to the bundle. Will be done automatically when adding a Spanner
+        to a Stream.
+        '''
         self._storage.append(other)
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
     def __len__(self):
         return len(self._storage)
@@ -744,7 +738,6 @@ class SpannerBundle(object):
 
     def remove(self, item):
         '''Remove a stored Spanner from the bundle with an instance. Each reference must have a matching id() value.
-
         
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
@@ -758,20 +751,20 @@ class SpannerBundle(object):
         >>> sb.remove(su2)
         >>> len(sb)
         1
-
         '''
         if item in self._storage:
             self._storage.remove(item)
         else:
             raise SpannerBundleException('cannot match object for removal: %s' % item)
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
 
     def _getList(self):
-        '''Return the bundle as a list.
+        '''
+        Return the bundle as a list.
         '''
         post = []
         for x in self._storage:
@@ -780,6 +773,16 @@ class SpannerBundle(object):
 
     list = property(_getList, 
         doc='''Return the bundle as a list.
+        
+        >>> su1 = spanner.Slur()
+        >>> su1.idLocal = 1
+        >>> su2 = spanner.Glissando()
+        >>> su2.idLocal = 2
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+        >>> sb.list
+        [<music21.spanner.Slur >, <music21.spanner.Glissando >]
         ''')
 
     def getSpannerStorageIds(self):
@@ -821,9 +824,9 @@ class SpannerBundle(object):
 
 
     def getByCompleteStatus(self, completeStatus):
-        '''Get spanners by matching status of `completeStatus` to the same attribute
+        '''
+        Get spanners by matching status of `completeStatus` to the same attribute
 
-        
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
         >>> su1.completeStatus = True
@@ -851,7 +854,6 @@ class SpannerBundle(object):
         '''
         Given a spanner spannedElement (an object), 
         return a new SpannerBundle of all Spanner objects that have this object as a spannedElement. 
-
         
         >>> n1 = note.Note()
         >>> n2 = note.Note()
@@ -863,9 +865,9 @@ class SpannerBundle(object):
         >>> sb.append(su2)
         >>> sb.getBySpannedElement(n1).list == [su1]
         True
-        >>> sb.getBySpannedElement(n3).list == [su2]
-        True
         >>> sb.getBySpannedElement(n2).list == [su1, su2]
+        True
+        >>> sb.getBySpannedElement(n3).list == [su2]
         True
         '''
         # NOTE: this is a performance critical operation
@@ -896,6 +898,29 @@ class SpannerBundle(object):
         The `old` parameter can be either an object or object id. 
 
         If no replacements are found, no errors are raised.
+
+        >>> n1 = note.Note('C')
+        >>> n2 = note.Note('D')
+        >>> su1 = spanner.Line(n1, n2)
+        >>> su2 = spanner.Glissando(n2, n1)
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+
+        >>> su1
+        <music21.spanner.Line <music21.note.Note C><music21.note.Note D>>
+        >>> su2
+        <music21.spanner.Glissando <music21.note.Note D><music21.note.Note C>>
+
+        >>> n3 = note.Note('E')
+        >>> sb.replaceSpannedElement(n2, n3)
+
+        >>> su1
+        <music21.spanner.Line <music21.note.Note C><music21.note.Note E>>
+        >>> su2
+        <music21.spanner.Glissando <music21.note.Note E><music21.note.Note C>>
+
+
         '''
         #environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old, 'new', new, 'len(self._storage)', len(self._storage)])
 
@@ -915,22 +940,27 @@ class SpannerBundle(object):
                 #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
         if len(self._cache) > 0:
-            self._cache = {} #common.DefaultHash()
+            self._cache = {} 
 
     def getByClass(self, className):
-        '''Given a spanner class, return a bundle of all Spanners of the desired class. 
-
+        '''
+        Given a spanner class, return a bundle of all Spanners of the desired class. 
         
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()
+        >>> su3 = layout.StaffGroup()
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
+        >>> sb.append(su3)
+        
+        Classes can be strings (short class) or classes.
+        
         >>> sb.getByClass(spanner.Slur).list == [su1]
         True
         >>> sb.getByClass('Slur').list == [su1]
         True
-        >>> sb.getByClass('StaffGroup').list == [su2]
+        >>> sb.getByClass('StaffGroup').list == [su2, su3]
         True
         '''
         # NOTE: this is called very frequently: optimize
@@ -1035,16 +1065,12 @@ class SpannerBundle(object):
         for className in classes:
             self.setIdLocalByClass(className)
     
-
-    def getBySpannedElementAndClass(self, spannedElement, className):
-        '''Get all Spanners that both contain the spannedElement and match the provided class. 
-        '''
-        return self.getBySpannedElement(spannedElement).getByClass(className)
-
     def getByClassIdLocalComplete(self, className, idLocal, completeStatus):
-        '''Get all spanners of a specified class `className`, an id `idLocal`, and a `completeStatus`. This is a convenience routine for multiple filtering when searching for relevant Spanners to pair with. 
+        '''
+        Get all spanners of a specified class `className`, an id `idLocal`, and a `completeStatus`. 
+        This is a convenience routine for multiple filtering when searching for relevant Spanners 
+        to pair with. 
 
-        
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()
         >>> su2.idLocal = 3
@@ -1059,27 +1085,6 @@ class SpannerBundle(object):
         '''
         return self.getByClass(className).getByIdLocal(
             idLocal).getByCompleteStatus(completeStatus)
-
-    def getByClassComplete(self, className, completeStatus):
-        '''Get all spanner of a specified class `className` and a `completeStatus`. Convenience routine for multiple filtering
-
-        
-        >>> su1 = spanner.Slur()
-        >>> su1.completeStatus = True
-        >>> su2 = layout.StaffGroup()
-        >>> su3 = spanner.Slur()
-        >>> su3.completeStatus = False
-        >>> sb = spanner.SpannerBundle()
-        >>> sb.append(su1)
-        >>> sb.append(su2)
-        >>> sb.append(su3)
-        >>> sb.getByClassComplete('Slur', True).list == [su1]
-        True
-        >>> sb.getByClassComplete('Slur', False).list == [su3]
-        True
-        '''
-        return self.getByClass(className).getByCompleteStatus(completeStatus)
-
 
     def setPendingSpannedElementAssignment(self, sp, className):
         ref = {'spanner':sp, 'className':className}
@@ -1296,7 +1301,16 @@ class Ottava(Spanner):
     '8vb'
     >>> print(ottava)
     <music21.spanner.Ottava 8vb >
+
+
+    All valid types
+
+    >>> ottava.validOttavaTypes
+    ('8va', '8vb', '15ma', '15mb')
+
     '''
+    validOttavaTypes = ('8va', '8vb', '15ma', '15mb')
+    
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
         self._type = None # can be 8va, 8vb, 15ma, 15mb
@@ -1337,8 +1351,7 @@ class Ottava(Spanner):
                 stub.append('a')        
             self._type = ''.join(stub)    
         else:
-            if not common.isStr(newType) or newType.lower() not in [
-                '8va', '8vb', '15ma', '15mb']:
+            if not common.isStr(newType) or newType.lower() not in self.validOttavaTypes:
                 raise SpannerException(
                     'cannot create Ottava of type: %s' % newType)
             self._type = newType.lower()
@@ -1417,7 +1430,10 @@ class Line(Spanner):
     20
 
     '''
+    validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
+
     def __init__(self, *arguments, **keywords):
+        
         Spanner.__init__(self, *arguments, **keywords)
 
         self._endTick = 'down' # can ne up/down/arrow/both/None
@@ -1500,22 +1516,23 @@ class Line(Spanner):
         return self._lineType
 
     def _setLineType(self, value):
-        if value is not None and value.lower() not in [
-            'solid', 'dashed', 'dotted', 'wavy']:
+        if value is not None and value.lower() not in self.validLineTypes:
             raise SpannerException('not a valid value: %s' % value)
         # not sure if we should permit setting as None
         if value is not None:
             self._lineType = value.lower()
 
     lineType = property(_getLineType, _setLineType, doc='''
-        Get or set the lineType property. Valid line types are "solid", "dashed", "dotted", or "wavy".
-
+        Get or set the lineType property. Valid line types are listed in .validLineTypes.
         
         >>> b = spanner.Line()
         >>> b.lineType = 'dotted'
         >>> b.lineType = 'junk'
         Traceback (most recent call last):
         SpannerException: not a valid value: junk
+
+        >>> b.validLineTypes
+        ('solid', 'dashed', 'dotted', 'wavy')
         ''')
 
     def _getEndHeight(self):
@@ -1566,6 +1583,8 @@ class Line(Spanner):
 class Glissando(Spanner):
     '''A between two Notes specifying a glissando or similar alteration. Different line types can be specified. 
     '''
+    validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
+    
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
 
@@ -1579,19 +1598,19 @@ class Glissando(Spanner):
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.BracketLine ')
+        msg = msg.replace(self._reprHead, '<music21.spanner.Glissando ')
         return msg
 
     def _getLineType(self):
         return self._lineType
 
     def _setLineType(self, value):
-        if value.lower() not in ['solid', 'dashed', 'dotted', 'wavy']:
+        if value.lower() not in self.validLineTypes:
             raise SpannerException('not a valid value: %s' % value)
         self._lineType = value.lower()
 
     lineType = property(_getLineType, _setLineType, doc='''
-        Get or set the lineType property.
+        Get or set the lineType property. See Line for valid line types
         ''')
 
 
@@ -2338,8 +2357,8 @@ class Test(unittest.TestCase):
         m2 = stream.Measure()
         m1.number = 1
         m2.number = 2
-        n1 = note.WholeNote("C#4")
-        n2 = note.WholeNote("D#4")
+        n1 = note.Note("C#4", type='whole')
+        n2 = note.Note("D#4", type='whole')
         m1.insert(0, n1)
         m2.insert(0, n2)
         p.append(m1)

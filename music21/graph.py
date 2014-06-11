@@ -4230,7 +4230,7 @@ class TestExternal(unittest.TestCase):
     def testPlotHorizontalBarPitchSpaceOffset(self):
         a = corpus.parse('bach/bwv57.8')
         # do not need to call flat version
-        b = PlotHorizontalBarPitchSpaceOffset(a[0], title='Bach (soprano voice)')
+        b = PlotHorizontalBarPitchSpaceOffset(a.parts[0], title='Bach (soprano voice)')
         b.process()
 
         b = PlotHorizontalBarPitchSpaceOffset(a, title='Bach (all parts)')
@@ -4240,11 +4240,11 @@ class TestExternal(unittest.TestCase):
 
     def testPlotHorizontalBarPitchClassOffset(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHorizontalBarPitchClassOffset(a[0], title='Bach (soprano voice)')
+        b = PlotHorizontalBarPitchClassOffset(a.parts[0], title='Bach (soprano voice)')
         b.process()
 
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHorizontalBarPitchClassOffset(a[0].measures(3,6), title='Bach (soprano voice, mm 3-6)')
+        b = PlotHorizontalBarPitchClassOffset(a.parts[0].measures(3,6), title='Bach (soprano voice, mm 3-6)')
         b.process()
 
 
@@ -4264,13 +4264,13 @@ class TestExternal(unittest.TestCase):
     def testPlotScatterWeightedPitchSpaceQuarterLength(self):
         for xLog in [True, False]:
             a = corpus.parse('bach/bwv57.8')
-            b = PlotScatterWeightedPitchSpaceQuarterLength(a[0].flat,
+            b = PlotScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat,
                             title='Pitch Space Bach (soprano voice)',
                             xLog=xLog)
             b.process()
     
             a = corpus.parse('bach/bwv57.8')
-            b = PlotScatterWeightedPitchClassQuarterLength(a[0].flat,
+            b = PlotScatterWeightedPitchClassQuarterLength(a.parts[0].flat,
                             title='Pitch Class Bach (soprano voice)',
                             xLog=xLog)
             b.process()
@@ -4278,17 +4278,17 @@ class TestExternal(unittest.TestCase):
 
     def testPlotPitchSpace(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramPitchSpace(a[0].flat, title='Bach (soprano voice)')
+        b = PlotHistogramPitchSpace(a.parts[0].flat, title='Bach (soprano voice)')
         b.process()
 
     def testPlotPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramPitchClass(a[0].flat, title='Bach (soprano voice)')
+        b = PlotHistogramPitchClass(a.parts[0].flat, title='Bach (soprano voice)')
         b.process()
 
     def testPlotQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramQuarterLength(a[0].flat, title='Bach (soprano voice)')
+        b = PlotHistogramQuarterLength(a.parts[0].flat, title='Bach (soprano voice)')
         b.process()
 
 
@@ -4296,24 +4296,24 @@ class TestExternal(unittest.TestCase):
         for xLog in [True, False]:
 
             a = corpus.parse('bach/bwv57.8')
-            b = PlotScatterPitchSpaceQuarterLength(a[0].flat, title='Bach (soprano voice)', xLog=xLog)
+            b = PlotScatterPitchSpaceQuarterLength(a.parts[0].flat, title='Bach (soprano voice)', xLog=xLog)
             b.process()
     
-            b = PlotScatterPitchClassQuarterLength(a[0].flat, title='Bach (soprano voice)', xLog=xLog)
+            b = PlotScatterPitchClassQuarterLength(a.parts[0].flat, title='Bach (soprano voice)', xLog=xLog)
             b.process()
 
     def testPlotScatterPitchClassOffset(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotScatterPitchClassOffset(a[0].flat, title='Bach (soprano voice)')
+        b = PlotScatterPitchClassOffset(a.parts[0].flat, title='Bach (soprano voice)')
         b.process()
 
 
     def testPlotScatterPitchSpaceDynamicSymbol(self):
         a = corpus.parse('schumann/opus41no1', 2)
-        b = PlotScatterPitchSpaceDynamicSymbol(a[0].flat, title='Schumann (soprano voice)')
+        b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
         b.process()
 
-        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a[0].flat, title='Schumann (soprano voice)')
+        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
         b.process()
 
 
@@ -5010,7 +5010,7 @@ _DOC_ORDER = [
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

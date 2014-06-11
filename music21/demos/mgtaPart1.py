@@ -370,7 +370,7 @@ def ch1_writing_I_B_1(show=True, *arguments, **keywords):
     from music21 import tinyNotation
 
     # camptown races
-    ex = tinyNotation.TinyNotationStream("g8 g e g", "2/4")
+    ex = tinyNotation.TinyNotationStream("2/4 g8 g e g")
     ex.insert(0, clef.AltoClef()) # maintain clef
     if show:
         ex.show()

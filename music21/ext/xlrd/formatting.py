@@ -1,23 +1,35 @@
-# -*- coding:cp1252 -*-
+# -*- coding: cp1252 -*-
 
 ##
 # Module for formatting information.
 #
-# <p>Copyright © 2005-2006 Stephen John Machin, Lingfo Pty Ltd</p>
+# <p>Copyright © 2005-2012 Stephen John Machin, Lingfo Pty Ltd</p>
 # <p>This module is part of the xlrd package, which is released under
 # a BSD-style licence.</p>
 ##
 
 # No part of the content of this file was derived from the works of David Giffin.
 
-DEBUG = 0
-import copy
-from timemachine import *
-from biffh import BaseObject, unpack_unicode, unpack_string, \
-    upkbits, upkbitsL, fprintf, XLRDError, \
-    FUN, FDT, FNU, FGE, FTX, XL_CELL_NUMBER, XL_CELL_DATE
-from struct import unpack
+from __future__ import print_function
 
+DEBUG = 0
+import re
+from struct import unpack
+from .timemachine import *
+from .biffh import BaseObject, unpack_unicode, unpack_string, \
+    upkbits, upkbitsL, fprintf, \
+    FUN, FDT, FNU, FGE, FTX, XL_CELL_NUMBER, XL_CELL_DATE, \
+    XL_FORMAT, XL_FORMAT2, \
+    XLRDError
+
+_cellty_from_fmtty = {
+    FNU: XL_CELL_NUMBER,
+    FUN: XL_CELL_NUMBER,
+    FGE: XL_CELL_NUMBER,
+    FDT: XL_CELL_DATE,
+    FTX: XL_CELL_NUMBER, # Yes, a number can be formatted as text.
+    }    
+    
 excel_default_palette_b5 = (
     (  0,   0,   0), (255, 255, 255), (255,   0,   0), (  0, 255,   0),
     (  0,   0, 255), (255, 255,   0), (255,   0, 255), (  0, 255, 255),
@@ -35,50 +47,36 @@ excel_default_palette_b5 = (
     (153,  51,   0), (153,  51, 102), ( 51,  51, 153), ( 51,  51,  51),
     )
 
-excel_default_palette_b3 = excel_default_palette_b5[:16]
+excel_default_palette_b2 = excel_default_palette_b5[:16]
 
-# Following two tables borrowed from Gnumeric 1.4 source.
-excel_default_palette_b5_gnumeric_14 = (
-    #### dodgy; didn't match Excel results
-    (  0,  0,  0), (255,255,255), (255,  0,  0), (  0,255,  0),
-    (  0,  0,255), (255,255,  0), (255,  0,255), (  0,255,255),
-    (128,  0,  0), (  0,128,  0), (  0,  0,128), (128,128,  0),
-    (128,  0,128), (  0,128,128), (192,192,192), (128,128,128),
-    (128,128,255), (128, 32, 96), (255,255,192), (160,224,224),
-    ( 96,  0,128), (255,128,128), (  0,128,192), (192,192,255),
-    (  0,  0,128), (255,  0,255), (255,255,  0), (  0,255,255),
-    (128,  0,128), (128,  0,  0), (  0,128,128), (  0,  0,255),
-    (  0,204,255), (105,255,255), (204,255,204), (255,255,153),
-    (166,202,240), (204,156,204), (204,153,255), (227,227,227),
-    ( 51,102,255), ( 51,204,204), ( 51,153, 51), (153,153, 51),
-    (153,102, 51), (153,102,102), (102,102,153), (150,150,150),
-    ( 51, 51,204), ( 51,102,102), (  0, 51,  0), ( 51, 51,  0),
-    (102, 51,  0), (153, 51,102), ( 51, 51,153), ( 66, 66, 66),
-    )
+# Following table borrowed from Gnumeric 1.4 source.
+# Checked against OOo docs and MS docs.
 excel_default_palette_b8 = ( # (red, green, blue)
-    (  0,  0,  0), (255,255,255), (255,  0,  0), (  0,255,  0),
-    (  0,  0,255), (255,255,  0), (255,  0,255), (  0,255,255),
-    (128,  0,  0), (  0,128,  0), (  0,  0,128), (128,128,  0),
-    (128,  0,128), (  0,128,128), (192,192,192), (128,128,128),
-    (153,153,255), (153, 51,102), (255,255,204), (204,255,255),
-    (102,  0,102), (255,128,128), (  0,102,204), (204,204,255),
-    (  0,  0,128), (255,  0,255), (255,255,  0), (  0,255,255),
-    (128,  0,128), (128,  0,  0), (  0,128,128), (  0,  0,255),
-    (  0,204,255), (204,255,255), (204,255,204), (255,255,153),
-    (153,204,255), (255,153,204), (204,153,255), (255,204,153),
-    ( 51,102,255), ( 51,204,204), (153,204,  0), (255,204,  0),
-    (255,153,  0), (255,102,  0), (102,102,153), (150,150,150),
-    (  0, 51,102), ( 51,153,102), (  0, 51,  0), ( 51, 51,  0),
-    (153, 51,  0), (153, 51,102), ( 51, 51,153), ( 51, 51, 51),
+    (  0,  0,  0), (255,255,255), (255,  0,  0), (  0,255,  0), # 0
+    (  0,  0,255), (255,255,  0), (255,  0,255), (  0,255,255), # 4
+    (128,  0,  0), (  0,128,  0), (  0,  0,128), (128,128,  0), # 8
+    (128,  0,128), (  0,128,128), (192,192,192), (128,128,128), # 12
+    (153,153,255), (153, 51,102), (255,255,204), (204,255,255), # 16
+    (102,  0,102), (255,128,128), (  0,102,204), (204,204,255), # 20
+    (  0,  0,128), (255,  0,255), (255,255,  0), (  0,255,255), # 24
+    (128,  0,128), (128,  0,  0), (  0,128,128), (  0,  0,255), # 28
+    (  0,204,255), (204,255,255), (204,255,204), (255,255,153), # 32
+    (153,204,255), (255,153,204), (204,153,255), (255,204,153), # 36
+    ( 51,102,255), ( 51,204,204), (153,204,  0), (255,204,  0), # 40
+    (255,153,  0), (255,102,  0), (102,102,153), (150,150,150), # 44
+    (  0, 51,102), ( 51,153,102), (  0, 51,  0), ( 51, 51,  0), # 48
+    (153, 51,  0), (153, 51,102), ( 51, 51,153), ( 51, 51, 51), # 52
     )
 
 default_palette = {
     80: excel_default_palette_b8,
     70: excel_default_palette_b5,
     50: excel_default_palette_b5,
-    45: excel_default_palette_b3,
-    40: excel_default_palette_b3,
-    30: excel_default_palette_b3,
+    45: excel_default_palette_b2,
+    40: excel_default_palette_b2,
+    30: excel_default_palette_b2,
+    21: excel_default_palette_b2,
+    20: excel_default_palette_b2,
     }
 
 """
@@ -109,6 +107,8 @@ built_in_style_names = [
 def initialise_colour_map(book):
     book.colour_map = {}
     book.colour_indexes_used = {}
+    if not book.formatting_info:
+        return
     # Add the 8 invariant colours
     for i in xrange(8):
         book.colour_map[i] = excel_default_palette_b8[i]
@@ -127,7 +127,7 @@ def initialise_colour_map(book):
         0x7FFF, # 32767, system window text colour for fonts
         ):
         book.colour_map[ci] = None
-        
+
 def nearest_colour_index(colour_map, rgb, debug=0):
     # General purpose function. Uses Euclidean distance.
     # So far used only for pre-BIFF8 WINDOW2 record.
@@ -146,9 +146,9 @@ def nearest_colour_index(colour_map, rgb, debug=0):
             best_colourx = colourx
             if metric == 0:
                 break
-    if debug:
-        print "nearest_colour_index for %r is %r -> %r; best_metric is %d" \
-            % (rgb, best_colourx, colour_map[best_colourx], best_metric)
+    if 0 and debug:
+        print("nearest_colour_index for %r is %r -> %r; best_metric is %d" \
+            % (rgb, best_colourx, colour_map[best_colourx], best_metric))
     return best_colourx
 
 ##
@@ -217,7 +217,7 @@ class Font(BaseObject, EqNeAttrs):
     italic = 0
     ##
     # The name of the font. Example: u"Arial"
-    name = u""
+    name = UNICODE_LITERAL("")
     ##
     # 1 = Characters are struck out.
     struck_out = 0
@@ -242,7 +242,14 @@ class Font(BaseObject, EqNeAttrs):
 
     # No methods ...
 
+def handle_efont(book, data): # BIFF2 only
+    if not book.formatting_info:
+        return
+    book.font_list[-1].colour_index = unpack('<H', data)[0]
+
 def handle_font(book, data):
+    if not book.formatting_info:
+        return
     if not book.encoding:
         book.derive_encoding()
     blah = DEBUG or book.verbosity >= 2
@@ -250,7 +257,7 @@ def handle_font(book, data):
     k = len(book.font_list)
     if k == 4:
         f = Font()
-        f.name = u'Dummy Font'
+        f.name = UNICODE_LITERAL('Dummy Font')
         f.font_index = k
         book.font_list.append(f)
         k += 1
@@ -260,7 +267,7 @@ def handle_font(book, data):
     if bv >= 50:
         (
             f.height, option_flags, f.colour_index, f.weight,
-            f.escapement_type, f.underline_type, f.family,
+            f.escapement, f.underline_type, f.family,
             f.character_set,
         ) = unpack('<HHHHHBBB', data[0:13])
         f.bold = option_flags & 1
@@ -273,7 +280,7 @@ def handle_font(book, data):
             f.name = unpack_unicode(data, 14, lenlen=1)
         else:
             f.name = unpack_string(data, 14, book.encoding, lenlen=1)
-    else:
+    elif bv >= 30:
         f.height, option_flags, f.colour_index = unpack('<HHH', data[0:6])
         f.bold = option_flags & 1
         f.italic = (option_flags & 2) >> 1
@@ -284,7 +291,23 @@ def handle_font(book, data):
         f.name = unpack_string(data, 6, book.encoding, lenlen=1)
         # Now cook up the remaining attributes ...
         f.weight = [400, 700][f.bold]
-        f.escapement_type = 0 # None
+        f.escapement = 0 # None
+        f.underline_type = f.underlined # None or Single
+        f.family = 0 # Unknown / don't care
+        f.character_set = 1 # System default (0 means "ANSI Latin")
+    else: # BIFF2
+        f.height, option_flags = unpack('<HH', data[0:4])
+        f.colour_index = 0x7FFF # "system window text colour"
+        f.bold = option_flags & 1
+        f.italic = (option_flags & 2) >> 1
+        f.underlined = (option_flags & 4) >> 2
+        f.struck_out = (option_flags & 8) >> 3
+        f.outline = 0
+        f.shadow = 0
+        f.name = unpack_string(data, 4, book.encoding, lenlen=1)
+        # Now cook up the remaining attributes ...
+        f.weight = [400, 700][f.bold]
+        f.escapement = 0 # None
         f.underline_type = f.underlined # None or Single
         f.family = 0 # Unknown / don't care
         f.character_set = 1 # System default (0 means "ANSI Latin")
@@ -316,7 +339,7 @@ class Format(BaseObject, EqNeAttrs):
     type = FUN
     ##
     # The format string
-    format_str = u''
+    format_str = UNICODE_LITERAL('')
 
     def __init__(self, format_key, ty, format_str):
         self.format_key = format_key
@@ -367,16 +390,20 @@ std_format_strings = {
 
 fmt_code_ranges = [ # both-inclusive ranges of "standard" format codes
     # Source: the openoffice.org doc't
+    # and the OOXML spec Part 4, section 3.8.30
     ( 0,  0, FGE),
     ( 1, 13, FNU),
     (14, 22, FDT),
-    #### (27, 36, FDT), # Japanese dates -- not sure of reliability of this
+    (27, 36, FDT), # CJK date formats
     (37, 44, FNU),
     (45, 47, FDT),
     (48, 48, FNU),
     (49, 49, FTX),
-    ####(50, 58, FDT), # Japanese dates -- but Gnumeric assumes
-                       # built-in formats finish at 49, not at 163
+    # Gnumeric assumes (or assumed) that built-in formats finish at 49, not at 163
+    (50, 58, FDT), # CJK date formats
+    (59, 62, FNU), # Thai number (currency?) formats
+    (67, 70, FNU), # Thai number (currency?) formats
+    (71, 81, FDT), # Thai date formats
     ]
 
 std_format_code_types = {}
@@ -385,30 +412,32 @@ for lo, hi, ty in fmt_code_ranges:
         std_format_code_types[x] = ty
 del lo, hi, ty, x
 
-date_chars = u'ymdhs' # year, month/minute, day, hour, second
+date_chars = UNICODE_LITERAL('ymdhs') # year, month/minute, day, hour, second
 date_char_dict = {}
 for _c in date_chars + date_chars.upper():
     date_char_dict[_c] = 5
 del _c, date_chars
 
 skip_char_dict = {}
-for _c in u'$-+/(): ':
+for _c in UNICODE_LITERAL('$-+/(): '):
     skip_char_dict[_c] = 1
 
 num_char_dict = {
-    u'0': 5,
-    u'#': 5,
-    u'?': 5,
+    UNICODE_LITERAL('0'): 5,
+    UNICODE_LITERAL('#'): 5,
+    UNICODE_LITERAL('?'): 5,
     }
 
 non_date_formats = {
-    u'0.00E+00':1,
-    u'##0.0E+0':1,
-    u'General' :1,
-    u'GENERAL' :1, # OOo Calc 1.1.4 does this.
-    u'general' :1,  # pyExcelerator 0.6.3 does this.
-    u'@'       :1,
+    UNICODE_LITERAL('0.00E+00'):1,
+    UNICODE_LITERAL('##0.0E+0'):1,
+    UNICODE_LITERAL('General') :1,
+    UNICODE_LITERAL('GENERAL') :1, # OOo Calc 1.1.4 does this.
+    UNICODE_LITERAL('general') :1,  # pyExcelerator 0.6.3 does this.
+    UNICODE_LITERAL('@')       :1,
     }
+
+fmt_bracketed_sub = re.compile(r'\[[^]]*\]').sub
 
 # Boolean format strings (actual cases)
 # u'"Yes";"Yes";"No"'
@@ -427,68 +456,62 @@ def is_date_format_string(book, fmt):
     # TODO: u'[h]\\ \\h\\o\\u\\r\\s' ([h] means don't care about hours > 23)
     state = 0
     s = ''
-    ignorable = skip_char_dict.has_key
+    
     for c in fmt:
         if state == 0:
-            if c == u'"':
+            if c == UNICODE_LITERAL('"'):
                 state = 1
-            elif c in ur"\_*":
+            elif c in UNICODE_LITERAL(r"\_*"):
                 state = 2
-            elif ignorable(c):
+            elif c in skip_char_dict:
                 pass
             else:
                 s += c
         elif state == 1:
-            if c == u'"':
+            if c == UNICODE_LITERAL('"'):
                 state = 0
         elif state == 2:
             # Ignore char after backslash, underscore or asterisk
             state = 0
         assert 0 <= state <= 2
-    # if book.verbosity >= 3:
-        # print "is_date_format_string: reduced format is %r" % s
-    if non_date_formats.has_key(s):
+    if book.verbosity >= 4:
+        print("is_date_format_string: reduced format is %s" % REPR(s), file=book.logfile)
+    s = fmt_bracketed_sub('', s)
+    if s in non_date_formats:
         return False
     state = 0
     separator = ";"
     got_sep = 0
     date_count = num_count = 0
     for c in s:
-        if state == 0:
-            if c == u'[':
-                state = 2
-            elif date_char_dict.has_key(c):
-                date_count += date_char_dict[c]
-            elif num_char_dict.has_key(c):
-                num_count += num_char_dict[c]
-            elif c == separator:
-                got_sep = 1
-        elif state == 2:
-            if c == u']':
-                state = 0
-    if state != 0:
-        fprintf(book.logfile,
-            "WARNING *** is_date_format_string: "
-            "parse failed: fmt=%r s=%r state=%d\n",
-            fmt, s, state)
+        if c in date_char_dict:
+            date_count += date_char_dict[c]
+        elif c in num_char_dict:
+            num_count += num_char_dict[c]
+        elif c == separator:
+            got_sep = 1
     # print num_count, date_count, repr(fmt)
     if date_count and not num_count:
         return True
     if num_count and not date_count:
         return False
     if date_count:
-        fprintf(book.logfile,
-            'WARNING *** is_date_format: ambiguous d=%d n=%d fmt=%r\n',
-            date_count, num_count, fmt)
+        if book.verbosity:
+            fprintf(book.logfile,
+                'WARNING *** is_date_format: ambiguous d=%d n=%d fmt=%r\n',
+                date_count, num_count, fmt)
     elif not got_sep:
-        fprintf(book.logfile,
-            "WARNING *** format %r produces constant result\n",
-            fmt)
+        if book.verbosity:
+            fprintf(book.logfile,
+                "WARNING *** format %r produces constant result\n",
+                fmt)
     return date_count > num_count
 
-def handle_format(self, data):
+def handle_format(self, data, rectype=XL_FORMAT):
     DEBUG = 0
     bv = self.biff_version
+    if rectype == XL_FORMAT2:
+        bv = min(bv, 30)
     if not self.encoding:
         self.derive_encoding()
     strpos = 2
@@ -517,7 +540,7 @@ def handle_format(self, data):
         std_ty = std_format_code_types.get(fmtkey, FUN)
         # print "std ty", std_ty
         is_date_c = std_ty == FDT
-        if 0 < fmtkey < 50 and (is_date_c ^ is_date_s):
+        if self.verbosity and 0 < fmtkey < 50 and (is_date_c ^ is_date_s):
             DEBUG = 2
             fprintf(self.logfile,
                 "WARNING *** Conflict between "
@@ -537,6 +560,8 @@ def handle_format(self, data):
 # =============================================================================
 
 def handle_palette(book, data):
+    if not book.formatting_info:
+        return
     blah = DEBUG or book.verbosity >= 2
     n_colours, = unpack('<H', data[:2])
     expected_n_colours = (16, 56)[book.biff_version >= 50]
@@ -549,7 +574,12 @@ def handle_palette(book, data):
         fprintf(book.logfile,
             "PALETTE record with %d colours\n", n_colours)
     fmt = '<xx%di' % n_colours # use i to avoid long integers
-    colours = unpack(fmt, data)
+    expected_size = 4 * n_colours + 2
+    actual_size = len(data)
+    tolerance = 4
+    if not expected_size <= actual_size <= expected_size + tolerance:
+        raise XLRDError('PALETTE record: expected size %d, actual size %d' % (expected_size, actual_size))
+    colours = unpack(fmt, data[:expected_size])
     assert book.palette_record == [] # There should be only 1 PALETTE record
     # a colour will be 0xbbggrr
     # IOW, red is at the little end
@@ -564,7 +594,7 @@ def handle_palette(book, data):
         book.colour_map[8+i] = new_rgb
         if blah:
             if new_rgb != old_rgb:
-                print >> book.logfile, "%2d: %r -> %r" % (i, old_rgb, new_rgb)
+                print("%2d: %r -> %r" % (i, old_rgb, new_rgb), file=book.logfile)
 
 def palette_epilogue(book):
     # Check colour indexes in fonts etc.
@@ -576,58 +606,83 @@ def palette_epilogue(book):
         cx = font.colour_index
         if cx == 0x7fff: # system window text colour
             continue
-        if book.colour_map.has_key(cx):
+        if cx in book.colour_map:
             book.colour_indexes_used[cx] = 1
-        else:
-            print "Size of colour table:", len(book.colour_map)
-            print >> book.logfile, \
-                "*** Font #%d (%r): colour index 0x%04x is unknown" \
-                % (font.font_index, font.name, cx)
+        elif book.verbosity:
+            print("Size of colour table:", len(book.colour_map), file=book.logfile)
+            fprintf(book.logfile, "*** Font #%d (%r): colour index 0x%04x is unknown\n",
+                font.font_index, font.name, cx)
     if book.verbosity >= 1:
-        used = book.colour_indexes_used.keys()
-        used.sort()
-        print >> book.logfile, "\nColour indexes used:\n%r\n" % used
+        used = sorted(book.colour_indexes_used.keys())
+        print("\nColour indexes used:\n%r\n" % used, file=book.logfile)
 
 def handle_style(book, data):
+    if not book.formatting_info:
+        return
     blah = DEBUG or book.verbosity >= 2
     bv = book.biff_version
-    xf_index, built_in_id, level = unpack('<HBB', data[:4])
-    if xf_index & 0x8000:
+    flag_and_xfx, built_in_id, level = unpack('<HBB', data[:4])
+    xf_index = flag_and_xfx & 0x0fff
+    if (data == b"\0\0\0\0"
+    and "Normal" not in book.style_name_map):
+        # Erroneous record (doesn't have built-in bit set).
+        # Example file supplied by Jeff Bell.
+        built_in = 1
+        built_in_id = 0
+        xf_index = 0
+        name = "Normal"
+        level = 255
+    elif flag_and_xfx & 0x8000:
         # built-in style
         built_in = 1
-        xf_index &= 0x7fff
         name = built_in_style_names[built_in_id]
         if 1 <= built_in_id <= 2:
             name += str(level + 1)
     else:
         # user-defined style
-        if bv >= 80:
-            name = unpack_unicode(data, 2, lenlen=2)
-        else:
-            name = unpack_string(data, 2, book.encoding, lenlen=1)
         built_in = 0
         built_in_id = 0
         level = 0
+        if bv >= 80:
+            try:
+                name = unpack_unicode(data, 2, lenlen=2)
+            except UnicodeDecodeError:
+                print("STYLE: built_in=%d xf_index=%d built_in_id=%d level=%d" \
+                    % (built_in, xf_index, built_in_id, level), file=book.logfile)
+                print("raw bytes:", repr(data[2:]), file=book.logfile)
+                raise
+        else:
+            name = unpack_string(data, 2, book.encoding, lenlen=1)
+        if blah and not name:
+            print("WARNING *** A user-defined style has a zero-length name", file=book.logfile)
     book.style_name_map[name] = (built_in, xf_index)
     if blah:
-        print >> book.logfile, \
-            "STYLE: built_in=%d xf_index=%d built_in_id=%d level=%d name=%r" \
-            % (built_in, xf_index, built_in_id, level, name)
+        fprintf(book.logfile, "STYLE: built_in=%d xf_index=%d built_in_id=%d level=%d name=%r\n",
+            built_in, xf_index, built_in_id, level, name)
 
 def check_colour_indexes_in_obj(book, obj, orig_index):
-    alist = obj.__dict__.items()
-    alist.sort()
+    alist = sorted(obj.__dict__.items())
     for attr, nobj in alist:
         if hasattr(nobj, 'dump'):
             check_colour_indexes_in_obj(book, nobj, orig_index)
         elif attr.find('colour_index') >= 0:
-            if book.colour_map.has_key(nobj):
+            if nobj in book.colour_map:
                 book.colour_indexes_used[nobj] = 1
                 continue
             oname = obj.__class__.__name__
-            print >> book.logfile, \
-                "*** xf #%d : %s.%s =  0x%04x (unknown)" \
-                % (orig_index, oname, attr, nobj)
+            print("*** xf #%d : %s.%s =  0x%04x (unknown)" \
+                % (orig_index, oname, attr, nobj), file=book.logfile)
+
+def fill_in_standard_formats(book):
+    for x in std_format_code_types.keys():
+        if x not in book.format_map:
+            ty = std_format_code_types[x]
+            # Note: many standard format codes (mostly CJK date formats) have
+            # format strings that vary by locale; xlrd does not (yet)
+            # handle those; the type (date or numeric) is recorded but the fmt_str will be None.
+            fmt_str = std_format_strings.get(x)
+            fmtobj = Format(x, ty, fmt_str)
+            book.format_map[x] = fmtobj
 
 def handle_xf(self, data):
     ### self is a Book instance
@@ -649,12 +704,7 @@ def handle_xf(self, data):
     # fill in the known standard formats
     if bv >= 50 and not self.xfcount:
         # i.e. do this once before we process the first XF record
-        for x in std_format_code_types.keys():
-            if not self.format_map.has_key(x):
-                ty = std_format_code_types[x]
-                fmt_str = std_format_strings[x]
-                fmtobj = Format(x, ty, fmt_str)
-                self.format_map[x] = fmtobj
+        fill_in_standard_formats(self)
     if bv >= 80:
         unpack_fmt = '<HHHBBBBIiH'
         (xf.font_index, xf.format_key, pkd_type_par,
@@ -697,7 +747,7 @@ def handle_xf(self, data):
             (16, 0x007f0000,  'left_colour_index'),
             (23, 0x3f800000,  'right_colour_index'),
             (30, 0x40000000,  'diag_down'),
-            (31, 0x80000000L, 'diag_up'),
+            (31, 0x80000000, 'diag_up'),
             ))
         upkbits(xf.border, pkd_brdbkg2, (
             (0,  0x0000007F, 'top_colour_index'),
@@ -706,7 +756,7 @@ def handle_xf(self, data):
             (21, 0x01E00000, 'diag_line_style'),
             ))
         upkbitsL(xf.background, pkd_brdbkg2, (
-            (26, 0xFC000000L, 'fill_pattern'),
+            (26, 0xFC000000, 'fill_pattern'),
             ))
         upkbits(xf.background, pkd_brdbkg3, (
             (0, 0x007F, 'pattern_colour_index'),
@@ -747,7 +797,7 @@ def handle_xf(self, data):
             ))
         upkbitsL(xf.border, pkd_brdbkg1, (
             (22, 0x01C00000,  'bottom_line_style'),
-            (25, 0xFE000000L, 'bottom_colour_index'),
+            (25, 0xFE000000, 'bottom_colour_index'),
             ))
         upkbits(xf.border, pkd_brdbkg2, (
             ( 0, 0x00000007, 'top_line_style'),
@@ -798,7 +848,7 @@ def handle_xf(self, data):
             (16, 0x00070000,  'bottom_line_style'),
             (19, 0x00F80000,  'bottom_colour_index'),
             (24, 0x07000000,  'right_line_style'),
-            (27, 0xF8000000L, 'right_colour_index'),
+            (27, 0xF8000000, 'right_colour_index'),
             ))
     elif bv == 30:
         unpack_fmt = '<BBBBHHI'
@@ -840,10 +890,45 @@ def handle_xf(self, data):
             (16, 0x00070000,  'bottom_line_style'),
             (19, 0x00F80000,  'bottom_colour_index'),
             (24, 0x07000000,  'right_line_style'),
-            (27, 0xF8000000L, 'right_colour_index'),
+            (27, 0xF8000000, 'right_colour_index'),
             ))
         xf.alignment.vert_align = 2 # bottom
         xf.alignment.rotation = 0
+    elif bv == 21:
+        #### Warning: incomplete treatment; formatting_info not fully supported.
+        #### Probably need to offset incoming BIFF2 XF[n] to BIFF8-like XF[n+16],
+        #### and create XF[0:16] like the standard ones in BIFF8
+        #### *AND* add 16 to all XF references in cell records :-(
+        (xf.font_index, format_etc, halign_etc) = unpack('<BxBB', data)
+        xf.format_key = format_etc & 0x3F
+        upkbits(xf.protection, format_etc, (
+            (6, 0x40, 'cell_locked'),
+            (7, 0x80, 'formula_hidden'),
+            ))
+        upkbits(xf.alignment, halign_etc, (
+            (0, 0x07, 'hor_align'),
+            ))
+        for mask, side in ((0x08, 'left'), (0x10, 'right'), (0x20, 'top'), (0x40, 'bottom')):
+            if halign_etc & mask:
+                colour_index, line_style = 8, 1 # black, thin
+            else:
+                colour_index, line_style = 0, 0 # none, none
+            setattr(xf.border, side + '_colour_index', colour_index)
+            setattr(xf.border, side + '_line_style', line_style)
+        bg = xf.background
+        if halign_etc & 0x80:
+            bg.fill_pattern = 17
+        else:
+            bg.fill_pattern = 0
+        bg.background_colour_index = 9 # white
+        bg.pattern_colour_index = 8 # black
+        xf.parent_style_index = 0 # ???????????
+        xf.alignment.vert_align = 2 # bottom
+        xf.alignment.rotation = 0
+        for attr_stem in \
+            "format font alignment border background protection".split():
+            attr = "_" + attr_stem + "_flag"
+            setattr(xf, attr, 1)
     else:
         raise XLRDError('programmer stuff-up: bv=%d' % bv)
 
@@ -856,13 +941,23 @@ def handle_xf(self, data):
             header="--- handle_xf: xf[%d] ---" % xf.xf_index,
             footer=" ",
         )
+    try:
+        fmt = self.format_map[xf.format_key]
+        cellty = _cellty_from_fmtty[fmt.type]
+    except KeyError:
+        cellty = XL_CELL_NUMBER
+    self._xf_index_to_xl_type_map[xf.xf_index] = cellty
+
     # Now for some assertions ...
-    if xf.is_style:
-        assert xf.parent_style_index == 0x0FFF
-    check_colour_indexes_in_obj(self, xf, xf.xf_index)
-    if not self.format_map.has_key(xf.format_key):
+    if self.formatting_info:
+        if self.verbosity and xf.is_style and xf.parent_style_index != 0x0FFF:
+            msg = "WARNING *** XF[%d] is a style XF but parent_style_index is 0x%04x, not 0x0fff\n"
+            fprintf(self.logfile, msg, xf.xf_index, xf.parent_style_index)
+        check_colour_indexes_in_obj(self, xf, xf.xf_index)
+    if xf.format_key not in self.format_map:
         msg = "WARNING *** XF[%d] unknown (raw) format key (%d, 0x%04x)\n"
-        fprintf(self.logfile, msg,
+        if self.verbosity:
+            fprintf(self.logfile, msg,
                 xf.xf_index, xf.format_key, xf.format_key)
         xf.format_key = 0
 
@@ -872,70 +967,81 @@ def xf_epilogue(self):
     num_xfs = len(self.xf_list)
     blah = DEBUG or self.verbosity >= 3
     blah1 = DEBUG or self.verbosity >= 1
-    
+    if blah:
+        fprintf(self.logfile, "xf_epilogue called ...\n")
+
     def check_same(book_arg, xf_arg, parent_arg, attr):
         # the _arg caper is to avoid a Warning msg from Python 2.1 :-(
         if getattr(xf_arg, attr) != getattr(parent_arg, attr):
             fprintf(book_arg.logfile,
                 "NOTE !!! XF[%d] parent[%d] %s different\n",
                 xf_arg.xf_index, parent_arg.xf_index, attr)
-                
-    for xf in self.xf_list:
-        if not self.format_map.has_key(xf.format_key):
+
+    for xfx in xrange(num_xfs):
+        xf = self.xf_list[xfx]
+        if xf.format_key not in self.format_map:
             msg = "ERROR *** XF[%d] unknown format key (%d, 0x%04x)\n"
             fprintf(self.logfile, msg,
                     xf.xf_index, xf.format_key, xf.format_key)
             xf.format_key = 0
-        cellty_from_fmtty = {
-            FNU: XL_CELL_NUMBER,
-            FUN: XL_CELL_NUMBER,
-            FGE: XL_CELL_NUMBER,
-            FDT: XL_CELL_DATE,
-            FTX: XL_CELL_NUMBER, # Yes, a number can be formatted as text.
-            }
+
         fmt = self.format_map[xf.format_key]
-        cellty = cellty_from_fmtty[fmt.type]
+        cellty = _cellty_from_fmtty[fmt.type]
         self._xf_index_to_xl_type_map[xf.xf_index] = cellty
         # Now for some assertions etc
+        if not self.formatting_info:
+            continue
         if xf.is_style:
             continue
-        assert 0 <= xf.parent_style_index < num_xfs
-        assert xf.parent_style_index != xf.xf_index
-        assert self.xf_list[xf.parent_style_index].is_style
-        if blah1 and xf.parent_style_index > xf.xf_index:
-            fprintf(self.logfile,
-                "NOTE !!! XF[%d]: parent_style_index is %d; out of order?\n",
-                xf.xf_index, xf.parent_style_index)
-        parent = self.xf_list[xf.parent_style_index]
-        if not xf._alignment_flag and not parent._alignment_flag:
-            if blah1: check_same(self, xf, parent, 'alignment')
-        if not xf._background_flag and not parent._background_flag:
-            if blah1: check_same(self, xf, parent, 'background')
-        if not xf._border_flag and not parent._border_flag:
-            if blah1: check_same(self, xf, parent, 'border')
-        if not xf._protection_flag and not parent._protection_flag:
-            if blah1: check_same(self, xf, parent, 'protection')
-        if not xf._format_flag and not parent._format_flag:
-            if blah1 and xf.format_key != parent.format_key:
+        if not(0 <= xf.parent_style_index < num_xfs):
+            if blah1:
                 fprintf(self.logfile,
-                    "NOTE !!! XF[%d] fmtk=%d, parent[%d] fmtk=%r\n%r / %r\n",
-                    xf.xf_index, xf.format_key, parent.xf_index, parent.format_key,
-                    self.format_map[xf.format_key].format_str,
-                    self.format_map[parent.format_key].format_str)
-        if not xf._font_flag and not parent._font_flag:
-            if blah1 and xf.font_index != parent.font_index:
+                    "WARNING *** XF[%d]: is_style=%d but parent_style_index=%d\n",
+                    xf.xf_index, xf.is_style, xf.parent_style_index)
+            # make it conform
+            xf.parent_style_index = 0
+        if self.biff_version >= 30:
+            if blah1:
+                if xf.parent_style_index == xf.xf_index:
+                    fprintf(self.logfile,
+                        "NOTE !!! XF[%d]: parent_style_index is also %d\n",
+                        xf.xf_index, xf.parent_style_index)
+                elif not self.xf_list[xf.parent_style_index].is_style:
+                    fprintf(self.logfile,
+                        "NOTE !!! XF[%d]: parent_style_index is %d; style flag not set\n",
+                        xf.xf_index, xf.parent_style_index)                
+            if blah1 and xf.parent_style_index > xf.xf_index:
                 fprintf(self.logfile,
-                    "NOTE !!! XF[%d] fontx=%d, parent[%d] fontx=%r\n",
-                    xf.xf_index, xf.font_index, parent.xf_index, parent.font_index)
-    # Following are deprecated, undocumented, and will vanish Real Soon Now.
-    self.raw_xf_list = self.xf_list
-    self.computed_xf_list = self.xf_list
+                    "NOTE !!! XF[%d]: parent_style_index is %d; out of order?\n",
+                    xf.xf_index, xf.parent_style_index)
+            parent = self.xf_list[xf.parent_style_index]
+            if not xf._alignment_flag and not parent._alignment_flag:
+                if blah1: check_same(self, xf, parent, 'alignment')
+            if not xf._background_flag and not parent._background_flag:
+                if blah1: check_same(self, xf, parent, 'background')
+            if not xf._border_flag and not parent._border_flag:
+                if blah1: check_same(self, xf, parent, 'border')
+            if not xf._protection_flag and not parent._protection_flag:
+                if blah1: check_same(self, xf, parent, 'protection')
+            if not xf._format_flag and not parent._format_flag:
+                if blah1 and xf.format_key != parent.format_key:
+                    fprintf(self.logfile,
+                        "NOTE !!! XF[%d] fmtk=%d, parent[%d] fmtk=%r\n%r / %r\n",
+                        xf.xf_index, xf.format_key, parent.xf_index, parent.format_key,
+                        self.format_map[xf.format_key].format_str,
+                        self.format_map[parent.format_key].format_str)
+            if not xf._font_flag and not parent._font_flag:
+                if blah1 and xf.font_index != parent.font_index:
+                    fprintf(self.logfile,
+                        "NOTE !!! XF[%d] fontx=%d, parent[%d] fontx=%r\n",
+                        xf.xf_index, xf.font_index, parent.xf_index, parent.font_index)
 
 def initialise_book(book):
     initialise_colour_map(book)
     book._xf_epilogue_done = 0
     methods = (
         handle_font,
+        handle_efont,
         handle_format,
         is_date_format_string,
         handle_palette,
@@ -953,7 +1059,7 @@ def initialise_book(book):
 # <p> An explanations of "colour index" is given in the Formatting
 # section at the start of this document.
 # There are five line style attributes; possible values and the
-# associated meanings are: 
+# associated meanings are:
 # 0&nbsp;=&nbsp;No line,
 # 1&nbsp;=&nbsp;Thin,
 # 2&nbsp;=&nbsp;Medium,
@@ -1141,7 +1247,6 @@ class XF(BaseObject):
     # is the same as the index into format_list, and <i>only</i>
     # if the index is less than 164.
     # </p>
-
     format_key = 0
     ##
     # An instance of an XFProtection object.

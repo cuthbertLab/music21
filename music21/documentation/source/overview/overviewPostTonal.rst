@@ -199,18 +199,18 @@ create and print a :class:`~music21.serial.TwelveToneMatrix` object.
     >>> from music21 import *
     >>> aRow = serial.getHistoricalRowByName('RowBergViolinConcerto')
     >>> aRow.show('text')
-    {0.0} <music21.pitch.Pitch G>
-    {0.0} <music21.pitch.Pitch B->
-    {0.0} <music21.pitch.Pitch D>
-    {0.0} <music21.pitch.Pitch F#>
-    {0.0} <music21.pitch.Pitch A>
-    {0.0} <music21.pitch.Pitch C>
-    {0.0} <music21.pitch.Pitch E>
-    {0.0} <music21.pitch.Pitch G#>
-    {0.0} <music21.pitch.Pitch B>
-    {0.0} <music21.pitch.Pitch C#>
-    {0.0} <music21.pitch.Pitch E->
-    {0.0} <music21.pitch.Pitch F>
+    {0.0} <music21.note.Note G>
+    {0.0} <music21.note.Note B->
+    {0.0} <music21.note.Note D>
+    {0.0} <music21.note.Note F#>
+    {0.0} <music21.note.Note A>
+    {0.0} <music21.note.Note C>
+    {0.0} <music21.note.Note E>
+    {0.0} <music21.note.Note G#>
+    {0.0} <music21.note.Note B>
+    {0.0} <music21.note.Note C#>
+    {0.0} <music21.note.Note E->
+    {0.0} <music21.note.Note F>
 
 ::
 

@@ -50,7 +50,8 @@ owners who have allowed them to be included with music21.
 
 
 __all__ = [
-    'base', 
+    'base',
+    'sites', # important 
     # sub folders
     'abcFormat', 
     'analysis', 
@@ -72,8 +73,10 @@ __all__ = [
     'musedata',
     'musicxml', 
     'noteworthy',
+    'omr',
     'romanText', 
-    'scala', 'search',
+    'scala', 
+    'search',
     'test',
     'theoryAnalysis',
     'trecento',
@@ -89,7 +92,6 @@ __all__ = [
     'chant',
     'chord',
     'chordTables', 
-    'classCache',
     'clef',
     'common',
     'configure',
@@ -153,9 +155,8 @@ from music21.base import Music21Exception
 from music21.base import SitesException
 from music21.base import Music21ObjectException
 from music21.base import ElementException
-from music21.base import SlottedObject
 from music21.base import Groups
-from music21.base import Site
+from music21.base import SiteRef
 from music21.base import Sites
 from music21.base import Music21Object
 from music21.base import ElementWrapper
@@ -178,6 +179,7 @@ from music21.base import *
 #------------------------------------------------------------------------------
 # this bring all of the __all__ names into the music21 package namespace
 from music21 import * # @UnresolvedImport
+
 #------------------------------------------------------------------------------
 # eof
 

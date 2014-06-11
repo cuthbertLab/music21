@@ -9,6 +9,7 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
+# MSC -- yes, it does work, as of May 2014!
 
 
 import getpass, os

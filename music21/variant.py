@@ -46,11 +46,11 @@ def mergeVariants(streamX, streamY, variantName = 'variant', inPlace = False):
     
     >>> aScore, vScore= stream.Score(), stream.Score()
     
-    >>> ap1 = stream.Part(converter.parse("  a4 b c d    e2 f2   g2 f4 g4 ", "4/4").makeMeasures())
-    >>> vp1 = stream.Part(converter.parse("  a4 b c e    e2 f2   g2 f4 a4 ", "4/4").makeMeasures())
+    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 ").makeMeasures())
+    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 ").makeMeasures())
     
-    >>> ap2 = stream.Part(converter.parse("  a4 g f e    f2 e2   d2 g4 f4 ", "4/4").makeMeasures())
-    >>> vp2 = stream.Part(converter.parse("  a4 g f e    f2 g2   f2 g4 d4 ", "4/4").makeMeasures())
+    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 ").makeMeasures())
+    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 ").makeMeasures())
     
     >>> aScore.insert(0.0, ap1)
     >>> aScore.insert(0.0, ap2)
@@ -80,8 +80,8 @@ def mergeVariants(streamX, streamY, variantName = 'variant', inPlace = False):
     ...
         {4.0} <music21.bar.Barline style=final>
     
-    >>> streamX = converter.parse("a4 b c d", "4/4")
-    >>> streamY = converter.parse("a4 d c b", "4/4")
+    >>> streamX = converter.parse("tinynotation: 4/4 a4 b c d")
+    >>> streamY = converter.parse("tinynotation: 4/4 a4 d c b")
     >>> mergedStream = variant.mergeVariants(streamX, streamY, variantName = 'docvariant', inPlace = False)
     >>> mergedStream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -92,7 +92,7 @@ def mergeVariants(streamX, streamY, variantName = 'variant', inPlace = False):
     {3.0} <music21.variant.Variant object of length 1.0>
     {3.0} <music21.note.Note D>
     
-    >>> streamY = converter.parse("a4 b c d e f g a", "4/4")
+    >>> streamY = converter.parse("tinynotation: 4/4 a4 b c d e f g a")
     >>> variant.mergeVariants(streamX, streamY, variantName = 'docvariant', inPlace = False)
     Traceback (most recent call last):
     ...
@@ -116,11 +116,11 @@ def mergeVariantScores(aScore, vScore, variantName = 'variant', inPlace = False)
     
     >>> aScore, vScore= stream.Score(), stream.Score()
     
-    >>> ap1 = stream.Part(converter.parse("  a4 b c d    e2 f2   g2 f4 g4 ", "4/4").makeMeasures())
-    >>> vp1 = stream.Part(converter.parse("  a4 b c e    e2 f2   g2 f4 a4 ", "4/4").makeMeasures())
+    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 ").makeMeasures())
+    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 ").makeMeasures())
     
-    >>> ap2 = stream.Part(converter.parse("  a4 g f e    f2 e2   d2 g4 f4 ", "4/4").makeMeasures())
-    >>> vp2 = stream.Part(converter.parse("  a4 g f e    f2 g2   f2 g4 d4 ", "4/4").makeMeasures())
+    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 ").makeMeasures())
+    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 ").makeMeasures())
     
     >>> aScore.insert(0.0, ap1)
     >>> aScore.insert(0.0, ap2)
@@ -609,8 +609,8 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
     because that information is not contained in the format of score this method is designed to deal with.
     
     
-    >>> mainstream = converter.parse("  A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ", "4/4")
-    >>> ossiastream = converter.parse(" r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ", "4/4")
+    >>> mainstream = converter.parse("tinynotation: 4/4   A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ")
+    >>> ossiastream = converter.parse("tinynotation: 4/4  r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ")
     >>> mainstream.makeMeasures(inPlace = True)
     >>> ossiastream.makeMeasures(inPlace = True)
     
@@ -1023,7 +1023,7 @@ def getMeasureHashes(s):
     implemented with search.translateStreamToString()
     
     
-    >>> s = converter.parse("c4 d8. e16 FF4 a'4 b-2", "2/4")
+    >>> s = converter.parse("tinynotation: 2/4 c4 d8. e16 FF4 a'4 b-2")
     >>> sm = s.makeMeasures()
     >>> hashes = variant.getMeasureHashes(sm)
     >>> hashes
@@ -1197,9 +1197,9 @@ def _getRegionsFromStreams(streamX,streamY):
     Takes in two streams, returns a list of 5-tuples via difflib.get_opcodes() working on measure differences.
     
     
-    >>> s1 = converter.parse("d4 e8. f16 GG4 b'4 b-2 c4 d8. e16 FF4 a'4 b-2", "2/4")
-    >>> #                     *0:Eq  *1:Rep        * *3:Eq             *6:In
-    >>> s2 = converter.parse("d4 e8. f16 FF4 b'4 c4 d8. e16 FF4 a'4 b-2 b-2", "2/4")
+    >>> s1 = converter.parse("tinynotation: 2/4 d4 e8. f16 GG4 b'4 b-2 c4 d8. e16 FF4 a'4 b-2")
+    >>> #                                       *0:Eq  *1:Rep        * *3:Eq             *6:In
+    >>> s2 = converter.parse("tinynotation: 2/4 d4 e8. f16 FF4 b'4 c4 d8. e16 FF4 a'4 b-2 b-2")
     >>> s1m = s1.makeMeasures()
     >>> s2m = s2.makeMeasures()
     >>> regions = variant._getRegionsFromStreams(s1m, s2m)
@@ -1403,10 +1403,10 @@ def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace
     method will work on variants within container objects within the stream (like parts).
     
     >>> from __future__ import print_function
-    >>> #                                         *                                            *                                *
-    >>> s = converter.parse("      d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
-    >>> s2 = converter.parse("     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4    f1", "4/4")
-    >>> #                                        replacement                            insertion                            deletion
+    >>> #                                                          *                                            *                                *
+    >>> s = converter.parse("tinynotation: 4/4       d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1")
+    >>> s2 = converter.parse("tinynotation: 4/4      d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4    f1")
+    >>> #                                                          replacement                            insertion                            deletion
     >>> s.makeMeasures(inPlace = True)
     >>> s2.makeMeasures(inPlace = True)
     >>> variant.mergeVariants(s, s2, variantName = 'london', inPlace = True)
@@ -1461,10 +1461,10 @@ def _doVariantFixingOnStream(s, variantNames = None):
     and performs the variant changing operation to eliminate strict deletion and insertion variants.
     
     
-    >>> #                            *                           *                                            *                                *                           *
-    >>> s = converter.parse("                   d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1    ", "4/4")
-    >>> s2 = converter.parse("     a4 b c d     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4          ", "4/4")
-    >>> #                      initial insertion              replacement                            insertion                            deletion                        final deletion
+    >>> #                                           *                           *                                            *                                *                           *
+    >>> s = converter.parse("tinynotation: 4/4                    d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1    ")
+    >>> s2 = converter.parse("tinynotation: 4/4      a4 b c d     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4          ")
+    >>> #                                        initial insertion              replacement                            insertion                            deletion                        final deletion
     >>> s.makeMeasures(inPlace = True)
     >>> s2.makeMeasures(inPlace = True)
     >>> variant.mergeVariants(s, s2, variantName = 'london', inPlace = True)
@@ -1498,9 +1498,9 @@ def _doVariantFixingOnStream(s, variantNames = None):
     
     This also works on streams with variants that contain notes and rests rather than measures.
     
-    >>> s = converter.parse('                     e4 b b b   f4 f f f   g4 a a a       ', '4/4')
-    >>> v1Stream = converter.parse('   a4 a a a                                       ', '4/4')
-    >>> #                              initial insertion     deletion
+    >>> s = converter.parse('tinyNotation: 4/4                     e4 b b b   f4 f f f   g4 a a a       ')
+    >>> v1Stream = converter.parse('tinyNotation: 4/4   a4 a a a                                       ')
+    >>> #                                               initial insertion     deletion
     >>> v1 = variant.Variant(v1Stream.notes)
     >>> v1.replacementDuration = 0.0
     >>> v1.groups = ['london']
@@ -1580,10 +1580,10 @@ def _getNextElements(s, v, numberOfElements = 1):
     of the type of elements found in the variant v so that if can be added to v.
     
     
-    >>> #                          *                       *
-    >>> s1 = converter.parse('             b4 c d e    f4 g a b   d4 e f g   ', '4/4')
-    >>> s2 = converter.parse(' e4 f g a    b4 c d e               d4 e f g   ', '4/4')
-    >>> #                      insertion               deletion
+    >>> #                                                   *                       *
+    >>> s1 = converter.parse('tinyNotation: 4/4             b4 c d e    f4 g a b   d4 e f g   ')
+    >>> s2 = converter.parse('tinyNotation: 4/4 e4 f g a    b4 c d e               d4 e f g   ')
+    >>> #                                       insertion               deletion
     >>> s1.makeMeasures(inPlace = True)
     >>> s2.makeMeasures(inPlace = True)
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
@@ -1595,9 +1595,9 @@ def _getNextElements(s, v, numberOfElements = 1):
     
     This also works on streams with variants that contain notes and rests rather than measures.
     
-    >>> s = converter.parse('                     e4 b b b   f4 f f f   g4 a a a       ', '4/4')
-    >>> v1Stream = converter.parse('   a4 a a a                                       ', '4/4')
-    >>> #                              initial insertion     deletion
+    >>> s = converter.parse('tinyNotation: 4/4                     e4 b b b   f4 f f f   g4 a a a       ')
+    >>> v1Stream = converter.parse('tinyNotation: 4/4   a4 a a a                                       ')
+    >>> #                                               initial insertion
     >>> v1 = variant.Variant(v1Stream.notes)
     >>> v1.replacementDuration = 0.0
     >>> v1.groups = ['london']
@@ -1659,10 +1659,10 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     of the type of elements found in the variant v so that if can be added to v.
     
     
-    >>> #                                      *                       *
-    >>> s1 = converter.parse(' a4 b c d                b4 c d e    f4 g a b    ', '4/4')
-    >>> s2 = converter.parse(' a4 b c d    e4 f g a    b4 c d e                ', '4/4')
-    >>> #                                  insertion               deletion
+    >>> #                                                   *                       *
+    >>> s1 = converter.parse('tinyNotation: 4/4 a4 b c d                b4 c d e    f4 g a b    ')
+    >>> s2 = converter.parse('tinyNotation: 4/4 a4 b c d    e4 f g a    b4 c d e                ')
+    >>> #                                                   insertion               deletion
     >>> s1.makeMeasures(inPlace = True)
     >>> s2.makeMeasures(inPlace = True)
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
@@ -1674,9 +1674,9 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     
     This also works on streams with variants that contain notes and rests rather than measures.
     
-    >>> s = converter.parse('         b4 b b a            e4 b b b      g4 e e e       ', '4/4')
-    >>> v1Stream = converter.parse('           f4 f f f                                ', '4/4')
-    >>> #                                      insertion                final deletion
+    >>> s = converter.parse('tinyNotation: 4/4         b4 b b a            e4 b b b      g4 e e e       ')
+    >>> v1Stream = converter.parse('tinyNotation: 4/4           f4 f f f                                ')
+    >>> #                                                       insertion                final deletion
     >>> v1 = variant.Variant(v1Stream.notes)
     >>> v1.replacementDuration = 0.0
     >>> v1.groups = ['london']
@@ -1826,33 +1826,6 @@ class Variant(base.Music21Object):
         # must override Music21Object to purge locations from the contained
         self._stream.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
-
-    def unwrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.unwrapWeakref(self)
-        # for contained objects that have weak refs
-        self._stream.unwrapWeakref()
-        # this presently is not a weakref but in case of future changes
-
-
-    def wrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
-        '''
-        # call base method: this gets defined contexts and active site
-        base.Music21Object.wrapWeakref(self)
-        self._stream.wrapWeakref()
-
-
-#    def freezeIds(self):
-#        base.Music21Object.freezeIds(self)
-#        self._stream.freezeIds()
-#
-#    def unfreezeIds(self):
-#        base.Music21Object.unfreezeIds(self)
-#        self._stream.unfreezeIds()
-
 
     def __repr__(self):
         return "<music21.variant.%s object of length %s>" % \
@@ -2052,11 +2025,11 @@ class Variant(base.Music21Object):
         are captured. Elsewhere, all elements are captured.
         
         
-        >>> s = converter.parse("d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
+        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1",)
         >>> s.makeMeasures(inPlace = True)
-        >>> v1stream = converter.parse("       a2. b-8 a8", "4/4")
-        >>> v2stream1 = converter.parse("                                      d4 f4 a2", "4/4")
-        >>> v2stream2 = converter.parse("                                                 d4 f4 AA2", "4/4")
+        >>> v1stream = converter.parse("tinynotation: 4/4        a2. b-8 a8")
+        >>> v2stream1 = converter.parse("tinynotation: 4/4                                       d4 f4 a2")
+        >>> v2stream2 = converter.parse("tinynotation: 4/4                                                  d4 f4 AA2")
         
         >>> v1 = variant.Variant()
         >>> v1measure = stream.Measure()

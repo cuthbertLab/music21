@@ -1,23 +1,28 @@
 # -*- coding: cp1252 -*-
-from __future__ import print_function
 
 ##
 # Support module for the xlrd package.
 #
-# <p> Portions copyright © 2005-2006 Stephen John Machin, Lingfo Pty Ltd</p>
+# <p>Portions copyright © 2005-2010 Stephen John Machin, Lingfo Pty Ltd</p>
 # <p>This module is part of the xlrd package, which is released under a BSD-style licence.</p>
 ##
 
+# 2010-03-01 SJM Reading SCL record
+# 2010-03-01 SJM Added more record IDs for biff_dump & biff_count
+# 2008-02-10 SJM BIFF2 BLANK record
+# 2008-02-08 SJM Preparation for Excel 2.0 support
+# 2008-02-02 SJM Added suffixes (_B2, _B2_ONLY, etc) on record names for biff_dump & biff_count
+# 2007-12-04 SJM Added support for Excel 2.x (BIFF2) files.
+# 2007-09-08 SJM Avoid crash when zero-length Unicode string missing options byte.
 # 2007-04-22 SJM Remove experimental "trimming" facility.
+
+from __future__ import print_function
 
 DEBUG = 0
 
 from struct import unpack
 import sys
-try:
-    from timemachine import *
-except:
-    from .timemachine import *
+from .timemachine import *
 
 class XLRDError(Exception):
     pass
@@ -39,10 +44,15 @@ class BaseObject(object):
     def dump(self, f=None, header=None, footer=None, indent=0):
         if f is None:
             f = sys.stderr
-        alist = self.__dict__.items()
-        alist.sort()
+        if hasattr(self, "__slots__"):
+            alist = []
+            for attr in self.__slots__:
+                alist.append((attr, getattr(self, attr)))
+        else:
+            alist = self.__dict__.items()
+        alist = sorted(alist)
         pad = " " * indent
-        if header is not None: print (header, file=f)
+        if header is not None: print(header, file=f)
         list_type = type([])
         dict_type = type({})
         for attr, value in alist:
@@ -53,10 +63,10 @@ class BaseObject(object):
             elif attr not in self._repr_these and (
                 isinstance(value, list_type) or isinstance(value, dict_type)
                 ):
-                print ("%s%s: %s, len = %d" % (pad, attr, type(value), len(value)), file=f)
+                print("%s%s: %s, len = %d" % (pad, attr, type(value), len(value)), file=f)
             else:
-                print ("%s%s: %r" % (pad, attr, value), file=f)
-        if footer is not None: print >> f, footer
+                fprintf(f, "%s%s: %r\n", pad, attr, value)
+        if footer is not None: print(footer, file=f)
 
 FUN, FDT, FNU, FGE, FTX = range(5) # unknown, date, number, general, text
 DATEFORMAT = FDT
@@ -73,7 +83,9 @@ NUMBERFORMAT = FNU
 ) = range(7)
 
 biff_text_from_num = {
-    20: "2",
+    0:  "(not BIFF)",
+    20: "2.0",
+    21: "2.1",
     30: "3",
     40: "4S",
     45: "4W",
@@ -93,7 +105,7 @@ biff_text_from_num = {
 # 0x17: '#REF!',   # Illegal or deleted cell reference
 # 0x1D: '#NAME?',  # Wrong function or range name
 # 0x24: '#NUM!',   # Value range overflow
-# 0x2A: '#N/A!',   # Argument or function not available
+# 0x2A: '#N/A',    # Argument or function not available
 # </pre></p>
 
 error_text_from_code = {
@@ -103,7 +115,7 @@ error_text_from_code = {
     0x17: '#REF!',   # Illegal or deleted cell reference
     0x1D: '#NAME?',  # Wrong function or range name
     0x24: '#NUM!',   # Value range overflow
-    0x2A: '#N/A!',   # Argument or function not available
+    0x2A: '#N/A',    # Argument or function not available
 }
 
 BIFF_FIRST_UNICODE = 80
@@ -120,13 +132,17 @@ XL_BOUNDSHEET_VB_MODULE = 0x06
 XL_ARRAY  = 0x0221
 XL_ARRAY2 = 0x0021
 XL_BLANK = 0x0201
+XL_BLANK_B2 = 0x01
 XL_BOF = 0x809
 XL_BOOLERR = 0x205
+XL_BOOLERR_B2 = 0x5
 XL_BOUNDSHEET = 0x85
 XL_BUILTINFMTCOUNT = 0x56
 XL_CF = 0x01B1
 XL_CODEPAGE = 0x42
 XL_COLINFO = 0x7D
+XL_COLUMNDEFAULT = 0x20 # BIFF2 only
+XL_COLWIDTH = 0x24 # BIFF2 only
 XL_CONDFMT = 0x01B0
 XL_CONTINUE = 0x3c
 XL_COUNTRY = 0x8C
@@ -135,9 +151,12 @@ XL_DEFAULTROWHEIGHT = 0x0225
 XL_DEFCOLWIDTH = 0x55
 XL_DIMENSION = 0x200
 XL_DIMENSION2 = 0x0
+XL_EFONT = 0x45
 XL_EOF = 0x0a
+XL_EXTERNNAME = 0x23
 XL_EXTERNSHEET = 0x17
 XL_EXTSST = 0xff
+XL_FEAT11 = 0x872
 XL_FILEPASS = 0x2f
 XL_FONT = 0x31
 XL_FONT_B3B4 = 0x231
@@ -147,11 +166,24 @@ XL_FORMULA = 0x6
 XL_FORMULA3 = 0x206
 XL_FORMULA4 = 0x406
 XL_GCW = 0xab
+XL_HLINK = 0x01B8
+XL_QUICKTIP = 0x0800
+XL_HORIZONTALPAGEBREAKS = 0x1b
 XL_INDEX = 0x20b
+XL_INTEGER = 0x2 # BIFF2 only
+XL_IXFE = 0x44 # BIFF2 only
 XL_LABEL = 0x204
-XL_LABEL2 = 0x04
+XL_LABEL_B2 = 0x04
 XL_LABELRANGES = 0x15f
 XL_LABELSST = 0xfd
+XL_LEFTMARGIN = 0x26
+XL_TOPMARGIN = 0x28
+XL_RIGHTMARGIN = 0x27
+XL_BOTTOMMARGIN = 0x29
+XL_HEADER = 0x14
+XL_FOOTER = 0x15
+XL_HCENTER = 0x83
+XL_VCENTER = 0x84
 XL_MERGEDCELLS = 0xE5
 XL_MSO_DRAWING = 0x00EC
 XL_MSO_DRAWING_GROUP = 0x00EB
@@ -161,27 +193,39 @@ XL_MULBLANK = 0xbe
 XL_NAME = 0x18
 XL_NOTE = 0x1c
 XL_NUMBER = 0x203
+XL_NUMBER_B2 = 0x3
 XL_OBJ = 0x5D
+XL_PAGESETUP = 0xA1
 XL_PALETTE = 0x92
+XL_PANE = 0x41
+XL_PRINTGRIDLINES = 0x2B
+XL_PRINTHEADERS = 0x2A
 XL_RK = 0x27e
 XL_ROW = 0x208
+XL_ROW_B2 = 0x08
 XL_RSTRING = 0xd6
+XL_SCL = 0x00A0
 XL_SHEETHDR = 0x8F # BIFF4W only
+XL_SHEETPR = 0x81
 XL_SHEETSOFFSET = 0x8E # BIFF4W only
 XL_SHRFMLA = 0x04bc
 XL_SST = 0xfc
 XL_STANDARDWIDTH = 0x99
 XL_STRING = 0x207
+XL_STRING_B2 = 0x7
 XL_STYLE = 0x293
-XL_SUPBOOK = 0x1AE
+XL_SUPBOOK = 0x1AE # aka EXTERNALBOOK in OOo docs
 XL_TABLEOP = 0x236
 XL_TABLEOP2 = 0x37
 XL_TABLEOP_B2 = 0x36
 XL_TXO = 0x1b6
 XL_UNCALCED = 0x5e
 XL_UNKNOWN = 0xffff
-XL_WINDOW2 = 0x023E
+XL_VERTICALPAGEBREAKS = 0x1a
+XL_WINDOW2    = 0x023E
+XL_WINDOW2_B2 = 0x003E
 XL_WRITEACCESS = 0x5C
+XL_WSBOOL = XL_SHEETPR
 XL_XF = 0xe0
 XL_XF2 = 0x0043 # BIFF2 version of XF record
 XL_XF3 = 0x0243 # BIFF3 version of XF record
@@ -189,6 +233,8 @@ XL_XF4 = 0x0443 # BIFF4 version of XF record
 
 boflen = {0x0809: 8, 0x0409: 6, 0x0209: 6, 0x0009: 4}
 bofcodes = (0x0809, 0x0409, 0x0209, 0x0009)
+
+XL_FORMULA_OPCODES = (0x0006, 0x0406, 0x0206)
 
 _cell_opcode_list = [
     XL_BOOLERR,
@@ -205,15 +251,9 @@ _cell_opcode_list = [
 _cell_opcode_dict = {}
 for _cell_opcode in _cell_opcode_list:
     _cell_opcode_dict[_cell_opcode] = 1
-#is_cell_opcode = _cell_opcode_dict.has_key
 
-# def fprintf(f, fmt, *vargs): f.write(fmt % vargs)
-
-def fprintf(f, fmt, *vargs):
-    if fmt.endswith('\n'):
-        print >> f, fmt[:-1] % vargs
-    else:
-        print >> f, fmt % vargs,
+def is_cell_opcode(c):
+    return c in  _cell_opcode_dict
 
 def upkbits(tgt_obj, src, manifest, local_setattr=setattr):
     for n, mask, attr in manifest:
@@ -241,8 +281,12 @@ def unpack_string_update_pos(data, pos, encoding, lenlen=1, known_len=None):
 def unpack_unicode(data, pos, lenlen=2):
     "Return unicode_strg"
     nchars = unpack('<' + 'BH'[lenlen-1], data[pos:pos+lenlen])[0]
+    if not nchars:
+        # Ambiguous whether 0-length string should have an "options" byte.
+        # Avoid crash if missing.
+        return UNICODE_LITERAL("")
     pos += lenlen
-    options = ord(data[pos])
+    options = BYTES_ORD(data[pos])
     pos += 1
     # phonetic = options & 0x04
     # richtext = options & 0x08
@@ -281,7 +325,10 @@ def unpack_unicode_update_pos(data, pos, lenlen=2, known_len=None):
     else:
         nchars = unpack('<' + 'BH'[lenlen-1], data[pos:pos+lenlen])[0]
         pos += lenlen
-    options = ord(data[pos])
+    if not nchars and not data[pos:]:
+        # Zero-length string with no options byte
+        return (UNICODE_LITERAL(""), pos)
+    options = BYTES_ORD(data[pos])
     pos += 1
     phonetic = options & 0x04
     richtext = options & 0x08
@@ -308,10 +355,9 @@ def unpack_unicode_update_pos(data, pos, lenlen=2, known_len=None):
 def unpack_cell_range_address_list_update_pos(
     output_list, data, pos, biff_version, addr_size=6):
     # output_list is updated in situ
-    if biff_version < 80:
-        assert addr_size == 6
-    else:
-        assert addr_size in (6, 8)
+    assert addr_size in (6, 8)
+    # Used to assert size == 6 if not BIFF8, but pyWLWriter writes
+    # BIFF8-only MERGEDCELLS records in a BIFF5 file!
     n, = unpack("<H", data[pos:pos+2])
     pos += 2
     if n:
@@ -326,18 +372,18 @@ def unpack_cell_range_address_list_update_pos(
     return pos
 
 _brecstrg = """\
-0000 DIMENSIONS
-0001 BLANK
-0002 INTEGER
-0003 NUMBER
-0004 LABEL
-0005 BOOLERR
+0000 DIMENSIONS_B2
+0001 BLANK_B2
+0002 INTEGER_B2_ONLY
+0003 NUMBER_B2
+0004 LABEL_B2
+0005 BOOLERR_B2
 0006 FORMULA
-0007 STRING
-0008 ROW
-0009 BOF
+0007 STRING_B2
+0008 ROW_B2
+0009 BOF_B2
 000A EOF
-000B INDEX
+000B INDEX_B2_ONLY
 000C CALCCOUNT
 000D CALCMODE
 000E PRECISION
@@ -350,20 +396,20 @@ _brecstrg = """\
 0015 FOOTER
 0016 EXTERNCOUNT
 0017 EXTERNSHEET
-0018 NAME
+0018 NAME_B2,5+
 0019 WINDOWPROTECT
 001A VERTICALPAGEBREAKS
 001B HORIZONTALPAGEBREAKS
 001C NOTE
 001D SELECTION
-001E FORMAT
-001F BUILTINFMTCOUNT
-0020 COLUMNDEFAULT
-0021 ARRAY_B2
+001E FORMAT_B2-3
+001F BUILTINFMTCOUNT_B2
+0020 COLUMNDEFAULT_B2_ONLY
+0021 ARRAY_B2_ONLY
 0022 DATEMODE
 0023 EXTERNNAME
-0024 COLWIDTH
-0025 DEFAULTROWHEIGHT
+0024 COLWIDTH_B2_ONLY
+0025 DEFAULTROWHEIGHT_B2_ONLY
 0026 LEFTMARGIN
 0027 RIGHTMARGIN
 0028 TOPMARGIN
@@ -372,21 +418,22 @@ _brecstrg = """\
 002B PRINTGRIDLINES
 002F FILEPASS
 0031 FONT
+0032 FONT2_B2_ONLY
 0036 TABLEOP_B2
-0037 TABLEOP2
+0037 TABLEOP2_B2
 003C CONTINUE
 003D WINDOW1
-003E WINDOW2
+003E WINDOW2_B2
 0040 BACKUP
 0041 PANE
 0042 CODEPAGE
 0043 XF_B2
-0044 IXFE
-0045 EFONT
+0044 IXFE_B2_ONLY
+0045 EFONT_B2_ONLY
 004D PLS
 0051 DCONREF
 0055 DEFCOLWIDTH
-0056 BUILTINFMTCOUNT
+0056 BUILTINFMTCOUNT_B3-4
 0059 XCT
 005A CRN
 005B FILESHARING
@@ -410,8 +457,11 @@ _brecstrg = """\
 008F SHEETHDR
 0090 SORT
 0092 PALETTE
-009C FNGROUPCOUNT
 0099 STANDARDWIDTH
+009B FILTERMODE
+009C FNGROUPCOUNT
+009D AUTOFILTERINFO
+009E AUTOFILTER
 00A0 SCL
 00A1 SETUP
 00AB GCW
@@ -459,10 +509,10 @@ _brecstrg = """\
 0207 STRING
 0208 ROW
 0209 BOF
-020B INDEX
+020B INDEX_B3+
 0218 NAME
 0221 ARRAY
-0223 EXTERNNAME
+0223 EXTERNNAME_B3-4
 0225 DEFAULTROWHEIGHT
 0231 FONT_B3B4
 0236 TABLEOP
@@ -488,37 +538,48 @@ for _buff in _brecstrg.splitlines():
     biff_rec_name_dict[int(_numh, 16)] = _name
 del _buff, _name, _brecstrg
 
-def hex_char_dump(strg, ofs, dlen, base=0, fout=sys.stdout):
+def hex_char_dump(strg, ofs, dlen, base=0, fout=sys.stdout, unnumbered=False):
     endpos = min(ofs + dlen, len(strg))
     pos = ofs
+    numbered = not unnumbered
+    num_prefix = ''
     while pos < endpos:
         endsub = min(pos + 16, endpos)
         substrg = strg[pos:endsub]
         lensub = endsub - pos
         if lensub <= 0 or lensub != len(substrg):
-            print('??? hex_char_dump: ofs=%d dlen=%d base=%d -> endpos=%d pos=%d endsub=%d substrg=%r' \
-                % (ofs, dlen, base, endpos, pos, endsub, substrg))
+            fprintf(
+                sys.stdout,
+                '??? hex_char_dump: ofs=%d dlen=%d base=%d -> endpos=%d pos=%d endsub=%d substrg=%r\n',
+                ofs, dlen, base, endpos, pos, endsub, substrg)
             break
-        hexd = ''.join(["%02x " % ord(c) for c in substrg])
+        hexd = ''.join(["%02x " % BYTES_ORD(c) for c in substrg])
+        
         chard = ''
         for c in substrg:
+            c = chr(BYTES_ORD(c))
             if c == '\0':
                 c = '~'
             elif not (' ' <= c <= '~'):
                 c = '?'
             chard += c
-        print("%5d:      %-48s %s" % (base+pos-ofs, hexd, chard), file=fout)
+        if numbered:
+            num_prefix = "%5d: " %  (base+pos-ofs)
+        
+        fprintf(fout, "%s     %-48s %s\n", num_prefix, hexd, chard)
         pos = endsub
 
-def biff_dump(mem, stream_offset, stream_len, base=0, fout=sys.stdout):
+def biff_dump(mem, stream_offset, stream_len, base=0, fout=sys.stdout, unnumbered=False):
     pos = stream_offset
     stream_end = stream_offset + stream_len
     adj = base - stream_offset
     dummies = 0
+    numbered = not unnumbered
+    num_prefix = ''
     while stream_end - pos >= 4:
         rc, length = unpack('<HH', mem[pos:pos+4])
         if rc == 0 and length == 0:
-            if mem[pos:] == '\0' * (stream_end - pos):
+            if mem[pos:] == b'\0' * (stream_end - pos):
                 dummies = stream_end - pos
                 savpos = pos
                 pos = stream_end
@@ -531,20 +592,28 @@ def biff_dump(mem, stream_offset, stream_len, base=0, fout=sys.stdout):
             pos += 4
         else:
             if dummies:
-                print >> fout, "%5d: ---- %d zero bytes skipped ----" % (adj+savpos, dummies)
+                if numbered:
+                    num_prefix =  "%5d: " % (adj + savpos)
+                fprintf(fout, "%s---- %d zero bytes skipped ----\n", num_prefix, dummies)
                 dummies = 0
             recname = biff_rec_name_dict.get(rc, '<UNKNOWN>')
-            print >> fout, "%5d: %04x %s len = %04x (%d)" % (adj+pos, rc, recname, length, length)
+            if numbered:
+                num_prefix = "%5d: " % (adj + pos)
+            fprintf(fout, "%s%04x %s len = %04x (%d)\n", num_prefix, rc, recname, length, length)
             pos += 4
-            hex_char_dump(mem, pos, length, adj+pos, fout)
+            hex_char_dump(mem, pos, length, adj+pos, fout, unnumbered)
             pos += length
     if dummies:
-        print >> fout, "%5d: ---- %d zero bytes skipped ----" % (adj+savpos, dummies, )
+        if numbered:
+            num_prefix =  "%5d: " % (adj + savpos)
+        fprintf(fout, "%s---- %d zero bytes skipped ----\n", num_prefix, dummies)
     if pos < stream_end:
-        print >> fout, "%5d: ---- Misc bytes at end ----"  % (adj + pos,)
-        hex_char_dump(mem, pos, stream_end-pos, adj + pos, fout)
+        if numbered:
+            num_prefix = "%5d: " % (adj + pos)
+        fprintf(fout, "%s---- Misc bytes at end ----\n", num_prefix)
+        hex_char_dump(mem, pos, stream_end-pos, adj + pos, fout, unnumbered)
     elif pos > stream_end:
-        print >> fout, "Last dumped record has length (%d) that is too large" % length
+        fprintf(fout, "Last dumped record has length (%d) that is too large\n", length)
 
 def biff_count_records(mem, stream_offset, stream_len, fout=sys.stdout):
     pos = stream_offset
@@ -553,7 +622,7 @@ def biff_count_records(mem, stream_offset, stream_len, fout=sys.stdout):
     while stream_end - pos >= 4:
         rc, length = unpack('<HH', mem[pos:pos+4])
         if rc == 0 and length == 0:
-            if mem[pos:] == '\0' * (stream_end - pos):
+            if mem[pos:] == b'\0' * (stream_end - pos):
                 break
             recname = "<Dummy (zero)>"
         else:
@@ -565,10 +634,9 @@ def biff_count_records(mem, stream_offset, stream_len, fout=sys.stdout):
         else:
             tally[recname] = 1
         pos += length + 4
-    slist = tally.items()
-    slist.sort()
+    slist = sorted(tally.items())
     for recname, count in slist:
-        print >> fout, "%8d %s" % (count, recname)
+        print("%8d %s" % (count, recname), file=fout)
 
 encoding_from_codepage = {
     1200 : 'utf_16_le',

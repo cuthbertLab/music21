@@ -1,24 +1,49 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2008 John Paulett (john -at- paulett.org)
+# Copyright (C) 2009, 2011, 2013 David Aguilar (davvid -at- gmail.com)
 # All rights reserved.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution.
 
-import operator
 import sys
-from music21.ext.jsonpickle import util
-from music21.ext.jsonpickle import tags
-from music21.ext.jsonpickle import handlers
-from music21.ext.jsonpickle.compat import set
+
+import jsonpickle.util as util # @UnresolvedImport
+import jsonpickle.tags as tags # @UnresolvedImport
+import jsonpickle.handlers as handlers # @UnresolvedImport
+
+from jsonpickle.compat import set # @UnresolvedImport
+from jsonpickle.backend import JSONBackend # @UnresolvedImport
+
+
+def decode(string, backend=None, context=None, keys=False, reset=True,
+           safe=False):
+    backend = _make_backend(backend)
+    if context is None:
+        context = Unpickler(keys=keys, backend=backend, safe=safe)
+    return context.restore(backend.decode(string), reset=reset)
+
+
+def _make_backend(backend):
+    if backend is None:
+        return JSONBackend()
+    else:
+        return backend
+
+def _supports_getstate(obj, instance):
+    return hasattr(instance, '__setstate__') and has_tag(obj, tags.STATE)
 
 
 class Unpickler(object):
-    def __init__(self):
+
+    def __init__(self, backend=None, keys=False, safe=False):
         ## The current recursion depth
-        self._depth = 0
         ## Maps reference names to object instances
+        self.backend = _make_backend(backend)
+        self.keys = keys
+        self.safe = safe
+
         self._namedict = {}
         ## The namestack grows whenever we recurse into a child object
         self._namestack = []
@@ -27,7 +52,7 @@ class Unpickler(object):
         self._obj_to_idx = {}
         self._objs = []
 
-    def _reset(self):
+    def reset(self):
         """Resets the object's internal state.
         """
         self._namedict = {}
@@ -35,23 +60,8 @@ class Unpickler(object):
         self._obj_to_idx = {}
         self._objs = []
 
-    def _push(self):
-        """Steps down one level in the namespace.
-        """
-        self._depth += 1
-
-    def _pop(self, value):
-        """Step up one level in the namespace and return the value.
-        If we're at the root, reset the unpickler's state.
-        """
-        self._depth -= 1
-        if self._depth == 0:
-            self._reset()
-        return value
-
-    def restore(self, obj):
-        """
-        Restores a flattened object to its original python state.
+    def restore(self, obj, reset=True):
+        """Restores a flattened object to its original python state.
 
         Simply returns any of the basic builtin types
 
@@ -61,106 +71,151 @@ class Unpickler(object):
         >>> u.restore({'key': 'value'})
         {'key': 'value'}
         """
-        self._push()
+        if reset:
+            self.reset()
+        return self._restore(obj)
 
+    def _restore(self, obj):
         if has_tag(obj, tags.ID):
-            objNumber = obj[tags.ID]
-            try:
-                objRef = self._objs[objNumber]
-            except IndexError:
-                raise IndexError('Cannot find objRef %d in self._objs of len(%d), looking for obj %r' % (objNumber, len(self._objs), obj))
-            poppedValue = self._pop(objRef)
-            return poppedValue
-        if has_tag(obj, tags.REF):
-            return self._pop(self._namedict.get(obj[tags.REF]))
+            restore = self._restore_id
+        elif has_tag(obj, tags.REF): # Backwards compatibility
+            restore = self._restore_ref
+        elif has_tag(obj, tags.TYPE):
+            restore = self._restore_type
+        elif has_tag(obj, tags.REPR): # Backwards compatibility
+            restore = self._restore_repr
+        elif has_tag(obj, tags.OBJECT):
+            restore = self._restore_object
+        elif util.is_list(obj):
+            restore = self._restore_list
+        elif has_tag(obj, tags.TUPLE):
+            restore = self._restore_tuple
+        elif has_tag(obj, tags.SET):
+            restore = self._restore_set
+        elif util.is_dictionary(obj):
+            restore = self._restore_dict
+        else:
+            restore = lambda x: x
+        try:
+            return restore(obj)
+        except IndexError as e:
+            raise e # for testing
+        
+    def _restore_id(self, obj):
+        return self._objs[obj[tags.ID]]
 
-        if has_tag(obj, tags.TYPE):
-            typeref = loadclass(obj[tags.TYPE])
-            if not typeref:
-                return self._pop(obj)
-            return self._pop(typeref)
+    def _restore_ref(self, obj):
+        return self._namedict.get(obj[tags.REF])
 
-        if has_tag(obj, tags.REPR):
-            return self._pop(loadrepr(obj[tags.REPR]))
+    def _restore_type(self, obj):
+        typeref = loadclass(obj[tags.TYPE])
+        if typeref is None:
+            return obj
+        return typeref
 
-        if has_tag(obj, tags.OBJECT):
+    def _restore_repr(self, obj):
+        if self.safe:
+            # eval() is not allowed in safe mode
+            return None
+        obj = loadrepr(obj[tags.REPR])
+        return self._mkref(obj)
 
-            cls = loadclass(obj[tags.OBJECT])
-            if not cls:
-                return self._pop(obj)
+    def _restore_object(self, obj):
+        cls = loadclass(obj[tags.OBJECT])
+        if cls is None:
+            return self._mkref(obj)
+        handler = handlers.get(cls)
+        if handler is not None: # custom handler
+            instance = handler(self).restore(obj)
+            return self._mkref(instance)
+        else:
+            return self._restore_object_instance(obj, cls)
 
-            # check custom handlers
-            HandlerClass = handlers.registry.get(cls)
-            if HandlerClass:
-                handler = HandlerClass(self)
-                return self._pop(handler.restore(obj))
-
-            try:
-                if hasattr(cls, '__new__'):
-                    instance = cls.__new__(cls)
+    def _restore_object_instance(self, obj, cls):
+        factory = loadfactory(obj)
+        args = getargs(obj)
+        if args:
+            args = self._restore(args)
+        try:
+            if hasattr(cls, '__new__'): # new style classes
+                if factory:
+                    instance = cls.__new__(cls, factory, *args)
+                    instance.default_factory = factory
                 else:
-                    instance = object.__new__(cls)
-            except TypeError:
-                # old-style classes
-                try:
-                    instance = cls()
-                except TypeError:
-                    # fail gracefully if the constructor requires arguments
-                    self._mkref(obj)
-                    return self._pop(obj)
+                    instance = cls.__new__(cls, *args)
+            else:
+                instance = object.__new__(cls)
+        except TypeError: # old-style classes
+            try:
+                instance = cls()
+            except TypeError: # fail gracefully
+                return self._mkref(obj)
 
-            # keep a obj->name mapping for use in the _isobjref() case
-            self._mkref(instance)
+        self._mkref(instance) # allow references in downstream objects
+        if isinstance(instance, tuple):
+            return instance
 
-            if hasattr(instance, '__setstate__') and has_tag(obj, tags.STATE):
-                state = self.restore(obj[tags.STATE])
-                instance.__setstate__(state)
-                return self._pop(instance)
+        return self._restore_object_instance_variables(obj, instance)
 
-            for k, v in sorted(obj.iteritems(), key=operator.itemgetter(0)):
-                # ignore the reserved attribute
-                if k in tags.RESERVED:
-                    continue
-                self._namestack.append(k)
-                # step into the namespace
-                value = self.restore(v)
-                if (util.is_noncomplex(instance) or
-                        util.is_dictionary_subclass(instance)):
-                    instance[k] = value
-                else:
-                    setattr(instance, k, value)
-                # step out
-                self._namestack.pop()
+    def _restore_object_instance_variables(self, obj, instance):
+        for k, v in sorted(obj.items(), key=util.itemgetter):
+            # ignore the reserved attribute
+            if k in tags.RESERVED:
+                continue
+            self._namestack.append(k)
+            # step into the namespace
+            value = self._restore(v)
+            if (util.is_noncomplex(instance) or
+                    util.is_dictionary_subclass(instance)):
+                instance[k] = value
+            else:
+                setattr(instance, k, value)
+            # step out
+            self._namestack.pop()
 
-            # Handle list and set subclasses
-            if has_tag(obj, tags.SEQ):
-                if hasattr(instance, 'append'):
-                    for v in obj[tags.SEQ]:
-                        instance.append(self.restore(v))
-                if hasattr(instance, 'add'):
-                    for v in obj[tags.SEQ]:
-                        instance.add(self.restore(v))
+        # Handle list and set subclasses
+        if has_tag(obj, tags.SEQ):
+            if hasattr(instance, 'append'):
+                for v in obj[tags.SEQ]:
+                    instance.append(self._restore(v))
+            if hasattr(instance, 'add'):
+                for v in obj[tags.SEQ]:
+                    instance.add(self._restore(v))
 
-            return self._pop(instance)
+        if _supports_getstate(obj, instance):
+            self._restore_state(obj, instance)
 
-        if util.is_list(obj):
-            return self._pop([self.restore(v) for v in obj])
+        return instance
 
-        if has_tag(obj, tags.TUPLE):
-            return self._pop(tuple([self.restore(v) for v in obj[tags.TUPLE]]))
+    def _restore_state(self, obj, instance):
+        state = self._restore(obj[tags.STATE])
+        instance.__setstate__(state)
+        return instance
 
-        if has_tag(obj, tags.SET):
-            return self._pop(set([self.restore(v) for v in obj[tags.SET]]))
+    def _restore_list(self, obj):
+        parent = []
+        self._mkref(parent)
+        children = [self._restore(v) for v in obj]
+        parent.extend(children)
+        return parent
 
-        if util.is_dictionary(obj):
-            data = {}
-            for k, v in sorted(obj.iteritems(), key=operator.itemgetter(0)):
-                self._namestack.append(k)
-                data[k] = self.restore(v)
-                self._namestack.pop()
-            return self._pop(data)
+    def _restore_tuple(self, obj):
+        return tuple([self._restore(v) for v in obj[tags.TUPLE]])
 
-        return self._pop(obj)
+    def _restore_set(self, obj):
+        return set([self._restore(v) for v in obj[tags.SET]])
+
+    def _restore_dict(self, obj):
+        data = {}
+        for k, v in sorted(obj.items(), key=util.itemgetter):
+            self._namestack.append(k)
+            if self.keys and k.startswith(tags.JSON_KEY):
+                k = decode(k[len(tags.JSON_KEY):],
+                           backend=self.backend, context=self,
+                           keys=True, reset=False)
+            data[k] = self._restore(v)
+            self._namestack.pop()
+        return data
 
     def _refname(self):
         """Calculates the name of the current location in the JSON stack.
@@ -190,50 +245,89 @@ class Unpickler(object):
 
     def _mkref(self, obj):
         """
-        >>> from samples import Thing
+        >>> from jsonpickle._samples import Thing
         >>> thing = Thing('referenced-thing')
         >>> u = Unpickler()
         >>> u._mkref(thing)
-        0
+        Thing("referenced-thing")
+
         >>> u._objs[0]
-        samples.Thing("referenced-thing")
+        Thing("referenced-thing")
 
         """
         obj_id = id(obj)
         try:
-            idx = self._obj_to_idx[obj_id]
+            self._obj_to_idx[obj_id]
         except KeyError:
-            idx = self._obj_to_idx[obj_id] = len(self._objs)
+            self._obj_to_idx[obj_id] = len(self._objs)
             self._objs.append(obj)
-        return idx
+            # Backwards compatibility: old versions of jsonpickle
+            # produced "py/ref" references.
+            self._namedict[self._refname()] = obj
+        return obj
+
 
 def loadclass(module_and_name):
     """Loads the module and returns the class.
 
-    >>> loadclass('samples.Thing')
-    <class 'samples.Thing'>
+    >>> loadclass('jsonpickle._samples.Thing')
+    <class 'jsonpickle._samples.Thing'>
 
-    >>> loadclass('example.module.does.not.exist.Missing')
+    >>> loadclass('does.not.exist')
 
 
-    >>> loadclass('samples.MissingThing')
-
+    >>> loadclass('__builtin__.int')()
+    0
 
     """
     try:
         module, name = module_and_name.rsplit('.', 1)
+        module = util.untranslate_module_name(module)
         __import__(module)
         return getattr(sys.modules[module], name)
     except:
         return None
 
+
+def loadfactory(obj):
+    try:
+        default_factory = obj['default_factory']
+    except KeyError:
+        return None
+    try:
+        type_tag = default_factory[tags.TYPE]
+    except:
+        return None
+
+    typeref = loadclass(type_tag)
+    if typeref:
+        del obj['default_factory']
+        return typeref
+
+    return None
+
+
+def getargs(obj):
+    try:
+        seq_list = obj[tags.SEQ]
+        obj_dict = obj[tags.OBJECT]
+    except KeyError:
+        return []
+    typeref = loadclass(obj_dict)
+    if not typeref:
+        return []
+    if hasattr(typeref, '_fields'):
+        if len(typeref._fields) == len(seq_list):
+            return seq_list
+    return []
+
+
 def loadrepr(reprstr):
     """Returns an instance of the object from the object's repr() string.
     It involves the dynamic specification of code.
 
-    >>> from jsonpickle import tags
-    >>> loadrepr('samples/samples.Thing("json")')
-    samples.Thing("json")
+    >>> loadrepr('jsonpickle._samples/jsonpickle._samples.Thing("json")')
+    Thing("json")
 
     """
     module, evalstr = reprstr.split('/')
@@ -243,6 +337,7 @@ def loadrepr(reprstr):
         localname = module.split('.', 1)[0]
     mylocals[localname] = __import__(module)
     return eval(evalstr)
+
 
 def has_tag(obj, tag):
     """Helper class that tests to see if the obj is a dictionary

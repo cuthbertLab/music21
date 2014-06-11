@@ -4,6 +4,7 @@ Users Guide
 .. toctree::
    :maxdepth: 1
 
+   usersGuide_99_Table_of_Contents
    usersGuide_00_introduction
    usersGuide_01_installing
    usersGuide_02_notes
@@ -15,4 +16,5 @@ Users Guide
    usersGuide_09_chordify
    usersGuide_11_corpusSearching
    usersGuide_14_timeSignatures
-   usersGuide_99_Table_of_Contents
+   usersGuide_17_derivations
+   usersGuide_54_extendingConverter

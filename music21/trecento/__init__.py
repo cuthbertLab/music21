@@ -4,20 +4,11 @@ __all__ = ['cadencebook', 'capua', 'findTrecentoFragments', 'notation', 'tonalit
 # from music21 import * import statement
 import sys
 
-if sys.version > '3':
-    pass
-    # xlrd errors! 
-#     from . import cadencebook
-#     from . import capua
-#     from . import findTrecentoFragments
-    from . import notation
-#     from . import tonality
-else:
-    import cadencebook # @Reimport
-    import capua # @Reimport
-    import findTrecentoFragments # @Reimport
-    import notation # @Reimport
-    import tonality # @Reimport
+from music21.trecento    import cadencebook 
+from music21.trecento    import capua 
+from music21.trecento    import findTrecentoFragments 
+from music21.trecento    import notation 
+from music21.trecento    import tonality 
 
 #from music21.trecento import *
 

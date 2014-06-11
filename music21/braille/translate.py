@@ -92,7 +92,7 @@ def objectToBraille(music21Obj, **keywords):
 
     >>> from music21.braille import translate
     >>> from music21 import tinyNotation
-    >>> samplePart = tinyNotation.TinyNotationStream("C4 D16 E F G# r4 e2.", "3/4")
+    >>> samplePart = tinyNotation.TinyNotationStream("3/4 C4 D16 E F G# r4 e2.")
     >>> #_DOCS_SHOW samplePart.show()
 
 
@@ -199,7 +199,7 @@ def measureToBraille(music21Measure, **keywords):
     Translates a :class:`~music21.stream.Measure` to braille.
     
     >>> p = stream.Part()
-    >>> p.append(note.WholeNote('C4'))
+    >>> p.append(note.Note('C4', type='whole'))
     >>> p.makeMeasures(inPlace=True)
     >>> p.show('t')
     {0.0} <music21.stream.Measure 1 offset=0.0>

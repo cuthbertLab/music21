@@ -55,7 +55,7 @@ class Wildcard(m21Base.Music21Object):
     >>> wc1 = search.Wildcard()
     >>> wc1.pitch = pitch.Pitch("C")
     >>> st1 = stream.Stream()
-    >>> st1.append(note.HalfNote("D"))
+    >>> st1.append(note.Note("D", type='half'))
     >>> st1.append(wc1)    
     '''
     def __init__(self):
@@ -75,7 +75,7 @@ def rhythmicSearch(thisStream, searchStream):
     Example 1: First we will set up a simple stream for searching:
     
     
-    >>> thisStream = tinyNotation.TinyNotationStream("c4. d8 e4 g4. a8 f4. c4.", "3/4")
+    >>> thisStream = tinyNotation.TinyNotationStream("3/4 c4. d8 e4 g4. a8 f4. c4.")
     >>> thisStream.show('text')
     {0.0} <music21.meter.TimeSignature 3/4>
     {0.0} <music21.note.Note C>
@@ -185,12 +185,12 @@ def approximateNoteSearch(thisStream, otherStreams):
 
 
     
-    >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
-    >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
+    >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
+    >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
     >>> o1.id = 'o1'
-    >>> o2 = converter.parse("d#2 f A a' G b", "4/4")
+    >>> o2 = converter.parse("tinynotation: 4/4 d#2 f A a' G b")
     >>> o2.id = 'o2'
-    >>> o3 = converter.parse("c8 d16 e32 FF32 a'8 b-8", "4/4")
+    >>> o3 = converter.parse("tinynotation: 4/4 c8 d16 e32 FF32 a'8 b-8")
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearch(s, [o1, o2, o3])
     >>> for i in l:
@@ -224,12 +224,12 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
 
 
     
-    >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
-    >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
+    >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
+    >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
     >>> o1.id = 'o1'
-    >>> o2 = converter.parse("d#2 f A a' G b", "4/4")
+    >>> o2 = converter.parse("tinynotation: 4/4 d#2 f A a' G b")
     >>> o2.id = 'o2'
-    >>> o3 = converter.parse("c4 d e GG CCC r", "4/4")
+    >>> o3 = converter.parse("tinynotation: 4/4 c4 d e GG CCC r")
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearchNoRhythm(s, [o1, o2, o3])
     >>> for i in l:
@@ -262,12 +262,12 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
 
 
     
-    >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
-    >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
+    >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
+    >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
     >>> o1.id = 'o1'
-    >>> o2 = converter.parse("d#2 f A a' G b", "4/4")
+    >>> o2 = converter.parse("tinynotation: 4/4 d#2 f A a' G b")
     >>> o2.id = 'o2'
-    >>> o3 = converter.parse("c4 d e GG CCC r", "4/4")
+    >>> o3 = converter.parse("tinynotation: 4/4 c4 d e GG CCC r")
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearchOnlyRhythm(s, [o1, o2, o3])
     >>> for i in l:
@@ -299,14 +299,14 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
 
 
     
-    >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
-    >>> o1 = converter.parse("c4 d8 e GG2 a' b-4", "4/4")
+    >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
+    >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG2 a' b-4")
     >>> o1.id = 'o1'
-    >>> o2 = converter.parse("AAA4 AAA8 AAA16 AAA16 AAA4 AAA4", "4/4")
+    >>> o2 = converter.parse("tinynotation: 4/4 AAA4 AAA8 AAA16 AAA16 AAA4 AAA4")
     >>> o2.id = 'o2'
-    >>> o3 = converter.parse("c8 d16 e32 FF32 a'8 b-8", "4/4")
+    >>> o3 = converter.parse("tinynotation: 4/4 c8 d16 e32 FF32 a'8 b-8")
     >>> o3.id = 'o3'
-    >>> o4 = converter.parse("c1 d1 e1 FF1 a'1 b-1", "4/4")
+    >>> o4 = converter.parse("tinynotation: 4/4 c1 d1 e1 FF1 a'1 b-1")
     >>> o4.id = 'o4'
     >>> l = search.approximateNoteSearchWeighted(s, [o1, o2, o3, o4])
     >>> for i in l:
@@ -346,7 +346,7 @@ def translateStreamToString(inputStream):
     a string for searching on.
     
     
-    >>> s = converter.parse("c4 d8 r16 FF8. a'8 b-2.", "3/4")
+    >>> s = converter.parse("tinynotation: 3/4 c4 d8 r16 FF8. a'8 b-2.")
     >>> sn = s.flat.notesAndRests
     >>> streamString = search.translateStreamToString(sn)
     >>> print streamString
@@ -376,7 +376,7 @@ def translateDiatonicStreamToString(inputStream, previousRest=False, previousTie
     Z = rest
     
     
-    >>> s = converter.parse("c4 d8~ d16 r16 FF8 F#8 a'8 b-2.", "3/4")
+    >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 FF8 F#8 a'8 b-2.")
     >>> sn = s.flat.notesAndRests
     >>> streamString = search.translateDiatonicStreamToString(sn)
     >>> print streamString
@@ -437,7 +437,7 @@ def translateStreamToStringNoRhythm(inputStream):
     a string for searching on.
     
     
-    >>> s = converter.parse("c4 d e FF a' b-", "4/4")
+    >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a' b-")
     >>> sn = s.flat.notesAndRests
     >>> search.translateStreamToStringNoRhythm(sn)
     '<>@)QF'
@@ -454,7 +454,7 @@ def translateStreamToStringOnlyRhythm(inputStream):
     a string for searching on.
     
     
-    >>> s = converter.parse("c4 d8 e16 FF8. a'8 b-2.", "3/4")
+    >>> s = converter.parse("tinynotation: 3/4 c4 d8 e16 FF8. a'8 b-2.")
     >>> sn = s.flat.notesAndRests
     >>> streamString = search.translateStreamToStringOnlyRhythm(sn)
     >>> print streamString

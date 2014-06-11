@@ -570,11 +570,11 @@ class KeySignature(base.Music21Object):
         
         >>> s1 = stream.Stream()
         >>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
-        >>> s1.append(note.HalfNote("C"))
-        >>> s1.append(note.HalfNote("E-"))
+        >>> s1.append(note.Note('C', type='half'))
+        >>> s1.append(note.Note('E-', type='half'))
         >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
-        >>> s1.append(note.WholeNote("A"))
-        >>> s1.append(note.WholeNote("F#"))
+        >>> s1.append(note.Note("A", type='whole'))
+        >>> s1.append(note.Note("F#", type='whole'))
         >>> #_DOCS_SHOW s1.show()
 
         .. image:: images/keyAccidentalByStep_Before.*
@@ -600,8 +600,8 @@ class KeySignature(base.Music21Object):
                 
         Test to make sure there are not linked accidentals (fixed bug 22 Nov. 2010)
         
-        >>> nB1 = note.WholeNote("B")
-        >>> nB2 = note.WholeNote("B")
+        >>> nB1 = note.Note("B", type='whole')
+        >>> nB2 = note.Note("B", type='whole')
         >>> s1.append(nB1)
         >>> s1.append(nB2)
         >>> for n in s1.notes:
@@ -898,15 +898,33 @@ class Key(KeySignature, scale.DiatonicScale):
     def __str__(self):
         # string representation needs to be complete, as is used
         # for metadata comparisons
+        tonic = self.tonicPitchNameWithCase
+        return "%s %s" % (tonic, self.mode)
+
+    @property
+    def tonicPitchNameWithCase(self):
+        '''
+        Return the pitch name as a string with the proper case (upper = major; lower = minor)
+        
+        Useful, but simple:
+        
+        >>> k = key.Key("c#")
+        >>> k.tonicPitchNameWithCase
+        'c#'
+        >>> k = key.Key("B")
+        >>> k.tonicPitchNameWithCase
+        'B'
+        >>> k.mode = 'minor'
+        >>> k.tonicPitchNameWithCase
+        'b'
+        '''
         tonic = self.tonic
         if self.mode == 'major':
             tonic = tonic.name.upper()
         elif self.mode == 'minor':
             tonic = tonic.name.lower()
-        return "%s %s" % (tonic, self.mode)
-
-
-
+        return tonic
+    
     def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
         if self.alternateInterpretations is None or len(self.alternateInterpretations) == 0:

@@ -17,7 +17,7 @@ conceptual idea of tied notes.  They can be start or stop ties.
 
 import unittest
 
-from music21.base import SlottedObject
+from music21.common import SlottedObject
 
 #-------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ class Tie(SlottedObject):
     ::
 
         >>> note1 = note.Note()
-        >>> note1.tie = tie.Tie("start")
+        >>> note1.tie = tie.Tie("start") # start, stop, or continue
         >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
         >>> note1.tie.type
         'start'
