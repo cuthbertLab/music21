@@ -357,7 +357,7 @@ class StaffLayout(LayoutBase):
                     self.hidden = True
 
     def __repr__(self):
-        return "<music21.layout.StaffLayout distance %r, staffNumber %r, staffSize %r>" % (self.distance, self.staffNumber, self.staffSize)
+        return "<music21.layout.StaffLayout distance %r, staffNumber %r, staffSize %r, staffLines %r>" % (self.distance, self.staffNumber, self.staffSize, self.staffLines)
 
 #-------------------------------------------------------------------------------
 class LayoutException(exceptions21.Music21Exception):
