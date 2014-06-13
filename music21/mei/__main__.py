@@ -28,6 +28,7 @@ from music21 import duration
 from music21 import articulations
 from music21 import pitch
 from music21 import stream
+from music21 import chord
 
 
 #------------------------------------------------------------------------------
@@ -374,12 +375,87 @@ def restFromElement(elem):
     ============
     None.
     '''
-    post = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0))))
+    post = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
+                                           int(elem.get('dots', 0))))
 
     if elem.get('id') is not None:
         post.id = elem.get('id')
 
     return post
+
+
+def chordFromElement(elem):
+    '''
+    <chord> is a simultaneous sounding of two or more notes in the same layer with the same duration.
+
+    In MEI 2013: pg.280 (294 in PDF) (MEI.shared module)
+
+    Attributes Implemented:
+    =======================
+    - <note> contained within
+    - dur, from att.duration.musical: (via _qlDurationFromAttr())
+    - dots, from att.augmentdots: [0..4]
+
+    Attributes In Progress:
+    =======================
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+               (att.id (@xml:id))
+    att.facsimile (@facs)
+    att.chord.log (att.event (att.timestamp.musical (@tstamp))
+                             (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+                             (att.staffident (@staff))
+                             (att.layerident (@layer)))
+                  (att.articulation (@artic))
+                  (att.augmentdots (@dots))
+                  (att.duration.musical (@dur))
+                  (att.fermatapresent (@fermata))
+                  (att.syltext (@syl))
+                  (att.slurpresent (@slur))
+                  (att.tiepresent (@tie))
+                  (att.tupletpresent (@tuplet))
+                  (att.chord.log.cmn (att.beamed (@beam))
+                                     (att.lvpresent (@lv))
+                                     (att.ornam (@ornam)))
+    att.chord.vis (@cluster)
+                  (att.altsym (@altsym))
+                  (att.color (@color))
+                  (att.relativesize (@size))
+                  (att.stemmed (@stem.dir, @stem.len, @stem.pos, @stem.x, @stem.y)
+                               (att.stemmed.cmn (@stem.mod, @stem.with)))
+                  (att.visibility (@visible))
+                  (att.visualoffset.ho (@ho))
+                  (att.visualoffset.to (@to))
+                  (att.xy (@x, @y))
+                  (att.chord.vis.cmn (att.beamsecondary (@breaksec)))
+    att.chord.ges (att.articulation.performed (@artic.ges))
+                  (att.duration.performed (@dur.ges))
+                  (att.instrumentident (@instr))
+                  (att.chord.ges.cmn (att.graced (@grace, @grace.time)))
+    att.chord.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                  (att.alignment (@when)))
+
+    May Contain:
+    ============
+    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    MEI.shared: artic note
+    '''
+    # pitch and duration... these are what we can set in the constructor
+    post = chord.Chord(notes=[noteFromElement(x) for x in elem.iterfind('note')])
+
+    # for a Chord, setting "duration" with a Duration object in __init__() doesn't work
+    post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
+
+    if elem.get('id') is not None:
+        post.id = elem.get('id')
+
+    if elem.get('artic') is not None:
+        post.articulations = _makeArticList(elem.get('artic'))
+
+    return post
+
 
 #------------------------------------------------------------------------------
 _DOC_ORDER = [noteFromElement, restFromElement]
@@ -391,6 +467,7 @@ if __name__ == "__main__":
                      test_main.TestAttrTranslators,
                      test_main.TestNoteFromElement,
                      test_main.TestRestFromElement,
+                     test_main.TestChordFromElement,
                      )
 
 #------------------------------------------------------------------------------

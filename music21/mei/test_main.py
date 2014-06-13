@@ -33,6 +33,7 @@ from music21 import pitch
 from music21 import note
 from music21 import duration
 from music21 import articulations
+from music21 import chord
 
 # Importing from __main__.py
 import music21.mei.__main__ as main
@@ -396,3 +397,158 @@ class TestRestFromElement(unittest.TestCase):
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
         self.assertEqual(42, actual.id)
+
+
+
+#------------------------------------------------------------------------------
+class TestChordFromElement(unittest.TestCase):
+    '''Tests for chordFromElement()'''
+
+    @staticmethod
+    def makeNoteTags(pname, accid, octArg, dur, dots):
+        '''Factory function for the Element objects that are a <note>.'''
+        return ETree.Element('note', pname=pname, accid=accid, oct=octArg, dur=dur, dots=dots)
+
+    @mock.patch('music21.chord.Chord')
+    @mock.patch('music21.mei.__main__.noteFromElement')
+    def testUnit1(self, mockNoteFromElement, mockChord):
+        '''
+        chordFromElement(): all the elements that go in Chord.__init__()...
+                            'dur', 'dots', and some note.Note objects.
+        (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
+        '''
+        elem = mock.MagicMock()
+        expectedGetOrder = [mock.call('dur'), mock.call('dots', 0)]
+        expectedGetOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
+        elemGetReturns = ['4', '1']
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
+        mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
+        mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
+        expected_notes = ['root', 'third', 'fifth']
+        expected = mockChord.return_value
+
+        actual = main.chordFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        elem.iterfind.assert_called_once_with('note')
+        mockChord.assert_called_once_with(notes=expected_notes)
+        self.assertEqual(mockChord.return_value.duration, duration.Duration(1.5))
+        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+
+    def testIntegration1(self):
+        '''
+        chordFromElement(): all the elements that go in Chord.__init__()...
+                            'dur', 'dots', and some note.Note objects.
+        (corresponds to testUnit1() with real Note, Chord, and ElementTree.Element)
+        '''
+        chordElem = ETree.Element('chord')
+        chordAttribs = {'dur': '4', 'dots': '1'}
+        for key in chordAttribs:
+            chordElem.set(key, chordAttribs[key])
+        for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
+            chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
+        expectedPitches = [pitch.Pitch(x) for x in ('C#2', 'D-2', 'F##3')]
+        expectedQuarterLength = 1.5
+        expectedDots = 1
+
+        actual = main.chordFromElement(chordElem)
+
+        self.assertEqual(expectedQuarterLength, actual.duration.quarterLength)
+        self.assertEqual(expectedDots, actual.duration.dots)
+        self.assertSequenceEqual(expectedPitches, actual.pitches)
+
+    @mock.patch('music21.chord.Chord')
+    @mock.patch('music21.mei.__main__.noteFromElement')
+    def testUnit2(self, mockNoteFromElement, mockChord):
+        '''
+        chordFromElement(): adds "id"
+        (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
+        '''
+        elem = mock.MagicMock()
+        expectedGetOrder = [mock.ANY for _ in xrange(2)]  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.call('id'), mock.call('id')])
+        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        elemGetReturns = ['4', '1', '42', '42']
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
+        mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
+        mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
+        expected_notes = ['root', 'third', 'fifth']
+        expected = mockChord.return_value
+
+        actual = main.chordFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        elem.iterfind.assert_called_once_with('note')
+        mockChord.assert_called_once_with(notes=expected_notes)
+        self.assertEqual(duration.Duration(1.5), actual.duration)
+        self.assertEqual('42', actual.id)
+        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+
+    def testIntegration2(self):
+        '''
+        chordFromElement(): adds "id"
+        (corresponds to testUnit2() with real Note, Chord, and ElementTree.Element)
+        '''
+        chordElem = ETree.Element('chord')
+        chordAttribs = {'dur': '4', 'dots': '1', 'id': 'bef1f18a'}
+        for key in chordAttribs:
+            chordElem.set(key, chordAttribs[key])
+        for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
+            chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
+        expectedPitches = [pitch.Pitch(x) for x in ('C#2', 'D-2', 'F##3')]
+        expectedQuarterLength = 1.5
+        expectedDots = 1
+
+        actual = main.chordFromElement(chordElem)
+
+        self.assertEqual(chordAttribs['id'], actual.id)
+
+    @mock.patch('music21.chord.Chord')
+    @mock.patch('music21.mei.__main__.noteFromElement')
+    def testUnit3(self, mockNoteFromElement, mockChord):
+        '''
+        chordFromElement(): adds "artic"
+        (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
+        '''
+        elem = mock.MagicMock()
+        expectedGetOrder = [mock.ANY for _ in xrange(3)]  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.call('artic'), mock.call('artic')])
+        expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
+        elemArtic = 'stacc'
+        elemGetReturns = ['4', '1', None, elemArtic, elemArtic]
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
+        mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
+        mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
+        expected_notes = ['root', 'third', 'fifth']
+        expected = mockChord.return_value
+
+        actual = main.chordFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        elem.iterfind.assert_called_once_with('note')
+        mockChord.assert_called_once_with(notes=expected_notes)
+        self.assertEqual(duration.Duration(1.5), actual.duration)
+        self.assertEqual([articulations.Staccato], actual.articulations)
+        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+
+    def testIntegration3(self):
+        '''
+        chordFromElement(): adds "artic"
+        (corresponds to testUnit2() with real Note, Chord, and ElementTree.Element)
+        '''
+        chordElem = ETree.Element('chord')
+        chordAttribs = {'dur': '4', 'dots': '1', 'artic': 'stacc'}
+        for key in chordAttribs:
+            chordElem.set(key, chordAttribs[key])
+        for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
+            chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
+        expectedPitches = [pitch.Pitch(x) for x in ('C#2', 'D-2', 'F##3')]
+        expectedQuarterLength = 1.5
+        expectedDots = 1
+
+        actual = main.chordFromElement(chordElem)
+
+        self.assertEqual([articulations.Staccato], actual.articulations)
