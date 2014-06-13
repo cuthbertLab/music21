@@ -1132,11 +1132,11 @@ class Tuplet(object):
         numNormal = self.numberNotesNormal
         #dur = self.durationActual
 
-        if numActual in [3] and numNormal in [2]:
+        if numActual == 3 and numNormal == 2:
             return 'Triplet'
-        elif numActual in [5] and numNormal in [4, 2]:
+        elif numActual == 5 and numNormal in (4, 2):
             return 'Quintuplet'
-        elif numActual in [6] and numNormal in [4]:
+        elif numActual == 6 and numNormal == 4:
             return 'Sextuplet'
         ordStr = common.ordinalAbbreviation(numNormal, plural=True)
         return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
