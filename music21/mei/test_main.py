@@ -28,7 +28,6 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ETree
 
-from music21 import base  # DEBUG
 from music21 import pitch
 from music21 import note
 from music21 import duration

@@ -413,9 +413,11 @@ def chordFromElement(elem):
 
     Attributes Implemented:
     =======================
+    - xml:id (or id), an XML id (submitted as the Music21Object "id")
     - <note> contained within
     - dur, from att.duration.musical: (via _qlDurationFromAttr())
     - dots, from att.augmentdots: [0..4]
+    - artic, a list from att.articulation: (via _articulationFromAttr())
 
     Attributes In Progress:
     =======================
@@ -423,13 +425,11 @@ def chordFromElement(elem):
     Attributes not Implemented:
     ===========================
     att.common (@label, @n, @xml:base)
-               (att.id (@xml:id))
     att.facsimile (@facs)
     att.chord.log (att.event (att.timestamp.musical (@tstamp))
                              (att.timestamp.performed (@tstamp.ges, @tstamp.real))
                              (att.staffident (@staff))
                              (att.layerident (@layer)))
-                  (att.articulation (@artic))
                   (att.augmentdots (@dots))
                   (att.duration.musical (@dur))
                   (att.fermatapresent (@fermata))
@@ -461,7 +461,7 @@ def chordFromElement(elem):
     May Contain:
     ============
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
-    MEI.shared: artic note
+    MEI.shared: artic
     '''
     # pitch and duration... these are what we can set in the constructor
     post = chord.Chord(notes=[noteFromElement(x) for x in elem.iterfind('note')])
@@ -520,13 +520,6 @@ def clefFromElement(elem):
     ============
     None.
     '''
-    # NOTE: in the _CLEF_ATTR_DICT, it's...
-    #       _CLEF_ATTR_DICT[clefshape][line][octave][dis][dis.place]
-    #       ... but most possibilities don't exist in music21, so we have to catch the KeyError
-
-    # NB: clefshape: G, GG, F, C, perc, TAB
-    # NB: line: integer between 1 and the number of lines on the staff
-
     if 'perc' == elem.get('clefshape'):
         post = clef.PercussionClef()
     elif 'TAB' == elem.get('clefshape'):
