@@ -29,6 +29,7 @@ from music21 import articulations
 from music21 import pitch
 from music21 import stream
 from music21 import chord
+from music21 import clef
 
 
 #------------------------------------------------------------------------------
@@ -232,6 +233,26 @@ def _makeArticList(attr):
     for eachArtic in attr.split(' '):
         post.extend(_articulationFromAttr(eachArtic))
     return post
+
+
+def _getOctaveShift(dis, disPlace):
+    '''
+    Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
+    :class:`~music21.clef.Clef` subclass. Any of the arguments may be ``None``.
+
+    :param str dis: The "dis" attribute from the <clef> tag.
+    :param str disPlace: The "dis.place" attribute from the <clef> tag.
+
+    :returns: The octave displacement compared to the clef's normal position. This may be 0.
+    :rtype: integer
+    '''
+    # NB: dis: 8, 15, or 22 (or "ottava" clefs)
+    # NB: dis.place: "above" or "below" depending on whether the ottava clef is Xva or Xvb
+    octavesDict = {None: 0, '8': 1, '15': 2, '22': 3}
+    if 'below' == disPlace:
+        return -1 * octavesDict[dis]
+    else:
+        return octavesDict[dis]
 
 
 # Converter Functions
@@ -457,6 +478,71 @@ def chordFromElement(elem):
     return post
 
 
+def clefFromElement(elem):
+    '''
+    <clef> Indication of the exact location of a particular note on the staff and, therefore,
+    the other notes as well.
+
+    In MEI 2013: pg.284 (298 in PDF) (MEI.shared module)
+
+    Attributes Implemented:
+    =======================
+    - xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - shape, from att.clef.gesatt.clef.log
+    - line, from att.clef.gesatt.clef.log
+    - dis, from att.clef.gesatt.clef.log
+    - dis.place, from att.clef.gesatt.clef.log
+
+    Attributes Ignored:
+    ===================
+    - cautionary, from att.clef.gesatt.clef.log
+        --> I don't know how this affects the music21 objects
+    - octave, from att.clef.gesatt.clef.log
+        --> this is more complicated than it's worth; who would write a G clef in octave 1?
+
+    Attributes In Progress:
+    =======================
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+    att.event (att.timestamp.musical (@tstamp))
+              (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+              (att.staffident (@staff))
+              (att.layerident (@layer))
+    att.facsimile (@facs)
+    att.clef.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                 (att.alignment (@when)))
+    att.clef.vis (att.altsym (@altsym))
+                 (att.color (@color))
+
+    May Contain:
+    ============
+    None.
+    '''
+    # NOTE: in the _CLEF_ATTR_DICT, it's...
+    #       _CLEF_ATTR_DICT[clefshape][line][octave][dis][dis.place]
+    #       ... but most possibilities don't exist in music21, so we have to catch the KeyError
+
+    # NB: clefshape: G, GG, F, C, perc, TAB
+    # NB: line: integer between 1 and the number of lines on the staff
+
+    if 'perc' == elem.get('clefshape'):
+        post = clef.PercussionClef()
+    elif 'TAB' == elem.get('clefshape'):
+        post = clef.TabClef()
+    else:
+        post = clef.clefFromString(elem.get('clefshape') + elem.get('line'),
+                                   octaveShift=_getOctaveShift(elem.get('dis'),
+                                                               elem.get('dis.place')))
+
+    if elem.get('id') is not None:
+        post.id = elem.get('id')
+
+    return post
+
+
+
 #------------------------------------------------------------------------------
 _DOC_ORDER = [noteFromElement, restFromElement]
 
@@ -468,6 +554,7 @@ if __name__ == "__main__":
                      test_main.TestNoteFromElement,
                      test_main.TestRestFromElement,
                      test_main.TestChordFromElement,
+                     test_main.TestClefFromElement,
                      )
 
 #------------------------------------------------------------------------------

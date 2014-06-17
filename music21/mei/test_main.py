@@ -34,6 +34,7 @@ from music21 import note
 from music21 import duration
 from music21 import articulations
 from music21 import chord
+from music21 import clef
 
 # Importing from __main__.py
 import music21.mei.__main__ as main
@@ -177,6 +178,38 @@ class TestAttrTranslators(unittest.TestCase):
         mockArtic.side_effect = lambda *x: mockReturns.pop(0)
         expected = ['accent', 'marcato', 'staccato', 'marcato']
         actual = main._makeArticList(attr)
+        self.assertEqual(expected, actual)
+
+    def testOctaveShift1(self):
+        '''_getOctaveShift(): properly handles positive displacement'''
+        dis = '15'
+        disPlace = 'above'
+        expected = 2
+        actual = main._getOctaveShift(dis, disPlace)
+        self.assertEqual(expected, actual)
+
+    def testOctaveShift2(self):
+        '''_getOctaveShift(): properly handles negative displacement'''
+        dis = '22'
+        disPlace = 'below'
+        expected = -3
+        actual = main._getOctaveShift(dis, disPlace)
+        self.assertEqual(expected, actual)
+
+    def testOctaveShift3(self):
+        '''_getOctaveShift(): properly handles positive displacement with "None"'''
+        dis = '8'
+        disPlace = None
+        expected = 1
+        actual = main._getOctaveShift(dis, disPlace)
+        self.assertEqual(expected, actual)
+
+    def testOctaveShift4(self):
+        '''_getOctaveShift(): properly positive two "None" args'''
+        dis = None
+        disPlace = None
+        expected = 0
+        actual = main._getOctaveShift(dis, disPlace)
         self.assertEqual(expected, actual)
 
 
@@ -552,3 +585,150 @@ class TestChordFromElement(unittest.TestCase):
         actual = main.chordFromElement(chordElem)
 
         self.assertEqual([articulations.Staccato], actual.articulations)
+
+
+
+#------------------------------------------------------------------------------
+class TestClefFromElement(unittest.TestCase):
+    '''Tests for clefFromElement()'''
+
+    @mock.patch('music21.clef.clefFromString')
+    @mock.patch('music21.clef.PercussionClef')
+    @mock.patch('music21.clef.TabClef')
+    def testUnit1a(self, mockTabClef, mockPercClef, mockClefFromString):
+        '''
+        clefFromElement(): all the elements that go in clef.clefFromString()...
+                           'clefshape', 'line', 'dis', and 'dis.place'
+        (mostly-unit test; only mock out clef and the ElementTree.Element)
+        '''
+        elem = mock.MagicMock()
+        expectedGetOrder = [mock.call('clefshape'), mock.call('clefshape'), mock.call('clefshape'),
+                            mock.call('line'), mock.call('dis'), mock.call('dis.place')]
+        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        elemGetReturns = ['theClefShape', 'theClefShape', 'theClefShape', '2', '8', 'above']
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        mockClefFromString.return_value = mock.MagicMock(name='clefFromString()')
+        expected = mockClefFromString.return_value
+
+        actual = main.clefFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        mockClefFromString.assert_called_once_with_('theClefShape2', 1)
+        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+        self.assertEqual(0, mockTabClef.call_count)
+        self.assertEqual(0, mockPercClef.call_count)
+
+    @mock.patch('music21.clef.clefFromString')
+    @mock.patch('music21.clef.PercussionClef')
+    @mock.patch('music21.clef.TabClef')
+    def testUnit1b(self, mockTabClef, mockPercClef, mockClefFromString):
+        '''
+        clefFromElement(): same as testUnit1a() but with 'perc' "clefshape"
+        '''
+        elem = mock.MagicMock()
+        expectedGetOrder = [mock.call('clefshape')]
+        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        elemGetReturns = ['perc']
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
+        expected = mockClefFromString.return_value
+
+        actual = main.clefFromElement(elem)
+
+        self.assertEqual(0, mockClefFromString.call_count)
+        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+        self.assertEqual(0, mockTabClef.call_count)
+        self.assertEqual(1, mockPercClef.call_count)
+
+    @mock.patch('music21.clef.clefFromString')
+    @mock.patch('music21.clef.PercussionClef')
+    @mock.patch('music21.clef.TabClef')
+    def testUnit1c(self, mockTabClef, mockPercClef, mockClefFromString):
+        '''
+        clefFromElement(): same as testUnit1c() but with 'TAB' "clefshape"
+        '''
+        elem = mock.MagicMock()
+        expectedGetOrder = [mock.call('clefshape'), mock.call('clefshape')]
+        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        elemGetReturns = ['TAB', 'TAB']
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
+        expected = mockClefFromString.return_value
+
+        actual = main.clefFromElement(elem)
+
+        self.assertEqual(0, mockClefFromString.call_count)
+        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+        self.assertEqual(1, mockTabClef.call_count)
+        self.assertEqual(0, mockPercClef.call_count)
+
+    def testIntegration1a(self):
+        '''
+        clefFromElement(): all the elements that go in clef.clefFromString()...
+                           'clefshape', 'line', 'dis', and 'dis.place'
+        (corresponds to testUnit1a, with real objects)
+        '''
+        clefElem = ETree.Element('clef')
+        clefAttribs = {'clefshape': 'G', 'line': '2', 'dis': '8', 'dis.place': 'above'}
+        for key in clefAttribs:
+            clefElem.set(key, clefAttribs[key])
+        expectedClass = clef.Treble8vaClef
+
+        actual = main.clefFromElement(clefElem)
+
+        self.assertEqual(expectedClass, actual.__class__)
+
+    def testIntegration1b(self):
+        '''
+        PercussionClef
+
+        (corresponds to testUnit1b, with real objects)
+        '''
+        clefElem = ETree.Element('clef')
+        clefAttribs = {'clefshape': 'perc'}
+        for key in clefAttribs:
+            clefElem.set(key, clefAttribs[key])
+        expectedClass = clef.PercussionClef
+
+        actual = main.clefFromElement(clefElem)
+
+        self.assertEqual(expectedClass, actual.__class__)
+
+    def testIntegration1c(self):
+        '''
+        TabClef
+
+        (corresponds to testUnit1c, with real objects)
+        '''
+        clefElem = ETree.Element('clef')
+        clefAttribs = {'clefshape': 'TAB'}
+        for key in clefAttribs:
+            clefElem.set(key, clefAttribs[key])
+        expectedClass = clef.TabClef
+
+        actual = main.clefFromElement(clefElem)
+
+        self.assertEqual(expectedClass, actual.__class__)
+
+    @mock.patch('music21.clef.clefFromString')
+    @mock.patch('music21.clef.PercussionClef')
+    @mock.patch('music21.clef.TabClef')
+    def testUnit2(self, mockTabClef, mockPercClef, mockClefFromString):
+        '''
+        clefFromElement(): adds the "xml:id" attribute
+        '''
+        elem = mock.MagicMock()
+        expectedGetOrder = [mock.call('clefshape'), mock.call('id'), mock.call('id')]
+        expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
+        elemGetReturns = ['perc', 'theXMLID', 'theXMLID']
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
+        expected = mockClefFromString.return_value
+
+        actual = main.clefFromElement(elem)
+
+        self.assertEqual(0, mockClefFromString.call_count)
+        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+        self.assertEqual(0, mockTabClef.call_count)
+        self.assertEqual(1, mockPercClef.call_count)
+        self.assertEqual('theXMLID', actual.id)
