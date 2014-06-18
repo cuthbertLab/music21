@@ -224,7 +224,7 @@ class TestNoteFromElement(unittest.TestCase):
                            'pname', 'accid', 'oct', 'dur', 'dots'
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedElemOrder = [mock.call('pname', ''), mock.call('accid'), mock.call('oct', ''),
                              mock.call('dur'), mock.call('dots', 0)]
         expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
@@ -273,7 +273,7 @@ class TestNoteFromElement(unittest.TestCase):
         noteFromElement(): adds "id"
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedElemOrder = [mock.ANY for _ in xrange(5)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call('id'), mock.call('id')])
         expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
@@ -311,7 +311,7 @@ class TestNoteFromElement(unittest.TestCase):
         noteFromElement(): adds "artic"
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedElemOrder = [mock.ANY for _ in xrange(6)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call('artic'), mock.call('artic')])
         elemArtic = 'stacc'
@@ -354,7 +354,7 @@ class TestRestFromElement(unittest.TestCase):
                            'dur', 'dots'
         (mostly-unit test; only mock out Rest and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedElemOrder = [mock.call('dur'), mock.call('dots', 0)]
         expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemReturns = ['4', '1']
@@ -400,7 +400,7 @@ class TestRestFromElement(unittest.TestCase):
         restFromElement(): adds the "id" attribute
         (mostly-unit test; only mock out Rest and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedElemOrder = [mock.ANY for _ in xrange(2)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call('id'), mock.call('id')])
         expectedId = 42
@@ -449,7 +449,7 @@ class TestChordFromElement(unittest.TestCase):
                             'dur', 'dots', and some note.Note objects.
         (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedGetOrder = [mock.call('dur'), mock.call('dots', 0)]
         expectedGetOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['4', '1']
@@ -497,7 +497,7 @@ class TestChordFromElement(unittest.TestCase):
         chordFromElement(): adds "id"
         (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedGetOrder = [mock.ANY for _ in xrange(2)]  # additional calls to elem.get(), not part of this test
         expectedGetOrder.extend([mock.call('id'), mock.call('id')])
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
@@ -544,7 +544,7 @@ class TestChordFromElement(unittest.TestCase):
         chordFromElement(): adds "artic"
         (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedGetOrder = [mock.ANY for _ in xrange(3)]  # additional calls to elem.get(), not part of this test
         expectedGetOrder.extend([mock.call('artic'), mock.call('artic')])
         expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
@@ -600,7 +600,7 @@ class TestClefFromElement(unittest.TestCase):
                            'clefshape', 'line', 'dis', and 'dis.place'
         (mostly-unit test; only mock out clef and the ElementTree.Element)
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedGetOrder = [mock.call('clefshape'), mock.call('clefshape'), mock.call('clefshape'),
                             mock.call('line'), mock.call('dis'), mock.call('dis.place')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
@@ -624,7 +624,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefFromElement(): same as testUnit1a() but with 'perc' "clefshape"
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedGetOrder = [mock.call('clefshape')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc']
@@ -646,7 +646,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefFromElement(): same as testUnit1c() but with 'TAB' "clefshape"
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedGetOrder = [mock.call('clefshape'), mock.call('clefshape')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['TAB', 'TAB']
@@ -716,7 +716,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefFromElement(): adds the "xml:id" attribute
         '''
-        elem = mock.MagicMock()
+        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
         expectedGetOrder = [mock.call('clefshape'), mock.call('id'), mock.call('id')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc', 'theXMLID', 'theXMLID']
