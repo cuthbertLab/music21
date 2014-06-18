@@ -21,12 +21,10 @@ if six.PY2:
 else:
     from unittest import mock  # pylint: disable=no-name-in-module
 
-# Determine which ElementTree implementation to use.
-# We'll prefer the C-based versions if available, since they provide better performance.
-try:
-    from xml.etree import cElementTree as ETree
-except ImportError:
-    from xml.etree import ElementTree as ETree
+# To have working MagicMock objects, we can't use cElementTree even though it would be faster.
+# The C implementation provides some methods/attributes dynamically (notably "tag"), so MagicMock
+# won't know to mock them, and raises an exception instead.
+from xml.etree import ElementTree as ETree
 
 from music21 import pitch
 from music21 import note
@@ -34,6 +32,7 @@ from music21 import duration
 from music21 import articulations
 from music21 import chord
 from music21 import clef
+from music21 import stream
 
 # Importing from __main__.py
 import music21.mei.__main__ as main
@@ -731,3 +730,70 @@ class TestClefFromElement(unittest.TestCase):
         self.assertEqual(0, mockTabClef.call_count)
         self.assertEqual(1, mockPercClef.call_count)
         self.assertEqual('theXMLID', actual.id)
+
+
+
+#------------------------------------------------------------------------------
+class TestLayerFromElement(unittest.TestCase):
+    '''Tests for layerFromElement()'''
+
+    @mock.patch('music21.mei.__main__.noteFromElement')
+    @mock.patch('music21.stream.Voice')
+    def testUnit1(self, mockVoice, mockNoteFromElement):
+        '''
+        layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
+                            mapping works; that tags not in the mapping are ignored; and that a
+                            Voice object is returned. And "xml:id" is set.
+        (mostly-unit test; only mock noteFromElement and the ElementTree.Element)
+        '''
+        elem = mock.MagicMock(spec_set=ETree.Element('layer'))
+        elemGetReturns = ['theXMLID', 'theXMLID']
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) else None
+        expectedGetOrder = [mock.call('id'), mock.call('id')]
+        findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
+                         mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
+                         mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
+        findallReturn[0].tag = 'note'
+        findallReturn[1].tag = 'imaginary'
+        findallReturn[2].tag = 'note'
+        elem.findall = mock.MagicMock(return_value=findallReturn)
+        expectedMNFEOrder = [mock.call(findallReturn[0]), mock.call(findallReturn[2])]  # "MNFE" is "mockNoteFromElement"
+        mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
+        mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
+        expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
+
+        actual = main.layerFromElement(elem)
+
+        elem.findall.assert_called_once_with('*')
+        self.assertEqual(mockVoice.return_value, actual)
+        self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
+        mockVoice.assert_called_once_with()
+        self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value.append.call_args_list)
+        self.assertEqual('theXMLID', actual.id)
+        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+
+    def testIntegration1(self):
+        '''
+        layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
+                            mapping works; that tags not in the mapping are ignored; and that a
+                            Voice object is returned. And "xml:id" is set.
+        (corresponds to testUnit1() but without mock objects)
+        '''
+        inputXML = '''<layer id="asdf1234">
+                          <note pname="F" oct="2" dur="4" />
+                          <note pname="E" oct="2" accid="f" dur="4" />
+                          <imaginary awesome="true" />
+                      </layer>'''
+        elem = ETree.fromstring(inputXML)
+
+        actual = main.layerFromElement(elem)
+
+        self.assertEqual(2, len(actual))
+        self.assertEqual(0.0, actual[0].offset)
+        self.assertEqual(1.0, actual[1].offset)
+        self.assertEqual(1.0, actual[0].quarterLength)
+        self.assertEqual(1.0, actual[1].quarterLength)
+        self.assertEqual('F2', actual[0].nameWithOctave)
+        self.assertEqual('E-2', actual[1].nameWithOctave)
+        self.assertEqual('asdf1234', actual.id)

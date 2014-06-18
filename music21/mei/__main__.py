@@ -21,6 +21,7 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ETree
 
+
 # music21
 from music21 import exceptions21
 from music21 import note
@@ -536,6 +537,76 @@ def clefFromElement(elem):
 
 
 
+def layerFromElement(elem):
+    '''
+    <layer> An independent stream of events on a staff.
+
+    In MEI 2013: pg.3534 (367 in PDF) (MEI.shared module)
+
+    Attributes Implemented:
+    =======================
+    - <clef> contained within
+    - <chord> contained within
+    - <note> contained within
+    - <rest> contained within
+    - xml:id (or id), an XML id (submitted as the Music21Object "id")
+
+    Attributes Ignored:
+    ===================
+
+    Attributes In Progress:
+    =======================
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+    att.declaring (@decls)
+    att.facsimile (@facs)
+    att.layer.log (@def)
+                  (att.meterconformance (@metcon))
+    att.layer.vis (att.visibility (@visible))
+    att.layer.gesatt.layer.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                               (att.alignment (@when)))
+
+    May Contain:
+    ============
+    MEI.cmn: arpeg bTrem beam beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
+             harpPedal mRest mRpt mRpt2 mSpace meterSig meterSigGrp multiRest multiRpt octave pedal
+             reh slur tie tuplet tupletSpan
+    MEI.cmnOrnaments: mordent trill turn
+    MEI.critapp: app
+    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    MEI.harmony: harm
+    MEI.lyrics: lyrics
+    MEI.mensural: ligature mensur proport
+    MEI.midi: midi
+    MEI.neumes: ineume syllable uneume
+    MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb
+                scoreDef space staffDef tempo
+    MEI.text: div
+    MEI.usersymbols: anchoredText curve line symbol
+    '''
+    # mapping from tag name to our converter function
+    tagToFunction = {'clef': clefFromElement, 'chord': chordFromElement, 'note': noteFromElement,
+                     'rest': restFromElement}
+    objects = []
+
+    # iterate all immediate children
+    for eachTag in elem.findall('*'):
+        if eachTag.tag in tagToFunction:
+            objects.append(tagToFunction[eachTag.tag](eachTag))
+
+    # make a music21.stream.Voice, set its "id" attribute, and return
+    post = stream.Voice()
+    for eachObj in objects:
+        post.append(eachObj)
+
+    if elem.get('id') is not None:
+        post.id = elem.get('id')
+
+    return post
+
+
 #------------------------------------------------------------------------------
 _DOC_ORDER = [noteFromElement, restFromElement]
 
@@ -548,6 +619,7 @@ if __name__ == "__main__":
                      test_main.TestRestFromElement,
                      test_main.TestChordFromElement,
                      test_main.TestClefFromElement,
+                     test_main.TestLayerFromElement,
                      )
 
 #------------------------------------------------------------------------------
