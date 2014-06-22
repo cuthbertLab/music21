@@ -1357,9 +1357,9 @@ class Ottava(Spanner):
             self._type = newType.lower()
     
     type = property(_getType, _setType, doc='''
-        Get or set Ottava type. This can be set by as complete string (such as 8va or 15mb) or with a pair specifying size and direction.
-
-        
+        Get or set Ottava type. This can be set by as complete string 
+        (such as 8va or 15mb) or with a pair specifying size and direction.
+ 
         >>> os = spanner.Ottava()
         >>> os.type = 15, 'down'
         >>> os.type
@@ -1373,7 +1373,8 @@ class Ottava(Spanner):
         '''Get basic parameters of shift.
         '''
         if self._type.startswith('8'): return 8
-        if self._type.startswith('15'): return 15
+        elif self._type.startswith('15'): return 15
+        else: raise SpannerException("Cannot get shift magnitude from %s" % self._type)
 
     def _getShiftDirection(self):
         '''Get basic parameters of shift.
@@ -1384,8 +1385,8 @@ class Ottava(Spanner):
         if self._type.endswith('b'): return 'up'
 
     def getStartParameters(self):
-        '''Return the parameters for the start of this spanners required by MusicXML output. 
-
+        '''
+        Return the parameters for the start of this spanners required by MusicXML output. 
         
         >>> ottava = spanner.Ottava(type='15mb')
         >>> st = ottava.getStartParameters()
@@ -1394,9 +1395,9 @@ class Ottava(Spanner):
         >>> st['size']
         15
         >>> en = ottava.getEndParameters()
-        >>> st['type']
+        >>> en['type']
         'stop'
-        >>> st['size']
+        >>> en['size']
         15
         ''' 
         post = {}
@@ -1414,9 +1415,9 @@ class Ottava(Spanner):
         >>> st['size']
         8
         >>> en = ottava.getEndParameters()
-        >>> st['type']
+        >>> en['type']
         'stop'
-        >>> st['size']
+        >>> en['size']
         8
         ''' 
         post = {}

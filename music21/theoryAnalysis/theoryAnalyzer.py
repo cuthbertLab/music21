@@ -52,7 +52,7 @@ of this that will analyze the root motion in a score:
     >>> l = theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony']) #gets a list of tuples, adjacent chord symbol objects in the score
     >>> for x in l:
     ...    averageMotion+= abs(x.rootInterval().intervalClass) #rootInterval() returns the interval between the roots of the first chordSymbol and second
-    >>> averageMotion=averageMotion/len(l)
+    >>> averageMotion=averageMotion // len(l)
     >>> averageMotion #average intervalClass in this piece is about 4
     4
     
@@ -2106,7 +2106,7 @@ class TheoryAnalyzerException(music21.Music21Exception):
 
 class Test(unittest.TestCase):
     
-    def chordMotionExample(self):
+    def testChordMotionExample(self):
         from music21 import harmony, theoryAnalysis
         p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
         harmony.realizeChordSymbolDurations(p)
@@ -2114,7 +2114,7 @@ class Test(unittest.TestCase):
         l = theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony'])
         for x in l:
             averageMotion+= abs(x.rootInterval().intervalClass)
-        averageMotion=averageMotion/len(l)
+        averageMotion = averageMotion // len(l)
         self.assertEqual(averageMotion, 4)
     
         

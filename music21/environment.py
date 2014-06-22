@@ -1198,6 +1198,8 @@ class Environment(object):
             msg = [msg]  # make into a list
         elif isinstance(msg, dict):
             msg = [repr(msg)]
+        elif common.isNum(msg):
+            msg = [str(msg)]
         if header is None:
             if msg[0] != self.modNameParent and self.modNameParent is not None:
                 msg = [self.modNameParent + ': WARNING:'] + msg

@@ -31,7 +31,7 @@ convert the file into .xml or .nwctxt first.
     >>> from music21 import *
     >>> #_DOCS_SHOW c = converter.parse('/Users/cuthbert/desktop/cuthbert_test1.nwc')
     >>> import os #_DOCS_HIDE
-    >>> c = converter.parse(common.getSourceFilePath() + os.path.sep + 'noteworthy' + os.path.sep + r'cuthbert_test1.nwc') #_DOCS_HIDE
+    >>> c = converter.parse(common.getSourceFilePath() + os.path.sep + 'noteworthy' + os.path.sep + r'cuthbert_test1.nwc', forceSource=True) #_DOCS_HIDE
     >>> c.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -77,7 +77,13 @@ convert the file into .xml or .nwctxt first.
 '''
 import struct
 from music21 import environment
+from music21 import exceptions21
+from music21.ext import six
+
 environLocal = environment.Environment("noteworthy.translate")
+
+class NoteworthyBinaryTranslateException(exceptions21.Music21Exception):
+    pass
 
 class NWCConverter(object):
     '''
@@ -113,7 +119,7 @@ class NWCConverter(object):
         self.staves = []
     
     def parseFile(self, fp = None):
-        '''
+        r'''
         Parse a file (calls .toStream)
         
         >>> #_DOCS_SHOW fp = '/Users/cuthbert/desktop/cuthbert_test1.nwc'
@@ -124,6 +130,8 @@ class NWCConverter(object):
         >>> streamObj = nwcc.parseFile()
         >>> len(nwcc.fileContents) # binary
         1139
+        >>> nwcc.fileContents[0:80]
+        b'[NoteWorthy ArtWare]\x00\x00\x00[NoteWorthy Composer]\x00\x01\x02\x02\x00\x00\x00N/A\x000_JldRQMSKq6M5a3FQqK_g\x00\x00\x00'
         >>> streamObj
         <music21.stream.Score ...>
         '''
@@ -134,12 +142,11 @@ class NWCConverter(object):
         self.parse()
         return self.toStream()
     
-    def parseString(self, stringIn = None):
+    def parseString(self, bytesIn = None):
         '''
-        same as parseFile but takes a string of binary data instead.
+        same as parseFile but takes a string (in Py3, bytes) of binary data instead.
         '''
-        
-        self.fileContents = stringIn
+        self.fileContents = bytesIn
         self.parse()
         return self.toStream()
 
@@ -148,7 +155,7 @@ class NWCConverter(object):
         Helper module: read a little-endian short value to an integer
         
         >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
-        >>> nwcc.fileContents = '\x02\x01\x03\x01'
+        >>> nwcc.fileContents = b'\x02\x01\x03\x01'
         >>> nwcc.parsePosition
         0
         >>> nwcc.readLEShort()
@@ -178,21 +185,30 @@ class NWCConverter(object):
         return value
 
     def byteToInt(self, updateParsePosition = True):
+        '''
+        changes a byte into an unsigned int (i.e., if the byte is > 127 then it's subtracted from 256)
+        '''
         fc = self.fileContents
         pp = self.parsePosition
-        value = ord(fc[pp:pp+1])
+        value = ord(fc[pp:pp+1])        
         #print value
         if updateParsePosition is True:
             self.parsePosition = pp+1
         return value
         
     def byteToSignedInt(self, updateParsePosition = True):
+        '''
+        changes a byte into a signed int (i.e., if the byte is > 127 then it's subtracted from 256)
+        '''
         val = self.byteToInt(updateParsePosition)
         if val > 127:
             val = val - 256
         return val
         
     def readBytes(self, bytesToRead = 1, updateParsePosition = True):
+        '''
+        reads the next bytesToRead bytes and then (optionally) updates self.parsePosition
+        '''
         fc = self.fileContents
         pp = self.parsePosition
         value = fc[pp:pp+bytesToRead]
@@ -201,8 +217,21 @@ class NWCConverter(object):
         return value
 
     def readToNUL(self, updateParsePosition = True):
+        r'''
+        reads self.fileContents up to, but not including, the next position of \x00.
+        
+        updates the parsePosition unless updateParsePosition is False
+        '''
         fc = self.fileContents
-        nulPosition = fc.find('\x00', self.parsePosition)
+        if six.PY2:
+            nulPosition = fc.find(b'\x00', self.parsePosition)
+        else:
+            try:
+                nulPosition = fc.index(0, self.parsePosition)
+            except ValueError:
+                nulPosition = -1
+                #raise NoteworthyBinaryTranslateException(fc[self.parsePosition:], self.parsePosition)
+        #print(self.parsePosition, nulPosition)
         ret = None
         if nulPosition == -1:
             ret = fc[self.parsePosition:]
@@ -216,7 +245,7 @@ class NWCConverter(object):
         storedPP = self.parsePosition
         self.parsePosition = 0
         header1 = self.readToNUL()
-        if header1 != '[NoteWorthy ArtWare]':
+        if header1 != b'[NoteWorthy ArtWare]':
             return False
         junk = self.readToNUL()
         junk = self.readToNUL()
@@ -256,22 +285,28 @@ class NWCConverter(object):
     def skipBytes(self, numBytes = 1):
         self.parsePosition += numBytes
         
-    def advanceToNotNUL(self, nul = '\x00'):
+    def advanceToNotNUL(self, nul = b'\x00'):
         pp = self.parsePosition
         fc = self.fileContents
-        while fc[pp] == nul:
+        # the slice Notation [pp:pp+1] is needed to avoid Py3 conversion to bytes
+        while fc[pp:pp+1] == nul:
             pp += 1
         self.parsePosition = pp
 
     def parse(self):
-        if self.fileContents[0:6] == '[NWZ]\x00':
+        '''
+        the main parse routine called by parseFile() or parseString()
+        '''
+        if self.fileContents[0:6] == b'[NWZ]\x00':
             import zlib
-            fcNew = zlib.decompress(self.fileContents[6:])
+            fcNew = zlib.decompress(self.fileContents[6:])            
             self.fileContents = fcNew
 
         self.parsePosition = 0
         self.parseHeader()
         self.staves = []
+        #print(self.numberOfStaves)
+
         for i in range(self.numberOfStaves):
             thisStaff = NWCStaff(parent = self)
             thisStaff.parse()
@@ -279,9 +314,12 @@ class NWCConverter(object):
 
 
     def parseHeader(self):
+        '''
+        Sets a ton of information from the header, and advances the parse position.
+        '''
         self.isValidNWCFile()
-        #print(self.parsePosition)
         self.fileVersion()
+        
         #print self.version
         #print self.parsePosition
         self.skipBytes(4) # skipping registered vs. unregistered
@@ -308,6 +346,7 @@ class NWCConverter(object):
         self.increaseNoteSpacing = self.readToNUL()
         unused = self.readToNUL()
         self.measureNumbers = self.readToNUL()
+
         unused = self.readToNUL()
         self.measureStart = self.readLEShort()
         if self.version >= 130:
@@ -328,6 +367,7 @@ class NWCConverter(object):
         else:
             self.notationTypeface = "Maestro"
         self.staffHeight = self.readLEShort()
+        
         if self.version > 170:
             fontCount = 12
         elif self.version > 130:
@@ -344,8 +384,8 @@ class NWCConverter(object):
             fontDict['size'] = self.byteToInt()
             unused = self.byteToInt()
             fontDict['charset'] = self.byteToInt()
-            if fontDict['name'] == '':
-                fontDict['name'] = 'Times New Roman'
+            if fontDict['name'] == b'':
+                fontDict['name'] = b'Times New Roman'
             if fontDict['style'] == 0:
                 fontDict['style'] = 0 # regular; 1 = bold; 2 = italic; 3 = bold italic???
             if fontDict['size'] == 0:
@@ -384,9 +424,13 @@ class NWCStaff(object):
         self.objects = []
     
     def parse(self):
+        #environLocal.warn([self.parent.parsePosition, self.objects])
         self.parseHeader()
+        #environLocal.warn(['header done', self.parent.parsePosition, self.objects])
         self.parseLyrics()
+        #environLocal.warn(['lyrics done', self.parent.parsePosition, self.objects])
         self.parseObjects()
+        #environLocal.warn([self.parent.parsePosition, self.objects])
         
     def dump(self):
         dumpObjects = []
@@ -452,8 +496,10 @@ class NWCStaff(object):
         #print "Number of lyrics:", self.numberOfLyrics
     
     def parseLyrics(self):
+
         p = self.parent
         lyrics = []
+        
         for i in range(self.numberOfLyrics):
             syllables = []
             try:
@@ -462,6 +508,7 @@ class NWCStaff(object):
                 lyricBlockSize = 0
                 environLocal.warn("Could not read lyrics. Trying with zero length.")
             #print "lyric block size: ", lyricBlockSize
+
             if lyricBlockSize > 0:
                 unused_lyricSize = p.readLEShort()
                 parsePositionStart = p.parsePosition
@@ -469,10 +516,13 @@ class NWCStaff(object):
                 #print "lyric Size: ", lyricSize
                 junk = p.readLEShort()
                 continueIt = True
-                while continueIt is True:
+                maxRead = 1000
+                while continueIt is True and maxRead > 0:
                     syllable = p.readToNUL()
+                    #environLocal.warn([p.parsePosition, syllable, 'syllable'])
+                    maxRead -= 1
                     #print "syllable: ", syllable
-                    if syllable == "":
+                    if syllable == b"":
                         continueIt = False
                     else:
                         syllables.append(syllable)
@@ -519,15 +569,15 @@ class NWCObject(object):
         '''
         p = self.parserParent
         objectType = p.readLEShort()
-        if objectType > len(self.objMethods):
-            print("CAN'T HANDLE objectType %d" % objectType)
-            return
+        if objectType >= len(self.objMethods):
+            raise NoteworthyBinaryTranslateException("Cannot translate objectType: %d; max is %d" % (objectType, len(self.objMethods) ))
         if p.version >= 170:
             self.visible = p.byteToInt()
         else:
             self.visible = 0
         
         objectMethod = self.objMethods[objectType]
+        
         objectMethod(self)
         
         
@@ -673,9 +723,14 @@ class NWCObject(object):
         else:
             self.dotAttribute = self.data2[3]
 
-        if (ord(self.dotAttribute) & 0x01) > 0:
+        if six.PY2:
+            ordDot = ord(self.dotAttribute)
+        else:
+            ordDot = self.dotAttribute
+
+        if (ordDot & 0x01) > 0:
             self.dots = 2
-        elif (ord(self.dotAttribute) & 0x04) > 0:
+        elif (ordDot & 0x04) > 0:
             self.dots = 1
         else:
             self.dots = 0
@@ -741,7 +796,11 @@ class NWCObject(object):
             self.alterationStr = ""
 
         self.tieInfo = ""
-        if (ord(self.attribute1[0]) & 0x10) > 0:
+        if six.PY2:
+            ordAtt1 = ord(self.attribute1[0])
+        else:
+            ordAtt1 = self.attribute1[0]
+        if (ordAtt1 & 0x10) > 0:
             self.tieInfo = "^"
         
 

@@ -423,7 +423,7 @@ class GeneralMensuralNote(base.Music21Object):
         self._gettingDuration = True
         if len(measure) > 0 and 'Divisione' in mOrD.classes:
             if index == 0:
-                self.lenList = trecento.notation.TranslateBrevisLength(mOrD, measure).getKnownLengths()
+                self.lenList = trecento.notation.BrevisLengthTranslator(mOrD, measure).getKnownLengths()
             elif index != -1:
                 tempMN = measure[0]
                 self.lenList = tempMN.lenList

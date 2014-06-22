@@ -2261,14 +2261,17 @@ class LilypondConverter(object):
         file is created by environment.getTempFile.
 
         '''
-
+        tloOut = str(self.topLevelObject)
+        if six.PY2:           
+            tloOut = tloOut.encode('utf-8')
+        
         if fp is None:
             fp = environLocal.getTempFile(ext)
 
         self.tempName = fp
-
+        
         with open(self.tempName, 'w') as f:
-            f.write(str(self.topLevelObject).encode('utf-8'))
+            f.write(tloOut)
 
         return self.tempName
 

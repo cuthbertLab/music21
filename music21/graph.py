@@ -3676,8 +3676,6 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
 class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
     '''A graph of dynamics used by pitch space.
 
-
-    
     >>> s = corpus.parse('schumann/opus41no1', 2)
     >>> p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s)
@@ -3685,7 +3683,7 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
-
+        
     '''
 
     values = ['pitchClass', 'dynamicSymbol']
@@ -4851,11 +4849,17 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, [[0.5, 0, 0], [1.0, 0, 1], [1.5, 0, 1], [3, 0, 3], [0.5, 1, 0], [1.0, 1, 0], [1.5, 1, 0], [3, 1, 0], [0.5, 2, 0], [1.0, 2, 0], [1.5, 2, 1], [3, 2, 2], [0.5, 3, 0], [1.0, 3, 0], [1.5, 3, 0], [3, 3, 0], [0.5, 4, 1], [1.0, 4, 0], [1.5, 4, 1], [3, 4, 2], [0.5, 5, 1], [1.0, 5, 0], [1.5, 5, 0], [3, 5, 4], [0.5, 6, 0], [1.0, 6, 0], [1.5, 6, 0], [3, 6, 0], [0.5, 7, 1], [1.0, 7, 0], [1.5, 7, 0], [3, 7, 4], [0.5, 8, 0], [1.0, 8, 0], [1.5, 8, 0], [3, 8, 0], [0.5, 9, 1], [1.0, 9, 0], [1.5, 9, 0], [3, 9, 2], [0.5, 10, 0], [1.0, 10, 0], [1.5, 10, 0], [3, 10, 0], [0.5, 11, 0], [1.0, 11, 0], [1.5, 11, 1], [3, 11, 2]])
         #b.write()
 
+    def testPlotChordsB2(self):
+        from music21 import stream, scale
+        sc = scale.MajorScale('c4')
 
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         #s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        c = sc.getChord('e3','a3', quarterLength=.5)
+        self.assertEqual(repr(c), '<music21.chord.Chord E3 F3 G3 A3>')
+        self.assertEqual([n.ps for n in c], [52.0, 53.0, 55.0, 57.0])
+        s.append(c)
         #s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('mf'))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))
@@ -4867,7 +4871,16 @@ class Test(unittest.TestCase):
         b = PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None, xLog=False)
         b.process()
         
-        self.assertEqual(b.data, [(69, 4, 2), (74, 4, 2), (76, 7, 1), (65, 4, 2), (59, 7, 1), (79, 7, 1), (72, 7, 1), (59, 8, 1), (64, 8, 1), (62, 7, 1), (69, 7, 1), (55, 8, 1), (62, 8, 1), (60, 8, 1), (71, 4, 2), (76, 4, 2), (65, 7, 1), (57, 8, 1), (67, 4, 2), (72, 4, 3), (77, 4, 2), (52, 8, 1), (71, 7, 1), (53, 8, 1), (64, 7, 1), (67, 7, 1), (74, 7, 1), (77, 7, 1), (79, 4, 2), (60, 7, 1)])
+        self.maxDiff = 2048
+        # TODO: Is this right? why are the old dynamics still active?
+        self.assertEqual(b.data, [(52.0, 8, 1), (53.0, 8, 1), (55.0, 8, 1), (57.0, 8, 1), 
+                                  (59.0, 8, 1), (59.0, 7, 1), (60.0, 8, 1), (60.0, 7, 1), 
+                                  (62.0, 8, 1), (62.0, 7, 1), (64.0, 8, 1), (64.0, 7, 1), 
+                                  (65.0, 7, 1), (65.0, 4, 2), 
+                                  (67.0, 7, 1), (67.0, 4, 2), (69.0, 7, 1), (69.0, 4, 2), 
+                                  (71.0, 7, 1), (71.0, 4, 2), (72.0, 7, 1), (72.0, 4, 3), # C x 3
+                                  (74.0, 7, 1), (74.0, 4, 2), (76.0, 7, 1), (76.0, 4, 2), 
+                                  (77.0, 7, 1), (77.0, 4, 2), (79.0, 7, 1), (79.0, 4, 2)])
         #b.write()
 
 
@@ -5068,7 +5081,7 @@ _DOC_ORDER = [
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

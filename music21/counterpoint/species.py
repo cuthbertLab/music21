@@ -1578,11 +1578,11 @@ def getRandomCF(mode = None):
 
     
     >>> cf = counterpoint.species.getRandomCF()
-    >>> list(cf.keys())
-    ['notes', 'mode']
-    >>> isinstance(cf['notes'],str)
+    >>> sorted(list(cf.keys()))
+    ['mode', 'notes']
+    >>> isinstance(cf['notes'], str)
     True
-    >>> isinstance(cf['mode'],str)
+    >>> isinstance(cf['mode'], str)
     True
     
     '''
@@ -1608,7 +1608,7 @@ class TestExternal(unittest.TestCase):
 
         cf = getRandomCF()
         environLocal.printDebug(['Using: ', cf['notes']])
-        cantusFirmus = stream.Part(converter.parse(cf['notes'], "4/4").notes)
+        cantusFirmus = stream.Part(converter.parse('tinynotation: 4/4 ' + cf['notes']).notes)
 
         baseNote = Note(cf['mode'])
         thisScale = scale.MinorScale(baseNote)

@@ -95,11 +95,11 @@ def intsToHexString(intList):
     
     >>> # note on, middle c, 120 velocity
     >>> midi.intsToHexString([144, 60, 120])
-    '\\x90<x'
+    b'\\x90<x'
     '''
     # note off are 128 to 143
     # note on messages are decimal 144 to 159
-    post = ''
+    post = b''
     for i in intList:
         # B is an unsigned char
         # this forces values between 0 and 255
@@ -155,37 +155,39 @@ def getVariableLengthNumber(midiStr):
     This is necessary as DeltaTime times are given with variable size, 
     and thus may be if different numbers of characters are used.
 
+    (The ellipses below are just to make the doctests work on both Python 2 and
+    Python 3 (where the output is in bytes).)
     
     >>> midi.getVariableLengthNumber('A-u')
-    (65, '-u')
+    (65, ...'-u')
     >>> midi.getVariableLengthNumber('-u')
-    (45, 'u')
+    (45, ...'u')
     >>> midi.getVariableLengthNumber('u')
-    (117, '')
+    (117, ...'')
 
     >>> midi.getVariableLengthNumber('test')
-    (116, 'est')
+    (116, ...'est')
     >>> midi.getVariableLengthNumber('E@-E')
-    (69, '@-E')
+    (69, ...'@-E')
     >>> midi.getVariableLengthNumber('@-E')
-    (64, '-E')
+    (64, ...'-E')
     >>> midi.getVariableLengthNumber('-E')
-    (45, 'E')
+    (45, ...'E')
     >>> midi.getVariableLengthNumber('E')
-    (69, '')
+    (69, ...'')
 
     Test that variable length characters work:
 
-    >>> midi.getVariableLengthNumber('\xff\x7f')
-    (16383, '')
-    >>> midi.getVariableLengthNumber(u'中xy')
-    (210638584, u'y')
+    >>> midi.getVariableLengthNumber(b'\xff\x7f')
+    (16383, ...'')
+    >>> midi.getVariableLengthNumber('中xy')
+    (210638584, ...'y')
 
     If no low-byte character is encoded, raises an IndexError
 
-    >>> midi.getVariableLengthNumber(u'中国')
+    >>> midi.getVariableLengthNumber('中国')
     Traceback (most recent call last):
-    IndexError: string index out of range
+    IndexError: ...index out of range
     '''
     # from http://faydoc.tripod.com/formats/mid.htm
     # This allows the number to be read one byte at a time, and when you see a msb of 0, you know that it was the last (least significant) byte of the number.
@@ -193,6 +195,9 @@ def getVariableLengthNumber(midiStr):
     # http://253.ccarh.org/handout/vlv/
     summation = 0 
     i = 0 
+    if six.PY3 and isinstance(midiStr, str):
+        midiStr = midiStr.encode('utf-8')
+    
     while i < 999: # should return eventually... was while True
         if common.isNum(midiStr[i]):
             x = midiStr[i]
@@ -782,9 +787,9 @@ class MidiEvent(object):
             return midiStr[1:] # 
 
 
-    def write(self): 
+    def getBytes(self): 
         '''
-        Write out a midi track.
+        Return a set of bytes for this MIDI event.
         '''
         sysex_event_dict = {"F0_SYSEX_EVENT": 0xF0, 
                             "F7_SYSEX_EVENT": 0xF7} 
@@ -826,11 +831,15 @@ class MidiEvent(object):
             return s + self.data 
 
         elif metaEvents.hasattr(self.type):                 
-            s = chr(0xFF) + chr(getattr(metaEvents, self.type)) 
+            if six.PY2:
+                s = chr(0xFF) + chr(getattr(metaEvents, self.type))
+            else:
+                s = bytes([0xFF]) + bytes([getattr(metaEvents, self.type)])
             s = s + putVariableLengthNumber(len(self.data)) 
+
             try: # TODO: need to handle unicode
                 return s + self.data 
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, TypeError):
                 #environLocal.printDebug(['cannot decode data', self.data])
                 return s + unicodedata.normalize('NFKD', 
                            self.data).encode('ascii','ignore')
@@ -841,7 +850,6 @@ class MidiEvent(object):
     def isNoteOn(self):
         '''
         Return a boolean if this is a note-on message and velocity is not zero.
-
         
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
@@ -975,7 +983,7 @@ class DeltaTime(MidiEvent):
         self.time, newstr = getVariableLengthNumber(oldstr) 
         return self.time, newstr 
 
-    def write(self): 
+    def getBytes(self): 
         midiStr = putVariableLengthNumber(self.time) 
         return midiStr
 
@@ -1063,7 +1071,7 @@ class MidiTrack(object):
 
         return remainder # remainder string after extracting track data
     
-    def write(self): 
+    def getBytes(self): 
         '''
         returns a string of midi-data from the `.events` in the object.
         '''
@@ -1075,7 +1083,7 @@ class MidiTrack(object):
         for e in self.events: 
             # this writes both delta time and message events
             try:
-                ew = e.write()
+                ew = e.getBytes()
                 if six.PY3:
                     intArray = []
                     for x in ew:
@@ -1251,7 +1259,7 @@ class MidiFile(object):
         '''
         midiStr = self.writeMThdStr()
         for trk in self.tracks: 
-            midiStr = midiStr + trk.write() 
+            midiStr = midiStr + trk.getBytes() 
         return midiStr 
 
 
