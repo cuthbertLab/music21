@@ -57,12 +57,12 @@ except ImportError:
 intervalCache = []
 
 class MotionType(str, enum.Enum):
-    parallel = 'Parallel'
-    contrary = 'Contrary'
-    oblique = 'Oblique'
     antiParallel = 'Anti-Parallel'
-    similar = 'Similar'
+    contrary = 'Contrary'
     noMotion = 'No Motion'
+    oblique = 'Oblique'
+    parallel = 'Parallel'
+    similar = 'Similar'
 
 #-------------------------------------------------------------------------------
 class VoiceLeadingQuartet(base.Music21Object):

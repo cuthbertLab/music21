@@ -20,6 +20,10 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 from music21 import freezeThaw
+from music21.ext import six
+
+if six.PY3:
+    unicode = str # @ReservedAssignment
 
 
 #------------------------------------------------------------------------------
@@ -409,7 +413,8 @@ class MetadataBundle(object):
         return self._apply_set_predicate(metadataBundle, '__ge__')
 
     def __getitem__(self, i):
-        return self._metadataEntries.values()[i]
+        # TODO: is this an OrderedDict???
+        return list(self._metadataEntries.values())[i]
 
     def __gt__(self, metadataBundle):
         '''

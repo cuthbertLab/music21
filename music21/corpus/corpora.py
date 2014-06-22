@@ -22,7 +22,8 @@ from music21.corpus import virtual
 from music21 import environment
 environLocal = environment.Environment(__file__)
 
-
+if six.PY3:
+    unicode = str # @ReservedAssignment
 #------------------------------------------------------------------------------
 
 

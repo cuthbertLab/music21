@@ -279,7 +279,7 @@ class ChordReducer(object):
             >>> cr = analysis.reduceChords.ChordReducer()
             >>> cws = cr.computeMeasureChordWeights(s)
             >>> for pcs in sorted(cws):
-            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
+            ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
                 (0, 4, 7)  3.0
             (0, 11, 4, 5)  1.0
 
@@ -290,7 +290,7 @@ class ChordReducer(object):
             >>> cws = cr.computeMeasureChordWeights(s,
             ...     weightAlgorithm=cr.quarterLengthBeatStrength)
             >>> for pcs in sorted(cws):
-            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
+            ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
                 (0, 4, 7)  2.2
             (0, 11, 4, 5)  0.5
 
@@ -301,7 +301,7 @@ class ChordReducer(object):
             >>> cws = cr.computeMeasureChordWeights(s,
             ...     weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
             >>> for pcs in sorted(cws):
-            ...     print "%18r  %2.1f" % (pcs, cws[pcs])
+            ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
                 (0, 4, 7)  3.0
             (0, 11, 4, 5)  0.5
 
@@ -310,7 +310,7 @@ class ChordReducer(object):
         >>> cws = cr.computeMeasureChordWeights(s,
         ...     weightAlgorithm=cr.qlbsmpConsonance)
         >>> for pcs in sorted(cws):
-        ...     print "%18r  %2.1f" % (pcs, cws[pcs])
+        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
              (0, 4, 7)  3.0
          (0, 11, 4, 5)  0.1
         '''
@@ -347,7 +347,7 @@ class ChordReducer(object):
                 if bassTimespan.startOffset < group[0].startOffset:
                     beatStrength = bassTimespan.beatStrength
                     startOffset = bassTimespan.startOffset
-                    previousTimespan = tree.findPreviousElementTimespanInSamePart(group[0])
+                    previousTimespan = tree.findPreviousElementTimespanInSameStreamByClass(group[0])
                     if previousTimespan is not None:
                         assert previousTimespan.stopOffset <= group[0].startOffset
                         if startOffset < previousTimespan.stopOffset:

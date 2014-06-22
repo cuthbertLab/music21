@@ -36,9 +36,14 @@ from music21.braille import basic
 from music21.braille import lookup
 from music21.braille import text
 
+try:
+    from future_builtins import zip
+except ImportError: # not 2.6+ or is 3.x
+    pass
+
 import collections
 import copy
-import itertools
+#import itertools
 import unittest
 
 
@@ -227,12 +232,12 @@ class BrailleSegment(collections.defaultdict):
                     continue
             except TypeError:
                 pass
-            allKeys.append("Measure {0}, {1} {2}:\n".format(int(key/100),
-                affinityNames[key%10], int(key%100)/10 + 1))
+            allKeys.append("Measure {0}, {1} {2}:\n".format(int(key//100),
+                affinityNames[key%10], int(key%100)//10 + 1))
             allGroupings.append(str(grouping))
             prevKey = key
         allElementGroupings = u"\n".join([u"".join([k, g, "\n==="])
-                                          for (k,g) in list(itertools.izip(allKeys, allGroupings))])
+                                          for (k,g) in list(zip(allKeys, allGroupings))])
         return u"\n".join(["---begin segment---", name, allElementGroupings, "---end segment---"])
     
     def __repr__(self):
@@ -459,7 +464,7 @@ class BrailleSegment(collections.defaultdict):
         self.addMeasureNumber(brailleText)
 
     def _getMeasureNumber(self, withDot=False):
-        initMeasureNumber = self._allGroupingKeys[0] / 100
+        initMeasureNumber = self._allGroupingKeys[0] // 100
         brailleNumber = basic.numberToBraille(initMeasureNumber)
         if not withDot:
             return brailleNumber
@@ -481,10 +486,10 @@ class BrailleGrandSegment():
         allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)
         for (rightKey, leftKey) in allKeyPairs:
             a = "Measure {0} Right, {1} {2}:\n".format(
-                int(rightKey/100), affinityNames[rightKey%10], int(rightKey%100)/10 + 1)
+                int(rightKey//100), affinityNames[rightKey%10], int(rightKey%100)//10 + 1)
             b = str(self.rightSegment[rightKey])
-            c = "\nMeasure {0} Left, {1} {2}:\n".format(int(leftKey/100),
-                affinityNames[leftKey%10], int(leftKey%100)/10 + 1)
+            c = "\nMeasure {0} Left, {1} {2}:\n".format(int(leftKey//100),
+                affinityNames[leftKey%10], int(leftKey%100)//10 + 1)
             d = str(self.leftSegment[leftKey])
             ab = u"".join([a,b]) 
             cd = u"".join([c,d])
@@ -532,7 +537,7 @@ class BrailleGrandSegment():
         """
         bk = text.BrailleKeyboard(self.maxLineLength)
         self.allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)   
-        bk.highestMeasureNumberLength = len(str(self.allKeyPairs[-1][0] / 100))
+        bk.highestMeasureNumberLength = len(str(self.allKeyPairs[-1][0] // 100))
 
         self.extractHeading(bk) # Heading
     
@@ -596,7 +601,7 @@ class BrailleGrandSegment():
     
     def extractNoteGrouping(self, brailleKeyboard):
         (rightKey, leftKey) = self.currentGroupingPair
-        currentMeasureNumber = basic.numberToBraille(rightKey / 100, withNumberSign=False)
+        currentMeasureNumber = basic.numberToBraille(rightKey // 100, withNumberSign=False)
         if rightKey % 10 == AFFINITY_INACCORD:
             inaccords = self.rightSegment[rightKey]
             voice_trans = []
@@ -1187,11 +1192,11 @@ def extractBrailleElements(music21Measure):
             if not isExempt.count(True):
                 environRules.warn("{0}".format(notSupportedException))
 
-    allElements.sort(cmp = lambda x, y: cmp(x.offset, y.offset) or cmp(x.classSortOrder, y.classSortOrder))
+    allElements.sort(key = lambda x: (x.offset, x.classSortOrder))
     if len(allElements) >= 2 and isinstance(allElements[-1], dynamics.Dynamic):
         if isinstance(allElements[-2], bar.Barline):
             allElements[-1].classSortOrder = -1
-            allElements.sort(cmp = lambda x, y: cmp(x.offset, y.offset) or cmp(x.classSortOrder, y.classSortOrder))
+            allElements.sort(key = lambda x: (x.offset, x.classSortOrder))
             
     return allElements
 
@@ -1413,7 +1418,7 @@ def compareNoteGroupings(noteGroupingA, noteGroupingB):
     if both groupings have identical contents. False otherwise.
     """
     if len(noteGroupingA) == len(noteGroupingB):
-        for (elementA, elementB) in itertools.izip(noteGroupingA, noteGroupingB):
+        for (elementA, elementB) in zip(noteGroupingA, noteGroupingB):
             if elementA != elementB:
                 return False
         return True
@@ -1461,6 +1466,7 @@ def fixArticulations(allSegments):
             for noteIndexStart in range(len(allNotes)):
                 music21NoteStart = allNotes[noteIndexStart]
                 for artc in music21NoteStart.articulations:
+                    artcName = artc.name
                     if isinstance(artc, articulations.Staccato) or isinstance(artc, articulations.Tenuto):
                         if not music21NoteStart.tie is None:
                             if music21NoteStart.tie.type == 'stop':
@@ -1473,15 +1479,18 @@ def fixArticulations(allSegments):
                     numSequential=0
                     for noteIndexContinue in range(noteIndexStart+1, len(allNotes)):
                         music21NoteContinue = allNotes[noteIndexContinue]
-                        if artc in music21NoteContinue.articulations:
+                        if artcName in [a.name for a in music21NoteContinue.articulations]:
                             numSequential+=1
                             continue
                         break
                     if numSequential >= 3:
+                        # double the articulation on the first note and remove from the next...
                         music21NoteStart.articulations.append(artc)
                         for noteIndexContinue in range(noteIndexStart+1, noteIndexStart+numSequential):
                             music21NoteContinue = allNotes[noteIndexContinue]
-                            music21NoteContinue.articulations.remove(artc)
+                            for artOther in music21NoteContinue.articulations:
+                                if artOther.name == artcName:
+                                    music21NoteContinue.articulations.remove(artOther)
 
 #-------------------------------------------------------------------------------
 # Helper Methods
@@ -1508,7 +1517,7 @@ def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSigna
     
     offset = 0.0
     if not(beatDivisionOffset == 0):
-        if abs(beatDivisionOffset) > ts.beatDivisionDurations:
+        if abs(beatDivisionOffset) > len(ts.beatDivisionDurations):
             raise Exception()
         i = len(ts.beatDivisionDurations) - abs(beatDivisionOffset)
         try:

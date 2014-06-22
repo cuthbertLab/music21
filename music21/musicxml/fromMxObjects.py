@@ -3007,15 +3007,16 @@ def mxToBeams(mxBeamList, inputM21 = None):
     >>> mxBeamList = musicxml.toMxObjects.beamsToMx(a)
     >>> b = musicxml.fromMxObjects.mxToBeams(mxBeamList)
     >>> b
-    <music21.beam.Beams <music21.beam.Beam None/start>/<music21.beam.Beam None/start>>
+    <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     '''
     if inputM21 is None:
         beamsOut = beam.Beams()
     else:
         beamsOut = inputM21
     
-    for mxBeam in mxBeamList:
+    for i, mxBeam in enumerate(mxBeamList):
         beamObj = mxToBeam(mxBeam)
+        beamObj.number = i + 1
         beamsOut.beamsList.append(beamObj)
 
     return beamsOut

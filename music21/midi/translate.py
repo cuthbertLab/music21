@@ -27,6 +27,8 @@ from music21 import common
 
 from music21 import exceptions21
 from music21 import environment
+from music21.ext import six
+
 _MOD = "midi.translate.py"  
 environLocal = environment.Environment(_MOD)
 
@@ -44,7 +46,7 @@ def offsetToMidi(o):
     
     Returns an int.
     
-    >>> print defaults.ticksPerQuarter
+    >>> defaults.ticksPerQuarter
     1024
     >>> midi.translate.offsetToMidi(20.5)
     20992
@@ -525,8 +527,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             volumes.append(v)
     # assume it is  a flat list        
     else:
-        onEvents = eventList[:(len(eventList) / 2)]
-        offEvents = eventList[(len(eventList) / 2):]
+        onEvents = eventList[:(len(eventList) // 2)]
+        offEvents = eventList[(len(eventList) // 2):]
         # first is always delta time
         tOn = onEvents[0].time
         tOff = offEvents[0].time
@@ -945,8 +947,13 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     >>> events = midi.translate.tempoToMidiEvents(mm)
     >>> events[0]
     <MidiEvent DeltaTime, t=0, track=None, channel=None>
+    
+    Data is not displayed directly below since it's a bytes object in PY3 and str in PY2
+    
     >>> events[1]
-    <MidiEvent SET_TEMPO, t=None, track=None, channel=1, data='\n,+'>    
+    <MidiEvent SET_TEMPO, t=None, track=None, channel=1, data=...>
+    >>> events[1].data    
+    b'\n,+'
     >>> microSecondsPerQuarterNote = midi.getNumber(events[1].data, len(events[1].data))[0]
     >>> microSecondsPerQuarterNote
     666667
@@ -1097,8 +1104,7 @@ def _streamToPackets(s, trackId=1):
     # sorting is useful here, as we need these to be in order to assign last
     # instrument
     packetsByOffset.sort(
-        cmp=lambda x,y: cmp(x['offset'], y['offset']) or
-                        cmp(x['midiEvent'].sortOrder, y['midiEvent'].sortOrder)
+        key=lambda x: (x['offset'], x['midiEvent'].sortOrder)
         )
     # return packets and stream, as this flat stream should be retained
     return packetsByOffset
@@ -1134,7 +1140,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
     if initChannelForTrack is None:
         initChannelForTrack = {}
     
-    #allChannels = range(1, 10) + range(11, 17) # all but 10
+    #allChannels = list(range(1, 10)) + list(range(11, 17)) # all but 10
     uniqueChannelEvents = {} # dict of (start, stop, usedChannel) : channel
     post = []
     usedTracks = []
@@ -1301,8 +1307,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
         #environLocal.printDebug(['adding pitch bend for found channels', me])
     # this sort is necessary
     post.sort(
-        cmp=lambda x,y: cmp(x['offset'], y['offset']) or
-                        cmp(x['midiEvent'].sortOrder, y['midiEvent'].sortOrder)
+        key=lambda x: (x['offset'], x['midiEvent'].sortOrder)
         )
 
     # TODO: for each track, add an additional silent event to make sure
@@ -1685,7 +1690,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
     if acceptableChannelList is not None:
         allChannels = acceptableChannelList
     else:
-        allChannels = range(1, 10) + range(11, 17) # all but 10
+        allChannels = list(range(1, 10)) + list(range(11, 17)) # all but 10
     # store streams in uniform list
     substreamList = []
     if s.hasPartLikeStreams():
@@ -1943,7 +1948,7 @@ def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tra
         >>> midiTrack.append(asciiMidiEventList)
         >>> midiBinStr = midi.translate.midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
         >>> midiBinStr
-        'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
+        b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
@@ -1992,7 +1997,7 @@ def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tra
                                 
             mf.tracks.append(trk) 
 
-    midiBinStr = ""
+    midiBinStr = b""
     midiBinStr = midiBinStr + mf.writestr()
     
     return midiBinStr
@@ -2086,7 +2091,7 @@ class Test(unittest.TestCase):
         
         midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
         
-        self.assertEqual(midiBinStr, "MThd"+ a2b_hex("000000060001000103c0") + "MTrk" + a2b_hex("0000000400901f0f")) 
+        self.assertEqual(midiBinStr, b"MThd"+ a2b_hex("000000060001000103c0") + b"MTrk" + a2b_hex("0000000400901f0f")) 
 
     def testNote(self):
         from music21 import midi as midiModule
@@ -2163,16 +2168,21 @@ class Test(unittest.TestCase):
         mts = streamHierarchyToMidiTracks(soprano)[0] # get one
 
         # first note-on is not delayed, even w anacrusis
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data='Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>]"""
        
-
+        self.maxDiff = None
+        if six.PY2:
+            mts.events[1].data = mts.events[1].data.encode('ascii') # unicode fix
         self.assertEqual(str(mts.events[:5]), match)
 
         # first note-on is not delayed, even w anacrusis
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data='Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>]"""
 
         alto = s.parts['alto']
         mta = streamHierarchyToMidiTracks(alto)[0]
+
+        if six.PY2:
+            mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
 
         self.assertEqual(str(mta.events[:10]), match)
 
@@ -2183,7 +2193,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 1)
 
         # its the same as before
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data='Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>]"""
+        if six.PY2:
+            mtList[0].events[1].data = mtList[0].events[1].data.encode('ascii') # unicode fix
 
         self.assertEqual(str(mtList[0].events[:12]), match)
 
@@ -2345,7 +2357,7 @@ class Test(unittest.TestCase):
 #         #s.show('midi', app='Logic Express')
 #         s.show('midi')
 
-        #print s.write('midi')
+        #print(s.write('midi'))
     def testMicrotonalOutputB(self):
         # a two-part stream
         from music21 import stream, note
@@ -2369,7 +2381,7 @@ class Test(unittest.TestCase):
         mts = streamHierarchyToMidiTracks(s)
         self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[1].getChannels(),  [1, 2])
-        #print mts
+        #print(mts)
         #s.show('midi', app='Logic Express')
         #s.show('midi')
 
@@ -2404,7 +2416,7 @@ class Test(unittest.TestCase):
 
         #s.show('midi')
         mts = streamHierarchyToMidiTracks(s)
-        #print mts[0]
+        #print(mts[0])
         self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[1].getChannels(),  [2])
         self.assertEqual(mts[2].getChannels(),  [3])
@@ -2432,7 +2444,7 @@ class Test(unittest.TestCase):
 
         #s.show('midi')
         mts = streamHierarchyToMidiTracks(s)
-        #print mts[0]
+        #print(mts[0])
         self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[0].getProgramChanges(),  [6])
 
@@ -2441,7 +2453,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(mts[2].getChannels(),  [3, 6])
         self.assertEqual(mts[2].getProgramChanges(),  [26])
-        #print mts[2]
+        #print(mts[2])
 
         self.assertEqual(mts[3].getChannels(),  [4, 6])
         self.assertEqual(mts[3].getProgramChanges(),  [73])
@@ -2529,7 +2541,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[1].getChannels(),  [2, 4])
         self.assertEqual(mts[1].getProgramChanges(),  [56])
         
-        #print mts[2]
+        #print(mts[2])
         self.assertEqual(mts[2].getChannels(),  [3, 4, 5])
         self.assertEqual(mts[2].getProgramChanges(),  [26])
 
@@ -2645,7 +2657,7 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         for i in range(10):
-            #print i
+            #print(i)
             n = note.Note('c3')
             n.volume.velocityScalar = i/10.
             n.volume.velocityIsRelative = False
@@ -2654,7 +2666,7 @@ class Test(unittest.TestCase):
         #s.show('midi')        
         mts = streamHierarchyToMidiTracks(s)
         mtsRepr = repr(mts)
-        #print mtsRepr
+        #print(mtsRepr)
         self.assertEqual(mtsRepr.count('velocity=114'), 1)
         self.assertEqual(mtsRepr.count('velocity=13'), 1)
         

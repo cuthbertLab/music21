@@ -124,7 +124,7 @@ repositories. Both of these can be installed via the Eclipse Marketplace.
     ..  image:: images/usingGit/eclipse__install_plugins__0.png
 
 2.  Search for PyDev in the Marketplace search box, and click **Install** in
-    the proper search results:
+    the proper search results: (the latest version is now 3.5)
 
     ..  image:: images/usingGit/eclipse__install_plugins__1__edited.png
 
@@ -198,6 +198,9 @@ contextual menu that appears.
     from Git**, then click **Next**:
 
     ..  image:: images/usingGit/eclipse__clone__1__edited.png
+    
+    You may not see the "Repositories from GitHub" option on your computer. That's okay,
+    despite using GitHub, you won't actually use this option.
 
 2.  You'll now be asked to choose a repository source. While you can try using
     the **GitHub** repository source - which allows dynamically searching
@@ -273,6 +276,8 @@ the **Package Explorer** window, right-click on your music21 project and choose
 **Set as PyDev Project** from the **PyDev** submenu:
 
 ..  image:: images/usingGit/eclipse__configure_pydev__1.png
+
+If you don't see this option, see http://stackoverflow.com/questions/19873064/pydev-not-showing-up-in-eclipse
 
 You also need to tell PyDev that your project should be included in your Python
 path. If you don't do this, Python won't be able to find music21 at all.

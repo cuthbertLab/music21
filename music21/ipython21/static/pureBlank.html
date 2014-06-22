@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>IPython Notebook</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/static/base/images/favicon.ico?v=4e6c6be5716444f7ac7b902e7f388939">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link rel="stylesheet" href="/static/components/jquery-ui/themes/smoothness/jquery-ui.min.css?v=60f0405edd95e7135ec6a0bbc36d1385" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full&delayStartupUntil=configured" charset="utf-8"></script>
+<script type="text/javascript">
+    // MathJax disabled, set as null to distingish from *missing* MathJax,
+    // where it will be undefined, and should prompt a dialog later.
+    window.mathjax_url = "http://cdn.mathjax.org/mathjax/latest/MathJax.js";
+</script>
+
+<link rel="stylesheet" href="/static/components/bootstrap-tour/build/css/bootstrap-tour.min.css?v=d0b3c2fce6056a2ddd5a4513762a94c4" type="text/css" />
+<link rel="stylesheet" href="/static/components/codemirror/lib/codemirror.css?v=73fb29fa560f1e385a1c7cff7cbc31bd">
+<link rel="stylesheet" href="/static/style/style.min.css?v=f89085d8b0348b8f370f1a42b1eac931" type="text/css"/>
+<link rel="stylesheet" href="/static/notebook/css/override.css?v=6ea2476bfc7a48925b5902913f113653" type="text/css" />
+<link rel="stylesheet" href="/static/custom/custom.css?v=900035aa0c126bb85df55c5b3e51b6f1" type="text/css" />
+
+<script src="/static/components/requirejs/require.js?v=07d7db4d3fd6519996822665e4239282" type="text/javascript" charset="utf-8"></script>
+    <script>
+      require.config({
+          baseUrl: '/static/',
+          paths: {
+            nbextensions : '/nbextensions',
+            underscore : '/static/components/underscore/underscore-min.js?v=ca26dc8cdf5d413cd8d3b62490e28210',
+            backbone : '/static/components/backbone/backbone-min.js?v=dd2e6c2643968f7932487454302f407d',
+          },
+          shim: {
+            underscore: {
+              exports: '_'
+            },
+            backbone: {
+              deps: ["underscore", "jquery"],
+              exports: "Backbone"
+            },
+          }
+      });
+    </script>
+</head>
+<body 
+    data-project=""
+    data-base-url="/"
+    data-notebook-name="zz_blank.ipynb"
+    data-notebook-path=""
+    class="notebook_app"
+>
+
+<noscript>
+    <div id='noscript'>
+      IPython Notebook requires JavaScript.<br>
+      Please enable it to proceed.
+  </div>
+</noscript>
+
+<div id="site">
+    <div id="ipython-main-app">
+        <div id="notebook_panel">
+            <div id="notebook"></div>
+            <div id="pager_splitter"></div>
+            <div id="pager">
+                <div id='pager_button_area'></div>
+                <div id="pager-container" class="container"></div>
+            </div>
+        </div>
+    </div>
+    <div id='tooltip' class='ipython_tooltip' style='display:none'></div>
+</div>
+
+<script src="/static/components/jquery/jquery.min.js?v=ccd0edd113b78697e04fb5c1b519a5cd" type="text/javascript" charset="utf-8"></script>
+<script src="/static/components/jquery-ui/ui/minified/jquery-ui.min.js?v=fd255415839568e52a48da5de5af244c" type="text/javascript" charset="utf-8"></script>
+<script src="/static/components/bootstrap/bootstrap/js/bootstrap.min.js?v=d700a93337122b390b90bbfe21e64f71" type="text/javascript" charset="utf-8"></script>
+<script src="/static/base/js/namespace.js?v=4a08e62cb5a63737d11b2cdfc27b14ef" type="text/javascript" charset="utf-8"></script>
+<script src="/static/base/js/page.js?v=8cff843ac51ad2c78fefd590fdeffaf4" type="text/javascript" charset="utf-8"></script>
+<script src="/static/auth/js/loginwidget.js?v=9704cc6d38aa3d5d0f9201416aec9086" type="text/javascript" charset="utf-8"></script>
+<script src="/static/components/google-caja/html-css-sanitizer-minified.js?v=e37ad48fe0c91a2685cb220b24976d5a" charset="utf-8"></script>
+<script src="/static/components/codemirror/lib/codemirror.js?v=0e59a0e2c19169db3fd8211ec6824685" charset="utf-8"></script>
+<script type="text/javascript">
+    CodeMirror.modeURL = "/static/components/codemirror/mode/%N/%N.js";
+</script>
+<script src="/static/components/codemirror/addon/mode/loadmode.js?v=77c25116ca25c8f486b6e51b8508b61b" charset="utf-8"></script>
+<script src="/static/components/codemirror/addon/mode/multiplex.js?v=d9c29e21d92780eb3a275c48cf95cba1" charset="utf-8"></script>
+<script src="/static/components/codemirror/addon/mode/overlay.js?v=d8c2d47f490ce2737d63567d72cd6cbd" charset="utf-8"></script>
+<script src="/static/components/codemirror/addon/edit/matchbrackets.js?v=73fcc92073c6300caefd88cb8bb7c8ea" charset="utf-8"></script>
+<script src="/static/components/codemirror/addon/edit/closebrackets.js?v=7a92b36072578bc059f1a24a51d8c5cd" charset="utf-8"></script>
+<script src="/static/components/codemirror/addon/comment/comment.js?v=4385bf45f415c7b10c77339ef92ca9c6" charset="utf-8"></script>
+<script src="/static/components/codemirror/mode/htmlmixed/htmlmixed.js?v=1c5f62d5c2b0340ae7e3114b966d9c5a" charset="utf-8"></script>
+<script src="/static/components/codemirror/mode/xml/xml.js?v=ece4ceadf21979bf4268ee2c5495a4d9" charset="utf-8"></script>
+<script src="/static/components/codemirror/mode/javascript/javascript.js?v=0651ee647d08c8a69b3880ef86d17cb2" charset="utf-8"></script>
+<script src="/static/components/codemirror/mode/css/css.js?v=c27aeb17961cd2ed3c91e673e1b13b67" charset="utf-8"></script>
+<script src="/static/components/codemirror/mode/rst/rst.js?v=9c14ec4fdc261c89d6b0c49251452572" charset="utf-8"></script>
+<script src="/static/components/codemirror/mode/markdown/markdown.js?v=a5801438e11396236bd84d154d3d7de4" charset="utf-8"></script>
+<script src="/static/components/codemirror/mode/gfm/gfm.js?v=7c6a0de693e3f943d166e9217940b311" charset="utf-8"></script>
+<script src="/static/components/codemirror/mode/python/python.js?v=c8c9319bf22dd5d03ac44a65eafe906c" charset="utf-8"></script>
+<script src="/static/notebook/js/codemirror-ipython.js?v=3dbfb564fbde794199bbb2f25f1c351f" charset="utf-8"></script>
+<script src="/static/components/highlight.js/build/highlight.pack.js?v=7b10417ab6f29ea4a9c2a372b7237ce5" charset="utf-8"></script>
+<script src="/static/dateformat/date.format.js?v=3d6c937e5616e43e12950082c2fff018" charset="utf-8"></script>
+<script src="/static/base/js/events.js?v=cc4013e9d8d26923095c78d790d199be" type="text/javascript" charset="utf-8"></script>
+<script src="/static/base/js/utils.js?v=61229923d450adacdf9a8e50241df65c" type="text/javascript" charset="utf-8"></script>
+<script src="/static/base/js/keyboard.js?v=4309078b5664681393539977962fcd1d" type="text/javascript" charset="utf-8"></script>
+<script src="/static/base/js/security.js?v=e9cf1cd9e6335aeaf3d0c366765ad26d" type="text/javascript" charset="utf-8"></script>
+<script src="/static/base/js/dialog.js?v=85f27bfb6d7862a1ecac24b754f32a88" type="text/javascript" charset="utf-8"></script>
+<script src="/static/services/kernels/js/kernel.js?v=6af87c42924701bcbf66ba75f4975cec" type="text/javascript" charset="utf-8"></script>
+<script src="/static/services/kernels/js/comm.js?v=f6acfac4110c05a2d4985876fb49765a" type="text/javascript" charset="utf-8"></script>
+<script src="/static/services/sessions/js/session.js?v=28f59d3c0cfe78f08790aaee1e68b0b9" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/layoutmanager.js?v=5af7c2d4adfe4ca8d4c01f3580f94678" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/mathjaxutils.js?v=d86811b815014810e39aea98f3df6bd7" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/outputarea.js?v=de72c2eeb2653a9b75ab7c6f84c451fb" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/cell.js?v=4536f378f56b6ff33d9e32c76f0878cd" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/celltoolbar.js?v=89a80739dcceb096a267eeb8f6f727a4" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/codecell.js?v=31968aed36a91a54af7b0c9f685641c6" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/completer.js?v=9c825c52abb24298e8429f2942b2670a" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/textcell.js?v=3bceff0eb3b6634401f00a538fc9d41a" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/savewidget.js?v=ac8187d3bad3d29eef7a0896ff393303" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/quickhelp.js?v=3c6bb4ef2231be17e3aefe6e830e43f1" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/pager.js?v=191cbaf5b9d377be52174ee360372f01" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/menubar.js?v=a96e18a648c497f303d1a6a32f88c8b0" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/toolbar.js?v=983204618254eac639a596ea9aa4d325" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/maintoolbar.js?v=70ef83f52af576a1e0dcf4cb8eb03ec6" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/notebook.js?v=390c5d23265da1409edeaf8422449b90" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/keyboardmanager.js?v=b4847de27c1ecd6b05c3b315ecc07c58" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/notificationwidget.js?v=755d243c7dcaa3f03588227fc284dfc2" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/notificationarea.js?v=fe361b37422e48aa3eaf052cb6589e30" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/tooltip.js?v=7e973071b4b5cd5c49cfee6d181a71f0" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/tour.js?v=630eb2e33426651abd1aca86b52a5a51" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/config.js?v=e9fbd59982fd5af3bd4521d1af09c008" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/main.js?v=6ecd0d39a87709190b6878d1e280de8e" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/contexthint.js?v=ee0ce7d63250863c32c3f1c57a3fed5e" charset="utf-8"></script>
+<script src="/static/notebook/js/celltoolbarpresets/default.js?v=4f89f0a656c7126c793208d35ab0c977" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/celltoolbarpresets/rawcell.js?v=b2fd7b68ffaa1a0743822566e51d51bb" type="text/javascript" charset="utf-8"></script>
+<script src="/static/notebook/js/celltoolbarpresets/slideshow.js?v=e0de0a8feb75f511d163c5950b465e86" type="text/javascript" charset="utf-8"></script>
+<script src="/static/custom/custom.js?v=ac0e144e4e80bfc108e6bbc1dc325d09" type="text/javascript" charset="utf-8"></script>
+
+
+<!-- MSC from here on... -->
+<script>
+require(['notebook/js/main', 'services/kernels/js/kernel', 'notebook/js/notebook', 
+         'widgets/js/init','base/js/utils',
+         'components/bootstrap-tour/build/js/bootstrap-tour.min'], 
+              function() {
+	getData = function (data) {
+        console.log('data', data);
+    };
+    handle_output = function (out){
+        // thanks to
+        // http://jakevdp.github.io/blog/2013/06/01/ipython-notebook-javascript-python-communication/
+        var res = null;
+
+        // if output is a print statement
+        if(out.msg_type == "stream"){
+           res = out.content.data;
+        }
+        // if output is a python object
+        else if(out.msg_type === "pyout"){
+           res = out.content.data["text/plain"];
+        }
+        // if output is a python error
+        else if (out.msg_type == "pyerr"){
+           res = out.content.ename + ": " + out.content.evalue;
+        }
+        // if output is something we haven't thought of
+        else {
+           res = "[out type not implemented]";  
+        }
+        return res;
+    };
+   
+    exec_code = function (messagedCodeInput, outputCallback){
+   	    console.log('exec_code', messagedCodeInput);
+   	    var kernel = IPython.notebook.kernel;
+        if (outputCallback === undefined) {
+       	  outputCallback = getData;
+        }
+        var callbacks = {};
+        if (parseInt(IPython.version.slice(0,1)) < 2) {
+            callbacks = {'output' : function (out) { var data = handle_output(out); 
+                        outputCallback(data);
+               } 
+            };
+        } else {
+            callbacks = { 'iopub' : {'output' : function (out) { var data = handle_output(out); 
+                                 outputCallback(data);
+                                    } 
+                        } 
+            };
+            
+        }
+        var msg_id = kernel.execute(messagedCodeInput, callbacks, {silent:false});
+    };
+    waitForKernel = function () {
+   		if (IPython.notebook.kernel !== null && IPython.notebook.kernel.execute !== null) {
+            console.log('all loaded...waiting 500 more ms');
+   			setTimeout(startLocal, 500, true);
+   		} else {
+   		    console.log('still waiting');
+   			setTimeout(waitForKernel, 100, true);
+   		}
+    };
+    changePython = function () {
+        var val = this.value; // HTMLInput
+        exec_code(val, function(data) { $('#pyOutput').text(data); });
+    }
+    startLocal = function () {
+   	    $(document).add('*').off();
+   	    exec_code('import random');
+		var $main = $("<div id='pyjsMain'>" + 
+		    "Put python code to run here: (danger: can affect local filesystem)<br/></div>");
+	    $main.css('font-size', '40px').css('margin','20px 20px 20px 20px').css('line-height', '50px');
+   	    var $pi = $("<input type='text' id='pythonIn' size='120' style='width: 300px' value='random.randint(25, 30)'/>");
+   	    $pi.change(changePython);
+   	    $main.append($pi);
+   	    $main.append("<div id='pyOutput'>Output goes here</div>");
+   	    $main.append("<div style='font-size: 12px'>I already called 'import random' to save time. Note that if you assign a variable, it will stick, even across reloads.</div>")
+        $('body').prepend($main);
+   	    IPython.notebook.notebook_name = newTitle + '.ABCDE';
+   	    IPython.save_widget.update_document_title();
+    };
+    console.log('about to wait...');   
+    var newTitle = "Python to Javascript Mapping via IPython Notebook";  // title keeps returning    
+    waitForKernel();
+});
+
+</script>
+<style>
+div#notebook { display: none; }
+div#ipython-main-app { display: none; }
+</style>
+</body>
+
+</html>

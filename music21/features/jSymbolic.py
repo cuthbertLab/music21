@@ -16,10 +16,10 @@ defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recor
 The LGPL jSymbolic system can be found here: http://jmir.sourceforge.net/jSymbolic.html
 '''
 
-
-import unittest
 import copy
 import math
+import unittest
+from collections import OrderedDict
 
 from music21 import common
 from music21 import base
@@ -1708,7 +1708,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.NoteDensityFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [12]
+    [12.368421...]
     '''
     id = 'R15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1747,7 +1747,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
         for i in range(minKey, maxKey+1):
             if i in regions: # there may be gaps
                 total += regions[i]
-        self._feature.vector[0] = total / (maxKey - minKey + 1) # number of slots, inclusive
+        self._feature.vector[0] = float(total) / (maxKey - minKey + 1) # number of slots, inclusive
 
 
 
@@ -1888,7 +1888,7 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
     >>> f = fe.extract()
-    >>> print round(f.vector[0], 2)
+    >>> print(round(f.vector[0], 2))
     0.35
     '''
     id = 'R22'
@@ -3049,7 +3049,7 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
     >>> s1.append(instrument.Tuba())
     >>> s1.repeatAppend(note.Note(), 4)
     >>> fe = features.jSymbolic.SaxophoneFractionFeature(s1)
-    >>> print fe.extract().vector[0]
+    >>> print(fe.extract().vector[0])
     0.6
 
     '''
@@ -3074,7 +3074,7 @@ class BrassFractionFeature(InstrumentFractionFeature):
     >>> s1.append(instrument.Tuba())
     >>> s1.repeatAppend(note.Note(), 4)
     >>> fe = features.jSymbolic.BrassFractionFeature(s1)
-    >>> print fe.extract().vector[0]
+    >>> print(fe.extract().vector[0])
     0.4
     '''
     id = 'I16'
@@ -3099,7 +3099,7 @@ class WoodwindsFractionFeature(InstrumentFractionFeature):
     >>> s1.append(instrument.Tuba())
     >>> s1.repeatAppend(note.Note(), 7)
     >>> fe = features.jSymbolic.WoodwindsFractionFeature(s1)
-    >>> print fe.extract().vector[0]
+    >>> print(fe.extract().vector[0])
     0.3
     '''
     id = 'I17'
@@ -3125,7 +3125,7 @@ class OrchestralStringsFractionFeature(InstrumentFractionFeature):
     >>> s1.append(instrument.Tuba())
     >>> s1.repeatAppend(note.Note(), 6)
     >>> fe = features.jSymbolic.OrchestralStringsFractionFeature(s1)
-    >>> print fe.extract().vector[0]
+    >>> print(fe.extract().vector[0])
     0.4
     '''
     id = 'I18'
@@ -3167,7 +3167,7 @@ class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
     >>> s1.append(instrument.Tuba())
     >>> s1.repeatAppend(note.Note(), 2)
     >>> fe = features.jSymbolic.ElectricInstrumentFractionFeature(s1)
-    >>> print fe.extract().vector[0]
+    >>> print(fe.extract().vector[0])
     0.8
     '''
     id = 'I20'
@@ -3190,7 +3190,15 @@ class JSymbolicFeatureException(featuresModule.FeatureException):
     pass
 
 
-extractorsById = {'I': [
+extractorsById = OrderedDict( [
+                  ('D', [
+    None,
+    OverallDynamicRangeFeature,
+    VariationOfDynamicsFeature,
+    VariationOfDynamicsInEachVoiceFeature,
+    AverageNoteToNoteDynamicsChangeFeature,                        
+                        ]),
+                  ('I', [
     None,
     PitchedInstrumentsPresentFeature,
     UnpitchedInstrumentsPresentFeature,
@@ -3212,31 +3220,60 @@ extractorsById = {'I': [
     OrchestralStringsFractionFeature,
     StringEnsembleFractionFeature,
     ElectricInstrumentFractionFeature,
-                        ],
-                  'T': [
+                        ]),
+                  ('M', [
     None,
-    MaximumNumberOfIndependentVoicesFeature,
-    AverageNumberOfIndependentVoicesFeature,
-    VariabilityOfNumberOfIndependentVoicesFeature,
-    VoiceEqualityNumberOfNotesFeature,
-    VoiceEqualityNoteDurationFeature,
-    VoiceEqualityDynamicsFeature,
-    VoiceEqualityMelodicLeapsFeature,
-    VoiceEqualityRangeFeature,
-    ImportanceOfLoudestVoiceFeature,
-    RelativeRangeOfLoudestVoiceFeature,
-    None,#RelativeRangeIsolationOfLoudestVoiceFeature,
-    RangeOfHighestLineFeature,
-    RelativeNoteDensityOfHighestLineFeature,
-    None,#RelativeNoteDurationsOfLowestLineFeature
-    MelodicIntervalsInLowestLineFeature,
-    None,#SimultaneityFeature
-    None,#VariabilityOfSimultaneityFeature
-    None,#VoiceOverlapFeature
-    None,#ParallelMotionFeature
-    VoiceSeparationFeature,
-                        ],
-                  'R': [
+    MelodicIntervalHistogramFeature,
+    AverageMelodicIntervalFeature,
+    MostCommonMelodicIntervalFeature,
+    DistanceBetweenMostCommonMelodicIntervalsFeature,
+    MostCommonMelodicIntervalPrevalenceFeature,
+    RelativeStrengthOfMostCommonIntervalsFeature,
+    NumberOfCommonMelodicIntervalsFeature,
+    AmountOfArpeggiationFeature,
+    RepeatedNotesFeature,
+    ChromaticMotionFeature,
+    StepwiseMotionFeature,
+    MelodicThirdsFeature,
+    MelodicFifthsFeature,
+    MelodicTritonesFeature,
+    MelodicOctavesFeature,
+    None,#EmbellishmentFeature,
+    DirectionOfMotionFeature,
+    DurationOfMelodicArcsFeature,
+    SizeOfMelodicArcsFeature,
+    None,#MelodicPitchVarietyFeature,
+                        ]),
+                  ('P', [
+    None,
+    MostCommonPitchPrevalenceFeature,
+    MostCommonPitchClassPrevalenceFeature,
+    RelativeStrengthOfTopPitchesFeature,
+    RelativeStrengthOfTopPitchClassesFeature,
+    IntervalBetweenStrongestPitchesFeature,
+    IntervalBetweenStrongestPitchClassesFeature,
+    NumberOfCommonPitchesFeature,
+    PitchVarietyFeature,
+    PitchClassVarietyFeature,
+    RangeFeature,
+    MostCommonPitchFeature,
+    PrimaryRegisterFeature,
+    ImportanceOfBassRegisterFeature,
+    ImportanceOfMiddleRegisterFeature,
+    ImportanceOfHighRegisterFeature,
+    MostCommonPitchClassFeature,
+    DominantSpreadFeature,
+    StrongTonalCentresFeature,
+    BasicPitchHistogramFeature,
+    PitchClassDistributionFeature,
+    FifthsPitchHistogramFeature,
+    QualityFeature,
+    GlissandoPrevalenceFeature,
+    AverageRangeOfGlissandosFeature,
+    VibratoPrevalenceFeature,
+    None,#PrevalenceOfMicroTonesFeature,                        
+                        ]),
+                  ('R', [
     None,
     StrongestRhythmicPulseFeature,
     SecondStrongestRhythmicPulseFeature,
@@ -3273,67 +3310,31 @@ extractorsById = {'I': [
     TripleMeterFeature,
     QuintupleMeterFeature,
     ChangesOfMeterFeature,
-                        ],
-                  'D': [
+                        ]),
+                  ('T', [
     None,
-    OverallDynamicRangeFeature,
-    VariationOfDynamicsFeature,
-    VariationOfDynamicsInEachVoiceFeature,
-    AverageNoteToNoteDynamicsChangeFeature,                        
-                        ],
-                  'P': [
-    None,
-    MostCommonPitchPrevalenceFeature,
-    MostCommonPitchClassPrevalenceFeature,
-    RelativeStrengthOfTopPitchesFeature,
-    RelativeStrengthOfTopPitchClassesFeature,
-    IntervalBetweenStrongestPitchesFeature,
-    IntervalBetweenStrongestPitchClassesFeature,
-    NumberOfCommonPitchesFeature,
-    PitchVarietyFeature,
-    PitchClassVarietyFeature,
-    RangeFeature,
-    MostCommonPitchFeature,
-    PrimaryRegisterFeature,
-    ImportanceOfBassRegisterFeature,
-    ImportanceOfMiddleRegisterFeature,
-    ImportanceOfHighRegisterFeature,
-    MostCommonPitchClassFeature,
-    DominantSpreadFeature,
-    StrongTonalCentresFeature,
-    BasicPitchHistogramFeature,
-    PitchClassDistributionFeature,
-    FifthsPitchHistogramFeature,
-    QualityFeature,
-    GlissandoPrevalenceFeature,
-    AverageRangeOfGlissandosFeature,
-    VibratoPrevalenceFeature,
-    None,#PrevalenceOfMicroTonesFeature,                        
-                        ],
-                  'M': [
-    None,
-    MelodicIntervalHistogramFeature,
-    AverageMelodicIntervalFeature,
-    MostCommonMelodicIntervalFeature,
-    DistanceBetweenMostCommonMelodicIntervalsFeature,
-    MostCommonMelodicIntervalPrevalenceFeature,
-    RelativeStrengthOfMostCommonIntervalsFeature,
-    NumberOfCommonMelodicIntervalsFeature,
-    AmountOfArpeggiationFeature,
-    RepeatedNotesFeature,
-    ChromaticMotionFeature,
-    StepwiseMotionFeature,
-    MelodicThirdsFeature,
-    MelodicFifthsFeature,
-    MelodicTritonesFeature,
-    MelodicOctavesFeature,
-    None,#EmbellishmentFeature,
-    DirectionOfMotionFeature,
-    DurationOfMelodicArcsFeature,
-    SizeOfMelodicArcsFeature,
-    None,#MelodicPitchVarietyFeature,
-                        ],
-                  'C': [
+    MaximumNumberOfIndependentVoicesFeature,
+    AverageNumberOfIndependentVoicesFeature,
+    VariabilityOfNumberOfIndependentVoicesFeature,
+    VoiceEqualityNumberOfNotesFeature,
+    VoiceEqualityNoteDurationFeature,
+    VoiceEqualityDynamicsFeature,
+    VoiceEqualityMelodicLeapsFeature,
+    VoiceEqualityRangeFeature,
+    ImportanceOfLoudestVoiceFeature,
+    RelativeRangeOfLoudestVoiceFeature,
+    None,#RelativeRangeIsolationOfLoudestVoiceFeature,
+    RangeOfHighestLineFeature,
+    RelativeNoteDensityOfHighestLineFeature,
+    None,#RelativeNoteDurationsOfLowestLineFeature
+    MelodicIntervalsInLowestLineFeature,
+    None,#SimultaneityFeature
+    None,#VariabilityOfSimultaneityFeature
+    None,#VoiceOverlapFeature
+    None,#ParallelMotionFeature
+    VoiceSeparationFeature,
+                        ]),
+                  ('C', [
     None,
     None,#VerticalIntervalsFeature,
     None,#ChordTypesFeature,
@@ -3363,9 +3364,9 @@ extractorsById = {'I': [
     None,#ComplexChordsFeature,
     None,#NonStandardChordsFeature,
     None,#ChordDurationFeature,
-                        ]
+                        ]),
                   
-                  }
+                  ])
 
 def getExtractorByTypeAndNumber(type, number): #@ReservedAssignment
     '''
@@ -3409,7 +3410,7 @@ def getExtractorByTypeAndNumber(type, number): #@ReservedAssignment
     ...         n = fs[k][i].__name__
     ...         if fs[k][i] not in features.jSymbolic.featureExtractors:
     ...            n += " (not implemented)"
-    ...         print k, i, n
+    ...         print("%s %d %s" % (k, i, n))
     D 1 OverallDynamicRangeFeature (not implemented)
     D 2 VariationOfDynamicsFeature (not implemented)
     D 3 VariationOfDynamicsInEachVoiceFeature (not implemented)
@@ -3957,7 +3958,7 @@ class Test(unittest.TestCase):
         
         fe = features.jSymbolic.NoteDensityFeature(s)
         f = fe.extract()
-        self.assertAlmostEqual(f.vector[0], 4)
+        self.assertAlmostEqual(f.vector[0], 4.88888888888)
         
         s = stream.Stream()
         s.insert(0, tempo.MetronomeMark(number=240))
@@ -3972,7 +3973,7 @@ class Test(unittest.TestCase):
         
         fe = features.jSymbolic.NoteDensityFeature(s)
         f = fe.extract()
-        self.assertAlmostEqual(f.vector[0], 6)
+        self.assertAlmostEqual(f.vector[0], 6.6666666666666666)
 
         
 

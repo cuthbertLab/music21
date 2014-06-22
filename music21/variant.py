@@ -1730,7 +1730,10 @@ class VariantException(exceptions21.Music21Exception):
 class Variant(base.Music21Object):
     '''A Music21Object that stores elements like a Stream, but does not represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
 
-    This is accomplished not by subclassing, but by object composition: similar to the Spanner, the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant, are automatically delegated by use of the __getattr__ method. Special casses are overridden or managed as necessary: e.g., the Duration of a Variant is generally always zero. 
+    This is accomplished not by subclassing, but by object composition: similar to the Spanner, 
+    the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant, 
+    are automatically delegated by use of the __getattr__ method. Special casses are overridden 
+    or managed as necessary: e.g., the Duration of a Variant is generally always zero. 
 
     To use Variants from a Stream, see the :func:`~music21.stream.Stream.activateVariants` method. 
 
@@ -1832,9 +1835,10 @@ class Variant(base.Music21Object):
             (self.__class__.__name__, str(self.containedHighestTime))
     
     def __getattr__(self, attr):
-        '''This defers all calls not defined in this Class to calls on the privately contained Stream.
         '''
-        #environLocal.printDebug(['relaying unmatched attribute request to private Stream'])
+        This defers all calls not defined in this Class to calls on the privately contained Stream.
+        '''
+        #environLocal.printDebug(['relaying unmatched attribute request ' + attr + ' to private Stream'])
 
         # must mask pitches so as not to recurse
         # TODO: check tt recurse does not go into this
@@ -1842,7 +1846,7 @@ class Variant(base.Music21Object):
             raise AttributeError
         try:
             ## needed for unpickling where ._stream doesn't exist until later...
-            if hasattr(self, '_stream'):
+            if attr != '_stream' and hasattr(self, '_stream'):
                 return getattr(self._stream, attr)
             else:
                 raise AttributeError

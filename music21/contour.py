@@ -36,19 +36,15 @@ def _getExtendedModules():
     this is done inside a def, so that the slow import of matplotlib is not done
     in ``from music21 import *`` unless it's actually needed.
 
-    Returns a tuple: (plt, numpy, sp)
+    Returns a tuple: (plt, numpy, sp = None)
     '''
     if 'matplotlib' in base._missingImport:
-        raise ContourException('could not find matplotlib, contour mapping is not allowed (numpy and scipy are also required)')
+        raise ContourException('could not find matplotlib, contour mapping is not allowed (numpy is also required)')
     if 'numpy' in base._missingImport:
         raise ContourException('could not find numpy, contour mapping is not allowed')    
-    #if 'scipy' in base._missingImport:
-    #    raise ContourException('could not find scipy, contour mapping is not allowed')
     import matplotlib.pyplot as plt # @UnresolvedImport
     import numpy
-    sp = None
-    #import scipy.stats as sp
-    return (plt, numpy, sp)
+    return (plt, numpy)
 
 
 
@@ -108,11 +104,16 @@ class ContourFinder(object):
         >>> metric = lambda s: len(s.measureOffsetMap())
         >>> c = corpus.parse('bwv10.7')
         >>> res = contour.ContourFinder(c).getContourValuesForMetric(metric, 3, 2, False)
-        >>> #set([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21]).issubset(set(res.keys()))
-        >>> res.keys()
+        
+        >>> resList = sorted(list(res.keys()))
+        >>> resList
         [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21]
-        >>> res.values()
+        >>> [res[x] for x in resList]
         [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2]
+        
+        
+        OMIT_FROM_DOCS
+        >>> #set([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21]).issubset(set(res.keys()))
         
         '''
         res = {}
@@ -298,7 +299,7 @@ class ContourFinder(object):
         
     #TODO: give same args as getContour, maybe? Also, test this.
     def plot(self, cType, contour=None, regression=True, order=4, title='Contour Plot', fileName=None):
-        (plt, numpy, sp) = _getExtendedModules() #@UnusedVariable
+        (plt, numpy) = _getExtendedModules()
 
         if contour is None:
             if cType not in self._contours:
@@ -550,7 +551,7 @@ class AggregateContour(object):
         
         Order is the order of the resulting polynomial.  e.g. For a linear regression, order=1.  
         '''
-        (plt, numpy, sp) = _getExtendedModules() #@UnusedVariable
+        (unused_plt, numpy) = _getExtendedModules()
 
         if cType in self._aggContoursPoly:
             return self._aggContoursPoly[cType]
@@ -582,7 +583,7 @@ class AggregateContour(object):
         else:
             contour = self._aggContoursAsList[cType]
         '''
-        (plt, numpy, sp) = _getExtendedModules() #@UnusedVariable
+        (plt, numpy) = _getExtendedModules() #@UnusedVariable
 
         x, y = zip(*contour)   
         

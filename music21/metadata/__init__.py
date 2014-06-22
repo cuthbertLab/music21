@@ -706,9 +706,8 @@ class Metadata(base.Music21Object):
     @property
     def number(self):
         r'''
-        Get or set the number of the work.
-
-        TODO: Explain what this means...
+        Get or set the number of the work within a collection of pieces.
+        (for instance, the number within a collection of ABC files)
         '''
         result = self._workIds['number']
         if result is not None:

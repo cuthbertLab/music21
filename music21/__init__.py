@@ -42,7 +42,6 @@ Files in the ext/ folder are not copyright music21 Project but whose distributio
 is compatible with music21.  The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
-
 # this defines what  is loaded when importing __all__
 # put these in alphabetical order FIRST dirs then modules
 # but: base must come first; in some cases other modules depend on 

@@ -24,7 +24,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import environment
 
-#from music21.ext import six
+from music21.ext import six
 
 _MOD = "text.py"  
 environLocal = environment.Environment(_MOD)
@@ -500,11 +500,6 @@ class TextBox(base.Music21Object, TextFormat):
         ''')
 
 
-
-
-
-
-
 #-------------------------------------------------------------------------------
 class LanguageDetector(object):
     '''
@@ -533,10 +528,11 @@ class LanguageDetector(object):
             thisExcerpt = os.path.join(common.getSourceFilePath(),
                                        'languageExcerpts',
                                        languageCode + '.txt')
-            f = open(thisExcerpt)                
-            self.trigrams[languageCode] = Trigram(f.read().split())
-            f.close()
-
+            
+            with open(thisExcerpt) as f:
+                excerptWords = f.read().split()
+                self.trigrams[languageCode] = Trigram(excerptWords)
+            
     def mostLikelyLanguage(self, excerpt):
         '''
         returns the code of the most likely language for a passage, works on 
@@ -547,8 +543,6 @@ class LanguageDetector(object):
         'en'
         >>> ld.mostLikelyLanguage("Ciao come stai? Sono molto lento oggi, ma non so perche.")
         'it'
-
-
         '''
         excTrigram = Trigram(excerpt)
         maxLang = ""
@@ -641,18 +635,26 @@ class Trigram(object):
 
     def __init__(self, excerptList = None):
         self.lut = {}
+        self._length = None
         if excerptList is not None:
             self.parseExcerpt(excerptList)
 
-    
+    @property
+    def length(self):
+        if self._length is None:
+            return self.measure()
+        else:
+            return self._length
+        
     def parseExcerpt(self, excerpt):
         pair = u'  '
         if isinstance(excerpt, list):
             for line in excerpt:
-                try:
-                    line = unicode(line, 'utf8') # just in case
-                except (UnicodeDecodeError, NameError): # no unicode in Py3
-                    continue # skip this line
+                if six.PY2:
+                    try:
+                        line = unicode(line, 'utf8') # just in case
+                    except (UnicodeDecodeError, NameError): # no unicode in Py3
+                        continue # skip this line
                 for letter in line.strip() + u' ':
                     d = self.lut.setdefault(pair, {})
                     d[letter] = d.get(letter, 0) + 1
@@ -670,7 +672,8 @@ class Trigram(object):
         total = 0
         for y in self.lut.values():
             total += sum([ x * x for x in y.values() ])
-        self.length = total ** 0.5
+        thisLength = total ** 0.5
+        self._length = thisLength
 
     def similarity(self, other):
         """
@@ -691,6 +694,9 @@ class Trigram(object):
                 for x in a:
                     if x in b:
                         total += a[x] * b[x]
+        
+        #environLocal.warn([self.length, "self"])
+        #environLocal.warn([other.length, "other"])
 
         return float(total) / (self.length * other.length)
 
@@ -771,7 +777,8 @@ class Test(unittest.TestCase):
         #print ld.trigrams['fr'] - ld.trigrams['de'] 
         #print ld.trigrams['fr'] - ld.trigrams['cn'] 
         
-        self.assertTrue(0.50 < ld.trigrams['fr'] - ld.trigrams['it'] < 0.55)
+        diffFrIt = ld.trigrams['fr'] - ld.trigrams['it']
+        self.assertTrue(0.50 < diffFrIt < 0.55)
         self.assertTrue(0.67 < ld.trigrams['fr'] - ld.trigrams['de'] < 0.70)
         self.assertTrue(0.99 < ld.trigrams['fr'] - ld.trigrams['cn'] < 1.0)
         

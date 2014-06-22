@@ -346,7 +346,7 @@ class Verticality(object):
                 >>> tree = stream.timespans.streamToTimespanCollection(score)
                 >>> verticalities = list(tree.iterateVerticalities())
                 >>> for verticality in verticalities[:10]:
-                ...     print verticality, verticality.isConsonant
+                ...     print("%r %r" % (verticality, verticality.isConsonant))
                 ...
                 <Verticality 0.0 {A3 E4 C#5}> True
                 <Verticality 0.5 {G#3 B3 E4 B4}> True
@@ -408,13 +408,13 @@ class Verticality(object):
             >>> score = corpus.parse('bwv66.6')
             >>> tree = stream.timespans.streamToTimespanCollection(score)
             >>> verticality = tree.getVerticalityAt(1.0)
-            >>> print verticality
+            >>> print(verticality)
             <Verticality 1.0 {F#3 C#4 F#4 A4}>
 
         ::
 
             >>> nextVerticality = verticality.nextVerticality
-            >>> print nextVerticality
+            >>> print(nextVerticality)
             <Verticality 2.0 {G#3 B3 E4 B4}>
 
         Verticality objects created by an offset-tree hold a reference back to

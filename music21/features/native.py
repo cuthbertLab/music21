@@ -9,10 +9,9 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-'''Original music21 feature extractors.
 '''
-
-
+Original music21 feature extractors.
+'''
 
 import unittest
 import urllib

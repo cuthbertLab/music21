@@ -8,13 +8,16 @@
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-'''Various tools and utilities to find correlations between disparate objects in a Stream.
+'''
+Various tools and utilities to find correlations between disparate objects in a Stream.
 
-See the chapter :ref:`overviewFormats` for more information and examples of converting formats into and out of music21.
+See the chapter :ref:`overviewFormats` for more information and examples of 
+converting formats into and out of music21.
 '''
 
 
 import unittest
+from collections import OrderedDict
 
 from music21 import exceptions21
 
@@ -57,7 +60,8 @@ class ActivityMatch(object):
 
 
     def _findActive(self, objNameSrc=None, objNameDst=None):
-        '''Do the analysis, finding correlations of src with dst
+        '''D
+        o the analysis, finding correlations of src with dst
         returns an ordered list of dictionaries, in the form
         {'src': obj, 'dst': [objs]}
 
@@ -98,22 +102,26 @@ class ActivityMatch(object):
 
 
     def pitchToDynamic(self, dataPoints=True):
-        '''Create an analysis of pitch to dynamic symbol.
+        '''
+        Create an analysis of pitch to dynamic symbol.
 
-        If `dataPoints` is True, all data matches between source and destination are returned. If false, 3 point weighted coordinates are created for each unique match. 
+        If `dataPoints` is True, all data matches between source and destination are returned. 
+        If False, 3 point weighted coordinates are created for each unique match. 
 
-        
         >>> s = corpus.parse('bach/bwv8.6.xml')
         >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat.sorted)
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
-        CorrelateException: cannot create correlation an object that is not found in the Stream: <class 'music21.dynamics.Dynamic'>
+        CorrelateException: cannot create correlation an object that is not found in the 
+        Stream: <class 'music21.dynamics.Dynamic'>
 
         >>> s = corpus.parse('schumann/opus41no1', 2)
         >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat.sorted)
         >>> data = am.pitchToDynamic()
         >>> len(data)
         427
+        >>> data[0]
+        [64.0, 5]
         '''
         objNameSrc = (note.Note, chord.Chord)
         #objNameSrc = note.Note
@@ -156,7 +164,7 @@ class ActivityMatch(object):
             return pairs
 
         # find unique coords and count instances
-        dictionary = {}
+        dictionary = OrderedDict()
         for coord in pairs: 
             coord = tuple(coord)
             if coord not in dictionary:

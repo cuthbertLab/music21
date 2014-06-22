@@ -112,14 +112,14 @@ class LyObject(object):
         LyMock (our test class) defines mappings for two classes:
         to LyMock.lilyAttributes:
         
-        >>> print lm.supportedClasses
-        [u'Mock', u'Mocker']
+        >>> print(lm.supportedClasses)
+        [...'Mock', ...'Mocker']
         
         Thus we can get attributes from the Mock class (see `setAttributesFromClassObject`):
         
         >>> lilyAttributes = lm.setAttributes(m)
         >>> for x in sorted(lilyAttributes.keys()):
-        ...    print "%s: %s" % (x, lilyAttributes[x])
+        ...    print("%s: %s" % (x, lilyAttributes[x]))
         mock-attribute: 32
         mock-attribute-2: None
             
@@ -152,7 +152,7 @@ class LyObject(object):
         to LyMock.lilyAttributes:
         
         >>> for x in sorted(lm.m21toLy['Mock'].keys()):
-        ...    print "%s: %s" % (x, lm.m21toLy['Mock'][x])
+        ...    print("%s: %s" % (x, lm.m21toLy['Mock'][x]))
         mockAttribute: mock-attribute
         mockAttribute2: mock-attribute-2
         
@@ -160,7 +160,7 @@ class LyObject(object):
         Some of these attributes have defaults:
         
         >>> for x in sorted(lm.defaultAttributes.keys()):
-        ...    print "%s: %s" % (x, lm.defaultAttributes[x])
+        ...    print("%s: %s" % (x, lm.defaultAttributes[x]))
         mockAttribute2: 7
         
         
@@ -169,7 +169,7 @@ class LyObject(object):
         
         >>> lilyAttributes = lm.setAttributesFromClassObject('Mock', m)
         >>> for x in sorted(lilyAttributes.keys()):
-        ...    print "%s: %s" % (x, lilyAttributes[x])
+        ...    print("%s: %s" % (x, lilyAttributes[x]))
         mock-attribute: hello
         mock-attribute-2: 7
             
@@ -190,7 +190,7 @@ class LyObject(object):
                 else:
                     value = None
             lyAttribute = classDict[m21Attribute]
-            #print m21Attribute, lyAttribute, value
+            #print(m21Attribute, lyAttribute, value)
             self.lilyAttributes[lyAttribute] = value
         return self.lilyAttributes
     
@@ -235,7 +235,7 @@ class LyObject(object):
         and an extra space at the end.
         
         >>> m = lily.lilyObjects.LyObject()
-        >>> print m.quoteString(r'Hello "there"!')
+        >>> print(m.quoteString(r'Hello "there"!'))
         "Hello \"there\"!" 
         '''
         stringNew = stringIn.replace('"', r'\"')
@@ -392,7 +392,7 @@ class LyAssignment(LyObject):
 
     >>> lyii = lily.lilyObjects.LyIdentifierInit(string = "hi")
     >>> lya = lily.lilyObjects.LyAssignment(assignmentId = "title", identifierInit = lyii)
-    >>> print lya
+    >>> print(lya)
     title = "hi" 
     
     Note that you could also pass assignmentId a LyAssignmentId object,
@@ -425,7 +425,7 @@ class LyIdentifierInit(LyObject):
     r'''
     
     >>> lyii = lily.lilyObjects.LyIdentifierInit(string = "hello")
-    >>> print lyii
+    >>> print(lyii)
     "hello" 
     '''
 
@@ -602,7 +602,7 @@ class LyScoreBlock(LyObject):
     with all the real stuff being in self.scoreBody
     
     >>> lysb = lily.lilyObjects.LyScoreBlock(scoreBody = "hello")
-    >>> print lysb
+    >>> print(lysb)
     \score { hello }
     '''
 
@@ -696,7 +696,7 @@ class LyOutputDefHead(LyObject):
 
     >>> lyODH = lily.lilyObjects.LyOutputDefHead()
     >>> lyODH.defType = 'midi'
-    >>> print lyODH.stringOutput()
+    >>> print(lyODH.stringOutput())
     \midi
 
     According to Appendix C, is the same as LyOutputDefHeadWithModeSwitch
@@ -1183,10 +1183,10 @@ class LyModeChangingHead(LyObject):
     .mode = ['note', 'drum', 'figure', 'chord', 'lyric']
     
     >>> l = lily.lilyObjects.LyModeChangingHead(hasContext = True, mode = 'drum')
-    >>> print l.stringOutput()
+    >>> print(l.stringOutput())
     \drummode
     >>> l2 = lily.lilyObjects.LyModeChangingHead(hasContext = False, mode = 'chord')
-    >>> print l2.stringOutput()
+    >>> print(l2.stringOutput())
     \chords
     
     '''
@@ -1653,7 +1653,7 @@ class LyStenoDuration(LyObject):
     
     
     >>> lsd = lily.lilyObjects.LyStenoDuration('2', 2)
-    >>> print lsd
+    >>> print(lsd)
     2..
     
     '''
@@ -1749,7 +1749,7 @@ class LyLyricElement(LyObject):
     >>> lle = lily.lilyObjects.LyLyricElement("hel_")
     >>> lle
     <music21.lily.lilyObjects.LyLyricElement object 'hel_'>
-    >>> print lle
+    >>> print(lle)
     hel_ 
     '''
     def __init__(self, lyMarkupOrString = None):

@@ -167,8 +167,11 @@ class ArchiveManager(object):
                         continue
                     if subFp.endswith('.xml'):
                         post = f.read(subFp)
-                        if six.PY3:
-                            post = post.decode(encoding='UTF-8')
+                        if six.PY3 and isinstance(post, bytes):
+                            try:
+                                post = post.decode(encoding='UTF-8')
+                            except UnicodeDecodeError: # sometimes windows written...
+                                post = post.decode(encoding='utf-16-le')
                         break
 
             elif name == None and dataFormat == 'musedata':
@@ -894,7 +897,7 @@ def parseURL(url, number=None, format=None, forceSource=False): # @ReservedAssig
     return v.stream
 
 def parse(value, *args, **keywords):
-    '''
+    r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
     parse the item into a Stream.  Note: URL downloading will not happen
     automatically unless the user has set their Environment "autoDownload"
@@ -933,7 +936,6 @@ def parse(value, *args, **keywords):
     >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation')
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 2/16>
-
     '''
 
     #environLocal.printDebug(['attempting to parse()', value])

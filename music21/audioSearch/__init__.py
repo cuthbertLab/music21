@@ -15,6 +15,7 @@ Base routines used throughout audioSearching and score-folling.
 
 Requires numpy, scipy, and matplotlib.
 '''
+from __future__ import division
 
 __all__ = ['transcriber', 'recording', 'scoreFollower']
 
@@ -45,7 +46,7 @@ environLocal = environment.Environment(_MOD)
 audioChunkLength = 1024
 recordSampleRate = 44100
 
-def histogram(data,bins):
+def histogram(data, bins):
     '''
     Partition the list in `data` into a number of bins defined by `bins`
     and return the number of elements in each bins and a set of `bins` + 1
@@ -58,18 +59,18 @@ def histogram(data,bins):
     >>> outputData, bins = audioSearch.histogram(data,8)
     >>> print(outputData)
     [3, 0, 0, 1, 1, 1, 0, 5]
-    >>> print(bins)
+    >>> print([int(b) for b in bins])
     [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
     >>> outputData, bins = audioSearch.histogram(data,4)
     >>> print(outputData)
     [3, 1, 2, 5]
-    >>> print(bins)
+    >>> print([int(b) for b in bins])
     [0, 2, 4, 6, 8]
     '''
     maxValue = max(data)
     minValue = min(data)
-    lengthEachBin = (maxValue-minValue)/bins
+    lengthEachBin = (maxValue-minValue) / bins
 
     container = []
     for i in range(int(bins)):
@@ -86,12 +87,12 @@ def histogram(data,bins):
     for i in range(int(bins)):
         binsLimits.append(minValue+count*lengthEachBin)
         count +=1
-    return container,binsLimits
+    return container, binsLimits
 
 
 def autocorrelationFunction(recordedSignal, recordSampleRate):
     '''
-    It converts the temporal domain into a frequency domain. In order to do that, it
+    Converts the temporal domain into a frequency domain. In order to do that, it
     uses the autocorrelation function, which finds periodicities in the signal
     in the temporal domain and, consequently, obtains the frequency in each instant
     of time.
@@ -99,7 +100,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
 
     >>> import wave
     >>> import os
-    >>> import numpy  # you need to have numpy installed to use this
+    >>> import numpy  # you need to have numpy, scipy, and matplotlib installed to use this
 
     >>> wv = wave.open(common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav', 'r')
     >>> data = wv.readframes(1024)
@@ -113,12 +114,15 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
         #len(_missingImport) > 0:
         raise AudioSearchException("Cannot run autocorrelationFunction without all of numpy, scipy, and matplotlib installed.  Missing %s" % base._missingImport)
     import numpy
-    import scipy.signal # @UnresolvedImport
+    try:   
+        from scipy.signal import fftconvolve # @UnresolvedImport
+    except ImportError:
+        raise AudioSearchException("autocorrelationFunction needs scipy -- the only part of music21 that needs it")
     #import matplotlib
     import matplotlib.mlab # @UnresolvedImport
 
     recordedSignal = numpy.array(recordedSignal)
-    correlation = scipy.signal.fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
+    correlation = fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
     lengthCorrelation = len(correlation) / 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
@@ -171,7 +175,6 @@ def prepareThresholds(useScale=None):
     for p in scPitches:
         pLog2 = math.log(p.frequency, 2)
         scPitchesRemainder.append(math.modf(pLog2)[0])
-
     scPitchesRemainder[-1] += 1
 
     scPitchesThreshold = []
@@ -236,6 +239,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     inputPitchLog2 = math.log(inputPitchFrequency, 2)
     (remainder, octave) = math.modf(inputPitchLog2)
     octave = int(octave)
+
     for i in range(len(thresholds)):
         threshold = thresholds[i]
         if remainder < threshold:
@@ -264,7 +268,6 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
 
     >>> import os
 
-    >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
     >>> readPath = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav'
     >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
 
@@ -272,7 +275,7 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
     >>> [str(p) for p in detectedPitchObjects]
-    ['A5', 'A5', 'A5', 'D5', 'D4', 'B4', 'A4', 'F4', 'E-4', 'C#3', 'B3', 'B3', 'B3', 'A3', 'G3',...]
+    ['A5', 'A5', 'A6', 'D6', 'D4', 'B4', 'A4', 'F4', 'E-4', 'C#3', 'B3', 'B3', 'B3', 'A3', 'G3',...]
     '''
     if useScale is None:
         useScale = scale.MajorScale('C4')
@@ -353,7 +356,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
         raise AudioSearchException("Cannot open %s for reading, does not exist" % waveFilename)
 
     #modify it to read the entire file
-    for i in range(wv.getnframes() / audioChunkLength):
+    for i in range(int(wv.getnframes() / audioChunkLength)):
         data = wv.readframes(audioChunkLength)
         storedWaveSampleList.append(data)
 
@@ -445,12 +448,12 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
     >>> freqFromAQList=[143.627689055,99.0835452019,211.004784689,4700.31347962,2197.9431119]
     >>> pitchesList = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.MajorScale('C4'))
     >>> for i in range(5):
-    ...     print(pitchesList[i])
-    146.832383959
-    97.9988589954
-    220.0
-    4698.63628668
-    2093.0045224
+    ...     print(int(round(pitchesList[i])))
+    147
+    98
+    220
+    4699
+    2093
     '''
     if useScale is None:
         useScale = scale.MajorScale('C4')
@@ -469,10 +472,12 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     It smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.
 
+
+
     >>> inputPitches=[440, 440, 440, 440, 442, 443, 441, 470, 440, 441, 440, 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441, 440, 440, 440, 440, 440, 442, 443, 441, 440, 440]
     >>> result = audioSearch.smoothFrequencies(inputPitches)
     >>> print(result)
-    [440, 440, 440, 440, 445, 445, 446, 446, 442, 442, 441, 441, 434, 433, 432, 430, 436, 437, 438, 439, 439, 439, 439, 439, 439, 440, 440, 440, 440, 440, 440, 440]
+    [441, 441, 441, 441, 446, 446, 446, 447, 443, 443, 442, 441, 435, 434, 432, 431, 437, 438, 439, 440, 440, 440, 440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
     '''
     dpf = detectedPitchesFreq
     if inPlace == True:
@@ -481,11 +486,11 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
         detectedPitchesFreq = copy.copy(dpf)
 
     #smoothing
-    beginning = 0
-    ends = 0
+    beginning = 0.0
+    ends = 0.0
 
     for i in range(smoothLevels):
-        beginning = beginning + detectedPitchesFreq[i]
+        beginning = beginning + float(detectedPitchesFreq[i])
     beginning = beginning / smoothLevels
 
     for i in range(smoothLevels):
@@ -502,7 +507,8 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
             for j in range(smoothLevels):
                 t = t + detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
             detectedPitchesFreq[i] = t / smoothLevels
-    return detectedPitchesFreq
+    #return detectedPitchesFreq
+    return [int(round(fq)) for fq in detectedPitchesFreq]
 
 
 
@@ -520,8 +526,6 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
 
     N.B. the returned list is NOT a :class:`~music21.stream.Stream`.
 
-    >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-
     >>> import os
     >>> readPath = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav'
     >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
@@ -532,7 +536,7 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     >>> print(notesList)
     [<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>, ...]
     >>> print(durationList)
-    [72, 6, 14, 23, 34, 40, 27, 36, 35, 15, 17, 15, 6, 33, 22, 13, 16, 39, 35, 38, 27, 27, 27, 8]
+    [71, 6, 14, 23, 34, 40, 27, 36, 35, 15, 17, 15, 6, 33, 22, 13, 16, 39, 35, 38, 27, 27, 26, 8]
     '''
     #initialization
     REST_FREQUENCY = 10

@@ -860,6 +860,8 @@ def isListLike(usrData):
     False
     >>> common.isListLike((None, None))
     True
+    >>> common.isListLike( set(['a','b','c','c']) )
+    True
     >>> common.isListLike(stream.Stream())
     False
     """

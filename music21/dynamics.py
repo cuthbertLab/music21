@@ -398,10 +398,17 @@ class Diminuendo(DynamicWedge):
 
     >>> from music21 import dynamics
     >>> d = dynamics.Diminuendo()
-    >>> d.getStartParameters()
-    {'spread': 15, 'type': 'diminuendo'}
-    >>> d.getEndParameters()
-    {'spread': 0, 'type': 'stop'}
+    >>> startP = d.getStartParameters()
+    >>> startP['spread']
+    15
+    >>> startP['type']
+    'diminuendo'
+    
+    >>> endP = d.getEndParameters()
+    >>> endP['spread']
+    0
+    >>> endP['type']
+    'stop'
     '''
     def __init__(self, *arguments, **keywords):
         DynamicWedge.__init__(self, *arguments, **keywords)

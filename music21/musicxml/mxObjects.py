@@ -23,7 +23,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import xmlnode
 
-#from music21.ext import six
+from music21.ext import six
 
 from music21 import environment
 _MOD = 'musicxml.py'
@@ -457,7 +457,7 @@ class TagLib(object):
 
     def _statTabulate(self):
         self._stat = {}
-        tags = self._t.keys()
+        tags = list(self._t.keys())
         tags.sort()
 
         maxCount = 0
@@ -492,7 +492,7 @@ class TagLib(object):
     def _statMapActive(self):
         '''Display method for tag audit checks
         '''
-        tags = self._t.keys()
+        tags = list(self._t.keys())
         tags.sort()
         sortOrder = []
         for tag in tags:
@@ -547,9 +547,7 @@ class MusicXMLElement(xmlnode.XMLNode):
 
     def __init__(self):
         '''
-        These tests are module specific and should be loaded as unittests, below
-
-        
+        These tests are module specific and should be loaded as unittests, below        
 
         >>> a = musicxml.mxObjects.MusicXMLElement()
         >>> a._convertNameToXml('groupAbbreviation')
@@ -578,8 +576,6 @@ class MusicXMLElement(xmlnode.XMLNode):
         3
         >>> print(a._publicAttributes())
         ['charData', 'external', 'tag']
-
-
         '''
         xmlnode.XMLNode.__init__(self)
         self.external = {} # references to external objects
@@ -800,7 +796,8 @@ class Score(MusicXMLElementList):
         >>> from music21.musicxml import xmlHandler
         >>> b = xmlHandler.Document()
         >>> b.read(testPrimitive.pitches01a)
-        >>> b.score.getScorePart(b.score.partIdToNameDict().keys()[0])
+        >>> spIdList = sorted(list(b.score.partIdToNameDict().keys()))
+        >>> b.score.getScorePart(spIdList[0])
         <score-part id=P1 part-name=MusicXML Part>
         '''
         inst = None
@@ -822,9 +819,10 @@ class Score(MusicXMLElementList):
         >>> from music21.musicxml import xmlHandler
         >>> b = xmlHandler.Document()
         >>> b.read(testPrimitive.ALL[0])
-        >>> c = b.score.getPart(b.score.partIdToNameDict().keys()[0])
+        >>> spIdList = sorted(list(b.score.partIdToNameDict().keys()))
+        >>> c = b.score.getPart(spIdList[0])
         >>> c
-        <part id=P1 <measure width=983 number=1 <print <system-layout...
+        <part id=P1 <measure number=1 width=983 <print <system-layout...
         >>> isinstance(c, musicxml.mxObjects.Part)
         True
         >>> isinstance(c, stream.Part)
@@ -952,7 +950,7 @@ class Credit(MusicXMLElementList):
         >>> a.setDefaults()
         >>> b = musicxml.mxObjects.CreditWords('testing')
         >>> a.append(b)
-        >>> print a
+        >>> print(a)
         <credit page=1 <credit-words charData=testing>>
         '''
         MusicXMLElementList.__init__(self)
@@ -2746,12 +2744,12 @@ class Lyric(MusicXMLElement):
         #text = xml.sax.saxutils.escape(text)
         if (text is None):
             return None
-        text = text.replace('>', unichr(62))
-        text = text.replace('<', unichr(60))
-        text = text.replace('&', unichr(38))
+        text = text.replace('>', six.unichr(62))
+        text = text.replace('<', six.unichr(60))
+        text = text.replace('&', six.unichr(38))
 
         # need to remove hyphens; but &mdash; and similar do not work
-        text = text.replace('-', unichr(8211))
+        text = text.replace('-', six.unichr(8211))
         return text
 
     def _getComponents(self):
@@ -3870,8 +3868,9 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     # this is a temporary hack to get encoding working right
     # this may not be the best way to do this
-    reload(sys)
-    sys.setdefaultencoding("utf-8") # @UndefinedVariable
+    if six.PY2:
+        reload(sys)
+        sys.setdefaultencoding("utf-8") # @UndefinedVariable
 
     import music21
     music21.mainTest(Test)

@@ -39,15 +39,15 @@ class ChoraleList(object):
     >>> from music21 import corpus
     >>> bcl = corpus.chorales.ChoraleList()
     >>> info358 = bcl.byBudapest[358]
-    >>> for key in info358:
-    ...   print key, info358[key]
+    >>> for key in sorted(list(info358.keys())):
+    ...   print("%s %s" % (key, info358[key]))
+    baerenreiter 68
     budapest 358
     bwv 431
-    title Wenn wir in höchsten Nöten sein
-    notes None
-    baerenreiter 68
-    riemenschneider 68
     kalmus 358
+    notes None
+    riemenschneider 68
+    title Wenn wir in höchsten Nöten sein
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info358['bwv']))
     >>> #_DOCS_SHOW c.show() # shows Bach BWV431
 
@@ -499,11 +499,11 @@ class ChoraleListRKBWV(object):
     >>> from music21 import corpus
     >>> bcl = corpus.chorales.ChoraleListRKBWV()
     >>> info155 = bcl.byRiemenschneider[155]
-    >>> for key in info155:
-    ...   print key, info155[key]
+    >>> for key in sorted(list(info155.keys())):
+    ...   print("%s %s" % (key, info155[key]))
+    bwv 344
     kalmus 173
     riemenschneider 155
-    bwv 344
     title Hilf, Herr Jesu, laß gelingen 1
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info155['bwv']))
     >>> #_DOCS_SHOW c.show() # shows Bach BWV344
@@ -934,7 +934,7 @@ class Iterator(object):
 
     >>> from music21 import corpus
     >>> for chorale in corpus.chorales.Iterator(1,4, returnType = 'filename'):
-    ...    print chorale
+    ...    print(chorale)
     bach/bwv269
     bach/bwv347
     bach/bwv153.1
@@ -973,7 +973,7 @@ class Iterator(object):
     Not a Chorale will be skipped because it is not a recognized title
 
     >>> for chorale in BCI:
-    ...    print chorale
+    ...    print(chorale)
     bach/bwv358
     bach/bwv83.5
 
@@ -987,7 +987,7 @@ class Iterator(object):
     25 will be skipped because it is not in the numberingSystem riemenschneider
 
     >>> for chorale in BCI:
-    ...    print chorale
+    ...    print(chorale)
     bach/bwv347
     bach/bwv153.1
     bach/bwv86.6
@@ -998,7 +998,7 @@ class Iterator(object):
     Elements in the iterator can be accessed by index as well as slice.
 
     >>> for chorale in corpus.chorales.Iterator(returnType = 'filename')[4:10]:
-    ...    print chorale
+    ...    print(chorale)
     bach/bwv86.6
     bach/bwv267
     bach/bwv281
@@ -1007,7 +1007,7 @@ class Iterator(object):
     bach/bwv248.12-2
     bach/bwv38.6
 
-    >>> print corpus.chorales.Iterator(returnType = 'filename')[55]
+    >>> print(corpus.chorales.Iterator(returnType = 'filename')[55])
     bach/bwv159.5
 
 
@@ -1120,6 +1120,9 @@ class Iterator(object):
             nextChorale = self._returnChorale()
             self._currentIndex += 1
             return nextChorale
+
+    def __next__(self): # PY3
+        return self.next()
 
     #---Functions
     def _returnChorale(self, choraleIndex = None):

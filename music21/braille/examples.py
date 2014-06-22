@@ -88,7 +88,7 @@ The exposition to movement 1 of Mozart's K545.
 #_OMIT_FROM_DOCS
 
 >>> from music21.braille import translate
->>> print translate.objectToBraille(hb, debug=True)
+>>> print(translate.objectToBraille(hb, debug=True))
 ---begin segment---
 <music21.braille.segment BrailleSegment>
 Measure 1, Signature Grouping 1:
@@ -158,7 +158,93 @@ Barline final ⠣⠅
 ---end segment---
 
 
->>> print translate.objectToBraille(verdi, debug=True)
+>>> print(translate.objectToBraille(verdi.measures(1, 3), debug=True))
+---begin grand segment---
+<music21.braille.segment BrailleGrandSegment>
+===
+Measure 1 Right, Signature Grouping 1:
+Key Signature 2 flat(s) ⠣⠣
+Time Signature 3/8 ⠼⠉⠦
+<BLANKLINE>
+Measure 1 Left, Signature Grouping 1:
+<music21.key.KeySignature of 2 flats, mode major>
+<music21.meter.TimeSignature 3/8>
+====
+Measure 1 Right, Note Grouping 1:
+<music21.clef.TrebleClef>
+Word ⠜
+Text Expression Allegretto ⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕
+Word: ⠜
+Dynamic f ⠋
+Dot 3 ⠄
+Rest whole ⠍
+<BLANKLINE>
+Measure 1 Left, Note Grouping 1:
+<music21.clef.BassClef>
+Octave 2 ⠘
+B eighth ⠚
+Ascending Chord:
+Octave 3 ⠸
+F eighth ⠛
+Interval 4 ⠼
+Interval 6 ⠴
+Ascending Chord:
+F eighth ⠛
+Interval 4 ⠼
+Interval 6 ⠴
+====
+Measure 2 Right, Note Grouping 1:
+Articulation staccato ⠦
+Octave 5 ⠨
+D eighth ⠑
+Articulation staccato ⠦
+D eighth ⠑
+Articulation staccato ⠦
+D eighth ⠑
+<BLANKLINE>
+Measure 2 Left, Note Grouping 1:
+Octave 2 ⠘
+B eighth ⠚
+Ascending Chord:
+Octave 3 ⠸
+F eighth ⠛
+Interval 4 ⠼
+Interval 6 ⠴
+Ascending Chord:
+F eighth ⠛
+Interval 4 ⠼
+Interval 6 ⠴
+====
+Measure 3 Right, Note Grouping 1:
+Articulation accent ⠨⠦
+Octave 5 ⠨
+F 16th ⠿
+Dot ⠄
+Opening single slur ⠉
+E 32nd ⠏
+Opening single slur ⠉
+C quarter ⠹
+<BLANKLINE>
+Measure 3 Left, Inaccord Grouping 1:
+Rest eighth ⠭
+Ascending Chord:
+Octave 3 ⠸
+F eighth ⠛
+Interval 3 ⠬
+Interval 7 ⠒
+Ascending Chord:
+F eighth ⠛
+Interval 3 ⠬
+Interval 7 ⠒
+Octave 2 ⠘
+F quarter ⠻
+Dot ⠄
+====
+<BLANKLINE>
+---end grand segment---
+
+
+>>> print(translate.objectToBraille(verdi, debug=True))
 ---begin grand segment---
 <music21.braille.segment BrailleGrandSegment>
 ===
@@ -1049,7 +1135,7 @@ Barline final ⠣⠅
 ---end grand segment---
 
 
->>> print translate.objectToBraille(mozart, debug=True)
+>>> print(translate.objectToBraille(mozart, debug=True))
 ---begin grand segment---
 <music21.braille.segment BrailleGrandSegment>
 ===
