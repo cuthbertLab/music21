@@ -72,7 +72,7 @@ Getting Humdrum Files
 
 Over one hundred thousand Kern files can be found at the following URL.
 
-http://kern.humdrum.net/
+http://kern.humdrum.org/
 
 
 Parsing ABC Files
