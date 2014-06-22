@@ -29,6 +29,7 @@ A scale or harmony may be composed of one or more BoundIntervalNetwork objects.
 Both nodes and edges can be weighted to suggest tonics, dominants, 
 finals, or other attributes of the network. 
 '''
+from collections import OrderedDict
 
 import unittest
 import copy
@@ -49,7 +50,6 @@ except ImportError:
     networkx = None
     #_missingImport.append('networkx')
 
-
 # these are just symbols/place holders; values do not matter as long
 # as they are not positive ints
 TERMINUS_LOW = 'terminusLow'
@@ -58,6 +58,26 @@ DIRECTION_BI = 'bi'
 DIRECTION_ASCENDING = 'ascending'
 DIRECTION_DESCENDING = 'descending'
 
+def _gte(a, b):
+    '''
+    check if a > b or abs(a - b) < epsilon
+    '''
+    if a > b:
+        return True
+    elif (abs(a-b) < .00001):
+        return True
+    return False
+
+def _lte(a, b):
+    '''
+    check if a < b or abs(a - b) < epsilon
+    '''
+    if a < b:
+        return True
+    elif (abs(a-b) < .00001):
+        return True
+    return False
+    
 
 
 class EdgeException(exceptions21.Music21Exception):
@@ -392,10 +412,10 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         # a dictionary of Edge object, where keys are _edgeIdCount values
         # Edges store directed connections between Node ids
-        self._edges = {}
+        self._edges = OrderedDict()
 
         # nodes suggest Pitches, but Pitches are not stored
-        self._nodes = {}
+        self._nodes = OrderedDict()
 
         if edgeList is not None: # auto initialize
             self.fillBiDirectedEdges(edgeList)
@@ -407,20 +427,20 @@ class BoundIntervalNetwork(IntervalNetwork):
         self.pitchSimplification = pitchSimplification  # could be 'simplifyEnharmonic', 'mostCommon' or None 
 
         # store segments
-        self._ascendingCache = {}
-        self._descendingCache = {}
+        self._ascendingCache = OrderedDict()
+        self._descendingCache = OrderedDict()
         # store min/max, as this is evaluated before getting cache values
-        self._minMaxCache = {}
+        self._minMaxCache = OrderedDict()
 
     def clear(self):
         '''Remove and reset all Nodes and Edges. 
         '''
         self._edgeIdCount = 0
         self._nodeIdCount = 0
-        self._edges = {}
-        self._nodes = {}
-        self._ascendingCache = {}
-        self._descendingCache = {}
+        self._edges = OrderedDict()
+        self._nodes = OrderedDict()
+        self._ascendingCache = OrderedDict()
+        self._descendingCache = OrderedDict()
 
 
 
@@ -870,7 +890,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         If `equateTermini` is True, the terminals will be given the same degree. 
         '''
         # TODO: this should be cached after network creation
-        post = {}
+        post = OrderedDict()
         for nId, n in self._nodes.items():
             if equateTermini:
                 if nId == TERMINUS_HIGH:
@@ -895,8 +915,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         
 
     def _nodeIdToEdgeDirections(self, nId):
-        '''Given a Node id, find all edges associated with this node and report on their directions
-
+        '''
+        Given a Node id, find all edges associated 
+        with this node and report on their directions
         
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillMelodicMinor()
@@ -1258,8 +1279,6 @@ class BoundIntervalNetwork(IntervalNetwork):
         return (nodeObj.id, pitchReference.nameWithOctave, 
                 minKey, maxKey, includeFirst)
 
-
-
     def _realizeAscending(self, pitchReference, nodeId=None, 
         minPitch=None, maxPitch=None, alteredDegrees={},
         fillMinMaxIfNone=False):
@@ -1306,20 +1325,26 @@ class BoundIntervalNetwork(IntervalNetwork):
         if common.isStr(maxPitch):
             maxPitch = pitch.Pitch(maxPitch)
         if fillMinMaxIfNone and minPitch is None and maxPitch is None:
-            minPitch, maxPitch = self.realizeMinMax(pitchReference, nodeObj, 
-                                 alteredDegrees=alteredDegrees)
+            minPitch, maxPitch = self.realizeMinMax(pitchReference, 
+                                                    nodeObj, 
+                                                    alteredDegrees=alteredDegrees)
 
         # when the pitch reference is altered, we need to get the
         # unaltered version of this pitch. 
-        pUnaltered = self._getUnalteredPitch(pitchReference, nodeObj,
-                     direction=DIRECTION_ASCENDING, alteredDegrees=alteredDegrees)
+        pUnaltered = self._getUnalteredPitch(pitchReference, 
+                                             nodeObj,
+                                             direction=DIRECTION_ASCENDING, 
+                                             alteredDegrees=alteredDegrees)
         if pUnaltered is not None:
             pitchReference = pUnaltered
 
         # see if we can get from cache
         if self.deterministic:
             #environLocal.printDebug('using cached scale segment')
-            ck = self._getCacheKey(nodeObj, pitchReference, minPitch, maxPitch)
+            ck = self._getCacheKey(nodeObj, 
+                                   pitchReference, 
+                                   minPitch, 
+                                   maxPitch)
             if ck in self._ascendingCache:
                 return self._ascendingCache[ck]
 
@@ -1334,7 +1359,6 @@ class BoundIntervalNetwork(IntervalNetwork):
         pCollect = p # usually p, unless the tone has been altered
         post = []
         postNodeId = [] # store node ids as well
-
         #environLocal.printDebug(['_realizeAscending()', 'n', n])
 
         attempts = 0
@@ -1344,13 +1368,13 @@ class BoundIntervalNetwork(IntervalNetwork):
             #environLocal.printDebug(['_realizeAscending()', 'p', p])
             appendPitch = False
 
-            if (minPitch is not None and pCollect.ps >= minPitch.ps and 
-                maxPitch is not None and pCollect.ps <= maxPitch.ps):
+            if (minPitch is not None and _gte(pCollect.ps, minPitch.ps) and 
+                maxPitch is not None and _lte(pCollect.ps, maxPitch.ps)):
                 appendPitch = True
-            elif (minPitch is not None and pCollect.ps >= minPitch.ps and 
+            elif (minPitch is not None and _gte(pCollect.ps, minPitch.ps) and 
                 maxPitch is None):
                 appendPitch = True
-            elif (maxPitch is not None and pCollect.ps <= maxPitch.ps and 
+            elif (maxPitch is not None and _lte(pCollect.ps, maxPitch.ps) and 
                 minPitch is None):
                 appendPitch = True
             elif minPitch is None and maxPitch is None: 
@@ -1359,7 +1383,7 @@ class BoundIntervalNetwork(IntervalNetwork):
             if appendPitch:
                 post.append(pCollect)
                 postNodeId.append(n.id)
-            if maxPitch is not None and p.ps >= maxPitch.ps:
+            if maxPitch is not None and _gte(p.ps, maxPitch.ps):
                 break
 
             #environLocal.printDebug(['_realizeAscending()', 'n', n, 'n.id', n.id])
@@ -1389,9 +1413,10 @@ class BoundIntervalNetwork(IntervalNetwork):
 
             p = self.transposePitchAndApplySimplification(intervalObj, p)
             pCollect = p
-
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
-                       n=n, p=p, direction=DIRECTION_ASCENDING)
+                                                 n=n, 
+                                                 p=p, 
+                                                 direction=DIRECTION_ASCENDING)
 
         if attempts >= maxattempts:
             raise IntervalNetworkException("Cannot realize these pitches; is your scale well-formed? (especially check if you're giving notes without octaves)")
@@ -1481,19 +1506,25 @@ class BoundIntervalNetwork(IntervalNetwork):
             maxPitch = pitch.Pitch(maxPitch)
         if fillMinMaxIfNone and minPitch is None and maxPitch is None:
             #environLocal.printDebug(['_realizeDescending()', 'fillMinMaxIfNone'])
-            minPitch, maxPitch = self.realizeMinMax(pitchReference, nodeObj, 
-                                 alteredDegrees=alteredDegrees)
+            minPitch, maxPitch = self.realizeMinMax(pitchReference, 
+                                                    nodeObj, 
+                                                    alteredDegrees=alteredDegrees)
 
         # when the pitch reference is altered, we need to get the
         # unaltered version of this pitch. 
-        pUnaltered = self._getUnalteredPitch(pitchReference, nodeObj,
-                     direction=DIRECTION_DESCENDING, alteredDegrees=alteredDegrees)
+        pUnaltered = self._getUnalteredPitch(pitchReference, 
+                                             nodeObj,
+                                             direction=DIRECTION_DESCENDING, 
+                                             alteredDegrees=alteredDegrees)
         if pUnaltered is not None:
             pitchReference = pUnaltered
 
         # see if we can get from cache
         if self.deterministic:
-            ck = self._getCacheKey(nodeObj, pitchReference, minPitch, maxPitch, 
+            ck = self._getCacheKey(nodeObj, 
+                                   pitchReference, 
+                                   minPitch, 
+                                   maxPitch, 
                                    includeFirst)
             if ck in self._descendingCache:
                 return self._descendingCache[ck]
@@ -1512,13 +1543,13 @@ class BoundIntervalNetwork(IntervalNetwork):
         isFirst = True
         while True:
             appendPitch = False
-            if (minPitch is not None and p.ps >= minPitch.ps and 
-                maxPitch is not None and p.ps <= maxPitch.ps):
+            if (minPitch is not None and _gte(p.ps, minPitch.ps) and 
+                maxPitch is not None and _lte(p.ps, maxPitch.ps)):
                 appendPitch = True
-            elif (minPitch is not None and p.ps >= minPitch.ps and 
+            elif (minPitch is not None and _gte(p.ps, minPitch.ps) and 
                 maxPitch is None):
                 appendPitch = True
-            elif (maxPitch is not None and p.ps <= maxPitch.ps and 
+            elif (maxPitch is not None and _lte(p.ps, maxPitch.ps) and 
                 minPitch is None):
                 appendPitch = True
             elif minPitch is None and maxPitch is None: 
@@ -1561,7 +1592,9 @@ class BoundIntervalNetwork(IntervalNetwork):
 
             p = self.transposePitchAndApplySimplification(intervalObj.reverse(), p)
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
-                       n=n, p=p, direction=DIRECTION_DESCENDING)
+                                                 n=n, 
+                                                 p=p, 
+                                                 direction=DIRECTION_DESCENDING)
 
         if reverse:
             pre.reverse()
@@ -1645,9 +1678,12 @@ class BoundIntervalNetwork(IntervalNetwork):
                 if self.octaveDuplicating and minPitch is not None:
                     pitchReference.transposeBelowTarget(minPitch)
 
-                mergedPitches, mergedNodes = self._realizeAscending(
-                pitchReference=pitchReference, nodeId=nodeId, 
-                minPitch=minPitch, maxPitch=maxPitch, alteredDegrees=alteredDegrees, fillMinMaxIfNone=True)
+                mergedPitches, mergedNodes = self._realizeAscending(pitchReference=pitchReference, 
+                                                                    nodeId=nodeId, 
+                                                                    minPitch=minPitch, 
+                                                                    maxPitch=maxPitch, 
+                                                                    alteredDegrees=alteredDegrees, 
+                                                                    fillMinMaxIfNone=True)
 
             elif direction == DIRECTION_DESCENDING:
                 # move pitch reference to above minimum
@@ -1658,11 +1694,13 @@ class BoundIntervalNetwork(IntervalNetwork):
                 # being returned if no min and max are given (otherwise
                 # we would just get the reference pitch.
 
-                mergedPitches, mergedNodes = self._realizeDescending(
-                pitchReference=pitchReference, nodeId=nodeId, 
-                minPitch=minPitch, maxPitch=maxPitch, 
-                alteredDegrees=alteredDegrees, includeFirst=True, 
-                fillMinMaxIfNone=True)
+                mergedPitches, mergedNodes = self._realizeDescending(pitchReference=pitchReference, 
+                                                                     nodeId=nodeId,
+                                                                     minPitch=minPitch, 
+                                                                     maxPitch=maxPitch,
+                                                                     alteredDegrees=alteredDegrees, 
+                                                                     includeFirst=True,
+                                                                     fillMinMaxIfNone=True)
 
             elif direction == DIRECTION_BI:
             # this is a union of both ascending and descending
@@ -1674,20 +1712,23 @@ class BoundIntervalNetwork(IntervalNetwork):
 
                 #pitchReferenceA.transposeBelowTarget(minPitch)
 
-                post, postNodeId = self._realizeAscending(
-                pitchReference=pitchReferenceA, nodeId=nodeId, 
-                minPitch=minPitch, maxPitch=maxPitch, alteredDegrees=alteredDegrees)
-
+                post, postNodeId = self._realizeAscending(pitchReference=pitchReferenceA, 
+                                                          nodeId=nodeId, 
+                                                          minPitch=minPitch, 
+                                                          maxPitch=maxPitch, 
+                                                          alteredDegrees=alteredDegrees)
 
                 if self.octaveDuplicating and maxPitch is not None:
                     pitchReferenceB.transposeAboveTarget(maxPitch)
 
                 #pitchReferenceB.transposeAboveTarget(maxPitch)
 
-                pre, preNodeId = self._realizeDescending(
-                pitchReference=pitchReferenceB, nodeId=nodeId, 
-                minPitch=minPitch, maxPitch=maxPitch, 
-                alteredDegrees=alteredDegrees, includeFirst=True)
+                pre, preNodeId = self._realizeDescending(pitchReference=pitchReferenceB, 
+                                                         nodeId=nodeId,
+                                                         minPitch=minPitch, 
+                                                         maxPitch=maxPitch,
+                                                         alteredDegrees=alteredDegrees, 
+                                                         includeFirst=True)
 
                 # need to create union of both lists, but keep order, as well
                 # as keep the node id list in order
@@ -1696,7 +1737,9 @@ class BoundIntervalNetwork(IntervalNetwork):
                 foundPitches = [] # just for membership comparison
                 i = 0
                 j = 0
-                while True:
+                preventPermanentRecursion = 99999
+                while preventPermanentRecursion > 0:
+                    preventPermanentRecursion -= 1
                     if i < len(post) and post[i] not in foundPitches:
                         foundPitches.append(post[i])
                         merged.append((post[i], postNodeId[i]))
@@ -1724,13 +1767,17 @@ class BoundIntervalNetwork(IntervalNetwork):
             # at the proper extreme, and then go the opposite way
             # presently, this will realize ascending from reference, 
             # then descending from reference
-            post, postNodeId = self._realizeAscending(
-                pitchReference=pitchReference, nodeId=nodeId, 
-                minPitch=minPitch, maxPitch=maxPitch, alteredDegrees=alteredDegrees)
-            pre, preNodeId = self._realizeDescending(
-                pitchReference=pitchReference, nodeId=nodeId, 
-                minPitch=minPitch, maxPitch=maxPitch, 
-                alteredDegrees=alteredDegrees, includeFirst=False)
+            post, postNodeId = self._realizeAscending(pitchReference=pitchReference, 
+                                                      nodeId=nodeId, 
+                                                      minPitch=minPitch, 
+                                                      maxPitch=maxPitch, 
+                                                      alteredDegrees=alteredDegrees)
+            pre, preNodeId = self._realizeDescending(pitchReference=pitchReference, 
+                                                     nodeId=nodeId, 
+                                                     minPitch=minPitch, 
+                                                     maxPitch=maxPitch, 
+                                                     alteredDegrees=alteredDegrees, 
+                                                     includeFirst=False)
 
             #environLocal.printDebug(['realize()', 'pre', pre, preNodeId])
             mergedPitches, mergedNodes = pre + post, preNodeId + postNodeId
@@ -1789,7 +1836,14 @@ class BoundIntervalNetwork(IntervalNetwork):
         ['C2', 'G2', 'D3', 'A3', 'E4', 'B4', 'F#5', 'D-6', 'A-6', 'E-7', 'B-7', 'F8', 'C9']
 
         '''
-        return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredDegrees=alteredDegrees, reverse=reverse)[0] # just return first component
+        components = self.realize(pitchReference=pitchReference, 
+                            nodeId=nodeId, 
+                            minPitch=minPitch, 
+                            maxPitch=maxPitch, 
+                            direction=direction, 
+                            alteredDegrees=alteredDegrees, 
+                            reverse=reverse)
+        return components[0] # just return first component
 
 
 
@@ -2038,7 +2092,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         # set positions of all nodes based on degree, where y value is degree
         # and x is count of values at that degree
-        degreeCount = {} # degree, count pairs
+        degreeCount = OrderedDict() # degree, count pairs
         # sorting nodes will help, but not insure, proper positioning
         nKeys = list(self._nodes.keys())
         nKeys.sort()
@@ -2894,8 +2948,8 @@ class Test(unittest.TestCase):
         net = BoundIntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
 
-        self.assertEqual(list(net._edges.keys()), [0, 1, 2, 3, 4, 5, 6])
-        self.assertEqual(sorted(list(net._nodes.keys())), [0, 1, 2, 3, 4, 5, 'terminusHigh', 'terminusLow'])
+        self.assertEqual(sorted(list(net._edges.keys())), [0, 1, 2, 3, 4, 5, 6])
+        self.assertEqual(sorted([str(x) for x in net._nodes.keys()]), ['0', '1', '2', '3', '4', '5', 'terminusHigh', 'terminusLow'])
 
         self.assertEqual(repr(net._nodes[0]), "<music21.intervalNetwork.Node id=0>")
         self.assertEqual(repr(net._nodes['terminusLow']), "<music21.intervalNetwork.Node id='terminusLow'>")
@@ -2955,8 +3009,8 @@ class Test(unittest.TestCase):
         net = BoundIntervalNetwork()
         net.fillDirectedEdges(ascendingEdgeList, descendingEdgeList)
 
-        self.assertEqual(repr(net._edges), "{0: <music21.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>, 1: <music21.intervalNetwork.Edge ascending m2 [(0,1)]>, 2: <music21.intervalNetwork.Edge ascending M2 [(1,2)]>, 3: <music21.intervalNetwork.Edge ascending M2 [(2,3)]>, 4: <music21.intervalNetwork.Edge ascending M2 [(3,4)]>, 5: <music21.intervalNetwork.Edge ascending M2 [(4,5)]>, 6: <music21.intervalNetwork.Edge ascending m2 [(5,'terminusHigh')]>, 7: <music21.intervalNetwork.Edge descending M2 [(6,'terminusLow')]>, 8: <music21.intervalNetwork.Edge descending m2 [(7,6)]>, 9: <music21.intervalNetwork.Edge descending M2 [(8,7)]>, 10: <music21.intervalNetwork.Edge descending M2 [(9,8)]>, 11: <music21.intervalNetwork.Edge descending m2 [(10,9)]>, 12: <music21.intervalNetwork.Edge descending M2 [(11,10)]>, 13: <music21.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>}")
-
+        self.assertEqual(repr(net._edges), "OrderedDict([(0, <music21.intervalNetwork.Edge ascending M2 [(\'terminusLow\',0)]>), (1, <music21.intervalNetwork.Edge ascending m2 [(0,1)]>), (2, <music21.intervalNetwork.Edge ascending M2 [(1,2)]>), (3, <music21.intervalNetwork.Edge ascending M2 [(2,3)]>), (4, <music21.intervalNetwork.Edge ascending M2 [(3,4)]>), (5, <music21.intervalNetwork.Edge ascending M2 [(4,5)]>), (6, <music21.intervalNetwork.Edge ascending m2 [(5,'terminusHigh')]>), (7, <music21.intervalNetwork.Edge descending M2 [(6,'terminusLow')]>), (8, <music21.intervalNetwork.Edge descending m2 [(7,6)]>), (9, <music21.intervalNetwork.Edge descending M2 [(8,7)]>), (10, <music21.intervalNetwork.Edge descending M2 [(9,8)]>), (11, <music21.intervalNetwork.Edge descending m2 [(10,9)]>), (12, <music21.intervalNetwork.Edge descending M2 [(11,10)]>), (13, <music21.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>)])")
+                         
         # returns a list of edges and notes
         self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'ascending')), "([<music21.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.intervalNetwork.Node id=0>])")
 
@@ -2997,7 +3051,7 @@ class Test(unittest.TestCase):
 
         
         sc1 = scale.MajorScale('g')
-        self.assertEqual(str(sorted(sc1.abstract._net._nodes.keys())), "[0, 1, 2, 3, 4, 5, 'terminusHigh', 'terminusLow']")
+        self.assertEqual(sorted([str(x) for x in sc1.abstract._net._nodes.keys()]), ['0', '1', '2', '3', '4', '5', 'terminusHigh', 'terminusLow'])
         self.assertEqual(str(sorted(sc1.abstract._net._edges.keys())), "[0, 1, 2, 3, 4, 5, 6]")
 
         nodes = ({'id':'terminusLow', 'degree':1},
@@ -3015,9 +3069,7 @@ class Test(unittest.TestCase):
 
         net = BoundIntervalNetwork()
         net.fillArbitrary(nodes, edges)
-
-        self.assertEqual(str(net._edges), "{0: <music21.intervalNetwork.Edge bi m2 [('terminusLow',0),(0,'terminusLow')]>, 1: <music21.intervalNetwork.Edge bi M3 [(0,'terminusHigh'),('terminusHigh',0)]>}")
-
+        self.assertEqual(str(net._edges), '''OrderedDict([(0, <music21.intervalNetwork.Edge bi m2 [('terminusLow',0),(0,'terminusLow')]>), (1, <music21.intervalNetwork.Edge bi M3 [(0,'terminusHigh'),('terminusHigh',0)]>)])''')
         
         self.assertEqual(net.degreeMax, 3)
         self.assertEqual(net.degreeMaxUnique, 2)
@@ -3196,7 +3248,7 @@ _DOC_ORDER = [BoundIntervalNetwork]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, 'noDocTest')
 
 
 #------------------------------------------------------------------------------

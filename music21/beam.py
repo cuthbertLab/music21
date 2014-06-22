@@ -124,12 +124,12 @@ class Beam(SlottedObject):
         >>> b3 = beam.Beam(type='partial', direction='left')
         >>> b4 = beam.Beam('partial', 'left')
         >>> b4.number = 1
-        >>> print b4
+        >>> b4
         <music21.beam.Beam 1/partial/left>
 
     ::
 
-        >>> print b2
+        >>> b2
         <music21.beam.Beam None/start>
     '''
 
@@ -192,7 +192,7 @@ class Beams(SlottedObject):
 
     ::
 
-        >>> print n.beams
+        >>> print(n.beams)
         <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
 
     '''
@@ -453,7 +453,7 @@ class Beams(SlottedObject):
             BeamException: beam type cannot be sexy
 
         '''
-        if type not in ['start', 'stop', 'continue', 'partial']:
+        if type not in ('start', 'stop', 'continue', 'partial'):
             raise BeamException('beam type cannot be %s' %  type)
         for beam in self.beamsList:
             beam.type = type

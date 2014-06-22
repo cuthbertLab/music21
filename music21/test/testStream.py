@@ -134,7 +134,7 @@ class TestExternal(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatInsert(n, range(0,120,3))
+        a.repeatInsert(n, list(range(0,120,3)))
         #a.show() # default time signature used
         
         a.insert( 0, meter.TimeSignature("5/4")  )
@@ -446,7 +446,7 @@ class Test(unittest.TestCase):
         offsets = [a.offset for a in farStream.flat]
 
         # create what we epxect to be the offsets
-        offsetsMatch = range(0, 6)
+        offsetsMatch = list(range(0, 6))
         offsetsMatch += [x + 10 for x in range(0, 6)]
         offsetsMatch += [x + 20 for x in range(0, 6)]
         offsetsMatch += [x + 30 for x in range(0, 6)]
@@ -817,7 +817,7 @@ class Test(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatInsert(n, range(0,120,3))        
+        a.repeatInsert(n, list(range(0,120,3)))
         a.insert( 0, meter.TimeSignature("5/4")  )
         a.insert(10, meter.TimeSignature("2/4")  )
         a.insert( 3, meter.TimeSignature("3/16") )
@@ -910,7 +910,7 @@ class Test(unittest.TestCase):
         self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
 
         # fill with notes
-        a.repeatInsert(n, range(0,120,3))        
+        a.repeatInsert(n, list(range(0,120,3)))
 
         b = a.getTimeSignatures(sortByCreationTime=False)
 
@@ -1070,7 +1070,7 @@ class Test(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatInsert(n, range(0,120,3))
+        a.repeatInsert(n, list(range(0,120,3)))
 
         self.assertEqual(len(a), 40)
         
@@ -1311,14 +1311,14 @@ class Test(unittest.TestCase):
 
         mOffsetMap = a.parts[0].measureOffsetMap()
 
-        self.assertEqual(sorted(mOffsetMap.keys()), 
+        self.assertEqual(sorted(list(mOffsetMap.keys())), 
             [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]  )
 
         # try on a complete score
         a = corpus.parse('bach/bwv324.xml')
         mOffsetMap = a.measureOffsetMap()
         #environLocal.printDebug([mOffsetMap])
-        self.assertEqual(sorted(mOffsetMap.keys()), 
+        self.assertEqual(sorted(list(mOffsetMap.keys())), 
             [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]  )
 
         for key, value in mOffsetMap.items():
@@ -1330,7 +1330,7 @@ class Test(unittest.TestCase):
         # get notes from one measure
 
         mOffsetMap = a.parts[0].flat.measureOffsetMap(note.Note)
-        self.assertEqual(sorted(mOffsetMap.keys()), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]   )
+        self.assertEqual(sorted(list(mOffsetMap.keys())), [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]   )
 
         self.assertEqual(str(mOffsetMap[0.0]), '[<music21.stream.Measure 1 offset=0.0>]')
 
@@ -1346,12 +1346,12 @@ class Test(unittest.TestCase):
         mOffsetMap = m1.measureOffsetMap(note.Note)
         # offset here is that of measure that originally contained this note
         #environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
-        self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
+        self.assertEqual(sorted(list(mOffsetMap.keys())), [4.0] )
 
         m2 = a.parts[0].getElementsByClass('Measure')[2]
         mOffsetMap = m2.measureOffsetMap(note.Note)
         # offset here is that of measure that originally contained this note
-        self.assertEqual(sorted(mOffsetMap.keys()), [8.0] )
+        self.assertEqual(sorted(list(mOffsetMap.keys())), [8.0] )
 
 
         # this should work but does not yet
@@ -1372,11 +1372,11 @@ class Test(unittest.TestCase):
         # offset map for measures looking at the part's Measures
         # note that pickup bar is taken into account
         post = alto.measureOffsetMap()
-        self.assertEqual(sorted(post.keys()), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0] )
+        self.assertEqual(sorted(list(post.keys())), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0] )
         
         # looking at Measure and Notes: no problem
         post = alto.flat.measureOffsetMap([Measure, note.Note])
-        self.assertEqual(sorted(post.keys()), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0] )
+        self.assertEqual(sorted(list(post.keys())), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0] )
         
         
         # after stripping ties, we have a stream with fewer notes
@@ -1396,12 +1396,12 @@ class Test(unittest.TestCase):
         # can we get an offset Measure map by looking for measures
         post = altoPostTie.measureOffsetMap(stream.Measure)
         # nothing: no Measures:
-        self.assertEqual(post.keys(), [])
+        self.assertEqual(list(post.keys()), [])
         
         # but, we can get an offset Measure map by looking at Notes
         post = altoPostTie.measureOffsetMap(note.Note)
         # nothing: no Measures:
-        self.assertEqual(sorted(post.keys()), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0])
+        self.assertEqual(sorted(list(post.keys())), [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0])
 
         #from music21 import graph
         #graph.plotStream(altoPostTie, 'scatter', values=['pitchclass','offset'])
@@ -1455,7 +1455,7 @@ class Test(unittest.TestCase):
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
-        a.repeatInsert(n, range(0,120,3))
+        a.repeatInsert(n, list(range(0,120,3)))
         #a.show() # default time signature used
         a.insert( 0, meter.TimeSignature("5/4")  )
         a.insert(10, meter.TimeSignature("2/4")  )
@@ -2386,7 +2386,7 @@ class Test(unittest.TestCase):
         n = note.Note()
         n.quarterLength = 1
         s = stream.Stream()
-        s.repeatInsert(n, range(100, 110))
+        s.repeatInsert(n, list(range(100, 110)))
 
         procCompare(s, 1, [100, 101, 102, 103])
         procCompare(s, 2, [100, 102, 104, 106])
@@ -2399,10 +2399,10 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         n1 = note.Note()
         n1.quarterLength = 1
-        s.repeatInsert(n, range(0, 30, 3))
+        s.repeatInsert(n, list(range(0, 30, 3)))
         n2 = note.Note()
         n2.quarterLength = 2
-        s.repeatInsert(n, range(1, 30, 3))
+        s.repeatInsert(n, list(range(1, 30, 3)))
         # procCompare will  sort offsets; this test non sorted operation
         procCompare(s, 1, [0.0, 1.0, 3.0, 4.0, 6.0, 7.0])
         procCompare(s, .5, [0.0, 0.5, 1.5, 2.0, 3.0, 3.5])
@@ -2412,10 +2412,10 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         n1 = note.Note()
         n1.quarterLength = 1
-        s.repeatInsert(n, range(100, 130, 3))
+        s.repeatInsert(n, list(range(100, 130, 3)))
         n2 = note.Note()
         n2.quarterLength = 2
-        s.repeatInsert(n, range(101, 130, 3))
+        s.repeatInsert(n, list(range(101, 130, 3)))
         # procCompare will  sort offsets; this test non sorted operation
         procCompare(s, 1, [100.0, 101.0, 103.0, 104.0, 106.0, 107.0])
         procCompare(s, .5, [100.0, 100.5, 101.5, 102.0, 103.0, 103.5])
@@ -2464,7 +2464,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = 1
             s = stream.Stream()
-            s.repeatInsert(n, range(100, 110))
+            s.repeatInsert(n, list(range(100, 110)))
 
             oListSrc = [e.offset for e in s]
             oListSrc.sort()
@@ -2493,10 +2493,10 @@ class Test(unittest.TestCase):
             s = stream.Stream()
             n1 = note.Note()
             n1.quarterLength = 1
-            s.repeatInsert(n1, range(0, 30, 3))
+            s.repeatInsert(n1, list(range(0, 30, 3)))
             n2 = note.Note()
             n2.quarterLength = 2
-            s.repeatInsert(n2, range(1, 30, 3))
+            s.repeatInsert(n2, list(range(1, 30, 3)))
 
             oListSrc = [e.offset for e in s]
             oListSrc.sort()
@@ -2524,10 +2524,10 @@ class Test(unittest.TestCase):
             s = stream.Stream()
             n1 = note.Note()
             n1.quarterLength = 1
-            s.repeatInsert(n1, range(100, 130, 3))
+            s.repeatInsert(n1, list(range(100, 130, 3)))
             n2 = note.Note()
             n2.quarterLength = 2
-            s.repeatInsert(n2, range(101, 130, 3))
+            s.repeatInsert(n2, list(range(101, 130, 3)))
 
             oListSrc = [e.offset for e in s]
             oListSrc.sort()
@@ -2682,7 +2682,7 @@ class Test(unittest.TestCase):
         n1 = note.Note()
         n1.quarterLength = .5
         s1 = Stream()
-        s1.repeatInsert(n1, range(6))
+        s1.repeatInsert(n1, list(range(6)))
 
         # test inPlace v/ not inPlace
         sNew = s1.scaleDurations(2, inPlace=False)
@@ -4972,7 +4972,7 @@ class Test(unittest.TestCase):
         oMap = s.offsetMap
         oMapStr = "[\n" # construct string from dict in fixed order...
         for ob in oMap:
-            oMapStr += "{'voiceIndex': " + str(ob['voiceIndex']) + ", 'element': " + str(ob['element']) + ", 'endTime': " + str(ob['endTime']) + ", 'offset': " + str(ob['offset']) + "},\n"
+            oMapStr += "{'voiceIndex': " + str(ob.voiceIndex) + ", 'element': " + str(ob.element) + ", 'endTime': " + str(ob.endTime) + ", 'offset': " + str(ob.offset) + "},\n"
         oMapStr += "]\n"
         #print oMapStr
         self.assertEqual(oMapStr, 
@@ -5413,7 +5413,7 @@ class Test(unittest.TestCase):
             melismaByBeat[beatStr].append(dur)
             #environLocal.printDebug(['start note:', n, 'beat:', beatStr, 'slured duration:', dur])
 
-        for beatStr in sorted(melismaByBeat.keys()):
+        for beatStr in sorted(list(melismaByBeat.keys())):
             unused_avg = sum(melismaByBeat[beatStr]) / len(melismaByBeat[beatStr])
             #environLocal.printDebug(['melisma beat:', beatStr.ljust(6), 'average duration:', avg])
 
@@ -6437,25 +6437,60 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.repeatAppend(note.Note(), 2)     
         s.insert([0, tempo.MetronomeMark(number=60)])      
-        self.assertEqual(str(s._getSecondsMap()), """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 1.0}, {'durationSeconds': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 1.0, 'endTimeSeconds': 2.0}]""")        
+
+
+        sMap = s._getSecondsMap()
+        sMapStr = "[" # construct string from dict in fixed order...
+        for ob in sMap:
+            sMapStr += "{'durationSeconds': " + str(ob['durationSeconds']) + ", 'voiceIndex': " + str(ob['voiceIndex']) + ", 'element': " + str(ob['element']) + ", 'offsetSeconds': " + str(ob['offsetSeconds']) + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, "
+        sMapStr = sMapStr[0:-2]
+        sMapStr += "]"
+
+        
+        self.assertEqual(sMapStr, """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 1.0}, {'durationSeconds': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 1.0, 'endTimeSeconds': 2.0}]""")        
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 2)     
         s.insert([0, tempo.MetronomeMark(number=15)])      
-        self.assertEqual(str(s._getSecondsMap()), """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 4.0}, {'durationSeconds': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 4.0, 'endTimeSeconds': 8.0}]""")        
+        
+        sMap = s._getSecondsMap()
+        sMapStr = "[" # construct string from dict in fixed order...
+        for ob in sMap:
+            sMapStr += "{'durationSeconds': " + str(ob['durationSeconds']) + ", 'voiceIndex': " + str(ob['voiceIndex']) + ", 'element': " + str(ob['element']) + ", 'offsetSeconds': " + str(ob['offsetSeconds']) + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, "
+        sMapStr = sMapStr[0:-2]
+        sMapStr += "]"
+
+        self.assertEqual(str(sMapStr), """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 4.0}, {'durationSeconds': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 4.0, 'endTimeSeconds': 8.0}]""")        
 
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 2)     
         s.insert([0, tempo.MetronomeMark(number=15), 
                   1, tempo.MetronomeMark(number=60)])      
-        self.assertEqual(str(s._getSecondsMap()), """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 4.0}, {'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'offsetSeconds': 4.0, 'endTimeSeconds': 4.0}, {'durationSeconds': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 4.0, 'endTimeSeconds': 5.0}]""")        
+
+        sMap = s._getSecondsMap()
+        sMapStr = "[" # construct string from dict in fixed order...
+        for ob in sMap:
+            sMapStr += "{'durationSeconds': " + str(ob['durationSeconds']) + ", 'voiceIndex': " + str(ob['voiceIndex']) + ", 'element': " + str(ob['element']) + ", 'offsetSeconds': " + str(ob['offsetSeconds']) + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, "
+        sMapStr = sMapStr[0:-2]
+        sMapStr += "]"
+
+        
+        self.assertEqual(sMapStr, """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 4.0}, {'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'offsetSeconds': 4.0, 'endTimeSeconds': 4.0}, {'durationSeconds': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 4.0, 'endTimeSeconds': 5.0}]""")        
 
         s = stream.Stream()
         s.repeatAppend(note.Note(quarterLength=2.0), 1)     
         s.insert([0, tempo.MetronomeMark(number=15), 
                   1, tempo.MetronomeMark(number=60)])      
-        self.assertEqual(str(s._getSecondsMap()), """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 5.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 5.0}, {'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'offsetSeconds': 4.0, 'endTimeSeconds': 4.0}]""")        
+
+        sMap = s._getSecondsMap()
+        sMapStr = "[" # construct string from dict in fixed order...
+        for ob in sMap:
+            sMapStr += "{'durationSeconds': " + str(ob['durationSeconds']) + ", 'voiceIndex': " + str(ob['voiceIndex']) + ", 'element': " + str(ob['element']) + ", 'offsetSeconds': " + str(ob['offsetSeconds']) + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, "
+        sMapStr = sMapStr[0:-2]
+        sMapStr += "]"
+        
+        self.assertEqual(sMapStr, """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 5.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 5.0}, {'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'offsetSeconds': 4.0, 'endTimeSeconds': 4.0}]""")        
 
 
 
@@ -6705,6 +6740,7 @@ class Test(unittest.TestCase):
             for n in m.notes:
                 targetOffset = n.getOffsetBySite(m)
                 if targetOffset != math.floor(targetOffset):
+                    ## remove all offbeats
                     r = note.Rest(quarterLength=n.quarterLength)
                     m.remove(n)
                     m.insert(targetOffset, r)
@@ -6722,7 +6758,7 @@ class Test(unittest.TestCase):
         <duration>5040</duration>
         <type>eighth</type>
         <stem>up</stem>
-        <beam>begin</beam>
+        <beam number="1">begin</beam>
         <notations/>
       </note>
       <note>
@@ -6748,7 +6784,7 @@ class Test(unittest.TestCase):
         match = match.replace('\n', '')
         raw = raw.replace(' ', '')
         raw = raw.replace('\n', '')
-        self.assertEqual(raw.find(match) > 0, True)
+        self.assertEqual(raw.find(match) > 0, True, (match, raw))
 
 
     def testInvertDiatonicA(self):

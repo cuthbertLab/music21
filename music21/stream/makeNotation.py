@@ -63,7 +63,7 @@ def makeBeams(s, inPlace=False):
     ::
 
         >>> for i in range(0, 4):
-        ...   print i, bMeasure.notes[i].beams
+        ...   print("%d %r" % (i, bMeasure.notes[i].beams))
         0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
         1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
         2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
@@ -432,7 +432,7 @@ def makeMeasures(
     #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
     #offsetMap.sort() not necessary; just get min and max
     if len(offsetMap) > 0:
-        oMax = max([x['endTime'] for x in offsetMap])
+        oMax = max([x.endTime for x in offsetMap])
     else:
         oMax = 0
 
@@ -509,12 +509,7 @@ def makeMeasures(
 
     # populate measures with elements
     for ob in offsetMap:
-        start, end, e, voiceIndex = (
-            ob['offset'],
-            ob['endTime'],
-            ob['element'],
-            ob['voiceIndex'],
-            )
+        e, start, end, voiceIndex = ob
 
         #environLocal.printDebug(['makeMeasures()', start, end, e, voiceIndex])
         # iterate through all measures, finding a measure that

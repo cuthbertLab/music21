@@ -884,7 +884,7 @@ class TestExternal(unittest.TestCase):
         s = stream.Stream()
         s.append(n)
         s.show('lily.png')
-        print s.write('lily.png')
+        print(s.write('lily.png'))
 
 
 if __name__ == '__main__':

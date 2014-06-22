@@ -79,9 +79,19 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
 
 from music21 import metadata, stream, tinyNotation, exceptions21
 from music21.braille import segment
-import itertools
+from music21.ext import six
+
 import re
 import unittest
+
+if six.PY3:
+    unicode = str # @ReservedAssignment
+
+try:
+    from future_builtins import zip
+except ImportError: # not 2.6+ or is 3.x
+    pass
+
 
 #------------------------------------------------------------------------------
 
@@ -100,7 +110,7 @@ def objectToBraille(music21Obj, **keywords):
             :width: 700
 
 
-    >>> print translate.objectToBraille(samplePart)
+    >>> print(translate.objectToBraille(samplePart))
     ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
 
@@ -118,12 +128,12 @@ def objectToBraille(music21Obj, **keywords):
 
     >>> from music21 import note
     >>> sampleNote = note.Note("C3")
-    >>> print translate.objectToBraille(sampleNote)
+    >>> print(translate.objectToBraille(sampleNote))
     ⠸⠹
 
     >>> from music21 import dynamics
     >>> sampleDynamic = dynamics.Dynamic("fff")
-    >>> print translate.objectToBraille(sampleDynamic)
+    >>> print(translate.objectToBraille(sampleDynamic))
     ⠜⠋⠋⠋
     """
     if isinstance(music21Obj, stream.Stream):
@@ -171,7 +181,7 @@ def metadataToString(music21Metadata):
     >>> corelli = corpus.parse("corelli")
     >>> corelli.getElementsByClass('Metadata')[0].__class__
     <class 'music21.metadata.Metadata'>
-    >>> print translate.metadataToString(corelli.getElementsByClass('Metadata')[0])
+    >>> print(translate.metadataToString(corelli.getElementsByClass('Metadata')[0]))
     Movement Name: [Movement 1]
     Movement Number: 1
     Number: 3
@@ -207,10 +217,10 @@ def measureToBraille(music21Measure, **keywords):
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.note.Note C>
         {4.0} <music21.bar.Barline style=final>    
-    >>> print braille.translate.objectToBraille(p)
+    >>> print(braille.translate.objectToBraille(p))
     ⠀⠀⠼⠙⠲⠀⠀
     ⠼⠁⠀⠐⠽⠣⠅
-    >>> print braille.translate.measureToBraille(p.measure(1))
+    >>> print(braille.translate.measureToBraille(p.measure(1)))
     ⠼⠙⠲⠀⠐⠽⠣⠅
     
     """
@@ -260,7 +270,7 @@ def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, **keywo
     rhSegments = segment.findSegments(upperPartToTranscribe, **keywords)
     lhSegments = segment.findSegments(lowerPartToTranscribe, **keywords)
     allBrailleText = []
-    for (rhSegment, lhSegment) in itertools.izip(rhSegments, lhSegments):
+    for (rhSegment, lhSegment) in zip(rhSegments, lhSegments):
         bg = segment.BrailleGrandSegment(rhSegment, lhSegment)
         if not debug:
             allBrailleText.append(bg.transcription)

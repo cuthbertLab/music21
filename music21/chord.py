@@ -147,6 +147,21 @@ class Chord(note.NotRest):
         >>> myChord
         <music21.chord.Chord A4 C#5 E5>
 
+
+    Duration as keyword?
+
+    ::
+
+        >>> d = duration.Duration(2.0)
+        >>> myChord = chord.Chord('A4 C#5 E5', duration=d)
+        >>> myChord
+        <music21.chord.Chord A4 C#5 E5>
+        >>> myChord.duration
+        <music21.duration.Duration 2.0>
+        >>> myChord.duration is myChord[0].duration
+        True
+
+
     '''
 
     ### CLASS VARIABLES ###
@@ -254,7 +269,9 @@ class Chord(note.NotRest):
             del(keywords['duration'])
             quickDuration = False
 
-        if "duration" in keywords or "type" in keywords or \
+        if "duration" in keywords:
+            self.duration = keywords['duration']
+        elif "type" in keywords or \
             "quarterLength" in keywords: #dots dont cut it
             self.duration = duration.Duration(**keywords)
 

@@ -108,10 +108,10 @@ def monophonicStreamFromFile(fileName, useScale=None):
     {0.75} <music21.note.Note D>
     {1.75} <music21.note.Note E>
     {2.75} <music21.note.Note F>
-    {3.75} <music21.note.Note G>
-    {4.75} <music21.note.Note A>
-    {5.75} <music21.note.Note B>
-    {6.75} <music21.note.Note C>
+    {4.25} <music21.note.Note G>
+    {5.25} <music21.note.Note A>
+    {6.25} <music21.note.Note B>
+    {7.25} <music21.note.Note C>
     ...
     '''
     from music21 import audioSearch as audioSearchBase

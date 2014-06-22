@@ -14,6 +14,7 @@ def load_ipython_extension(ip):
     pngFormatter.for_type(music21.ipython21.objects.IPythonPNGObject, returnDataFromIPython21Object)  
     from IPython.display import display, HTML
     display(HTML('''
+     <script src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
      <script>
     require.config(
        { baseUrl: "http://web.mit.edu/music21/music21j/src/",

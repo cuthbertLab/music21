@@ -10,7 +10,6 @@
 #               Project
 # License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
-
 '''
 `music21.base` is what you get in `music21` if you type ``import music21``. It
 contains all the most low-level objects that also appear in the music21 module
@@ -44,6 +43,8 @@ under the module "base":
     <class 'music21.base.Music21Object'>
 
 '''
+from __future__ import print_function
+
 import collections
 import copy
 import doctest
@@ -550,7 +551,9 @@ class Music21Object(object):
 
         >>> q = note.Note()
         >>> q.fullyQualifiedClasses
-        ['music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 'music21.base.Music21Object', '__builtin__.object']
+        ['music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 'music21.base.Music21Object', '...builtin...object']
+        
+        The last one (object) will be different in Py2 (__builtin__.object) and Py3 (builtins.object)
         ''')
 
     #--------------------------------------------------------------------------
@@ -1682,7 +1685,7 @@ class Music21Object(object):
         Stream.
 
         >>> for thisElement in s2:
-        ...     print thisElement.offset
+        ...     thisElement.offset
         30.5
 
         When in doubt, use `.getOffsetBySite(streamObj)`
@@ -2299,7 +2302,7 @@ class Music21Object(object):
         >>> g._notes[1].tie = tie.Tie('start')
         >>> h, i = g.splitAtQuarterLength(2.0)
         >>> for j in range(0,3):
-        ...   print (h._notes[j].tie, i._notes[j].tie)
+        ...   h._notes[j].tie, i._notes[j].tie
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
         (<music21.tie.Tie start>, <music21.tie.Tie continue>)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
@@ -2550,7 +2553,7 @@ class Music21Object(object):
         'eighth'
         >>> d.tie.type
         'start'
-        >>> print e.tie
+        >>> print(e.tie)
         <music21.tie.Tie stop>
 
         Assume c is tied to the next note.  Then the last split note should also be tied
@@ -3072,11 +3075,11 @@ class ElementWrapper(Music21Object):
 
     >>> for j in s.getElementsByClass('ElementWrapper'):
     ...    if j.beatStrength > 0.4:
-    ...        print j.offset, j.beatStrength, j.getnchannels(), j.fileName
-    0.0 1.0 2 thisSound_1.wav
-    3.0 1.0 2 thisSound_16.wav
-    6.0 1.0 2 thisSound_12.wav
-    9.0 1.0 2 thisSound_8.wav
+    ...        (j.offset, j.beatStrength, j.getnchannels(), j.fileName)
+    (0.0, 1.0, 2, 'thisSound_1.wav')
+    (3.0, 1.0, 2, 'thisSound_16.wav')
+    (6.0, 1.0, 2, 'thisSound_12.wav')
+    (9.0, 1.0, 2, 'thisSound_8.wav')
 
     Test representation of an ElementWrapper
 
@@ -3086,7 +3089,7 @@ class ElementWrapper(Music21Object):
     ...     else:
     ...         j.id = str(i) + "_wrapper"
     ...     if i <=2:
-    ...         print j
+    ...         print(j)
     <ElementWrapper id=0_wrapper offset=0.0 obj="<...Wave_read object...">
     <ElementWrapper id=1_wrapper offset=1.0 obj="<...Wave_read object...">
     <ElementWrapper offset=2.0 obj="<...Wave_read object...">
@@ -4269,6 +4272,9 @@ def mainTest(*testClasses, **kwargs):
         if __name__ == '__main__':
             music21.mainTest(Test)
 
+
+    This module tries to fix up some differences between python2 and python3 so
+    that the same doctests can work.
     '''
     #environLocal.printDebug(['mainTest()', testClasses])
 
@@ -4358,7 +4364,7 @@ def mainTest(*testClasses, **kwargs):
             for dtc in s1: # Suite to DocTestCase
                 if hasattr(dtc, '_dt_test'):
                     dt = dtc._dt_test # DocTest
-                    for example in dt.examples:
+                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
                         if example.exc_msg is not None and len(example.exc_msg) > 0:
                             example.exc_msg = "..." + example.exc_msg[1:]
                         elif (example.want is not None and
@@ -4367,7 +4373,18 @@ def mainTest(*testClasses, **kwargs):
                                     # simplistic, since (u'hi', u'bye')
                                     # won't be caught, but saves a lot of anguish
                                 example.want = example.want[1:]
-
+        elif six.PY2: #
+            for dtc in s1: # Suite to DocTestCase
+                if hasattr(dtc, '_dt_test'):
+                    dt = dtc._dt_test # DocTest
+                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
+                        if (example.want is not None and
+                                example.want.startswith('b\'')):
+                                    # probably a unicode example:
+                                    # simplistic, since (b'hi', b'bye')
+                                    # won't be caught, but saves a lot of anguish
+                                example.want = example.want[1:]
+                                    
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity
         unused_testResult = runner.run(s1)

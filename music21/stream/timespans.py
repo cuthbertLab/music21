@@ -650,7 +650,7 @@ class ElementTimespan(object):
 
         ::
 
-            >>> print(timespan_one).part
+            >>> print(timespan_one.part)
             <music21.stream.Part Alto>
 
         ::
@@ -1040,7 +1040,7 @@ class TimespanCollection(object):
 
         >>> bach = corpus.parse('bwv66.6')
         >>> tree = stream.timespans.streamToTimespanCollection(bach)
-        >>> print tree.getVerticalityAt(17.0)
+        >>> print(tree.getVerticalityAt(17.0))
         <Verticality 17.0 {F#3 C#4 A4}>
 
     All offsets are assumed to be relative to the score's origin.
@@ -1838,7 +1838,8 @@ class TimespanCollection(object):
 
     def findPreviousElementTimespanInSameStreamByClass(self, elementTimespan, classList=None):
         r'''
-        Finds next element timespan in the same part as `elementTimespan`.
+        Finds next element timespan in the same Part/Measure, etc. (specify in classList) as 
+        the `elementTimespan`.
 
         ::
 
@@ -2125,7 +2126,7 @@ class TimespanCollection(object):
         ::
 
             >>> for timespan in timespans:
-            ...     print timespan, tree.index(timespan)
+            ...     print("%r %d" % (timespan, tree.index(timespan)))
             ...
             <Timespan 0 2> 0
             <Timespan 0 9> 1
@@ -2200,14 +2201,14 @@ class TimespanCollection(object):
             >>> score = corpus.parse('bwv66.6')
             >>> tree = score.asTimespans()
             >>> for subsequence in tree.iterateConsonanceBoundedVerticalities():
-            ...     print 'Subequence:'
+            ...     print('Subequence:')
             ...     for verticality in subsequence:
-            ...         print '\t[{}] {}: {} [{}]'.format(
+            ...         print('\t[{}] {}: {} [{}]'.format(
             ...             verticality.measureNumber,
             ...             verticality,
             ...             verticality.isConsonant,
             ...             verticality.beatStrength,
-            ...             )
+            ...             ))
             ...
             Subequence:
                 [2] <Verticality 6.0 {E3 E4 G#4 B4}>: True [0.25]
@@ -2265,9 +2266,9 @@ class TimespanCollection(object):
 
         '''
         iterator = self.iterateVerticalities()
-        startingVerticality = iterator.next()
+        startingVerticality = next(iterator)
         while not startingVerticality.isConsonant:
-            startingVerticality = iterator.next()
+            startingVerticality = next(iterator)
         verticalityBuffer = [startingVerticality]
         for verticality in iterator:
             verticalityBuffer.append(verticality)
@@ -2296,7 +2297,7 @@ class TimespanCollection(object):
             >>> tree = score.asTimespans()
             >>> iterator = tree.iterateVerticalities()
             >>> for _ in range(10):
-            ...     iterator.next()
+            ...     next(iterator)
             ...
             <Verticality 0.0 {A3 E4 C#5}>
             <Verticality 0.5 {G#3 B3 E4 B4}>
@@ -2313,7 +2314,7 @@ class TimespanCollection(object):
 
             >>> iterator = tree.iterateVerticalities(reverse=True)
             >>> for _ in range(10):
-            ...     iterator.next()
+            ...     next(iterator)
             ...
             <Verticality 35.0 {F#3 A#3 C#4 F#4}>
             <Verticality 34.5 {B2 B3 D4 E#4}>
@@ -2365,7 +2366,7 @@ class TimespanCollection(object):
             >>> tree = score.asTimespans()
             >>> iterator = tree.iterateVerticalitiesNwise(n=2)
             >>> for _ in range(4):
-            ...     print iterator.next()
+            ...     print(next(iterator))
             ...
             <VerticalitySequence: [
                 <Verticality 0.0 {A3 E4 C#5}>,
@@ -2390,7 +2391,7 @@ class TimespanCollection(object):
 
             >>> iterator = tree.iterateVerticalitiesNwise(n=2, reverse=True)
             >>> for _ in range(4):
-            ...     print iterator.next()
+            ...     print(next(iterator))
             ...
             <VerticalitySequence: [
                 <Verticality 34.5 {B2 B3 D4 E#4}>,
@@ -2502,12 +2503,12 @@ class TimespanCollection(object):
 
             >>> tree.splitAt(0.1)
             >>> for elementTimespan in tree.findTimespansStartingAt(0.1):
-            ...     elementTimespan, elementTimespan.part.id
+            ...     print("%r, %s" % (elementTimespan, elementTimespan.part.id))
             ...
-            (<ElementTimespan (0.1 to 0.5) <music21.note.Note C#>>, u'Soprano')
-            (<ElementTimespan (0.1 to 1.0) <music21.note.Note E>>, u'Alto')
-            (<ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, u'Tenor')
-            (<ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, u'Bass')
+            <ElementTimespan (0.1 to 0.5) <music21.note.Note C#>>, Soprano
+            <ElementTimespan (0.1 to 1.0) <music21.note.Note E>>, Alto
+            <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, Tenor
+            <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, Bass
 
         ::
 
@@ -2547,15 +2548,15 @@ class TimespanCollection(object):
             >>> score = corpus.parse('bwv66.6')
             >>> tree = score.asTimespans()
             >>> iterator = tree.iterateVerticalitiesNwise()
-            >>> verticalities = iterator.next()
+            >>> verticalities = next(iterator)
             >>> unwrapped = tree.unwrapVerticalities(verticalities)
             >>> for part in sorted(unwrapped,
             ...     key=lambda x: x.getInstrument().partName,
             ...     ):
-            ...     print part
+            ...     print(part)
             ...     horizontality = unwrapped[part]
             ...     for timespan in horizontality:
-            ...         print '\t', timespan
+            ...         print('\t%r' % timespan)
             ...
             <music21.stream.Part Alto>
                 <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>

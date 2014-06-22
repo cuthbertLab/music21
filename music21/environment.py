@@ -22,8 +22,6 @@ and other settings.
 Additional documentation for and examples of using this module are found in
 :ref:`environment`.
 '''
-
-
 import os
 import sys
 import tempfile
@@ -34,6 +32,8 @@ from xml.sax import saxutils
 from music21 import exceptions21
 from music21 import common
 from music21 import xmlnode
+from music21.ext import six
+
 
 _MOD = 'environment.py'
 
@@ -97,6 +97,15 @@ class Preference(xmlnode.XMLNode):
         self._attr['name'] = None
         self._attr['value'] = None
 
+#     def loadAttrs(self, attrs):
+#         # thought that this would solve a bytes problem for Python3, but nope...
+#         try:
+#             x = attrs.getValue('value')
+#             print(repr(x), type(x))
+#         except KeyError:
+#             pass
+#         return xmlnode.XMLNode.loadAttrs(self, attrs)
+
 
 class LocalCorpusSettings(xmlnode.XMLNodeList):
     '''
@@ -139,7 +148,7 @@ class LocalCorporaSettings(xmlnode.XMLNodeList):
         >>> localCorpora.append(corpusA)
         >>> localCorpora.append(corpusB)
         >>> print(localCorpora.xmlStr())
-        <?xml version="1.0" encoding="utf-8"?>
+        <?xml version="1.0" ...?>
         <localCorporaSettings>
           <localCorpusSettings name="A">
             <localCorpusPath>foo</localCorpusPath>
@@ -179,12 +188,11 @@ class LocalCorpusPath(xmlnode.XMLNode):
         >>> lcp.charData = 'testing'
         >>> lcs.append(lcp)
         >>> print(lcs.xmlStr())
-        <?xml version="1.0" encoding="utf-8"?>
+        <?xml version="1.0" ...?>
         <localCorpusSettings>
         <localCorpusPath>testing</localCorpusPath>
         </localCorpusSettings>
         <BLANKLINE>
-
     '''
 
     ### INITIALIZER ###
@@ -321,6 +329,9 @@ class _EnvironmentCore(object):
         if key not in self._ref:
             raise EnvironmentException('no preference: %s' % key)
         value = self._ref[key]
+        if six.PY3 and isinstance(value, bytes):
+            value = value.decode(errors='replace')
+        
         valueStr = str(value).lower()
 
         if key in ['debug']:  # debug expects a number
@@ -352,6 +363,9 @@ class _EnvironmentCore(object):
         # saxutils.escape(msg).encode('UTF-8')
 
         # add local corpus path as a key
+        if six.PY3 and isinstance(value, bytes):
+            value = value.decode(errors='replace')
+            
         if key not in self._ref:
             if key != 'localCorpusPath':
                 raise EnvironmentException('no preference: %s' % key)
@@ -389,6 +403,7 @@ class _EnvironmentCore(object):
         # set value
         if key == 'localCorpusPath':
             # only add if unique
+            value = xmlnode.fixBytes(value)
             if value not in self._ref['localCorpusSettings']:
                 # check for malicious values here
                 self._ref['localCorpusSettings'].append(value)
@@ -520,6 +535,7 @@ class _EnvironmentCore(object):
             if key == 'localCorpusSettings':
                 localCorpusSettings = LocalCorpusSettings()
                 for filePath in sorted(value):
+                    filePath = xmlnode.fixBytes(filePath)
                     localCorpusPath = LocalCorpusPath(path=filePath)
                     localCorpusSettings.append(localCorpusPath)
                 settings.append(localCorpusSettings)
@@ -528,6 +544,7 @@ class _EnvironmentCore(object):
                 for name, paths in sorted(value.items()):
                     localCorpusSettings = LocalCorpusSettings(name=name)
                     for path in sorted(paths):
+                        path = xmlnode.fixBytes(path)
                         localCorpusPath = LocalCorpusPath(path=path)
                         localCorpusSettings.append(localCorpusPath)
                     localCorporaSettings.append(localCorpusSettings)
@@ -535,6 +552,7 @@ class _EnvironmentCore(object):
             else:
                 slot = Preference()
                 slot.set('name', key)
+                value = xmlnode.fixBytes(value)
                 slot.set('value', value)
                 settings.append(slot)
         return settings
@@ -681,7 +699,7 @@ class _EnvironmentCore(object):
         return filePath
 
     def keys(self):
-        return self._ref.keys() + ['localCorpusPath']
+        return list(self._ref.keys()) + ['localCorpusPath']
 
     def formatToKey(self, m21Format):
         '''
@@ -806,7 +824,13 @@ class _EnvironmentCore(object):
         saxparser.setFeature(xml.sax.handler.feature_namespaces, 0)
         h = SettingsHandler()
         saxparser.setContentHandler(h)
-        with open(filePath, 'r') as f:
+#         if six.PY2:
+#             openStyle = 'r'
+#         else:
+#             openStyle = 'rt'
+#         
+        openStyle = 'r'
+        with open(filePath, openStyle) as f:
             saxparser.parse(f)
         # load from XML into dictionary
         # updates self._ref in place
@@ -899,7 +923,7 @@ class Environment(object):
             >>> myEnv = environment.Environment()
             >>> post = myEnv['writeFormat']
             >>> #_DOCS_SHOW post
-            >>> print "\'musicxml\'" #_DOCS_HIDE
+            >>> print("\'musicxml\'") #_DOCS_HIDE
             'musicxml'
 
         '''
@@ -1068,7 +1092,7 @@ class Environment(object):
 
         >>> from music21 import environment
         >>> e = environment.Environment()
-        >>> for x in sorted(e.keys()):
+        >>> for x in sorted(list(e.keys())):
         ...     x
         ...
         'autoDownload'
@@ -1525,8 +1549,12 @@ class Test(unittest.TestCase):
             slot.set('name', 'name%s' % i)
             slot.set('value', i)
             storage.append(slot)
-
-        self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
+        xstr = storage.xmlStr()
+        if 'encoding' in xstr:
+            enc = 'encoding="utf-8"'
+        else:
+            enc = ''
+        self.assertEqual("""<?xml version="1.0" """ + enc + """?>
 <settings>
   <preference name="name0" value="0"/>
   <preference name="name1" value="1"/>
@@ -1539,7 +1567,7 @@ class Test(unittest.TestCase):
   <preference name="name8" value="8"/>
   <preference name="name9" value="9"/>
 </settings>
-""", storage.xmlStr())
+""", xstr)
 
     def testToSettings(self):
 
@@ -1547,7 +1575,11 @@ class Test(unittest.TestCase):
         match = _environStorage['instance']._toSettings(
             _environStorage['instance']._ref).xmlStr()
         self.maxDiff = None
-        self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
+        if 'encoding' in match:
+            enc = 'encoding="utf-8"'
+        else:
+            enc = ''
+        canonic = """<?xml version="1.0" """ + enc + """?>
 <settings>
   <preference name="autoDownload" value="ask"/>
   <preference name="braillePath"/>
@@ -1571,14 +1603,19 @@ class Test(unittest.TestCase):
   <preference name="warnings" value="1"/>
   <preference name="writeFormat" value="musicxml"/>
 </settings>
-""".split('\n'), match.split('\n'))
+"""
+        self.assertEqual(canonic.split('\n'), match.split('\n'))
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = ['a', 'b', 'c']
         env['localCorporaSettings']['foo'] = ['bar', 'baz', 'quux']
         match = _environStorage['instance']._toSettings(
             _environStorage['instance']._ref).xmlStr()
-        self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
+        if 'encoding' in match:
+            enc = 'encoding="utf-8"'
+        else:
+            enc = ''
+        canonic = """<?xml version="1.0" """ + enc + """?>
 <settings>
   <preference name="autoDownload" value="ask"/>
   <preference name="braillePath"/>
@@ -1612,7 +1649,8 @@ class Test(unittest.TestCase):
   <preference name="warnings" value="1"/>
   <preference name="writeFormat" value="musicxml"/>
 </settings>
-""".split('\n'), match.split('\n'))
+"""
+        self.assertEqual(canonic.split('\n'), match.split('\n'))
 
     def testFromSettings(self):
 
@@ -1630,7 +1668,11 @@ class Test(unittest.TestCase):
         # get xml strings
         match = _environStorage['instance']._toSettings(
             _environStorage['instance']._ref).xmlStr()
-        self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
+        if 'encoding' in match:
+            enc = 'encoding="utf-8"'
+        else:
+            enc = ''
+        canonic = """<?xml version="1.0" """ + enc + """?>
 <settings>
   <preference name="autoDownload" value="ask"/>
   <preference name="braillePath"/>
@@ -1658,7 +1700,8 @@ class Test(unittest.TestCase):
   <preference name="warnings" value="1"/>
   <preference name="writeFormat" value="musicxml"/>
 </settings>
-""".split(), match.split())
+"""
+        self.assertEqual(canonic.split(), match.split())
 
     def testEnvironmentA(self):
         env = Environment(forcePlatform='darwin')

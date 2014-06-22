@@ -641,10 +641,17 @@ class Trigram(object):
 
     def __init__(self, excerptList = None):
         self.lut = {}
+        self._length = None
         if excerptList is not None:
             self.parseExcerpt(excerptList)
 
-    
+    @property
+    def length(self):
+        if self._length is None:
+            return self.measure()
+        else:
+            return self._length
+        
     def parseExcerpt(self, excerpt):
         pair = u'  '
         if isinstance(excerpt, list):
@@ -670,7 +677,7 @@ class Trigram(object):
         total = 0
         for y in self.lut.values():
             total += sum([ x * x for x in y.values() ])
-        self.length = total ** 0.5
+        self._length = total ** 0.5
 
     def similarity(self, other):
         """
@@ -771,7 +778,8 @@ class Test(unittest.TestCase):
         #print ld.trigrams['fr'] - ld.trigrams['de'] 
         #print ld.trigrams['fr'] - ld.trigrams['cn'] 
         
-        self.assertTrue(0.50 < ld.trigrams['fr'] - ld.trigrams['it'] < 0.55)
+        diffFrIt = ld.trigrams['fr'] - ld.trigrams['it']
+        self.assertTrue(0.50 < diffFrIt < 0.55)
         self.assertTrue(0.67 < ld.trigrams['fr'] - ld.trigrams['de'] < 0.70)
         self.assertTrue(0.99 < ld.trigrams['fr'] - ld.trigrams['cn'] < 1.0)
         

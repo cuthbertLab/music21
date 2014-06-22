@@ -81,7 +81,7 @@ class DiscreteAnalysis(object):
         '''
         value = value.lstrip('#')
         lv = len(value)
-        return list(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
+        return list(int(value[i:i+lv//3], 16) for i in range(0, lv, lv//3))
 
     def _rgbLimit(self, value):
         '''Utility conversion method    
@@ -1072,11 +1072,11 @@ class Ambitus(DiscreteAnalysis):
             colors[i] = self._pitchSpanColors[i]  
 
         # keys here are solutions, not colors
-        keys = colors.keys()
+        keys = list(colors.keys())
         keys.sort()
 
-        keysTopRow = keys[:(len(keys)/2)]
-        keysBottomRow = keys[(len(keys)/2):]
+        keysTopRow = keys[:(len(keys)//2)]
+        keysBottomRow = keys[(len(keys)//2):]
 
         # split keys into two groups for two rows (optional)
         for keyGroup in [keysTopRow, keysBottomRow]:
@@ -1182,7 +1182,8 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         '''
         Find all unique melodic intervals in this Stream. 
 
-        If `found` is provided as a dictionary, this dictionary will be used to store Intervals, and counts of Intervals already found will be incremented.
+        If `found` is provided as a dictionary, this dictionary will be used to store Intervals, 
+        and counts of Intervals already found will be incremented.
         '''
         # note that Stream.findConsecutiveNotes() and Stream.melodicIntervals()
         # offer similar approaches, but return Streams and manage offsets and durations, components not needed here
@@ -1383,8 +1384,10 @@ class Test(unittest.TestCase):
         s.append(note.Note('g4'))
 
         mid = MelodicIntervalDiversity()
-        self.assertEqual(str(mid.countMelodicIntervals(s)), "{'m7': [<music21.interval.Interval m7>, 1], 'm2': [<music21.interval.Interval m2>, 1]}")
-
+        midDict = mid.countMelodicIntervals(s)
+        self.assertEqual(str(midDict['m7']), "[<music21.interval.Interval m7>, 1]")
+        self.assertEqual(str(midDict['m2']), "[<music21.interval.Interval m2>, 1]")
+        self.assertEqual(len(midDict), 2)
 
         s = stream.Stream()
         s.append(note.Note('c3'))
@@ -1393,17 +1396,35 @@ class Test(unittest.TestCase):
         s.append(note.Note('d3'))
 
         mid = MelodicIntervalDiversity()
-        self.assertEqual(str(mid.countMelodicIntervals(s)), "{'M2': [<music21.interval.Interval M2>, 3]}")
+        midDict = mid.countMelodicIntervals(s)
+        self.assertEqual(len(midDict), 1)
+        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 3]")
 
-        self.assertEqual(str(mid.countMelodicIntervals(s, ignoreDirection=False)), """{'M-2': [<music21.interval.Interval M-2>, 1], 'M2': [<music21.interval.Interval M2>, 2]}""")
+        midDict = mid.countMelodicIntervals(s, ignoreDirection=False)
+        self.assertEqual(len(midDict), 2)
+        self.assertEqual(str(midDict['M-2']), "[<music21.interval.Interval M-2>, 1]")
+        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 2]")
 
         mid = MelodicIntervalDiversity()
         s = corpus.parse('hwv56', '1-08')
         #s.show()
 
-        self.assertEqual(str(mid.countMelodicIntervals(s.parts[1])), "{'P5': [<music21.interval.Interval P5>, 1], 'P4': [<music21.interval.Interval P4>, 1], 'm3': [<music21.interval.Interval m3>, 1], 'M2': [<music21.interval.Interval M2>, 2]}")
+        midDict = mid.countMelodicIntervals(s.parts[1])
+        self.assertEqual(len(midDict), 4)
+        self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 1]")
+        self.assertEqual(str(midDict['P4']), "[<music21.interval.Interval P4>, 1]")       
+        self.assertEqual(str(midDict['m3']), "[<music21.interval.Interval m3>, 1]")
+        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 2]")       
+       
 
-        self.assertEqual(str(mid.countMelodicIntervals(s)), "{'M3': [<music21.interval.Interval M3>, 1], 'P4': [<music21.interval.Interval P4>, 5], 'P5': [<music21.interval.Interval P5>, 2], 'M2': [<music21.interval.Interval M2>, 8], 'm3': [<music21.interval.Interval m3>, 3], 'm2': [<music21.interval.Interval m2>, 1]}")
+        midDict = mid.countMelodicIntervals(s)
+        self.assertEqual(len(midDict), 6)
+        self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 2]")
+        self.assertEqual(str(midDict['P4']), "[<music21.interval.Interval P4>, 5]")       
+        self.assertEqual(str(midDict['M3']), "[<music21.interval.Interval M3>, 1]")
+        self.assertEqual(str(midDict['m3']), "[<music21.interval.Interval m3>, 3]")
+        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 8]")       
+        self.assertEqual(str(midDict['m2']), "[<music21.interval.Interval m2>, 1]")       
         
 
     def testKeyAnalysisSpelling(self):
@@ -1428,7 +1449,7 @@ class Test(unittest.TestCase):
         post = [k.tonic, k.mode, k.correlationCoefficient]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'major')
-        self.assertEqual(str(post[2]), '0.812100774572')
+        self.assertEqual(str(post[2])[0:7], '0.81210')
 
         p = KrumhanslKessler()
         k = p.getSolution(s)

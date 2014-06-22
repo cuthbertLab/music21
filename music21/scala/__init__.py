@@ -118,7 +118,7 @@ class ScalaPitch(object):
 
     
     >>> sp = scala.ScalaPitch(' 1066.667 cents')
-    >>> print sp.parse()
+    >>> print(sp.parse())
     1066.667
 
     >>> sp = scala.ScalaPitch(' 2/1')

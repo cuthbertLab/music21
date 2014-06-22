@@ -11,9 +11,13 @@ import unittest
 
 from music21.braille import lookup
 from music21 import exceptions21
+from music21.ext import six
 
 symbols = lookup.symbols
 binary_dots = lookup.binary_dots
+
+if six.PY3:
+    unicode = str # @ReservedAssignment
 
 class BrailleText():
     """

@@ -911,10 +911,16 @@ class StreamThawer(StreamFreezeThawBase):
     def parseOpenFmt(self, storage):
         '''Look at the file and determine the format
         '''
-        if storage.startswith(b'{"'): # was m21Version": {"py/tuple" but order of dict may change
-            return 'jsonpickle'
-        else:
-            return 'pickle'
+        if (six.PY3 and isinstance(storage, bytes)):
+            if storage.startswith(b'{"'): # was m21Version": {"py/tuple" but order of dict may change
+                return 'jsonpickle'
+            else:
+                return 'pickle'
+        else:            
+            if storage.startswith('{"'): # was m21Version": {"py/tuple" but order of dict may change
+                return 'jsonpickle'
+            else:
+                return 'pickle'
 
     def open(self, fp, zipType=None):
         '''

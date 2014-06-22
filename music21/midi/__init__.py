@@ -17,7 +17,7 @@ __all__ = ['translate', 'realtime', 'percussion']
 import sys
 from music21.midi import realtime
 from music21.midi import percussion
-from music21.ext.six import StringIO
+from music21.ext import six
 
 '''
 Objects and tools for processing MIDI data.  Converts from MIDI files to
@@ -111,16 +111,15 @@ def intsToHexString(intList):
 def getNumber(midiStr, length): 
     '''
     Return the value of a string byte or bytes if length > 1
-    from an 8-bit string. 
+    from an 8-bit string or (PY3) bytes object
     
-    Then, return the remaining string.
+    Then, return the remaining string or bytes object
 
     The `length` is the number of chars to read. 
     This will sum a length greater than 1 if desired.
 
     Note that MIDI uses big-endian for everything.
     This is the inverse of Python's chr() function.
-
     
     >>> midi.getNumber('test', 0)
     (0, 'test')
@@ -130,9 +129,19 @@ def getNumber(midiStr, length):
     (1952805748, '')
     '''
     summation = 0 
-    for i in range(length): 
-        summation = (summation << 8) + ord(midiStr[i]) 
-    return summation, midiStr[length:] 
+    if not common.isNum(midiStr):
+        for i in range(length): 
+            midiStrOrNum = midiStr[i]
+            if common.isNum(midiStrOrNum):
+                summation = (summation << 8) + midiStrOrNum 
+            else:
+                summation = (summation << 8) + ord(midiStrOrNum) 
+        return summation, midiStr[length:] 
+    else:  # midiStr is a number...
+        midNum = midiStr
+        summation = midNum - (( midNum >> (8*length)) << (8*length))
+        bigBytes = midNum - summation
+        return summation, bigBytes
 
 def getVariableLengthNumber(midiStr): 
     r'''
@@ -143,7 +152,7 @@ def getVariableLengthNumber(midiStr):
     After finding the appropriate termination, 
     return the remaining string.
 
-    This necessary as DeltaTime times are given with variable size, 
+    This is necessary as DeltaTime times are given with variable size, 
     and thus may be if different numbers of characters are used.
 
     
@@ -184,14 +193,18 @@ def getVariableLengthNumber(midiStr):
     # http://253.ccarh.org/handout/vlv/
     summation = 0 
     i = 0 
-    while True: 
-        x = ord(midiStr[i]) 
+    while i < 999: # should return eventually... was while True
+        if common.isNum(midiStr[i]):
+            x = midiStr[i]
+        else:
+            x = ord(midiStr[i]) 
         #environLocal.printDebug(['getVariableLengthNumber: examined char:', charToBinary(midiStr[i])])
         summation = (summation << 7) + (x & 0x7F) 
         i += 1 
         if not (x & 0x80): 
             #environLocal.printDebug(['getVariableLengthNumber: depth read into string: %s' % i])
             return summation, midiStr[i:] 
+    raise MidiException('did not find the end of the number!')
 
 def getNumbersAsList(midiStr):
     '''
@@ -205,40 +218,53 @@ def getNumbersAsList(midiStr):
     '''
     post = []
     for i in range(len(midiStr)):
-        post.append(ord(midiStr[i]))
+        if common.isNum(midiStr[i]):
+            post.append(midiStr[i])
+        else:
+            post.append(ord(midiStr[i]))
     return post
 
 def putNumber(num, length): 
     '''
     Put a single number as a hex number at the end of a string `length` bytes long.
     
-    
     >>> midi.putNumber(3, 4)
-    '\\x00\\x00\\x00\\x03'
+    b'\\x00\\x00\\x00\\x03'
     >>> midi.putNumber(0, 1)
-    '\\x00'
+    b'\\x00'
     '''
-    lst = [] 
+    if six.PY2:
+        lst = [] 
+    else:
+        lst = bytearray()
+    
     for i in range(length): 
         n = 8 * (length - 1 - i) 
-        lst.append(chr((num >> n) & 0xFF)) 
-    return string.join(lst, "") 
+        thisNum = (num >> n) & 0xFF
+        if six.PY2:
+            lst.append(chr(thisNum)) 
+        else:
+            lst.append(thisNum)
+    
+    if six.PY2:
+        return string.join(lst, "") 
+    else:
+        return bytes(lst)
 
 def putVariableLengthNumber(x): 
     '''
-    
     >>> midi.putVariableLengthNumber(4)
-    '\\x04'
+    b'\\x04'
     >>> midi.putVariableLengthNumber(127)
-    '\\x7f'
+    b'\\x7f'
     >>> midi.putVariableLengthNumber(0)
-    '\\x00'
+    b'\\x00'
     >>> midi.putVariableLengthNumber(1024)
-    '\\x88\\x00'
+    b'\\x88\\x00'
     >>> midi.putVariableLengthNumber(8192)
-    '\\xc0\\x00'
+    b'\\xc0\\x00'
     >>> midi.putVariableLengthNumber(16383)
-    '\\xff\\x7f'
+    b'\\xff\\x7f'
 
     >>> midi.putVariableLengthNumber(-1)
     Traceback (most recent call last):
@@ -248,15 +274,25 @@ def putVariableLengthNumber(x):
     # note: negative numbers will cause an infinite loop here
     if x < 0:
         raise MidiException('cannot putVariableLengthNumber() when number is negative: %s' % x)
-    lst = [ ] 
+    if six.PY2:
+        lst = [] 
+    else:
+        lst = bytearray()
     while True: 
         y, x = x & 0x7F, x >> 7 
-        lst.append(chr(y + 0x80)) 
+        if six.PY2:
+            lst.append(chr(y + 0x80)) 
+        else:
+            lst.append(y + 0x80)
         if x == 0: 
             break 
     lst.reverse() 
-    lst[-1] = chr(ord(lst[-1]) & 0x7f) 
-    return string.join(lst, "") 
+    if six.PY2:
+        lst[-1] = chr(ord(lst[-1]) & 0x7f) 
+        return string.join(lst, "") 
+    else:
+        lst[-1] = lst[-1] & 0x7f 
+        return bytes(lst)
 
 def putNumbersAsList(numList):
     '''
@@ -326,16 +362,16 @@ class Enumeration(object):
         if attr in self.lookup:
             return True
         return False
-        #return self.lookup.has_key(attr) 
+        #return attr in self.lookup
 
     def hasValue(self, attr): 
         if attr in self.reverseLookup:
             return True
         return False
-        #return self.reverseLookup.has_key(attr) 
+        #return attr in self.reverseLookup
 
     def __getattr__(self, attr): 
-        if not self.lookup.has_key(attr): 
+        if attr not in self.lookup: 
             raise AttributeError 
         return self.lookup[attr] 
 
@@ -597,10 +633,19 @@ class MidiEvent(object):
         '''
         # x, y, and z define characteristics of the first two chars
         # for x: The left nybble (4 bits) contains the actual command, and the right nibble contains the midi channel number on which the command will be executed.
-        x = ord(midiStr[0]) # return the char number
+        if common.isNum(midiStr[0]):
+            x = midiStr[0]
+        else:
+            x = ord(midiStr[0])  # given a string representation, get decimal number
         y = x & 0xF0  # bitwise and to derive channel number
-        z = ord(midiStr[1])
-        thirdByte = midiStr[2] 
+        if common.isNum(midiStr[1]):
+            z = midiStr[1]
+        else:
+            z = ord(midiStr[1])  # given a string representation, get decimal number
+        if common.isNum(midiStr[2]):
+            thirdByte = midiStr[2]
+        else:
+            thirdByte = ord(midiStr[2])  # given a string representation, get decimal number
 
         self.channel = (x & 0x0F) + 1  # this is same as y + 1
         self.type = channelVoiceMessages.whatis(y) 
@@ -613,12 +658,12 @@ class MidiEvent(object):
             # for now, do nothing with this data
             # for a note, str[2] is velocity; here, it is the control value
             self.pitch = z # this is the controller id
-            self.velocity = ord(thirdByte) # this is the controller value
+            self.velocity = thirdByte # this is the controller value
             return midiStr[3:] 
         else: 
             self.pitch = z # the second byte
             # read the third chart toi get velocity 
-            self.velocity = ord(thirdByte) 
+            self.velocity = thirdByte
             # each MidiChannel object is accessed here
             # using that channel, data for each event is added or 
             # removed 
@@ -654,7 +699,10 @@ class MidiEvent(object):
 
         # x, y, and z define characteristics of the first two chars
         # for x: The left nybble (4 bits) contains the actual command, and the right nibble contains the midi channel number on which the command will be executed.
-        x = ord(midiStr[0]) # given a string representation, get decimal number
+        if common.isNum(midiStr[0]):
+            x = midiStr[0]
+        else:
+            x = ord(midiStr[0])  # given a string representation, get decimal number
 
         # detect running status: if the status byte is less than 128, its 
         # not a status byte, but a data byte
@@ -663,20 +711,32 @@ class MidiEvent(object):
 
             if self.lastStatusByte is not None:
                 rsb = self.lastStatusByte
+                if common.isNum(rsb):
+                    rsb = bytes([rsb])
             else: # provide a default
-                rsb = chr(0x90)
+                if six.PY3:
+                    rsb = bytes([0x90])
+                else:
+                    rsb = chr(0x90)
             #post = self._parseChannelVoiceMessage(str, runningStatusByte=rsb)
             #return post
             # add the running status byte to the front of the string 
             # and process as before
             midiStr = rsb + midiStr
-            x = ord(midiStr[0]) # given a string representation, get decimal number
+            if common.isNum(midiStr[0]):
+                x = midiStr[0]
+            else:
+                x = ord(midiStr[0]) # given a string representation, get decimal number
         else:
             # store last status byte
             self.lastStatusByte = midiStr[0]
 
         y = x & 0xF0  # bitwise and to derive message type
-        z = ord(midiStr[1]) 
+
+        if common.isNum(midiStr[1]):
+            z = midiStr[1]
+        else:
+            z = ord(midiStr[1])  # given a string representation, get decimal number
 
         #environLocal.printDebug(['MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:', 'repr(x)', repr(x), 'charToBinary(str[0])', charToBinary(str[0]), 'charToBinary(str[1])', charToBinary(str[1])])
 
@@ -760,7 +820,7 @@ class MidiEvent(object):
                  chr(self.data)) 
             return x 
 
-        elif sysex_event_dict.has_key(self.type): 
+        elif self.type in sysex_event_dict: 
             s = chr(sysex_event_dict[self.type]) 
             s = s + putVariableLengthNumber(len(self.data)) 
             return s + self.data 
@@ -960,7 +1020,7 @@ class MidiTrack(object):
         '''
         time = 0 # a running counter of ticks
 
-        if not midiStr[:4] == "MTrk":
+        if not midiStr[:4] == b"MTrk":
             raise MidiException('badly formed midi string: missing leading MTrk')
         # get the 4 chars after the MTrk encoding
         length, midiStr = getNumber(midiStr[4:], 4)      
@@ -1011,15 +1071,23 @@ class MidiTrack(object):
         # set time to the first event
         # time = self.events[0].time 
         # build str using MidiEvents 
-        midiStr = ""
+        midiStr = b""
         for e in self.events: 
             # this writes both delta time and message events
             try:
                 ew = e.write()
+                if six.PY3:
+                    intArray = []
+                    for x in ew:
+                        if common.isNum(x):
+                            intArray.append(x)
+                        else:
+                            intArray.append(ord(x))
+                    ew = bytes(bytearray(intArray)) 
                 midiStr = midiStr + ew
             except MidiException as me:
                 environLocal.warn("Conversion error for %s: %s; ignored." % (e, me))
-        return "MTrk" + putNumber(len(midiStr), 4) + midiStr
+        return b"MTrk" + putNumber(len(midiStr), 4) + midiStr
     
     def __repr__(self): 
         r = "<MidiTrack %d -- %d events\n" % (self.index, len(self.events)) 
@@ -1133,7 +1201,7 @@ class MidiFile(object):
         data in `.ticksPerQuarterNote` and a list of
         `MidiTrack` objects in the attribute `.tracks`. 
         '''
-        if not midiStr[:4] == "MThd":
+        if not midiStr[:4] == b"MThd":
             raise MidiException('badly formated midi string, got: %s' % midiStr[:20])
 
         # we step through the str src, chopping off characters as we go
@@ -1196,7 +1264,7 @@ class MidiFile(object):
         # Don't handle ticksPerSecond yet, too confusing 
         if (division & 0x8000) != 0:
             raise MidiException('Cannot write midi string unless self.ticksPerQuarterNote is a multiple of 1024')
-        midiStr = "MThd" + putNumber(6, 4) + putNumber(self.format, 2) 
+        midiStr = b"MThd" + putNumber(6, 4) + putNumber(self.format, 2) 
         midiStr = midiStr + putNumber(len(self.tracks), 2) 
         midiStr = midiStr + putNumber(division, 2) 
         return midiStr
@@ -1259,7 +1327,7 @@ class Test(unittest.TestCase):
         #self.assertEqual(mf.writestr(), None)
 
         # try to write contents
-        fileLikeOpen = StringIO()
+        fileLikeOpen = six.StringIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1278,7 +1346,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = StringIO()
+        fileLikeOpen = six.StringIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1297,7 +1365,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = StringIO()
+        fileLikeOpen = six.StringIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1315,7 +1383,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = StringIO()
+        fileLikeOpen = six.StringIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1422,7 +1490,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
         
-        fileLikeOpen = StringIO()
+        fileLikeOpen = six.StringIO()
         #mf.open('/src/music21/music21/midi/out.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()
@@ -1509,7 +1577,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
         
-        fileLikeOpen = StringIO()
+        fileLikeOpen = six.StringIO()
         #mf.open('/_scratch/test.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()

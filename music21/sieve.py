@@ -113,9 +113,9 @@ def eratosthenes(firstCandidate = 2):
 
     
     >>> a = sieve.eratosthenes()
-    >>> a.next()
+    >>> next(a)
     2
-    >>> a.next()
+    >>> next(a)
     3
 
 
@@ -124,9 +124,9 @@ def eratosthenes(firstCandidate = 2):
 
 
     >>> a = sieve.eratosthenes(95)
-    >>> a.next()
+    >>> next(a)
     97
-    >>> a.next()
+    >>> next(a)
     101
     """
     D = {}  # map composite integers to primes witnessing their compositeness
@@ -567,7 +567,7 @@ class Residual(object):
         # is an actual range and not start/end points b/c when producing a not (-)
         # it is easy to remove the mod,n from the range
         if z == None: # supply default if necessary
-            z = range(0, 100) 
+            z = list(range(0, 100))
         self._z = z
         #print 'residual init self._z', self._z
         self._m = m
@@ -591,7 +591,7 @@ class Residual(object):
         """z is the range of integers to use when generating a list
         convenience functiont that fixes max
         """
-        self._z = range(minInt, maxInt+1)
+        self._z = list(range(minInt, maxInt+1))
 
     def setSegmentFormat(self, fmt):
         #fmt = drawer.strScrub(fmt, 'l')
@@ -737,7 +737,18 @@ class Residual(object):
                         return -1
                     else: return 1
                 else: return 0
-            
+    
+    def __lt__(self, other):
+        if self.__cmp__(other) == -1:
+            return True
+        else:
+            return False        
+
+    def __gt__(self, other):
+        if self.__cmp__(other) == 1:
+            return True
+        else:
+            return False        
 
     def __neg__(self):
         """unary neg operators; return neg object"""
@@ -782,8 +793,8 @@ class Residual(object):
         find m,n such that the intersection of two Residual's can 
         be reduced to one Residual Xenakis p 273"""
         d = _gcd(m1, m2)
-        c1 = m1 / d # not sure if we need floats here
-        c2 = m2 / d
+        c1 = m1 // d # not sure if we need floats here
+        c2 = m2 // d
         n3 = 0
         m3 = 0
         if m1 != 0 and m2 != 0:
@@ -868,7 +879,7 @@ class CompressionSegment(object):
         # z is range from max to min, unless provided at init     
         else: # range from min, max; add 1 for range() to max
             zMin, zMax = self._match[0], self._match[-1] 
-            self._z = range(zMin, (zMax + 1)) 
+            self._z = list(range(zMin, (zMax + 1)))
 
     #---------------------------------------------------------------------------
     def __call__(self):
@@ -995,7 +1006,7 @@ class Sieve(object):
         """
         # note: this z should only be used if usrStr is a str, and not a list
         if z is None and common.isStr(usrStr):
-            z = range(0, 100)
+            z = list(range(0, 100))
         elif z is None and common.isListLike(usrStr): # if a list
             pass
         self._z = z # may be none; will be handled in self._load
@@ -1120,7 +1131,7 @@ class Sieve(object):
         Set the z as a min and max value. The z is the range of 
         integers to use when generating a sieve segment.
         """
-        self._z = range(minInt, maxInt+1)
+        self._z = list(range(minInt, maxInt+1))
 
     def setSegmentFormat(self, fmt):
         #fmt = drawer.strScrub(fmt, 'l')
@@ -1352,7 +1363,7 @@ class Sieve(object):
             z = self._z 
         # z is valid, gets default from residual class
         if not common.isListLike(z) and z != None:
-            raise SieveException('z must be a list of integers.')
+            raise SieveException('z must be a list of integers, not %r' % z)
         valList = self._resLib[resId](n, z) # call residual object
         return self._setInstantiateStr(valList)
 
@@ -1658,9 +1669,9 @@ class Sieve(object):
 
             # must collect non width formats as integer values; then convert
             if segmentFormat in ['wid', 'width']:
-                segmentPartial = self.segment(self._state, n, range(zMin, zMax), segmentFormat)
+                segmentPartial = self.segment(self._state, n, list(range(zMin, zMax)), segmentFormat)
             else: # if a unit, need to start with integers
-                segmentPartial = self.segment(self._state, n, range(zMin, zMax), 'int')
+                segmentPartial = self.segment(self._state, n, list(range(zMin, zMax)), 'int')
 
             found = found + segmentPartial[:]
             p = p + zStep # increment start value
@@ -1791,7 +1802,7 @@ class PitchSieve(object):
         """
         minPS = self.pitchLower.ps
         maxPS = self.pitchUpper.ps
-        z = range(int(minPS), int(maxPS+1))
+        z = list(range(int(minPS), int(maxPS+1)))
         n = self.pitchOrigin.ps # shift origin
 
         # get integer range
@@ -1807,7 +1818,7 @@ class PitchSieve(object):
             valList = unitNormStep(self.eld, minPS, maxPS, normalized=False)
             # this z will not be shifted
             # need to get list of apropriate size
-            z = range(len(valList)) 
+            z = list(range(len(valList)))
             # get a binary segment
             binSeg = self.sieveObject(n, z, 'bin')
             sieveSeg = []
@@ -1932,7 +1943,7 @@ class Test(unittest.TestCase):
         for arg in testArgs:
             #environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
-            dummy = testObj(0, range(0, 30))
+            dummy = testObj(0, list(range(0, 30)))
 
 
     def testSievePitch(self):
@@ -1958,7 +1969,7 @@ class Test(unittest.TestCase):
 
 
     def testSieve(self):
-        z = range(0,100)
+        z = list(range(0,100))
         usrStr = '3@2 & 4@1 | 2@0 & 3@1 | 3@3 | -4@2'
         a = Sieve(usrStr, z)
         self.assertEqual(str(a), '3@2&4@1|2@0&3@1|3@0|-4@2')

@@ -72,7 +72,7 @@ def toPitch(pitchString, languageString):
     >>> languageExcerpts.naturalLanguageObjects.toPitch("H", "de")
     <music21.pitch.Pitch B>
     >>> for i in ['As','A','Ais']:
-    ...     print languageExcerpts.naturalLanguageObjects.toPitch(i, "de")
+    ...     print(languageExcerpts.naturalLanguageObjects.toPitch(i, "de"))
     A-
     A
     A#
@@ -99,7 +99,7 @@ def toNote(pitchString, languageString):
     >>> languageExcerpts.naturalLanguageObjects.toNote("H", "de")
     <music21.note.Note B>
     >>> for i in ['As','A','Ais']:
-    ...     print languageExcerpts.naturalLanguageObjects.toNote(i, "de")
+    ...     print(languageExcerpts.naturalLanguageObjects.toNote(i, "de"))
     <music21.note.Note A->
     <music21.note.Note A>
     <music21.note.Note A#>

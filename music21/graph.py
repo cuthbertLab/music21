@@ -1426,13 +1426,13 @@ class GraphGroupedVerticalBar(Graph):
     Data set is simply a list of x and y pairs, where there
     is only one of each x value, and y value is a list of values
 
-    
-    >>> import random
+    >>> from collections import OrderedDict
     >>> #_DOCS_SHOW g = graph.GraphGroupedVerticalBar()
     >>> g = graph.GraphGroupedVerticalBar(doneAction=None) #_DOCS_HIDE
-    >>> data = [('bar%s' % x, {'a':3,'b':2,'c':1}) for x in range(10)]
+    >>> lengths = OrderedDict( [('a', 3), ('b', 2), ('c', 1)] )
+    >>> data = [('bar' + str(x), lengths) for x in range(3)]
     >>> data
-    [('bar0', {'a': 3, 'c': 1, 'b': 2}), ('bar1', {'a': 3, 'c': 1, 'b': 2}), ('bar2', {'a': 3, 'c': 1, 'b': 2}), ('bar3', {'a': 3, 'c': 1, 'b': 2}), ('bar4', {'a': 3, 'c': 1, 'b': 2}), ('bar5', {'a': 3, 'c': 1, 'b': 2}), ('bar6', {'a': 3, 'c': 1, 'b': 2}), ('bar7', {'a': 3, 'c': 1, 'b': 2}), ('bar8', {'a': 3, 'c': 1, 'b': 2}), ('bar9', {'a': 3, 'c': 1, 'b': 2})]
+    [('bar0', OrderedDict([('a', 3), ('b', 2), ('c', 1)])), ('bar1', OrderedDict([('a', 3), ('b', 2), ('c', 1)])), ('bar2', OrderedDict([('a', 3), ('b', 2), ('c', 1)]))]    
     >>> g.setData(data)
     >>> g.process()
     '''
@@ -1595,9 +1595,10 @@ class Graph3DPolygonBars(Graph):
     >>> #_DOCS_SHOW g = graph.Graph3DPolygonBars()
     >>> g = graph.Graph3DPolygonBars(doneAction=None) #_DOCS_HIDE
     >>> data = {1:[], 2:[], 3:[]}
-    >>> for i in range(len(data.keys())):
+    >>> dk = list(data.keys())
+    >>> for i in range(len(dk)):
     ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
-    ...    data[data.keys()[i]] = q
+    ...    data[dk[i]] = q
     >>> g.setData(data)
     >>> g.process()
 
@@ -1636,7 +1637,7 @@ class Graph3DPolygonBars(Graph):
         verts = []
         vertsColor = []
         q = 0
-        zVals = self.data.keys()
+        zVals = list(self.data.keys())
         zVals.sort()
 
         colors = []
@@ -1920,9 +1921,17 @@ class PlotStream(object):
         >>> s.analyze('key')
         <music21.key.Key of G major>
         >>> a = graph.PlotStream(s)
-        >>> a.ticksPitchClassUsage(hideUnused=True)
-        [[0, u'C'], [2, u'D'], [3, u'D$\\sharp$'], [4, u'E'], [6, u'F$\\sharp$'], [7, u'G'], [9, u'A'], [11, u'B']]
-
+        >>> for position, noteName in a.ticksPitchClassUsage(hideUnused=True):
+        ...            print (str(position) + " " + noteName)
+        0 C
+        2 D
+        3 D$\sharp$
+        4 E
+        6 F$\sharp$
+        7 G
+        9 A
+        11 B
+        
         >>> s = corpus.parse('bach/bwv281.xml')
         >>> a = graph.PlotStream(s)
         >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True, hideUnused=True)]
@@ -2215,18 +2224,18 @@ class PlotStream(object):
             offsetMap = self.streamObj.measureOffsetMap([stream.Measure])
         else:
             offsetMap = self.streamObj.measureOffsetMap([note.Note])
-        if len(offsetMap.keys()) > 0:
+        if len(offsetMap) > 0:
             self._axisLabelUsesMeasures = True
         else:
             self._axisLabelUsesMeasures = False
         #environLocal.printDebug(['ticksOffset: got offset map keys', offsetMap.keys(), self._axisLabelUsesMeasures])
 
         ticks = [] # a list of graphed value, string label pairs
-        if len(offsetMap.keys()) > 0:
+        if len(offsetMap) > 0:
             #environLocal.printDebug(['using measures for offset ticks'])
             # store indices in offsetMap
             mNoToUse = []
-            sortedKeys = sorted(offsetMap.keys())
+            sortedKeys = sorted(list(offsetMap.keys()))
             for key in sortedKeys:
                 if key >= offsetMin and key <= offsetMax:
 #                     if key == 0.0 and not displayMeasureNumberZero:
@@ -2303,10 +2312,13 @@ class PlotStream(object):
         
         >>> a = graph.PlotStream(s)
         >>> a.ticksQuarterLength()
-        [[-3.0, '0.13'], [-2.0, '0.25'], [-1.0, '0.5'], [0.0, '1.0'], [1.0, '2.0']]
+        [[-3.0, '0.1...'], [-2.0, '0.25'], [-1.0, '0.5'], [0.0, '1.0'], [1.0, '2.0']]
 
         >>> a.ticksQuarterLength(remap = False)
-        [[0.125, '0.13'], [0.25, '0.25'], [0.5, '0.5'], [1.0, '1.0'], [2.0, '2.0']]
+        [[0.125, '0.1...'], [0.25, '0.25'], [0.5, '0.5'], [1.0, '1.0'], [2.0, '2.0']]
+
+        The second entry is 0.125 but gets rounded differently in python 2 (1.3) and python 3
+        (1.2)
         '''
         if self.flatten:
             sSrc = self.streamObj.flat
@@ -2716,9 +2728,9 @@ class PlotHistogram(PlotStream):
                 if data[value] >= countMax:
                     countMax = data[value]
 
-        data = data.items()
+        data = list(data.items())
         data.sort()
-        dataTick = dataTick.items()
+        dataTick = list(dataTick.items())
         dataTick.sort()
         xTicks = dataTick
         # alway have min and max
@@ -3369,12 +3381,10 @@ class PlotDolan(PlotHorizontalBarWeighted):
 
     If the `normalizeByPart` parameter is True, each part will be normalized within the range only of that part. If False, all parts will be normalized by the max of all parts. The default is True. 
 
-
-    
     >>> s = corpus.parse('bwv66.6')
     >>> dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
     >>> i = 0
-    ... for p in s.parts:
+    >>> for p in s.parts:
     ...     for m in p.getElementsByClass('Measure'):
     ...         m.insert(0, dynamics.Dynamic(dyn[i % len(dyn)]))
     ...         i += 1
@@ -4062,12 +4072,13 @@ def _getPlotsToMake(*args, **keywords):
                 if len(match) == len(values):
                     plotMake.append(plotClassName)
                 else:
-                    plotMakeCandidates.append([len(match), plotClassName])
+                    sortTuple = (len(match), plotClassName)
+                    plotMakeCandidates.append(sortTuple)
 
         # if no matches, try something more drastic:
         if len(plotMake) == 0:
             if len(plotMakeCandidates) > 0:
-                plotMakeCandidates.sort()
+                plotMakeCandidates.sort(key=lambda x: (x[0], x[1].__name__.lower()) )
                 # last in list has highest score; second item is class
                 plotMake.append(plotMakeCandidates[-1][1])
             else:
@@ -4171,21 +4182,25 @@ class TestExternal(unittest.TestCase):
         data = [(x, x*x) for x in range(50)]
         a.setData(data)
         a.process()
+        
         del a
 
         a = GraphHistogram(doneAction='write', title='50 x with random(30) y counts')
         data = [(x, random.choice(range(30))) for x in range(50)]
         a.setData(data)
         a.process()
+        
         del a
 
         a = Graph3DPolygonBars(doneAction='write', title='50 x with random values increase by 10 per x', alpha=.8, colors=['b', 'g'])
         data = {1:[], 2:[], 3:[], 4:[], 5:[]}
         for i in range(len(data.keys())):
             q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
-            data[data.keys()[i]] = q
+            dk = list(data.keys())
+            data[dk[i]] = q
         a.setData(data)
         a.process()
+        
         del a
 
 
@@ -4209,6 +4224,7 @@ class TestExternal(unittest.TestCase):
         # this does not work, and instead causes massive distortion
         #a.setTicks('x', xTicks)
         a.process()
+        
 
 
     def testBrokenHorizontal(self):
@@ -4225,6 +4241,7 @@ class TestExternal(unittest.TestCase):
         a = GraphHorizontalBar()
         a.setData(data)
         a.process()
+        
 
 
     def testPlotHorizontalBarPitchSpaceOffset(self):
@@ -4232,9 +4249,11 @@ class TestExternal(unittest.TestCase):
         # do not need to call flat version
         b = PlotHorizontalBarPitchSpaceOffset(a.parts[0], title='Bach (soprano voice)')
         b.process()
+        
 
         b = PlotHorizontalBarPitchSpaceOffset(a, title='Bach (all parts)')
         b.process()
+        
 
 
 
@@ -4242,10 +4261,12 @@ class TestExternal(unittest.TestCase):
         a = corpus.parse('bach/bwv57.8')
         b = PlotHorizontalBarPitchClassOffset(a.parts[0], title='Bach (soprano voice)')
         b.process()
+        
 
         a = corpus.parse('bach/bwv57.8')
         b = PlotHorizontalBarPitchClassOffset(a.parts[0].measures(3,6), title='Bach (soprano voice, mm 3-6)')
         b.process()
+        
 
 
 
@@ -4280,6 +4301,7 @@ class TestExternal(unittest.TestCase):
         a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramPitchSpace(a.parts[0].flat, title='Bach (soprano voice)')
         b.process()
+        
 
     def testPlotPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
@@ -4312,9 +4334,11 @@ class TestExternal(unittest.TestCase):
         a = corpus.parse('schumann/opus41no1', 2)
         b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
         b.process()
+        
 
         b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
         b.process()
+        
 
 
 
@@ -4322,6 +4346,7 @@ class TestExternal(unittest.TestCase):
         a = corpus.parse('bach/bwv57.8')
         b = Plot3DBarsPitchSpaceQuarterLength(a.flat, title='Bach (soprano voice)')
         b.process()
+        
 
 
 
@@ -4387,6 +4412,7 @@ class TestExternal(unittest.TestCase):
         fp = os.path.join(environLocal.getRootTempDir(), fn)
 
         a.write(fp)
+        
 
 
 
@@ -4487,6 +4513,7 @@ class TestExternal(unittest.TestCase):
             fp = os.path.join(environLocal.getRootTempDir(), fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
+            
 
 
 
@@ -4523,12 +4550,14 @@ class Test(unittest.TestCase):
         data = [(x, x*x) for x in range(50)]
         a.setData(data)
         a.process()
+        
         del a
 
         a = GraphHistogram(doneAction=None, title='50 x with random(30) y counts')
         data = [(x, random.choice(range(30))) for x in range(50)]
         a.setData(data)
         a.process()
+        
         del a
 
 
@@ -4536,9 +4565,11 @@ class Test(unittest.TestCase):
         data = {1:[], 2:[], 3:[], 4:[], 5:[]}
         for i in range(len(data.keys())):
             q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
-            data[data.keys()[i]] = q
+            dk = list(data.keys())
+            data[dk[i]] = q
         a.setData(data)
         a.process()
+        
         del a
 
     def testBrokenHorizontal(self):
@@ -4554,6 +4585,7 @@ class Test(unittest.TestCase):
         a = GraphHorizontalBar(doneAction=None)
         a.setData(data)
         a.process()
+        
 
 
 
@@ -4562,29 +4594,35 @@ class Test(unittest.TestCase):
         b = PlotScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat, doneAction=None,
                         title='Bach (soprano voice)')
         b.process()
+        
 
     def testPlotPitchSpace(self):
         a = corpus.parse('bach')
         b = PlotHistogramPitchSpace(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
+        
 
     def testPlotPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramPitchClass(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
+        
 
     def testPlotQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
         b = PlotHistogramQuarterLength(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.process()
+        
 
     def testPitchDuration(self):
         a = corpus.parse('schumann/opus41no1', 2)
         b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schumann (soprano voice)')
         b.process()
+        
 
         b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schumann (soprano voice)')
         b.process()
+        
 
         
     def testPlotWindowed(self, doneAction=None):
@@ -4609,6 +4647,7 @@ class Test(unittest.TestCase):
             minWindow=1, windowStep=windowStep, 
             doneAction=doneAction, dpi=300)
         b.process()
+        
 
 
 
@@ -4625,6 +4664,7 @@ class Test(unittest.TestCase):
         a = GraphColorGridLegend(doneAction=doneAction, dpi=300)
         a.setData(data)
         a.process()
+        
 
     def testPianoRollFromOpus(self):
         o = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
@@ -4632,6 +4672,7 @@ class Test(unittest.TestCase):
 
         b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
         b.process()
+        
 
 
 
@@ -4642,6 +4683,7 @@ class Test(unittest.TestCase):
             b = GraphNetworxGraph(doneAction=None)
             #b = GraphNetworxGraph()
             b.process()
+            
 
 
     def testPlotChordsA(self):
@@ -4660,6 +4702,7 @@ class Test(unittest.TestCase):
         s.append(note.Note('c5'))
         b = PlotHistogramPitchSpace(s, doneAction=None)
         b.process()
+        
         #b.write()
         self.assertEqual(b.data, [(48, 1), (61, 1), (62, 1), (71, 1), (72, 1)])
 
@@ -4668,6 +4711,7 @@ class Test(unittest.TestCase):
         s.append(note.Note('c3'))
         b = PlotHistogramPitchClass(s, doneAction=None)
         b.process()
+        
         #b.write()
         self.assertEqual(b.data, [(0, 1), (4, 1), (5, 1), (7, 1), (9, 1)])
 
@@ -4676,6 +4720,7 @@ class Test(unittest.TestCase):
         s.append(note.Note('c3', quarterLength=.5))
         b = PlotHistogramQuarterLength(s, doneAction=None)
         b.process()
+        
         #b.write()
         self.assertEqual(b.data, [(0, 1), (1, 1)])
 
@@ -4699,6 +4744,7 @@ class Test(unittest.TestCase):
         s.append(note.Note('c3', quarterLength=2))
         b = PlotScatterPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
         b.process()
+        
         self.assertEqual(b.data, [[2, 48], [0.5, 52], [0.5, 53], [0.5, 55], [0.5, 57], [1.5, 59], [1.5, 60], [1.5, 62], [1.5, 64], [1.5, 65], [1.5, 67], [1.5, 69], [1.5, 71], [1.5, 72]])
         #b.write()
 
@@ -4709,6 +4755,7 @@ class Test(unittest.TestCase):
         s.append(note.Note('c3', quarterLength=2))
         b = PlotScatterPitchClassQuarterLength(s, doneAction=None, xLog=False)
         b.process()
+        
         self.assertEqual(b.data, [[2, 0], [0.5, 4], [0.5, 5], [0.5, 7], [0.5, 9], [1.5, 11], [1.5, 0], [1.5, 2], [1.5, 4], [1.5, 5], [1.5, 7], [1.5, 9], [1.5, 11], [1.5, 0]] )
         #b.write()
 
@@ -4722,6 +4769,7 @@ class Test(unittest.TestCase):
         #s.show()
         b = PlotScatterPitchClassOffset(s, doneAction=None)
         b.process()
+        
         self.assertEqual(b.data, [[0.5, 0], [4.0, 2], [0.0, 4], [0.0, 5], [0.0, 7], [0.0, 9], [2.5, 11], [2.5, 0], [2.5, 2], [2.5, 4]] )
         #b.write()
 
@@ -4736,6 +4784,7 @@ class Test(unittest.TestCase):
         #s.show()
         b = PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None)
         b.process()
+        
         self.assertEqual(b.data, [[52, 8], [53, 8], [55, 8], [57, 8], [59, 8], [59, 5], [60, 8], [60, 5], [62, 8], [62, 5], [64, 8], [64, 5]])
         #b.write()
 
@@ -4752,6 +4801,7 @@ class Test(unittest.TestCase):
 
         b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
         b.process()
+        
         self.assertEqual(b.data, [['C', [(0.0, 1.0), (1.5, 1.5)]], ['', []], ['D', [(1.5, 1.5)]], ['', []], ['E', [(1.0, 0.5), (1.5, 1.5)]], ['F', [(1.0, 0.5)]], ['', []], ['G', [(1.0, 0.5)]], ['', []], ['A', [(1.0, 0.5)]], ['', []], ['B', [(1.5, 1.5)]]] )
         #b.write()
 
@@ -4764,6 +4814,7 @@ class Test(unittest.TestCase):
 
         b = PlotHorizontalBarPitchSpaceOffset(s, doneAction=None)
         b.process()
+        
         self.assertEqual(b.data, [['C3', [(0.0, 1.0)]], ['', []], ['', []], ['', []], ['E3', [(1.0, 0.5)]], ['F3', [(1.0, 0.5)]], ['', []], ['G3', [(1.0, 0.5)]], ['', []], ['A3', [(1.0, 0.5)]], ['', []], ['B3', [(1.5, 1.5)]], ['C4', [(1.5, 1.5)]], ['', []], ['D4', [(1.5, 1.5)]], ['', []], ['E4', [(1.5, 1.5)]]] )
         #b.write()
 
@@ -4779,6 +4830,7 @@ class Test(unittest.TestCase):
 
         b = PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
         b.process()
+        
         self.assertEqual(b.data, [[0.5, 48, 0], [1.0, 48, 1], [1.5, 48, 0], [3, 48, 0], [0.5, 49, 0], [1.0, 49, 0], [1.5, 49, 0], [3, 49, 0], [0.5, 50, 0], [1.0, 50, 0], [1.5, 50, 0], [3, 50, 0], [0.5, 51, 0], [1.0, 51, 0], [1.5, 51, 0], [3, 51, 0], [0.5, 52, 1], [1.0, 52, 0], [1.5, 52, 0], [3, 52, 0], [0.5, 53, 1], [1.0, 53, 0], [1.5, 53, 0], [3, 53, 0], [0.5, 54, 0], [1.0, 54, 0], [1.5, 54, 0], [3, 54, 0], [0.5, 55, 1], [1.0, 55, 0], [1.5, 55, 0], [3, 55, 0], [0.5, 56, 0], [1.0, 56, 0], [1.5, 56, 0], [3, 56, 0], [0.5, 57, 1], [1.0, 57, 0], [1.5, 57, 0], [3, 57, 0], [0.5, 58, 0], [1.0, 58, 0], [1.5, 58, 0], [3, 58, 0], [0.5, 59, 0], [1.0, 59, 0], [1.5, 59, 1], [3, 59, 0], [0.5, 60, 0], [1.0, 60, 0], [1.5, 60, 1], [3, 60, 0], [0.5, 61, 0], [1.0, 61, 0], [1.5, 61, 0], [3, 61, 0], [0.5, 62, 0], [1.0, 62, 0], [1.5, 62, 1], [3, 62, 0], [0.5, 63, 0], [1.0, 63, 0], [1.5, 63, 0], [3, 63, 0], [0.5, 64, 0], [1.0, 64, 0], [1.5, 64, 1], [3, 64, 0], [0.5, 65, 0], [1.0, 65, 0], [1.5, 65, 0], [3, 65, 2], [0.5, 66, 0], [1.0, 66, 0], [1.5, 66, 0], [3, 66, 0], [0.5, 67, 0], [1.0, 67, 0], [1.5, 67, 0], [3, 67, 2], [0.5, 68, 0], [1.0, 68, 0], [1.5, 68, 0], [3, 68, 0], [0.5, 69, 0], [1.0, 69, 0], [1.5, 69, 0], [3, 69, 2], [0.5, 70, 0], [1.0, 70, 0], [1.5, 70, 0], [3, 70, 0], [0.5, 71, 0], [1.0, 71, 0], [1.5, 71, 0], [3, 71, 2], [0.5, 72, 0], [1.0, 72, 0], [1.5, 72, 0], [3, 72, 3], [0.5, 73, 0], [1.0, 73, 0], [1.5, 73, 0], [3, 73, 0], [0.5, 74, 0], [1.0, 74, 0], [1.5, 74, 0], [3, 74, 2], [0.5, 75, 0], [1.0, 75, 0], [1.5, 75, 0], [3, 75, 0], [0.5, 76, 0], [1.0, 76, 0], [1.5, 76, 0], [3, 76, 2], [0.5, 77, 0], [1.0, 77, 0], [1.5, 77, 0], [3, 77, 2], [0.5, 78, 0], [1.0, 78, 0], [1.5, 78, 0], [3, 78, 0], [0.5, 79, 0], [1.0, 79, 0], [1.5, 79, 0], [3, 79, 2]] )
         #b.write()
 
@@ -4795,6 +4847,7 @@ class Test(unittest.TestCase):
 
         b = PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None, xLog=False)
         b.process()
+        
         self.assertEqual(b.data, [[0.5, 0, 0], [1.0, 0, 1], [1.5, 0, 1], [3, 0, 3], [0.5, 1, 0], [1.0, 1, 0], [1.5, 1, 0], [3, 1, 0], [0.5, 2, 0], [1.0, 2, 0], [1.5, 2, 1], [3, 2, 2], [0.5, 3, 0], [1.0, 3, 0], [1.5, 3, 0], [3, 3, 0], [0.5, 4, 1], [1.0, 4, 0], [1.5, 4, 1], [3, 4, 2], [0.5, 5, 1], [1.0, 5, 0], [1.5, 5, 0], [3, 5, 4], [0.5, 6, 0], [1.0, 6, 0], [1.5, 6, 0], [3, 6, 0], [0.5, 7, 1], [1.0, 7, 0], [1.5, 7, 0], [3, 7, 4], [0.5, 8, 0], [1.0, 8, 0], [1.5, 8, 0], [3, 8, 0], [0.5, 9, 1], [1.0, 9, 0], [1.5, 9, 0], [3, 9, 2], [0.5, 10, 0], [1.0, 10, 0], [1.5, 10, 0], [3, 10, 0], [0.5, 11, 0], [1.0, 11, 0], [1.5, 11, 1], [3, 11, 2]])
         #b.write()
 
@@ -4813,6 +4866,7 @@ class Test(unittest.TestCase):
 
         b = PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None, xLog=False)
         b.process()
+        
         self.assertEqual(b.data, [(69, 4, 2), (74, 4, 2), (76, 7, 1), (65, 4, 2), (59, 7, 1), (79, 7, 1), (72, 7, 1), (59, 8, 1), (64, 8, 1), (62, 7, 1), (69, 7, 1), (55, 8, 1), (62, 8, 1), (60, 8, 1), (71, 4, 2), (76, 4, 2), (65, 7, 1), (57, 8, 1), (67, 4, 2), (72, 4, 3), (77, 4, 2), (52, 8, 1), (71, 7, 1), (53, 8, 1), (64, 7, 1), (67, 7, 1), (74, 7, 1), (77, 7, 1), (79, 4, 2), (60, 7, 1)])
         #b.write()
 
@@ -4831,6 +4885,7 @@ class Test(unittest.TestCase):
 
         b = Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
         b.process()
+        
         self.assertEqual(b.data, {48: [[0.5, 0], [1.0, 1], [1.5, 0], [3, 0]], 49: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 50: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 51: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 52: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 53: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 54: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 55: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 56: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 57: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 58: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 59: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 60: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 61: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 62: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 63: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 64: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 65: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 66: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 67: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 68: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 69: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 70: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 71: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 72: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 2]], 73: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 74: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 75: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 76: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 77: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 78: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 79: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]]})
         #b.write()
 
@@ -4934,6 +4989,7 @@ class Test(unittest.TestCase):
 
         p = PlotFeatures(streamList, featureExtractors=feList, doneAction=None)
         p.process()
+        
 
 
     def testColors(self):
@@ -4954,6 +5010,7 @@ class Test(unittest.TestCase):
         a = corpus.parse('bach/bwv57.8')
         b = PlotDolan(a, title='Bach', doneAction=None)
         b.process()
+        
         #b.show()
 
 
@@ -4965,6 +5022,7 @@ class Test(unittest.TestCase):
         #labelList = [os.path.basename(fp) for fp in streamList]
         p = PlotFeatures(streamList, feList)
         p.process()
+        
 
 
     def testHorizontalInstrumentationA(self):

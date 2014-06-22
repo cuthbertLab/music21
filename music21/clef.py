@@ -71,7 +71,6 @@ class Clef(base.Music21Object):
         # line counts start from the bottom up, the reverse of musedata
         self.line = None
         self.octaveChange = 0 # set to zero as default
-
         # musicxml has an attribute for clefOctaveChange, 
         # an integer to show transposing clefs
 

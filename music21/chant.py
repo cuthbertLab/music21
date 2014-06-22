@@ -471,7 +471,7 @@ SCOREGOESHERE
         ...    mode = 'VII'
         ...    paperType = None
         >>> c = Converter()
-        >>> print wrapper.substituteInfo(c)
+        >>> print(wrapper.substituteInfo(c))
         % !TEX TS-program = lualatex
         % !TEX encoding = UTF-8
         ...

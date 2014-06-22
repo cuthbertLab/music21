@@ -245,7 +245,7 @@ class WindowedAnalysis(object):
         metaMatrix = [] 
 
         if common.isNum(windowStepSize):
-            windowSizes = range(minLength, maxLength+1, windowStepSize)
+            windowSizes = list(range(minLength, maxLength+1, windowStepSize))
         else:
             num, junk = common.getNumFromStr(windowStepSize)
             windowSizes = []

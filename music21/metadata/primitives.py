@@ -140,6 +140,8 @@ class Date(object):
                     sub = fmt % value + Date.errorToSymbol(error)
                 else:
                     sub = fmt % value
+                if (six.PY3):
+                    sub = str(sub)
                 msg.append(sub)
         return '/'.join(msg)
 
@@ -783,6 +785,8 @@ class Text(object):
         if six.PY3:
             if isinstance(self._data, bytes):
                 return self._data.decode('UTF-8')
+            elif not isinstance(self._data, str):
+                return str(self._data)
             else:
                 return self._data
         else:      

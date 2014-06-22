@@ -62,7 +62,7 @@ class ModuleGather(object):
     def _visitFunc(self, args, dirname, names):
         '''
         append all module paths from _walk() to self.modulePaths.
-        Utility function called from os.path.walk()
+        Utility function called from os.walk()
         '''
         for fileName in names:
             if fileName.endswith('py'):
@@ -75,7 +75,8 @@ class ModuleGather(object):
         Get all the modules in reverse order, storing them in self.modulePaths
         '''
         # the results of this are stored in self.curFiles, self.dirList
-        os.path.walk(self.dirParent, self._visitFunc, '')
+        for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
+            self._visitFunc(None, dirpath, filenames)
         self.modulePaths.sort()
         #for p in self.modulePaths:
         #    print p# self.modulePaths

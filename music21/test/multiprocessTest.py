@@ -37,7 +37,7 @@ from music21 import base
 from music21 import environment
 _MOD = 'multiprocessTest.py'
 environLocal = environment.Environment(_MOD)
-
+from music21.ext import six
 
 #-------------------------------------------------------------------------------
 class ModuleGather(object):
@@ -68,6 +68,18 @@ class ModuleGather(object):
             'exceldiff.py', 
             'mrjobaws.py', # takes too long.
             'configure.py', # runs oddly...
+            
+            'vexflow/testShow.py',
+            'vexflow/exporter.py',
+            'trecento/quodJactatur.py',
+            'trecento/find_vatican1790.py',
+            'trecento/findSevs.py',
+            'trecento/correlations.py',
+            'trecento/contenanceAngloise.py',
+            'trecento/capuaProbabilities.py',
+            'theoryAnalysis/wwnortonMGTA.py',
+            'test/treeYield.py',
+            'test/toggleDebug.py',
             ]
         # skip any path that starts with this string
         self.pathSkip = ['abj', 'obsolete', 'ext', 'server', 'demos']
@@ -77,7 +89,7 @@ class ModuleGather(object):
     def _visitFunc(self, args, dirname, names):
         '''
         append all module paths from _walk() to self.modulePaths.
-        Utility function called from os.path.walk()
+        Utility function was called from os.path.walk() now called from os.walk
         '''
         for fileName in names:
             if fileName.endswith('py'):
@@ -90,7 +102,8 @@ class ModuleGather(object):
         Get all the modules in reverse order, storing them in self.modulePaths
         '''
         # the results of this are stored in self.curFiles, self.dirList
-        os.path.walk(self.dirParent, self._visitFunc, '')
+        for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
+            self._visitFunc(None, dirpath, filenames)
         self.modulePaths.sort()
         self.modulePaths.reverse()
 
@@ -260,6 +273,34 @@ def runOneModuleWithoutImp(args):
         except ValueError:
             environLocal.printDebug('%s cannot load Doctests' % moduleObject)
             pass        
+
+        #### fix up tests for py2 and py3
+        if six.PY3: # correct "M21Exception" to "...M21Exception"
+            for dtc in s1: # Suite to DocTestCase
+                if hasattr(dtc, '_dt_test'):
+                    dt = dtc._dt_test # DocTest
+                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
+                        if example.exc_msg is not None and len(example.exc_msg) > 0:
+                            example.exc_msg = "..." + example.exc_msg[1:]
+                        elif (example.want is not None and
+                                example.want.startswith('u\'')):
+                                    # probably a unicode example:
+                                    # simplistic, since (u'hi', u'bye')
+                                    # won't be caught, but saves a lot of anguish
+                                example.want = example.want[1:]
+        elif six.PY2: #
+            for dtc in s1: # Suite to DocTestCase
+                if hasattr(dtc, '_dt_test'):
+                    dt = dtc._dt_test # DocTest
+                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
+                        if (example.want is not None and
+                                example.want.startswith('b\'')):
+                                    # probably a unicode example:
+                                    # simplistic, since (b'hi', b'bye')
+                                    # won't be caught, but saves a lot of anguish
+                                example.want = example.want[1:]
+        
+        
         environLocal.printDebug('running Tests...\n')
         runner = unittest.TextTestRunner(verbosity=verbosity)
         try:
@@ -285,7 +326,7 @@ def runOneModuleWithoutImp(args):
     
 def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOut = 1):
     '''
-    Run all tests. Group can be test and external
+    Run all tests. Group can be test and/or external
     '''    
     
     timeStart = time.time()
@@ -304,7 +345,12 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     pathsToRun = modGather.modulePaths
 
     pool = multiprocessing.Pool(processes=poolSize)
-    res = pool.imap_unordered(runOneModuleWithoutImp, ((modGather,fp) for fp in pathsToRun))
+    
+    # imap returns the results as they are completed.  Since the number of files is small,
+    # the overhead of returning is outweighed by the positive aspect of getting results immediately
+    # unordered says that results can RETURN in any order; not that they'd be pooled out in any
+    # order.
+    res = pool.imap_unordered(runOneModuleWithoutImp, ((modGather, fp) for fp in pathsToRun))
 
     continueIt = True
     timeouts = 0

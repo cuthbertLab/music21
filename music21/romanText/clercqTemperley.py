@@ -522,13 +522,12 @@ in the text file as a string, and have python do the parsing.
         >>> len(s.rules)
         5
         >>> for rule in s.rules:
-        ...   print rule.LHS
+        ...   print(rule.LHS)
         BP
         In
         Vr
         Br
         Co
-        
         ''')
     
     
@@ -1424,7 +1423,7 @@ S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
         tdc = 'C:/clercqTemperley/tdc'
  
         for x in os.listdir(tdc):
-            print x
+            print(x)
             f = open(os.path.join(tdc, x), 'r')
             txt = f.read()
 
@@ -1433,16 +1432,16 @@ S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
                 try:
                     x = chord.pitches
                 except:
-                    print x, chord
+                    print(x, chord)
         
         
         for num in range(1, 200):
             try:
                 fileName = 'C:\\dt\\%s.txt' % num
                 s = clercqTemperley.CTSong(fileName)
-                print s.toScore().highestOffset, 'Success', num
+                print(s.toScore().highestOffset, 'Success', num)
             except:
-                print "ERROR", num
+                print("ERROR", num)
         '''
         #s = clercqTemperley.CTSong(exampleClercqTemperley)
         

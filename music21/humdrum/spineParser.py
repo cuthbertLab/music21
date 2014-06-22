@@ -281,9 +281,9 @@ class HumdrumDataCollection(object):
         >>> (hasOpus, dataCollections) = hdc.determineIfDataStreamIsOpus()
         >>> if hasOpus is True:
         ...     op = hdc.parseOpusDataCollections(dataCollections)
-        ...     print len(op.scores)
+        ...     print(len(op.scores))
         ...     for sc in op.scores:
-        ...        print sc
+        ...        print(sc)
         3
         <music21.stream.Score section_1>
         <music21.stream.Score section_2>
@@ -330,15 +330,15 @@ class HumdrumDataCollection(object):
         >>> eList is hdc.eventList
         True
         >>> for e in eList:
-        ...     print e
+        ...     print(e)
         <music21.humdrum.spineParser.GlobalReferenceLine object at 0x...>
         <music21.humdrum.spineParser.GlobalCommentLine object at 0x...>
         <music21.humdrum.spineParser.SpineLine object at 0x...>
         <music21.humdrum.spineParser.SpineLine object at 0x...>
         <music21.humdrum.spineParser.SpineLine object at 0x...>
-        >>> print eList[0].value
+        >>> print(eList[0].value)
         Beethoven, Ludwig van
-        >>> print eList[3].spineData
+        >>> print(eList[3].spineData)
         ['C4', 'pp']
         '''
         if dataStream is None:
@@ -412,7 +412,7 @@ class HumdrumDataCollection(object):
         Looking at individual slices is unlikely to tell you much.
 
         >>> for thisSlice in eventCollections:
-        ...    print thisSlice
+        ...    print(thisSlice)
         <music21.humdrum.spineParser.EventCollection object at 0x...>
         <music21.humdrum.spineParser.EventCollection object at 0x...>
         <music21.humdrum.spineParser.EventCollection object at 0x...>
@@ -420,7 +420,7 @@ class HumdrumDataCollection(object):
         <music21.humdrum.spineParser.EventCollection object at 0x...>
 
         >>> for thisSlice in protoSpines:
-        ...    print thisSlice
+        ...    print(thisSlice)
         <music21.humdrum.spineParser.ProtoSpine object at 0x...>
         <music21.humdrum.spineParser.ProtoSpine object at 0x...>
 
@@ -926,7 +926,7 @@ class HumdrumSpine(object):
     Spines can be iterated through:
 
     >>> for e in spine1:
-    ...    print e
+    ...    print(e)
     **kern
     c,4
     d#8
@@ -1563,7 +1563,7 @@ class SpineCollection(object):
         >>> newSpineTrumpet.stream.append(instrument.Trumpet())
         >>> hsc.assignIds()
         >>> for sp in hsc.spines:
-        ...     print sp.stream.id
+        ...     print(sp.stream.id)
         1
         2
         Oboe-1
