@@ -311,7 +311,7 @@ class Test(unittest.TestCase):
             # the processor
             wa = WindowedAnalysis(s, p)
             # do smallest and larges
-            for i in range(1, 4) + [None]:
+            for i in list(range(1, 4)) + [None]:
                 unused_x, unused_y, unused_z = wa.process(i, i)
     
 

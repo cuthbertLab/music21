@@ -1388,10 +1388,16 @@ class Ottava(Spanner):
 
         
         >>> ottava = spanner.Ottava(type='15mb')
-        >>> ottava.getStartParameters()
-        {'type': 'up', 'size': 15}
-        >>> ottava.getEndParameters()
-        {'type': 'stop', 'size': 15}
+        >>> st = ottava.getStartParameters()
+        >>> st['type']
+        'up'
+        >>> st['size']
+        15
+        >>> en = ottava.getEndParameters()
+        >>> st['type']
+        'stop'
+        >>> st['size']
+        15
         ''' 
         post = {}
         post['size'] = self._getShiftMagnitude()
@@ -1401,12 +1407,17 @@ class Ottava(Spanner):
     def getEndParameters(self):
         '''Return the parameters for the start of this spanner required by MusicXML output. 
 
-        
         >>> ottava = spanner.Ottava(type=8)
-        >>> ottava.getStartParameters()
-        {'type': 'down', 'size': 8}
-        >>> ottava.getEndParameters()
-        {'type': 'stop', 'size': 8}
+        >>> st = ottava.getStartParameters()
+        >>> st['type']
+        'down'
+        >>> st['size']
+        8
+        >>> en = ottava.getEndParameters()
+        >>> st['type']
+        'stop'
+        >>> st['size']
+        8
         ''' 
         post = {}
         post['size'] = self._getShiftMagnitude()

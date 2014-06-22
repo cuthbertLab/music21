@@ -237,7 +237,7 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc)
-    [<music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note G>]})  ]
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note G>]})  ]
     >>> len(theoryAnalysis.theoryAnalyzer.getVerticalities(sc))
     2
 
@@ -248,7 +248,7 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> part4.append(chord.Chord(['A','B','C']))
     >>> sc4.insert(part4)
     >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc4)
-    [<music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  ]
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})  ]
 
     >>> sc3 = stream.Score()
     >>> p1 = stream.Part()
@@ -257,7 +257,7 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> p1.append(harmony.ChordSymbol('E7', quarterLength = 4))
     >>> sc3.append(p1)
     >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc3)
-    [<music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol D>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol E7>]})  ]
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol C>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol D>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol E7>]})  ]
 
     '''   
     
@@ -340,7 +340,7 @@ def getVLQs(score, partNum1, partNum2):
     vlqCacheKey = str(partNum1) + "," + str(partNum2)
 
     addAnalysisData(score)    
-    if 'vlqs' in score.analysisData and vlqCacheKey in score.analysisData['vlqs'].keys():
+    if 'vlqs' in score.analysisData and vlqCacheKey in score.analysisData['vlqs']:
         return score.analysisData['vlqs'][vlqCacheKey]
     
     vlqList = []
@@ -437,7 +437,7 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> len(theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']))
     3
     >>> for x in theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']):
-    ...   print x.rootInterval(), x.bassInterval()
+    ...   print("%r %r" % (x.rootInterval(), x.bassInterval()))
     <music21.interval.ChromaticInterval 7> <music21.interval.ChromaticInterval 2>
     <music21.interval.ChromaticInterval -7> <music21.interval.ChromaticInterval -2>
     <music21.interval.ChromaticInterval 5> <music21.interval.ChromaticInterval 0>
@@ -514,7 +514,7 @@ def getVerticalityNTuplets(score, ntupletNum):
     >>> len(theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets(sc, 3))
     2
     >>> theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets(sc, 3)[1]
-    <music21.voiceLeading.VerticalityTriplet listofVerticalities=[<music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note G>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note A>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note E>], 1: [<music21.note.Note D>]})  ] 
+    <music21.voiceLeading.VerticalityTriplet listofVerticalities=[<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.note.Note G>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note A>]})  , <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.note.Note E>], 1: [<music21.note.Note D>]})  ] 
 
     '''
 
@@ -1385,7 +1385,7 @@ def removePassingTones(score, dictKey = 'unaccentedPassingTones'):
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.removePassingTones(sc)
     >>> for x in sc.flat.notes:
-    ...   print x
+    ...   print(x)
     <music21.note.Note A>
     <music21.note.Note A>
     <music21.note.Note F#>
@@ -1427,7 +1427,7 @@ def removeNeighborTones(score, dictKey = 'unaccentedNeighborTones'):
     >>> sc.insert(part1)
     >>> theoryAnalyzer.removeNeighborTones(sc)
     >>> for x in sc.flat.notes:
-    ...   print x
+    ...   print(x)
     <music21.note.Note E->
     <music21.note.Note C>
     <music21.note.Note C>
@@ -1950,7 +1950,7 @@ def getResultsString(score, typeList=None):
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.identifyCommonPracticeErrors(sc)
-    >>> print theoryAnalysis.theoryAnalyzer.getResultsString(sc)
+    >>> print(theoryAnalysis.theoryAnalyzer.getResultsString(sc))
     commonPracticeErrors: 
     Parallel fifth in measure 1: Part 1 moves from D to E while part 2 moves from G to A
     Parallel fifth in measure 1: Part 1 moves from E to G while part 2 moves from A to C
@@ -2085,7 +2085,7 @@ def getKeyAtMeasure(score, measureNumber):
     
     keyMeasureMap = getKeyMeasureMap(score)
     if keyMeasureMap:
-        for dictKey in sorted(keyMeasureMap.iterkeys(), reverse=True):
+        for dictKey in sorted(list(keyMeasureMap.keys()), reverse=True):
             if measureNumber >= dictKey:                             
                 if common.isStr(keyMeasureMap[dictKey]):
                     return key.Key(key.convertKeyStringToMusic21KeyString(keyMeasureMap[dictKey]))

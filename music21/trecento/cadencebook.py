@@ -85,6 +85,9 @@ class TrecentoSheet(object):
         self.iterIndex += 1
         return work
 
+    def __next__(self):
+        return self.next()
+
     def __getitem__(self, key):
         if isinstance(key, int):
             return self.makeWork(key)

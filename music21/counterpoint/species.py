@@ -1578,7 +1578,7 @@ def getRandomCF(mode = None):
 
     
     >>> cf = counterpoint.species.getRandomCF()
-    >>> cf.keys()
+    >>> list(cf.keys())
     ['notes', 'mode']
     >>> isinstance(cf['notes'],str)
     True

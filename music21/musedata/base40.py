@@ -185,7 +185,7 @@ def base40DeltaToInterval(delta):
     except KeyError:
         raise Base40Exception('Interval not handled by Base40 ' + str(simpleDelta))
 
-    numOctaves = abs(delta) / 40
+    numOctaves = abs(delta) // 40
     
     sgi = simpleInterval.generic #Simple generic interval
     cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves)) #Compound generic interval

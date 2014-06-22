@@ -2490,12 +2490,12 @@ class TimespanCollection(object):
         ::
 
             >>> for elementTimespan in tree.findTimespansOverlapping(0.1):
-            ...     elementTimespan, elementTimespan.part.id
+            ...     print("%r, %s" % (elementTimespan, elementTimespan.part.id))
             ...
-            (<ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>, u'Soprano')
-            (<ElementTimespan (0.0 to 0.5) <music21.note.Note A>>, u'Tenor')
-            (<ElementTimespan (0.0 to 0.5) <music21.note.Note A>>, u'Bass')
-            (<ElementTimespan (0.0 to 1.0) <music21.note.Note E>>, u'Alto')
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>, Soprano
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>, Tenor
+            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>, Bass
+            <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>, Alto
 
 
         
@@ -2885,8 +2885,8 @@ class Test(unittest.TestCase):
         todo -- use self.assertX -- better failure messages
         '''
         for attempt in range(100):
-            starts = range(20)
-            stops = range(20)
+            starts = list(range(20))
+            stops = list(range(20))
             random.shuffle(starts)
             random.shuffle(stops)
             timespans = [Timespan(start, stop)

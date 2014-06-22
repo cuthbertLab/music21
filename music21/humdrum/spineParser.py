@@ -998,6 +998,9 @@ class HumdrumSpine(object):
         self.iterIndex += 1
         return thisEvent
 
+    def __next__(self):
+        return self.next()
+
     def _getSpineCollection(self):
         return common.unwrapWeakref(self._spineCollection)
 
