@@ -52,7 +52,7 @@ def musicxmlText(outputStream):
     >>> (output, contentType) = webapps.templates.musicxmlText(sc)
     >>> contentType
     'text/plain; charset=utf-8'
-    >>> 'score-partwise' in output
+    >>> b'score-partwise' in output
     True
     '''
     from music21.musicxml import m21ToString
@@ -67,7 +67,7 @@ def musicxmlFile(outputStream):
     >>> (output, contentType) = webapps.templates.musicxmlFile(sc)
     >>> contentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
-    >>> 'score-partwise' in output
+    >>> b'score-partwise' in output
     True
 
     '''
@@ -84,7 +84,6 @@ def vexflow(outputStream):
     >>> (output, contentType) = webapps.templates.vexflow(sc)
     >>> contentType
     'text/html; charset=utf-8'
-
     '''
     from music21 import vexflow
     outputHTML = vexflow.fromObject(outputStream, mode='html')

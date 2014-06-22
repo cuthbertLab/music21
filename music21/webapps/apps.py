@@ -17,19 +17,15 @@ It includes a set of applicationInitializers which augment agendas with data and
 specific to a given application as well as a set of commands specific to the various applications.
 
 '''
-import sys
 import unittest
 
-if sys.version > '3':
-    from . import templates # @UnusedImport
-else:
-    import templates # @Reimport
+from music21.webapps import templates
 
 def setupURLCorpusParseApp(agenda):
     '''
     Augments an agenda with the data and commands related to the URL Corpus Parse App.
     
-    
+    ResponseData is returned as a bytes object in Python3
     
     >>> agenda = webapps.Agenda()
     >>> agenda.addData('measureEnd','4')
@@ -43,6 +39,12 @@ def setupURLCorpusParseApp(agenda):
     >>> (responseData, responseContentType) = processor.getOutput()
     >>> responseContentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
+    
+    Python 3 conversion first... 
+    
+    >>> if ext.six.PY3:
+    ...     responseData = responseData.decode('utf-8')
+    
     >>> converter.parse(responseData).flat.highestOffset
     16.5
     '''
@@ -90,8 +92,15 @@ def setupConverterApp(agenda):
     >>> (responseData, responseContentType) = processor.getOutput()
     >>> responseContentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
-    >>> print responseData
-    <?xml version="1.0" encoding="utf-8"?>
+    
+    Python 3 conversion first... 
+    
+    >>> if ext.six.PY3:
+    ...     responseData = responseData.decode('utf-8')
+
+    
+    >>> print(responseData)
+    <?xml version="1.0" ...?>
     <!DOCTYPE score-partwise
       PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
       'http://www.musicxml.org/dtds/partwise.dtd'>

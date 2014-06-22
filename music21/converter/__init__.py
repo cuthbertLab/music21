@@ -500,26 +500,31 @@ class Converter(object):
             dataStr = dataStr.lstrip()
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
+            if six.PY3 and isinstance(dataStr, bytes):
+                dataStrMakeStr = dataStr.decode('ascii')
+            else:
+                dataStrMakeStr = dataStr
+
             if useFormat is not None:
                 pass
-            elif dataStr.startswith('<?xml') or dataStr.startswith('musicxml:'):
+            elif dataStrMakeStr.startswith('<?xml') or dataStrMakeStr.lower().startswith('musicxml:'):
                 useFormat = 'musicxml'
-            elif dataStr.startswith('MThd') or dataStr.startswith('midi:'):
+            elif dataStrMakeStr.startswith('MThd') or dataStrMakeStr.lower().startswith('midi:'):
                 useFormat = 'midi'
-            elif dataStr.startswith('!!!') or dataStr.startswith('**') or dataStr.startswith('humdrum:'):
+            elif dataStrMakeStr.startswith('!!!') or dataStrMakeStr.startswith('**') or dataStrMakeStr.lower().startswith('humdrum:'):
                 useFormat = 'humdrum'
-            elif dataStr.lower().startswith('tinynotation:'):
+            elif dataStrMakeStr.lower().startswith('tinynotation:'):
                 useFormat = 'tinyNotation'
 
             # assume MuseData must define a meter and a key
-            elif 'WK#:' in dataStr and 'measure' in dataStr:
+            elif 'WK#:' in dataStrMakeStr and 'measure' in dataStrMakeStr:
                 useFormat = 'musedata'
-            elif 'M:' in dataStr and 'K:' in dataStr:
+            elif 'M:' in dataStrMakeStr and 'K:' in dataStrMakeStr:
                 useFormat = 'abc'
-            elif 'Time Signature:' in dataStr and 'm1' in dataStr:
+            elif 'Time Signature:' in dataStrMakeStr and 'm1' in dataStrMakeStr:
                 useFormat = 'romanText'
             else:
-                raise ConverterException('File not found or no such format found for: %s' % dataStr)
+                raise ConverterException('File not found or no such format found for: %s' % dataStrMakeStr)
 
         self.setSubconverterFromFormat(useFormat)
         self.subConverter.parseData(dataStr, number=number)
@@ -955,6 +960,11 @@ def parse(value, *args, **keywords):
     else:
         m21Format = None
 
+    if six.PY3 and isinstance(value, bytes):
+        valueStr = value.decode('utf-8')
+    else:
+        valueStr = value
+
     if (common.isListLike(value) and len(value) == 2 and
         value[1] == None and os.path.exists(value[0])):
         # comes from corpus.search
@@ -968,11 +978,11 @@ def parse(value, *args, **keywords):
             value = [value] + list(args)
         return parseData(value, number=number)
     # a midi string, must come before os.path.exists test
-    elif value.startswith('MThd'):
+    elif valueStr.startswith('MThd'):
         return parseData(value, number=number, format=m21Format)
     elif os.path.exists(value):
         return parseFile(value, number=number, format=m21Format, forceSource=forceSource)
-    elif (value.startswith('http://') or value.startswith('https://')):
+    elif (valueStr.startswith('http://') or valueStr.startswith('https://')):
         # its a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format, forceSource=forceSource)
     else:

@@ -24,7 +24,7 @@ Run test/testDocumentation after this.
 '''
 from __future__ import print_function
 
-
+import collections
 import doctest
 import multiprocessing
 import os
@@ -32,7 +32,6 @@ import sys
 import time
 import types
 import unittest
-from collections import namedtuple
 
 import music21
 from music21 import base
@@ -41,8 +40,9 @@ _MOD = 'multiprocessTest.py'
 environLocal = environment.Environment(_MOD)
 from music21.ext import six
 
-ModuleResponse = namedtuple('ModuleResponse', 'returnCode fp moduleName success testRunner errors failures testsRun')
-
+ModuleResponse = collections.namedtuple('ModuleResponse', 'returnCode fp moduleName success testRunner errors failures testsRun')
+ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
+ 
 #-------------------------------------------------------------------------------
 class ModuleGather(object):
     r'''
@@ -191,11 +191,11 @@ def runOneModuleWithoutImp(args):
     if moduleObject == 'skip':
         success = '%s is skipped \n' % fp
         environLocal.printDebug(success)
-        return ModuleResponse('Skipped', fp, success, None, None, None, None, None)
+        return ModuleResponse('Skipped', fp, success)
     elif moduleObject == 'notInTree':
         success = '%s is in the music21 directory but not imported in music21. Skipped -- fix!' % modGath._getNamePeriod(fp)
         environLocal.printDebug(success)
-        return ModuleResponse("NotInTree", fp, success, None, None, None, None, None)
+        return ModuleResponse("NotInTree", fp, success)
 
     
     try:
@@ -266,10 +266,10 @@ def runOneModuleWithoutImp(args):
                                   str(testResult), errors, failures, testResult.testsRun)
         except Exception as excp:
             environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
-            return ModuleResponse("TrappedException", fp, moduleName, None, str(excp), None, None, None)
+            return ModuleResponse("TrappedException", fp, moduleName, None, str(excp))
     except Exception as excp:
         environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
-        return ModuleResponse("LargeException", fp, None, None, str(excp), None, None, None)
+        return ModuleResponse("LargeException", fp, None, None, str(excp))
 
     
 def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOut = 1):
@@ -335,7 +335,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
             pool.join()
         except Exception as excp:
             eventsProcessed += 1
-            exceptionLog = ModuleResponse("UntrappedException", None, "%s" % excp, None, None, None, None, None)
+            exceptionLog = ModuleResponse("UntrappedException", None, "%s" % excp)
             summaryOutput.append(exceptionLog)
 
     printSummary(summaryOutput, timeStart, pathsToRun)
@@ -345,7 +345,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     summaryOutputTwo = [i[1] for i in summaryOutput]
     for fp in pathsToRun:
         if fp not in summaryOutputTwo:
-            failLog = ModuleResponse("NoResult", fp, None, None, None, None, None, None)
+            failLog = ModuleResponse("NoResult", fp)
             summaryOutput.append(failLog)
 
     totalTests = 0
@@ -355,7 +355,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     errorsFoundSummary = []
     otherSummary = []
     for moduleResponse in summaryOutput:
-        #print(moduleResponse)
+        print(moduleResponse)
         if moduleResponse.returnCode == 'Skipped':
             skippedSummary.append("Skipped: %s" % moduleResponse.fp)
         elif moduleResponse.returnCode == 'NoResult':
