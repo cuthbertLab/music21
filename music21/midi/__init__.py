@@ -826,7 +826,10 @@ class MidiEvent(object):
             return x 
 
         elif self.type in sysex_event_dict: 
-            s = chr(sysex_event_dict[self.type]) 
+            if six.PY2:
+                s = chr(sysex_event_dict[self.type]) 
+            else:
+                s = bytes([sysex_event_dict[self.type]])
             s = s + putVariableLengthNumber(len(self.data)) 
             return s + self.data 
 
@@ -1308,10 +1311,10 @@ class Test(unittest.TestCase):
         mf.tracks.append(trk)
         mf.ticksPerQuarterNote = 960
     
-        midiBinStr = ""
+        midiBinStr = b""
         midiBinStr = midiBinStr + mf.writeMThdStr()
         
-        self.assertEqual(midiBinStr, "MThd"+ a2b_hex("000000060001000103c0") )
+        self.assertEqual(midiBinStr, b"MThd"+ a2b_hex(b"000000060001000103c0") )
 
     def testBasicImport(self):
 
@@ -1335,7 +1338,7 @@ class Test(unittest.TestCase):
         #self.assertEqual(mf.writestr(), None)
 
         # try to write contents
-        fileLikeOpen = six.StringIO()
+        fileLikeOpen = six.BytesIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1354,7 +1357,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = six.StringIO()
+        fileLikeOpen = six.BytesIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1373,7 +1376,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = six.StringIO()
+        fileLikeOpen = six.BytesIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1391,7 +1394,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = six.StringIO()
+        fileLikeOpen = six.BytesIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1498,7 +1501,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
         
-        fileLikeOpen = six.StringIO()
+        fileLikeOpen = six.BytesIO()
         #mf.open('/src/music21/music21/midi/out.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()
@@ -1585,7 +1588,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
         
-        fileLikeOpen = six.StringIO()
+        fileLikeOpen = six.BytesIO()
         #mf.open('/_scratch/test.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()

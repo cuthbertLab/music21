@@ -465,16 +465,16 @@ class ScoreFollower(object):
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.scoreNotesOnly = ScF.scoreStream.flat.notesAndRests
         >>> ScF.lastNotePosition = 14
-        >>> ScF.seconds_recording = 10
+        >>> ScF.seconds_recording = 10.0
         >>> totalLengthPeriod = 8
-        >>> totalSeconds = 2
+        >>> totalSeconds = 2.0
         >>> predictedStartPosition = ScF.predictNextNotePosition(
         ...     totalLengthPeriod, totalSeconds)
         >>> print(predictedStartPosition)
-        16
+        18
 
         '''
-        extraLength = totalLengthPeriod * totalSeconds / self.seconds_recording
+        extraLength = totalLengthPeriod * totalSeconds / float(self.seconds_recording)
         middleRhythm = 0
         slots = 0
 

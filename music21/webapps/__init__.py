@@ -203,7 +203,6 @@ def ModWSGIApplication(environ, start_response):
     
     The request to the application should have the following structures:
 
-    
     >>> from music21.ext.six import StringIO
     >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
     >>> wsgiInput = StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
@@ -217,7 +216,7 @@ def ModWSGIApplication(environ, start_response):
     >>> environ['CONTENT_TYPE'] = "application/json"
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
     >>> webapps.ModWSGIApplication(environ, start_response)
-    [...'{"dataDict": {"a": {"data": "3", "fmt": "int"}}, "errorList": [], "status": "success"}']    
+    [...'{"dataDict": {"a": ...}, "errorList": [], "status": "success"}']    
     '''    
 
     # Get content of request: is in a file-like object that will need to be .read() to get content
@@ -339,7 +338,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
             
         elif type(value) == file:
             agenda['dataDict'][key] = collections.OrderedDict([("data",value),
-                                       ("fmt","file")])
+                                                               ("fmt","file")])
     
         else: # Put in data dict
             agenda['dataDict'][key] = {"data": value}
@@ -1165,13 +1164,17 @@ class CommandProcessor(object):
             outputType = 'text/html'
         
         if self.outputTemplate == "":
-            output =  json.dumps(self.getResultObject())
+            resDict = self.getResultObject()
+            resOrderedDict = collections.OrderedDict(sorted(list(resDict.items())))
+            output =  json.dumps(resOrderedDict)
             output = unicode(output).encode('utf-8')
             outputType = 'text/html; charset=utf-8'
-            
+            # TODO: unify these two -- duplicate code
         elif self.outputTemplate not in availableOutputTemplates:
             self.recordError("Unknown output template "+str(self.outputTemplate))
-            output =  json.dumps(self.getResultObject(),indent=4)
+            resDict = self.getResultObject()
+            resOrderedDict = collections.OrderedDict(sorted(list(resDict.items())))
+            output =  json.dumps(resOrderedDict,indent=4)
             output = unicode(output).encode('utf-8')
             outputType = 'text/html; charset=utf-8'
             
@@ -1181,6 +1184,7 @@ class CommandProcessor(object):
                 parsedArg = self.parseInputToPrimitive(arg)
                 argList[i] = parsedArg  
             # safe because check for self.outputTemplate in availableOutputTemplates
+            ### But let's still TODO: get rid of eval
             (output, outputType) = eval(self.outputTemplate)(*argList)
         return (output, outputType)
     

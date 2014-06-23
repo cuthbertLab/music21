@@ -34,7 +34,7 @@ import os
 import math
 import json
 import difflib
-
+from collections import OrderedDict
 
 def translateMonophonicPartToSegments(
     inputStream,
@@ -196,7 +196,7 @@ def indexScoreFilePaths(
         'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
     
     '''
-    scoreDict = {}
+    scoreDict = OrderedDict()
     scoreIndex = 0
     totalScores = len(scoreFilePaths)
     for filePath in scoreFilePaths:
@@ -295,17 +295,17 @@ def scoreSimilarity(
         >>> for result in scoreSim[64:68]:
         ...     result
         ...
-        (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 3, 17, 0.0)
-        (u'bwv197.5.mxl', 0, 1, 4, u'bwv190.7.mxl', 3, 4, 22, 0.0)
-        (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 0, 0, 0.377...)
-        (u'bwv197.5.mxl', 0, 2, 9, u'bwv197.10.mxl', 0, 1, 5, 0.339...)
-
+        (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 1, 4, 0.0)
+        (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 2, 9, 0.0)
+        (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 0, 0, 0.07547...)
+        (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 1, 5, 0.07547...)
+        
     Return tuple.
     '''
     similarityScores = []
     scoreIndex = 0
     totalScores = len(scoreDict)
-    scoreDictKeys = scoreDict.keys()
+    scoreDictKeys = list(scoreDict.keys())
     for thisScoreNumber in range(totalScores):
         thisScoreKey = scoreDictKeys[thisScoreNumber]
         thisScore = scoreDict[thisScoreKey]

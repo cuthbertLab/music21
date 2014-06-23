@@ -16,7 +16,7 @@
 import os
 import time
 import unittest
-
+from collections import OrderedDict
 from music21 import common
 from music21 import exceptions21
 from music21 import freezeThaw
@@ -165,10 +165,15 @@ class MetadataBundle(object):
         >>> resultsEntries
         <music21.metadata.bundles.MetadataBundle {4 entries}>
 
+
+    Results are ordered by their source path:
+    
     ::
 
         >>> resultsEntries[0]
-        <music21.metadata.bundles.MetadataEntry: bach_choraleAnalyses_riemenschneider007_rntxt>
+        <music21.metadata.bundles.MetadataEntry: bach_choraleAnalyses_riemenschneider001_rntxt>
+
+    To get a score out of the entry, call .parse()
 
     ::
 
@@ -262,7 +267,7 @@ class MetadataBundle(object):
 
     def __init__(self, expr=None):
         from music21 import corpus
-        self._metadataEntries = {}
+        self._metadataEntries = OrderedDict()
         assert isinstance(expr, (str, corpus.corpora.Corpus, type(None)))
         if isinstance(expr, corpus.corpora.Corpus):
             self._name = expr.name
@@ -413,7 +418,6 @@ class MetadataBundle(object):
         return self._apply_set_predicate(metadataBundle, '__ge__')
 
     def __getitem__(self, i):
-        # TODO: is this an OrderedDict???
         return list(self._metadataEntries.values())[i]
 
     def __gt__(self, metadataBundle):
@@ -758,6 +762,9 @@ class MetadataBundle(object):
             else:
                 metadataEntry = metadataBundle._metadataEntries[key]
             resultBundle._metadataEntries[key] = metadataEntry
+            
+        resultBundle._metadataEntries = OrderedDict(sorted(list(resultBundle._metadataEntries.items()), 
+                                                        key=lambda mde: mde[1].sourcePath))
         return resultBundle
 
     def _apply_set_predicate(self, metadataBundle, predicate):
@@ -1472,6 +1479,9 @@ class MetadataBundle(object):
                     include = True
                 if include and key not in newMetadataBundle._metadataEntries:
                     newMetadataBundle._metadataEntries[key] = metadataEntry
+        newMetadataBundle._metadataEntries = OrderedDict(sorted(list(newMetadataBundle._metadataEntries.items()), 
+                                                        key=lambda mde: mde[1].sourcePath))
+
         return newMetadataBundle
 
     def symmetric_difference(self, metadataBundle):

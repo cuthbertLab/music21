@@ -2075,24 +2075,26 @@ class ConcreteScale(Scale):
         >>> sc2 = scale.MajorScale('d')
         >>> sc3 = scale.MajorScale('a')
         >>> sc4 = scale.MajorScale('e')
-        >>> sc1.match(sc2)
-        {'notMatched': [<music21.pitch.Pitch C#5>], 
-         'matched': [<music21.pitch.Pitch D4>, <music21.pitch.Pitch E4>, 
+        
+        >>> from pprint import pprint as pp
+        >>> pp(sc1.match(sc2))
+        {'matched': [<music21.pitch.Pitch D4>, <music21.pitch.Pitch E4>, 
                      <music21.pitch.Pitch F#4>, <music21.pitch.Pitch G4>, 
-                     <music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>]}
+                     <music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>],
+        'notMatched': [<music21.pitch.Pitch C#5>]}
 
-        >>> sc2.match(sc3)
-        {'notMatched': [<music21.pitch.Pitch G#5>], 
-         'matched': [<music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>, 
+        >>> pp(sc2.match(sc3))
+        {'matched': [<music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>, 
                      <music21.pitch.Pitch C#5>, <music21.pitch.Pitch D5>, 
-                     <music21.pitch.Pitch E5>, <music21.pitch.Pitch F#5>]}
+                     <music21.pitch.Pitch E5>, <music21.pitch.Pitch F#5>],
+        'notMatched': [<music21.pitch.Pitch G#5>]}
 
-        >>> sc1.match(sc4)
-        {'notMatched': [<music21.pitch.Pitch G#4>, 
+        >>> pp(sc1.match(sc4))
+        {'matched': [<music21.pitch.Pitch E4>, <music21.pitch.Pitch F#4>, 
+                     <music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>],
+         'notMatched': [<music21.pitch.Pitch G#4>, 
                         <music21.pitch.Pitch C#5>, 
-                        <music21.pitch.Pitch D#5>], 
-         'matched': [<music21.pitch.Pitch E4>, <music21.pitch.Pitch F#4>, 
-                     <music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>]}
+                        <music21.pitch.Pitch D#5>]}
         '''
         # strip out unique pitches in a list
         otherPitches = self.extractPitchList(other,
@@ -3278,9 +3280,14 @@ class Test(unittest.TestCase):
         self.assertEqual(sc1.abstract == sc2.abstract, True)
         self.assertEqual(sc1 == sc3, False)
         self.assertEqual(sc1.abstract == sc3.abstract, False)
-
+        from pprint import pformat
         # getting details on comparison
-        self.assertEqual(str(sc1.match(sc2)), "{'notMatched': [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch G#5>], 'matched': [<music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch F#5>]}")
+        self.assertEqual(pformat(sc1.match(sc2)), """{'matched': [<music21.pitch.Pitch A4>,
+             <music21.pitch.Pitch B4>,
+             <music21.pitch.Pitch D5>,
+             <music21.pitch.Pitch E5>,
+             <music21.pitch.Pitch F#5>],
+ 'notMatched': [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch G#5>]}""", pformat(sc1.match(sc2)))
 
 
     def testCyclicalScales(self):

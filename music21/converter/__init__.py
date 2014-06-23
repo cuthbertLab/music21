@@ -501,7 +501,7 @@ class Converter(object):
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
             if six.PY3 and isinstance(dataStr, bytes):
-                dataStrMakeStr = dataStr.decode('ascii')
+                dataStrMakeStr = dataStr.decode('utf-8','ignore')
             else:
                 dataStrMakeStr = dataStr
 
@@ -764,8 +764,9 @@ class Converter(object):
         ('sonix', 'AIFF data')
         >>> converter._resetSubconverters() #_DOCS_HIDE    
         '''
-
         dataStrStartLower = dataStr[:20].lower()
+        if six.PY3 and isinstance(dataStrStartLower, bytes):
+            dataStrStartLower = dataStrStartLower.decode('utf-8','ignore')
 
         foundFormat = None
         sclist = self.subconvertersList()
@@ -961,7 +962,7 @@ def parse(value, *args, **keywords):
         m21Format = None
 
     if six.PY3 and isinstance(value, bytes):
-        valueStr = value.decode('utf-8')
+        valueStr = value.decode('utf-8', 'ignore')
     else:
         valueStr = value
 

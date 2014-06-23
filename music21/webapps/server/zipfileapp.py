@@ -30,6 +30,7 @@ from music21 import common
 from music21 import converter
 from music21 import note
 from music21 import interval
+from music21 import exceptions21
 
 import zipfile
 import cgi
@@ -104,6 +105,8 @@ def performFunction(sc, command):
     as it changes to allow for more standard music21 functions 
     '''
     commandParts = command.split("/")
+    if (len(commandParts) < 3):
+        raise exceptions21.Music21Exception("Not enough parts on the command")
     
     if commandParts[1] == "transpose":
         return sc.transpose(commandParts[2])

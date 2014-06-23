@@ -54,15 +54,12 @@ CHORD_TYPES = {
     'diminished':                  ['1,-3,-5', ['dim', 'o']],                  # Y
     # sevenths
     'dominant-seventh':            ['1,3,5,-7', ['7', 'dom7',]],               # Y: 'dominant'
-    'dominant':                    ['1,3,5,-7', ['7', 'dom7',]],               # Y: 'dominant'
     'major-seventh':               ['1,3,5,7', ['maj7', 'M7']],                # Y
     'minor-major-seventh':         ['1,-3,5,7', ['mM7', 'm#7', 'minmaj7']],    # Y: 'major-minor'
-    'major-minor':                 ['1,-3,5,7', ['Mm7', 'm#7', 'mMaj7']],      # Y: 'major-minor'
     'minor-seventh':               ['1,-3,5,-7', ['m7', 'min7']],              # Y
     'augmented-major seventh':     ['1,3,#5,7', ['+M7', 'augmaj7']],           # N
     'augmented-seventh':           ['1,3,#5,-7', ['7+', '+7', 'aug7']],        # Y
     'half-diminished-seventh':     ['1,-3,-5,-7', ['/o7', 'm7b5']],            # Y: 'half-diminished'
-    'half-diminished':             ['1,-3,-5,-7', ['/o7', 'm7b5']],            # Y: 'half-diminished'
     'diminished-seventh':          ['1,-3,-5,--7', ['o7', 'dim7']],            # Y
     'seventh-flat-five':           ['1,3,-5,-7', ['dom7dim5']],                # N
     # sixths
@@ -108,6 +105,11 @@ CHORD_TYPES = {
     'Tristan':                     ['1,#4,#6,#9', ['tristan']]                 # Y
     }
 
+# these are different names used by MusicXML and others, and the authoritative name that they resolve to
+CHORD_ALIASES = {'dominant': 'dominant-seventh',
+                 'major-minor': 'major-minor-seventh',
+                 'half-diminished': 'half-diminished-seventh',
+                 }
 
 #-------------------------------------------------------------------------------
 
@@ -792,7 +794,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
         >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4'])
         >>> harmony.chordSymbolFigureFromChord(c, True)
-        ('G/o7', 'half-diminished')
+        ('G/o7', 'half-diminished-seventh')
 
     ::
 
@@ -1221,6 +1223,9 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         # convert the fbnotation string provided in CHORD_TYPES to chordDegrees notation
         types = {3:4, 5:7, 7:11, 9:2, 11:5, 13:9, 2:2, 4:5, 6:9}
         chordDegrees = []
+        if kind in CHORD_ALIASES:
+            kind = CHORD_ALIASES[kind]
+        
         if kind in CHORD_TYPES:
             for char in fbNotation.split(','):
                 if char == '1':
@@ -1826,7 +1831,9 @@ class ChordSymbol(Harmony):
         notationString = ""
 
         kind = self.chordKind
- 
+        if kind in CHORD_ALIASES:
+            kind = CHORD_ALIASES[kind]
+
         if kind in CHORD_TYPES:
             notationString = getNotationStringGivenChordType(kind)
         else:
@@ -2210,9 +2217,12 @@ class ChordSymbol(Harmony):
                 raise HarmonyException('Cannot find figure. No root to the chord found' , self)
             else:
                 figure = self.root().name
+            kind = self.chordKind
+            if kind in CHORD_ALIASES:
+                kind = CHORD_ALIASES[kind]
     
-            if self.chordKind in CHORD_TYPES:
-                figure += getAbbreviationListGivenChordType(self.chordKind)[0]
+            if kind in CHORD_TYPES:
+                figure += getAbbreviationListGivenChordType(kind)[0]
             if self.bass() != None:
                 if self.root().name != self.bass().name:
                     figure += '/' + self.bass().name
