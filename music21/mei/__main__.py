@@ -36,6 +36,11 @@ from music21 import chord
 from music21 import clef
 
 
+# Module-Level Constants
+#------------------------------------------------------------------------------
+_XMLID = '{http://www.w3.org/XML/1998/namespace}id'
+
+
 # Exceptions
 #------------------------------------------------------------------------------
 class MeiValueError(exceptions21.Music21Exception):
@@ -352,8 +357,8 @@ def noteFromElement(elem):
                      duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
 
-    if elem.get('id') is not None:
-        post.id = elem.get('id')
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
 
     if elem.get('artic') is not None:
         post.articulations = _makeArticList(elem.get('artic'))
@@ -412,8 +417,8 @@ def restFromElement(elem):
     post = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
 
-    if elem.get('id') is not None:
-        post.id = elem.get('id')
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
 
     return post
 
@@ -482,8 +487,8 @@ def chordFromElement(elem):
     # for a Chord, setting "duration" with a Duration object in __init__() doesn't work
     post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
 
-    if elem.get('id') is not None:
-        post.id = elem.get('id')
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
 
     if elem.get('artic') is not None:
         post.articulations = _makeArticList(elem.get('artic'))
@@ -542,8 +547,8 @@ def clefFromElement(elem):
                                    octaveShift=_getOctaveShift(elem.get('dis'),
                                                                elem.get('dis.place')))
 
-    if elem.get('id') is not None:
-        post.id = elem.get('id')
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
 
     return post
 
@@ -615,8 +620,8 @@ def layerFromElement(elem):
     for eachObj in objects:
         post.append(eachObj)
 
-    if elem.get('id') is not None:
-        post.id = elem.get('id')
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
 
     return post
 
@@ -675,8 +680,8 @@ def staffFromElement(elem):
     for eachObj in objects:
         post.append(eachObj)
 
-    if elem.get('id') is not None:
-        post.id = elem.get('id')
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
 
     return post
 
@@ -729,8 +734,8 @@ def measureFromElement(elem):
     for eachObj in objects:
         post.append(eachObj)
 
-    if elem.get('id') is not None:
-        post.id = elem.get('id')
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
 
     return post
 
