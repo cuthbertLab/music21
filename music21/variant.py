@@ -334,6 +334,10 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
             startOffset = returnObj.duration.quarterLength #This deals with insertion at the end case where returnObj.measure(xRegionStartMeasure+1) does not exist.
         else:
             startOffset = returnObj.measure(xRegionStartMeasure+1).getOffsetBySite(returnObj)
+
+        yRegion = None
+        replacementDuration = 0.0
+
         if regionType is 'equal':
             #yRegion = streamY.measures(yRegionStartMeasure+1, yRegionEndMeasure)
             continue #Do nothing
@@ -348,6 +352,8 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
         elif regionType is 'insert':
             yRegion = streamY.measures(yRegionStartMeasure+1, yRegionEndMeasure)
             replacementDuration = 0.0
+        else:
+            raise VariantException("Unknown regionType %r" % regionType)
         addVariant(returnObj, startOffset, yRegion, variantName = variantName, replacementDuration = replacementDuration)
     
     if inPlace is True:
@@ -933,12 +939,12 @@ def refineVariant(s, sVariant, inPlace = False):
     for regionType, returnStart, returnEnd, variantStart, variantEnd in regions:
         startOffset = returnRegion[returnStart].getOffsetBySite(returnRegion)
         #endOffset = returnRegion[returnEnd-1].getOffsetBySite(returnRegion)+returnRegion[returnEnd-1].duration.quarterLength       
+        variantSubRegion = None
         if regionType is 'equal':
             returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
             variantSubRegion = variantRegion.measures(variantStart+1, variantEnd)
             mergeVariantsEqualDuration([returnSubRegion, variantSubRegion], variantGroups, inPlace = True)
-            continue
-        
+            continue        
         elif regionType is 'replace':
             returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
             replacementDuration = returnSubRegion.duration.quarterLength
@@ -950,6 +956,9 @@ def refineVariant(s, sVariant, inPlace = False):
         elif regionType is 'insert':
             variantSubRegion = variantRegion.measures(variantStart+1, variantEnd)
             replacementDuration = 0.0
+        else:
+            raise VariantException("Unknown regionType %r" % regionType)
+
         addVariant(returnRegion, startOffset, variantSubRegion, variantGroups = variantGroups, replacementDuration = replacementDuration)
             
     returnObject.remove(variantRegion) # The original variant object has been replaced by more refined variant objects and so should be deleted.
@@ -1612,9 +1621,7 @@ def _getNextElements(s, v, numberOfElements = 1):
     ...     print(returnElement)
     <music21.note.Note E>
     <music21.note.Note G>
-    '''
-    
-    
+    '''  
     replacedElements = v.replacedElements(s)
     lengthType = v.lengthType
     # Get class of elements in variant or replaced Region
@@ -1696,14 +1703,17 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     replacedElements = v.replacedElements(s)
     lengthType = v.lengthType
     # Get class of elements in variant or replaced Region
+    foundStream = None
     if lengthType is 'elongation':
-        vClass = type(v.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
-        if isinstance(vClass, note.GeneralNote):
-            vClass = note.GeneralNote
+        foundStream = v.getElementsByClass(['Measure', 'Note', 'Rest'])
     else:
-        vClass = type(replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
-        if isinstance(vClass, note.GeneralNote):
-            vClass = note.GeneralNote
+        foundStream = replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])
+
+    if len(foundStream) == 0:
+        raise VariantException("Cannot find any Measures, Notes, or Rests in variant")
+    vClass = type(foundStream[0])
+    if isinstance(vClass, note.GeneralNote):
+        vClass = note.GeneralNote
     
     # Get next element in s after v which is of type vClass
     variantOffset = v.getOffsetBySite(s)
@@ -1730,7 +1740,10 @@ class VariantException(exceptions21.Music21Exception):
 class Variant(base.Music21Object):
     '''A Music21Object that stores elements like a Stream, but does not represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
 
-    This is accomplished not by subclassing, but by object composition: similar to the Spanner, the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant, are automatically delegated by use of the __getattr__ method. Special casses are overridden or managed as necessary: e.g., the Duration of a Variant is generally always zero. 
+    This is accomplished not by subclassing, but by object composition: similar to the Spanner, 
+    the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant, 
+    are automatically delegated by use of the __getattr__ method. Special casses are overridden 
+    or managed as necessary: e.g., the Duration of a Variant is generally always zero. 
 
     To use Variants from a Stream, see the :func:`~music21.stream.Stream.activateVariants` method. 
 
@@ -1832,9 +1845,10 @@ class Variant(base.Music21Object):
             (self.__class__.__name__, str(self.containedHighestTime))
     
     def __getattr__(self, attr):
-        '''This defers all calls not defined in this Class to calls on the privately contained Stream.
         '''
-        #environLocal.printDebug(['relaying unmatched attribute request to private Stream'])
+        This defers all calls not defined in this Class to calls on the privately contained Stream.
+        '''
+        #environLocal.printDebug(['relaying unmatched attribute request ' + attr + ' to private Stream'])
 
         # must mask pitches so as not to recurse
         # TODO: check tt recurse does not go into this
@@ -1842,7 +1856,7 @@ class Variant(base.Music21Object):
             raise AttributeError
         try:
             ## needed for unpickling where ._stream doesn't exist until later...
-            if hasattr(self, '_stream'):
+            if attr != '_stream' and hasattr(self, '_stream'):
                 return getattr(self._stream, attr)
             else:
                 raise AttributeError

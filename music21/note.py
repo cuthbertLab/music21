@@ -658,7 +658,9 @@ class NotRest(GeneralNote):
 
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
-
+    _DOC_ATTR = {
+    'beams': 'A :class:`~music21.beam.Beams` object that contains information about the beaming of this note.',
+    }
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
         self._notehead = 'normal'
@@ -667,6 +669,10 @@ class NotRest(GeneralNote):
         self._stemDirection = 'unspecified'
         self._volume = None # created on demand
         self.duration.linkage = 'tie'
+        if "beams" in keywords:
+            self.beams = keywords["beams"]
+        else:
+            self.beams = beam.Beams()
 
     def __deepcopy__(self, memo=None):
         '''
@@ -875,7 +881,6 @@ class Note(NotRest):
     'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
     'isUnpitched': 'Boolean read-only value describing if this Note is Unpitched (False).',
     'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
-    'beams': 'A :class:`~music21.beam.Beams` object that contains information about the beaming of this note.',
     'pitch': 'A :class:`~music21.pitch.Pitch` object containing all the information about the note\'s pitch.  Many `.pitch` properties and methods are also made `Note` properties also',
     }
 
@@ -891,11 +896,6 @@ class Note(NotRest):
             if 'name' in keywords:
                 del(keywords['name'])
             self.pitch = pitch.Pitch('C4', **keywords)
-
-        if "beams" in keywords:
-            self.beams = keywords["beams"]
-        else:
-            self.beams = beam.Beams()
 
     #---------------------------------------------------------------------------
     # operators, representations, and transformatioins
@@ -934,8 +934,8 @@ class Note(NotRest):
                 # converting to sets produces ordered cols that remove duplicate
                 # however, must then convert to list to match based on class ==
                 # not on class id()
-                if (sorted(list(set(self.articulations))) ==
-                    sorted(list(set(other.articulations)))):
+                if (sorted(list(set([x.classes[0] for x in self.articulations]))) ==
+                    sorted(list(set([x.classes[0] for x in other.articulations])))):
                     # Tie objects if present compare only type
                     if self.tie == other.tie:
                         return True

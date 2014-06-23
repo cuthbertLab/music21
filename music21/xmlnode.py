@@ -13,9 +13,9 @@
 as object representations.  Used by the musicxml converter, obviously, but
 also by environment.py.
 '''
-
 import copy
 import xml.dom.minidom
+from music21.ext import six
 
 
 # cannot import environment because environment reads/writes XML
@@ -68,6 +68,11 @@ def fixed_writexml(self, writer, indent="", addindent="", newl=""):
     else:
         writer.write("/>%s"%(newl))
 
+def fixBytes(value):
+    if six.PY3 and isinstance(value, bytes):
+        return value.decode(errors='replace')
+    else:
+        return value
 
 
 #-------------------------------------------------------------------------------
@@ -109,12 +114,10 @@ class XMLNode(object):
         Get all sub-components, in order. 
         These may be XMLNode subclasses, or may be simple entities. 
  
-        
         Simple entities do not have attributes and are only used 
         as containers for character data. These entities are generally 
         not modeled as objects.
-        
-        
+               
         The xmlnode.XMLNode._getComponents() method just returns
         an empty list.  Subclasses override this method.
         '''
@@ -123,7 +126,7 @@ class XMLNode(object):
 
     def loadAttrs(self, attrs):
         '''
-        Given a SAX attrs object, load all atributes that are 
+        Given a SAX attrs object, load all attributes that are 
         named within this object's _attr dictionary. 
         '''
         for key in self._attr:
@@ -133,6 +136,7 @@ class XMLNode(object):
 
     def hasAttrs(self):
         '''
+        Returns bool depending on whether there are any attributes
         
         >>> a = xmlnode.XMLNode()
         >>> a.hasAttrs()
@@ -349,7 +353,9 @@ class XMLNode(object):
         
 
     def set(self, name, value):
-        '''Set an attribute, using either the name of the attribute, a name that can be converter, or a direct attribute on the object. 
+        '''
+        Set an attribute, using either the name of the attribute, 
+        a name that can be converter, or a direct attribute on the object. 
         '''
         #if name in self._attr:
         try:    
@@ -392,13 +398,13 @@ class XMLNode(object):
         '''
         #if name in self._attr:
         try:
-            return self._attr[name]
+            return fixBytes(self._attr[name])
         except KeyError:
             pass
 
         # try direct access
         try:
-            return getattr(self, name)
+            return fixBytes(getattr(self, name))
         except AttributeError:
             pass
 
@@ -406,7 +412,7 @@ class XMLNode(object):
         nameDst = self._convertNameToXml(name)
         #if nameDst in self._attr:
         try:
-            return self._attr[nameDst]
+            return fixBytes(self._attr[nameDst])
         except KeyError:
             pass
 
@@ -418,7 +424,7 @@ class XMLNode(object):
         for candidate in candidates:
             if hasattr(self, candidate):
                 match = True
-                return getattr(self, candidate)
+                return fixBytes(getattr(self, candidate))
         if not match:
             raise XMLNodeException('this object (%r) does not have a "%s" (or %s) attribute' % (self, name, candidate))
         
@@ -437,13 +443,13 @@ class XMLNode(object):
         This is not XML, but a simple format for viewing contents of elements.'''
         msg = []
         # NOTE: this fails in python3:
-        msg.append(u'<%s ' % self._tag)
+        msg.append(u'<%s ' % fixBytes(self._tag))
         sub = []
-        for name, value in self._getAttributes():
+        for name, value in sorted(list(self._getAttributes()), key=lambda x: x[0]):
             if value == None: continue
-            sub.append(u'%s=%s' % (name, value))
+            sub.append(u'%s=%s' % (fixBytes(name), fixBytes(value)))
         if self.charData not in ['', None]:
-            sub.append(u'charData=%s' % self.charData)
+            sub.append(u'charData=%s' % fixBytes(self.charData))
         
         for component in self._getComponents():
             if type(component) == tuple: # its a simple element
@@ -451,18 +457,22 @@ class XMLNode(object):
                 if value == None: continue
                 # generally we do not need to see False boolean nodes
                 if type(value) == bool and value == False: continue 
-                sub.append(u'%s=%s' % (name, value))
+                sub.append(u'%s=%s' % (fixBytes(name), fixBytes(value)))
             else: # its a node subclass
                 if component == None: continue
-                sub.append(component.__repr__()) # all __repr__ on sub objects
+                else: sub.append(fixBytes(component.__repr__())) # all __repr__ on sub objects
         #print _MOD, sub
         try:
             msg.append(u' '.join(sub))
         except UnicodeDecodeError:
+            return "Unicode Decode Error"
             msg.append(u'unicode decode error!!')
         msg.append(u'>')
 
-        return u''.join(msg).encode('utf-8')
+        if six.PY2:
+            return u''.join(msg).encode('utf-8')
+        else:
+            return u''.join(msg)
 
     def getNewDoc(self):
         doc = xml.dom.minidom.Document()
@@ -493,11 +503,12 @@ class XMLNode(object):
 
         # if self.charData is defined, this is a text component of this tag
         if self.charData != None:
+            cd = fixBytes(self.charData)
             try:
-                node.appendChild(doc.createTextNode(str(self.charData)))
+                node.appendChild(doc.createTextNode(str(cd)))
             except UnicodeEncodeError:                
                 # try raw data
-                node.appendChild(doc.createTextNode(self.charData))
+                node.appendChild(doc.createTextNode(cd))
 
         for component in self._getComponents():
             if component == None: continue
@@ -505,26 +516,43 @@ class XMLNode(object):
             elif isinstance(component, tuple): 
                 tag, content = component
                 if content == None: continue
+
                 # some elements are treated as boolean values; presence 
                 # of element, w/o text, is true
                 if type(content) == bool and content == False: 
                     continue 
+                content = fixBytes(content)
+                tag = fixBytes(tag)
+                
                 sub = doc.createElement(tag)
                 if type(content) == bool and content == True:
                     pass # no text node needed
                 else:
                     # was the topline; trying to use replace for errors
                     #entry = u"%s" % content
+                    if (isinstance(content, int) or isinstance(content, float)):
+                        contentStr = str(content)
+                    else:
+                        contentStr = content
+
+                    if six.PY2:                       
+                        try:
+                            entry = unicode(contentStr, errors='replace')
+                        except TypeError:
+                            entry = u"%s" % contentStr
+                            #entry = str(content)
+                        except NameError: # py3
+                            entry = contentStr
+                        except RuntimeError:  # IronPython
+                            entry = u"%s" % contentStr                        
+                    else:
+                        entry = contentStr
+
+
                     try:
-                        entry = unicode(content, errors='replace')
+                        sub.appendChild(doc.createTextNode(entry))
                     except TypeError:
-                        entry = u"%s" % content
-                        #entry = str(content)
-                    except NameError: # py3
-                        entry = content
-                    except RuntimeError:  # IronPython
-                        entry = u"%s" % content                        
-                    sub.appendChild(doc.createTextNode(entry))
+                        raise TypeError("More problems with %r, type: %s" % (entry, type(entry)))
                 node.appendChild(sub)
             elif isinstance(component, XMLNode): # its a XMLNode subclass
                 # parent is this node
@@ -542,7 +570,10 @@ class XMLNode(object):
         # append completed node to parent (from arg) or document
         parent.appendChild(node)
         if stringOut:
-            return parent.toprettyxml(indent=u"  ", encoding="utf-8")
+            if six.PY2:
+                return parent.toprettyxml(indent=u"  ", encoding="utf-8")
+            else:
+                return parent.toprettyxml(indent="  ")
             #return parent.toxml(encoding="utf-8")
 
         else:
@@ -551,8 +582,14 @@ class XMLNode(object):
 
     def xmlStr(self):
         '''Shortcut method to provide quick xml out.'''
-        return self.toxml(None, None, 1)
-
+        x = self.toxml(None, None, 1)
+        if six.PY2:
+            return x
+        else:
+            if isinstance(x, bytes):
+                return x.decode(errors='replace')
+            else:
+                return x
 
 
 class XMLNodeList(XMLNode):

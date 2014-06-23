@@ -115,9 +115,9 @@ class ScoreFollower(object):
         >>> ScF.useScale = scale.ChromaticScale('C4')
         >>> ScF.currentSample = 0
         >>> exitType = ScF.repeatTranscription()
-        >>> print exitType
+        >>> print(exitType)
         False
-        >>> print ScF.lastNotePosition
+        >>> print(ScF.lastNotePosition)
         10
 
         '''
@@ -278,7 +278,7 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 15
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        >>> print ScF.startSearchAtSlot
+        >>> print(ScF.startSearchAtSlot)
         0
 
         Different examples for different countdowns:
@@ -300,7 +300,7 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        >>> print ScF.startSearchAtSlot
+        >>> print(ScF.startSearchAtSlot)
         38
 
         >>> ScF.predictedNotePosition >=38
@@ -322,7 +322,7 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        >>> print ScF.startSearchAtSlot
+        >>> print(ScF.startSearchAtSlot)
         15
 
         >>> ScF.predictedNotePosition > 15
@@ -344,10 +344,10 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        >>> print ScF.startSearchAtSlot
+        >>> print(ScF.startSearchAtSlot)
         15
 
-        >>> print ScF.predictedNotePosition
+        >>> print(ScF.predictedNotePosition)
         39
 
         Countdown = 4:
@@ -366,10 +366,10 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        >>> print ScF.startSearchAtSlot
+        >>> print(ScF.startSearchAtSlot)
         0
 
-        >>> print ScF.predictedNotePosition
+        >>> print(ScF.predictedNotePosition)
         0
 
         Countdown = 5:
@@ -387,7 +387,7 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        >>> print exitType
+        >>> print(exitType)
         countdownExceeded
 
         '''
@@ -465,16 +465,16 @@ class ScoreFollower(object):
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.scoreNotesOnly = ScF.scoreStream.flat.notesAndRests
         >>> ScF.lastNotePosition = 14
-        >>> ScF.seconds_recording = 10
+        >>> ScF.seconds_recording = 10.0
         >>> totalLengthPeriod = 8
-        >>> totalSeconds = 2
+        >>> totalSeconds = 2.0
         >>> predictedStartPosition = ScF.predictNextNotePosition(
         ...     totalLengthPeriod, totalSeconds)
-        >>> print predictedStartPosition
-        16
+        >>> print(predictedStartPosition)
+        18
 
         '''
-        extraLength = totalLengthPeriod * totalSeconds / self.seconds_recording
+        extraLength = totalLengthPeriod * totalSeconds / float(self.seconds_recording)
         middleRhythm = 0
         slots = 0
 

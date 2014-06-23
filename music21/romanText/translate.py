@@ -41,7 +41,7 @@ the data to make a histogram of scale degree usage within a key:
 >>> degreeDictionary = {}
 >>> for el in monteverdi.recurse():
 ...    if 'RomanNumeral' in el.classes:
-...         print el.figure, el.key
+...         print("%s %s" % (el.figure, el.key))
 ...         for p in el.pitches:
 ...              degree, accidental = el.key.getScaleDegreeAndAccidentalFromPitch(p)
 ...              if accidental is None:
@@ -52,7 +52,8 @@ the data to make a histogram of scale degree usage within a key:
 ...                   degreeDictionary[degreeString] = 1
 ...              else:
 ...                   degreeDictionary[degreeString] += 1
-...              print (str(p), degreeString)
+...              degTuple = (str(p), degreeString)
+...              print ("%r" % (degTuple,) )
     vi F major
     ('D5', '6')
     ('F5', '1')
@@ -84,7 +85,7 @@ It's a little complex, but worth seeing in full:
 >>> data = []
 >>> xlabels = []
 >>> values = []
->>> for deg,value in sorted(degreeDictionary.iteritems(), key=operator.itemgetter(1), reverse=True):
+>>> for deg,value in sorted(list(degreeDictionary.items()), key=operator.itemgetter(1), reverse=True):
 ...    data.append((i, degreeDictionary[deg]), )
 ...    xlabels.append((i+.5, deg), )
 ...    values.append(degreeDictionary[deg])
@@ -690,7 +691,7 @@ def _consolidateRepeatEndings(repeatEndings):
     >>> repeatEndings = {1: [(5, 'm5a'), (6, 'm6a'), (17, 'm17'), (18, 'm18'), (19, 'm19'), (23, 'm23a')], 
     ...                  2: [(5, 'm5b'), (6, 'm6b'), (20, 'm20'), (21, 'm21'), (23, 'm23b')], 
     ...                  3: [(23, 'm23c')]}
-    >>> print romanText.translate._consolidateRepeatEndings(repeatEndings)
+    >>> print(romanText.translate._consolidateRepeatEndings(repeatEndings))
     [(['m5a', 'm6a'], 1), (['m17', 'm18', 'm19'], 1), (['m23a'], 1), (['m5b', 'm6b'], 2), (['m20', 'm21'], 2), (['m23b'], 2), (['m23c'], 3)]
     '''
     returnList = []

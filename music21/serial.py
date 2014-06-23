@@ -52,7 +52,7 @@ class TwelveToneMatrix(stream.Stream):
     :meth:`~music21.stream.TwelveToneRow.matrix` method of 
     :meth:`~music21.stream.TwelveToneRow` (or a subclass).
 
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
 
     
     >>> aMatrix = serial.rowToMatrix([0,2,11,7,8,3,9,1,4,10,6,5])
@@ -1160,7 +1160,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
     distinct pitch classes, but the top note of the first chord (or note), the bottom note of the last chord (or note), 
     and all pitches of all notes and chords other than the first and last contain at most 4 distinct pitch classes.
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     ::
 
@@ -1746,7 +1746,7 @@ def findSegments(inputStream, searchList, reps = 'skipConsecutive', includeChord
     and the bottom note of the second, or as [2, 4, 5], by taking the top note of the first chord and the two notes of the second
     chord in order. Both times, the chords are read from bottom to top.
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     >>> for a in serial.findSegments(sc, [[7, -3, 11], [9, 11, 0]], includeChords = False):
     ...    print(a.matchedSegment)
@@ -1886,7 +1886,7 @@ def labelSegments(inputStream, segmentDict, reps = 'skipConsecutive', includeCho
     .. image:: images/serial-labelSegments.png
        :width: 500
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     ::
 
@@ -1979,7 +1979,7 @@ def findTransposedSegments(inputStream, searchList, reps = 'skipConsecutive', in
     >>> [seg.segment for seg in serial.findTransposedSegments(newpart, [[4, 6, 'A']])]
     [[<music21.note.Note F>, <music21.chord.Chord G4 B4>]]
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     >>> testSameSeg = serial.findTransposedSegments(newpart, [[12, 13], [0, 1]], 'skipConsecutive', includeChords = False)
     >>> len(testSameSeg)
@@ -2133,7 +2133,7 @@ def labelTransposedSegments(inputStream, segmentDict, reps = 'skipConsecutive', 
     .. image:: images/serial-labelTransposedSegments.png
        :width: 500
         
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     ::
 
@@ -2240,7 +2240,7 @@ def findTransformedSegments(inputStream, searchList, reps = 'skipConsecutive', i
     is an inversion of the search segment, [4, 0, 4], and furthermore, the first 7 is part of the first note of the segment (G), and
     the last 7 is part of the last chord of the segment, the found segment is matched to the segment being searched for.
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     >>> s = stream.Stream()
     >>> s.repeatAppend(part, 2)
@@ -2354,7 +2354,7 @@ def labelTransformedSegments(inputStream, segmentDict, reps = 'skipConsecutive',
     
     Note: the spanners above were moved manually so that they can be more easily distinguished from one another.
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     ::
 
@@ -2541,7 +2541,7 @@ def findMultisets(inputStream, searchList, reps = 'skipConsecutive', includeChor
     >>> serial.findMultisets(sc1, [[0, 2, 5]])
     []
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     >>> s = stream.Stream()
     >>> s.repeatAppend(part, 2)
@@ -2695,7 +2695,7 @@ def labelMultisets(inputStream, multisetDict, reps = 'skipConsecutive', includeC
         
     Note: the spanners above were moved manually so that they can be more easily distinguished from one another.
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     >>> [len(n.lyrics) for n in labeledPart.flat.notes]
     [1, 1, 0, 0]
@@ -2748,12 +2748,12 @@ def findTransposedMultisets(inputStream, searchList, reps = 'skipConsecutive', i
     
     >>> instanceList = serial.findTransposedMultisets(part, [[-9, -10, -11]], includeChords = False)
     >>> for instance in instanceList:
-    ...    print(instance.activeSegment, instance.startMeasureNumber, instance.matchedSegment)
+    ...    (instance.activeSegment, instance.startMeasureNumber, instance.matchedSegment)
     ([2, 4, 3], 3, [-9, -10, -11])
     ([3, 4, 2], 5, [-9, -10, -11])
     ([0, 1, 2], 1, [-9, -10, -11])
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     
     >>> part2 = stream.Part()
@@ -2977,7 +2977,7 @@ def findTransposedAndInvertedMultisets(inputStream, searchList, reps = 'skipCons
     of contiguous segments. Accordingly, calling :attr:`~music21.serial.ContiguousSegmentOfNotes.matchedSegment`
     returns only one element of the searchList for each found segment.
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
     
     >>> majAndMinTriads = serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7]], 'rowsOnly', includeChords = True)
     >>> [maj.segment for maj in majAndMinTriads]
@@ -3439,7 +3439,8 @@ def pcToToneRow(pcSet):
       B  0  7  1  2  9  5  3  4  8  6  A
     ...
     
-    __OMIT_FROM_DOCS__
+    OMIT_FROM_DOCS
+    
     >>> a = serial.pcToToneRow([1,1,1,1,1,1,1,1,1,1,1,1])
     >>> a.pitchClasses()
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]

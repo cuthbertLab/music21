@@ -336,9 +336,9 @@ class GeneralMordent(Ornament):
             raise ExpressionException("Cannot realize a mordent if I do not know its direction")
         if self.size == "":
             raise ExpressionException("Cannot realize a mordent if there is no size given")
-        if srcObject.duration == None or srcObject.duration.quarterLength == 0:
+        if srcObject.duration is None or srcObject.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
-        if srcObject.duration < self.quarterLength*2:
+        if srcObject.duration.quarterLength < self.quarterLength*2:
             raise ExpressionException("The note is not long enough to realize a mordent")
 
         remainderDuration = srcObject.duration.quarterLength - (2 * self.quarterLength)
@@ -527,7 +527,7 @@ class Trill(Ornament):
             numberOfTrillNotes = int(srcObject.duration.quarterLength / self.quarterLength)
             
         trillNotes = []
-        for unused_counter in range(numberOfTrillNotes / 2):
+        for unused_counter in range(int(numberOfTrillNotes / 2)):
             firstNote = copy.deepcopy(srcObject)
             #TODO: remove expressions
             firstNote.duration.quarterLength = self.quarterLength

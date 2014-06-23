@@ -129,66 +129,67 @@ class Articulation(base.Music21Object):
     def __repr__(self):
         return '<music21.articulations.%s>' % (self.__class__.__name__)
     
-    def __eq__(self, other):
-        '''
-        Equality. Based only on the class name, 
-        as other other attributes are independent of context and deployment.
-
-        
-        >>> at1 = articulations.StrongAccent()
-        >>> at2 = articulations.StrongAccent()
-        >>> at1.placement = 'above'
-        >>> at2.placement = 'below'
-        >>> at1 == at2
-        True
-
-
-        Comparison between classes and with the object itself behaves as expected
-
-
-        >>> at3 = articulations.Accent()
-        >>> at4 = articulations.Staccatissimo()
-        >>> at1 == at3
-        False
-        >>> at4 == at4
-        True
-
-
-        #OMIT_FROM_DOCS
-        >>> at5 = articulations.Staccato()
-        >>> at6 = articulations.Spiccato()
-        >>> [at1, at4, at3] == [at1, at4, at3]
-        True
-        >>> [at1, at2, at3] == [at2, at3, at1]
-        False
-        >>> set([at1, at2, at3]) == set([at2, at3, at1])
-        True 
-        >>> at6 == None
-        False
-        '''
-        # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
-        if other == None or not isinstance(other, Articulation):
-            return False
-        elif self.__class__ == other.__class__:
-            return True
-        return False
-
-    def __ne__(self, other):
-        '''Inequality. Needed for pitch comparisons.
-
-        
-        >>> at1 = articulations.StrongAccent()
-        >>> at2 = articulations.StrongAccent()
-        >>> at3 = articulations.Accent()
-        >>> at4 = articulations.Staccatissimo()
-        >>> at5 = articulations.Staccato()
-        >>> at6 = articulations.Spiccato()
-        >>> at1 != at2
-        False
-        >>> at1 != at3
-        True
-        '''
-        return not self.__eq__(other)
+#     def __eq__(self, other):
+#         '''
+#         Equality. Based only on the class name, 
+#         as other other attributes are independent of context and deployment.
+# 
+#         
+#         >>> at1 = articulations.StrongAccent()
+#         >>> at2 = articulations.StrongAccent()
+#         >>> at1.placement = 'above'
+#         >>> at2.placement = 'below'
+#         >>> at1 == at2
+#         True
+# 
+# 
+#         Comparison between classes and with the object itself behaves as expected
+# 
+# 
+#         >>> at3 = articulations.Accent()
+#         >>> at4 = articulations.Staccatissimo()
+#         >>> at1 == at3
+#         False
+#         >>> at4 == at4
+#         True
+# 
+# 
+#         OMIT_FROM_DOCS
+#         
+#         >>> at5 = articulations.Staccato()
+#         >>> at6 = articulations.Spiccato()
+#         >>> [at1, at4, at3] == [at1, at4, at3]
+#         True
+#         >>> [at1, at2, at3] == [at2, at3, at1]
+#         False
+#         >>> set([at1, at2, at3]) == set([at2, at3, at1])
+#         True 
+#         >>> at6 == None
+#         False
+#         '''
+#         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
+#         if other == None or not isinstance(other, Articulation):
+#             return False
+#         elif self.__class__ == other.__class__:
+#             return True
+#         return False
+# 
+#     def __ne__(self, other):
+#         '''Inequality. Needed for pitch comparisons.
+# 
+#         
+#         >>> at1 = articulations.StrongAccent()
+#         >>> at2 = articulations.StrongAccent()
+#         >>> at3 = articulations.Accent()
+#         >>> at4 = articulations.Staccatissimo()
+#         >>> at5 = articulations.Staccato()
+#         >>> at6 = articulations.Spiccato()
+#         >>> at1 != at2
+#         False
+#         >>> at1 != at3
+#         True
+#         '''
+#         return not self.__eq__(other)
 
     def _getVolumeShift(self):
         return self._volumeShift
@@ -553,23 +554,23 @@ class Test(unittest.TestCase):
         self.assertEqual(a.bendAlter, None)
 
 
-    def testArticulationEquality(self):
-        a1 = Accent()
-        a2 = Accent()
-        a3 = StrongAccent()
-        a4 = StrongAccent()
-
-        self.assertEqual(a1, a2)
-        self.assertEqual(a3, a4)
-
-        # in order lists
-        self.assertEqual([a1, a3], [a2, a4])
-
-        self.assertEqual(set([a1, a3]), set([a1, a3]))
-        self.assertEqual(set([a1, a3]), set([a3, a1]))
-
-        # comparison of sets of different objects do not pass
-        #self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
+#     def testArticulationEquality(self):
+#         a1 = Accent()
+#         a2 = Accent()
+#         a3 = StrongAccent()
+#         a4 = StrongAccent()
+# 
+#         self.assertEqual(a1, a2)
+#         self.assertEqual(a3, a4)
+# 
+#         # in order lists
+#         self.assertEqual([a1, a3], [a2, a4])
+# 
+#         self.assertEqual(set([a1, a3]), set([a1, a3]))
+#         self.assertEqual(set([a1, a3]), set([a3, a1]))
+# 
+#         # comparison of sets of different objects do not pass
+#         #self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
 
 
 #-------------------------------------------------------------------------------

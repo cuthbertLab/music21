@@ -1058,7 +1058,8 @@ class Expander(object):
         
         Does nothing, because only searching for repeatBrackets, not repeat signs.  Need a better test.
         
-        >>> e._groupRepeatBracketIndices(s)
+        >>> from pprint import pprint as pp
+        >>> pp(e._groupRepeatBracketIndices(s))
         [{'measureIndices': [], 'repeatBrackets': []}]
         ''' 
         groups = []
@@ -1140,7 +1141,7 @@ class Expander(object):
                     # 1,3 will
                     # return 1, 2, 3
                     target += rb.getNumberList()
-                match = range(1, max(target)+1) # max of target + 1
+                match = list(range(1, max(target)+1)) # max of target + 1
                 if match != target:
                     environLocal.printDebug(['repeat brackets are not numbered consecutively: %s, %s' % (match, target)])
                     return False
@@ -1561,14 +1562,14 @@ class Expander(object):
                 mLastRightBar = mLast.rightBarline
                 if (mLastRightBar is not None and 'Repeat' in     
                     mLastRightBar.classes):
-                    indices = range(startIndex, endIndex+1)
+                    indices = list(range(startIndex, endIndex+1))
                 # condition of when to repeat next is not always clear
                 # if we have  [1 x :|[2 x | x still need to repeat
                 else: 
-                    indices = range(startIndex, endIndex+1)
+                    indices = list(range(startIndex, endIndex+1))
                     #indices = None # mark as not for repeating
                 # get bracket indices
-                bracketIndices = range(bracketStartIndex, endIndex+1)
+                bracketIndices = list(range(bracketStartIndex, endIndex+1))
                 # remove last found bracket indices from next indices to copy
                 if indices is not None:
                     # go over all past if bracketIndicies and remove

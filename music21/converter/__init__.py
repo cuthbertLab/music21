@@ -175,8 +175,11 @@ class ArchiveManager(object):
                         continue
                     if subFp.endswith('.xml'):
                         post = f.read(subFp)
-                        if six.PY3:
-                            post = post.decode(encoding='UTF-8')
+                        if six.PY3 and isinstance(post, bytes):
+                            try:
+                                post = post.decode(encoding='UTF-8')
+                            except UnicodeDecodeError: # sometimes windows written...
+                                post = post.decode(encoding='utf-16-le')
                         break
 
             elif name == None and dataFormat == 'musedata':
@@ -505,9 +508,14 @@ class Converter(object):
             dataStr = dataStr.lstrip()
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
+            if six.PY3 and isinstance(dataStr, bytes):
+                dataStrMakeStr = dataStr.decode('utf-8','ignore')
+            else:
+                dataStrMakeStr = dataStr
+
             if useFormat is not None:
                 pass
-            elif dataStr.startswith('<?xml'):
+            elif dataStrMakeStr.startswith('<?xml'):
                 # we'll check the root tag to determine file type
                 rootTag = ETree.fromstring(dataStr)
                 if isinstance(rootTag, ETree.ElementTree):
@@ -520,27 +528,28 @@ class Converter(object):
                     useFormat = 'mei'
                 else:
                     useFormat = 'musicxml'
-
-            elif dataStr.startswith('musicxml:'):
+            elif dataStrMakeStr.startswith('musicxml:'):
                 useFormat = 'musicxml'
-            elif dataStr.startswith('mei:'):
+            elif dataStrMakeStr.startswith('mei:'):
                 useFormat = 'mei'
-            elif dataStr.startswith('MThd') or dataStr.startswith('midi:'):
+            elif dataStrMakeStr.startswith('<?xml') or dataStrMakeStr.lower().startswith('musicxml:'):
+                useFormat = 'musicxml'
+            elif dataStrMakeStr.startswith('MThd') or dataStrMakeStr.lower().startswith('midi:'):
                 useFormat = 'midi'
-            elif dataStr.startswith('!!!') or dataStr.startswith('**') or dataStr.startswith('humdrum:'):
+            elif dataStrMakeStr.startswith('!!!') or dataStrMakeStr.startswith('**') or dataStrMakeStr.lower().startswith('humdrum:'):
                 useFormat = 'humdrum'
-            elif dataStr.lower().startswith('tinynotation:'):
+            elif dataStrMakeStr.lower().startswith('tinynotation:'):
                 useFormat = 'tinyNotation'
 
             # assume MuseData must define a meter and a key
-            elif 'WK#:' in dataStr and 'measure' in dataStr:
+            elif 'WK#:' in dataStrMakeStr and 'measure' in dataStrMakeStr:
                 useFormat = 'musedata'
-            elif 'M:' in dataStr and 'K:' in dataStr:
+            elif 'M:' in dataStrMakeStr and 'K:' in dataStrMakeStr:
                 useFormat = 'abc'
-            elif 'Time Signature:' in dataStr and 'm1' in dataStr:
+            elif 'Time Signature:' in dataStrMakeStr and 'm1' in dataStrMakeStr:
                 useFormat = 'romanText'
             else:
-                raise ConverterException('File not found or no such format found for: %s' % dataStr)
+                raise ConverterException('File not found or no such format found for: %s' % dataStrMakeStr)
 
         self.setSubconverterFromFormat(useFormat)
         self.subConverter.parseData(dataStr, number=number)
@@ -782,8 +791,9 @@ class Converter(object):
         ('sonix', 'AIFF data')
         >>> converter._resetSubconverters() #_DOCS_HIDE    
         '''
-
         dataStrStartLower = dataStr[:20].lower()
+        if six.PY3 and isinstance(dataStrStartLower, bytes):
+            dataStrStartLower = dataStrStartLower.decode('utf-8','ignore')
 
         foundFormat = None
         sclist = self.subconvertersList()
@@ -920,7 +930,7 @@ def parseURL(url, number=None, format=None, forceSource=False): # @ReservedAssig
     return v.stream
 
 def parse(value, *args, **keywords):
-    '''
+    r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
     parse the item into a Stream.  Note: URL downloading will not happen
     automatically unless the user has set their Environment "autoDownload"
@@ -959,7 +969,6 @@ def parse(value, *args, **keywords):
     >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation')
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 2/16>
-
     '''
 
     #environLocal.printDebug(['attempting to parse()', value])
@@ -979,6 +988,11 @@ def parse(value, *args, **keywords):
     else:
         m21Format = None
 
+    if six.PY3 and isinstance(value, bytes):
+        valueStr = value.decode('utf-8', 'ignore')
+    else:
+        valueStr = value
+
     if (common.isListLike(value) and len(value) == 2 and
         value[1] == None and os.path.exists(value[0])):
         # comes from corpus.search
@@ -992,11 +1006,11 @@ def parse(value, *args, **keywords):
             value = [value] + list(args)
         return parseData(value, number=number)
     # a midi string, must come before os.path.exists test
-    elif value.startswith('MThd'):
+    elif valueStr.startswith('MThd'):
         return parseData(value, number=number, format=m21Format)
     elif os.path.exists(value):
         return parseFile(value, number=number, format=m21Format, forceSource=forceSource)
-    elif (value.startswith('http://') or value.startswith('https://')):
+    elif (valueStr.startswith('http://') or valueStr.startswith('https://')):
         # its a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format, forceSource=forceSource)
     else:

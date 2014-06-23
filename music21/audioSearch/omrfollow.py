@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from music21 import audioSearch
 from music21 import converter
 from music21 import search
@@ -62,13 +64,13 @@ def recognizeScore(scorePart, pageMeasureNumbers, iterations = 1):
 
     allStreams = []
     for pgMinus1 in range(len(pages)):
-        print str(pgMinus1 + 1)
+        print(str(pgMinus1 + 1))
         thisPage = pages[pgMinus1]
         totalNotes = len(thisPage)
         for i in range(0, totalNotes, 8):
             startNote = thisPage[i]
             startMeasure = startNote.measureNumber
-            print "  " + str(startMeasure)
+            print("  " + str(startMeasure))
             newStream = stream.Stream(thisPage[i:i+24])
             newStream.pageNumber = pgMinus1 + 1
             newStream.startMeasure = startMeasure
@@ -76,7 +78,7 @@ def recognizeScore(scorePart, pageMeasureNumbers, iterations = 1):
 
     for loopy in range(iterations):
         if loopy > 0:
-            print "\n\nstarting again in 3 seconds"
+            print("\n\nstarting again in 3 seconds")
             time.sleep(3) 
         searchScore = audioSearch.transcriber.runTranscribe(show = False, plot = False, seconds = 15.0, saveFile = False)
         l = search.approximateNoteSearch(searchScore, allStreams)
@@ -88,20 +90,20 @@ def recognizeScore(scorePart, pageMeasureNumbers, iterations = 1):
             scores[scorePage] += (topStream.matchProbability / (i+1.5))*10
     
         
-        print "\nBest guesses (pg#, starting measure, probability)"
+        print("\nBest guesses (pg#, starting measure, probability)")
         for i,st in enumerate(l):
-            print st.pageNumber, st.startMeasure, st.matchProbability
+            print(st.pageNumber, st.startMeasure, st.matchProbability)
             if i >= 7:
                 break
         
-        print "\nWeighed top scores (pg#, score):"
+        print("\nWeighed top scores (pg#, score):")
         
         for i in range(len(pages)):
-            print i+1, scores[i],
+            print( (i+1, scores[i]), end="")
             if i == numpy.argmax(scores):
-                print " **** "
+                print(" **** ")
             else:
-                print ""
+                print("")
 
 
 if __name__ == '__main__':

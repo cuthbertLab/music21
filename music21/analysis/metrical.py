@@ -92,14 +92,15 @@ def thomassenMelodicAccent(streamIn):
     >>> s = converter.parse('tinynotation: 7/4 c4 c c d e d d')
     >>> analysis.metrical.thomassenMelodicAccent(s.flat.notes)
     >>> for n in s.flat.notes:
-    ...    print n.pitch.nameWithOctave, n.melodicAccent
-    C4 1.0
-    C4 0.0
-    C4 0.0
-    D4 0.33
-    E4 0.5561
-    D4 0.17
-    D4 0.0
+    ...    (n.pitch.nameWithOctave, n.melodicAccent)
+    ('C4', 1.0)
+    ('C4', 0.0)
+    ('C4', 0.0)
+    ('D4', 0.33)
+    ('E4', 0.5561)
+    ('D4', 0.17)
+    ('D4', 0.0)
+
     '''
     # we use .ps instead of Intervals for speed, since
     # we just need perceived contours

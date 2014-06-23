@@ -13,6 +13,7 @@
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
+import math
 from music21.audioSearch import * #@UnusedWildImport
 from music21.audioSearch import repetitionGame
 import Tkinter
@@ -40,7 +41,7 @@ class SFApp():
         self.buttonAccept = Tkinter.Button(master, text="Accept", width=self.sizeButton,command=self.callback, bg='white')
         self.buttonAccept.grid(row=8,column=1,columnspan=2)       
         
-        print 'Initialized!'
+        print('Initialized!')
         
         
     def callback(self):
@@ -106,7 +107,7 @@ class SFApp():
         
 
         if self.good == True:
-            print 'rounddddddddddddasdasdadsadad',self.rG.round
+            print('rounddddddddddddasdasdadsadad',self.rG.round)
             self.textRound.set('Round %d' %(self.rG.round+1))
             self.counter = math.pow(-1, self.rG.round)
             if self.counter == 1: #player 1

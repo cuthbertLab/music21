@@ -311,7 +311,7 @@ class JobProcessor(object):
         ...     jobs.append(job)
         >>> jobGenerator = metadata.JobProcessor.process_serial(jobs)
         >>> for result in jobGenerator:
-        ...     print result['remainingJobs']
+        ...     print(result['remainingJobs'])
         ...
         4
         3

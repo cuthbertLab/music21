@@ -583,7 +583,7 @@ class SFApp():
                 environLocal.printDebug("playing a note of the left page")
        
         
-        print '------------------last note position', self.ScF.lastNotePosition
+        print('------------------last note position', self.ScF.lastNotePosition)
         self.master.after(1000, self.continueScoreFollower)
  
     def stopScoreFollower(self):

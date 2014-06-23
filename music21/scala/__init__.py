@@ -118,7 +118,7 @@ class ScalaPitch(object):
 
     
     >>> sp = scala.ScalaPitch(' 1066.667 cents')
-    >>> print sp.parse()
+    >>> print(sp.parse())
     1066.667
 
     >>> sp = scala.ScalaPitch(' 2/1')
@@ -375,8 +375,8 @@ def parse(target):
 
 
     >>> ss = scala.parse('barbourChrom1')
-    >>> ss.description
-    u"Barbour's #1 Chromatic"
+    >>> print(ss.description)
+    Barbour's #1 Chromatic
     >>> ss.fileName
     'barbour_chrom1.scl'
 
@@ -491,11 +491,11 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
         self.assertEqual(ss.pitchCount, 5)
         self.assertEqual(ss.fileName, 'slendro5_2.scl')
         self.assertEqual(len(ss.pitchValues), 5)
-        self.assertEqual([str(x.cents) for x in ss.pitchValues], ['266.870905604', '498.044999135', '701.955000865', '968.825906469', '1200.0'])
+        self.assertEqual(["%.9f" % x.cents for x in ss.pitchValues], ['266.870905604', '498.044999135', '701.955000865', '968.825906469', '1200.000000000'])
 
-        self.assertEqual([str(x) for x in ss.getCentsAboveTonic()], ['266.870905604', '498.044999135', '701.955000865', '968.825906469', '1200.0'])
+        self.assertEqual(["%.9f" % x for x in ss.getCentsAboveTonic()], ['266.870905604', '498.044999135', '701.955000865', '968.825906469', '1200.000000000'])
         # sent values between scale degrees
-        self.assertEqual([str(x) for x in ss.getAdjacentCents()], ['266.870905604', '231.174093531', '203.910001731', '266.870905604', '231.174093531'] )
+        self.assertEqual(["%.9f" % x for x in ss.getAdjacentCents()], ['266.870905604', '231.174093531', '203.910001731', '266.870905604', '231.174093531'] )
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()], ['<music21.interval.Interval m3 (-33c)>', '<music21.interval.Interval M2 (+31c)>', '<music21.interval.Interval M2 (+4c)>', '<music21.interval.Interval m3 (-33c)>', '<music21.interval.Interval M2 (+31c)>'])
 
@@ -525,9 +525,31 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(ss.fileName, 'fj-12tet.scl')
         self.assertEqual(ss.description, 'Franck Jedrzejewski continued fractions approx. of 12-tet')
 
-        self.assertEqual([str(x) for x in ss.getCentsAboveTonic()], ['100.099209825', '199.979843291', '299.97390361', '400.10848047', '498.044999135', '600.088323762', '699.997698171', '800.909593096', '900.02609639', '1000.02015671', '1088.26871473', '1200.0'])
+        self.assertEqual(["%.9f" % x for x in ss.getCentsAboveTonic()], ['100.099209825', 
+                                                                         '199.979843291', 
+                                                                         '299.973903610', 
+                                                                         '400.108480470', 
+                                                                         '498.044999135', 
+                                                                         '600.088323762', 
+                                                                         '699.997698171', 
+                                                                         '800.909593096', 
+                                                                         '900.026096390', 
+                                                                        '1000.020156709', 
+                                                                        '1088.268714730', 
+                                                                        '1200.000000000'])
 
-        self.assertEqual([str(x) for x in ss.getAdjacentCents()], ['100.099209825', '99.8806334662', '99.9940603187', '100.13457686', '97.9365186644', '102.043324627', '99.9093744091', '100.911894925', '99.1165032942', '99.9940603187', '88.2485580216', '111.73128527'])
+        self.assertEqual(["%.9f" % x for x in ss.getAdjacentCents()], ['100.099209825', 
+                                                                        '99.880633466', 
+                                                                        '99.994060319', 
+                                                                       '100.134576860', 
+                                                                        '97.936518664', 
+                                                                       '102.043324627', 
+                                                                        '99.909374409', 
+                                                                       '100.911894925', 
+                                                                        '99.116503294', 
+                                                                        '99.994060319', 
+                                                                        '88.248558022',
+                                                                       '111.731285270'])
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()], ['<music21.interval.Interval m2 (+0c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (+0c)>', '<music21.interval.Interval m2 (-2c)>', '<music21.interval.Interval m2 (+2c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (+1c)>', '<music21.interval.Interval m2 (-1c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (-12c)>', '<music21.interval.Interval m2 (+12c)>'])
 
@@ -536,7 +558,18 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         ss2 = ScalaStorage()
         ss2.setAdjacentCents(ss.getAdjacentCents())
         
-        self.assertEqual([str(x) for x in ss2.getCentsAboveTonic()], ['100.099209825', '199.979843291', '299.97390361', '400.10848047', '498.044999135', '600.088323762', '699.997698171', '800.909593096', '900.02609639', '1000.02015671', '1088.26871473', '1200.0'])
+        self.assertEqual(["%.9f" % x for x in ss2.getCentsAboveTonic()], ['100.099209825', 
+                                                                          '199.979843291', 
+                                                                          '299.973903610', 
+                                                                          '400.108480470', 
+                                                                          '498.044999135', 
+                                                                          '600.088323762', 
+                                                                          '699.997698171', 
+                                                                          '800.909593096', 
+                                                                          '900.026096390', 
+                                                                         '1000.020156709', 
+                                                                         '1088.268714730', 
+                                                                         '1200.000000000'])
 
 
     def testScalaFileA(self):

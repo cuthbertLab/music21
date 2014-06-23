@@ -159,7 +159,7 @@ class wwnortonExercise(object):
             correctLyric = lyricFunc(resultObj)
             markerNote = markerPart.flat.getElementAtOrBefore(offset,classList=['Note'])
             if markerNote is None or markerNote.offset != offset:
-                print "No Marker"
+                print("No Marker")
                 continue
             if markerNote.lyric != str(correctLyric):
                 #markerNote.lyric = markerNote.lyric + "->" + str(correctLyric)

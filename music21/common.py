@@ -860,6 +860,8 @@ def isListLike(usrData):
     False
     >>> common.isListLike((None, None))
     True
+    >>> common.isListLike( set(['a','b','c','c']) )
+    True
     >>> common.isListLike(stream.Stream())
     False
     """
@@ -1057,7 +1059,6 @@ def getPlatform():
 def dotMultiplier(dots):
     '''
     dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots
-
 
     >>> common.dotMultiplier(1)
     1.5

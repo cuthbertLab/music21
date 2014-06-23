@@ -24,6 +24,7 @@ ensemble.py module.
 import copy
 import unittest
 import sys
+from collections import OrderedDict
 
 from music21 import base
 from music21 import exceptions21
@@ -1526,9 +1527,137 @@ def instrumentFromMidiProgram(number):
     
 
 def partitionByInstrument(streamObj):
-    '''Given a single Stream, or a Score or similar multi-part structure, partition into a Part for each unique Instrument, joining events possibly from different parts.
     '''
-    # TODO: this might be generalized and placed on Stream?
+    Given a single Stream, or a Score or similar multi-part structure, 
+    partition into a Part for each unique Instrument, joining events 
+    possibly from different parts.
+    
+    >>> p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
+    >>> p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
+
+    >>> p1.makeMeasures(inPlace=True)
+    >>> p2.makeMeasures(inPlace=True)
+
+    >>> p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
+    >>> p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
+    >>> p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
+    
+    >>> p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
+    >>> p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo()) # not likely...
+    >>> p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
+    
+    >>> s = stream.Score()
+    >>> s.insert(0, p1)
+    >>> s.insert(0, p2)
+    >>> s.show('text')
+    {0.0} <music21.tinyNotation.TinyNotationStream ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.instrument.Instrument Piccolo>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.instrument.Instrument Alto Saxophone>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.note.Note F>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B>
+            {3.0} <music21.instrument.Instrument Piccolo>
+            {3.0} <music21.note.Note C>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {4.0} <music21.bar.Barline style=final>
+    {0.0} <music21.tinyNotation.TinyNotationStream ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.instrument.Instrument Trombone>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note D#>
+            {2.0} <music21.note.Note E#>
+            {3.0} <music21.instrument.Instrument Piccolo>
+            {3.0} <music21.note.Note F#>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note G#>
+            {1.0} <music21.instrument.Instrument Trombone>
+            {1.0} <music21.note.Note A#>
+            {2.0} <music21.note.Note B#>
+            {3.0} <music21.note.Note C#>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note C#>
+            {4.0} <music21.bar.Barline style=final>
+
+    >>> s2 = instrument.partitionByInstrument(s)
+    >>> len(s2.parts)
+    3
+    
+    # TODO: this step might not be necessary...
+    
+    >>> for p in s2.parts:
+    ...     unused = p.makeRests(fillGaps=True, inPlace=True)
+    
+    # TODO: this step SHOULD not be necessary (measureTemplate)...
+    
+    >>> for p in s2.parts:
+    ...     p.makeMeasures(inPlace = True)
+    ...     p.makeTies(inPlace = True)
+    
+    >>> s2.show('text')
+    {0.0} <music21.stream.Part Piccolo>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.instrument.Instrument Piccolo>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Rest rest>
+            {3.0} <music21.note.Note F#>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note G#>
+            {1.0} <music21.note.Rest rest>
+            {3.0} <music21.note.Note C>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {4.0} <music21.bar.Barline style=final>
+    {0.0} <music21.stream.Part Trombone>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.instrument.Instrument Trombone>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note D#>
+            {2.0} <music21.note.Note E#>
+            {3.0} <music21.note.Rest rest>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Rest rest>
+            {1.0} <music21.note.Note A#>
+            {2.0} <music21.note.Note B#>
+            {3.0} <music21.note.Note C#>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note C#>
+            {4.0} <music21.bar.Barline style=final>
+    {0.0} <music21.stream.Part Alto Saxophone>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.instrument.Instrument Alto Saxophone>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.note.Note F>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.instrument.Instrument Alto Saxophone>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B>
+            {3.0} <music21.bar.Barline style=final>
+
+
+    Bug in makeRests -- notice the missing rest at the beginning of the alto sax part...
+
+    TODO: parts should be in Score Order. Cooindicence that this works.
+    TODO: note redundant Alto Saxophone...
+    '''
     from music21 import stream
 
     if not streamObj.hasPartLikeStreams():
@@ -1550,16 +1679,17 @@ def partitionByInstrument(streamObj):
     if len(found) == 0:
         return None # no partition is available
     
-    names = {} # store unique names
+    names = OrderedDict() # store unique names
     for e in found:
         # matching here by instrument name
-        if e.instrumentName not in names.keys():
+        if e.instrumentName not in names:
             names[e.instrumentName] = {'Instrument':e} # just store one instance
         
     # create a return object that has a part for each instrument
     post = stream.Score()
-    for iName in names.keys():
+    for iName in names:
         p = stream.Part()
+        p.id = iName
         # add the instrument instance
         p.insert(0, names[iName]['Instrument'])
         # store a handle to this part
@@ -1840,12 +1970,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 6)
-        self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Flute')
-        self.assertEqual(len(post.parts[1].notes), 4)
-
-        self.assertEqual(post.parts[2].getInstrument().instrumentName, 'Piccolo')
-        self.assertEqual(len(post.parts[2].notes), 2)
-
+        self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Piccolo')
+        self.assertEqual(len(post.parts[1].notes), 2)
+        self.assertEqual(post.parts[2].getInstrument().instrumentName, 'Flute')
+        self.assertEqual(len(post.parts[2].notes), 4)
         self.assertEqual(post.parts[3].getInstrument().instrumentName, 'Acoustic Guitar')
         self.assertEqual(len(post.parts[3].notes), 3)
 

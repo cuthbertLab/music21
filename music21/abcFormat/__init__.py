@@ -335,8 +335,8 @@ class ABCMetadata(ABCToken):
         if parameters == None:
             return None
         else:
-            n, d, unused_symbol = parameters
-            return meter.TimeSignature('%s/%s' % (n,d))
+            numerator, denominator, unused_symbol = parameters
+            return meter.TimeSignature('%s/%s' % (numerator, denominator))
 
 
     def _getKeySignatureParameters(self):
@@ -3050,7 +3050,7 @@ class Test(unittest.TestCase):
         ah.process(testFiles.theBeggerBoy)
         ahs = ah.splitByReferenceNumber()
         self.assertEqual(len(ahs), 1)
-        self.assertEqual(ahs.keys(), [5])
+        self.assertEqual(list(ahs.keys()), [5])
         self.assertEqual(len(ahs[5]), 88) # tokens
         self.assertEqual(ahs[5].tokens[0].src, 'X:5') # first is retained
         self.assertEqual(ahs[5].getTitle(), 'The Begger Boy') # tokens
@@ -3062,7 +3062,7 @@ class Test(unittest.TestCase):
 
         ahs = ah.splitByReferenceNumber()
         self.assertEqual(len(ahs), 1)
-        self.assertEqual(ahs.keys(), [None])
+        self.assertEqual(list(ahs.keys()), [None])
         self.assertEqual(ahs[None].tokens[0].src, 'M:6/8') # first is retained
         self.assertEqual(len(ahs[None]), 47) # tokens
 
@@ -3073,7 +3073,7 @@ class Test(unittest.TestCase):
 
         ahs = ah.splitByReferenceNumber()
         self.assertEqual(len(ahs), 3)
-        self.assertEqual(ahs.keys(), [168, 166, 167])
+        self.assertEqual(sorted(list(ahs.keys())), [166, 167, 168])
 
         self.assertEqual(ahs[168].tokens[0].src, 'X:168') # first is retained
         self.assertEqual(ahs[168].getTitle(), '168  The Castle Gate   (HJ)')

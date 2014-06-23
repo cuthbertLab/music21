@@ -75,8 +75,8 @@ def textBoxToMxCredit(textBox):
     >>> tb.positionHorizontal = 300
     >>> tb.page = 3
     >>> mxCredit = musicxml.toMxObjects.textBoxToMxCredit(tb)
-    >>> print mxCredit
-    <credit page=3 <credit-words halign=center default-y=500 default-x=300 valign=top charData=testing>>
+    >>> print(mxCredit)
+    <credit page=3 <credit-words default-x=300 default-y=500 halign=center valign=top charData=testing>>
     '''
     # use line carriages to separate messages
     mxCredit = mxObjects.Credit()
@@ -768,7 +768,7 @@ def dynamicToMx(d):
 
     
     >>> a = dynamics.Dynamic('ppp')
-    >>> print '%.2f' % a.volumeScalar
+    >>> print('%.2f' % a.volumeScalar)
     0.15
     >>> a._positionRelativeY = -10
     >>> b = musicxml.toMxObjects.dynamicToMx(a)
@@ -2449,6 +2449,8 @@ def beamToMx(beamObject):
 
     >>> a.type = 'stop'
     >>> b = musicxml.toMxObjects.beamToMx(a)
+    >>> b
+    <beam number=1 charData=end>
     >>> b.get('charData')
     'end'
 
