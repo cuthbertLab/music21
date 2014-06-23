@@ -36,6 +36,7 @@ from music21 import chord
 from music21 import clef
 
 
+# Exceptions
 #------------------------------------------------------------------------------
 class MeiValueError(exceptions21.Music21Exception):
     "When an attribute has an invalid value."
@@ -49,8 +50,15 @@ class MeiTagError(exceptions21.Music21Exception):
     "When there's an invalid tag."
     pass
 
+# Text Strings for Error Conditions
+#------------------------------------------------------------------------------
+_WRONG_ROOT_TAG = 'Root tag is should be <mei>, not <%s>.'
+_MULTIPLE_ROOT_TAGS = 'Found multiple <mei> tags.'
+_UNKNOWN_TAG = 'Found unexpected tag while parsing MEI: <%s>.'
+_UNEXPECTED_ATTR_VALUE = 'Unexpected value for "%s" attribute: %s'
 
-# Stuff
+
+# Module-level Functions
 #------------------------------------------------------------------------------
 def convertFromString(dataStr):
     '''
@@ -77,9 +85,9 @@ def convertFromString(dataStr):
             if not foundTheRoot:
                 foundTheRoot = True
             else:
-                raise MeiTagError('Found multiple <mei> tags')
+                raise MeiTagError(_MULTIPLE_ROOT_TAGS)
         else:
-            raise MeiTagError('what garbage is this?!: %s' % eachTag.tag)
+            raise MeiTagError(_UNKNOWN_TAG % eachTag.tag)
 
     return stream.Score(parsed)
 
@@ -191,7 +199,7 @@ def _attrTranslator(attr, name, mapping):
     try:
         return mapping[attr]
     except KeyError:
-        raise MeiValueError('Unexpected value for "%s" attribute: %s' % (name, attr))
+        raise MeiValueError(_UNEXPECTED_ATTR_VALUE % (name, attr))
 
 
 def _accidentalFromAttr(attr):
