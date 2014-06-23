@@ -12,6 +12,8 @@
 Tests for :mod:`music21.mei.__main__`.
 '''
 # pylint: disable=protected-access
+# pylint: disable=too-many-public-methods
+# pylint: disable=no-self-use
 
 from music21.ext import six
 
@@ -40,10 +42,10 @@ import music21.mei.__main__ as main
 
 
 class TestThings(unittest.TestCase):
-    'Tests for utility functions.'
+    '''Tests for utility functions.'''
 
     def testSafePitch1(self):
-        'safePitch(): when ``name`` is a valid pitch name'
+        '''safePitch(): when ``name`` is a valid pitch name'''
         name = 'D#6'
         expected = pitch.Pitch('D#6')
         actual = main.safePitch(name)
@@ -52,7 +54,7 @@ class TestThings(unittest.TestCase):
         self.assertEqual(expected.octave, actual.octave)
 
     def testSafePitch2(self):
-        'safePitch(): when ``name`` is not a valid pitch name'
+        '''safePitch(): when ``name`` is not a valid pitch name'''
         name = ''
         expected = pitch.Pitch()
         actual = main.safePitch(name)
@@ -61,7 +63,7 @@ class TestThings(unittest.TestCase):
         self.assertEqual(expected.octave, actual.octave)
 
     def testMakeDuration(self):
-        'makeDuration(): just a couple of things'
+        '''makeDuration(): just a couple of things'''
         self.assertEqual(2.0, main.makeDuration(2.0, 0).quarterLength)
         self.assertEqual(3.0, main.makeDuration(2.0, 1).quarterLength)
         self.assertEqual(3.5, main.makeDuration(2, 2).quarterLength) # "base" as int---should work
@@ -483,14 +485,14 @@ class TestChordFromElement(unittest.TestCase):
         elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
         mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
         mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
-        expected_notes = ['root', 'third', 'fifth']
+        expectedNotes = ['root', 'third', 'fifth']
         expected = mockChord.return_value
 
         actual = main.chordFromElement(elem)
 
         self.assertEqual(expected, actual)
         elem.iterfind.assert_called_once_with('note')
-        mockChord.assert_called_once_with(notes=expected_notes)
+        mockChord.assert_called_once_with(notes=expectedNotes)
         self.assertEqual(mockChord.return_value.duration, duration.Duration(1.5))
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
 
@@ -532,14 +534,14 @@ class TestChordFromElement(unittest.TestCase):
         elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
         mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
         mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
-        expected_notes = ['root', 'third', 'fifth']
+        expectedNotes = ['root', 'third', 'fifth']
         expected = mockChord.return_value
 
         actual = main.chordFromElement(elem)
 
         self.assertEqual(expected, actual)
         elem.iterfind.assert_called_once_with('note')
-        mockChord.assert_called_once_with(notes=expected_notes)
+        mockChord.assert_called_once_with(notes=expectedNotes)
         self.assertEqual(duration.Duration(1.5), actual.duration)
         self.assertEqual('42', actual.id)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
@@ -580,14 +582,14 @@ class TestChordFromElement(unittest.TestCase):
         elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
         mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
         mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
-        expected_notes = ['root', 'third', 'fifth']
+        expectedNotes = ['root', 'third', 'fifth']
         expected = mockChord.return_value
 
         actual = main.chordFromElement(elem)
 
         self.assertEqual(expected, actual)
         elem.iterfind.assert_called_once_with('note')
-        mockChord.assert_called_once_with(notes=expected_notes)
+        mockChord.assert_called_once_with(notes=expectedNotes)
         self.assertEqual(duration.Duration(1.5), actual.duration)
         self.assertEqual([articulations.Staccato], actual.articulations)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)

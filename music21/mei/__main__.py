@@ -12,6 +12,9 @@
 These are the public methods for the MEI module.
 
 To convert a string with MEI markup into music21 objects, use :func:`convertFromString`.
+
+In the future, most of the functions in this module should be moved to a separate, import-only
+module, so that functions for writing music21-to-MEI will fit nicely.
 '''
 
 # Determine which ElementTree implementation to use.
@@ -76,14 +79,13 @@ def convertFromString(dataStr):
 
     if 'mei' != documentRoot.tag:
         raise MeiTagError('Root tag is should be <mei>, not <%s>.' % documentRoot.tag)
+
     # NOTE: this is obviously not proper document structure---there *should* be many levels of things before a <note>
     parsed = []
     foundTheRoot = False  # when the <mei> tag is discovered
-    for eachTag in documentRoot.iter():
-        if 'note' == eachTag.tag:
-            parsed.append(noteFromElement(eachTag))
-        elif 'rest' == eachTag.tag:
-            parsed.append(restFromElement(eachTag))
+    for eachTag in documentRoot.findall('*'):
+        if 'measure' == eachTag.tag:
+            parsed.append(measureFromElement(eachTag))
         elif 'mei' == eachTag.tag:
             if not foundTheRoot:
                 foundTheRoot = True
@@ -647,15 +649,14 @@ _DOC_ORDER = [noteFromElement, restFromElement]
 
 if __name__ == "__main__":
     import music21
-    import test_main
+    from music21.mei import test_main
     music21.mainTest(test_main.TestThings,
                      test_main.TestAttrTranslators,
                      test_main.TestNoteFromElement,
                      test_main.TestRestFromElement,
                      test_main.TestChordFromElement,
                      test_main.TestClefFromElement,
-                     test_main.TestLayerFromElement,
-                     )
+                     test_main.TestLayerFromElement,)
 
 #------------------------------------------------------------------------------
 # eof
