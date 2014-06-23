@@ -36,15 +36,7 @@ from music21 import chord
 from music21 import clef
 
 
-# Exceptions
 #------------------------------------------------------------------------------
-class MeiValidityError(exceptions21.Music21Exception):
-    """
-    When there is an otherwise-unspecified error with validity. For example, when
-    :func:`_filterNamespace` does not find the expected ``@xmlns`` attribute.
-    """
-    pass
-
 class MeiValueError(exceptions21.Music21Exception):
     "When an attribute has an invalid value."
     pass
@@ -58,11 +50,6 @@ class MeiTagError(exceptions21.Music21Exception):
     pass
 
 
-# Text Strings for Error Conditions
-#------------------------------------------------------------------------------
-_NO_NAMESPACE_ERROR = 'Unable to find an XML namespace declaration.'
-
-
 # Stuff
 #------------------------------------------------------------------------------
 def convertFromString(dataStr):
@@ -73,10 +60,8 @@ def convertFromString(dataStr):
     :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
     :rtype: :class:`music21.stream.Stream`
     '''
-    documentRoot = ETree.fromstring(_filterNamespace(dataStr))
-    if isinstance(documentRoot, ETree.ElementTree):
-        documentRoot = documentRoot.getroot()
-
+    ETree.register_namespace('mei', 'http://www.music-encoding.org/ns/mei')
+    documentRoot = ETree.fromstring(dataStr)
     if 'mei' != documentRoot.tag:
         raise MeiTagError('Root tag is should be <mei>, not <%s>.' % documentRoot.tag)
 
@@ -95,26 +80,6 @@ def convertFromString(dataStr):
             raise MeiTagError('what garbage is this?!: %s' % eachTag.tag)
 
     return stream.Score(parsed)
-
-
-def _filterNamespace(dataStr):
-    '''
-    Remove MEI's XML namespace declaration from a string that contains an MEI document. This means
-    that MEI tag names will not be prefixed with ``'{http://www.music-encoding.org/ns/mei}'`` when
-    imported with Python's :mod:`xml.etree.ElementTree` module.
-
-    Remember this means that any other namespace (that doesn't have an XML namespace declaration)"
-    may conflict with the MEI namespace.
-
-    :param string dataStr: The MEI file from which to remove the XML namespace declaration.
-    :returns: The MEI file without its XML namespace declaration.
-    :rtype: same as ``dataStr``
-    :raises: :exc:`MeiValidityError` When the expected ``@xmlns`` attribute is not found.
-    '''
-    post = dataStr.replace('xmlns="http://www.music-encoding.org/ns/mei"', '')
-    if len(post) == len(dataStr):
-        raise MeiValidityError(_NO_NAMESPACE_ERROR)
-    return post
 
 
 def safePitch(name):

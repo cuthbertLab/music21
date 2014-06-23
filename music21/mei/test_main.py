@@ -69,33 +69,6 @@ class TestThings(unittest.TestCase):
         self.assertEqual(3.5, main.makeDuration(2, 2).quarterLength) # "base" as int---should work
         self.assertEqual(3.999998092651367, main.makeDuration(2.0, 20).quarterLength)
 
-    def testFilterNamespace1(self):
-        '''_filterNamespace(): when there's an @xmlns to filter'''
-        # NOTE: I know the spacing in "expected" is a little weird, but that's not important
-        inVal = '<mei xmlns="http://www.music-encoding.org/ns/mei"><note pname="g"></mei>'
-        expected = '<mei ><note pname="g"></mei>'
-        actual = main._filterNamespace(inVal)
-        self.assertEqual(expected, actual)
-
-    def testFilterNamespace2(self):
-        '''_filterNamespace(): when there are two @xmlns to filter'''
-        # NOTE: I know the spacing in "expected" is a little weird, but that's not important
-        inVal = '''<mei xmlns="http://www.music-encoding.org/ns/mei">
-                   <note xmlns="http://www.music-encoding.org/ns/mei" pname="g"></mei>'''
-        expected = '''<mei >
-                   <note  pname="g"></mei>'''
-        actual = main._filterNamespace(inVal)
-        self.assertEqual(expected, actual)
-
-    def testFilterNamespace3(self):
-        '''_filterNamespace(): when there are no @xmlns to filter'''
-        inVal = '<mei><note pname="g"></mei>'
-        expected = main._NO_NAMESPACE_ERROR
-        self.assertRaises(main.MeiValidityError, main._filterNamespace, inVal)
-        try:
-            main._filterNamespace(inVal)
-        except main.MeiValidityError as theError:
-            self.assertEqual(expected, theError.message)
 
 
 #------------------------------------------------------------------------------
