@@ -217,6 +217,7 @@ class TestAttrTranslators(unittest.TestCase):
 #------------------------------------------------------------------------------
 class TestNoteFromElement(unittest.TestCase):
     '''Tests for noteFromElement()'''
+    # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
 
     @mock.patch('music21.note.Note')
     def testUnit1(self, mockNote):
@@ -347,6 +348,7 @@ class TestNoteFromElement(unittest.TestCase):
 #------------------------------------------------------------------------------
 class TestRestFromElement(unittest.TestCase):
     '''Tests for restFromElement()'''
+    # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
 
     @mock.patch('music21.note.Rest')
     def testUnit1(self, mockRest):
@@ -436,6 +438,7 @@ class TestRestFromElement(unittest.TestCase):
 #------------------------------------------------------------------------------
 class TestChordFromElement(unittest.TestCase):
     '''Tests for chordFromElement()'''
+    # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
 
     @staticmethod
     def makeNoteTags(pname, accid, octArg, dur, dots):
@@ -591,6 +594,7 @@ class TestChordFromElement(unittest.TestCase):
 #------------------------------------------------------------------------------
 class TestClefFromElement(unittest.TestCase):
     '''Tests for clefFromElement()'''
+    # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
 
     @mock.patch('music21.clef.clefFromString')
     @mock.patch('music21.clef.PercussionClef')
