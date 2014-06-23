@@ -60,18 +60,20 @@ def convertFromString(dataStr):
     :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
     :rtype: :class:`music21.stream.Stream`
     '''
-    ETree.register_namespace('mei', 'http://www.music-encoding.org/ns/mei')
     documentRoot = ETree.fromstring(dataStr)
-    if 'mei' != documentRoot.tag:
-        raise MeiTagError('Root tag is should be <mei>, not <%s>.' % documentRoot.tag)
+    if isinstance(documentRoot, ETree.ElementTree):
+        documentRoot = documentRoot.getroot()
 
-    # NOTE: this is obviously not proper document structure---there *should* be many levels of things before a <note>
+    if '{http://www.music-encoding.org/ns/mei}mei' != documentRoot.tag:
+        raise MeiTagError(_WRONG_ROOT_TAG % documentRoot.tag)
+
+    # NOTE: this is obviously not proper document structure
     parsed = []
     foundTheRoot = False  # when the <mei> tag is discovered
     for eachTag in documentRoot.findall('*'):
-        if 'measure' == eachTag.tag:
+        if '{http://www.music-encoding.org/ns/mei}measure' == eachTag.tag:
             parsed.append(measureFromElement(eachTag))
-        elif 'mei' == eachTag.tag:
+        elif '{http://www.music-encoding.org/ns/mei}mei' == eachTag.tag:
             if not foundTheRoot:
                 foundTheRoot = True
             else:
@@ -589,8 +591,10 @@ def layerFromElement(elem):
     MEI.usersymbols: anchoredText curve line symbol
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {'clef': clefFromElement, 'chord': chordFromElement, 'note': noteFromElement,
-                     'rest': restFromElement}
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
+                     '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
+                     '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
+                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement}
     objects = []
 
     # iterate all immediate children
@@ -650,7 +654,7 @@ def staffFromElement(elem):
     MEI.usersymbols: anchoredText curve line symbol
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {'layer': layerFromElement}
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}layer': layerFromElement}
     objects = []
 
     # iterate all immediate children
@@ -704,7 +708,7 @@ def measureFromElement(elem):
     MEI.usersymbols: anchoredText curve line symbol
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {'staff': staffFromElement}
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}staff': staffFromElement}
     objects = []
 
     # iterate all immediate children
