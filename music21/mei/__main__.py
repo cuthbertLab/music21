@@ -644,6 +644,119 @@ def layerFromElement(elem):
     return post
 
 
+def staffFromElement(elem):
+    '''
+    <staff> A group of equidistant horizontal lines on which notes are placed in order to
+    represent pitch or a grouping element for individual 'strands' of notes, rests, etc. that may
+    or may not actually be rendered on staff lines; that is, both diastematic and non-diastematic
+    signs.
+
+    In MEI 2013: pg.444 (458 in PDF) (MEI.shared module)
+
+    Attributes Implemented:
+    =======================
+
+    Attributes Ignored:
+    ===================
+
+    Attributes In Progress:
+    =======================
+    - <layer> contained within
+    - xml:id (or id), an XML id (submitted as the Music21Object "id")
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+    att.declaring (@decls)
+    att.facsimile (@facs)
+    att.staff.log (@def)
+                  (att.meterconformance (@metcon))
+    att.staff.vis (att.visibility (@visible))
+    att.staff.gesatt.staff.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                               (att.alignment (@when)))
+
+    May Contain:
+    ============
+    MEI.cmn: ossia
+    MEI.critapp: app
+    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    MEI.shared: annot pb sb scoreDef staffDef
+    MEI.text: div
+    MEI.usersymbols: anchoredText curve line symbol
+    '''
+    # mapping from tag name to our converter function
+    tagToFunction = {'layer': layerFromElement}
+    objects = []
+
+    # iterate all immediate children
+    for eachTag in elem.findall('*'):
+        if eachTag.tag in tagToFunction:
+            objects.append(tagToFunction[eachTag.tag](eachTag))
+
+    # make a music21.stream.Part, set its "id" attribute, and return
+    post = stream.Part()
+    for eachObj in objects:
+        post.append(eachObj)
+
+    if elem.get('id') is not None:
+        post.id = elem.get('id')
+
+    return post
+
+
+def measureFromElement(elem):
+    '''
+    <measure> Unit of musical time consisting of a fixed number of note-values of a given type, as
+    determined by the prevailing meter, and delimited in musical notation by two bar lines.
+
+    In MEI 2013: pg.365 (379 in PDF) (MEI.cmn module)
+
+    Attributes Implemented:
+    =======================
+
+    Attributes Ignored:
+    ===================
+
+    Attributes In Progress:
+    =======================
+    - <staff> contained within
+    - xml:id (or id), an XML id (submitted as the Music21Object "id")
+
+    Attributes not Implemented:
+    ===========================
+
+    May Contain:
+    ============
+    MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh slur tie tupletSpan
+    MEI.cmnOrnaments: mordent trill turn
+    MEI.critapp: app
+    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    MEI.harmony: harm
+    MEI.lyrics: lyrics
+    MEI.midi: midi
+    MEI.shared: annot dir dynam pb phrase sb staffDef tempo
+    MEI.text: div
+    MEI.usersymbols: anchoredText curve line symbol
+    '''
+    # mapping from tag name to our converter function
+    tagToFunction = {'staff': staffFromElement}
+    objects = []
+
+    # iterate all immediate children
+    for eachTag in elem.findall('*'):
+        if eachTag.tag in tagToFunction:
+            objects.append(tagToFunction[eachTag.tag](eachTag))
+
+    # make a music21.stream.Measure, set its "id" attribute, and return
+    post = stream.Measure()
+    for eachObj in objects:
+        post.append(eachObj)
+
+    if elem.get('id') is not None:
+        post.id = elem.get('id')
+
+    return post
+
 #------------------------------------------------------------------------------
 _DOC_ORDER = [noteFromElement, restFromElement]
 

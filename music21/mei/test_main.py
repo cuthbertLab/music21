@@ -826,3 +826,70 @@ class TestLayerFromElement(unittest.TestCase):
         self.assertEqual('F2', actual[0].nameWithOctave)
         self.assertEqual('E-2', actual[1].nameWithOctave)
         self.assertEqual('asdf1234', actual.id)
+
+
+
+#------------------------------------------------------------------------------
+class TestStaffFromElement(unittest.TestCase):
+    '''Tests for staffFromElement()'''
+
+    #@mock.patch('music21.mei.__main__.noteFromElement')
+    #@mock.patch('music21.stream.Voice')
+    #def testUnit1(self, mockVoice, mockNoteFromElement):
+        #'''
+        #layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
+                            #mapping works; that tags not in the mapping are ignored; and that a
+                            #Voice object is returned. And "xml:id" is set.
+        #(mostly-unit test; only mock noteFromElement and the ElementTree.Element)
+        #'''
+        #elem = mock.MagicMock(spec_set=ETree.Element('layer'))
+        #elemGetReturns = ['theXMLID', 'theXMLID']
+        #elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) else None
+        #expectedGetOrder = [mock.call('id'), mock.call('id')]
+        #findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
+                         #mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
+                         #mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
+        #findallReturn[0].tag = 'note'
+        #findallReturn[1].tag = 'imaginary'
+        #findallReturn[2].tag = 'note'
+        #elem.findall = mock.MagicMock(return_value=findallReturn)
+        #expectedMNFEOrder = [mock.call(findallReturn[0]), mock.call(findallReturn[2])]  # "MNFE" is "mockNoteFromElement"
+        #mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
+        #mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        #mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
+        #expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
+
+        #actual = main.layerFromElement(elem)
+
+        #elem.findall.assert_called_once_with('*')
+        #self.assertEqual(mockVoice.return_value, actual)
+        #self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
+        #mockVoice.assert_called_once_with()
+        #self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value.append.call_args_list)
+        #self.assertEqual('theXMLID', actual.id)
+        #self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+
+    #def testIntegration1(self):
+        #'''
+        #layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
+                            #mapping works; that tags not in the mapping are ignored; and that a
+                            #Voice object is returned. And "xml:id" is set.
+        #(corresponds to testUnit1() but without mock objects)
+        #'''
+        #inputXML = '''<layer id="asdf1234">
+                          #<note pname="F" oct="2" dur="4" />
+                          #<note pname="E" oct="2" accid="f" dur="4" />
+                          #<imaginary awesome="true" />
+                      #</layer>'''
+        #elem = ETree.fromstring(inputXML)
+
+        #actual = main.layerFromElement(elem)
+
+        #self.assertEqual(2, len(actual))
+        #self.assertEqual(0.0, actual[0].offset)
+        #self.assertEqual(1.0, actual[1].offset)
+        #self.assertEqual(1.0, actual[0].quarterLength)
+        #self.assertEqual(1.0, actual[1].quarterLength)
+        #self.assertEqual('F2', actual[0].nameWithOctave)
+        #self.assertEqual('E-2', actual[1].nameWithOctave)
+        #self.assertEqual('asdf1234', actual.id)
