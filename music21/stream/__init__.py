@@ -5730,7 +5730,8 @@ class Stream(base.Music21Object):
         return makeNotation.realizeOrnaments(self)
 
     def extendDuration(self, objName, inPlace=True):
-        '''Given a Stream and an object class name, go through the Stream
+        '''
+        Given a Stream and an object class name, go through the Stream
         and find each instance of the desired object. The time between
         adjacent objects is then assigned to the duration of each object.
         The last duration of the last object is assigned to extend to the
@@ -5747,27 +5748,33 @@ class Stream(base.Music21Object):
 
         >>> dyn = dynamics.Dynamic('ff')
         >>> stream1.insert(15, dyn)
-        >>> sort1 = stream1.sorted
-        >>> sort1[-1].offset # offset of last element
+        >>> stream1[-1].offset # offset of last element
         40.0
-        >>> sort1.duration.quarterLength # total duration
+        >>> stream1.duration.quarterLength # total duration
         41.0
-        >>> len(sort1)
+        >>> len(stream1)
         6
 
-        >>> stream2 = sort1.flat.extendDuration(note.GeneralNote)
+        >>> stream2 = stream1.flat.extendDuration(note.GeneralNote)
         >>> len(stream2)
         6
         >>> stream2[0].duration.quarterLength
         10.0
-        >>> stream2[1].duration.quarterLength # all note durs are 10
+
+        The Dynamic does not affect the second note:
+        
+        >>> stream2[1].offset
         10.0
+        >>> stream2[1].duration.quarterLength
+        10.0
+
         >>> stream2[-1].duration.quarterLength # or extend to end of stream
         1.0
         >>> stream2.duration.quarterLength
         41.0
         >>> stream2[-1].offset
         40.0
+
 
 
         TODO: extendDuration inPlace should be False by default

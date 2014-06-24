@@ -4,8 +4,9 @@
 # Purpose:      music21 functions for implementing web interfaces
 #
 # Authors:      Lars Johnson
+#               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2012 The music21 Project
+# Copyright:    (c) 2012-14 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -19,19 +20,27 @@ For details about various output template options available, see webapps.templat
 
 **Overview of Processing a Request**
 
-1. The GET and POST data from the request are combined into an agenda object. The POST data can in the formats ``'application/json', 'multipart/form-data' or 'application/x-www-form-urlencoded'``. For more information, see the documentation for Agenda and makeAgendaFromRequest
+1. The GET and POST data from the request are combined into an agenda object. 
+The POST data can be in the formats ``'application/json', 'multipart/form-data' or 
+'application/x-www-form-urlencoded'``. 
+For more information, see the documentation for Agenda and makeAgendaFromRequest
 
-2. If an appName is specified, additional data and commands are added to the agenda. For more information, see the applicationInitializers in apps.py.
+2. If an appName is specified, additional data and commands are added to the agenda. 
+For more information, see the applicationInitializers in apps.py.
 
 3. A CommandProcessor is created for the agenda
 
-4. The processor parses its dataDict into primitives or music21 objects and saves them to a parsedDataDict. For more information, see ``commandProcessor._parseData()``
+4. The processor parses its dataDict into primitives or music21 objects and saves them 
+to a parsedDataDict. For more information, see ``commandProcessor._parseData()``
 
-5. The processor executes its commandList, modifying its internal parsedDataDict. For more information, see :meth:`~music21.webapps.CommandProcessor.executeCommands`
+5. The processor executes its commandList, modifying its internal parsedDataDict. 
+For more information, see :meth:`~music21.webapps.CommandProcessor.executeCommands`
 
-6. If outputTemplate is specified, the processor uses a template to generate and output. For more information, see :meth:`~music21.webapps.CommandProcessor.getOutput` and the templates in templates.py
+6. If outputTemplate is specified, the processor uses a template to generate and output. 
+For more information, see :meth:`~music21.webapps.CommandProcessor.getOutput` and the templates in templates.py
 
-7. Otherwise, the data will be returned as JSON, where the variables in the agenda's returnDict specify which variables to include in the returned JSON.
+7. Otherwise, the data will be returned as JSON, where the variables in the agenda's 
+returnDict specify which variables to include in the returned JSON.
 
 8. If an error occurs, an error message will be returned to the user 
 
@@ -80,7 +89,8 @@ Below is an example of a complete JSON request::
     }
     
 '''
-
+import collections
+import sys
 import unittest
 
 # music21 imports
@@ -95,17 +105,10 @@ from music21 import clef #@UnusedImport
 from music21 import tempo #@UnusedImport
 from music21.theoryAnalysis import theoryAnalyzer #@UnusedImport
 
-import sys
 
-if sys.version > '3':
-    from . import commands
-    from . import templates
-    from . import apps
-else:
-    # webapps imports
-    import commands #@UnusedImport @Reimport
-    import templates #@UnusedImport @Reimport
-    import apps # @Reimport
+from music21.webapps import commands
+from music21.webapps import templates
+from music21.webapps import apps
 
 # python library imports
 import json
@@ -118,8 +121,13 @@ except ImportError:
 import re #@UnusedImport
 import traceback
 
+from music21.ext import six
 from music21.ext.six import StringIO
 
+if six.PY3:
+    import io
+    file = io.IOBase # @ReservedAssignment
+    unicode = str # @ReservedAssignment
 #-------------------------------------------------------------------------------
 
 # Valid format types for data input to the server
@@ -195,12 +203,11 @@ def ModWSGIApplication(environ, start_response):
     
     The request to the application should have the following structures:
 
-    
     >>> from music21.ext.six import StringIO
     >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
     >>> wsgiInput = StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
-    >>> wsgiInput.write('{"dataDict":{"a":{"data":3}},"returnDict":{"a":"int"}}')
-    >>> wsgiInput.seek(0)
+    >>> unused = wsgiInput.write('{"dataDict":{"a":{"data":3}},"returnDict":{"a":"int"}}')
+    >>> unused = wsgiInput.seek(0)
     >>> environ['wsgi.input'] = wsgiInput
     >>> environ['QUERY_STRING'] = ""
     >>> environ['DOCUMENT_ROOT'] = "/Library/WebServer/Documents"
@@ -209,7 +216,7 @@ def ModWSGIApplication(environ, start_response):
     >>> environ['CONTENT_TYPE'] = "application/json"
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
     >>> webapps.ModWSGIApplication(environ, start_response)
-    ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
+    [...'{"dataDict": {"a": ...}, "errorList": [], "status": "success"}']    
     '''    
 
     # Get content of request: is in a file-like object that will need to be .read() to get content
@@ -244,30 +251,41 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     that can be used with the CommandProcessor.
 
     Takes in a file-like requestInput (has ``.read()``) containing POST data,
-    a dictionary-like environ from the server containing at a minimum a value for the keys QUERY_STRING,
-    and a requestType specifying the content-type of the POST data ('application/json','multipart/form-data', etc.)
+    a dictionary-like environ from the server containing at a minimum a value for the 
+    keys QUERY_STRING,
+    and a requestType specifying the content-type of the POST data 
+    ('application/json','multipart/form-data', etc.)
         
     Note that variables specified via query string will be returned as a list if
-    they are specified more than once (e.g. ``?b=3&b=4`` will yeld ``['3', '4']`` as the value of b
-    
+    they are specified more than once (e.g. ``?b=3&b=4`` will yeld ``['3', '4']`` 
+    as the value of b
     
     requestInput should be buffer from the server application. Using StringIO for demonstration
     
     >>> from music21.ext.six import StringIO
     >>> requestInput = StringIO()
-    >>> requestInput.write('{"dataDict":{"a":{"data":3}}}')
-    >>> requestInput.seek(0)
+    >>> unused = requestInput.write('{"dataDict":{"a":{"data":3}}}')
+    >>> unused = requestInput.seek(0)
     >>> environ = {"QUERY_STRING":"b=3"}
     >>> agenda = webapps.makeAgendaFromRequest(requestInput, environ, 'application/json')
-    >>> agenda
-    {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 
-     'returnDict': {}, 'commandList': []} 
+
+    >>> from pprint import pprint as pp
+    >>> pp(agenda)
+    {'commandList': [],
+     'dataDict': {...'a': {...'data': 3}, 'b': {'data': '3'}},
+     'returnDict': {}}
+
+    (the ellipses above comment out the u unicode prefix in PY2)
+
     >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4"}
     >>> agenda2 = webapps.makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
-    >>> agenda2
-    {'dataDict': {'a': {'data': '2'}, 'b': {'data': ['3', '4']}}, 
-     'returnDict': {}, 'commandList': []}
 
+    Note that the 3 in a:data becomes '2' -- a string.
+    
+    >>> pp(agenda2)
+    {'commandList': [],
+     'dataDict': {...'a': {...'data': '2'}, 'b': {'data': ['3', '4']}},
+     'returnDict': {}}
     '''
     
     agenda = Agenda()
@@ -294,7 +312,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
             
     elif requestType == 'application/x-www-form-urlencoded':
         postFormFields =urlparse.parse_qs(requestInput.read())
-        for (key, value) in postFormFields.iteritems():
+        for (key, value) in postFormFields.items():
             if len(value) == 1:
                 value = value[0]
             combinedFormFields[key] = value
@@ -305,13 +323,13 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
         
     # Add GET fields:
     getFormFields = urlparse.parse_qs(environ['QUERY_STRING']) # Parse GET request in URL to dict
-    for (key,value) in getFormFields.iteritems():
+    for (key,value) in getFormFields.items():
         if len(value) == 1:
             value = value[0]
         combinedFormFields[key] = value
 
     # Add remaining form fields to agenda
-    for (key, value) in combinedFormFields.iteritems():
+    for (key, value) in combinedFormFields.items():
         if key in ['dataDict','commandList','returnDict','json']: # These values can only be specified via JSON, JSON already loaded
             pass
             
@@ -319,8 +337,8 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
             agenda[key] = value
             
         elif type(value) == file:
-            agenda['dataDict'][key] = {"data":value,
-                                       "fmt":"file"}
+            agenda['dataDict'][key] = collections.OrderedDict([("data",value),
+                                                               ("fmt","file")])
     
         else: # Put in data dict
             agenda['dataDict'][key] = {"data": value}
@@ -389,7 +407,8 @@ class Agenda(dict):
                               ]
                               
     Calling :meth:`~music21.webapps.CommandProcessor.executeCommands` iterates through 
-    the commandList sequentially, calling the equivalent of ``<CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)``
+    the commandList sequentially, calling the equivalent of 
+    ``<CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)``
     where the command TYPE is "function", "method", or "attribute"
     
 *    **'returnDict'** whose value is a list specifying the variables to be returned from the server::
@@ -407,15 +426,14 @@ class Agenda(dict):
     '''
     def __init__(self):
         '''
-    
         Agenda initialization function:
         
         Initializes core key values 'dataDict', 'commandList', 'returnDict'
 
-        
+        >>> from pprint import pprint as pp
         >>> agenda = webapps.Agenda()
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         '''
         self['dataDict'] = dict()
         self['commandList'] = list()
@@ -427,14 +445,13 @@ class Agenda(dict):
         Raises an error if one attempts to set 'dataDict', 'returnDict', or 'commandList'
         to values that are not of the corresponding dict/list type.
 
-        
+        >>> from pprint import pprint as pp
         >>> agenda = webapps.Agenda()
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda['dataDict'] = {"a":{"data":2}}
-        >>> agenda
-        {'dataDict': {'a': {'data': 2}}, 'returnDict': {}, 'commandList': []}
-        
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {'a': {'data': 2}}, 'returnDict': {}}
         '''
         if key in ['dataDict','returnDict'] and type(value) is not dict:
             raise Exception('value for key: '+ str(key) + ' must be dict')
@@ -451,17 +468,18 @@ class Agenda(dict):
         Given a variable name, data, and optionally format, constructs the proper dataDictElement structure,
         and adds it to the dataDict of the agenda.
         
-        
+        >>> from pprint import pprint as pp
         >>> agenda = webapps.Agenda()
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda.addData('a', 2)
-        >>> agenda
-        {'dataDict': {'a': {'data': 2}}, 'returnDict': {}, 'commandList': []}
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {'a': {'data': 2}}, 'returnDict': {}}
         >>> agenda.addData(variableName='b', data=[1,2,3], fmt='list')
-        >>> agenda
-        {'dataDict': {'a': {'data': 2}, 'b': {'fmt': 'list', 'data': [1, 2, 3]}}, 'returnDict': {}, 'commandList': []}
-        
+        >>> pp(agenda)
+        {'commandList': [],
+         'dataDict': {'a': {'data': 2}, 'b': {'data': [1, 2, 3], 'fmt': 'list'}},
+         'returnDict': {}}
         '''
         dataDictElement = {}
         dataDictElement['data'] = data
@@ -474,10 +492,10 @@ class Agenda(dict):
         Given a variable name, returns the data stored in the agenda for that variable name. If no data is stored,
         returns the value None.        
 
-        
+        >>> from pprint import pprint as pp        
         >>> agenda = webapps.Agenda()
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda.getData('a') == None
         True
         >>> agenda.addData('a', 2)
@@ -499,17 +517,28 @@ class Agenda(dict):
         
             ``<resultVar> = <caller>.<command>(<argList>)``
         
+        >>> from pprint import pprint as pp
         
         >>> agenda = webapps.Agenda()
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda.addCommand('method','sc','sc','transpose',['p5'])
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'argList': ['p5'], 'caller': 'sc', 'method': 'transpose', 'resultVar': 'sc'}]}
+        >>> pp(agenda)
+        {'commandList': [{'argList': ['p5'],
+                          'caller': 'sc',
+                          'method': 'transpose',
+                          'resultVar': 'sc'}],
+         'dataDict': {},
+         'returnDict': {}}
         >>> agenda.addCommand('attribute','scFlat','sc','flat')
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'argList': ['p5'], 'caller': 'sc', 'method': 'transpose', 'resultVar': 'sc'}, {'attribute': 'flat', 'caller': 'sc', 'resultVar': 'scFlat'}]}
-        
+        >>> pp(agenda)
+        {'commandList': [{'argList': ['p5'],
+                          'caller': 'sc',
+                          'method': 'transpose',
+                          'resultVar': 'sc'},
+                         {'attribute': 'flat', 'caller': 'sc', 'resultVar': 'scFlat'}],
+         'dataDict': {},
+         'returnDict': {}}
         '''        
         commandListElement = {}
         commandListElement[commandType] = command
@@ -526,13 +555,19 @@ class Agenda(dict):
         '''
         Specifies the output template that will be used for the agenda.
         
+        >>> from pprint import pprint as pp ## pprint stablizes dictionary order
         
         >>> agenda = webapps.Agenda()
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {}, 'returnDict': {}}
+        
         >>> agenda.setOutputTemplate('templates.noteflightEmbed',['sc'])
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'outputArgList': ['sc'], 'commandList': [], 'outputTemplate': 'templates.noteflightEmbed'}
+        >>> pp(agenda)
+        {'commandList': [],
+         'dataDict': {},
+         'outputArgList': ['sc'],
+         'outputTemplate': 'templates.noteflightEmbed',
+         'returnDict': {}}
         '''
         self['outputTemplate'] = outputTemplate
         self['outputArgList'] = outputArgList
@@ -541,17 +576,19 @@ class Agenda(dict):
         '''
         Runs json.loads on jsonRequestStr and loads the resulting structure into the agenda object.
         
+        >>> from pprint import pprint as pp ## pprint stablizes dictionary order
         
         >>> agenda = webapps.Agenda()
-        >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> pp(agenda)
+        {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda.loadJson(webapps.sampleJsonStringSimple)
-        >>> agenda
-        {'dataDict': {u'myNum': {u'fmt': u'int', u'data': u'23'}}, 'returnDict': {u'myNum': u'int'}, 'commandList': []}
-
+        >>> pp(agenda)
+        {'commandList': [],
+         'dataDict': {...'myNum': {...'data': ...'23', ...'fmt': ...'int'}},
+         'returnDict': {...'myNum': ...'int'}}
         '''
         tempDict = json.loads(jsonRequestStr)
-        for (key, value) in tempDict.iteritems():
+        for (key, value) in tempDict.items():
 #            if isinstance(key, unicode):
 #                key = str(key)
 #            if isinstance(value, unicode):
@@ -631,7 +668,7 @@ class CommandProcessor(object):
         '''
         Parses data specified as strings in self.dataDict into objects in self.parsedDataDict
         '''
-        for (name,dataDictElement) in self.rawDataDict.iteritems():
+        for (name,dataDictElement) in self.rawDataDict.items():
             if 'data' not in dataDictElement:
                 self.recordError("no data specified for data element "+unicode(dataDictElement))
                 continue
@@ -979,9 +1016,9 @@ class CommandProcessor(object):
             return return_obj
         
         if len(self.returnDict) == 0:
-            iterItems = [(k, 'str') for k in self.parsedDataDict]
+            iterItems = [(k, 'str') for k in sorted(list(self.parsedDataDict.items()))]
         else:
-            iterItems = self.returnDict.iteritems()
+            iterItems = sorted(list(self.returnDict.items()))
         
         for (dataName,fmt) in iterItems:
             if dataName not in self.parsedDataDict:
@@ -1127,13 +1164,17 @@ class CommandProcessor(object):
             outputType = 'text/html'
         
         if self.outputTemplate == "":
-            output =  json.dumps(self.getResultObject())
+            resDict = self.getResultObject()
+            resOrderedDict = collections.OrderedDict(sorted(list(resDict.items())))
+            output =  json.dumps(resOrderedDict)
             output = unicode(output).encode('utf-8')
             outputType = 'text/html; charset=utf-8'
-            
+            # TODO: unify these two -- duplicate code
         elif self.outputTemplate not in availableOutputTemplates:
             self.recordError("Unknown output template "+str(self.outputTemplate))
-            output =  json.dumps(self.getResultObject(),indent=4)
+            resDict = self.getResultObject()
+            resOrderedDict = collections.OrderedDict(sorted(list(resDict.items())))
+            output =  json.dumps(resOrderedDict,indent=4)
             output = unicode(output).encode('utf-8')
             outputType = 'text/html; charset=utf-8'
             
@@ -1143,6 +1184,7 @@ class CommandProcessor(object):
                 parsedArg = self.parseInputToPrimitive(arg)
                 argList[i] = parsedArg  
             # safe because check for self.outputTemplate in availableOutputTemplates
+            ### But let's still TODO: get rid of eval
             (output, outputType) = eval(self.outputTemplate)(*argList)
         return (output, outputType)
     

@@ -1326,7 +1326,7 @@ class Test(unittest.TestCase):
 
 
     def testStreamFormsC(self):
-
+        from pprint import pformat
         from music21 import features, note
 
         s = stream.Stream()
@@ -1334,7 +1334,46 @@ class Test(unittest.TestCase):
             s.append(note.Note(p))
         di = features.DataInstance(s)
 
-        self.assertEqual(str(di['secondsMap']), """[{'durationSeconds': 0.5, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.5}, {'durationSeconds': 0.5, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.5, 'endTimeSeconds': 1.0}, {'durationSeconds': 0.5, 'voiceIndex': None, 'element': <music21.note.Note D->, 'offsetSeconds': 1.0, 'endTimeSeconds': 1.5}, {'durationSeconds': 0.5, 'voiceIndex': None, 'element': <music21.note.Note D#>, 'offsetSeconds': 1.5, 'endTimeSeconds': 2.0}, {'durationSeconds': 0.5, 'voiceIndex': None, 'element': <music21.note.Note F#>, 'offsetSeconds': 2.0, 'endTimeSeconds': 2.5}, {'durationSeconds': 0.5, 'voiceIndex': None, 'element': <music21.note.Note A#>, 'offsetSeconds': 2.5, 'endTimeSeconds': 3.0}, {'durationSeconds': 0.5, 'voiceIndex': None, 'element': <music21.note.Note D#>, 'offsetSeconds': 3.0, 'endTimeSeconds': 3.5}, {'durationSeconds': 0.5, 'voiceIndex': None, 'element': <music21.note.Note A>, 'offsetSeconds': 3.5, 'endTimeSeconds': 4.0}]""")
+        self.assertEqual(pformat(di['secondsMap']), """[{'durationSeconds': 0.5,
+  'element': <music21.note.Note C>,
+  'endTimeSeconds': 0.5,
+  'offsetSeconds': 0.0,
+  'voiceIndex': None},
+ {'durationSeconds': 0.5,
+  'element': <music21.note.Note C>,
+  'endTimeSeconds': 1.0,
+  'offsetSeconds': 0.5,
+  'voiceIndex': None},
+ {'durationSeconds': 0.5,
+  'element': <music21.note.Note D->,
+  'endTimeSeconds': 1.5,
+  'offsetSeconds': 1.0,
+  'voiceIndex': None},
+ {'durationSeconds': 0.5,
+  'element': <music21.note.Note D#>,
+  'endTimeSeconds': 2.0,
+  'offsetSeconds': 1.5,
+  'voiceIndex': None},
+ {'durationSeconds': 0.5,
+  'element': <music21.note.Note F#>,
+  'endTimeSeconds': 2.5,
+  'offsetSeconds': 2.0,
+  'voiceIndex': None},
+ {'durationSeconds': 0.5,
+  'element': <music21.note.Note A#>,
+  'endTimeSeconds': 3.0,
+  'offsetSeconds': 2.5,
+  'voiceIndex': None},
+ {'durationSeconds': 0.5,
+  'element': <music21.note.Note D#>,
+  'endTimeSeconds': 3.5,
+  'offsetSeconds': 3.0,
+  'voiceIndex': None},
+ {'durationSeconds': 0.5,
+  'element': <music21.note.Note A>,
+  'endTimeSeconds': 4.0,
+  'offsetSeconds': 3.5,
+  'voiceIndex': None}]""", pformat(di['secondsMap']))
 
 
     def testDataSetOutput(self):

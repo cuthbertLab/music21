@@ -11,5 +11,5 @@ if __name__ == '__main__':
     hp.setrelheap()
     x = corpus.parse('bwv66.6')
     h = hp.heap()
-    print h
+    print(h)
     

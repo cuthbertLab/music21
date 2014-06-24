@@ -14,22 +14,24 @@ Original music21 feature extractors.
 '''
 
 import unittest
-import urllib
 import re
 import math
 
 try:
     from urllib import FancyURLopener # @UnusedImport
+    from urllib import urlencode # @UnusedImport
 except: # python3
     from urllib.request import FancyURLopener # @UnresolvedImport @Reimport
-
+    from urllib.parse import urlencode # @UnresolvedImport @Reimport
+    
 from music21.features import base as featuresModule
+from music21.ext import six
 from music21 import text
-
 from music21 import environment
 _MOD = 'features/native.py'
 environLocal = environment.Environment(_MOD)
 
+#from music21.ext import six
 
 #-------------------------------------------------------------------------------
 # ideas for other music21 features extactors
@@ -790,7 +792,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     >>> s.append(metadata.Metadata()) #_DOCS_HIDE
     >>> s.metadata.composer = "W.A. Mozart" #_DOCS_HIDE
     >>> fe = features.native.ComposerPopularity(s)
-    >>> fe.extract().vector >= 6 
+    >>> fe.extract().vector[0] > 6.0 
     True
     '''
     id = 'MD1'
@@ -818,9 +820,12 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         paramsBasic = {'q': composer}
 
         myGoogle = URLOpenerUI()
-        params = urllib.urlencode(paramsBasic)
+        params = urlencode(paramsBasic)
         page = myGoogle.open("http://www.google.com/search?%s" % params)
         the_page = page.read()
+        if six.PY3:
+            the_page = the_page.decode('utf-8')
+        
         m = googleResultsRE.search(the_page)
         if m is not None and m.group(0):
             totalRes = int(m.group(1).replace(',',""))

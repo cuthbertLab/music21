@@ -41,6 +41,7 @@ try out different solutions, moving notes over a measure or two, etc.
 without any problems.  Working on this problem also gave a great test
 of music21's ability to manipulate diatonic Streams.
 '''
+from __future__ import print_function
 
 from music21 import clef
 #from music21 import common
@@ -257,7 +258,7 @@ def findRetrogradeVoices(show = True):
                     invStr = "Invert"
                 else:
                     invStr = "      "
-                print str(transpose) + " " + invStr + " " + str(finalScore)
+                print(str(transpose) + " " + invStr + " " + str(finalScore))
     
 def prepareSolution(triplumTup, ctTup, tenorTup):
     qjSolved = stream.Score()
@@ -338,8 +339,8 @@ def bentWolfSolution():
 
     unused_qjChords, avgScore, fullScore = prepareSolution(triplum, ct, tenor)
     fullScore.show('musicxml')
-    print avgScore
-    print cachedParts
+    print(avgScore)
+    print(cachedParts)
     
 def possibleSolution():
     getQJ()
@@ -349,7 +350,7 @@ def possibleSolution():
     tenor = (5, 5, False, False)
     
     unused_qjChords, avgScore, qjSolved = prepareSolution(tenor, triplum, ct)
-    print avgScore
+    print(avgScore)
 #    qjSolved.insert(0, stream.Part())
 #    qjSolved.insert(0, qjChords)
     qjSolved.show('musicxml')
@@ -409,13 +410,13 @@ def multipleSolve():
                                                     #writeLine = (tripT, ctT, tenT, tripDelay, ctDelay, tenDelay, tripInvert, ctInvert, tenInvert, tripRetro, ctRetro, tenRetro, avgScore)
                                                     writeLine = (transHighest, delayHighest, highestInvert, highestRetro, transMiddle, delayMiddle, middleInvert, middleRetro, transLowest, delayLowest, lowestInvert, lowestRetro, avgScore)
                                                     if avgScore > 0:
-                                                        print ""
+                                                        print("")
                                                         if avgScore > maxScore:
                                                             maxScore = avgScore
-                                                            print "***** ",
-                                                        print writeLine
+                                                            print("***** ", end="")
+                                                        print(writeLine)
                                                     else:
-                                                        print str(i) + " ",
+                                                        print(str(i) + " ", end="")
                                                     csvFile.writerow(writeLine)
 
 class QuodJactaturException(exceptions21.Music21Exception):

@@ -50,7 +50,7 @@ class SFApp():
                 self.textVarComments.set('Now, you can press recording')                      
 
             except:
-                print 'no he pogut'
+                print('no he pogut')
 
 
 
@@ -96,7 +96,7 @@ class SFApp():
         self.buttonStart.grid(row=6,column=0,columnspan=2)
         
         
-        print 'Initialized!'
+        print('Initialized!')
         
     def startRecording (self):
         self.buttonStart = Tkinter.Button(self.master, text="Start Recording",state='disable', width=self.sizeButton,command=self.startRecording, bg='green')
@@ -112,7 +112,7 @@ class SFApp():
         if storeSong == 0:
             self.nameSong = None
             
-        print 'nom final', self.nameSong    
+        print('nom final', self.nameSong)   
         self.textVarComments.set('Recording...') 
         self.rt=RecordThread(self.show,self.nameSong,self.durationSong)            
         self.rt.daemon=True

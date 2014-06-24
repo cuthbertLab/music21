@@ -680,7 +680,7 @@ class RTKeyTypeAtom(RTAtom):
 class RTKey(RTKeyTypeAtom):
     footerStrip = ';:'
 
-    def __init(self, src = u'', container=None):
+    def __init(self, src=u'', container=None):
         '''An RTKey(RTAtom) defines both a change in KeySignature and a change
         in the analyzed Key.
         
@@ -909,7 +909,7 @@ class RTRepeatStart(RTRepeat):
         '''
         >>> repeat = romanText.RTRepeatStart()
         >>> repeat
-        <RTRepeatStart u'||:'>
+        <RTRepeatStart ...'||:'>
         '''
         RTRepeat.__init__(self, src, container)
 
@@ -923,7 +923,7 @@ class RTRepeatStop(RTRepeat):
         '''
         >>> repeat = romanText.RTRepeatStop()
         >>> repeat
-        <RTRepeatStop u':||'>
+        <RTRepeatStop ...':||'>
         '''
         RTRepeat.__init__(self, src, container)
 

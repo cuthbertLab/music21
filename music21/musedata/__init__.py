@@ -31,6 +31,7 @@ from music21 import environment
 _MOD = 'musedata.base.py'
 environLocal = environment.Environment(_MOD)
 
+from music21.ext import six
 # for implementation
 # see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
 # http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
@@ -1494,12 +1495,21 @@ class MuseDataFile(object):
 
     def open(self, fp):
         #self.file = codecs.open(filename, encoding='utf-8')
-        self.file = open(fp, 'r') 
+        if six.PY3:
+            self.file = open(fp, 'rb')
+        else:
+            self.file = open(fp, 'r') 
         self.filename = fp
 
     def read(self): 
         # call readstr with source string from file
-        return self.readstr(self.file.read()) 
+        fileContents = self.file.read()
+        if six.PY3:
+            try:
+                fileContents = fileContents.decode('utf-8')
+            except UnicodeDecodeError:
+                fileContents = fileContents.decode('ISO-8859-1', 'ignore')
+        return self.readstr(fileContents) 
 
     def close(self):
         self.file.close()

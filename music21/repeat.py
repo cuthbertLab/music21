@@ -1058,7 +1058,8 @@ class Expander(object):
         
         Does nothing, because only searching for repeatBrackets, not repeat signs.  Need a better test.
         
-        >>> e._groupRepeatBracketIndices(s)
+        >>> from pprint import pprint as pp
+        >>> pp(e._groupRepeatBracketIndices(s))
         [{'measureIndices': [], 'repeatBrackets': []}]
         ''' 
         groups = []

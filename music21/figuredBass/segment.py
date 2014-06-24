@@ -31,6 +31,12 @@ from music21.figuredBass import possibility
 from music21.figuredBass import realizerScale
 from music21.figuredBass import resolution
 from music21.figuredBass import rules
+from music21.ext import six
+
+imap = six.moves.map # @UndefinedVariable
+izip = six.moves.zip # @UndefinedVariable
+ifilter = six.moves.filter # @UndefinedVariable
+ifilterfalse = six.moves.filterfalse # @UndefinedVariable
 
 _MOD = 'segment.py'
 
@@ -531,7 +537,7 @@ class Segment(object):
         >>> segmentA = segment.Segment()
         >>> allPossib = segmentA.allSinglePossibilities()
         >>> allPossib.__class__
-        <type 'itertools.product'>
+        <... 'itertools.product'>
         
         
         The number of naive possibilities is always the length of 
@@ -594,7 +600,7 @@ class Segment(object):
         '''
         self._singlePossibilityRuleChecking = _compileRules(self.singlePossibilityRules(self.fbRules))
         allA = self.allSinglePossibilities()
-        return itertools.ifilter(lambda possibA: self._isCorrectSinglePossibility(possibA), allA)
+        return ifilter(lambda possibA: self._isCorrectSinglePossibility(possibA), allA)
              
     def allCorrectConsecutivePossibilities(self, segmentB):
         '''
@@ -706,7 +712,7 @@ class Segment(object):
         correctA = self.allCorrectSinglePossibilities()
         correctB = segmentB.allCorrectSinglePossibilities()
         correctAB = itertools.product(correctA, correctB)
-        return itertools.ifilter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA = possibAB[0], possibB = possibAB[1]), correctAB)        
+        return ifilter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA = possibAB[0], possibB = possibAB[1]), correctAB)        
 
     def _resolveSpecialSegment(self, segmentB, specialResolutionMethods):
         resolutionMethodExecutor = _compileRules(specialResolutionMethods, 3)
@@ -714,14 +720,14 @@ class Segment(object):
             iterables = []
             for arg in args:
                 iterables.append(itertools.repeat(arg))
-            resolutions = itertools.imap(resolutionMethod, self.allCorrectSinglePossibilities(), *iterables)
-            correctAB = itertools.izip(self.allCorrectSinglePossibilities(), resolutions)
-            correctAB = itertools.ifilter(lambda possibAB: possibility.pitchesWithinLimit(possibA = possibAB[1], maxPitch = segmentB._maxPitch), correctAB)
+            resolutions = imap(resolutionMethod, self.allCorrectSinglePossibilities(), *iterables)
+            correctAB = izip(self.allCorrectSinglePossibilities(), resolutions)
+            correctAB = ifilter(lambda possibAB: possibility.pitchesWithinLimit(possibA = possibAB[1], maxPitch = segmentB._maxPitch), correctAB)
             if self.fbRules.applyConsecutivePossibRulesToResolution:
-                correctAB = itertools.ifilter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA = possibAB[0], possibB = possibAB[1]), correctAB)
+                correctAB = ifilter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA = possibAB[0], possibB = possibAB[1]), correctAB)
             if self.fbRules.applySinglePossibRulesToResolution:
                 segmentB._singlePossibilityRuleChecking = _compileRules(segmentB.singlePossibilityRules(segmentB.fbRules))               
-                correctAB = itertools.ifilter(lambda possibAB: segmentB._isCorrectSinglePossibility(possibA = possibAB[1]), correctAB)
+                correctAB = ifilter(lambda possibAB: segmentB._isCorrectSinglePossibility(possibA = possibAB[1]), correctAB)
             return correctAB
 
         raise SegmentException("No standard resolution available.")
@@ -776,9 +782,9 @@ def getPitches(pitchNames = ['C','E','G'], bassPitch = 'C3', maxPitch = 'C8'):
         maxPitch = pitch.Pitch(maxPitch)
     
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
-    iter2 = itertools.imap(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
-    iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
-    iter4 = itertools.ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
+    iter2 = imap(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
+    iter3 = ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
+    iter4 = ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
     allPitches = list(iter4)
     allPitches.sort()
     return allPitches

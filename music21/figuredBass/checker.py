@@ -80,7 +80,7 @@ def extractHarmonies(music21Stream):
     >>> from music21.figuredBass import checker
     >>> allHarmonies = checker.extractHarmonies(score)
     >>> for (offsets, notes) in sorted(allHarmonies.items()):
-    ...    print("{0:15}[{1:23}{2:23}{3:22}]".format(offsets, notes[0], notes[1], notes[2]))
+    ...    print("{0!s:15}[{1!s:23}{2!s:23}{3!s:22}]".format(offsets, notes[0], notes[1], notes[2]))
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>  <music21.note.Note G> ]
@@ -118,7 +118,7 @@ def createOffsetMapping(music21Part):
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> for (offsets, notes) in sorted(offsetMapping.items()):
-    ...    print("{0:15}[{1:22}]".format(offsets, notes[0]))
+    ...    print("{0!s:15}[{1!s:22}]".format(offsets, notes[0]))
     (0.0, 1.5)     [<music21.note.Note C> ]
     (1.5, 2.0)     [<music21.note.Note C> ]
     (2.0, 3.0)     [<music21.note.Note B->]
@@ -151,7 +151,7 @@ def correlateHarmonies(currentMapping, music21Part):
     >>> v1 = score[1]
     >>> newMapping = checker.correlateHarmonies(offsetMapping, v1)
     >>> for (offsets, notes) in sorted(newMapping.items()):
-    ...    print("{0:15}[{1:23}{2:21}]".format(offsets, notes[0], notes[1]))
+    ...    print("{0!s:15}[{1!s:23}{2!s:21}]".format(offsets, notes[0], notes[1]))
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>]
@@ -230,9 +230,9 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
     if debug is True:
         debugInfo = []
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0:25}{1}".format("(Offset, End Time):", "Part Numbers:"))
+        debugInfo.append("{0!s:25}{1!s}".format("(Offset, End Time):", "Part Numbers:"))
     
-    allHarmonies = sorted(extractHarmonies(music21Stream).items())
+    allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
     allParts = [p.flat for p in music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])]
     for (offsets, notes) in allHarmonies:
         vlm = [generalNoteToPitch(n) for n in notes]
@@ -244,7 +244,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
                     noteA = allParts[partNumber - 1].getElementsByOffset(initOffset, initOffset, mustBeginInSpan=False)[0]
                     noteA.color = color
             if debug is True:
-                debugInfo.append("{0:25}{1}".format(offsets, partNumberTuple))
+                debugInfo.append("{0!s:25}{1!s}".format(offsets, partNumberTuple))
 
     if debug is True:
         if len(debugInfo) == 2:
@@ -292,7 +292,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
     if debug is True:
         debugInfo = []
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0:25}{1:25}{2}".format("(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
+        debugInfo.append("{0!s:25}{1!s:25}{2!s}".format("(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
     allParts = [p.flat for p in music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])]    
@@ -312,7 +312,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
                     noteA.color = color
                     noteB.color = color
             if debug is True:
-                debugInfo.append("{0:25}{1:25}{2}".format(previousOffsets, offsets, partNumberTuple))
+                debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(previousOffsets, offsets, partNumberTuple))
         # Current vlm becomes previous
         previousOffsets = offsets
         vlmA = vlmB
@@ -441,7 +441,7 @@ def parallelFifths(possibA, possibB):
                 continue
             #Very high probability of ||5, but still not certain.
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
-            if parallelFifthsTable.has_key(pitchQuartet):
+            if pitchQuartet in parallelFifthsTable:
                 hasParallelFifths = parallelFifthsTable[pitchQuartet]
                 if hasParallelFifths: 
                     partViolations.append((pair1Index + 1, pair2Index + 1))
@@ -518,7 +518,7 @@ def hiddenFifth(possibA, possibB):
         if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 7:
             #Very high probability of hidden fifth, but still not certain.
             pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
-            if hiddenFifthsTable.has_key(pitchQuartet):
+            if pitchQuartet in hiddenFifthsTable:
                 hasHiddenFifth = hiddenFifthsTable[pitchQuartet]
                 if hasHiddenFifth:
                     partViolations.append((1, len(possibB)))
@@ -599,7 +599,7 @@ def parallelOctaves(possibA, possibB):
                 continue
             #Very high probability of ||8, but still not certain.
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
-            if parallelOctavesTable.has_key(pitchQuartet):
+            if pitchQuartet in parallelOctavesTable:
                 hasParallelOctaves = parallelOctavesTable[pitchQuartet]
                 if hasParallelOctaves: 
                     partViolations.append((pair1Index + 1, pair2Index + 1))
@@ -664,7 +664,7 @@ def hiddenOctave(possibA, possibB):
         if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 0:
             #Very high probability of hidden octave, but still not certain.
             pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
-            if hiddenOctavesTable.has_key(pitchQuartet):
+            if pitchQuartet in hiddenOctavesTable:
                 hasHiddenOctave = hiddenOctavesTable[pitchQuartet]
                 if hasHiddenOctave:
                     partViolations.append((1, len(possibB)))
