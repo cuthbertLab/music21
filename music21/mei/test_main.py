@@ -70,6 +70,40 @@ class TestThings(unittest.TestCase):
         self.assertEqual(3.5, main.makeDuration(2, 2).quarterLength) # "base" as int---should work
         self.assertEqual(3.999998092651367, main.makeDuration(2.0, 20).quarterLength)
 
+    def testAllPartsPresent1(self):
+        '''allPartsPresent(): one <staffDef>, no repeats'''
+        inputValue = [mock.MagicMock(spec_set=ETree.Element('staffDef'))]
+        inputValue[0].get = mock.MagicMock(return_value='1')
+        expected = ['1']
+        actual = main.allPartsPresent(inputValue)
+        self.assertSequenceEqual(expected, actual)
+
+    def testAllPartsPresent2(self):
+        '''allPartsPresent(): four <staffDef>s'''
+        inputValue = [mock.MagicMock(spec_set=ETree.Element('staffDef')) for _ in xrange(4)]
+        for i in xrange(4):
+            inputValue[i].get = mock.MagicMock(return_value=str(i + 1))
+        expected = list('1234')
+        actual = main.allPartsPresent(inputValue)
+        self.assertSequenceEqual(expected, actual)
+
+    def testAllPartsPresent3(self):
+        '''allPartsPresent(): four unique <staffDef>s, several repeats'''
+        inputValue = [mock.MagicMock(spec_set=ETree.Element('staffDef')) for _ in xrange(12)]
+        for i in xrange(12):
+            inputValue[i].get = mock.MagicMock(return_value=str((i % 4) + 1))
+        expected = list('1234')
+        actual = main.allPartsPresent(inputValue)
+        self.assertSequenceEqual(expected, actual)
+
+    def testAllPartsPresent4(self):
+        '''allPartsPresent(): error: no <staffDef>s'''
+        inputValue = []
+        self.assertRaises(main.MeiValidityError, main.allPartsPresent, inputValue)
+        try:
+            main.allPartsPresent(inputValue)
+        except main.MeiValidityError as mvErr:
+            self.assertEqual(main._SEEMINGLY_NO_PARTS, mvErr.message)
 
 
 #------------------------------------------------------------------------------

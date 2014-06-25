@@ -39,10 +39,15 @@ from music21 import clef
 # Module-Level Constants
 #------------------------------------------------------------------------------
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
+_MEINS = '{http://www.music-encoding.org/ns/mei}'
 
 
 # Exceptions
 #------------------------------------------------------------------------------
+class MeiValidityError(exceptions21.Music21Exception):
+    "When there is an otherwise-unspecified validity error that prevents parsing."
+    pass
+
 class MeiValueError(exceptions21.Music21Exception):
     "When an attribute has an invalid value."
     pass
@@ -61,6 +66,7 @@ _WRONG_ROOT_TAG = 'Root tag is should be <mei>, not <%s>.'
 _MULTIPLE_ROOT_TAGS = 'Found multiple <mei> tags.'
 _UNKNOWN_TAG = 'Found unexpected tag while parsing MEI: <%s>.'
 _UNEXPECTED_ATTR_VALUE = 'Unexpected value for "%s" attribute: %s'
+_SEEMINGLY_NO_PARTS = 'There appear to be no <staffDef> tags in this score.'
 
 
 # Module-level Functions
@@ -135,6 +141,32 @@ def makeDuration(base=0.0, dots=0):
     '''
     return duration.Duration(base + sum([float(base) / x for x in [2 ** i for i in xrange(1, dots + 1)]]),
                              dots=dots)
+
+
+def allPartsPresent(allStaffDefs):
+    '''
+    Given an iterable of all <staffDef> :class:`Element` objects in an MEI file, deduplicate the @n
+    attributes, yielding a list of all @n attributes in the <score>.
+
+    :param allStaffDefs: All the <staffDef> elements in a <score>.
+    :type allStaffDefs: iterable of :class:`~xml.etree.ElementTree.Element`
+    :returns: All the unique @n values in the <score>.
+
+    ``allStaffDefs`` should probably be the result of this XPath query:::
+        documentRoot.findall('.//score//staffDef')
+
+    But of course you must prefix it with the MEI namespace, so it's actually this:::
+        documentRoot.findall('.//{http://www.music-encoding.org/ns/mei}score//{http://www.music-encoding.org/ns/mei}staffDef')  # pylint: disable=line-too-long
+
+    If you don't do this, you may get misleading <staffDef> tags from, for example, the incipit.
+    '''
+    post = []
+    for staffDef in allStaffDefs:
+        if staffDef.get('n') not in post:
+            post.append(staffDef.get('n'))
+    if 0 == len(post):
+        raise MeiValidityError(_SEEMINGLY_NO_PARTS)
+    return post
 
 
 # Constants for One-to-One Translation
