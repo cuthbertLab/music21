@@ -33,7 +33,8 @@ To do a release,
 11. COMMIT to Github at this point, then don't change anything until the next step is done.
     (.gitignore SHOULD avoid uploading the large files created here...)
 
-12. Create a new release on GitHub and upload the FIVE files created here.
+12. Create a new release on GitHub and upload the FIVE files created here. Use tag v1.9.3 (etc.).
+    Drag in this order: .egg, .tar.gz, .exe, no-corpus.egg, no-corpus.tar.gz
 
 13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking edit and augment
 the version number and the download URL.
