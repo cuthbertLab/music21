@@ -637,11 +637,11 @@ class TestClefFromElement(unittest.TestCase):
     def testUnit1a(self, mockTabClef, mockPercClef, mockClefFromString):
         '''
         clefFromElement(): all the elements that go in clef.clefFromString()...
-                           'clefshape', 'line', 'dis', and 'dis.place'
+                           'shape', 'line', 'dis', and 'dis.place'
         (mostly-unit test; only mock out clef and the ElementTree.Element)
         '''
         elem = mock.MagicMock(spec_set=ETree.Element('mock'))
-        expectedGetOrder = [mock.call('clefshape'), mock.call('clefshape'), mock.call('clefshape'),
+        expectedGetOrder = [mock.call('shape'), mock.call('shape'), mock.call('shape'),
                             mock.call('line'), mock.call('dis'), mock.call('dis.place')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['theClefShape', 'theClefShape', 'theClefShape', '2', '8', 'above']
@@ -662,10 +662,10 @@ class TestClefFromElement(unittest.TestCase):
     @mock.patch('music21.clef.TabClef')
     def testUnit1b(self, mockTabClef, mockPercClef, mockClefFromString):
         '''
-        clefFromElement(): same as testUnit1a() but with 'perc' "clefshape"
+        clefFromElement(): same as testUnit1a() but with 'perc' "shape"
         '''
         elem = mock.MagicMock(spec_set=ETree.Element('mock'))
-        expectedGetOrder = [mock.call('clefshape')]
+        expectedGetOrder = [mock.call('shape')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
@@ -684,10 +684,10 @@ class TestClefFromElement(unittest.TestCase):
     @mock.patch('music21.clef.TabClef')
     def testUnit1c(self, mockTabClef, mockPercClef, mockClefFromString):
         '''
-        clefFromElement(): same as testUnit1c() but with 'TAB' "clefshape"
+        clefFromElement(): same as testUnit1c() but with 'TAB' "shape"
         '''
         elem = mock.MagicMock(spec_set=ETree.Element('mock'))
-        expectedGetOrder = [mock.call('clefshape'), mock.call('clefshape')]
+        expectedGetOrder = [mock.call('shape'), mock.call('shape')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['TAB', 'TAB']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
@@ -704,11 +704,11 @@ class TestClefFromElement(unittest.TestCase):
     def testIntegration1a(self):
         '''
         clefFromElement(): all the elements that go in clef.clefFromString()...
-                           'clefshape', 'line', 'dis', and 'dis.place'
+                           'shape', 'line', 'dis', and 'dis.place'
         (corresponds to testUnit1a, with real objects)
         '''
         clefElem = ETree.Element('clef')
-        clefAttribs = {'clefshape': 'G', 'line': '2', 'dis': '8', 'dis.place': 'above'}
+        clefAttribs = {'shape': 'G', 'line': '2', 'dis': '8', 'dis.place': 'above'}
         for key in clefAttribs:
             clefElem.set(key, clefAttribs[key])
         expectedClass = clef.Treble8vaClef
@@ -724,7 +724,7 @@ class TestClefFromElement(unittest.TestCase):
         (corresponds to testUnit1b, with real objects)
         '''
         clefElem = ETree.Element('clef')
-        clefAttribs = {'clefshape': 'perc'}
+        clefAttribs = {'shape': 'perc'}
         for key in clefAttribs:
             clefElem.set(key, clefAttribs[key])
         expectedClass = clef.PercussionClef
@@ -740,7 +740,7 @@ class TestClefFromElement(unittest.TestCase):
         (corresponds to testUnit1c, with real objects)
         '''
         clefElem = ETree.Element('clef')
-        clefAttribs = {'clefshape': 'TAB'}
+        clefAttribs = {'shape': 'TAB'}
         for key in clefAttribs:
             clefElem.set(key, clefAttribs[key])
         expectedClass = clef.TabClef
@@ -757,7 +757,7 @@ class TestClefFromElement(unittest.TestCase):
         clefFromElement(): adds the "xml:id" attribute
         '''
         elem = mock.MagicMock(spec_set=ETree.Element('mock'))
-        expectedGetOrder = [mock.call('clefshape'), mock.call(_XMLID), mock.call(_XMLID)]
+        expectedGetOrder = [mock.call('shape'), mock.call(_XMLID), mock.call(_XMLID)]
         expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc', 'theXMLID', 'theXMLID']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None

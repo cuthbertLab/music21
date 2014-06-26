@@ -571,12 +571,12 @@ def clefFromElement(elem):
     ============
     None.
     '''
-    if 'perc' == elem.get('clefshape'):
+    if 'perc' == elem.get('shape'):
         post = clef.PercussionClef()
-    elif 'TAB' == elem.get('clefshape'):
+    elif 'TAB' == elem.get('shape'):
         post = clef.TabClef()
     else:
-        post = clef.clefFromString(elem.get('clefshape') + elem.get('line'),
+        post = clef.clefFromString(elem.get('shape') + elem.get('line'),
                                    octaveShift=_getOctaveShift(elem.get('dis'),
                                                                elem.get('dis.place')))
 
