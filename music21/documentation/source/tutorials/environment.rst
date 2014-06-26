@@ -62,6 +62,7 @@ the names of user-configurable parameters, call the keys() method.
     'debug'
     'directoryScratch'
     'graphicsPath'
+    'ipythonShowFormat'
     'lilypondBackend'
     'lilypondFormat'
     'lilypondPath'

@@ -15,23 +15,31 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 To do a release, 
 
 1. update the VERSION in _version.py and the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
-2. run test/multiprocessTest.py
+2. run test/multiprocessTest.py  for Python2 AND Python3
 3. If all tests pass, run `corpus.cacheMetadata(['core'])`, 
-4. run test/test.py (normally not necessary,because it's slower and mostly duplicates multiprocessTest, but should be done before making a release), 
+4. run test/testSingleCoreAll.py 
+     (normally not necessary,because it's slower and mostly duplicates multiprocessTest, 
+     but should be done before making a release).  Does not yet need to be done via python3
 5. then test/testDocumentation
 6. then test/testSerialization
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
 9. run documentation/upload [not via eclipse] or upload via ssh.
 
-[*] you will need IPython (pip or easy_install) and pandoc (.dmg) installed
+[*] you will need sphinx, IPython (pip or easy_install) and pandoc (.dmg) installed
 
-10. and finally this file. 
+10. And finally this file. 
 
-11. Create a new release on GitHub and upload the FIVE files created here.
+11. COMMIT to Github at this point, then don't change anything until the next step is done.
+    (.gitignore SHOULD avoid uploading the large files created here...)
 
-12. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking edit and augment
+12. Create a new release on GitHub and upload the FIVE files created here. Use tag v1.9.3 (etc.).
+    Drag in this order: .egg, .tar.gz, .exe, no-corpus.egg, no-corpus.tar.gz
+
+13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking edit and augment
 the version number and the download URL.
+
+14. Delete the files in dist...
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''

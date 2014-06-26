@@ -949,7 +949,7 @@ def ch2_writing_III_B_1(show=True, *arguments, **keywords):
 
     Renotate the following rhythms without ties. 
     '''
-    ex = converter.parse("c8~ c16 c16 c16 c16 c8~ c8 c c16 c~ c c c8 c4~ c8", "3/8")
+    ex = converter.parse("tinynotation: 3/8 c8~ c16 c16 c16 c16 c8~ c8 c c16 c~ c c c8 c4~ c8")
 
     ex = ch2_writing_III_B(ex)
     if show:
@@ -961,7 +961,7 @@ def ch2_writing_III_B_1(show=True, *arguments, **keywords):
 def ch2_writing_III_B_2(show=True, *arguments, **keywords):
     '''p. 17
     '''
-    ex = converter.parse("c4~ c8 c16 c c8 c~ c c c2~ c4 c8 c8 c8~ c16 c c8~ c16 c c2", "4/4")
+    ex = converter.parse("tinynotation: 4/4 c4~ c8 c16 c c8 c~ c c c2~ c4 c8 c8 c8~ c16 c c8~ c16 c c2")
 
     ex = ch2_writing_III_B(ex)
     if show:
@@ -973,7 +973,7 @@ def ch2_writing_III_B_2(show=True, *arguments, **keywords):
 def ch2_writing_III_B_3(show=True, *arguments, **keywords):
     '''p. 17
     '''
-    ex = converter.parse("c2~ c4 c c~ c8 c c4 c~ c c c2 c2 c2~ c4 c c1~ c2", "3/2")
+    ex = converter.parse("tinynotation: 3/2 c2~ c4 c c~ c8 c c4 c~ c c c2 c2 c2~ c4 c c1~ c2")
 
     ex = ch2_writing_III_B(ex)
     if show:
@@ -999,7 +999,7 @@ def ch2_writing_IV_A(show=True, *arguments, **keywords):
 def ch2_writing_IV_B(show=True, *arguments, **keywords):
     '''p. 18
     '''
-    ex = converter.parse("c8. c16 e8 g c'4. r8 a8. a16 c'8 a g4. e16 f g8 g8 e16 e g16 g a8 g8 e4 d8 e16 f e d8 d16 c4.", "2/4")
+    ex = converter.parse("tinynotation: 2/4 c8. c16 e8 g c'4. r8 a8. a16 c'8 a g4. e16 f g8 g8 e16 e g16 g a8 g8 e4 d8 e16 f e d8 d16 c4.")
     
     ex = ex.makeMeasures() 
     ex.makeBeams(inPlace=True)
@@ -1021,7 +1021,7 @@ def ch2_writing_V_A(show=True, *arguments, **keywords):
     from music21 import key
 
     # note: tiny is not encoding C#s for c'#4 properly (it seems)
-    ex = converter.parse("g#1 f#4 g#4 a1 g#2 f#1 g#4. en8 g#2 f#4 r4 f#4 d#8 B8 e2 r4 e4 a4. a8 a2 g#4 g# b4. e8 a2~ a4 a4 d'n4. d'8 d'n2 c'#4 c'# c'# c'#", "3/2")
+    ex = converter.parse("tinynotation: 3/2 g#1 f#4 g#4 a1 g#2 f#1 g#4. en8 g#2 f#4 r4 f#4 d#8 B8 e2 r4 e4 a4. a8 a2 g#4 g# b4. e8 a2~ a4 a4 d'n4. d'8 d'n2 c'#4 c'# c'# c'#")
     
     ex.insert(0, key.KeySignature(4))
     # presently, this only works if makeAccidentals is called before make measures
