@@ -67,6 +67,7 @@ _MULTIPLE_ROOT_TAGS = 'Found multiple <mei> tags.'
 _UNKNOWN_TAG = 'Found unexpected tag while parsing MEI: <%s>.'
 _UNEXPECTED_ATTR_VALUE = 'Unexpected value for "%s" attribute: %s'
 _SEEMINGLY_NO_PARTS = 'There appear to be no <staffDef> tags in this score.'
+_MISSING_VOICE_ID = 'Found a <layer> without @n attribute and no override.'
 
 
 # Module-level Functions
@@ -586,11 +587,27 @@ def clefFromElement(elem):
 
 
 
-def layerFromElement(elem):
+def layerFromElement(elem, overrideN=None):
     '''
     <layer> An independent stream of events on a staff.
 
-    In MEI 2013: pg.3534 (367 in PDF) (MEI.shared module)
+    In MEI 2013: pg.353 (367 in PDF) (MEI.shared module)
+
+    .. note:: The :class:`Voice` object's :attr:`~music21.stream.Voice.id` attribute must be set
+        properly in order to ensure continuity of voices between measures. If the ``elem`` does not
+        have an @n attribute, you can set one with the ``overrideN`` parameter in this function. If
+        you provide a value for ``overrideN``, it will be used instead of the ``elemn`` object's
+        @n attribute.
+
+        Because improperly-set :attr:`~music21.stream.Voice.id` attributes nearly guarantees errors
+        in the imported :class:`Score`, either ``overrideN`` or @n must be specified.
+
+    :param elem: The ``<layer>`` tag to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :param str overrideN: The value to be set as the ``id`` attribute in the outputted :class:`Voice`.
+    :returns: A :class:`Voice` with the objects found in the provided :class:`Element`.
+    :rtype: :class:`music21.stream.Voice`
+    :raises: :exc:`MeiAttributeError` if neither ``overrideN`` nor @n are specified.
 
     Attributes Implemented:
     =======================
@@ -598,17 +615,22 @@ def layerFromElement(elem):
     - <chord> contained within
     - <note> contained within
     - <rest> contained within
-    - xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - @n, from att.common
 
     Attributes Ignored:
     ===================
+    - xml:id. Since the @xml:id atttribute must be unique within a document, setting @xml:id as the
+        :class:`Voice` object's ``id`` attribute would make it seem as though every measure has an
+        entirely different set of voices. Since voices are (in this case) connected between
+        measures, we must ensure corresponding :class:`Voice` objects have corresponding ``id``
+        attributes.
 
     Attributes In Progress:
     =======================
 
     Attributes not Implemented:
     ===========================
-    att.common (@label, @n, @xml:base)
+    att.common (@label, @xml:base)
     att.declaring (@decls)
     att.facsimile (@facs)
     att.layer.log (@def)
@@ -640,20 +662,20 @@ def layerFromElement(elem):
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
                      '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement}
-    objects = []
+    post = stream.Voice()
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
-            objects.append(tagToFunction[eachTag.tag](eachTag))
+            post.append(tagToFunction[eachTag.tag](eachTag))
 
-    # make a music21.stream.Voice, set its "id" attribute, and return
-    post = stream.Voice()
-    for eachObj in objects:
-        post.append(eachObj)
-
-    if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+    # try to set the Voice's "id" attribte
+    if overrideN:
+        post.id = overrideN
+    elif elem.get('n') is not None:
+        post.id = elem.get('n')
+    else:
+        raise MeiAttributeError(_MISSING_VOICE_ID)
 
     return post
 

@@ -780,23 +780,24 @@ class TestLayerFromElement(unittest.TestCase):
 
     @mock.patch('music21.mei.__main__.noteFromElement')
     @mock.patch('music21.stream.Voice')
-    def testUnit1(self, mockVoice, mockNoteFromElement):
+    def testUnit1a(self, mockVoice, mockNoteFromElement):
         '''
         layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
                             mapping works; that tags not in the mapping are ignored; and that a
-                            Voice object is returned. And "xml:id" is set.
+                            Voice object is returned. And "id" is set from the @n attribute.
         (mostly-unit test; only mock noteFromElement and the ElementTree.Element)
         '''
+        theNAttribute = '@n value'
         elem = mock.MagicMock(spec_set=ETree.Element('layer'))
-        elemGetReturns = ['theXMLID', 'theXMLID']
+        elemGetReturns = [theNAttribute, theNAttribute]
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) else None
-        expectedGetOrder = [mock.call(_XMLID), mock.call(_XMLID)]
+        expectedGetOrder = [mock.call('n'), mock.call('n')]
         findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
                          mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
                          mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
-        findallReturn[0].tag = 'note'
-        findallReturn[1].tag = 'imaginary'
-        findallReturn[2].tag = 'note'
+        findallReturn[0].tag = '%snote' % main._MEINS
+        findallReturn[1].tag = '%simaginary' % main._MEINS
+        findallReturn[2].tag = '%snote' % main._MEINS
         elem.findall = mock.MagicMock(return_value=findallReturn)
         expectedMNFEOrder = [mock.call(findallReturn[0]), mock.call(findallReturn[2])]  # "MNFE" is "mockNoteFromElement"
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
@@ -811,17 +812,77 @@ class TestLayerFromElement(unittest.TestCase):
         self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
         mockVoice.assert_called_once_with()
         self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value.append.call_args_list)
-        self.assertEqual('theXMLID', actual.id)
+        self.assertEqual(theNAttribute, actual.id)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
 
-    def testIntegration1(self):
+    @mock.patch('music21.mei.__main__.noteFromElement')
+    @mock.patch('music21.stream.Voice')
+    def testUnit1b(self, mockVoice, mockNoteFromElement):
+        '''
+        Same as testUnit1a() *but* with ``overrideN`` provided.
+        '''
+        elem = mock.MagicMock(spec_set=ETree.Element('layer'))
+        findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
+                         mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
+                         mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
+        findallReturn[0].tag = '%snote' % main._MEINS
+        findallReturn[1].tag = '%simaginary' % main._MEINS
+        findallReturn[2].tag = '%snote' % main._MEINS
+        elem.findall = mock.MagicMock(return_value=findallReturn)
+        expectedMNFEOrder = [mock.call(findallReturn[0]), mock.call(findallReturn[2])]  # "MNFE" is "mockNoteFromElement"
+        mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
+        mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
+        expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
+        overrideN = 'my own @n'
+
+        actual = main.layerFromElement(elem, overrideN)
+
+        elem.findall.assert_called_once_with('*')
+        self.assertEqual(mockVoice.return_value, actual)
+        self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
+        mockVoice.assert_called_once_with()
+        self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value.append.call_args_list)
+        self.assertEqual(overrideN, actual.id)
+        self.assertEqual(0, elem.get.call_count)
+
+    @mock.patch('music21.mei.__main__.noteFromElement')
+    @mock.patch('music21.stream.Voice')
+    def testUnit1c(self, mockVoice, mockNoteFromElement):
+        '''
+        Same as testUnit1a() *but* without ``overrideN`` or @n.
+        '''
+        elem = mock.MagicMock(spec_set=ETree.Element('layer'))
+        elem.get.return_value = None
+        findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
+                         mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
+                         mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
+        findallReturn[0].tag = '%snote' % main._MEINS
+        findallReturn[1].tag = '%simaginary' % main._MEINS
+        findallReturn[2].tag = '%snote' % main._MEINS
+        elem.findall = mock.MagicMock(return_value=findallReturn)
+        # NB: we call the layerFromElement() twice, so we need twice the return values here
+        mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2',
+                          'mockNoteFromElement return 1', 'mockNoteFromElement return 2']  # "MNFE" is "mockNoteFromElement"
+        mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
+
+        self.assertRaises(main.MeiAttributeError, main.layerFromElement, elem)
+
+        try:
+            main.layerFromElement(elem)
+        except main.MeiAttributeError as maError:
+            self.assertEqual(main._MISSING_VOICE_ID, maError.message)
+
+
+    def testIntegration1a(self):
         '''
         layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
                             mapping works; that tags not in the mapping are ignored; and that a
                             Voice object is returned. And "xml:id" is set.
-        (corresponds to testUnit1() but without mock objects)
+        (corresponds to testUnit1a() but without mock objects)
         '''
-        inputXML = '''<layer id="asdf1234">
+        inputXML = '''<layer n="so voice ID" xmlns="http://www.music-encoding.org/ns/mei">
                           <note pname="F" oct="2" dur="4" />
                           <note pname="E" oct="2" accid="f" dur="4" />
                           <imaginary awesome="true" />
@@ -831,13 +892,55 @@ class TestLayerFromElement(unittest.TestCase):
         actual = main.layerFromElement(elem)
 
         self.assertEqual(2, len(actual))
+        self.assertEqual('so voice ID', actual.id)
         self.assertEqual(0.0, actual[0].offset)
         self.assertEqual(1.0, actual[1].offset)
         self.assertEqual(1.0, actual[0].quarterLength)
         self.assertEqual(1.0, actual[1].quarterLength)
         self.assertEqual('F2', actual[0].nameWithOctave)
         self.assertEqual('E-2', actual[1].nameWithOctave)
-        self.assertEqual('asdf1234', actual.id)
+
+
+    def testIntegration1b(self):
+        '''
+        (corresponds to testUnit1b() but without mock objects)
+        '''
+        inputXML = '''<layer xmlns="http://www.music-encoding.org/ns/mei">
+                          <note pname="F" oct="2" dur="4" />
+                          <note pname="E" oct="2" accid="f" dur="4" />
+                          <imaginary awesome="true" />
+                      </layer>'''
+        elem = ETree.fromstring(inputXML)
+
+        actual = main.layerFromElement(elem, 'so voice ID')
+
+        self.assertEqual(2, len(actual))
+        self.assertEqual('so voice ID', actual.id)
+        self.assertEqual(0.0, actual[0].offset)
+        self.assertEqual(1.0, actual[1].offset)
+        self.assertEqual(1.0, actual[0].quarterLength)
+        self.assertEqual(1.0, actual[1].quarterLength)
+        self.assertEqual('F2', actual[0].nameWithOctave)
+        self.assertEqual('E-2', actual[1].nameWithOctave)
+
+
+    def testIntegration1c(self):
+        '''
+        (corresponds to testUnit1c() but without mock objects)
+        '''
+        inputXML = '''<layer xmlns="http://www.music-encoding.org/ns/mei">
+                          <note pname="F" oct="2" dur="4" />
+                          <note pname="E" oct="2" accid="f" dur="4" />
+                          <imaginary awesome="true" />
+                      </layer>'''
+        elem = ETree.fromstring(inputXML)
+
+        self.assertRaises(main.MeiAttributeError, main.layerFromElement, elem)
+
+        try:
+            main.layerFromElement(elem)
+        except main.MeiAttributeError as maError:
+            self.assertEqual(main._MISSING_VOICE_ID, maError.message)
 
 
 
