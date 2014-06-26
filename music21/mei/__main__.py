@@ -689,16 +689,21 @@ def staffFromElement(elem):
 
     In MEI 2013: pg.444 (458 in PDF) (MEI.shared module)
 
+    :param elem: The ``<staff>`` tag to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :returns: The :class:`Voice` classes corresponding to the ``<layer>`` tags in ``elem``.
+    :rtype: list of :class:`music21.stream.Voice`
+
     Attributes Implemented:
     =======================
+    - <layer> contained within
 
     Attributes Ignored:
     ===================
+    - xml:id. Because the function does not return a music21 object, we cannot use @xml:id.
 
     Attributes In Progress:
     =======================
-    - <layer> contained within
-    - xml:id (or id), an XML id (submitted as the Music21Object "id")
 
     Attributes not Implemented:
     ===========================
@@ -721,23 +726,25 @@ def staffFromElement(elem):
     MEI.usersymbols: anchoredText curve line symbol
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}layer': layerFromElement}
-    objects = []
+    layerTagName = '{http://www.music-encoding.org/ns/mei}layer'
+    tagToFunction = {}
+    post = []
+
+    # track the @n values given to layerFromElement()
+    currentNValue = '1'
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
-        if eachTag.tag in tagToFunction:
-            objects.append(tagToFunction[eachTag.tag](eachTag))
-
-    # make a music21.stream.Part, set its "id" attribute, and return
-    post = stream.Part()
-    for eachObj in objects:
-        post.append(eachObj)
-
-    if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+        if layerTagName == eachTag.tag:
+            post.append(layerFromElement(eachTag, currentNValue))
+            currentNValue = str(int(currentNValue) + 1)  # inefficient, but we need a string
+        elif eachTag.tag in tagToFunction:
+            # NB: this won't be tested until there's something in tagToFunction
+            post.append(tagToFunction[eachTag.tag](eachTag))
 
     return post
+
+
 
 
 def measureFromElement(elem):
@@ -805,7 +812,8 @@ if __name__ == "__main__":
                      test_main.TestRestFromElement,
                      test_main.TestChordFromElement,
                      test_main.TestClefFromElement,
-                     test_main.TestLayerFromElement,)
+                     test_main.TestLayerFromElement,
+                     test_main.TestStaffFromElement,)
 
 #------------------------------------------------------------------------------
 # eof

@@ -948,63 +948,66 @@ class TestLayerFromElement(unittest.TestCase):
 class TestStaffFromElement(unittest.TestCase):
     '''Tests for staffFromElement()'''
 
-    #@mock.patch('music21.mei.__main__.noteFromElement')
-    #@mock.patch('music21.stream.Voice')
-    #def testUnit1(self, mockVoice, mockNoteFromElement):
-        #'''
-        #layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
-                            #mapping works; that tags not in the mapping are ignored; and that a
-                            #Voice object is returned. And "xml:id" is set.
-        #(mostly-unit test; only mock noteFromElement and the ElementTree.Element)
-        #'''
-        #elem = mock.MagicMock(spec_set=ETree.Element('layer'))
-        #elemGetReturns = ['theXMLID', 'theXMLID']
-        #elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) else None
-        #expectedGetOrder = [mock.call(_XMLID), mock.call(_XMLID)]
-        #findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
-                         #mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
-                         #mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
-        #findallReturn[0].tag = 'note'
-        #findallReturn[1].tag = 'imaginary'
-        #findallReturn[2].tag = 'note'
-        #elem.findall = mock.MagicMock(return_value=findallReturn)
-        #expectedMNFEOrder = [mock.call(findallReturn[0]), mock.call(findallReturn[2])]  # "MNFE" is "mockNoteFromElement"
-        #mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
-        #mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
-        #mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
-        #expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
+    @mock.patch('music21.mei.__main__.layerFromElement')
+    def testUnit1(self, mockLayerFromElement):
+        '''
+        staffFromElement(): basic functionality (i.e., that layerFromElement() is called with the
+                            right arguments, and with properly-incrementing "id" attributes
+        (mostly-unit test; only mock noteFromElement and the ElementTree.Element)
+        '''
+        elem = mock.MagicMock(spec_set=ETree.Element('staff'))
+        findallReturn = [mock.MagicMock(spec_set=ETree.Element('layer'), name='layer1'),
+                         mock.MagicMock(spec_set=ETree.Element('layer'), name='layer2'),
+                         mock.MagicMock(spec_set=ETree.Element('layer'), name='layer3')]
+        findallReturn[0].tag = '%slayer' % main._MEINS  # percent slayer... UNIT TESTS BE TOUGH
+        findallReturn[1].tag = '%slayer' % main._MEINS
+        findallReturn[2].tag = '%slayer' % main._MEINS
+        elem.findall = mock.MagicMock(return_value=findallReturn)
+        expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1)) for i in xrange(len(findallReturn))]  # "MLFE" is "mockLayerFromElement"
+        mockLFEreturns = ['mockLayerFromElement return %i' for i in xrange(len(findallReturn))]
+        mockLayerFromElement.side_effect = lambda *x: mockLFEreturns.pop(0)
+        expectedAppendCalls = [mock.call(mockLFEreturns[i]) for i in xrange(len(findallReturn))]
+        expected = ['mockLayerFromElement return %i' for i in xrange(len(findallReturn))]
 
-        #actual = main.layerFromElement(elem)
+        actual = main.staffFromElement(elem)
 
-        #elem.findall.assert_called_once_with('*')
-        #self.assertEqual(mockVoice.return_value, actual)
-        #self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
-        #mockVoice.assert_called_once_with()
-        #self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value.append.call_args_list)
-        #self.assertEqual('theXMLID', actual.id)
-        #self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+        elem.findall.assert_called_once_with('*')
+        self.assertEqual(expected, actual)
+        self.assertSequenceEqual(expectedMLFEOrder, mockLayerFromElement.call_args_list)
 
-    #def testIntegration1(self):
-        #'''
-        #layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
-                            #mapping works; that tags not in the mapping are ignored; and that a
-                            #Voice object is returned. And "xml:id" is set.
-        #(corresponds to testUnit1() but without mock objects)
-        #'''
-        #inputXML = '''<layer id="asdf1234">
-                          #<note pname="F" oct="2" dur="4" />
-                          #<note pname="E" oct="2" accid="f" dur="4" />
-                          #<imaginary awesome="true" />
-                      #</layer>'''
-        #elem = ETree.fromstring(inputXML)
+    def testIntegration1(self):
+        '''
+        staffFromElement(): basic functionality (i.e., that layerFromElement() is called with the
+                            right arguments, and with properly-incrementing "id" attributes
+        (corresponds to testUnit1() but without mock objects)
+        '''
+        inputXML = '''<staff xmlns="http://www.music-encoding.org/ns/mei">
+                          <layer>
+                              <note pname="F" oct="2" dur="4" />
+                          </layer>
+                          <layer>
+                              <note pname="A" oct="2" dur="4" />
+                          </layer>
+                          <layer>
+                              <note pname="C" oct="2" dur="4" />
+                          </layer>
+                      </staff>'''
+        elem = ETree.fromstring(inputXML)
 
-        #actual = main.layerFromElement(elem)
+        actual = main.staffFromElement(elem)
 
-        #self.assertEqual(2, len(actual))
-        #self.assertEqual(0.0, actual[0].offset)
-        #self.assertEqual(1.0, actual[1].offset)
-        #self.assertEqual(1.0, actual[0].quarterLength)
-        #self.assertEqual(1.0, actual[1].quarterLength)
-        #self.assertEqual('F2', actual[0].nameWithOctave)
-        #self.assertEqual('E-2', actual[1].nameWithOctave)
-        #self.assertEqual('asdf1234', actual.id)
+        self.assertEqual(3, len(actual))
+        # common to each part
+        for i in xrange(len(actual)):
+            self.assertEqual(1, len(actual[i]))
+            self.assertEqual(0.0, actual[i][0].offset)
+            self.assertEqual(1.0, actual[i][0].quarterLength)
+        # first part
+        self.assertEqual('1', actual[0].id)
+        self.assertEqual('F2', actual[0][0].nameWithOctave)
+        # second part
+        self.assertEqual('2', actual[1].id)
+        self.assertEqual('A2', actual[1][0].nameWithOctave)
+        # third part
+        self.assertEqual('3', actual[2].id)
+        self.assertEqual('C2', actual[2][0].nameWithOctave)
