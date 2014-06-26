@@ -152,6 +152,7 @@ def allPartsPresent(allStaffDefs):
     :param allStaffDefs: All the <staffDef> elements in a <score>.
     :type allStaffDefs: iterable of :class:`~xml.etree.ElementTree.Element`
     :returns: All the unique @n values in the <score>.
+    :rtype: tuple of str
 
     ``allStaffDefs`` should probably be the result of this XPath query:::
         documentRoot.findall('.//score//staffDef')
@@ -167,7 +168,7 @@ def allPartsPresent(allStaffDefs):
             post.append(staffDef.get('n'))
     if 0 == len(post):
         raise MeiValidityError(_SEEMINGLY_NO_PARTS)
-    return post
+    return tuple(post)
 
 
 # Constants for One-to-One Translation
