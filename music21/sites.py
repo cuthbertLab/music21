@@ -12,11 +12,15 @@
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
-
+import fractions
 import unittest
 
 from music21 import common
 from music21 import exceptions21
+from music21.ext import six
+
+if six.PY3:
+    basestring = str # @ReservedAssignment
 
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
@@ -70,7 +74,7 @@ class SiteRef(common.SlottedObject):
         'siteIndex',
         'isDead',
         'siteWeakref',
-        'offset',
+        '_offset',
         )
     ### INITIALIZER ###
 
@@ -85,6 +89,38 @@ class SiteRef(common.SlottedObject):
         self.siteWeakref = common.wrapWeakref(site)
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
+
+
+    def _getOffsetAsFloat(self):
+        if isinstance(self._offset, basestring):
+            return self._offset
+        elif self._offset is not None:
+            return float(self._offset)
+        else:
+            return None
+    
+    def _setOffset(self, offset):
+        if offset is None:
+            self._offset = None
+        elif isinstance(offset, fractions.Fraction):
+            self._offset = offset        
+        elif isinstance(offset, basestring):
+            self._offset = offset
+        else:
+            self._offset = fractions.Fraction(offset).limit_denominator(65535)
+    
+    offset = property(_getOffsetAsFloat, _setOffset)
+
+    def _getOffsetRational(self):
+        '''
+        returns the offset without conversion to float...
+        '''
+        return self._offset
+    
+    offsetRational = property(_getOffsetRational, _setOffset)
+    
+    offsetFloat = property(_getOffsetAsFloat, _setOffset, doc='''synonym for offset''')
+
 
 _singletonCounter = common.SingletonCounter()
 
@@ -677,7 +713,7 @@ class Sites(common.SlottedObject):
         #if common.isWeakref(dict['obj']):
         return siteRef.site
 
-    def getOffsetByObjectMatch(self, obj):
+    def getOffsetByObjectMatch(self, obj, returnType='float'):
         '''
         For a given object, return the offset using a direct object match.  The
         stored id value is not used; instead, the id() of both the stored
@@ -697,12 +733,11 @@ class Sites(common.SlottedObject):
             >>> aLocations.add(aSite, 23)
             >>> aLocations.add(bSite, 121.5)
             >>> aLocations.getOffsetByObjectMatch(aSite)
-            23
-
-        ::
-
+            23.0
             >>> aLocations.getOffsetByObjectMatch(bSite)
             121.5
+            >>> aLocations.getOffsetByObjectMatch(bSite, returnType='rational')
+            Fraction(243, 2)
 
         '''
         for idKey in self.siteDict:
@@ -717,10 +752,10 @@ class Sites(common.SlottedObject):
                 continue
             if id(compareObj) == id(obj):
                 #environLocal.printDebug(['found object as site', obj, id(obj), 'idKey', idKey])
-                return self.getOffsetBySiteId(idKey) #dict['offset']
+                return self.getOffsetBySiteId(idKey, returnType=returnType) #dict['offset']
         raise SitesException('an entry for this object (%s) is not stored in Sites' % obj)
 
-    def getOffsetBySite(self, siteObj):
+    def getOffsetBySite(self, siteObj, returnType='float'):
         '''
         For a given site return this Sites's offset in it. The None site is
         permitted. The id() of the site is used to find the offset.
@@ -737,7 +772,7 @@ class Sites(common.SlottedObject):
             >>> aLocations.add(aSite, 23)
             >>> aLocations.add(bSite, 121.5)
             >>> aLocations.getOffsetBySite(aSite)
-            23
+            23.0
 
         ::
 
@@ -754,13 +789,13 @@ class Sites(common.SlottedObject):
             siteId = id(siteObj)
         try:
             # will raise a key error if not found
-            return self.getOffsetBySiteId(siteId)
+            return self.getOffsetBySiteId(siteId, returnType=returnType)
             #post = self.siteDict[siteId]['offset']
         except SitesException: # the site id is not valid
             #environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self.siteDict])
             raise # re-raise Exception
 
-    def getOffsetBySiteId(self, idKey, strictDeadCheck=False):
+    def getOffsetBySiteId(self, idKey, strictDeadCheck=False, returnType='float'):
         '''
         Main method for getting an offset from a location key.
 
@@ -781,7 +816,7 @@ class Sites(common.SlottedObject):
             >>> sitesObj.add(bSite, 234) # can add at same offset or a different one
             >>> sitesObj.add(dSite) # a context
             >>> sitesObj.getOffsetBySiteId(id(bSite))
-            234
+            234.0
 
         If strictDeadCheck is False (default) we can still retrieve the context
         from a dead weakref.  This is necessary to get the offset from an
@@ -808,7 +843,7 @@ class Sites(common.SlottedObject):
         ::
         
             >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = False) # default
-            234
+            234.0
 
         With this, you'll get an exception:
 
@@ -825,7 +860,11 @@ class Sites(common.SlottedObject):
 #        if idKey == self._lastID:
 #            return self._lastOffset
         try:
-            value = self.siteDict[idKey].offset
+            if returnType == 'float':
+                value = self.siteDict[idKey].offset
+            else:
+                value = self.siteDict[idKey].offsetRational
+            
             if WEAKREF_ACTIVE and strictDeadCheck is True and self.siteDict[idKey].siteWeakref is not None:
                 obj = self.siteDict[idKey].site
                 if obj is None:
@@ -853,7 +892,7 @@ class Sites(common.SlottedObject):
         self._lastOffset = value
         return value
 
-    def getOffsets(self):
+    def getOffsets(self, returnType='float'):
         '''
         Return a list of all offsets.
 
@@ -873,11 +912,15 @@ class Sites(common.SlottedObject):
             >>> sitesObj.add(bSite, 234) # can add at same offset or another
             >>> sitesObj.add(dSite) # a context -- no offset
             >>> sitesObj.getOffsets()
-            [0, 234]
-
+            [0.0, 234.0]
+            
+            Can call returnType = 'rational' instead:
+            
+            >>> sitesObj.getOffsets(returnType='rational')
+            [Fraction(0, 1), Fraction(234, 1)]
         '''
         # here, already having location keys may be an advantage
-        return [self.getOffsetBySiteId(x) for x in self._locationKeys]
+        return [self.getOffsetBySiteId(x, returnType=returnType) for x in self._locationKeys]
 
     def getSiteByOffset(self, offset):
         '''
@@ -889,17 +932,19 @@ class Sites(common.SlottedObject):
 
         ::
 
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
+            >>> import fractions
+            >>> class Mock(base.Music21Object):
             ...     pass
             ...
             >>> aSite = Mock()
             >>> bSite = Mock()
             >>> cSite = Mock()
-            >>> sitesObj = music21.Sites()
+            >>> sitesObj = sites.Sites()
             >>> sitesObj.add(aSite, 23)
             >>> sitesObj.add(bSite, 23121.5)
             >>> aSite is sitesObj.getSiteByOffset(23)
+            True
+            >>> bSite is sitesObj.getSiteByOffset(fractions.Fraction(46243, 2))
             True
 
         '''
@@ -907,7 +952,15 @@ class Sites(common.SlottedObject):
         match = None
         for siteId in self.siteDict:
             # might need to use almost equals here
-            if self.siteDict[siteId].offset == offset:
+            matched = False
+            if isinstance(offset, fractions.Fraction):
+                if self.siteDict[siteId].offsetRational == offset:
+                    matched = True
+            else:
+                if self.siteDict[siteId].offset == offset:
+                    matched = True
+            
+            if matched is True:
                 if self.siteDict[siteId].isDead:
                     return None
                 match = self.siteDict[siteId].site
@@ -1338,7 +1391,7 @@ class Sites(common.SlottedObject):
             >>> aLocations.add(bSite, 121.5)
             >>> aLocations.setOffsetBySite(aSite, 20)
             >>> aLocations.getOffsetBySite(aSite)
-            20
+            20.0
 
         ::
 

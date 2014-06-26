@@ -2138,8 +2138,8 @@ def hdStringToNote(contents):
             newTup.durationNormal.type = thisObject.duration.type
 
             gcd = common.euclidGCD(int(dT), basevalue)
-            newTup.numberNotesActual = dT/gcd
-            newTup.numberNotesNormal = float(basevalue)/gcd
+            newTup.numberNotesActual = int(dT/gcd)
+            newTup.numberNotesNormal = int(float(basevalue)/gcd)
 
             # The Josquin Research Project uses an incorrect definition of
             # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = "JRP"

@@ -115,7 +115,7 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     >>> d2.quarterLength
     1.171875
     >>> d2.components
-    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
+    [<music21.duration.DurationUnit 1>, <music21.duration.DurationUnit 1/8>, <music21.duration.DurationUnit 3/64>]
     >>> d2.components[2].type
     '128th'
     >>> d2.components[2].dots

@@ -474,14 +474,18 @@ def cleanupFloat(floatNum, maxDenominator=1000):
     >>> common.cleanupFloat(1.5)
     1.5
 
-    '''
-    # this form only works w/ python2.7
-    #f = fractions.Fraction(floatNum).limit_denominator(maxDenominator)
+    Fractions are passed through silently...
+    
+    >>> import fractions
+    >>> common.cleanupFloat(fractions.Fraction(4, 3))
+    Fraction(4, 3)
 
-    # this works w/ python2.6, 2.7
-    f = fractions.Fraction.from_float(
-        floatNum).limit_denominator(maxDenominator)
-    return float(f)
+    '''
+    if isinstance(floatNum, fractions.Fraction):
+        return floatNum # do nothing to fractions
+    else:
+        f = fractions.Fraction(floatNum).limit_denominator(maxDenominator)
+        return float(f)
 
 #------------------------------------------------------------------------------
 # Number methods...
@@ -514,8 +518,8 @@ def mixedNumeral(expr, limitDenominator=100):
     return str(0)
 
 def roundToHalfInteger(num):
-    '''Given a floating-point number, round to the nearest half-integer.
-
+    '''
+    Given a floating-point number, round to the nearest half-integer.
 
     >>> common.roundToHalfInteger(1.2)
     1
@@ -552,7 +556,13 @@ def almostEquals(x, y = 0.0, grain=1e-7):
     >>> common.almostEquals(1.001, 1, grain=0.1)
     True
 
+
     '''
+    # for very small grains, just compare Fractions without converting...
+    if (isinstance(x, fractions.Fraction) and isinstance(y, fractions.Fraction) and grain <= 5e-6):
+        if x == y:
+            return True
+    
     if abs(x - y) < grain:
         return True
     return False
@@ -1061,14 +1071,14 @@ def dotMultiplier(dots):
     dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots
 
     >>> common.dotMultiplier(1)
-    1.5
+    Fraction(3, 2)
     >>> common.dotMultiplier(2)
-    1.75
+    Fraction(7, 4)
     >>> common.dotMultiplier(3)
-    1.875
+    Fraction(15, 8)
     '''
     x = (((2**(dots+1.0))-1.0)/(2**dots))
-    return x
+    return fractions.Fraction(x)
 
 
 

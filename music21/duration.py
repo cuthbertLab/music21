@@ -10,13 +10,6 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 from __future__ import print_function
-
-#python3
-try:
-    basestring
-except:
-    basestring = str # @ReservedAssignment
-
 '''
 The duration module contains  :class:`~music21.duration.Duration` objects
 (among other objects and functions).  Duration objects are a fundamental
@@ -66,15 +59,21 @@ Example usage:
     2
 
 '''
-
+import fractions
 import unittest
 import copy
 
 from music21 import common
 from music21 import exceptions21
 from music21.common import SlottedObject
-
 from music21 import environment
+
+try:
+    basestring
+except:
+    basestring = str # @ReservedAssignment
+
+
 _MOD = "duration.py"
 environLocal = environment.Environment(_MOD)
 
@@ -84,41 +83,42 @@ environLocal = environment.Environment(_MOD)
 
 # N.B.: MusicXML uses long instead of longa
 typeToDuration = {
-    'duplex-maxima': 64.0,
-    'maxima': 32.0,
-    'longa': 16.0,
-    'breve': 8.0,
-    'whole': 4.0,
-    'half': 2.0,
-    'quarter': 1.0,
-    'eighth': 0.5,
-    '16th': 0.25,
-    '32nd': 0.125,
-    '64th': 0.0625,
-    '128th': 0.03125,
-    '256th': 0.015625,
-    '512th': 0.015625 / 2.0,
-    '1024th': 0.015625 / 4.0,
-    'zero': 0.0,
+    'duplex-maxima': fractions.Fraction(64, 1),
+    'maxima': fractions.Fraction(32, 1),
+    'longa': fractions.Fraction(16, 1),
+    'breve': fractions.Fraction(8, 1),
+    'whole': fractions.Fraction(4, 1),
+    'half': fractions.Fraction(2, 1),
+    'quarter': fractions.Fraction(1, 1),
+    'eighth': fractions.Fraction(1, 2),
+    '16th': fractions.Fraction(1, 4),
+    '32nd': fractions.Fraction(1, 8),
+    '64th': fractions.Fraction(1, 16),
+    '128th': fractions.Fraction(1, 32),
+    '256th': fractions.Fraction(1, 64),
+    '512th': fractions.Fraction(1, 128),
+    '1024th': fractions.Fraction(1, 256),
+    'zero': fractions.Fraction(0, 1),
     }
 
+# fractions in the form X, 1 hash as ints...
 typeFromNumDict = {
-    1: 'whole',
-    2: 'half',
-    4: 'quarter',
-    8: 'eighth',
-    16: '16th',
-    32: '32nd',
-    64: '64th',
-    128: '128th',
-    256: '256th',
-    512: '512th',
-    1024: '1024th',
-    0: 'zero',
-    0.5: 'breve',
-    0.25: 'longa',
-    0.125: 'maxima',
-    0.0625: 'duplex-maxima',
+    fractions.Fraction(1, 1): 'whole',
+    fractions.Fraction(2, 1): 'half',
+    fractions.Fraction(4, 1): 'quarter',
+    fractions.Fraction(8, 1): 'eighth',
+    fractions.Fraction(16, 1): '16th',
+    fractions.Fraction(32, 1): '32nd',
+    fractions.Fraction(64, 1): '64th',
+    fractions.Fraction(128, 1): '128th',
+    fractions.Fraction(256, 1): '256th',
+    fractions.Fraction(512, 1): '512th',
+    fractions.Fraction(1024, 1): '1024th',
+    fractions.Fraction(0, 1): 'zero',
+    fractions.Fraction(1, 2): 'breve',
+    fractions.Fraction(1, 4): 'longa',
+    fractions.Fraction(1, 8): 'maxima',
+    fractions.Fraction(1, 16): 'duplex-maxima',
     }
 
 ordinalTypeFromNum = [
@@ -158,42 +158,36 @@ def unitSpec(durationObjectOrObjects):
         >>> aDur = duration.Duration()
         >>> aDur.quarterLength = 3
         >>> duration.unitSpec(aDur)
-        (3.0, 'half', 1, None, None, None)
-
-    ::
+        (Fraction(3, 1), 'half', 1, None, None, None)
 
         >>> bDur = duration.Duration()
         >>> bDur.quarterLength = 1.125
         >>> duration.unitSpec(bDur)
-        (1.125, 'complex', None, None, None, None)
-
-    ::
+        (Fraction(9, 8), 'complex', None, None, None, None)
 
         >>> cDur = duration.Duration()
         >>> cDur.quarterLength = 0.3333333
         >>> duration.unitSpec(cDur)
-        (0.33333..., 'eighth', 0, 3, 2, 'eighth')
-
-    ::
+        (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
 
         >>> duration.unitSpec([aDur, bDur, cDur])
-        [(3.0, 'half', 1, None, None, None), (1.125, 'complex', None, None, None, None), (0.333333..., 'eighth', 0, 3, 2, 'eighth')]
+        [(Fraction(3, 1), 'half', 1, None, None, None), (Fraction(9, 8), 'complex', None, None, None, None), (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')]
 
     '''
     if common.isListLike(durationObjectOrObjects):
         ret = []
         for dO in durationObjectOrObjects:
             if dO.tuplets is None or len(dO.tuplets) == 0:
-                ret.append((dO.quarterLength, dO.type, dO.dots, None, None, None))
+                ret.append((dO.quarterLengthRational, dO.type, dO.dots, None, None, None))
             else:
-                ret.append((dO.quarterLength, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type))
+                ret.append((dO.quarterLengthRational, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type))
         return ret
     else:
         dO = durationObjectOrObjects
         if dO.tuplets is None or len(dO.tuplets) == 0:
-            return (dO.quarterLength, dO.type, dO.dots, None, None, None)
+            return (dO.quarterLengthRational, dO.type, dO.dots, None, None, None)
         else:
-            return (dO.quarterLength, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type)
+            return (dO.quarterLengthRational, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type)
 
 def nextLargerType(durType):
     '''
@@ -203,14 +197,8 @@ def nextLargerType(durType):
 
         >>> duration.nextLargerType("16th")
         'eighth'
-
-    ::
-
         >>> duration.nextLargerType("whole")
         'breve'
-
-    ::
-
         >>> duration.nextLargerType("duplex-maxima")
         'unexpressible'
     '''
@@ -263,18 +251,21 @@ def quarterLengthToClosestType(qLen):
     >>> duration.quarterLengthToClosestType(2.0000000000000001)
     ('half', True)
     '''
-    noteLengthType = round(4.0/qLen, 6)
+    if (isinstance(qLen, fractions.Fraction)):
+        noteLengthType = fractions.Fraction(4, 1) / qLen
+    else:
+        noteLengthType = round(4.0/qLen, 6)
 
     if noteLengthType in typeFromNumDict:
         return (typeFromNumDict[noteLengthType], True)
     else:
-        for numDict in sorted(typeFromNumDict.keys()):
+        for numDict in sorted(list(typeFromNumDict.keys())):
             if numDict == 0:
                 continue
-            elif (4.0 / qLen) < numDict and (8.0 / qLen) > numDict:
+            elif (fractions.Fraction(4, 1) / qLen) < numDict and (fractions.Fraction(8, 1) / qLen) > numDict:
                 return (typeFromNumDict[numDict], False)
         # CUTHBERT ATTEMPT AT FIX Feb 2011
-        if qLen < 0.005:
+        if qLen < fractions.Fraction(5, 10000):
             return (None, False)
         raise DurationException("Cannot return types greater than double duplex-maxima, your length was %s : remove this when we are sure this works..." % qLen)
 
@@ -366,7 +357,7 @@ def quarterLengthToTuplet(qLen, maxToReturn=4):
 
     >>> c = duration.quarterLengthToTuplet(.3333333, 1)[0]
     >>> c.tupletMultiplier()
-    0.6666...
+    Fraction(2, 3)
     '''
     post = []
     # type, qLen pairs
@@ -420,28 +411,28 @@ def quarterLengthToDurations(qLen, link=True):
 
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(2))
-    [(2.0, 'half', 0, None, None, None)]
+    [(Fraction(2, 1), 'half', 0, None, None, None)]
 
     Dots are supported
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(3))
-    [(3.0, 'half', 1, None, None, None)]
+    [(Fraction(3, 1), 'half', 1, None, None, None)]
     >>> duration.unitSpec(duration.quarterLengthToDurations(6.0))
-    [(6.0, 'whole', 1, None, None, None)]
+    [(Fraction(6, 1), 'whole', 1, None, None, None)]
 
     Double and triple dotted half note.
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(3.5))
-    [(3.5, 'half', 2, None, None, None)]
+    [(Fraction(7, 2), 'half', 2, None, None, None)]
     >>> duration.unitSpec(duration.quarterLengthToDurations(3.75))
-    [(3.75, 'half', 3, None, None, None)]
+    [(Fraction(15, 4), 'half', 3, None, None, None)]
 
     A triplet quarter note, lasting .6666 qLen
     Or, a quarter that is 1/3 of a half.
     Or, a quarter that is 2/3 of a quarter.
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(2.0/3.0))
-    [(0.666..., 'quarter', 0, 3, 2, 'quarter')]
+    [(Fraction(2, 3), 'quarter', 0, 3, 2, 'quarter')]
 
     A triplet eighth note, where 3 eights are in the place of 2.
     Or, an eighth that is 1/3 of a quarter
@@ -457,41 +448,42 @@ def quarterLengthToDurations(qLen, link=True):
     Or, a half that is 2/3 of a half
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(4.0/3.0))
-    [(1.33..., 'half', 0, 3, 2, 'half')]
+    [(Fraction(4, 3), 'half', 0, 3, 2, 'half')]
 
     A sixteenth that is 1/5 of a quarter
     Or, a sixteenth that is 4/5ths of a 16th
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/5.0))
-    [(0.2..., '16th', 0, 5, 4, '16th')]
+    [(Fraction(1, 5), '16th', 0, 5, 4, '16th')]
 
     A 16th that is  1/7th of a quarter
     Or, a 16th that is 4/7 of a 16th
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/7.0))
-    [(0.142857..., '16th', 0, 7, 4, '16th')]
+    [(Fraction(1, 7), '16th', 0, 7, 4, '16th')]
 
     A 4/7ths of a whole note, or
     A quarter that is 4/7th of of a quarter
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(4.0/7.0))
-    [(0.571428..., 'quarter', 0, 7, 4, 'quarter')]
+    [(Fraction(4, 7), 'quarter', 0, 7, 4, 'quarter')]
 
     If a duration is not containable in a single unit, this method
     will break off the largest type that fits within this type
     and recurse, adding as my units as necessary.
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(2.5))
-    [(2.0, 'half', 0, None, None, None), (0.5, 'eighth', 0, None, None, None)]
+    [(Fraction(2, 1), 'half', 0, None, None, None), (Fraction(1, 2), 'eighth', 0, None, None, None)]
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(2.3333333))
-    [(2.0, 'half', 0, None, None, None), (0.333..., 'eighth', 0, 3, 2, 'eighth')]
+    [(Fraction(2, 1), 'half', 0, None, None, None), (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')]
+
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/6.0))
-    [(0.1666..., '16th', 0, 3, 2, '16th')]
-
+    [(Fraction(1, 6), '16th', 0, 3, 2, '16th')]
+    
     >>> duration.quarterLengthToDurations(.18333333333333)
-    [<music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.03125>, <music21.duration.DurationUnit 0.015625>, <music21.duration.DurationUnit 0.0078125>]
+    [<music21.duration.DurationUnit 1/8>, <music21.duration.DurationUnit 1/32>, <music21.duration.DurationUnit 1/64>, <music21.duration.DurationUnit 1/128>]
 
     >>> duration.quarterLengthToDurations(0.0)
     [<music21.duration.ZeroDuration>]
@@ -581,47 +573,47 @@ def partitionQuarterLength(qLen, qLenDiv=4):
 
     Divide 2.5 quarters worth of time into eighth notes.
     >>> pql(2.5,.5)
-    (0.5, 'eighth', 0, None, None, None)
-    (0.5, 'eighth', 0, None, None, None)
-    (0.5, 'eighth', 0, None, None, None)
-    (0.5, 'eighth', 0, None, None, None)
-    (0.5, 'eighth', 0, None, None, None)
+    (Fraction(1, 2), 'eighth', 0, None, None, None)
+    (Fraction(1, 2), 'eighth', 0, None, None, None)
+    (Fraction(1, 2), 'eighth', 0, None, None, None)
+    (Fraction(1, 2), 'eighth', 0, None, None, None)
+    (Fraction(1, 2), 'eighth', 0, None, None, None)
 
 
     Divide 5 qLen into 2.5 qLen bundles (i.e., 5/8 time)
     >>> pql(5, 2.5)
-    (2.0, 'half', 0, None, None, None)
-    (0.5, 'eighth', 0, None, None, None)
-    (2.0, 'half', 0, None, None, None)
-    (0.5, 'eighth', 0, None, None, None)
+    (Fraction(2, 1), 'half', 0, None, None, None)
+    (Fraction(1, 2), 'eighth', 0, None, None, None)
+    (Fraction(2, 1), 'half', 0, None, None, None)
+    (Fraction(1, 2), 'eighth', 0, None, None, None)
 
 
     Divide 5.25 qLen into dotted halves
     >>> pql(5.25,3)
-    (3.0, 'half', 1, None, None, None)
-    (2.0, 'half', 0, None, None, None)
-    (0.25, '16th', 0, None, None, None)
+    (Fraction(3, 1), 'half', 1, None, None, None)
+    (Fraction(2, 1), 'half', 0, None, None, None)
+    (Fraction(1, 4), '16th', 0, None, None, None)
 
 
     Divide 1.33333 qLen into triplet eighths:
     >>> pql(4.0/3.0, 1.0/3.0)
-    (0.333..., 'eighth', 0, 3, 2, 'eighth')
-    (0.333..., 'eighth', 0, 3, 2, 'eighth')
-    (0.333..., 'eighth', 0, 3, 2, 'eighth')
-    (0.333..., 'eighth', 0, 3, 2, 'eighth')
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
 
     Divide 1.5 into triplet eighths
     >>> pql(1.5,.33333333333333)
-    (0.333..., 'eighth', 0, 3, 2, 'eighth')
-    (0.333..., 'eighth', 0, 3, 2, 'eighth')
-    (0.333..., 'eighth', 0, 3, 2, 'eighth')
-    (0.333..., 'eighth', 0, 3, 2, 'eighth')
-    (0.1666..., '16th', 0, 3, 2, '16th')
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
+    (Fraction(1, 6), '16th', 0, 3, 2, '16th')
 
     There is no problem if the division unit is larger then the source duration, it
     just will not be totally filled.
     >>> pql(1.5, 4)
-    (1.5, 'quarter', 1, None, None, None)
+    (Fraction(3, 2), 'quarter', 1, None, None, None)
     '''
 
     post = []
@@ -645,22 +637,20 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     Medieval dot groups (`dotGroups`), return the equivalent quarter length.
 
     >>> duration.convertTypeToQuarterLength('whole')
-    4.0
+    Fraction(4, 1)
     >>> duration.convertTypeToQuarterLength('16th')
-    0.25
+    Fraction(1, 4)
     >>> duration.convertTypeToQuarterLength('quarter', 2)
-    1.75
+    Fraction(7, 4)
 
 
     >>> tup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
     >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
-    0.8...
-
+    Fraction(4, 5)
 
     >>> tup = duration.Tuplet(numberNotesActual = 3, numberNotesNormal = 4)
     >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
-    1.333333...
-
+    Fraction(4, 3)
 
     Also can handle those rare medieval dot groups
     (such as dotted-dotted half notes that take a full measure of 9/8.
@@ -668,7 +658,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     trecento.trecentoCadence for more information
     ).
     >>> duration.convertTypeToQuarterLength('half', dots = 1, dotGroups = [1,1])
-    4.5
+    Fraction(9, 2)
     '''
     if dType in typeToDuration:
         durationFromType = typeToDuration[dType]
@@ -696,15 +686,14 @@ def convertTypeToNumber(dType):
     '''Convert a duration type string (`dType`) to a numerical scalar representation that shows
     how many of that duration type fits within a whole note.
 
-
     >>> duration.convertTypeToNumber('quarter')
-    4
+    Fraction(4, 1)
     >>> duration.convertTypeToNumber('half')
-    2
+    Fraction(2, 1)
     >>> duration.convertTypeToNumber('1024th')
-    1024
+    Fraction(1024, 1)
     >>> duration.convertTypeToNumber('maxima')
-    0.125
+    Fraction(1, 8)
     '''
     dTypeFound = None
     for num, typeName in typeFromNumDict.items():
@@ -806,13 +795,18 @@ class Tuplet(object):
 
         >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
         >>> print(myTup.tupletMultiplier())
-        0.8
+        4/5
 
     ::
 
         >>> myTup2 = duration.Tuplet(8, 5)
-        >>> print(myTup2.tupletMultiplier())
+        >>> tm = myTup2.tupletMultiplier()
+        >>> tm
+        Fraction(5, 8)
+        >>> float(tm)
         0.625
+        >>> print(tm)
+        5/8
 
     ::
 
@@ -823,7 +817,7 @@ class Tuplet(object):
     ::
 
         >>> print(myTup2.tupletMultiplier())
-        0.666...
+        2/3
 
     Tuplets may be frozen, in which case they become immutable. Tuplets
     which are attached to Durations are automatically frozen.  Otherwise
@@ -905,7 +899,7 @@ class Tuplet(object):
         if 'numberNotesActual' in keywords:
             self.numberNotesActual = keywords['numberNotesActual']
         else:
-            self.numberNotesActual = 3.0
+            self.numberNotesActual = 3
 
         # this previously stored a Duration, not a DurationUnit
         if 'durationActual' in keywords and keywords['durationActual'] != None:
@@ -920,7 +914,7 @@ class Tuplet(object):
         if 'numberNotesNormal' in keywords:
             self.numberNotesNormal = keywords['numberNotesNormal']
         else:
-            self.numberNotesNormal = 2.0
+            self.numberNotesNormal = 2
 
         # this previously stored a Duration, not a DurationUnit
         if 'durationNormal' in keywords and keywords['durationNormal'] != None:
@@ -970,14 +964,14 @@ class Tuplet(object):
         >>> a = duration.Tuplet()
         >>> a.setRatio(6,2)
         >>> a.tupletMultiplier()
-        0.333...
+        Fraction(1, 3)
         >>> a.durationActual
-        <music21.duration.DurationUnit 0.5>
+        <music21.duration.DurationUnit 1/2>
         >>> a.augmentOrDiminish(.5)
         >>> a.durationActual
-        <music21.duration.DurationUnit 0.25>
+        <music21.duration.DurationUnit 1/4>
         >>> a.tupletMultiplier()
-        0.333...
+        Fraction(1, 3)
         '''
         if not amountToScale > 0:
             raise DurationException('amountToScale must be greater than zero')
@@ -1005,21 +999,21 @@ class Tuplet(object):
 
         >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
-        0.666...
+        Fraction(2, 3)
         >>> a.totalTupletLength()
-        1.0
+        Fraction(1, 1)
         >>> a.setDurationType('half')
         >>> a.tupletMultiplier()
-        0.6666...
+        Fraction(2, 3)
         >>> a.totalTupletLength()
-        4.0
+        Fraction(4, 1)
 
         >>> a.setDurationType(2)
         >>> a.totalTupletLength()
-        4.0
+        Fraction(4, 1)
         >>> a.setDurationType(4)
         >>> a.totalTupletLength()
-        8.0
+        Fraction(8, 1)
         '''
         # these used to be Duration; now using DurationUnits
         if self.frozen is True:
@@ -1034,13 +1028,12 @@ class Tuplet(object):
         '''Set the ratio of actual divisions to represented in normal divisions.
         A triplet is 3 actual in the time of 2 normal.
 
-
         >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
-        0.666...
+        Fraction(2, 3)
         >>> a.setRatio(6,2)
         >>> a.tupletMultiplier()
-        0.333...
+        Fraction(1, 3)
 
         One way of expressing 6/4-ish triplets without numbers:
         >>> a = duration.Tuplet()
@@ -1048,9 +1041,9 @@ class Tuplet(object):
         >>> a.durationActual = duration.DurationUnit('quarter')
         >>> a.durationNormal = duration.DurationUnit('half')
         >>> a.tupletMultiplier()
-        0.666...
+        Fraction(2, 3)
         >>> a.totalTupletLength()
-        2.0
+        Fraction(2, 1)
         '''
         if self.frozen is True:
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
@@ -1070,41 +1063,47 @@ class Tuplet(object):
 
         >>> a = duration.Tuplet()
         >>> a.totalTupletLength()
-        1.0
+        Fraction(1, 1)
         >>> a.numberNotesActual = 3
         >>> a.durationActual = duration.Duration('half')
         >>> a.numberNotesNormal = 2
         >>> a.durationNormal = duration.Duration('half')
         >>> a.totalTupletLength()
-        4.0
+        Fraction(4, 1)
         >>> a.setRatio(5,4)
         >>> a.totalTupletLength()
-        8.0
+        Fraction(8, 1)
         >>> a.setRatio(5,2)
         >>> a.totalTupletLength()
-        4.0
+        Fraction(4, 1)
         '''
-        return self.numberNotesNormal * self.durationNormal.quarterLength
+        n = self.numberNotesNormal
+        if not isinstance(n, fractions.Fraction):
+            n = fractions.Fraction(n).limit_denominator(65535)
+        return n * self.durationNormal.quarterLengthRational
 
     def tupletMultiplier(self):
-        '''Get a floating point value by which to scale the duration that
+        '''Get a Fraction() by which to scale the duration that
         this Tuplet is associated with.
 
-
         >>> myTuplet = duration.Tuplet()
-        >>> print(round(myTuplet.tupletMultiplier(), 3))
-        0.667
+        >>> myTuplet.tupletMultiplier()
+        Fraction(2, 3)
         >>> myTuplet.tupletActual = [5, duration.Duration('eighth')]
         >>> myTuplet.numberNotesActual
         5
         >>> myTuplet.durationActual.type
         'eighth'
         >>> print(myTuplet.tupletMultiplier())
-        0.4
+        2/5
+        >>> myTuplet.numberNotesNormal = 4
+        >>> print(myTuplet.tupletMultiplier())
+        4/5
+        
         '''
-        lengthActual = self.durationActual.quarterLength
+        lengthActual = self.durationActual.quarterLengthRational
         return (self.totalTupletLength() / (
-                self.numberNotesActual * lengthActual))
+                lengthActual * self.numberNotesActual))
 
     ### PUBLIC PROPERTIES ###
 
@@ -1306,15 +1305,19 @@ class DurationUnit(DurationCommon):
         #  e.g. dotted-dotted half in 9/8 expressed as 1,1
         self._dots = [0]
         self._tuplets = ()  # an empty tuple
-        if common.isNum(prototype):
+        if isinstance(prototype, fractions.Fraction):
             self._qtrLength = prototype
+            self._typeNeedsUpdating = True
+            self._quarterLengthNeedsUpdating = False            
+        elif common.isNum(prototype):
+            self._qtrLength = fractions.Fraction(prototype).limit_denominator(65535)
             self._typeNeedsUpdating = True
             self._quarterLengthNeedsUpdating = False
         else:
             if prototype not in typeToDuration:
                 raise DurationException('type (%s) is not valid' % type)
             self.type = prototype
-            self._qtrLength = 0.0
+            self._qtrLength = fractions.Fraction(0, 1)
             self._typeNeedsUpdating = False
             self._quarterLengthNeedsUpdating = True
 
@@ -1376,10 +1379,10 @@ class DurationUnit(DurationCommon):
 
             >>> aDur = duration.DurationUnit('quarter')
             >>> repr(aDur)
-            '<music21.duration.DurationUnit 1.0>'
+            '<music21.duration.DurationUnit 1>'
 
         '''
-        return '<music21.duration.DurationUnit %s>' % self.quarterLength
+        return '<music21.duration.DurationUnit %s>' % self.quarterLengthRational
 
     ### PUBLIC METHODS ###
 
@@ -1428,7 +1431,7 @@ class DurationUnit(DurationCommon):
 
             >>> cDur = bDur.augmentOrDiminish(16, inPlace=False)
             >>> cDur, bDur
-            (<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>)
+            (<music21.duration.DurationUnit 4>, <music21.duration.DurationUnit 1/4>)
 
         '''
         if not amountToScale > 0:
@@ -1478,19 +1481,13 @@ class DurationUnit(DurationCommon):
             >>> bDur.quarterLength
             0.25
 
-        ::
-
             >>> bDur.unlink()
             >>> bDur.quarterLength = 234
             >>> bDur.quarterLength
             234.0
 
-        ::
-
             >>> bDur.type
             '16th'
-
-        ::
 
             >>> bDur.link() # if linking is restored, type is used to get qLen
             >>> bDur.updateQuarterLength()
@@ -1759,8 +1756,7 @@ class DurationUnit(DurationCommon):
         else:
             return ordinalFound
 
-    @property
-    def quarterLength(self):
+    def _getQuarterLengthFloat(self):
         '''
         Property for getting or setting the quarterLength of a
         DurationUnit.
@@ -1772,34 +1768,22 @@ class DurationUnit(DurationCommon):
             >>> a.quarterLength
             3.0
 
-        ::
-
             >>> a.type
             'half'
 
-        ::
-
             >>> a.dots
             1
-
-        ::
 
             >>> a.quarterLength = .5
             >>> a.type
             'eighth'
 
-        ::
-
             >>> a.quarterLength = .75
             >>> a.type
             'eighth'
 
-        ::
-
             >>> a.dots
             1
-
-        ::
 
             >>> b = duration.DurationUnit()
             >>> b.quarterLength = 16
@@ -1809,10 +1793,34 @@ class DurationUnit(DurationCommon):
         '''
         if self._quarterLengthNeedsUpdating:
             self.updateQuarterLength()
-        return self._qtrLength
+        return float(self._qtrLength)
+    
+    def _getQuarterLengthRational(self):
+        '''
+        Property for getting or setting the quarterLength of a
+        DurationUnit.
 
-    @quarterLength.setter
-    def quarterLength(self, value):
+        ::
+
+            >>> a = duration.DurationUnit()
+            >>> a.quarterLength = 3
+            >>> a.quarterLengthRational
+            Fraction(3, 1)
+            >>> a.quarterLength = .75
+            >>> a.quarterLengthRational
+            Fraction(3, 4)
+            
+            
+        '''
+        
+        if self._quarterLengthNeedsUpdating:
+            self.updateQuarterLength()
+        if not isinstance(self._qtrLength, fractions.Fraction):
+            raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))        
+        return self._qtrLength
+        
+
+    def _setQuarterLength(self, value):
         '''Set the quarter note length to the specified value.
 
         (We no longer unlink if quarterLength is greater than a longa)
@@ -1823,37 +1831,23 @@ class DurationUnit(DurationCommon):
             >>> a.quarterLength = 3
             >>> a.type
             'half'
-
-        ::
-
             >>> a.dots
             1
-
-        ::
 
             >>> a.quarterLength = .5
             >>> a.type
             'eighth'
 
-        ::
-
             >>> a.quarterLength = .75
             >>> a.type
             'eighth'
-
-        ::
-
             >>> a.dots
             1
-
-        ::
 
             >>> b = duration.DurationUnit()
             >>> b.quarterLength = 16
             >>> b.type
             'longa'
-
-        ::
 
             >>> c = duration.DurationUnit()
             >>> c.quarterLength = 129
@@ -1867,11 +1861,19 @@ class DurationUnit(DurationCommon):
             raise DurationException(
             "not a valid quarter length (%s)" % value)
         if isinstance(value, int):
-            value = float(value)
+            value = fractions.Fraction(value, 1)
+        elif not isinstance(value, fractions.Fraction):
+            value = fractions.Fraction(value).limit_denominator(65535)
+        else:
+            pass
+            
         if self._link:
             self._typeNeedsUpdating = True
         # need to make sure its a float for comparisons
         self._qtrLength = value
+
+    quarterLengthRational = property(_getQuarterLengthRational, _setQuarterLength)
+    quarterLength = property(_getQuarterLengthFloat, _setQuarterLength)
 
     @property
     def tuplets(self):
@@ -2036,7 +2038,7 @@ class Duration(DurationCommon):
     ::
 
         >>> d2.components
-        [<music21.duration.DurationUnit 0.5>, <music21.duration.DurationUnit 0.125>]
+        [<music21.duration.DurationUnit 1/2>, <music21.duration.DurationUnit 1/8>]
 
     Example 3: A Duration configured by keywords.
 
@@ -2067,7 +2069,7 @@ class Duration(DurationCommon):
         '''
         DurationCommon.__init__(self)
         self._quarterLengthNeedsUpdating = False
-        self._qtrLength = 0.0
+        self._qtrLength = fractions.Fraction(0, 1)
         # always have one DurationUnit object
         self._components = []
         # assume first arg is a duration type
@@ -2269,11 +2271,11 @@ class Duration(DurationCommon):
         >>> cDur.quarterLength
         4.25
         >>> cDur.components
-        [<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>]
+        [<music21.duration.DurationUnit 4>, <music21.duration.DurationUnit 1/4>]
 
         >>> dDur = bDur.augmentOrDiminish(2, retainComponents=False, inPlace=False)
         >>> dDur.components
-        [<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>]
+        [<music21.duration.DurationUnit 4>, <music21.duration.DurationUnit 1/4>]
 
 
         '''
@@ -2397,10 +2399,7 @@ class Duration(DurationCommon):
         For a valid component index value, this returns the quarter note offset
         at which that component would start.
 
-
         This does not handle fractional arguments.
-
-
 
         >>> components = []
         >>> components.append(duration.Duration('quarter'))
@@ -2530,6 +2529,9 @@ class Duration(DurationCommon):
         '''
         # quarter length is always obtained from _qtrLength, even when
         # not linked; yet a component must be present to provide a type
+        if not isinstance(value, fractions.Fraction):
+            value = fractions.Fraction(value).limit_denominator(65535)
+        
         self._qtrLength = value
         if len(self._components) == 0:
             if self._qtrLength == 0.0: # if not set create a default
@@ -2643,7 +2645,7 @@ class Duration(DurationCommon):
         4.5
         >>> d2 = d1.splitDotGroups()
         >>> d2.components
-        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
+        [<music21.duration.DurationUnit 3>, <music21.duration.DurationUnit 3/2>]
         >>> d2.quarterLength
         4.5
 
@@ -2655,7 +2657,7 @@ class Duration(DurationCommon):
         >>> n1.duration = d1
         >>> n1.duration = n1.duration.splitDotGroups()
         >>> n1.duration.components
-        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
+        [<music21.duration.DurationUnit 3>, <music21.duration.DurationUnit 3/2>]
         >>> s1 = stream.Stream()
         >>> s1.append(meter.TimeSignature('9/8'))
         >>> s1.append(n1)
@@ -2697,11 +2699,11 @@ class Duration(DurationCommon):
         '''Look to components and determine quarter length.
         '''
         if self.isLinked:
-            self._qtrLength = 0.0
+            self._qtrLength = fractions.Fraction(0, 1)
             for dur in self.components:
                 # if components quarterLength needs to be updated, it will
                 # be updated when this property is called
-                self._qtrLength += dur.quarterLength
+                self._qtrLength += dur.quarterLengthRational
         self._quarterLengthNeedsUpdating = False
 
     ### PUBLIC PROPERTIES ###
@@ -2890,41 +2892,27 @@ class Duration(DurationCommon):
             >>> aDur.isComplex
             True
 
-        ::
-
             >>> len(aDur.components)
             2
 
-        ::
-
             >>> aDur.components
-            [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.375>]
-
-        ::
+            [<music21.duration.DurationUnit 1>, <music21.duration.DurationUnit 3/8>]
 
             >>> bDur = duration.Duration()
             >>> bDur.quarterLength = 1.6666666
             >>> bDur.isComplex
             True
 
-        ::
-
             >>> len(bDur.components)
             2
 
-        ::
-
             >>> bDur.components
-            [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.6666...>]
-
-        ::
-
+            [<music21.duration.DurationUnit 1>, <music21.duration.DurationUnit 2/3>]
+            
             >>> cDur = duration.Duration()
             >>> cDur.quarterLength = .25
             >>> cDur.isComplex
             False
-
-        ::
 
             >>> len(cDur.components)
             1
@@ -3011,9 +2999,42 @@ class Duration(DurationCommon):
         else:
             return None
 
-    @property
-    def quarterLength(self):
-        '''
+    
+    def _getQuarterLengthFloat(self):
+        if self._quarterLengthNeedsUpdating:
+            self.updateQuarterLength()
+        # this is set in updateQuarterLength
+        #self._quarterLengthNeedsUpdating = False
+        return float(self._qtrLength)
+
+    def _getQuarterLengthRational(self):
+        if self._quarterLengthNeedsUpdating:
+            self.updateQuarterLength()
+        # this is set in updateQuarterLength
+        #self._quarterLengthNeedsUpdating = False
+        return self._qtrLength
+
+
+    def _setQuarterLength(self, value):
+        if self._qtrLength != value:
+            if isinstance(value, fractions.Fraction):
+                pass
+            elif isinstance(value, float):
+                try:
+                    value = fractions.Fraction.from_float(value).limit_denominator(65535)
+                except TypeError:
+                    raise DurationException("Could not convert %r, %s to Fraction" % (value, type(value)))
+            elif isinstance(value, int):
+                value = fractions.Fraction(value, 1)
+            if value == fractions.Fraction(0.0) and self.isLinked is True:
+                self.clear()
+            self._qtrLength = value
+            self._componentsNeedUpdating = True
+            self._quarterLengthNeedsUpdating = False
+
+    quarterLengthRational = property(_getQuarterLengthRational, _setQuarterLength)
+    quarterLength = property(_getQuarterLengthFloat, _setQuarterLength,
+                             doc='''
         Returns the quarter note length or Sets the quarter note length to
         the specified value.
 
@@ -3034,22 +3055,19 @@ class Duration(DurationCommon):
 
             >>> for thisUnit in a.components:
             ...    print(duration.unitSpec(thisUnit))
-            (3.5, 'half', 2, None, None, None)
-
-        ::
+            (Fraction(7, 2), 'half', 2, None, None, None)
 
             >>> a.quarterLength = 2.5
             >>> a.quarterLength
             2.5
 
-        ::
-
             >>> for thisUnit in a.components:
             ...    print(duration.unitSpec(thisUnit))
-            (2.0, 'half', 0, None, None, None)
-            (0.5, 'eighth', 0, None, None, None)
+            (Fraction(2, 1), 'half', 0, None, None, None)
+            (Fraction(1, 2), 'eighth', 0, None, None, None)
 
-        Note that integer values of quarter lengths get silently converted to floats:
+        Note that integer values of quarter lengths get silently converted to floats (internally
+        Fraction objects):
 
         ::
 
@@ -3063,23 +3081,7 @@ class Duration(DurationCommon):
             >>> b.type  # complex because 5qL cannot be expressed as a single note.
             'complex'
 
-        '''
-        if self._quarterLengthNeedsUpdating:
-            self.updateQuarterLength()
-        # this is set in updateQuarterLength
-        #self._quarterLengthNeedsUpdating = False
-        return self._qtrLength
-
-    @quarterLength.setter
-    def quarterLength(self, value):
-        if self._qtrLength != value:
-            if isinstance(value, int):
-                value = float(value)
-            if value == 0.0 and self.isLinked is True:
-                self.clear()
-            self._qtrLength = value
-            self._componentsNeedUpdating = True
-            self._quarterLengthNeedsUpdating = False
+        ''')
 
     @property
     def tuplets(self):
@@ -3469,8 +3471,8 @@ class TupletFixer(object):
         >>> tf.fixBrokenTupletDuration(tupletGroups[-1])
         >>> m1[-1].duration.tuplets[0]
         <music21.duration.Tuplet 3/2/whole>
-        >>> m1[-1].duration.quarterLength
-        1.333...
+        >>> m1[-1].duration.quarterLengthRational
+        Fraction(4, 3)
         '''
         if len(tupletGroup) == 0:
             return
