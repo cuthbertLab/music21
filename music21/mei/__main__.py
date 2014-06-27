@@ -889,6 +889,7 @@ def layerFromElement(elem, overrideN=None):
 
     Attributes In Progress:
     =======================
+    - <beam> contained within
 
     Attributes not Implemented:
     ===========================
@@ -973,7 +974,6 @@ def staffFromElement(elem):
 
     Attributes In Progress:
     =======================
-    - <beam> contained within
 
     Attributes not Implemented:
     ===========================
@@ -1006,7 +1006,13 @@ def staffFromElement(elem):
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if layerTagName == eachTag.tag:
-            post.append(layerFromElement(eachTag, currentNValue))
+            thisLayer = layerFromElement(eachTag, currentNValue)
+            # check for objects that must appear in the Measure, but are currently in the Voice
+            for eachThing in thisLayer:
+                if isinstance(eachThing, (clef.Clef,)):
+                    post.append(eachThing)
+                    thisLayer.remove(eachThing)
+            post.append(thisLayer)
             currentNValue = str(int(currentNValue) + 1)  # inefficient, but we need a string
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
