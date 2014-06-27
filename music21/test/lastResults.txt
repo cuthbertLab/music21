@@ -1,3 +1,300 @@
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.stream.Stream.chordify
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 5019, in chordify
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 5067, in music21.stream.Stream.chordify
+Failed example:
+    cc.show('text')
+Expected:
+    {0.0} <music21.note.Rest rest>
+    {2.12} <music21.chord.Chord D-4>
+    {4.0} <music21.chord.Chord C#4 D-4>
+    {4.12} <music21.chord.Chord C#4>
+    {5.0} <music21.note.Rest rest>
+Got:
+    {0.0} <music21.note.Rest rest>
+    {2.12} <music21.chord.Chord D-4>
+    {4.0} <music21.chord.Chord C#4 D-4>
+    {4.12} <music21.chord.Chord C#4 D-4>
+    {5.0} <music21.note.Rest rest>
+
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 4855, in testChordifyC
+    self.assertEqual(match, [3, 9, 9, 25, 25, 21, 12, 6, 21, 29])
+AssertionError: Lists differ: [3, 9, 9, 25, 25, 21, 12, 8, 2... != [3, 9, 9, 25, 25, 21, 12, 6, 2...
+
+First differing element 7:
+8
+6
+
+- [3, 9, 9, 25, 25, 21, 12, 8, 21, 29]
+?                           ^
+
++ [3, 9, 9, 25, 25, 21, 12, 6, 21, 29]
+?                           ^
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.midi.translate.midiToDuration
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/translate.py", line 83, in midiToDuration
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/translate.py", line 117, in music21.midi.translate.midiToDuration
+Failed example:
+    d2.components
+Expected:
+    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
+Got:
+    [<music21.duration.DurationUnit 1>, <music21.duration.DurationUnit 1/8>, <music21.duration.DurationUnit 3/64>]
+
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/humdrum/spineParser.py", line 2584, in testSpineMazurka
+    self.assertEqual(GsharpCount, 52)
+AssertionError: 53 != 52
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.freezeThaw.JSONFreezer.jsonPrint
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1507, in jsonPrint
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1514, in music21.freezeThaw.JSONFreezer.jsonPrint
+Failed example:
+    jsf.jsonPrint()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.freezeThaw.JSONFreezer.jsonPrint[2]>", line 1, in <module>
+        jsf.jsonPrint()
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1595, in jsonPrint
+        indent=2,
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 250, in dumps
+        sort_keys=sort_keys, **kw).encode(obj)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 209, in encode
+        chunks = list(chunks)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 434, in _iterencode
+        for chunk in _iterencode_dict(o, _current_indent_level):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 332, in _iterencode_list
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 442, in _iterencode
+        o = _default(o)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 184, in default
+        raise TypeError(repr(o) + " is not JSON serializable")
+    TypeError: Fraction(1, 1) is not JSON serializable
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.freezeThaw.JSONThawer._setJSON
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1654, in _setJSON
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1683, in music21.freezeThaw.JSONThawer._setJSON
+Failed example:
+    jsfJSON = jsf.json
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.freezeThaw.JSONThawer._setJSON[12]>", line 1, in <module>
+        jsfJSON = jsf.json
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1494, in json
+        sort_keys=True,
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 250, in dumps
+        sort_keys=sort_keys, **kw).encode(obj)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 209, in encode
+        chunks = list(chunks)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 434, in _iterencode
+        for chunk in _iterencode_dict(o, _current_indent_level):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 332, in _iterencode_list
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 442, in _iterencode
+        o = _default(o)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 184, in default
+        raise TypeError(repr(o) + " is not JSON serializable")
+    TypeError: Fraction(1, 1) is not JSON serializable
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1689, in music21.freezeThaw.JSONThawer._setJSON
+Failed example:
+    n2
+Expected:
+    <music21.note.Note D#>
+Got:
+    <music21.metadata.primitives.Text object at 0x113351e90>
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1691, in music21.freezeThaw.JSONThawer._setJSON
+Failed example:
+    n2.octave
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.freezeThaw.JSONThawer._setJSON[17]>", line 1, in <module>
+        n2.octave
+    AttributeError: 'Text' object has no attribute 'octave'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1696, in music21.freezeThaw.JSONThawer._setJSON
+Failed example:
+    n2.duration.dots
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.freezeThaw.JSONThawer._setJSON[18]>", line 1, in <module>
+        n2.duration.dots
+    AttributeError: 'Text' object has no attribute 'duration'
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line unknown line number, in inheritedReadwritePropertiesMapping
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line ?, in music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping
+Failed example:
+    for classDocumenter in sorted(mapping, key=sortBy):
+        print('{0}:'.format(classDocumenter.referentPackagesystemPath))
+        for attributeDocumenter in mapping[classDocumenter][:10]:
+            print('- {0}'.format(attributeDocumenter.referentPackagesystemPath))
+Expected:
+    music21.base.Music21Object:
+    - music21.base.Music21Object.activeSite
+    - music21.base.Music21Object.offset
+    - music21.base.Music21Object.priority
+    music21.stream.Stream:
+    - music21.stream.Stream.atSoundingPitch
+    - music21.stream.Stream.duration
+    - music21.stream.Stream.elements
+    - music21.stream.Stream.finalBarline
+    - music21.stream.Stream.metadata
+    - music21.stream.Stream.seconds
+Got:
+    music21.base.Music21Object:
+    - music21.base.Music21Object.activeSite
+    - music21.base.Music21Object.offset
+    - music21.base.Music21Object.offsetRational
+    - music21.base.Music21Object.priority
+    music21.stream.Stream:
+    - music21.stream.Stream.atSoundingPitch
+    - music21.stream.Stream.duration
+    - music21.stream.Stream.elements
+    - music21.stream.Stream.finalBarline
+    - music21.stream.Stream.metadata
+    - music21.stream.Stream.seconds
+
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 825, in testExtractionA
+    post = sr.reduce()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
+    return self._createReduction()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
+    rn.measureOffset, n)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
+    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
+    return self.duration.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
+    self.updateQuarterLength()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
+    self._qtrLength += dur.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
+    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
+DurationException: Someone is not playing welll...1.0 <type 'float'>
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 852, in testExtractionB
+    post = sr.reduce()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
+    return self._createReduction()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 351, in _createReduction
+    v.insertIntoNoteOrChord(rn.measureOffset, n)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
+    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
+    return self.duration.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
+    self.updateQuarterLength()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
+    self._qtrLength += dur.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
+    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
+DurationException: Someone is not playing welll...1.0 <type 'float'>
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 914, in testExtractionD
+    unused_post = sr.reduce()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
+    return self._createReduction()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
+    rn.measureOffset, n)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
+    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
+    return self.duration.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
+    self.updateQuarterLength()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
+    self._qtrLength += dur.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
+    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
+DurationException: Someone is not playing welll...1.0 <type 'float'>
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 937, in testExtractionD2
+    unused_post = sr.reduce()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
+    return self._createReduction()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
+    rn.measureOffset, n)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
+    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
+    return self.duration.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
+    self.updateQuarterLength()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
+    self._qtrLength += dur.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
+    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
+DurationException: Someone is not playing welll...1.0 <type 'float'>
+
 
 
 ---------------SUMMARY---------------------------------------------------
@@ -90,81 +387,80 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
 xmlnode successfully ran 12 tests
-webapps_templates successfully ran 9 tests
 webapps_apps successfully ran 6 tests
 webapps___init__ successfully ran 14 tests
+webapps_templates successfully ran 9 tests
 volume successfully ran 20 tests
 vexflow_toMusic21j successfully ran 9 tests
 vexflow_indent successfully ran 3 tests
 voiceLeading successfully ran 64 tests
 vexflow___init__ successfully ran 30 tests
 trecento_trecentoCadence successfully ran 7 tests
-webapps_commands successfully ran 10 tests
 variant successfully ran 34 tests
 trecento_polyphonicSnippet successfully ran 9 tests
+webapps_commands successfully ran 10 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
 trecento_tonality successfully ran 5 tests
-trecento_capua successfully ran 9 tests
 trecento___init__ successfully ran 3 tests
-tinyNotation successfully ran 11 tests
+trecento_capua successfully ran 9 tests
 tie successfully ran 7 tests
+tinyNotation successfully ran 11 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
 text successfully ran 23 tests
 test___init__ successfully ran 3 tests
-tempo successfully ran 45 tests
 theoryAnalysis_theoryAnalyzer successfully ran 43 tests
+tempo successfully ran 45 tests
 stream_timespanNode successfully ran 11 tests
 stream_timespanAnalysis successfully ran 20 tests
 stream_streamStatus successfully ran 5 tests
 stream_makeNotation successfully ran 10 tests
 stream_timespans successfully ran 51 tests
 spanner successfully ran 53 tests
-stream___init__ successfully ran 142 tests
 sites successfully ran 26 tests
 sieve successfully ran 40 tests
 serial successfully ran 47 tests
 search_segment successfully ran 7 tests
-search___init__ successfully ran 19 tests
+scale successfully ran 90 tests
 scala_scl___init__ successfully ran 3 tests
 scala___init__ successfully ran 12 tests
 romanText_testFiles successfully ran 4 tests
-scale successfully ran 90 tests
+search___init__ successfully ran 19 tests
 romanText___init__ successfully ran 45 tests
-test_testStream successfully ran 206 tests
 roman successfully ran 30 tests
+repeat successfully ran 72 tests
 pitch successfully ran 94 tests
 omr_evaluators successfully ran 8 tests
 omr_correctors successfully ran 24 tests
 omr___init__ successfully ran 3 tests
 noteworthy_translate successfully ran 21 tests
-noteworthy_binaryTranslate successfully ran 7 tests
 noteworthy___init__ successfully ran 3 tests
-repeat successfully ran 72 tests
+noteworthy_binaryTranslate successfully ran 7 tests
 note successfully ran 49 tests
 musicxml_toMxObjects successfully ran 37 tests
-musicxml_mxObjects successfully ran 45 tests
 musicxml_xmlHandler successfully ran 13 tests
+musicxml_testFiles successfully ran 5 tests
+musicxml_mxObjects successfully ran 45 tests
+musicxml_testPrimitive successfully ran 5 tests
 musicxml_m21ToString successfully ran 45 tests
 musicxml___init__ successfully ran 3 tests
 musedata_base40 successfully ran 9 tests
 musicxml_fromMxObjects successfully ran 65 tests
-musedata___init__ successfully ran 49 tests
 midi_realtime successfully ran 4 tests
+musedata___init__ successfully ran 49 tests
 midi_percussion successfully ran 7 tests
-midi___init__ successfully ran 29 tests
-midi_translate successfully ran 49 tests
-metadata_primitives successfully ran 38 tests
 meter successfully ran 108 tests
-metadata_caching successfully ran 7 tests
+metadata_primitives successfully ran 38 tests
+midi___init__ successfully ran 29 tests
+romanText_clercqTemperley successfully ran 19 tests
 metadata___init__ successfully ran 18 tests
-metadata_bundles successfully ran 34 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
 lily_lilyObjects successfully ran 14 tests
 lily___init__ successfully ran 3 tests
+metadata_bundles successfully ran 34 tests
 languageExcerpts_naturalLanguageObjects successfully ran 9 tests
 languageExcerpts_instrumentLookup successfully ran 3 tests
 languageExcerpts___init__ successfully ran 3 tests
@@ -176,89 +472,87 @@ intervalNetwork successfully ran 57 tests
 interval successfully ran 55 tests
 instrument successfully ran 23 tests
 humdrum_testFiles successfully ran 3 tests
-humdrum_spineParser successfully ran 32 tests
-layout successfully ran 22 tests
 humdrum_instruments successfully ran 8 tests
 humdrum___init__ successfully ran 3 tests
 harmony successfully ran 28 tests
-freezeThaw successfully ran 30 tests
+layout successfully ran 22 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
-romanText_clercqTemperley successfully ran 19 tests
+figuredBass_realizer successfully ran 12 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
-figuredBass_realizer successfully ran 12 tests
+graph successfully ran 63 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
-graph successfully ran 63 tests
+figuredBass_examples successfully ran 15 tests
 features_jSymbolic successfully ran 86 tests
 features_base successfully ran 27 tests
 features___init__ successfully ran 8 tests
-figuredBass_examples successfully ran 15 tests
-exceptions21 successfully ran 3 tests
 expressions successfully ran 26 tests
-editorial successfully ran 10 tests
+exceptions21 successfully ran 3 tests
 environment successfully ran 31 tests
-duration successfully ran 65 tests
-documentation_library_writers successfully ran 3 tests
+editorial successfully ran 10 tests
 dynamics successfully ran 15 tests
+duration successfully ran 69 tests
+documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
-documentation_library_documenters successfully ran 28 tests
+documentation_library_extensions successfully ran 3 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
 documentation___init__ successfully ran 3 tests
+derivation successfully ran 8 tests
 defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
-derivation successfully ran 8 tests
-corpus_virtual successfully ran 5 tests
 counterpoint___init__ successfully ran 3 tests
-corpus_chorales successfully ran 9 tests
+corpus_virtual successfully ran 5 tests
 features_native successfully ran 26 tests
-converter_subConverters successfully ran 10 tests
 corpus_corpora successfully ran 28 tests
-converter___init__ successfully ran 40 tests
-contour successfully ran 10 tests
+corpus_testCorpus successfully ran 25 tests
+corpus_chorales successfully ran 9 tests
 corpus___init__ successfully ran 17 tests
+converter_subConverters successfully ran 10 tests
+contour successfully ran 10 tests
+converter___init__ successfully ran 40 tests
+composition_aug30 successfully ran 3 tests
 composition___init__ successfully ran 3 tests
-clef successfully ran 28 tests
 common successfully ran 62 tests
+clef successfully ran 28 tests
 chordTables successfully ran 17 tests
+composition_phasing successfully ran 5 tests
 chant successfully ran 12 tests
+chord successfully ran 108 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
-braille_translate successfully ran 7 tests
-composition_phasing successfully ran 5 tests
 braille_text successfully ran 4 tests
+braille_translate successfully ran 7 tests
 braille_segment successfully ran 11 tests
-chord successfully ran 108 tests
 braille_lookup successfully ran 3 tests
+braille_examples successfully ran 5 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
-braille_examples successfully ran 5 tests
+base successfully ran 85 tests
 bar successfully ran 9 tests
-base successfully ran 84 tests
-audioSearch_recording successfully ran 4 tests
 audioSearch_transcriber successfully ran 4 tests
-articulations successfully ran 26 tests
+audioSearch_recording successfully ran 4 tests
 audioSearch___init__ successfully ran 19 tests
-analysis_search successfully ran 4 tests
+articulations successfully ran 26 tests
 braille_test successfully ran 151 tests
+analysis_search successfully ran 4 tests
+analysis_windowed successfully ran 9 tests
 analysis_reduceChords successfully ran 7 tests
 analysis_patel successfully ran 6 tests
-analysis_neoRiemannian successfully ran 10 tests
-analysis_reduction successfully ran 15 tests
 analysis_metrical successfully ran 6 tests
-analysis_windowed successfully ran 9 tests
-analysis___init__ successfully ran 3 tests
+analysis_neoRiemannian successfully ran 10 tests
 analysis_correlate successfully ran 6 tests
 analysis_discrete successfully ran 31 tests
+analysis___init__ successfully ran 3 tests
+abcFormat_testFiles successfully ran 5 tests
 abcFormat___init__ successfully ran 53 tests
 _version successfully ran 3 tests
 abcFormat_translate successfully ran 18 tests
-abcFormat_testFiles successfully ran 5 tests
 Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocumentation is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -269,8 +563,6 @@ Not in Tree Error: test.testCoverage is in the music21 directory but not importe
 Not in Tree Error: test.memoryUsage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: romanText.translate is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: musicxml.testPrimitive is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: musicxml.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.translate is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test03 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test02 is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -284,10 +576,7 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -298,6 +587,339 @@ Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
+Silent test fail for /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/metadata/caching.py: Run separately!
+
+-----------------------------
+stream___init__ had 0 ERRORS and 1 FAILURES in 142 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.stream.Stream.chordify
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 5019, in chordify
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 5067, in music21.stream.Stream.chordify
+Failed example:
+    cc.show('text')
+Expected:
+    {0.0} <music21.note.Rest rest>
+    {2.12} <music21.chord.Chord D-4>
+    {4.0} <music21.chord.Chord C#4 D-4>
+    {4.12} <music21.chord.Chord C#4>
+    {5.0} <music21.note.Rest rest>
+Got:
+    {0.0} <music21.note.Rest rest>
+    {2.12} <music21.chord.Chord D-4>
+    {4.0} <music21.chord.Chord C#4 D-4>
+    {4.12} <music21.chord.Chord C#4 D-4>
+    {5.0} <music21.note.Rest rest>
+
+
+
+-----------------------------
+test_testStream had 0 ERRORS and 1 FAILURES in 206 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 4855, in testChordifyC
+    self.assertEqual(match, [3, 9, 9, 25, 25, 21, 12, 6, 21, 29])
+AssertionError: Lists differ: [3, 9, 9, 25, 25, 21, 12, 8, 2... != [3, 9, 9, 25, 25, 21, 12, 6, 2...
+
+First differing element 7:
+8
+6
+
+- [3, 9, 9, 25, 25, 21, 12, 8, 21, 29]
+?                           ^
+
++ [3, 9, 9, 25, 25, 21, 12, 6, 21, 29]
+?                           ^
+
+
+
+-----------------------------
+midi_translate had 0 ERRORS and 1 FAILURES in 49 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.midi.translate.midiToDuration
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/translate.py", line 83, in midiToDuration
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/translate.py", line 117, in music21.midi.translate.midiToDuration
+Failed example:
+    d2.components
+Expected:
+    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
+Got:
+    [<music21.duration.DurationUnit 1>, <music21.duration.DurationUnit 1/8>, <music21.duration.DurationUnit 3/64>]
+
+
+
+-----------------------------
+humdrum_spineParser had 0 ERRORS and 1 FAILURES in 32 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/humdrum/spineParser.py", line 2584, in testSpineMazurka
+    self.assertEqual(GsharpCount, 52)
+AssertionError: 53 != 52
+
+
+-----------------------------
+freezeThaw had 0 ERRORS and 2 FAILURES in 30 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.freezeThaw.JSONFreezer.jsonPrint
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1507, in jsonPrint
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1514, in music21.freezeThaw.JSONFreezer.jsonPrint
+Failed example:
+    jsf.jsonPrint()
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.freezeThaw.JSONFreezer.jsonPrint[2]>", line 1, in <module>
+        jsf.jsonPrint()
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1595, in jsonPrint
+        indent=2,
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 250, in dumps
+        sort_keys=sort_keys, **kw).encode(obj)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 209, in encode
+        chunks = list(chunks)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 434, in _iterencode
+        for chunk in _iterencode_dict(o, _current_indent_level):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 332, in _iterencode_list
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 442, in _iterencode
+        o = _default(o)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 184, in default
+        raise TypeError(repr(o) + " is not JSON serializable")
+    TypeError: Fraction(1, 1) is not JSON serializable
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.freezeThaw.JSONThawer._setJSON
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1654, in _setJSON
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1683, in music21.freezeThaw.JSONThawer._setJSON
+Failed example:
+    jsfJSON = jsf.json
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.freezeThaw.JSONThawer._setJSON[12]>", line 1, in <module>
+        jsfJSON = jsf.json
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1494, in json
+        sort_keys=True,
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 250, in dumps
+        sort_keys=sort_keys, **kw).encode(obj)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 209, in encode
+        chunks = list(chunks)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 434, in _iterencode
+        for chunk in _iterencode_dict(o, _current_indent_level):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 332, in _iterencode_list
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
+        for chunk in chunks:
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 442, in _iterencode
+        o = _default(o)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 184, in default
+        raise TypeError(repr(o) + " is not JSON serializable")
+    TypeError: Fraction(1, 1) is not JSON serializable
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1689, in music21.freezeThaw.JSONThawer._setJSON
+Failed example:
+    n2
+Expected:
+    <music21.note.Note D#>
+Got:
+    <music21.metadata.primitives.Text object at 0x113351e90>
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1691, in music21.freezeThaw.JSONThawer._setJSON
+Failed example:
+    n2.octave
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.freezeThaw.JSONThawer._setJSON[17]>", line 1, in <module>
+        n2.octave
+    AttributeError: 'Text' object has no attribute 'octave'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1696, in music21.freezeThaw.JSONThawer._setJSON
+Failed example:
+    n2.duration.dots
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.freezeThaw.JSONThawer._setJSON[18]>", line 1, in <module>
+        n2.duration.dots
+    AttributeError: 'Text' object has no attribute 'duration'
+
+
+
+-----------------------------
+documentation_library_documenters had 0 ERRORS and 1 FAILURES in 28 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line unknown line number, in inheritedReadwritePropertiesMapping
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line ?, in music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping
+Failed example:
+    for classDocumenter in sorted(mapping, key=sortBy):
+        print('{0}:'.format(classDocumenter.referentPackagesystemPath))
+        for attributeDocumenter in mapping[classDocumenter][:10]:
+            print('- {0}'.format(attributeDocumenter.referentPackagesystemPath))
+Expected:
+    music21.base.Music21Object:
+    - music21.base.Music21Object.activeSite
+    - music21.base.Music21Object.offset
+    - music21.base.Music21Object.priority
+    music21.stream.Stream:
+    - music21.stream.Stream.atSoundingPitch
+    - music21.stream.Stream.duration
+    - music21.stream.Stream.elements
+    - music21.stream.Stream.finalBarline
+    - music21.stream.Stream.metadata
+    - music21.stream.Stream.seconds
+Got:
+    music21.base.Music21Object:
+    - music21.base.Music21Object.activeSite
+    - music21.base.Music21Object.offset
+    - music21.base.Music21Object.offsetRational
+    - music21.base.Music21Object.priority
+    music21.stream.Stream:
+    - music21.stream.Stream.atSoundingPitch
+    - music21.stream.Stream.duration
+    - music21.stream.Stream.elements
+    - music21.stream.Stream.finalBarline
+    - music21.stream.Stream.metadata
+    - music21.stream.Stream.seconds
+
+
+
+-----------------------------
+analysis_reduction had 4 ERRORS and 0 FAILURES in 15 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 825, in testExtractionA
+    post = sr.reduce()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
+    return self._createReduction()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
+    rn.measureOffset, n)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
+    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
+    return self.duration.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
+    self.updateQuarterLength()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
+    self._qtrLength += dur.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
+    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
+DurationException: Someone is not playing welll...1.0 <type 'float'>
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 852, in testExtractionB
+    post = sr.reduce()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
+    return self._createReduction()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 351, in _createReduction
+    v.insertIntoNoteOrChord(rn.measureOffset, n)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
+    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
+    return self.duration.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
+    self.updateQuarterLength()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
+    self._qtrLength += dur.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
+    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
+DurationException: Someone is not playing welll...1.0 <type 'float'>
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 914, in testExtractionD
+    unused_post = sr.reduce()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
+    return self._createReduction()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
+    rn.measureOffset, n)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
+    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
+    return self.duration.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
+    self.updateQuarterLength()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
+    self._qtrLength += dur.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
+    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
+DurationException: Someone is not playing welll...1.0 <type 'float'>
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 937, in testExtractionD2
+    unused_post = sr.reduce()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
+    return self._createReduction()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
+    rn.measureOffset, n)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
+    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
+    return self.duration.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
+    self.updateQuarterLength()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
+    self._qtrLength += dur.quarterLengthRational
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
+    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
+DurationException: Someone is not playing welll...1.0 <type 'float'>
+
 -------------------------------------------------------------------------
-Ran 3990 tests in 352.7818 seconds
-Run at 2014-06-23 01:15:20
+Ran 4029 tests in 1214.6136 seconds
+Run at 2014-06-25 20:02:33

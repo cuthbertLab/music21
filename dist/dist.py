@@ -112,14 +112,16 @@ class Distributor(object):
             if self.version in fn and fn.endswith('.egg'):
                 self.fpEgg = fp
             elif self.version in fn and fn.endswith('.exe'):
-                fpNew = fp.replace('.macosx-10.6-intel.exe', '.exe')
-                fpNew = fpNew.replace('.macosx-10.7-x86_64.exe', '.exe')
+                fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.8-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.10-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.11-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.12-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.12-x86_64.exe', '.win32.exe')
                 if fpNew != fp:
                     os.rename(fp, fpNew)
                 self.fpWin = fpNew
@@ -134,7 +136,9 @@ class Distributor(object):
                 environLocal.warn(fn)   
     
     def removeCorpus(self, fp):
-        '''Remove the corpus from a compressed file (.tar.gz or .egg) and create a new music21-noCorpus version.
+        '''
+        Remove the corpus from a compressed file (.tar.gz or .egg) and 
+        create a new music21-noCorpus version.
 
         Return the completed file path of the newly created edition.
     
@@ -242,7 +246,9 @@ class Distributor(object):
 
 
     def build(self):
-        '''Build all distributions. Update and rename file paths if necessary; remove extract build produts.
+        '''
+        Build all distributions. Update and rename file paths if necessary; 
+        remove extract build products.
         '''
         # call setup.py
         #import setup -- for some reason doesnt work unless called from commandline
@@ -280,7 +286,7 @@ class Distributor(object):
 
     def uploadPyPi(self):
         '''
-        Upload source package to PyPI
+        Upload source package to PyPI -- currently source file is too big for PyPi...sigh...
         '''
         environLocal.warn('putting bdist_egg on pypi -- looks redundant, but we have to do it again')
         savePath = os.getcwd()
@@ -290,58 +296,6 @@ class Distributor(object):
 
         #os.system('cd %s; %s setup.py bdist_egg upload' % 
         #        (self.fpPackageDir, PY))
-
-#     def uploadGoogleCodeOneFile(self, fp):
-#         '''Upload distributions to Google code. Requires googlecode_upload.py script from: 
-#         http://code.google.com/p/support/source/browse/trunk/scripts/googlecode_upload.py
-#         
-#         As of January 2014, googleCode no longer accepts uploads so this method is no longer used.
-# 
-#         '''
-#         import googlecode_upload # placed in site-packages
-# 
-#         summary = self.version
-#         project = 'music21'
-#         user = 'cuthbert@gmail.com'
-# 
-#         if fp.endswith('.tar.gz'):
-#             labels = ['OpSys-All', 'Featured', 'Type-Archive']
-#         elif fp.endswith('.exe'):
-#             labels = ['OpSys-Windows', 'Featured', 'Type-Installer']
-#         elif fp.endswith('.egg'):
-#             labels = ['OpSys-All', 'Featured', 'Type-Archive']
-#         
-#         print(['starting GoogleCode upload of:', fp])
-#         status, reason, unused_url = googlecode_upload.upload_find_auth(fp, 
-#                         project, summary, labels, user)
-#         print([status, reason])
-# 
-# 
-#     def uploadGoogleCode(self):
-#         '''
-#         Upload each file to googleCode.
-#         
-#         As of January 2014, googleCode no longer accepts uploads so this method is no longer used.
-#         '''
-# #         for fp in [self.fpTar, self.fpEgg, self.fpWin, 
-# #             self.fpTarNoCorpus, self.fpEggNoCorpus]:
-#         if self.buildNoCorpus is True:
-#             fileList = (
-#                 self.fpEggNoCorpus,
-#                 self.fpTarNoCorpus,
-#                 self.fpWin,
-#                 self.fpEgg,
-#                 self.fpTar,
-#                 )
-#         else:
-#             fileList = (
-#                 self.fpWin,
-#                 self.fpEgg,
-#                 self.fpTar,
-#                 )
-#         
-#         for fp in fileList:
-#             self.uploadGoogleCodeOneFile(fp)
 
     def md5ForFile(self, path, hexReturn=True):
         if hexReturn:

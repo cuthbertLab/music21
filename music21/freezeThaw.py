@@ -69,11 +69,12 @@ exist in the Python namespace.
 
 import codecs
 import copy
-import unittest
+import fractions
 import inspect
+import json
 import os
 import time
-import json
+import unittest
 import zlib
 
 from music21 import base
@@ -1433,7 +1434,8 @@ class JSONFreezer(JSONFreezeThawBase):
 
         for attr in self.jsonAttributes():
             attrValue = getattr(self.storedObject, attr)
-
+            if isinstance(attrValue, fractions.Fraction):
+                attrValue = float(attrValue)
             #environLocal.printDebug(['_getJSON', attr, "hasattr(attrValue, 'json')", hasattr(attrValue, 'json')])
 
             # do not store None values; assume initial/unset state
