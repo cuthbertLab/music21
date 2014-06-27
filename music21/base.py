@@ -32,7 +32,7 @@ available after importing music21.
 ::
 
     >>> music21.VERSION_STR
-    '2.0.0'
+    '1.9.3'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -48,7 +48,6 @@ from __future__ import print_function
 import collections
 import copy
 import doctest
-import fractions
 import sys
 import types
 import unittest
@@ -625,7 +624,7 @@ class Music21Object(object):
 #             if not isinstance(classFilterList, tuple):
 #                 classFilterList = [classFilterList]
 
-    def getOffsetBySite(self, site, returnType='float'):
+    def getOffsetBySite(self, site):
         '''
         If this class has been registered in a container such as a Stream,
         that container can be provided here, and the offset in that object
@@ -645,10 +644,6 @@ class Music21Object(object):
         >>> s1.insert(20.5, n)
         >>> n.getOffsetBySite(s1)
         20.5
-        >>> n.getOffsetBySite(s1, returnType='rational')
-        Fraction(41, 2)
-
-
         >>> s2 = stream.Stream()
         >>> s2.id = 'notContainingStream'
         >>> n.getOffsetBySite(s2)
@@ -656,7 +651,7 @@ class Music21Object(object):
         SitesException: The object <music21.note.Note A-> is not in site <music21.stream.Stream notContainingStream>.
         '''
         try:
-            return self.sites.getOffsetBySite(site, returnType=returnType)
+            return self.sites.getOffsetBySite(site)
         except SitesException:
             raise SitesException('The object %r is not in site %r.' % (self, site))
 
@@ -674,7 +669,7 @@ class Music21Object(object):
         >>> a.sites.add(aSite, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
-        30.0
+        30
         '''
         return self.sites.setOffsetBySite(site, value)
 
@@ -1521,7 +1516,7 @@ class Music21Object(object):
         be moved to .sites soon.
         ''')
 
-    def _getOffsetFloatOrRational(self, returnType):
+    def _getOffset(self):
         '''Get the offset for the activeSite.
 
 
@@ -1533,17 +1528,12 @@ class Music21Object(object):
         True
         >>> n.offset
         3.0
-        >>> n.offsetRational
-        Fraction(3, 1)
-        
+
         Still works...
 
         >>> n._activeSiteId = 3234234
         >>> n.offset
         3.0
-        >>> n.offsetRational
-        Fraction(3, 1)
-
 
         There is a branch that does slow searches.
         See test/testSerialization to have it active.
@@ -1562,25 +1552,22 @@ class Music21Object(object):
 
         if (activeSiteId is not None and
             self.sites.hasSiteId(activeSiteId)):
-            return self.sites.getOffsetBySiteId(activeSiteId, returnType=returnType)
+            return self.sites.getOffsetBySiteId(activeSiteId)
             #return self.sites.coordinates[activeSiteId]['offset']
         elif self.activeSite is None: # assume we want self
             try:
-                return self.sites.getOffsetBySite(None, returnType=returnType)
-            except SitesException:  # might not have a None offset
-                if returnType == 'float':
-                    return 0.0
-                else:
-                    return fractions.Fraction(0, 1)
+                return self.sites.getOffsetBySite(None)
+            except SitesException:
+                return 0.0 # might not have a None offset
         else:
             # try to look for it in all objects
             environLocal.printDebug(['doing a manual activeSite search: probably means that ' +
                                      'id(self.activeSite) (%s) is not equal to self._activeSiteId (%r)' % (id(self.activeSite), self._activeSiteId)])
             #environLocal.printDebug(['activeSite', self.activeSite, 'self.sites.hasSiteId(activeSiteId)', self.sites.hasSiteId(activeSiteId)])
             #environLocal.printDebug(['self.hasSite(self.activeSite)', self.hasSite(self.activeSite)])
-        
+
             offset = self.sites.getOffsetByObjectMatch(
-                    self.activeSite, returnType=returnType)
+                    self.activeSite)
             return offset
 
             #environLocal.printDebug(['self.sites', self.sites.siteDict])
@@ -1612,9 +1599,6 @@ class Music21Object(object):
         # do not have to unwrap a weakref of self.activeSite to get the id()
         # of activeSite
         self.sites.setOffsetBySiteId(self._activeSiteId, offset)
-
-    def _getOffset(self):
-        return self._getOffsetFloatOrRational('float')
 
     offset = property(_getOffset, _setOffset,
         doc = '''
@@ -1705,102 +1689,6 @@ class Music21Object(object):
         30.5
 
         When in doubt, use `.getOffsetBySite(streamObj)`
-        which is safer.
-        ''')
-    
-    def _getOffsetRational(self):
-        return self._getOffsetFloatOrRational('rational')
-
-    offsetRational = property(_getOffsetRational, _setOffset,
-                              doc = '''
-        The offsetRational property sets or returns the position of this object
-        as a fractions.Fraction value
-        (generally in `quarterLengths`) from the start of its `activeSite`,
-        that is, the most recently referenced `Stream` or `Stream` subclass such
-        as `Part`, `Measure`, or `Voice`.  It is a simpler
-        way of calling `o.getOffsetBySite(o.activeSite, returnType='rational')`.
-
-        If we put a `Note` into a `Stream`, we will see the activeSite changes.
-
-        >>> import fractions
-        >>> n1 = note.Note("D#3")
-        >>> n1.activeSite is None
-        True
-
-        >>> m1 = stream.Measure()
-        >>> m1.number = 4
-        >>> m1.insert(10.0, n1)
-        >>> n1.offsetRational
-        Fraction(10, 1)
-        >>> n1.activeSite
-        <music21.stream.Measure 4 offset=0.0>
-
-        >>> n1.activeSite is m1
-        True
-
-        The most recently referenced `Stream` becomes an object's `activeSite` and
-        thus the place where `.offset` looks to find its number.
-
-        >>> m2 = stream.Measure()
-        >>> m2.insert(3.0/5, n1)
-        >>> m2.number = 5
-        >>> n1.offsetRational
-        Fraction(3, 5)
-        >>> n1.activeSite is m2
-        True
-
-        Notice though that `.offset` depends on the `.activeSite` which is the most
-        recently accessed/referenced Stream.
-
-        Here we will iterate over the `elements` in `m1` and we
-        will see that the `.offset` of `n1` now is its offset in
-        `m1` even though we haven't done anything directly to `n1`.
-        Simply iterating over a site is enough to change the `.activeSite`
-        of its elements:
-
-        >>> for element in m1:
-        ...     pass
-        >>> n1.offsetRational
-        Fraction(10, 1)
-
-
-        The property can also set the offset for the object if no
-        container has been set:
-
-
-        >>> n1 = note.Note()
-        >>> n1.id = 'hi'
-        >>> n1.offsetRational = fractions.Fraction(20, 1)
-        >>> n1.offsetRational
-        Fraction(20, 1)
-
-        >>> s1 = stream.Stream()
-        >>> s1.append(n1)
-        >>> n1.offsetRational
-        Fraction(0, 1)
-        >>> s2 = stream.Stream()
-        >>> s2.insert(30.5, n1)
-        >>> n1.offsetRational
-        Fraction(61, 2)
-
-        After calling `getElementById` on `s1`, the
-        returned element's `offsetRational` will be its offset in `s1`.
-
-        >>> n2 = s1.getElementById('hi')
-        >>> n2 is n1
-        True
-        >>> n2.offsetRational
-        Fraction(0, 1)
-
-        Iterating over the elements in a Stream will
-        make its `offset` be the offset in iterated
-        Stream.
-
-        >>> for thisElement in s2:
-        ...     thisElement.offsetRational
-        Fraction(61, 2)
-
-        When in doubt, use `.getOffsetBySite(streamObj, returnType='rational')`
         which is safer.
         ''')
 

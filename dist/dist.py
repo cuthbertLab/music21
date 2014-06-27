@@ -36,10 +36,8 @@ To do a release,
 12. Create a new release on GitHub and upload the FIVE files created here. Use tag v1.9.3 (etc.).
     Drag in this order: .egg, .tar.gz, .exe, no-corpus.egg, no-corpus.tar.gz
 
-13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking 
-    edit and augment the version number and the download URL. -- The URL will be printed when
-    running dist.py -- it's important to cut and paste this, since it has the md5 tag.
-
+13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking edit and augment
+the version number and the download URL.
 
 14. Delete the files in dist...
 
