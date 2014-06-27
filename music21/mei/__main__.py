@@ -34,6 +34,7 @@ from music21 import pitch
 from music21 import stream
 from music21 import chord
 from music21 import clef
+from music21 import beam
 
 
 # Module-Level Constants
@@ -598,6 +599,88 @@ def clefFromElement(elem):
     return post
 
 
+def beamFromElement(elem, overrideN=None):
+    '''
+    <beam> A container for a series of explicitly beamed events that begins and ends entirely
+           within a measure.
+
+    In MEI 2013: pg.264 (278 in PDF) (MEI.cmn module)
+
+    :param elem: The ``<beam>`` tag to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :returns: An iterable of all the objects contained within the ``<beam>`` container.
+    :rtype: tuple of :class:`~music21.base.Music21Object`
+
+    Attributes Implemented:
+    =======================
+    - <clef> contained within
+    - <chord> contained within
+    - <note> contained within
+    - <rest> contained within
+
+    Attributes Ignored:
+    ===================
+    - @xml:id. Since this tag does not translate to a :class:`Music21Object`, we cannot set the ``id``.
+
+    Attributes In Progress:
+    =======================
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+    att.facsimile (@facs)
+    att.beam.log (att.event (att.timestamp.musical (@tstamp))
+                            (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+                            (att.staffident (@staff))
+                            (att.layerident (@layer)))
+                 (att.beamedwith (@beam.with))
+    att.beam.vis (att.color (@color))
+                 (att.beamrend (@rend, @slope))
+    att.beam.gesatt.beam.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                             (att.alignment (@when)))
+
+    May Contain:
+    ============
+    MEI.cmn: bTrem beam beatRpt fTrem halfmRpt meterSig meterSigGrp tuplet
+    MEI.critapp: app
+    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    MEI.mensural: ligature mensur proport
+    MEI.shared: barLine clefGrp custos keySig pad space
+    '''
+    # mapping from tag name to our converter function
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
+                     '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
+                     '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
+                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement}
+    post = []
+
+    # iterate all immediate children
+    for eachTag in elem.findall('*'):
+        if eachTag.tag in tagToFunction:
+            post.append(tagToFunction[eachTag.tag](eachTag))
+        else:  # DEBUG
+            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+
+    # install the beams
+    beamEnd = len(post) - 1  # object with this index in "post" should have the 'stop' Beam type
+    if 0 != beamEnd:
+        for i, thing in enumerate(post):
+            # first determine beam type
+            if 0 == i:
+                beamType = 'start'
+            elif beamEnd == i:
+                beamType = 'stop'
+            else:
+                beamType = 'continue'
+
+            # then set it (if possible)
+            if hasattr(thing, 'beams'):
+                thing.beams.fill(duration.convertQuarterLengthToType(thing.quarterLength), beamType)
+            elif beamEnd == i:  # end the beam earlier if the last thing is a Rest (for example)
+                post[i - 1].beams.setAll('partial', direction='right')
+
+    return tuple(post)
+
 
 def layerFromElement(elem, overrideN=None):
     '''
@@ -675,13 +758,19 @@ def layerFromElement(elem, overrideN=None):
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
                      '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
-                     '{http://www.music-encoding.org/ns/mei}mRest': mRestFromElement}
+                     '{http://www.music-encoding.org/ns/mei}mRest': mRestFromElement,
+                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement}
     post = stream.Voice()
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
-            post.append(tagToFunction[eachTag.tag](eachTag))
+            result = tagToFunction[eachTag.tag](eachTag)
+            if not isinstance(result, (tuple, list)):
+                post.append(result)
+            else:
+                for eachObject in result:
+                    post.append(eachObject)
 
     # try to set the Voice's "id" attribte
     if overrideN:
@@ -718,6 +807,7 @@ def staffFromElement(elem):
 
     Attributes In Progress:
     =======================
+    - <beam> contained within
 
     Attributes not Implemented:
     ===========================
