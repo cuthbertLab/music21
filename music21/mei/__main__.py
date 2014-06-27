@@ -35,6 +35,8 @@ from music21 import stream
 from music21 import chord
 from music21 import clef
 from music21 import beam
+from music21 import meter
+from music21 import key
 
 
 # Module-Level Constants
@@ -308,8 +310,144 @@ def _getOctaveShift(dis, disPlace):
         return octavesDict[dis]
 
 
+def _sharpsFromAttr(signature):
+    '''
+    Use :func:`_sharpsFromAttr` to convert MEI's ``data.KEYSIGNATURE`` datatype to an integer
+    representing the number of sharps, for use with music21's :class:`~music21.key.KeySignature`.
+
+    :param str signature: The @key.sig attribute.
+    :returns: The number of sharps.
+    :rtype: int
+
+    >>> _sharpsFromAttr('3s')
+    3
+    >>> _sharpsFromAttr('3f')
+    -3
+    >>> _sharpsFromAttr('0')
+    0
+    '''
+    if signature.startswith('0'):
+        return 0
+    elif signature.endswith('s'):
+        return int(signature[0])
+    else:
+        return -1 * int(signature[0])
+
+
 # Converter Functions
 #------------------------------------------------------------------------------
+def scoreDefFromElement(elem):
+    # TODO: this whole function is untested
+    '''
+    <scoreDef> Container for score meta-information.
+
+    In MEI 2013: pg.431 (445 in PDF) (MEI.shared module)
+
+    This function returns objects related to the score overall, and those relevant only to
+    specific parts, depending on the attributes and contents of the given :class:`Element`.
+
+    Objects relevant only to a particular part are accessible in the returned dictionary using that
+    part's @n attribute. The dictionary also has two special keys:
+    * ``'whole-score objects'``, which are related to the entire score (e.g., page size), and
+    * ``'all-part objects'``, which should appear in every part.
+
+    Note that it is the caller's responsibility to determine the right actions if there are
+    conflicting objects in the returned dictionary.
+
+    :param elem: The ``<scoreDef>`` tag to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :returns: Objects from the ``<scoreDef>`` relevant on a per-part and whole-score basis.
+    :rtype: dict of list of :class:`Music21Objects`
+
+    Attributes Implemented:
+    =======================
+
+    Attributes In Progress:
+    =======================
+    (att.meterSigDefault.log (@meter.count, @meter.unit))
+    (att.keySigDefault.log (@key.accid, @key.mode, @key.pname, @key.sig))
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+               (att.id (@xml:id))
+    att.scoreDef.log (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place))
+                     (att.duration.default (@dur.default, @num.default, @numbase.default))
+                     (att.keySigDefault.log (@key.sig.mixed))
+                     (att.octavedefault (@octave.default))
+                     (att.transposition (@trans.diat, @trans.semi))
+                     (att.scoreDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
+                     (att.scoreDef.log.mensural (att.mensural.log (@mensur.dot, @mensur.sign,
+                                                                   @mensur.slash, @proport.num,
+                                                                   @proport.numbase)
+                                                (att.mensural.shared (@modusmaior, @modusminor,
+                                                                      @prolatio, @tempus))))
+    att.scoreDef.vis (@ending.rend, @mnum.visible, @music.name, @music.size, @optimize,
+                      @page.height, @page.width, @page.topmar, @page.botmar, @page.leftmar,
+                      @page.rightmar, @page.panels, @page.scale, @spacing.packexp,
+                      @spacing.packfact, @spacing.staff, @spacing.system, @system.leftmar,
+                      @system.rightmar, @system.topmar, @vu.height)
+                     (att.barplacement (@barplace, @taktplace))
+                     (att.cleffing.vis (@clef.color, @clef.visible))
+                     (att.distances (@dynam.dist, @harm.dist, @text.dist))
+                     (att.keySigDefault.vis (@key.sig.show, @key.sig.showchange))
+                     (att.lyricstyle (@lyric.align, @lyric.fam, @lyric.name, @lyric.size,
+                                      @lyric.style, @lyric.weight))
+                     (att.meterSigDefault.vis (@meter.rend, @meter.showchange, @meter.sym))
+                     (att.multinummeasures (@multi.number))
+                     (att.onelinestaff (@ontheline))
+                     (att.textstyle (@text.fam, @text.name, @text.size, @text.style, @text.weight))
+                     (att.scoreDef.vis.cmn (@grid.show)
+                                           (att.beaming.vis (@beam.color, @beam.rend, @beam.slope))
+                                           (att.pianopedals (@pedal.style))
+                                           (att.rehearsal (@reh.enclose))
+                                           (att.slurrend (@slur.rend))
+                                           (att.tierend (@tie.rend)))
+                     (att.scoreDef.vis.mensural (att.mensural.vis (@mensur.color, @mensur.form,
+                                                                   @mensur.loc, @mensur.orient,
+                                                                   @mensur.size)))
+    att.scoreDef.ges (@tune.pname, @tune.Hz, @tune.temper)
+                     (att.channelized (@midi.channel, @midi.duty, @midi.port, @midi.track))
+                     (att.timebase (@ppq))
+                     (att.miditempo (@midi.tempo))
+                     (att.mmtempo (@mm, @mm.unit, @mm.dots))
+    att.scoreDef.anl
+
+    May Contain:
+    ============
+    MEI.cmn: meterSig meterSigGrp
+    MEI.harmony: chordTable
+    MEI.linkalign: timeline
+    MEI.midi: instrGrp
+    MEI.shared: keySig pgFoot pgFoot2 pgHead pgHead2 staffGrp
+    MEI.usersymbols: symbolTable
+    '''
+    # make the dict
+    allParts = 'all-part objects'
+    wholeScore = 'whole-score objects'
+    post = {allParts: [], wholeScore: []}
+
+    # 1.) process whole-score objects
+    # --> time signature
+    if elem.get('meter.count') is not None:
+        post[allParts].append(meter.TimeSignature('%s/%s' % (elem.get('meter.count'),
+                                                             elem.get('meter.unit'))))
+    # --> key signature
+    if elem.get('key.pname') is not None:
+        # @key.accid, @key.mode, @key.pname
+        post[allParts].append(key.Key(tonic=elem.get('key.pname') + _accidentalFromAttr(elem.get('key.accid')),
+                                      mode=elem.get('key.mode', '')))
+    elif elem.get('key.sig') is not None:
+        # @key.sig, @key.mode
+        post[allParts].append(key.KeySignature(sharps=_sharpsFromAttr(elem.get('key.sig')),
+                                               mode=elem.get('key.mode')))
+
+    # 2.) process per-part objects
+    # TODO: deal with per-part stuff
+
+    return post
+
+
 def noteFromElement(elem):
     '''
     <note> is a single pitched event.
