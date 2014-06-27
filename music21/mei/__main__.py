@@ -90,19 +90,47 @@ def convertFromString(dataStr):
     if '{http://www.music-encoding.org/ns/mei}mei' != documentRoot.tag:
         raise MeiTagError(_WRONG_ROOT_TAG % documentRoot.tag)
 
-    # NOTE: this is obviously not proper document structure
-    parsed = []
-    foundTheRoot = False  # when the <mei> tag is discovered
-    for eachTag in documentRoot.findall('*'):
-        if '{http://www.music-encoding.org/ns/mei}measure' == eachTag.tag:
-            parsed.append(measureFromElement(eachTag))
-        elif '{http://www.music-encoding.org/ns/mei}mei' == eachTag.tag:
-            if not foundTheRoot:
-                foundTheRoot = True
+    # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
+    # corresponds to what will be a music21 Part.
+    allPartNs = allPartsPresent(documentRoot.findall('.//%sscore//%sstaffDef' % (_MEINS, _MEINS)))
+
+    # holds the music21.stream.Part that we're building
+    parsed = {n: stream.Part() for n in allPartNs}
+    # holds things that should go in the following Measure
+    inNextMeasure = {n: stream.Part() for n in allPartNs}
+
+    backupMeasureNum = 0
+    for eachSection in documentRoot.findall('.//%(mei)smusic//%(mei)sscore//*[%(mei)smeasure]' % {'mei': _MEINS}):
+        # TODO: sections aren't divided or treated specially, yet
+        for eachObject in eachSection:
+            if ('%smeasure' % _MEINS) == eachObject.tag:
+                backupMeasureNum += 1
+                for eachN in allPartNs:
+                    thisStaffTag = eachObject.findall('./%sstaff[@n="%s"]' % (_MEINS, eachN))[0]
+                    thisMeasure = stream.Measure(staffFromElement(thisStaffTag),
+                                                number=int(eachObject.get('n', backupMeasureNum)))  # NB: the 2nd param is for measures that don't have @n set
+                    # add things that were specified in the immediately-preceding <scoreDef>
+                    for eachThing in inNextMeasure[eachN]:
+                        thisMeasure.insert(0, eachThing)
+                    inNextMeasure[eachN] = []
+                    # add this Measure to the Part
+                    parsed[eachN].append(thisMeasure)
+            elif ('%sscoreDef' % _MEINS) == eachObject.tag:
+                scoreDefResults = scoreDefFromElement(eachObject)
+                # spread all-part elements across all the parts
+                for allPartObject in scoreDefResults['all-part objects']:
+                    for n in allPartNs:
+                        inNextMeasure[n].append(allPartObject)
             else:
-                raise MeiTagError(_MULTIPLE_ROOT_TAGS)
-        else:
-            raise MeiTagError(_UNKNOWN_TAG % eachTag.tag)
+                print('!! unprocessed %s in %s' % (eachObject.tag, eachSection.tag))
+                pass
+
+    # TODO: check if there's anything left in "inNextMeasure"
+
+    # convert the dict to a list
+    # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
+    # document, whereas iterating over the keys in "parsed" would not preserve the order.
+    parsed = [parsed[n] for n in allPartNs]
 
     return stream.Score(parsed)
 
