@@ -457,6 +457,17 @@ def restFromElement(elem):
     return post
 
 
+def mRestFromElement(elem):
+    '''
+    <mRest/> Complete measure rest in any meter.
+
+    In MEI 2013: pg.375 (389 in PDF) (MEI.cmn module)
+
+    This is a function wrapper for :func:`restFromElement`.
+    '''
+    return restFromElement(elem)
+
+
 def chordFromElement(elem):
     '''
     <chord> is a simultaneous sounding of two or more notes in the same layer with the same duration.
@@ -616,6 +627,7 @@ def layerFromElement(elem, overrideN=None):
     - <chord> contained within
     - <note> contained within
     - <rest> contained within
+    - <mRest> contained within
     - @n, from att.common
 
     Attributes Ignored:
@@ -642,8 +654,8 @@ def layerFromElement(elem, overrideN=None):
 
     May Contain:
     ============
-    MEI.cmn: arpeg bTrem beam beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
-             harpPedal mRest mRpt mRpt2 mSpace meterSig meterSigGrp multiRest multiRpt octave pedal
+    MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
+             harpPedal mRpt mRpt2 mSpace meterSig meterSigGrp multiRest multiRpt octave pedal
              reh slur tie tuplet tupletSpan
     MEI.cmnOrnaments: mordent trill turn
     MEI.critapp: app
@@ -662,7 +674,8 @@ def layerFromElement(elem, overrideN=None):
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
                      '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
-                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement}
+                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
+                     '{http://www.music-encoding.org/ns/mei}mRest': mRestFromElement}
     post = stream.Voice()
 
     # iterate all immediate children
