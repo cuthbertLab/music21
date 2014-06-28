@@ -5070,6 +5070,10 @@ class Stream(base.Music21Object):
             {4.0} <music21.chord.Chord C#4 D-4>
             {4.12} <music21.chord.Chord C#4>
             {5.0} <music21.note.Rest rest>
+            >>> cc[3]
+            <music21.chord.Chord C#4>
+            >>> print(cc[3].duration.quarterLength) # slightly less than 0.88 as float
+            0.88
 
         Here's how addPartIdAsGroup works:
 
