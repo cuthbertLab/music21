@@ -41,7 +41,7 @@ meterNumerator = 4
 meterDenominator = 'quarter'
 meterDenominatorBeatType = 4  # musicxml representation
 
-limitOffsetDenominator = 44100 # CD track level precision. 
+limitOffsetDenominator = 65535 # > CD track level precision. 
 # allows for tuples up to n:x within m:y within l:z within k:w where x,y,z <=100 and w<=44
 # not allowing more can be construed as a feature. 
 

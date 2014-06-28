@@ -2569,19 +2569,18 @@ class Test(unittest.TestCase):
 #       print common.stripAddresses(masterStream.recurseRepr())
 
         # humdrum type problem: how many G#s start on beat 2 of a measure?
-        # problem with beat!!!
         GsharpCount = 0
         #masterStream.show('text')
         for n in masterStream.recurse():
             if hasattr(n, "pitch") and n.pitch.name == "G#":
-                if n.offset == 2: # beat doesn't work... :-(
+                if n.beat == 2: # beat doesn't work... :-(
                     GsharpCount += 1
             elif hasattr(n, "pitches"):
-                if 'G#' in [p.name for p in n.pitches]:
-                    if n.offset == 2:
+                for p in n.pitches:
+                    if p.name == 'G#' and n.beat == 2:
                         GsharpCount += 1
-
-        self.assertEqual(GsharpCount, 52)
+        #masterStream.show()
+        self.assertEqual(GsharpCount, 86)
 #        masterStream.show()
 
 #       masterStream.show('text')

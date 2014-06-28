@@ -1454,6 +1454,8 @@ class LilypondConverter(object):
             else:
                 # no support for maxima...
                 number_type = int(number_type * 16)
+        else:
+            number_type = int(number_type)
 
         try:
             stenoDuration = lyo.LyStenoDuration(number_type, int(durationObj.dots))
