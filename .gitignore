@@ -48,3 +48,5 @@ music21/documentation/source/tutorials/MersenneDemo_files/_fig_03.png
 music21/documentation/source/tutorials/MersenneDemo_files/_fig_05.png
 
 music21/documentation/source/usersGuide/.ipynb_checkpoints/usersGuide_35_reductions-checkpoint.ipynb
+
+*.orig
