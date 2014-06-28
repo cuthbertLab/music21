@@ -451,12 +451,15 @@ def reBar(music21Part, inPlace=True):
     mistakenly marked as 4/4, but has some measures that are longer.
 
     >>> music21Part2 = irl[14][1] # 4/4 time signature
+    >>> music21Part2.show('text')
     >>> music21Part2.measure(1).show("text")
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note A>
     {1.5} <music21.note.Note G>
     {2.0} <music21.note.Note E>
     {2.5} <music21.note.Note G>
+    >>> music21Part2.measure(1)[-1].duration.quarterLength
+    1.5
 
     >>> music21Part2.measure(2).show("text")
     {0.0} <music21.meter.TimeSignature 1/8>
@@ -493,7 +496,7 @@ def reBar(music21Part, inPlace=True):
             m2.clef = None # suppress the clef
             m2.number = m1.number + 1
             mnOffset += 1
-            music21Part.insert(m1.offset + m1.highestTime, m2)
+            music21Part.insert(m1.offsetRational + m1.highestTime, m2)
         """
         elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
             # The first and last measures are allowed to be incomplete

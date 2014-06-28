@@ -1,26 +1,31 @@
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.stream.Stream.chordify
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 5019, in chordify
+AssertionError: Failed doctest test for music21.stream.Stream._uniqueOffsetsAndEndTimes
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 4666, in _uniqueOffsetsAndEndTimes
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 5067, in music21.stream.Stream.chordify
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 4686, in music21.stream.Stream._uniqueOffsetsAndEndTimes
 Failed example:
-    cc.show('text')
+    [str(o) for o in s.flat._uniqueOffsetsAndEndTimes()]
 Expected:
-    {0.0} <music21.note.Rest rest>
-    {2.12} <music21.chord.Chord D-4>
-    {4.0} <music21.chord.Chord C#4 D-4>
-    {4.12} <music21.chord.Chord C#4>
-    {5.0} <music21.note.Rest rest>
+    ['53/25', '4', '103/25', '5', '53/10', '11/2', '63/10', '13/2']
 Got:
-    {0.0} <music21.note.Rest rest>
-    {2.12} <music21.chord.Chord D-4>
-    {4.0} <music21.chord.Chord C#4 D-4>
-    {4.12} <music21.chord.Chord C#4 D-4>
-    {5.0} <music21.note.Rest rest>
+    ['53/25', '4', '4.12', '5.0', '53/10', '11/2', '6.3', '6.5']
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 4693, in music21.stream.Stream._uniqueOffsetsAndEndTimes
+Failed example:
+    [str(o) for o in s.flat._uniqueOffsetsAndEndTimes(endTimesOnly = True)]
+Expected:
+    ['103/25', '5', '63/10', '13/2']
+Got:
+    ['4.12', '5.0', '6.3', '6.5']
 
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 2063, in testBestTimeSignature
+    self.assertEqual(ts.numerator, 7)
+AssertionError: 70 != 7
 
 Traceback (most recent call last):
   File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 4855, in testChordifyC
@@ -31,12 +36,22 @@ First differing element 7:
 8
 6
 
-- [3, 9, 9, 25, 25, 21, 12, 8, 21, 29]
-?                           ^
+- [3, 9, 9, 25, 25, 21, 12, 8, 28, 29]
+?                           ^   ^
 
 + [3, 9, 9, 25, 25, 21, 12, 6, 21, 29]
-?                           ^
+?                           ^   ^
 
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 6880, in testChordifyF
+    "(['A4', 'B-2'], '2.0', '2.0')]")
+AssertionError: "[(['B-4', 'B-2'], '0.0', '0.667'), (['C5'], '0.67', '0.0'), (['C5', 'B-2'], '0.67', '0.667'), (['B-4'], '1.33', '0.0'), (['B-4', 'B-2'], '1.33', '0.667'), (['A4', 'B-2'], '2.0', '2.0')]" != "[(['B-4', 'B-2'], '0.0', '0.667'), (['C5', 'B-2'], '0.67', '0.667'), (['B-4', 'B-2'], '1.33', '0.667'), (['A4', 'B-2'], '2.0', '2.0')]"
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 1632, in testComplex
+    self.assertEqual(matchStr, outStr)
+AssertionError: "c'4~\nc'2.~\nc'4" != "c'4.0~\nc'2.0.~\nc'4.0"
 
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
@@ -49,9 +64,1186 @@ File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/tra
 Failed example:
     d2.components
 Expected:
-    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
-Got:
     [<music21.duration.DurationUnit 1>, <music21.duration.DurationUnit 1/8>, <music21.duration.DurationUnit 3/64>]
+Got:
+    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
+
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 4598, in testBestTimeSignature
+    ts6 = bestTimeSignature(m6)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 466, in bestTimeSignature
+    ts.loadRatio(numerator, denominator)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 3008, in loadRatio
+    self.load(value, partitionRequest)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 2986, in load
+    self._setDefaultBeatPartitions()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 2829, in _setDefaultBeatPartitions
+    self.beatSequence.partition(self.numerator)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 1570, in partition
+    self.partitionByCount(value, loadDefault=False)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 1415, in partitionByCount
+    raise MeterException('Cannot set partition by %s (%s/%s)' % (countRequest, self.numerator, self.denominator))
+MeterException: Cannot set partition by 110 (110/320)
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.meter.bestTimeSignature
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 296, in bestTimeSignature
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 347, in music21.meter.bestTimeSignature
+Failed example:
+    ts6 = meter.bestTimeSignature(m6)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.meter.bestTimeSignature[28]>", line 1, in <module>
+        ts6 = meter.bestTimeSignature(m6)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 466, in bestTimeSignature
+        ts.loadRatio(numerator, denominator)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 3008, in loadRatio
+        self.load(value, partitionRequest)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 2986, in load
+        self._setDefaultBeatPartitions()
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 2829, in _setDefaultBeatPartitions
+        self.beatSequence.partition(self.numerator)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 1570, in partition
+        self.partitionByCount(value, loadDefault=False)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 1415, in partitionByCount
+        raise MeterException('Cannot set partition by %s (%s/%s)' % (countRequest, self.numerator, self.denominator))
+    MeterException: Cannot set partition by 110 (110/320)
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 348, in music21.meter.bestTimeSignature
+Failed example:
+    ts6
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.meter.bestTimeSignature[29]>", line 1, in <module>
+        ts6
+    NameError: name 'ts6' is not defined
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.appendContextFromNoteOrRest
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1064, in appendContextFromNoteOrRest
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1075, in music21.lily.translate.LilypondConverter.appendContextFromNoteOrRest
+Failed example:
+    print(lpMusicList)
+Expected:
+    cis' 4
+    <BLANKLINE>
+Got:
+    cis' 4.0  
+    <BLANKLINE>
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1096, in music21.lily.translate.LilypondConverter.appendContextFromNoteOrRest
+Failed example:
+    print(lpc.context)
+Expected:
+    cis' 4
+    \times 2/3 { dis' 8
+       e' 8
+       f' 8
+        }
+    <BLANKLINE>
+    fis' 4
+    <BLANKLINE>
+Got:
+    cis' 4.0  
+    \times 2/3 { dis' 8.0  
+       e' 8.0  
+       f' 8.0  
+        } 
+    <BLANKLINE>
+    fis' 4.0  
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.appendObjectsToContextFromStream
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 877, in appendObjectsToContextFromStream
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 895, in music21.lily.translate.LilypondConverter.appendObjectsToContextFromStream
+Failed example:
+    print(lpc.context)
+Expected:
+    \time 3/4
+    c' 4
+    des' 4
+    eis' 4
+    <BLANKLINE>
+Got:
+    \time 3/4
+    c' 4.0  
+    des' 4.0  
+    eis' 4.0  
+    <BLANKLINE>
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 913, in music21.lily.translate.LilypondConverter.appendObjectsToContextFromStream
+Failed example:
+    print(lpc.context) # internal spaces removed...
+Expected:
+      << \new Voice { c'' 1
+              }
+       \new Voice { cis'' 1
+              }
+        >>
+Got:
+    <BLANKLINE>
+      << \new Voice { c'' 1.0  
+              } 
+    <BLANKLINE>
+    <BLANKLINE>
+       \new Voice { cis'' 1.0  
+              } 
+    <BLANKLINE>
+    <BLANKLINE>
+        >>
+    <BLANKLINE>
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.getLySpacersFromStream
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 532, in getLySpacersFromStream
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 545, in music21.lily.translate.LilypondConverter.getLySpacersFromStream
+Failed example:
+    print(lpc.getLySpacersFromStream(streamIn))
+Expected:
+    s2. s2. s1 s1 s1 s1 s4
+Got:
+    s2.0. s2.0. s1.0 s1.0 s1.0 s1.0 s4.0 
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyGroupedMusicListFromScoreWithParts
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 579, in lyGroupedMusicListFromScoreWithParts
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 588, in music21.lily.translate.LilypondConverter.lyGroupedMusicListFromScoreWithParts
+Failed example:
+    print(lpGroupedMusicList)
+Expected:
+    <BLANKLINE>
+     << \new Staff  = Soprano { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+       \new Staff  = Alto { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+       \new Staff  = Tenor { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+       \new Staff  = Bass { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+    <BLANKLINE>
+      \context Staff  = Soprano \with {
+          \autoBeamOff
+      }
+      { \startStaff \partial 32*8
+            \clef "treble"
+            \key fis \minor
+            \time 4/4
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN
+            cis'' 8 [
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN
+            b' 8 ]
+            \bar "|"  %{ end measure 0 %}
+            \once \override Stem #'direction = #UP
+            a' 4
+            \once \override Stem #'direction = #DOWN
+            b' 4
+            \once \override Stem #'direction = #DOWN
+            cis'' 4  \fermata
+            \once \override Stem #'direction = #DOWN
+            e'' 4
+            \bar "|"  %{ end measure 1 %}
+            \once \override Stem #'direction = #DOWN
+            cis'' 4
+            ...
+    }
+    <BLANKLINE>
+    <BLANKLINE>
+    \context Staff  = Alto \with  {
+        \autoBeamOff
+     }
+     { \startStaff \partial 32*8
+        \clef "treble"...
+        \once \override Stem #'direction = #UP
+        e' 4
+        \bar "|"  %{ end measure 0 %}
+        \once \override Stem #'direction = #UP
+        fis' 4
+        \once \override Stem #'direction = #UP
+        e' 4
+    ...
+    }
+    <BLANKLINE>
+    <BLANKLINE>
+    >>
+    <BLANKLINE>
+Got:
+    <BLANKLINE>
+     << \new Staff  = Soprano { \stopStaff s4.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s2.0. } 
+       \new Staff  = Alto { \stopStaff s4.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s2.0. } 
+       \new Staff  = Tenor { \stopStaff s4.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s2.0. } 
+       \new Staff  = Bass { \stopStaff s4.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s2.0. } 
+    <BLANKLINE>
+      \context Staff  = Soprano \with  { 
+        \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
+            \clef "treble" 
+            \key fis \minor 
+            \time 4/4
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis'' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b' 8.0 ]  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  \fermata  
+            \once \override Stem #'direction = #DOWN 
+            e'' 4.0  
+            \bar "|"  %{ end measure 1 %} 
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #UP 
+            a' 4.0  \fermata  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  
+            \bar "|"  %{ end measure 2 %} 
+            \break
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            a' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            b' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  \fermata  
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \bar "|"  %{ end measure 3 %} 
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \bar "|"  %{ end measure 4 %} 
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  \fermata  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  
+            \bar "|"  %{ end measure 5 %} 
+            \break
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \bar "|"  %{ end measure 6 %} 
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            gis' 2.0  \fermata  
+            \bar "|"  %{ end measure 7 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 2.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  ~  
+            \bar "|"  %{ end measure 8 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            eis' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  \fermata  
+            \bar "|."  %{ end measure 9 %} 
+             } 
+    <BLANKLINE>
+    <BLANKLINE>
+      \context Staff  = Alto \with  { 
+        \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
+            \clef "treble" 
+            \key fis \minor 
+            \time 4/4
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \bar "|"  %{ end measure 1 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            e' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            a' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \bar "|"  %{ end measure 2 %} 
+            \break
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            gis' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            eis' 4.0  
+            \once \override Stem #'direction = #UP 
+            cis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \bar "|"  %{ end measure 3 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            dis' 4.0  
+            \once \override Stem #'direction = #UP 
+            cis' 4.0  
+            \bar "|"  %{ end measure 4 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \bar "|"  %{ end measure 5 %} 
+            \break
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \bar "|"  %{ end measure 6 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            eis' 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            cis' 2.0  
+            \bar "|"  %{ end measure 7 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            d' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            e' 2.0  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            d' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis' 8.0 ]  
+            \bar "|"  %{ end measure 8 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            b 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            d' 4.0  
+            \once \override Stem #'direction = #UP 
+            cis' 4.0  
+            \bar "|."  %{ end measure 9 %} 
+             } 
+    <BLANKLINE>
+    <BLANKLINE>
+      \context Staff  = Tenor \with  { 
+        \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
+            \clef "bass" 
+            \key fis \minor 
+            \time 4/4
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 ]  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \bar "|"  %{ end measure 1 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            e' 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            e' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            d' 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \bar "|"  %{ end measure 2 %} 
+            \break
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            d' 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \bar "|"  %{ end measure 3 %} 
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            gis 4.0  
+            \bar "|"  %{ end measure 4 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            fis 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            d' 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            e' 4.0  
+            \bar "|"  %{ end measure 5 %} 
+            \break
+            \once \override Stem #'direction = #DOWN 
+            d' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            d' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \bar "|"  %{ end measure 6 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            d' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 ]  ~  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            eis 2.0  
+            \bar "|"  %{ end measure 7 %} 
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 2.0  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            ais 8.0 ]  
+            \bar "|"  %{ end measure 8 %} 
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            ais 4.0  
+            \bar "|."  %{ end measure 9 %} 
+             } 
+    <BLANKLINE>
+    <BLANKLINE>
+      \context Staff  = Bass \with  { 
+        \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
+            \clef "bass" 
+            \key fis \minor 
+            \time 4/4
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            gis 8.0 ]  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            gis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            gis 4.0  
+            \bar "|"  %{ end measure 1 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            e 4.0  
+            \once \override Stem #'direction = #UP 
+            a, 4.0  
+            \once \override Stem #'direction = #DOWN 
+            eis 4.0  
+            \bar "|"  %{ end measure 2 %} 
+            \break
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            fis 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b, 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            cis 4.0  
+            \once \override Stem #'direction = #UP 
+            fis, 4.0  
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \bar "|"  %{ end measure 3 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            gis 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            fis 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            gis 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b, 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            cis 4.0  
+            \bar "|"  %{ end measure 4 %} 
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            gis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \bar "|"  %{ end measure 5 %} 
+            \break
+            \once \override Stem #'direction = #DOWN 
+            d' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            eis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \bar "|"  %{ end measure 6 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            b, 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            d 4.0  
+            \once \override Stem #'direction = #UP 
+            cis 2.0  
+            \bar "|"  %{ end measure 7 %} 
+            \once \override Stem #'direction = #UP 
+            ais, 2.0  
+            \once \override Stem #'direction = #UP 
+            b, 4.0  
+            \once \override Stem #'direction = #UP 
+            cis 4.0  
+            \bar "|"  %{ end measure 8 %} 
+            \once \override Stem #'direction = #DOWN 
+            d 4.0  
+            \once \override Stem #'direction = #UP 
+            b, 4.0  
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \bar "|."  %{ end measure 9 %} 
+             } 
+    <BLANKLINE>
+    <BLANKLINE>
+       >>
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyMultipliedDurationFromDuration
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1414, in lyMultipliedDurationFromDuration
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1423, in music21.lily.translate.LilypondConverter.lyMultipliedDurationFromDuration
+Failed example:
+    str(lyMultipliedDuration)
+Expected:
+    '2. '
+Got:
+    '2.0. '
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1439, in music21.lily.translate.LilypondConverter.lyMultipliedDurationFromDuration
+Failed example:
+    [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
+Expected:
+    ['1 ', '4 ']
+Got:
+    ['1.0 ', '4.0 ']
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyOssiaMusicFromVariant
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 2089, in lyOssiaMusicFromVariant
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 2100, in music21.lily.translate.LilypondConverter.lyOssiaMusicFromVariant
+Failed example:
+    print(lySequentialMusicOut)
+Expected:
+    { \time 3/4
+     c 4
+     d 4
+     e 4
+     f 2.
+    }
+Got:
+    { \time 3/4
+     c 4.0  
+     d 4.0  
+     e 4.0  
+     f 2.0.  
+      } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPartsAndOssiaInitFromScore
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 392, in lyPartsAndOssiaInitFromScore
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 425, in music21.lily.translate.LilypondConverter.lyPartsAndOssiaInitFromScore
+Failed example:
+    print(lpc.lyPartsAndOssiaInitFromScore(s))
+Expected:
+    \new Staff  = pa { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = londonpa
+                \with {
+                      \remove "Time_signature_engraver"
+                      alignAboveContext = #"pa"
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                      \override OctavateEight #'transparent = ##t
+                      \consists "Default_bar_line_engraver"
+                    }
+             { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = romepa
+                \with {
+                      \remove "Time_signature_engraver"
+                      alignAboveContext = #"pa"
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                      \override OctavateEight #'transparent = ##t
+                      \consists "Default_bar_line_engraver"
+                    }
+             { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = pb { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = londonpb
+                \with {
+                      \remove "Time_signature_engraver"
+                      alignAboveContext = #"pb"
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                      \override OctavateEight #'transparent = ##t
+                      \consists "Default_bar_line_engraver"
+                    }
+             { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = romepb
+                \with {
+                      \remove "Time_signature_engraver"
+                      alignAboveContext = #"pb"
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                      \override OctavateEight #'transparent = ##t
+                      \consists "Default_bar_line_engraver"
+                    }
+             { \stopStaff s1 s1 s1 s1 }
+Got:
+    \new Staff  = pa { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = londonpa \with  { 
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"pa"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
+      \override Clef #'transparent = ##t
+      \override OctavateEight #'transparent = ##t
+      \consists "Default_bar_line_engraver"
+       } 
+       { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = romepa \with  { 
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"pa"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
+      \override Clef #'transparent = ##t
+      \override OctavateEight #'transparent = ##t
+      \consists "Default_bar_line_engraver"
+       } 
+       { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = pb { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = londonpb \with  { 
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"pb"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
+      \override Clef #'transparent = ##t
+      \override OctavateEight #'transparent = ##t
+      \consists "Default_bar_line_engraver"
+       } 
+       { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = romepb \with  { 
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"pb"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
+      \override Clef #'transparent = ##t
+      \override OctavateEight #'transparent = ##t
+      \consists "Default_bar_line_engraver"
+       } 
+       { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1704, in lyPrefixCompositeMusicFromRelatedVariants
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1756, in music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants
+Failed example:
+    print(lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0])
+Expected:
+    \new Staff  = london... { { \times 1/2 {\startStaff \clef "treble"
+          a' 4
+          a' 4
+          a' 4
+          a' 4
+          \clef "treble"
+          | %{ end measure 1 %}
+          a' 1
+          | %{ end measure 2 %}
+           \stopStaff}
+           }
+    <BLANKLINE>
+      {\startStaff \clef "treble"
+        b' 4
+        b' 4
+        b' 4
+        b' 4
+        | %{ end measure 1 %}
+         \stopStaff}
+    <BLANKLINE>
+      {\startStaff \clef "treble"
+        c' 4
+        c' 4
+        c' 4
+        c' 4
+        | %{ end measure 1 %}
+         \stopStaff}
+    <BLANKLINE>
+      s 1
+      {\startStaff \clef "treble"
+        d' 4
+        d' 4
+        d' 4
+        d' 4
+        | %{ end measure 1 %}
+         \stopStaff}
+    <BLANKLINE>
+       }
+    <BLANKLINE>
+Got:
+    \new Staff  = londonacfwbbwcwe { { \times 1/2 {\startStaff \clef "treble" 
+          a' 4.0  
+          a' 4.0  
+          a' 4.0  
+          a' 4.0  
+          \clef "treble" 
+          | %{ end measure 1 %} 
+          a' 1.0  
+          | %{ end measure 2 %} 
+           \stopStaff}
+           } 
+    <BLANKLINE>
+      {\startStaff \clef "treble" 
+        b' 4.0  
+        b' 4.0  
+        b' 4.0  
+        b' 4.0  
+        | %{ end measure 1 %} 
+         \stopStaff}
+    <BLANKLINE>
+      {\startStaff \clef "treble" 
+        c' 4.0  
+        c' 4.0  
+        c' 4.0  
+        c' 4.0  
+        | %{ end measure 1 %} 
+         \stopStaff}
+    <BLANKLINE>
+      s 1.0  
+      {\startStaff \clef "treble" 
+        d' 4.0  
+        d' 4.0  
+        d' 4.0  
+        d' 4.0  
+        | %{ end measure 1 %} 
+         \stopStaff}
+    <BLANKLINE>
+       } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromStream
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 804, in lyPrefixCompositeMusicFromStream
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 816, in music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromStream
+Failed example:
+    print(lyPrefixCompositeMusicOut)
+Expected:
+    \new Staff = ... \with {
+     \override StaffSymbol #'line-count = #4
+    }
+    { \time 3/4
+       c 4
+       d 4
+       e 4
+       f 2.
+      }
+Got:
+    \new Staff  = adxcdzaeww \with  { 
+     \override StaffSymbol #'line-count = #4
+      } 
+      { \time 3/4
+         c 4.0  
+         d 4.0  
+         e 4.0  
+         f 2.0.  
+          } 
+    <BLANKLINE>
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromVariant
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1938, in lyPrefixCompositeMusicFromVariant
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1954, in music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromVariant
+Failed example:
+    print(lpPrefixCompositeMusicVariant)
+Expected:
+    \new Staff  = londonpx { {\startStaff \clef "treble"
+        a' 4.
+        b' 8
+        c' 4
+        d' 4
+        \clef "treble"
+        | %{ end measure 1 %}
+         \stopStaff}
+       }
+Got:
+    \new Staff  = londonpx { {\startStaff \clef "treble" 
+        a' 4.0.  
+        b' 8.0  
+        c' 4.0  
+        d' 4.0  
+        \clef "treble" 
+        | %{ end measure 1 %} 
+         \stopStaff}
+    <BLANKLINE>
+       } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lySequentialMusicFromStream
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 773, in lySequentialMusicFromStream
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 782, in music21.lily.translate.LilypondConverter.lySequentialMusicFromStream
+Failed example:
+    print(lySequentialMusicOut)
+Expected:
+    { \time 3/4
+     c 4
+     d 4
+     e 4
+     f 2.
+    }
+Got:
+    { \time 3/4
+     c 4.0  
+     d 4.0  
+     e 4.0  
+     f 2.0.  
+      } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lySimpleMusicFromChord
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1302, in lySimpleMusicFromChord
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1310, in music21.lily.translate.LilypondConverter.lySimpleMusicFromChord
+Failed example:
+    print(conv.lySimpleMusicFromChord(c1))
+Expected:
+     < cis, e' dis''  !  > 2..
+Got:
+    < cis,  e'  dis''  !  > 2.0..   
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1316, in music21.lily.translate.LilypondConverter.lySimpleMusicFromChord
+Failed example:
+    print(conv.lySimpleMusicFromChord(c1))
+Expected:
+    s 2..
+Got:
+    s  2.0..   
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lySimpleMusicFromNoteOrRest
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1128, in lySimpleMusicFromNoteOrRest
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1155, in music21.lily.translate.LilypondConverter.lySimpleMusicFromNoteOrRest
+Failed example:
+    print(sm)
+Expected:
+    \color "blue" dis'' ! ? 4
+Got:
+    \color "blue" dis'' ! ? 4.0  
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1163, in music21.lily.translate.LilypondConverter.lySimpleMusicFromNoteOrRest
+Failed example:
+    print(sm)
+Expected:
+    s 4
+Got:
+    s 4.0  
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.textFromMusic21Object
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 218, in textFromMusic21Object
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 224, in music21.lily.translate.LilypondConverter.textFromMusic21Object
+Failed example:
+    print(lily.translate.LilypondConverter().textFromMusic21Object(n))
+Expected:
+    \version "2..."
+    \include "lilypond-book-preamble.ly"
+    color = #(define-music-function (parser location color) (string?) #{
+            \once \override NoteHead #'color = #(x11-color $color)
+            \once \override Stem #'color = #(x11-color $color)
+            \once \override Rest #'color = #(x11-color $color)
+            \once \override Beam #'color = #(x11-color $color)
+         #})
+    \header { }
+    \score  {
+          << \new Staff  = ... { c' 4
+                  }
+            >>
+      }
+    \paper { }
+    ...
+Got:
+    \version "2.18" 
+    \include "lilypond-book-preamble.ly"
+    color = #(define-music-function (parser location color) (string?) #{
+            \once \override NoteHead #'color = #(x11-color $color)
+            \once \override Stem #'color = #(x11-color $color)
+            \once \override Rest #'color = #(x11-color $color)
+            \once \override Beam #'color = #(x11-color $color)
+         #})
+    \header { } 
+    \score  {
+          << \new Staff  = acdeeawywe { c' 4.0  
+                  }
+            >>
+      }
+    \paper { }
+    \layout {
+      \context {
+        \RemoveEmptyStaffContext
+        \override VerticalAxisGroup #'remove-first = ##t
+      }
+     }
 
 
 Traceback (most recent call last):
@@ -63,237 +1255,206 @@ Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
 AssertionError: Failed doctest test for music21.freezeThaw.JSONFreezer.jsonPrint
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1507, in jsonPrint
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1509, in jsonPrint
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1514, in music21.freezeThaw.JSONFreezer.jsonPrint
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1516, in music21.freezeThaw.JSONFreezer.jsonPrint
 Failed example:
     jsf.jsonPrint()
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.freezeThaw.JSONFreezer.jsonPrint[2]>", line 1, in <module>
-        jsf.jsonPrint()
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1595, in jsonPrint
-        indent=2,
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 250, in dumps
-        sort_keys=sort_keys, **kw).encode(obj)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 209, in encode
-        chunks = list(chunks)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 434, in _iterencode
-        for chunk in _iterencode_dict(o, _current_indent_level):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 332, in _iterencode_list
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 442, in _iterencode
-        o = _default(o)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 184, in default
-        raise TypeError(repr(o) + " is not JSON serializable")
-    TypeError: Fraction(1, 1) is not JSON serializable
+Expected:
+    {
+      "__attr__": {
+        "_duration": {
+          "__attr__": {
+            "_cachedIsLinked": true, 
+            "_components": [
+              {
+                "__attr__": {
+                  "_componentsNeedUpdating": false, 
+                  "_dots": [
+                    0
+                  ], 
+                  "_link": true, 
+                  "_qtrLength": 1.0, 
+                  "_quarterLengthNeedsUpdating": false, 
+                  "_tuplets": [], 
+                  "_type": "quarter", 
+                  "_typeNeedsUpdating": false
+                }, 
+                "__class__": "music21.duration.DurationUnit"
+              }
+            ], 
+            "_componentsNeedUpdating": false, 
+            "_qtrLength": 1.0, 
+            "_quarterLengthNeedsUpdating": false, 
+            "_typeNeedsUpdating": false
+          }, 
+          "__class__": "music21.duration.Duration"
+        }, 
+        "_notehead": "normal", 
+        "_noteheadFill": "default", 
+        "_noteheadParenthesis": false, 
+        "_priority": 0, 
+        "_stemDirection": "unspecified", 
+        "articulations": [], 
+        "beams": {
+          "__attr__": {
+            "beamsList": [], 
+            "feathered": false
+          }, 
+          "__class__": "music21.beam.Beams"
+        }, 
+        "expressions": [], 
+        "lyrics": [], 
+        "offset": 0.0, 
+        "pitch": {
+          "__attr__": {
+            "_accidental": {
+              "__attr__": {
+                "_alter": 1.0, 
+                "_displayType": "normal", 
+                "_modifier": "#", 
+                "_name": "sharp" 
+              }, 
+              "__class__": "music21.pitch.Accidental"
+            }, 
+            "_microtone": {
+              "__attr__": {
+                "_centShift": 0, 
+                "_harmonicShift": 1
+              }, 
+              "__class__": "music21.pitch.Microtone"
+            }, 
+            "_octave": 5, 
+            "_step": "D"
+          }, 
+          "__class__": "music21.pitch.Pitch"
+        }
+      }, 
+      "__class__": "music21.note.Note", 
+      "__version__": [
+        1, 
+        9, 
+        3
+      ]
+    }
+Got:
+    {
+      "__attr__": {
+        "_duration": {
+          "__attr__": {
+            "_cachedIsLinked": true, 
+            "_components": [
+              {
+                "__attr__": {
+                  "_componentsNeedUpdating": false, 
+                  "_dots": [
+                    0
+                  ], 
+                  "_link": true, 
+                  "_qtrLength": 1.0, 
+                  "_quarterLengthNeedsUpdating": false, 
+                  "_tuplets": [], 
+                  "_type": "quarter", 
+                  "_typeNeedsUpdating": false
+                }, 
+                "__class__": "music21.duration.DurationUnit"
+              }
+            ], 
+            "_componentsNeedUpdating": false, 
+            "_qtrLength": 1.0, 
+            "_quarterLengthNeedsUpdating": false, 
+            "_typeNeedsUpdating": false
+          }, 
+          "__class__": "music21.duration.Duration"
+        }, 
+        "_notehead": "normal", 
+        "_noteheadFill": "default", 
+        "_noteheadParenthesis": false, 
+        "_priority": 0, 
+        "_stemDirection": "unspecified", 
+        "articulations": [], 
+        "beams": {
+          "__attr__": {
+            "beamsList": [], 
+            "feathered": false
+          }, 
+          "__class__": "music21.beam.Beams"
+        }, 
+        "expressions": [], 
+        "lyrics": [], 
+        "offset": 0.0, 
+        "pitch": {
+          "__attr__": {
+            "_accidental": {
+              "__attr__": {
+                "_alter": 1.0, 
+                "_displayType": "normal", 
+                "_modifier": "#", 
+                "_name": "sharp"
+              }, 
+              "__class__": "music21.pitch.Accidental"
+            }, 
+            "_microtone": {
+              "__attr__": {
+                "_centShift": 0, 
+                "_harmonicShift": 1
+              }, 
+              "__class__": "music21.pitch.Microtone"
+            }, 
+            "_octave": 5, 
+            "_step": "D"
+          }, 
+          "__class__": "music21.pitch.Pitch"
+        }
+      }, 
+      "__class__": "music21.note.Note", 
+      "__version__": [
+        2, 
+        0, 
+        0
+      ]
+    }
 
 
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.freezeThaw.JSONThawer._setJSON
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1654, in _setJSON
+AssertionError: Failed doctest test for music21.features.native.MostCommonSetClassSimultaneityPrevalence
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/features/native.py", line 424, in MostCommonSetClassSimultaneityPrevalence
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1683, in music21.freezeThaw.JSONThawer._setJSON
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/features/native.py", line 436, in music21.features.native.MostCommonSetClassSimultaneityPrevalence
 Failed example:
-    jsfJSON = jsf.json
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.freezeThaw.JSONThawer._setJSON[12]>", line 1, in <module>
-        jsfJSON = jsf.json
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1494, in json
-        sort_keys=True,
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 250, in dumps
-        sort_keys=sort_keys, **kw).encode(obj)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 209, in encode
-        chunks = list(chunks)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 434, in _iterencode
-        for chunk in _iterencode_dict(o, _current_indent_level):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 332, in _iterencode_list
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 442, in _iterencode
-        o = _default(o)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 184, in default
-        raise TypeError(repr(o) + " is not JSON serializable")
-    TypeError: Fraction(1, 1) is not JSON serializable
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1689, in music21.freezeThaw.JSONThawer._setJSON
-Failed example:
-    n2
+    fe2.extract().vector
 Expected:
-    <music21.note.Note D#>
+    [0.184...]
 Got:
-    <music21.metadata.primitives.Text object at 0x113351e90>
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1691, in music21.freezeThaw.JSONThawer._setJSON
-Failed example:
-    n2.octave
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.freezeThaw.JSONThawer._setJSON[17]>", line 1, in <module>
-        n2.octave
-    AttributeError: 'Text' object has no attribute 'octave'
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1696, in music21.freezeThaw.JSONThawer._setJSON
-Failed example:
-    n2.duration.dots
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.freezeThaw.JSONThawer._setJSON[18]>", line 1, in <module>
-        n2.duration.dots
-    AttributeError: 'Text' object has no attribute 'duration'
+    [0.175]
 
 
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line unknown line number, in inheritedReadwritePropertiesMapping
+AssertionError: Failed doctest test for music21.abcFormat.translate.reBar
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abcFormat/translate.py", line 421, in reBar
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line ?, in music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abcFormat/translate.py", line 461, in music21.abcFormat.translate.reBar
 Failed example:
-    for classDocumenter in sorted(mapping, key=sortBy):
-        print('{0}:'.format(classDocumenter.referentPackagesystemPath))
-        for attributeDocumenter in mapping[classDocumenter][:10]:
-            print('- {0}'.format(attributeDocumenter.referentPackagesystemPath))
+    music21Part2.measure(2).show("text")
 Expected:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.activeSite
-    - music21.base.Music21Object.offset
-    - music21.base.Music21Object.priority
-    music21.stream.Stream:
-    - music21.stream.Stream.atSoundingPitch
-    - music21.stream.Stream.duration
-    - music21.stream.Stream.elements
-    - music21.stream.Stream.finalBarline
-    - music21.stream.Stream.metadata
-    - music21.stream.Stream.seconds
+    {0.0} <music21.meter.TimeSignature 1/8>
+    {0.0} <music21.note.Note E>
 Got:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.activeSite
-    - music21.base.Music21Object.offset
-    - music21.base.Music21Object.offsetRational
-    - music21.base.Music21Object.priority
-    music21.stream.Stream:
-    - music21.stream.Stream.atSoundingPitch
-    - music21.stream.Stream.duration
-    - music21.stream.Stream.elements
-    - music21.stream.Stream.finalBarline
-    - music21.stream.Stream.metadata
-    - music21.stream.Stream.seconds
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note G>
+    {1.5} <music21.note.Note A>
+    {2.0} <music21.note.Note B>
+    {2.5} <music21.note.Note C>
+    {3.5} <music21.note.Note G>
+    {4.0} <music21.note.Note B>
 
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 825, in testExtractionA
-    post = sr.reduce()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
-    return self._createReduction()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
-    rn.measureOffset, n)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
-    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
-    return self.duration.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
-    self.updateQuarterLength()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
-    self._qtrLength += dur.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
-    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
-DurationException: Someone is not playing welll...1.0 <type 'float'>
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 852, in testExtractionB
-    post = sr.reduce()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
-    return self._createReduction()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 351, in _createReduction
-    v.insertIntoNoteOrChord(rn.measureOffset, n)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
-    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
-    return self.duration.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
-    self.updateQuarterLength()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
-    self._qtrLength += dur.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
-    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
-DurationException: Someone is not playing welll...1.0 <type 'float'>
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 914, in testExtractionD
-    unused_post = sr.reduce()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
-    return self._createReduction()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
-    rn.measureOffset, n)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
-    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
-    return self.duration.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
-    self.updateQuarterLength()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
-    self._qtrLength += dur.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
-    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
-DurationException: Someone is not playing welll...1.0 <type 'float'>
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 937, in testExtractionD2
-    unused_post = sr.reduce()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
-    return self._createReduction()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
-    rn.measureOffset, n)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
-    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
-    return self.duration.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
-    self.updateQuarterLength()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
-    self._qtrLength += dur.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
-    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
-DurationException: Someone is not playing welll...1.0 <type 'float'>
 
 
 
@@ -388,8 +1549,8 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
 xmlnode successfully ran 12 tests
 webapps_apps successfully ran 6 tests
-webapps___init__ successfully ran 14 tests
 webapps_templates successfully ran 9 tests
+webapps___init__ successfully ran 14 tests
 volume successfully ran 20 tests
 vexflow_toMusic21j successfully ran 9 tests
 vexflow_indent successfully ran 3 tests
@@ -404,14 +1565,14 @@ trecento_notation successfully ran 17 tests
 trecento_tonality successfully ran 5 tests
 trecento___init__ successfully ran 3 tests
 trecento_capua successfully ran 9 tests
-tie successfully ran 7 tests
 tinyNotation successfully ran 11 tests
+tie successfully ran 7 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
 text successfully ran 23 tests
-test___init__ successfully ran 3 tests
 theoryAnalysis_theoryAnalyzer successfully ran 43 tests
+test___init__ successfully ran 3 tests
 tempo successfully ran 45 tests
 stream_timespanNode successfully ran 11 tests
 stream_timespanAnalysis successfully ran 20 tests
@@ -430,37 +1591,33 @@ romanText_testFiles successfully ran 4 tests
 search___init__ successfully ran 19 tests
 romanText___init__ successfully ran 45 tests
 roman successfully ran 30 tests
-repeat successfully ran 72 tests
+romanText_clercqTemperley successfully ran 19 tests
 pitch successfully ran 94 tests
 omr_evaluators successfully ran 8 tests
-omr_correctors successfully ran 24 tests
 omr___init__ successfully ran 3 tests
 noteworthy_translate successfully ran 21 tests
-noteworthy___init__ successfully ran 3 tests
+repeat successfully ran 72 tests
 noteworthy_binaryTranslate successfully ran 7 tests
-note successfully ran 49 tests
+noteworthy___init__ successfully ran 3 tests
+omr_correctors successfully ran 24 tests
 musicxml_toMxObjects successfully ran 37 tests
-musicxml_xmlHandler successfully ran 13 tests
-musicxml_testFiles successfully ran 5 tests
 musicxml_mxObjects successfully ran 45 tests
-musicxml_testPrimitive successfully ran 5 tests
-musicxml_m21ToString successfully ran 45 tests
+musicxml_xmlHandler successfully ran 13 tests
 musicxml___init__ successfully ran 3 tests
+musicxml_m21ToString successfully ran 45 tests
 musedata_base40 successfully ran 9 tests
-musicxml_fromMxObjects successfully ran 65 tests
-midi_realtime successfully ran 4 tests
 musedata___init__ successfully ran 49 tests
+midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
-meter successfully ran 108 tests
+musedata_translate successfully ran 16 tests
 metadata_primitives successfully ran 38 tests
+musicxml_fromMxObjects successfully ran 65 tests
 midi___init__ successfully ran 29 tests
-romanText_clercqTemperley successfully ran 19 tests
 metadata___init__ successfully ran 18 tests
 medren successfully ran 30 tests
-lily_translate successfully ran 32 tests
 lily_lilyObjects successfully ran 14 tests
 lily___init__ successfully ran 3 tests
-metadata_bundles successfully ran 34 tests
+layout successfully ran 22 tests
 languageExcerpts_naturalLanguageObjects successfully ran 9 tests
 languageExcerpts_instrumentLookup successfully ran 3 tests
 languageExcerpts___init__ successfully ran 3 tests
@@ -471,23 +1628,23 @@ ipython21___init__ successfully ran 3 tests
 intervalNetwork successfully ran 57 tests
 interval successfully ran 55 tests
 instrument successfully ran 23 tests
+metadata_caching successfully ran 7 tests
 humdrum_testFiles successfully ran 3 tests
-humdrum_instruments successfully ran 8 tests
+metadata_bundles successfully ran 34 tests
 humdrum___init__ successfully ran 3 tests
+humdrum_instruments successfully ran 8 tests
 harmony successfully ran 28 tests
-layout successfully ran 22 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
-figuredBass_realizer successfully ran 12 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
-graph successfully ran 63 tests
+figuredBass_realizer successfully ran 12 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
+graph successfully ran 63 tests
 figuredBass_examples successfully ran 15 tests
-features_jSymbolic successfully ran 86 tests
 features_base successfully ran 27 tests
 features___init__ successfully ran 8 tests
 expressions successfully ran 26 tests
@@ -495,10 +1652,11 @@ exceptions21 successfully ran 3 tests
 environment successfully ran 31 tests
 editorial successfully ran 10 tests
 dynamics successfully ran 15 tests
-duration successfully ran 69 tests
+duration successfully ran 70 tests
 documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
 documentation_library_extensions successfully ran 3 tests
+documentation_library_documenters successfully ran 28 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
 documentation___init__ successfully ran 3 tests
@@ -507,14 +1665,14 @@ defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
 counterpoint___init__ successfully ran 3 tests
 corpus_virtual successfully ran 5 tests
-features_native successfully ran 26 tests
+features_jSymbolic successfully ran 86 tests
 corpus_corpora successfully ran 28 tests
-corpus_testCorpus successfully ran 25 tests
 corpus_chorales successfully ran 9 tests
 corpus___init__ successfully ran 17 tests
 converter_subConverters successfully ran 10 tests
-contour successfully ran 10 tests
+corpus_testCorpus successfully ran 25 tests
 converter___init__ successfully ran 40 tests
+contour successfully ran 10 tests
 composition_aug30 successfully ran 3 tests
 composition___init__ successfully ran 3 tests
 common successfully ran 62 tests
@@ -522,37 +1680,38 @@ clef successfully ran 28 tests
 chordTables successfully ran 17 tests
 composition_phasing successfully ran 5 tests
 chant successfully ran 12 tests
-chord successfully ran 108 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
 braille_text successfully ran 4 tests
 braille_translate successfully ran 7 tests
 braille_segment successfully ran 11 tests
 braille_lookup successfully ran 3 tests
-braille_examples successfully ran 5 tests
+chord successfully ran 108 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
 base successfully ran 85 tests
 bar successfully ran 9 tests
 audioSearch_transcriber successfully ran 4 tests
+braille_examples successfully ran 5 tests
 audioSearch_recording successfully ran 4 tests
-audioSearch___init__ successfully ran 19 tests
+audioSearch_scoreFollower successfully ran 7 tests
 articulations successfully ran 26 tests
-braille_test successfully ran 151 tests
+audioSearch___init__ successfully ran 19 tests
 analysis_search successfully ran 4 tests
-analysis_windowed successfully ran 9 tests
+braille_test successfully ran 151 tests
 analysis_reduceChords successfully ran 7 tests
 analysis_patel successfully ran 6 tests
-analysis_metrical successfully ran 6 tests
 analysis_neoRiemannian successfully ran 10 tests
-analysis_correlate successfully ran 6 tests
-analysis_discrete successfully ran 31 tests
+analysis_metrical successfully ran 6 tests
+analysis_reduction successfully ran 15 tests
+analysis_windowed successfully ran 9 tests
 analysis___init__ successfully ran 3 tests
-abcFormat_testFiles successfully ran 5 tests
+analysis_discrete successfully ran 31 tests
+analysis_correlate successfully ran 6 tests
 abcFormat___init__ successfully ran 53 tests
 _version successfully ran 3 tests
-abcFormat_translate successfully ran 18 tests
+abcFormat_testFiles successfully ran 5 tests
 Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocumentation is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -563,7 +1722,8 @@ Not in Tree Error: test.testCoverage is in the music21 directory but not importe
 Not in Tree Error: test.memoryUsage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: romanText.translate is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: musedata.translate is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musicxml.testPrimitive is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: musicxml.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test03 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test02 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive.test01 is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -578,7 +1738,6 @@ Not in Tree Error: documentation.source.conf is in the music21 directory but not
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -587,7 +1746,6 @@ Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
-Silent test fail for /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/metadata/caching.py: Run separately!
 
 -----------------------------
 stream___init__ had 0 ERRORS and 1 FAILURES in 142 tests:
@@ -596,31 +1754,36 @@ stream___init__ had 0 ERRORS and 1 FAILURES in 142 tests:
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.stream.Stream.chordify
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 5019, in chordify
+AssertionError: Failed doctest test for music21.stream.Stream._uniqueOffsetsAndEndTimes
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 4666, in _uniqueOffsetsAndEndTimes
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 5067, in music21.stream.Stream.chordify
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 4686, in music21.stream.Stream._uniqueOffsetsAndEndTimes
 Failed example:
-    cc.show('text')
+    [str(o) for o in s.flat._uniqueOffsetsAndEndTimes()]
 Expected:
-    {0.0} <music21.note.Rest rest>
-    {2.12} <music21.chord.Chord D-4>
-    {4.0} <music21.chord.Chord C#4 D-4>
-    {4.12} <music21.chord.Chord C#4>
-    {5.0} <music21.note.Rest rest>
+    ['53/25', '4', '103/25', '5', '53/10', '11/2', '63/10', '13/2']
 Got:
-    {0.0} <music21.note.Rest rest>
-    {2.12} <music21.chord.Chord D-4>
-    {4.0} <music21.chord.Chord C#4 D-4>
-    {4.12} <music21.chord.Chord C#4 D-4>
-    {5.0} <music21.note.Rest rest>
+    ['53/25', '4', '4.12', '5.0', '53/10', '11/2', '6.3', '6.5']
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 4693, in music21.stream.Stream._uniqueOffsetsAndEndTimes
+Failed example:
+    [str(o) for o in s.flat._uniqueOffsetsAndEndTimes(endTimesOnly = True)]
+Expected:
+    ['103/25', '5', '63/10', '13/2']
+Got:
+    ['4.12', '5.0', '6.3', '6.5']
 
 
 
 -----------------------------
-test_testStream had 0 ERRORS and 1 FAILURES in 206 tests:
+test_testStream had 0 ERRORS and 3 FAILURES in 206 tests:
 -----------------------------
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 2063, in testBestTimeSignature
+    self.assertEqual(ts.numerator, 7)
+AssertionError: 70 != 7
 
 Traceback (most recent call last):
   File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 4855, in testChordifyC
@@ -631,12 +1794,27 @@ First differing element 7:
 8
 6
 
-- [3, 9, 9, 25, 25, 21, 12, 8, 21, 29]
-?                           ^
+- [3, 9, 9, 25, 25, 21, 12, 8, 28, 29]
+?                           ^   ^
 
 + [3, 9, 9, 25, 25, 21, 12, 6, 21, 29]
-?                           ^
+?                           ^   ^
 
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 6880, in testChordifyF
+    "(['A4', 'B-2'], '2.0', '2.0')]")
+AssertionError: "[(['B-4', 'B-2'], '0.0', '0.667'), (['C5'], '0.67', '0.0'), (['C5', 'B-2'], '0.67', '0.667'), (['B-4'], '1.33', '0.0'), (['B-4', 'B-2'], '1.33', '0.667'), (['A4', 'B-2'], '2.0', '2.0')]" != "[(['B-4', 'B-2'], '0.0', '0.667'), (['C5', 'B-2'], '0.67', '0.667'), (['B-4', 'B-2'], '1.33', '0.667'), (['A4', 'B-2'], '2.0', '2.0')]"
+
+
+-----------------------------
+note had 0 ERRORS and 1 FAILURES in 49 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 1632, in testComplex
+    self.assertEqual(matchStr, outStr)
+AssertionError: "c'4~\nc'2.~\nc'4" != "c'4.0~\nc'2.0.~\nc'4.0"
 
 
 -----------------------------
@@ -654,9 +1832,1196 @@ File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/midi/tra
 Failed example:
     d2.components
 Expected:
-    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
-Got:
     [<music21.duration.DurationUnit 1>, <music21.duration.DurationUnit 1/8>, <music21.duration.DurationUnit 3/64>]
+Got:
+    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
+
+
+
+-----------------------------
+meter had 1 ERRORS and 1 FAILURES in 108 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 4598, in testBestTimeSignature
+    ts6 = bestTimeSignature(m6)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 466, in bestTimeSignature
+    ts.loadRatio(numerator, denominator)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 3008, in loadRatio
+    self.load(value, partitionRequest)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 2986, in load
+    self._setDefaultBeatPartitions()
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 2829, in _setDefaultBeatPartitions
+    self.beatSequence.partition(self.numerator)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 1570, in partition
+    self.partitionByCount(value, loadDefault=False)
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 1415, in partitionByCount
+    raise MeterException('Cannot set partition by %s (%s/%s)' % (countRequest, self.numerator, self.denominator))
+MeterException: Cannot set partition by 110 (110/320)
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.meter.bestTimeSignature
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 296, in bestTimeSignature
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 347, in music21.meter.bestTimeSignature
+Failed example:
+    ts6 = meter.bestTimeSignature(m6)
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.meter.bestTimeSignature[28]>", line 1, in <module>
+        ts6 = meter.bestTimeSignature(m6)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 466, in bestTimeSignature
+        ts.loadRatio(numerator, denominator)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 3008, in loadRatio
+        self.load(value, partitionRequest)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 2986, in load
+        self._setDefaultBeatPartitions()
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 2829, in _setDefaultBeatPartitions
+        self.beatSequence.partition(self.numerator)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 1570, in partition
+        self.partitionByCount(value, loadDefault=False)
+      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 1415, in partitionByCount
+        raise MeterException('Cannot set partition by %s (%s/%s)' % (countRequest, self.numerator, self.denominator))
+    MeterException: Cannot set partition by 110 (110/320)
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/meter.py", line 348, in music21.meter.bestTimeSignature
+Failed example:
+    ts6
+Exception raised:
+    Traceback (most recent call last):
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
+        compileflags, 1) in test.globs
+      File "<doctest music21.meter.bestTimeSignature[29]>", line 1, in <module>
+        ts6
+    NameError: name 'ts6' is not defined
+
+
+
+-----------------------------
+lily_translate had 0 ERRORS and 14 FAILURES in 32 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.appendContextFromNoteOrRest
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1064, in appendContextFromNoteOrRest
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1075, in music21.lily.translate.LilypondConverter.appendContextFromNoteOrRest
+Failed example:
+    print(lpMusicList)
+Expected:
+    cis' 4
+    <BLANKLINE>
+Got:
+    cis' 4.0  
+    <BLANKLINE>
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1096, in music21.lily.translate.LilypondConverter.appendContextFromNoteOrRest
+Failed example:
+    print(lpc.context)
+Expected:
+    cis' 4
+    \times 2/3 { dis' 8
+       e' 8
+       f' 8
+        }
+    <BLANKLINE>
+    fis' 4
+    <BLANKLINE>
+Got:
+    cis' 4.0  
+    \times 2/3 { dis' 8.0  
+       e' 8.0  
+       f' 8.0  
+        } 
+    <BLANKLINE>
+    fis' 4.0  
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.appendObjectsToContextFromStream
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 877, in appendObjectsToContextFromStream
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 895, in music21.lily.translate.LilypondConverter.appendObjectsToContextFromStream
+Failed example:
+    print(lpc.context)
+Expected:
+    \time 3/4
+    c' 4
+    des' 4
+    eis' 4
+    <BLANKLINE>
+Got:
+    \time 3/4
+    c' 4.0  
+    des' 4.0  
+    eis' 4.0  
+    <BLANKLINE>
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 913, in music21.lily.translate.LilypondConverter.appendObjectsToContextFromStream
+Failed example:
+    print(lpc.context) # internal spaces removed...
+Expected:
+      << \new Voice { c'' 1
+              }
+       \new Voice { cis'' 1
+              }
+        >>
+Got:
+    <BLANKLINE>
+      << \new Voice { c'' 1.0  
+              } 
+    <BLANKLINE>
+    <BLANKLINE>
+       \new Voice { cis'' 1.0  
+              } 
+    <BLANKLINE>
+    <BLANKLINE>
+        >>
+    <BLANKLINE>
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.getLySpacersFromStream
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 532, in getLySpacersFromStream
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 545, in music21.lily.translate.LilypondConverter.getLySpacersFromStream
+Failed example:
+    print(lpc.getLySpacersFromStream(streamIn))
+Expected:
+    s2. s2. s1 s1 s1 s1 s4
+Got:
+    s2.0. s2.0. s1.0 s1.0 s1.0 s1.0 s4.0 
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyGroupedMusicListFromScoreWithParts
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 579, in lyGroupedMusicListFromScoreWithParts
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 588, in music21.lily.translate.LilypondConverter.lyGroupedMusicListFromScoreWithParts
+Failed example:
+    print(lpGroupedMusicList)
+Expected:
+    <BLANKLINE>
+     << \new Staff  = Soprano { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+       \new Staff  = Alto { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+       \new Staff  = Tenor { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+       \new Staff  = Bass { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. }
+    <BLANKLINE>
+      \context Staff  = Soprano \with {
+          \autoBeamOff
+      }
+      { \startStaff \partial 32*8
+            \clef "treble"
+            \key fis \minor
+            \time 4/4
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN
+            cis'' 8 [
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN
+            b' 8 ]
+            \bar "|"  %{ end measure 0 %}
+            \once \override Stem #'direction = #UP
+            a' 4
+            \once \override Stem #'direction = #DOWN
+            b' 4
+            \once \override Stem #'direction = #DOWN
+            cis'' 4  \fermata
+            \once \override Stem #'direction = #DOWN
+            e'' 4
+            \bar "|"  %{ end measure 1 %}
+            \once \override Stem #'direction = #DOWN
+            cis'' 4
+            ...
+    }
+    <BLANKLINE>
+    <BLANKLINE>
+    \context Staff  = Alto \with  {
+        \autoBeamOff
+     }
+     { \startStaff \partial 32*8
+        \clef "treble"...
+        \once \override Stem #'direction = #UP
+        e' 4
+        \bar "|"  %{ end measure 0 %}
+        \once \override Stem #'direction = #UP
+        fis' 4
+        \once \override Stem #'direction = #UP
+        e' 4
+    ...
+    }
+    <BLANKLINE>
+    <BLANKLINE>
+    >>
+    <BLANKLINE>
+Got:
+    <BLANKLINE>
+     << \new Staff  = Soprano { \stopStaff s4.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s2.0. } 
+       \new Staff  = Alto { \stopStaff s4.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s2.0. } 
+       \new Staff  = Tenor { \stopStaff s4.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s2.0. } 
+       \new Staff  = Bass { \stopStaff s4.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s1.0 s2.0. } 
+    <BLANKLINE>
+      \context Staff  = Soprano \with  { 
+        \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
+            \clef "treble" 
+            \key fis \minor 
+            \time 4/4
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis'' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b' 8.0 ]  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  \fermata  
+            \once \override Stem #'direction = #DOWN 
+            e'' 4.0  
+            \bar "|"  %{ end measure 1 %} 
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #UP 
+            a' 4.0  \fermata  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  
+            \bar "|"  %{ end measure 2 %} 
+            \break
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            a' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            b' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  \fermata  
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \bar "|"  %{ end measure 3 %} 
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \bar "|"  %{ end measure 4 %} 
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  \fermata  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  
+            \bar "|"  %{ end measure 5 %} 
+            \break
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis'' 4.0  
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \bar "|"  %{ end measure 6 %} 
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            gis' 2.0  \fermata  
+            \bar "|"  %{ end measure 7 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 2.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  ~  
+            \bar "|"  %{ end measure 8 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            eis' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  \fermata  
+            \bar "|."  %{ end measure 9 %} 
+             } 
+    <BLANKLINE>
+    <BLANKLINE>
+      \context Staff  = Alto \with  { 
+        \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
+            \clef "treble" 
+            \key fis \minor 
+            \time 4/4
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \bar "|"  %{ end measure 1 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            e' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            a' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \bar "|"  %{ end measure 2 %} 
+            \break
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            gis' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            eis' 4.0  
+            \once \override Stem #'direction = #UP 
+            cis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \bar "|"  %{ end measure 3 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            dis' 4.0  
+            \once \override Stem #'direction = #UP 
+            cis' 4.0  
+            \bar "|"  %{ end measure 4 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            e' 4.0  
+            \once \override Stem #'direction = #UP 
+            a' 4.0  
+            \bar "|"  %{ end measure 5 %} 
+            \break
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \once \override Stem #'direction = #UP 
+            gis' 4.0  
+            \once \override Stem #'direction = #UP 
+            fis' 4.0  
+            \bar "|"  %{ end measure 6 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            eis' 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            fis 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            cis' 2.0  
+            \bar "|"  %{ end measure 7 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            d' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            e' 2.0  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            d' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis' 8.0 ]  
+            \bar "|"  %{ end measure 8 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            b 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis' 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            d' 4.0  
+            \once \override Stem #'direction = #UP 
+            cis' 4.0  
+            \bar "|."  %{ end measure 9 %} 
+             } 
+    <BLANKLINE>
+    <BLANKLINE>
+      \context Staff  = Tenor \with  { 
+        \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
+            \clef "bass" 
+            \key fis \minor 
+            \time 4/4
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 ]  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \bar "|"  %{ end measure 1 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            e' 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            e' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            d' 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \bar "|"  %{ end measure 2 %} 
+            \break
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            d' 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \bar "|"  %{ end measure 3 %} 
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            gis 4.0  
+            \bar "|"  %{ end measure 4 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            fis 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            d' 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            e' 4.0  
+            \bar "|"  %{ end measure 5 %} 
+            \break
+            \once \override Stem #'direction = #DOWN 
+            d' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            d' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 4.0  
+            \bar "|"  %{ end measure 6 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            d' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 ]  ~  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis' 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            eis 2.0  
+            \bar "|"  %{ end measure 7 %} 
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            cis' 2.0  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            ais 8.0 ]  
+            \bar "|"  %{ end measure 8 %} 
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            ais 4.0  
+            \bar "|."  %{ end measure 9 %} 
+             } 
+    <BLANKLINE>
+    <BLANKLINE>
+      \context Staff  = Bass \with  { 
+        \autoBeamOff 
+         } 
+         { \startStaff \partial 32*8 
+            \clef "bass" 
+            \key fis \minor 
+            \time 4/4
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            gis 8.0 ]  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            gis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            gis 4.0  
+            \bar "|"  %{ end measure 1 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            cis 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            e 4.0  
+            \once \override Stem #'direction = #UP 
+            a, 4.0  
+            \once \override Stem #'direction = #DOWN 
+            eis 4.0  
+            \bar "|"  %{ end measure 2 %} 
+            \break
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            fis 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b, 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            cis 4.0  
+            \once \override Stem #'direction = #UP 
+            fis, 4.0  
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \bar "|"  %{ end measure 3 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            gis 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            fis 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            gis 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            a 8.0 ]  
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #DOWN 
+            b, 8.0 ]  
+            \once \override Stem #'direction = #UP 
+            cis 4.0  
+            \bar "|"  %{ end measure 4 %} 
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            gis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \once \override Stem #'direction = #DOWN 
+            a 4.0  
+            \bar "|"  %{ end measure 5 %} 
+            \break
+            \once \override Stem #'direction = #DOWN 
+            d' 4.0  
+            \once \override Stem #'direction = #DOWN 
+            b 4.0  
+            \once \override Stem #'direction = #DOWN 
+            eis 4.0  
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \bar "|"  %{ end measure 6 %} 
+            \set stemRightBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            b, 8.0 [  
+            \set stemLeftBeamCount = #1
+            \once \override Stem #'direction = #UP 
+            cis 8.0 ]  
+            \once \override Stem #'direction = #DOWN 
+            d 4.0  
+            \once \override Stem #'direction = #UP 
+            cis 2.0  
+            \bar "|"  %{ end measure 7 %} 
+            \once \override Stem #'direction = #UP 
+            ais, 2.0  
+            \once \override Stem #'direction = #UP 
+            b, 4.0  
+            \once \override Stem #'direction = #UP 
+            cis 4.0  
+            \bar "|"  %{ end measure 8 %} 
+            \once \override Stem #'direction = #DOWN 
+            d 4.0  
+            \once \override Stem #'direction = #UP 
+            b, 4.0  
+            \once \override Stem #'direction = #DOWN 
+            fis 4.0  
+            \bar "|."  %{ end measure 9 %} 
+             } 
+    <BLANKLINE>
+    <BLANKLINE>
+       >>
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyMultipliedDurationFromDuration
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1414, in lyMultipliedDurationFromDuration
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1423, in music21.lily.translate.LilypondConverter.lyMultipliedDurationFromDuration
+Failed example:
+    str(lyMultipliedDuration)
+Expected:
+    '2. '
+Got:
+    '2.0. '
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1439, in music21.lily.translate.LilypondConverter.lyMultipliedDurationFromDuration
+Failed example:
+    [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
+Expected:
+    ['1 ', '4 ']
+Got:
+    ['1.0 ', '4.0 ']
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyOssiaMusicFromVariant
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 2089, in lyOssiaMusicFromVariant
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 2100, in music21.lily.translate.LilypondConverter.lyOssiaMusicFromVariant
+Failed example:
+    print(lySequentialMusicOut)
+Expected:
+    { \time 3/4
+     c 4
+     d 4
+     e 4
+     f 2.
+    }
+Got:
+    { \time 3/4
+     c 4.0  
+     d 4.0  
+     e 4.0  
+     f 2.0.  
+      } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPartsAndOssiaInitFromScore
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 392, in lyPartsAndOssiaInitFromScore
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 425, in music21.lily.translate.LilypondConverter.lyPartsAndOssiaInitFromScore
+Failed example:
+    print(lpc.lyPartsAndOssiaInitFromScore(s))
+Expected:
+    \new Staff  = pa { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = londonpa
+                \with {
+                      \remove "Time_signature_engraver"
+                      alignAboveContext = #"pa"
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                      \override OctavateEight #'transparent = ##t
+                      \consists "Default_bar_line_engraver"
+                    }
+             { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = romepa
+                \with {
+                      \remove "Time_signature_engraver"
+                      alignAboveContext = #"pa"
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                      \override OctavateEight #'transparent = ##t
+                      \consists "Default_bar_line_engraver"
+                    }
+             { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = pb { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = londonpb
+                \with {
+                      \remove "Time_signature_engraver"
+                      alignAboveContext = #"pb"
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                      \override OctavateEight #'transparent = ##t
+                      \consists "Default_bar_line_engraver"
+                    }
+             { \stopStaff s1 s1 s1 s1 }
+    \new Staff  = romepb
+                \with {
+                      \remove "Time_signature_engraver"
+                      alignAboveContext = #"pb"
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                      \override OctavateEight #'transparent = ##t
+                      \consists "Default_bar_line_engraver"
+                    }
+             { \stopStaff s1 s1 s1 s1 }
+Got:
+    \new Staff  = pa { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = londonpa \with  { 
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"pa"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
+      \override Clef #'transparent = ##t
+      \override OctavateEight #'transparent = ##t
+      \consists "Default_bar_line_engraver"
+       } 
+       { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = romepa \with  { 
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"pa"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
+      \override Clef #'transparent = ##t
+      \override OctavateEight #'transparent = ##t
+      \consists "Default_bar_line_engraver"
+       } 
+       { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = pb { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = londonpb \with  { 
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"pb"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
+      \override Clef #'transparent = ##t
+      \override OctavateEight #'transparent = ##t
+      \consists "Default_bar_line_engraver"
+       } 
+       { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    \new Staff  = romepb \with  { 
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"pb"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
+      \override Clef #'transparent = ##t
+      \override OctavateEight #'transparent = ##t
+      \consists "Default_bar_line_engraver"
+       } 
+       { \stopStaff s1.0 s1.0 s1.0 s1.0 } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1704, in lyPrefixCompositeMusicFromRelatedVariants
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1756, in music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromRelatedVariants
+Failed example:
+    print(lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0])
+Expected:
+    \new Staff  = london... { { \times 1/2 {\startStaff \clef "treble"
+          a' 4
+          a' 4
+          a' 4
+          a' 4
+          \clef "treble"
+          | %{ end measure 1 %}
+          a' 1
+          | %{ end measure 2 %}
+           \stopStaff}
+           }
+    <BLANKLINE>
+      {\startStaff \clef "treble"
+        b' 4
+        b' 4
+        b' 4
+        b' 4
+        | %{ end measure 1 %}
+         \stopStaff}
+    <BLANKLINE>
+      {\startStaff \clef "treble"
+        c' 4
+        c' 4
+        c' 4
+        c' 4
+        | %{ end measure 1 %}
+         \stopStaff}
+    <BLANKLINE>
+      s 1
+      {\startStaff \clef "treble"
+        d' 4
+        d' 4
+        d' 4
+        d' 4
+        | %{ end measure 1 %}
+         \stopStaff}
+    <BLANKLINE>
+       }
+    <BLANKLINE>
+Got:
+    \new Staff  = londonacfwbbwcwe { { \times 1/2 {\startStaff \clef "treble" 
+          a' 4.0  
+          a' 4.0  
+          a' 4.0  
+          a' 4.0  
+          \clef "treble" 
+          | %{ end measure 1 %} 
+          a' 1.0  
+          | %{ end measure 2 %} 
+           \stopStaff}
+           } 
+    <BLANKLINE>
+      {\startStaff \clef "treble" 
+        b' 4.0  
+        b' 4.0  
+        b' 4.0  
+        b' 4.0  
+        | %{ end measure 1 %} 
+         \stopStaff}
+    <BLANKLINE>
+      {\startStaff \clef "treble" 
+        c' 4.0  
+        c' 4.0  
+        c' 4.0  
+        c' 4.0  
+        | %{ end measure 1 %} 
+         \stopStaff}
+    <BLANKLINE>
+      s 1.0  
+      {\startStaff \clef "treble" 
+        d' 4.0  
+        d' 4.0  
+        d' 4.0  
+        d' 4.0  
+        | %{ end measure 1 %} 
+         \stopStaff}
+    <BLANKLINE>
+       } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromStream
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 804, in lyPrefixCompositeMusicFromStream
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 816, in music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromStream
+Failed example:
+    print(lyPrefixCompositeMusicOut)
+Expected:
+    \new Staff = ... \with {
+     \override StaffSymbol #'line-count = #4
+    }
+    { \time 3/4
+       c 4
+       d 4
+       e 4
+       f 2.
+      }
+Got:
+    \new Staff  = adxcdzaeww \with  { 
+     \override StaffSymbol #'line-count = #4
+      } 
+      { \time 3/4
+         c 4.0  
+         d 4.0  
+         e 4.0  
+         f 2.0.  
+          } 
+    <BLANKLINE>
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromVariant
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1938, in lyPrefixCompositeMusicFromVariant
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1954, in music21.lily.translate.LilypondConverter.lyPrefixCompositeMusicFromVariant
+Failed example:
+    print(lpPrefixCompositeMusicVariant)
+Expected:
+    \new Staff  = londonpx { {\startStaff \clef "treble"
+        a' 4.
+        b' 8
+        c' 4
+        d' 4
+        \clef "treble"
+        | %{ end measure 1 %}
+         \stopStaff}
+       }
+Got:
+    \new Staff  = londonpx { {\startStaff \clef "treble" 
+        a' 4.0.  
+        b' 8.0  
+        c' 4.0  
+        d' 4.0  
+        \clef "treble" 
+        | %{ end measure 1 %} 
+         \stopStaff}
+    <BLANKLINE>
+       } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lySequentialMusicFromStream
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 773, in lySequentialMusicFromStream
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 782, in music21.lily.translate.LilypondConverter.lySequentialMusicFromStream
+Failed example:
+    print(lySequentialMusicOut)
+Expected:
+    { \time 3/4
+     c 4
+     d 4
+     e 4
+     f 2.
+    }
+Got:
+    { \time 3/4
+     c 4.0  
+     d 4.0  
+     e 4.0  
+     f 2.0.  
+      } 
+    <BLANKLINE>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lySimpleMusicFromChord
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1302, in lySimpleMusicFromChord
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1310, in music21.lily.translate.LilypondConverter.lySimpleMusicFromChord
+Failed example:
+    print(conv.lySimpleMusicFromChord(c1))
+Expected:
+     < cis, e' dis''  !  > 2..
+Got:
+    < cis,  e'  dis''  !  > 2.0..   
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1316, in music21.lily.translate.LilypondConverter.lySimpleMusicFromChord
+Failed example:
+    print(conv.lySimpleMusicFromChord(c1))
+Expected:
+    s 2..
+Got:
+    s  2.0..   
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.lySimpleMusicFromNoteOrRest
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1128, in lySimpleMusicFromNoteOrRest
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1155, in music21.lily.translate.LilypondConverter.lySimpleMusicFromNoteOrRest
+Failed example:
+    print(sm)
+Expected:
+    \color "blue" dis'' ! ? 4
+Got:
+    \color "blue" dis'' ! ? 4.0  
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 1163, in music21.lily.translate.LilypondConverter.lySimpleMusicFromNoteOrRest
+Failed example:
+    print(sm)
+Expected:
+    s 4
+Got:
+    s 4.0  
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.lily.translate.LilypondConverter.textFromMusic21Object
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 218, in textFromMusic21Object
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/lily/translate.py", line 224, in music21.lily.translate.LilypondConverter.textFromMusic21Object
+Failed example:
+    print(lily.translate.LilypondConverter().textFromMusic21Object(n))
+Expected:
+    \version "2..."
+    \include "lilypond-book-preamble.ly"
+    color = #(define-music-function (parser location color) (string?) #{
+            \once \override NoteHead #'color = #(x11-color $color)
+            \once \override Stem #'color = #(x11-color $color)
+            \once \override Rest #'color = #(x11-color $color)
+            \once \override Beam #'color = #(x11-color $color)
+         #})
+    \header { }
+    \score  {
+          << \new Staff  = ... { c' 4
+                  }
+            >>
+      }
+    \paper { }
+    ...
+Got:
+    \version "2.18" 
+    \include "lilypond-book-preamble.ly"
+    color = #(define-music-function (parser location color) (string?) #{
+            \once \override NoteHead #'color = #(x11-color $color)
+            \once \override Stem #'color = #(x11-color $color)
+            \once \override Rest #'color = #(x11-color $color)
+            \once \override Beam #'color = #(x11-color $color)
+         #})
+    \header { } 
+    \score  {
+          << \new Staff  = acdeeawywe { c' 4.0  
+                  }
+            >>
+      }
+    \paper { }
+    \layout {
+      \context {
+        \RemoveEmptyStaffContext
+        \override VerticalAxisGroup #'remove-first = ##t
+      }
+     }
 
 
 
@@ -671,255 +3036,224 @@ AssertionError: 53 != 52
 
 
 -----------------------------
-freezeThaw had 0 ERRORS and 2 FAILURES in 30 tests:
+freezeThaw had 0 ERRORS and 1 FAILURES in 30 tests:
 -----------------------------
 
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
 AssertionError: Failed doctest test for music21.freezeThaw.JSONFreezer.jsonPrint
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1507, in jsonPrint
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1509, in jsonPrint
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1514, in music21.freezeThaw.JSONFreezer.jsonPrint
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1516, in music21.freezeThaw.JSONFreezer.jsonPrint
 Failed example:
     jsf.jsonPrint()
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.freezeThaw.JSONFreezer.jsonPrint[2]>", line 1, in <module>
-        jsf.jsonPrint()
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1595, in jsonPrint
-        indent=2,
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 250, in dumps
-        sort_keys=sort_keys, **kw).encode(obj)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 209, in encode
-        chunks = list(chunks)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 434, in _iterencode
-        for chunk in _iterencode_dict(o, _current_indent_level):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 332, in _iterencode_list
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 442, in _iterencode
-        o = _default(o)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 184, in default
-        raise TypeError(repr(o) + " is not JSON serializable")
-    TypeError: Fraction(1, 1) is not JSON serializable
+Expected:
+    {
+      "__attr__": {
+        "_duration": {
+          "__attr__": {
+            "_cachedIsLinked": true, 
+            "_components": [
+              {
+                "__attr__": {
+                  "_componentsNeedUpdating": false, 
+                  "_dots": [
+                    0
+                  ], 
+                  "_link": true, 
+                  "_qtrLength": 1.0, 
+                  "_quarterLengthNeedsUpdating": false, 
+                  "_tuplets": [], 
+                  "_type": "quarter", 
+                  "_typeNeedsUpdating": false
+                }, 
+                "__class__": "music21.duration.DurationUnit"
+              }
+            ], 
+            "_componentsNeedUpdating": false, 
+            "_qtrLength": 1.0, 
+            "_quarterLengthNeedsUpdating": false, 
+            "_typeNeedsUpdating": false
+          }, 
+          "__class__": "music21.duration.Duration"
+        }, 
+        "_notehead": "normal", 
+        "_noteheadFill": "default", 
+        "_noteheadParenthesis": false, 
+        "_priority": 0, 
+        "_stemDirection": "unspecified", 
+        "articulations": [], 
+        "beams": {
+          "__attr__": {
+            "beamsList": [], 
+            "feathered": false
+          }, 
+          "__class__": "music21.beam.Beams"
+        }, 
+        "expressions": [], 
+        "lyrics": [], 
+        "offset": 0.0, 
+        "pitch": {
+          "__attr__": {
+            "_accidental": {
+              "__attr__": {
+                "_alter": 1.0, 
+                "_displayType": "normal", 
+                "_modifier": "#", 
+                "_name": "sharp" 
+              }, 
+              "__class__": "music21.pitch.Accidental"
+            }, 
+            "_microtone": {
+              "__attr__": {
+                "_centShift": 0, 
+                "_harmonicShift": 1
+              }, 
+              "__class__": "music21.pitch.Microtone"
+            }, 
+            "_octave": 5, 
+            "_step": "D"
+          }, 
+          "__class__": "music21.pitch.Pitch"
+        }
+      }, 
+      "__class__": "music21.note.Note", 
+      "__version__": [
+        1, 
+        9, 
+        3
+      ]
+    }
+Got:
+    {
+      "__attr__": {
+        "_duration": {
+          "__attr__": {
+            "_cachedIsLinked": true, 
+            "_components": [
+              {
+                "__attr__": {
+                  "_componentsNeedUpdating": false, 
+                  "_dots": [
+                    0
+                  ], 
+                  "_link": true, 
+                  "_qtrLength": 1.0, 
+                  "_quarterLengthNeedsUpdating": false, 
+                  "_tuplets": [], 
+                  "_type": "quarter", 
+                  "_typeNeedsUpdating": false
+                }, 
+                "__class__": "music21.duration.DurationUnit"
+              }
+            ], 
+            "_componentsNeedUpdating": false, 
+            "_qtrLength": 1.0, 
+            "_quarterLengthNeedsUpdating": false, 
+            "_typeNeedsUpdating": false
+          }, 
+          "__class__": "music21.duration.Duration"
+        }, 
+        "_notehead": "normal", 
+        "_noteheadFill": "default", 
+        "_noteheadParenthesis": false, 
+        "_priority": 0, 
+        "_stemDirection": "unspecified", 
+        "articulations": [], 
+        "beams": {
+          "__attr__": {
+            "beamsList": [], 
+            "feathered": false
+          }, 
+          "__class__": "music21.beam.Beams"
+        }, 
+        "expressions": [], 
+        "lyrics": [], 
+        "offset": 0.0, 
+        "pitch": {
+          "__attr__": {
+            "_accidental": {
+              "__attr__": {
+                "_alter": 1.0, 
+                "_displayType": "normal", 
+                "_modifier": "#", 
+                "_name": "sharp"
+              }, 
+              "__class__": "music21.pitch.Accidental"
+            }, 
+            "_microtone": {
+              "__attr__": {
+                "_centShift": 0, 
+                "_harmonicShift": 1
+              }, 
+              "__class__": "music21.pitch.Microtone"
+            }, 
+            "_octave": 5, 
+            "_step": "D"
+          }, 
+          "__class__": "music21.pitch.Pitch"
+        }
+      }, 
+      "__class__": "music21.note.Note", 
+      "__version__": [
+        2, 
+        0, 
+        0
+      ]
+    }
 
+
+
+-----------------------------
+features_native had 0 ERRORS and 1 FAILURES in 26 tests:
+-----------------------------
 
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.freezeThaw.JSONThawer._setJSON
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1654, in _setJSON
+AssertionError: Failed doctest test for music21.features.native.MostCommonSetClassSimultaneityPrevalence
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/features/native.py", line 424, in MostCommonSetClassSimultaneityPrevalence
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1683, in music21.freezeThaw.JSONThawer._setJSON
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/features/native.py", line 436, in music21.features.native.MostCommonSetClassSimultaneityPrevalence
 Failed example:
-    jsfJSON = jsf.json
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.freezeThaw.JSONThawer._setJSON[12]>", line 1, in <module>
-        jsfJSON = jsf.json
-      File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1494, in json
-        sort_keys=True,
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/__init__.py", line 250, in dumps
-        sort_keys=sort_keys, **kw).encode(obj)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 209, in encode
-        chunks = list(chunks)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 434, in _iterencode
-        for chunk in _iterencode_dict(o, _current_indent_level):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 332, in _iterencode_list
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 408, in _iterencode_dict
-        for chunk in chunks:
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 442, in _iterencode
-        o = _default(o)
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/json/encoder.py", line 184, in default
-        raise TypeError(repr(o) + " is not JSON serializable")
-    TypeError: Fraction(1, 1) is not JSON serializable
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1689, in music21.freezeThaw.JSONThawer._setJSON
-Failed example:
-    n2
+    fe2.extract().vector
 Expected:
-    <music21.note.Note D#>
+    [0.184...]
 Got:
-    <music21.metadata.primitives.Text object at 0x113351e90>
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1691, in music21.freezeThaw.JSONThawer._setJSON
-Failed example:
-    n2.octave
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.freezeThaw.JSONThawer._setJSON[17]>", line 1, in <module>
-        n2.octave
-    AttributeError: 'Text' object has no attribute 'octave'
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/freezeThaw.py", line 1696, in music21.freezeThaw.JSONThawer._setJSON
-Failed example:
-    n2.duration.dots
-Exception raised:
-    Traceback (most recent call last):
-      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest music21.freezeThaw.JSONThawer._setJSON[18]>", line 1, in <module>
-        n2.duration.dots
-    AttributeError: 'Text' object has no attribute 'duration'
+    [0.175]
 
 
 
 -----------------------------
-documentation_library_documenters had 0 ERRORS and 1 FAILURES in 28 tests:
+abcFormat_translate had 0 ERRORS and 1 FAILURES in 18 tests:
 -----------------------------
 
 Traceback (most recent call last):
   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line unknown line number, in inheritedReadwritePropertiesMapping
+AssertionError: Failed doctest test for music21.abcFormat.translate.reBar
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abcFormat/translate.py", line 421, in reBar
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/documentation/library/documenters.py", line ?, in music21.documentation.library.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abcFormat/translate.py", line 461, in music21.abcFormat.translate.reBar
 Failed example:
-    for classDocumenter in sorted(mapping, key=sortBy):
-        print('{0}:'.format(classDocumenter.referentPackagesystemPath))
-        for attributeDocumenter in mapping[classDocumenter][:10]:
-            print('- {0}'.format(attributeDocumenter.referentPackagesystemPath))
+    music21Part2.measure(2).show("text")
 Expected:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.activeSite
-    - music21.base.Music21Object.offset
-    - music21.base.Music21Object.priority
-    music21.stream.Stream:
-    - music21.stream.Stream.atSoundingPitch
-    - music21.stream.Stream.duration
-    - music21.stream.Stream.elements
-    - music21.stream.Stream.finalBarline
-    - music21.stream.Stream.metadata
-    - music21.stream.Stream.seconds
+    {0.0} <music21.meter.TimeSignature 1/8>
+    {0.0} <music21.note.Note E>
 Got:
-    music21.base.Music21Object:
-    - music21.base.Music21Object.activeSite
-    - music21.base.Music21Object.offset
-    - music21.base.Music21Object.offsetRational
-    - music21.base.Music21Object.priority
-    music21.stream.Stream:
-    - music21.stream.Stream.atSoundingPitch
-    - music21.stream.Stream.duration
-    - music21.stream.Stream.elements
-    - music21.stream.Stream.finalBarline
-    - music21.stream.Stream.metadata
-    - music21.stream.Stream.seconds
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note G>
+    {1.5} <music21.note.Note A>
+    {2.0} <music21.note.Note B>
+    {2.5} <music21.note.Note C>
+    {3.5} <music21.note.Note G>
+    {4.0} <music21.note.Note B>
 
-
-
------------------------------
-analysis_reduction had 4 ERRORS and 0 FAILURES in 15 tests:
------------------------------
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 825, in testExtractionA
-    post = sr.reduce()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
-    return self._createReduction()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
-    rn.measureOffset, n)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
-    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
-    return self.duration.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
-    self.updateQuarterLength()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
-    self._qtrLength += dur.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
-    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
-DurationException: Someone is not playing welll...1.0 <type 'float'>
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 852, in testExtractionB
-    post = sr.reduce()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
-    return self._createReduction()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 351, in _createReduction
-    v.insertIntoNoteOrChord(rn.measureOffset, n)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
-    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
-    return self.duration.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
-    self.updateQuarterLength()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
-    self._qtrLength += dur.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
-    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
-DurationException: Someone is not playing welll...1.0 <type 'float'>
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 914, in testExtractionD
-    unused_post = sr.reduce()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
-    return self._createReduction()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
-    rn.measureOffset, n)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
-    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
-    return self.duration.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
-    self.updateQuarterLength()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
-    self._qtrLength += dur.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
-    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
-DurationException: Someone is not playing welll...1.0 <type 'float'>
-
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 937, in testExtractionD2
-    unused_post = sr.reduce()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 388, in reduce
-    return self._createReduction()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/analysis/reduction.py", line 342, in _createReduction
-    rn.measureOffset, n)
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/stream/__init__.py", line 1583, in insertIntoNoteOrChord
-    offset + noteOrChord.quarterLengthRational, # set end to dur of supplied
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/note.py", line 570, in _getQuarterLengthRational
-    return self.duration.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3012, in _getQuarterLengthRational
-    self.updateQuarterLength()
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 2706, in updateQuarterLength
-    self._qtrLength += dur.quarterLengthRational
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 1819, in _getQuarterLengthRational
-    raise DurationException("Someone is not playing welll...%r %r" % (self._qtrLength, type(self._qtrLength)))
-DurationException: Someone is not playing welll...1.0 <type 'float'>
 
 -------------------------------------------------------------------------
-Ran 4029 tests in 1214.6136 seconds
-Run at 2014-06-25 20:02:33
+Ran 4050 tests in 580.5155 seconds
+Run at 2014-06-28 00:53:54

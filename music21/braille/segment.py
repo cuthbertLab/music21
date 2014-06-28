@@ -99,7 +99,7 @@ affinityNames = {AFFINITY_SIGNATURE: "Signature Grouping",
 excludeFromBrailleElements = [spanner.Slur, layout.SystemLayout, layout.PageLayout, layout.StaffLayout]
 
 GROUPING_KEYSIG = key.KeySignature(0)
-GROUPING_TIMESIG = None# meter.TimeSignature("4/4")
+GROUPING_TIMESIG = meter.TimeSignature("4/4")
 GROUPING_DESC_CHORDS = True
 GROUPING_SHOW_CLEFS = False
 GROUPING_UPPERFIRST_NOTEFINGERING = True
