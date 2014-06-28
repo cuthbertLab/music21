@@ -715,6 +715,8 @@ class ClassDocumenter(ObjectDocumenter):
             - music21.base.Music21Object.offset
             - music21.base.Music21Object.offsetRational
             - music21.base.Music21Object.priority
+            - music21.base.Music21Object.quarterLength
+            - music21.base.Music21Object.quarterLengthRational
             music21.stream.Stream:
             - music21.stream.Stream.atSoundingPitch
             - music21.stream.Stream.duration

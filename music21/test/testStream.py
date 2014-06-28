@@ -6870,22 +6870,45 @@ class Test(unittest.TestCase):
         # TODO: there are still errors in this chordify output
         s = converter.parse(testPrimitive.triplets01)
         #s.parts[0].show()
-        #s.show() 
+        self.maxDiff = None
+        self.assertMultiLineEqual(s.parts[0].getElementsByClass('Measure')[0]._reprText(addEndTimes=True, useMixedNumerals=True), 
+                                  '''{0 - 0} <music21.layout.SystemLayout>
+{0 - 0} <music21.clef.TrebleClef>
+{0 - 0} <music21.key.KeySignature of 2 flats, mode major>
+{0 - 0} <music21.meter.TimeSignature 4/4>
+{0 - 2/3} <music21.note.Note B->
+{2/3 - 1 1/3} <music21.note.Note C>
+{1 1/3 - 2} <music21.note.Note B->
+{2 - 4} <music21.note.Note A>''') 
+        self.assertMultiLineEqual(s.parts[1].getElementsByClass('Measure')[0]._reprText(addEndTimes=True), 
+                                  '''{0.0 - 0.0} <music21.clef.BassClef>
+{0.0 - 0.0} <music21.key.KeySignature of 2 flats, mode major>
+{0.0 - 0.0} <music21.meter.TimeSignature 4/4>
+{0.0 - 4.0} <music21.note.Note B->''') 
         chords = s.chordify()
-        m1 = chords.getElementsByClass('Measure')
-        match = [([str(p) for p in n.pitches], str(round(n.offset, 2)), str(round(n.quarterLength, 3))) for n in m1[0].notes]
+        m1 = chords.getElementsByClass('Measure')[0]
+        self.assertMultiLineEqual(m1._reprText(addEndTimes=True, useMixedNumerals=True), 
+                                  '''{0 - 0} <music21.layout.SystemLayout>
+{0 - 0} <music21.clef.TrebleClef>
+{0 - 0} <music21.key.KeySignature of 2 flats, mode major>
+{0 - 0} <music21.meter.TimeSignature 4/4>
+{0 - 2/3} <music21.chord.Chord B-4 B-2>
+{2/3 - 1 1/3} <music21.chord.Chord C5 B-2>
+{1 1/3 - 2} <music21.chord.Chord B-4 B-2>
+{2 - 4} <music21.chord.Chord A4 B-2>''') 
+        match = [([str(p) for p in n.pitches], str(round(n.offset, 2)), str(round(n.quarterLength, 3))) for n in m1.notes]
         self.assertEqual(str(match), "[(['B-4', 'B-2'], '0.0', '0.667'), " + \
                                      "(['C5', 'B-2'], '0.67', '0.667'), " + \
                                      "(['B-4', 'B-2'], '1.33', '0.667'), " + \
                                      "(['A4', 'B-2'], '2.0', '2.0')]")
 
         #chords.show()
-        raw = m21ToString.fromMusic21Object(m1[0])
-        # there should only be 2 tuplet indications in the produced chords
-        self.assertEqual(raw.count('<tuplet'), 2)
+        raw = m21ToString.fromMusic21Object(m1)
+        # there should only be 2 tuplet indications in the produced chords: start and stop...
+        self.assertEqual(raw.count('<tuplet'), 2, raw)
         # pitch grouping in measure index 1 was not allocated properly
-        for c in chords.getElementsByClass('Chord'):
-            self.assertEqual(len(c), 2)
+        #for c in chords.getElementsByClass('Chord'):
+        #    self.assertEqual(len(c), 2)
 
 
     def testChordifyG(self):

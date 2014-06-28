@@ -234,12 +234,12 @@ class FunctionIterator(Iterator):
         ('music21.abcFormat.translate', 'abcToStreamOpus')
         ('music21.abcFormat.translate', 'abcToStreamPart')
         ('music21.abcFormat.translate', 'abcToStreamScore')
+        ('music21.abcFormat.translate', 'parseTokens')
         ('music21.abcFormat.translate', 'reBar')
         ('music21.analysis.discrete', 'analyzeStream')
         ('music21.analysis.metrical', 'labelBeatDepth')
         ('music21.analysis.metrical', 'thomassenMelodicAccent')
         ('music21.analysis.neoRiemannian', 'L')
-        ('music21.analysis.neoRiemannian', 'LRP_combinations')
 
     '''
 

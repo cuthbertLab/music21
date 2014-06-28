@@ -24,6 +24,8 @@ module's :func:`~music21.converter.parse` function.
 
 import copy
 import unittest
+
+from music21 import common
 from music21 import environment
 from music21 import exceptions21
 from music21 import meter
@@ -147,110 +149,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
         #environLocal.printDebug([mh, 'dst', dst])
         #ql = 0 # might not be zero if there is a pickup
-        # in case need to transpose due to clef indication
-        postTransposition = 0
-        clefSet = False
-        for t in mh.tokens:
-            if isinstance(t, abcFormat.ABCMetadata):
-                if t.isMeter():
-                    ts = t.getTimeSignatureObject()
-                    if ts != None: # can be None
-                    # should append at the right position
-                        if useMeasures: # assume at start of measures
-                            dst.timeSignature = ts
-                        else:
-                            dst._appendCore(ts)
-                elif t.isKey():
-                    ks = t.getKeySignatureObject()
-                    if useMeasures:  # assume at start of measures
-                        dst.keySignature = ks
-                    else:
-                        dst._appendCore(ks)
-                    # check for clef information sometimes stored in key
-                    clefObj, transposition = t.getClefObject()
-                    if clefObj != None:
-                        clefSet = False
-                        #environLocal.printDebug(['found clef in key token:', t, clefObj, transposition])
-                        if useMeasures:  # assume at start of measures
-                            dst.clef = clefObj
-                        else:
-                            dst._appendCore(clefObj)
-                        postTransposition = transposition
-                elif t.isTempo():
-                    mmObj = t.getMetronomeMarkObject()
-                    dst._appendCore(mmObj)
-
-            # as ABCChord is subclass of ABCNote, handle first
-            elif isinstance(t, abcFormat.ABCChord):
-                # may have more than notes?
-                pitchNameList = []
-                accStatusList = [] # accidental display status list
-                for tSub in t.subTokens:
-                    # notes are contained as subtokens are already parsed
-                    if isinstance(tSub, abcFormat.ABCNote):
-                        pitchNameList.append(tSub.pitchName)
-                        accStatusList.append(tSub.accidentalDisplayStatus)
-                c = chord.Chord(pitchNameList)
-                c.quarterLength = t.quarterLength
-                # adjust accidental display for each contained pitch
-                for pIndex in range(len(c.pitches)):
-                    if c.pitches[pIndex].accidental == None:
-                        continue
-                    c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
-                dst._appendCore(c)
-
-                #ql += t.quarterLength
-
-            elif isinstance(t, abcFormat.ABCNote):
-                if t.isRest:
-                    n = note.Rest()
-                else:
-                    n = note.Note(t.pitchName)
-                    if n.accidental != None:
-                        n.accidental.displayStatus = t.accidentalDisplayStatus
-
-                n.quarterLength = t.quarterLength
-
-                # start or end a tie at note n
-                if t.tie is not None:
-                    if t.tie == "start":
-                        n.tie = tie.Tie(t.tie)
-                        n.tie.style = "normal"
-                    elif t.tie == "stop":
-                        n.tie = tie.Tie(t.tie)
-                ### Was: Extremely Slow for large Opus files... why?
-                ### Answer: some pieces didn't close all their spanners, so
-                ###         everything was in a Slur/Diminuendo, etc.
-                for span in t.applicableSpanners:
-                    span.addSpannedElements(n)
-
-                if t.inGrace:
-                    n = n.getGrace()
-
-                n.articulations = []
-                while len(t.artic) > 0:
-                    tmp = t.artic.pop()
-                    if tmp == "staccato":
-                        n.articulations.append(articulations.Staccato())
-                    if tmp == "upbow":
-                        n.articulations.append(articulations.UpBow())
-                    if tmp == "downbow":
-                        n.articulations.append(articulations.DownBow())
-                    if tmp == "accent":
-                        n.articulations.append(articulations.Accent())
-                    if tmp == "strongaccent":
-                        n.articulations.append(articulations.StrongAccent())
-                    if tmp == "tenuto":
-                        n.articulations.append(articulations.Tenuto())
-
-                dst._appendCore(n)
-            elif isinstance(t, abcFormat.ABCSlurStart):
-                p._appendCore(t.slurObj)
-            elif isinstance(t, abcFormat.ABCCrescStart):
-                p._appendCore(t.crescObj)
-            elif isinstance(t, abcFormat.ABCDimStart):
-                p._appendCore(t.dimObj)
-        dst._elementsChanged()
+        
+        postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
 
         # append measure to part; in the case of trailing meta data
         # dst may be part, even though useMeasures is True
@@ -305,6 +205,114 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     p._elementsChanged()
     return p
 
+def parseTokens(mh, dst, p, useMeasures):        
+    # in case need to transpose due to clef indication
+    from music21 import abcFormat
+
+    postTransposition = 0
+    clefSet = False
+    for t in mh.tokens:
+        if isinstance(t, abcFormat.ABCMetadata):
+            if t.isMeter():
+                ts = t.getTimeSignatureObject()
+                if ts != None: # can be None
+                # should append at the right position
+                    if useMeasures: # assume at start of measures
+                        dst.timeSignature = ts
+                    else:
+                        dst._appendCore(ts)
+            elif t.isKey():
+                ks = t.getKeySignatureObject()
+                if useMeasures:  # assume at start of measures
+                    dst.keySignature = ks
+                else:
+                    dst._appendCore(ks)
+                # check for clef information sometimes stored in key
+                clefObj, transposition = t.getClefObject()
+                if clefObj != None:
+                    clefSet = False
+                    #environLocal.printDebug(['found clef in key token:', t, clefObj, transposition])
+                    if useMeasures:  # assume at start of measures
+                        dst.clef = clefObj
+                    else:
+                        dst._appendCore(clefObj)
+                    postTransposition = transposition
+            elif t.isTempo():
+                mmObj = t.getMetronomeMarkObject()
+                dst._appendCore(mmObj)
+
+        # as ABCChord is subclass of ABCNote, handle first
+        elif isinstance(t, abcFormat.ABCChord):
+            # may have more than notes?
+            pitchNameList = []
+            accStatusList = [] # accidental display status list
+            for tSub in t.subTokens:
+                # notes are contained as subtokens are already parsed
+                if isinstance(tSub, abcFormat.ABCNote):
+                    pitchNameList.append(tSub.pitchName)
+                    accStatusList.append(tSub.accidentalDisplayStatus)
+            c = chord.Chord(pitchNameList)
+            c.quarterLength = t.quarterLength
+            # adjust accidental display for each contained pitch
+            for pIndex in range(len(c.pitches)):
+                if c.pitches[pIndex].accidental == None:
+                    continue
+                c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
+            dst._appendCore(c)
+
+            #ql += t.quarterLength
+
+        elif isinstance(t, abcFormat.ABCNote):
+            if t.isRest:
+                n = note.Rest()
+            else:
+                n = note.Note(t.pitchName)
+                if n.accidental != None:
+                    n.accidental.displayStatus = t.accidentalDisplayStatus
+
+            n.quarterLength = t.quarterLength
+
+            # start or end a tie at note n
+            if t.tie is not None:
+                if t.tie == "start":
+                    n.tie = tie.Tie(t.tie)
+                    n.tie.style = "normal"
+                elif t.tie == "stop":
+                    n.tie = tie.Tie(t.tie)
+            ### Was: Extremely Slow for large Opus files... why?
+            ### Answer: some pieces didn't close all their spanners, so
+            ###         everything was in a Slur/Diminuendo, etc.
+            for span in t.applicableSpanners:
+                span.addSpannedElements(n)
+
+            if t.inGrace:
+                n = n.getGrace()
+
+            n.articulations = []
+            while len(t.artic) > 0:
+                tmp = t.artic.pop()
+                if tmp == "staccato":
+                    n.articulations.append(articulations.Staccato())
+                if tmp == "upbow":
+                    n.articulations.append(articulations.UpBow())
+                if tmp == "downbow":
+                    n.articulations.append(articulations.DownBow())
+                if tmp == "accent":
+                    n.articulations.append(articulations.Accent())
+                if tmp == "strongaccent":
+                    n.articulations.append(articulations.StrongAccent())
+                if tmp == "tenuto":
+                    n.articulations.append(articulations.Tenuto())
+
+            dst._appendCore(n)
+        elif isinstance(t, abcFormat.ABCSlurStart):
+            p._appendCore(t.slurObj)
+        elif isinstance(t, abcFormat.ABCCrescStart):
+            p._appendCore(t.crescObj)
+        elif isinstance(t, abcFormat.ABCDimStart):
+            p._appendCore(t.dimObj)
+    dst._elementsChanged()
+    return postTransposition, clefSet
 
 def abcToStreamScore(abcHandler, inputM21=None):
     '''Given an abcHandler object, build into a multi-part :class:`~music21.stream.Score` with metadata.
@@ -423,15 +431,19 @@ def reBar(music21Part, inPlace=True):
     Re-bar overflow measures using the last known time signature.
 
     >>> from music21 import corpus
-    >>> irl = corpus.parse("irl")
-    >>> music21Part = irl[1][1]
+    >>> irl2 = corpus.parse("irl", number=2)
+    >>> irl2.metadata.title
+    'Aililiu na Gamhna, S.35'
+    >>> music21Part = irl2[1]
+
 
     The whole part is in 2/4 time, but there are some measures expressed in 4/4 time
     without an explicit time signature change, an error in abc parsing due to the
     omission of barlines. The method will split those measures such that they conform
     to the last time signature, in this case 2/4. The default is to reBar in place.
-    The measure numbers are updated accordingly. (NOTE: reBar is called automatically
-    in abcToStreamPart)
+    The measure numbers are updated accordingly. 
+    
+    (NOTE: reBar is called automatically in abcToStreamPart, hence not demonstrated below...)
 
     The key signature and clef are assumed to be the same in the second measure after the
     split, so both are omitted. If the time signature is not the same in the second measure,
@@ -450,8 +462,10 @@ def reBar(music21Part, inPlace=True):
     An example where the time signature wouldn't be the same. This score is
     mistakenly marked as 4/4, but has some measures that are longer.
 
-    >>> music21Part2 = irl[14][1] # 4/4 time signature
-    >>> music21Part2.show('text')
+    >>> irl15 = corpus.parse("irl", number=15)
+    >>> irl15.metadata.title
+    'Esternowe, S. 60'
+    >>> music21Part2 = irl15.parts[0] # 4/4 time signature
     >>> music21Part2.measure(1).show("text")
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note A>
@@ -468,7 +482,7 @@ def reBar(music21Part, inPlace=True):
     if not inPlace:
         music21Part = copy.deepcopy(music21Part)
     lastTimeSignature = None
-    mnOffset = 0
+    measureNumberOffset = 0 # amount to shift current measure numbers
     allMeasures = music21Part.getElementsByClass(stream.Measure)
     for measureIndex in range(len(allMeasures)):
         music21Measure = allMeasures[measureIndex]
@@ -478,13 +492,13 @@ def reBar(music21Part, inPlace=True):
         if lastTimeSignature is None:
             raise ABCTranslateException("No time signature found in this Part")
 
-        tsEnd = lastTimeSignature.barDuration.quarterLength
-        mEnd = music21Measure.highestTime
-        music21Measure.number += mnOffset
+        tsEnd = lastTimeSignature.barDuration.quarterLengthRational
+        mEnd = common.optionalNumToFraction(music21Measure.highestTime)
+        music21Measure.number += measureNumberOffset
         if mEnd > tsEnd:
             m1, m2 = music21Measure.splitAtQuarterLength(tsEnd)
             m2.timeSignature = None
-            if lastTimeSignature.barDuration.quarterLength != m2.highestTime:
+            if lastTimeSignature.barDuration.quarterLengthRational != m2.highestTime:
                 try:
                     m2.timeSignature = m2.bestTimeSignature()
                 except stream.StreamException as e:
@@ -495,8 +509,8 @@ def reBar(music21Part, inPlace=True):
             m2.keySignature = None # suppress the key signature
             m2.clef = None # suppress the clef
             m2.number = m1.number + 1
-            mnOffset += 1
-            music21Part.insert(m1.offsetRational + m1.highestTime, m2)
+            measureNumberOffset += 1
+            music21Part.insert(common.optionalNumToFraction(m1.offsetRational + m1.highestTime), m2)
         """
         elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
             # The first and last measures are allowed to be incomplete

@@ -1027,7 +1027,8 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         >>> score = corpus.parse('bach/bwv380')
         >>> excerpt = score.measures(2, 3)
         >>> cs = []
-        >>> for c in excerpt.chordify().flat.getElementsByClass(chord.Chord):
+        >>> chfy = excerpt.chordify()
+        >>> for c in chfy.flat.getElementsByClass(chord.Chord):
         ...   print(harmony.chordSymbolFigureFromChord(c))
         B-7
         E-maj7/B-
