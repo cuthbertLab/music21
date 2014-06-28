@@ -64,6 +64,7 @@ import unittest
 import copy
 
 from music21 import common
+from music21 import defaults
 from music21 import exceptions21
 from music21.common import SlottedObject
 from music21 import environment
@@ -77,7 +78,7 @@ except:
 _MOD = "duration.py"
 environLocal = environment.Environment(_MOD)
 
-DENOM_LIMIT = 65535
+DENOM_LIMIT = defaults.limitOffsetDenominator
 
 #-------------------------------------------------------------------------------
 # duration constants and reference
@@ -251,9 +252,9 @@ def quarterLengthToClosestType(qLen):
     ('half', True)
     '''
     if (isinstance(qLen, fractions.Fraction)):
-        noteLengthType = fractions.Fraction(4, 1) / qLen
+        noteLengthType = 4 / qLen  # divides right...
     else:
-        noteLengthType = round(4.0/qLen, 6)
+        noteLengthType = common.optionalNumToFraction(4.0/qLen)
 
     if noteLengthType in typeFromNumDict:
         return (typeFromNumDict[noteLengthType], True)
@@ -682,9 +683,9 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
         qtrLength *= common.dotMultiplier(dots)
 
     if tuplets is not None and len(tuplets) > 0:
-        qtrLength = fractions.Fraction(qtrLength).limit_denominator(DENOM_LIMIT)
+        qtrLength = common.optionalNumToFraction(qtrLength)
         for tup in tuplets:
-            qtrLength *= tup.tupletMultiplier()
+            qtrLength = common.optionalNumToFraction(qtrLength * tup.tupletMultiplier())
     return qtrLength
 
 
@@ -803,16 +804,16 @@ class Tuplet(object):
         >>> print(myTup.tupletMultiplier())
         4/5
 
+
+    In this case, the tupletMultiplier is a float because it can be expressed
+    as a binary number:
+
     ::
 
         >>> myTup2 = duration.Tuplet(8, 5)
         >>> tm = myTup2.tupletMultiplier()
         >>> tm
-        Fraction(5, 8)
-        >>> float(tm)
         0.625
-        >>> print(tm)
-        5/8
 
     ::
 
@@ -854,6 +855,8 @@ class Tuplet(object):
 
         >>> myNote = note.Note("C#4")
         >>> myNote.quarterLength = 0.8
+        >>> myNote.quarterLengthRational
+        Fraction(4, 5)
         >>> myNote.duration.fullName
         'Quarter Quintuplet (0.8QL)'
 
@@ -1082,9 +1085,7 @@ class Tuplet(object):
         4.0
         '''
         n = self.numberNotesNormal
-        if not isinstance(n, fractions.Fraction):
-            n = fractions.Fraction(n).limit_denominator(DENOM_LIMIT)
-        return n * self.durationNormal.quarterLengthRational
+        return common.optionalNumToFraction(n * self.durationNormal.quarterLengthRational)
 
     def tupletMultiplier(self):
         '''Get a Fraction() by which to scale the duration that
@@ -1106,8 +1107,8 @@ class Tuplet(object):
         
         '''
         lengthActual = self.durationActual.quarterLengthRational
-        return fractions.Fraction(self.totalTupletLength() / (
-                lengthActual * self.numberNotesActual)).limit_denominator(DENOM_LIMIT)
+        return common.optionalNumToFraction(self.totalTupletLength() / (
+                lengthActual * self.numberNotesActual))
 
     ### PUBLIC PROPERTIES ###
 
@@ -1309,19 +1310,15 @@ class DurationUnit(DurationCommon):
         #  e.g. dotted-dotted half in 9/8 expressed as 1,1
         self._dots = [0]
         self._tuplets = ()  # an empty tuple
-        if isinstance(prototype, fractions.Fraction):
-            self._qtrLength = prototype
-            self._typeNeedsUpdating = True
-            self._quarterLengthNeedsUpdating = False            
-        elif common.isNum(prototype):
-            self._qtrLength = fractions.Fraction(prototype).limit_denominator(DENOM_LIMIT)
+        if common.isNum(prototype):
+            self._qtrLength = common.optionalNumToFraction(prototype)
             self._typeNeedsUpdating = True
             self._quarterLengthNeedsUpdating = False
         else:
             if prototype not in typeToDuration:
                 raise DurationException('type (%s) is not valid' % type)
             self.type = prototype
-            self._qtrLength = fractions.Fraction(0, 1)
+            self._qtrLength = 0.0
             self._typeNeedsUpdating = False
             self._quarterLengthNeedsUpdating = True
 
@@ -1868,19 +1865,8 @@ class DurationUnit(DurationCommon):
             
         if self._link:
             self._typeNeedsUpdating = True
-            
-        if isinstance(value, int):
-            value = value + 0.0
-        elif isinstance(value, float):
-            unused_numerator, denominator = value.as_integer_ratio()
-            if (denominator & (denominator-1) == 0):
-                # quick test of power of whether denominator is a power
-                # of two, and thus representable exactly as a float
-                pass
-            else:
-                value = fractions.Fraction(float).limit_denominator(DENOM_LIMIT)
-            
-        # need to make sure its a float for comparisons
+        
+        value = common.optionalNumToFraction(value)
         self._qtrLength = value
 
     quarterLengthRational = property(_getQuarterLengthRational, _setQuarterLength)
@@ -2714,9 +2700,7 @@ class Duration(DurationCommon):
                 # if components quarterLength needs to be updated, it will
                 # be updated when this property is called
                 qlr = dur.quarterLengthRational
-                if isinstance(qlr, fractions.Fraction) and not isinstance(self._qtrLength, fractions.Fraction):
-                    self._qtrLength = fractions.Fraction(self._qtrLength).limit_denominator(DENOM_LIMIT)
-                self._qtrLength += qlr
+                self._qtrLength = common.optionalNumToFraction(self._qtrLength + qlr)
         self._quarterLengthNeedsUpdating = False
 
     ### PUBLIC PROPERTIES ###
@@ -3030,19 +3014,7 @@ class Duration(DurationCommon):
 
     def _setQuarterLength(self, value):
         if self._qtrLength != value:
-            if isinstance(value, int):
-                value = float(value)
-            elif isinstance(value, float):
-                unused_numerator, denominator = value.as_integer_ratio()
-                if denominator > DENOM_LIMIT:
-                    # quick test of power of whether denominator is a power
-                    # of two, and thus representable exactly as a float: can it be
-                    # represented w/ a denominator less than DENOM_LIMIT?
-                    # this doesn't work:
-                    #    (denominator & (denominator-1)) != 0
-                    # which is a nice test, but denominator here is always a power of two...
-                    value = fractions.Fraction(value).limit_denominator(DENOM_LIMIT)
-
+            value = common.optionalNumToFraction(value)
             if value == 0.0 and self.isLinked is True:
                 self.clear()
             self._qtrLength = value

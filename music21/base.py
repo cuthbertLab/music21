@@ -48,7 +48,6 @@ from __future__ import print_function
 import collections
 import copy
 import doctest
-import fractions
 import sys
 import types
 import unittest
@@ -557,6 +556,47 @@ class Music21Object(object):
         The last one (object) will be different in Py2 (__builtin__.object) and Py3 (builtins.object)
         ''')
 
+    #---------------------------
+    # convienence.  used to be in note.Note, but belongs everywhere:
+    def _getQuarterLength(self):
+        '''Return quarter length
+
+        >>> n = base.Music21Object()
+        >>> n.quarterLength = 2.0
+        >>> n.quarterLength
+        2.0
+        '''
+        return self.duration.quarterLength
+
+    def _getQuarterLengthRational(self):
+        return self.duration.quarterLengthRational
+    
+    def _setQuarterLength(self, value):
+        self.duration.quarterLength = value
+
+    quarterLengthRational = property(_getQuarterLengthRational, _setQuarterLength, doc='''
+        Set or Return the Duration as represented in Quarter Length, possibly as a fraction
+
+        note: the setter is identical to .quarterLength
+
+        >>> n = note.Note()
+        >>> n.quarterLengthRational = 2.0
+        >>> n.quarterLengthRational
+        2.0
+        >>> n.quarterLengthRational = 1.0/3
+        >>> n.quarterLengthRational
+        Fraction(1, 3)
+    ''')
+    quarterLength = property(_getQuarterLength, _setQuarterLength,
+        doc = '''Set or Return the Duration as represented in Quarter Length.
+
+        >>> n = note.Note()
+        >>> n.quarterLength = 2.0
+        >>> n.quarterLength
+        2.0
+        ''')
+
+
     #--------------------------------------------------------------------------
     # look at this object for an atttribute; if not here
     # look up to activeSite
@@ -642,11 +682,11 @@ class Music21Object(object):
 
         >>> s1 = stream.Stream()
         >>> s1.id = 'containingStream'
-        >>> s1.insert(20.5, n)
+        >>> s1.insert(20.0/3, n)
         >>> n.getOffsetBySite(s1)
-        20.5
+        6.6666...
         >>> n.getOffsetBySite(s1, returnType='rational')
-        Fraction(41, 2)
+        Fraction(20, 3)
 
 
         >>> s2 = stream.Stream()
@@ -1534,7 +1574,7 @@ class Music21Object(object):
         >>> n.offset
         3.0
         >>> n.offsetRational
-        Fraction(3, 1)
+        3.0
         
         Still works...
 
@@ -1542,7 +1582,7 @@ class Music21Object(object):
         >>> n.offset
         3.0
         >>> n.offsetRational
-        Fraction(3, 1)
+        3.0
 
 
         There is a branch that does slow searches.
@@ -1568,10 +1608,7 @@ class Music21Object(object):
             try:
                 return self.sites.getOffsetBySite(None, returnType=returnType)
             except SitesException:  # might not have a None offset
-                if returnType == 'float':
-                    return 0.0
-                else:
-                    return fractions.Fraction(0, 1)
+                return 0.0
         else:
             # try to look for it in all objects
             environLocal.printDebug(['doing a manual activeSite search: probably means that ' +
@@ -1714,8 +1751,10 @@ class Music21Object(object):
     offsetRational = property(_getOffsetRational, _setOffset,
                               doc = '''
         The offsetRational property sets or returns the position of this object
-        as a fractions.Fraction value
-        (generally in `quarterLengths`) from the start of its `activeSite`,
+        as a float or fractions.Fraction value
+        (generally in `quarterLengths`), depending on what is representable. 
+        
+        Offsets are measured from the start of the object's `activeSite`,
         that is, the most recently referenced `Stream` or `Stream` subclass such
         as `Part`, `Measure`, or `Voice`.  It is a simpler
         way of calling `o.getOffsetBySite(o.activeSite, returnType='rational')`.
@@ -1731,7 +1770,7 @@ class Music21Object(object):
         >>> m1.number = 4
         >>> m1.insert(10.0, n1)
         >>> n1.offsetRational
-        Fraction(10, 1)
+        10.0
         >>> n1.activeSite
         <music21.stream.Measure 4 offset=0.0>
 
@@ -1761,7 +1800,7 @@ class Music21Object(object):
         >>> for element in m1:
         ...     pass
         >>> n1.offsetRational
-        Fraction(10, 1)
+        10.0
 
 
         The property can also set the offset for the object if no
@@ -1770,18 +1809,18 @@ class Music21Object(object):
 
         >>> n1 = note.Note()
         >>> n1.id = 'hi'
-        >>> n1.offsetRational = fractions.Fraction(20, 1)
+        >>> n1.offsetRational = fractions.Fraction(20, 3)
         >>> n1.offsetRational
-        Fraction(20, 1)
+        Fraction(20, 3)
 
         >>> s1 = stream.Stream()
         >>> s1.append(n1)
         >>> n1.offsetRational
-        Fraction(0, 1)
+        0.0
         >>> s2 = stream.Stream()
         >>> s2.insert(30.5, n1)
         >>> n1.offsetRational
-        Fraction(61, 2)
+        30.5
 
         After calling `getElementById` on `s1`, the
         returned element's `offsetRational` will be its offset in `s1`.
@@ -1790,7 +1829,7 @@ class Music21Object(object):
         >>> n2 is n1
         True
         >>> n2.offsetRational
-        Fraction(0, 1)
+        0.0
 
         Iterating over the elements in a Stream will
         make its `offset` be the offset in iterated
@@ -1798,7 +1837,7 @@ class Music21Object(object):
 
         >>> for thisElement in s2:
         ...     thisElement.offsetRational
-        Fraction(61, 2)
+        30.5
 
         When in doubt, use `.getOffsetBySite(streamObj, returnType='rational')`
         which is safer.
@@ -2257,7 +2296,7 @@ class Music21Object(object):
 #         else:
 #             raise Music21ObjectException('cannot yet support writing in the %s format' % fileFormat)
 
-    def _reprText(self):
+    def _reprText(self, **keywords):
         '''
         Return a text representation possible with line
         breaks. This methods can be overridden by subclasses

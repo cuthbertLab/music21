@@ -2090,7 +2090,7 @@ class Stream(base.Music21Object):
 
     #---------------------------------------------------------------------------
     def _recurseRepr(self, thisStream, prefixSpaces=0,
-                    addBreaks=True, addIndent=True):
+                    addBreaks=True, addIndent=True, addEndTimes=False):
         '''
         Used by .show('text')
 
@@ -2106,10 +2106,18 @@ class Stream(base.Music21Object):
         >>> post
         '{0.0} <music21.stream.Stream ...> / {0.0} <music21.stream.Stream ...> / {0.0} <music21.note.Note C>'
         '''
+        def singleElement(element, indent, thisStream, addEndTimes):
+            off = common.strTrimFloat(element.getOffsetBySite(thisStream))            
+            if addEndTimes is False:
+                return indent + "{" + off + "} " + element.__repr__()
+            else:
+                ql = common.strTrimFloat(element.getOffsetBySite(thisStream, returnType='rational') 
+                                         + element.duration.quarterLengthRational)
+                return indent + "{" + off + ' - ' + ql + '} ' + element.__repr__()
+            
         msg = []
         insertSpaces = 4
         for element in thisStream:
-            off = common.strTrimFloat(element.getOffsetBySite(thisStream))            
             if addIndent:
                 indent = " " * prefixSpaces
             else:
@@ -2117,12 +2125,12 @@ class Stream(base.Music21Object):
 
             #if isinstance(element, Stream):
             if element.isStream:
-                msg.append(indent + "{" + off + "} " + element.__repr__())
+                msg.append(singleElement(element, indent, thisStream, addEndTimes))
                 msg.append(self._recurseRepr(element,
                            prefixSpaces + insertSpaces,
-                           addBreaks=addBreaks, addIndent=addIndent))
+                           addBreaks=addBreaks, addIndent=addIndent, addEndTimes=addEndTimes))
             else:
-                msg.append(indent + "{" + off + "} " + element.__repr__())
+                msg.append(singleElement(element, indent, thisStream, addEndTimes))
         if addBreaks:
             msg = '\n'.join(msg)
         else: # use a slashs
@@ -2130,16 +2138,20 @@ class Stream(base.Music21Object):
         return msg
 
 
-    def _reprText(self):
+    def _reprText(self, **keywords):
         '''
         Return a text representation. This methods can be overridden by
         subclasses to provide alternative text representations.
 
         This is used by .show('text')
         '''
-        return self._recurseRepr(self)
+        if 'addEndTimes' in keywords:
+            addEndTimes = keywords['addEndTimes']
+        else:
+            addEndTimes = False
+        return self._recurseRepr(self, addEndTimes = addEndTimes)
 
-    def _reprTextLine(self):
+    def _reprTextLine(self, **keywords):
         '''
         Return a text representation without line breaks.
         This methods can be overridden by subclasses to
@@ -3300,21 +3312,21 @@ class Stream(base.Music21Object):
         (in other words, you'll need to call list[i][0].getOffsetBySite(self) to
         get the offset)
 
-
+        >>> from pprint import pprint as pp
         >>> s = stream.Stream()
         >>> s.insert(3, note.Note('C'))
         >>> s.insert(4, note.Note('C#'))
         >>> s.insert(4, note.Note('D-'))
-        >>> s.insert(5, note.Note('D'))
+        >>> s.insert(16.0/3, note.Note('D'))
 
         >>> returnList = s.groupElementsByOffset()
         >>> returnList
         [[<music21.note.Note C>], [<music21.note.Note C#>, <music21.note.Note D->], [<music21.note.Note D>]]
 
         >>> returnDict = s.groupElementsByOffset(returnDict = True)
-        >>> returnDict
-        {Fraction(3, 1): [<music21.note.Note C>], Fraction(4, 1): [<music21.note.Note C#>, <music21.note.Note D->], Fraction(5, 1): [<music21.note.Note D>]}
-
+        >>> pp(returnDict)
+        {3.0: [<music21.note.Note C>], 4.0: [<music21.note.Note C#>, <music21.note.Note D->], Fraction(16, 3): [<music21.note.Note D>]}
+        
         Test that sorting still works...
 
         >>> s.insert(0, meter.TimeSignature('2/4'))
@@ -4684,7 +4696,7 @@ class Stream(base.Music21Object):
         >>> s.insert(0, p1)
         >>> s.insert(0, p2)
         >>> [str(o) for o in s.flat._uniqueOffsetsAndEndTimes()]
-        ['53/25', '4', '103/25', '5', '53/10', '11/2', '63/10', '13/2']
+        ['53/25', '4.0', '103/25', '5.0', '53/10', '11/2', '63/10', '6.5']
 
         Limit what is returned:
 
@@ -5063,13 +5075,20 @@ class Stream(base.Music21Object):
             >>> p2.insert(5.5, note.Rest())
             >>> s.insert(0, p1)
             >>> s.insert(0, p2)
+            >>> s.show('text', addEndTimes=True)
+            {0.0 - 6.3} <music21.stream.Part part1>
+                {4.0 - 5.0} <music21.note.Note C#>
+                {5.3 - 6.3} <music21.note.Rest rest>
+            {0.0 - 6.5} <music21.stream.Part part2>
+                {2.12 - 4.12} <music21.note.Note D->
+                {5.5 - 6.5} <music21.note.Rest rest>
             >>> cc = s.chordify()
-            >>> cc.show('text')
-            {0.0} <music21.note.Rest rest>
-            {2.12} <music21.chord.Chord D-4>
-            {4.0} <music21.chord.Chord C#4 D-4>
-            {4.12} <music21.chord.Chord C#4>
-            {5.0} <music21.note.Rest rest>
+            >>> cc.show('text', addEndTimes=True)
+            {0.0 - 2.12} <music21.note.Rest rest>
+            {2.12 - 4.0} <music21.chord.Chord D-4>
+            {4.0 - 4.12} <music21.chord.Chord C#4 D-4>
+            {4.12 - 5.0} <music21.chord.Chord C#4>
+            {5.0 - 6.5} <music21.note.Rest rest>
 
         Here's how addPartIdAsGroup works:
 
@@ -7955,10 +7974,9 @@ class Stream(base.Music21Object):
 
         for e in eToProcess:
             # if qlList values are greater than the found duration, skip
-            if sum(quarterLengthList) > e.quarterLengthRational:
+            if common.optionalNumToFraction(sum(quarterLengthList)) > e.quarterLengthRational:
                 continue
-            elif not common.almostEquals(sum(quarterLengthList),
-                e.quarterLengthRational, grain=1e-4):
+            elif not common.optionalNumToFraction(sum(quarterLengthList)) == e.quarterLengthRational:
                 # try to map a list that is of sufficient duration
                 qlProcess = []
                 i = 0

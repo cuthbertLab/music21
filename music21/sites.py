@@ -12,10 +12,10 @@
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
-import fractions
 import unittest
 
 from music21 import common
+from music21 import defaults
 from music21 import exceptions21
 from music21.ext import six
 
@@ -26,6 +26,9 @@ if six.PY3:
 WEAKREF_ACTIVE = True
 
 #DEBUG_CONTEXT = False
+
+DENOM_LIMIT = defaults.limitOffsetDenominator
+
 
 class SitesException(exceptions21.Music21Exception):
     pass
@@ -100,14 +103,15 @@ class SiteRef(common.SlottedObject):
             return None
     
     def _setOffset(self, offset):
+        '''
+        sets the offset and if necessary, translates it to a Fraction for exact representation.
+        '''
         if offset is None:
             self._offset = None
-        elif isinstance(offset, fractions.Fraction):
-            self._offset = offset        
         elif isinstance(offset, basestring):
             self._offset = offset
         else:
-            self._offset = fractions.Fraction(offset).limit_denominator(65535)
+            self._offset = common.optionalNumToFraction(offset)
     
     offset = property(_getOffsetAsFloat, _setOffset)
 
@@ -730,14 +734,14 @@ class Sites(common.SlottedObject):
             >>> aSite = Mock()
             >>> bSite = Mock()
             >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 23)
-            >>> aLocations.add(bSite, 121.5)
+            >>> aLocations.add(aSite, 5)
+            >>> aLocations.add(bSite, 3.2)
             >>> aLocations.getOffsetByObjectMatch(aSite)
-            23.0
+            5.0
             >>> aLocations.getOffsetByObjectMatch(bSite)
-            121.5
+            3.2...
             >>> aLocations.getOffsetByObjectMatch(bSite, returnType='rational')
-            Fraction(243, 2)
+            Fraction(16, 5)
 
         '''
         for idKey in self.siteDict:
@@ -773,8 +777,6 @@ class Sites(common.SlottedObject):
             >>> aLocations.add(bSite, 121.5)
             >>> aLocations.getOffsetBySite(aSite)
             23.0
-
-        ::
 
             >>> aLocations.getOffsetBySite(bSite)
             121.5
@@ -830,12 +832,8 @@ class Sites(common.SlottedObject):
             >>> sitesObj.siteDict[idBSite].siteWeakref
             <weakref at 0x...; dead>
 
-        ::
-
             >>> sitesObj.siteDict[idBSite].siteWeakref is None
             False
-
-        ::
 
             >>> sitesObj.siteDict[idBSite].site is None
             True
@@ -909,15 +907,15 @@ class Sites(common.SlottedObject):
             >>> sitesObj = music21.Sites()
             >>> sitesObj.add(aSite, 0)
             >>> sitesObj.add(cSite) # a context -- no offset
-            >>> sitesObj.add(bSite, 234) # can add at same offset or another
+            >>> sitesObj.add(bSite, 2.33333333333) # can add at same offset or another
             >>> sitesObj.add(dSite) # a context -- no offset
             >>> sitesObj.getOffsets()
-            [0.0, 234.0]
+            [0.0, 2.3333...]
             
             Can call returnType = 'rational' instead:
             
             >>> sitesObj.getOffsets(returnType='rational')
-            [Fraction(0, 1), Fraction(234, 1)]
+            [0.0, Fraction(7, 3)]
         '''
         # here, already having location keys may be an advantage
         return [self.getOffsetBySiteId(x, returnType=returnType) for x in self._locationKeys]
@@ -940,26 +938,23 @@ class Sites(common.SlottedObject):
             >>> bSite = Mock()
             >>> cSite = Mock()
             >>> sitesObj = sites.Sites()
-            >>> sitesObj.add(aSite, 23)
-            >>> sitesObj.add(bSite, 23121.5)
-            >>> aSite is sitesObj.getSiteByOffset(23)
+            >>> sitesObj.add(aSite, 2)
+            >>> sitesObj.add(bSite, 10.0/3)
+            >>> aSite is sitesObj.getSiteByOffset(2)
             True
-            >>> bSite is sitesObj.getSiteByOffset(fractions.Fraction(46243, 2))
+            >>> bSite is sitesObj.getSiteByOffset(fractions.Fraction(10, 3))
+            True
+            >>> bSite is sitesObj.getSiteByOffset(3.33333333333)
             True
 
         '''
-
         match = None
+        offset = common.optionalNumToFraction(offset)
         for siteId in self.siteDict:
             # might need to use almost equals here
             matched = False
-            if isinstance(offset, fractions.Fraction):
-                if self.siteDict[siteId].offsetRational == offset:
-                    matched = True
-            else:
-                if self.siteDict[siteId].offset == offset:
-                    matched = True
-            
+            if self.siteDict[siteId].offsetRational == offset:
+                matched = True
             if matched is True:
                 if self.siteDict[siteId].isDead:
                     return None
