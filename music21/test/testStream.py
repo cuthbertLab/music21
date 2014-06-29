@@ -5847,8 +5847,8 @@ class Test(unittest.TestCase):
         self.assertEqual([n.pitch.accidental.displayStatus for n in m.notes[:5]], [True, False, False, False, True])
         
         raw = m21ToString.fromMusic21Object(m)
-        self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
-        self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
+        self.assertTrue(raw.find('<tuplet bracket="yes" placement="above"') > 0, raw)
+        self.assertTrue(raw.find('<beam number="1">begin</beam>') > 0, raw)
 
     def testMakeNotationByMeasuresB(self):
         from music21 import stream
@@ -7435,10 +7435,10 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    #import sys
     #'testContextNestedC'
     #'testContextNestedD'
-    #sys.argv.append('testContextNestedD')
+    #import sys
+    #sys.argv.append('testMakeNotationByMeasuresA')
     music21.mainTest(Test)
 
 

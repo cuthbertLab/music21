@@ -3630,7 +3630,7 @@ class Test(unittest.TestCase):
 #         print "times as long as it would normally be."
 
         self.assertEqual(tup2.totalTupletLength(), 0.5)
-        self.assertEqual(tup2.tupletMultiplier(), 2.0/3)
+        self.assertEqual(tup2.tupletMultiplier(), fractions.Fraction(2,3))
 
         dur3.tuplets = (tup1, tup2)
 #         print "So a tuplet-dotted-quarter's length under both tuplets is",

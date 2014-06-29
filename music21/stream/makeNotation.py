@@ -128,7 +128,7 @@ def makeBeams(s, inPlace=False):
             # error check; call before sending to time signature, as, if this
             # fails, it represents a problem that happens before time signature
             # processing
-            durSum = sum([d.quarterLengthRational for d in durList])
+            durSum = common.optionalNumToFraction(sum([d.quarterLengthRational for d in durList]))
             barQL = lastTimeSignature.barDuration.quarterLengthRational
 
             if durSum > barQL:
