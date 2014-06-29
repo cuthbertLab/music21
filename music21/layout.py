@@ -307,7 +307,7 @@ class StaffLayout(LayoutBase):
     the <defaults> and in <print> attributes.
 
 
-    >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize = 113)
+    >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize = 113, staffLines=5)
     >>> sl.distance
     3
 
@@ -319,9 +319,10 @@ class StaffLayout(LayoutBase):
     >>> sl.staffNumber
     1
 
-    Music21 also stores the <staff-size> and eventually
-    <staff-lines> of the <attributes> tag in a StaffLayout
-    object.  TODO: make it export properly.
+    staffLines specifies the number of lines for a non 5-line staff.
+    
+    >>> sl.staffLines
+    5
 
     staffSize is a percentage of the base staff size, so
     this defines a staff 13% larger than normal.
@@ -329,7 +330,7 @@ class StaffLayout(LayoutBase):
     >>> sl.staffSize
     113.0
     >>> sl
-    <music21.layout.StaffLayout distance 3, staffNumber 1, staffSize 113.0>
+    <music21.layout.StaffLayout distance 3, staffNumber 1, staffSize 113.0, staffLines 5>
 
     '''
     def __init__(self, *args, **keywords):
@@ -357,7 +358,7 @@ class StaffLayout(LayoutBase):
                     self.hidden = True
 
     def __repr__(self):
-        return "<music21.layout.StaffLayout distance %r, staffNumber %r, staffSize %r>" % (self.distance, self.staffNumber, self.staffSize)
+        return "<music21.layout.StaffLayout distance %r, staffNumber %r, staffSize %r, staffLines %r>" % (self.distance, self.staffNumber, self.staffSize, self.staffLines)            
 
 #-------------------------------------------------------------------------------
 class LayoutException(exceptions21.Music21Exception):
@@ -968,7 +969,7 @@ class LayoutScore(stream.Opus):
 
         >>> staffLayout031 = ls.pages[0].systems[3].staves[1].staffLayout
         >>> staffLayout031
-        <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0>
+        <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5>
         >>> staffLayout031.hidden
         True
 

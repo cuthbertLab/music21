@@ -1852,8 +1852,14 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     if m.timeSignature is not None:
         # timeSignatureToMx returns a mxTime ojbect, needs to be in a list
         mxAttributes.timeList = [timeSignatureToMx(m.timeSignature)]
+ 
+    found = m.getElementsByClass('StaffLayout')
+    if len(found) > 0:
+        sl = found[0] # assume only one per measure
+        mxAttributes.staffDetailsList = [staffLayoutToMxStaffDetails(sl)]
+ 
     mxMeasure.set('attributes', mxAttributes)
-
+       
     # see if we have barlines
     if (m.leftBarline != None or
         (len(rbSpanners) > 0 and rbSpanners[0].isFirst(m))):
@@ -2746,6 +2752,18 @@ def staffLayoutToMxStaffLayout(staffLayout):
     mxStaffLayout.staffDistance = staffLayout.distance
     mxStaffLayout.set('number', staffLayout.staffNumber)
     return mxStaffLayout
+
+def staffLayoutToMxStaffDetails(staffLayout):
+    '''
+    
+    >>> sl = layout.StaffLayout(distance=34.0, staffNumber=2)
+    >>> mxStaffLayout = musicxml.toMxObjects.staffLayoutToMxStaffLayout(sl)    
+    >>> mxStaffLayout
+    <staff-layout number=2 staff-distance=34.0>
+    '''
+    mxStaffDetails = mxObjects.StaffDetails()
+    mxStaffDetails.staffLines = staffLayout.staffLines
+    return mxStaffDetails
 
 #-----------------------------------------------------------------
 # metadata

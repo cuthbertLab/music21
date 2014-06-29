@@ -2092,7 +2092,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                     
                     staffLines = None
                     try:
-                        staffLines = float(mxStaffDetails.staffLines)
+                        staffLines = int(mxStaffDetails.staffLines)
                     except TypeError:
                         staffLines = 5     
                                        

@@ -1372,6 +1372,7 @@ class Attributes(MusicXMLElement):
         # instruments
         c = c + self.clefList  
         # staff details
+        c = c + self.staffDetailsList
         c.append(self.transposeObj)
         # directive
         c.append(self.measureStyleObj)
