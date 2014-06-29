@@ -1191,7 +1191,7 @@ def makeTupletBrackets(s, inPlace=False):
 
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
-            # common.greaterThan uses is >= w/ almost equals
+            # common.greaterThanOrEqual uses is >= w/ almost equals
             elif (tupletNext is None or
                 common.greaterThanOrEqual(completionCount, completionTarget)):
                 tupletObj.type = 'stop'

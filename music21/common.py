@@ -652,8 +652,6 @@ def almostEquals(x, y = 0.0, grain=1e-7):
         return True
     return False
 
-almostEqual = almostEquals
-
 
 def nearestCommonFraction(x, grain=1e-2):
     '''Given a value that suggests a floating point fraction, like .33,
@@ -681,24 +679,6 @@ def nearestCommonFraction(x, grain=1e-2):
             return v
     return x
 
-
-def greaterThan(x, y = 0.0, grain=1e-7):
-    '''
-    greaterThan returns True if x is greater than and not almostEquals y
-
-
-    >>> common.greaterThan(5, 4)
-    True
-    >>> common.greaterThan(5.05, 5.02)
-    True
-    >>> common.greaterThan(5.000000000005, 5.000000000006)
-    False
-    >>> common.greaterThan(5.000000000006, 5.000000000005)
-    False
-    '''
-    if x < y or almostEquals(x, y, grain):
-        return False
-    return True
 
 def greaterThanOrEqual(x, y=0.0, grain=1e-7):
     '''
@@ -729,59 +709,6 @@ def lessThan(x, y = 0.0, grain=1e-7):
     if x > y or almostEquals(x, y, grain):
         return False
     return True
-
-
-def lessThanOrEqual(x, y = 0.0, grain=1e-7):
-    '''
-    lessThan -- returns True if x is less than and not almostEquals y
-
-
-    >>> common.lessThanOrEqual(4, 4)
-    True
-    >>> common.lessThanOrEqual(5.2, 5.5)
-    True
-    >>> common.lessThanOrEqual(5.2, 5.5)
-    True
-    >>> common.lessThanOrEqual(5.000000000005, 5.000000000006)
-    True
-
-    '''
-    if x < y or almostEquals(x, y, grain):
-        return True
-    return False
-
-
-def isPowerOfTwo(n):
-    '''
-    returns True if argument is either a power of 2 or a reciprocal
-    of a power of 2. Uses almostEquals so that a float whose reminder after
-    taking a log is nearly zero is still True
-
-
-    >>> common.isPowerOfTwo(3)
-    False
-    >>> common.isPowerOfTwo(18)
-    False
-    >>> common.isPowerOfTwo(1024)
-    True
-    >>> common.isPowerOfTwo(1024.01)
-    False
-    >>> common.isPowerOfTwo(1024.00001)
-    True
-
-    OMIT_FROM_DOCS
-    >>> common.isPowerOfTwo(10)
-    False
-    '''
-
-    if n <= 0:
-        return False
-
-    (remainder, unused_throwAway) = math.modf(math.log(n, 2))
-    if (almostEquals(remainder, 0.0)):
-        return True
-    else:
-        return False
 
 
 def nearestMultiple(n, unit):
@@ -1019,7 +946,6 @@ def toUnicode(usrStr):
 def classToClassStr(classObj):
     '''Convert a class object to a class string.
 
-
     >>> common.classToClassStr(note.Note)
     'Note'
     >>> common.classToClassStr(chord.Chord)
@@ -1030,7 +956,6 @@ def classToClassStr(classObj):
 
 def getNumFromStr(usrStr, numbers='0123456789'):
     '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
-
 
     >>> common.getNumFromStr('23a')
     ('23', 'a')
@@ -1194,7 +1119,7 @@ def decimalToTuplet(decNum):
     Traceback (most recent call last):
     ZeroDivisionError: number must be greater than zero
 
-
+    TODO: replace with fractions...
     '''
 
     def findSimpleFraction(working):
@@ -1356,7 +1281,7 @@ def approximateGCD(values, grain=1e-4):
         # lowest is already a float
         unused_int, floatingValue = divmod(x / lowest, 1.0)
         # if almost an even division
-        if almostEqual(floatingValue, 0.0, grain=grain):
+        if almostEquals(floatingValue, 0.0, grain=grain):
             count += 1
     if count == len(values):
         return lowest
