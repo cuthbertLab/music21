@@ -2598,12 +2598,11 @@ class Music21Object(object):
         if self.duration is None:
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
-        if not common.almostEqual(sum(quarterLengthList),
-            self.duration.quarterLength, grain=1e-4):
-            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLength))
+        if common.optionalNumToFraction(sum(quarterLengthList)) != self.duration.quarterLengthRational:
+            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLengthRational))
         # if nothing to do
-        elif (len(quarterLengthList) == 1 and quarterLengthList[0] ==
-            self.duration.quarterLength):
+        elif (len(quarterLengthList) == 1 and common.optionalNumToFraction(quarterLengthList[0]) ==
+            self.duration.quarterLengthRational):
             # return a copy of self in a list
             return [copy.deepcopy(self)]
         elif len(quarterLengthList) <= 1:
@@ -2612,7 +2611,7 @@ class Music21Object(object):
         post = []
         forceEndTieType = 'stop'
         for i in range(len(quarterLengthList)):
-            ql = quarterLengthList[i]
+            ql = common.optionalNumToFraction(quarterLengthList[i])
             e = copy.deepcopy(self)
             e.quarterLength = ql
 

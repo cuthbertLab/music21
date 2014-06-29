@@ -283,14 +283,8 @@ def proportionToFraction(value):
     >>> meter.proportionToFraction(0.83333)
     (5, 6)
     '''
-    # TODO: this is a brute-force method: is there a more elegant alternative?
-    for i in range(2,16+1):
-        xBase = 1. / i
-        for j in range(1,i+1): # take all multiples
-            x = xBase * j
-            if common.almostEquals(value, x, grain=1e-3):
-                return (j, i)
-    return None
+    f = fractions.Fraction(value).limit_denominator(16)
+    return (f.numerator, f.denominator)
 
 
 def bestTimeSignature(meas):
@@ -347,7 +341,6 @@ def bestTimeSignature(meas):
     >>> ts6 = meter.bestTimeSignature(m6)
     >>> ts6
     <music21.meter.TimeSignature 11/32>
-
     '''
 
     #TODO: set limit at 11/4?
@@ -378,9 +371,9 @@ def bestTimeSignature(meas):
         i = 10
         while i > 0:
             partsFloor = int(sumDurQL / minDurTest)
-            partsReal = sumDurQL / float(minDurTest)
-            if (common.almostEquals(partsFloor, partsReal) or
-            minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
+            partsReal = common.optionalNumToFraction(sumDurQL / float(minDurTest))
+            if (partsFloor == partsReal or
+                minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
                 break
             # need to break down minDur until we can get a match
             else:
@@ -2178,15 +2171,16 @@ class MeterSequence(MeterTerminal):
         >>> b.getLevelSpan(2)
         [(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.25), (3.25, 3.5), (3.5, 4.0)]
         '''
+        optf = common.optionalNumToFraction
         ms = self._getLevelList(level, flat=True)
         mapping = []
         pos = 0.0
 
         for i in range(len(ms)):
             start = pos
-            end = pos + ms[i].duration.quarterLength
+            end = optf(pos + ms[i].duration.quarterLengthRational)
             mapping.append((start, end))
-            pos += ms[i].duration.quarterLength
+            pos = end
         return mapping
 
     def getLevelWeight(self, level=0):
@@ -2409,13 +2403,14 @@ class MeterSequence(MeterTerminal):
         (1.0, 2.0)
 
         '''
-        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
+        qLenPos = common.optionalNumToFraction(qLenPos)
+        if qLenPos >= self.duration.quarterLengthRational or qLenPos < 0:
             if not permitMeterModulus:
                 #environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
                 raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
             else:
                 #environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
-                qLenPos = qLenPos % self.duration.quarterLength
+                qLenPos = qLenPos % self.duration.quarterLengthRational
                 #environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
 
         iMatch = self.offsetToIndex(qLenPos)
@@ -2426,9 +2421,9 @@ class MeterSequence(MeterTerminal):
             #print(i, iMatch, self[i])
             if i == iMatch:
                 start = pos
-                end = pos + self[i].duration.quarterLength
+                end = common.optionalNumToFraction(pos + self[i].duration.quarterLengthRational)
             else:
-                pos += self[i].duration.quarterLength
+                pos = common.optionalNumToFraction(pos + self[i].duration.quarterLengthRational)
         #environLocal.printDebug(['start, end', start, end])
         return start, end
 
@@ -2436,7 +2431,6 @@ class MeterSequence(MeterTerminal):
         '''
         Given a lenPos, return the weight of the active region.
         Only applies to the top-most level of partitions
-
 
         >>> a = meter.MeterSequence('3/4', 3)
         >>> a.offsetToWeight(0.0)
@@ -2446,7 +2440,8 @@ class MeterSequence(MeterTerminal):
 
         ??? Not sure what this does...
         '''
-        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
+        qLenPos = common.optionalNumToFraction(qLenPos)
+        if qLenPos >= self.duration.quarterLengthRational or qLenPos < 0:
             raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
         iMatch = self.offsetToIndex(qLenPos)
         return self[iMatch].weight
@@ -2454,7 +2449,6 @@ class MeterSequence(MeterTerminal):
     def offsetToDepth(self, qLenPos, align='quantize'):
         '''
         Given a qLenPos, return the maximum available depth at this position
-
 
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
@@ -2471,7 +2465,8 @@ class MeterSequence(MeterTerminal):
         >>> b.offsetToDepth(1.5)
         2
         '''
-        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
+        qLenPos = common.optionalNumToFraction(qLenPos)
+        if qLenPos >= self.duration.quarterLengthRational or qLenPos < 0:
             raise MeterException('cannot access from qLenPos %s' % qLenPos)
 
         # need to quantize by lowest level
@@ -2479,7 +2474,7 @@ class MeterSequence(MeterTerminal):
         msMin = self.getLevel(self.depth-1)
         qStart, unused_qEnd = mapMin[msMin.offsetToIndex(qLenPos)]
         if align == 'quantize':
-            posMatch = qStart
+            posMatch = common.optionalNumToFraction(qStart)
         else:
             posMatch = qLenPos
 
@@ -2491,7 +2486,7 @@ class MeterSequence(MeterTerminal):
                     srcMatch = start
                 elif align == 'end':
                     srcMatch = end
-                if common.almostEquals(srcMatch, posMatch):
+                if srcMatch == posMatch:
                     score += 1
 
         return score
@@ -3511,19 +3506,18 @@ class TimeSignature(base.Music21Object):
                 beams = beamsList[i]
 
                 if beams is None: # if a place holder
-                    pos += dur.quarterLength
+                    pos += dur.quarterLengthRational
                     continue
 
                 # see if there is a component defined for this beam number
                 # if not, continue
                 if beamNumber not in beams.getNumbers():
-                    pos += dur.quarterLength
+                    pos += dur.quarterLengthRational
                     continue
 
                 start = pos
-                end = pos + dur.quarterLength
-
-                startNext = pos + dur.quarterLength
+                end = pos + dur.quarterLengthRational
+                startNext = pos + dur.quarterLengthRational
                 #endPrevious = pos
 
                 if i == len(durList) - 1: # last
@@ -3544,7 +3538,7 @@ class TimeSignature(base.Music21Object):
                     # sandwiched between two unbeamables = no beams
                     # delete beams, increment position, and continue loop
                     beamsList[i] = None
-                    pos += dur.quarterLength
+                    pos += dur.quarterLengthRational
                     continue
 
 
@@ -3563,14 +3557,12 @@ class TimeSignature(base.Music21Object):
 
                 # watch for a special case where a duration completely fills
                 # the archetype; this generally should not be beamed
-                if (common.almostEquals(start, archetypeSpan[0]) and
-                    common.almostEquals(end, archetypeSpan[1])):
+                if (start == archetypeSpan[0] and
+                    end == archetypeSpan[1]):
                     # increment position and continue loop
                     beamsList[i] = None # replace with None!
-                    pos += dur.quarterLength
+                    pos += dur.quarterLengthRational
                     continue
-
-
 
                 # determine beamType
                 if i == 0: # if the first, we always start
@@ -3596,7 +3588,7 @@ class TimeSignature(base.Music21Object):
                 elif beamPrevious is None or beamNumber not in beamPrevious.getNumbers():
                     if beamNumber == 1 and beamNext is None:
                         beamsList[i] = None
-                        pos += dur.quarterLength
+                        pos += dur.quarterLengthRational
                         continue
                     elif beamNext is None and beamNumber > 1:
                         beamType = 'partial-left'
@@ -3675,7 +3667,7 @@ class TimeSignature(base.Music21Object):
                 beams.setByNumber(beamNumber, beamType)
 
                 # increment position and continue loop
-                pos += dur.quarterLength
+                pos += dur.quarterLengthRational
 
         ## clear elements that have partial beams with no full beams:
 
@@ -3735,10 +3727,11 @@ class TimeSignature(base.Music21Object):
         True
         '''
         pos = 0
+        qLenPos = common.optionalNumToFraction(qLenPos)
         for i in range(len(self.accentSequence)):
-            if common.almostEquals(pos, qLenPos):
+            if (pos == qLenPos):
                 return True
-            pos += self.accentSequence[i].duration.quarterLength
+            pos += self.accentSequence[i].duration.quarterLengthRational
         return False
 
     def setAccentWeight(self, weightList, level=0):
@@ -3809,34 +3802,51 @@ class TimeSignature(base.Music21Object):
 
     def getAccentWeight(self, qLenPos, level=0, forcePositionMatch=False,
         permitMeterModulus=False):
-        '''Given a qLenPos,  return an accent level. In general, accents are assumed to define only a first-level weight.
+        '''Given a qLenPos,  return an accent level. In general, accents are assumed to 
+        define only a first-level weight.
 
-        If `forcePositionMatch` is True, an accent will only be returned if the provided qLenPos is a near exact match to the provided quarter length. Otherwise, half of the minimum quarter length will be provided.
+        If `forcePositionMatch` is True, an accent will only be returned if the 
+        provided qLenPos is a near exact match to the provided quarter length. Otherwise, half of the minimum quarter length will be provided.
 
-        If `permitMeterModulus` is True, quarter length positions greater than the duration of the Meter will be accepted as the modulus of the total meter duration.
+        If `permitMeterModulus` is True, quarter length positions greater than 
+        the duration of the Meter will be accepted as the modulus of the total meter duration.
 
 
         >>> ts1 = meter.TimeSignature('3/4')
         >>> [ts1.getAccentWeight(x) for x in range(3)]
         [1.0, 0.5, 0.5]
-        '''
 
+
+        Returns an error...
+        
+        >>> [ts1.getAccentWeight(x) for x in range(6)]
+        Traceback (most recent call last):
+        MeterException: cannot access from qLenPos 3.0 where total duration is 3.0
+
+        ...unless permitMeterModulus is employed
+
+        >>> [ts1.getAccentWeight(x, permitMeterModulus=True) for x in range(6)]
+        [1.0, 0.5, 0.5, 1.0, 0.5, 0.5]
+
+        '''
+        qLenPos = common.optionalNumToFraction(qLenPos)
         # might store this weight every time it is set, rather than
         # getting it here
         minWeight = min(
                     [mt.weight for mt in self.accentSequence._partition]) * .5
         msLevel = self.accentSequence.getLevel(level)
 
+        if permitMeterModulus:
+            environLocal.printDebug([' self.duration.quarterLength',  self.duration.quarterLength, 'self.barDuration.quar', self.barDuration.quarterLength])
+            qLenPos = qLenPos % self.barDuration.quarterLength
+
         if forcePositionMatch:
             # only return values for qLen positions that are at the start
             # of a span; for those that are not, we need to return a minWeight
             localSpan = msLevel.offsetToSpan(qLenPos,
-                        permitMeterModulus=permitMeterModulus)
-            if permitMeterModulus:
-                environLocal.printDebug([' self.duration.quarterLength',  self.duration.quarterLength, 'self.barDuration.quar', self.barDuration.quarterLength])
-                qLenPos = qLenPos % self.barDuration.quarterLength
+                            permitMeterModulus=permitMeterModulus)
 
-            if not common.almostEquals(qLenPos, localSpan[0]):
+            if qLenPos != localSpan[0]:
                 return minWeight
         return msLevel[msLevel.offsetToIndex(qLenPos)].weight
 
@@ -3863,7 +3873,6 @@ class TimeSignature(base.Music21Object):
     def getBeatOffsets(self):
         '''Return offset positions in a list for the start of each beat, assuming this object is found at offset zero.
 
-
         >>> a = meter.TimeSignature('3/4')
         >>> a.getBeatOffsets()
         [0.0, 1.0, 2.0]
@@ -3876,11 +3885,11 @@ class TimeSignature(base.Music21Object):
         if len(self.beatSequence) == 1:
             return post
         else:
-            endOffset = self.barDuration.quarterLength
+            endOffset = self.barDuration.quarterLengthRational
             o = 0.0
             for ms in self.beatSequence._partition:
-                o += ms.duration.quarterLength
-                if common.almostEquals(o, endOffset) or o >= endOffset:
+                o = common.optionalNumToFraction(o + ms.duration.quarterLengthRational)
+                if o >= endOffset:
                     return post # do not add offset for end of bar
                 post.append(o)
 

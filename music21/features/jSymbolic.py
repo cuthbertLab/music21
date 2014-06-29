@@ -1884,7 +1884,6 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
 
 class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
-    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
     >>> f = fe.extract()

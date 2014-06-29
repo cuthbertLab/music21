@@ -2953,13 +2953,13 @@ class Stream(base.Music21Object):
         >>> [el.step for el in out7]
         ['C', 'D']
 
-        
-
         '''
+        offsetStart = common.optionalNumToFraction(offsetStart)
         if offsetEnd is None:
             offsetEnd = offsetStart
             zeroLengthSearch = True
         else:
+            offsetEnd = common.optionalNumToFraction(offsetEnd)
             if offsetEnd > offsetStart:
                 zeroLengthSearch = False
             else:
@@ -3116,13 +3116,17 @@ class Stream(base.Music21Object):
         #>>> e = stream1.getElementAtOrBefore(21)
         #>>> e
         #<music21.note.Note D4>
+        
         # FAILS, returns the clef!
 
         '''
         # NOTE: this is a performance critical method
         # TODO: need to deal with more than on object the same
         # offset and span from the source
+        
+        # TODO: switch to timespans
         candidates = []
+        offset = common.optionalNumToFraction(offset)
         nearestTrailSpan = offset # start with max time
 
         # need both _elements and _endElements
@@ -3131,11 +3135,11 @@ class Stream(base.Music21Object):
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
-            span = offset - e.getOffsetBySite(self, returnType='rational')
+            span = common.optionalNumToFraction(offset - e.getOffsetBySite(self, returnType='rational'))
             #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(self), 'e', e])
-            if (span < -.000000001): # i.e. , span < 0, but with epsilon # the e is after this offset
+            if span < 0: 
                 continue
-            elif common.almostEquals(span, 0):
+            elif span == 0:
                 candidates.append((span, e))
                 nearestTrailSpan = span
             else:
@@ -3184,7 +3188,6 @@ class Stream(base.Music21Object):
         are instances of
         these classes or subclasses of these classes will be returned.
 
-
         >>> stream1 = stream.Stream()
         >>> x = note.Note('D4')
         >>> x.id = 'x'
@@ -3216,6 +3219,7 @@ class Stream(base.Music21Object):
         '''
         # NOTE: this is a performance critical method
         candidates = []
+        offset = common.optionalNumToFraction(offset)
         nearestTrailSpan = offset # start with max time
 
         # need both _elements and _endElements
@@ -3224,7 +3228,7 @@ class Stream(base.Music21Object):
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
-            span = offset - e.getOffsetBySite(self, returnType='rational')
+            span = common.optionalNumToFraction(offset - e.getOffsetBySite(self, returnType='rational'))
             #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(self), 'e', e])
             # by forcing <= here, we are sure to get offsets not at zero
             if span <= 0: # the e is after this offset
@@ -3262,8 +3266,6 @@ class Stream(base.Music21Object):
         '''
         Given an element, get the next element.  If classList is specified,
         check to make sure that the element is an instance of the class list
-
-
 
         >>> st1 = stream.Stream()
         >>> n1 = note.Note()
@@ -3350,12 +3352,10 @@ class Stream(base.Music21Object):
         >>> s.groupElementsByOffset()[0]
         [<music21.clef.TrebleClef>, <music21.meter.TimeSignature 2/4>]
 
-
         it is DEFINITELY a feature that this method does not
         find elements within substreams that have the same
         absolute offset.  See lily.translate for how this is
         useful for finding voices.  For the other behavior, call Stream.flat first or Stream.recurse()
-
         '''
         offsetsRepresented = {}
         for el in self.elements:
@@ -7952,7 +7952,8 @@ class Stream(base.Music21Object):
     def sliceByQuarterLengths(self, quarterLengthList, target=None,
         addTies=True, inPlace=False):
         '''
-        Slice all :class:`~music21.duration.Duration` objects on all Notes of this Stream.
+        Slice all :class:`~music21.duration.Duration` objects on all Notes and Rests 
+        of this Stream.
         Duration are sliced according to values provided in `quarterLengthList` list.
         If the sum of these values is less than the Duration, the values are accumulated
         in a loop to try to fill the Duration. If a match cannot be found, an
@@ -8005,16 +8006,15 @@ class Stream(base.Music21Object):
                     qlProcess.append(
                         quarterLengthList[i%len(quarterLengthList)])
                     i += 1
-                    sumQL = sum(qlProcess)
-                    if (common.almostEquals(sumQL, e.quarterLengthRational) or
-                    sumQL >= e.quarterLengthRational):
+                    sumQL = common.optionalNumToFraction(sum(qlProcess))
+                    if sumQL >= e.quarterLengthRational:
                         break
             else:
                 qlProcess = quarterLengthList
 
             #environLocal.printDebug(['got qlProcess', qlProcess, 'for element', e, e.quarterLengthRational])
 
-            if not common.almostEquals(sum(qlProcess), e.quarterLengthRational):
+            if not common.optionalNumToFraction(sum(qlProcess)) == e.quarterLengthRational:
                 raise StreamException('cannot map quarterLength list into element Duration: %s, %s' % (sum(qlProcess), e.quarterLengthRational))
 
             post = e.splitByQuarterLengths(qlProcess, addTies=addTies)
@@ -8023,7 +8023,7 @@ class Stream(base.Music21Object):
             returnObj.remove(e)
             for eNew in post:
                 returnObj._insertCore(oInsert, eNew)
-                oInsert += eNew.quarterLengthRational
+                oInsert = common.optionalNumToFraction(oInsert + eNew.quarterLengthRational)
 
         returnObj._elementsChanged()
         return returnObj

@@ -367,16 +367,17 @@ def quarterLengthToTuplet(qLen, maxToReturn=4):
     for key, value in typeToDuration.items():
         durationToType.append((value, key))
     durationToType.sort()
+    qLen = common.optionalNumToFraction(qLen)
 
     for typeValue, typeKey in durationToType:
         # try tuplets
         for i in defaultTupletNumerators:
-            qLenBase = typeValue / float(i)
+            qLenBase = common.optionalNumToFraction(typeValue / float(i))
             # try multiples of the tuplet division, from 1 to max-1
             for m in range(1, i):
                 qLenCandidate = qLenBase * m
                 # need to use a courser grain here
-                if common.almostEquals(qLenCandidate, qLen, 1e-5):
+                if qLenCandidate == qLen:
                     tupletDuration = Duration(typeKey)
                     newTuplet = Tuplet(numberNotesActual=i,
                                        numberNotesNormal=m,
@@ -440,11 +441,9 @@ def quarterLengthToDurations(qLen, link=True):
     Or, an eighth that is 1/3 of a quarter
     Or, an eighth that is 2/3 of eighth
 
-    >>> post = duration.unitSpec(duration.quarterLengthToDurations(.3333333))
-    >>> common.almostEquals(post[0][0], .3333333)
-    True
-    >>> post[0][1:]
-    ('eighth', 0, 3, 2, 'eighth')
+    >>> post = duration.unitSpec(duration.quarterLengthToDurations(1.0/3))
+    >>> post[0]
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
 
     A half that is 1/3 of a whole, or a triplet half note.
     Or, a half that is 2/3 of a half
@@ -496,12 +495,13 @@ def quarterLengthToDurations(qLen, link=True):
 
     '''
     post = []
+    qLen = common.optionalNumToFraction(qLen)
 
     if qLen < 0:
         raise DurationException("qLen cannot be less than Zero.  Read Lewin, GMIT for more details...")
 
     ## CUTHBERT: TRIED INCREASING 0.0 to < 0.005 but did not help...
-    elif common.almostEqual(qLen, 0.0):
+    elif qLen == 0:
         post.append(ZeroDuration()) # this is a DurationUnit subclass
         return post
 
@@ -545,7 +545,7 @@ def quarterLengthToDurations(qLen, link=True):
             raise DurationException('cannot reduce quarter length (%s)' % qLenRemainder)
         # trying a fixed minimum limit
         # this it do deal with common errors in processing
-        if qLenRemainder > .004:
+        if qLenRemainder > .004: # 1e-4 grain almostEquals -- TODO: FIX
             try:
                 if len(post) > 6: # we probably have a problem
                     raise DurationException('duration exceeds 6 components, with %s qLen left' % (qLenRemainder))
@@ -608,8 +608,8 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
     (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
 
-    Divide 1.5 into triplet eighths
-    >>> pql(1.5,.33333333333333)
+    Divide 1.5 into triplet eighths, with a triplet 16th leftover.
+    >>> pql(1.5, 1.0/3)
     (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
     (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
     (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
@@ -621,18 +621,19 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     >>> pql(1.5, 4)
     (1.5, 'quarter', 1, None, None, None)
     '''
-
+    qLen = common.optionalNumToFraction(qLen)
+    qLenDiv = common.optionalNumToFraction(qLenDiv)
     post = []
 
     while qLen >= qLenDiv:
         post += quarterLengthToDurations(qLenDiv)
         qLen = qLen - qLenDiv
-    if common.almostEquals(qLen, 0, grain=1e-5):
-        #return post, True
+        
+    if qLen == 0:
         return post
     else:
+        # leftovers...
         post += quarterLengthToDurations(qLen)
-        #return post, False
         return post
 
 
@@ -723,13 +724,13 @@ def updateTupletType(durationList):
     examine each Duration, and each component, and set Tuplet type to
     start or stop, as necessary.
 
-    >>> a = duration.Duration(); a.quarterLength = .33333
-    >>> b = duration.Duration(); b.quarterLength = .33333
-    >>> c = duration.DurationUnit(); c.quarterLength = .33333
+    >>> a = duration.Duration(); a.quarterLength = 1.0/3
+    >>> b = duration.Duration(); b.quarterLength = 1.0/3
+    >>> c = duration.DurationUnit(); c.quarterLength = 1.0/3
     >>> d = duration.Duration(); d.quarterLength = 2
-    >>> e = duration.Duration(); e.quarterLength = .33333
-    >>> f = duration.DurationUnit(); f.quarterLength = .33333
-    >>> g = duration.Duration(); g.quarterLength = .33333
+    >>> e = duration.Duration(); e.quarterLength = 1.0/3
+    >>> f = duration.DurationUnit(); f.quarterLength = 1.0/3
+    >>> g = duration.Duration(); g.quarterLength = 1.0/3
 
     >>> a.tuplets[0].type is None
     True
@@ -2357,12 +2358,12 @@ class Duration(DurationCommon):
 #         if self._expansionNeeded:
 #             self.expand()
 #             self._expansionNeeded = False
-
+        quarterPosition = common.optionalNumToFraction(quarterPosition)
 
         if self.components == []:
             raise DurationException(
                 "Need components to run getComponentIndexAtQtrPosition")
-        elif quarterPosition > self.quarterLength:
+        elif quarterPosition > self.quarterLengthRational:
             raise DurationException(
                 "position is after the end of the duration")
 
@@ -2373,17 +2374,17 @@ class Duration(DurationCommon):
 
         # it seems very odd that thes return objects
         # while the method name suggests indices will be returned
-        if common.almostEquals(quarterPosition, 0):
+        if quarterPosition == 0:
             return self.components[0]
-        elif common.almostEquals(quarterPosition, self.quarterLength):
+        elif quarterPosition == self.quarterLengthRational:
             return self.components[-1]
 
         currentPosition = 0.0
         indexFound = None
         for i in range(len(self.components)):
-            currentPosition += self.components[i].quarterLength
-            if (currentPosition > quarterPosition and
-                not common.almostEquals(currentPosition, quarterPosition)):
+            currentPosition = common.optionalNumToFraction(currentPosition + 
+                                                           self.components[i].quarterLengthRational)
+            if currentPosition > quarterPosition:
                 indexFound = i
                 break
         if indexFound is None:
@@ -3629,16 +3630,14 @@ class Test(unittest.TestCase):
 #         print "times as long as it would normally be."
 
         self.assertEqual(tup2.totalTupletLength(), 0.5)
-        self.assertEqual(common.almostEquals(
-            tup2.tupletMultiplier(), 0.666666666667), True)
+        self.assertEqual(tup2.tupletMultiplier(), 2.0/3)
 
         dur3.tuplets = (tup1, tup2)
 #         print "So a tuplet-dotted-quarter's length under both tuplets is",
 #         print dur3.getQuarterLength(),
 #         print "quarter notes"
 
-        self.assertEqual(common.almostEquals(
-            dur3.quarterLength, 0.7), True)
+        self.assertAlmostEquals(dur3.quarterLengthRational, 0.7)
 
         myTuplet = Tuplet()
         self.assertAlmostEquals(round(myTuplet.tupletMultiplier(), 3), 0.667)
