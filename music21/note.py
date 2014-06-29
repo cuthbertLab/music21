@@ -554,29 +554,6 @@ class GeneralNote(base.Music21Object):
 
     #---------------------------------------------------------------------------
     # properties common to Notes, Rests,
-    def _getQuarterLength(self):
-        '''Return quarter length
-
-
-        >>> n = note.Note()
-        >>> n.quarterLength = 2.0
-        >>> n.quarterLength
-        2.0
-        '''
-        return self.duration.quarterLength
-
-    def _setQuarterLength(self, value):
-        self.duration.quarterLength = value
-
-    quarterLength = property(_getQuarterLength, _setQuarterLength,
-        doc = '''Return the Duration as represented in Quarter Length.
-
-
-        >>> n = note.Note()
-        >>> n.quarterLength = 2.0
-        >>> n.quarterLength
-        2.0
-        ''')
 
     #---------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, inPlace=True):

@@ -17,9 +17,9 @@ as well as component objects for defining nested metrical structures,
 '''
 
 import copy
+import fractions
 import re
 import unittest
-#import fractions # available in 2.6 and greater
 
 from music21 import base
 from music21 import beam
@@ -370,56 +370,63 @@ def bestTimeSignature(meas):
 
     # first, we need to evenly divide min dur into total
     minDurTest = minDurQL
-    i = 10
-    while i > 0:
-        partsFloor = int(sumDurQL / minDurTest)
-        partsReal = sumDurQL / float(minDurTest)
-        if (common.almostEquals(partsFloor, partsReal) or
-        minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
-            break
-        # need to break down minDur until we can get a match
-        else:
+    if isinstance(sumDurQL, fractions.Fraction):
+        numerator = minDurTest.numerator
+        denominator = minDurTest.denominator
+    else:
+    
+        i = 10
+        while i > 0:
+            partsFloor = int(sumDurQL / minDurTest)
+            partsReal = sumDurQL / float(minDurTest)
+            if (common.almostEquals(partsFloor, partsReal) or
+            minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
+                break
+            # need to break down minDur until we can get a match
+            else:
+                if minDurDotted:
+                    minDurTest = minDurTest / 3.
+                else:
+                    minDurTest = minDurTest / 2.
+            i -= 1
+    
+        # see if we can get a type for the denominator
+        # if we do not have a match; we need to break down this value
+        match = False
+        i = 10
+        while i>0:
+            try:
+                dType, match = duration.quarterLengthToClosestType(minDurTest)
+            except ZeroDivisionError:
+                raise MeterException("Cannot find a good match for this measure")
+    
+            if match or dType == MIN_DENOMINATOR_TYPE:
+                break
             if minDurDotted:
                 minDurTest = minDurTest / 3.
             else:
                 minDurTest = minDurTest / 2.
-        i -= 1
-
-    # see if we can get a type for the denominator
-    # if we do not have a match; we need to break down this value
-    match = False
-    i = 10
-    while i>0:
-        try:
-            dType, match = duration.quarterLengthToClosestType(minDurTest)
-        except ZeroDivisionError:
-            raise MeterException("Cannot find a good match for this measure")
-
-        if match or dType == MIN_DENOMINATOR_TYPE:
-            break
-        if minDurDotted:
-            minDurTest = minDurTest / 3.
-        else:
-            minDurTest = minDurTest / 2.
-        i -= 1
-
-    minDurQL = minDurTest
-    dType, match = duration.quarterLengthToClosestType(minDurQL)
-    if not match: # cant find a type for a denominator
-        raise MeterException('cannot find a type for denominator %s' % minDurQL)
-
-    # denominator is the numerical representation of the min type
-    # e.g., quarter is 4, whole is 1
-    for num, typeName in duration.typeFromNumDict.items():
-        if typeName == dType:
-            denominator = num
-    # numerator is the count of min parts in the sum
-    numerator = int(sumDurQL / minDurQL)
-
-    #simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
-    denom = common.euclidGCD(numerator, denominator)
-    numerator = numerator // denom
-    denominator = denominator // denom
+            i -= 1
+    
+        minDurQL = minDurTest
+        dType, match = duration.quarterLengthToClosestType(minDurQL)
+        if not match: # cant find a type for a denominator
+            raise MeterException('cannot find a type for denominator %s' % minDurQL)
+    
+        # denominator is the numerical representation of the min type
+        # e.g., quarter is 4, whole is 1
+        for num, typeName in duration.typeFromNumDict.items():
+            if typeName == dType:
+                if num >= 1:
+                    num = int(num)
+                denominator = num
+        # numerator is the count of min parts in the sum
+        numerator = int(sumDurQL / minDurQL)
+    
+        #simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
+        denom = common.euclidGCD(numerator, denominator)
+        numerator = numerator // denom
+        denominator = denominator // denom
 
     # simplifies rare time signatures like 16/16 and 1/1 to 4/4
     if numerator == denominator and numerator not in [2,4]:

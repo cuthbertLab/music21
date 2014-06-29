@@ -110,7 +110,7 @@ class Test(unittest.TestCase):
         assert n2.getOffsetBySite(m1) == 2.0
         assert n2.getOffsetBySite(s2) == 10
         # the None site provides a default offset
-        assert n2.getSites() == [None, m1, s2, s3]
+        assert n2.sites.getSites() == [None, m1, s2, s3]
         # the same instance is found in all Streams
         assert m1.hasElement(n2) == True
         assert s2.hasElement(n2) == True

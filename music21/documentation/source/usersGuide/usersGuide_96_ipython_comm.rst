@@ -5,7 +5,13 @@
 .. code:: python
 
     from music21 import *
+
+.. code:: python
+
     from IPython.display import HTML, Javascript
+
+.. code:: python
+
     m21url = "http://web.mit.edu/music21/music21j/src/music21.js"
     
     def Javas(msg, lib=None):
@@ -126,8 +132,8 @@
              require(['music21'], function() { 
                data = ''' + outputCode + ''';       
                var jpc = new music21.jsonPickle.Converter();
-               var streamObj = jpc.run(data);
-               streamObj.replaceLastCanvas("#''' + idName + '''");
+               streamObj = jpc.run(data);
+               streamObj.replaceCanvas("#''' + idName + '''");
              });
         </script>
         '''
@@ -148,8 +154,28 @@
 .. parsed-literal::
    :class: ipython-result
 
-    <music21.stream.Score 4506157584>
+    <music21.stream.Score 4412264400>
 
+
+.. code:: python
+
+    Javascript('''var n = new music21.note.Note("F#4");
+          var s = new music21.stream.Stream();
+          s.append(n);
+          var newPlace = $('div.output_subarea.output_javascript.output_pyout');
+          console.log(newPlace);
+          s.appendNewCanvas(newPlace[newPlace.length-1]);''')
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    <IPython.core.display.Javascript at 0x107704250>
+
+
+.. code:: python
+
+    
 
 .. code:: python
 

@@ -311,9 +311,15 @@ class TextBoxException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class TextBox(base.Music21Object, TextFormat):
-    '''A TextBox is arbitrary text that might be positioned anywhere on a page, independent of notes or staffs. A page attribute specifies what page this text is found on; positionVertical and positionHorizontal position the text from the bottom left corner in units of tenths.
+    '''
+    A TextBox is arbitrary text that might be positioned anywhere on a page, 
+    independent of notes or staffs. A page attribute specifies what page this text is found on; 
+    positionVertical and positionHorizontal position the text from the bottom left corner in 
+    units of tenths.
 
-    This object is similar to the TextExpression object, but does not have as many position parameters, enclosure attributes, and the ability to convert to RepeatExpressions and TempoTexts. 
+    This object is similar to the TextExpression object, but does not have as many position 
+    parameters, enclosure attributes, and the ability to convert to 
+    RepeatExpressions and TempoTexts. 
 
     >>> from music21 import text, stream
     >>> y = 1000 # set a fixed vertical distance

@@ -15,23 +15,33 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 To do a release, 
 
 1. update the VERSION in _version.py and the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
-2. run test/multiprocessTest.py
+2. run test/multiprocessTest.py  for Python2 AND Python3
 3. If all tests pass, run `corpus.cacheMetadata(['core'])`, 
-4. run test/test.py (normally not necessary,because it's slower and mostly duplicates multiprocessTest, but should be done before making a release), 
+4. run test/testSingleCoreAll.py 
+     (normally not necessary,because it's slower and mostly duplicates multiprocessTest, 
+     but should be done before making a release).  Does not yet need to be done via python3
 5. then test/testDocumentation
 6. then test/testSerialization
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
 9. run documentation/upload [not via eclipse] or upload via ssh.
 
-[*] you will need IPython (pip or easy_install) and pandoc (.dmg) installed
+[*] you will need sphinx, IPython (pip or easy_install) and pandoc (.dmg) installed
 
-10. and finally this file. 
+10. And finally this file. 
 
-11. Create a new release on GitHub and upload the FIVE files created here.
+11. COMMIT to Github at this point, then don't change anything until the next step is done.
+    (.gitignore SHOULD avoid uploading the large files created here...)
 
-12. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking edit and augment
-the version number and the download URL.
+12. Create a new release on GitHub and upload the FIVE files created here. Use tag v1.9.3 (etc.).
+    Drag in this order: .egg, .tar.gz, .exe, no-corpus.egg, no-corpus.tar.gz
+
+13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking 
+    edit and augment the version number and the download URL. -- The URL will be printed when
+    running dist.py -- it's important to cut and paste this, since it has the md5 tag.
+
+
+14. Delete the files in dist...
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
@@ -102,14 +112,16 @@ class Distributor(object):
             if self.version in fn and fn.endswith('.egg'):
                 self.fpEgg = fp
             elif self.version in fn and fn.endswith('.exe'):
-                fpNew = fp.replace('.macosx-10.6-intel.exe', '.exe')
-                fpNew = fpNew.replace('.macosx-10.7-x86_64.exe', '.exe')
+                fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.8-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.10-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.11-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.12-intel.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.12-x86_64.exe', '.win32.exe')
                 if fpNew != fp:
                     os.rename(fp, fpNew)
                 self.fpWin = fpNew
@@ -124,7 +136,9 @@ class Distributor(object):
                 environLocal.warn(fn)   
     
     def removeCorpus(self, fp):
-        '''Remove the corpus from a compressed file (.tar.gz or .egg) and create a new music21-noCorpus version.
+        '''
+        Remove the corpus from a compressed file (.tar.gz or .egg) and 
+        create a new music21-noCorpus version.
 
         Return the completed file path of the newly created edition.
     
@@ -232,7 +246,9 @@ class Distributor(object):
 
 
     def build(self):
-        '''Build all distributions. Update and rename file paths if necessary; remove extract build produts.
+        '''
+        Build all distributions. Update and rename file paths if necessary; 
+        remove extract build products.
         '''
         # call setup.py
         #import setup -- for some reason doesnt work unless called from commandline
@@ -270,7 +286,7 @@ class Distributor(object):
 
     def uploadPyPi(self):
         '''
-        Upload source package to PyPI
+        Upload source package to PyPI -- currently source file is too big for PyPi...sigh...
         '''
         environLocal.warn('putting bdist_egg on pypi -- looks redundant, but we have to do it again')
         savePath = os.getcwd()
@@ -280,58 +296,6 @@ class Distributor(object):
 
         #os.system('cd %s; %s setup.py bdist_egg upload' % 
         #        (self.fpPackageDir, PY))
-
-#     def uploadGoogleCodeOneFile(self, fp):
-#         '''Upload distributions to Google code. Requires googlecode_upload.py script from: 
-#         http://code.google.com/p/support/source/browse/trunk/scripts/googlecode_upload.py
-#         
-#         As of January 2014, googleCode no longer accepts uploads so this method is no longer used.
-# 
-#         '''
-#         import googlecode_upload # placed in site-packages
-# 
-#         summary = self.version
-#         project = 'music21'
-#         user = 'cuthbert@gmail.com'
-# 
-#         if fp.endswith('.tar.gz'):
-#             labels = ['OpSys-All', 'Featured', 'Type-Archive']
-#         elif fp.endswith('.exe'):
-#             labels = ['OpSys-Windows', 'Featured', 'Type-Installer']
-#         elif fp.endswith('.egg'):
-#             labels = ['OpSys-All', 'Featured', 'Type-Archive']
-#         
-#         print(['starting GoogleCode upload of:', fp])
-#         status, reason, unused_url = googlecode_upload.upload_find_auth(fp, 
-#                         project, summary, labels, user)
-#         print([status, reason])
-# 
-# 
-#     def uploadGoogleCode(self):
-#         '''
-#         Upload each file to googleCode.
-#         
-#         As of January 2014, googleCode no longer accepts uploads so this method is no longer used.
-#         '''
-# #         for fp in [self.fpTar, self.fpEgg, self.fpWin, 
-# #             self.fpTarNoCorpus, self.fpEggNoCorpus]:
-#         if self.buildNoCorpus is True:
-#             fileList = (
-#                 self.fpEggNoCorpus,
-#                 self.fpTarNoCorpus,
-#                 self.fpWin,
-#                 self.fpEgg,
-#                 self.fpTar,
-#                 )
-#         else:
-#             fileList = (
-#                 self.fpWin,
-#                 self.fpEgg,
-#                 self.fpTar,
-#                 )
-#         
-#         for fp in fileList:
-#             self.uploadGoogleCodeOneFile(fp)
 
     def md5ForFile(self, path, hexReturn=True):
         if hexReturn:
