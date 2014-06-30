@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from music21 import stream, converter, corpus, instrument, graph, note, meter, common, humdrum
+from music21 import stream, converter, corpus, instrument, graph, note, meter, humdrum
 import music21.note
 import music21.pitch
 from collections import defaultdict
@@ -96,7 +96,7 @@ def displayChopinRhythms():
         return len(rhythmicHash[keyname])
 
     for thisMeasure in measureStream:
-        if thisMeasure.duration.quarterLengthRational == 3.0:
+        if thisMeasure.duration.quarterLength == 3.0:
             continue
         notes = thisMeasure.flat.notesAndRests  # n.b. won't work any more because of voices...
         if len(notes) == 0:
@@ -321,7 +321,7 @@ def threeDimChopin():
 
 
 def threeDimMozart():
-    from music21.musicxml.testFiles import mozartTrioK581Excerpt  
+    from music21.musicxml.testFiles import mozartTrioK581Excerpt  # @UnresolvedImport
 
     streamObject = converter.parse(mozartTrioK581Excerpt) # 
 #    stream2 = streamObject.stripTies() # adds one outlier that makes the graph difficult to read
@@ -332,7 +332,7 @@ def threeDimMozart():
 
 
 def threeDimBoth():
-    from music21.musicxml.testFiles import mozartTrioK581Excerpt  
+    from music21.musicxml.testFiles import mozartTrioK581Excerpt # @UnresolvedImport
     from music21.humdrum import testFiles as kernTest  
 
     mozartStream = converter.parse(mozartTrioK581Excerpt)

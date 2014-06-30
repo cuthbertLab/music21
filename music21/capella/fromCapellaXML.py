@@ -766,7 +766,7 @@ class CapellaImporter(object):
         >>> durationTag2 = ci.domElementFromText('<duration base="1/4"><tuplet count="3"/></duration>')
         >>> d2 = ci.durationFromDuration(durationTag2)
         >>> d2
-        <music21.duration.Duration 0.666666...>
+        <music21.duration.Duration 2/3>
         >>> d2.type
         'quarter'
         >>> d2.tuplets

@@ -128,8 +128,8 @@ def makeBeams(s, inPlace=False):
             # error check; call before sending to time signature, as, if this
             # fails, it represents a problem that happens before time signature
             # processing
-            durSum = common.optionalNumToFraction(sum([d.quarterLengthRational for d in durList]))
-            barQL = lastTimeSignature.barDuration.quarterLengthRational
+            durSum = common.optionalNumToFraction(sum([d.quarterLength for d in durList]))
+            barQL = lastTimeSignature.barDuration.quarterLength
 
             if durSum > barQL:
                 #environLocal.printDebug([
@@ -146,8 +146,8 @@ def makeBeams(s, inPlace=False):
             if m.paddingLeft != 0.0:
                 offset = common.optionalNumToFraction(m.paddingLeft)
             elif (noteStream.highestTime <
-                lastTimeSignature.barDuration.quarterLengthRational):
-                offset = (lastTimeSignature.barDuration.quarterLengthRational -
+                lastTimeSignature.barDuration.quarterLength):
+                offset = (lastTimeSignature.barDuration.quarterLength -
                     noteStream.highestTime)
             beamsList = lastTimeSignature.getBeams(
                 noteStream, measureStartOffset=offset)

@@ -2178,7 +2178,7 @@ class MeterSequence(MeterTerminal):
 
         for i in range(len(ms)):
             start = pos
-            end = optf(pos + ms[i].duration.quarterLengthRational)
+            end = optf(pos + ms[i].duration.quarterLength)
             mapping.append((start, end))
             pos = end
         return mapping
@@ -2404,13 +2404,13 @@ class MeterSequence(MeterTerminal):
 
         '''
         qLenPos = common.optionalNumToFraction(qLenPos)
-        if qLenPos >= self.duration.quarterLengthRational or qLenPos < 0:
+        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             if not permitMeterModulus:
                 #environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
                 raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
             else:
                 #environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
-                qLenPos = qLenPos % self.duration.quarterLengthRational
+                qLenPos = qLenPos % self.duration.quarterLength
                 #environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
 
         iMatch = self.offsetToIndex(qLenPos)
@@ -2421,9 +2421,9 @@ class MeterSequence(MeterTerminal):
             #print(i, iMatch, self[i])
             if i == iMatch:
                 start = pos
-                end = common.optionalNumToFraction(pos + self[i].duration.quarterLengthRational)
+                end = common.optionalNumToFraction(pos + self[i].duration.quarterLength)
             else:
-                pos = common.optionalNumToFraction(pos + self[i].duration.quarterLengthRational)
+                pos = common.optionalNumToFraction(pos + self[i].duration.quarterLength)
         #environLocal.printDebug(['start, end', start, end])
         return start, end
 
@@ -2441,7 +2441,7 @@ class MeterSequence(MeterTerminal):
         ??? Not sure what this does...
         '''
         qLenPos = common.optionalNumToFraction(qLenPos)
-        if qLenPos >= self.duration.quarterLengthRational or qLenPos < 0:
+        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
         iMatch = self.offsetToIndex(qLenPos)
         return self[iMatch].weight
@@ -2466,7 +2466,7 @@ class MeterSequence(MeterTerminal):
         2
         '''
         qLenPos = common.optionalNumToFraction(qLenPos)
-        if qLenPos >= self.duration.quarterLengthRational or qLenPos < 0:
+        if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException('cannot access from qLenPos %s' % qLenPos)
 
         # need to quantize by lowest level
@@ -3506,18 +3506,18 @@ class TimeSignature(base.Music21Object):
                 beams = beamsList[i]
 
                 if beams is None: # if a place holder
-                    pos += dur.quarterLengthRational
+                    pos += dur.quarterLength
                     continue
 
                 # see if there is a component defined for this beam number
                 # if not, continue
                 if beamNumber not in beams.getNumbers():
-                    pos += dur.quarterLengthRational
+                    pos += dur.quarterLength
                     continue
 
                 start = pos
-                end = pos + dur.quarterLengthRational
-                startNext = pos + dur.quarterLengthRational
+                end = pos + dur.quarterLength
+                startNext = pos + dur.quarterLength
                 #endPrevious = pos
 
                 if i == len(durList) - 1: # last
@@ -3538,7 +3538,7 @@ class TimeSignature(base.Music21Object):
                     # sandwiched between two unbeamables = no beams
                     # delete beams, increment position, and continue loop
                     beamsList[i] = None
-                    pos += dur.quarterLengthRational
+                    pos += dur.quarterLength
                     continue
 
 
@@ -3561,7 +3561,7 @@ class TimeSignature(base.Music21Object):
                     end == archetypeSpan[1]):
                     # increment position and continue loop
                     beamsList[i] = None # replace with None!
-                    pos += dur.quarterLengthRational
+                    pos += dur.quarterLength
                     continue
 
                 # determine beamType
@@ -3588,7 +3588,7 @@ class TimeSignature(base.Music21Object):
                 elif beamPrevious is None or beamNumber not in beamPrevious.getNumbers():
                     if beamNumber == 1 and beamNext is None:
                         beamsList[i] = None
-                        pos += dur.quarterLengthRational
+                        pos += dur.quarterLength
                         continue
                     elif beamNext is None and beamNumber > 1:
                         beamType = 'partial-left'
@@ -3667,7 +3667,7 @@ class TimeSignature(base.Music21Object):
                 beams.setByNumber(beamNumber, beamType)
 
                 # increment position and continue loop
-                pos += dur.quarterLengthRational
+                pos += dur.quarterLength
 
         ## clear elements that have partial beams with no full beams:
 
@@ -3731,7 +3731,7 @@ class TimeSignature(base.Music21Object):
         for i in range(len(self.accentSequence)):
             if (pos == qLenPos):
                 return True
-            pos += self.accentSequence[i].duration.quarterLengthRational
+            pos += self.accentSequence[i].duration.quarterLength
         return False
 
     def setAccentWeight(self, weightList, level=0):
@@ -3885,10 +3885,10 @@ class TimeSignature(base.Music21Object):
         if len(self.beatSequence) == 1:
             return post
         else:
-            endOffset = self.barDuration.quarterLengthRational
+            endOffset = self.barDuration.quarterLength
             o = 0.0
             for ms in self.beatSequence._partition:
-                o = common.optionalNumToFraction(o + ms.duration.quarterLengthRational)
+                o = common.optionalNumToFraction(o + ms.duration.quarterLength)
                 if o >= endOffset:
                     return post # do not add offset for end of bar
                 post.append(o)

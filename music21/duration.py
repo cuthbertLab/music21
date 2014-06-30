@@ -178,16 +178,16 @@ def unitSpec(durationObjectOrObjects):
         ret = []
         for dO in durationObjectOrObjects:
             if dO.tuplets is None or len(dO.tuplets) == 0:
-                ret.append((dO.quarterLengthRational, dO.type, dO.dots, None, None, None))
+                ret.append((dO.quarterLength, dO.type, dO.dots, None, None, None))
             else:
-                ret.append((dO.quarterLengthRational, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type))
+                ret.append((dO.quarterLength, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type))
         return ret
     else:
         dO = durationObjectOrObjects
         if dO.tuplets is None or len(dO.tuplets) == 0:
-            return (dO.quarterLengthRational, dO.type, dO.dots, None, None, None)
+            return (dO.quarterLength, dO.type, dO.dots, None, None, None)
         else:
-            return (dO.quarterLengthRational, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type)
+            return (dO.quarterLength, dO.type, dO.dots, dO.tuplets[0].numberNotesActual, dO.tuplets[0].numberNotesNormal, dO.tuplets[0].durationNormal.type)
 
 def nextLargerType(durType):
     '''
@@ -855,8 +855,8 @@ class Tuplet(object):
     ::
 
         >>> myNote = note.Note("C#4")
-        >>> myNote.quarterLength = 0.8
-        >>> myNote.quarterLengthRational
+        >>> myNote.duration.quarterLength = 0.8
+        >>> myNote.duration.quarterLength
         Fraction(4, 5)
         >>> myNote.duration.fullName
         'Quarter Quintuplet (0.8QL)'
@@ -1086,7 +1086,7 @@ class Tuplet(object):
         4.0
         '''
         n = self.numberNotesNormal
-        return common.optionalNumToFraction(n * self.durationNormal.quarterLengthRational)
+        return common.optionalNumToFraction(n * self.durationNormal.quarterLength)
 
     def tupletMultiplier(self):
         '''Get a Fraction() by which to scale the duration that
@@ -1107,7 +1107,7 @@ class Tuplet(object):
         4/5
         
         '''
-        lengthActual = self.durationActual.quarterLengthRational
+        lengthActual = self.durationActual.quarterLength
         return common.optionalNumToFraction(self.totalTupletLength() / (
                 lengthActual * self.numberNotesActual))
 
@@ -1384,7 +1384,7 @@ class DurationUnit(DurationCommon):
             '<music21.duration.DurationUnit 1.0>'
 
         '''
-        qlr = self.quarterLengthRational
+        qlr = self.quarterLength
         
         return '<music21.duration.DurationUnit %s>' % qlr
 
@@ -1805,17 +1805,17 @@ class DurationUnit(DurationCommon):
 
         >>> a = duration.DurationUnit()
         >>> a.quarterLength = 3
-        >>> a.quarterLengthRational
+        >>> a.quarterLength
         3.0
         >>> a.quarterLength = .75
-        >>> a.quarterLengthRational
+        >>> a.quarterLength
         0.75
         >>> a.quarterLength = 2.0/3
         >>> a.type
         'quarter'
         >>> a.tuplets
         (<music21.duration.Tuplet 3/2/quarter>,)
-        >>> a.quarterLengthRational
+        >>> a.quarterLength
         Fraction(2, 3)            
         '''
         if self._quarterLengthNeedsUpdating:
@@ -1870,8 +1870,8 @@ class DurationUnit(DurationCommon):
         value = common.optionalNumToFraction(value)
         self._qtrLength = value
 
-    quarterLengthRational = property(_getQuarterLengthRational, _setQuarterLength)
-    quarterLength = property(_getQuarterLengthFloat, _setQuarterLength)
+    quarterLength      = property(_getQuarterLengthRational, _setQuarterLength)
+    quarterLengthFloat = property(_getQuarterLengthFloat, _setQuarterLength)
 
     @property
     def tuplets(self):
@@ -2183,7 +2183,7 @@ class Duration(DurationCommon):
         self._quarterLengthNeedsUpdating = False
         if self.isLinked:
             try:
-                self.components = quarterLengthToDurations(self.quarterLengthRational)
+                self.components = quarterLengthToDurations(self.quarterLength)
             except DurationException:
                 print("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
                 raise
@@ -2363,7 +2363,7 @@ class Duration(DurationCommon):
         if self.components == []:
             raise DurationException(
                 "Need components to run getComponentIndexAtQtrPosition")
-        elif quarterPosition > self.quarterLengthRational:
+        elif quarterPosition > self.quarterLength:
             raise DurationException(
                 "position is after the end of the duration")
 
@@ -2376,14 +2376,14 @@ class Duration(DurationCommon):
         # while the method name suggests indices will be returned
         if quarterPosition == 0:
             return self.components[0]
-        elif quarterPosition == self.quarterLengthRational:
+        elif quarterPosition == self.quarterLength:
             return self.components[-1]
 
         currentPosition = 0.0
         indexFound = None
         for i in range(len(self.components)):
             currentPosition = common.optionalNumToFraction(currentPosition + 
-                                                           self.components[i].quarterLengthRational)
+                                                           self.components[i].quarterLength)
             if currentPosition > quarterPosition:
                 indexFound = i
                 break
@@ -2700,7 +2700,7 @@ class Duration(DurationCommon):
             for dur in self.components:
                 # if components quarterLength needs to be updated, it will
                 # be updated when this property is called
-                qlr = dur.quarterLengthRational
+                qlr = dur.quarterLength
                 self._qtrLength = common.optionalNumToFraction(self._qtrLength + qlr)
         self._quarterLengthNeedsUpdating = False
 
@@ -3022,8 +3022,8 @@ class Duration(DurationCommon):
             self._componentsNeedUpdating = True
             self._quarterLengthNeedsUpdating = False
 
-    quarterLengthRational = property(_getQuarterLengthRational, _setQuarterLength)
-    quarterLength = property(_getQuarterLengthFloat, _setQuarterLength,
+    quarterLength      = property(_getQuarterLengthRational, _setQuarterLength)
+    quarterLengthFloat = property(_getQuarterLengthFloat, _setQuarterLength,
                              doc='''
         Returns the quarter note length or Sets the quarter note length to
         the specified value.
@@ -3427,12 +3427,12 @@ class TupletFixer(object):
 
         >>> n1 = note.Note()
         >>> n1.duration.quarterLength = 2.0/3
-        >>> n1.duration.quarterLengthRational
+        >>> n1.duration.quarterLength
         Fraction(2, 3)
         >>> s.append(n1)
         >>> n2 = note.Note()
         >>> n2.duration.quarterLength = 1.0/3
-        >>> n2.duration.quarterLengthRational
+        >>> n2.duration.quarterLength
         Fraction(1, 3)
         >>> s.append(n2)
 
@@ -3447,7 +3447,7 @@ class TupletFixer(object):
 
         >>> n1.duration.tuplets[0]
         <music21.duration.Tuplet 3/2/eighth>
-        >>> n1.duration.quarterLengthRational
+        >>> n1.duration.quarterLength
         Fraction(2, 3)
         >>> n2.duration.tuplets[0]
         <music21.duration.Tuplet 3/2/eighth>
@@ -3465,7 +3465,7 @@ class TupletFixer(object):
         >>> tf.fixBrokenTupletDuration(tupletGroups[-1])
         >>> m1[-1].duration.tuplets[0]
         <music21.duration.Tuplet 3/2/whole>
-        >>> m1[-1].duration.quarterLengthRational
+        >>> m1[-1].duration.quarterLength
         Fraction(4, 3)
         '''
         if len(tupletGroup) == 0:
@@ -3637,7 +3637,7 @@ class Test(unittest.TestCase):
 #         print dur3.getQuarterLength(),
 #         print "quarter notes"
 
-        self.assertAlmostEquals(dur3.quarterLengthRational, 0.7)
+        self.assertAlmostEquals(dur3.quarterLength, 0.7)
 
         myTuplet = Tuplet()
         self.assertAlmostEquals(round(myTuplet.tupletMultiplier(), 3), 0.667)
@@ -3826,14 +3826,14 @@ class Test(unittest.TestCase):
     def testSimpleSetQuarterLength(self):
         d = Duration()
         d.quarterLength = 0.33333333333333
-        self.assertEqual(repr(d.quarterLengthRational), 'Fraction(1, 3)')
+        self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(d._components, [] )
         self.assertEqual(d._componentsNeedUpdating, True )
         self.assertEqual(str(d.components), '[<music21.duration.DurationUnit 1/3>]')
         self.assertEqual(d._componentsNeedUpdating, False )
         self.assertEqual(str(d._qtrLength), '1/3')
         self.assertTrue(d._quarterLengthNeedsUpdating)
-        self.assertEqual(repr(d.quarterLengthRational), 'Fraction(1, 3)')
+        self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")
 
 #-------------------------------------------------------------------------------

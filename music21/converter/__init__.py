@@ -1552,8 +1552,11 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['\nopening fp', fp])
 
         #s.show()
+        from fractions import Fraction as F
         dList = [n.quarterLength for n in s.flat.notesAndRests[:30]]
-        match = [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.33333333333333331, 0.33333333333333331, 0.33333333333333331, 0.5, 0.5, 1.0]
+        match = [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 
+                 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 
+                 0.5, 0.5, 0.5, 0.5, F(1,3), F(1,3), F(1,3), 0.5, 0.5, 1.0]
         self.assertEqual(dList, match)
 
 

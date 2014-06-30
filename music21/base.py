@@ -558,42 +558,38 @@ class Music21Object(object):
 
     #---------------------------
     # convienence.  used to be in note.Note, but belongs everywhere:
-    def _getQuarterLength(self):
-        '''Return quarter length
-
-        >>> n = base.Music21Object()
-        >>> n.quarterLength = 2.0
-        >>> n.quarterLength
-        2.0
-        '''
-        return self.duration.quarterLength
+    def _getQuarterLengthFloat(self):
+        return self.duration.quarterLengthFloat
 
     def _getQuarterLengthRational(self):
-        return self.duration.quarterLengthRational
+        return self.duration.quarterLength
     
     def _setQuarterLength(self, value):
         self.duration.quarterLength = value
 
-    quarterLengthRational = property(_getQuarterLengthRational, _setQuarterLength, doc='''
+    quarterLength = property(_getQuarterLengthRational, _setQuarterLength, doc='''
         Set or Return the Duration as represented in Quarter Length, possibly as a fraction
 
-        note: the setter is identical to .quarterLength
-
-        >>> n = note.Note()
-        >>> n.quarterLengthRational = 2.0
-        >>> n.quarterLengthRational
-        2.0
-        >>> n.quarterLengthRational = 1.0/3
-        >>> n.quarterLengthRational
-        Fraction(1, 3)
-    ''')
-    quarterLength = property(_getQuarterLength, _setQuarterLength,
-        doc = '''Set or Return the Duration as represented in Quarter Length.
+        note: the setter is identical to .quarterLengthFloat
 
         >>> n = note.Note()
         >>> n.quarterLength = 2.0
         >>> n.quarterLength
         2.0
+        >>> n.quarterLength = 1.0/3
+        >>> n.quarterLength
+        Fraction(1, 3)
+    ''')
+    quarterLengthFloat = property(_getQuarterLengthFloat, _setQuarterLength,
+        doc = '''Set or Return the Duration as represented in Quarter Length as a float
+
+        >>> n = note.Note()
+        >>> n.quarterLengthFloat = 2.0
+        >>> n.quarterLengthFloat
+        2.0
+        >>> n.quarterLengthFloat = 1.0/3
+        >>> n.quarterLengthFloat
+        0.333...
         ''')
 
 
@@ -2598,11 +2594,11 @@ class Music21Object(object):
         if self.duration is None:
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
-        if common.optionalNumToFraction(sum(quarterLengthList)) != self.duration.quarterLengthRational:
-            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLengthRational))
+        if common.optionalNumToFraction(sum(quarterLengthList)) != self.duration.quarterLength:
+            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLength))
         # if nothing to do
         elif (len(quarterLengthList) == 1 and common.optionalNumToFraction(quarterLengthList[0]) ==
-            self.duration.quarterLengthRational):
+            self.duration.quarterLength):
             # return a copy of self in a list
             return [copy.deepcopy(self)]
         elif len(quarterLengthList) <= 1:

@@ -1918,7 +1918,7 @@ def hdStringToNote(contents):
 
     >>> n = humdrum.spineParser.hdStringToNote("CC3%2")
     >>> n.duration.quarterLength
-    2.6666666...
+    Fraction(8, 3)
     >>> n.duration.fullName
     'Whole Triplet (2.67QL)'
 
@@ -1951,7 +1951,7 @@ def hdStringToNote(contents):
 
     >>> n = humdrum.spineParser.hdStringToNote("6..fff")
     >>> n.duration.quarterLength
-    1.166666...
+    Fraction(7, 6)
     >>> n.duration.dots
     0
     >>> n.duration.tuplets[0].durationNormal.dots
@@ -1963,7 +1963,7 @@ def hdStringToNote(contents):
     >>> humdrum.spineParser.flavors['JRP'] = True
     >>> n = humdrum.spineParser.hdStringToNote("6..fff")
     >>> n.duration.quarterLength
-    1.166666...
+    Fraction(7, 6)
     >>> n.duration.dots
     2
     >>> n.duration.tuplets[0].durationNormal.dots
