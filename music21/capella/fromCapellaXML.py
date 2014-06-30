@@ -25,6 +25,7 @@ import zipfile
 from music21 import bar
 from music21 import chord
 from music21 import clef
+from music21 import common
 from music21 import duration
 #from music21 import dynamics
 from music21 import exceptions21
@@ -220,7 +221,7 @@ class CapellaImporter(object):
                 else:
                     newPart = partDictById[thisPart.id]['part']
                 for el in thisPart: # no need for recurse...
-                    newPart._insertCore(el.offset + systemOffset, el)
+                    newPart._insertCore(common.opFrac(el.offset + systemOffset), el)
                 newPart._elementsChanged()
         newScore = stream.Score()
         ## ORDERED DICT
@@ -891,7 +892,6 @@ class TestExternal(unittest.TestCase):
         ci = CapellaImporter()
         #ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
         import os
-        from music21 import common
         capellaDirPath = common.getSourceFilePath() + os.path.sep + 'capella'
         oswaldPath = capellaDirPath + os.path.sep + r'Nu_rue_mit_sorgen.capx'
         partScore = ci.scoreFromFile(oswaldPath)
@@ -900,7 +900,6 @@ class TestExternal(unittest.TestCase):
     def xtestImportSorgen(self):
         ci = CapellaImporter()
         import os
-        from music21 import common
         capellaDirPath = common.getSourceFilePath() + os.path.sep + 'capella'
         oswaldPath = capellaDirPath + os.path.sep + r'Nu_rue_mit_sorgen.capx'
 

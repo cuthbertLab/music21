@@ -66,7 +66,7 @@ import copy
 from music21 import common
 from music21 import defaults
 from music21 import exceptions21
-from music21.common import SlottedObject
+from music21.common import SlottedObject, opFrac
 from music21 import environment
 
 try:
@@ -254,7 +254,7 @@ def quarterLengthToClosestType(qLen):
     if (isinstance(qLen, fractions.Fraction)):
         noteLengthType = 4 / qLen  # divides right...
     else:
-        noteLengthType = common.optionalNumToFraction(4.0/qLen)
+        noteLengthType = opFrac(4.0/qLen)
 
     if noteLengthType in typeFromNumDict:
         return (typeFromNumDict[noteLengthType], True)
@@ -367,12 +367,12 @@ def quarterLengthToTuplet(qLen, maxToReturn=4):
     for key, value in typeToDuration.items():
         durationToType.append((value, key))
     durationToType.sort()
-    qLen = common.optionalNumToFraction(qLen)
+    qLen = opFrac(qLen)
 
     for typeValue, typeKey in durationToType:
         # try tuplets
         for i in defaultTupletNumerators:
-            qLenBase = common.optionalNumToFraction(typeValue / float(i))
+            qLenBase = opFrac(typeValue / float(i))
             # try multiples of the tuplet division, from 1 to max-1
             for m in range(1, i):
                 qLenCandidate = qLenBase * m
@@ -495,7 +495,7 @@ def quarterLengthToDurations(qLen, link=True):
 
     '''
     post = []
-    qLen = common.optionalNumToFraction(qLen)
+    qLen = opFrac(qLen)
 
     if qLen < 0:
         raise DurationException("qLen cannot be less than Zero.  Read Lewin, GMIT for more details...")
@@ -621,8 +621,8 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     >>> pql(1.5, 4)
     (1.5, 'quarter', 1, None, None, None)
     '''
-    qLen = common.optionalNumToFraction(qLen)
-    qLenDiv = common.optionalNumToFraction(qLenDiv)
+    qLen = opFrac(qLen)
+    qLenDiv = opFrac(qLenDiv)
     post = []
 
     while qLen >= qLenDiv:
@@ -684,9 +684,9 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
         qtrLength *= common.dotMultiplier(dots)
 
     if tuplets is not None and len(tuplets) > 0:
-        qtrLength = common.optionalNumToFraction(qtrLength)
+        qtrLength = opFrac(qtrLength)
         for tup in tuplets:
-            qtrLength = common.optionalNumToFraction(qtrLength * tup.tupletMultiplier())
+            qtrLength = opFrac(qtrLength * tup.tupletMultiplier())
     return qtrLength
 
 
@@ -1086,7 +1086,7 @@ class Tuplet(object):
         4.0
         '''
         n = self.numberNotesNormal
-        return common.optionalNumToFraction(n * self.durationNormal.quarterLength)
+        return opFrac(n * self.durationNormal.quarterLength)
 
     def tupletMultiplier(self):
         '''Get a Fraction() by which to scale the duration that
@@ -1108,7 +1108,7 @@ class Tuplet(object):
         
         '''
         lengthActual = self.durationActual.quarterLength
-        return common.optionalNumToFraction(self.totalTupletLength() / (
+        return opFrac(self.totalTupletLength() / (
                 lengthActual * self.numberNotesActual))
 
     ### PUBLIC PROPERTIES ###
@@ -1312,7 +1312,7 @@ class DurationUnit(DurationCommon):
         self._dots = [0]
         self._tuplets = ()  # an empty tuple
         if common.isNum(prototype):
-            self._qtrLength = common.optionalNumToFraction(prototype)
+            self._qtrLength = opFrac(prototype)
             self._typeNeedsUpdating = True
             self._quarterLengthNeedsUpdating = False
         else:
@@ -1867,7 +1867,7 @@ class DurationUnit(DurationCommon):
         if self._link:
             self._typeNeedsUpdating = True
         
-        value = common.optionalNumToFraction(value)
+        value = opFrac(value)
         self._qtrLength = value
 
     quarterLength      = property(_getQuarterLengthRational, _setQuarterLength)
@@ -2358,7 +2358,7 @@ class Duration(DurationCommon):
 #         if self._expansionNeeded:
 #             self.expand()
 #             self._expansionNeeded = False
-        quarterPosition = common.optionalNumToFraction(quarterPosition)
+        quarterPosition = opFrac(quarterPosition)
 
         if self.components == []:
             raise DurationException(
@@ -2382,7 +2382,7 @@ class Duration(DurationCommon):
         currentPosition = 0.0
         indexFound = None
         for i in range(len(self.components)):
-            currentPosition = common.optionalNumToFraction(currentPosition + 
+            currentPosition = opFrac(currentPosition + 
                                                            self.components[i].quarterLength)
             if currentPosition > quarterPosition:
                 indexFound = i
@@ -2701,7 +2701,7 @@ class Duration(DurationCommon):
                 # if components quarterLength needs to be updated, it will
                 # be updated when this property is called
                 qlr = dur.quarterLength
-                self._qtrLength = common.optionalNumToFraction(self._qtrLength + qlr)
+                self._qtrLength = opFrac(self._qtrLength + qlr)
         self._quarterLengthNeedsUpdating = False
 
     ### PUBLIC PROPERTIES ###
@@ -3015,7 +3015,7 @@ class Duration(DurationCommon):
 
     def _setQuarterLength(self, value):
         if self._qtrLength != value:
-            value = common.optionalNumToFraction(value)
+            value = opFrac(value)
             if value == 0.0 and self.isLinked is True:
                 self.clear()
             self._qtrLength = value

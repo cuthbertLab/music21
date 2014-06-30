@@ -22,6 +22,8 @@ from music21 import environment
 from music21 import meter
 from music21 import note
 
+from music21.common import opFrac
+
 environLocal = environment.Environment(__file__)
 
 
@@ -128,7 +130,7 @@ def makeBeams(s, inPlace=False):
             # error check; call before sending to time signature, as, if this
             # fails, it represents a problem that happens before time signature
             # processing
-            durSum = common.optionalNumToFraction(sum([d.quarterLength for d in durList]))
+            durSum = opFrac(sum([d.quarterLength for d in durList]))
             barQL = lastTimeSignature.barDuration.quarterLength
 
             if durSum > barQL:
@@ -144,7 +146,7 @@ def makeBeams(s, inPlace=False):
 
             offset = 0.0
             if m.paddingLeft != 0.0:
-                offset = common.optionalNumToFraction(m.paddingLeft)
+                offset = opFrac(m.paddingLeft)
             elif (noteStream.highestTime <
                 lastTimeSignature.barDuration.quarterLength):
                 offset = (lastTimeSignature.barDuration.quarterLength -

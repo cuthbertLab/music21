@@ -36,6 +36,8 @@ from music21.braille import basic
 from music21.braille import lookup
 from music21.braille import text
 
+from music21.common import opFrac
+
 try:
     from future_builtins import zip
 except ImportError: # not 2.6+ or is 3.x
@@ -43,7 +45,6 @@ except ImportError: # not 2.6+ or is 3.x
 
 import collections
 import copy
-#import itertools
 import unittest
 
 
@@ -1521,7 +1522,7 @@ def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSigna
             raise Exception()
         i = len(ts.beatDivisionDurations) - abs(beatDivisionOffset)
         try:
-            offset += ts.beatDivisionDurations[i].quarterLength
+            offset += opFrac(ts.beatDivisionDurations[i].quarterLength)
         except IndexError:
             environRules.warn('Problem in converting a time signature in measure %d, offset may be wrong' % music21Measure.number)
     bs = copy.deepcopy(ts.beatSequence)

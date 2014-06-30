@@ -493,7 +493,7 @@ def reBar(music21Part, inPlace=True):
             raise ABCTranslateException("No time signature found in this Part")
 
         tsEnd = lastTimeSignature.barDuration.quarterLength
-        mEnd = common.optionalNumToFraction(music21Measure.highestTime)
+        mEnd = common.opFrac(music21Measure.highestTime)
         music21Measure.number += measureNumberOffset
         if mEnd > tsEnd:
             m1, m2 = music21Measure.splitAtQuarterLength(tsEnd)
@@ -510,7 +510,7 @@ def reBar(music21Part, inPlace=True):
             m2.clef = None # suppress the clef
             m2.number = m1.number + 1
             measureNumberOffset += 1
-            music21Part.insert(common.optionalNumToFraction(m1.offsetRational + m1.highestTime), m2)
+            music21Part.insert(common.opFrac(m1.offsetRational + m1.highestTime), m2)
         """
         elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
             # The first and last measures are allowed to be incomplete
@@ -658,7 +658,7 @@ class Test(unittest.TestCase):
             1./12, 1./12, 1./12, 1./12, 1./12, 1./12, 
             2.0
             ]
-        self.assertEqual(match, [common.optionalNumToFraction(x) for x in shouldFind])
+        self.assertEqual(match, [common.opFrac(x) for x in shouldFind])
 
 
     def testAnacrusisPadding(self):

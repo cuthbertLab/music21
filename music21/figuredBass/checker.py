@@ -14,7 +14,7 @@ import unittest
 
 from music21 import stream
 from music21 import voiceLeading
-
+from music21.common import opFrac
 from music21.figuredBass import possibility
 
 #-------------------------------------------------------------------------------
@@ -182,7 +182,7 @@ def correlateHarmonies(currentMapping, music21Part):
             if not music21GeneralNote.offset < initOffset:
                 newInitOffset = music21GeneralNote.offset
             if not music21GeneralNote.offset + music21GeneralNote.quarterLength > endTime:
-                newEndTime = music21GeneralNote.offset + music21GeneralNote.quarterLength
+                newEndTime = opFrac(music21GeneralNote.offset + music21GeneralNote.quarterLength)
             allNotesCopy = copy.copy(allNotesSoFar)
             allNotesCopy.append(music21GeneralNote)
             newMapping[(newInitOffset, newEndTime)] = allNotesCopy

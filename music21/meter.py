@@ -27,7 +27,7 @@ from music21 import common
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21.common import SlottedObject
+from music21.common import SlottedObject, opFrac
 _MOD = 'meter.py'
 environLocal = environment.Environment(_MOD)
 
@@ -371,7 +371,7 @@ def bestTimeSignature(meas):
         i = 10
         while i > 0:
             partsFloor = int(sumDurQL / minDurTest)
-            partsReal = common.optionalNumToFraction(sumDurQL / float(minDurTest))
+            partsReal = opFrac(sumDurQL / float(minDurTest))
             if (partsFloor == partsReal or
                 minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
                 break
@@ -2171,7 +2171,7 @@ class MeterSequence(MeterTerminal):
         >>> b.getLevelSpan(2)
         [(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.25), (3.25, 3.5), (3.5, 4.0)]
         '''
-        optf = common.optionalNumToFraction
+        optf = opFrac
         ms = self._getLevelList(level, flat=True)
         mapping = []
         pos = 0.0
@@ -2403,7 +2403,7 @@ class MeterSequence(MeterTerminal):
         (1.0, 2.0)
 
         '''
-        qLenPos = common.optionalNumToFraction(qLenPos)
+        qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             if not permitMeterModulus:
                 #environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
@@ -2421,9 +2421,9 @@ class MeterSequence(MeterTerminal):
             #print(i, iMatch, self[i])
             if i == iMatch:
                 start = pos
-                end = common.optionalNumToFraction(pos + self[i].duration.quarterLength)
+                end = opFrac(pos + self[i].duration.quarterLength)
             else:
-                pos = common.optionalNumToFraction(pos + self[i].duration.quarterLength)
+                pos = opFrac(pos + self[i].duration.quarterLength)
         #environLocal.printDebug(['start, end', start, end])
         return start, end
 
@@ -2440,7 +2440,7 @@ class MeterSequence(MeterTerminal):
 
         ??? Not sure what this does...
         '''
-        qLenPos = common.optionalNumToFraction(qLenPos)
+        qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
         iMatch = self.offsetToIndex(qLenPos)
@@ -2465,7 +2465,7 @@ class MeterSequence(MeterTerminal):
         >>> b.offsetToDepth(1.5)
         2
         '''
-        qLenPos = common.optionalNumToFraction(qLenPos)
+        qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException('cannot access from qLenPos %s' % qLenPos)
 
@@ -2474,7 +2474,7 @@ class MeterSequence(MeterTerminal):
         msMin = self.getLevel(self.depth-1)
         qStart, unused_qEnd = mapMin[msMin.offsetToIndex(qLenPos)]
         if align == 'quantize':
-            posMatch = common.optionalNumToFraction(qStart)
+            posMatch = opFrac(qStart)
         else:
             posMatch = qLenPos
 
@@ -3727,7 +3727,7 @@ class TimeSignature(base.Music21Object):
         True
         '''
         pos = 0
-        qLenPos = common.optionalNumToFraction(qLenPos)
+        qLenPos = opFrac(qLenPos)
         for i in range(len(self.accentSequence)):
             if (pos == qLenPos):
                 return True
@@ -3829,7 +3829,7 @@ class TimeSignature(base.Music21Object):
         [1.0, 0.5, 0.5, 1.0, 0.5, 0.5]
 
         '''
-        qLenPos = common.optionalNumToFraction(qLenPos)
+        qLenPos = opFrac(qLenPos)
         # might store this weight every time it is set, rather than
         # getting it here
         minWeight = min(
@@ -3888,7 +3888,7 @@ class TimeSignature(base.Music21Object):
             endOffset = self.barDuration.quarterLength
             o = 0.0
             for ms in self.beatSequence._partition:
-                o = common.optionalNumToFraction(o + ms.duration.quarterLength)
+                o = opFrac(o + ms.duration.quarterLength)
                 if o >= endOffset:
                     return post # do not add offset for end of bar
                 post.append(o)
