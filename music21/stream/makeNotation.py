@@ -128,10 +128,10 @@ def makeBeams(s, inPlace=False):
             # error check; call before sending to time signature, as, if this
             # fails, it represents a problem that happens before time signature
             # processing
-            durSum = sum([d.quarterLength for d in durList])
-            barQL = lastTimeSignature.barDuration.quarterLength
+            durSum = common.optionalNumToFraction(sum([d.quarterLengthRational for d in durList]))
+            barQL = lastTimeSignature.barDuration.quarterLengthRational
 
-            if not common.almostEquals(durSum, barQL) and durSum > barQL:
+            if durSum > barQL:
                 #environLocal.printDebug([
                 #    'attempting makeBeams with a bar that contains durations
                 #    that sum greater than bar duration (%s > %s)' %
@@ -144,10 +144,10 @@ def makeBeams(s, inPlace=False):
 
             offset = 0.0
             if m.paddingLeft != 0.0:
-                offset = m.paddingLeft
+                offset = common.optionalNumToFraction(m.paddingLeft)
             elif (noteStream.highestTime <
-                lastTimeSignature.barDuration.quarterLength):
-                offset = (lastTimeSignature.barDuration.quarterLength -
+                lastTimeSignature.barDuration.quarterLengthRational):
+                offset = (lastTimeSignature.barDuration.quarterLengthRational -
                     noteStream.highestTime)
             beamsList = lastTimeSignature.getBeams(
                 noteStream, measureStartOffset=offset)
@@ -1191,7 +1191,7 @@ def makeTupletBrackets(s, inPlace=False):
 
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
-            # common.greaterThan uses is >= w/ almost equals
+            # common.greaterThanOrEqual uses is >= w/ almost equals
             elif (tupletNext is None or
                 common.greaterThanOrEqual(completionCount, completionTarget)):
                 tupletObj.type = 'stop'

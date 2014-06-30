@@ -16,8 +16,10 @@ This module supposes that the musicxml document has already been parsed by xml.s
 base.Document.read() ) and is stored as a collection of mxObjects -- equivalent parsing 
 methods could be created and fed into `mxScoreToScore` to make this work.
 '''
-import unittest
 import copy
+import pprint
+import traceback
+import unittest
 
 from music21.musicxml import mxObjects
 
@@ -2077,7 +2079,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                             stl.staffSize = float(mxStaffDetails.staffSize)
                             foundMatch = True
                         if stl.staffLines is None:
-                            stl.staffLines = float(mxStaffDetails.staffLines)
+                            stl.staffLines = int(mxStaffDetails.staffLines)
                             foundMatch = True
                             
                         
@@ -2090,7 +2092,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                     
                     staffLines = None
                     try:
-                        staffLines = float(mxStaffDetails.staffLines)
+                        staffLines = int(mxStaffDetails.staffLines)
                     except TypeError:
                         staffLines = 5     
                                        
@@ -2597,7 +2599,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
             else:
                 emessage = execInfoTuple[0].__name__ + " : " #+ execInfoTuple[1].__name__
             message = "In measure (" + measureNumber + "): " + emessage
-            raise type(e)(type(e)(message), execInfoTuple[2])
+            raise type(e)(type(e)(message), pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
         if t is not None:
             if lastTransposition is None and i == 0: # if this is the first
                 #environLocal.printDebug(['transposition', t])
@@ -2865,7 +2867,7 @@ def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
                 emessage = str(execInfoTuple[1])
             
             message = "For part number " + str(pNum + 1) + ", with Id (" + partId + "): " + emessage
-            raise type(e)(type(e)(message), execInfoTuple[2])
+            raise type(e)(type(e)(message), pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
 
 
         # update dictionary to store music21 part

@@ -1,3 +1,34 @@
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5850, in testMakeNotationByMeasuresA
+    self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
+AssertionError: False != True
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5859, in testMakeNotationByMeasuresB
+    self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
+AssertionError: False != True
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.layout.LayoutScore.getPositionForStaff
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/layout.py", line 911, in getPositionForStaff
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/layout.py", line 971, in music21.layout.LayoutScore.getPositionForStaff
+Failed example:
+    staffLayout031
+Expected:
+    <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5>
+Got:
+    <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5.0>
+
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3633, in testTuple
+    self.assertEqual(tup2.tupletMultiplier(), 2.0/3)
+AssertionError: Fraction(2, 3) != 0.6666666666666666
+
 
 
 ---------------SUMMARY---------------------------------------------------
@@ -90,8 +121,8 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
 xmlnode successfully ran 12 tests
-webapps_templates successfully ran 9 tests
 webapps_apps successfully ran 6 tests
+webapps_templates successfully ran 9 tests
 webapps___init__ successfully ran 14 tests
 volume successfully ran 20 tests
 vexflow_toMusic21j successfully ran 9 tests
@@ -99,16 +130,16 @@ vexflow_indent successfully ran 3 tests
 voiceLeading successfully ran 64 tests
 vexflow___init__ successfully ran 30 tests
 trecento_trecentoCadence successfully ran 7 tests
-webapps_commands successfully ran 10 tests
 variant successfully ran 34 tests
 trecento_polyphonicSnippet successfully ran 9 tests
+webapps_commands successfully ran 10 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
 trecento_tonality successfully ran 5 tests
-trecento_capua successfully ran 9 tests
 trecento___init__ successfully ran 3 tests
-tinyNotation successfully ran 11 tests
+trecento_capua successfully ran 9 tests
 tie successfully ran 7 tests
+tinyNotation successfully ran 11 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
@@ -122,9 +153,9 @@ stream_streamStatus successfully ran 5 tests
 stream_makeNotation successfully ran 10 tests
 stream_timespans successfully ran 51 tests
 spanner successfully ran 53 tests
-stream___init__ successfully ran 142 tests
 sites successfully ran 26 tests
 sieve successfully ran 40 tests
+stream___init__ successfully ran 142 tests
 serial successfully ran 47 tests
 search_segment successfully ran 7 tests
 search___init__ successfully ran 19 tests
@@ -133,7 +164,6 @@ scala___init__ successfully ran 12 tests
 romanText_testFiles successfully ran 4 tests
 scale successfully ran 90 tests
 romanText___init__ successfully ran 45 tests
-test_testStream successfully ran 206 tests
 roman successfully ran 30 tests
 pitch successfully ran 94 tests
 omr_evaluators successfully ran 8 tests
@@ -141,26 +171,25 @@ omr_correctors successfully ran 24 tests
 omr___init__ successfully ran 3 tests
 noteworthy_translate successfully ran 21 tests
 noteworthy_binaryTranslate successfully ran 7 tests
+romanText_clercqTemperley successfully ran 19 tests
 noteworthy___init__ successfully ran 3 tests
-repeat successfully ran 72 tests
-note successfully ran 49 tests
-musicxml_toMxObjects successfully ran 37 tests
+note successfully ran 47 tests
+musicxml_toMxObjects successfully ran 38 tests
 musicxml_mxObjects successfully ran 45 tests
 musicxml_xmlHandler successfully ran 13 tests
+repeat successfully ran 72 tests
 musicxml_m21ToString successfully ran 45 tests
 musicxml___init__ successfully ran 3 tests
 musedata_base40 successfully ran 9 tests
-musicxml_fromMxObjects successfully ran 65 tests
 musedata___init__ successfully ran 49 tests
+musicxml_fromMxObjects successfully ran 65 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
-midi___init__ successfully ran 29 tests
 midi_translate successfully ran 49 tests
 metadata_primitives successfully ran 38 tests
+midi___init__ successfully ran 29 tests
 meter successfully ran 108 tests
-metadata_caching successfully ran 7 tests
 metadata___init__ successfully ran 18 tests
-metadata_bundles successfully ran 34 tests
 medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
 lily_lilyObjects successfully ran 14 tests
@@ -175,35 +204,34 @@ ipython21___init__ successfully ran 3 tests
 intervalNetwork successfully ran 57 tests
 interval successfully ran 55 tests
 instrument successfully ran 23 tests
+metadata_bundles successfully ran 34 tests
 humdrum_testFiles successfully ran 3 tests
-humdrum_spineParser successfully ran 32 tests
-layout successfully ran 22 tests
 humdrum_instruments successfully ran 8 tests
 humdrum___init__ successfully ran 3 tests
+humdrum_spineParser successfully ran 32 tests
 harmony successfully ran 28 tests
-freezeThaw successfully ran 30 tests
+metadata_caching successfully ran 7 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
 figuredBass_realizerScale successfully ran 9 tests
-romanText_clercqTemperley successfully ran 19 tests
+freezeThaw successfully ran 30 tests
 figuredBass_possibility successfully ran 20 tests
 figuredBass_notation successfully ran 15 tests
 figuredBass_realizer successfully ran 12 tests
 figuredBass_checker successfully ran 16 tests
 figuredBass___init__ successfully ran 3 tests
 graph successfully ran 63 tests
-features_jSymbolic successfully ran 86 tests
-features_base successfully ran 27 tests
-features___init__ successfully ran 8 tests
 figuredBass_examples successfully ran 15 tests
-exceptions21 successfully ran 3 tests
+features_jSymbolic successfully ran 86 tests
+features___init__ successfully ran 8 tests
 expressions successfully ran 26 tests
-editorial successfully ran 10 tests
+exceptions21 successfully ran 3 tests
 environment successfully ran 31 tests
-duration successfully ran 65 tests
-documentation_library_writers successfully ran 3 tests
+editorial successfully ran 10 tests
 dynamics successfully ran 15 tests
+features_base successfully ran 27 tests
+documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
 documentation_library_documenters successfully ran 28 tests
 documentation_library_cleaners successfully ran 3 tests
@@ -212,34 +240,35 @@ documentation___init__ successfully ran 3 tests
 defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
 derivation successfully ran 8 tests
-corpus_virtual successfully ran 5 tests
 counterpoint___init__ successfully ran 3 tests
-corpus_chorales successfully ran 9 tests
-features_native successfully ran 26 tests
-converter_subConverters successfully ran 10 tests
+corpus_virtual successfully ran 5 tests
 corpus_corpora successfully ran 28 tests
-converter___init__ successfully ran 40 tests
-contour successfully ran 10 tests
+corpus_chorales successfully ran 9 tests
 corpus___init__ successfully ran 17 tests
+converter_subConverters successfully ran 10 tests
+corpus_testCorpus successfully ran 25 tests
+converter___init__ successfully ran 40 tests
+features_native successfully ran 26 tests
 composition___init__ successfully ran 3 tests
+common successfully ran 60 tests
 clef successfully ran 28 tests
-common successfully ran 62 tests
 chordTables successfully ran 17 tests
+composition_phasing successfully ran 5 tests
 chant successfully ran 12 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
 braille_translate successfully ran 7 tests
-composition_phasing successfully ran 5 tests
 braille_text successfully ran 4 tests
-braille_segment successfully ran 11 tests
+contour successfully ran 10 tests
 chord successfully ran 108 tests
 braille_lookup successfully ran 3 tests
+braille_segment successfully ran 11 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
 braille_examples successfully ran 5 tests
+base successfully ran 88 tests
 bar successfully ran 9 tests
-base successfully ran 84 tests
 audioSearch_recording successfully ran 4 tests
 audioSearch_transcriber successfully ran 4 tests
 articulations successfully ran 26 tests
@@ -247,18 +276,17 @@ audioSearch___init__ successfully ran 19 tests
 analysis_search successfully ran 4 tests
 braille_test successfully ran 151 tests
 analysis_reduceChords successfully ran 7 tests
-analysis_patel successfully ran 6 tests
-analysis_neoRiemannian successfully ran 10 tests
-analysis_reduction successfully ran 15 tests
-analysis_metrical successfully ran 6 tests
 analysis_windowed successfully ran 9 tests
+analysis_patel successfully ran 6 tests
+analysis_metrical successfully ran 6 tests
+analysis_reduction successfully ran 15 tests
+analysis_neoRiemannian successfully ran 10 tests
 analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
-analysis_discrete successfully ran 31 tests
 abcFormat___init__ successfully ran 53 tests
+analysis_discrete successfully ran 31 tests
 _version successfully ran 3 tests
 abcFormat_translate successfully ran 18 tests
-abcFormat_testFiles successfully ran 5 tests
 Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocumentation is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -285,7 +313,6 @@ Not in Tree Error: documentation.upload is in the music21 directory but not impo
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -297,7 +324,54 @@ Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 d
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: abcFormat.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
+
+-----------------------------
+test_testStream had 0 ERRORS and 2 FAILURES in 206 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5850, in testMakeNotationByMeasuresA
+    self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
+AssertionError: False != True
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5859, in testMakeNotationByMeasuresB
+    self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
+AssertionError: False != True
+
+
+-----------------------------
+layout had 0 ERRORS and 1 FAILURES in 22 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.layout.LayoutScore.getPositionForStaff
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/layout.py", line 911, in getPositionForStaff
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/layout.py", line 971, in music21.layout.LayoutScore.getPositionForStaff
+Failed example:
+    staffLayout031
+Expected:
+    <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5>
+Got:
+    <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5.0>
+
+
+
+-----------------------------
+duration had 0 ERRORS and 1 FAILURES in 70 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3633, in testTuple
+    self.assertEqual(tup2.tupletMultiplier(), 2.0/3)
+AssertionError: Fraction(2, 3) != 0.6666666666666666
+
 -------------------------------------------------------------------------
-Ran 3990 tests in 352.7818 seconds
-Run at 2014-06-23 01:15:20
+Ran 4016 tests in 408.8828 seconds
+Run at 2014-06-29 15:26:57

@@ -116,22 +116,22 @@ class FunctionDocumenter(ObjectDocumenter):
     ::
 
         >>> from music21 import common, documentation
-        >>> function = common.almostEquals
+        >>> function = common.optionalNumToFraction
         >>> documenter = documentation.FunctionDocumenter(function)
         >>> documenter
-        <music21.documentation.library.documenters.FunctionDocumenter: music21.common.almostEquals>
+        <music21.documentation.library.documenters.FunctionDocumenter: music21.common.optionalNumToFraction>
 
     ::
 
         >>> documenter.rstCrossReferenceString
-        ':func:`~music21.common.almostEquals`'
+        ':func:`~music21.common.optionalNumToFraction`'
 
     ::
 
         >>> for line in documenter.rstAutodocDirectiveFormat:
         ...     line
         ...
-        '.. autofunction:: music21.common.almostEquals'
+        '.. autofunction:: music21.common.optionalNumToFraction'
         ''
 
     Call the documenter to generate its ReStructuredText format:
@@ -713,7 +713,10 @@ class ClassDocumenter(ObjectDocumenter):
             music21.base.Music21Object:
             - music21.base.Music21Object.activeSite
             - music21.base.Music21Object.offset
+            - music21.base.Music21Object.offsetRational
             - music21.base.Music21Object.priority
+            - music21.base.Music21Object.quarterLength
+            - music21.base.Music21Object.quarterLengthRational
             music21.stream.Stream:
             - music21.stream.Stream.atSoundingPitch
             - music21.stream.Stream.duration

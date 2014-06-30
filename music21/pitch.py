@@ -1524,9 +1524,6 @@ class Pitch(object):
             raise PitchException("Cannot get a microtone object from %s", value)
         # look for microtones of 0 and set-back to None
 
-#         if common.almostEquals(self._microtone.cents, 0.0):
-#             self._microtone = None
-
 
     microtone = property(_getMicrotone, _setMicrotone,
         doc='''

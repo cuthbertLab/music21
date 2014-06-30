@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
-
-import music21
-from music21 import *
-from music21.common import *
-from music21.humdrum import *
+from music21 import stream, converter, corpus, instrument, graph, note, meter, common, humdrum
 import music21.note
 import music21.pitch
-import music21.stream
 from collections import defaultdict
 
+import copy
+import unittest
 
 def simple1():
     '''
@@ -39,19 +36,17 @@ def simple3():
     '''
     reduce all measures of Chopin mazurkas to their rhythmic components and give the measure numbers (harder: render in notation) of all measures sorted by pattern.
     '''
-    import copy
-
     def lsort(keyname):
         return len(rhythmicHash[keyname])
     
     defaultPitch = music21.pitch.Pitch("C3")      
     
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
-    measureStream = converter.parse(testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
+    measureStream = converter.parse(humdrum.testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
     rhythmicHash = defaultdict(list) 
     
     for thisMeasure in measureStream:
-        if not common.almostEquals(thisMeasure.duration.quarterLength, 3.0):
+        if thisMeasure.duration.quarterLength != 3.0:
             continue
         notes = thisMeasure.flat.notesAndRests  # n.b. won't work any more because of voices...
         if len(notes) == 0:
@@ -91,19 +86,17 @@ def simple3():
     s.show('lily.png')
 
 def displayChopinRhythms():
-    import copy
-    
     defaultPitch = music21.pitch.Pitch("C3")      
     
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
-    measureStream = converter.parse(testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
+    measureStream = converter.parse(humdrum.testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
     rhythmicHash = {} 
 
     def lsort(keyname):
         return len(rhythmicHash[keyname])
 
     for thisMeasure in measureStream:
-        if not common.almostEquals(thisMeasure.duration.quarterLength, 3.0):
+        if thisMeasure.duration.quarterLengthRational == 3.0:
             continue
         notes = thisMeasure.flat.notesAndRests  # n.b. won't work any more because of voices...
         if len(notes) == 0:
@@ -152,7 +145,6 @@ def simple4a(show=True):
 # dynamic for a given pitch, and a single number for the Correlation Coefficient
 # between dynamic level and pitch -- the sort of super scientific. I imagine
 # it'd be something like 0.55, so no, not a connection between pitch and dynamic.
-    from music21 import graph, corpus  
 
     # question 1: Above G4 do higher pitches tend to be louder?
     work = 'opus18no1'
@@ -181,7 +173,6 @@ def simple4a(show=True):
 
 
 def simple4b(show=True):
-    from music21 import corpus
     from music21 import dynamics
 
     # question 8: Are dynamic swells (crescendo-diminuendos) more common than dips (diminuendos-crescendos)?
@@ -193,7 +184,7 @@ def simple4b(show=True):
     countCrescendo = 0
     countDiminuendo = 0
     for part in s.getElementsByClass(stream.Part):
-        map = [] # create a l
+        map = [] # create a l @ReservedAssignment
         wedgeStream = part.flat.getElementsByClass(dynamics.DynamicWedge)
         for wedge in wedgeStream:
             if wedge.type == 'crescendo':
@@ -228,10 +219,9 @@ def simple4d():
     music21 extension: then Google the lyrics if they contain the word exultavit
     '''
     import webbrowser
-    from music21 import converter
     from music21 import text
         
-    for part in music21.parse('d:/web/eclipse/music21misc/musicxmlLib/Binchois.xml'):
+    for part in converter.parse('d:/web/eclipse/music21misc/musicxmlLib/Binchois.xml'):
         lyrics = text.assembleLyrics(part)
         if 'exultavit' in lyrics:
             print(lyrics)
@@ -312,7 +302,6 @@ def simple4h():
 
 
 def threeDimChopin():
-    from music21 import converter
     from music21.humdrum import testFiles  
 
     streamObject = converter.parse(testFiles.mazurka6)
@@ -332,10 +321,9 @@ def threeDimChopin():
 
 
 def threeDimMozart():
-    from music21 import converter
-    from music21.musicxml import testFiles  
+    from music21.musicxml.testFiles import mozartTrioK581Excerpt  
 
-    streamObject = converter.parse(testFiles.mozartTrioK581Excerpt)
+    streamObject = converter.parse(mozartTrioK581Excerpt) # 
 #    stream2 = streamObject.stripTies() # adds one outlier that makes the graph difficult to read
 
     g = graph.Plot3DBarsPitchSpaceQuarterLength(streamObject.flat)
@@ -344,11 +332,10 @@ def threeDimMozart():
 
 
 def threeDimBoth():
-    from music21 import converter
-    from music21.musicxml import testFiles as xmlTest
+    from music21.musicxml.testFiles import mozartTrioK581Excerpt  
     from music21.humdrum import testFiles as kernTest  
 
-    mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt)
+    mozartStream = converter.parse(mozartTrioK581Excerpt)
     g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.flat)
     g.process()
     
@@ -429,7 +416,7 @@ def js_q1():
     '''
     from music21 import expressions
 
-    allChorales = Chorales().all()
+    allChorales = corpus.chorales.Iterator()
     returnStream = stream.Stream()
     
     prevChord = None
@@ -467,10 +454,10 @@ def js_q3():
     '''
     find all I II42 V65 I progressions 
     '''
-    allChorales = Chorales().all()
+    allChorales = corpus.chorales.Iterator()
     returnStream = stream.Stream()
     for chorale in allChorales:
-        reducedChorale = chorale.simplify()
+        unused_reducedChorale = chorale.simplify()
         
     returnStream.show()
 
@@ -479,10 +466,10 @@ def js_q4():
     give all instances of half cadences in which the arrival is preceded 
     by VII6/V. 
     '''
-    allChorales = Chorales().all()
+    allChorales = corpus.chorales.Iterator()
     returnStream = stream.Stream()
     for chorale in allChorales:
-        reducedChorale = chorale.simplify()
+        unused_reducedChorale = chorale.simplify()
         
     returnStream.show()
 
@@ -490,10 +477,10 @@ def js_q5():
     '''
     give all cadences that represent modulations to the key of bVII. 
     '''
-    allChorales = Chorales().all()
+    allChorales = corpus.chorales.Iterator()
     returnStream = stream.Stream()
     for chorale in allChorales:
-        reducedChorale = chorale.simplify()
+        unused_reducedChorale = chorale.simplify()
         
     returnStream.show()
 

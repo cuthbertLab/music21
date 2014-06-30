@@ -321,7 +321,7 @@ class ConverterText(SubConverter):
         return fp
     
     def show(self, obj, *args, **keywords):
-        print(obj._reprText())
+        print(obj._reprText(**keywords))
 
 class ConverterTextLine(SubConverter):
     '''

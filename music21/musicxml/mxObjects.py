@@ -1372,6 +1372,7 @@ class Attributes(MusicXMLElement):
         # instruments
         c = c + self.clefList  
         # staff details
+        c = c + self.staffDetailsList
         c.append(self.transposeObj)
         # directive
         c.append(self.measureStyleObj)
@@ -1402,7 +1403,7 @@ class StaffDetails(MusicXMLElement):
         
         # attributes
         self._attr['number'] = None
-        self._attr['print-object'] = True
+        self._attr['print-object'] = 'yes'
         
         # elements     
         self.staffSize = None

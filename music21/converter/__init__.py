@@ -1130,14 +1130,34 @@ class TestExternal(unittest.TestCase):
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
         for mxString in testFiles.ALL: # @UndefinedVariable
-            a = subConverters.ConverterMusicXML(False)
+            a = subConverters.ConverterMusicXML()
             a.parseData(mxString)
 
     def testMusicXMLTabConversion(self):
         from music21.musicxml import testFiles
+        
         mxString = testFiles.ALL[5] # @UndefinedVariable
-        a = subConverters.ConverterMusicXML(False)
+        a = subConverters.ConverterMusicXML()
         a.parseData(mxString)
+
+        b = parseData(mxString)
+        b.show('text')
+
+        #{0.0} <music21.metadata.Metadata object at 0x04501CD0>
+        #{0.0} <music21.stream.Part Electric Guitar>
+        #    {0.0} <music21.instrument.Instrument P0: Electric Guitar: >
+        #    {0.0} <music21.stream.Measure 0 offset=0.0>
+        #        {0.0} <music21.layout.StaffLayout distance None, staffNumber None, staffSize None, staffLines 6>
+        #        {0.0} <music21.clef.TabClef>
+        #        {0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
+        #        {0.0} <music21.key.KeySignature of no sharps or flats, mode major>
+        #        {0.0} <music21.meter.TimeSignature 4/4>
+        #        {0.0} <music21.note.Note F>
+        #        {2.0} <music21.note.Note F#>
+        
+        b.show()
+        pass        
+
 
     def testConversionMusicXml(self):
         c = stream.Score()

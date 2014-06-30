@@ -32,7 +32,7 @@ available after importing music21.
 ::
 
     >>> music21.VERSION_STR
-    '1.9.3'
+    '2.0.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -556,6 +556,47 @@ class Music21Object(object):
         The last one (object) will be different in Py2 (__builtin__.object) and Py3 (builtins.object)
         ''')
 
+    #---------------------------
+    # convienence.  used to be in note.Note, but belongs everywhere:
+    def _getQuarterLength(self):
+        '''Return quarter length
+
+        >>> n = base.Music21Object()
+        >>> n.quarterLength = 2.0
+        >>> n.quarterLength
+        2.0
+        '''
+        return self.duration.quarterLength
+
+    def _getQuarterLengthRational(self):
+        return self.duration.quarterLengthRational
+    
+    def _setQuarterLength(self, value):
+        self.duration.quarterLength = value
+
+    quarterLengthRational = property(_getQuarterLengthRational, _setQuarterLength, doc='''
+        Set or Return the Duration as represented in Quarter Length, possibly as a fraction
+
+        note: the setter is identical to .quarterLength
+
+        >>> n = note.Note()
+        >>> n.quarterLengthRational = 2.0
+        >>> n.quarterLengthRational
+        2.0
+        >>> n.quarterLengthRational = 1.0/3
+        >>> n.quarterLengthRational
+        Fraction(1, 3)
+    ''')
+    quarterLength = property(_getQuarterLength, _setQuarterLength,
+        doc = '''Set or Return the Duration as represented in Quarter Length.
+
+        >>> n = note.Note()
+        >>> n.quarterLength = 2.0
+        >>> n.quarterLength
+        2.0
+        ''')
+
+
     #--------------------------------------------------------------------------
     # look at this object for an atttribute; if not here
     # look up to activeSite
@@ -624,7 +665,7 @@ class Music21Object(object):
 #             if not isinstance(classFilterList, tuple):
 #                 classFilterList = [classFilterList]
 
-    def getOffsetBySite(self, site):
+    def getOffsetBySite(self, site, returnType='float'):
         '''
         If this class has been registered in a container such as a Stream,
         that container can be provided here, and the offset in that object
@@ -641,9 +682,13 @@ class Music21Object(object):
 
         >>> s1 = stream.Stream()
         >>> s1.id = 'containingStream'
-        >>> s1.insert(20.5, n)
+        >>> s1.insert(20.0/3, n)
         >>> n.getOffsetBySite(s1)
-        20.5
+        6.6666...
+        >>> n.getOffsetBySite(s1, returnType='rational')
+        Fraction(20, 3)
+
+
         >>> s2 = stream.Stream()
         >>> s2.id = 'notContainingStream'
         >>> n.getOffsetBySite(s2)
@@ -651,7 +696,7 @@ class Music21Object(object):
         SitesException: The object <music21.note.Note A-> is not in site <music21.stream.Stream notContainingStream>.
         '''
         try:
-            return self.sites.getOffsetBySite(site)
+            return self.sites.getOffsetBySite(site, returnType=returnType)
         except SitesException:
             raise SitesException('The object %r is not in site %r.' % (self, site))
 
@@ -669,7 +714,7 @@ class Music21Object(object):
         >>> a.sites.add(aSite, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
-        30
+        30.0
         '''
         return self.sites.setOffsetBySite(site, value)
 
@@ -1516,7 +1561,7 @@ class Music21Object(object):
         be moved to .sites soon.
         ''')
 
-    def _getOffset(self):
+    def _getOffsetFloatOrRational(self, returnType):
         '''Get the offset for the activeSite.
 
 
@@ -1528,12 +1573,17 @@ class Music21Object(object):
         True
         >>> n.offset
         3.0
-
+        >>> n.offsetRational
+        3.0
+        
         Still works...
 
         >>> n._activeSiteId = 3234234
         >>> n.offset
         3.0
+        >>> n.offsetRational
+        3.0
+
 
         There is a branch that does slow searches.
         See test/testSerialization to have it active.
@@ -1552,22 +1602,22 @@ class Music21Object(object):
 
         if (activeSiteId is not None and
             self.sites.hasSiteId(activeSiteId)):
-            return self.sites.getOffsetBySiteId(activeSiteId)
+            return self.sites.getOffsetBySiteId(activeSiteId, returnType=returnType)
             #return self.sites.coordinates[activeSiteId]['offset']
         elif self.activeSite is None: # assume we want self
             try:
-                return self.sites.getOffsetBySite(None)
-            except SitesException:
-                return 0.0 # might not have a None offset
+                return self.sites.getOffsetBySite(None, returnType=returnType)
+            except SitesException:  # might not have a None offset
+                return 0.0
         else:
             # try to look for it in all objects
             environLocal.printDebug(['doing a manual activeSite search: probably means that ' +
                                      'id(self.activeSite) (%s) is not equal to self._activeSiteId (%r)' % (id(self.activeSite), self._activeSiteId)])
             #environLocal.printDebug(['activeSite', self.activeSite, 'self.sites.hasSiteId(activeSiteId)', self.sites.hasSiteId(activeSiteId)])
             #environLocal.printDebug(['self.hasSite(self.activeSite)', self.hasSite(self.activeSite)])
-
+        
             offset = self.sites.getOffsetByObjectMatch(
-                    self.activeSite)
+                    self.activeSite, returnType=returnType)
             return offset
 
             #environLocal.printDebug(['self.sites', self.sites.siteDict])
@@ -1599,6 +1649,9 @@ class Music21Object(object):
         # do not have to unwrap a weakref of self.activeSite to get the id()
         # of activeSite
         self.sites.setOffsetBySiteId(self._activeSiteId, offset)
+
+    def _getOffset(self):
+        return self._getOffsetFloatOrRational('float')
 
     offset = property(_getOffset, _setOffset,
         doc = '''
@@ -1689,6 +1742,104 @@ class Music21Object(object):
         30.5
 
         When in doubt, use `.getOffsetBySite(streamObj)`
+        which is safer.
+        ''')
+    
+    def _getOffsetRational(self):
+        return self._getOffsetFloatOrRational('rational')
+
+    offsetRational = property(_getOffsetRational, _setOffset,
+                              doc = '''
+        The offsetRational property sets or returns the position of this object
+        as a float or fractions.Fraction value
+        (generally in `quarterLengths`), depending on what is representable. 
+        
+        Offsets are measured from the start of the object's `activeSite`,
+        that is, the most recently referenced `Stream` or `Stream` subclass such
+        as `Part`, `Measure`, or `Voice`.  It is a simpler
+        way of calling `o.getOffsetBySite(o.activeSite, returnType='rational')`.
+
+        If we put a `Note` into a `Stream`, we will see the activeSite changes.
+
+        >>> import fractions
+        >>> n1 = note.Note("D#3")
+        >>> n1.activeSite is None
+        True
+
+        >>> m1 = stream.Measure()
+        >>> m1.number = 4
+        >>> m1.insert(10.0, n1)
+        >>> n1.offsetRational
+        10.0
+        >>> n1.activeSite
+        <music21.stream.Measure 4 offset=0.0>
+
+        >>> n1.activeSite is m1
+        True
+
+        The most recently referenced `Stream` becomes an object's `activeSite` and
+        thus the place where `.offset` looks to find its number.
+
+        >>> m2 = stream.Measure()
+        >>> m2.insert(3.0/5, n1)
+        >>> m2.number = 5
+        >>> n1.offsetRational
+        Fraction(3, 5)
+        >>> n1.activeSite is m2
+        True
+
+        Notice though that `.offset` depends on the `.activeSite` which is the most
+        recently accessed/referenced Stream.
+
+        Here we will iterate over the `elements` in `m1` and we
+        will see that the `.offset` of `n1` now is its offset in
+        `m1` even though we haven't done anything directly to `n1`.
+        Simply iterating over a site is enough to change the `.activeSite`
+        of its elements:
+
+        >>> for element in m1:
+        ...     pass
+        >>> n1.offsetRational
+        10.0
+
+
+        The property can also set the offset for the object if no
+        container has been set:
+
+
+        >>> n1 = note.Note()
+        >>> n1.id = 'hi'
+        >>> n1.offsetRational = fractions.Fraction(20, 3)
+        >>> n1.offsetRational
+        Fraction(20, 3)
+
+        >>> s1 = stream.Stream()
+        >>> s1.append(n1)
+        >>> n1.offsetRational
+        0.0
+        >>> s2 = stream.Stream()
+        >>> s2.insert(30.5, n1)
+        >>> n1.offsetRational
+        30.5
+
+        After calling `getElementById` on `s1`, the
+        returned element's `offsetRational` will be its offset in `s1`.
+
+        >>> n2 = s1.getElementById('hi')
+        >>> n2 is n1
+        True
+        >>> n2.offsetRational
+        0.0
+
+        Iterating over the elements in a Stream will
+        make its `offset` be the offset in iterated
+        Stream.
+
+        >>> for thisElement in s2:
+        ...     thisElement.offsetRational
+        30.5
+
+        When in doubt, use `.getOffsetBySite(streamObj, returnType='rational')`
         which is safer.
         ''')
 
@@ -2145,7 +2296,7 @@ class Music21Object(object):
 #         else:
 #             raise Music21ObjectException('cannot yet support writing in the %s format' % fileFormat)
 
-    def _reprText(self):
+    def _reprText(self, **keywords):
         '''
         Return a text representation possible with line
         breaks. This methods can be overridden by subclasses
@@ -2447,12 +2598,11 @@ class Music21Object(object):
         if self.duration is None:
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
-        if not common.almostEqual(sum(quarterLengthList),
-            self.duration.quarterLength, grain=1e-4):
-            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLength))
+        if common.optionalNumToFraction(sum(quarterLengthList)) != self.duration.quarterLengthRational:
+            raise Music21ObjectException('cannot split by quarter length list that is not equal to the duration of the source: %s, %s' % (quarterLengthList, self.duration.quarterLengthRational))
         # if nothing to do
-        elif (len(quarterLengthList) == 1 and quarterLengthList[0] ==
-            self.duration.quarterLength):
+        elif (len(quarterLengthList) == 1 and common.optionalNumToFraction(quarterLengthList[0]) ==
+            self.duration.quarterLengthRational):
             # return a copy of self in a list
             return [copy.deepcopy(self)]
         elif len(quarterLengthList) <= 1:
@@ -2461,7 +2611,7 @@ class Music21Object(object):
         post = []
         forceEndTieType = 'stop'
         for i in range(len(quarterLengthList)):
-            ql = quarterLengthList[i]
+            ql = common.optionalNumToFraction(quarterLengthList[i])
             e = copy.deepcopy(self)
             e.quarterLength = ql
 
