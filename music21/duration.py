@@ -859,7 +859,7 @@ class Tuplet(object):
         >>> myNote.duration.quarterLength
         Fraction(4, 5)
         >>> myNote.duration.fullName
-        'Quarter Quintuplet (0.8QL)'
+        'Quarter Quintuplet (4/5 QL)'
 
     ::
 
@@ -1639,12 +1639,9 @@ class DurationUnit(DurationCommon):
             >>> d.fullName
             'Imperfect Longa'
 
-        ::
-
             >>> d.dots = 1
             >>> d.fullName
             'Perfect Longa'
-
         '''
         dots = self.dots
         if dots == 1:
@@ -1696,7 +1693,8 @@ class DurationUnit(DurationCommon):
             msg.append('%s ' % tupletStr)
         # only add QL display if there are no dots or tuplets
         if tupletStr is not None or dots >= 3 or typeStr.lower() == 'complex':
-            msg.append('(%sQL)' % (round(self.quarterLength, 2)))
+            qlStr = common.mixedNumeral(self.quarterLength)
+            msg.append('(%s QL)' % (qlStr))
 
         return ''.join(msg).strip() # avoid extra space
 
@@ -2831,31 +2829,31 @@ class Duration(DurationCommon):
 
             >>> d = duration.Duration(quarterLength=1.25)
             >>> d.fullName
-            'Quarter tied to 16th (1.25 total QL)'
+            'Quarter tied to 16th (1 1/4 total QL)'
 
         ::
 
             >>> d.addDurationUnit(duration.DurationUnit(.3333333))
             >>> d.fullName
-            'Quarter tied to 16th tied to Eighth Triplet (0.33QL) (1.58 total QL)'
+            'Quarter tied to 16th tied to Eighth Triplet (1/3 QL) (1 7/12 total QL)'
 
         ::
 
             >>> d = duration.Duration(quarterLength=0.333333)
             >>> d.fullName
-            'Eighth Triplet (0.33QL)'
+            'Eighth Triplet (1/3 QL)'
 
         ::
 
             >>> d = duration.Duration(quarterLength=0.666666)
             >>> d.fullName
-            'Quarter Triplet (0.67QL)'
+            'Quarter Triplet (2/3 QL)'
 
         ::
 
             >>> d = duration.Duration(quarterLength=0.571428)
             >>> d.fullName
-            'Quarter Tuplet of 7/4ths (0.57QL)'
+            'Quarter Tuplet of 7/4ths (4/7 QL)'
 
         ::
 
@@ -2869,7 +2867,8 @@ class Duration(DurationCommon):
             for part in self.components:
                 msg.append(part.fullName)
             msg = ' tied to '.join(msg)
-            msg += ' (%s total QL)' % (round(self.quarterLength, 2))
+            qlStr = common.mixedNumeral(self.quarterLength)
+            msg += ' (%s total QL)' % (qlStr)
             return msg
         if len(self.components) == 1:
             return self.components[0].fullName
@@ -3612,7 +3611,7 @@ class Test(unittest.TestCase):
         dur3.dots = 1
         dur3.tuplets = (tup1,)
         #print "So a tuplet-dotted-quarter's length is",
-        self.assertEqual(round(dur3.quarterLength, 2), 1.05)
+        self.assertEqual(dur3.quarterLength, fractions.Fraction(21, 20))
 
         # print "quarter notes"
 

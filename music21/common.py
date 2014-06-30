@@ -524,6 +524,20 @@ def _preFracLimitDenominator(n, d):
        setup='x = 1000001/3000001.; from fractions import Fraction', 
        number=100000)
     7.941488981246948
+    
+    Proof of working...
+    
+    >>> import random
+    >>> myWay = lambda x: Fraction(*common._preFracLimitDenominator(*x.as_integer_ratio()))
+    >>> theirWay = lambda x: Fraction(x).limit_denominator(65535)
+
+    >>> for i in range(50):
+    ...     x = random.random()
+    ...     if myWay(x) != theirWay(x):
+    ...         print "boo: %s, %s, %s" % (x, myWay(x), theirWay(x))
+    
+    (n.b. -- nothing printed)
+    
     '''
     nOrg = n
     dOrg = d
@@ -639,7 +653,8 @@ def opFrac(num):
             return num._numerator/(d + 0.0) # 50% faster than float(num)
         else:
             return num # leave fraction alone
-        
+    else:
+        raise Exception("Cannot convert num: %r" % num)
         
 
 

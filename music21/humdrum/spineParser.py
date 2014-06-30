@@ -1920,7 +1920,7 @@ def hdStringToNote(contents):
     >>> n.duration.quarterLength
     Fraction(8, 3)
     >>> n.duration.fullName
-    'Whole Triplet (2.67QL)'
+    'Whole Triplet (2 2/3 QL)'
 
     >>> n = humdrum.spineParser.hdStringToNote("e-00.")
     >>> n.pitch
