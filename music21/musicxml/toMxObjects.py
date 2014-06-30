@@ -2763,6 +2763,8 @@ def staffLayoutToMxStaffDetails(staffLayout):
     '''
     mxStaffDetails = mxObjects.StaffDetails()
     mxStaffDetails.staffLines = staffLayout.staffLines
+    if staffLayout.hidden is True:
+        mxStaffDetails._attr['print-object'] = 'no'
     return mxStaffDetails
 
 #-----------------------------------------------------------------

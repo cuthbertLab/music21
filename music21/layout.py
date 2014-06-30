@@ -332,6 +332,13 @@ class StaffLayout(LayoutBase):
     >>> sl
     <music21.layout.StaffLayout distance 3, staffNumber 1, staffSize 113.0, staffLines 5>
 
+    There is one other attribute, '.hidden' which has three settings:
+       None - inherit from previous StaffLayout object, or False if no object exists 
+              (TODO: Not working; always gives False)
+       False - not hidden -- show as a default staff
+       True - hidden -- for playback only staves, or for a hidden/optimized-out staff
+       
+
     '''
     def __init__(self, *args, **keywords):
         LayoutBase.__init__(self)
@@ -340,8 +347,8 @@ class StaffLayout(LayoutBase):
         self.distance = None
         self.staffNumber = None
         self.staffSize = None
-        self.hidden = None  # True = hidden; False = shown; None = inherit
         self.staffLines = None
+        self.hidden = None  # True = hidden; False = shown; None = inherit
 
         for key in keywords:
             if key.lower() == 'distance':
@@ -969,7 +976,7 @@ class LayoutScore(stream.Opus):
 
         >>> staffLayout031 = ls.pages[0].systems[3].staves[1].staffLayout
         >>> staffLayout031
-        <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5.0>
+        <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5>
         >>> staffLayout031.hidden
         True
 

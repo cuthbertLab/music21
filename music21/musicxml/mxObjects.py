@@ -1403,7 +1403,7 @@ class StaffDetails(MusicXMLElement):
         
         # attributes
         self._attr['number'] = None
-        self._attr['print-object'] = True
+        self._attr['print-object'] = 'yes'
         
         # elements     
         self.staffSize = None

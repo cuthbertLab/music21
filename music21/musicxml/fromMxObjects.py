@@ -2079,7 +2079,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                             stl.staffSize = float(mxStaffDetails.staffSize)
                             foundMatch = True
                         if stl.staffLines is None:
-                            stl.staffLines = float(mxStaffDetails.staffLines)
+                            stl.staffLines = int(mxStaffDetails.staffLines)
                             foundMatch = True
                             
                         
