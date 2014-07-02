@@ -36,6 +36,9 @@ from music21 import chord
 from music21 import clef
 from music21 import stream
 
+# six
+from six.moves import range, xrange
+
 # Importing from __main__.py
 import music21.mei.__main__ as main
 from music21.mei.__main__ import _XMLID
@@ -72,7 +75,7 @@ class TestThings(unittest.TestCase):
 
     def testAllPartsPresent1(self):
         '''allPartsPresent(): one <staffDef>, no repeats'''
-        inputValue = [mock.MagicMock(spec_set=ETree.Element('staffDef'))]
+        inputValue = [mock.MagicMock()]
         inputValue[0].get = mock.MagicMock(return_value='1')
         expected = ['1']
         actual = main.allPartsPresent(inputValue)
@@ -80,7 +83,7 @@ class TestThings(unittest.TestCase):
 
     def testAllPartsPresent2(self):
         '''allPartsPresent(): four <staffDef>s'''
-        inputValue = [mock.MagicMock(spec_set=ETree.Element('staffDef')) for _ in xrange(4)]
+        inputValue = [mock.MagicMock() for _ in xrange(4)]
         for i in xrange(4):
             inputValue[i].get = mock.MagicMock(return_value=str(i + 1))
         expected = list('1234')
@@ -89,7 +92,7 @@ class TestThings(unittest.TestCase):
 
     def testAllPartsPresent3(self):
         '''allPartsPresent(): four unique <staffDef>s, several repeats'''
-        inputValue = [mock.MagicMock(spec_set=ETree.Element('staffDef')) for _ in xrange(12)]
+        inputValue = [mock.MagicMock() for _ in xrange(12)]
         for i in xrange(12):
             inputValue[i].get = mock.MagicMock(return_value=str((i % 4) + 1))
         expected = list('1234')
@@ -103,7 +106,7 @@ class TestThings(unittest.TestCase):
         try:
             main.allPartsPresent(inputValue)
         except main.MeiValidityError as mvErr:
-            self.assertEqual(main._SEEMINGLY_NO_PARTS, mvErr.message)
+            self.assertEqual(main._SEEMINGLY_NO_PARTS, mvErr.args[0])
 
 
 #------------------------------------------------------------------------------
@@ -129,7 +132,7 @@ class TestAttrTranslators(unittest.TestCase):
         try:
             main._attrTranslator(attr, name, mapping)
         except main.MeiValueError as mvErr:
-            self.assertEqual(expected, mvErr.message)
+            self.assertEqual(expected, mvErr.args[0])
 
     @mock.patch('music21.mei.__main__._attrTranslator')
     def testAccidental(self, mockTrans):
@@ -184,7 +187,7 @@ class TestAttrTranslators(unittest.TestCase):
         try:
             main._articulationFromAttr(attr)
         except main.MeiValueError as mvErr:
-            self.assertEqual(expected, mvErr.message)
+            self.assertEqual(expected, mvErr.args[0])
 
     @mock.patch('music21.mei.__main__._articulationFromAttr')
     def testArticList1(self, mockArtic):
@@ -261,7 +264,7 @@ class TestNoteFromElement(unittest.TestCase):
                            'pname', 'accid', 'oct', 'dur', 'dots'
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedElemOrder = [mock.call('pname', ''), mock.call('accid'), mock.call('oct', ''),
                              mock.call('dur'), mock.call('dots', 0)]
         expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
@@ -310,7 +313,7 @@ class TestNoteFromElement(unittest.TestCase):
         noteFromElement(): adds "id"
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedElemOrder = [mock.ANY for _ in xrange(5)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
         expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
@@ -348,7 +351,7 @@ class TestNoteFromElement(unittest.TestCase):
         noteFromElement(): adds "artic"
         (mostly-unit test; only mock out Note and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedElemOrder = [mock.ANY for _ in xrange(6)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call('artic'), mock.call('artic')])
         elemArtic = 'stacc'
@@ -392,7 +395,7 @@ class TestRestFromElement(unittest.TestCase):
                            'dur', 'dots'
         (mostly-unit test; only mock out Rest and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedElemOrder = [mock.call('dur'), mock.call('dots', 0)]
         expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemReturns = ['4', '1']
@@ -438,7 +441,7 @@ class TestRestFromElement(unittest.TestCase):
         restFromElement(): adds the "id" attribute
         (mostly-unit test; only mock out Rest and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedElemOrder = [mock.ANY for _ in xrange(2)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
         expectedId = 42
@@ -488,7 +491,7 @@ class TestChordFromElement(unittest.TestCase):
                             'dur', 'dots', and some note.Note objects.
         (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedGetOrder = [mock.call('dur'), mock.call('dots', 0)]
         expectedGetOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['4', '1']
@@ -536,7 +539,7 @@ class TestChordFromElement(unittest.TestCase):
         chordFromElement(): adds "id"
         (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedGetOrder = [mock.ANY for _ in xrange(2)]  # additional calls to elem.get(), not part of this test
         expectedGetOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
@@ -583,7 +586,7 @@ class TestChordFromElement(unittest.TestCase):
         chordFromElement(): adds "artic"
         (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedGetOrder = [mock.ANY for _ in xrange(3)]  # additional calls to elem.get(), not part of this test
         expectedGetOrder.extend([mock.call('artic'), mock.call('artic')])
         expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
@@ -640,7 +643,7 @@ class TestClefFromElement(unittest.TestCase):
                            'shape', 'line', 'dis', and 'dis.place'
         (mostly-unit test; only mock out clef and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedGetOrder = [mock.call('shape'), mock.call('shape'), mock.call('shape'),
                             mock.call('line'), mock.call('dis'), mock.call('dis.place')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
@@ -664,7 +667,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefFromElement(): same as testUnit1a() but with 'perc' "shape"
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedGetOrder = [mock.call('shape')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc']
@@ -686,7 +689,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefFromElement(): same as testUnit1c() but with 'TAB' "shape"
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedGetOrder = [mock.call('shape'), mock.call('shape')]
         expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['TAB', 'TAB']
@@ -756,7 +759,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefFromElement(): adds the "xml:id" attribute
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('mock'))
+        elem = mock.MagicMock()
         expectedGetOrder = [mock.call('shape'), mock.call(_XMLID), mock.call(_XMLID)]
         expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc', 'theXMLID', 'theXMLID']
@@ -788,13 +791,13 @@ class TestLayerFromElement(unittest.TestCase):
         (mostly-unit test; only mock noteFromElement and the ElementTree.Element)
         '''
         theNAttribute = '@n value'
-        elem = mock.MagicMock(spec_set=ETree.Element('layer'))
+        elem = mock.MagicMock()
         elemGetReturns = [theNAttribute, theNAttribute]
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) else None
         expectedGetOrder = [mock.call('n'), mock.call('n')]
-        findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
-                         mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
-                         mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
+        findallReturn = [mock.MagicMock(name='note1'),
+                         mock.MagicMock(name='imaginary'),
+                         mock.MagicMock(name='note2')]
         findallReturn[0].tag = '%snote' % main._MEINS
         findallReturn[1].tag = '%simaginary' % main._MEINS
         findallReturn[2].tag = '%snote' % main._MEINS
@@ -821,10 +824,10 @@ class TestLayerFromElement(unittest.TestCase):
         '''
         Same as testUnit1a() *but* with ``overrideN`` provided.
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('layer'))
-        findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
-                         mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
-                         mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
+        elem = mock.MagicMock()
+        findallReturn = [mock.MagicMock(name='note1'),
+                         mock.MagicMock(name='imaginary'),
+                         mock.MagicMock(name='note2')]
         findallReturn[0].tag = '%snote' % main._MEINS
         findallReturn[1].tag = '%simaginary' % main._MEINS
         findallReturn[2].tag = '%snote' % main._MEINS
@@ -852,11 +855,11 @@ class TestLayerFromElement(unittest.TestCase):
         '''
         Same as testUnit1a() *but* without ``overrideN`` or @n.
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('layer'))
+        elem = mock.MagicMock()
         elem.get.return_value = None
-        findallReturn = [mock.MagicMock(spec_set=ETree.Element('note'), name='note1'),
-                         mock.MagicMock(spec_set=ETree.Element('imaginary'), name='imaginary'),
-                         mock.MagicMock(spec_set=ETree.Element('note'), name='note2')]
+        findallReturn = [mock.MagicMock(name='note1'),
+                         mock.MagicMock(name='imaginary'),
+                         mock.MagicMock(name='note2')]
         findallReturn[0].tag = '%snote' % main._MEINS
         findallReturn[1].tag = '%simaginary' % main._MEINS
         findallReturn[2].tag = '%snote' % main._MEINS
@@ -872,7 +875,7 @@ class TestLayerFromElement(unittest.TestCase):
         try:
             main.layerFromElement(elem)
         except main.MeiAttributeError as maError:
-            self.assertEqual(main._MISSING_VOICE_ID, maError.message)
+            self.assertEqual(main._MISSING_VOICE_ID, maError.args[0])
 
 
     def testIntegration1a(self):
@@ -940,7 +943,7 @@ class TestLayerFromElement(unittest.TestCase):
         try:
             main.layerFromElement(elem)
         except main.MeiAttributeError as maError:
-            self.assertEqual(main._MISSING_VOICE_ID, maError.message)
+            self.assertEqual(main._MISSING_VOICE_ID, maError.args[0])
 
 
 
@@ -955,10 +958,10 @@ class TestStaffFromElement(unittest.TestCase):
                             right arguments, and with properly-incrementing "id" attributes
         (mostly-unit test; only mock noteFromElement and the ElementTree.Element)
         '''
-        elem = mock.MagicMock(spec_set=ETree.Element('staff'))
-        findallReturn = [mock.MagicMock(spec_set=ETree.Element('layer'), name='layer1'),
-                         mock.MagicMock(spec_set=ETree.Element('layer'), name='layer2'),
-                         mock.MagicMock(spec_set=ETree.Element('layer'), name='layer3')]
+        elem = mock.MagicMock()
+        findallReturn = [mock.MagicMock(name='layer1'),
+                         mock.MagicMock(name='layer2'),
+                         mock.MagicMock(name='layer3')]
         findallReturn[0].tag = '%slayer' % main._MEINS  # percent slayer... UNIT TESTS BE TOUGH
         findallReturn[1].tag = '%slayer' % main._MEINS
         findallReturn[2].tag = '%slayer' % main._MEINS

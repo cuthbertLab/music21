@@ -38,6 +38,9 @@ from music21 import beam
 from music21 import meter
 from music21 import key
 
+# six
+from music21.ext.six.moves import range, xrange
+
 
 # Module-Level Constants
 #------------------------------------------------------------------------------
