@@ -39,9 +39,11 @@ from music21 import meter
 from music21 import key
 from music21 import instrument
 from music21 import interval
+from music21 import bar
 
 # six
-from music21.ext.six.moves import range, xrange
+from music21.ext import six
+from six.moves import range, xrange
 
 
 # Module-Level Constants
@@ -121,6 +123,7 @@ def convertFromString(dataStr):
         # TODO: sections aren't divided or treated specially, yet
         for eachObject in eachSection:
             if ('%smeasure' % _MEINS) == eachObject.tag:
+                # TODO: MEI's "rptboth" barlines require handling at the multi-measure level
                 backupMeasureNum += 1
                 # process all the stuff in the <measure>
                 measureResult = measureFromElement(eachObject, backupMeasureNum)
@@ -252,6 +255,11 @@ _ARTIC_ATTR_DICT = {'acc': articulations.Accent, 'stacc': articulations.Staccato
                     'tap': None, 'lhpizz': None, 'dot': None, 'stroke': None, 'rip': None,
                     'bend': None, 'flip': None, 'smear': None, 'fingernail': None,  # (u1D1B3)
                     'damp': None, 'dampall': None}
+
+# for _barlineFromAttr()
+# TODO: make new music21 Barline styles for 'dbldashed' and 'dbldotted'
+_BAR_ATTR_DICT = {'dashed': 'dashed', 'dotted': 'dotted', 'dbl': 'double', 'end': 'final',
+                  'invis': 'none', 'single': 'none'}
 
 
 # One-to-One Translator Functions
@@ -436,6 +444,28 @@ def _transpositionFromAttrs(elem):
     else:
         return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
                      interval.ChromaticInterval(int(elem.get('trans.diat')) + 1))
+
+
+def _barlineFromAttr(attr):
+    # TODO: write tests
+    '''
+    Use :func:`_attrTranslator` to convert the value of a "left" or "right" attribute to a
+    list of :class:`Barline` or :class:`Repeat`. Note this must be a list because an end-repeat and
+    start-repeat at the same time must be two distinct objects in music21.
+
+    :param str attr: The MEI @left or @right attribute to convert to a barline.
+    :returns: The barline.
+    :rtype: list of :class:`music21.bar.Barline` or :class:`~music21.bar.Repeat`
+    '''
+    # NB: the MEI Specification says @left is used only for legcay-format conversions, so we'll
+    #     just assume it's a @right attribute. Not a huge deal if we get this wrong (I hope).
+    if attr.startswith('rpt'):
+        if 'rptboth' == attr:
+            return None
+        else:
+            return bar.Repeat(attr[3:], times=2)
+    else:
+        return bar.Barline(_attrTranslator(attr, 'right', _BAR_ATTR_DICT))
 
 
 # Converter Functions
@@ -1258,11 +1288,14 @@ def staffFromElement(elem):
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             post.append(tagToFunction[eachTag.tag](eachTag))
+        else:  # DEBUG
+            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
     return post
 
 
 def measureFromElement(elem, backupNum=0):
+    # TODO: write tests
     '''
     <measure> Unit of musical time consisting of a fixed number of note-values of a given type, as
     determined by the prevailing meter, and delimited in musical notation by two bar lines.
@@ -1289,6 +1322,8 @@ def measureFromElement(elem, backupNum=0):
     Attributes In Progress:
     =======================
     - <staff> contained within
+    - @right (att.measure.log)
+    - @left (att.measure.log)
 
     Attributes not Implemented:
     ===========================
@@ -1339,6 +1374,18 @@ def measureFromElement(elem, backupNum=0):
             post.append(tagToFunction[eachTag.tag](eachTag))
         else:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+
+    # assign left and right barlines
+    if elem.get('left') is not None:
+        for eachMeasure in six.itervalues(post):
+            if not isinstance(eachMeasure, stream.Measure):
+                continue
+            eachMeasure.leftBarline = _barlineFromAttr(elem.get('left'))
+    if elem.get('right') is not None:
+        for eachMeasure in six.itervalues(post):
+            if not isinstance(eachMeasure, stream.Measure):
+                continue
+            eachMeasure.rightBarline = _barlineFromAttr(elem.get('right'))
 
     return post
 
