@@ -7246,7 +7246,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'B-', 'B-', 'B-', 'B-', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 2)
 
-        # TODO: 
+        # TODO: keep groups
         # we now have 2 variants that have been stripped of their groups
         match = [e.groups for e in s.variants]
         self.assertEqual(str(match), "[['default'], ['default']]")

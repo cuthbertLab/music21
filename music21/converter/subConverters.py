@@ -302,7 +302,12 @@ class ConverterVexflow(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         #from music21 import vexflow
         from music21.vexflow import toMusic21j as vexflow
-        dataStr = vexflow.fromObject(obj, mode='html')
+        if 'local' in keywords:
+            local = keywords['local']
+        else:
+            local = False
+        
+        dataStr = vexflow.fromObject(obj, mode='html', local=local)
         fp = self.writeDataStream(fp, dataStr)
         return fp
 

@@ -349,16 +349,17 @@ def quarterLengthToTuplet(qLen, maxToReturn=4):
     >>> duration.quarterLengthToTuplet(.33333333)
     [<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>]
 
+    >>> duration.quarterLengthToTuplet(.20)
+    [<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 5/2/eighth>, <music21.duration.Tuplet 5/1/quarter>]
+
+
     By specifying only 1 `maxToReturn`, the a single-length list containing the Tuplet with the smallest type will be returned.
 
     >>> duration.quarterLengthToTuplet(.3333333, 1)
     [<music21.duration.Tuplet 3/2/eighth>]
 
-    >>> duration.quarterLengthToTuplet(.20)
-    [<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 5/2/eighth>, <music21.duration.Tuplet 5/1/quarter>]
-
-    >>> c = duration.quarterLengthToTuplet(.3333333, 1)[0]
-    >>> c.tupletMultiplier()
+    >>> tup = duration.quarterLengthToTuplet(.3333333, 1)[0]
+    >>> tup.tupletMultiplier()
     Fraction(2, 3)
     '''
     post = []
@@ -1215,22 +1216,29 @@ class DurationCommon(SlottedObject):
 
     ### PUBLIC METHODS ###
 
-    def aggregateTupletRatio(self):
+    def aggregateTupletMultiplier(self):
         '''
-        Return the aggregate tuplet ratio. Say you have 3:2 under a 5:4. This
-        will give the equivalent in non-nested tuplets. Returns a tuple
-        representing the tuplet(!).  In the case of 3:2 under 5:4, it will
-        return (15, 8).
+        Returns the multiple of all the tuplet multipliers as an opFrac.
 
         This method is needed for MusicXML time-modification among other
         places.
 
+
+        No tuplets...
+
         ::
 
             >>> complexDur = duration.Duration('eighth')
+            >>> complexDur.aggregateTupletMultiplier()
+            1.0
+            
+        With tuplets:
+        
+        ::
+            
             >>> complexDur.appendTuplet(duration.Tuplet())
-            >>> complexDur.aggregateTupletRatio()
-            (3, 2)
+            >>> complexDur.aggregateTupletMultiplier()
+            Fraction(2, 3)
 
         Nested tuplets are possible...
 
@@ -1239,15 +1247,14 @@ class DurationCommon(SlottedObject):
             >>> tup2 = duration.Tuplet()
             >>> tup2.setRatio(5, 4)
             >>> complexDur.appendTuplet(tup2)
-            >>> complexDur.aggregateTupletRatio()
-            (15, 8)
-
+            >>> complexDur.aggregateTupletMultiplier()
+            Fraction(8, 15)
         '''
         currentMultiplier = 1
         for thisTuplet in self.tuplets:
             currentMultiplier *= thisTuplet.tupletMultiplier()
-        return common.decimalToTuplet(1.0 / currentMultiplier)
-
+        return common.opFrac(currentMultiplier)
+    
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -3743,30 +3750,30 @@ class Test(unittest.TestCase):
 
         a = DurationUnit()
         a.quarterLength = .3333333
-        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.))
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.5>')
 
         a.augmentOrDiminish(2)
-        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 1.0>')
 
         a.augmentOrDiminish(.25)
-        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.25>')
 
 
         # testing tuplets on Durations
         a = Duration()
         a.quarterLength = .3333333
-        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.5>')
 
         a.augmentOrDiminish(2)
-        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 1.0>')
 
         a.augmentOrDiminish(.25)
-        self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
+        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.25>')
 
 

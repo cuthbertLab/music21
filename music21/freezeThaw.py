@@ -616,7 +616,7 @@ class StreamFreezer(StreamFreezeThawBase):
         else:
             return 'pickle'
 
-    def write(self, fmt='pickle', fp=None, zipType=None):
+    def write(self, fmt='pickle', fp=None, zipType=None, **keywords):
         '''
         For a supplied Stream, write a serialized version to
         disk in either 'pickle' or 'jsonpickle' format and
@@ -659,7 +659,7 @@ class StreamFreezer(StreamFreezeThawBase):
             with open(fp, 'wb') as f: # binary
                 f.write(pickleString)
         elif fmt == 'jsonpickle':
-            data = jsonpickle.encode(storage)
+            data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
                 data = zlib.compress(data)
             with open(fp, 'w') as f:
@@ -672,7 +672,7 @@ class StreamFreezer(StreamFreezeThawBase):
         #self.teardownStream(self.stream)
         return fp
 
-    def writeStr(self, fmt=None):
+    def writeStr(self, fmt=None, **keywords):
         '''
         Convert the object to a pickled/jsonpickled string
         and return the string
@@ -684,7 +684,7 @@ class StreamFreezer(StreamFreezeThawBase):
         if fmt == 'pickle':
             out = pickleMod.dumps(storage, protocol=-1)
         elif fmt == 'jsonpickle':
-            out = jsonpickle.encode(storage)
+            out = jsonpickle.encode(storage, **keywords)
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
 
