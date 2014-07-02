@@ -46,6 +46,10 @@ from music21.ext.six.moves import range, xrange
 #------------------------------------------------------------------------------
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
 _MEINS = '{http://www.music-encoding.org/ns/mei}'
+# when these tags aren't processed, we won't worry about them (at least for now)
+_IGNORE_UNPROCESSED = ('%ssb' % _MEINS,  # system break
+                       '%slb' % _MEINS,  # line break
+                      )
 
 
 # Exceptions
@@ -124,7 +128,7 @@ def convertFromString(dataStr):
                 for allPartObject in scoreDefResults['all-part objects']:
                     for n in allPartNs:
                         inNextMeasure[n].append(allPartObject)
-            else:
+            elif eachObject.tag not in _IGNORE_UNPROCESSED:
                 print('!! unprocessed %s in %s' % (eachObject.tag, eachSection.tag))
                 pass
 
