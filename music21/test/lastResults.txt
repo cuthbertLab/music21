@@ -1,33 +1,105 @@
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5850, in testMakeNotationByMeasuresA
-    self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
-AssertionError: False != True
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 6903, in testChordifyF
+    "(['A4', 'B-2'], '2.0', '2.0')]")
+AssertionError: "[(['[17 chars]0', '667/1000'), (['C5', 'B-2'], '67/100', '66[77 chars]0')]" != "[(['[17 chars]0', '0.667'), (['C5', 'B-2'], '0.67', '0.667')[63 chars]0')]"
+- [(['B-4', 'B-2'], '0.0', '667/1000'), (['C5', 'B-2'], '67/100', '667/1000'), (['B-4', 'B-2'], '133/100', '667/1000'), (['A4', 'B-2'], '2.0', '2.0')]
+?                              -----                       ----       -----                         ----       -----
++ [(['B-4', 'B-2'], '0.0', '0.667'), (['C5', 'B-2'], '0.67', '0.667'), (['B-4', 'B-2'], '1.33', '0.667'), (['A4', 'B-2'], '2.0', '2.0')]
+?                           ++                        ++      ++                          +      ++
+
 
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5859, in testMakeNotationByMeasuresB
-    self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
-AssertionError: False != True
-
-Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.layout.LayoutScore.getPositionForStaff
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/layout.py", line 911, in getPositionForStaff
+AssertionError: Failed doctest test for music21.humdrum.spineParser.hdStringToNote
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/humdrum/spineParser.py", line 1907, in hdStringToNote
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/layout.py", line 971, in music21.layout.LayoutScore.getPositionForStaff
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/humdrum/spineParser.py", line 1922, in music21.humdrum.spineParser.hdStringToNote
 Failed example:
-    staffLayout031
+    n.duration.fullName
 Expected:
-    <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5>
+    'Whole Triplet (2.67QL)'
 Got:
-    <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5.0>
+    'Whole Triplet (267/100QL)'
 
 
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3633, in testTuple
-    self.assertEqual(tup2.tupletMultiplier(), 2.0/3)
-AssertionError: Fraction(2, 3) != 0.6666666666666666
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3615, in testTuple
+    self.assertEqual(round(dur3.quarterLength, 2), 1.05)
+AssertionError: Fraction(21, 20) != 1.05
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.duration.Duration.fullName
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line unknown line number, in fullName
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line ?, in music21.duration.Duration.fullName
+Failed example:
+    d.fullName
+Expected:
+    'Quarter tied to 16th tied to Eighth Triplet (0.33QL) (1.58 total QL)'
+Got:
+    'Quarter tied to 16th tied to Eighth Triplet (33/100QL) (79/50 total QL)'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line ?, in music21.duration.Duration.fullName
+Failed example:
+    d.fullName
+Expected:
+    'Eighth Triplet (0.33QL)'
+Got:
+    'Eighth Triplet (33/100QL)'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line ?, in music21.duration.Duration.fullName
+Failed example:
+    d.fullName
+Expected:
+    'Quarter Triplet (0.67QL)'
+Got:
+    'Quarter Triplet (67/100QL)'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line ?, in music21.duration.Duration.fullName
+Failed example:
+    d.fullName
+Expected:
+    'Quarter Tuplet of 7/4ths (0.57QL)'
+Got:
+    'Quarter Tuplet of 7/4ths (57/100QL)'
+
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.duration.Tuplet
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 774, in Tuplet
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 861, in music21.duration.Tuplet
+Failed example:
+    myNote.duration.fullName
+Expected:
+    'Quarter Quintuplet (0.8QL)'
+Got:
+    'Quarter Quintuplet (4/5QL)'
+
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.chord.Chord.fullName
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/chord.py", line unknown line number, in fullName
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/chord.py", line ?, in music21.chord.Chord.fullName
+Failed example:
+    chord.Chord(['d1', 'e4-', 'b3-'], quarterLength=2/3.).fullName
+Expected:
+    'Chord {D in octave 1 | E-flat in octave 4 | B-flat in octave 3} Quarter Triplet (0.67QL)'
+Got:
+    'Chord {D in octave 1 | E-flat in octave 4 | B-flat in octave 3} Quarter Triplet (67/100QL)'
+
 
 
 
@@ -131,15 +203,15 @@ voiceLeading successfully ran 64 tests
 vexflow___init__ successfully ran 30 tests
 trecento_trecentoCadence successfully ran 7 tests
 variant successfully ran 34 tests
-trecento_polyphonicSnippet successfully ran 9 tests
 webapps_commands successfully ran 10 tests
+trecento_polyphonicSnippet successfully ran 9 tests
 trecento_findTrecentoFragments successfully ran 3 tests
 trecento_notation successfully ran 17 tests
 trecento_tonality successfully ran 5 tests
 trecento___init__ successfully ran 3 tests
 trecento_capua successfully ran 9 tests
-tie successfully ran 7 tests
 tinyNotation successfully ran 11 tests
+tie successfully ran 7 tests
 theoryAnalysis_theoryResult successfully ran 4 tests
 theoryAnalysis___init__ successfully ran 3 tests
 trecento_cadencebook successfully ran 23 tests
@@ -171,20 +243,20 @@ omr_correctors successfully ran 24 tests
 omr___init__ successfully ran 3 tests
 noteworthy_translate successfully ran 21 tests
 noteworthy_binaryTranslate successfully ran 7 tests
-romanText_clercqTemperley successfully ran 19 tests
 noteworthy___init__ successfully ran 3 tests
+romanText_clercqTemperley successfully ran 19 tests
 note successfully ran 47 tests
 musicxml_toMxObjects successfully ran 38 tests
 musicxml_mxObjects successfully ran 45 tests
 musicxml_xmlHandler successfully ran 13 tests
 repeat successfully ran 72 tests
-musicxml_m21ToString successfully ran 45 tests
 musicxml___init__ successfully ran 3 tests
 musedata_base40 successfully ran 9 tests
+musicxml_m21ToString successfully ran 45 tests
 musedata___init__ successfully ran 49 tests
-musicxml_fromMxObjects successfully ran 65 tests
 midi_realtime successfully ran 4 tests
 midi_percussion successfully ran 7 tests
+musicxml_fromMxObjects successfully ran 65 tests
 midi_translate successfully ran 49 tests
 metadata_primitives successfully ran 38 tests
 midi___init__ successfully ran 29 tests
@@ -194,6 +266,7 @@ medren successfully ran 30 tests
 lily_translate successfully ran 32 tests
 lily_lilyObjects successfully ran 14 tests
 lily___init__ successfully ran 3 tests
+layout successfully ran 22 tests
 languageExcerpts_naturalLanguageObjects successfully ran 9 tests
 languageExcerpts_instrumentLookup successfully ran 3 tests
 languageExcerpts___init__ successfully ran 3 tests
@@ -201,16 +274,15 @@ key successfully ran 21 tests
 ipython21_objects successfully ran 3 tests
 ipython21_ipExtension successfully ran 3 tests
 ipython21___init__ successfully ran 3 tests
+metadata_caching successfully ran 7 tests
 intervalNetwork successfully ran 57 tests
 interval successfully ran 55 tests
-instrument successfully ran 23 tests
-metadata_bundles successfully ran 34 tests
 humdrum_testFiles successfully ran 3 tests
+instrument successfully ran 23 tests
 humdrum_instruments successfully ran 8 tests
 humdrum___init__ successfully ran 3 tests
-humdrum_spineParser successfully ran 32 tests
+metadata_bundles successfully ran 34 tests
 harmony successfully ran 28 tests
-metadata_caching successfully ran 7 tests
 figuredBass_segment successfully ran 16 tests
 figuredBass_rules successfully ran 5 tests
 figuredBass_resolution successfully ran 17 tests
@@ -229,46 +301,46 @@ expressions successfully ran 26 tests
 exceptions21 successfully ran 3 tests
 environment successfully ran 31 tests
 editorial successfully ran 10 tests
-dynamics successfully ran 15 tests
 features_base successfully ran 27 tests
+dynamics successfully ran 15 tests
 documentation_library_writers successfully ran 3 tests
 documentation_library_iterators successfully ran 6 tests
-documentation_library_documenters successfully ran 28 tests
+documentation_library_extensions successfully ran 3 tests
 documentation_library_cleaners successfully ran 3 tests
 documentation_library___init__ successfully ran 3 tests
 documentation___init__ successfully ran 3 tests
+documentation_library_documenters successfully ran 28 tests
 defaults successfully ran 4 tests
 counterpoint_species successfully ran 27 tests
-derivation successfully ran 8 tests
 counterpoint___init__ successfully ran 3 tests
+derivation successfully ran 8 tests
 corpus_virtual successfully ran 5 tests
 corpus_corpora successfully ran 28 tests
 corpus_chorales successfully ran 9 tests
+corpus_testCorpus successfully ran 25 tests
 corpus___init__ successfully ran 17 tests
 converter_subConverters successfully ran 10 tests
-corpus_testCorpus successfully ran 25 tests
-converter___init__ successfully ran 40 tests
 features_native successfully ran 26 tests
-composition___init__ successfully ran 3 tests
-common successfully ran 60 tests
-clef successfully ran 28 tests
-chordTables successfully ran 17 tests
 composition_phasing successfully ran 5 tests
+converter___init__ successfully ran 40 tests
+composition___init__ successfully ran 3 tests
+clef successfully ran 28 tests
+common successfully ran 61 tests
+chordTables successfully ran 17 tests
 chant successfully ran 12 tests
+contour successfully ran 10 tests
 capella_fromCapellaXML successfully ran 20 tests
 capella___init__ successfully ran 3 tests
 braille_translate successfully ran 7 tests
 braille_text successfully ran 4 tests
-contour successfully ran 10 tests
-chord successfully ran 108 tests
-braille_lookup successfully ran 3 tests
 braille_segment successfully ran 11 tests
+braille_lookup successfully ran 3 tests
 braille_basic successfully ran 24 tests
 braille___init__ successfully ran 3 tests
 beam successfully ran 15 tests
 braille_examples successfully ran 5 tests
-base successfully ran 88 tests
 bar successfully ran 9 tests
+base successfully ran 86 tests
 audioSearch_recording successfully ran 4 tests
 audioSearch_transcriber successfully ran 4 tests
 articulations successfully ran 26 tests
@@ -276,16 +348,16 @@ audioSearch___init__ successfully ran 19 tests
 analysis_search successfully ran 4 tests
 braille_test successfully ran 151 tests
 analysis_reduceChords successfully ran 7 tests
-analysis_windowed successfully ran 9 tests
 analysis_patel successfully ran 6 tests
+analysis_windowed successfully ran 9 tests
 analysis_metrical successfully ran 6 tests
-analysis_reduction successfully ran 15 tests
 analysis_neoRiemannian successfully ran 10 tests
+analysis_reduction successfully ran 15 tests
 analysis___init__ successfully ran 3 tests
 analysis_correlate successfully ran 6 tests
 abcFormat___init__ successfully ran 53 tests
-analysis_discrete successfully ran 31 tests
 _version successfully ran 3 tests
+analysis_discrete successfully ran 31 tests
 abcFormat_translate successfully ran 18 tests
 Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -312,7 +384,6 @@ Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not i
 Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -328,50 +399,127 @@ Not in Tree Error: abcFormat.testFiles is in the music21 directory but not impor
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
 
 -----------------------------
-test_testStream had 0 ERRORS and 2 FAILURES in 206 tests:
+test_testStream had 0 ERRORS and 1 FAILURES in 206 tests:
 -----------------------------
 
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5850, in testMakeNotationByMeasuresA
-    self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
-AssertionError: False != True
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 6903, in testChordifyF
+    "(['A4', 'B-2'], '2.0', '2.0')]")
+AssertionError: "[(['[17 chars]0', '667/1000'), (['C5', 'B-2'], '67/100', '66[77 chars]0')]" != "[(['[17 chars]0', '0.667'), (['C5', 'B-2'], '0.67', '0.667')[63 chars]0')]"
+- [(['B-4', 'B-2'], '0.0', '667/1000'), (['C5', 'B-2'], '67/100', '667/1000'), (['B-4', 'B-2'], '133/100', '667/1000'), (['A4', 'B-2'], '2.0', '2.0')]
+?                              -----                       ----       -----                         ----       -----
++ [(['B-4', 'B-2'], '0.0', '0.667'), (['C5', 'B-2'], '0.67', '0.667'), (['B-4', 'B-2'], '1.33', '0.667'), (['A4', 'B-2'], '2.0', '2.0')]
+?                           ++                        ++      ++                          +      ++
 
-Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 5859, in testMakeNotationByMeasuresB
-    self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
-AssertionError: False != True
 
 
 -----------------------------
-layout had 0 ERRORS and 1 FAILURES in 22 tests:
+humdrum_spineParser had 0 ERRORS and 1 FAILURES in 32 tests:
 -----------------------------
 
 Traceback (most recent call last):
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.layout.LayoutScore.getPositionForStaff
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/layout.py", line 911, in getPositionForStaff
+AssertionError: Failed doctest test for music21.humdrum.spineParser.hdStringToNote
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/humdrum/spineParser.py", line 1907, in hdStringToNote
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/layout.py", line 971, in music21.layout.LayoutScore.getPositionForStaff
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/humdrum/spineParser.py", line 1922, in music21.humdrum.spineParser.hdStringToNote
 Failed example:
-    staffLayout031
+    n.duration.fullName
 Expected:
-    <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5>
+    'Whole Triplet (2.67QL)'
 Got:
-    <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5.0>
+    'Whole Triplet (267/100QL)'
 
 
 
 -----------------------------
-duration had 0 ERRORS and 1 FAILURES in 70 tests:
+duration had 0 ERRORS and 3 FAILURES in 70 tests:
 -----------------------------
 
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3633, in testTuple
-    self.assertEqual(tup2.tupletMultiplier(), 2.0/3)
-AssertionError: Fraction(2, 3) != 0.6666666666666666
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 3615, in testTuple
+    self.assertEqual(round(dur3.quarterLength, 2), 1.05)
+AssertionError: Fraction(21, 20) != 1.05
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.duration.Duration.fullName
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line unknown line number, in fullName
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line ?, in music21.duration.Duration.fullName
+Failed example:
+    d.fullName
+Expected:
+    'Quarter tied to 16th tied to Eighth Triplet (0.33QL) (1.58 total QL)'
+Got:
+    'Quarter tied to 16th tied to Eighth Triplet (33/100QL) (79/50 total QL)'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line ?, in music21.duration.Duration.fullName
+Failed example:
+    d.fullName
+Expected:
+    'Eighth Triplet (0.33QL)'
+Got:
+    'Eighth Triplet (33/100QL)'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line ?, in music21.duration.Duration.fullName
+Failed example:
+    d.fullName
+Expected:
+    'Quarter Triplet (0.67QL)'
+Got:
+    'Quarter Triplet (67/100QL)'
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line ?, in music21.duration.Duration.fullName
+Failed example:
+    d.fullName
+Expected:
+    'Quarter Tuplet of 7/4ths (0.57QL)'
+Got:
+    'Quarter Tuplet of 7/4ths (57/100QL)'
+
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.duration.Tuplet
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 774, in Tuplet
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/duration.py", line 861, in music21.duration.Tuplet
+Failed example:
+    myNote.duration.fullName
+Expected:
+    'Quarter Quintuplet (0.8QL)'
+Got:
+    'Quarter Quintuplet (4/5QL)'
+
+
+
+-----------------------------
+chord had 0 ERRORS and 1 FAILURES in 108 tests:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.chord.Chord.fullName
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/chord.py", line unknown line number, in fullName
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/chord.py", line ?, in music21.chord.Chord.fullName
+Failed example:
+    chord.Chord(['d1', 'e4-', 'b3-'], quarterLength=2/3.).fullName
+Expected:
+    'Chord {D in octave 1 | E-flat in octave 4 | B-flat in octave 3} Quarter Triplet (0.67QL)'
+Got:
+    'Chord {D in octave 1 | E-flat in octave 4 | B-flat in octave 3} Quarter Triplet (67/100QL)'
+
 
 -------------------------------------------------------------------------
-Ran 4016 tests in 408.8828 seconds
-Run at 2014-06-29 15:26:57
+Ran 4018 tests in 327.2432 seconds
+Run at 2014-06-30 16:02:11

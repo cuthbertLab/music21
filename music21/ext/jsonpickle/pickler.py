@@ -128,8 +128,10 @@ class Pickler(object):
         self._seen.append(obj)
         max_reached = self._depth == self._max_depth
 
-        if max_reached or (not self.make_refs and id(obj) in self._objs):
+        if max_reached:
             # break the cycle
+            flatten_func = repr
+        elif self.make_refs is False and id(obj) in self._objs:
             flatten_func = repr
         else:
             flatten_func = self._get_flattener(obj)

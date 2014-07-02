@@ -1403,7 +1403,7 @@ class ABCNote(ABCToken):
             # or the activeDefaultQuarterLength
             self.activeTuplet.setDurationType(activeDefaultQuarterLength)
             # scale duration by active tuplet multipler
-            ql = common.optionalNumToFraction(ql * self.activeTuplet.tupletMultiplier())
+            ql = common.opFrac(ql * self.activeTuplet.tupletMultiplier())
         return ql
 
 

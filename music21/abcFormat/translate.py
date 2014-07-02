@@ -492,13 +492,13 @@ def reBar(music21Part, inPlace=True):
         if lastTimeSignature is None:
             raise ABCTranslateException("No time signature found in this Part")
 
-        tsEnd = lastTimeSignature.barDuration.quarterLengthRational
-        mEnd = common.optionalNumToFraction(music21Measure.highestTime)
+        tsEnd = lastTimeSignature.barDuration.quarterLength
+        mEnd = common.opFrac(music21Measure.highestTime)
         music21Measure.number += measureNumberOffset
         if mEnd > tsEnd:
             m1, m2 = music21Measure.splitAtQuarterLength(tsEnd)
             m2.timeSignature = None
-            if lastTimeSignature.barDuration.quarterLengthRational != m2.highestTime:
+            if lastTimeSignature.barDuration.quarterLength != m2.highestTime:
                 try:
                     m2.timeSignature = m2.bestTimeSignature()
                 except stream.StreamException as e:
@@ -510,7 +510,7 @@ def reBar(music21Part, inPlace=True):
             m2.clef = None # suppress the clef
             m2.number = m1.number + 1
             measureNumberOffset += 1
-            music21Part.insert(common.optionalNumToFraction(m1.offsetRational + m1.highestTime), m2)
+            music21Part.insert(common.opFrac(m1.offsetRational + m1.highestTime), m2)
         """
         elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
             # The first and last measures are allowed to be incomplete
@@ -648,7 +648,7 @@ class Test(unittest.TestCase):
         # match strings for better comparison
         for n in s.flat.notesAndRests:
             match.append(n.quarterLength)
-        self.assertEqual(match, [
+        shouldFind = [
             1./3, 1./3, 1./3, 
             1./5, 1./5, 1./5, 1./5, 1./5,
             1./6, 1./6, 1./6, 1./6, 1./6, 1./6,
@@ -657,7 +657,8 @@ class Test(unittest.TestCase):
             1./12, 1./12, 1./12, 1./12, 1./12, 1./12, 
             1./12, 1./12, 1./12, 1./12, 1./12, 1./12, 
             2.0
-            ])
+            ]
+        self.assertEqual(match, [common.opFrac(x) for x in shouldFind])
 
 
     def testAnacrusisPadding(self):

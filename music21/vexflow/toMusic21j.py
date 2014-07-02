@@ -26,7 +26,7 @@ supportedDisplayModes = [
 ]
 
 
-def fromObject(thisObject, mode='html'):
+def fromObject(thisObject, mode='html', local=False):
     '''
     returns a string of data for a given Music21Object such as a Score, Note, etc. that
     can be displayed in a browser using the music21j package.  Called by .show('vexflow').
@@ -64,6 +64,7 @@ def fromObject(thisObject, mode='html'):
     '''
     conv = VexflowPickler()
     conv.mode = mode
+    conv.useLocal = local
     return conv.fromObject(thisObject)
 
 class VexflowPickler(object):
@@ -95,10 +96,12 @@ class VexflowPickler(object):
             'pickleOutput' : '{"py/object": "hello"}',
             'm21URI' : 'http://web.mit.edu/music21/music21j/src/music21',
             'requireURI' :'http://web.mit.edu/music21/music21j/ext/require/require.js',
-            'callback' :'streamObj.renderOptions.events.resize = "reflow";\n\t\t\tstreamObj.appendNewCanvas();'
+            'callback' :'streamObj.renderOptions.events.resize = "reflow";\n\t\tstreamObj.appendNewCanvas();',
+            'm21URIlocal' : 'file:///Users/Cuthbert/git/music21j/src/music21',
+            'requireURIlocal' : 'file:///Users/Cuthbert/git/music21j/ext/require/require.js',
         }
         self.mode = 'html'
-    
+        self.useLocal = False
         
     def fromObject(self, thisObject, mode=None):
         if mode is None:
@@ -132,8 +135,14 @@ class VexflowPickler(object):
         
         if urls is None:
             urls = self.defaults
-        loadM21formatted = self.loadM21Template.format(m21URI = urls['m21URI'], 
-                                                       requireURI = urls['requireURI'],)
+        if self.useLocal is False:
+            loadM21formatted = self.loadM21Template.format(m21URI = urls['m21URI'], 
+                                                           requireURI = urls['requireURI'],)
+        else:
+            loadM21formatted = self.loadM21Template.format(m21URI = urls['m21URIlocal'], 
+                                                           requireURI = urls['requireURIlocal'],)
+            
+        
         return loadM21formatted
     
     def getJSBodyScript(self, dataSplit, defaults = None):
@@ -228,6 +237,8 @@ class VexflowPickler(object):
         else:
             title = "Music21 Fragment"
         sf = freezeThaw.StreamFreezer(thisStream)
+
+        ## recursive data structures will be expanded up to a high depth -- make sure there are none...
         data = sf.writeStr(fmt='jsonpickle')
         dataSplit = self.splitLongJSON(data)
         if mode == 'json':
@@ -282,5 +293,16 @@ class TestExternal(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
+    
+    from music21 import note, clef, meter
+    s = stream.Measure()
+    s.insert(0, clef.TrebleClef())
+    s.insert(0, meter.TimeSignature('1/4'))
+    n = note.Note()
+    n.duration.quarterLength = 1/3.
+    s.repeatAppend(n, 3)
+    p = stream.Part()
+    p.repeatAppend(s, 2)
+    p.show('vexflow', local=True)
     
     #s.show('vexflow')

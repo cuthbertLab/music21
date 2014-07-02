@@ -108,6 +108,8 @@ def encode(value,
     encode()/decode(), but the resulting JSON stream will be conceptually
     simpler.  jsonpickle detects cyclical objects and will break the
     cycle by calling repr() instead of recursing when make_refs is set False.
+    
+    MSC: if make_refs is None then continues until max_depth is reached.
 
     The keyword argument 'keys' defaults to False.
     If set to True then jsonpickle will encode non-string dictionary keys

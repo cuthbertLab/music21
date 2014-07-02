@@ -339,7 +339,7 @@ class TinyNotationNote(object):
     >>> tnN.note.tie
     <music21.tie.Tie stop>
     >>> tnN.note.duration.quarterLength
-    0.6666666...
+    Fraction(2, 3)
 
 
     OMIT_FROM_DOCS
