@@ -37,6 +37,8 @@ from music21 import clef
 from music21 import beam
 from music21 import meter
 from music21 import key
+from music21 import instrument
+from music21 import interval
 
 # six
 from music21.ext.six.moves import range, xrange
@@ -377,6 +379,63 @@ def _sharpsFromAttr(signature):
     else:
         return -1 * int(signature[0])
 
+def _timeSigFromAttrs(elem):
+    # TODO: write tests
+    '''
+    From any tag with @meter.count and @meter.unit attributes, make a :class:`TimeSignature`.
+
+    :param :class:`~xml.etree.ElementTree.Element` elem: An :class:`Element` with @meter.count and
+        @meter.unit attributes.
+    :returns: The corresponding time signature.
+    :rtype: :class:`~music21.meter.TimeSignature`
+    '''
+    return meter.TimeSignature('%s/%s' % (elem.get('meter.count'), elem.get('meter.unit')))
+
+
+def _keySigFromAttrs(elem):
+    # TODO: write tests
+    '''
+    From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
+    :class:`KeySignature` or :class:`Key`, as possible.
+
+    :param :class:`~xml.etree.ElementTree.Element` elem: An :class:`Element` with either the
+        @key.pname or @key.sig attribute.
+    :returns: The key or key signature.
+    :rtype: :class:`music21.key.Key` or :class:`~music21.key.KeySignature`
+    '''
+    if elem.get('key.pname') is not None:
+        # @key.accid, @key.mode, @key.pname
+        return key.Key(tonic=elem.get('key.pname') + _accidentalFromAttr(elem.get('key.accid')),
+                       mode=elem.get('key.mode', ''))
+    else:
+        # @key.sig, @key.mode
+        return key.KeySignature(sharps=_sharpsFromAttr(elem.get('key.sig')),
+                                mode=elem.get('key.mode'))
+
+
+def _transpositionFromAttrs(elem):
+    # TODO: write tests
+    '''
+    From any tag with the @trans.diat (and optionally the @trans.semi) attributes, make an
+    :class:`Interval` that represents the interval of transposition from written to concert pitch.
+
+    :param :class:`~xml.etree.ElementTree.Element` elem: An :class:`Element` with the @trans.diat
+        (and optionally @trans.semi) attributes.
+    :returns: The interval of transposition from written to concert pitch.
+    :rtype: :class:`music21.interval.Interval`
+    '''
+    # NB: MEI uses zero-based unison rather than 1-based unison, so for music21 we must make every
+    #     diatonic interval one greater than it was. E.g., '@trans.diat="2"' in MEI means to
+    #     "transpose up two diatonic steps," which music21 would rephrase as "transpose up by a
+    #     diatonic third."
+    iFGAC = interval.intervalFromGenericAndChromatic
+    if elem.get('trans.diat') < 0:
+        return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
+                     interval.ChromaticInterval(int(elem.get('trans.diat')) - 1))
+    else:
+        return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
+                     interval.ChromaticInterval(int(elem.get('trans.diat')) + 1))
+
 
 # Converter Functions
 #------------------------------------------------------------------------------
@@ -474,17 +533,11 @@ def scoreDefFromElement(elem):
     # 1.) process whole-score objects
     # --> time signature
     if elem.get('meter.count') is not None:
-        post[allParts].append(meter.TimeSignature('%s/%s' % (elem.get('meter.count'),
-                                                             elem.get('meter.unit'))))
+        post[allParts].append(_timeSigFromAttrs(elem))
+
     # --> key signature
-    if elem.get('key.pname') is not None:
-        # @key.accid, @key.mode, @key.pname
-        post[allParts].append(key.Key(tonic=elem.get('key.pname') + _accidentalFromAttr(elem.get('key.accid')),
-                                      mode=elem.get('key.mode', '')))
-    elif elem.get('key.sig') is not None:
-        # @key.sig, @key.mode
-        post[allParts].append(key.KeySignature(sharps=_sharpsFromAttr(elem.get('key.sig')),
-                                               mode=elem.get('key.mode')))
+    if elem.get('key.pname') is not None or elem.get('key.sig') is not None:
+        post[allParts].append(_keySigFromAttrs(elem))
 
     # 2.) process per-part objects
     # TODO: deal with per-part stuff
@@ -908,6 +961,48 @@ def clefFromElement(elem):
         post.id = elem.get(_XMLID)
 
     return post
+
+
+def instrDefFromElement(elem):
+    # TODO: write tests
+    '''
+    <instrDef> (instrument definition)---MIDI instrument declaration.
+
+    In MEI 2013: pg.344 (358 in PDF) (MEI.midi module)
+
+    :returns: An :class:`Instrument`
+
+    Attributes Implemented:
+    =======================
+
+    Attributes In Progress:
+    =======================
+    - @midi.instrname (att.midiinstrument)
+    - @midi.instrnum (att.midiinstrument)
+
+    Attributes Ignored:
+    ===================
+    - @xml:id
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+    att.channelized (@midi.channel, @midi.duty, @midi.port, @midi.track)
+    att.midiinstrument (@midi.pan, @midi.volume)
+
+    May Contain:
+    ============
+    None.
+    '''
+    if elem.get('midi.instrnum') is not None:
+        return instrument.instrumentFromMidiProgram(int(elem.get('midi.instrnum')))
+    else:
+        try:
+            return instrument.fromString(elem.get('midi.instrname'))
+        except (AttributeError, instrument.InstrumentException):
+            post = instrument.Instrument()
+            post.partName = elem.get('midi.instrname', '')
+            return post
 
 
 def beamFromElement(elem, overrideN=None):
