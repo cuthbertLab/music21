@@ -347,6 +347,7 @@ def _sharpsFromAttr(signature):
     :returns: The number of sharps.
     :rtype: int
 
+    >>> from music21.mei.__main__ import _sharpsFromAttr
     >>> _sharpsFromAttr('3s')
     3
     >>> _sharpsFromAttr('3f')
