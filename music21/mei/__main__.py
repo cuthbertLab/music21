@@ -98,13 +98,21 @@ def convertFromString(dataStr):
         raise MeiTagError(_WRONG_ROOT_TAG % documentRoot.tag)
 
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
-    # corresponds to what will be a music21 Part.
-    allPartNs = allPartsPresent(documentRoot.findall('.//%sscore//%sstaffDef' % (_MEINS, _MEINS)))
+    # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
+    # get all the <staffDef> tags that are in the <score>, no matter where they appear. This is just
+    # to fetch everything that will affect the maximum number of parts that might happen at a time.
+    allPartNs = allPartsPresent(documentRoot.findall('.//%(mei)smusic//%(mei)sscore//%(mei)sstaffDef' % {'mei': _MEINS}))
 
     # holds the music21.stream.Part that we're building
     parsed = {n: stream.Part() for n in allPartNs}
     # holds things that should go in the following Measure
     inNextMeasure = {n: stream.Part() for n in allPartNs}
+
+    # set the Instrument for each staff
+    for eachN in allPartNs:
+        queryStr = './/%(mei)smusic//%(mei)sstaffDef[@n="%(n)s"]' % {'mei': _MEINS, 'n': eachN}
+        for info in staffDefFromElement(documentRoot.findall(queryStr)[0]):  # TODO: decide whether we need more than the first
+            parsed[eachN].append(info)
 
     backupMeasureNum = 0
     for eachSection in documentRoot.findall('.//%(mei)smusic//%(mei)sscore//*[%(mei)smeasure]' % {'mei': _MEINS}):
@@ -480,6 +488,135 @@ def scoreDefFromElement(elem):
 
     # 2.) process per-part objects
     # TODO: deal with per-part stuff
+
+    return post
+
+
+def staffDefFromElement(elem):
+    '''
+    <staffDef> Container for staff meta-information.
+
+    In MEI 2013: pg.445 (459 in PDF) (MEI.shared module)
+
+    :returns: A list with an :class:`Instrument` subclass with the staff's metadata, followed by
+        other music21 objects specified by the ``<staffDef>``, like a :class:`Clef` or :class:`Key`.
+    :rtype: list of :class:`music21.instrument.Instrument` then :class:`music21.base.Music21Object`
+
+    Attributes Implemented:
+    =======================
+
+    Attributes Ignored:
+    ===================
+    - @key.sig.mixed (from att.keySigDefault.log)
+
+    Attributes In Progress:
+    =======================
+    - @label (att.common) as Instrument.partName
+    - @label.abbr (att.labels.addl) as Instrument.partAbbreviation
+    - @n (att.common) as Instrument.partId
+    - (att.keySigDefault.log (@key.accid, @key.mode, @key.pname, @key.sig))
+    - (att.meterSigDefault.log (@meter.count, @meter.unit))
+    - (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place)) (via :func:`clefFromElement`)
+    - @trans.diat and @trans.demi (att.transposition)
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@n, @xml:base)
+               (att.id (@xml:id))
+    att.declaring (@decls)
+    att.staffDef.log (att.duration.default (@dur.default, @num.default, @numbase.default)) <-- need this!!!
+                     (att.octavedefault (@octave.default)) <-- need this!!!
+                     (att.staffDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
+                     (att.staffDef.log.mensural (att.mensural.log (@mensur.dot, @mensur.sign, @mensur.slash, @proport.num, @proport.numbase)
+                                                (att.mensural.shared (@modusmaior, @modusminor, @prolatio, @tempus))))
+    att.staffDef.vis (@grid.show, @layerscheme, @lines, @lines.color, @lines.visible, @spacing)
+                     (att.cleffing.vis (@clef.color, @clef.visible))
+                     (att.distances (@dynam.dist, @harm.dist, @text.dist))
+                     (att.keySigDefault.vis (@key.sig.show, @key.sig.showchange))
+                     (att.lyricstyle (@lyric.align, @lyric.fam, @lyric.name, @lyric.size, @lyric.style, @lyric.weight))
+                     (att.meterSigDefault.vis (@meter.rend, @meter.showchange, @meter.sym))
+                     (att.multinummeasures (@multi.number))
+                     (att.onelinestaff (@ontheline))
+                     (att.scalable (@scale))
+                     (att.textstyle (@text.fam, @text.name, @text.size, @text.style, @text.weight))
+                     (att.visibility (@visible))
+                     (att.staffDef.vis.cmn (att.beaming.vis (@beam.color, @beam.rend, @beam.slope))
+                                           (att.pianopedals (@pedal.style))
+                                           (att.rehearsal (@reh.enclose))
+                                           (att.slurrend (@slur.rend))
+                                           (att.tierend (@tie.rend)))
+                     (att.staffDef.vis.mensural (att.mensural.vis (@mensur.color, @mensur.form, @mensur.loc, @mensur.orient, @mensur.size)))
+    att.staffDef.ges (att.instrumentident (@instr))
+                     (att.timebase (@ppq))
+                     (att.staffDef.ges.tablature (@tab.strings))
+    att.staffDef.anl
+
+    May Contain:
+    ============
+    MEI.cmn: meterSig meterSigGrp
+    MEI.mensural: mensur proport
+    MEI.midi: instrDef <-- need this!!!
+    MEI.shared: clef clefGrp keySig label layerDef
+    '''
+    # mapping from tag name to our converter function
+    tagToFunction = {}
+
+    # <instrDef> contained within
+    #for eachDef in elem.findall('%sinstrDef' % _MEINS):
+        #print('?? partName: %s; partId: %s' % (post[0].partName == '', post[0].partId))  # DEBUG
+        #instr = instrDefFromElement(eachDef)
+        #if '' == post[0].partName and '' != instr.bestName():
+            #post[0].partName = instr.bestName()
+        #if post[0].partId is None and instr.partId is not None:
+            #post[0].partId = instr.partId
+
+    # first make the Instrument
+    post = elem.findall('%sinstrDef' % _MEINS)
+    if len(post) > 0:
+        post = [instrDefFromElement(post[0])]
+    else:
+        try:
+            post = [instrument.fromString(elem.get('label'))]
+        except (AttributeError, instrument.InstrumentException):
+            post = [instrument.Instrument()]
+    post[0].partName = elem.get('label')
+    post[0].partAbbreviation = elem.get('label.abbr')
+    post[0].partId = elem.get('n')
+
+
+
+
+
+    # process other part-specific information
+    # --> time signature
+    if elem.get('meter.count') is not None:
+        post.append(_timeSigFromAttrs(elem))
+
+    # --> key signature
+    if elem.get('key.pname') is not None or elem.get('key.sig') is not None:
+        post.append(_keySigFromAttrs(elem))
+
+    # --> clef
+    # (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place))
+    if elem.get('clef.shape') is not None:
+        post.append(clefFromElement(ETree.Element('clef', {'shape': elem.get('clef.shape'),
+                                                           'line': elem.get('clef.line'),
+                                                           'dis': elem.get('clef.dis'),
+                                                           'dis.place': elem.get('clef.dis.place')})))
+
+    # --> transposition
+    # - A clarinet: trans.semi="-3" trans.diat="-2"... because C to A is two diatonic steps comprised of three semitones
+    # - they're both integer values
+    # - "diatonic transposition" requires both .semi and .diat
+    if elem.get('trans.semi') is not None:
+        post[0].transposition = _transpositionFromAttrs(elem)
+
+    # iterate all immediate children
+    for eachTag in elem.findall('*'):
+        if eachTag.tag in tagToFunction:
+            post.append(tagToFunction[eachTag.tag](eachTag))
+        elif '%sinstrDef' % _MEINS != eachTag.tag:  # DEBUG
+            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
     return post
 
