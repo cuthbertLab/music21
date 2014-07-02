@@ -122,16 +122,17 @@ def convertFromString(dataStr):
         for eachObject in eachSection:
             if ('%smeasure' % _MEINS) == eachObject.tag:
                 backupMeasureNum += 1
+                # process all the stuff in the <measure>
+                measureResult = measureFromElement(eachObject, backupMeasureNum)
+                # process and append each part's stuff to the staff
                 for eachN in allPartNs:
-                    thisStaffTag = eachObject.findall('./%sstaff[@n="%s"]' % (_MEINS, eachN))[0]
-                    thisMeasure = stream.Measure(staffFromElement(thisStaffTag),
-                                                number=int(eachObject.get('n', backupMeasureNum)))  # NB: the 2nd param is for measures that don't have @n set
-                    # add things that were specified in the immediately-preceding <scoreDef>
+                    # TODO: what if an @n doesn't exist in this <measure>?
+                    # insert objects specified in the immediately-preceding <scoreDef>
                     for eachThing in inNextMeasure[eachN]:
-                        thisMeasure.insert(0, eachThing)
+                        measureResult[eachN].insert(0, eachThing)
                     inNextMeasure[eachN] = []
                     # add this Measure to the Part
-                    parsed[eachN].append(thisMeasure)
+                    parsed[eachN].append(measureResult[eachN])
             elif ('%sscoreDef' % _MEINS) == eachObject.tag:
                 scoreDefResults = scoreDefFromElement(eachObject)
                 # spread all-part elements across all the parts
@@ -1261,35 +1262,60 @@ def staffFromElement(elem):
     return post
 
 
-
-
-def measureFromElement(elem):
+def measureFromElement(elem, backupNum=0):
     '''
     <measure> Unit of musical time consisting of a fixed number of note-values of a given type, as
     determined by the prevailing meter, and delimited in musical notation by two bar lines.
 
     In MEI 2013: pg.365 (379 in PDF) (MEI.cmn module)
 
+    :param elem: The ``<measure>`` tag to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :param int backupNum: A fallback value for the resulting :class:`Measure` objects' ``number``
+        attribute.
+    :returns: A dictionary where keys are the @n attributes for <staff> tags found in this
+        <measure>, and values are :class:`~music21.stream.Measure` objects that should be appended
+        to the :class:`Part` instance with the value's @n attributes.
+    :rtype: dict of :class:`music21.stream.Measure`
+
     Attributes Implemented:
     =======================
 
     Attributes Ignored:
     ===================
+    - xml:id, since it would logically require every :class:`Measure` object's ``id`` attribute
+        to be set identically, running contrary to the point of unique ``id`` fields.
 
     Attributes In Progress:
     =======================
     - <staff> contained within
-    - xml:id (or id), an XML id (submitted as the Music21Object "id")
 
     Attributes not Implemented:
     ===========================
+    att.common (@label, @n, @xml:base)
+               (att.id (@xml:id))
+    att.declaring (@decls)
+    att.facsimile (@facs)
+    att.typed (@type, @subtype)
+    att.pointing (@xlink:actuate, @xlink:role, @xlink:show, @target, @targettype, @xlink:title)
+    att.measure.log (@left, @right)
+                    (att.meterconformance.bar (@metcon, @control))
+    att.measure.vis (att.barplacement (@barplace, @taktplace))
+                    (att.measurement (@unit))
+                    (att.width (@width))
+    att.measure.ges (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+    att.measure.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                    (att.alignment (@when)))
+                    (att.joined (@join))
 
     May Contain:
     ============
-    MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh slur tie tupletSpan
+    MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh slur
+             tie tupletSpan
     MEI.cmnOrnaments: mordent trill turn
     MEI.critapp: app
-    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied
+                   unclear
     MEI.harmony: harm
     MEI.lyrics: lyrics
     MEI.midi: midi
@@ -1297,24 +1323,25 @@ def measureFromElement(elem):
     MEI.text: div
     MEI.usersymbols: anchoredText curve line symbol
     '''
+    post = {}
+
     # mapping from tag name to our converter function
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}staff': staffFromElement}
-    objects = []
+    staffTagName = '{http://www.music-encoding.org/ns/mei}staff'
+    tagToFunction = {}
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
-        if eachTag.tag in tagToFunction:
-            objects.append(tagToFunction[eachTag.tag](eachTag))
-
-    # make a music21.stream.Measure, set its "id" attribute, and return
-    post = stream.Measure()
-    for eachObj in objects:
-        post.append(eachObj)
-
-    if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+        if staffTagName == eachTag.tag:
+            post[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag),
+                                                    number=int(elem.get('n', backupNum)))
+        elif eachTag.tag in tagToFunction:
+            # NB: this won't be tested until there's something in tagToFunction
+            post.append(tagToFunction[eachTag.tag](eachTag))
+        else:  # DEBUG
+            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
     return post
+
 
 #------------------------------------------------------------------------------
 _DOC_ORDER = [noteFromElement, restFromElement]
