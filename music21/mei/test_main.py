@@ -42,7 +42,7 @@ from six.moves import range, xrange
 # Importing from __main__.py
 import music21.mei.__main__ as main
 from music21.mei.__main__ import _XMLID
-
+from music21.mei.__main__ import _MEINS
 
 
 class TestThings(unittest.TestCase):
@@ -481,7 +481,7 @@ class TestChordFromElement(unittest.TestCase):
     @staticmethod
     def makeNoteTags(pname, accid, octArg, dur, dots):
         '''Factory function for the Element objects that are a <note>.'''
-        return ETree.Element('note', pname=pname, accid=accid, oct=octArg, dur=dur, dots=dots)
+        return ETree.Element('%snote' % _MEINS, pname=pname, accid=accid, oct=octArg, dur=dur, dots=dots)
 
     @mock.patch('music21.chord.Chord')
     @mock.patch('music21.mei.__main__.noteFromElement')
@@ -505,7 +505,7 @@ class TestChordFromElement(unittest.TestCase):
         actual = main.chordFromElement(elem)
 
         self.assertEqual(expected, actual)
-        elem.iterfind.assert_called_once_with('note')
+        elem.iterfind.assert_called_once_with('%snote' % _MEINS)
         mockChord.assert_called_once_with(notes=expectedNotes)
         self.assertEqual(mockChord.return_value.duration, duration.Duration(1.5))
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
@@ -554,7 +554,7 @@ class TestChordFromElement(unittest.TestCase):
         actual = main.chordFromElement(elem)
 
         self.assertEqual(expected, actual)
-        elem.iterfind.assert_called_once_with('note')
+        elem.iterfind.assert_called_once_with('%snote' % _MEINS)
         mockChord.assert_called_once_with(notes=expectedNotes)
         self.assertEqual(duration.Duration(1.5), actual.duration)
         self.assertEqual('42', actual.id)
@@ -602,7 +602,7 @@ class TestChordFromElement(unittest.TestCase):
         actual = main.chordFromElement(elem)
 
         self.assertEqual(expected, actual)
-        elem.iterfind.assert_called_once_with('note')
+        elem.iterfind.assert_called_once_with('%snote' % _MEINS)
         mockChord.assert_called_once_with(notes=expectedNotes)
         self.assertEqual(duration.Duration(1.5), actual.duration)
         self.assertEqual([articulations.Staccato], actual.articulations)

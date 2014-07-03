@@ -923,7 +923,7 @@ def chordFromElement(elem):
     MEI.shared: artic
     '''
     # pitch and duration... these are what we can set in the constructor
-    post = chord.Chord(notes=[noteFromElement(x) for x in elem.iterfind('note')])
+    post = chord.Chord(notes=[noteFromElement(x) for x in elem.iterfind('%snote' % _MEINS)])
 
     # for a Chord, setting "duration" with a Duration object in __init__() doesn't work
     post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
