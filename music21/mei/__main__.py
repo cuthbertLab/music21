@@ -462,8 +462,10 @@ def _barlineFromAttr(attr):
     if attr.startswith('rpt'):
         if 'rptboth' == attr:
             return None
+        elif 'rptend' == attr:
+            return bar.Repeat('end', times=2)
         else:
-            return bar.Repeat(attr[3:], times=2)
+            return bar.Repeat('start')
     else:
         return bar.Barline(_attrTranslator(attr, 'right', _BAR_ATTR_DICT))
 
