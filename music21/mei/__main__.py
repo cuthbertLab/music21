@@ -126,7 +126,7 @@ def convertFromString(dataStr):
                 # TODO: MEI's "rptboth" barlines require handling at the multi-measure level
                 backupMeasureNum += 1
                 # process all the stuff in the <measure>
-                measureResult = measureFromElement(eachObject, backupMeasureNum)
+                measureResult = measureFromElement(eachObject, backupMeasureNum, allPartNs)
                 # process and append each part's stuff to the staff
                 for eachN in allPartNs:
                     # TODO: what if an @n doesn't exist in this <measure>?
@@ -144,7 +144,6 @@ def convertFromString(dataStr):
                         inNextMeasure[n].append(allPartObject)
             elif eachObject.tag not in _IGNORE_UNPROCESSED:
                 print('!! unprocessed %s in %s' % (eachObject.tag, eachSection.tag))
-                pass
 
     # TODO: check if there's anything left in "inNextMeasure"
 
@@ -1211,6 +1210,8 @@ def layerFromElement(elem, overrideN=None):
             else:
                 for eachObject in result:
                     post.append(eachObject)
+        else:  # DEBUG
+            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
     # try to set the Voice's "id" attribte
     if overrideN:
@@ -1296,7 +1297,7 @@ def staffFromElement(elem):
     return post
 
 
-def measureFromElement(elem, backupNum=0):
+def measureFromElement(elem, backupNum=None, expectedNs=None):
     # TODO: write tests
     '''
     <measure> Unit of musical time consisting of a fixed number of note-values of a given type, as
@@ -1307,7 +1308,11 @@ def measureFromElement(elem, backupNum=0):
     :param elem: The ``<measure>`` tag to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :param int backupNum: A fallback value for the resulting :class:`Measure` objects' ``number``
-        attribute.
+        attribute. The default will be 0.
+    :param expectedNs: A list of the expected @n attributes for the <staff> tags in this <measure>.
+        If an expected <staff> isn't in the <measure>, it will be created with a full-measure rest.
+        The default is ``None``.
+    :type expectedNs: iterable of str
     :returns: A dictionary where keys are the @n attributes for <staff> tags found in this
         <measure>, and values are :class:`~music21.stream.Measure` objects that should be appended
         to the :class:`Part` instance with the value's @n attributes.
@@ -1362,20 +1367,35 @@ def measureFromElement(elem, backupNum=0):
     '''
     post = {}
 
+    backupNum = 0 if backupNum is None else backupNum
+    expectedNs = [] if expectedNs is None else expectedNs
+
     # mapping from tag name to our converter function
     staffTagName = '{http://www.music-encoding.org/ns/mei}staff'
     tagToFunction = {}
+
+    # track the bar's duration
+    barDuration = None
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if staffTagName == eachTag.tag:
             post[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag),
                                                     number=int(elem.get('n', backupNum)))
+            if barDuration is None:
+                barDuration = post[eachTag.get('n')].duration.quarterLength
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             post.append(tagToFunction[eachTag.tag](eachTag))
         else:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+
+    # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
+    for eachN in expectedNs:
+        if eachN not in post:
+            restVoice = stream.Voice([note.Rest(quarterLength=barDuration)])
+            restVoice.id = '1'
+            post[eachN] = stream.Measure([restVoice], number=int(elem.get('n', backupNum)))
 
     # assign left and right barlines
     if elem.get('left') is not None:
