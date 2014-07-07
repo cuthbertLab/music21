@@ -12,8 +12,7 @@ Python is a simple but powerful programming language that music21
 is written in and in which you will write your own programs that 
 use music21.  
 
-Windows users should download and install Python version 2.7 and 
-*not* 3.0, 3.3, etc. 
+Windows users should download and install Python version 2.7 (or, experimentally, 3.4). 
 
 To get Python 2.7 for Windows, go to http://www.python.org/download/ 
 and click on the "Windows installer" link.  It is probably the 
@@ -33,10 +32,9 @@ Updating Python
 If you have already installed Python on your computer, launch IDLE (a Python interpreter and code editor) by clicking the start menu and clicking Run (on Windows XP or older) and typing in "IDLE" or (on Windows Vista and newer) typing in "IDLE" in the Search Programs list.
 
 The first lines of text displayed will include a version number.  
-Make sure it begins with 2.6.0 or higher, but not 3.0 or 3.1, etc.
+Make sure it begins with 2.7 or higher or 3.3 or higher.
 
-If your version is too old, download a newer version as above. You may want to upgrade to 2.7 even if you are on 2.6 already.
-
+If your version is too old, download a newer version as above.
 
 Download music21
 -------------------------------
