@@ -721,6 +721,45 @@ def staffDefFromElement(elem):
     return post
 
 
+def dotFromElement(elem):
+    '''
+    <dot> Dot of augmentation or division.
+
+    In MEI 2013: pg.304 (318 in PDF) (MEI.shared module)
+
+    Attributes Implemented:
+    =======================
+
+    Attributes In Progress:
+    =======================
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+               (att.id (@xml:id))
+    att.facsimile (@facs)
+    att.dot.log (@form)
+                (att.controlevent (att.plist (@plist, @evaluate))
+                                  (att.timestamp.musical (@tstamp))
+                                  (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+                                  (att.staffident (@staff))
+                                  (att.layerident (@layer)))
+    att.dot.vis (att.color (@color))
+                (att.staffloc (@loc))
+                (att.visualoffset.ho (@ho))
+                (att.visualoffset.vo (@vo))
+                (att.xy (@x, @y))
+                (att.dot.vis.mensural (att.staffloc.pitched (@ploc, @oloc)))
+    att.dot.gesatt.dot.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                           (att.alignment (@when)))
+
+    May Contain:
+    ============
+    None.
+    '''
+    return 1
+
+
 def noteFromElement(elem):
     '''
     <note> is a single pitched event.
