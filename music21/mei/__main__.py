@@ -760,6 +760,48 @@ def dotFromElement(elem):
     return 1
 
 
+def articFromElement(elem):
+    '''
+    <artic> An indication of how to play a note or chord.
+
+    In MEI 2013: pg.259 (273 in PDF) (MEI.shared module)
+
+    Attributes Implemented:
+    =======================
+
+    Attributes In Progress:
+    =======================
+    - @artic
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+               (att.id (@xml:id))
+    att.facsimile (@facs)
+    att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
+    att.artic.log (att.controlevent (att.plist (@plist, @evaluate))
+                                    (att.timestamp.musical (@tstamp))
+                                    (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+                                    (att.staffident (@staff))
+                                    (att.layerident (@layer)))
+    att.artic.vis (att.color (@color))
+                  (att.enclosingchars (@enclose))
+                  (att.placement (@place))
+                  (att.staffloc (@loc))
+                  (att.visualoffset (att.visualoffset.ho (@ho))
+                  (att.visualoffset.to (@to))
+                  (att.visualoffset.vo (@vo)))
+                  (att.xy (@x, @y))
+    att.artic.gesatt.artic.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                               (att.alignment (@when)))
+
+    May Contain:
+    ============
+    None.
+    '''
+    return _makeArticList(elem.get('artic'))
+
+
 def accidFromElement(elem):
     '''
     <accid> Records a temporary alteration to the pitch of a note.
