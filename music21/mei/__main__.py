@@ -760,6 +760,48 @@ def dotFromElement(elem):
     return 1
 
 
+def accidFromElement(elem):
+    '''
+    <accid> Records a temporary alteration to the pitch of a note.
+
+    In MEI 2013: pg.248 (262 in PDF) (MEI.shared module)
+
+    Attributes Implemented:
+    =======================
+
+    Attributes In Progress:
+    =======================
+    - accid (from att.accid.log)
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+               (att.id (@xml:id))
+    att.facsimile (@facs)
+    att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
+    att.accid.log (@func)
+                  (att.controlevent (att.plist (@plist, @evaluate))
+                                    (att.timestamp.musical (@tstamp))
+                                    (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+                                    (att.staffident (@staff)) (att.layerident (@layer)))
+    att.accid.vis (att.color (@color))
+                  (att.enclosingchars (@enclose))
+                  (att.placement (@place))
+                  (att.staffloc (@loc))
+                  (att.visualoffset.ho (@ho))
+                  (att.visualoffset.vo (@vo))
+                  (att.xy (@x, @y))
+                  (att.accid.vis.mensural (att.staffloc.pitched (@ploc, @oloc)))
+    att.accid.gesatt.accid.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                               (att.alignment (@when)))
+
+    May Contain:
+    ============
+    None.
+    '''
+    return _accidentalFromAttr(elem.get('accid'))
+
+
 def noteFromElement(elem):
     '''
     <note> is a single pitched event.
