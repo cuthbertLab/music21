@@ -1252,7 +1252,7 @@ def beamFromElement(elem, overrideN=None):
 
             # then set it (if possible)
             if hasattr(thing, 'beams'):
-                thing.beams.fill(duration.convertQuarterLengthToType(thing.quarterLength), beamType)
+                thing.beams.fill(duration.dottedMatch(thing.quarterLength)[1], beamType)
             elif beamEnd == i:  # end the beam earlier if the last thing is a Rest (for example)
                 post[i - 1].beams.setAll('partial', direction='right')
 
