@@ -51,8 +51,8 @@ from six.moves import range, xrange
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
 _MEINS = '{http://www.music-encoding.org/ns/mei}'
 # when these tags aren't processed, we won't worry about them (at least for now)
-_IGNORE_UNPROCESSED = ('%ssb' % _MEINS,  # system break
-                       '%slb' % _MEINS,  # line break
+_IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
+                       '{}lb'.format(_MEINS),  # line break
                       )
 
 
@@ -76,10 +76,10 @@ class MeiTagError(exceptions21.Music21Exception):
 
 # Text Strings for Error Conditions
 #------------------------------------------------------------------------------
-_WRONG_ROOT_TAG = 'Root tag is should be <mei>, not <%s>.'
+_WRONG_ROOT_TAG = 'Root tag is should be <mei>, not <{}>.'
 _MULTIPLE_ROOT_TAGS = 'Found multiple <mei> tags.'
-_UNKNOWN_TAG = 'Found unexpected tag while parsing MEI: <%s>.'
-_UNEXPECTED_ATTR_VALUE = 'Unexpected value for "%s" attribute: %s'
+_UNKNOWN_TAG = 'Found unexpected tag while parsing MEI: <{}>.'
+_UNEXPECTED_ATTR_VALUE = 'Unexpected value for "{}" attribute: {}'
 _SEEMINGLY_NO_PARTS = 'There appear to be no <staffDef> tags in this score.'
 _MISSING_VOICE_ID = 'Found a <layer> without @n attribute and no override.'
 
@@ -99,13 +99,13 @@ def convertFromString(dataStr):
         documentRoot = documentRoot.getroot()
 
     if '{http://www.music-encoding.org/ns/mei}mei' != documentRoot.tag:
-        raise MeiTagError(_WRONG_ROOT_TAG % documentRoot.tag)
+        raise MeiTagError(_WRONG_ROOT_TAG.format(documentRoot.tag))
 
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
     # get all the <staffDef> tags that are in the <score>, no matter where they appear. This is just
     # to fetch everything that will affect the maximum number of parts that might happen at a time.
-    allPartNs = allPartsPresent(documentRoot.findall('.//%(mei)smusic//%(mei)sscore//%(mei)sstaffDef' % {'mei': _MEINS}))
+    allPartNs = allPartsPresent(documentRoot.findall('.//{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)))
 
     # holds the music21.stream.Part that we're building
     parsed = {n: stream.Part() for n in allPartNs}
@@ -114,15 +114,15 @@ def convertFromString(dataStr):
 
     # set the Instrument for each staff
     for eachN in allPartNs:
-        queryStr = './/%(mei)smusic//%(mei)sstaffDef[@n="%(n)s"]' % {'mei': _MEINS, 'n': eachN}
+        queryStr = './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)
         for info in staffDefFromElement(documentRoot.findall(queryStr)[0]):  # TODO: decide whether we need more than the first
             parsed[eachN].append(info)
 
     backupMeasureNum = 0
-    for eachSection in documentRoot.findall('.//%(mei)smusic//%(mei)sscore//*[%(mei)smeasure]' % {'mei': _MEINS}):
+    for eachSection in documentRoot.findall('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
         # TODO: sections aren't divided or treated specially, yet
         for eachObject in eachSection:
-            if ('%smeasure' % _MEINS) == eachObject.tag:
+            if '{http://www.music-encoding.org/ns/mei}measure' == eachObject.tag:
                 # TODO: MEI's "rptboth" barlines require handling at the multi-measure level
                 backupMeasureNum += 1
                 # process all the stuff in the <measure>
@@ -136,14 +136,14 @@ def convertFromString(dataStr):
                     inNextMeasure[eachN] = []
                     # add this Measure to the Part
                     parsed[eachN].append(measureResult[eachN])
-            elif ('%sscoreDef' % _MEINS) == eachObject.tag:
+            elif '{http://www.music-encoding.org/ns/mei}scoreDef' == eachObject.tag:
                 scoreDefResults = scoreDefFromElement(eachObject)
                 # spread all-part elements across all the parts
                 for allPartObject in scoreDefResults['all-part objects']:
                     for n in allPartNs:
                         inNextMeasure[n].append(allPartObject)
             elif eachObject.tag not in _IGNORE_UNPROCESSED:
-                print('!! unprocessed %s in %s' % (eachObject.tag, eachSection.tag))
+                print('!! unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
 
     # TODO: check if there's anything left in "inNextMeasure"
 
@@ -288,13 +288,13 @@ def _attrTranslator(attr, name, mapping):
       File "<doctest __main__._attrTranslator[2]>", line 1, in <module>
         _attrTranslator('9', 'dur', _DUR_ATTR_DICT)
       File "/home/crantila/Documents/DDMAL/programs/music21/music21/mei/__main__.py", line 131, in _attrTranslator
-        raise MeiValueError('Unexpected value for "%s" attribute: %s' % (name, attr))
+        raise MeiValueError('Unexpected value for "{}" attribute: {}'.format(name, attr))
     MeiValueError: Unexpected value for "dur" attribute: 9
     '''
     try:
         return mapping[attr]
     except KeyError:
-        raise MeiValueError(_UNEXPECTED_ATTR_VALUE % (name, attr))
+        raise MeiValueError(_UNEXPECTED_ATTR_VALUE.format(name, attr))
 
 
 def _accidentalFromAttr(attr):
@@ -387,6 +387,7 @@ def _sharpsFromAttr(signature):
     else:
         return -1 * int(signature[0])
 
+
 def _timeSigFromAttrs(elem):
     # TODO: write tests
     '''
@@ -397,7 +398,7 @@ def _timeSigFromAttrs(elem):
     :returns: The corresponding time signature.
     :rtype: :class:`~music21.meter.TimeSignature`
     '''
-    return meter.TimeSignature('%s/%s' % (elem.get('meter.count'), elem.get('meter.unit')))
+    return meter.TimeSignature('{!s}/{!s}'.format(elem.get('meter.count'), elem.get('meter.unit')))
 
 
 def _keySigFromAttrs(elem):
@@ -656,7 +657,7 @@ def staffDefFromElement(elem):
             #post[0].partId = instr.partId
 
     # first make the Instrument
-    post = elem.findall('%sinstrDef' % _MEINS)
+    post = elem.findall('{}instrDef'.format(_MEINS))
     if len(post) > 0:
         post = [instrDefFromElement(post[0])]
     else:
@@ -924,7 +925,7 @@ def chordFromElement(elem):
     MEI.shared: artic
     '''
     # pitch and duration... these are what we can set in the constructor
-    post = chord.Chord(notes=[noteFromElement(x) for x in elem.iterfind('%snote' % _MEINS)])
+    post = chord.Chord(notes=[noteFromElement(x) for x in elem.iterfind('{}note'.format(_MEINS))])
 
     # for a Chord, setting "duration" with a Duration object in __init__() doesn't work
     post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
