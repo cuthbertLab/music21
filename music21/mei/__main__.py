@@ -852,17 +852,16 @@ def noteFromElement(elem):
 
     Attributes Implemented:
     =======================
-    - accid, from att.accidental: (via _accidentalFromAttr())
-    - pname, from att.pitch: [a--g]
-    - oct, from att.octave: [0..9]
-    - dur, from att.duration.musical: (via _qlDurationFromAttr())
-    - dots, from att.augmentdots: [0..4]
-    - xml:id (or id), an XML id (submitted as the Music21Object "id")
-    - artic, a list from att.articulation: (via _articulationFromAttr())
+    - @accid and <accid> contained within
+    - @pname, from att.pitch: [a--g]
+    - @oct, from att.octave: [0..9]
+    - @dur, from att.duration.musical: (via _qlDurationFromAttr())
+    - @dots: [0..4], and <dot> contained within
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - @artic and <artic> contained within
 
     Attributes In Progress:
     =======================
-    - <accid>, <artic>, and <dot> contained within (all from MEI.shared)
 
     Attributes not Implemented:
     ===========================
@@ -918,8 +917,12 @@ def noteFromElement(elem):
     MEI.critapp: app
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
     MEI.lyrics: verse
-    MEI.shared: accid artic dot syl
+    MEI.shared: syl
     '''
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}dot': dotFromElement,
+                     '{http://www.music-encoding.org/ns/mei}artic': articFromElement,
+                     '{http://www.music-encoding.org/ns/mei}accid': accidFromElement}
+
     # pitch and duration... these are what we can set in the constructor
     post = note.Note(safePitch(''.join((elem.get('pname', ''),
                                         _accidentalFromAttr(elem.get('accid')),
@@ -932,6 +935,26 @@ def noteFromElement(elem):
 
     if elem.get('artic') is not None:
         post.articulations = _makeArticList(elem.get('artic'))
+
+    addDots = 0  # if there are multiple <dot> tags, we won't know until after the whole loop
+    # iterate all immediate children
+    for eachTag in elem.findall('*'):
+        if eachTag.tag in tagToFunction:
+            tagResult = tagToFunction[eachTag.tag](eachTag)
+        else:
+            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+            continue
+
+        if '{http://www.music-encoding.org/ns/mei}dot' == eachTag.tag:
+            addDots += tagResult
+        elif '{http://www.music-encoding.org/ns/mei}artic' == eachTag.tag:
+            post.articulations = tagResult
+        elif '{http://www.music-encoding.org/ns/mei}accid' == eachTag.tag:
+            post.pitch.accidental = pitch.Accidental(tagResult)
+
+    # add dots as required
+    if addDots > 0:
+        post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), addDots)
 
     return post
 

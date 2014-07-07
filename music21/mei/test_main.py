@@ -370,13 +370,79 @@ class TestNoteFromElement(unittest.TestCase):
     def testIntegration3(self):
         '''
         noteFromElement(): adds "artic"
-        (corresponds to testUnit2() with real Note and real ElementTree.Element)
+        (corresponds to testUnit3() with real Note and real ElementTree.Element)
         '''
         elem = ETree.Element('note')
         attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1', 'artic': 'stacc'}
         for key in attribDict:
             elem.set(key, attribDict[key])
         actual = main.noteFromElement(elem)
+        self.assertEqual('D#2', actual.nameWithOctave)
+        self.assertEqual(1.5, actual.quarterLength)
+        self.assertEqual(1, actual.duration.dots)
+        self.assertEqual([articulations.Staccato], actual.articulations)
+
+    @mock.patch('music21.note.Note')
+    @mock.patch('music21.mei.__main__.articFromElement')
+    def testUnit4(self, mockArticFE, mockNote):
+        '''
+        noteFromElement(): processing an element (<artic>) held within
+        (mostly-unit test; mock out Note, articFromElement(), and the ElementTree.Element)
+        '''
+        elem = mock.MagicMock()
+        # make the mock of <artic> and setup its "tag" property
+        mockArtic = mock.MagicMock('<artic>')
+        mockArticTag = mock.PropertyMock(return_value='{}artic'.format(_MEINS))
+        type(mockArtic).tag = mockArticTag
+        elem.findall.return_value = [mockArtic]
+        # make the expected order of calls to (and the return values for) elem.get()
+        expectedElemOrder = [mock.ANY for _ in xrange(7)]  # not testing the calls from previous unit tests
+        elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
+                       None, None]  # @xml:id and @artic
+        elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
+        # setup the Note and its "articulations" property
+        noteReturn = mock.MagicMock(spec=note.Note, name='note return')
+        articulationsMock = mock.PropertyMock()
+        type(noteReturn).articulations = articulationsMock
+        mockNote.return_value = noteReturn
+        # other things
+        mockArticFE.return_value = 'articFromElement() return'
+        expected = mockNote.return_value
+
+        actual = main.noteFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        self.assertEqual([mock.call() for _ in xrange(4)], mockArticTag.call_args_list)
+        mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
+        self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
+        mockArticFE.assert_called_once_with(mockArtic)
+        articulationsMock.assert_called_once_with(mockArticFE.return_value)
+
+    def testIntegration4(self):
+        '''
+        noteFromElement(): processing elements held within (<artic>, <dot>, <accid>)
+        (corresponds to testUnit4() with real Note and real ElementTree.Element)
+        '''
+        elemNote = ETree.Element('{http://www.music-encoding.org/ns/mei}note')
+        attribDict = {'pname': 'D', 'oct': '2', 'dur': '4'}
+        for key in attribDict:
+            elemNote.set(key, attribDict[key])
+        elemArtic = ETree.Element('{http://www.music-encoding.org/ns/mei}artic')
+        attribDict = {'artic': 'stacc'}
+        for key in attribDict:
+            elemArtic.set(key, attribDict[key])
+        elemDot = ETree.Element('{http://www.music-encoding.org/ns/mei}dot')
+        attribDict = {'xml:id': 'THE ID'}
+        for key in attribDict:
+            elemDot.set(key, attribDict[key])
+        elemAccid = ETree.Element('{http://www.music-encoding.org/ns/mei}accid')
+        attribDict = {'accid': 's'}
+        for key in attribDict:
+            elemAccid.set(key, attribDict[key])
+        elemNote.extend([elemArtic, elemDot, elemAccid])
+
+        actual = main.noteFromElement(elemNote)
+
         self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
