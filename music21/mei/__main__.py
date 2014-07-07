@@ -242,7 +242,7 @@ def allPartsPresent(allStaffDefs):
 # None is for when @accid is omitted
 # TODO: figure out these equivalencies
 _ACCID_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'x': '##', 'ff': '--', 'xs': '###',
-                    'ts': '###', 'tf': '---', 'n': '', 'nf': '-', 'ns': '#', 'su': '???',
+                    'ts': '###', 'tf': '---', 'n': 'n', 'nf': '-', 'ns': '#', 'su': '???',
                     'sd': '???', 'fu': '???', 'fd': '???', 'nu': '???', 'nd': '???', None: ''}
 
 # for _qlDurationFromAttr()
@@ -862,6 +862,7 @@ def noteFromElement(elem):
 
     Attributes In Progress:
     =======================
+    - <accid>, <artic>, and <dot> contained within (all from MEI.shared)
 
     Attributes not Implemented:
     ===========================
