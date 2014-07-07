@@ -34,7 +34,6 @@ from music21 import pitch
 from music21 import stream
 from music21 import chord
 from music21 import clef
-from music21 import beam
 from music21 import meter
 from music21 import key
 from music21 import instrument
@@ -43,7 +42,7 @@ from music21 import bar
 
 # six
 from music21.ext import six
-from six.moves import range, xrange
+from six.moves import xrange  # pylint: disable=redefined-builtin,import-error
 
 
 # Module-Level Constants
@@ -115,7 +114,8 @@ def convertFromString(dataStr):
     # set the Instrument for each staff
     for eachN in allPartNs:
         queryStr = './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)
-        for info in staffDefFromElement(documentRoot.findall(queryStr)[0]):  # TODO: decide whether we need more than the first
+        for info in staffDefFromElement(documentRoot.findall(queryStr)[0]):
+            # TODO: decide whether we need more than index [0]
             parsed[eachN].append(info)
 
     # it's possible there's a <scoreDef> before any of the <section> tags
@@ -125,11 +125,11 @@ def convertFromString(dataStr):
             scoreDefResults = scoreDefFromElement(eachDef)
             # spread all-part elements across all the parts
             for allPartObject in scoreDefResults['all-part objects']:
-                for n in allPartNs:
-                    inNextMeasure[n].append(allPartObject)
+                for partN in allPartNs:
+                    inNextMeasure[partN].append(allPartObject)
         else:
             # this should never happen
-            print('!! found a {} in a place we only expected <scoreDef>s!!'.format(eachObject.tag))
+            print('!! found a {} in a place we only expected <scoreDef>s!!'.format(eachDef.tag))
             raise RuntimeError('bananas!')
 
     backupMeasureNum = 0
@@ -154,8 +154,8 @@ def convertFromString(dataStr):
                 scoreDefResults = scoreDefFromElement(eachObject)
                 # spread all-part elements across all the parts
                 for allPartObject in scoreDefResults['all-part objects']:
-                    for n in allPartNs:
-                        inNextMeasure[n].append(allPartObject)
+                    for partN in allPartNs:
+                        inNextMeasure[partN].append(allPartObject)
             elif eachObject.tag not in _IGNORE_UNPROCESSED:
                 print('!! unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
 
@@ -210,6 +210,7 @@ def makeDuration(base=0.0, dots=0):
 
 
 def allPartsPresent(allStaffDefs):
+    # pylint: disable=line-too-long
     '''
     Given an iterable of all <staffDef> :class:`Element` objects in an MEI file, deduplicate the @n
     attributes, yielding a list of all @n attributes in the <score>.
@@ -223,7 +224,7 @@ def allPartsPresent(allStaffDefs):
         documentRoot.findall('.//score//staffDef')
 
     But of course you must prefix it with the MEI namespace, so it's actually this:::
-        documentRoot.findall('.//{http://www.music-encoding.org/ns/mei}score//{http://www.music-encoding.org/ns/mei}staffDef')  # pylint: disable=line-too-long
+        documentRoot.findall('.//{http://www.music-encoding.org/ns/mei}score//{http://www.music-encoding.org/ns/mei}staffDef')
 
     If you don't do this, you may get misleading <staffDef> tags from, for example, the incipit.
     '''
@@ -624,16 +625,20 @@ def staffDefFromElement(elem):
     att.common (@n, @xml:base)
                (att.id (@xml:id))
     att.declaring (@decls)
-    att.staffDef.log (att.duration.default (@dur.default, @num.default, @numbase.default)) <-- need this!!!
+    att.staffDef.log (att.duration.default (@dur.default, @num.default, @numbase.default)) <-- TODO: need this!!!
                      (att.octavedefault (@octave.default)) <-- need this!!!
                      (att.staffDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
-                     (att.staffDef.log.mensural (att.mensural.log (@mensur.dot, @mensur.sign, @mensur.slash, @proport.num, @proport.numbase)
-                                                (att.mensural.shared (@modusmaior, @modusminor, @prolatio, @tempus))))
+                     (att.staffDef.log.mensural (att.mensural.log (@mensur.dot, @mensur.sign,
+                                                                   @mensur.slash, @proport.num,
+                                                                   @proport.numbase)
+                                                (att.mensural.shared (@modusmaior, @modusminor,
+                                                                      @prolatio, @tempus))))
     att.staffDef.vis (@grid.show, @layerscheme, @lines, @lines.color, @lines.visible, @spacing)
                      (att.cleffing.vis (@clef.color, @clef.visible))
                      (att.distances (@dynam.dist, @harm.dist, @text.dist))
                      (att.keySigDefault.vis (@key.sig.show, @key.sig.showchange))
-                     (att.lyricstyle (@lyric.align, @lyric.fam, @lyric.name, @lyric.size, @lyric.style, @lyric.weight))
+                     (att.lyricstyle (@lyric.align, @lyric.fam, @lyric.name, @lyric.size,
+                                      @lyric.style, @lyric.weight))
                      (att.meterSigDefault.vis (@meter.rend, @meter.showchange, @meter.sym))
                      (att.multinummeasures (@multi.number))
                      (att.onelinestaff (@ontheline))
@@ -645,7 +650,9 @@ def staffDefFromElement(elem):
                                            (att.rehearsal (@reh.enclose))
                                            (att.slurrend (@slur.rend))
                                            (att.tierend (@tie.rend)))
-                     (att.staffDef.vis.mensural (att.mensural.vis (@mensur.color, @mensur.form, @mensur.loc, @mensur.orient, @mensur.size)))
+                     (att.staffDef.vis.mensural (att.mensural.vis (@mensur.color, @mensur.form,
+                                                                   @mensur.loc, @mensur.orient,
+                                                                   @mensur.size)))
     att.staffDef.ges (att.instrumentident (@instr))
                      (att.timebase (@ppq))
                      (att.staffDef.ges.tablature (@tab.strings))
@@ -705,7 +712,8 @@ def staffDefFromElement(elem):
                                                            'dis.place': elem.get('clef.dis.place')})))
 
     # --> transposition
-    # - A clarinet: trans.semi="-3" trans.diat="-2"... because C to A is two diatonic steps comprised of three semitones
+    # - A clarinet: trans.semi="-3" trans.diat="-2"... because C to A is two diatonic steps
+    #               comprised of three semitones
     # - they're both integer values
     # - "diatonic transposition" requires both .semi and .diat
     if elem.get('trans.semi') is not None:
@@ -721,7 +729,7 @@ def staffDefFromElement(elem):
     return post
 
 
-def dotFromElement(elem):
+def dotFromElement(elem):  # pylint: disable=unused-argument
     '''
     <dot> Dot of augmentation or division.
 
@@ -1199,7 +1207,7 @@ def instrDefFromElement(elem):
             return post
 
 
-def beamFromElement(elem, overrideN=None):
+def beamFromElement(elem):
     '''
     <beam> A container for a series of explicitly beamed events that begins and ends entirely
            within a measure.
@@ -1548,7 +1556,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None):
                 barDuration = post[eachTag.get('n')].duration.quarterLength
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
-            post.append(tagToFunction[eachTag.tag](eachTag))
+            post[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag)
         else:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
