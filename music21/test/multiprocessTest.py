@@ -40,7 +40,7 @@ _MOD = 'multiprocessTest.py'
 environLocal = environment.Environment(_MOD)
 from music21.ext import six
 
-ModuleResponse = collections.namedtuple('ModuleResponse', 'returnCode fp moduleName success testRunner errors failures testsRun')
+ModuleResponse = collections.namedtuple('ModuleResponse', 'returnCode fp moduleName success testRunner errors failures testsRun runTime')
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
  
 #-------------------------------------------------------------------------------
@@ -186,6 +186,7 @@ def runOneModuleWithoutImp(args):
     modGath = args[0] # modGather object
     fp = args[1]
     verbosity = False
+    timeStart = time.time()
     moduleObject = modGath.getModuleWithoutImp(fp)
     environLocal.printDebug('running %s \n' % fp)
     if moduleObject == 'skip':
@@ -262,8 +263,9 @@ def runOneModuleWithoutImp(args):
             failures = []
             for f in testResult.failures:
                 failures.append(f[1])
+            runTime = int(time.time() - timeStart)
             return ModuleResponse("TestsRun", fp, moduleName, testResult.wasSuccessful(), 
-                                  str(testResult), errors, failures, testResult.testsRun)
+                                  str(testResult), errors, failures, testResult.testsRun, runTime)
         except Exception as excp:
             environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
             return ModuleResponse("TrappedException", fp, moduleName, None, str(excp))
@@ -290,7 +292,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     modGather = ModuleGather()
 
     maxTimeout = 200
-    pathsToRun = modGather.modulePaths
+    pathsToRun = modGather.modulePaths # [0:30]
 
     pool = multiprocessing.Pool(processes=poolSize)
     
@@ -375,15 +377,17 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
             if moduleResponse.success:
-                successSummary.append("%s successfully ran %d tests" 
-                                      % (moduleResponse.moduleName, moduleResponse.testsRun))
+                successSummary.append("%s successfully ran %d tests in %d seconds" 
+                                      % (moduleResponse.moduleName, 
+                                         moduleResponse.testsRun,
+                                         moduleResponse.runTime))
             else:
                 errorsList = moduleResponse.errors # not the original errors list! see pickle note above
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append("\n-----------------------------\n" + 
-                                          "%s had %d ERRORS and %d FAILURES in %d tests:\n-----------------------------\n" 
+                                          "%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n-----------------------------\n" 
                                           % (moduleResponse.moduleName, len(errorsList), 
-                                             len(failuresList), moduleResponse.testsRun))
+                                             len(failuresList), moduleResponse.testsRun, moduleResponse.runTime))
 
                 for e in errorsList:
                     outStr += e + "\n"
