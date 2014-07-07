@@ -118,6 +118,20 @@ def convertFromString(dataStr):
         for info in staffDefFromElement(documentRoot.findall(queryStr)[0]):  # TODO: decide whether we need more than the first
             parsed[eachN].append(info)
 
+    # it's possible there's a <scoreDef> before any of the <section> tags
+    for eachDef in documentRoot.findall('*//{mei}score//{mei}scoreDef'.format(mei=_MEINS)):
+        # TODO: this only puts the *first* <scoreDef> in the right spot
+        if '{http://www.music-encoding.org/ns/mei}scoreDef' == eachDef.tag:
+            scoreDefResults = scoreDefFromElement(eachDef)
+            # spread all-part elements across all the parts
+            for allPartObject in scoreDefResults['all-part objects']:
+                for n in allPartNs:
+                    inNextMeasure[n].append(allPartObject)
+        else:
+            # this should never happen
+            print('!! found a {} in a place we only expected <scoreDef>s!!'.format(eachObject.tag))
+            raise RuntimeError('bananas!')
+
     backupMeasureNum = 0
     for eachSection in documentRoot.findall('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
         # TODO: sections aren't divided or treated specially, yet
