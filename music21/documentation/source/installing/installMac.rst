@@ -22,7 +22,7 @@ use music21.
 
 Mac OS X comes with Python, but if you have an older version of OS X
 (Leopard or earlier) it might not be a new enough version 
-to run music21. Music21 requires Python 2.6 or 2.7 to run. Python 3 is not yet supported. 
+to run music21. Music21 requires Python 2.7 or Python 3.3 or 3.4. 
 
 To determine the Python version you have installed, open a 
 terminal (by going to Applications, then Utilities, and then 

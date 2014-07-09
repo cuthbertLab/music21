@@ -46,13 +46,7 @@ def cacheMetadata(
     '''
     Cache metadata from corpuses in `corpusNames` as local cache files:
 
-    ::
-
-        >>> from music21 import metadata
-        >>> metadata.cacheMetadata(
-        ...     corpusNames='core',
-        ...     useMultiprocessing=False,
-        ...     )
+    Call as ``metadata.cacheMetadata()``
 
     '''
     from music21 import corpus

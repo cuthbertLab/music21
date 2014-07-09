@@ -11187,7 +11187,7 @@ class Measure(Stream):
         >>> m.barDuration.fullName
         'Dotted Half'
         >>> m.duration.fullName
-        'Whole tied to Quarter (5.0 total QL)'
+        'Whole tied to Quarter (5 total QL)'
         ''')
 
     #---------------------------------------------------------------------------

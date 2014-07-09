@@ -185,10 +185,17 @@ class ModuleGather(object):
 def runOneModuleWithoutImp(args):
     modGath = args[0] # modGather object
     fp = args[1]
+    updateQueue = runOneModuleWithoutImp.queue
+
     verbosity = False
     timeStart = time.time()
     moduleObject = modGath.getModuleWithoutImp(fp)
     environLocal.printDebug('running %s \n' % fp)
+
+    queueTuple = (os.getpid(), fp)
+    updateQueue.put(queueTuple)
+
+    
     if moduleObject == 'skip':
         success = '%s is skipped \n' % fp
         environLocal.printDebug(success)
@@ -273,12 +280,39 @@ def runOneModuleWithoutImp(args):
         environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
         return ModuleResponse("LargeException", fp, None, None, str(excp))
 
+def poolInit(q):
+    runOneModuleWithoutImp.queue = q
+
+updateQueue = multiprocessing.Queue()
+filesRunOrRunning = collections.OrderedDict()
+import Queue
+
+def updateFromQueue(modGather):
+    try:
+        possibleResult = updateQueue.get(False) # no blocking
+    except Queue.Empty:
+        return
     
+    if possibleResult:
+        pid = possibleResult[0]
+        fp = possibleResult[1]
+        timeStart = time.time()
+        filesRunOrRunning[pid] = (modGather._getNamePeriod(fp), timeStart)
+    
+    print('\033[2J\033[H', end='')
+    processorNumber = 0;
+    for pid, info in filesRunOrRunning.items():
+        processorNumber += 1
+        moduleName, timeStart = info
+        timeRunning = time.time() - timeStart
+        bar = ('=' * int(timeRunning)).ljust(40)
+        print("%2s [%s] %s" % (processorNumber, bar, moduleName))
+        
+        
 def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOut = 1):
     '''
     Run all tests. Group can be test and/or external
     '''    
-    
     timeStart = time.time()
     poolSize = multiprocessing.cpu_count()
     if poolSize > 2:
@@ -287,29 +321,29 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
         leaveOut = 0
 
     print('Creating %d processes for multiprocessing (omitting %d processors)' % (poolSize, leaveOut))
-    
+    #print('\033[2J\033[H') #clear screen
 
     modGather = ModuleGather()
 
     maxTimeout = 200
     pathsToRun = modGather.modulePaths # [0:30]
 
-    pool = multiprocessing.Pool(processes=poolSize)
+    pool = multiprocessing.Pool(processes=poolSize, initializer=poolInit, initargs=(updateQueue,))
     
     # imap returns the results as they are completed.  Since the number of files is small,
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
     # unordered says that results can RETURN in any order; not that they'd be pooled out in any
     # order.
-    res = pool.imap_unordered(runOneModuleWithoutImp, ((modGather, fp) for fp in pathsToRun))
+    poolRunner = pool.imap_unordered(runOneModuleWithoutImp, ((modGather, fp) for fp in pathsToRun))
 
     continueIt = True
     timeouts = 0
     eventsProcessed = 0
-    summaryOutput = []
+    summaryOutput = []    
     
     while continueIt is True:
         try:
-            newResult = res.next(timeout=1)
+            newResult = poolRunner.next(timeout=1)
             if timeouts >= 5:
                 print("")
             if newResult.testRunner is not None:
@@ -317,8 +351,13 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
+            updateFromQueue(modGather)
+            
         except multiprocessing.TimeoutError:
+            updateFromQueue(modGather)
+
             timeouts += 1
+            
             if timeouts == 5 and eventsProcessed > 0:
                 print("Delay in processing, seconds: ", end="")
             elif timeouts == 5:
@@ -341,6 +380,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
             summaryOutput.append(exceptionLog)
 
     printSummary(summaryOutput, timeStart, pathsToRun)
+    
 
 def printSummary(summaryOutput, timeStart, pathsToRun):
     outStr = ""
