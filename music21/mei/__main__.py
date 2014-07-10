@@ -169,20 +169,33 @@ def convertFromString(dataStr):
     return stream.Score(parsed)
 
 
-def safePitch(name):
+def safePitch(name, accidental=None, octave=''):
     '''
     Safely build a :class:`Pitch` from a string.
 
     When :meth:`Pitch.__init__` is given an empty string, it raises a :exc:`PitchException`. This
-    function catches the :exc:`PitchException`, instead returning a :class:`Pitch` instance with
-    the music21 default.
+    function instead returns a default :class:`Pitch` instance.
 
-    .. note:: Every :exc:`PitchException` is caught---not just those arising from an empty string.
+    :param str name: Desired name of the :class:`Pitch`.
+    :param str accidental: (Optional) Symbol for the accidental.
+    :param octave: (Optional) Octave number.
+    :type octave: str or int
+
+    :returns: A :class:`Pitch` with the appropriate properties.
+    :rtype: :class:`music21.pitch.Pitch`
+
+    >>> from music21.mei.__main__ import safePitch  # OMIT_FROM_DOCS
+    >>> safePitch('D#6')
+    <music21.pitch.Pitch D#6>
+    >>> safePitch('D', '#', '6')
+    <music21.pitch.Pitch D#6>
     '''
-    try:
-        return pitch.Pitch(name)
-    except pitch.PitchException:
+    if len(name) < 1:
         return pitch.Pitch()
+    elif accidental is None:
+        return pitch.Pitch(name + octave)
+    else:
+        return pitch.Pitch(name, accidental=accidental, octave=int(octave))
 
 
 def makeDuration(base=0.0, dots=0):
@@ -244,7 +257,7 @@ def allPartsPresent(allStaffDefs):
 # TODO: figure out these equivalencies
 _ACCID_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'x': '##', 'ff': '--', 'xs': '###',
                     'ts': '###', 'tf': '---', 'n': 'n', 'nf': '-', 'ns': '#', 'su': '???',
-                    'sd': '???', 'fu': '???', 'fd': '???', 'nu': '???', 'nd': '???', None: ''}
+                    'sd': '???', 'fu': '???', 'fd': '???', 'nu': '???', 'nd': '???', None: None}
 
 # for _qlDurationFromAttr()
 # None is for when @dur is omitted
@@ -932,9 +945,9 @@ def noteFromElement(elem):
                      '{http://www.music-encoding.org/ns/mei}accid': accidFromElement}
 
     # pitch and duration... these are what we can set in the constructor
-    post = note.Note(safePitch(''.join((elem.get('pname', ''),
-                                        _accidentalFromAttr(elem.get('accid')),
-                                        elem.get('oct', '')))),
+    post = note.Note(safePitch(elem.get('pname', ''),
+                               _accidentalFromAttr(elem.get('accid')),
+                               elem.get('oct', '')),
                      duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
 

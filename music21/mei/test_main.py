@@ -66,6 +66,22 @@ class TestThings(unittest.TestCase):
         self.assertEqual(expected.accidental, actual.accidental)
         self.assertEqual(expected.octave, actual.octave)
 
+    def testSafePitch3(self):
+        '''safePitch(): when ``name`` is not given, but there are various kwargs'''
+        expected = pitch.Pitch('D#6')
+        actual = main.safePitch(name='D', accidental='#', octave='6')
+        self.assertEqual(expected.name, actual.name)
+        self.assertEqual(expected.accidental, actual.accidental)
+        self.assertEqual(expected.octave, actual.octave)
+
+    def testSafePitch4(self):
+        '''safePitch(): when 2nd argument is None'''
+        expected = pitch.Pitch('D6')
+        actual = main.safePitch(name='D', accidental=None, octave='6')
+        self.assertEqual(expected.name, actual.name)
+        self.assertEqual(expected.accidental, actual.accidental)
+        self.assertEqual(expected.octave, actual.octave)
+
     def testMakeDuration(self):
         '''makeDuration(): just a couple of things'''
         self.assertEqual(2.0, main.makeDuration(2.0, 0).quarterLength)
