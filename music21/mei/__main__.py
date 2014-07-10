@@ -24,6 +24,7 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ETree
 
+from uuid import uuid4 as makeUuid
 
 # music21
 from music21 import exceptions21
@@ -39,6 +40,8 @@ from music21 import key
 from music21 import instrument
 from music21 import interval
 from music21 import bar
+from music21 import spanner
+from music21 import tie
 
 # six
 from music21.ext import six
@@ -52,6 +55,8 @@ _MEINS = '{http://www.music-encoding.org/ns/mei}'
 # when these tags aren't processed, we won't worry about them (at least for now)
 _IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
                        '{}lb'.format(_MEINS),  # line break
+                       '{}slur'.format(_MEINS),
+                       '{}tie'.format(_MEINS),
                       )
 
 
@@ -81,6 +86,7 @@ _UNKNOWN_TAG = 'Found unexpected tag while parsing MEI: <{}>.'
 _UNEXPECTED_ATTR_VALUE = 'Unexpected value for "{}" attribute: {}'
 _SEEMINGLY_NO_PARTS = 'There appear to be no <staffDef> tags in this score.'
 _MISSING_VOICE_ID = 'Found a <layer> without @n attribute and no override.'
+_CANNOT_FIND_XMLID = 'Could not find the @{} so we could not create the {}.'
 
 
 # Module-level Functions
@@ -99,6 +105,26 @@ def convertFromString(dataStr):
 
     if '{http://www.music-encoding.org/ns/mei}mei' != documentRoot.tag:
         raise MeiTagError(_WRONG_ROOT_TAG.format(documentRoot.tag))
+
+    # pre-processing for <slur> tags
+    slurBundle = spanner.SpannerBundle()
+    for eachSlur in documentRoot.findall('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
+        thisIdLocal = str(makeUuid())
+        startId = eachSlur.get('startid')
+        if startId.startswith('#'):
+            startId = startId[1:]
+        startElem = documentRoot.findall('*//*[@{}="{}"]'.format(_XMLID, startId))
+        startElem[0].set('m21SlurStart', thisIdLocal)
+
+        endId = eachSlur.get('endid')
+        if endId.startswith('#'):
+            endId = endId[1:]
+        endElem = documentRoot.findall('*//*[@{}="{}"]'.format(_XMLID, endId))
+        endElem[0].set('m21SlurEnd', thisIdLocal)
+
+        thisSlur = spanner.Slur()
+        thisSlur.idLocal = thisIdLocal
+        slurBundle.append(thisSlur)
 
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
@@ -140,7 +166,7 @@ def convertFromString(dataStr):
                 # TODO: MEI's "rptboth" barlines require handling at the multi-measure level
                 backupMeasureNum += 1
                 # process all the stuff in the <measure>
-                measureResult = measureFromElement(eachObject, backupMeasureNum, allPartNs)
+                measureResult = measureFromElement(eachObject, backupMeasureNum, allPartNs, slurBundle=slurBundle)
                 # process and append each part's stuff to the staff
                 for eachN in allPartNs:
                     # TODO: what if an @n doesn't exist in this <measure>?
@@ -166,7 +192,20 @@ def convertFromString(dataStr):
     # document, whereas iterating over the keys in "parsed" would not preserve the order.
     parsed = [parsed[n] for n in allPartNs]
 
-    return stream.Score(parsed)
+    post = stream.Score(parsed)
+
+    # process spanners (<slur>, <tie>, etc.)
+    for eachSpanner in documentRoot.findall('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
+        try:
+            tieFromElement(eachSpanner, post)
+        except MeiAttributeError:
+            print('---> failed to place tie from {} to {}'.format(eachSpanner.get('startid'), eachSpanner.get('endid')))
+
+    # put slurs in the Score
+    for eachSlur in slurBundle:
+        post.append(eachSlur)
+
+    return post
 
 
 def safePitch(name, accidental=None, octave=''):
@@ -248,6 +287,43 @@ def allPartsPresent(allStaffDefs):
     if 0 == len(post):
         raise MeiValidityError(_SEEMINGLY_NO_PARTS)
     return tuple(post)
+
+
+def findInStreamById(elementId, inStream, classFilter=None):
+    '''
+    Recursively find an object in a :class:`Stream` by its ``id`` property. The built-in
+    :meth:`~music21.stream.Stream.getElementById` method does not search recursively through
+    embedded :class:`Stream` or :class:`Chord` objects, which may both hold the :class:`Note`
+    objects this function is designed to find.
+
+    :param elementId: The ``id`` of the object you seek.
+    :type elementId: Any type that may be set as the ``id`` of a :class:`Stream`.
+    :param inStream: The :class:`Stream` in which to recursively look for an element.
+    :type inStream: :class:`music21.stream.Stream`
+    :param classFilter: Given to :meth:`~music21.stream.Stream.getElementById` without change.
+    :type classFilter: As specified in :meth:`music21.base.Music21Object.isClassOrSubclass`
+
+    :returns: The first object found with an ``id`` matching ``elementId`` or None if no element
+        is found.
+    :rtype: :class:`~music21.base.Music21Object` or None
+    '''
+    # TODO: rewrite this with a lot more thought
+    # try 1: it might be right here
+    post = inStream.getElementById(elementId, classFilter=classFilter)
+    if post is not None:
+        return post
+
+    # try 2: search in Chord objects
+    for eachChord in inStream.getElementsByClass([chord.Chord], returnStreamSubClass=False):
+        for eachNote in eachChord:
+            if elementId == eachNote.id:
+                return eachNote
+
+    # try 3: recurse through Stream objects
+    for eachStream in inStream.getElementsByClass([stream.Stream], returnStreamSubClass=False):
+        post = findInStreamById(elementId, eachStream, classFilter)
+        if post is not None:
+            return post
 
 
 # Constants for One-to-One Translation
@@ -865,11 +941,14 @@ def accidFromElement(elem):
     return _accidentalFromAttr(elem.get('accid'))
 
 
-def noteFromElement(elem):
+def noteFromElement(elem, slurBundle=None):
     '''
     <note> is a single pitched event.
 
     In MEI 2013: pg.382 (396 in PDF) (MEI.shared module)
+
+    .. note:: We use the ``id`` attribute (from the @xml:id attribute) to attach slurs and other
+        spanners to :class:`Note` objects, so @xml:id *must* be imported from the MEI file.
 
     Attributes Implemented:
     =======================
@@ -973,6 +1052,17 @@ def noteFromElement(elem):
         elif '{http://www.music-encoding.org/ns/mei}accid' == eachTag.tag:
             post.pitch.accidental = pitch.Accidental(tagResult)
 
+    # DEBUG: TESTING: TODO: this is a trial of a strategy to get slurs working!
+    # TODO: ensure this stays in sync with chordFromElement()
+    # maybe we should treat start and end differently?
+    try:
+        if elem.get('m21SlurStart') is not None:
+            slurBundle.getByIdLocal(elem.get('m21SlurStart'))[0].addSpannedElements(post)
+        if elem.get('m21SlurEnd') is not None:
+            slurBundle.getByIdLocal(elem.get('m21SlurEnd'))[0].addSpannedElements(post)
+    except AttributeError:
+        print('\t(slur placement failed because of an AttributeError and slurBundle is {})'.format(slurBundle))
+
     # add dots as required
     if addDots > 0:
         post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), addDots)
@@ -1048,7 +1138,7 @@ def mRestFromElement(elem):
     return restFromElement(elem)
 
 
-def chordFromElement(elem):
+def chordFromElement(elem, slurBundle=None):
     '''
     <chord> is a simultaneous sounding of two or more notes in the same layer with the same duration.
 
@@ -1106,8 +1196,10 @@ def chordFromElement(elem):
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
     MEI.shared: artic
     '''
+    if slurBundle is None:
+        print('\t\t\t\t--> chord has slurBundle of None')  # DEBUG
     # pitch and duration... these are what we can set in the constructor
-    post = chord.Chord(notes=[noteFromElement(x) for x in elem.iterfind('{}note'.format(_MEINS))])
+    post = chord.Chord(notes=[noteFromElement(x, slurBundle) for x in elem.iterfind('{}note'.format(_MEINS))])
 
     # for a Chord, setting "duration" with a Duration object in __init__() doesn't work
     post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
@@ -1117,6 +1209,17 @@ def chordFromElement(elem):
 
     if elem.get('artic') is not None:
         post.articulations = _makeArticList(elem.get('artic'))
+
+    # DEBUG: TESTING: TODO: this is a trial of a strategy to get slurs working!
+    # TODO: ensure this stays in sync with noteFromElement
+    # maybe we should treat start and end differently?
+    try:
+        if elem.get('m21SlurStart') is not None:
+            slurBundle.getByIdLocal(elem.get('m21SlurStart'))[0].addSpannedElements(post)
+        if elem.get('m21SlurEnd') is not None:
+            slurBundle.getByIdLocal(elem.get('m21SlurEnd'))[0].addSpannedElements(post)
+    except AttributeError:
+        print('\t(slur placement failed because of an AttributeError and slurBundle is {})'.format(slurBundle))
 
     return post
 
@@ -1178,6 +1281,91 @@ def clefFromElement(elem):
     return post
 
 
+def tieFromElement(elem, inStream):
+    '''
+    <tie> An indication that two notes of the same pitch form a single note with their combined
+    rhythmic values.
+
+    In MEI 2013: pg.465 (479 in PDF) (MEI.cmn module)
+
+    :param elem: The <tie> tag.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :param inStream: The :class:`Stream` in which the tie's start and end points will be found.
+        This should probably be the top-level :class:`Score`, or some points may not be found.
+    :type inStream: :class:`music21.stream.Stream`
+
+    :returns: ``None``, since a :class:`Tie` is attached to a :class:`Note` and does not otherwise
+        need insertion to a :class:`Stream`.
+    :rtype: NoneType
+
+    :raises: :exc:`MeiAttributeError` if @startid or @endid was not found in ``inStream``, and the
+        tie therefore cannot be created.
+
+    Attributes Implemented:
+    =======================
+
+    Attributes Ignored:
+    ===================
+
+    Attributes In Progress:
+    =======================
+    - @startid (the @xml:id of the start-attached <note>)
+    - @endid (the @xml:id of the end-attached <note>)
+    - @staff (an @n ofthe relevant <staff>) ???
+    - @layer (an @n of the relevant <layer>) ???
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+               (att.id (@xml:id))
+    att.facsimile (@facs)
+    att.typed (@type, @subtype)
+    att.tie.log (att.controlevent (att.plist (@plist, @evaluate))
+                                  (att.timestamp.musical (@tstamp))
+                                  (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+                                  (att.staffident (@staff))
+                                  (att.layerident (@layer)))
+                                  (att.startendid (@endid) (att.startid (@startid)))
+                                  (att.timestamp2.musical (@tstamp2))
+    att.tie.vis (att.color (@color))
+                (att.visualoffset (att.visualoffset.ho (@ho))
+                                  (att.visualoffset.to (@to))
+                                  (att.visualoffset.vo (@vo)))
+                (att.visualoffset2 (att.visualoffset2.ho (@startho, @endho))
+                                   (att.visualoffset2.to (@startto, @endto))
+                                   (att.visualoffset2.vo (@startvo, @endvo)))
+                (att.xy (@x, @y))
+                (att.xy2 (@x2, @y2))
+                (att.curvature (@bezier, @bulge, @curvedir))
+                (att.curverend (@rend))
+    att.tie.gesatt.tie.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                           (att.alignment (@when)))
+
+    May Contain:
+    ============
+    None.
+    '''
+    # find objects to which we'll attach
+    #print('tag name: {}'.format(elem.tag))  # DEBUG
+    if elem.get('startid') is None or elem.get('endid') is None:  # DEBUG
+        print('--> we had some None! We have... {}'.format(elem.attrib))  # DEBUG
+        raise MeiAttributeError('asdf')
+
+    startObject = elem.get('startid')
+    startObject = startObject[1:] if startObject.startswith('#') else startObject
+    startObject = findInStreamById(startObject, inStream)
+    if startObject is None:
+        #print('startid: "{}"'.format(elem.get('startid')))  # DEBUG
+        raise MeiAttributeError(_CANNOT_FIND_XMLID.format('startid', 'tie'))
+    startObject.tie = tie.Tie('start')
+
+    endObject = elem.get('endid')
+    endObject = endObject[1:] if endObject.startswith('#') else endObject
+    endObject = findInStreamById(endObject, inStream)
+    if endObject is not None:
+        endObject.tie = tie.Tie('stop')
+
+
 def instrDefFromElement(elem):
     # TODO: write tests
     '''
@@ -1220,7 +1408,7 @@ def instrDefFromElement(elem):
             return post
 
 
-def beamFromElement(elem):
+def beamFromElement(elem, slurBundle=None):
     '''
     <beam> A container for a series of explicitly beamed events that begins and ends entirely
            within a measure.
@@ -1277,7 +1465,10 @@ def beamFromElement(elem):
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
-        if eachTag.tag in tagToFunction:
+        if ('{http://www.music-encoding.org/ns/mei}note' == eachTag.tag or
+            '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag):
+            post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
+        elif eachTag.tag in tagToFunction:
             post.append(tagToFunction[eachTag.tag](eachTag))
         else:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
@@ -1303,7 +1494,7 @@ def beamFromElement(elem):
     return tuple(post)
 
 
-def layerFromElement(elem, overrideN=None):
+def layerFromElement(elem, overrideN=None, slurBundle=None):
     '''
     <layer> An independent stream of events on a staff.
 
@@ -1386,14 +1577,19 @@ def layerFromElement(elem, overrideN=None):
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
-        if eachTag.tag in tagToFunction:
+        if ('{http://www.music-encoding.org/ns/mei}note' == eachTag.tag or
+            '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag or
+            '{http://www.music-encoding.org/ns/mei}beam' == eachTag.tag):
+            result = tagToFunction[eachTag.tag](eachTag, slurBundle)
+            post.append(result)
+        elif eachTag.tag in tagToFunction:
             result = tagToFunction[eachTag.tag](eachTag)
             if not isinstance(result, (tuple, list)):
                 post.append(result)
             else:
                 for eachObject in result:
                     post.append(eachObject)
-        else:  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
     # try to set the Voice's "id" attribte
@@ -1407,7 +1603,7 @@ def layerFromElement(elem, overrideN=None):
     return post
 
 
-def staffFromElement(elem):
+def staffFromElement(elem, slurBundle=None):
     '''
     <staff> A group of equidistant horizontal lines on which notes are placed in order to
     represent pitch or a grouping element for individual 'strands' of notes, rests, etc. that may
@@ -1463,7 +1659,7 @@ def staffFromElement(elem):
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if layerTagName == eachTag.tag:
-            thisLayer = layerFromElement(eachTag, currentNValue)
+            thisLayer = layerFromElement(eachTag, currentNValue, slurBundle=slurBundle)
             # check for objects that must appear in the Measure, but are currently in the Voice
             for eachThing in thisLayer:
                 if isinstance(eachThing, (clef.Clef,)):
@@ -1474,13 +1670,13 @@ def staffFromElement(elem):
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             post.append(tagToFunction[eachTag.tag](eachTag))
-        else:  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
     return post
 
 
-def measureFromElement(elem, backupNum=None, expectedNs=None):
+def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
     # TODO: write tests
     '''
     <measure> Unit of musical time consisting of a fixed number of note-values of a given type, as
@@ -1508,6 +1704,11 @@ def measureFromElement(elem, backupNum=None, expectedNs=None):
     ===================
     - xml:id, since it would logically require every :class:`Measure` object's ``id`` attribute
         to be set identically, running contrary to the point of unique ``id`` fields.
+    - <slur> and <tie> contained within. These spanners will usually be attached to their starting
+        and ending notes with @xml:id attributes, so it's not necessary to process them when
+        encountered in a <measure>. Furthermore, because the possibility exists for cross-measure
+        slurs and ties, we can't guarantee we'll be able to process all spanners until all
+        spanner-attachable objects are processed. So we manage these tags at a higher level.
 
     Attributes In Progress:
     =======================
@@ -1535,8 +1736,8 @@ def measureFromElement(elem, backupNum=None, expectedNs=None):
 
     May Contain:
     ============
-    MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh slur
-             tie tupletSpan
+    MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh
+             tupletSpan
     MEI.cmnOrnaments: mordent trill turn
     MEI.critapp: app
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied
@@ -1563,14 +1764,14 @@ def measureFromElement(elem, backupNum=None, expectedNs=None):
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if staffTagName == eachTag.tag:
-            post[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag),
+            post[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag, slurBundle=slurBundle),
                                                     number=int(elem.get('n', backupNum)))
             if barDuration is None:
                 barDuration = post[eachTag.get('n')].duration.quarterLength
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             post[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag)
-        else:  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
