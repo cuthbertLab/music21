@@ -574,10 +574,68 @@ def _barlineFromAttr(attr):
         return bar.Barline(_attrTranslator(attr, 'right', _BAR_ATTR_DICT))
 
 
+def _tieFromAttr(attr):
+    # TODO: write tests
+    '''
+    Convert a @tie attribute to the required :class:`Tie` object.
+
+    :param str attr: The MEI @tie attribute to convert.
+    :return: The relevant :class:`Tie` object.
+    :rtype: :class:`music21.tie.Tie`
+    '''
+    if 'm' in attr or ('t' in attr and 'i' in attr):
+        return tie.Tie('continue')
+    elif 'i' in attr:
+        return tie.Tie('start')
+    else:
+        return tie.Tie('stop')
+
+
+def _addSlurToThing(m21Start, m21End, attr, thing, slurBundle):
+    '''
+    If relevant, add a slur to an object. Both "thing" and "slurBundle" must not be ``None``, but
+    the first three arguments may be ``None``. To trigger a slur, either "m21Start", "m21End",
+    or "attr" must be present.
+
+    :param str m21Start: Value of the @m21SlurStart attribute added by the :mod:`~music21.mei`
+        module to facilitate slur processing.
+    :param str m21End: Value of the @m21SlurEnd attribute added by the :mod:`~music21.mei`
+        module to facilitate slur processing.
+    :param str attr: Value of the @slur attribute on the element from which "thing" was created.
+    :param thing: The object to which to attach a slur. This will probably be a
+        :class:`~music21.note.Note` or :class:`~music21.chord.Chord` instance, but it may be
+        something else.
+    :type thing: :class:`~music21.base.Music21Object`
+    :param slurBundle: The :class:`SlurBundle` associated with the :class:`Stream` that holds
+        "thing."
+    :type slurBundle: :class:`music21.spanner.SlurBundle`
+
+    :returns: ``None``
+    '''
+    if m21Start is not None:
+        slurBundle.getByIdLocal(m21Start)[0].addSpannedElements(thing)
+    if m21End is not None:
+        slurBundle.getByIdLocal(m21End)[0].addSpannedElements(thing)
+
+    # TODO: this is slurs based on the @slur attribute
+    if attr is not None:
+        theseSlurs = attr.split(' ')
+        for eachSlur in theseSlurs:
+            slurNum, slurType = eachSlur
+            if 'i' == slurType:
+                newSlur = spanner.Slur()
+                newSlur.idLocal = slurNum
+                slurBundle.append(newSlur)
+                newSlur.addSpannedElements(thing)
+            else:
+                slurBundle.getByIdLocal(slurNum)[0].addSpannedElements(thing)
+
+
 # Converter Functions
 #------------------------------------------------------------------------------
 def scoreDefFromElement(elem):
     # TODO: this whole function is untested
+    # TODO: in the test file, all the TimeSignatures are processed and included in the first measure *and* wherever else they appear
     '''
     <scoreDef> Container for score meta-information.
 
@@ -962,6 +1020,8 @@ def noteFromElement(elem, slurBundle=None):
 
     Attributes In Progress:
     =======================
+    - @slur, (many of "[i|m|t][1-6]")
+    - @tie, (many of "[i|m|t]")
 
     Attributes not Implemented:
     ===========================
@@ -973,8 +1033,6 @@ def noteFromElement(elem, slurBundle=None):
                             (att.layerident (@layer)))
                  (att.fermatapresent (@fermata))
                  (att.syltext (@syl))
-                 (att.slurpresent (@slur))
-                 (att.tiepresent (@tie))
                  (att.tupletpresent (@tuplet))
                  (att.note.log.cmn (att.beamed (@beam))
                                    (att.lvpresent (@lv))
@@ -1052,16 +1110,15 @@ def noteFromElement(elem, slurBundle=None):
         elif '{http://www.music-encoding.org/ns/mei}accid' == eachTag.tag:
             post.pitch.accidental = pitch.Accidental(tagResult)
 
-    # DEBUG: TESTING: TODO: this is a trial of a strategy to get slurs working!
-    # TODO: ensure this stays in sync with chordFromElement()
-    # maybe we should treat start and end differently?
-    try:
-        if elem.get('m21SlurStart') is not None:
-            slurBundle.getByIdLocal(elem.get('m21SlurStart'))[0].addSpannedElements(post)
-        if elem.get('m21SlurEnd') is not None:
-            slurBundle.getByIdLocal(elem.get('m21SlurEnd'))[0].addSpannedElements(post)
-    except AttributeError:
-        print('\t(slur placement failed because of an AttributeError and slurBundle is {})'.format(slurBundle))
+    # NOTE: ensure this stays in sync with chordFromElement()
+    # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
+    if slurBundle is not None:
+        _addSlurToThing(elem.get('m21SlurStart'), elem.get('m21SlurEnd'), elem.get('slur'),
+                        post, slurBundle)
+
+    # ties in the @tie attribute
+    if elem.get('tie') is not None:
+        post.tie = _tieFromAttr(elem.get('tie'))
 
     # add dots as required
     if addDots > 0:
@@ -1154,6 +1211,8 @@ def chordFromElement(elem, slurBundle=None):
 
     Attributes In Progress:
     =======================
+    - @slur, (many of "[i|m|t][1-6]")
+    - @tie, (many of "[i|m|t]")
 
     Attributes not Implemented:
     ===========================
@@ -1163,12 +1222,8 @@ def chordFromElement(elem, slurBundle=None):
                              (att.timestamp.performed (@tstamp.ges, @tstamp.real))
                              (att.staffident (@staff))
                              (att.layerident (@layer)))
-                  (att.augmentdots (@dots))
-                  (att.duration.musical (@dur))
                   (att.fermatapresent (@fermata))
                   (att.syltext (@syl))
-                  (att.slurpresent (@slur))
-                  (att.tiepresent (@tie))
                   (att.tupletpresent (@tuplet))
                   (att.chord.log.cmn (att.beamed (@beam))
                                      (att.lvpresent (@lv))
@@ -1210,16 +1265,15 @@ def chordFromElement(elem, slurBundle=None):
     if elem.get('artic') is not None:
         post.articulations = _makeArticList(elem.get('artic'))
 
-    # DEBUG: TESTING: TODO: this is a trial of a strategy to get slurs working!
-    # TODO: ensure this stays in sync with noteFromElement
-    # maybe we should treat start and end differently?
-    try:
-        if elem.get('m21SlurStart') is not None:
-            slurBundle.getByIdLocal(elem.get('m21SlurStart'))[0].addSpannedElements(post)
-        if elem.get('m21SlurEnd') is not None:
-            slurBundle.getByIdLocal(elem.get('m21SlurEnd'))[0].addSpannedElements(post)
-    except AttributeError:
-        print('\t(slur placement failed because of an AttributeError and slurBundle is {})'.format(slurBundle))
+    # NOTE: ensure this stays in sync with chordFromElement()
+    # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
+    if slurBundle is not None:
+        _addSlurToThing(elem.get('m21SlurStart'), elem.get('m21SlurEnd'), elem.get('slur'),
+                        post, slurBundle)
+
+    # ties in the @tie attribute
+    if elem.get('tie') is not None:
+        post.tie = _tieFromAttr(elem.get('tie'))
 
     return post
 
