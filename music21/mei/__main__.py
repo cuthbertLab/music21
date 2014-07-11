@@ -53,10 +53,10 @@ from six.moves import xrange  # pylint: disable=redefined-builtin,import-error
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
 _MEINS = '{http://www.music-encoding.org/ns/mei}'
 # when these tags aren't processed, we won't worry about them (at least for now)
-_IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
-                       '{}lb'.format(_MEINS),  # line break
-                       '{}slur'.format(_MEINS),
-                       '{}tie'.format(_MEINS),
+_IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break; still TODO
+                       '{}lb'.format(_MEINS),  # line break; still TODO
+                       '{}slur'.format(_MEINS),  # slurs; handled in convertFromString()
+                       '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
                       )
 
 
@@ -106,25 +106,41 @@ def convertFromString(dataStr):
     if '{http://www.music-encoding.org/ns/mei}mei' != documentRoot.tag:
         raise MeiTagError(_WRONG_ROOT_TAG.format(documentRoot.tag))
 
+    def _innerAttrSetter(xmlid, attr, value, append=False):
+        '''
+        Set the "attr" attribute to "value" on the element with @xml:id of "xmlid". If "xmlid" begins
+        with a '#' character, this is removed before searching for the element. If "append" is
+        ``True``, "value" is appended to the current attribute's value, rather than replacing it.
+        '''
+        if xmlid is None:
+            return
+        elif xmlid.startswith('#'):
+            xmlid = xmlid[1:]
+        targetElem = documentRoot.findall('*//*[@{}="{}"]'.format(_XMLID, xmlid))
+        if 0 == len(targetElem):
+            return
+
+        if append:
+            targetElem[0].set(attr, targetElem[0].get(attr, '') + value)
+        else:
+            targetElem[0].set(attr, value)
+
     # pre-processing for <slur> tags
     slurBundle = spanner.SpannerBundle()
     for eachSlur in documentRoot.findall('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
         thisIdLocal = str(makeUuid())
-        startId = eachSlur.get('startid')
-        if startId.startswith('#'):
-            startId = startId[1:]
-        startElem = documentRoot.findall('*//*[@{}="{}"]'.format(_XMLID, startId))
-        startElem[0].set('m21SlurStart', thisIdLocal)
-
-        endId = eachSlur.get('endid')
-        if endId.startswith('#'):
-            endId = endId[1:]
-        endElem = documentRoot.findall('*//*[@{}="{}"]'.format(_XMLID, endId))
-        endElem[0].set('m21SlurEnd', thisIdLocal)
-
         thisSlur = spanner.Slur()
         thisSlur.idLocal = thisIdLocal
         slurBundle.append(thisSlur)
+
+        _innerAttrSetter(eachSlur.get('startid'), 'm21SlurStart', thisIdLocal)
+        _innerAttrSetter(eachSlur.get('endid'), 'm21SlurEnd', thisIdLocal)
+
+    # pre-processing for <tie> tags
+    # (this essentially converts <tie> tags into @tie attributes)
+    for eachTie in documentRoot.findall('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
+        _innerAttrSetter(eachTie.get('startid'), 'tie', ' i', True)
+        _innerAttrSetter(eachTie.get('endid'), 'tie', ' t', True)
 
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
@@ -187,23 +203,16 @@ def convertFromString(dataStr):
 
     # TODO: check if there's anything left in "inNextMeasure"
 
-    # convert the dict to a list
+    # Convert the dict to a Score
     # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
-    # document, whereas iterating over the keys in "parsed" would not preserve the order.
+    # document. Iterating the keys in "parsed" would not preserve the order.
     parsed = [parsed[n] for n in allPartNs]
-
     post = stream.Score(parsed)
 
-    # process spanners (<slur>, <tie>, etc.)
-    for eachSpanner in documentRoot.findall('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
-        try:
-            tieFromElement(eachSpanner, post)
-        except MeiAttributeError:
-            print('---> failed to place tie from {} to {}'.format(eachSpanner.get('startid'), eachSpanner.get('endid')))
-
     # put slurs in the Score
-    for eachSlur in slurBundle:
-        post.append(eachSlur)
+    post.append(slurBundle.list)
+    #for eachSlur in slurBundle:
+        #post.append(eachSlur)
 
     return post
 
@@ -1333,91 +1342,6 @@ def clefFromElement(elem):
         post.id = elem.get(_XMLID)
 
     return post
-
-
-def tieFromElement(elem, inStream):
-    '''
-    <tie> An indication that two notes of the same pitch form a single note with their combined
-    rhythmic values.
-
-    In MEI 2013: pg.465 (479 in PDF) (MEI.cmn module)
-
-    :param elem: The <tie> tag.
-    :type elem: :class:`~xml.etree.ElementTree.Element`
-    :param inStream: The :class:`Stream` in which the tie's start and end points will be found.
-        This should probably be the top-level :class:`Score`, or some points may not be found.
-    :type inStream: :class:`music21.stream.Stream`
-
-    :returns: ``None``, since a :class:`Tie` is attached to a :class:`Note` and does not otherwise
-        need insertion to a :class:`Stream`.
-    :rtype: NoneType
-
-    :raises: :exc:`MeiAttributeError` if @startid or @endid was not found in ``inStream``, and the
-        tie therefore cannot be created.
-
-    Attributes Implemented:
-    =======================
-
-    Attributes Ignored:
-    ===================
-
-    Attributes In Progress:
-    =======================
-    - @startid (the @xml:id of the start-attached <note>)
-    - @endid (the @xml:id of the end-attached <note>)
-    - @staff (an @n ofthe relevant <staff>) ???
-    - @layer (an @n of the relevant <layer>) ???
-
-    Attributes not Implemented:
-    ===========================
-    att.common (@label, @n, @xml:base)
-               (att.id (@xml:id))
-    att.facsimile (@facs)
-    att.typed (@type, @subtype)
-    att.tie.log (att.controlevent (att.plist (@plist, @evaluate))
-                                  (att.timestamp.musical (@tstamp))
-                                  (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                                  (att.staffident (@staff))
-                                  (att.layerident (@layer)))
-                                  (att.startendid (@endid) (att.startid (@startid)))
-                                  (att.timestamp2.musical (@tstamp2))
-    att.tie.vis (att.color (@color))
-                (att.visualoffset (att.visualoffset.ho (@ho))
-                                  (att.visualoffset.to (@to))
-                                  (att.visualoffset.vo (@vo)))
-                (att.visualoffset2 (att.visualoffset2.ho (@startho, @endho))
-                                   (att.visualoffset2.to (@startto, @endto))
-                                   (att.visualoffset2.vo (@startvo, @endvo)))
-                (att.xy (@x, @y))
-                (att.xy2 (@x2, @y2))
-                (att.curvature (@bezier, @bulge, @curvedir))
-                (att.curverend (@rend))
-    att.tie.gesatt.tie.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                           (att.alignment (@when)))
-
-    May Contain:
-    ============
-    None.
-    '''
-    # find objects to which we'll attach
-    #print('tag name: {}'.format(elem.tag))  # DEBUG
-    if elem.get('startid') is None or elem.get('endid') is None:  # DEBUG
-        print('--> we had some None! We have... {}'.format(elem.attrib))  # DEBUG
-        raise MeiAttributeError('asdf')
-
-    startObject = elem.get('startid')
-    startObject = startObject[1:] if startObject.startswith('#') else startObject
-    startObject = findInStreamById(startObject, inStream)
-    if startObject is None:
-        #print('startid: "{}"'.format(elem.get('startid')))  # DEBUG
-        raise MeiAttributeError(_CANNOT_FIND_XMLID.format('startid', 'tie'))
-    startObject.tie = tie.Tie('start')
-
-    endObject = elem.get('endid')
-    endObject = endObject[1:] if endObject.startswith('#') else endObject
-    endObject = findInStreamById(endObject, inStream)
-    if endObject is not None:
-        endObject.tie = tie.Tie('stop')
 
 
 def instrDefFromElement(elem):
