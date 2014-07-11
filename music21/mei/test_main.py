@@ -28,6 +28,8 @@ else:
 # won't know to mock them, and raises an exception instead.
 from xml.etree import ElementTree as ETree
 
+from fractions import Fraction
+
 from music21 import pitch
 from music21 import note
 from music21 import duration
@@ -87,7 +89,9 @@ class TestThings(unittest.TestCase):
         self.assertEqual(2.0, main.makeDuration(2.0, 0).quarterLength)
         self.assertEqual(3.0, main.makeDuration(2.0, 1).quarterLength)
         self.assertEqual(3.5, main.makeDuration(2, 2).quarterLength) # "base" as int---should work
-        self.assertEqual(3.999998092651367, main.makeDuration(2.0, 20).quarterLength)
+        self.assertEqual(Fraction(4, 1), main.makeDuration(2.0, 20).quarterLength)
+        self.assertEqual(Fraction(1, 3), main.makeDuration(0.33333333333333333333, 0).quarterLength)
+        self.assertEqual(Fraction(1, 3), main.makeDuration(Fraction(1, 3), 0).quarterLength)
 
     def testAllPartsPresent1(self):
         '''allPartsPresent(): one <staffDef>, no repeats'''
