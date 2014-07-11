@@ -128,6 +128,7 @@ def convertFromString(dataStr):
     # pre-processing for <slur> tags
     slurBundle = spanner.SpannerBundle()
     for eachSlur in documentRoot.findall('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
+        # TODO: slurs with @tstamp
         thisIdLocal = str(makeUuid())
         thisSlur = spanner.Slur()
         thisSlur.idLocal = thisIdLocal
@@ -180,6 +181,7 @@ def convertFromString(dataStr):
         for eachObject in eachSection:
             if '{http://www.music-encoding.org/ns/mei}measure' == eachObject.tag:
                 # TODO: MEI's "rptboth" barlines require handling at the multi-measure level
+                # TODO: follow the use of @n described on pg.585 (599) of the MEI Guidelines
                 backupMeasureNum += 1
                 # process all the stuff in the <measure>
                 measureResult = measureFromElement(eachObject, backupMeasureNum, allPartNs, slurBundle=slurBundle)
@@ -190,6 +192,11 @@ def convertFromString(dataStr):
                     for eachThing in inNextMeasure[eachN]:
                         measureResult[eachN].insert(0, eachThing)
                     inNextMeasure[eachN] = []
+                    # if it's the first measure, pad for a possible anacrusis
+                    # TODO: this may have to change when @n is better set
+                    # TODO: this doesn't actually solve the "pick-up measure" problem
+                    if 1 == backupMeasureNum:
+                        measureResult[eachN].padAsAnacrusis()
                     # add this Measure to the Part
                     parsed[eachN].append(measureResult[eachN])
             elif '{http://www.music-encoding.org/ns/mei}scoreDef' == eachObject.tag:
@@ -438,11 +445,11 @@ def _articulationFromAttr(attr):
         respectively.
     '''
     if 'marc-stacc' == attr:
-        return (articulations.StrongAccent, articulations.Staccato)
+        return (articulations.StrongAccent(), articulations.Staccato())
     elif 'ten-stacc' == attr:
-        return (articulations.Tenuto, articulations.Staccato)
+        return (articulations.Tenuto(), articulations.Staccato())
     else:
-        return (_attrTranslator(attr, 'artic', _ARTIC_ATTR_DICT),)
+        return (_attrTranslator(attr, 'artic', _ARTIC_ATTR_DICT)(),)
 
 
 def _makeArticList(attr):
@@ -555,6 +562,9 @@ def _transpositionFromAttrs(elem):
         return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
                      interval.ChromaticInterval(int(elem.get('trans.diat')) - 1))
     else:
+        # TODO: sometimes I get this error:
+        # music21.interval.IntervalException: cannot get a specifier for a note with this many semitones off of Perfect: -18
+        # I think it's when there's a very large transposition (duh)
         return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
                      interval.ChromaticInterval(int(elem.get('trans.diat')) + 1))
 
@@ -1201,6 +1211,8 @@ def mRestFromElement(elem):
 
     This is a function wrapper for :func:`restFromElement`.
     '''
+    # TODO: <mRest> elements sometimes won't have a @dur set; it's simply supposed to take up the
+    #       whole measure. But then the quarterLength will be 1.0, which isn't good.
     return restFromElement(elem)
 
 
