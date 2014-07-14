@@ -1902,9 +1902,9 @@ if __name__ == "__main__":
                      test_main.TestNoteFromElement,
                      test_main.TestRestFromElement,
                      test_main.TestChordFromElement,
-                     #test_main.TestClefFromElement,
-                     #test_main.TestLayerFromElement,
-                     #test_main.TestStaffFromElement,
+                     test_main.TestClefFromElement,
+                     test_main.TestLayerFromElement,
+                     test_main.TestStaffFromElement,
                      )
 
 #------------------------------------------------------------------------------

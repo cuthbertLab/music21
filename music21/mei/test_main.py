@@ -1062,9 +1062,11 @@ class TestStaffFromElement(unittest.TestCase):
         findallReturn[1].tag = '%slayer' % main._MEINS
         findallReturn[2].tag = '%slayer' % main._MEINS
         elem.findall = mock.MagicMock(return_value=findallReturn)
-        expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1)) for i in xrange(len(findallReturn))]  # "MLFE" is "mockLayerFromElement"
+        # "MLFE" is "mockLayerFromElement"
+        expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1), slurBundle=None)
+                             for i in xrange(len(findallReturn))]
         mockLFEreturns = ['mockLayerFromElement return %i' for i in xrange(len(findallReturn))]
-        mockLayerFromElement.side_effect = lambda *x: mockLFEreturns.pop(0)
+        mockLayerFromElement.side_effect = lambda x, y, slurBundle: mockLFEreturns.pop(0)
         expectedAppendCalls = [mock.call(mockLFEreturns[i]) for i in xrange(len(findallReturn))]
         expected = ['mockLayerFromElement return %i' for i in xrange(len(findallReturn))]
 
