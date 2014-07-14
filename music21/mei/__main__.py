@@ -1308,8 +1308,6 @@ def chordFromElement(elem, slurBundle=None):
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
     MEI.shared: artic
     '''
-    if slurBundle is None:
-        print('\t\t\t\t--> chord has slurBundle of None')  # DEBUG
     # pitch and duration... these are what we can set in the constructor
     post = chord.Chord(notes=[noteFromElement(x, slurBundle) for x in elem.iterfind('{}note'.format(_MEINS))])
 
@@ -1493,12 +1491,8 @@ def beamFromElement(elem, slurBundle=None):
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
-        if ('{http://www.music-encoding.org/ns/mei}note' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}tuplet' == eachTag.tag):
+        if eachTag.tag in tagToFunction:
             post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
-        elif eachTag.tag in tagToFunction:
-            post.append(tagToFunction[eachTag.tag](eachTag))
         else:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
@@ -1577,13 +1571,8 @@ def tupletFromElement(elem, slurBundle=None):
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
-        if ('{http://www.music-encoding.org/ns/mei}note' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}tuplet' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}beam' == eachTag.tag):
+        if eachTag.tag in tagToFunction:
             post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
-        elif eachTag.tag in tagToFunction:
-            post.append(tagToFunction[eachTag.tag](eachTag))
         else:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
@@ -1684,14 +1673,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
-        if ('{http://www.music-encoding.org/ns/mei}note' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}beam' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}tuplet' == eachTag.tag):
+        if eachTag.tag in tagToFunction:
             result = tagToFunction[eachTag.tag](eachTag, slurBundle)
-            post.append(result)
-        elif eachTag.tag in tagToFunction:
-            result = tagToFunction[eachTag.tag](eachTag)
             if not isinstance(result, (tuple, list)):
                 post.append(result)
             else:
@@ -1777,7 +1760,7 @@ def staffFromElement(elem, slurBundle=None):
             currentNValue = str(int(currentNValue) + 1)  # inefficient, but we need a string
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
-            post.append(tagToFunction[eachTag.tag](eachTag))
+            post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
         elif eachTag.tag not in _IGNORE_UNPROCESSED:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
@@ -1878,7 +1861,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
                 barDuration = post[eachTag.get('n')].duration.quarterLength
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
-            post[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag)
+            post[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag, slurBundle)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
