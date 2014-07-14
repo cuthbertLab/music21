@@ -896,7 +896,8 @@ class TestLayerFromElement(unittest.TestCase):
         findallReturn[1].tag = '%simaginary' % main._MEINS
         findallReturn[2].tag = '%snote' % main._MEINS
         elem.findall = mock.MagicMock(return_value=findallReturn)
-        expectedMNFEOrder = [mock.call(findallReturn[0]), mock.call(findallReturn[2])]  # "MNFE" is "mockNoteFromElement"
+        # "MNFE" is "mockNoteFromElement"
+        expectedMNFEOrder = [mock.call(findallReturn[0], None), mock.call(findallReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
@@ -926,7 +927,8 @@ class TestLayerFromElement(unittest.TestCase):
         findallReturn[1].tag = '%simaginary' % main._MEINS
         findallReturn[2].tag = '%snote' % main._MEINS
         elem.findall = mock.MagicMock(return_value=findallReturn)
-        expectedMNFEOrder = [mock.call(findallReturn[0]), mock.call(findallReturn[2])]  # "MNFE" is "mockNoteFromElement"
+        # "MNFE" is "mockNoteFromElement"
+        expectedMNFEOrder = [mock.call(findallReturn[0], None), mock.call(findallReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
