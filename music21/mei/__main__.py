@@ -44,6 +44,10 @@ from music21 import spanner
 from music21 import tie
 from music21 import beam
 
+from music21 import environment
+_MOD = 'mei.__main__'
+environLocal = environment.Environment(_MOD)
+
 # six
 from music21.ext import six
 from six.moves import xrange  # pylint: disable=redefined-builtin,import-error
@@ -174,7 +178,7 @@ def convertFromString(dataStr):
                     inNextMeasure[partN].append(allPartObject)
         else:
             # this should never happen
-            print('!! found a {} in a place we only expected <scoreDef>s!!'.format(eachDef.tag))
+            environLocal.printDebug('found a {} in a place we only expected <scoreDef>s!!'.format(eachDef.tag))
             raise RuntimeError('bananas!')
 
     backupMeasureNum = 0
@@ -208,7 +212,7 @@ def convertFromString(dataStr):
                     for partN in allPartNs:
                         inNextMeasure[partN].append(allPartObject)
             elif eachObject.tag not in _IGNORE_UNPROCESSED:
-                print('!! unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
+                environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
 
     # TODO: check if there's anything left in "inNextMeasure"
 
@@ -925,8 +929,8 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
             post.append(tagToFunction[eachTag.tag](eachTag))
-        elif '%sinstrDef' % _MEINS != eachTag.tag:  # DEBUG
-            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     return post
 
@@ -1154,8 +1158,8 @@ def noteFromElement(elem, slurBundle=None):
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
             tagResult = tagToFunction[eachTag.tag](eachTag)
-        else:
-            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
             continue
 
         if '{http://www.music-encoding.org/ns/mei}dot' == eachTag.tag:
@@ -1493,8 +1497,8 @@ def beamFromElement(elem, slurBundle=None):
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
             post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
-        else:  # DEBUG
-            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     post = beamTogether(post)
 
@@ -1573,8 +1577,8 @@ def tupletFromElement(elem, slurBundle=None):
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
             post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
-        else:  # DEBUG
-            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     # "tuplet-ify" the duration of everything held within
     for eachObj in post:
@@ -1680,8 +1684,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
             else:
                 for eachObject in result:
                     post.append(eachObject)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:  # DEBUG
-            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     # try to set the Voice's "id" attribte
     if overrideN:
@@ -1761,8 +1765,8 @@ def staffFromElement(elem, slurBundle=None):
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:  # DEBUG
-            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     return post
 
@@ -1862,8 +1866,8 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             post[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag, slurBundle)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:  # DEBUG
-            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
     for eachN in expectedNs:
