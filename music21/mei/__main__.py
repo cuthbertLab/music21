@@ -42,6 +42,7 @@ from music21 import interval
 from music21 import bar
 from music21 import spanner
 from music21 import tie
+from music21 import beam
 
 # six
 from music21.ext import six
@@ -87,6 +88,7 @@ _UNEXPECTED_ATTR_VALUE = 'Unexpected value for "{}" attribute: {}'
 _SEEMINGLY_NO_PARTS = 'There appear to be no <staffDef> tags in this score.'
 _MISSING_VOICE_ID = 'Found a <layer> without @n attribute and no override.'
 _CANNOT_FIND_XMLID = 'Could not find the @{} so we could not create the {}.'
+_MISSING_TUPLET_DATA = 'Both @num and @numbase attributes are required on <tuplet> tags.'
 
 
 # Module-level Functions
@@ -1075,6 +1077,7 @@ def noteFromElement(elem, slurBundle=None):
     =======================
     - @slur, (many of "[i|m|t][1-6]")
     - @tie, (many of "[i|m|t]")
+    - @tuplet, (many of "[i|m|t][1-6]") ??????
 
     Attributes not Implemented:
     ===========================
@@ -1086,7 +1089,6 @@ def noteFromElement(elem, slurBundle=None):
                             (att.layerident (@layer)))
                  (att.fermatapresent (@fermata))
                  (att.syltext (@syl))
-                 (att.tupletpresent (@tuplet))
                  (att.note.log.cmn (att.beamed (@beam))
                                    (att.lvpresent (@lv))
                                    (att.ornam (@ornam)))
@@ -1457,6 +1459,7 @@ def beamFromElement(elem, slurBundle=None):
 
     Attributes In Progress:
     =======================
+    - <tuplet> contained within
 
     Attributes not Implemented:
     ===========================
@@ -1484,13 +1487,15 @@ def beamFromElement(elem, slurBundle=None):
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
                      '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
-                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement}
+                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
+                     '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement}
     post = []
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if ('{http://www.music-encoding.org/ns/mei}note' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag):
+            '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag or
+            '{http://www.music-encoding.org/ns/mei}tuplet' == eachTag.tag):
             post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
         elif eachTag.tag in tagToFunction:
             post.append(tagToFunction[eachTag.tag](eachTag))
@@ -1501,11 +1506,95 @@ def beamFromElement(elem, slurBundle=None):
 
     return post
 
-            # then set it (if possible)
-            if hasattr(thing, 'beams'):
-                thing.beams.fill(duration.dottedMatch(thing.quarterLength)[1], beamType)
-            elif beamEnd == i:  # end the beam earlier if the last thing is a Rest (for example)
-                post[i - 1].beams.setAll('partial', direction='right')
+
+def tupletFromElement(elem, slurBundle=None):
+    # TODO: tuplet brackets on un-beamed notes don't work
+    # TODO: ratio numbers are never printed
+    '''
+    <tuplet> A group of notes with "irregular" (sometimes called "irrational") rhythmic values,
+    for example, three notes in the time normally occupied by two or nine in the time of five.
+
+    In MEI 2013: pg.473 (487 in PDF) (MEI.cmn module)
+
+    :param elem: The ``<tuplet>`` tag to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :returns: An iterable of all the objects contained within the ``<tuplet>`` container.
+    :rtype: tuple of :class:`~music21.base.Music21Object`
+
+    Attributes Implemented:
+    =======================
+
+    Attributes Ignored:
+    ===================
+
+    Attributes In Progress:
+    =======================
+    - elements contained within: <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>
+    - @num and @numbase
+
+    Attributes not Implemented:
+    ===========================
+    att.common (@label, @n, @xml:base)
+               (att.id (@xml:id))
+    att.facsimile (@facs)
+    att.tuplet.log (att.event (att.timestamp.musical (@tstamp))
+                              (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+                              (att.staffident (@staff))
+                              (att.layerident (@layer)))
+                   (att.beamedwith (@beam.with))
+                   (att.augmentdots (@dots))
+                   (att.duration.additive (@dur))
+                   (att.startendid (@endid) (att.startid (@startid)))
+    att.tuplet.vis (@bracket.place, @bracket.visible, @dur.visible, @num.format)
+                   (att.color (@color))
+                   (att.numberplacement (@num.place, @num.visible))
+    att.tuplet.ges (att.duration.performed (@dur.ges))
+    att.tuplet.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                   (att.alignment (@when)))
+
+    May Contain:
+    ============
+    MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
+    MEI.critapp: app
+    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    MEI.mensural: ligature mensur proport
+    MEI.shared: barLine clefGrp custos keySig pad space
+    '''
+    # mapping from tag name to our converter function
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
+                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
+                     '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
+                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
+                     '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
+                     '{http://www.music-encoding.org/ns/mei}clef': clefFromElement}
+    post = []
+
+    # get the @num and @numbase attributes, without which we can't properly calculate the tuplet
+    num = int(elem.get('num', '-1'))
+    numbase = int(elem.get('numbase', '-1'))
+    if -1 == num or -1 == numbase:
+        raise MeiAttributeError(_MISSING_TUPLET_DATA)
+
+    # iterate all immediate children
+    for eachTag in elem.findall('*'):
+        if ('{http://www.music-encoding.org/ns/mei}note' == eachTag.tag or
+            '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag or
+            '{http://www.music-encoding.org/ns/mei}tuplet' == eachTag.tag or
+            '{http://www.music-encoding.org/ns/mei}beam' == eachTag.tag):
+            post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
+        elif eachTag.tag in tagToFunction:
+            post.append(tagToFunction[eachTag.tag](eachTag))
+        else:  # DEBUG
+            print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
+
+    # "tuplet-ify" the duration of everything held within
+    for eachObj in post:
+        if hasattr(eachObj, 'duration'):
+            eachObj.duration.appendTuplet(duration.Tuplet(numberNotesActual=num,
+                                                          numberNotesNormal=numbase))
+
+    # beam it all together
+    post = beamTogether(post)
 
     return tuple(post)
 
@@ -1552,6 +1641,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     Attributes In Progress:
     =======================
     - <beam> contained within
+    - <tuplet> contained within
 
     Attributes not Implemented:
     ===========================
@@ -1588,14 +1678,16 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
                      '{http://www.music-encoding.org/ns/mei}mRest': mRestFromElement,
-                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement}
+                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
+                     '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement}
     post = stream.Voice()
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if ('{http://www.music-encoding.org/ns/mei}note' == eachTag.tag or
             '{http://www.music-encoding.org/ns/mei}chord' == eachTag.tag or
-            '{http://www.music-encoding.org/ns/mei}beam' == eachTag.tag):
+            '{http://www.music-encoding.org/ns/mei}beam' == eachTag.tag or
+            '{http://www.music-encoding.org/ns/mei}tuplet' == eachTag.tag):
             result = tagToFunction[eachTag.tag](eachTag, slurBundle)
             post.append(result)
         elif eachTag.tag in tagToFunction:
