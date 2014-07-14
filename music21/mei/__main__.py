@@ -688,7 +688,7 @@ def beamTogether(someThings):
 
 # Converter Functions
 #------------------------------------------------------------------------------
-def scoreDefFromElement(elem):
+def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     # TODO: this whole function is untested
     # TODO: in the test file, all the TimeSignatures are processed and included in the first measure *and* wherever else they appear
     '''
@@ -795,7 +795,7 @@ def scoreDefFromElement(elem):
     return post
 
 
-def staffDefFromElement(elem):
+def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <staffDef> Container for staff meta-information.
 
@@ -931,7 +931,7 @@ def staffDefFromElement(elem):
     return post
 
 
-def dotFromElement(elem):  # pylint: disable=unused-argument
+def dotFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <dot> Dot of augmentation or division.
 
@@ -970,7 +970,7 @@ def dotFromElement(elem):  # pylint: disable=unused-argument
     return 1
 
 
-def articFromElement(elem):
+def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <artic> An indication of how to play a note or chord.
 
@@ -1012,7 +1012,7 @@ def articFromElement(elem):
     return _makeArticList(elem.get('artic'))
 
 
-def accidFromElement(elem):
+def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <accid> Records a temporary alteration to the pitch of a note.
 
@@ -1182,7 +1182,7 @@ def noteFromElement(elem, slurBundle=None):
     return post
 
 
-def restFromElement(elem):
+def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <rest/> is a non-sounding event found in the source being transcribed
 
@@ -1239,7 +1239,7 @@ def restFromElement(elem):
     return post
 
 
-def mRestFromElement(elem):
+def mRestFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <mRest/> Complete measure rest in any meter.
 
@@ -1335,7 +1335,7 @@ def chordFromElement(elem, slurBundle=None):
     return post
 
 
-def clefFromElement(elem):
+def clefFromElement(elem, slurBundle=None):
     '''
     <clef> Indication of the exact location of a particular note on the staff and, therefore,
     the other notes as well.
@@ -1392,7 +1392,7 @@ def clefFromElement(elem):
     return post
 
 
-def instrDefFromElement(elem):
+def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     # TODO: write tests
     '''
     <instrDef> (instrument definition)---MIDI instrument declaration.
