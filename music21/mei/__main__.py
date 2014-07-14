@@ -24,7 +24,7 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ETree
 
-from uuid import uuid4 as makeUuid
+from uuid import uuid4
 
 # music21
 from music21 import exceptions21
@@ -129,7 +129,7 @@ def convertFromString(dataStr):
     slurBundle = spanner.SpannerBundle()
     for eachSlur in documentRoot.findall('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
         # TODO: slurs with @tstamp
-        thisIdLocal = str(makeUuid())
+        thisIdLocal = str(uuid4())
         thisSlur = spanner.Slur()
         thisSlur.idLocal = thisIdLocal
         slurBundle.append(thisSlur)
