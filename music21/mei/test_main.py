@@ -892,9 +892,9 @@ class TestLayerFromElement(unittest.TestCase):
         findallReturn = [mock.MagicMock(name='note1'),
                          mock.MagicMock(name='imaginary'),
                          mock.MagicMock(name='note2')]
-        findallReturn[0].tag = '%snote' % main._MEINS
-        findallReturn[1].tag = '%simaginary' % main._MEINS
-        findallReturn[2].tag = '%snote' % main._MEINS
+        findallReturn[0].tag = '{}note'.format(main._MEINS)
+        findallReturn[1].tag = '{}imaginary'.format(main._MEINS)
+        findallReturn[2].tag = '{}note'.format(main._MEINS)
         elem.findall = mock.MagicMock(return_value=findallReturn)
         # "MNFE" is "mockNoteFromElement"
         expectedMNFEOrder = [mock.call(findallReturn[0], None), mock.call(findallReturn[2], None)]
@@ -923,9 +923,9 @@ class TestLayerFromElement(unittest.TestCase):
         findallReturn = [mock.MagicMock(name='note1'),
                          mock.MagicMock(name='imaginary'),
                          mock.MagicMock(name='note2')]
-        findallReturn[0].tag = '%snote' % main._MEINS
-        findallReturn[1].tag = '%simaginary' % main._MEINS
-        findallReturn[2].tag = '%snote' % main._MEINS
+        findallReturn[0].tag = '{}note'.format(main._MEINS)
+        findallReturn[1].tag = '{}imaginary'.format(main._MEINS)
+        findallReturn[2].tag = '{}note'.format(main._MEINS)
         elem.findall = mock.MagicMock(return_value=findallReturn)
         # "MNFE" is "mockNoteFromElement"
         expectedMNFEOrder = [mock.call(findallReturn[0], None), mock.call(findallReturn[2], None)]
@@ -956,9 +956,9 @@ class TestLayerFromElement(unittest.TestCase):
         findallReturn = [mock.MagicMock(name='note1'),
                          mock.MagicMock(name='imaginary'),
                          mock.MagicMock(name='note2')]
-        findallReturn[0].tag = '%snote' % main._MEINS
-        findallReturn[1].tag = '%simaginary' % main._MEINS
-        findallReturn[2].tag = '%snote' % main._MEINS
+        findallReturn[0].tag = '{}note'.format(main._MEINS)
+        findallReturn[1].tag = '{}imaginary'.format(main._MEINS)
+        findallReturn[2].tag = '{}note'.format(main._MEINS)
         elem.findall = mock.MagicMock(return_value=findallReturn)
         # NB: we call the layerFromElement() twice, so we need twice the return values here
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2',
@@ -1058,9 +1058,9 @@ class TestStaffFromElement(unittest.TestCase):
         findallReturn = [mock.MagicMock(name='layer1'),
                          mock.MagicMock(name='layer2'),
                          mock.MagicMock(name='layer3')]
-        findallReturn[0].tag = '%slayer' % main._MEINS  # percent slayer... UNIT TESTS BE TOUGH
-        findallReturn[1].tag = '%slayer' % main._MEINS
-        findallReturn[2].tag = '%slayer' % main._MEINS
+        findallReturn[0].tag = '{}layer'.format(main._MEINS)
+        findallReturn[1].tag = '{}layer'.format(main._MEINS)
+        findallReturn[2].tag = '{}layer'.format(main._MEINS)
         elem.findall = mock.MagicMock(return_value=findallReturn)
         # "MLFE" is "mockLayerFromElement"
         expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1), slurBundle=None)
