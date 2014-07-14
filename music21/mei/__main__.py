@@ -1269,11 +1269,11 @@ def chordFromElement(elem, slurBundle=None):
     - dur, from att.duration.musical: (via _qlDurationFromAttr())
     - dots, from att.augmentdots: [0..4]
     - artic, a list from att.articulation: (via _articulationFromAttr())
+    - @tie, (many of "[i|m|t]")
 
     Attributes In Progress:
     =======================
     - @slur, (many of "[i|m|t][1-6]")
-    - @tie, (many of "[i|m|t]")
 
     Attributes not Implemented:
     ===========================
@@ -1900,8 +1900,8 @@ if __name__ == "__main__":
     music21.mainTest(test_main.TestThings,
                      test_main.TestAttrTranslators,
                      test_main.TestNoteFromElement,
-                     #test_main.TestRestFromElement,
-                     #test_main.TestChordFromElement,
+                     test_main.TestRestFromElement,
+                     test_main.TestChordFromElement,
                      #test_main.TestClefFromElement,
                      #test_main.TestLayerFromElement,
                      #test_main.TestStaffFromElement,

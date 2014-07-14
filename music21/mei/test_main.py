@@ -585,12 +585,12 @@ class TestChordFromElement(unittest.TestCase):
         '''
         elem = mock.MagicMock()
         expectedGetOrder = [mock.call('dur'), mock.call('dots', 0)]
-        expectedGetOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in xrange(3)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['4', '1']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
         mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
-        mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
+        mockNoteFromElement.side_effect = lambda x, y: x  # noteFromElement() returns first argument
         expectedNotes = ['root', 'third', 'fifth']
         expected = mockChord.return_value
 
@@ -634,12 +634,12 @@ class TestChordFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedGetOrder = [mock.ANY for _ in xrange(2)]  # additional calls to elem.get(), not part of this test
         expectedGetOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
-        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['4', '1', '42', '42']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
         mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
-        mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
+        mockNoteFromElement.side_effect = lambda x, y: x  # noteFromElement() returns first argument
         expectedNotes = ['root', 'third', 'fifth']
         expected = mockChord.return_value
 
@@ -681,13 +681,13 @@ class TestChordFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedGetOrder = [mock.ANY for _ in xrange(3)]  # additional calls to elem.get(), not part of this test
         expectedGetOrder.extend([mock.call('artic'), mock.call('artic')])
-        expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemArtic = 'stacc'
         elemGetReturns = ['4', '1', None, elemArtic, elemArtic]
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
         mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
-        mockNoteFromElement.side_effect = lambda x: x  # noteFromElement() returns its input
+        mockNoteFromElement.side_effect = lambda x, y: x  # noteFromElement() returns first argument
         expectedNotes = ['root', 'third', 'fifth']
         expected = mockChord.return_value
 
@@ -697,7 +697,8 @@ class TestChordFromElement(unittest.TestCase):
         elem.iterfind.assert_called_once_with('%snote' % _MEINS)
         mockChord.assert_called_once_with(notes=expectedNotes)
         self.assertEqual(duration.Duration(1.5), actual.duration)
-        self.assertEqual([articulations.Staccato], actual.articulations)
+        self.assertEqual(1, len(actual.articulations))
+        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
 
     def testIntegration3(self):
@@ -717,7 +718,8 @@ class TestChordFromElement(unittest.TestCase):
 
         actual = main.chordFromElement(chordElem)
 
-        self.assertEqual([articulations.Staccato], actual.articulations)
+        self.assertEqual(1, len(actual.articulations))
+        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
 
 
 
