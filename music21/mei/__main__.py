@@ -650,6 +650,40 @@ def _addSlurToThing(m21Start, m21End, attr, thing, slurBundle):
                 slurBundle.getByIdLocal(slurNum)[0].addSpannedElements(thing)
 
 
+def beamTogether(someThings):
+    '''
+    Beam some things together. The function beams :class:`Note` and :class:`Chord` objects, but
+    everything else is ignored.
+
+    :param things: An iterable of things to beam together.
+    :type things: iterable of :class:`~music21.base.Music21Object`
+    :returns: ``someThings`` with all possible objects beamed together.
+    :rtype: same as ``someThings``
+    '''
+    iLastNote = 0  # index of the most recent Note or Chord in someThings
+
+    for i, thing in enumerate(someThings):
+        if isinstance(thing, (note.Note, chord.Chord)):
+            if 0 == iLastNote:
+                beamType = 'start'
+            else:
+                beamType = 'continue'
+
+            iLastNote = i
+
+            try:  # TODO: find the better way to deal with durations that don't have beams
+                thing.beams.fill(thing.duration.type, beamType)
+            except beam.BeamException:
+                pass
+
+    try:
+        someThings[iLastNote].beams.fill(someThings[iLastNote].duration.type, 'stop')
+    except beam.BeamException:
+        pass
+
+    return someThings
+
+
 # Converter Functions
 #------------------------------------------------------------------------------
 def scoreDefFromElement(elem):
@@ -1408,7 +1442,7 @@ def beamFromElement(elem, slurBundle=None):
     :param elem: The ``<beam>`` tag to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :returns: An iterable of all the objects contained within the ``<beam>`` container.
-    :rtype: tuple of :class:`~music21.base.Music21Object`
+    :rtype: list of :class:`~music21.base.Music21Object`
 
     Attributes Implemented:
     =======================
@@ -1463,17 +1497,9 @@ def beamFromElement(elem, slurBundle=None):
         else:  # DEBUG
             print('!! unprocessed %s in %s' % (eachTag.tag, elem.tag))  # DEBUG
 
-    # install the beams
-    beamEnd = len(post) - 1  # object with this index in "post" should have the 'stop' Beam type
-    if 0 != beamEnd:
-        for i, thing in enumerate(post):
-            # first determine beam type
-            if 0 == i:
-                beamType = 'start'
-            elif beamEnd == i:
-                beamType = 'stop'
-            else:
-                beamType = 'continue'
+    post = beamTogether(post)
+
+    return post
 
             # then set it (if possible)
             if hasattr(thing, 'beams'):
