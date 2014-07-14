@@ -172,7 +172,7 @@ class TestAttrTranslators(unittest.TestCase):
     def testArticulation1(self, mockTrans):
         '''_articulationFromAttr(): ensure proper arguments to _attrTranslator'''
         attr = 'marc'
-        mockTrans.return_value = 5
+        mockTrans.return_value = mock.MagicMock(name='asdf', return_value=5)
         expected = (5,)
         actual = main._articulationFromAttr(attr)
         mockTrans.assert_called_once_with(attr, 'artic', main._ARTIC_ATTR_DICT)
@@ -185,7 +185,8 @@ class TestAttrTranslators(unittest.TestCase):
         expected = (articulations.StrongAccent, articulations.Staccato)
         actual = main._articulationFromAttr(attr)
         self.assertEqual(0, mockTrans.call_count)
-        self.assertEqual(expected, actual)
+        for i in xrange(len(expected)):
+            self.assertTrue(isinstance(actual[i], expected[i]))
 
     @mock.patch('music21.mei.__main__._attrTranslator')
     def testArticulation3(self, mockTrans):
@@ -194,7 +195,8 @@ class TestAttrTranslators(unittest.TestCase):
         expected = (articulations.Tenuto, articulations.Staccato)
         actual = main._articulationFromAttr(attr)
         self.assertEqual(0, mockTrans.call_count)
-        self.assertEqual(expected, actual)
+        for i in xrange(len(expected)):
+            self.assertTrue(isinstance(actual[i], expected[i]))
 
     @mock.patch('music21.mei.__main__._attrTranslator')
     def testArticulation4(self, mockTrans):
