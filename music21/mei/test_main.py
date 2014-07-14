@@ -289,7 +289,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedElemOrder = [mock.call('pname', ''), mock.call('accid'), mock.call('oct', ''),
                              mock.call('dur'), mock.call('dots', 0)]
-        expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
+        expectedElemOrder.extend([mock.ANY for _ in xrange(3)])  # additional calls to elem.get(), not part of this test
         elemReturns = ['D', 's', '2', '4', '1']
         elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
         mockNote.return_value = mock.MagicMock(spec_set=note.Note, name='note return')
@@ -338,7 +338,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedElemOrder = [mock.ANY for _ in xrange(5)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
-        expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
         expectedId = 42
         elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
                        expectedId, expectedId]  # xml:id for this test
@@ -376,6 +376,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedElemOrder = [mock.ANY for _ in xrange(6)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call('artic'), mock.call('artic')])
+        expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         elemArtic = 'stacc'
         elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
                        None,  # the xml:id attribute
@@ -387,7 +388,8 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(expected, actual)
         mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
         self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
-        self.assertSequenceEqual([articulations.Staccato], actual.articulations)
+        self.assertEqual(1, len(actual.articulations))
+        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
 
     def testIntegration3(self):
         '''
@@ -402,7 +404,8 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
-        self.assertEqual([articulations.Staccato], actual.articulations)
+        self.assertEqual(1, len(actual.articulations))
+        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
 
     @mock.patch('music21.note.Note')
     @mock.patch('music21.mei.__main__.articFromElement')
@@ -418,7 +421,7 @@ class TestNoteFromElement(unittest.TestCase):
         type(mockArtic).tag = mockArticTag
         elem.findall.return_value = [mockArtic]
         # make the expected order of calls to (and the return values for) elem.get()
-        expectedElemOrder = [mock.ANY for _ in xrange(7)]  # not testing the calls from previous unit tests
+        expectedElemOrder = [mock.ANY for _ in xrange(8)]  # not testing the calls from previous unit tests
         elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
                        None, None]  # @xml:id and @artic
         elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
@@ -468,7 +471,8 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
-        self.assertEqual([articulations.Staccato], actual.articulations)
+        self.assertEqual(1, len(actual.articulations))
+        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
 
 
 #------------------------------------------------------------------------------

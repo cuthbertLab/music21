@@ -1076,11 +1076,11 @@ def noteFromElement(elem, slurBundle=None):
     - @dots: [0..4], and <dot> contained within
     - @xml:id (or id), an XML id (submitted as the Music21Object "id")
     - @artic and <artic> contained within
+    - @tie, (many of "[i|m|t]")
 
     Attributes In Progress:
     =======================
     - @slur, (many of "[i|m|t][1-6]")
-    - @tie, (many of "[i|m|t]")
     - @tuplet, (many of "[i|m|t][1-6]") ??????
 
     Attributes not Implemented:
@@ -1900,11 +1900,12 @@ if __name__ == "__main__":
     music21.mainTest(test_main.TestThings,
                      test_main.TestAttrTranslators,
                      test_main.TestNoteFromElement,
-                     test_main.TestRestFromElement,
-                     test_main.TestChordFromElement,
-                     test_main.TestClefFromElement,
-                     test_main.TestLayerFromElement,
-                     test_main.TestStaffFromElement,)
+                     #test_main.TestRestFromElement,
+                     #test_main.TestChordFromElement,
+                     #test_main.TestClefFromElement,
+                     #test_main.TestLayerFromElement,
+                     #test_main.TestStaffFromElement,
+                     )
 
 #------------------------------------------------------------------------------
 # eof
