@@ -335,7 +335,7 @@ def figureTuplets(chordObject, keyObject):
 
 def figureTupletSolo(pitchObj, keyObj, bass):
     '''
-    Return a single tuplet for a pitch and key showing the interval above
+    Return a single tuple for a pitch and key showing the interval above
     the bass, its alteration from a step in the given key, an alteration
     string, and the pitch object.
 
@@ -351,7 +351,7 @@ def figureTupletSolo(pitchObj, keyObj, bass):
         ...     )
         (3, -1.0, 'b', <music21.pitch.Pitch A-3>)
 
-    Return tuplet.
+    Return tuple.
     '''
     unused_scaleStep, scaleAccidental = \
         keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
@@ -1155,8 +1155,8 @@ class RomanNumeral(harmony.Harmony):
         self.bracketedAlterations = None
 
         self._parsingComplete = False
-
         self.key = keyOrScale
+
         harmony.Harmony.__init__(self, figure)
         self._correctBracketedPitches()
         self._parsingComplete = True
@@ -1841,7 +1841,7 @@ class RomanNumeral(harmony.Harmony):
             self._updatePitches()
 
 
-    def bassScaleDegreeFromNotation(self, notationObject):
+    def bassScaleDegreeFromNotation(self, notationObject = None):
         '''
         Given a notationObject from
         :class:`music21.figuredBass.notation.Notation`
@@ -1862,9 +1862,26 @@ class RomanNumeral(harmony.Harmony):
             >>> vi.bassScaleDegreeFromNotation(fbn2)
             3
 
+        Can figure it out directly from an existing RomanNumeral:
+        
+        ::
+        
+            >>> ii65 = roman.RomanNumeral('ii65', 'C')
+            >>> ii65.bassScaleDegreeFromNotation()
+            4
+            
+        Simple test:
+        
+        ::
+            >>> I = roman.RomanNumeral('I')
+            >>> I.bassScaleDegreeFromNotation()
+            1
+
 
         A bit slow (6 seconds for 1000 operations, but not the bottleneck)
         '''
+        if notationObject is None:
+            notationObject = self.figuresNotationObj
         c = pitch.Pitch("C3")
         cDNN = c.diatonicNoteNum # always 22
         pitches = [c]

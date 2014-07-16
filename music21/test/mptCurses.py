@@ -285,7 +285,10 @@ def poolInit(q):
 
 updateQueue = multiprocessing.Queue()
 filesRunOrRunning = collections.OrderedDict()
-import Queue
+try:
+    import Queue
+except ImportError:
+    import queue as Queue # Py3
 
 def updateFromQueue(modGather):
     try:
