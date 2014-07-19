@@ -1759,7 +1759,7 @@ class Music21Object(object):
 
     def sortTuple(self, useSite=None):
         '''
-        Returns a collections.NamedTuple called SortTuple(atEnd, offset, priority, classSortOrder,
+        Returns a collections.namedtuple called SortTuple(atEnd, offset, priority, classSortOrder,
         isNotGrace, insertIndex)
         which contains the six elements necessary to determine the sort order of any set of
         objects in a Stream.
