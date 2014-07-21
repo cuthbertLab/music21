@@ -240,7 +240,7 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug = None, originalDiff
     myOmrScore = omrGTP.omrScore
     s = myOmrScore
     if debug:
-        print('RUNNING HORIZONTAL MODEL')
+        print('Running Horizontal Model (Prior-based-on-distance)')
         
     if runOnePart is True:
         scorePart = s.singleParts[pn]
@@ -266,7 +266,7 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug = None, originalDiff
         print("HORIZONTAL CORRECTING ARRAY", correctingArrayHorAllPart)
         print("**********************************")
         
-        print('RUNNING VERTICAL MODEL')
+        print('Running Vertical Model (Prior-based-on-Parts)')
         
     correctingArrayVertAllPart = s.runVerticalCorrectionModel()         
     
@@ -277,11 +277,11 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug = None, originalDiff
         print("**********************************")
 
         print('Finding best from Horizontal and Vertical and replacing flagged measures with source measures')
-    s.generateCorrectedScore(correctingArrayHorAllPart,correctingArrayVertAllPart)            
+    priorScore = s.generateCorrectedScore(correctingArrayHorAllPart,correctingArrayVertAllPart)            
 
     if debug:
         print('done replacing flagged measures with source measures')
-     
+        print(priorScore)
     # get new number of differences
     newNumberOfDifferences = omrGTP.getDifferences()
     
@@ -369,14 +369,16 @@ def autoCorrelationBestMeasure(inputScore):
     return (totalMeasures, totalMatches)
   
 if __name__ == '__main__':
-    import music21
-    music21.mainTest()
+    #import music21
+    #music21.mainTest()
     
 
-    #omrFilePath = '/Users/cuthbert/Desktop/SchubertOMR.xml'
-    #groundTruthFilePath = '/Users/cuthbert/Dropbox/Vladimir_Myke/schubert unvoll all_fixed.xml'
+    omrFilePath = '/Users/cuthbert/Desktop/SchubertOMR.xml'
+    groundTruthFilePath = '/Users/cuthbert/Dropbox/Vladimir_Myke/schubert unvoll all_fixed.xml'
     
-    #evaluateCorrectingModel(omrFilePath,     groundTruthFilePath)
+    omrFilePath = correctors.K525omrFilePath
+    groundTruthFilePath = correctors.K525groundTruthFilePath
+    evaluateCorrectingModel(omrFilePath, groundTruthFilePath, debug = True)
 
 
 

@@ -4,6 +4,28 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 import re
 
+splitLots = re.sub("\s\s\s\s+", "\t", \
+'''
+**kern        **kern
+*staff2       *staff1
+*clefF4       *clefG2
+*M2/4         *M2/4
+=1            =1
+2D            2e#
+=2            =2
+*^            *^
+*     *       *     *^
+2F    2G      2a#    2b#    2c#
+=3    =3      =3    =3
+*v    *v      *     *     *
+*             *v    *v    *v
+2A            4c#
+.             4d#
+=4            =4
+*-            *-
+''')
+
+
 fakeTest = re.sub("\s\s\s\s+", "\t", \
 '''
 !! Global Comment

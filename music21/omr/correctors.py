@@ -12,6 +12,7 @@
 import math
 import difflib
 import copy
+import collections
 
 import os
 import inspect
@@ -24,6 +25,11 @@ K525omrShortPath = pathName + os.sep + 'k525OMRShort.xml'
 K525groundTruthShortPath = pathName + os.sep + 'k525GTShort.xml'
 
 debug = False
+
+MeasureRelationship = collections.namedtuple('MeasureRelationship', ['flaggedMeasurePart', 'flaggedMeasureIndex',
+                                                                     'correctMeasurePart', 'correctMeasureIndex',
+                                                                     'correctionProbability'])
+PriorsIntegrationScore = collections.namedtuple('PriorsIntegrationScore', ['total', 'horizontal', 'vertical', 'ignored'])
 
 class ScoreCorrector(object):
     '''
@@ -333,34 +339,48 @@ class ScoreCorrector(object):
         using substituteOneMeasureContentsForAnother.
         It then rehashes the score so that a new difference comparison can be run.
         
+        Returns a collections.namedtuple of the total number of flagged measures, the total number
+        corrected by the horizontal (Prior based on Distance) and the vertical (Prior based on Parts)
+        methods.
         '''
-        for p in range(len(self.singleParts)):
+        totalFlagged = 0
+        totalHorizontal = 0
+        totalVertical = 0
+        totalIgnored = 0
+        
+        numParts = len(self.singleParts)
+        for p in range(numParts):
             for h in range(len(horizontalArray[p])):
                 for v in range(len(verticalArray[p])):
-                    horizontalDict = horizontalArray[p][h]
-                    verticalDict = verticalArray[p][v]
+                    horizontalTuple = horizontalArray[p][h]
+                    verticalTuple = verticalArray[p][v]
 
-                    if horizontalDict[0] != verticalDict[0]:
+                    if horizontalTuple.flaggedMeasurePart != verticalTuple.flaggedMeasurePart:
                         continue
-                    if horizontalDict[1] != verticalDict[1]:
+                    if horizontalTuple.flaggedMeasureIndex != verticalTuple.flaggedMeasureIndex:
                         continue
                     
 
-                    destinationHorizontalIndex = horizontalDict[1]
-                    destinationVerticalIndex = horizontalDict[0]
+                    destinationHorizontalIndex = horizontalTuple.flaggedMeasureIndex
+                    destinationVerticalIndex = horizontalTuple.flaggedMeasurePart
                     
-                    
-                    if horizontalDict[4] > verticalDict[4]:
-                        sourceHorizontalIndex = horizontalDict[3]
-                        sourceVerticalIndex = horizontalDict[2]
+                    totalFlagged += 1
+                    #if verticalTuple.correctionProbability == 0.0 and numParts > 2:
+                    #    totalIgnored += 1
+                    #el
+                    if horizontalTuple.correctionProbability > verticalTuple.correctionProbability:
+                        totalHorizontal += 1
+                        sourceHorizontalIndex = horizontalTuple.correctMeasureIndex
+                        sourceVerticalIndex = horizontalTuple.correctMeasurePart
                         self.substituteOneMeasureContentsForAnother(sourceHorizontalIndex, sourceVerticalIndex, destinationHorizontalIndex, destinationVerticalIndex)
-                    else: # horizontalDict[4] <= verticalArray[p][v][4]:
-                        sourceHorizontalIndex = verticalDict[3]
-                        sourceVerticalIndex = verticalDict[2]
+                    else: # horizontalTuple.correctionProbability <= verticalTuple.correctionProbability:
+                        totalVertical += 1
+                        sourceHorizontalIndex = verticalTuple.correctMeasureIndex
+                        sourceVerticalIndex = verticalTuple.correctMeasurePart
                         self.substituteOneMeasureContentsForAnother(sourceHorizontalIndex, sourceVerticalIndex, destinationHorizontalIndex, destinationVerticalIndex)
                      
             self.singleParts[p].hashedNotes = self.singleParts[p].getSequenceHashesFromMeasureStream() 
-
+        return PriorsIntegrationScore(totalFlagged, totalHorizontal, totalVertical, totalIgnored)
 
 class SinglePart(object):
     def __init__(self, part = None, pn = None):
@@ -497,16 +517,15 @@ class SinglePart(object):
         given a measure (with index i) to compare to.
         
         '''
-        self.correctingMeasure = []
         unused_probabilityDistribution = self.horizontalProbabilityDist()
-        im = self.incorrectMeasures
-        incorrectMeasureIndex = im[i]
+        incorrectMeasures = self.incorrectMeasures
+        incorrectMeasureIndex = incorrectMeasures[i]
         hashedNotesI = self.hashedNotes[incorrectMeasureIndex]
         mh = MeasureHash(self.measureStream[incorrectMeasureIndex])
         mh.setSequenceMatcher(hashedNotesI)
         probabilityArray = []
         for k in range(len(self.hashedNotes)):
-            if k in im:
+            if k in incorrectMeasures:
                 probabilityArray.append(0.0)
                 #put a huge placeholder in for the incorrect measures to keep indices consistent
             else:
@@ -522,17 +541,9 @@ class SinglePart(object):
             if m == maximumProbability:
                 maximumProbabilityMeasures.append(l)
         
-        self.correctingDictionary = {}
-        self.correctingDictionary['partNumber'] = self.partNumber
-        self.correctingDictionary['incorrectMeasureIndex'] = incorrectMeasureIndex
-        self.correctingDictionary['maximumProbabilityMeasure'] = maximumProbabilityMeasures[0]
-        self.correctingDictionary['maximumProbability'] = maximumProbability
-        
-        self.correctingMeasure.append(self.partNumber)
-        self.correctingMeasure.append(incorrectMeasureIndex)
-        self.correctingMeasure.append(self.partNumber)
-        self.correctingMeasure.append(maximumProbabilityMeasures[0])
-        self.correctingMeasure.append(maximumProbability)
+        self.correctingMeasure = MeasureRelationship(self.partNumber, incorrectMeasureIndex,
+                                                     self.partNumber, maximumProbabilityMeasures[0],
+                                                     maximumProbability)
 
         return self.correctingMeasure
     
@@ -601,7 +612,9 @@ class MeasureSlice(object):
         '''
         Takes in an incorrectPartIndex and returns an array
         of the measure indices within the slice that have the
-        maximum probability to correct a given flagged measures
+        maximum probability to correct a given flagged measures.
+        
+        Returns a namedtuple (MeasureRelationship)
         
         >>> omrPath = omr.correctors.K525omrShortPath
         >>> omrScore = converter.parse(omrPath)
@@ -610,13 +623,12 @@ class MeasureSlice(object):
         >>> measureSlice
         <music21.omr.correctors.MeasureSlice object at 0x...>
         >>> measureSlice.runSliceSearch(1)
-        [1, 2, 3, 2, 0.00544...]
+        MeasureRelationship(flaggedMeasurePart=1, flaggedMeasureIndex=2, correctMeasurePart=3, correctMeasureIndex=2, correctionProbability=0.0054...)
  
         >>> measureSlice = ssOMR.getMeasureSlice(3)
         >>> measureSlice.runSliceSearch(0)
-        [0, 3, 1, 3, 2.41...e-14]
+        MeasureRelationship(flaggedMeasurePart=0, flaggedMeasureIndex=3, correctMeasurePart=1, correctMeasureIndex=3, correctionProbability=2.41...e-14)
         '''
-        self.correctingMeasure = []
         probabilityArray = []
         sliceHashes = self.getSliceHashes()
         allIncorrectMeasures = self.score.getAllIncorrectMeasures()
@@ -631,7 +643,8 @@ class MeasureSlice(object):
                 #put a huge placeholder in for any other measures in the measure slice
                 #that are flagged  
             else:                  
-                priorBasedOnChangesProbability = mh.getProbabilityBasedOnChanges(sliceHashes[k].getHashString())
+                hashString = sliceHashes[k].getHashString()
+                priorBasedOnChangesProbability = mh.getProbabilityBasedOnChanges(hashString)
                 priorBasedOnVerticalDistanceProbability = self.allProbabilities[incorrectPartIndex][k]
                 priorBasedOnChangesAndDistance = priorBasedOnChangesProbability * priorBasedOnVerticalDistanceProbability
                 probabilityArray.append(priorBasedOnChangesAndDistance)
@@ -641,12 +654,9 @@ class MeasureSlice(object):
         for l, m in enumerate(probabilityArray):
             if m == maximumProbability:
                 maximumProbabilityMeasures.append(l)
-        
-        self.correctingMeasure.append(incorrectPartIndex)
-        self.correctingMeasure.append(self.index)
-        self.correctingMeasure.append(maximumProbabilityMeasures[0])
-        self.correctingMeasure.append(self.index)
-        self.correctingMeasure.append(maximumProbability)
+        self.correctingMeasure = MeasureRelationship(incorrectPartIndex, self.index,
+                                                     maximumProbabilityMeasures[0], self.index,
+                                                     maximumProbability)
         
         return self.correctingMeasure  
 

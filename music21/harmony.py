@@ -191,7 +191,7 @@ class Harmony(chord.Chord):
         # specify an array of degree alteration objects
         self.chordStepModifications = []
         self._degreesList = []
-        self._key = []
+        self._key = None
         self._updateBasedOnXMLInput(keywords)
         #figure is the string representation of a Harmony object
         #for example, for Chord Symbols the figure might be 'Cm7'
@@ -334,7 +334,7 @@ class Harmony(chord.Chord):
             >>> r1.pitches
             (<music21.pitch.Pitch E5>, <music21.pitch.Pitch G#5>, <music21.pitch.Pitch B5>)
         
-        Changing the key for a ChordSymbol object does nothing, since it's
+        Changing the key for a ChordSymbol object does nothing to its pitches, since it's
         not dependent on key:
         
         ::
@@ -343,12 +343,23 @@ class Harmony(chord.Chord):
             >>> [str(p) for p in h1.pitches]
             ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
 
-        ::
-
             >>> h1.key = 'CM'
             >>> [str(p) for p in h1.pitches]
             ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
 
+
+        But it should change the .romanNumeral object:
+        
+        ::
+            >>> y = harmony.ChordSymbol('F')
+            >>> y.key is None
+            True
+            >>> y.romanNumeral
+            <music21.roman.RomanNumeral I in F major>
+            >>> y.key = key.Key('C')
+            >>> y.romanNumeral
+            <music21.roman.RomanNumeral IV in C major>
+        
         '''
         return self._key
 
@@ -357,7 +368,8 @@ class Harmony(chord.Chord):
         if common.isStr(keyOrScale):
             self._key = key.Key(keyOrScale)
         else:
-            self._key = key
+            self._key = keyOrScale
+            self._roman = None
 
     @property
     # TODO: move this attribute to roman class which inherits from harmony.Harmony objects
@@ -369,21 +381,33 @@ class Harmony(chord.Chord):
 
         ::
 
-            >>> h = harmony.ChordSymbol()
-            >>> h.romanNumeral = 'III'
+            >>> h = harmony.ChordSymbol('Dmaj7')
             >>> h.romanNumeral
-            <music21.roman.RomanNumeral III>
+            <music21.roman.RomanNumeral I7 in D major>
 
+            >>> h.romanNumeral = 'III7'
+            >>> h.romanNumeral
+            <music21.roman.RomanNumeral III7>
+            
+            >>> h.romanNumeral.key = key.Key('B')
+            >>> h.romanNumeral
+            <music21.roman.RomanNumeral III7 in B major>
+            
+            >>> h.romanNumeral = roman.RomanNumeral('IV7', 'A')
+            >>> h.romanNumeral
+            <music21.roman.RomanNumeral IV7 in A major>
+            
         ::
-
-            >>> h.romanNumeral = roman.RomanNumeral('vii')
+            >>> h = harmony.ChordSymbol('B-/D')
             >>> h.romanNumeral
-            <music21.roman.RomanNumeral vii>
-
+            <music21.roman.RomanNumeral I6 in B- major>
         '''
         if self._roman is None:
             from music21 import roman
-            self._roman = roman.romanNumeralFromChord(self)
+            if self.key is None:
+                self._roman = roman.romanNumeralFromChord(self, key.Key(self.root()))
+            else:
+                self._roman = roman.romanNumeralFromChord(self, self.key)
         return self._roman
 
     @romanNumeral.setter

@@ -841,7 +841,8 @@ class Key(KeySignature, scale.DiatonicScale):
 
     def __init__(self, tonic = None, mode = None):
         if tonic is not None:
-            if hasattr(tonic, 'classes') and 'Music21Object' in tonic.classes:
+            if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes or 
+                                              'Pitch' in tonic.classes):
                 if hasattr(tonic, 'name'):
                     tonic = tonic.name
                 elif hasattr(tonic, 'pitches') and len(tonic.pitches) > 0: # chord
