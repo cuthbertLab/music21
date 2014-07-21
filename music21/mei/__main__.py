@@ -15,6 +15,14 @@ To convert a string with MEI markup into music21 objects, use :func:`convertFrom
 
 In the future, most of the functions in this module should be moved to a separate, import-only
 module, so that functions for writing music21-to-MEI will fit nicely.
+
+**Ignored Elements**
+
+The following elements are not yet imported, though you might expect they would be:
+
+* ``<sb>``: a system break, since this is not usually semantically significant
+* ``<lb>``: a line break, since this is not usually semantically significant
+* ``<pb>``: a page break, since this is not usually semantically significant
 '''
 
 # Determine which ElementTree implementation to use.
@@ -58,8 +66,9 @@ from six.moves import xrange  # pylint: disable=redefined-builtin,import-error
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
 _MEINS = '{http://www.music-encoding.org/ns/mei}'
 # when these tags aren't processed, we won't worry about them (at least for now)
-_IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break; still TODO
-                       '{}lb'.format(_MEINS),  # line break; still TODO
+_IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
+                       '{}lb'.format(_MEINS),  # line break
+                       '{}pb'.format(_MEINS),  # page break
                        '{}slur'.format(_MEINS),  # slurs; handled in convertFromString()
                        '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
                       )
