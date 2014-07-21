@@ -652,11 +652,13 @@ def _addSlurToThing(m21Start, m21End, attr, thing, slurBundle):
                 newSlur.idLocal = slurNum
                 slurBundle.append(newSlur)
                 newSlur.addSpannedElements(thing)
-            else:
+            elif 't' == slurType:
                 slurBundle.getByIdLocal(slurNum)[0].addSpannedElements(thing)
+            # 'm' is currently ignored; we may need it for cross-staff slurs
 
 
 def beamTogether(someThings):
+    # TODO: write tests
     '''
     Beam some things together. The function beams :class:`Note` and :class:`Chord` objects, but
     everything else is ignored.
@@ -666,26 +668,23 @@ def beamTogether(someThings):
     :returns: ``someThings`` with all possible objects beamed together.
     :rtype: same as ``someThings``
     '''
-    iLastNote = 0  # index of the most recent Note or Chord in someThings
+    # Index of the most recent beamedNote/Chord in someThings. Not all Note/Chord objects will
+    # necessarily be beamed (especially when this is called from tupletFromElement()), so we have
+    # to make that distinction.
+    iLastBeamedNote = 0
 
     for i, thing in enumerate(someThings):
         if isinstance(thing, (note.Note, chord.Chord)):
-            if 0 == iLastNote:
+            if 0 == iLastBeamedNote:
                 beamType = 'start'
             else:
                 beamType = 'continue'
 
-            iLastNote = i
-
-            try:  # TODO: find the better way to deal with durations that don't have beams
+            if duration.convertTypeToNumber(thing.duration.type) > 4:
                 thing.beams.fill(thing.duration.type, beamType)
-            except beam.BeamException:
-                pass
+                iLastBeamedNote = i
 
-    try:
-        someThings[iLastNote].beams.fill(someThings[iLastNote].duration.type, 'stop')
-    except beam.BeamException:
-        pass
+    someThings[iLastBeamedNote].beams.setAll('stop')
 
     return someThings
 
