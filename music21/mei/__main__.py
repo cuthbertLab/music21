@@ -1436,6 +1436,8 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
 
 def beamFromElement(elem, slurBundle=None):
+    # TODO: nested <beam> tags. This requires adjusting the beam.Beams object differently for
+    #       every level, which seems to require knowing which level to adjust. Hmm.
     '''
     <beam> A container for a series of explicitly beamed events that begins and ends entirely
            within a measure.
@@ -1446,6 +1448,8 @@ def beamFromElement(elem, slurBundle=None):
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :returns: An iterable of all the objects contained within the ``<beam>`` container.
     :rtype: list of :class:`~music21.base.Music21Object`
+
+    .. note:: Nested <beam> tags do not yet import properly.
 
     Attributes Implemented:
     =======================
@@ -1460,7 +1464,7 @@ def beamFromElement(elem, slurBundle=None):
 
     Attributes In Progress:
     =======================
-    - <tuplet> contained within
+    - <tuplet> and <beam> contained within
 
     Attributes not Implemented:
     ===========================
@@ -1478,7 +1482,7 @@ def beamFromElement(elem, slurBundle=None):
 
     May Contain:
     ============
-    MEI.cmn: bTrem beam beatRpt fTrem halfmRpt meterSig meterSigGrp tuplet
+    MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
     MEI.critapp: app
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
     MEI.mensural: ligature mensur proport
@@ -1489,13 +1493,19 @@ def beamFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
                      '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
-                     '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement}
+                     '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
+                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement}
     post = []
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
-            post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
+            result = tagToFunction[eachTag.tag](eachTag, slurBundle)
+            if not isinstance(result, (tuple, list)):
+                post.append(result)
+            else:
+                for eachObject in result:
+                    post.append(eachObject)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
@@ -1575,7 +1585,12 @@ def tupletFromElement(elem, slurBundle=None):
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
-            post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
+            result = tagToFunction[eachTag.tag](eachTag, slurBundle)
+            if not isinstance(result, (tuple, list)):
+                post.append(result)
+            else:
+                for eachObject in result:
+                    post.append(eachObject)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
