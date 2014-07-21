@@ -160,12 +160,15 @@ def convertFromString(dataStr):
     # holds things that should go in the following Measure
     inNextMeasure = {n: stream.Part() for n in allPartNs}
 
-    # set the Instrument for each staff
+    # set the initial Instrument for each staff
     for eachN in allPartNs:
-        queryStr = './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)
-        for info in staffDefFromElement(documentRoot.findall(queryStr)[0]):
-            # TODO: decide whether we need more than index [0]
-            parsed[eachN].append(info)
+        eachStaffDef = staffDefFromElement(documentRoot.find(
+                       './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)))
+        if eachStaffDef is not None:
+            parsed[eachN].append(eachStaffDef)
+        else:
+            # TODO: try another strategy to get instrument information
+            pass
 
     # process a <scoreDef> tag that happen before a <section> tag
     scoreDefResults = documentRoot.find('*//{mei}score/{mei}scoreDef'.format(mei=_MEINS))
