@@ -1598,7 +1598,14 @@ def tupletFromElement(elem, slurBundle=None):
     for eachObj in post:
         if hasattr(eachObj, 'duration'):
             eachObj.duration.appendTuplet(duration.Tuplet(numberNotesActual=num,
-                                                          numberNotesNormal=numbase))
+                                                          numberNotesNormal=numbase,
+                                                          durationNormal=eachObj.duration.type,
+                                                          durationActual=eachObj.duration.type))
+
+    # NB: it's undocumented, but we have to set the Tuplet.type property for the first and final
+    # note in a tuplet. Otherwise, the grouping bracket and fraction numbers won't show up.
+    post[0].duration.tuplets[0].type = 'start'
+    post[-1].duration.tuplets[0].type = 'stop'
 
     # beam it all together
     post = beamTogether(post)
