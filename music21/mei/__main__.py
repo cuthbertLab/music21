@@ -210,6 +210,14 @@ def convertFromString(dataStr):
                 for allPartObject in scoreDefResults['all-part objects']:
                     for partN in allPartNs:
                         inNextMeasure[partN].append(allPartObject)
+            elif '{http://www.music-encoding.org/ns/mei}staffDef' == eachObject.tag:
+                whichPart = eachObject.get('n')
+                # to process this here, we need @n. But if something refers to this <staffDef> with
+                # the @xml:id, it may not have an @n
+                if whichPart is not None:
+                    staffDefResults = staffDefFromElement(eachObject)
+                    for thisPartObject in staffDefResults:
+                        parsed[whichPart].append(thisPartObject)
             elif eachObject.tag not in _IGNORE_UNPROCESSED:
                 environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
 
