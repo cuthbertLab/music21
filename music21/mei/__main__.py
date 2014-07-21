@@ -167,19 +167,15 @@ def convertFromString(dataStr):
             # TODO: decide whether we need more than index [0]
             parsed[eachN].append(info)
 
-    # it's possible there's a <scoreDef> before any of the <section> tags
-    for eachDef in documentRoot.findall('*//{mei}score//{mei}scoreDef'.format(mei=_MEINS)):
-        # TODO: this only puts the *first* <scoreDef> in the right spot
-        if '{http://www.music-encoding.org/ns/mei}scoreDef' == eachDef.tag:
-            scoreDefResults = scoreDefFromElement(eachDef)
-            # spread all-part elements across all the parts
-            for allPartObject in scoreDefResults['all-part objects']:
-                for partN in allPartNs:
-                    inNextMeasure[partN].append(allPartObject)
-        else:
-            # this should never happen
-            environLocal.printDebug('found a {} in a place we only expected <scoreDef>s!!'.format(eachDef.tag))
-            raise RuntimeError('bananas!')
+    # process a <scoreDef> tag that happen before a <section> tag
+    scoreDefResults = documentRoot.find('*//{mei}score/{mei}scoreDef'.format(mei=_MEINS))
+    if scoreDefResults is not None:
+        # scoreDefResults would be None if there is no <scoreDef> outside of a <section>, but...
+        # TODO: we don't actually know whether this <scoreDef> happens before or between <section>
+        scoreDefResults = scoreDefFromElement(scoreDefResults)
+        for allPartObject in scoreDefResults['all-part objects']:
+            for partN in allPartNs:
+                inNextMeasure[partN].append(allPartObject)
 
     backupMeasureNum = 0
     for eachSection in documentRoot.findall('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
