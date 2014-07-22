@@ -1725,6 +1725,22 @@ def tupletFromElement(elem, slurBundle=None):
     return tuple(post)
 
 
+def tupletSpanFromElement(elem, documentRoot):
+    '''
+    Use a <tupletSpan> ``elem`` with properly-set @plist attribute to find and add custom music21
+    tuplet-marking attributes to all affected elements in the ``documentRoot``.
+
+    :param elem: The <tupletSpan> element with appropriately-set @plist attribute.
+    :type elem: :class:`xml.etree.ElementTree.Element`
+    :param documentRoot: The MEI document's root element.
+    :type documentRoot: :class:`~xml.etree.ElementTree.Element`
+    :returns: ``None``
+    :rtype: NoneType
+    '''
+    # TODO: write this function
+    pass
+
+
 def layerFromElement(elem, overrideN=None, slurBundle=None):
     '''
     <layer> An independent stream of events on a staff.
