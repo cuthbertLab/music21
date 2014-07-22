@@ -769,8 +769,6 @@ def removeOctothorpe(xmlid):
 # Element-Based Converter Functions
 #------------------------------------------------------------------------------
 def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
-    # TODO: this whole function is untested
-    # TODO: in the test file, all the TimeSignatures are processed and included in the first measure *and* wherever else they appear
     '''
     <scoreDef> Container for score meta-information.
 
@@ -794,11 +792,11 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     Attributes Implemented:
     =======================
+    - (att.meterSigDefault.log (@meter.count, @meter.unit))
+    - (att.keySigDefault.log (@key.accid, @key.mode, @key.pname, @key.sig))
 
     Attributes In Progress:
     =======================
-    (att.meterSigDefault.log (@meter.count, @meter.unit))
-    (att.keySigDefault.log (@key.accid, @key.mode, @key.pname, @key.sig))
 
     Attributes not Implemented:
     ===========================
@@ -868,9 +866,6 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     # --> key signature
     if elem.get('key.pname') is not None or elem.get('key.sig') is not None:
         post[allParts].append(_keySigFromAttrs(elem))
-
-    # 2.) process per-part objects
-    # TODO: deal with per-part stuff
 
     return post
 
@@ -2065,6 +2060,7 @@ if __name__ == "__main__":
                      test_main.TestLayerFromElement,
                      test_main.TestStaffFromElement,
                      test_main.TestStaffDefFromElement,
+                     test_main.TestScoreDefFromElement,
                      )
 
 #------------------------------------------------------------------------------

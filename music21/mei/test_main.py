@@ -1425,3 +1425,64 @@ class TestStaffDefFromElement(unittest.TestCase):
         self.assertEqual('3/8', actual[1].ratioString)
         self.assertEqual('major', actual[2].mode)
         self.assertEqual(0, actual[2].sharps)
+
+
+
+#------------------------------------------------------------------------------
+class TestScoreDefFromElement(unittest.TestCase):
+    '''Tests for scoreDefFromElement()'''
+
+    @mock.patch('music21.mei.__main__._timeSigFromAttrs')
+    @mock.patch('music21.mei.__main__._keySigFromAttrs')
+    def testUnit1(self, mockKey, mockTime):
+        '''
+        scoreDefFromElement(): proper handling of the following attributes (see function docstring
+            for more information).
+
+        @meter.count, @meter.unit, @key.accid, @key.mode, @key.pname, @key.sig
+        '''
+        # 1.) prepare
+        elem = mock.MagicMock()
+        def elemGetSideEffect(which, default=None):
+            theDict = {'meter.count': '7', 'key.pname': 'G'}
+            if which in theDict:
+                return theDict[which]
+            else:
+                return default
+        elem.get = mock.MagicMock(side_effect=elemGetSideEffect)
+        expectedGetCalls = ['meter.count', 'key.pname']
+        expectedGetCalls = [mock.call(x) for x in expectedGetCalls]
+        mockTime.return_value = 'mockTime return'
+        mockKey.return_value = 'mockKey return'
+        expected = {'all-part objects': [mockTime.return_value, mockKey.return_value],
+                    'whole-score objects': []}
+
+        # 2.) run
+        actual = main.scoreDefFromElement(elem)
+
+        # 3.) check
+        self.assertEqual(expected, actual)
+        # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
+        # be in a particular order
+        self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        mockTime.assert_called_once_with(elem)
+        mockKey.assert_called_once_with(elem)
+
+    def testIntegration1(self):
+        '''
+        scoreDefFromElement(): corresponds to testUnit1() without mock objects
+        '''
+        # 1.) prepare
+        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei"
+                                key.sig="4s" key.mode="major" meter.count="3" meter.unit="8"/>'''
+        elem = ETree.fromstring(inputXML)
+
+        # 2.) run
+        actual = main.scoreDefFromElement(elem)
+
+        # 3.) check
+        self.assertIsInstance(actual['all-part objects'][0], meter.TimeSignature)
+        self.assertIsInstance(actual['all-part objects'][1], key.KeySignature)
+        self.assertEqual('3/8', actual['all-part objects'][0].ratioString)
+        self.assertEqual('major', actual['all-part objects'][1].mode)
+        self.assertEqual(4, actual['all-part objects'][1].sharps)
