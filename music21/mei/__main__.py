@@ -130,8 +130,7 @@ def convertFromString(dataStr):
         '''
         if xmlid is None:
             return
-        elif xmlid.startswith('#'):
-            xmlid = xmlid[1:]
+        xmlid = removeOctothorpe(xmlid)
         targetElem = documentRoot.findall('*//*[@{}="{}"]'.format(_XMLID, xmlid))
         if 0 == len(targetElem):
             return
@@ -575,6 +574,8 @@ def _sharpsFromAttr(signature):
         return -1 * int(signature[0])
 
 
+# Helper Functions
+#------------------------------------------------------------------------------
 def _timeSigFromAttrs(elem):
     # TODO: write tests
     '''
