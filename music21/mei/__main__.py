@@ -627,7 +627,7 @@ def _transpositionFromAttrs(elem):
     #     "transpose up two diatonic steps," which music21 would rephrase as "transpose up by a
     #     diatonic third."
     iFGAC = interval.intervalFromGenericAndChromatic
-    if elem.get('trans.diat') < 0:
+    if int(elem.get('trans.diat')) < 0:
         return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
                      interval.ChromaticInterval(int(elem.get('trans.diat')) - 1))
     else:
@@ -2063,7 +2063,8 @@ if __name__ == "__main__":
                      test_main.TestLayerFromElement,
                      test_main.TestStaffFromElement,
                      test_main.TestStaffDefFromElement,
-                     test_main.TestScoreDefFromElement,)
+                     test_main.TestScoreDefFromElement,
+                    )
 
 #------------------------------------------------------------------------------
 # eof

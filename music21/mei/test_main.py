@@ -292,7 +292,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedElemOrder = [mock.call('pname', ''), mock.call('accid'), mock.call('oct', ''),
                              mock.call('dur'), mock.call('dots', 0)]
-        expectedElemOrder.extend([mock.ANY for _ in xrange(3)])  # additional calls to elem.get(), not part of this test
+        expectedElemOrder.extend([mock.ANY for _ in xrange(4)])  # additional calls to elem.get(), not part of this test
         elemReturns = ['D', 's', '2', '4', '1']
         elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
         mockNote.return_value = mock.MagicMock(spec_set=note.Note, name='note return')
@@ -341,7 +341,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedElemOrder = [mock.ANY for _ in xrange(5)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
-        expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
+        expectedElemOrder.extend([mock.ANY for _ in xrange(3)])  # additional calls to elem.get(), not part of this test
         expectedId = 42
         elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
                        expectedId, expectedId]  # xml:id for this test
@@ -379,7 +379,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedElemOrder = [mock.ANY for _ in xrange(6)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call('artic'), mock.call('artic')])
-        expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
         elemArtic = 'stacc'
         elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
                        None,  # the xml:id attribute
@@ -424,7 +424,7 @@ class TestNoteFromElement(unittest.TestCase):
         type(mockArtic).tag = mockArticTag
         elem.findall.return_value = [mockArtic]
         # make the expected order of calls to (and the return values for) elem.get()
-        expectedElemOrder = [mock.ANY for _ in xrange(8)]  # not testing the calls from previous unit tests
+        expectedElemOrder = [mock.ANY for _ in xrange(9)]  # not testing the calls from previous unit tests
         elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
                        None, None]  # @xml:id and @artic
         elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
@@ -492,7 +492,7 @@ class TestRestFromElement(unittest.TestCase):
         '''
         elem = mock.MagicMock()
         expectedElemOrder = [mock.call('dur'), mock.call('dots', 0)]
-        expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
         elemReturns = ['4', '1']
         elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
         mockRest.return_value = mock.MagicMock(spec_set=note.Rest, name='rest return')
@@ -539,6 +539,7 @@ class TestRestFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedElemOrder = [mock.ANY for _ in xrange(2)]  # not testing the calls from previous unit tests
         expectedElemOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
+        expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
         expectedId = 42
         elemReturns = ['4', '1',  # copied from testUnit1()---not important in this test
                        expectedId, expectedId]  # xml:id for this test
@@ -588,7 +589,7 @@ class TestChordFromElement(unittest.TestCase):
         '''
         elem = mock.MagicMock()
         expectedGetOrder = [mock.call('dur'), mock.call('dots', 0)]
-        expectedGetOrder.extend([mock.ANY for _ in xrange(3)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in xrange(4)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['4', '1']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
@@ -637,7 +638,7 @@ class TestChordFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedGetOrder = [mock.ANY for _ in xrange(2)]  # additional calls to elem.get(), not part of this test
         expectedGetOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
-        expectedGetOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in xrange(3)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['4', '1', '42', '42']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
@@ -681,7 +682,7 @@ class TestChordFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedGetOrder = [mock.ANY for _ in xrange(3)]  # additional calls to elem.get(), not part of this test
         expectedGetOrder.extend([mock.call('artic'), mock.call('artic')])
-        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
         elemArtic = 'stacc'
         elemGetReturns = ['4', '1', None, elemArtic, elemArtic]
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
@@ -764,7 +765,7 @@ class TestClefFromElement(unittest.TestCase):
         elemGetReturns = ['perc']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
-        expected = mockClefFromString.return_value
+        expected = mockPercClef.return_value
 
         actual = main.clefFromElement(elem)
 
@@ -787,7 +788,7 @@ class TestClefFromElement(unittest.TestCase):
         elemGetReturns = ['TAB', 'TAB']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
-        expected = mockClefFromString.return_value
+        expected = mockTabClef.return_value
 
         actual = main.clefFromElement(elem)
 
@@ -1168,7 +1169,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         self.assertSequenceEqual(expected, actual)
         # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
         # be in a particular order
-        self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        if six.PY2:
+            self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        else:
+            self.assertCountEqual(expectedGetCalls, elem.get.mock_calls)
         mockInstr.assert_called_once_with('{}instrDef tag')
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
@@ -1287,7 +1291,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         self.assertSequenceEqual(expected, actual)
         # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
         # be in a particular order
-        self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        if six.PY2:
+            self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        else:
+            self.assertCountEqual(expectedGetCalls, elem.get.mock_calls)
         self.assertEqual(0, mockInstr.call_count)  # D1
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
@@ -1382,7 +1389,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         self.assertSequenceEqual(expected, actual)
         # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
         # be in a particular order
-        self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        if six.PY2:
+            self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        else:
+            self.assertCountEqual(expectedGetCalls, elem.get.mock_calls)
         self.assertEqual(0, mockInstr.call_count)  # D1
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
@@ -1463,7 +1473,10 @@ class TestScoreDefFromElement(unittest.TestCase):
         self.assertEqual(expected, actual)
         # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
         # be in a particular order
-        self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        if six.PY2:
+            self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        else:
+            self.assertCountEqual(expectedGetCalls, elem.get.mock_calls)
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
 
