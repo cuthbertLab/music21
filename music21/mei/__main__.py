@@ -1342,7 +1342,7 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     return post
 
 
-def mRestFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+def mRestFromElement(elem, slurBundle=None):
     '''
     <mRest/> Complete measure rest in any meter.
 
@@ -1352,7 +1352,19 @@ def mRestFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     # TODO: <mRest> elements sometimes won't have a @dur set; it's simply supposed to take up the
     #       whole measure. But then the quarterLength will be 1.0, which isn't good.
-    return restFromElement(elem)
+    return restFromElement(elem, slurBundle)
+
+
+def spaceFromElement(elem, slurBundle=None):
+    '''
+    <space>  A placeholder used to fill an incomplete measure, layer, etc. most often so that the
+    combined duration of the events equals the number of beats in the measure.
+
+    In MEI 2013: pg.440 (455 in PDF) (MEI.shared module)
+
+    .. note:: Since music21 lacks "spacer" objects, this is imported as a :class:`~music21.note.Rest`.
+    '''
+    return restFromElement(elem, slurBundle)
 
 
 def chordFromElement(elem, slurBundle=None):
@@ -1569,6 +1581,7 @@ def beamFromElement(elem, slurBundle=None):
     - <chord> contained within
     - <note> contained within
     - <rest> contained within
+    - <space>
 
     Attributes Ignored:
     ===================
@@ -1598,7 +1611,7 @@ def beamFromElement(elem, slurBundle=None):
     MEI.critapp: app
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
     MEI.mensural: ligature mensur proport
-    MEI.shared: barLine clefGrp custos keySig pad space
+    MEI.shared: barLine clefGrp custos keySig pad
     '''
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
@@ -1606,7 +1619,8 @@ def beamFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
                      '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
-                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement}
+                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
+                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
     post = []
 
     # iterate all immediate children
@@ -1648,7 +1662,7 @@ def tupletFromElement(elem, slurBundle=None):
 
     Attributes In Progress:
     =======================
-    - elements contained within: <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>
+    - elements contained within: <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>
     - @num and @numbase
 
     Attributes not Implemented:
@@ -1677,7 +1691,7 @@ def tupletFromElement(elem, slurBundle=None):
     MEI.critapp: app
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
     MEI.mensural: ligature mensur proport
-    MEI.shared: barLine clefGrp custos keySig pad space
+    MEI.shared: barLine clefGrp custos keySig pad
     '''
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
@@ -1685,7 +1699,8 @@ def tupletFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
-                     '{http://www.music-encoding.org/ns/mei}clef': clefFromElement}
+                     '{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
+                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
     post = []
 
     # get the @num and @numbase attributes, without which we can't properly calculate the tuplet
@@ -1784,6 +1799,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     =======================
     - <beam> contained within
     - <tuplet> contained within
+    - <space> contained within
 
     Attributes not Implemented:
     ===========================
@@ -1810,7 +1826,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     MEI.midi: midi
     MEI.neumes: ineume syllable uneume
     MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb
-                scoreDef space staffDef tempo
+                scoreDef staffDef tempo
     MEI.text: div
     MEI.usersymbols: anchoredText curve line symbol
     '''
@@ -1821,7 +1837,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
                      '{http://www.music-encoding.org/ns/mei}mRest': mRestFromElement,
                      '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
-                     '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement}
+                     '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
+                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
     post = stream.Voice()
 
     # iterate all immediate children
