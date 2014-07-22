@@ -887,13 +887,6 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     Attributes Implemented:
     =======================
-
-    Attributes Ignored:
-    ===================
-    - @key.sig.mixed (from att.keySigDefault.log)
-
-    Attributes In Progress:
-    =======================
     - @label (att.common) as Instrument.partName
     - @label.abbr (att.labels.addl) as Instrument.partAbbreviation
     - @n (att.common) as Instrument.partId
@@ -901,14 +894,22 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - (att.meterSigDefault.log (@meter.count, @meter.unit))
     - (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place)) (via :func:`clefFromElement`)
     - @trans.diat and @trans.demi (att.transposition)
+    - <instrDef> held within
+
+    Attributes Ignored:
+    ===================
+    - @key.sig.mixed (from att.keySigDefault.log)
+
+    Attributes In Progress:
+    =======================
 
     Attributes not Implemented:
     ===========================
     att.common (@n, @xml:base)
                (att.id (@xml:id))
     att.declaring (@decls)
-    att.staffDef.log (att.duration.default (@dur.default, @num.default, @numbase.default)) <-- TODO: need this!!!
-                     (att.octavedefault (@octave.default)) <-- need this!!!
+    att.staffDef.log (att.duration.default (@dur.default, @num.default, @numbase.default))
+                     (att.octavedefault (@octave.default))
                      (att.staffDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
                      (att.staffDef.log.mensural (att.mensural.log (@mensur.dot, @mensur.sign,
                                                                    @mensur.slash, @proport.num,
@@ -944,25 +945,15 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     ============
     MEI.cmn: meterSig meterSigGrp
     MEI.mensural: mensur proport
-    MEI.midi: instrDef <-- need this!!!
     MEI.shared: clef clefGrp keySig label layerDef
     '''
     # mapping from tag name to our converter function
     tagToFunction = {}
 
-    # <instrDef> contained within
-    #for eachDef in elem.findall('%sinstrDef' % _MEINS):
-        #print('?? partName: %s; partId: %s' % (post[0].partName == '', post[0].partId))  # DEBUG
-        #instr = instrDefFromElement(eachDef)
-        #if '' == post[0].partName and '' != instr.bestName():
-            #post[0].partName = instr.bestName()
-        #if post[0].partId is None and instr.partId is not None:
-            #post[0].partId = instr.partId
-
     # first make the Instrument
-    post = elem.findall('{}instrDef'.format(_MEINS))
-    if len(post) > 0:
-        post = [instrDefFromElement(post[0])]
+    post = elem.find('{}instrDef'.format(_MEINS))
+    if post is not None:
+        post = [instrDefFromElement(post)]
     else:
         try:
             post = [instrument.fromString(elem.get('label'))]
@@ -1001,7 +992,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
             post.append(tagToFunction[eachTag.tag](eachTag))
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+        elif eachTag.tag not in _IGNORE_UNPROCESSED and eachTag.tag != '{}instrDef'.format(_MEINS):
             environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     return post
@@ -2071,6 +2062,7 @@ if __name__ == "__main__":
                      test_main.TestClefFromElement,
                      test_main.TestLayerFromElement,
                      test_main.TestStaffFromElement,
+                     test_main.TestStaffDefFromElement,
                      )
 
 #------------------------------------------------------------------------------

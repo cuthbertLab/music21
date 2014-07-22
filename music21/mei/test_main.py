@@ -37,6 +37,9 @@ from music21 import articulations
 from music21 import chord
 from music21 import clef
 from music21 import stream
+from music21 import instrument
+from music21 import key
+from music21 import meter
 
 # six
 from six.moves import range, xrange
@@ -1112,3 +1115,287 @@ class TestStaffFromElement(unittest.TestCase):
         # third part
         self.assertEqual('3', actual[2].id)
         self.assertEqual('C2', actual[2][0].nameWithOctave)
+
+
+
+#------------------------------------------------------------------------------
+class TestStaffDefFromElement(unittest.TestCase):
+    '''Tests for staffDefFromElement()'''
+
+    @mock.patch('music21.mei.__main__.instrDefFromElement')
+    @mock.patch('music21.mei.__main__._timeSigFromAttrs')
+    @mock.patch('music21.mei.__main__._keySigFromAttrs')
+    @mock.patch('music21.mei.__main__.clefFromElement')
+    @mock.patch('music21.mei.__main__._transpositionFromAttrs')
+    def testUnit1(self, mockTrans, mockClef, mockKey, mockTime, mockInstr):
+        '''
+        staffDefFromElement(): proper handling of the following attributes (see function docstring
+            for more information).
+
+        @label, @label.abbr  @n, @key.accid, @key.mode, @key.pname, @key.sig, @meter.count,
+        @meter.unit, @clef.shape, @clef.line, @clef.dis, @clef.dis.place, @trans.diat, @trans.demi
+        '''
+        # 1.) prepare
+        elem = mock.MagicMock()
+        elem.find = mock.MagicMock(name='{}instrDef', return_value='{}instrDef tag')
+        elem.findall = mock.MagicMock(return_value=[])
+        def elemGetSideEffect(which, default=None):
+            theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
+                       'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
+                       'key.pname': 'G', 'trans.semi': '123'}
+            if which in theDict:
+                return theDict[which]
+            else:
+                return default
+        elem.get = mock.MagicMock(side_effect=elemGetSideEffect)
+        expectedGetCalls = ['label', 'label.abbr', 'n', 'meter.count', 'key.pname',
+                            'clef.shape', 'clef.shape', 'clef.line', 'clef.dis', 'clef.dis.place',
+                            'trans.semi']
+        expectedGetCalls = [mock.call(x) for x in expectedGetCalls]
+        theMockInstrument = mock.MagicMock('mock instrument')
+        mockInstr.return_value = theMockInstrument
+        mockTime.return_value = 'mockTime return'
+        mockKey.return_value = 'mockKey return'
+        mockClef.return_value = 'mockClef return'
+        mockTrans.return_value = 'mockTrans return'
+        expected = [mockInstr.return_value, mockTime.return_value, mockKey.return_value,
+                    mockClef.return_value]
+        # attributes on theMockInstrument that should be set by staffDefFromElement()
+        expectedAttrs = [('partName', 'the label'), ('partAbbreviation', 'the l.'), ('partId', '1'),
+                         ('transposition', mockTrans.return_value)]
+
+        # 2.) run
+        actual = main.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertSequenceEqual(expected, actual)
+        # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
+        # be in a particular order
+        self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        mockInstr.assert_called_once_with('{}instrDef tag')
+        mockTime.assert_called_once_with(elem)
+        mockKey.assert_called_once_with(elem)
+        # mockClef is more difficult because it's given an Element
+        mockTrans.assert_called_once_with(elem)
+        elem.findall.assert_called_once_with('*')
+        # check that all attributes are set with their expected values
+        for attrName, attrValue in expectedAttrs:
+            self.assertEqual(getattr(theMockInstrument, attrName), attrValue)
+        # now mockClef, which got an Element
+        mockClef.assert_called_once_with(mock.ANY)  # confirm there was a single one-argument call
+        mockClefArg = mockClef.call_args_list[0][0][0]
+        self.assertEqual('clef', mockClefArg.tag)
+        self.assertEqual('F', mockClefArg.get('shape'))
+        self.assertEqual('4', mockClefArg.get('line'))
+        self.assertEqual('cd', mockClefArg.get('dis'))
+        self.assertEqual('cdp', mockClefArg.get('dis.place'))
+
+    def testIntegration1(self):
+        '''
+        staffFromElement(): corresponds to testUnit1() without mock objects
+        '''
+        # 1.) prepare
+        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"
+                                clef.shape="G" key.sig="0" key.mode="major" trans.semi="-3"
+                                trans.diat="-2" meter.count="3" meter.unit="8">
+                         <instrDef midi.channel="1" midi.instrnum="71" midi.instrname="Clarinet"/>
+                      </staffDef>'''
+        elem = ETree.fromstring(inputXML)
+
+        # 2.) run
+        actual = main.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertIsInstance(actual[0], instrument.Clarinet)
+        self.assertIsInstance(actual[1], meter.TimeSignature)
+        self.assertIsInstance(actual[2], key.KeySignature)
+        self.assertIsInstance(actual[3], clef.TrebleClef)
+        self.assertEqual('12', actual[0].partId)
+        self.assertEqual('3/8', actual[1].ratioString)
+        self.assertEqual('major', actual[2].mode)
+        self.assertEqual(0, actual[2].sharps)
+
+    @mock.patch('music21.instrument.fromString')
+    @mock.patch('music21.mei.__main__.instrDefFromElement')
+    @mock.patch('music21.mei.__main__._timeSigFromAttrs')
+    @mock.patch('music21.mei.__main__._keySigFromAttrs')
+    @mock.patch('music21.mei.__main__.clefFromElement')
+    @mock.patch('music21.mei.__main__._transpositionFromAttrs')
+    def testUnit2(self, mockTrans, mockClef, mockKey, mockTime, mockInstr, mockFromString):
+        '''
+        staffDefFromElement(): same as testUnit1() *but* there's no <instrDef> so we have to use
+            music21.instrument.fromString()
+        '''
+        # NB: differences from testUnit1() are marked with a "D1" comment at the end of the line
+        # 1.) prepare
+        elem = mock.MagicMock()
+        elem.find = mock.MagicMock(name='{}instrDef', return_value=None)  # D1
+        elem.findall = mock.MagicMock(return_value=[])
+        def elemGetSideEffect(which, default=None):
+            theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
+                       'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
+                       'key.pname': 'G', 'trans.semi': '123'}
+            if which in theDict:
+                return theDict[which]
+            else:
+                return default
+        elem.get = mock.MagicMock(side_effect=elemGetSideEffect)
+        expectedGetCalls = ['label', 'label', 'label.abbr', 'n', 'meter.count', 'key.pname',  # D1
+                            'clef.shape', 'clef.shape', 'clef.line', 'clef.dis', 'clef.dis.place',
+                            'trans.semi']
+        expectedGetCalls = [mock.call(x) for x in expectedGetCalls]
+        theMockInstrument = mock.MagicMock('mock instrument')
+        mockFromString.return_value = theMockInstrument  # D1
+        mockTime.return_value = 'mockTime return'
+        mockKey.return_value = 'mockKey return'
+        mockClef.return_value = 'mockClef return'
+        mockTrans.return_value = 'mockTrans return'
+        expected = [mockFromString.return_value, mockTime.return_value, mockKey.return_value,  # D1
+                    mockClef.return_value]
+        # attributes on theMockInstrument that should be set by staffDefFromElement()
+        expectedAttrs = [('partName', 'the label'), ('partAbbreviation', 'the l.'), ('partId', '1'),
+                         ('transposition', mockTrans.return_value)]
+
+        # 2.) run
+        actual = main.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertSequenceEqual(expected, actual)
+        # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
+        # be in a particular order
+        self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        self.assertEqual(0, mockInstr.call_count)  # D1
+        mockTime.assert_called_once_with(elem)
+        mockKey.assert_called_once_with(elem)
+        # mockClef is more difficult because it's given an Element
+        mockTrans.assert_called_once_with(elem)
+        elem.findall.assert_called_once_with('*')
+        # check that all attributes are set with their expected values
+        for attrName, attrValue in expectedAttrs:
+            self.assertEqual(getattr(theMockInstrument, attrName), attrValue)
+        # now mockClef, which got an Element
+        mockClef.assert_called_once_with(mock.ANY)  # confirm there was a single one-argument call
+        mockClefArg = mockClef.call_args_list[0][0][0]
+        self.assertEqual('clef', mockClefArg.tag)
+        self.assertEqual('F', mockClefArg.get('shape'))
+        self.assertEqual('4', mockClefArg.get('line'))
+        self.assertEqual('cd', mockClefArg.get('dis'))
+        self.assertEqual('cdp', mockClefArg.get('dis.place'))
+
+    def testIntegration2(self):
+        '''
+        staffFromElement(): corresponds to testUnit2() but without mock objects
+        '''
+        # 1.) prepare
+        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"
+                                clef.shape="G" key.sig="0" key.mode="major" trans.semi="-3"
+                                trans.diat="-2" meter.count="3" meter.unit="8" label="clarinet">
+                      </staffDef>'''
+        elem = ETree.fromstring(inputXML)
+
+        # 2.) run
+        actual = main.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertIsInstance(actual[0], instrument.Clarinet)
+        self.assertIsInstance(actual[1], meter.TimeSignature)
+        self.assertIsInstance(actual[2], key.KeySignature)
+        self.assertIsInstance(actual[3], clef.TrebleClef)
+        self.assertEqual('12', actual[0].partId)
+        self.assertEqual('3/8', actual[1].ratioString)
+        self.assertEqual('major', actual[2].mode)
+        self.assertEqual(0, actual[2].sharps)
+
+    @mock.patch('music21.instrument.Instrument')
+    @mock.patch('music21.instrument.fromString')
+    @mock.patch('music21.mei.__main__.instrDefFromElement')
+    @mock.patch('music21.mei.__main__._timeSigFromAttrs')
+    @mock.patch('music21.mei.__main__._keySigFromAttrs')
+    @mock.patch('music21.mei.__main__.clefFromElement')
+    @mock.patch('music21.mei.__main__._transpositionFromAttrs')
+    def testUnit3(self, mockTrans, mockClef, mockKey, mockTime, mockInstr, mockFromString, mockInstrInit):
+        '''
+        staffDefFromElement(): same as testUnit1() *but* there's no <instrDef> so we have to use
+          music21.instrument.fromString() *and* that raises an InstrumentException.
+        '''
+        # NB: differences from testUnit1() are marked with a "D1" comment at the end of the line
+        # NB: differences from testUnit2() are marked with a "D2" comment at the end of the line
+        # 1.) prepare
+        elem = mock.MagicMock()
+        elem.find = mock.MagicMock(name='{}instrDef', return_value=None)  # D1
+        elem.findall = mock.MagicMock(return_value=[])
+        def elemGetSideEffect(which, default=None):
+            theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
+                       'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
+                       'key.pname': 'G', 'trans.semi': '123'}
+            if which in theDict:
+                return theDict[which]
+            else:
+                return default
+        elem.get = mock.MagicMock(side_effect=elemGetSideEffect)
+        expectedGetCalls = ['label', 'label', 'label.abbr', 'n', 'meter.count', 'key.pname',  # D1
+                            'clef.shape', 'clef.shape', 'clef.line', 'clef.dis', 'clef.dis.place',
+                            'trans.semi']
+        expectedGetCalls = [mock.call(x) for x in expectedGetCalls]
+        theMockInstrument = mock.MagicMock('mock instrument')
+        mockFromString.side_effect = instrument.InstrumentException  # D2
+        mockInstrInit.return_value = theMockInstrument  # D1 & D2
+        mockTime.return_value = 'mockTime return'
+        mockKey.return_value = 'mockKey return'
+        mockClef.return_value = 'mockClef return'
+        mockTrans.return_value = 'mockTrans return'
+        expected = [mockInstrInit.return_value, mockTime.return_value, mockKey.return_value,  # D1 & D2
+                    mockClef.return_value]
+        # attributes on theMockInstrument that should be set by staffDefFromElement()
+        expectedAttrs = [('partName', 'the label'), ('partAbbreviation', 'the l.'), ('partId', '1'),
+                         ('transposition', mockTrans.return_value)]
+
+        # 2.) run
+        actual = main.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertSequenceEqual(expected, actual)
+        # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
+        # be in a particular order
+        self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
+        self.assertEqual(0, mockInstr.call_count)  # D1
+        mockTime.assert_called_once_with(elem)
+        mockKey.assert_called_once_with(elem)
+        # mockClef is more difficult because it's given an Element
+        mockTrans.assert_called_once_with(elem)
+        elem.findall.assert_called_once_with('*')
+        # check that all attributes are set with their expected values
+        for attrName, attrValue in expectedAttrs:
+            self.assertEqual(getattr(theMockInstrument, attrName), attrValue)
+        # now mockClef, which got an Element
+        mockClef.assert_called_once_with(mock.ANY)  # confirm there was a single one-argument call
+        mockClefArg = mockClef.call_args_list[0][0][0]
+        self.assertEqual('clef', mockClefArg.tag)
+        self.assertEqual('F', mockClefArg.get('shape'))
+        self.assertEqual('4', mockClefArg.get('line'))
+        self.assertEqual('cd', mockClefArg.get('dis'))
+        self.assertEqual('cdp', mockClefArg.get('dis.place'))
+
+    def testIntegration3(self):
+        '''
+        staffFromElement(): corresponds to testUnit3() but without mock objects
+        '''
+        # 1.) prepare
+        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"
+                                clef.shape="G" key.sig="0" key.mode="major" trans.semi="-3"
+                                trans.diat="-2" meter.count="3" meter.unit="8">
+                      </staffDef>'''
+        elem = ETree.fromstring(inputXML)
+
+        # 2.) run
+        actual = main.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertIsInstance(actual[0], instrument.Instrument)
+        self.assertIsInstance(actual[1], meter.TimeSignature)
+        self.assertIsInstance(actual[2], key.KeySignature)
+        self.assertIsInstance(actual[3], clef.TrebleClef)
+        self.assertEqual('12', actual[0].partId)
+        self.assertEqual('3/8', actual[1].ratioString)
+        self.assertEqual('major', actual[2].mode)
+        self.assertEqual(0, actual[2].sharps)
