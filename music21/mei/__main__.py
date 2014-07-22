@@ -50,7 +50,6 @@ from music21 import interval
 from music21 import bar
 from music21 import spanner
 from music21 import tie
-from music21 import beam
 
 from music21 import environment
 _MOD = 'mei.__main__'
@@ -177,7 +176,8 @@ def convertFromString(dataStr):
             # We mark as a tuplet-member everything at the same hierarchic level as the @startid
             # element, starting from the @startid element, ending either at the @endid element or
             # the end of same-level elements.
-            startIdTag = documentRoot.find('.//{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, startid, mei=_MEINS))
+            startIdTag = documentRoot.find(
+                './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, startid, mei=_MEINS))
             atThisLevel = startIdTag.findall('*')
             for eachObject in atThisLevel:
                 if eachObject.get(_XMLID, '') == startid:
@@ -193,7 +193,8 @@ def convertFromString(dataStr):
             # hierarchic level as the @endid element marking as a tuplet-member everything at that
             # level that precedes the @endid element.
             if not foundTheEnd:
-                endIdTag = documentRoot.find('.//{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, endid, mei=_MEINS))
+                endIdTag = documentRoot.find(
+                    './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, endid, mei=_MEINS))
                 atThisLevel = endIdTag.findall('*')
                 for eachObject in atThisLevel:
                     eachObject.set('m21TupletNum', eachTuplet.get('num'))
@@ -216,7 +217,7 @@ def convertFromString(dataStr):
     # set the initial Instrument for each staff
     for eachN in allPartNs:
         eachStaffDef = staffDefFromElement(documentRoot.find(
-                       './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)))
+            './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)))
         if eachStaffDef is not None:
             parsed[eachN].append(eachStaffDef)
         else:
@@ -631,7 +632,8 @@ def _transpositionFromAttrs(elem):
                      interval.ChromaticInterval(int(elem.get('trans.diat')) - 1))
     else:
         # TODO: sometimes I get this error:
-        # music21.interval.IntervalException: cannot get a specifier for a note with this many semitones off of Perfect: -18
+        # music21.interval.IntervalException: cannot get a specifier for a note with this many
+        #         semitones off of Perfect: -18
         # I think it's when there's a very large transposition (duh)
         return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
                      interval.ChromaticInterval(int(elem.get('trans.diat')) + 1))
@@ -755,6 +757,7 @@ def removeOctothorpe(xmlid):
     '''
     Given a string with an @xml:id to search for, remove a leading octothorpe, if present.
 
+    >>> from music21.mei.__main__ import removeOctothorpe  # OMIT_FROM_DOCS
     >>> removeOctothorpe('110a923d-a13a-4a2e-b85c-e1d438e4c5d6')
     '110a923d-a13a-4a2e-b85c-e1d438e4c5d6'
     >>> removeOctothorpe('#e46cbe82-95fc-4522-9f7a-700e41a40c8e')
@@ -969,7 +972,6 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
         post.append(_keySigFromAttrs(elem))
 
     # --> clef
-    # (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place))
     if elem.get('clef.shape') is not None:
         post.append(clefFromElement(ETree.Element('clef', {'shape': elem.get('clef.shape'),
                                                            'line': elem.get('clef.line'),
@@ -981,6 +983,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
         post[0].transposition = _transpositionFromAttrs(elem)
 
     # iterate all immediate children
+    # TODO: break this into a shared function
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
             result = tagToFunction[eachTag.tag](eachTag, slurBundle)
@@ -1448,7 +1451,7 @@ def chordFromElement(elem, slurBundle=None):
     return post
 
 
-def clefFromElement(elem, slurBundle=None):
+def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <clef> Indication of the exact location of a particular note on the staff and, therefore,
     the other notes as well.
@@ -2060,8 +2063,7 @@ if __name__ == "__main__":
                      test_main.TestLayerFromElement,
                      test_main.TestStaffFromElement,
                      test_main.TestStaffDefFromElement,
-                     test_main.TestScoreDefFromElement,
-                     )
+                     test_main.TestScoreDefFromElement,)
 
 #------------------------------------------------------------------------------
 # eof

@@ -42,7 +42,7 @@ from music21 import key
 from music21 import meter
 
 # six
-from six.moves import range, xrange
+from six.moves import xrange  # pylint: disable=redefined-builtin
 
 # Importing from __main__.py
 import music21.mei.__main__ as main
@@ -310,8 +310,8 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('note')
         attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1'}
-        for key in attribDict:
-            elem.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elem.set(eachKey, attribDict[eachKey])
         actual = main.noteFromElement(elem)
         self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.5, actual.quarterLength)
@@ -325,8 +325,8 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('note')
         attribDict = {'pname': 'D', 'accid': 'n', 'oct': '2', 'dur': '4'}
-        for key in attribDict:
-            elem.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elem.set(eachKey, attribDict[eachKey])
         actual = main.noteFromElement(elem)
         self.assertEqual('D2', actual.nameWithOctave)
         self.assertEqual(1.0, actual.quarterLength)
@@ -362,8 +362,8 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('note')
         attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1', _XMLID: 42}
-        for key in attribDict:
-            elem.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elem.set(eachKey, attribDict[eachKey])
         actual = main.noteFromElement(elem)
         self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.5, actual.quarterLength)
@@ -401,8 +401,8 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('note')
         attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1', 'artic': 'stacc'}
-        for key in attribDict:
-            elem.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elem.set(eachKey, attribDict[eachKey])
         actual = main.noteFromElement(elem)
         self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.5, actual.quarterLength)
@@ -453,20 +453,20 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         elemNote = ETree.Element('{http://www.music-encoding.org/ns/mei}note')
         attribDict = {'pname': 'D', 'oct': '2', 'dur': '4'}
-        for key in attribDict:
-            elemNote.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elemNote.set(eachKey, attribDict[eachKey])
         elemArtic = ETree.Element('{http://www.music-encoding.org/ns/mei}artic')
         attribDict = {'artic': 'stacc'}
-        for key in attribDict:
-            elemArtic.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elemArtic.set(eachKey, attribDict[eachKey])
         elemDot = ETree.Element('{http://www.music-encoding.org/ns/mei}dot')
         attribDict = {'xml:id': 'THE ID'}
-        for key in attribDict:
-            elemDot.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elemDot.set(eachKey, attribDict[eachKey])
         elemAccid = ETree.Element('{http://www.music-encoding.org/ns/mei}accid')
         attribDict = {'accid': 's'}
-        for key in attribDict:
-            elemAccid.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elemAccid.set(eachKey, attribDict[eachKey])
         elemNote.extend([elemArtic, elemDot, elemAccid])
 
         actual = main.noteFromElement(elemNote)
@@ -510,8 +510,8 @@ class TestRestFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('rest')
         attribDict = {'dur': '4', 'dots': '1'}
-        for key in attribDict:
-            elem.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elem.set(eachKey, attribDict[eachKey])
         actual = main.restFromElement(elem)
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
@@ -524,8 +524,8 @@ class TestRestFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('note')
         attribDict = {'dur': '4'}
-        for key in attribDict:
-            elem.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elem.set(eachKey, attribDict[eachKey])
         actual = main.restFromElement(elem)
         self.assertEqual(1.0, actual.quarterLength)
         self.assertEqual(0, actual.duration.dots)
@@ -559,8 +559,8 @@ class TestRestFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('rest')
         attribDict = {'dur': '4', 'dots': '1', _XMLID: 42}
-        for key in attribDict:
-            elem.set(key, attribDict[key])
+        for eachKey in attribDict:
+            elem.set(eachKey, attribDict[eachKey])
         actual = main.restFromElement(elem)
         self.assertEqual(1.5, actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
@@ -613,8 +613,8 @@ class TestChordFromElement(unittest.TestCase):
         '''
         chordElem = ETree.Element('chord')
         chordAttribs = {'dur': '4', 'dots': '1'}
-        for key in chordAttribs:
-            chordElem.set(key, chordAttribs[key])
+        for eachKey in chordAttribs:
+            chordElem.set(eachKey, chordAttribs[eachKey])
         for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
             chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
         expectedPitches = [pitch.Pitch(x) for x in ('C#2', 'D-2', 'F##3')]
@@ -662,13 +662,10 @@ class TestChordFromElement(unittest.TestCase):
         '''
         chordElem = ETree.Element('chord')
         chordAttribs = {'dur': '4', 'dots': '1', _XMLID: 'bef1f18a'}
-        for key in chordAttribs:
-            chordElem.set(key, chordAttribs[key])
+        for eachKey in chordAttribs:
+            chordElem.set(eachKey, chordAttribs[eachKey])
         for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
             chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
-        expectedPitches = [pitch.Pitch(x) for x in ('C#2', 'D-2', 'F##3')]
-        expectedQuarterLength = 1.5
-        expectedDots = 1
 
         actual = main.chordFromElement(chordElem)
 
@@ -711,13 +708,10 @@ class TestChordFromElement(unittest.TestCase):
         '''
         chordElem = ETree.Element('chord')
         chordAttribs = {'dur': '4', 'dots': '1', 'artic': 'stacc'}
-        for key in chordAttribs:
-            chordElem.set(key, chordAttribs[key])
+        for eachKey in chordAttribs:
+            chordElem.set(eachKey, chordAttribs[eachKey])
         for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
             chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
-        expectedPitches = [pitch.Pitch(x) for x in ('C#2', 'D-2', 'F##3')]
-        expectedQuarterLength = 1.5
-        expectedDots = 1
 
         actual = main.chordFromElement(chordElem)
 
@@ -774,6 +768,7 @@ class TestClefFromElement(unittest.TestCase):
 
         actual = main.clefFromElement(elem)
 
+        self.assertEqual(expected, actual)
         self.assertEqual(0, mockClefFromString.call_count)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
         self.assertEqual(0, mockTabClef.call_count)
@@ -796,6 +791,7 @@ class TestClefFromElement(unittest.TestCase):
 
         actual = main.clefFromElement(elem)
 
+        self.assertEqual(expected, actual)
         self.assertEqual(0, mockClefFromString.call_count)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
         self.assertEqual(1, mockTabClef.call_count)
@@ -809,8 +805,8 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefElem = ETree.Element('clef')
         clefAttribs = {'shape': 'G', 'line': '2', 'dis': '8', 'dis.place': 'above'}
-        for key in clefAttribs:
-            clefElem.set(key, clefAttribs[key])
+        for eachKey in clefAttribs:
+            clefElem.set(eachKey, clefAttribs[eachKey])
         expectedClass = clef.Treble8vaClef
 
         actual = main.clefFromElement(clefElem)
@@ -825,8 +821,8 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefElem = ETree.Element('clef')
         clefAttribs = {'shape': 'perc'}
-        for key in clefAttribs:
-            clefElem.set(key, clefAttribs[key])
+        for eachKey in clefAttribs:
+            clefElem.set(eachKey, clefAttribs[eachKey])
         expectedClass = clef.PercussionClef
 
         actual = main.clefFromElement(clefElem)
@@ -841,8 +837,8 @@ class TestClefFromElement(unittest.TestCase):
         '''
         clefElem = ETree.Element('clef')
         clefAttribs = {'shape': 'TAB'}
-        for key in clefAttribs:
-            clefElem.set(key, clefAttribs[key])
+        for eachKey in clefAttribs:
+            clefElem.set(eachKey, clefAttribs[eachKey])
         expectedClass = clef.TabClef
 
         actual = main.clefFromElement(clefElem)
@@ -964,8 +960,9 @@ class TestLayerFromElement(unittest.TestCase):
         findallReturn[2].tag = '{}note'.format(main._MEINS)
         elem.findall = mock.MagicMock(return_value=findallReturn)
         # NB: we call the layerFromElement() twice, so we need twice the return values here
+        # "MNFE" is "mockNoteFromElement"
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2',
-                          'mockNoteFromElement return 1', 'mockNoteFromElement return 2']  # "MNFE" is "mockNoteFromElement"
+                          'mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
 
@@ -1070,7 +1067,6 @@ class TestStaffFromElement(unittest.TestCase):
                              for i in xrange(len(findallReturn))]
         mockLFEreturns = ['mockLayerFromElement return %i' for i in xrange(len(findallReturn))]
         mockLayerFromElement.side_effect = lambda x, y, slurBundle: mockLFEreturns.pop(0)
-        expectedAppendCalls = [mock.call(mockLFEreturns[i]) for i in xrange(len(findallReturn))]
         expected = ['mockLayerFromElement return %i' for i in xrange(len(findallReturn))]
 
         actual = main.staffFromElement(elem)
@@ -1140,6 +1136,7 @@ class TestStaffDefFromElement(unittest.TestCase):
         elem.find = mock.MagicMock(name='{}instrDef', return_value='{}instrDef tag')
         elem.findall = mock.MagicMock(return_value=[])
         def elemGetSideEffect(which, default=None):
+            "mock the behaviour of Element.get()"
             theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
                        'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
                        'key.pname': 'G', 'trans.semi': '123'}
@@ -1258,6 +1255,7 @@ class TestStaffDefFromElement(unittest.TestCase):
         elem.find = mock.MagicMock(name='{}instrDef', return_value=None)  # D1
         elem.findall = mock.MagicMock(return_value=[])
         def elemGetSideEffect(which, default=None):
+            "mock the behaviour of Element.get()"
             theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
                        'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
                        'key.pname': 'G', 'trans.semi': '123'}
@@ -1351,6 +1349,7 @@ class TestStaffDefFromElement(unittest.TestCase):
         elem.find = mock.MagicMock(name='{}instrDef', return_value=None)  # D1
         elem.findall = mock.MagicMock(return_value=[])
         def elemGetSideEffect(which, default=None):
+            "mock the behaviour of Element.get()"
             theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
                        'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
                        'key.pname': 'G', 'trans.semi': '123'}
