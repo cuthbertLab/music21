@@ -71,6 +71,7 @@ _IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
                        '{}pb'.format(_MEINS),  # page break
                        '{}slur'.format(_MEINS),  # slurs; handled in convertFromString()
                        '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
+                       '{}tupletSpan'.format(_MEINS),  # tuplets; handled in convertFromString()
                       )
 
 
@@ -157,6 +158,50 @@ def convertFromString(dataStr):
     for eachTie in documentRoot.findall('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
         _innerAttrSetter(eachTie.get('startid'), 'tie', ' i', True)
         _innerAttrSetter(eachTie.get('endid'), 'tie', ' t', True)
+
+    # TODO: probably clean this up
+    # pre-processing <tupletSpan> tags
+    for eachTuplet in documentRoot.findall('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
+        if eachTuplet.get('plist') is not None:
+            # Properly-encoded <tupletSpan> elements should have a @plist that enumerates the
+            # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
+            # @plist to add our custom @m21TupletNum and @m21TupletNumbase attributes.
+            tupletSpanFromElement(eachTuplet, documentRoot)
+        else:
+            # Poorly-encoded <tupletSpan> elements don't give a @plist attribute, so we have to do
+            # some crude guesswork to find all the related elements.
+            startid = removeOctothorpe(eachTuplet.get('startid'))
+            endid = removeOctothorpe(eachTuplet.get('endid'))
+            foundTheStart = False
+            foundTheEnd = False
+
+            # We mark as a tuplet-member everything at the same hierarchic level as the @startid
+            # element, starting from the @startid element, ending either at the @endid element or
+            # the end of same-level elements.
+            startIdTag = documentRoot.find('.//{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, startid, mei=_MEINS))
+            atThisLevel = startIdTag.findall('*')
+            for eachObject in atThisLevel:
+                if eachObject.get(_XMLID, '') == startid:
+                    foundTheStart = True
+                if foundTheStart and not foundTheEnd:
+                    eachObject.set('m21TupletNum', eachTuplet.get('num'))
+                    eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
+                if eachObject.get(_XMLID, '') == endid:
+                    foundTheEnd = True
+                    break
+
+            # And if we didn't already hit the @endid element, we'll find everything at the same
+            # hierarchic level as the @endid element marking as a tuplet-member everything at that
+            # level that precedes the @endid element.
+            if not foundTheEnd:
+                endIdTag = documentRoot.find('.//{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, endid, mei=_MEINS))
+                atThisLevel = endIdTag.findall('*')
+                for eachObject in atThisLevel:
+                    eachObject.set('m21TupletNum', eachTuplet.get('num'))
+                    eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
+                    if eachObject.get(_XMLID, '') == endid:
+                        foundTheEnd = True
+                        break
 
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
@@ -705,7 +750,22 @@ def beamTogether(someThings):
     return someThings
 
 
-# Converter Functions
+def removeOctothorpe(xmlid):
+    '''
+    Given a string with an @xml:id to search for, remove a leading octothorpe, if present.
+
+    >>> removeOctothorpe('110a923d-a13a-4a2e-b85c-e1d438e4c5d6')
+    '110a923d-a13a-4a2e-b85c-e1d438e4c5d6'
+    >>> removeOctothorpe('#e46cbe82-95fc-4522-9f7a-700e41a40c8e')
+    'e46cbe82-95fc-4522-9f7a-700e41a40c8e'
+    '''
+    if xmlid.startswith('#'):
+        return xmlid[1:]
+    else:
+        return xmlid
+
+
+# Element-Based Converter Functions
 #------------------------------------------------------------------------------
 def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     # TODO: this whole function is untested
@@ -1197,6 +1257,18 @@ def noteFromElement(elem, slurBundle=None):
     if addDots > 0:
         post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), addDots)
 
+    # adjust for <tupletDef>-given tuplets
+    if elem.get('m21TupletNum') is not None:
+        post.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
+                                                   numberNotesNormal=int(elem.get('m21TupletNumbase')),
+                                                   durationNormal=post.duration.type,
+                                                   durationActual=post.duration.type))
+        tupletAttr = elem.get('tuplet', '')
+        if tupletAttr.startswith('i'):
+            post.duration.tuplets[0].type = 'start'
+        elif tupletAttr.startswith('t'):
+            post.duration.tuplets[0].type = 'stop'
+
     return post
 
 
@@ -1253,6 +1325,18 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     if elem.get(_XMLID) is not None:
         post.id = elem.get(_XMLID)
+
+    # adjust for <tupletDef>-given tuplets
+    if elem.get('m21TupletNum') is not None:
+        post.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
+                                                   numberNotesNormal=int(elem.get('m21TupletNumbase')),
+                                                   durationNormal=post.duration.type,
+                                                   durationActual=post.duration.type))
+        tupletAttr = elem.get('tuplet', '')
+        if tupletAttr.startswith('i'):
+            post.duration.tuplets[0].type = 'start'
+        elif tupletAttr.startswith('t'):
+            post.duration.tuplets[0].type = 'stop'
 
     return post
 
@@ -1347,6 +1431,18 @@ def chordFromElement(elem, slurBundle=None):
     # ties in the @tie attribute
     if elem.get('tie') is not None:
         post.tie = _tieFromAttr(elem.get('tie'))
+
+    # adjust for <tupletDef>-given tuplets
+    if elem.get('m21TupletNum') is not None:
+        post.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
+                                                   numberNotesNormal=int(elem.get('m21TupletNumbase')),
+                                                   durationNormal=post.duration.type,
+                                                   durationActual=post.duration.type))
+        tupletAttr = elem.get('tuplet', '')
+        if tupletAttr.startswith('i'):
+            post.duration.tuplets[0].type = 'start'
+        elif tupletAttr.startswith('t'):
+            post.duration.tuplets[0].type = 'stop'
 
     return post
 
