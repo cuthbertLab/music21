@@ -982,10 +982,6 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
                                                            'dis.place': elem.get('clef.dis.place')})))
 
     # --> transposition
-    # - A clarinet: trans.semi="-3" trans.diat="-2"... because C to A is two diatonic steps
-    #               comprised of three semitones
-    # - they're both integer values
-    # - "diatonic transposition" requires both .semi and .diat
     if elem.get('trans.semi') is not None:
         post[0].transposition = _transpositionFromAttrs(elem)
 
