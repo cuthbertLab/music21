@@ -1190,15 +1190,41 @@ class TestStaffDefFromElement(unittest.TestCase):
         self.assertEqual('cd', mockClefArg.get('dis'))
         self.assertEqual('cdp', mockClefArg.get('dis.place'))
 
-    def testIntegration1(self):
+    def testIntegration1a(self):
         '''
-        staffFromElement(): corresponds to testUnit1() without mock objects
+        staffDefFromElement(): corresponds to testUnit1() without mock objects
         '''
         # 1.) prepare
         inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"
                                 clef.shape="G" key.sig="0" key.mode="major" trans.semi="-3"
                                 trans.diat="-2" meter.count="3" meter.unit="8">
                          <instrDef midi.channel="1" midi.instrnum="71" midi.instrname="Clarinet"/>
+                      </staffDef>'''
+        elem = ETree.fromstring(inputXML)
+
+        # 2.) run
+        actual = main.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertIsInstance(actual[0], instrument.Clarinet)
+        self.assertIsInstance(actual[1], meter.TimeSignature)
+        self.assertIsInstance(actual[2], key.KeySignature)
+        self.assertIsInstance(actual[3], clef.TrebleClef)
+        self.assertEqual('12', actual[0].partId)
+        self.assertEqual('3/8', actual[1].ratioString)
+        self.assertEqual('major', actual[2].mode)
+        self.assertEqual(0, actual[2].sharps)
+
+    def testIntegration1b(self):
+        '''
+        staffDefFromElement(): testIntegration1() with <clef> tag inside
+        '''
+        # 1.) prepare
+        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" key.sig="0"
+                                key.mode="major" trans.semi="-3" trans.diat="-2" meter.count="3"
+                                meter.unit="8">
+                         <instrDef midi.channel="1" midi.instrnum="71" midi.instrname="Clarinet"/>
+                         <clef shape="G" line="2"/>
                       </staffDef>'''
         elem = ETree.fromstring(inputXML)
 
@@ -1284,7 +1310,7 @@ class TestStaffDefFromElement(unittest.TestCase):
 
     def testIntegration2(self):
         '''
-        staffFromElement(): corresponds to testUnit2() but without mock objects
+        staffDefFromElement(): corresponds to testUnit2() but without mock objects
         '''
         # 1.) prepare
         inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"
@@ -1378,7 +1404,7 @@ class TestStaffDefFromElement(unittest.TestCase):
 
     def testIntegration3(self):
         '''
-        staffFromElement(): corresponds to testUnit3() but without mock objects
+        staffDefFromElement(): corresponds to testUnit3() but without mock objects
         '''
         # 1.) prepare
         inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"

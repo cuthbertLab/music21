@@ -895,6 +895,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place)) (via :func:`clefFromElement`)
     - @trans.diat and @trans.demi (att.transposition)
     - <instrDef> held within
+    - <clef> held within
 
     Attributes Ignored:
     ===================
@@ -943,12 +944,12 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     May Contain:
     ============
-    MEI.cmn: meterSig meterSigGrp
+    MEI.cmn: meterSig meterSigGrp  TODO: these
     MEI.mensural: mensur proport
-    MEI.shared: clef clefGrp keySig label layerDef
+    MEI.shared: clefGrp keySig label layerDef  TODO: these
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {}
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement}
 
     # first make the Instrument
     post = elem.find('{}instrDef'.format(_MEINS))
@@ -991,7 +992,12 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if eachTag.tag in tagToFunction:
-            post.append(tagToFunction[eachTag.tag](eachTag))
+            result = tagToFunction[eachTag.tag](eachTag, slurBundle)
+            if not isinstance(result, (tuple, list)):
+                post.append(result)
+            else:
+                for eachObject in result:
+                    post.append(eachObject)
         elif eachTag.tag not in _IGNORE_UNPROCESSED and eachTag.tag != '{}instrDef'.format(_MEINS):
             environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
