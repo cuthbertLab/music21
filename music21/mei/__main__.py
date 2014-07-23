@@ -1358,6 +1358,19 @@ def spaceFromElement(elem, slurBundle=None):
     return restFromElement(elem, slurBundle)
 
 
+def mSpaceFromElement(elem, slurBundle=None):
+    '''
+    <mSpace/> A measure containing only empty space in any meter.
+
+    In MEI 2013: pg.377 (391 in PDF) (MEI.cmn module)
+
+    This is a function wrapper for :func:`spaceFromElement`.
+    '''
+    # TODO: <mSpace> elements sometimes won't have a @dur set; it's simply supposed to take up the
+    #       whole measure. But then the quarterLength will be 1.0, which isn't good.
+    return spaceFromElement(elem, slurBundle)
+
+
 def chordFromElement(elem, slurBundle=None):
     '''
     <chord> is a simultaneous sounding of two or more notes in the same layer with the same duration.
@@ -1791,6 +1804,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     - <beam> contained within
     - <tuplet> contained within
     - <space> contained within
+    - <mSpace> contained within
 
     Attributes not Implemented:
     ===========================
@@ -1806,7 +1820,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     May Contain:
     ============
     MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
-             harpPedal mRpt mRpt2 mSpace meterSig meterSigGrp multiRest multiRpt octave pedal
+             harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal
              reh slur tie tuplet tupletSpan
     MEI.cmnOrnaments: mordent trill turn
     MEI.critapp: app
@@ -1829,7 +1843,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}mRest': mRestFromElement,
                      '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
                      '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
-                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
+                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
+                     '{http://www.music-encoding.org/ns/mei}mSpace': mSpaceFromElement}
     post = stream.Voice()
 
     # iterate all immediate children
