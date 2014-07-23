@@ -560,13 +560,13 @@ class AbstractScale(Scale):
 
 
     #---------------------------------------------------------------------------
-    def getScalaStorage(self, direction=DIRECTION_ASCENDING):
+    def getScalaData(self, direction=DIRECTION_ASCENDING):
         '''
-        Get the interval sequence as a :class:~music21.scala.ScalaStorage object
+        Get the interval sequence as a :class:~music21.scala.ScalaData object
         for a particular scale:
         '''
         # get one octave of intervals
-        ss = scala.ScalaStorage()
+        ss = scala.ScalaData()
         ss.setIntervalSequence(self.getIntervals(direction=direction))
         ss.description = self.__repr__()
         return ss
@@ -579,7 +579,7 @@ class AbstractScale(Scale):
             if fp is None:
                 fpLocal = environLocal.getTempFile(ext)
             if fileFormat in ['scala']:
-                ss = self.getScalaStorage(direction=direction)
+                ss = self.getScalaData(direction=direction)
                 sf = scala.ScalaFile(ss) # pass storage to the file
                 sf.open(fpLocal, 'w')
                 sf.write()
@@ -2313,13 +2313,13 @@ class ConcreteScale(Scale):
     # alternative outputs
 
 
-    def getScalaStorage(self):
+    def getScalaData(self):
         '''
-        Return a configured :class:`~music21.scala.ScalaStorage` 
+        Return a configured :class:`~music21.scala.ScalaData` 
         Object for this scale.  It can be used to find interval
         distances in cents between degrees.
         '''
-        ss = self.abstract.getScalaStorage()
+        ss = self.abstract.getScalaData()
         # customize with more specific representation
         ss.description = self.__repr__()
         return ss
@@ -2982,14 +2982,14 @@ class ScalaScale(ConcreteScale):
         
         ConcreteScale.__init__(self, tonic=tonic)
 
-        self._scalaStorage = None
+        self._scalaData = None
         self.description = None
 
         # this might be a raw scala file list
         if scalaString is not None and scalaString.count('\n') > 3:
             # if no match, this might be a complete Scala string
-            self._scalaStorage = scala.ScalaStorage(scalaString)
-            self._scalaStorage.parse()
+            self._scalaData = scala.ScalaData(scalaString)
+            self._scalaData.parse()
         elif scalaString is not None:
             # try to load a named scale from a file path or stored
             # on the scala archive
@@ -2997,13 +2997,13 @@ class ScalaScale(ConcreteScale):
             readFile = scala.parse(scalaString)
             if readFile is None:
                 raise ScaleException("Could not find a file named %s in the scala database" % scalaString)
-            self._scalaStorage = readFile
+            self._scalaData = readFile
         else: # grab a default
-            self._scalaStorage = scala.parse('fj-12tet.scl')    
+            self._scalaData = scala.parse('fj-12tet.scl')    
         self._abstract = AbstractCyclicalScale(
-                         mode=self._scalaStorage.getIntervalSequence())
-        self.type = 'Scala: %s' % self._scalaStorage.fileName
-        self.description = self._scalaStorage.description
+                         mode=self._scalaData.getIntervalSequence())
+        self.type = 'Scala: %s' % self._scalaData.fileName
+        self.description = self._scalaData.description
 
 
 
@@ -3731,7 +3731,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testScalaScaleOutput(self):
         sc = MajorScale('c4')
-        ss = sc.getScalaStorage()
+        ss = sc.getScalaData()
         self.assertEqual(ss.pitchCount, 7)
         msg = '''!
 <music21.scale.MajorScale C major>

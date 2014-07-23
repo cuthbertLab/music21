@@ -171,10 +171,13 @@ class ScalaPitch(object):
 
 
 
-class ScalaStorage(object):
-    '''Object representation of data stored in a Scale scale file. This objeject is used to access Scala information stored in a file. To create a music21 scale with a Scala file, use :class:`~music21.scale.ScalaScale`.
+class ScalaData(object):
+    '''Object representation of data stored in a Scale scale file. This object is used to 
+    access Scala information stored in a file. To create a music21 scale with a Scala file, 
+    use :class:`~music21.scale.ScalaScale`.
 
-    This is not called ScalaScale, as this name clashes with the :class:`~music21.scale.ScalaScale` that uses this object.
+    This is not called ScalaScale, as this name clashes with the 
+    :class:`~music21.scale.ScalaScale` that uses this object.
     '''
     def __init__(self, sourceString=None, fileName=None):
         self.src = sourceString
@@ -301,7 +304,7 @@ class ScalaStorage(object):
 class ScalaFile(object):
     '''
     Interface for reading and writing scala files. 
-    On reading, returns a :class:`~music21.scala.ScalaStorage` object.
+    On reading, returns a :class:`~music21.scala.ScalaData` object.
 
     
     >>> sf = scala.ScalaFile() 
@@ -341,7 +344,7 @@ class ScalaFile(object):
     def readstr(self, strSrc): 
         '''Read a string and process all Tokens. Returns a ABCHandler instance.
         '''
-        ss = ScalaStorage(strSrc, self.fileName)
+        ss = ScalaData(strSrc, self.fileName)
         ss.parse()
         self.data = ss
         return ss
@@ -351,7 +354,7 @@ class ScalaFile(object):
         self.file.write(ws) 
     
     def writestr(self): 
-        if isinstance(self.data, ScalaStorage):
+        if isinstance(self.data, ScalaData):
             return self.data.getFileString()
         # handle Scale or other objects
         
@@ -359,7 +362,7 @@ class ScalaFile(object):
 #-------------------------------------------------------------------------------
 def parse(target):
     '''
-    Get a :class:`~music21.scala.ScalaStorage` object from 
+    Get a :class:`~music21.scala.ScalaData` object from 
     the bundled SCL archive or a file path. 
 
     >>> from music21 import scala
@@ -486,7 +489,7 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
  7/4
  2/1
 '''
-        ss = ScalaStorage(msg)
+        ss = ScalaData(msg)
         ss.parse()
         self.assertEqual(ss.pitchCount, 5)
         self.assertEqual(ss.fileName, 'slendro5_2.scl')
@@ -519,7 +522,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 2/1
 
 '''
-        ss = ScalaStorage(msg)
+        ss = ScalaData(msg)
         ss.parse()
         self.assertEqual(ss.pitchCount, 12)
         self.assertEqual(ss.fileName, 'fj-12tet.scl')
@@ -555,7 +558,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
 
         # test loading a new scala object from adjacent sets
-        ss2 = ScalaStorage()
+        ss2 = ScalaData()
         ss2.setAdjacentCents(ss.getAdjacentCents())
         
         self.assertEqual(["%.9f" % x for x in ss2.getCentsAboveTonic()], ['100.099209825', 

@@ -7817,7 +7817,7 @@ class Stream(base.Music21Object):
         return returnObj
 
 
-    def quantize(self, quarterLengthDivisors=[4, 3],
+    def quantize(self, quarterLengthDivisors=(4, 3),
             processOffsets=True, processDurations=True, inPlace=False, recurse=True):
         '''
         Quantize time values in this Stream by snapping offsets
@@ -7826,9 +7826,9 @@ class Stream(base.Music21Object):
         value found closest to a divisor multiple will be used.
 
         The `quarterLengthDivisors` provides a flexible way to provide quantization
-        settings. For example, [2] will snap all events to eighth note grid.
-        [4, 3] will snap events to sixteenth notes and eighth note triplets,
-        whichever is closer. [4, 6] will snap events to sixteenth notes and
+        settings. For example, (2,) will snap all events to eighth note grid.
+        (4, 3) will snap events to sixteenth notes and eighth note triplets,
+        whichever is closer. (4, 6) will snap events to sixteenth notes and
         sixteenth note triplets.
 
         `processOffsets` determines whether the Offsets are quantized.
@@ -7869,10 +7869,11 @@ class Stream(base.Music21Object):
         def bestMatch(target, divisors):
             found = []
             for div in divisors:
-                match, error = common.nearestMultiple(target, (1.0/div))
-                found.append((error, match)) # reverse for sorting
+                match, error, signedError = common.nearestMultiple(target, (1.0/div))
+                found.append((error, match, signedError)) # reverse for sorting
             # get first, and leave out the error
-            return sorted(found)[0][1]
+            bestMatchTuple = sorted(found)[0]
+            return bestMatchTuple
 
         # if we have a min of .25 (sixteenth)
         # quarterLengthMin = quarterLengthDivisors[0]
@@ -7892,15 +7893,17 @@ class Stream(base.Music21Object):
             for e in useStream._elements:
                 if processOffsets:
                     o = e.getOffsetBySite(useStream)
-                    oNew = bestMatch(o, quarterLengthDivisors)
-                    #oNew = common.nearestMultiple(o, quarterLengthMin)
+                    unused_error, oNew, signedError = bestMatch(o, quarterLengthDivisors)
                     e.setOffsetBySite(useStream, oNew)
+                    if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:
+                        e.editorial.misc['offsetQuantizationError'] = signedError
                 if processDurations:
                     if e.duration is not None:
                         ql = e.duration.quarterLength
-                        qlNew = bestMatch(ql, quarterLengthDivisors)
-                        #qlNew = common.nearestMultiple(ql, quarterLengthMin)
+                        unused_error, qlNew, signedError = bestMatch(ql, quarterLengthDivisors)
                         e.duration.quarterLength = qlNew
+                        if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:
+                            e.editorial.misc['quarterLengthQuantizationError'] = signedError
 
         if inPlace is False:
             return returnStream
