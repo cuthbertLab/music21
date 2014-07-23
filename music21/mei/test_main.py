@@ -40,6 +40,7 @@ from music21 import stream
 from music21 import instrument
 from music21 import key
 from music21 import meter
+from music21 import interval
 
 # six
 from six.moves import xrange  # pylint: disable=redefined-builtin
@@ -156,6 +157,54 @@ class TestThings(unittest.TestCase):
         self.assertIsInstance(actual, key.KeySignature)
         self.assertEqual(expectedSharps, actual.sharps)
         self.assertEqual(expectedMode, actual.mode)
+
+    def testTranspositionFromAttrs1(self):
+        '''_transpositionFromAttrs(): descending transposition (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'trans.semi': '-3', 'trans.diat': '-2'})
+        expectedName = 'm-3'
+        actual = main._transpositionFromAttrs(elem)
+        self.assertIsInstance(actual, interval.Interval)
+        self.assertEqual(expectedName, actual.directedName)
+
+    def testTranspositionFromAttrs2(self):
+        '''_transpositionFromAttrs(): ascending transposition (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'trans.semi': '7', 'trans.diat': '4'})
+        expectedName = 'P5'
+        actual = main._transpositionFromAttrs(elem)
+        self.assertIsInstance(actual, interval.Interval)
+        self.assertEqual(expectedName, actual.directedName)
+
+    def testTranspositionFromAttrs3(self):
+        '''_transpositionFromAttrs(): large ascending interval (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'trans.semi': '19', 'trans.diat': '11'})
+        expectedName = 'P12'
+        actual = main._transpositionFromAttrs(elem)
+        self.assertIsInstance(actual, interval.Interval)
+        self.assertEqual(expectedName, actual.directedName)
+
+    def testTranspositionFromAttrs4(self):
+        '''_transpositionFromAttrs(): alternate octave spec (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'trans.semi': '12', 'trans.diat': '0'})
+        expectedName = 'P8'
+        actual = main._transpositionFromAttrs(elem)
+        self.assertIsInstance(actual, interval.Interval)
+        self.assertEqual(expectedName, actual.directedName)
+
+    def testTranspositionFromAttrs5(self):
+        '''_transpositionFromAttrs(): alternate large descending interval (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'trans.semi': '-19', 'trans.diat': '-4'})
+        expectedName = 'P-12'
+        actual = main._transpositionFromAttrs(elem)
+        self.assertIsInstance(actual, interval.Interval)
+        self.assertEqual(expectedName, actual.directedName)
+
+    def testTranspositionFromAttrs6(self):
+        '''_transpositionFromAttrs(): alternate ascending sixteenth interval (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'trans.semi': '26', 'trans.diat': '1'})
+        expectedName = 'M16'
+        actual = main._transpositionFromAttrs(elem)
+        self.assertIsInstance(actual, interval.Interval)
+        self.assertEqual(expectedName, actual.directedName)
 
 
 #------------------------------------------------------------------------------

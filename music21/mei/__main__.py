@@ -618,31 +618,41 @@ def _keySigFromAttrs(elem):
 
 
 def _transpositionFromAttrs(elem):
-    # TODO: write tests
     '''
-    From any tag with the @trans.diat (and optionally the @trans.semi) attributes, make an
-    :class:`Interval` that represents the interval of transposition from written to concert pitch.
+    From any element with the @trans.diat and @trans.semi attributes, make an :class:`Interval` that
+    represents the interval of transposition from written to concert pitch.
 
     :param :class:`~xml.etree.ElementTree.Element` elem: An :class:`Element` with the @trans.diat
-        (and optionally @trans.semi) attributes.
+        and @trans.semi attributes.
     :returns: The interval of transposition from written to concert pitch.
     :rtype: :class:`music21.interval.Interval`
     '''
+    transDiat = int(elem.get('trans.diat', 0))
+    transSemi = int(elem.get('trans.semi', 0))
+
+    # If the difference between transSemi and transDiat is greater than five per octave...
+    if abs(transSemi - transDiat) > 5 * (abs(transSemi) // 12 + 1):
+        # ... we need to add octaves to transDiat so it's the proper size. Otherwise,
+        #     intervalFromGenericAndChromatic() tries to create things like AAAAAAAAA5. Except it
+        #     actually just fails.
+        # NB: we test this against transSemi because transDiat could be 0 when transSemi is a
+        #     multiple of 12 *either* greater or less than 0.
+        if transSemi < 0:
+            transDiat -= 7 * (abs(transSemi) // 12)
+        elif transSemi > 0:
+            transDiat += 7 * (abs(transSemi) // 12)
+
     # NB: MEI uses zero-based unison rather than 1-based unison, so for music21 we must make every
     #     diatonic interval one greater than it was. E.g., '@trans.diat="2"' in MEI means to
     #     "transpose up two diatonic steps," which music21 would rephrase as "transpose up by a
     #     diatonic third."
-    iFGAC = interval.intervalFromGenericAndChromatic
-    if int(elem.get('trans.diat')) < 0:
-        return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
-                     interval.ChromaticInterval(int(elem.get('trans.diat')) - 1))
-    else:
-        # TODO: sometimes I get this error:
-        # music21.interval.IntervalException: cannot get a specifier for a note with this many
-        #         semitones off of Perfect: -18
-        # I think it's when there's a very large transposition (duh)
-        return iFGAC(interval.GenericInterval(int(elem.get('trans.semi'))),
-                     interval.ChromaticInterval(int(elem.get('trans.diat')) + 1))
+    if transDiat < 0:
+        transDiat -= 1
+    elif transDiat > 0:
+        transDiat += 1
+
+    return interval.intervalFromGenericAndChromatic(interval.GenericInterval(transDiat),
+                                                    interval.ChromaticInterval(transSemi))
 
 
 def _barlineFromAttr(attr):
