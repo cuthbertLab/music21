@@ -598,7 +598,6 @@ def _timeSigFromAttrs(elem):
 
 
 def _keySigFromAttrs(elem):
-    # TODO: write tests
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.

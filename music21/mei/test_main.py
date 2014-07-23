@@ -138,6 +138,25 @@ class TestThings(unittest.TestCase):
         actual = main._timeSigFromAttrs(elem)
         self.assertEqual(expectedRatioString, actual.ratioString)
 
+    def testKeySigFromAttrs1(self):
+        '''_keySigFromAttrs(): using @key.pname, @key.accid, and @key.mode (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'key.pname': 'B', 'key.accid': 'f',
+                                                          'key.mode': 'minor'})
+        expectedTPNWC = 'b-'
+        actual = main._keySigFromAttrs(elem)
+        self.assertIsInstance(actual, key.Key)
+        self.assertEqual(expectedTPNWC, actual.tonicPitchNameWithCase)
+
+    def testKeySigFromAttrs2(self):
+        '''_keySigFromAttrs(): using @key.sig, and @key.mode (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'key.sig': '6s', 'key.mode': 'minor'})
+        expectedSharps = 6
+        expectedMode = 'minor'
+        actual = main._keySigFromAttrs(elem)
+        self.assertIsInstance(actual, key.KeySignature)
+        self.assertEqual(expectedSharps, actual.sharps)
+        self.assertEqual(expectedMode, actual.mode)
+
 
 #------------------------------------------------------------------------------
 class TestAttrTranslators(unittest.TestCase):
