@@ -114,6 +114,7 @@ def convertFromString(dataStr):
     :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
     :rtype: :class:`music21.stream.Stream`
     '''
+    environLocal.printDebug('*** reached convertFromString()')
     documentRoot = ETree.fromstring(dataStr)
     if isinstance(documentRoot, ETree.ElementTree):
         documentRoot = documentRoot.getroot()
@@ -151,11 +152,15 @@ def convertFromString(dataStr):
         _innerAttrSetter(eachSlur.get('startid'), 'm21SlurStart', thisIdLocal)
         _innerAttrSetter(eachSlur.get('endid'), 'm21SlurEnd', thisIdLocal)
 
+    environLocal.printDebug('*** finished slurs')
+
     # pre-processing for <tie> tags
     # (this essentially converts <tie> tags into @tie attributes)
     for eachTie in documentRoot.findall('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
         _innerAttrSetter(eachTie.get('startid'), 'tie', ' i', True)
         _innerAttrSetter(eachTie.get('endid'), 'tie', ' t', True)
+
+    environLocal.printDebug('*** finished ties')
 
     # TODO: probably clean this up
     # pre-processing <tupletSpan> tags
@@ -202,6 +207,8 @@ def convertFromString(dataStr):
                     if eachObject.get(_XMLID, '') == endid:
                         foundTheEnd = True
                         break
+
+    environLocal.printDebug('*** finished tuplets')
 
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
@@ -276,6 +283,7 @@ def convertFromString(dataStr):
                 environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
 
     # TODO: check if there's anything left in "inNextMeasure"
+    environLocal.printDebug('*** finished sections')
 
     # Convert the dict to a Score
     # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
@@ -1757,7 +1765,7 @@ def tupletSpanFromElement(elem, documentRoot):
     :rtype: NoneType
     '''
     # TODO: write this function
-    pass
+    environLocal.printDebug('trying to use tupletSpanFromElement()')
 
 
 def layerFromElement(elem, overrideN=None, slurBundle=None):
