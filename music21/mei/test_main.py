@@ -131,6 +131,13 @@ class TestThings(unittest.TestCase):
         except main.MeiValidityError as mvErr:
             self.assertEqual(main._SEEMINGLY_NO_PARTS, mvErr.args[0])
 
+    def testTimeSigFromAttrs(self):
+        '''_timeSigFromAttrs(): that it works (integration test)'''
+        elem = ETree.Element('{mei}staffDef', attrib={'meter.count': '3', 'meter.unit': '8'})
+        expectedRatioString = '3/8'
+        actual = main._timeSigFromAttrs(elem)
+        self.assertEqual(expectedRatioString, actual.ratioString)
+
 
 #------------------------------------------------------------------------------
 class TestAttrTranslators(unittest.TestCase):

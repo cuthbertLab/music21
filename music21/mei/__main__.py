@@ -586,7 +586,6 @@ def _sharpsFromAttr(signature):
 # Helper Functions
 #------------------------------------------------------------------------------
 def _timeSigFromAttrs(elem):
-    # TODO: write tests
     '''
     From any tag with @meter.count and @meter.unit attributes, make a :class:`TimeSignature`.
 
