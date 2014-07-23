@@ -225,7 +225,7 @@ def convertFromString(dataStr):
             pass
 
     # process a <scoreDef> tag that happen before a <section> tag
-    scoreDefResults = documentRoot.find('*//{mei}score/{mei}scoreDef'.format(mei=_MEINS))
+    scoreDefResults = documentRoot.find('.//{mei}music//{mei}scoreDef'.format(mei=_MEINS))
     if scoreDefResults is not None:
         # scoreDefResults would be None if there is no <scoreDef> outside of a <section>, but...
         # TODO: we don't actually know whether this <scoreDef> happens before or between <section>
