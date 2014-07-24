@@ -208,6 +208,20 @@ class TestThings(unittest.TestCase):
         self.assertIsInstance(actual, interval.Interval)
         self.assertEqual(expectedName, actual.directedName)
 
+    def testRemoveOctothorpe1(self):
+        '''removeOctothorpe(): when there's an octothorpe'''
+        xmlid = '#14ccdc11-8090-49f4-b094-5935f534131a'
+        expected = '14ccdc11-8090-49f4-b094-5935f534131a'
+        actual = main.removeOctothorpe(xmlid)
+        self.assertEqual(expected, actual)
+
+    def testRemoveOctothorpe2(self):
+        '''removeOctothorpe(): when there's not an octothorpe'''
+        xmlid = 'b05c3007-bc49-4bc2-a970-bb5700cb634d'
+        expected = 'b05c3007-bc49-4bc2-a970-bb5700cb634d'
+        actual = main.removeOctothorpe(xmlid)
+        self.assertEqual(expected, actual)
+
 
 #------------------------------------------------------------------------------
 class TestAttrTranslators(unittest.TestCase):
