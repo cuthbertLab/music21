@@ -153,22 +153,34 @@ class LilypondConverter(object):
         self.variantColors = ['blue', 'red', 'purple', 'green', 'orange', 'yellow', 'grey']
         self.coloredVariants = False
         self.variantMode = False
+        self.LILYEXEC = None
+        
 
-    def setupTools(self):
+    def findLilyExec(self):
         if os.path.exists(environLocal['lilypondPath']):
             LILYEXEC = environLocal['lilypondPath']
         else:
             if sys.platform == "darwin":
                 LILYEXEC = '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'
+                if not os.path.exists(LILYEXEC):
+                    LILYEXEC = 'lilypond'
             elif sys.platform == 'win32' and os.path.exists('c:/Program Files (x86)'):
                 LILYEXEC = 'c:/Program\ Files\ (x86)/lilypond/usr/bin/lilypond'
+                if not os.path.exists(LILYEXEC) and not os.path.exists(LILYEXEC + '.exe'):
+                    LILYEXEC = 'lilypond'
             elif sys.platform == 'win32':
                 LILYEXEC = 'c:/Program\ Files/lilypond/usr/bin/lilypond'
+                if not os.path.exists(LILYEXEC) and not os.path.exists(LILYEXEC + '.exe'):
+                    LILYEXEC = 'lilypond'
             else:
                 LILYEXEC = 'lilypond'
-        self.LILYEXEC = LILYEXEC
 
-        command = self.LILYEXEC + ' --version'
+        self.LILYEXEC = LILYEXEC
+        return LILYEXEC
+
+    def setupTools(self):
+        LILYEXEC = self.findLilyExec()
+        command = LILYEXEC + ' --version'
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
         versionString = proc.stdout.readline()
         if six.PY3:
@@ -201,7 +213,6 @@ class LilypondConverter(object):
         else:
             self.backendString = '--backend='
         # I had a note that said 2.12 and > should use 'self.backendString = '--formats=' ' but doesn't seem true
-
 
     def newContext(self, newContext):
         self.storedContexts.append(self.context)
@@ -2287,7 +2298,7 @@ class LilypondConverter(object):
         If skipWriting is True and a fileName is given then it will run that file through lilypond instead
 
         '''
-
+        LILYEXEC = self.findLilyExec()
         if fileName is None:
             fileName = self.writeLyFile(ext = 'ly')
         else:
@@ -2295,7 +2306,7 @@ class LilypondConverter(object):
                 fileName = self.writeLyFile(ext = 'ly', fp = fileName)
 
 
-        lilyCommand = '"' + self.LILYEXEC + '" '
+        lilyCommand = '"' + LILYEXEC + '" '
         if format is not None:
             lilyCommand += "-f " + format + " "
         if backend is not None:
@@ -2415,6 +2426,7 @@ class LilypondConverter(object):
 
         most users will just call stream.Stream.write('lily.svg') on a stream.
         '''
+        self.headerScheme.content = "" # clear header        
         lilyFile = self.runThroughLily(format = 'svg', backend = 'svg', fileName = fileName)
         return lilyFile
 
@@ -2512,7 +2524,7 @@ class TestExternal(unittest.TestCase):
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
     #music21.mainTest(TestExternal, 'noDocTest')
 
 #------------------------------------------------------------------------------

@@ -831,20 +831,20 @@ def lessThan(x, y = 0.0, grain=1e-7):
 
 
 def nearestMultiple(n, unit):
-    '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as the difference (error) to
-    seven significant digits.
+    '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as 
+    the absolute difference (error) to seven significant digits and the signed difference.
 
 
     >>> print(common.nearestMultiple(.25, .25))
-    (0.25, 0.0)
+    (0.25, 0.0, 0.0)
     >>> print(common.nearestMultiple(.35, .25))
-    (0.25, 0.1...)
+    (0.25, 0.1..., 0.1...)
+    >>> print(common.nearestMultiple(.20, .25))
+    (0.25, 0.05..., -0.05...)
 
     Note that this one also has an error of .1 but it's a positive error off of 0.5
     >>> print(common.nearestMultiple(.4, .25))
-    (0.5, 0.1...)
-
-
+    (0.5, 0.1..., -0.1...)
 
     >>> common.nearestMultiple(.4, .25)[0]
     0.5
@@ -852,6 +852,12 @@ def nearestMultiple(n, unit):
     23404.0
     >>> common.nearestMultiple(23404.134, .125)[0]
     23404.125
+    
+    Error is always positive, but signed difference can be negative.
+    
+    >>> common.nearestMultiple(23404 - 0.0625, .125)
+    (23404.0, 0.0625, -0.0625)
+
     >>> common.nearestMultiple(.001, .125)[0]
     0.0
 
@@ -881,9 +887,9 @@ def nearestMultiple(n, unit):
         raise Exception('cannot place n between multiples: %s, %s', matchLow, matchHigh)
 
     if n >= matchLow and n < (matchLow + halfUnit):
-        return matchLow, round(n - matchLow, 7)
+        return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
     elif n >= (matchHigh - halfUnit) and n <= matchHigh:
-        return matchHigh, round(matchHigh - n, 7)
+        return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
 def standardDeviation(coll, bassel=False):
