@@ -42,6 +42,7 @@ from music21 import key
 from music21 import meter
 from music21 import interval
 from music21 import bar
+from music21 import tie
 
 # six
 from six.moves import xrange  # pylint: disable=redefined-builtin
@@ -383,6 +384,38 @@ class TestAttrTranslators(unittest.TestCase):
         actual = main._barlineFromAttr(right)
         self.assertEqual(type(expected), type(actual))
         self.assertEqual(expected.style, expected.style)
+
+    def testTieFromAttr1(self):
+        '''_tieFromAttr(): "i"'''
+        right = ''
+        expected = tie.Tie('start')
+        actual = main._tieFromAttr(right)
+        self.assertEqual(type(expected), type(actual))
+        self.assertEqual(expected.type, expected.type)
+
+    def testTieFromAttr2(self):
+        '''_tieFromAttr(): "ti"'''
+        right = ''
+        expected = tie.Tie('continue')
+        actual = main._tieFromAttr(right)
+        self.assertEqual(type(expected), type(actual))
+        self.assertEqual(expected.type, expected.type)
+
+    def testTieFromAttr3(self):
+        '''_tieFromAttr(): "m"'''
+        right = ''
+        expected = tie.Tie('continue')
+        actual = main._tieFromAttr(right)
+        self.assertEqual(type(expected), type(actual))
+        self.assertEqual(expected.type, expected.type)
+
+    def testTieFromAttr4(self):
+        '''_tieFromAttr(): "t"'''
+        right = ''
+        expected = tie.Tie('stop')
+        actual = main._tieFromAttr(right)
+        self.assertEqual(type(expected), type(actual))
+        self.assertEqual(expected.type, expected.type)
 
 
 #------------------------------------------------------------------------------

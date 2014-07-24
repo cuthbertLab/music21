@@ -679,7 +679,6 @@ def _barlineFromAttr(attr):
 
 
 def _tieFromAttr(attr):
-    # TODO: write tests
     '''
     Convert a @tie attribute to the required :class:`Tie` object.
 
