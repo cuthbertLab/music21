@@ -231,6 +231,15 @@ class TestThings(unittest.TestCase):
         self.assertEqual(5, actual)
         mockMakeList.assert_called_once_with('yes')
 
+    @mock.patch('music21.mei.__main__._accidentalFromAttr')
+    def testAccidFromElement(self, mockAccid):
+        '''accidFromElement(): very straight-forward test'''
+        elem = ETree.Element('accid', attrib={'accid': 'yes'})
+        mockAccid.return_value = 5
+        actual = main.accidFromElement(elem)
+        self.assertEqual(5, actual)
+        mockAccid.assert_called_once_with('yes')
+
 
 #------------------------------------------------------------------------------
 class TestAttrTranslators(unittest.TestCase):
