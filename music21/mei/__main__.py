@@ -695,6 +695,7 @@ def _tieFromAttr(attr):
 
 
 def _addSlurToThing(m21Start, m21End, attr, thing, slurBundle):
+    # TODO: write tests
     '''
     If relevant, add a slur to an object. Both "thing" and "slurBundle" must not be ``None``, but
     the first three arguments may be ``None``. To trigger a slur, either "m21Start", "m21End",

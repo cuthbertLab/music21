@@ -222,6 +222,15 @@ class TestThings(unittest.TestCase):
         actual = main.removeOctothorpe(xmlid)
         self.assertEqual(expected, actual)
 
+    @mock.patch('music21.mei.__main__._makeArticList')
+    def testArticFromElement(self, mockMakeList):
+        '''articFromElement(): very straight-forward test'''
+        elem = ETree.Element('artic', attrib={'artic': 'yes'})
+        mockMakeList.return_value = 5
+        actual = main.articFromElement(elem)
+        self.assertEqual(5, actual)
+        mockMakeList.assert_called_once_with('yes')
+
 
 #------------------------------------------------------------------------------
 class TestAttrTranslators(unittest.TestCase):
