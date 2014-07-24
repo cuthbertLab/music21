@@ -1945,6 +1945,8 @@ def staffFromElement(elem, slurBundle=None):
             # check for objects that must appear in the Measure, but are currently in the Voice
             for eachThing in thisLayer:
                 if isinstance(eachThing, (clef.Clef,)):
+                    # TODO: this causes problems because a clef-change part-way through the measure
+                    #       won't end up appearing part-way through
                     post.append(eachThing)
                     thisLayer.remove(eachThing)
             post.append(thisLayer)
@@ -2041,15 +2043,16 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
     tagToFunction = {}
 
     # track the bar's duration
-    barDuration = None
+    maxBarDuration = None
 
     # iterate all immediate children
     for eachTag in elem.findall('*'):
         if staffTagName == eachTag.tag:
             post[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag, slurBundle=slurBundle),
                                                     number=int(elem.get('n', backupNum)))
-            if barDuration is None:
-                barDuration = post[eachTag.get('n')].duration.quarterLength
+            thisBarDuration = post[eachTag.get('n')].duration.quarterLength
+            if maxBarDuration is None or maxBarDuration < thisBarDuration:
+                maxBarDuration = thisBarDuration
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             post[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag, slurBundle)
@@ -2059,9 +2062,19 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
     for eachN in expectedNs:
         if eachN not in post:
-            restVoice = stream.Voice([note.Rest(quarterLength=barDuration)])
+            restVoice = stream.Voice([note.Rest(quarterLength=maxBarDuration)])
             restVoice.id = '1'
             post[eachN] = stream.Measure([restVoice], number=int(elem.get('n', backupNum)))
+
+    # see if any of the Measures are shorter than the others; if so, check for <mRest/> tags that
+    # didn't have a @dur set
+    # TODO: write explanation and test
+    for eachN in expectedNs:
+        if post[eachN].duration.quarterLength < maxBarDuration:
+            for eachVoice in post[eachN]:
+                for eachThing in eachVoice:
+                    if isinstance(eachThing, note.Rest):
+                        eachThing.duration = duration.Duration(maxBarDuration - post[eachN].duration.quarterLength + eachThing.duration.quarterLength)
 
     # assign left and right barlines
     if elem.get('left') is not None:
