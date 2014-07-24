@@ -656,7 +656,6 @@ def _transpositionFromAttrs(elem):
 
 
 def _barlineFromAttr(attr):
-    # TODO: write tests
     '''
     Use :func:`_attrTranslator` to convert the value of a "left" or "right" attribute to a
     list of :class:`Barline` or :class:`Repeat`. Note this must be a list because an end-repeat and

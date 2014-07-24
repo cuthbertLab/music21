@@ -41,6 +41,7 @@ from music21 import instrument
 from music21 import key
 from music21 import meter
 from music21 import interval
+from music21 import bar
 
 # six
 from six.moves import xrange  # pylint: disable=redefined-builtin
@@ -350,6 +351,38 @@ class TestAttrTranslators(unittest.TestCase):
         actual = main._getOctaveShift(dis, disPlace)
         self.assertEqual(expected, actual)
 
+    def testBarlineFromAttr1(self):
+        '''_barlineFromAttr(): rptboth'''
+        right = 'rptboth'
+        expected = None
+        actual = main._barlineFromAttr(right)
+        self.assertEqual(type(expected), type(actual))
+
+    def testBarlineFromAttr2(self):
+        '''_barlineFromAttr(): rptend'''
+        right = 'rptend'
+        expected = bar.Repeat('end', times=2)
+        actual = main._barlineFromAttr(right)
+        self.assertEqual(type(expected), type(actual))
+        self.assertEqual(expected.direction, expected.direction)
+        self.assertEqual(expected.times, expected.times)
+
+    def testBarlineFromAttr3(self):
+        '''_barlineFromAttr(): rptstart'''
+        right = 'rptstart'
+        expected = bar.Repeat('start')
+        actual = main._barlineFromAttr(right)
+        self.assertEqual(type(expected), type(actual))
+        self.assertEqual(expected.direction, expected.direction)
+        self.assertEqual(expected.times, expected.times)
+
+    def testBarlineFromAttr4(self):
+        '''_barlineFromAttr(): end (--> final)'''
+        right = 'end'
+        expected = bar.Barline('final')
+        actual = main._barlineFromAttr(right)
+        self.assertEqual(type(expected), type(actual))
+        self.assertEqual(expected.style, expected.style)
 
 
 #------------------------------------------------------------------------------
