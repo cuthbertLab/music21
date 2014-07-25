@@ -50,6 +50,7 @@ from music21 import interval
 from music21 import bar
 from music21 import spanner
 from music21 import tie
+from music21 import metadata
 
 from music21 import environment
 _MOD = 'mei.__main__'
@@ -291,10 +292,11 @@ def convertFromString(dataStr):
     parsed = [parsed[n] for n in allPartNs]
     post = stream.Score(parsed)
 
+    # insert metadata
+    post.metadata = makeMetadata(documentRoot)
+
     # put slurs in the Score
     post.append(slurBundle.list)
-    #for eachSlur in slurBundle:
-        #post.append(eachSlur)
 
     return post
 
@@ -782,6 +784,71 @@ def removeOctothorpe(xmlid):
         return xmlid[1:]
     else:
         return xmlid
+
+
+def makeMetadata(fromThis):
+    # TODO: tests
+    # TODO: break into sub-functions
+    # TODO/NOTE: only returns a single Metadata objects atm
+    '''
+    Produce metadata objects for all the metadata stored in the MEI header.
+
+    :param fromThis: The MEI file's root tag.
+    :type fromThis: :class:`~xml.etree.ElementTree.Element`
+    :returns: Metadata objects that hold the metadata stored in the MEI header.
+    :rtype: sequence of :class:`music21.metadata.Metadata` and :class:`~music21.metadata.RichMetadata`.
+    '''
+    fromThis = fromThis.find('.//{}work'.format(_MEINS))
+    if fromThis is None:
+        return []
+
+    meta = metadata.Metadata()
+    #richMeta = metadata.RichMetadata()
+
+    for eachTag in fromThis.findall('*'):
+        if eachTag.tag == '{}titleStmt'.format(_MEINS):
+            for subTag in eachTag.findall('*'):
+                if subTag.tag == '{}title'.format(_MEINS):
+                    if subTag.get('type', '') == 'subtitle':
+                        meta.subtitle = subTag.text
+                    elif meta.title is None:
+                        meta.title = subTag.text
+                elif subTag.tag == '{}respStmt'.format(_MEINS):
+                    for subSubTag in subTag.findall('*'):
+                        if subSubTag.tag == '{}persName'.format(_MEINS):
+                            if subSubTag.get('role') == 'composer':
+                                meta.composer = subSubTag.text
+
+        elif eachTag.tag == '{}history'.format(_MEINS):
+            for subTag in eachTag.findall('*'):
+                if subTag.tag == '{}creation'.format(_MEINS):
+                    for subSubTag in subTag.findall('*'):
+                        if subSubTag.tag == '{}date'.format(_MEINS):
+                            if subSubTag.text is None:
+                                dateStart, dateEnd = None, None
+                                if subSubTag.get('isodate') is not None:
+                                    meta.date = subSubTag.get('isodate')
+                                elif subSubTag.get('notbefore') is not None:
+                                    dateStart = subSubTag.get('notbefore')
+                                elif subSubTag.get('startdate') is not None:
+                                    dateStart = subSubTag.get('startdate')
+
+                                if subSubTag.get('notafter') is not None:
+                                    dateEnd = subSubTag.get('notafter')
+                                elif subSubTag.get('enddate') is not None:
+                                    dateEnd = subSubTag.get('enddate')
+
+                                if dateStart is not None and dateEnd is not None:
+                                    meta.date = metadata.DateBetween((dateStart, dateEnd))
+                            else:
+                                meta.date = subSubTag.text
+
+        elif eachTag.tag == '{}tempo'.format(_MEINS):
+            # NB: this has to be done after a proper, movement-specific title would have been set
+            if meta.movementName is None:
+                meta.movementName = eachTag.text
+
+    return meta
 
 
 # Element-Based Converter Functions
