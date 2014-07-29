@@ -587,7 +587,7 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.mei.__main__.articFromElement')
     def testUnit4(self, mockArticFE, mockNote):
         '''
-        noteFromElement(): processing an element (<artic>) held within
+        noteFromElement(): processing element (<artic>) held within
         (mostly-unit test; mock out Note, articFromElement(), and the ElementTree.Element)
         '''
         elem = mock.MagicMock()
@@ -595,7 +595,7 @@ class TestNoteFromElement(unittest.TestCase):
         mockArtic = mock.MagicMock('<artic>')
         mockArticTag = mock.PropertyMock(return_value='{}artic'.format(_MEINS))
         type(mockArtic).tag = mockArticTag
-        elem.findall.return_value = [mockArtic]
+        elem.iterfind.return_value = [mockArtic]
         # make the expected order of calls to (and the return values for) elem.get()
         expectedElemOrder = [mock.ANY for _ in xrange(9)]  # not testing the calls from previous unit tests
         elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
@@ -1062,15 +1062,15 @@ class TestLayerFromElement(unittest.TestCase):
         elemGetReturns = [theNAttribute, theNAttribute]
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) else None
         expectedGetOrder = [mock.call('n'), mock.call('n')]
-        findallReturn = [mock.MagicMock(name='note1'),
+        iterfindReturn = [mock.MagicMock(name='note1'),
                          mock.MagicMock(name='imaginary'),
                          mock.MagicMock(name='note2')]
-        findallReturn[0].tag = '{}note'.format(main._MEINS)
-        findallReturn[1].tag = '{}imaginary'.format(main._MEINS)
-        findallReturn[2].tag = '{}note'.format(main._MEINS)
-        elem.findall = mock.MagicMock(return_value=findallReturn)
+        iterfindReturn[0].tag = '{}note'.format(main._MEINS)
+        iterfindReturn[1].tag = '{}imaginary'.format(main._MEINS)
+        iterfindReturn[2].tag = '{}note'.format(main._MEINS)
+        elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # "MNFE" is "mockNoteFromElement"
-        expectedMNFEOrder = [mock.call(findallReturn[0], None), mock.call(findallReturn[2], None)]
+        expectedMNFEOrder = [mock.call(iterfindReturn[0], None), mock.call(iterfindReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
@@ -1078,7 +1078,7 @@ class TestLayerFromElement(unittest.TestCase):
 
         actual = main.layerFromElement(elem)
 
-        elem.findall.assert_called_once_with('*')
+        elem.iterfind.assert_called_once_with('*')
         self.assertEqual(mockVoice.return_value, actual)
         self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
         mockVoice.assert_called_once_with()
@@ -1093,15 +1093,15 @@ class TestLayerFromElement(unittest.TestCase):
         Same as testUnit1a() *but* with ``overrideN`` provided.
         '''
         elem = mock.MagicMock()
-        findallReturn = [mock.MagicMock(name='note1'),
+        iterfindReturn = [mock.MagicMock(name='note1'),
                          mock.MagicMock(name='imaginary'),
                          mock.MagicMock(name='note2')]
-        findallReturn[0].tag = '{}note'.format(main._MEINS)
-        findallReturn[1].tag = '{}imaginary'.format(main._MEINS)
-        findallReturn[2].tag = '{}note'.format(main._MEINS)
-        elem.findall = mock.MagicMock(return_value=findallReturn)
+        iterfindReturn[0].tag = '{}note'.format(main._MEINS)
+        iterfindReturn[1].tag = '{}imaginary'.format(main._MEINS)
+        iterfindReturn[2].tag = '{}note'.format(main._MEINS)
+        elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # "MNFE" is "mockNoteFromElement"
-        expectedMNFEOrder = [mock.call(findallReturn[0], None), mock.call(findallReturn[2], None)]
+        expectedMNFEOrder = [mock.call(iterfindReturn[0], None), mock.call(iterfindReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
@@ -1110,7 +1110,7 @@ class TestLayerFromElement(unittest.TestCase):
 
         actual = main.layerFromElement(elem, overrideN)
 
-        elem.findall.assert_called_once_with('*')
+        elem.iterfind.assert_called_once_with('*')
         self.assertEqual(mockVoice.return_value, actual)
         self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
         mockVoice.assert_called_once_with()
@@ -1126,13 +1126,13 @@ class TestLayerFromElement(unittest.TestCase):
         '''
         elem = mock.MagicMock()
         elem.get.return_value = None
-        findallReturn = [mock.MagicMock(name='note1'),
+        iterfindReturn = [mock.MagicMock(name='note1'),
                          mock.MagicMock(name='imaginary'),
                          mock.MagicMock(name='note2')]
-        findallReturn[0].tag = '{}note'.format(main._MEINS)
-        findallReturn[1].tag = '{}imaginary'.format(main._MEINS)
-        findallReturn[2].tag = '{}note'.format(main._MEINS)
-        elem.findall = mock.MagicMock(return_value=findallReturn)
+        iterfindReturn[0].tag = '{}note'.format(main._MEINS)
+        iterfindReturn[1].tag = '{}imaginary'.format(main._MEINS)
+        iterfindReturn[2].tag = '{}note'.format(main._MEINS)
+        elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # NB: we call the layerFromElement() twice, so we need twice the return values here
         # "MNFE" is "mockNoteFromElement"
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2',
@@ -1235,7 +1235,7 @@ class TestStaffFromElement(unittest.TestCase):
         findallReturn[0].tag = '{}layer'.format(main._MEINS)
         findallReturn[1].tag = '{}layer'.format(main._MEINS)
         findallReturn[2].tag = '{}layer'.format(main._MEINS)
-        elem.findall = mock.MagicMock(return_value=findallReturn)
+        elem.iterfind = mock.MagicMock(return_value=findallReturn)
         # "MLFE" is "mockLayerFromElement"
         expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1), slurBundle=None)
                              for i in xrange(len(findallReturn))]
@@ -1245,7 +1245,7 @@ class TestStaffFromElement(unittest.TestCase):
 
         actual = main.staffFromElement(elem)
 
-        elem.findall.assert_called_once_with('*')
+        elem.iterfind.assert_called_once_with('*')
         self.assertEqual(expected, actual)
         self.assertSequenceEqual(expectedMLFEOrder, mockLayerFromElement.call_args_list)
 

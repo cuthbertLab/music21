@@ -143,7 +143,7 @@ def convertFromString(dataStr):
 
     # pre-processing for <slur> tags
     slurBundle = spanner.SpannerBundle()
-    for eachSlur in documentRoot.findall('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
+    for eachSlur in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
         # TODO: slurs with @tstamp
         thisIdLocal = str(uuid4())
         thisSlur = spanner.Slur()
@@ -157,7 +157,7 @@ def convertFromString(dataStr):
 
     # pre-processing for <tie> tags
     # (this essentially converts <tie> tags into @tie attributes)
-    for eachTie in documentRoot.findall('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
+    for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
         _innerAttrSetter(eachTie.get('startid'), 'tie', ' i', True)
         _innerAttrSetter(eachTie.get('endid'), 'tie', ' t', True)
 
@@ -165,7 +165,7 @@ def convertFromString(dataStr):
 
     # TODO: probably clean this up
     # pre-processing <tupletSpan> tags
-    for eachTuplet in documentRoot.findall('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
+    for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
         if eachTuplet.get('plist') is not None:
             # Properly-encoded <tupletSpan> elements should have a @plist that enumerates the
             # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
@@ -184,8 +184,7 @@ def convertFromString(dataStr):
             # the end of same-level elements.
             startIdTag = documentRoot.find(
                 './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, startid, mei=_MEINS))
-            atThisLevel = startIdTag.findall('*')
-            for eachObject in atThisLevel:
+            for eachObject in startIdTag.iterfind('*'):
                 if eachObject.get(_XMLID, '') == startid:
                     foundTheStart = True
                 if foundTheStart and not foundTheEnd:
@@ -201,8 +200,7 @@ def convertFromString(dataStr):
             if not foundTheEnd:
                 endIdTag = documentRoot.find(
                     './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, endid, mei=_MEINS))
-                atThisLevel = endIdTag.findall('*')
-                for eachObject in atThisLevel:
+                for eachObject in endIdTag.iterfind('*'):
                     eachObject.set('m21TupletNum', eachTuplet.get('num'))
                     eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
                     if eachObject.get(_XMLID, '') == endid:
@@ -243,7 +241,7 @@ def convertFromString(dataStr):
                 inNextMeasure[partN].append(allPartObject)
 
     backupMeasureNum = 0
-    for eachSection in documentRoot.findall('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
+    for eachSection in documentRoot.iterfind('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
         # TODO: sections aren't divided or treated specially, yet
         for eachObject in eachSection:
             if '{http://www.music-encoding.org/ns/mei}measure' == eachObject.tag:
@@ -861,24 +859,24 @@ def makeMetadata(fromThis):
     meta = metadata.Metadata()
     #richMeta = metadata.RichMetadata()
 
-    for eachTag in fromThis.findall('*'):
+    for eachTag in fromThis.iterfind('*'):
         if eachTag.tag == '{}titleStmt'.format(_MEINS):
-            for subTag in eachTag.findall('*'):
+            for subTag in eachTag.iterfind('*'):
                 if subTag.tag == '{}title'.format(_MEINS):
                     if subTag.get('type', '') == 'subtitle':
                         meta.subtitle = subTag.text
                     elif meta.title is None:
                         meta.title = subTag.text
                 elif subTag.tag == '{}respStmt'.format(_MEINS):
-                    for subSubTag in subTag.findall('*'):
+                    for subSubTag in subTag.iterfind('*'):
                         if subSubTag.tag == '{}persName'.format(_MEINS):
                             if subSubTag.get('role') == 'composer':
                                 meta.composer = subSubTag.text
 
         elif eachTag.tag == '{}history'.format(_MEINS):
-            for subTag in eachTag.findall('*'):
+            for subTag in eachTag.iterfind('*'):
                 if subTag.tag == '{}creation'.format(_MEINS):
-                    for subSubTag in subTag.findall('*'):
+                    for subSubTag in subTag.iterfind('*'):
                         if subSubTag.tag == '{}date'.format(_MEINS):
                             if subSubTag.text is None:
                                 dateStart, dateEnd = None, None
@@ -1348,7 +1346,7 @@ def noteFromElement(elem, slurBundle=None):
 
     addDots = 0  # if there are multiple <dot> tags, we won't know until after the whole loop
     # iterate all immediate children
-    for eachTag in elem.findall('*'):
+    for eachTag in elem.iterfind('*'):
         if eachTag.tag in tagToFunction:
             tagResult = tagToFunction[eachTag.tag](eachTag)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
@@ -1955,7 +1953,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     post = stream.Voice()
 
     # iterate all immediate children
-    for eachTag in elem.findall('*'):
+    for eachTag in elem.iterfind('*'):
         if eachTag.tag in tagToFunction:
             result = tagToFunction[eachTag.tag](eachTag, slurBundle)
             if not isinstance(result, (tuple, list)):
@@ -2031,7 +2029,7 @@ def staffFromElement(elem, slurBundle=None):
     currentNValue = '1'
 
     # iterate all immediate children
-    for eachTag in elem.findall('*'):
+    for eachTag in elem.iterfind('*'):
         if layerTagName == eachTag.tag:
             thisLayer = layerFromElement(eachTag, currentNValue, slurBundle=slurBundle)
             # check for objects that must appear in the Measure, but are currently in the Voice
@@ -2138,7 +2136,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
     maxBarDuration = None
 
     # iterate all immediate children
-    for eachTag in elem.findall('*'):
+    for eachTag in elem.iterfind('*'):
         if staffTagName == eachTag.tag:
             post[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag, slurBundle=slurBundle),
                                                     number=int(elem.get('n', backupNum)))
