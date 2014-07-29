@@ -1704,6 +1704,7 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 def beamFromElement(elem, slurBundle=None):
     # TODO: nested <beam> tags. This requires adjusting the beam.Beams object differently for
     #       every level, which seems to require knowing which level to adjust. Hmm.
+    # TODO: write tests
     '''
     <beam> A container for a series of explicitly beamed events that begins and ends entirely
            within a measure.
@@ -1763,20 +1764,8 @@ def beamFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
                      '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
-    post = []
 
-    # iterate all immediate children
-    for eachTag in elem.findall('*'):
-        if eachTag.tag in tagToFunction:
-            result = tagToFunction[eachTag.tag](eachTag, slurBundle)
-            if not isinstance(result, (tuple, list)):
-                post.append(result)
-            else:
-                for eachObject in result:
-                    post.append(eachObject)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
-
+    post = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
     post = beamTogether(post)
 
     return post
