@@ -1120,18 +1120,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     if elem.get('trans.semi') is not None:
         post[0].transposition = _transpositionFromAttrs(elem)
 
-    # iterate all immediate children
-    # TODO: break this into a shared function
-    for eachTag in elem.findall('*'):
-        if eachTag.tag in tagToFunction:
-            result = tagToFunction[eachTag.tag](eachTag, slurBundle)
-            if not isinstance(result, (tuple, list)):
-                post.append(result)
-            else:
-                for eachObject in result:
-                    post.append(eachObject)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED and eachTag.tag != '{}instrDef'.format(_MEINS):
-            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
+    post.extend(_processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle))
 
     return post
 
