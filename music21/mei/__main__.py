@@ -587,6 +587,62 @@ def _sharpsFromAttr(signature):
 
 # Helper Functions
 #------------------------------------------------------------------------------
+def _processEmbeddedElements(elements, mapping, slurBundle=None):
+    '''
+    From an iterable of MEI ``elements``, use functions in the ``mapping`` to convert each element
+    to its music21 object. This function was designed for use with elements that may contain other
+    elements; the contained elements will be converted as appropriate.
+
+    If an element itself has embedded elements (i.e., its convertor function in ``mapping`` returns
+    a sequence), those elements will appear in the returned sequence in order---there are no
+    hierarchic lists.
+
+    :param elements: A list of :class:`Element` objects to convert to music21 objects.
+    :type elements: iterable of :class:`~xml.etree.ElementTree.Element`
+    :param mapping: A dictionary where keys are the :attr:`Element.tag` attribute and values are
+        the function to call to convert that :class:`Element` to a music21 object.
+    :type mapping: mapping of str to function
+    :param slurBundle: A slur bundle, as used by the other :func:`*fromElements` functions.
+    :type slurBundle: :class:`music21.spanner.SlurBundle`
+    :returns: A list of the music21 objects returned by the converter functions, or an empty list
+        if no objects were returned.
+    :rtype: sequence of :class:`~music21.base.Music21Object`
+
+    **Examples:**
+
+    Because there is no ``'rest'`` key in the ``mapping``, that :class:`Element` is ignored:
+
+    >>> from xml.etree.ElementTree import Element  #_DOCS_HIDE
+    >>> from music21.mei.__main__ import _processEmbeddedElements  #_DOCS_HIDE
+    >>> elements = [Element('note'), Element('rest'), Element('note')]
+    >>> mapping = {'note': lambda x, y: note.Note('D2')}
+    >>> _processEmbeddedElements(elements, mapping)
+    [<music21.note.Note D>, <music21.note.Note D>]
+
+    The "beam" element holds "note" elements. All elements appear in a single level of the list:
+
+    >>> elements = [Element('note'), Element('beam'), Element('note')]
+    >>> mapping = {'note': lambda x, y: note.Note('D2'),
+    ...            'beam': lambda x, y: [note.Note('E2') for _ in xrange(2)]}
+    >>> _processEmbeddedElements(elements, mapping)
+    [<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note E>, <music21.note.Note D>]
+    '''
+    post = []
+
+    for eachTag in elements:
+        if eachTag.tag in mapping:
+            result = mapping[eachTag.tag](eachTag, slurBundle)
+            if isinstance(result, (tuple, list)):
+                for eachObject in result:
+                    post.append(eachObject)
+            else:
+                post.append(result)
+        elif eachTag.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, '?'))  # TODO: decide whether we want "elem.tag" back
+
+    return post
+
+
 def _timeSigFromAttrs(elem):
     '''
     From any tag with @meter.count and @meter.unit attributes, make a :class:`TimeSignature`.

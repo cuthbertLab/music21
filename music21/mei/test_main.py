@@ -1671,3 +1671,56 @@ class TestScoreDefFromElement(unittest.TestCase):
         self.assertEqual('3/8', actual['all-part objects'][0].ratioString)
         self.assertEqual('major', actual['all-part objects'][1].mode)
         self.assertEqual(4, actual['all-part objects'][1].sharps)
+
+
+
+#------------------------------------------------------------------------------
+class TestEmbeddedElements(unittest.TestCase):
+    '''Tests for _processesEmbeddedElements()'''
+
+    def testUnit1(self):
+        '''
+        _processesEmbeddedElements(): that single m21 objects are handled properly
+        '''
+        mockTranslator = mock.MagicMock(return_value='translator return')
+        elements = [ETree.Element('note') for _ in xrange(2)]
+        mapping = {'note': mockTranslator}
+        expected = ['translator return', 'translator return']
+        expectedCalls = [mock.call(elements[0], None), mock.call(elements[1], None)]
+
+        actual = main._processEmbeddedElements(elements, mapping)
+
+        self.assertSequenceEqual(expected, actual)
+        self.assertSequenceEqual(expectedCalls, mockTranslator.call_args_list)
+
+    def testUnit2(self):
+        '''
+        _processesEmbeddedElements(): that iterables of m21 objects are handled properly
+        '''
+        mockTranslator = mock.MagicMock(return_value='translator return')
+        mockBeamTranslator = mock.MagicMock(return_value=['embedded 1', 'embedded 2'])
+        elements = [ETree.Element('note'), ETree.Element('beam')]
+        mapping = {'note': mockTranslator, 'beam': mockBeamTranslator}
+        expected = ['translator return', 'embedded 1', 'embedded 2']
+
+        actual = main._processEmbeddedElements(elements, mapping)
+
+        self.assertSequenceEqual(expected, actual)
+        mockTranslator.assert_called_once_with(elements[0], None)
+        mockBeamTranslator.assert_called_once_with(elements[1], None)
+
+    @mock.patch('music21.mei.__main__.environLocal')
+    def testUnit3(self, mockEnviron):
+        '''
+        _processesEmbeddedElements(): that un-translated elements are reported properly
+        '''
+        mockTranslator = mock.MagicMock(return_value='translator return')
+        elements = [ETree.Element('note'), ETree.Element('bream')]
+        mapping = {'note': mockTranslator}
+        expected = ['translator return']
+
+        actual = main._processEmbeddedElements(elements, mapping)
+
+        self.assertSequenceEqual(expected, actual)
+        mockTranslator.assert_called_once_with(elements[0], None)
+        mockEnviron.printDebug.assert_called_once_with('unprocessed bream in ?')
