@@ -1785,6 +1785,7 @@ def beamFromElement(elem, slurBundle=None):
 def tupletFromElement(elem, slurBundle=None):
     # TODO: tuplet brackets on un-beamed notes don't work
     # TODO: ratio numbers are never printed
+    # TODO: write tests
     '''
     <tuplet> A group of notes with "irregular" (sometimes called "irrational") rhythmic values,
     for example, three notes in the time normally occupied by two or nine in the time of five.
@@ -1843,7 +1844,6 @@ def tupletFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
                      '{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
-    post = []
 
     # get the @num and @numbase attributes, without which we can't properly calculate the tuplet
     num = int(elem.get('num', '-1'))
@@ -1852,16 +1852,7 @@ def tupletFromElement(elem, slurBundle=None):
         raise MeiAttributeError(_MISSING_TUPLET_DATA)
 
     # iterate all immediate children
-    for eachTag in elem.findall('*'):
-        if eachTag.tag in tagToFunction:
-            result = tagToFunction[eachTag.tag](eachTag, slurBundle)
-            if not isinstance(result, (tuple, list)):
-                post.append(result)
-            else:
-                for eachObject in result:
-                    post.append(eachObject)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
+    post = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
 
     # "tuplet-ify" the duration of everything held within
     for eachObj in post:
