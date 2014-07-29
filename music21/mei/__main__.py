@@ -2197,6 +2197,7 @@ if __name__ == "__main__":
                      test_main.TestStaffFromElement,
                      test_main.TestStaffDefFromElement,
                      test_main.TestScoreDefFromElement,
+                     test_main.TestEmbeddedElements,
                     )
 
 #------------------------------------------------------------------------------
