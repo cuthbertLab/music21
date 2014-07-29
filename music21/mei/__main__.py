@@ -132,14 +132,14 @@ def convertFromString(dataStr):
         if xmlid is None:
             return
         xmlid = removeOctothorpe(xmlid)
-        targetElem = documentRoot.findall('*//*[@{}="{}"]'.format(_XMLID, xmlid))
-        if 0 == len(targetElem):
+        targetElem = documentRoot.find('*//*[@{}="{}"]'.format(_XMLID, xmlid))
+        if targetElem is None:
             return
 
         if append:
-            targetElem[0].set(attr, targetElem[0].get(attr, '') + value)
+            targetElem.set(attr, targetElem.get(attr, '') + value)
         else:
-            targetElem[0].set(attr, value)
+            targetElem.set(attr, value)
 
     # pre-processing for <slur> tags
     slurBundle = spanner.SpannerBundle()
@@ -1866,6 +1866,7 @@ def tupletSpanFromElement(elem, documentRoot):
 
 
 def layerFromElement(elem, overrideN=None, slurBundle=None):
+    # TODO: clefs that should appear part-way through a measure don't
     '''
     <layer> An independent stream of events on a staff.
 
