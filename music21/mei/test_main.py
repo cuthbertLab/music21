@@ -144,7 +144,7 @@ class TestThings(unittest.TestCase):
     def testKeySigFromAttrs1(self):
         '''_keySigFromAttrs(): using @key.pname, @key.accid, and @key.mode (integration test)'''
         elem = ETree.Element('{mei}staffDef', attrib={'key.pname': 'B', 'key.accid': 'f',
-                                                          'key.mode': 'minor'})
+                                                      'key.mode': 'minor'})
         expectedTPNWC = 'b-'
         actual = main._keySigFromAttrs(elem)
         self.assertIsInstance(actual, key.Key)
@@ -1032,10 +1032,11 @@ class TestClefFromElement(unittest.TestCase):
         elemGetReturns = ['perc', 'theXMLID', 'theXMLID']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
-        expected = mockClefFromString.return_value
+        expected = mockPercClef.return_value
 
         actual = main.clefFromElement(elem)
 
+        self.assertEqual(expected, actual)
         self.assertEqual(0, mockClefFromString.call_count)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
         self.assertEqual(0, mockTabClef.call_count)
@@ -1063,8 +1064,8 @@ class TestLayerFromElement(unittest.TestCase):
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) else None
         expectedGetOrder = [mock.call('n'), mock.call('n')]
         iterfindReturn = [mock.MagicMock(name='note1'),
-                         mock.MagicMock(name='imaginary'),
-                         mock.MagicMock(name='note2')]
+                          mock.MagicMock(name='imaginary'),
+                          mock.MagicMock(name='note2')]
         iterfindReturn[0].tag = '{}note'.format(main._MEINS)
         iterfindReturn[1].tag = '{}imaginary'.format(main._MEINS)
         iterfindReturn[2].tag = '{}note'.format(main._MEINS)
@@ -1094,8 +1095,8 @@ class TestLayerFromElement(unittest.TestCase):
         '''
         elem = mock.MagicMock()
         iterfindReturn = [mock.MagicMock(name='note1'),
-                         mock.MagicMock(name='imaginary'),
-                         mock.MagicMock(name='note2')]
+                          mock.MagicMock(name='imaginary'),
+                          mock.MagicMock(name='note2')]
         iterfindReturn[0].tag = '{}note'.format(main._MEINS)
         iterfindReturn[1].tag = '{}imaginary'.format(main._MEINS)
         iterfindReturn[2].tag = '{}note'.format(main._MEINS)
@@ -1127,8 +1128,8 @@ class TestLayerFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         elem.get.return_value = None
         iterfindReturn = [mock.MagicMock(name='note1'),
-                         mock.MagicMock(name='imaginary'),
-                         mock.MagicMock(name='note2')]
+                          mock.MagicMock(name='imaginary'),
+                          mock.MagicMock(name='note2')]
         iterfindReturn[0].tag = '{}note'.format(main._MEINS)
         iterfindReturn[1].tag = '{}imaginary'.format(main._MEINS)
         iterfindReturn[2].tag = '{}note'.format(main._MEINS)
@@ -1625,7 +1626,7 @@ class TestScoreDefFromElement(unittest.TestCase):
         '''
         # 1.) prepare
         elem = mock.MagicMock()
-        def elemGetSideEffect(which, default=None):
+        def elemGetSideEffect(which, default=None):  # pylint: disable=missing-docstring
             theDict = {'meter.count': '7', 'key.pname': 'G'}
             if which in theDict:
                 return theDict[which]
