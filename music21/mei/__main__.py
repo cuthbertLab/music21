@@ -621,7 +621,7 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
 
     >>> elements = [Element('note'), Element('beam'), Element('note')]
     >>> mapping = {'note': lambda x, y: note.Note('D2'),
-    ...            'beam': lambda x, y: [note.Note('E2') for _ in xrange(2)]}
+    ...            'beam': lambda x, y: [note.Note('E2') for _ in range(2)]}
     >>> _processEmbeddedElements(elements, mapping)
     [<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note E>, <music21.note.Note D>]
     '''
