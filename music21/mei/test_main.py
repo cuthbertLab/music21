@@ -453,27 +453,37 @@ class TestAttrTranslators(unittest.TestCase):
 #------------------------------------------------------------------------------
 class TestNoteFromElement(unittest.TestCase):
     '''Tests for noteFromElement()'''
-    # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
 
     @mock.patch('music21.note.Note')
-    def testUnit1(self, mockNote):
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.safePitch')
+    @mock.patch('music21.mei.__main__.makeDuration')
+    def testUnit1(self, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
-        noteFromElement(): all the elements that go in Note.__init__()...
-                           'pname', 'accid', 'oct', 'dur', 'dots'
-        (mostly-unit test; only mock out Note and the ElementTree.Element)
+        noteFromElement(): all the basic attributes (i.e., @pname, @accid, @oct, @dur, @dots)
+
+        (mostly-unit test; mock out Note, _processEmbeddedElements(), safePitch(), and makeDuration())
         '''
-        elem = mock.MagicMock()
-        expectedElemOrder = [mock.call('pname', ''), mock.call('accid'), mock.call('oct', ''),
-                             mock.call('dur'), mock.call('dots', 0)]
-        expectedElemOrder.extend([mock.ANY for _ in xrange(4)])  # additional calls to elem.get(), not part of this test
-        elemReturns = ['D', 's', '2', '4', '1']
-        elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
-        mockNote.return_value = mock.MagicMock(spec_set=note.Note, name='note return')
-        expected = mockNote.return_value
-        actual = main.noteFromElement(elem)
-        self.assertEqual(expected, actual)
-        mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
-        self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
+        elem = ETree.Element('note', attrib={'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4',
+                                             'dots': '1'})
+        mockMakeDuration.return_value = 'makeDuration() return'
+        mockSafePitch.return_value = 'safePitch() return'
+        mockNewNote = mock.MagicMock()
+        mockNote.return_value = mockNewNote
+        mockProcEmbEl.return_value = []
+        expected = mockNewNote
+
+        actual = main.noteFromElement(elem, None)
+
+        self.assertEqual(expected, mockNewNote, actual)
+        mockSafePitch.assert_called_once_with('D', '#', '2')
+        mockMakeDuration.assert_called_once_with(1.0, 1)
+        mockNote.assert_called_once_with(mockSafePitch.return_value,
+                                         duration=mockMakeDuration.return_value)
+        self.assertEqual(0, mockNewNote.id.call_count)
+        self.assertEqual(0, mockNewNote.articulations.extend.call_count)
+        self.assertEqual(0, mockNewNote.tie.call_count)
+        self.assertEqual(0, mockNewNote.duration.call_count)
 
     def testIntegration1a(self):
         '''
@@ -506,155 +516,89 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(0, actual.duration.dots)
 
     @mock.patch('music21.note.Note')
-    def testUnit2(self, mockNote):
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.safePitch')
+    @mock.patch('music21.mei.__main__.makeDuration')
+    @mock.patch('music21.mei.pitch.Accidental')
+    def testUnit2(self, mockAccid, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
-        noteFromElement(): adds "id"
-        (mostly-unit test; only mock out Note and the ElementTree.Element)
-        '''
-        elem = mock.MagicMock()
-        expectedElemOrder = [mock.ANY for _ in xrange(5)]  # not testing the calls from previous unit tests
-        expectedElemOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
-        expectedElemOrder.extend([mock.ANY for _ in xrange(3)])  # additional calls to elem.get(), not part of this test
-        expectedId = 42
-        elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
-                       expectedId, expectedId]  # xml:id for this test
-        elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
-        # NB: this can't use 'spec_set' because the "id" attribute is part of Music21Object, note Note
-        mockNote.return_value = mock.MagicMock(spec=note.Note, name='note return')
-        expected = mockNote.return_value
-        actual = main.noteFromElement(elem)
-        self.assertEqual(expected, actual)
-        mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
-        self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
-        self.assertEqual(expectedId, actual.id)
+        noteFromElement(): adds <artic>, <accid>, and <dot> elements held within
 
-    def testIntegration2(self):
+        (mostly-unit test; mock out Note, _processEmbeddedElements(), safePitch(), and makeDuration())
         '''
-        noteFromElement(): adds "id"
-        (corresponds to testUnit2() with real Note and real ElementTree.Element)
-        '''
-        elem = ETree.Element('note')
-        attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1', _XMLID: 42}
-        for eachKey in attribDict:
-            elem.set(eachKey, attribDict[eachKey])
-        actual = main.noteFromElement(elem)
-        self.assertEqual('D#2', actual.nameWithOctave)
-        self.assertEqual(1.5, actual.quarterLength)
-        self.assertEqual(1, actual.duration.dots)
-        self.assertEqual(42, actual.id)
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4'})
+        # accid: s, dots: 1, artic: stacc
+        mockMakeDuration.return_value = 'makeDuration() return'
+        mockSafePitch.return_value = 'safePitch() return'
+        mockAccid.return_value = 'an accidental'
+        mockNewNote = mock.MagicMock()
+        mockNote.return_value = mockNewNote
+        mockProcEmbEl.return_value = [1, '#', articulations.Staccato()]
+        expected = mockNewNote
+        expMockMakeDur = [mock.call(1.0, 0), mock.call(1.0, 1)]
 
-    @mock.patch('music21.note.Note')
-    def testUnit3(self, mockNote):
-        '''
-        noteFromElement(): adds "artic"
-        (mostly-unit test; only mock out Note and the ElementTree.Element)
-        '''
-        elem = mock.MagicMock()
-        expectedElemOrder = [mock.ANY for _ in xrange(6)]  # not testing the calls from previous unit tests
-        expectedElemOrder.extend([mock.call('artic'), mock.call('artic')])
-        expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
-        elemArtic = 'stacc'
-        elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
-                       None,  # the xml:id attribute
-                       elemArtic, elemArtic]  # value of "artic", for this test
-        elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
-        mockNote.return_value = mock.MagicMock(spec=note.Note, name='note return')
-        expected = mockNote.return_value
-        actual = main.noteFromElement(elem)
-        self.assertEqual(expected, actual)
-        mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
-        self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
-        self.assertEqual(1, len(actual.articulations))
-        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
+        actual = main.noteFromElement(elem, None)
 
-    def testIntegration3(self):
-        '''
-        noteFromElement(): adds "artic"
-        (corresponds to testUnit3() with real Note and real ElementTree.Element)
-        '''
-        elem = ETree.Element('note')
-        attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1', 'artic': 'stacc'}
-        for eachKey in attribDict:
-            elem.set(eachKey, attribDict[eachKey])
-        actual = main.noteFromElement(elem)
-        self.assertEqual('D#2', actual.nameWithOctave)
-        self.assertEqual(1.5, actual.quarterLength)
-        self.assertEqual(1, actual.duration.dots)
-        self.assertEqual(1, len(actual.articulations))
-        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
+        self.assertEqual(expected, mockNewNote, actual)
+        mockSafePitch.assert_called_once_with('D', None, '2')
+        mockNewNote.pitch.accidental = mockAccid.return_value
+        self.assertEqual(1, mockNewNote.articulations.append.call_count)
+        self.assertIsInstance(mockNewNote.articulations.append.call_args_list[0][0][0],
+                              articulations.Staccato)
+        self.assertEqual(expMockMakeDur, mockMakeDuration.call_args_list)
+        mockNote.assert_called_once_with(mockSafePitch.return_value,
+                                         duration=mockMakeDuration.return_value)
+        self.assertEqual(0, mockNewNote.id.call_count)
+        self.assertEqual(0, mockNewNote.articulations.extend.call_count)
+        self.assertEqual(0, mockNewNote.tie.call_count)
+        self.assertEqual(mockMakeDuration.return_value, mockNewNote.duration)
+
+    # TODO: testIntegration2()
 
     @mock.patch('music21.note.Note')
-    @mock.patch('music21.mei.__main__.articFromElement')
-    def testUnit4(self, mockArticFE, mockNote):
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.safePitch')
+    @mock.patch('music21.mei.__main__.makeDuration')
+    @mock.patch('music21.mei.__main__._makeArticList')
+    @mock.patch('music21.mei.__main__._tieFromAttr')
+    @mock.patch('music21.mei.__main__._addSlurToThing')
+    def testUnit3_new(self, mockSlur, mockTie, mockArticList, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
-        noteFromElement(): processing element (<artic>) held within
-        (mostly-unit test; mock out Note, articFromElement(), and the ElementTree.Element)
+        noteFromElement(): adds @xml:id, @artic, and @tie attributes, and the slurBundle
+
+        (mostly-unit test; mock out Note, _processEmbeddedElements(), safePitch(), and makeDuration())
         '''
-        elem = mock.MagicMock()
-        # make the mock of <artic> and setup its "tag" property
-        mockArtic = mock.MagicMock('<artic>')
-        mockArticTag = mock.PropertyMock(return_value='{}artic'.format(_MEINS))
-        type(mockArtic).tag = mockArticTag
-        elem.iterfind.return_value = [mockArtic]
-        # make the expected order of calls to (and the return values for) elem.get()
-        expectedElemOrder = [mock.ANY for _ in xrange(9)]  # not testing the calls from previous unit tests
-        elemReturns = ['D', 's', '2', '4', '1',  # copied from testUnit1()---not important in this test
-                       None, None]  # @xml:id and @artic
-        elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
-        # setup the Note and its "articulations" property
-        noteReturn = mock.MagicMock(spec=note.Note, name='note return')
-        articulationsMock = mock.PropertyMock()
-        type(noteReturn).articulations = articulationsMock
-        mockNote.return_value = noteReturn
-        # other things
-        mockArticFE.return_value = 'articFromElement() return'
-        expected = mockNote.return_value
+        elem = ETree.Element('note', attrib={'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4',
+                                             'dots': '1', 'artic': 'stacc', _XMLID: '123',
+                                             'tie': 'i1'})
+        mockMakeDuration.return_value = 'makeDuration() return'
+        mockSafePitch.return_value = 'safePitch() return'
+        mockNewNote = mock.MagicMock()
+        mockNote.return_value = mockNewNote
+        mockProcEmbEl.return_value = []
+        mockArticList.return_value = ['staccato!']
+        mockTie.return_value = 'a tie!'
+        expected = mockNewNote
 
-        actual = main.noteFromElement(elem)
+        actual = main.noteFromElement(elem, 'slur bundle')
 
-        self.assertEqual(expected, actual)
-        self.assertEqual([mock.call() for _ in xrange(4)], mockArticTag.call_args_list)
-        mockNote.assert_called_once_with(pitch.Pitch('D#2'), duration=duration.Duration(1.5))
-        self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
-        mockArticFE.assert_called_once_with(mockArtic)
-        articulationsMock.assert_called_once_with(mockArticFE.return_value)
+        self.assertEqual(expected, mockNewNote, actual)
+        mockSafePitch.assert_called_once_with('D', '#', '2')
+        mockMakeDuration.assert_called_once_with(1.0, 1)
+        mockNote.assert_called_once_with(mockSafePitch.return_value,
+                                         duration=mockMakeDuration.return_value)
+        self.assertEqual('123', mockNewNote.id)
+        mockNewNote.articulations.extend.assert_called_once_with(['staccato!'])
+        self.assertEqual('a tie!', mockNewNote.tie)
+        self.assertEqual(0, mockNewNote.duration.call_count)
+        mockSlur.assert_called_once_with(None, None, None, mockNewNote, 'slur bundle')
 
-    def testIntegration4(self):
-        '''
-        noteFromElement(): processing elements held within (<artic>, <dot>, <accid>)
-        (corresponds to testUnit4() with real Note and real ElementTree.Element)
-        '''
-        elemNote = ETree.Element('{http://www.music-encoding.org/ns/mei}note')
-        attribDict = {'pname': 'D', 'oct': '2', 'dur': '4'}
-        for eachKey in attribDict:
-            elemNote.set(eachKey, attribDict[eachKey])
-        elemArtic = ETree.Element('{http://www.music-encoding.org/ns/mei}artic')
-        attribDict = {'artic': 'stacc'}
-        for eachKey in attribDict:
-            elemArtic.set(eachKey, attribDict[eachKey])
-        elemDot = ETree.Element('{http://www.music-encoding.org/ns/mei}dot')
-        attribDict = {'xml:id': 'THE ID'}
-        for eachKey in attribDict:
-            elemDot.set(eachKey, attribDict[eachKey])
-        elemAccid = ETree.Element('{http://www.music-encoding.org/ns/mei}accid')
-        attribDict = {'accid': 's'}
-        for eachKey in attribDict:
-            elemAccid.set(eachKey, attribDict[eachKey])
-        elemNote.extend([elemArtic, elemDot, elemAccid])
-
-        actual = main.noteFromElement(elemNote)
-
-        self.assertEqual('D#2', actual.nameWithOctave)
-        self.assertEqual(1.5, actual.quarterLength)
-        self.assertEqual(1, actual.duration.dots)
-        self.assertEqual(1, len(actual.articulations))
-        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
+    # TODO: testIntegration3()
 
 
 #------------------------------------------------------------------------------
 class TestRestFromElement(unittest.TestCase):
     '''Tests for restFromElement()'''
-    # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
 
     @mock.patch('music21.note.Rest')
     def testUnit1(self, mockRest):
