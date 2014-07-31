@@ -157,11 +157,11 @@ class Lyric(SlottedObject):
         applyRaw=False,
         identifier=None,
         ):
-        # these are set by _setTextAndSyllabic
+        # these are set by setTextAndSyllabic
         self.text = None
         # given as begin, middle, end, or single
         self.syllabic = syllabic
-        self._setTextAndSyllabic(text, applyRaw)
+        self.setTextAndSyllabic(text, applyRaw)
         self.number = number
         self.identifier = identifier
 
@@ -187,7 +187,18 @@ class Lyric(SlottedObject):
 
     ### PRIVATE METHODS ###
 
-    def _setTextAndSyllabic(self, rawText, applyRaw):
+    def setTextAndSyllabic(self, rawText, applyRaw=False):
+        '''
+        Given a setting for rawText and applyRaw,
+        sets the syllabic type for a lyric based on the rawText:
+        
+        >>> l = note.Lyric()
+        >>> l.setTextAndSyllabic('hel-')
+        >>> l.text
+        'hel'
+        >>> l.syllabic
+        'begin'
+        '''
         # do not want to do this unless we are sure this is not a string
         # possible might alter unicode or other string-like representations
         if not common.isStr(rawText):
@@ -443,6 +454,12 @@ class GeneralNote(base.Music21Object):
         >>> a.lyric
         >>> a.lyrics
         []
+
+        TODO: should check data here
+        should split \\n separated lyrics into different lyrics
+
+        presently only creates one lyric, and destroys any existing
+        lyrics
         ''')
 
     def addLyric(self, text, lyricNumber = None, applyRaw = False, lyricIdentifier=None):
