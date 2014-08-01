@@ -43,6 +43,7 @@ from music21 import meter
 from music21 import interval
 from music21 import bar
 from music21 import tie
+from music21 import spanner
 
 # six
 from six.moves import xrange  # pylint: disable=redefined-builtin
@@ -489,12 +490,10 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         noteFromElement(): all the elements that go in Note.__init__()...
                            'pname', 'accid', 'oct', 'dur', 'dots'
-        (corresponds to testUnit1() with real Note and real ElementTree.Element)
+        (corresponds to testUnit1() with no mocks)
         '''
-        elem = ETree.Element('note')
-        attribDict = {'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4', 'dots': '1'}
-        for eachKey in attribDict:
-            elem.set(eachKey, attribDict[eachKey])
+        elem = ETree.Element('note', attrib={'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4',
+                                             'dots': '1'})
         actual = main.noteFromElement(elem)
         self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.5, actual.quarterLength)
@@ -504,12 +503,9 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         noteFromElement(): all the elements that go in Note.__init__()...
                            'pname', 'accid', 'oct', 'dur', 'dots'
-        (this has different arguments than testIntegration2())
+        (this has different arguments than testIntegration1a())
         '''
-        elem = ETree.Element('note')
-        attribDict = {'pname': 'D', 'accid': 'n', 'oct': '2', 'dur': '4'}
-        for eachKey in attribDict:
-            elem.set(eachKey, attribDict[eachKey])
+        elem = ETree.Element('note', attrib={'pname': 'D', 'accid': 'n', 'oct': '2', 'dur': '4'})
         actual = main.noteFromElement(elem)
         self.assertEqual('D2', actual.nameWithOctave)
         self.assertEqual(1.0, actual.quarterLength)
@@ -553,7 +549,23 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(0, mockNewNote.tie.call_count)
         self.assertEqual(mockMakeDuration.return_value, mockNewNote.duration)
 
-    # TODO: testIntegration2()
+    def testIntegration2(self):
+        '''
+        noteFromElement(): adds <artic>, <accid>, and <dot> elements held within
+        (corresponds to testUnit2() with no mocks)
+        '''
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '2'})
+        elem.append(ETree.Element('{}dot'.format(_MEINS)))
+        elem.append(ETree.Element('{}artic'.format(_MEINS), attrib={'artic': 'stacc'}))
+        elem.append(ETree.Element('{}accid'.format(_MEINS), attrib={'accid': 's'}))
+
+        actual = main.noteFromElement(elem)
+
+        self.assertEqual('D#2', actual.nameWithOctave)
+        self.assertEqual(3.0, actual.quarterLength)
+        self.assertEqual(1, actual.duration.dots)
+        self.assertEqual(1, len(actual.articulations))
+        self.assertIsInstance(actual.articulations[0], articulations.Staccato)
 
     @mock.patch('music21.note.Note')
     @mock.patch('music21.mei.__main__._processEmbeddedElements')
@@ -593,7 +605,25 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(0, mockNewNote.duration.call_count)
         mockSlur.assert_called_once_with(None, None, None, mockNewNote, 'slur bundle')
 
-    # TODO: testIntegration3()
+    def testIntegration3(self):
+        '''
+        noteFromElement(): adds @xml:id, @artic, and @tie attributes, and the slurBundle
+        (corresponds to testUnit3() with no mocks)
+        '''
+        elem = ETree.Element('note', attrib={'pname': 'D', 'accid': 's', 'oct': '2', 'dur': '4',
+                                             'dots': '1', _XMLID: 'asdf1234', 'artic': 'stacc',
+                                             'tie': 'i1'})
+        slurBundle = spanner.SpannerBundle()
+
+        actual = main.noteFromElement(elem, slurBundle)
+
+        self.assertEqual('D#2', actual.nameWithOctave)
+        self.assertEqual(1.5, actual.quarterLength)
+        self.assertEqual(1, actual.duration.dots)
+        self.assertEqual('asdf1234', actual.id)
+        self.assertEqual(1, len(actual.articulations))
+        self.assertIsInstance(actual.articulations[0], articulations.Staccato)
+        self.assertEqual(tie.Tie('start'), actual.tie)
 
 
 #------------------------------------------------------------------------------
