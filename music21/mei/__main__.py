@@ -1276,6 +1276,8 @@ def noteFromElement(elem, slurBundle=None):
     Attributes In Progress:
     =======================
     - @tuplet, (many of "[i|m|t][1-6]") ??????
+    - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
+        duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
     Attributes not Implemented:
     ===========================
@@ -1311,7 +1313,7 @@ def noteFromElement(elem, slurBundle=None):
                  (att.duration.performed (@dur.ges))
                  (att.instrumentident (@instr))
                  (att.note.ges.cmn (@gliss)
-                                   (att.graced (@grace, @grace.time)))
+                                   (att.graced (@grace, @grace.time)))  <-- partially implemented
                  (att.note.ges.mensural (att.duration.ratio (@num, @numbase)))
                  (att.note.ges.tablature (@tab.fret, @tab.string))
     att.note.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
@@ -1372,6 +1374,11 @@ def noteFromElement(elem, slurBundle=None):
     # dots from inner <dot> elements
     if dotElements > 0:
         post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), dotElements)
+
+    # grace note (only mark as grace note---don't worry about "time-stealing")
+    # TODO: test this
+    if elem.get('grace') is not None:
+        post.duration = duration.GraceDuration(post.duration.quarterLength)
 
     # tuplets indicated in a <tupletDef> held elsewhere
     # TODO: test this tuplet stuff (after you figure out whether it's sufficient)
@@ -1514,6 +1521,8 @@ def chordFromElement(elem, slurBundle=None):
     Attributes In Progress:
     =======================
     - @slur, (many of "[i|m|t][1-6]")
+    - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
+        duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
     Attributes not Implemented:
     ===========================
@@ -1543,7 +1552,7 @@ def chordFromElement(elem, slurBundle=None):
     att.chord.ges (att.articulation.performed (@artic.ges))
                   (att.duration.performed (@dur.ges))
                   (att.instrumentident (@instr))
-                  (att.chord.ges.cmn (att.graced (@grace, @grace.time)))
+                  (att.chord.ges.cmn (att.graced (@grace, @grace.time)))  <-- partially implemented
     att.chord.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
                                   (att.alignment (@when)))
 
@@ -1573,6 +1582,11 @@ def chordFromElement(elem, slurBundle=None):
     # ties in the @tie attribute
     if elem.get('tie') is not None:
         post.tie = _tieFromAttr(elem.get('tie'))
+
+    # grace note (only mark as grace note---don't worry about "time-stealing")
+    if elem.get('grace') is not None:
+        # TODO: test this
+        post.duration = duration.GraceDuration(post.duration.quarterLength)
 
     # adjust for <tupletDef>-given tuplets
     if elem.get('m21TupletNum') is not None:
