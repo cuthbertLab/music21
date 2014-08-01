@@ -213,6 +213,9 @@ def convertFromString(dataStr):
     # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
     # get all the <staffDef> tags that are in the <score>, no matter where they appear. This is just
     # to fetch everything that will affect the maximum number of parts that might happen at a time.
+    # TODO: this doesn't always work. For some scores where a part uses more than one clef, more
+    #       than one @n is picked up, so more than one staff appears---though all the notes are put
+    #       in the highest relevant staff
     allPartNs = allPartsPresent(documentRoot.findall('.//{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)))
 
     # holds the music21.stream.Part that we're building
@@ -863,7 +866,7 @@ def makeMetadata(fromThis):
         if eachTag.tag == '{}titleStmt'.format(_MEINS):
             for subTag in eachTag.iterfind('*'):
                 if subTag.tag == '{}title'.format(_MEINS):
-                    if subTag.get('type', '') == 'subtitle':
+                    if subTag.get('type', '') == 'subtitle':  # TODO: this is meaningless because m21's Metadata doesn't do anything with it
                         meta.subtitle = subTag.text
                     elif meta.title is None:
                         meta.title = subTag.text
