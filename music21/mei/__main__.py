@@ -1268,10 +1268,10 @@ def noteFromElement(elem, slurBundle=None):
     - @xml:id (or id), an XML id (submitted as the Music21Object "id")
     - @artic and <artic> contained within
     - @tie, (many of "[i|m|t]")
+    - @slur, (many of "[i|m|t][1-6]")
 
     Attributes In Progress:
     =======================
-    - @slur, (many of "[i|m|t][1-6]")
     - @tuplet, (many of "[i|m|t][1-6]") ??????
 
     Attributes not Implemented:
@@ -1338,27 +1338,15 @@ def noteFromElement(elem, slurBundle=None):
                      duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
 
-    if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
-
-    if elem.get('artic') is not None:
-        post.articulations = _makeArticList(elem.get('artic'))
-
-    addDots = 0  # if there are multiple <dot> tags, we won't know until after the whole loop
     # iterate all immediate children
-    for eachTag in elem.iterfind('*'):
-        if eachTag.tag in tagToFunction:
-            tagResult = tagToFunction[eachTag.tag](eachTag)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
-            continue
-
-        if '{http://www.music-encoding.org/ns/mei}dot' == eachTag.tag:
-            addDots += tagResult
-        elif '{http://www.music-encoding.org/ns/mei}artic' == eachTag.tag:
-            post.articulations = tagResult
-        elif '{http://www.music-encoding.org/ns/mei}accid' == eachTag.tag:
-            post.pitch.accidental = pitch.Accidental(tagResult)
+    dotElements = 0  # count the number of <dot> elements
+    for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle):
+        if isinstance(subElement, six.integer_types):
+            dotElements += subElement
+        elif isinstance(subElement, articulations.Articulation):
+            post.articulations.append(subElement)
+        elif isinstance(subElement, six.string_types):
+            post.pitch.accidental = pitch.Accidental(subElement)
 
     # NOTE: ensure this stays in sync with chordFromElement()
     # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
@@ -1366,15 +1354,24 @@ def noteFromElement(elem, slurBundle=None):
         _addSlurToThing(elem.get('m21SlurStart'), elem.get('m21SlurEnd'), elem.get('slur'),
                         post, slurBundle)
 
+    # id in the @xml:id attribute
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
+
+    # articulations in the @artic attribute
+    if elem.get('artic') is not None:
+        post.articulations.extend(_makeArticList(elem.get('artic')))
+
     # ties in the @tie attribute
     if elem.get('tie') is not None:
         post.tie = _tieFromAttr(elem.get('tie'))
 
-    # add dots as required
-    if addDots > 0:
-        post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), addDots)
+    # dots from inner <dot> elements
+    if dotElements > 0:
+        post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), dotElements)
 
-    # adjust for <tupletDef>-given tuplets
+    # tuplets indicated in a <tupletDef> held elsewhere
+    # TODO: test this tuplet stuff (after you figure out whether it's sufficient)
     if elem.get('m21TupletNum') is not None:
         post.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
                                                    numberNotesNormal=int(elem.get('m21TupletNumbase')),
