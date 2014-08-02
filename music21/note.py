@@ -255,6 +255,25 @@ class Lyric(SlottedObject):
         self._identifier = value
 
     @property
+    def rawText(self):
+        '''
+        returns the text of the syllable with '-' etc.
+        
+        >>> l = note.Lyric("hel-")
+        >>> l.text
+        'hel'
+        >>> l.rawText
+        'hel-'
+        '''
+        if self.syllabic == 'begin':
+            return self.text + '-'
+        elif self.syllabic == 'middle':
+            return '-' + self.text + '-'
+        elif self.syllabic == 'end':
+            return '-' + self.text
+        else:
+            return self.text
+    @property
     def number(self):
         '''
         This stores the number of the lyric (which determines the order
