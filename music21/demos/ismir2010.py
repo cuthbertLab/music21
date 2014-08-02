@@ -520,7 +520,7 @@ def demoBachSearch():
 
     for fp in fpList[:40]:
         fn = os.path.split(fp)[1]
-        print fn
+        print (fn)
         s = converter.parse(fp)
         # get key, mode
         key, mode = s.analyze('key')[:2]
@@ -552,7 +552,7 @@ def demoBachSearch():
             m = stream.Measure()
             m.keySignature = s.flat.getElementsByClass('KeySignature')[0]
 
-            print 'got', m.keySignature
+            print ('got', m.keySignature)
 
             m.append(cFirst)
             m.append(cLast)
@@ -568,7 +568,7 @@ def demoBachSearchBrief():
         fileName = os.path.split(filePath)[1]
         pieceName = fileName.replace('.xml', '')
         chorale = converter.parse(filePath)
-        print fileName
+        print (fileName)
         key = chorale.analyze('key')
         if key.mode == 'minor':
             lastChordPitches = []

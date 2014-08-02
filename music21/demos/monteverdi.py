@@ -36,7 +36,7 @@ def spliceAnalysis(book = 3, madrigal = 1):
     for myN in aMeasures.flat.notesAndRests:
         myN.hideObjectOnPrint = True
     x = aMeasures.write()    
-    print x
+    print (x)
     #excerpt.insert(0, aMeasures)
     #excerpt.show()
     
@@ -46,8 +46,8 @@ def showAnalysis(book = 3, madrigal = 13):
     analysis = music21.corpus.parse(filename)
     #analysis.show()
     (major, minor) = iqSemitonesAndPercentage(analysis)
-    print major
-    print minor
+    print (major)
+    print (minor)
     
 def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False):
     majorFig = ""
@@ -61,13 +61,13 @@ def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False)
             filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, i)
             if strict == True:
                 analysis = music21.corpus.parse(filename)
-                print book,i
+                print (book,i)
             else:
                 try:
                     analysis = music21.corpus.parse(filename)
-                    print book,i
+                    print (book,i)
                 except:
-                    print "Cannot parse %s, maybe it does not exist..." % (filename)
+                    print ("Cannot parse %s, maybe it does not exist..." % (filename))
                     continue
             if show == True:
                 analysis.show()
@@ -80,12 +80,12 @@ def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False)
             minorSt += mSt
             majorRoot += MRoot
             minorRoot += mRoot
-    print majorFig
-    print minorFig
-    print majorSt
-    print minorSt
-    print majorRoot
-    print minorRoot
+    print (majorFig)
+    print (minorFig)
+    print (majorSt)
+    print (minorSt)
+    print (majorRoot)
+    print (minorRoot)
 
 
 def iqChordsAndPercentage(analysisStream):
@@ -186,13 +186,13 @@ def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = 
             filename = 'monteverdi/madrigal.%s.%s.xml' % (book, i)
             if strict == True:
                 c = corpus.parse(filename)
-                print book,i
+                print (book,i)
             else:
                 try:
                     c = corpus.parse(filename)
-                    print book,i
+                    print (book,i)
                 except:
-                    print "Cannot parse %s, maybe it does not exist..." % (filename)
+                    print ("Cannot parse %s, maybe it does not exist..." % (filename))
                     continue
             displayMe = False
             for i in range(len(c.parts) - 1):
@@ -290,10 +290,10 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
     for thisOffset in sorted(phraseScoresByOffset.keys()):
         psbo = phraseScoresByOffset[thisOffset]
         if psbo > 0: 
-            print thisOffset, psbo
+            print (thisOffset, psbo)
             relevantNote = flattenedBass.getElementAtOrBefore(thisOffset - 0.1)
             if hasattr(relevantNote, 'score'):
-                print "adjusting score from %d to %d for note in measure %d" % (relevantNote.score, relevantNote.score + psbo, relevantNote.measureNumber)
+                print ("adjusting score from %d to %d for note in measure %d" % (relevantNote.score, relevantNote.score + psbo, relevantNote.measureNumber))
                 relevantNote.score += psbo
             else:
                 relevantNote.score = psbo

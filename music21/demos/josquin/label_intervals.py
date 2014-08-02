@@ -41,6 +41,6 @@ if __name__ == "__main__":
    elif os.path.isfile(basedir + filename):
       displayIntervals(basedir + filename)
    else:
-      print "Cannot find file ", argv[1]
-      print "Usage: " + argv[0] + " filename"
+      print ("Cannot find file ", argv[1])
+      print ("Usage: " + argv[0] + " filename")
 

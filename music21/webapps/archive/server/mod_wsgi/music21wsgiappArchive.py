@@ -149,7 +149,7 @@ def processJSONData(json_data_str):
 
 # WWNorton related commands -- in progress
 def processWWNortonJSON(json_obj):
-    print 'processing WW Norton'
+    print('processing WW Norton')
     message = ""
     # Get what command the JSON is requesting
     try:
