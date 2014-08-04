@@ -716,46 +716,69 @@ def _tieFromAttr(attr):
         return tie.Tie('stop')
 
 
-def _addSlurToThing(m21Start, m21End, attr, thing, slurBundle):
-    # TODO: write tests
+def addSlurs(elem, obj, slurBundle):
     '''
-    If relevant, add a slur to an object. Both "thing" and "slurBundle" must not be ``None``, but
-    the first three arguments may be ``None``. To trigger a slur, either "m21Start", "m21End",
-    or "attr" must be present.
+    If relevant, add a slur to an ``obj``ect that was created from an ``elem``ent.
 
-    :param str m21Start: Value of the @m21SlurStart attribute added by the :mod:`~music21.mei`
-        module to facilitate slur processing.
-    :param str m21End: Value of the @m21SlurEnd attribute added by the :mod:`~music21.mei`
-        module to facilitate slur processing.
-    :param str attr: Value of the @slur attribute on the element from which "thing" was created.
-    :param thing: The object to which to attach a slur. This will probably be a
-        :class:`~music21.note.Note` or :class:`~music21.chord.Chord` instance, but it may be
-        something else.
-    :type thing: :class:`~music21.base.Music21Object`
-    :param slurBundle: The :class:`SlurBundle` associated with the :class:`Stream` that holds
-        "thing."
-    :type slurBundle: :class:`music21.spanner.SlurBundle`
+    :param elem: The :class:`Element` that caused creation of the ``obj``.
+    :type elem: :class:`xml.etree.ElementTree.Element`
+    :param obj: The musical object (:class:`Note`, :class:`Chord`, etc.) created from ``elem``, to
+        which a slur might be attached.
+    :type obj: :class:`music21.base.Music21Object`
+    :param slurBundle: The :class:`Slur`-holding :class:`SpannerBundle` associated with the
+        :class:`Stream` that holds ``obj``.
+    :type slurBundle: :class:`music21.spanner.SpannerBundle`
+    :returns: Whether at least one slur was added.
+    :rtype: bool
 
-    :returns: ``None``
+    **A Note about Importing Slurs**
+
+    Because of how the MEI format specifies slurs, the strategy required for proper import to
+    music21 is not obvious. There are two ways to specify a slur:
+
+    #. With a ``@slur`` attribute, in which case :func:`addSlurs` reads the attribute and manages
+       creating a :class:`Slur` object, adding the affected objects to it, and storing the
+       :class:`Slur` in the ``slurBundle``.
+    #. With a ``<slur>`` element, which requires pre-processing. In this case, :class:`Slur` objects
+       must already exist in the ``slurBundle``, and special attributes must be added to the
+       affected elements (``@m21SlurStart`` to the element at the start of the slur and
+       ``@m21SlurEnd`` to the element at the end). These attributes hold the ``id`` of a
+       :class:`Slur` in the ``slurBundle``, allowing :func:`addSlurs` to find the slur and add
+       ``obj`` to it.
+
+    .. caution:: If an ``elem`` has an @m21SlurStart or @m21SlurEnd attribute that refer to an
+        object not found in the ``slurBundle``, the slur is silently dropped.
     '''
-    if m21Start is not None:
-        slurBundle.getByIdLocal(m21Start)[0].addSpannedElements(thing)
-    if m21End is not None:
-        slurBundle.getByIdLocal(m21End)[0].addSpannedElements(thing)
+    post = False
 
-    # TODO: this is slurs based on the @slur attribute
-    if attr is not None:
-        theseSlurs = attr.split(' ')
+    def wrapGetByIdLocal(theId):
+        try:
+            slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
+            return True
+        except IndexError:
+            # when getByIdLocal() couldn't find the Slur
+            return False
+
+    if elem.get('m21SlurStart') is not None:
+        post = wrapGetByIdLocal(elem.get('m21SlurStart'))
+    if elem.get('m21SlurEnd') is not None:
+        post = wrapGetByIdLocal(elem.get('m21SlurEnd'))
+
+    if elem.get('slur') is not None:
+        theseSlurs = elem.get('slur').split(' ')
         for eachSlur in theseSlurs:
             slurNum, slurType = eachSlur
             if 'i' == slurType:
                 newSlur = spanner.Slur()
                 newSlur.idLocal = slurNum
                 slurBundle.append(newSlur)
-                newSlur.addSpannedElements(thing)
+                newSlur.addSpannedElements(obj)
+                post = True
             elif 't' == slurType:
-                slurBundle.getByIdLocal(slurNum)[0].addSpannedElements(thing)
+                post = wrapGetByIdLocal(slurNum)
             # 'm' is currently ignored; we may need it for cross-staff slurs
+
+    return post
 
 
 def beamTogether(someThings):
@@ -2176,6 +2199,7 @@ if __name__ == "__main__":
                      test_main.TestStaffDefFromElement,
                      test_main.TestScoreDefFromElement,
                      test_main.TestEmbeddedElements,
+                     test_main.TestAddSlurs,
                     )
 
 #------------------------------------------------------------------------------

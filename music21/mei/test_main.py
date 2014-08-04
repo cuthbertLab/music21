@@ -1699,3 +1699,189 @@ class TestEmbeddedElements(unittest.TestCase):
         self.assertSequenceEqual(expected, actual)
         mockTranslator.assert_called_once_with(elements[0], None)
         mockEnviron.printDebug.assert_called_once_with('unprocessed bream in ?')
+
+
+
+#------------------------------------------------------------------------------
+class TestAddSlurs(unittest.TestCase):
+    '''Tests for addSlurs()'''
+
+    def testUnit1(self):
+        '''
+        addSlurs(): element with @m21SlurStart is handled correctly
+        '''
+        theUUID = 'ae0b1570-451f-4ee9-a136-2094e26a797b'
+        elem = ETree.Element('note', attrib={'m21SlurStart': theUUID,
+                                             'm21SlurEnd': None,
+                                             'slur': None})
+        slurBundle = mock.MagicMock('slur bundle')
+        mockNewSlur = mock.MagicMock('mock slur')
+        mockNewSlur.addSpannedElements = mock.MagicMock()
+        slurBundle.getByIdLocal = mock.MagicMock(return_value=[mockNewSlur])
+        obj = mock.MagicMock('object')
+        expected = True
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+        slurBundle.getByIdLocal.assert_called_once_with(theUUID)
+        mockNewSlur.addSpannedElements.assert_called_once_with(obj)
+
+    def testIntegration1(self):
+        '''
+        addSlurs(): element with @m21SlurStart is handled correctly
+        '''
+        theUUID = 'ae0b1570-451f-4ee9-a136-2094e26a797b'
+        elem = ETree.Element('note', attrib={'m21SlurStart': theUUID,
+                                             'm21SlurEnd': None,
+                                             'slur': None})
+        slurBundle = spanner.SpannerBundle()
+        theSlur = spanner.Slur()
+        theSlur.idLocal = theUUID
+        slurBundle.append(theSlur)
+        obj = note.Note('E-7', quarterLength=2.0)
+        expected = True
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+        self.assertSequenceEqual([theSlur], slurBundle.list)
+        self.assertSequenceEqual([obj], slurBundle.list[0].getSpannedElements())
+
+    def testUnit2(self):
+        '''
+        addSlurs(): element with @m21SlurEnd is handled correctly
+        '''
+        theUUID = 'ae0b1570-451f-4ee9-a136-2094e26a797b'
+        elem = ETree.Element('note', attrib={'m21SlurStart': None,
+                                             'm21SlurEnd': theUUID,
+                                             'slur': None})
+        slurBundle = mock.MagicMock('slur bundle')
+        mockNewSlur = mock.MagicMock('mock slur')
+        mockNewSlur.addSpannedElements = mock.MagicMock()
+        slurBundle.getByIdLocal = mock.MagicMock(return_value=[mockNewSlur])
+        obj = mock.MagicMock('object')
+        expected = True
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+        slurBundle.getByIdLocal.assert_called_once_with(theUUID)
+        mockNewSlur.addSpannedElements.assert_called_once_with(obj)
+
+    # NB: skipping testIntegration2() ... if Integration1 and Unit2 work, this probably does too
+
+    @mock.patch('music21.spanner.Slur')
+    def testUnit3(self, mockSlur):
+        '''
+        addSlurs(): element with @slur is handled correctly (both an 'i' and 't' slur)
+        '''
+        elem = ETree.Element('note', attrib={'m21SlurStart': None,
+                                             'm21SlurEnd': None,
+                                             'slur': '1i 2t'})
+        slurBundle = mock.MagicMock('slur bundle')
+        slurBundle.append = mock.MagicMock('slurBundle.append')
+        mockSlur.return_value = mock.MagicMock('mock slur')
+        mockSlur.return_value.addSpannedElements = mock.MagicMock()
+        mockNewSlur = mock.MagicMock('mock new slur')
+        mockNewSlur.addSpannedElements = mock.MagicMock()
+        slurBundle.getByIdLocal = mock.MagicMock(return_value=[mockNewSlur])
+        obj = mock.MagicMock('object')
+        expected = True
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+        slurBundle.append.assert_called_once_with(mockSlur.return_value)
+        mockSlur.return_value.addSpannedElements.assert_called_once_with(obj)
+        mockSlur.return_value.idLocal = '1'
+        slurBundle.getByIdLocal.assert_called_once_with('2')
+        mockNewSlur.addSpannedElements.assert_called_once_with(obj)
+
+    def testIntegration3(self):
+        '''
+        addSlurs(): element with @slur is handled correctly (both an 'i' and 't' slur)
+        '''
+        elem = ETree.Element('note', attrib={'m21SlurStart': None,
+                                             'm21SlurEnd': None,
+                                             'slur': '1i 2t'})
+        slurBundle = spanner.SpannerBundle()
+        theSlur = spanner.Slur()
+        theSlur.idLocal = '2'
+        slurBundle.append(theSlur)
+        obj = note.Note('E-7', quarterLength=2.0)
+        expected = True
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+        self.assertSequenceEqual([theSlur, mock.ANY], slurBundle.list)
+        self.assertIsInstance(slurBundle.list[1], spanner.Slur)
+        self.assertSequenceEqual([obj], slurBundle.list[0].getSpannedElements())
+        self.assertSequenceEqual([obj], slurBundle.list[1].getSpannedElements())
+
+    def testUnit4(self):
+        '''
+        addSlurs(): nothing was added; all three slur-related attributes missing
+        '''
+        elem = ETree.Element('note', attrib={'m21SlurStart': None,
+                                             'm21SlurEnd': None,
+                                             'slur': None})
+        slurBundle = mock.MagicMock('slur bundle')
+        obj = mock.MagicMock('object')
+        expected = False
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+
+    def testUnit5(self):
+        '''
+        addSlurs(): nothing was added; @slur is present, but only "medial" indicators
+        '''
+        elem = ETree.Element('note', attrib={'m21SlurStart': None,
+                                             'm21SlurEnd': None,
+                                             'slur': '1m 2m'})
+        slurBundle = mock.MagicMock('slur bundle')
+        obj = mock.MagicMock('object')
+        expected = False
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+
+    def testUnit6(self):
+        '''
+        addSlurs(): nothing was added; when the Slur with id of @m21SlurStart can't be found
+
+        NB: this tests that the inner function works---catching the IndexError
+        '''
+        elem = ETree.Element('note', attrib={'m21SlurStart': '07f5513a-436a-4247-8a5d-85c10c661920',
+                                             'm21SlurEnd': None,
+                                             'slur': None})
+        slurBundle = mock.MagicMock('slur bundle')
+        slurBundle.getByIdLocal = mock.MagicMock(side_effect=IndexError)
+        obj = mock.MagicMock('object')
+        expected = False
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+
+    def testIntegration6(self):
+        '''
+        addSlurs(): nothing was added; when the Slur with id of @m21SlurStart can't be found
+
+        NB: this tests that the inner function works---catching the IndexError
+        '''
+        elem = ETree.Element('note', attrib={'m21SlurStart': '07f5513a-436a-4247-8a5d-85c10c661920',
+                                             'm21SlurEnd': None,
+                                             'slur': None})
+        slurBundle = spanner.SpannerBundle()
+        obj = note.Note('E-7', quarterLength=2.0)
+        expected = False
+
+        actual = main.addSlurs(elem, obj, slurBundle)
+
+        self.assertEqual(expected, actual)
+        self.assertSequenceEqual([], slurBundle.list)
