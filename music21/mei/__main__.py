@@ -141,6 +141,7 @@ def convertFromString(dataStr):
         else:
             targetElem.set(attr, value)
 
+    environLocal.printDebug('*** pre-processing slurs')
     # pre-processing for <slur> tags
     slurBundle = spanner.SpannerBundle()
     for eachSlur in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
@@ -153,16 +154,14 @@ def convertFromString(dataStr):
         _innerAttrSetter(eachSlur.get('startid'), 'm21SlurStart', thisIdLocal)
         _innerAttrSetter(eachSlur.get('endid'), 'm21SlurEnd', thisIdLocal)
 
-    environLocal.printDebug('*** finished slurs')
-
+    environLocal.printDebug('*** pre-processing ties')
     # pre-processing for <tie> tags
     # (this essentially converts <tie> tags into @tie attributes)
     for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
         _innerAttrSetter(eachTie.get('startid'), 'tie', ' i', True)
         _innerAttrSetter(eachTie.get('endid'), 'tie', ' t', True)
 
-    environLocal.printDebug('*** finished ties')
-
+    environLocal.printDebug('*** pre-processing tuplets')
     # TODO: probably clean this up
     # pre-processing <tupletSpan> tags
     for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
@@ -207,7 +206,7 @@ def convertFromString(dataStr):
                         foundTheEnd = True
                         break
 
-    environLocal.printDebug('*** finished tuplets')
+    environLocal.printDebug('*** preparing part and staff definitions')
 
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
@@ -242,6 +241,8 @@ def convertFromString(dataStr):
         for allPartObject in scoreDefResults['all-part objects']:
             for partN in allPartNs:
                 inNextMeasure[partN].append(allPartObject)
+
+    environLocal.printDebug('*** processing measures')
 
     backupMeasureNum = 0
     for eachSection in documentRoot.iterfind('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
