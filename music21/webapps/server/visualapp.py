@@ -56,7 +56,7 @@ def music21ModWSGIVisualApplication(environ, start_response):
     n = note.Note(noteName)
     
     tempPath = n.write('png')
-    print tempPath
+    print(tempPath)
     
     writePath = documentRoot + "/music21/OutputFiles/"
     

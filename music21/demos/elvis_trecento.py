@@ -118,7 +118,7 @@ class NGramJob(common.SlottedObject):
             reducedScore = chordReducer(score).parts[0]
         except AssertionError as e:
             self.debug('REDUCTION ERROR')
-            print e
+            print(e)
             return
         self.debug('REDUCED')
         self.results['chordified'] = []

@@ -291,7 +291,7 @@ def corpusMelodicIntervalSearch(show = True):
 
     for sub in msg: 
         if show == True:
-            print sub
+            print (sub)
 
 
 
@@ -327,7 +327,7 @@ def corpusMelodicIntervalSearchBrief(show=False):
         message.append('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (region, pcentSevenths, intervalCount, workCount))
     if show == True:
         for sub in message: 
-            print sub
+            print (sub)
 
 
 def corpusFindMelodicSevenths(show = True):

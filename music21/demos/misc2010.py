@@ -67,8 +67,8 @@ def countCs():
     for thisPitch in wtcf1.pitches:
         if thisPitch.name == 'C':
             numberOfCs += 1
-    print numberOfCs
-    print wtcf1.analyze('key')
+    print (numberOfCs)
+    print (wtcf1.analyze('key'))
 
 def bachParallels():
     '''
@@ -79,7 +79,7 @@ def bachParallels():
     Thessaloniki, Greece, 3-6 July 2008, http://web.auth.gr/cim08/
     '''
     for fn in corpus.getBachChorales():
-        print fn
+        print (fn)
         c = corpus.parseWork(fn)
         displayMe = False
         for i in range(len(c.parts) - 1):
@@ -214,7 +214,7 @@ def pcsFromHumdrum(show = False):
     for thisChord in onePartScore.flat.getElementsByClass(chord.Chord):
         output = output + thisChord.forteName + "\n"
     if show == True:
-        print output
+        print (output)
         
 
 

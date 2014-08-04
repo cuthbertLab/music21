@@ -505,7 +505,7 @@ class ABCMetadata(ABCToken):
         >>> am = abcFormat.ABCMetadata('Q:1/4 3/8 1/4 3/8=40')
         >>> am.preParse()
         >>> am.getMetronomeMarkObject()
-        <music21.tempo.MetronomeMark grave Whole tied to Quarter (5.0 total QL)=40.0>
+        <music21.tempo.MetronomeMark grave Whole tied to Quarter (5 total QL)=40.0>
 
         >>> am = abcFormat.ABCMetadata('Q:90')
         >>> am.preParse()

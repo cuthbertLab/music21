@@ -734,7 +734,7 @@ class Test(unittest.TestCase):
                         results[degree] += 1
 
         print ('Of %s works, the following major scale degrees are not used the following number of times:' % workCount)
-        print results
+        print (results)
 
         #Of 104 works, the following major scale degrees are not used the following number of times:
         #{4: 5, 5: 1, 6: 6, 7: 6}

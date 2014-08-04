@@ -26,15 +26,15 @@ from music21 import corpus, converter
 def main():
     trecentoFiles = corpus.getWork('trecento')
     for t in trecentoFiles:
-        print t
+        print (t)
         tparsed = converter.parse(t)
         for p in tparsed.parts:
             ambi = p.analyze('ambitus')
             distance = ambi.diatonic.generic.undirected
             if distance >= 15:
-                print "************ GOT ONE!: %r ************".format(ambi)
+                print ("************ GOT ONE!: %r ************".format(ambi))
             elif distance >= 9:
-                print ambi
+                print (ambi)
             else:
                 pass
 
