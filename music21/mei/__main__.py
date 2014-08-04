@@ -143,6 +143,16 @@ def convertFromString(dataStr):
 
     environLocal.printDebug('*** pre-processing slurs')
     # pre-processing for <slur> tags
+    # TODO: plan for reimplmenenting the slur pre-processing...
+    #       The reason this is slow is the call to documentRoot.find() above, which must iterate
+    #       the entire tree on every call (of which there will be two times the number of slurs).
+    #       If we can iterate the tree only once, it'll be much faster. Thus, we'll iterate the
+    #       slurs first, preparing the SpannerBundle instance with all the Slur objects. At the
+    #       same time, we'll add the slurs to a mapping from _XMLID to Slur objects. Then, we can
+    #       iterate the tree, and use the mapping to quickly access the relevant Slur object, if
+    #       there is one. How will we know whether to add @m21SlurStart or @m21SlurEnd to the
+    #       element? Good question---probably it's easy.
+    #       And why not do this right now? First I want to have everything tested and mostly working.
     slurBundle = spanner.SpannerBundle()
     for eachSlur in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
         # TODO: slurs with @tstamp
