@@ -383,43 +383,6 @@ def allPartsPresent(allStaffDefs):
     return tuple(post)
 
 
-def findInStreamById(elementId, inStream, classFilter=None):
-    '''
-    Recursively find an object in a :class:`Stream` by its ``id`` property. The built-in
-    :meth:`~music21.stream.Stream.getElementById` method does not search recursively through
-    embedded :class:`Stream` or :class:`Chord` objects, which may both hold the :class:`Note`
-    objects this function is designed to find.
-
-    :param elementId: The ``id`` of the object you seek.
-    :type elementId: Any type that may be set as the ``id`` of a :class:`Stream`.
-    :param inStream: The :class:`Stream` in which to recursively look for an element.
-    :type inStream: :class:`music21.stream.Stream`
-    :param classFilter: Given to :meth:`~music21.stream.Stream.getElementById` without change.
-    :type classFilter: As specified in :meth:`music21.base.Music21Object.isClassOrSubclass`
-
-    :returns: The first object found with an ``id`` matching ``elementId`` or None if no element
-        is found.
-    :rtype: :class:`~music21.base.Music21Object` or None
-    '''
-    # TODO: rewrite this with a lot more thought
-    # try 1: it might be right here
-    post = inStream.getElementById(elementId, classFilter=classFilter)
-    if post is not None:
-        return post
-
-    # try 2: search in Chord objects
-    for eachChord in inStream.getElementsByClass([chord.Chord], returnStreamSubClass=False):
-        for eachNote in eachChord:
-            if elementId == eachNote.id:
-                return eachNote
-
-    # try 3: recurse through Stream objects
-    for eachStream in inStream.getElementsByClass([stream.Stream], returnStreamSubClass=False):
-        post = findInStreamById(elementId, eachStream, classFilter)
-        if post is not None:
-            return post
-
-
 # Constants for One-to-One Translation
 #------------------------------------------------------------------------------
 # for _accidentalFromAttr()
