@@ -1342,8 +1342,7 @@ def noteFromElement(elem, slurBundle=None):
     # NOTE: ensure this stays in sync with chordFromElement()
     # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
     if slurBundle is not None:
-        _addSlurToThing(elem.get('m21SlurStart'), elem.get('m21SlurEnd'), elem.get('slur'),
-                        post, slurBundle)
+        addSlurs(elem, post, slurBundle)
 
     # id in the @xml:id attribute
     if elem.get(_XMLID) is not None:
@@ -1562,8 +1561,7 @@ def chordFromElement(elem, slurBundle=None):
     # NOTE: ensure this stays in sync with chordFromElement()
     # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
     if slurBundle is not None:
-        _addSlurToThing(elem.get('m21SlurStart'), elem.get('m21SlurEnd'), elem.get('slur'),
-                        post, slurBundle)
+        addSlurs(elem, post, slurBundle)
 
     # ties in the @tie attribute
     if elem.get('tie') is not None:

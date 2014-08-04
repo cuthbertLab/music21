@@ -573,8 +573,8 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.mei.__main__.makeDuration')
     @mock.patch('music21.mei.__main__._makeArticList')
     @mock.patch('music21.mei.__main__._tieFromAttr')
-    @mock.patch('music21.mei.__main__._addSlurToThing')
-    def testUnit3_new(self, mockSlur, mockTie, mockArticList, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+    @mock.patch('music21.mei.__main__.addSlurs')
+    def testUnit3(self, mockSlur, mockTie, mockArticList, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
         noteFromElement(): adds @xml:id, @artic, and @tie attributes, and the slurBundle
 
@@ -603,7 +603,7 @@ class TestNoteFromElement(unittest.TestCase):
         mockNewNote.articulations.extend.assert_called_once_with(['staccato!'])
         self.assertEqual('a tie!', mockNewNote.tie)
         self.assertEqual(0, mockNewNote.duration.call_count)
-        mockSlur.assert_called_once_with(None, None, None, mockNewNote, 'slur bundle')
+        mockSlur.assert_called_once_with(elem, mockNewNote, 'slur bundle')
 
     def testIntegration3(self):
         '''
