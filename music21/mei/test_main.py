@@ -454,6 +454,10 @@ class TestAttrTranslators(unittest.TestCase):
 #------------------------------------------------------------------------------
 class TestNoteFromElement(unittest.TestCase):
     '''Tests for noteFromElement()'''
+    # NOTE: For this TestCase, in the unit tests, if you get...
+    #       AttributeError: 'str' object has no attribute 'call_count'
+    #       ... it means a test failure, because the str should have been a MagicMock but was
+    #       replaced with a string by the unit under test.
 
     @mock.patch('music21.note.Note')
     @mock.patch('music21.mei.__main__._processEmbeddedElements')
@@ -719,153 +723,163 @@ class TestRestFromElement(unittest.TestCase):
 #------------------------------------------------------------------------------
 class TestChordFromElement(unittest.TestCase):
     '''Tests for chordFromElement()'''
-    # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
+    # NOTE: For this TestCase, in the unit tests, if you get...
+    #       AttributeError: 'str' object has no attribute 'call_count'
+    #       ... it means a test failure, because the str should have been a MagicMock but was
+    #       replaced with a string by the unit under test.
 
     @staticmethod
-    def makeNoteTags(pname, accid, octArg, dur, dots):
+    def makeNoteElems(pname, accid, octArg, dur, dots):
         '''Factory function for the Element objects that are a <note>.'''
-        return ETree.Element('%snote' % _MEINS, pname=pname, accid=accid, oct=octArg, dur=dur, dots=dots)
+        return ETree.Element('{}note'.format(_MEINS), pname=pname, accid=accid, oct=octArg, dur=dur, dots=dots)
 
     @mock.patch('music21.chord.Chord')
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.makeDuration')
     @mock.patch('music21.mei.__main__.noteFromElement')
-    def testUnit1(self, mockNoteFromElement, mockChord):
+    def testUnit1(self, mockNoteFromE, mockMakeDuration, mockProcEmbEl, mockChord):
         '''
-        chordFromElement(): all the elements that go in Chord.__init__()...
-                            'dur', 'dots', and some note.Note objects.
-        (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
+        chordFromElement(): all the basic attributes (i.e., @pname, @accid, @oct, @dur, @dots)
         '''
-        elem = mock.MagicMock()
-        expectedGetOrder = [mock.call('dur'), mock.call('dots', 0)]
-        expectedGetOrder.extend([mock.ANY for _ in xrange(4)])  # additional calls to elem.get(), not part of this test
-        elemGetReturns = ['4', '1']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
-        elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
-        mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
-        mockNoteFromElement.side_effect = lambda x, y: x  # noteFromElement() returns first argument
-        expectedNotes = ['root', 'third', 'fifth']
-        expected = mockChord.return_value
+        elem = ETree.Element('chord', attrib={'dur': '4', 'dots': '1'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, None, '4', '8', None) for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        mockNoteFromE.return_value = 'a note'
+        mockMakeDuration.return_value = 'makeDuration() return'
+        mockNewChord = mock.MagicMock()
+        mockChord.return_value = mockNewChord
+        mockProcEmbEl.return_value = []
+        expected = mockNewChord
 
+        actual = main.chordFromElement(elem, None)
+
+        self.assertEqual(expected, mockNewChord, actual)  # TODO: this calls __eq__() but I don't know if that actually returns something useful
+        mockMakeDuration.assert_called_once_with(1.0, 1)
+        mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
+        self.assertEqual(0, mockNewChord.id.call_count)
+        self.assertEqual(0, mockNewChord.articulations.extend.call_count)
+        self.assertEqual(0, mockNewChord.tie.call_count)
+        self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
+
+    def testIntegration1a(self):
+        '''
+        chordFromElement(): all the basic attributes (i.e., @pname, @accid, @oct, @dur, @dots)
+
+        (corresponds to testUnit1() with no mocks)
+        '''
+        elem = ETree.Element('chord', attrib={'dur': '4', 'dots': '1'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, 'n', '4', '8', '0') for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        expectedName = 'Chord {C-natural in octave 4 | E-natural in octave 4 | G-natural in octave 4} Dotted Quarter'
         actual = main.chordFromElement(elem)
-
-        self.assertEqual(expected, actual)
-        elem.iterfind.assert_called_once_with('%snote' % _MEINS)
-        mockChord.assert_called_once_with(notes=expectedNotes)
-        self.assertEqual(mockChord.return_value.duration, duration.Duration(1.5))
-        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
-
-    def testIntegration1(self):
-        '''
-        chordFromElement(): all the elements that go in Chord.__init__()...
-                            'dur', 'dots', and some note.Note objects.
-        (corresponds to testUnit1() with real Note, Chord, and ElementTree.Element)
-        '''
-        chordElem = ETree.Element('chord')
-        chordAttribs = {'dur': '4', 'dots': '1'}
-        for eachKey in chordAttribs:
-            chordElem.set(eachKey, chordAttribs[eachKey])
-        for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
-            chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
-        expectedPitches = [pitch.Pitch(x) for x in ('C#2', 'D-2', 'F##3')]
-        expectedQuarterLength = 1.5
-        expectedDots = 1
-
-        actual = main.chordFromElement(chordElem)
-
-        self.assertEqual(expectedQuarterLength, actual.duration.quarterLength)
-        self.assertEqual(expectedDots, actual.duration.dots)
-        self.assertSequenceEqual(expectedPitches, actual.pitches)
+        self.assertEqual(expectedName, actual.fullName)
 
     @mock.patch('music21.chord.Chord')
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.makeDuration')
     @mock.patch('music21.mei.__main__.noteFromElement')
-    def testUnit2(self, mockNoteFromElement, mockChord):
+    def testUnit2(self, mockNoteFromE, mockMakeDuration, mockProcEmbEl, mockChord):
         '''
-        chordFromElement(): adds "id"
-        (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
+        chordFromElement(): adds an <artic> element held within
         '''
-        elem = mock.MagicMock()
-        expectedGetOrder = [mock.ANY for _ in xrange(2)]  # additional calls to elem.get(), not part of this test
-        expectedGetOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
-        expectedGetOrder.extend([mock.ANY for _ in xrange(3)])  # additional calls to elem.get(), not part of this test
-        elemGetReturns = ['4', '1', '42', '42']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
-        elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
-        mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
-        mockNoteFromElement.side_effect = lambda x, y: x  # noteFromElement() returns first argument
-        expectedNotes = ['root', 'third', 'fifth']
-        expected = mockChord.return_value
+        elem = ETree.Element('chord', attrib={'dur': '4', 'dots': '1'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, None, '4', '8', None) for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        elem.append(ETree.Element('{}artic'.format(_MEINS), artic='stacc'))
+        mockNoteFromE.return_value = 'a note'
+        mockMakeDuration.return_value = 'makeDuration() return'
+        mockNewChord = mock.MagicMock()
+        mockChord.return_value = mockNewChord
+        mockProcEmbEl.return_value = [articulations.Staccato()]
+        expected = mockNewChord
 
-        actual = main.chordFromElement(elem)
+        actual = main.chordFromElement(elem, None)
 
-        self.assertEqual(expected, actual)
-        elem.iterfind.assert_called_once_with('%snote' % _MEINS)
-        mockChord.assert_called_once_with(notes=expectedNotes)
-        self.assertEqual(duration.Duration(1.5), actual.duration)
-        self.assertEqual('42', actual.id)
-        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+        self.assertEqual(expected, mockNewChord, actual)
+        mockMakeDuration.assert_called_once_with(1.0, 1)
+        mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
+        self.assertEqual(1, mockNewChord.articulations.append.call_count)
+        self.assertIsInstance(mockNewChord.articulations.append.call_args_list[0][0][0],
+                              articulations.Staccato)
+        self.assertEqual(0, mockNewChord.id.call_count)
+        self.assertEqual(0, mockNewChord.articulations.extend.call_count)
+        self.assertEqual(0, mockNewChord.tie.call_count)
+        self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
 
     def testIntegration2(self):
         '''
-        chordFromElement(): adds "id"
-        (corresponds to testUnit2() with real Note, Chord, and ElementTree.Element)
+        noteFromElement(): adds <artic>, <accid>, and <dot> elements held within
+
+        (corresponds to testUnit2() with no mocks)
         '''
-        chordElem = ETree.Element('chord')
-        chordAttribs = {'dur': '4', 'dots': '1', _XMLID: 'bef1f18a'}
-        for eachKey in chordAttribs:
-            chordElem.set(eachKey, chordAttribs[eachKey])
-        for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
-            chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
-
-        actual = main.chordFromElement(chordElem)
-
-        self.assertEqual(chordAttribs[_XMLID], actual.id)
+        elem = ETree.Element('chord', attrib={'dur': '4', 'dots': '1'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, 'n', '4', '8', '0') for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        elem.append(ETree.Element('{}artic'.format(_MEINS), artic='stacc'))
+        expectedName = 'Chord {C-natural in octave 4 | E-natural in octave 4 | G-natural in octave 4} Dotted Quarter'
+        actual = main.chordFromElement(elem)
+        self.assertEqual(expectedName, actual.fullName)
+        self.assertEqual(1, len(actual.articulations))
+        self.assertIsInstance(actual.articulations[0], articulations.Staccato)
 
     @mock.patch('music21.chord.Chord')
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.makeDuration')
     @mock.patch('music21.mei.__main__.noteFromElement')
-    def testUnit3(self, mockNoteFromElement, mockChord):
+    @mock.patch('music21.mei.__main__._makeArticList')
+    @mock.patch('music21.mei.__main__._tieFromAttr')
+    @mock.patch('music21.mei.__main__.addSlurs')
+    def testUnit3(self, mockSlur, mockTie, mockArticList, mockNoteFromE, mockMakeDuration, mockProcEmbEl, mockChord):
         '''
-        chordFromElement(): adds "artic"
-        (mostly-unit test; only mock out Chord, noteFromElement, and the ElementTree.Element)
+        chordFromElement(): adds @xml:id, @artic, and @tie attributes, and the slurBundle
         '''
-        elem = mock.MagicMock()
-        expectedGetOrder = [mock.ANY for _ in xrange(3)]  # additional calls to elem.get(), not part of this test
-        expectedGetOrder.extend([mock.call('artic'), mock.call('artic')])
-        expectedGetOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
-        elemArtic = 'stacc'
-        elemGetReturns = ['4', '1', None, elemArtic, elemArtic]
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
-        elem.iterfind = mock.MagicMock(return_value=['root', 'third', 'fifth'])
-        mockChord.return_value = mock.MagicMock(spec=chord.Chord, name='chord return')
-        mockNoteFromElement.side_effect = lambda x, y: x  # noteFromElement() returns first argument
-        expectedNotes = ['root', 'third', 'fifth']
-        expected = mockChord.return_value
+        elem = ETree.Element('chord', attrib={'dur': '4', 'dots': '1', 'artic': 'stacc',
+                                              _XMLID: '123', 'tie': 'i1'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, None, '4', '8', None) for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        mockNoteFromE.return_value = 'a note'
+        mockMakeDuration.return_value = 'makeDuration() return'
+        mockNewChord = mock.MagicMock()
+        mockChord.return_value = mockNewChord
+        mockProcEmbEl.return_value = []
+        mockArticList.return_value = ['staccato!']
+        mockTie.return_value = 'a tie!'
+        expected = mockNewChord
 
-        actual = main.chordFromElement(elem)
+        actual = main.chordFromElement(elem, 'slur bundle')
 
-        self.assertEqual(expected, actual)
-        elem.iterfind.assert_called_once_with('%snote' % _MEINS)
-        mockChord.assert_called_once_with(notes=expectedNotes)
-        self.assertEqual(duration.Duration(1.5), actual.duration)
-        self.assertEqual(1, len(actual.articulations))
-        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
-        self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
+        self.assertEqual(expected, mockNewChord, actual)
+        mockMakeDuration.assert_called_once_with(1.0, 1)
+        mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
+        self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
+        mockNewChord.articulations.extend.assert_called_once_with(['staccato!'])
+        self.assertEqual('123', mockNewChord.id)
+        self.assertEqual('a tie!', mockNewChord.tie)
+        mockSlur.assert_called_once_with(elem, mockNewChord, 'slur bundle')
 
     def testIntegration3(self):
         '''
-        chordFromElement(): adds "artic"
-        (corresponds to testUnit2() with real Note, Chord, and ElementTree.Element)
+        noteFromElement(): adds @xml:id, @artic, and @tie attributes, and the slurBundle
+
+        (corresponds to testUnit3() with no mocks)
         '''
-        chordElem = ETree.Element('chord')
-        chordAttribs = {'dur': '4', 'dots': '1', 'artic': 'stacc'}
-        for eachKey in chordAttribs:
-            chordElem.set(eachKey, chordAttribs[eachKey])
-        for eachPitch in [('C', 's', '2'), ('D', 'f', '2'), ('F', 'ss', '3')]:
-            chordElem.append(TestChordFromElement.makeNoteTags(eachPitch[0], eachPitch[1], eachPitch[2], '4', '1'))
-
-        actual = main.chordFromElement(chordElem)
-
+        elem = ETree.Element('chord', attrib={'dur': '4', 'dots': '1', 'artic': 'stacc',
+                                              _XMLID: 'asdf1234', 'tie': 'i1'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, 'n', '4', '8', '0') for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        expectedName = 'Chord {C-natural in octave 4 | E-natural in octave 4 | G-natural in octave 4} Dotted Quarter'
+        actual = main.chordFromElement(elem)
+        self.assertEqual(expectedName, actual.fullName)
         self.assertEqual(1, len(actual.articulations))
-        self.assertTrue(isinstance(actual.articulations[0], articulations.Staccato))
-
+        self.assertIsInstance(actual.articulations[0], articulations.Staccato)
+        self.assertEqual('asdf1234', actual.id)
+        self.assertEqual(tie.Tie('start'), actual.tie)
 
 
 #------------------------------------------------------------------------------

@@ -1250,6 +1250,7 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
 
 def noteFromElement(elem, slurBundle=None):
+    # NOTE: this function should stay in sync with chordFromElement() where sensible
     '''
     <note> is a single pitched event.
 
@@ -1350,7 +1351,6 @@ def noteFromElement(elem, slurBundle=None):
         elif isinstance(subElement, six.string_types):
             post.pitch.accidental = pitch.Accidental(subElement)
 
-    # NOTE: ensure this stays in sync with chordFromElement()
     # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
     if slurBundle is not None:
         addSlurs(elem, post, slurBundle)
@@ -1500,6 +1500,7 @@ def mSpaceFromElement(elem, slurBundle=None):
 
 
 def chordFromElement(elem, slurBundle=None):
+    # NOTE: this function should stay in sync with noteFromElement() where sensible
     '''
     <chord> is a simultaneous sounding of two or more notes in the same layer with the same duration.
 
@@ -1513,10 +1514,12 @@ def chordFromElement(elem, slurBundle=None):
     - dots, from att.augmentdots: [0..4]
     - artic, a list from att.articulation: (via _articulationFromAttr())
     - @tie, (many of "[i|m|t]")
+    - <artic> contained within
+    - @slur, (many of "[i|m|t][1-6]")
 
     Attributes In Progress:
     =======================
-    - @slur, (many of "[i|m|t][1-6]")
+    - @tuplet, (many of "[i|m|t][1-6]") ??????
     - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
@@ -1530,7 +1533,6 @@ def chordFromElement(elem, slurBundle=None):
                              (att.layerident (@layer)))
                   (att.fermatapresent (@fermata))
                   (att.syltext (@syl))
-                  (att.tupletpresent (@tuplet))
                   (att.chord.log.cmn (att.beamed (@beam))
                                      (att.lvpresent (@lv))
                                      (att.ornam (@ornam)))
@@ -1555,24 +1557,32 @@ def chordFromElement(elem, slurBundle=None):
     May Contain:
     ============
     MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
-    MEI.shared: artic
     '''
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}artic': articFromElement}
+
     # pitch and duration... these are what we can set in the constructor
     post = chord.Chord(notes=[noteFromElement(x, slurBundle) for x in elem.iterfind('{}note'.format(_MEINS))])
 
     # for a Chord, setting "duration" with a Duration object in __init__() doesn't work
     post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
 
-    if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+    # iterate all immediate children
+    dotElements = 0  # count the number of <dot> elements
+    for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle):
+        if isinstance(subElement, articulations.Articulation):
+            post.articulations.append(subElement)
 
-    if elem.get('artic') is not None:
-        post.articulations = _makeArticList(elem.get('artic'))
-
-    # NOTE: ensure this stays in sync with chordFromElement()
     # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
     if slurBundle is not None:
         addSlurs(elem, post, slurBundle)
+
+    # id in the @xml:id attribute
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
+
+    # articulations in the @artic attribute
+    if elem.get('artic') is not None:
+        post.articulations.extend(_makeArticList(elem.get('artic')))
 
     # ties in the @tie attribute
     if elem.get('tie') is not None:
@@ -1768,8 +1778,6 @@ def beamFromElement(elem, slurBundle=None):
 
 
 def tupletFromElement(elem, slurBundle=None):
-    # TODO: tuplet brackets on un-beamed notes don't work
-    # TODO: ratio numbers are never printed
     # TODO: write tests
     '''
     <tuplet> A group of notes with "irregular" (sometimes called "irrational") rhythmic values,
