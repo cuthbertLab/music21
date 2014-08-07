@@ -33,6 +33,7 @@ except ImportError:
     from xml.etree import ElementTree as ETree
 
 from uuid import uuid4
+from collections import defaultdict
 
 # music21
 from music21 import exceptions21
@@ -141,18 +142,13 @@ def convertFromString(dataStr):
         else:
             targetElem.set(attr, value)
 
+    # This defaultdict stores extra, music21-specific attributes that we add to elements to help
+    # importing. The key is an element's @xml:id, and the value is a regular dict with keys
+    # corresponding to attributes we'll add and values corresponding to those attributes's values.
+    m21Attributes = defaultdict(lambda: {})
+
     environLocal.printDebug('*** pre-processing slurs')
     # pre-processing for <slur> tags
-    # TODO: plan for reimplmenenting the slur pre-processing...
-    #       The reason this is slow is the call to documentRoot.find() above, which must iterate
-    #       the entire tree on every call (of which there will be two times the number of slurs).
-    #       If we can iterate the tree only once, it'll be much faster. Thus, we'll iterate the
-    #       slurs first, preparing the SpannerBundle instance with all the Slur objects. At the
-    #       same time, we'll add the slurs to a mapping from _XMLID to Slur objects. Then, we can
-    #       iterate the tree, and use the mapping to quickly access the relevant Slur object, if
-    #       there is one. How will we know whether to add @m21SlurStart or @m21SlurEnd to the
-    #       element? Good question---probably it's easy.
-    #       And why not do this right now? First I want to have everything tested and mostly working.
     slurBundle = spanner.SpannerBundle()
     for eachSlur in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
         # TODO: slurs with @tstamp
@@ -161,18 +157,19 @@ def convertFromString(dataStr):
         thisSlur.idLocal = thisIdLocal
         slurBundle.append(thisSlur)
 
-        _innerAttrSetter(eachSlur.get('startid'), 'm21SlurStart', thisIdLocal)
-        _innerAttrSetter(eachSlur.get('endid'), 'm21SlurEnd', thisIdLocal)
+        m21Attributes[removeOctothorpe(eachSlur.get('startid'))]['m21SlurStart'] = thisIdLocal
+        m21Attributes[removeOctothorpe(eachSlur.get('endid'))]['m21SlurEnd'] = thisIdLocal
 
     environLocal.printDebug('*** pre-processing ties')
     # pre-processing for <tie> tags
     # (this essentially converts <tie> tags into @tie attributes)
     for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
-        _innerAttrSetter(eachTie.get('startid'), 'tie', ' i', True)
-        _innerAttrSetter(eachTie.get('endid'), 'tie', ' t', True)
+        m21Attributes[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
+        m21Attributes[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
 
     environLocal.printDebug('*** pre-processing tuplets')
     # TODO: probably clean this up
+    # TODO: decide whether we can use the "m21Attributes" thing for tuplets
     # pre-processing <tupletSpan> tags
     for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
         if eachTuplet.get('plist') is not None:
@@ -183,6 +180,7 @@ def convertFromString(dataStr):
         else:
             # Poorly-encoded <tupletSpan> elements don't give a @plist attribute, so we have to do
             # some crude guesswork to find all the related elements.
+            # TODO: write the well-encoded <tupletSpan> situation here with the "m21Attributes" object
             startid = removeOctothorpe(eachTuplet.get('startid'))
             endid = removeOctothorpe(eachTuplet.get('endid'))
             foundTheStart = False
@@ -215,6 +213,15 @@ def convertFromString(dataStr):
                     if eachObject.get(_XMLID, '') == endid:
                         foundTheEnd = True
                         break
+
+    environLocal.printDebug('*** concluding pre-processing')
+    # conclude pre-processing by adding music21-specific attributes to their respective elements
+    for eachObject in documentRoot.iterfind('*//*'):
+        # we have a defaultdict, so this "if" isn't strictly necessary; but without it, every single
+        # element with an @xml:id creates a new, empty dict, which would consume a lot of memory
+        if eachObject.get(_XMLID) in m21Attributes:
+            for eachAttr in m21Attributes[eachObject.get(_XMLID)]:
+                eachObject.set(eachAttr, eachObject.get(eachAttr, '') + m21Attributes[eachObject.get(_XMLID)][eachAttr])
 
     environLocal.printDebug('*** preparing part and staff definitions')
 
@@ -1686,22 +1693,6 @@ def tupletFromElement(elem, slurBundle=None):
     post = beamTogether(post)
 
     return tuple(post)
-
-
-def tupletSpanFromElement(elem, documentRoot):
-    '''
-    Use a <tupletSpan> ``elem`` with properly-set @plist attribute to find and add custom music21
-    tuplet-marking attributes to all affected elements in the ``documentRoot``.
-
-    :param elem: The <tupletSpan> element with appropriately-set @plist attribute.
-    :type elem: :class:`xml.etree.ElementTree.Element`
-    :param documentRoot: The MEI document's root element.
-    :type documentRoot: :class:`~xml.etree.ElementTree.Element`
-    :returns: ``None``
-    :rtype: NoneType
-    '''
-    # TODO: write this function
-    environLocal.printDebug('trying to use tupletSpanFromElement()')
 
 
 def layerFromElement(elem, overrideN=None, slurBundle=None):
