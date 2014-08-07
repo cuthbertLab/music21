@@ -422,7 +422,7 @@ _ARTIC_ATTR_DICT = {'acc': articulations.Accent, 'stacc': articulations.Staccato
                     'open': articulations.OpenString,  # this may also mean "no mute?"
                     'dbltongue': articulations.DoubleTongue, 'toe': articulations.OrganToe,
                     'trpltongue': articulations.TripleTongue, 'heel': articulations.OrganHeel,
-                    # NOTE: these aren't implemented in music21, so I'll make new ones
+                    # TODO: these aren't implemented in music21, so I'll make new ones
                     'tap': None, 'lhpizz': None, 'dot': None, 'stroke': None, 'rip': None,
                     'bend': None, 'flip': None, 'smear': None, 'fingernail': None,  # (u1D1B3)
                     'damp': None, 'dampall': None}
@@ -929,16 +929,14 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     :returns: Objects from the ``<scoreDef>`` relevant on a per-part and whole-score basis.
     :rtype: dict of list of :class:`Music21Objects`
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
     - (att.meterSigDefault.log (@meter.count, @meter.unit))
     - (att.keySigDefault.log (@key.accid, @key.mode, @key.pname, @key.sig))
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
+    - none
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
                (att.id (@xml:id))
     att.scoreDef.log (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place))
@@ -952,39 +950,11 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
                                                                    @proport.numbase)
                                                 (att.mensural.shared (@modusmaior, @modusminor,
                                                                       @prolatio, @tempus))))
-    att.scoreDef.vis (@ending.rend, @mnum.visible, @music.name, @music.size, @optimize,
-                      @page.height, @page.width, @page.topmar, @page.botmar, @page.leftmar,
-                      @page.rightmar, @page.panels, @page.scale, @spacing.packexp,
-                      @spacing.packfact, @spacing.staff, @spacing.system, @system.leftmar,
-                      @system.rightmar, @system.topmar, @vu.height)
-                     (att.barplacement (@barplace, @taktplace))
-                     (att.cleffing.vis (@clef.color, @clef.visible))
-                     (att.distances (@dynam.dist, @harm.dist, @text.dist))
-                     (att.keySigDefault.vis (@key.sig.show, @key.sig.showchange))
-                     (att.lyricstyle (@lyric.align, @lyric.fam, @lyric.name, @lyric.size,
-                                      @lyric.style, @lyric.weight))
-                     (att.meterSigDefault.vis (@meter.rend, @meter.showchange, @meter.sym))
-                     (att.multinummeasures (@multi.number))
-                     (att.onelinestaff (@ontheline))
-                     (att.textstyle (@text.fam, @text.name, @text.size, @text.style, @text.weight))
-                     (att.scoreDef.vis.cmn (@grid.show)
-                                           (att.beaming.vis (@beam.color, @beam.rend, @beam.slope))
-                                           (att.pianopedals (@pedal.style))
-                                           (att.rehearsal (@reh.enclose))
-                                           (att.slurrend (@slur.rend))
-                                           (att.tierend (@tie.rend)))
-                     (att.scoreDef.vis.mensural (att.mensural.vis (@mensur.color, @mensur.form,
-                                                                   @mensur.loc, @mensur.orient,
-                                                                   @mensur.size)))
-    att.scoreDef.ges (@tune.pname, @tune.Hz, @tune.temper)
-                     (att.channelized (@midi.channel, @midi.duty, @midi.port, @midi.track))
-                     (att.timebase (@ppq))
-                     (att.miditempo (@midi.tempo))
-                     (att.mmtempo (@mm, @mm.unit, @mm.dots))
-    att.scoreDef.anl
+    att.scoreDef.vis (all)
+    att.scoreDef.ges (all)
+    att.scoreDef.anl (none exist)
 
-    May Contain:
-    ============
+    **Contained Elements not Implemented:**
     MEI.cmn: meterSig meterSigGrp
     MEI.harmony: chordTable
     MEI.linkalign: timeline
@@ -1019,8 +989,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
         other music21 objects specified by the ``<staffDef>``, like a :class:`Clef` or :class:`Key`.
     :rtype: list of :class:`music21.instrument.Instrument` then :class:`music21.base.Music21Object`
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
     - @label (att.common) as Instrument.partName
     - @label.abbr (att.labels.addl) as Instrument.partAbbreviation
     - @n (att.common) as Instrument.partId
@@ -1031,15 +1000,13 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - <instrDef> held within
     - <clef> held within
 
-    Attributes Ignored:
-    ===================
+    **Attributes/Elements Ignored:**
     - @key.sig.mixed (from att.keySigDefault.log)
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
+    - none
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@n, @xml:base)
                (att.id (@xml:id))
     att.declaring (@decls)
@@ -1051,36 +1018,14 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
                                                                    @proport.numbase)
                                                 (att.mensural.shared (@modusmaior, @modusminor,
                                                                       @prolatio, @tempus))))
-    att.staffDef.vis (@grid.show, @layerscheme, @lines, @lines.color, @lines.visible, @spacing)
-                     (att.cleffing.vis (@clef.color, @clef.visible))
-                     (att.distances (@dynam.dist, @harm.dist, @text.dist))
-                     (att.keySigDefault.vis (@key.sig.show, @key.sig.showchange))
-                     (att.lyricstyle (@lyric.align, @lyric.fam, @lyric.name, @lyric.size,
-                                      @lyric.style, @lyric.weight))
-                     (att.meterSigDefault.vis (@meter.rend, @meter.showchange, @meter.sym))
-                     (att.multinummeasures (@multi.number))
-                     (att.onelinestaff (@ontheline))
-                     (att.scalable (@scale))
-                     (att.textstyle (@text.fam, @text.name, @text.size, @text.style, @text.weight))
-                     (att.visibility (@visible))
-                     (att.staffDef.vis.cmn (att.beaming.vis (@beam.color, @beam.rend, @beam.slope))
-                                           (att.pianopedals (@pedal.style))
-                                           (att.rehearsal (@reh.enclose))
-                                           (att.slurrend (@slur.rend))
-                                           (att.tierend (@tie.rend)))
-                     (att.staffDef.vis.mensural (att.mensural.vis (@mensur.color, @mensur.form,
-                                                                   @mensur.loc, @mensur.orient,
-                                                                   @mensur.size)))
-    att.staffDef.ges (att.instrumentident (@instr))
-                     (att.timebase (@ppq))
-                     (att.staffDef.ges.tablature (@tab.strings))
-    att.staffDef.anl
+    att.staffDef.vis (all)
+    att.staffDef.ges (all)
+    att.staffDef.anl (none exist)
 
-    May Contain:
-    ============
-    MEI.cmn: meterSig meterSigGrp  TODO: these
-    MEI.mensural: mensur proport
-    MEI.shared: clefGrp keySig label layerDef  TODO: these
+    **Contained Elements not Implemented:**
+    - MEI.cmn: meterSig meterSigGrp  TODO: these
+    - MEI.mensural: mensur proport
+    - MEI.shared: clefGrp keySig label layerDef  TODO: these
     '''
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement}
@@ -1129,37 +1074,24 @@ def dotFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.304 (318 in PDF) (MEI.shared module)
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
+    - none
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
+    - none
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
                (att.id (@xml:id))
     att.facsimile (@facs)
-    att.dot.log (@form)
-                (att.controlevent (att.plist (@plist, @evaluate))
-                                  (att.timestamp.musical (@tstamp))
-                                  (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                                  (att.staffident (@staff))
-                                  (att.layerident (@layer)))
-    att.dot.vis (att.color (@color))
-                (att.staffloc (@loc))
-                (att.visualoffset.ho (@ho))
-                (att.visualoffset.vo (@vo))
-                (att.xy (@x, @y))
-                (att.dot.vis.mensural (att.staffloc.pitched (@ploc, @oloc)))
-    att.dot.gesatt.dot.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                           (att.alignment (@when)))
+    att.dot.log (all)
+    att.dot.vis (all)
+    att.dot.gesatt.dot.anl (all)
 
-    May Contain:
-    ============
-    None.
+    **Elements not Implemented:**
+    - none
     '''
-    # TODO: implement @plist
+    # TODO: implement @plist, in att.dot.log
     return 1
 
 
@@ -1169,40 +1101,28 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.259 (273 in PDF) (MEI.shared module)
 
-    Attributes Implemented:
-    =======================
+    **Attributes Implemented:**
+    - none
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
     - @artic
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
                (att.id (@xml:id))
     att.facsimile (@facs)
     att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
-    att.artic.log (att.controlevent (att.plist (@plist, @evaluate))
+    att.artic.log (att.controlevent (att.plist (@plist, @evaluate))  # TODO: this
                                     (att.timestamp.musical (@tstamp))
                                     (att.timestamp.performed (@tstamp.ges, @tstamp.real))
                                     (att.staffident (@staff))
                                     (att.layerident (@layer)))
-    att.artic.vis (att.color (@color))
-                  (att.enclosingchars (@enclose))
-                  (att.placement (@place))
-                  (att.staffloc (@loc))
-                  (att.visualoffset (att.visualoffset.ho (@ho))
-                  (att.visualoffset.to (@to))
-                  (att.visualoffset.vo (@vo)))
-                  (att.xy (@x, @y))
-    att.artic.gesatt.artic.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                               (att.alignment (@when)))
+    att.artic.vis (all)
+    att.artic.gesatt.artic.anl (all)
 
-    May Contain:
-    ============
-    None.
+    **Contained Elements not Implemented:**
+    - none
     '''
-    # TODO: implement @plist
     return _makeArticList(elem.get('artic'))
 
 
@@ -1212,40 +1132,28 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.248 (262 in PDF) (MEI.shared module)
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
+    - none
 
-    Attributes In Progress:
-    =======================
-    - accid (from att.accid.log)
+    **Attributes/Elements in Testing:**
+    - @accid (from att.accid.log)
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
                (att.id (@xml:id))
     att.facsimile (@facs)
     att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
     att.accid.log (@func)
-                  (att.controlevent (att.plist (@plist, @evaluate))
+                  (att.controlevent (att.plist (@plist, @evaluate))  # TODO: this
                                     (att.timestamp.musical (@tstamp))
                                     (att.timestamp.performed (@tstamp.ges, @tstamp.real))
                                     (att.staffident (@staff)) (att.layerident (@layer)))
-    att.accid.vis (att.color (@color))
-                  (att.enclosingchars (@enclose))
-                  (att.placement (@place))
-                  (att.staffloc (@loc))
-                  (att.visualoffset.ho (@ho))
-                  (att.visualoffset.vo (@vo))
-                  (att.xy (@x, @y))
-                  (att.accid.vis.mensural (att.staffloc.pitched (@ploc, @oloc)))
-    att.accid.gesatt.accid.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                               (att.alignment (@when)))
+    att.accid.vis (all)
+    att.accid.gesatt.accid.anl (all)
 
-    May Contain:
-    ============
-    None.
+    **Contained Elements not Implemented:**
+    - none
     '''
-    # TODO: implement @plist
     return _accidentalFromAttr(elem.get('accid'))
 
 
@@ -1259,26 +1167,23 @@ def noteFromElement(elem, slurBundle=None):
     .. note:: We use the ``id`` attribute (from the @xml:id attribute) to attach slurs and other
         spanners to :class:`Note` objects, so @xml:id *must* be imported from the MEI file.
 
-    Attributes Implemented:
-    =======================
-    - @accid and <accid> contained within
+    **Attributes/Elements Implemented:**
+    - @accid and <accid>
     - @pname, from att.pitch: [a--g]
     - @oct, from att.octave: [0..9]
     - @dur, from att.duration.musical: (via _qlDurationFromAttr())
     - @dots: [0..4], and <dot> contained within
     - @xml:id (or id), an XML id (submitted as the Music21Object "id")
-    - @artic and <artic> contained within
+    - @artic and <artic>
     - @tie, (many of "[i|m|t]")
     - @slur, (many of "[i|m|t][1-6]")
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
     - @tuplet, (many of "[i|m|t][1-6]") ??????
     - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
     att.facsimile (@facs)
     att.note.log (att.event (att.timestamp.musical (@tstamp))
@@ -1291,22 +1196,9 @@ def noteFromElement(elem, slurBundle=None):
                                    (att.lvpresent (@lv))
                                    (att.ornam (@ornam)))
                  (att.note.log.mensural (@lig))
-    att.note.vis (@headshape)
-                 (att.altsym (@altsym))
-                 (att.color (@color))
-                 (att.coloration (@colored))
-                 (att.enclosingchars (@enclose))
-                 (att.relativesize (@size))
-                 (att.staffloc (@loc))
-                 (att.stemmed (@stem.dir, @stem.len, @stem.pos, @stem.x, @stem.y)
-                              (att.stemmed.cmn (@stem.mod, @stem.with)))
-                 (att.visibility (@visible))
-                 (att.visualoffset.ho (@ho))
-                 (att.visualoffset.to (@to))
-                 (att.xy (@x, @y))
-                 (att.note.vis.cmn (att.beamsecondary (@breaksec)))
+    att.note.vis (all)
     att.note.ges (@oct.ges, @pname.ges, @pnum)
-                 (att.accidental.performed (@accid.ges))
+                 (att.accidental.performed (@accid.ges))  # TODO: consider this, in relation to key signature
                  (att.articulation.performed (@artic.ges))
                  (att.duration.performed (@dur.ges))
                  (att.instrumentident (@instr))
@@ -1314,19 +1206,11 @@ def noteFromElement(elem, slurBundle=None):
                                    (att.graced (@grace, @grace.time)))  <-- partially implemented
                  (att.note.ges.mensural (att.duration.ratio (@num, @numbase)))
                  (att.note.ges.tablature (@tab.fret, @tab.string))
-    att.note.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                 (att.alignment (@when)))
-                 (att.harmonicfunction (@deg))
-                 (att.intervallicdesc (@intm)
-                                      (att.intervalharmonic (@inth)))
-                 (att.melodicfunction (@mfunc))
-                 (att.pitchclass (@pclass))
-                 (att.solfa (@psolfa))
+    att.note.anl (all)
 
-    May Contain:
-    ============
+    **Contained Elements not Implemented:**
     MEI.critapp: app
-    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    MEI.edittrans: (all)
     MEI.lyrics: verse
     MEI.shared: syl
     '''
@@ -1398,17 +1282,15 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.424 (438 in PDF) (MEI.shared module)
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
     - xml:id (or id), an XML id (submitted as the Music21Object "id")
     - dur, from att.duration.musical: (via _qlDurationFromAttr())
     - dots, from att.augmentdots: [0..4]
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
+    - none
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
     att.facsimile (@facs)
     att.rest.log (att.event (att.timestamp.musical (@tstamp))
@@ -1418,27 +1300,12 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
                  (att.fermatapresent (@fermata))
                  (att.tupletpresent (@tuplet))
                  (att.rest.log.cmn (att.beamed (@beam)))
-    att.rest.vis (att.altsym (@altsym))
-                 (att.color (@color))
-                 (att.enclosingchars (@enclose))
-                 (att.relativesize (@size))
-                 (att.rest.vis.cmn)
-                 (att.rest.vis.mensural (@spaces))
-                 (att.staffloc (@loc))
-                 (att.staffloc.pitched (@ploc, @oloc))
-                 (att.visualoffset (att.visualoffset.ho (@ho))
-                                   (att.visualoffset.to (@to))
-                                   (att.visualoffset.vo (@vo)))
-                 (att.xy (@x, @y))
-    att.rest.ges (att.duration.performed (@dur.ges))
-                 (att.instrumentident (@instr))
-                 (att.rest.ges.mensural (att.duration.ratio (@num, @numbase)))
-    att.rest.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                 (att.alignment (@when)))
+    att.rest.vis (all)
+    att.rest.ges (all)
+    att.rest.anl (all)
 
-    May Contain:
-    ============
-    None.
+    **Contained Elements not Implemented:**
+    - none
     '''
     post = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
@@ -1506,25 +1373,21 @@ def chordFromElement(elem, slurBundle=None):
 
     In MEI 2013: pg.280 (294 in PDF) (MEI.shared module)
 
-    Attributes Implemented:
-    =======================
-    - xml:id (or id), an XML id (submitted as the Music21Object "id")
+    **Attributes/Elements Implemented:**
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
     - <note> contained within
-    - dur, from att.duration.musical: (via _qlDurationFromAttr())
-    - dots, from att.augmentdots: [0..4]
-    - artic, a list from att.articulation: (via _articulationFromAttr())
+    - @dur, from att.duration.musical: (via _qlDurationFromAttr())
+    - @dots, from att.augmentdots: [0..4]
+    - @artic and <artic>
     - @tie, (many of "[i|m|t]")
-    - <artic> contained within
     - @slur, (many of "[i|m|t][1-6]")
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
     - @tuplet, (many of "[i|m|t][1-6]") ??????
     - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
     att.facsimile (@facs)
     att.chord.log (att.event (att.timestamp.musical (@tstamp))
@@ -1536,27 +1399,15 @@ def chordFromElement(elem, slurBundle=None):
                   (att.chord.log.cmn (att.beamed (@beam))
                                      (att.lvpresent (@lv))
                                      (att.ornam (@ornam)))
-    att.chord.vis (@cluster)
-                  (att.altsym (@altsym))
-                  (att.color (@color))
-                  (att.relativesize (@size))
-                  (att.stemmed (@stem.dir, @stem.len, @stem.pos, @stem.x, @stem.y)
-                               (att.stemmed.cmn (@stem.mod, @stem.with)))
-                  (att.visibility (@visible))
-                  (att.visualoffset.ho (@ho))
-                  (att.visualoffset.to (@to))
-                  (att.xy (@x, @y))
-                  (att.chord.vis.cmn (att.beamsecondary (@breaksec)))
+    att.chord.vis (all)
     att.chord.ges (att.articulation.performed (@artic.ges))
                   (att.duration.performed (@dur.ges))
                   (att.instrumentident (@instr))
                   (att.chord.ges.cmn (att.graced (@grace, @grace.time)))  <-- partially implemented
-    att.chord.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                  (att.alignment (@when)))
+    att.chord.anl (all)
 
-    May Contain:
-    ============
-    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    **Contained Elements not Implemented:**
+    - MEI.edittrans: (all)
     '''
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}artic': articFromElement}
 
@@ -1615,40 +1466,32 @@ def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.284 (298 in PDF) (MEI.shared module)
 
-    Attributes Implemented:
-    =======================
-    - xml:id (or id), an XML id (submitted as the Music21Object "id")
-    - shape, from att.clef.gesatt.clef.log
-    - line, from att.clef.gesatt.clef.log
-    - dis, from att.clef.gesatt.clef.log
-    - dis.place, from att.clef.gesatt.clef.log
+    **Attributes/Elements Implemented:**
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - @shape, from att.clef.gesatt.clef.log
+    - @line, from att.clef.gesatt.clef.log
+    - @dis, from att.clef.gesatt.clef.log
+    - @dis.place, from att.clef.gesatt.clef.log
 
-    Attributes Ignored:
-    ===================
-    - cautionary, from att.clef.gesatt.clef.log
-        --> I don't know how this affects the music21 objects
-    - octave, from att.clef.gesatt.clef.log
-        --> this is more complicated than it's worth; who would write a G clef in octave 1?
+    **Attributes/Elements Ignored:**
+    - @cautionary, since this has no obvious implication for a music21 Clef
+    - @octave, since this is likely obscure
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
+    - none
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
     att.event (att.timestamp.musical (@tstamp))
               (att.timestamp.performed (@tstamp.ges, @tstamp.real))
               (att.staffident (@staff))
               (att.layerident (@layer))
     att.facsimile (@facs)
-    att.clef.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                 (att.alignment (@when)))
-    att.clef.vis (att.altsym (@altsym))
-                 (att.color (@color))
+    att.clef.anl (all)
+    att.clef.vis (all)
 
-    May Contain:
-    ============
-    None.
+    **Contained Elements not Implemented:**
+    - none
     '''
     if 'perc' == elem.get('shape'):
         post = clef.PercussionClef()
@@ -1674,27 +1517,23 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     :returns: An :class:`Instrument`
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
+    - none
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
     - @midi.instrname (att.midiinstrument)
     - @midi.instrnum (att.midiinstrument)
 
-    Attributes Ignored:
-    ===================
+    **Attributes/Elements Ignored:**
     - @xml:id
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
     att.channelized (@midi.channel, @midi.duty, @midi.port, @midi.track)
     att.midiinstrument (@midi.pan, @midi.volume)
 
-    May Contain:
-    ============
-    None.
+    **Contained Elements not Implemented:**
+    - none
     '''
     if elem.get('midi.instrnum') is not None:
         return instrument.instrumentFromMidiProgram(int(elem.get('midi.instrnum')))
@@ -1724,24 +1563,16 @@ def beamFromElement(elem, slurBundle=None):
 
     .. note:: Nested <beam> tags do not yet import properly.
 
-    Attributes Implemented:
-    =======================
-    - <clef> contained within
-    - <chord> contained within
-    - <note> contained within
-    - <rest> contained within
-    - <space>
+    **Attributes/Elements Implemented:**
+    - <clef>, <chord>, <note>, <rest>, <space>
 
-    Attributes Ignored:
-    ===================
-    - @xml:id. Since this tag does not translate to a :class:`Music21Object`, we cannot set the ``id``.
+    **Attributes/Elements Ignored:**
+    - @xml:id
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
     - <tuplet> and <beam> contained within
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
     att.facsimile (@facs)
     att.beam.log (att.event (att.timestamp.musical (@tstamp))
@@ -1749,18 +1580,15 @@ def beamFromElement(elem, slurBundle=None):
                             (att.staffident (@staff))
                             (att.layerident (@layer)))
                  (att.beamedwith (@beam.with))
-    att.beam.vis (att.color (@color))
-                 (att.beamrend (@rend, @slope))
-    att.beam.gesatt.beam.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                             (att.alignment (@when)))
+    att.beam.vis (all)
+    att.beam.gesatt.beam.anl (all)
 
-    May Contain:
-    ============
-    MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
-    MEI.critapp: app
-    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
-    MEI.mensural: ligature mensur proport
-    MEI.shared: barLine clefGrp custos keySig pad
+    **Contained Elements not Implemented:**
+    - MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
+    - MEI.critapp: app
+    - MEI.edittrans: (all)
+    - MEI.mensural: ligature mensur proport
+    - MEI.shared: barLine clefGrp custos keySig pad
     '''
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
@@ -1790,19 +1618,14 @@ def tupletFromElement(elem, slurBundle=None):
     :returns: An iterable of all the objects contained within the ``<tuplet>`` container.
     :rtype: tuple of :class:`~music21.base.Music21Object`
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
+    - none
 
-    Attributes Ignored:
-    ===================
-
-    Attributes In Progress:
-    =======================
-    - elements contained within: <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>
+    **Attributes/Elements in Testing:**
+    - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>
     - @num and @numbase
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
                (att.id (@xml:id))
     att.facsimile (@facs)
@@ -1821,13 +1644,12 @@ def tupletFromElement(elem, slurBundle=None):
     att.tuplet.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
                                    (att.alignment (@when)))
 
-    May Contain:
-    ============
-    MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
-    MEI.critapp: app
-    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
-    MEI.mensural: ligature mensur proport
-    MEI.shared: barLine clefGrp custos keySig pad
+    **Contained Elements not Implemented:**
+    - MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
+    - MEI.critapp: app
+    - MEI.edittrans: (all)
+    - MEI.mensural: ligature mensur proport
+    - MEI.shared: barLine clefGrp custos keySig pad
     '''
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
@@ -1905,58 +1727,41 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     :rtype: :class:`music21.stream.Voice`
     :raises: :exc:`MeiAttributeError` if neither ``overrideN`` nor @n are specified.
 
-    Attributes Implemented:
-    =======================
-    - <clef> contained within
-    - <chord> contained within
-    - <note> contained within
-    - <rest> contained within
-    - <mRest> contained within
+    **Attributes/Elements Implemented:**
+    - <clef>, <chord>, <note>, <rest>, <mRest> contained within
     - @n, from att.common
 
-    Attributes Ignored:
-    ===================
-    - xml:id. Since the @xml:id atttribute must be unique within a document, setting @xml:id as the
-        :class:`Voice` object's ``id`` attribute would make it seem as though every measure has an
-        entirely different set of voices. Since voices are (in this case) connected between
-        measures, we must ensure corresponding :class:`Voice` objects have corresponding ``id``
-        attributes.
+    **Attributes Ignored:**
+    - @xml:id
 
-    Attributes In Progress:
-    =======================
-    - <beam> contained within
-    - <tuplet> contained within
-    - <space> contained within
-    - <mSpace> contained within
+    **Attributes/Elements in Testing:**
+    - <beam>, <tuplet>, <space>, <mSpace> contained within
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @xml:base)
     att.declaring (@decls)
     att.facsimile (@facs)
     att.layer.log (@def)
                   (att.meterconformance (@metcon))
     att.layer.vis (att.visibility (@visible))
-    att.layer.gesatt.layer.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                               (att.alignment (@when)))
+    att.layer.gesatt.layer.anl (all)
 
-    May Contain:
-    ============
-    MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
-             harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal
-             reh slur tie tuplet tupletSpan
-    MEI.cmnOrnaments: mordent trill turn
-    MEI.critapp: app
-    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
-    MEI.harmony: harm
-    MEI.lyrics: lyrics
-    MEI.mensural: ligature mensur proport
-    MEI.midi: midi
-    MEI.neumes: ineume syllable uneume
-    MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb
-                scoreDef staffDef tempo
-    MEI.text: div
-    MEI.usersymbols: anchoredText curve line symbol
+    **Contained Elements not Implemented:**
+    - MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
+               harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal
+               reh slur tie tuplet tupletSpan
+    - MEI.cmnOrnaments: mordent trill turn
+    - MEI.critapp: app
+    - MEI.edittrans: (all)
+    - MEI.harmony: harm
+    - MEI.lyrics: lyrics
+    - MEI.mensural: ligature mensur proport
+    - MEI.midi: midi
+    - MEI.neumes: ineume syllable uneume
+    - MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb
+                  scoreDef staffDef tempo
+    - MEI.text: div
+    - MEI.usersymbols: anchoredText curve line symbol
     '''
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
@@ -2007,36 +1812,31 @@ def staffFromElement(elem, slurBundle=None):
     :returns: The :class:`Voice` classes corresponding to the ``<layer>`` tags in ``elem``.
     :rtype: list of :class:`music21.stream.Voice`
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
     - <layer> contained within
 
-    Attributes Ignored:
-    ===================
-    - xml:id. Because the function does not return a music21 object, we cannot use @xml:id.
+    **Attributes Ignored:**
+    - @xml:id
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
+    - none
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
     att.declaring (@decls)
     att.facsimile (@facs)
     att.staff.log (@def)
                   (att.meterconformance (@metcon))
     att.staff.vis (att.visibility (@visible))
-    att.staff.gesatt.staff.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                               (att.alignment (@when)))
+    att.staff.gesatt.staff.anl (all)
 
-    May Contain:
-    ============
-    MEI.cmn: ossia
-    MEI.critapp: app
-    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
-    MEI.shared: annot pb sb scoreDef staffDef
-    MEI.text: div
-    MEI.usersymbols: anchoredText curve line symbol
+    **Contained Elements not Implemented:**
+    - MEI.cmn: ossia
+    - MEI.critapp: app
+    - MEI.edittrans: (all)
+    - MEI.shared: annot pb sb scoreDef staffDef
+    - MEI.text: div
+    - MEI.usersymbols: anchoredText curve line symbol
     '''
     # mapping from tag name to our converter function
     layerTagName = '{http://www.music-encoding.org/ns/mei}layer'
@@ -2089,57 +1889,46 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
         to the :class:`Part` instance with the value's @n attributes.
     :rtype: dict of :class:`music21.stream.Measure`
 
-    Attributes Implemented:
-    =======================
+    **Attributes/Elements Implemented:**
+    - none
 
-    Attributes Ignored:
-    ===================
-    - xml:id, since it would logically require every :class:`Measure` object's ``id`` attribute
-        to be set identically, running contrary to the point of unique ``id`` fields.
+    **Attributes Ignored:**
+    - @xml:id
     - <slur> and <tie> contained within. These spanners will usually be attached to their starting
-        and ending notes with @xml:id attributes, so it's not necessary to process them when
-        encountered in a <measure>. Furthermore, because the possibility exists for cross-measure
-        slurs and ties, we can't guarantee we'll be able to process all spanners until all
-        spanner-attachable objects are processed. So we manage these tags at a higher level.
+      and ending notes with @xml:id attributes, so it's not necessary to process them when
+      encountered in a <measure>. Furthermore, because the possibility exists for cross-measure
+      slurs and ties, we can't guarantee we'll be able to process all spanners until all
+      spanner-attachable objects are processed. So we manage these tags at a higher level.
 
-    Attributes In Progress:
-    =======================
+    **Attributes/Elements in Testing:**
     - <staff> contained within
-    - @right (att.measure.log)
-    - @left (att.measure.log)
+    - @right and @left (att.measure.log)
 
-    Attributes not Implemented:
-    ===========================
+    **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
                (att.id (@xml:id))
     att.declaring (@decls)
     att.facsimile (@facs)
     att.typed (@type, @subtype)
     att.pointing (@xlink:actuate, @xlink:role, @xlink:show, @target, @targettype, @xlink:title)
-    att.measure.log (@left, @right)
-                    (att.meterconformance.bar (@metcon, @control))
-    att.measure.vis (att.barplacement (@barplace, @taktplace))
-                    (att.measurement (@unit))
-                    (att.width (@width))
+    att.measure.log (att.meterconformance.bar (@metcon, @control))
+    att.measure.vis (all)
     att.measure.ges (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-    att.measure.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                    (att.alignment (@when)))
-                    (att.joined (@join))
+    att.measure.anl (all)
 
-    May Contain:
-    ============
-    MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh
-             tupletSpan
-    MEI.cmnOrnaments: mordent trill turn
-    MEI.critapp: app
-    MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied
-                   unclear
-    MEI.harmony: harm
-    MEI.lyrics: lyrics
-    MEI.midi: midi
-    MEI.shared: annot dir dynam pb phrase sb staffDef tempo
-    MEI.text: div
-    MEI.usersymbols: anchoredText curve line symbol
+    **Contained Elements not Implemented:**
+    - MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh
+               tupletSpan
+    - MEI.cmnOrnaments: mordent trill turn
+    - MEI.critapp: app
+    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied
+                     unclear
+    - MEI.harmony: harm
+    - MEI.lyrics: lyrics
+    - MEI.midi: midi
+    - MEI.shared: annot dir dynam pb phrase sb staffDef tempo
+    - MEI.text: div
+    - MEI.usersymbols: anchoredText curve line symbol
     '''
     post = {}
 
