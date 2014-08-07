@@ -124,24 +124,6 @@ def convertFromString(dataStr):
     if '{http://www.music-encoding.org/ns/mei}mei' != documentRoot.tag:
         raise MeiTagError(_WRONG_ROOT_TAG.format(documentRoot.tag))
 
-    def _innerAttrSetter(xmlid, attr, value, append=False):
-        '''
-        Set the "attr" attribute to "value" on the element with @xml:id of "xmlid". If "xmlid" begins
-        with a '#' character, this is removed before searching for the element. If "append" is
-        ``True``, "value" is appended to the current attribute's value, rather than replacing it.
-        '''
-        if xmlid is None:
-            return
-        xmlid = removeOctothorpe(xmlid)
-        targetElem = documentRoot.find('*//*[@{}="{}"]'.format(_XMLID, xmlid))
-        if targetElem is None:
-            return
-
-        if append:
-            targetElem.set(attr, targetElem.get(attr, '') + value)
-        else:
-            targetElem.set(attr, value)
-
     # This defaultdict stores extra, music21-specific attributes that we add to elements to help
     # importing. The key is an element's @xml:id, and the value is a regular dict with keys
     # corresponding to attributes we'll add and values corresponding to those attributes's values.
@@ -176,11 +158,11 @@ def convertFromString(dataStr):
             # Properly-encoded <tupletSpan> elements should have a @plist that enumerates the
             # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
             # @plist to add our custom @m21TupletNum and @m21TupletNumbase attributes.
-            tupletSpanFromElement(eachTuplet, documentRoot)
+            # TODO: write the well-encoded <tupletSpan> situation here with the "m21Attributes" object
+            pass
         else:
             # Poorly-encoded <tupletSpan> elements don't give a @plist attribute, so we have to do
             # some crude guesswork to find all the related elements.
-            # TODO: write the well-encoded <tupletSpan> situation here with the "m21Attributes" object
             startid = removeOctothorpe(eachTuplet.get('startid'))
             endid = removeOctothorpe(eachTuplet.get('endid'))
             foundTheStart = False
@@ -620,7 +602,7 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
             else:
                 post.append(result)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, '?'))  # TODO: decide whether we want "elem.tag" back
+            environLocal.printDebug('found an unprocessed {} element'.format(eachTag.tag))
 
     return post
 
@@ -770,6 +752,7 @@ def addSlurs(elem, obj, slurBundle):
     post = False
 
     def wrapGetByIdLocal(theId):
+        "Avoid crashing when getByIdLocl() doesn't find the slur"
         try:
             slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
             return True
@@ -870,7 +853,8 @@ def makeMetadata(fromThis):
         if eachTag.tag == '{}titleStmt'.format(_MEINS):
             for subTag in eachTag.iterfind('*'):
                 if subTag.tag == '{}title'.format(_MEINS):
-                    if subTag.get('type', '') == 'subtitle':  # TODO: this is meaningless because m21's Metadata doesn't do anything with it
+                    if subTag.get('type', '') == 'subtitle':
+                        # TODO: this is meaningless because m21's Metadata doesn't do anything with it
                         meta.subtitle = subTag.text
                     elif meta.title is None:
                         meta.title = subTag.text
@@ -1425,7 +1409,6 @@ def chordFromElement(elem, slurBundle=None):
     post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
 
     # iterate all immediate children
-    dotElements = 0  # count the number of <dot> elements
     for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle):
         if isinstance(subElement, articulations.Articulation):
             post.articulations.append(subElement)
@@ -1962,7 +1945,9 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
             for eachVoice in post[eachN]:
                 for eachThing in eachVoice:
                     if isinstance(eachThing, note.Rest):
-                        eachThing.duration = duration.Duration(maxBarDuration - post[eachN].duration.quarterLength + eachThing.duration.quarterLength)
+                        eachThing.duration = duration.Duration(maxBarDuration -
+                                                               post[eachN].duration.quarterLength +
+                                                               eachThing.duration.quarterLength)
 
     # assign left and right barlines
     if elem.get('left') is not None:
