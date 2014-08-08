@@ -1168,11 +1168,11 @@ def noteFromElement(elem, slurBundle=None):
     - @artic and <artic>
     - @tie, (many of "[i|m|t]")
     - @slur, (many of "[i|m|t][1-6]")
+    - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
+        duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
     **Attributes/Elements in Testing:**
     - @tuplet, (many of "[i|m|t][1-6]") ??????
-    - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
-        duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
     **Attributes not Implemented:**
     att.common (@label, @n, @xml:base)
@@ -1247,7 +1247,6 @@ def noteFromElement(elem, slurBundle=None):
         post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), dotElements)
 
     # grace note (only mark as grace note---don't worry about "time-stealing")
-    # TODO: test this
     if elem.get('grace') is not None:
         post.duration = duration.GraceDuration(post.duration.quarterLength)
 

@@ -629,6 +629,50 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertIsInstance(actual.articulations[0], articulations.Staccato)
         self.assertEqual(tie.Tie('start'), actual.tie)
 
+    @mock.patch('music21.note.Note')
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.safePitch')
+    @mock.patch('music21.mei.__main__.makeDuration')
+    @mock.patch('music21.duration.GraceDuration')
+    def testUnit4(self, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+        '''
+        noteFromElement(): adds @grace
+
+        (mostly-unit test)
+        '''
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4', 'grace': 'acc'})
+        mockSafePitch.return_value = 'safePitch() return'
+        mockNewNote = mock.MagicMock()
+        mockNote.return_value = mockNewNote
+        mockProcEmbEl.return_value = []
+        mockGrace.return_value = 1234
+        expected = mockNewNote
+
+        actual = main.noteFromElement(elem, 'slur bundle')
+
+        self.assertEqual(expected, mockNewNote, actual)
+        mockSafePitch.assert_called_once_with('D', None, '2')
+        mockMakeDuration.assert_calleed_once_with(1.0, 0)
+        mockNote.assert_called_once_with(mockSafePitch.return_value,
+                                         duration=mockMakeDuration.return_value)
+        self.assertEqual(mockGrace.return_value, mockNewNote.duration)
+
+    def testIntegration4(self):
+        '''
+        noteFromElement(): adds @grace
+        (corresponds to testUnit4() with no mocks)
+        '''
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4', 'grace': 'acc'})
+        slurBundle = spanner.SpannerBundle()
+
+        actual = main.noteFromElement(elem, slurBundle)
+
+        self.assertEqual('D2', actual.nameWithOctave)
+        self.assertEqual(0.0, actual.quarterLength)
+        self.assertEqual('quarter', actual.duration.type)
+
+    # NOTE: consider adding to the testUnit4() and testIntegration4() rather than making a new test
+
 
 #------------------------------------------------------------------------------
 class TestRestFromElement(unittest.TestCase):
