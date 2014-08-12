@@ -73,6 +73,7 @@ _IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
                        '{}slur'.format(_MEINS),  # slurs; handled in convertFromString()
                        '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
                        '{}tupletSpan'.format(_MEINS),  # tuplets; handled in convertFromString()
+                       '{}beamSpan'.format(_MEINS),  # beams; handled in convertFromString()
                       )
 
 
@@ -148,6 +149,23 @@ def convertFromString(dataStr):
     for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
         m21Attributes[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
         m21Attributes[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
+
+    environLocal.printDebug('*** pre-processing beams')
+    # pre-processing for <beamSpan> elements
+    # TODO: test this beam-adding part
+    for eachBeam in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
+        m21Attributes[removeOctothorpe(eachBeam.get('startid'))]['m21Beam'] = 'start'
+        m21Attributes[removeOctothorpe(eachBeam.get('endid'))]['m21Beam'] = 'stop'
+
+        # iterate things in the @plist attribute
+        for eachXmlid in eachBeam.get('plist', '').split(' '):
+            eachXmlid = removeOctothorpe(eachXmlid)
+            if 0 == len(eachXmlid):
+                # this is either @plist not set or extra spaces around the contained xml:id values
+                pass
+            if 'm21Beam' not in m21Attributes[eachXmlid]: #['m21Beam'] is None:
+                # only set to 'continue' if it wasn't already set above
+                m21Attributes[eachXmlid]['m21Beam'] = 'continue'
 
     environLocal.printDebug('*** pre-processing tuplets')
     # TODO: probably clean this up
@@ -1251,6 +1269,12 @@ def noteFromElement(elem, slurBundle=None):
     if elem.get('grace') is not None:
         post.duration = duration.GraceDuration(post.duration.quarterLength)
 
+    # beams indicated by a <beamSpan> held elsewhere
+    # TODO: test this beam stuff (after you figure out wheter it's sufficient)
+    if elem.get('m21Beam') is not None:
+        if duration.convertTypeToNumber(post.duration.type) > 4:
+            post.beams.fill(post.duration.type, elem.get('m21Beam'))
+
     # tuplets indicated in a <tupletDef> held elsewhere
     # TODO: test this tuplet stuff (after you figure out whether it's sufficient)
     if elem.get('m21TupletNum') is not None:
@@ -1433,6 +1457,12 @@ def chordFromElement(elem, slurBundle=None):
     if elem.get('grace') is not None:
         # TODO: test this
         post.duration = duration.GraceDuration(post.duration.quarterLength)
+
+    # beams indicated by a <beamSpan> held elsewhere
+    # TODO: test this beam stuff (after you figure out wheter it's sufficient)
+    if elem.get('m21Beam') is not None:
+        if duration.convertTypeToNumber(post.duration.type) > 4:
+            post.beams.fill(post.duration.type, elem.get('m21Beam'))
 
     # adjust for <tupletDef>-given tuplets
     if elem.get('m21TupletNum') is not None:
