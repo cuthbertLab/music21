@@ -69,11 +69,7 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ETree
 
-# mock library from testing---in Python 3 it's part of the standard library
-if six.PY2:
-    import mock
-else:
-    from unittest import mock
+
 
 #-------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
