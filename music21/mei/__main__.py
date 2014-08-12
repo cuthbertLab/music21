@@ -783,29 +783,30 @@ def addSlurs(elem, obj, slurBundle):
 
 
 def beamTogether(someThings):
-    # TODO: write tests
     '''
-    Beam some things together. The function beams :class:`Note` and :class:`Chord` objects, but
-    everything else is ignored.
+    Beam some things together. The function beams every object that has a :attrib:`beams` attribute,
+    leaving the other objects unmodified.
 
     :param things: An iterable of things to beam together.
     :type things: iterable of :class:`~music21.base.Music21Object`
-    :returns: ``someThings`` with all possible objects beamed together.
+    :returns: ``someThings`` with relevant objects beamed together.
     :rtype: same as ``someThings``
     '''
     # Index of the most recent beamedNote/Chord in someThings. Not all Note/Chord objects will
     # necessarily be beamed (especially when this is called from tupletFromElement()), so we have
     # to make that distinction.
-    iLastBeamedNote = 0
+    iLastBeamedNote = -1
 
     for i, thing in enumerate(someThings):
-        if isinstance(thing, (note.Note, chord.Chord)):
-            if 0 == iLastBeamedNote:
+        if hasattr(thing, 'beams'):
+            if -1 == iLastBeamedNote:
                 beamType = 'start'
             else:
                 beamType = 'continue'
 
-            if duration.convertTypeToNumber(thing.duration.type) > 4:
+            # checking for len(thing.beams) avoids clobbering beams that were set with a nested
+            # <beam> element, like a grace note
+            if duration.convertTypeToNumber(thing.duration.type) > 4 and 0 == len(thing.beams):
                 thing.beams.fill(thing.duration.type, beamType)
                 iLastBeamedNote = i
 
@@ -1981,6 +1982,7 @@ if __name__ == "__main__":
                      test_main.TestScoreDefFromElement,
                      test_main.TestEmbeddedElements,
                      test_main.TestAddSlurs,
+                     test_main.TestBeams,
                     )
 
 #------------------------------------------------------------------------------

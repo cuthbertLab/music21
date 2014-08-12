@@ -1943,3 +1943,76 @@ class TestAddSlurs(unittest.TestCase):
 
         self.assertEqual(expected, actual)
         self.assertSequenceEqual([], slurBundle.list)
+
+
+
+#------------------------------------------------------------------------------
+class TestBeams(unittest.TestCase):
+    '''Tests for beams in all their guises.'''
+
+    def testBeamTogether1(self):
+        '''
+        beamTogether(): with three mock objects, that their "beams" attributes are set properly
+        '''
+        someThings = [mock.MagicMock() for _ in range(3)]
+        for i in xrange(len(someThings)):
+            someThings[i].beams = mock.MagicMock('thing {} beams'.format(i))
+            someThings[i].beams.__len__.return_value = 0
+            someThings[i].beams.fill = mock.MagicMock()
+            someThings[i].beams.setAll = mock.MagicMock()
+            someThings[i].duration.type = '16th'
+        expectedTypes = ['start', 'continue', 'continue']  # first call with "continue"; corrected later in function
+
+        main.beamTogether(someThings)
+
+        for i in xrange(len(someThings)):
+            someThings[i].beams.__len__.assert_called_once_with()
+            someThings[i].beams.fill.assert_called_once_with('16th', expectedTypes[i])
+        someThings[2].beams.setAll.assert_called_once_with('stop')
+
+    def testBeamTogether2(self):
+        '''
+        beamTogether(): with four mock objects, the middle two of which already have "beams" set
+        '''
+        someThings = [mock.MagicMock() for _ in range(4)]
+        for i in xrange(len(someThings)):
+            someThings[i].beams = mock.MagicMock('thing {} beams'.format(i))
+            someThings[i].beams.__len__.return_value = 0
+            someThings[i].beams.fill = mock.MagicMock()
+            someThings[i].beams.setAll = mock.MagicMock()
+            someThings[i].duration.type = '16th'
+        expectedTypes = ['start', None, None, 'continue']  # first call with "continue"; corrected later in function
+        # modifications for test 2
+        someThings[1].beams.__len__.return_value = 2
+        someThings[2].beams.__len__.return_value = 2
+
+        main.beamTogether(someThings)
+
+        for i in [0, 3]:
+            someThings[i].beams.__len__.assert_called_once_with()
+            someThings[i].beams.fill.assert_called_once_with('16th', expectedTypes[i])
+        someThings[3].beams.setAll.assert_called_once_with('stop')
+        for i in [1, 2]:
+            self.assertEqual(0, someThings[i].beams.fill.call_count)
+            self.assertEqual(0, someThings[i].beams.setAll.call_count)
+
+    def testBeamTogether3(self):
+        '''
+        beamTogether(): with four mock objects, one of which doesn't have a "beams" attribute
+        '''
+        someThings = [mock.MagicMock() for _ in range(4)]
+        someThings[2] = 5  # this will cause failure if the function tries to set "beams"
+        for i in [0, 1, 3]:
+            someThings[i].beams = mock.MagicMock('thing {} beams'.format(i))
+            someThings[i].beams.__len__.return_value = 0
+            someThings[i].beams.fill = mock.MagicMock()
+            someThings[i].beams.setAll = mock.MagicMock()
+            someThings[i].duration.type = '16th'
+        expectedTypes = ['start', 'continue', None, 'continue']  # first call with "continue"; corrected later in function
+
+        main.beamTogether(someThings)
+
+        for i in [0, 1, 3]:
+            someThings[i].beams.__len__.assert_called_once_with()
+            someThings[i].beams.fill.assert_called_once_with('16th', expectedTypes[i])
+        someThings[3].beams.setAll.assert_called_once_with('stop')
