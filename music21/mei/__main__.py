@@ -1424,7 +1424,8 @@ def chordFromElement(elem, slurBundle=None):
     **Contained Elements not Implemented:**
     - MEI.edittrans: (all)
     '''
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}artic': articFromElement}
+    tagToFunction = {'{http://www.music-encoding.org/ns/mei}note': lambda *x: None,
+                     '{http://www.music-encoding.org/ns/mei}artic': articFromElement}
 
     # pitch and duration... these are what we can set in the constructor
     post = chord.Chord(notes=[noteFromElement(x, slurBundle) for x in elem.iterfind('{}note'.format(_MEINS))])
