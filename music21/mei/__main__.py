@@ -602,7 +602,7 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
             else:
                 post.append(result)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('found an unprocessed {} element'.format(eachTag.tag))
+            environLocal.printDebug('found an unprocessed <{}> element'.format(eachTag.tag))
 
     return post
 

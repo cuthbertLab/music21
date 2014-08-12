@@ -1756,7 +1756,7 @@ class TestEmbeddedElements(unittest.TestCase):
 
         self.assertSequenceEqual(expected, actual)
         mockTranslator.assert_called_once_with(elements[0], None)
-        mockEnviron.printDebug.assert_called_once_with('unprocessed bream in ?')
+        mockEnviron.printDebug.assert_called_once_with('found an unprocessed <bream> element')
 
 
 
