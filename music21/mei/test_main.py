@@ -29,6 +29,7 @@ else:
 from xml.etree import ElementTree as ETree
 
 from fractions import Fraction
+from collections import defaultdict
 
 from music21 import pitch
 from music21 import note
@@ -2016,3 +2017,33 @@ class TestBeams(unittest.TestCase):
             someThings[i].beams.__len__.assert_called_once_with()
             someThings[i].beams.fill.assert_called_once_with('16th', expectedTypes[i])
         someThings[3].beams.setAll.assert_called_once_with('stop')
+
+
+
+#------------------------------------------------------------------------------
+class TestPreprocessors(unittest.TestCase):
+    '''Tests for the preprocessing helper functions for convertFromString().'''
+
+    def testUnitTies1(self):
+        '''
+        _ppTies(): that three ties are specified correctly in the m21Attr
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)
+        iterfindReturn = []
+        for i in xrange(3):
+            iterfindReturn.append(ETree.Element('tie', attrib={'startid': 'start {}'.format(i),
+                                                               'endid': 'end {}'.format(i)}))
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+
+        actual = main._ppTies(documentRoot, m21Attr)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check all the right values were added to the m21Attr dict
+        for i in xrange(3):
+            self.assertEqual('i', m21Attr['start {}'.format(i)]['tie'])
+            self.assertEqual('t', m21Attr['end {}'.format(i)]['tie'])

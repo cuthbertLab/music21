@@ -533,7 +533,6 @@ def _ppSlurs(documentRoot, m21Attr, slurBundle):
 
 
 def _ppTies(documentRoot, m21Attr):
-    # TODO: test this function
     '''
     Pre-processing helper for :func:`convertFromString` that handles ties specified in <tie> elements.
 
@@ -559,8 +558,6 @@ def _ppTies(documentRoot, m21Attr):
     Guidelines, so no special action is required.
     '''
     environLocal.printDebug('*** pre-processing ties')
-    # pre-processing for <tie> tags
-    # (this essentially converts <tie> tags into @tie attributes)
     for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
         m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
         m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
