@@ -128,100 +128,15 @@ def convertFromString(dataStr):
     # This defaultdict stores extra, music21-specific attributes that we add to elements to help
     # importing. The key is an element's @xml:id, and the value is a regular dict with keys
     # corresponding to attributes we'll add and values corresponding to those attributes's values.
-    m21Attributes = defaultdict(lambda: {})
+    m21Attr = defaultdict(lambda: {})
 
-    environLocal.printDebug('*** pre-processing slurs')
-    # pre-processing for <slur> tags
     slurBundle = spanner.SpannerBundle()
-    for eachSlur in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
-        # TODO: slurs with @tstamp
-        thisIdLocal = str(uuid4())
-        thisSlur = spanner.Slur()
-        thisSlur.idLocal = thisIdLocal
-        slurBundle.append(thisSlur)
 
-        m21Attributes[removeOctothorpe(eachSlur.get('startid'))]['m21SlurStart'] = thisIdLocal
-        m21Attributes[removeOctothorpe(eachSlur.get('endid'))]['m21SlurEnd'] = thisIdLocal
-
-    environLocal.printDebug('*** pre-processing ties')
-    # pre-processing for <tie> tags
-    # (this essentially converts <tie> tags into @tie attributes)
-    for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
-        m21Attributes[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
-        m21Attributes[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
-
-    environLocal.printDebug('*** pre-processing beams')
-    # pre-processing for <beamSpan> elements
-    # TODO: test this beam-adding part
-    for eachBeam in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
-        m21Attributes[removeOctothorpe(eachBeam.get('startid'))]['m21Beam'] = 'start'
-        m21Attributes[removeOctothorpe(eachBeam.get('endid'))]['m21Beam'] = 'stop'
-
-        # iterate things in the @plist attribute
-        for eachXmlid in eachBeam.get('plist', '').split(' '):
-            eachXmlid = removeOctothorpe(eachXmlid)
-            if 0 == len(eachXmlid):
-                # this is either @plist not set or extra spaces around the contained xml:id values
-                pass
-            if 'm21Beam' not in m21Attributes[eachXmlid]: #['m21Beam'] is None:
-                # only set to 'continue' if it wasn't already set above
-                m21Attributes[eachXmlid]['m21Beam'] = 'continue'
-
-    environLocal.printDebug('*** pre-processing tuplets')
-    # TODO: probably clean this up
-    # TODO: decide whether we can use the "m21Attributes" thing for tuplets
-    # pre-processing <tupletSpan> tags
-    for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
-        if eachTuplet.get('plist') is not None:
-            # Properly-encoded <tupletSpan> elements should have a @plist that enumerates the
-            # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
-            # @plist to add our custom @m21TupletNum and @m21TupletNumbase attributes.
-            # TODO: write the well-encoded <tupletSpan> situation here with the "m21Attributes" object
-            pass
-        else:
-            # Poorly-encoded <tupletSpan> elements don't give a @plist attribute, so we have to do
-            # some crude guesswork to find all the related elements.
-            startid = removeOctothorpe(eachTuplet.get('startid'))
-            endid = removeOctothorpe(eachTuplet.get('endid'))
-            foundTheStart = False
-            foundTheEnd = False
-
-            # We mark as a tuplet-member everything at the same hierarchic level as the @startid
-            # element, starting from the @startid element, ending either at the @endid element or
-            # the end of same-level elements.
-            startIdTag = documentRoot.find(
-                './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, startid, mei=_MEINS))
-            for eachObject in startIdTag.iterfind('*'):
-                if eachObject.get(_XMLID, '') == startid:
-                    foundTheStart = True
-                if foundTheStart and not foundTheEnd:
-                    eachObject.set('m21TupletNum', eachTuplet.get('num'))
-                    eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
-                if eachObject.get(_XMLID, '') == endid:
-                    foundTheEnd = True
-                    break
-
-            # And if we didn't already hit the @endid element, we'll find everything at the same
-            # hierarchic level as the @endid element marking as a tuplet-member everything at that
-            # level that precedes the @endid element.
-            if not foundTheEnd:
-                endIdTag = documentRoot.find(
-                    './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, endid, mei=_MEINS))
-                for eachObject in endIdTag.iterfind('*'):
-                    eachObject.set('m21TupletNum', eachTuplet.get('num'))
-                    eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
-                    if eachObject.get(_XMLID, '') == endid:
-                        foundTheEnd = True
-                        break
-
-    environLocal.printDebug('*** concluding pre-processing')
-    # conclude pre-processing by adding music21-specific attributes to their respective elements
-    for eachObject in documentRoot.iterfind('*//*'):
-        # we have a defaultdict, so this "if" isn't strictly necessary; but without it, every single
-        # element with an @xml:id creates a new, empty dict, which would consume a lot of memory
-        if eachObject.get(_XMLID) in m21Attributes:
-            for eachAttr in m21Attributes[eachObject.get(_XMLID)]:
-                eachObject.set(eachAttr, eachObject.get(eachAttr, '') + m21Attributes[eachObject.get(_XMLID)][eachAttr])
+    documentRoot, m21Attr = _ppSlurs(documentRoot, m21Attr, slurBundle)
+    documentRoot, m21Attr = _ppTies(documentRoot, m21Attr)
+    documentRoot, m21Attr = _ppBeams(documentRoot, m21Attr)
+    documentRoot, m21Attr = _ppTuplets(documentRoot, m21Attr)
+    documentRoot = _ppConclude(documentRoot, m21Attr)
 
     environLocal.printDebug('*** preparing part and staff definitions')
 
@@ -565,6 +480,260 @@ def _sharpsFromAttr(signature):
         return int(signature[0])
     else:
         return -1 * int(signature[0])
+
+
+# "Preprocessing" Functions for convertFromString()
+#------------------------------------------------------------------------------
+def _ppSlurs(documentRoot, m21Attr, slurBundle):
+    # TODO: test this function
+    '''
+    Pre-processing helper for :func:`convertFromString` that handles slurs specified in <slur>
+    elements.
+
+    :param documentRoot: The root tag of the MEI document being imported.
+    :type documentRoot: :class:`xml.etree.ElementTree.Element`
+    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
+        element with that @xml:id (read below for more information).
+    :type m21Attr: defaultdict
+    :param slurBundle: The :class:`SpannerBundle` that holds :class:`Slur` objects for the MEI
+        document being imported.
+    :type slurBundle: :class:`music21.spanner.SpannerBundle`
+    :returns: The ``documentRoot`` element and ``m21Attr`` mapping after specified transformations.
+    :rtype: :class:`~xml.etree.ElementTree.Element` and defaultdict
+
+    **Example of ``m21Attr``**
+
+    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
+    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
+    attribute names and their values that should be added to the element with the given @xml:id.
+
+    For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
+    element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
+
+    **This Preprocessor**
+    The slur preprocessor adds @m21SlurStart and @m21SlurEnd attributes. The value of these
+    attributes is the ``idLocal`` of a :class:`Slur` in the ``slurBundle`` argument. This means, for
+    example, that if you encounter an element like ``<note m21SlurStart="82f87cd7"/>``, the
+    resulting :class:`music21.note.Note` should be set as the starting point of the slur with and
+    ``idLocal`` of ``'82f87cd7'``.
+    '''
+    environLocal.printDebug('*** pre-processing slurs')
+    # pre-processing for <slur> tags
+    for eachSlur in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
+        # TODO: slurs with @tstamp
+        thisIdLocal = str(uuid4())
+        thisSlur = spanner.Slur()
+        thisSlur.idLocal = thisIdLocal
+        slurBundle.append(thisSlur)
+
+        m21Attr[removeOctothorpe(eachSlur.get('startid'))]['m21SlurStart'] = thisIdLocal
+        m21Attr[removeOctothorpe(eachSlur.get('endid'))]['m21SlurEnd'] = thisIdLocal
+
+    return documentRoot, m21Attr
+
+
+def _ppTies(documentRoot, m21Attr):
+    # TODO: test this function
+    '''
+    Pre-processing helper for :func:`convertFromString` that handles ties specified in <tie> elements.
+
+    :param documentRoot: The root tag of the MEI document being imported.
+    :type documentRoot: :class:`xml.etree.ElementTree.Element`
+    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
+        element with that @xml:id (read below for more information).
+    :type m21Attr: defaultdict
+    :returns: The ``documentRoot`` element and ``m21Attr`` mapping after specified transformations.
+    :rtype: :class:`~xml.etree.ElementTree.Element` and defaultdict
+
+    **Example of ``m21Attr``**
+
+    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
+    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
+    attribute names and their values that should be added to the element with the given @xml:id.
+
+    For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
+    element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
+
+    **This Preprocessor**
+    The tie preprocessor adds @tie attributes. The value of these attributes conforms to the MEI
+    Guidelines, so no special action is required.
+    '''
+    environLocal.printDebug('*** pre-processing ties')
+    # pre-processing for <tie> tags
+    # (this essentially converts <tie> tags into @tie attributes)
+    for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
+        m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
+        m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
+
+    return documentRoot, m21Attr
+
+
+def _ppBeams(documentRoot, m21Attr):
+    # TODO: test this function
+    '''
+    Pre-processing helper for :func:`convertFromString` that handles beams specified in <beamSpan>
+    elements.
+
+    :param documentRoot: The root tag of the MEI document being imported.
+    :type documentRoot: :class:`xml.etree.ElementTree.Element`
+    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
+        element with that @xml:id (read below for more information).
+    :type m21Attr: defaultdict
+    :returns: The ``documentRoot`` element and ``m21Attr`` mapping after specified transformations.
+    :rtype: :class:`~xml.etree.ElementTree.Element` and defaultdict
+
+    **Example of ``m21Attr``**
+
+    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
+    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
+    attribute names and their values that should be added to the element with the given @xml:id.
+
+    For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
+    element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
+
+    **This Preprocessor**
+    The slur preprocessor adds the @m21Beam attribute. The value of this attribute is either
+    ``'start'``, ``'continue'``, or ``'stop'``, indicating the music21 ``type`` of the primary
+    beam attached to this element.
+    '''
+    environLocal.printDebug('*** pre-processing beams')
+    # pre-processing for <beamSpan> elements
+    for eachBeam in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
+        m21Attr[removeOctothorpe(eachBeam.get('startid'))]['m21Beam'] = 'start'
+        m21Attr[removeOctothorpe(eachBeam.get('endid'))]['m21Beam'] = 'stop'
+
+        # iterate things in the @plist attribute
+        for eachXmlid in eachBeam.get('plist', '').split(' '):
+            eachXmlid = removeOctothorpe(eachXmlid)
+            if 0 == len(eachXmlid):
+                # this is either @plist not set or extra spaces around the contained xml:id values
+                pass
+            if 'm21Beam' not in m21Attr[eachXmlid]: #['m21Beam'] is None:
+                # only set to 'continue' if it wasn't already set above
+                m21Attr[eachXmlid]['m21Beam'] = 'continue'
+
+    return documentRoot, m21Attr
+
+
+def _ppTuplets(documentRoot, m21Attr):
+    # TODO: test this function
+    '''
+    Pre-processing helper for :func:`convertFromString` that handles tuplets specified in
+    <tupletSpan> elements.
+
+    :param documentRoot: The root tag of the MEI document being imported.
+    :type documentRoot: :class:`xml.etree.ElementTree.Element`
+    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
+        element with that @xml:id (read below for more information).
+    :type m21Attr: defaultdict
+    :returns: The ``documentRoot`` element and ``m21Attr`` mapping after specified transformations.
+    :rtype: :class:`~xml.etree.ElementTree.Element` and defaultdict
+
+    **Example of ``m21Attr``**
+
+    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
+    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
+    attribute names and their values that should be added to the element with the given @xml:id.
+
+    For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
+    element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
+
+    **This Preprocessor**
+    The slur preprocessor adds @m21TupletNum and @m21TupletNumbase attributes. The value of these
+    attributes corresponds to the @num and @numbase attributes found on a <tuplet> element.
+
+    This preprocessor also performs a significant amount of guesswork to try to handle <tupletSpan>
+    elements that do not include a @plist attribute.
+    '''
+    environLocal.printDebug('*** pre-processing tuplets')
+    # TODO: probably clean this up
+    # TODO: decide whether we can use the "m21Attributes" thing for tuplets
+    # pre-processing <tupletSpan> tags
+    for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
+        if eachTuplet.get('plist') is not None:
+            # Properly-encoded <tupletSpan> elements should have a @plist that enumerates the
+            # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
+            # @plist to add our custom @m21TupletNum and @m21TupletNumbase attributes.
+            # TODO: write the well-encoded <tupletSpan> situation here with the "m21Attributes" object
+            environLocal.printDebug('found  <tupletSpan> with @plist, but did not process it')
+        else:
+            # Poorly-encoded <tupletSpan> elements don't give a @plist attribute, so we have to do
+            # some crude guesswork to find all the related elements.
+            startid = removeOctothorpe(eachTuplet.get('startid'))
+            endid = removeOctothorpe(eachTuplet.get('endid'))
+            foundTheStart = False
+            foundTheEnd = False
+
+            # We mark as a tuplet-member everything at the same hierarchic level as the @startid
+            # element, starting from the @startid element, ending either at the @endid element or
+            # the end of same-level elements.
+            startIdTag = documentRoot.find(
+                './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, startid, mei=_MEINS))
+            for eachObject in startIdTag.iterfind('*'):
+                if eachObject.get(_XMLID, '') == startid:
+                    foundTheStart = True
+                if foundTheStart and not foundTheEnd:
+                    eachObject.set('m21TupletNum', eachTuplet.get('num'))
+                    eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
+                if eachObject.get(_XMLID, '') == endid:
+                    foundTheEnd = True
+                    break
+
+            # And if we didn't already hit the @endid element, we'll find everything at the same
+            # hierarchic level as the @endid element marking as a tuplet-member everything at that
+            # level that precedes the @endid element.
+            if not foundTheEnd:
+                endIdTag = documentRoot.find(
+                    './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, endid, mei=_MEINS))
+                for eachObject in endIdTag.iterfind('*'):
+                    eachObject.set('m21TupletNum', eachTuplet.get('num'))
+                    eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
+                    if eachObject.get(_XMLID, '') == endid:
+                        foundTheEnd = True
+                        break
+
+    return documentRoot, m21Attr
+
+
+def _ppConclude(documentRoot, m21Attr):
+    # TODO: test this function
+    '''
+    Pre-processing helper for :func:`convertFromString` that adds attributes from ``m21Attr`` to the
+    appropriate elements in ``documentRoot``.
+
+    :param documentRoot: The root tag of the MEI document being imported.
+    :type documentRoot: :class:`xml.etree.ElementTree.Element`
+    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
+        element with that @xml:id (read below for more information).
+    :type m21Attr: defaultdict
+    :returns: The ``documentRoot`` element.
+    :rtype: :class:`~xml.etree.ElementTree.Element`
+
+    **Example of ``m21Attr``**
+
+    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
+    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
+    attribute names and their values that should be added to the element with the given @xml:id.
+
+    For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
+    element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
+
+    **This Preprocessor**
+    The slur preprocessor adds all attributes from the ``m21Attr`` to the appropriate element in
+    ``documentRoot``. In effect, it finds the element corresponding to each key in ``m21Attr``,
+    then iterates the keys in its dict, *appending* the ``m21Attr``-specified value to any existing
+    value.
+    '''
+    environLocal.printDebug('*** concluding pre-processing')
+    # conclude pre-processing by adding music21-specific attributes to their respective elements
+    for eachObject in documentRoot.iterfind('*//*'):
+        # we have a defaultdict, so this "if" isn't strictly necessary; but without it, every single
+        # element with an @xml:id creates a new, empty dict, which would consume a lot of memory
+        if eachObject.get(_XMLID) in m21Attr:
+            for eachAttr in m21Attr[eachObject.get(_XMLID)]:
+                eachObject.set(eachAttr, eachObject.get(eachAttr, '') + m21Attr[eachObject.get(_XMLID)][eachAttr])
+
+    return documentRoot
 
 
 # Helper Functions
@@ -1970,7 +2139,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
 
     # see if any of the Measures are shorter than the others; if so, check for <mRest/> tags that
     # didn't have a @dur set
-    # TODO: write explanation and test
+    # TODO: write explanation and test (plus, it doesn't always work; we can catch errors with this)
     for eachN in expectedNs:
         if post[eachN].duration.quarterLength < maxBarDuration:
             for eachVoice in post[eachN]:
