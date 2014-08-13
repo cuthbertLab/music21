@@ -1471,6 +1471,7 @@ class Rest(GeneralNote):
     'isUnpitched': 'Boolean read-only value describing if this Rest is Unpitched (False -- only Unpitched objects are True).',
     'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
     'name': 'returns "rest" always.  It is here so that you can get `x.name` on all `.notesAndRests` objects',
+    'lineShift': 'number of lines/spaces to shift the note upwards or downwards for display.',
     }
 
     # TODO: may need to set a display pitch,
@@ -1478,6 +1479,7 @@ class Rest(GeneralNote):
 
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
+        self.lineShift = 0; # display line
 
     def __repr__(self):
         return "<music21.note.Rest %s>" % self.name
