@@ -68,8 +68,8 @@ code like this can be done:
      s = stream.Stream(...)
      ls = layout.divideByPages(s)
      pg2sys3 = ls.pages[1].systems[2]  # n.b.! 1, 2
-     startMeasure, endMeasure = pg2sys3.startMeasure, pg2sys3.endMeasure
-     scoreExcerpt = s.measures(startMeasure, endMeasure)
+     measureStart, measureEnd = pg2sys3.measureStart, pg2sys3.measureEnd
+     scoreExcerpt = s.measures(measureStart, measureEnd)
      scoreExcerpt.show()  # will show page 2, system 3
 
 Note that while the coordinates given by music21 for a musicxml score (based on margins,
@@ -575,8 +575,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     scoreLists = LayoutScore()
     scoreLists.definesExplicitPageBreaks = True
     scoreLists.definesExplicitSystemBreaks = True
-    scoreLists.startMeasure = firstMeasureNumber
-    scoreLists.endMeasure = lastMeasureNumber
+    scoreLists.measureStart = firstMeasureNumber
+    scoreLists.measureEnd = lastMeasureNumber
     for el in scoreIn:
         if 'Part' not in el.classes:
             if 'ScoreLayout' in el.classes:
@@ -700,8 +700,8 @@ class LayoutScore(stream.Opus):
     def __init__(self, *args, **keywords):
         stream.Opus.__init__(self, *args, **keywords)
         self.scoreLayout = None
-        self.startMeasure = None
-        self.endMeasure = None
+        self.measureStart = None
+        self.measureEnd = None
 
     def _getPages(self):
         return self.getElementsByClass(Page)
@@ -828,10 +828,11 @@ class LayoutScore(stream.Opus):
         '''
         first systems on a page use a different positioning.
 
-        returns a tuple of the (top, left, right, and bottom) where each unit is relative to the page margins
+        returns a tuple of the (top, left, right, and bottom) where each unit is 
+        relative to the page margins
 
-        N.B. right is NOT the width -- it is different.  It is the offset to the right margin.  weird, inconsistent, but most useful...
-        bottom is the hard part to compute...
+        N.B. right is NOT the width -- it is different.  It is the offset to the right margin.  
+        weird, inconsistent, but most useful...bottom is the hard part to compute...
 
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
@@ -1395,14 +1396,14 @@ class LayoutScore(stream.Opus):
         returns a list of dictionaries, where each dictionary gives the measure number
         and other information, etc. in the document.
 
-        #
+        
         # >>> g = corpus.parse('luca/gloria')
         # >>> gl = layout.divideByPages(g)
         # >>> gl.getAllMeasurePositionsInDocument()
         '''
         numStaves = len(self.pages[0].systems[0].staves)
         allRetInfo = []
-        for mNum in range(self.startMeasure, self.endMeasure + 1):
+        for mNum in range(self.measureStart, self.measureEnd + 1):
             if printUpdates is True: # so fast now that it's not needed
                 print("Doing measure ", mNum)
             mList = []
