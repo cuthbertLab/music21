@@ -485,7 +485,6 @@ def _sharpsFromAttr(signature):
 # "Preprocessing" Functions for convertFromString()
 #------------------------------------------------------------------------------
 def _ppSlurs(documentRoot, m21Attr, slurBundle):
-    # TODO: test this function
     '''
     Pre-processing helper for :func:`convertFromString` that handles slurs specified in <slur>
     elements.
