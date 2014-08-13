@@ -132,10 +132,10 @@ def convertFromString(dataStr):
 
     slurBundle = spanner.SpannerBundle()
 
-    documentRoot, m21Attr = _ppSlurs(documentRoot, m21Attr, slurBundle)
-    documentRoot, m21Attr = _ppTies(documentRoot, m21Attr)
-    documentRoot, m21Attr = _ppBeams(documentRoot, m21Attr)
-    documentRoot, m21Attr = _ppTuplets(documentRoot, m21Attr)
+    m21Attr = _ppSlurs(documentRoot, m21Attr, slurBundle)
+    m21Attr = _ppTies(documentRoot, m21Attr)
+    m21Attr = _ppBeams(documentRoot, m21Attr)
+    m21Attr = _ppTuplets(documentRoot, m21Attr)
     documentRoot = _ppConclude(documentRoot, m21Attr)
 
     environLocal.printDebug('*** preparing part and staff definitions')
@@ -498,8 +498,8 @@ def _ppSlurs(documentRoot, m21Attr, slurBundle):
     :param slurBundle: The :class:`SpannerBundle` that holds :class:`Slur` objects for the MEI
         document being imported.
     :type slurBundle: :class:`music21.spanner.SpannerBundle`
-    :returns: The ``documentRoot`` element and ``m21Attr`` mapping after specified transformations.
-    :rtype: :class:`~xml.etree.ElementTree.Element` and defaultdict
+    :returns: The ``m21Attr`` mapping after specified transformations.
+    :rtype: defaultdict
 
     **Example of ``m21Attr``**
 
@@ -529,7 +529,7 @@ def _ppSlurs(documentRoot, m21Attr, slurBundle):
         m21Attr[removeOctothorpe(eachSlur.get('startid'))]['m21SlurStart'] = thisIdLocal
         m21Attr[removeOctothorpe(eachSlur.get('endid'))]['m21SlurEnd'] = thisIdLocal
 
-    return documentRoot, m21Attr
+    return m21Attr
 
 
 def _ppTies(documentRoot, m21Attr):
@@ -542,8 +542,8 @@ def _ppTies(documentRoot, m21Attr):
     :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
         element with that @xml:id (read below for more information).
     :type m21Attr: defaultdict
-    :returns: The ``documentRoot`` element and ``m21Attr`` mapping after specified transformations.
-    :rtype: :class:`~xml.etree.ElementTree.Element` and defaultdict
+    :returns: The ``m21Attr`` mapping after specified transformations.
+    :rtype: defaultdict
 
     **Example of ``m21Attr``**
 
@@ -565,7 +565,7 @@ def _ppTies(documentRoot, m21Attr):
         m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
         m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
 
-    return documentRoot, m21Attr
+    return m21Attr
 
 
 def _ppBeams(documentRoot, m21Attr):
@@ -579,8 +579,8 @@ def _ppBeams(documentRoot, m21Attr):
     :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
         element with that @xml:id (read below for more information).
     :type m21Attr: defaultdict
-    :returns: The ``documentRoot`` element and ``m21Attr`` mapping after specified transformations.
-    :rtype: :class:`~xml.etree.ElementTree.Element` and defaultdict
+    :returns: The ``m21Attr`` mapping after specified transformations.
+    :rtype: defaultdict
 
     **Example of ``m21Attr``**
 
@@ -612,7 +612,7 @@ def _ppBeams(documentRoot, m21Attr):
                 # only set to 'continue' if it wasn't already set above
                 m21Attr[eachXmlid]['m21Beam'] = 'continue'
 
-    return documentRoot, m21Attr
+    return m21Attr
 
 
 def _ppTuplets(documentRoot, m21Attr):
@@ -626,8 +626,8 @@ def _ppTuplets(documentRoot, m21Attr):
     :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
         element with that @xml:id (read below for more information).
     :type m21Attr: defaultdict
-    :returns: The ``documentRoot`` element and ``m21Attr`` mapping after specified transformations.
-    :rtype: :class:`~xml.etree.ElementTree.Element` and defaultdict
+    :returns: The ``m21Attr`` mapping after specified transformations.
+    :rtype: defaultdict
 
     **Example of ``m21Attr``**
 
@@ -692,7 +692,7 @@ def _ppTuplets(documentRoot, m21Attr):
                         foundTheEnd = True
                         break
 
-    return documentRoot, m21Attr
+    return m21Attr
 
 
 def _ppConclude(documentRoot, m21Attr):
@@ -1522,6 +1522,9 @@ def mRestFromElement(elem, slurBundle=None):
     '''
     # TODO: <mRest> elements sometimes won't have a @dur set; it's simply supposed to take up the
     #       whole measure. But then the quarterLength will be 1.0, which isn't good.
+    # TODO: even the algorithm currently in measureFromElement() won't necessarily do this correctly,
+    #       since if all parts have a full-measure rest, they will all have the same (incorrect)
+    #       duration set.
     return restFromElement(elem, slurBundle)
 
 
@@ -2183,6 +2186,7 @@ if __name__ == "__main__":
                      test_main.TestEmbeddedElements,
                      test_main.TestAddSlurs,
                      test_main.TestBeams,
+                     test_main.TestPreprocessors,
                     )
 
 #------------------------------------------------------------------------------
