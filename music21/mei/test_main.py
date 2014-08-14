@@ -2105,6 +2105,33 @@ class TestPreprocessors(unittest.TestCase):
             self.assertTrue(m21Attr['start {}'.format(i)]['m21SlurStart'] in expectedIdLocal)
             self.assertTrue(m21Attr['end {}'.format(i)]['m21SlurEnd'] in expectedIdLocal)
 
+    @mock.patch('music21.spanner.Slur')
+    @mock.patch('music21.mei.__main__.environLocal')
+    def testUnitSlurs2(self, mockEnviron, mockSlur):
+        '''
+        _ppSlurs(): <slur> without @startid and @endid is properly announced as failing
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)
+        iterfindReturn = [ETree.Element('slur', attrib={'tstamp': '4.1', 'tstamp2': '4.3'})]
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockSlur.side_effect = lambda: mock.MagicMock('a fake Slur')
+        # the "slurBundle" only needs to support append(), so this can serve as our mock object
+        slurBundle = []
+
+        actual = main._ppSlurs(documentRoot, m21Attr, slurBundle)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check things in the slurBundle
+        self.assertEqual(0, len(slurBundle))
+        # check all the right values were added to the m21Attr dict
+        self.assertEqual(0, len(m21Attr))
+        mockEnviron.warn.assert_called_once_with('Importing <slur> without @startid and @endid is not yet supported.')
+
     def testUnitBeams1(self):
         '''
         _ppBeams(): that three beamed notes are specified correctly in the m21Attr

@@ -520,14 +520,16 @@ def _ppSlurs(documentRoot, m21Attr, slurBundle):
     environLocal.printDebug('*** pre-processing slurs')
     # pre-processing for <slur> tags
     for eachSlur in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
-        # TODO: slurs with @tstamp
-        thisIdLocal = str(uuid4())
-        thisSlur = spanner.Slur()
-        thisSlur.idLocal = thisIdLocal
-        slurBundle.append(thisSlur)
+        if eachSlur.get('startid') is not None and eachSlur.get('endid') is not None:
+            thisIdLocal = str(uuid4())
+            thisSlur = spanner.Slur()
+            thisSlur.idLocal = thisIdLocal
+            slurBundle.append(thisSlur)
 
-        m21Attr[removeOctothorpe(eachSlur.get('startid'))]['m21SlurStart'] = thisIdLocal
-        m21Attr[removeOctothorpe(eachSlur.get('endid'))]['m21SlurEnd'] = thisIdLocal
+            m21Attr[removeOctothorpe(eachSlur.get('startid'))]['m21SlurStart'] = thisIdLocal
+            m21Attr[removeOctothorpe(eachSlur.get('endid'))]['m21SlurEnd'] = thisIdLocal
+        else:
+            environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<slur>', '@startid and @endid'))
 
     return m21Attr
 
