@@ -600,6 +600,10 @@ def _ppBeams(documentRoot, m21Attr):
     environLocal.printDebug('*** pre-processing beams')
     # pre-processing for <beamSpan> elements
     for eachBeam in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
+        if eachBeam.get('startid') is None or eachBeam.get('endid') is None:
+            environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<beamSpan>', '@startid and @endid'))
+            continue
+
         m21Attr[removeOctothorpe(eachBeam.get('startid'))]['m21Beam'] = 'start'
         m21Attr[removeOctothorpe(eachBeam.get('endid'))]['m21Beam'] = 'stop'
 

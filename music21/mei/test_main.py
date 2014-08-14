@@ -2187,3 +2187,25 @@ class TestPreprocessors(unittest.TestCase):
         for i in xrange(3):
             self.assertEqual('start', m21Attr['start-{}'.format(i)]['m21Beam'])
             self.assertEqual('stop', m21Attr['end-{}'.format(i)]['m21Beam'])
+
+    @mock.patch('music21.mei.__main__.environLocal')
+    def testUnitBeams3(self, mockEnviron):
+        '''
+        _ppBeams(): <beamSpan> without @startid and @endid is properly announced as failing
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
+        iterfindReturn = [ETree.Element('beamSpan', attrib={'tstamp': '12.4', 'tstamp2': '13.1'})]
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+
+        actual = main._ppBeams(documentRoot, m21Attr)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check all the right values were added to the m21Attr dict
+        self.assertEqual(0, len(m21Attr))
+        mockEnviron.warn.assert_called_once_with('Importing <beamSpan> without @startid and @endid is not yet supported.')
+
