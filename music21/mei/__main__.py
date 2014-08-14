@@ -652,18 +652,27 @@ def _ppTuplets(documentRoot, m21Attr):
     '''
     environLocal.printDebug('*** pre-processing tuplets')
     # TODO: probably clean this up
-    # TODO: decide whether we can use the "m21Attributes" thing for tuplets
+    # TODO: decide whether we can use the "m21Attributes" thing for tuplets without @plist
     # pre-processing <tupletSpan> tags
     for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
-        if eachTuplet.get('plist') is not None:
-            # Properly-encoded <tupletSpan> elements should have a @plist that enumerates the
+        if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None)
+            and eachTuplet.get('plist') is None):
+            environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tupletSpan>', '@startid and @endid or @plist'))
+        elif eachTuplet.get('plist') is not None:
+            # Ideally (for us) <tupletSpan> elements will have a @plist that enumerates the
             # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
             # @plist to add our custom @m21TupletNum and @m21TupletNumbase attributes.
-            # TODO: write the well-encoded <tupletSpan> situation here with the "m21Attributes" object
-            environLocal.printDebug('found  <tupletSpan> with @plist, but did not process it')
+            for eachXmlid in eachTuplet.get('plist', '').split(' '):
+                eachXmlid = removeOctothorpe(eachXmlid)
+                if 0 < len(eachXmlid):
+                    # protect against extra spaces around the contained xml:id values
+                    m21Attr[eachXmlid]['m21TupletNum'] = eachTuplet.get('num')
+                    m21Attr[eachXmlid]['m21TupletNumbase'] = eachTuplet.get('numbase')
         else:
-            # Poorly-encoded <tupletSpan> elements don't give a @plist attribute, so we have to do
-            # some crude guesswork to find all the related elements.
+            # TODO: rewrite this comment
+            # TODO: rewrite this to use m21Attr---because we don't return documentRoot!
+            # For <tupletSpan> elements that don't give a @plist attribute, we have to do some
+            # guesswork and hope we find all the related elements.
             startid = removeOctothorpe(eachTuplet.get('startid'))
             endid = removeOctothorpe(eachTuplet.get('endid'))
             foundTheStart = False

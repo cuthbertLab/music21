@@ -2209,3 +2209,59 @@ class TestPreprocessors(unittest.TestCase):
         self.assertEqual(0, len(m21Attr))
         mockEnviron.warn.assert_called_once_with('Importing <beamSpan> without @startid and @endid is not yet supported.')
 
+    def testUnitTuplets1(self):
+        '''
+        _ppTuplets(): that three notes in a tuplet are specified correctly in the m21Attr
+
+        with @plist
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)
+        theNum = 42
+        theNumbase = 900
+        iterfindReturn = []
+        for i in xrange(3):
+            iterfindReturn.append(ETree.Element('tupletSpan',
+                                                attrib={'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i),
+                                                        'num': theNum,
+                                                        'numbase': theNumbase}))
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+
+        actual = main._ppTuplets(documentRoot, m21Attr)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check all the right values were added to the m21Attr dict
+        for i in xrange(3):
+            self.assertEqual(theNum, m21Attr['start-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual(theNum, m21Attr['mid-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, m21Attr['mid-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual(theNum, m21Attr['end-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
+
+    @mock.patch('music21.mei.__main__.environLocal')
+    def testUnitTuplets2(self, mockEnviron):
+        '''
+        _ppTuplets(): <tupletSpan> without (@startid and @endid) or @plist is properly announced as failing
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)
+        theNum = 42
+        theNumbase = 900
+        iterfindReturn = [ETree.Element('tupletSpan', attrib={'num': theNum, 'numbase': theNumbase})]
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+
+        actual = main._ppTuplets(documentRoot, m21Attr)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check all the right values were added to the m21Attr dict
+        self.assertEqual(0, len(m21Attr))
+        mockEnviron.warn.assert_called_once_with('Importing <tupletSpan> without @startid and @endid or @plist is not yet supported.')
