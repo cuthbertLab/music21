@@ -2060,8 +2060,9 @@ class TestPreprocessors(unittest.TestCase):
         expectedIterfind = './/{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)
         iterfindReturn = []
         for i in xrange(3):
-            iterfindReturn.append(ETree.Element('slur', attrib={'startid': 'start {}'.format(i),
-                                                                'endid': 'end {}'.format(i)}))
+            iterfindReturn.append(ETree.Element('slur',
+                                                attrib={'startid': 'start {}'.format(i),
+                                                        'endid': 'end {}'.format(i)}))
         documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
         mockSlur.side_effect = lambda: mock.MagicMock('a fake Slur')
         # the "slurBundle" only needs to support append(), so this can serve as our mock object
@@ -2082,3 +2083,59 @@ class TestPreprocessors(unittest.TestCase):
         for i in xrange(3):
             self.assertTrue(m21Attr['start {}'.format(i)]['m21SlurStart'] in expectedIdLocal)
             self.assertTrue(m21Attr['end {}'.format(i)]['m21SlurEnd'] in expectedIdLocal)
+
+    def testUnitBeams1(self):
+        '''
+        _ppBeams(): that three beamed notes are specified correctly in the m21Attr
+
+        with @plist
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
+        iterfindReturn = []
+        for i in xrange(3):
+            iterfindReturn.append(ETree.Element('beamSpan',
+                                                attrib={'startid': 'start-{}'.format(i),
+                                                        'endid': 'end-{}'.format(i),
+                                                        'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i)}))
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+
+        actual = main._ppBeams(documentRoot, m21Attr)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check all the right values were added to the m21Attr dict
+        for i in xrange(3):
+            self.assertEqual('start', m21Attr['start-{}'.format(i)]['m21Beam'])
+            self.assertEqual('continue', m21Attr['mid-{}'.format(i)]['m21Beam'])
+            self.assertEqual('stop', m21Attr['end-{}'.format(i)]['m21Beam'])
+
+    def testUnitBeams2(self):
+        '''
+        _ppBeams(): that three beamed notes are specified correctly in the m21Attr
+
+        without @plist
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
+        iterfindReturn = []
+        for i in xrange(3):
+            iterfindReturn.append(ETree.Element('beamSpan',
+                                                attrib={'startid': '#start-{}'.format(i),
+                                                        'endid': '#end-{}'.format(i)}))
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+
+        actual = main._ppBeams(documentRoot, m21Attr)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check all the right values were added to the m21Attr dict
+        for i in xrange(3):
+            self.assertEqual('start', m21Attr['start-{}'.format(i)]['m21Beam'])
+            self.assertEqual('stop', m21Attr['end-{}'.format(i)]['m21Beam'])

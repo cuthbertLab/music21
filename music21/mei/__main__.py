@@ -565,7 +565,6 @@ def _ppTies(documentRoot, m21Attr):
 
 
 def _ppBeams(documentRoot, m21Attr):
-    # TODO: test this function
     '''
     Pre-processing helper for :func:`convertFromString` that handles beams specified in <beamSpan>
     elements.
@@ -604,8 +603,8 @@ def _ppBeams(documentRoot, m21Attr):
             if 0 == len(eachXmlid):
                 # this is either @plist not set or extra spaces around the contained xml:id values
                 pass
-            if 'm21Beam' not in m21Attr[eachXmlid]: #['m21Beam'] is None:
-                # only set to 'continue' if it wasn't already set above
+            if 'm21Beam' not in m21Attr[eachXmlid]:
+                # only set to 'continue' if it wasn't previously set to 'start' or 'stop'
                 m21Attr[eachXmlid]['m21Beam'] = 'continue'
 
     return m21Attr
