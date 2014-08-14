@@ -132,11 +132,11 @@ def convertFromString(dataStr):
 
     slurBundle = spanner.SpannerBundle()
 
-    m21Attr = _ppSlurs(documentRoot, m21Attr, slurBundle)
-    m21Attr = _ppTies(documentRoot, m21Attr)
-    m21Attr = _ppBeams(documentRoot, m21Attr)
-    m21Attr = _ppTuplets(documentRoot, m21Attr)
-    documentRoot = _ppConclude(documentRoot, m21Attr)
+    _ppSlurs(documentRoot, m21Attr, slurBundle)
+    _ppTies(documentRoot, m21Attr)
+    _ppBeams(documentRoot, m21Attr)
+    _ppTuplets(documentRoot, m21Attr)
+    _ppConclude(documentRoot, m21Attr)
 
     environLocal.printDebug('*** preparing part and staff definitions')
 
