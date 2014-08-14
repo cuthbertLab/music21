@@ -2048,6 +2048,27 @@ class TestPreprocessors(unittest.TestCase):
             self.assertEqual('i', m21Attr['start {}'.format(i)]['tie'])
             self.assertEqual('t', m21Attr['end {}'.format(i)]['tie'])
 
+    @mock.patch('music21.mei.__main__.environLocal')
+    def testUnitTies2(self, mockEnviron):
+        '''
+        _ppTies(): <tie> without @startid and @endid is properly announced as failing
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)
+        iterfindReturn = [ETree.Element('tie', attrib={'tstamp': '4.1', 'tstamp2': '4.2'})]
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+
+        actual = main._ppTies(documentRoot, m21Attr)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check all the right values were added to the m21Attr dict
+        self.assertEqual(0, len(m21Attr))
+        mockEnviron.warn.assert_called_once_with('Importing <tie> without @startid and @endid is not yet supported.')
+
     @mock.patch('music21.spanner.Slur')
     def testUnitSlurs1(self, mockSlur):
         '''

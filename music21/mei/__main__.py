@@ -105,6 +105,7 @@ _SEEMINGLY_NO_PARTS = 'There appear to be no <staffDef> tags in this score.'
 _MISSING_VOICE_ID = 'Found a <layer> without @n attribute and no override.'
 _CANNOT_FIND_XMLID = 'Could not find the @{} so we could not create the {}.'
 _MISSING_TUPLET_DATA = 'Both @num and @numbase attributes are required on <tuplet> tags.'
+_UNIMPLEMENTED_IMPORT = 'Importing {} without {} is not yet supported.'
 
 
 # Module-level Functions
@@ -558,8 +559,11 @@ def _ppTies(documentRoot, m21Attr):
     '''
     environLocal.printDebug('*** pre-processing ties')
     for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
-        m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
-        m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
+        if eachTie.get('startid') is not None and eachTie.get('endid') is not None:
+            m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
+            m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
+        else:
+            environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tie>', '@startid and @endid'))
 
     return m21Attr
 
