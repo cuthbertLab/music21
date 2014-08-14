@@ -5745,7 +5745,7 @@ class Stream(base.Music21Object):
         #measureStream.makeBeams(inPlace=True)
         try:
             measureStream.makeBeams(inPlace=True)
-        except StreamException, meter.MeterException:
+        except (StreamException, meter.MeterException):
             # this is a result of makeMeaures not getting everything
             # note to measure allocation right
             #environLocal.printDebug(['skipping makeBeams exception', StreamException])
