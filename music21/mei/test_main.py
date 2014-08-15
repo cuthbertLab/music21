@@ -242,6 +242,29 @@ class TestThings(unittest.TestCase):
         self.assertEqual(5, actual)
         mockAccid.assert_called_once_with('yes')
 
+    def testGetVoiceId1(self):
+        '''getVoiceId(): usual case'''
+        theVoice = stream.Voice()
+        theVoice.id = 42
+        fromThese = [None, theVoice, stream.Stream(), stream.Part(), 900]
+        expected = 42
+        actual = main.getVoiceId(fromThese)
+        self.assertEqual(expected, actual)
+
+    def testGetVoiceId2(self):
+        '''getVoiceId(): no Voice objects causes RuntimeError'''
+        fromThese = [None, stream.Stream(), stream.Part(), 900]
+        self.assertRaises(RuntimeError, main.getVoiceId, fromThese)
+
+    def testGetVoiceId3(self):
+        '''getVoiceId(): three Voice objects causes RuntimeError'''
+        firstVoice = stream.Voice()
+        firstVoice.id = 42
+        otherVoice = stream.Voice()
+        otherVoice.id = 24
+        fromThese = [None, firstVoice, stream.Stream(), stream.Part(), otherVoice, 900]
+        self.assertRaises(RuntimeError, main.getVoiceId, fromThese)
+
 
 #------------------------------------------------------------------------------
 class TestAttrTranslators(unittest.TestCase):

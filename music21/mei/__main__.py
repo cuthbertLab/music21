@@ -1072,6 +1072,23 @@ def makeMetadata(fromThis):
     return meta
 
 
+def getVoiceId(fromThese):
+    '''
+    From a list of objects with mixed type, find the "id" of the :class:`music21.stream.Voice`
+    instance.
+
+    :param list fromThese: A list of objects of any type, at least one of which must be a
+        :class:`~music21.stream.Voice` instance.
+    :returns: The ``id`` of the :class:`Voice` instance.
+    :raises: :exc:`RuntimeError` if zero or many :class:`Voice` objects are found.
+    '''
+    fromThese = [item for item in fromThese if isinstance(item, stream.Voice)]
+    if 1 == len(fromThese):
+        return fromThese[0].id
+    else:
+        raise RuntimeError('getVoiceId: found too few or too many Voice objects')
+
+
 # Element-Based Converter Functions
 #------------------------------------------------------------------------------
 def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
