@@ -621,7 +621,6 @@ def _ppBeams(documentRoot, m21Attr):
 
 
 def _ppTuplets(documentRoot, m21Attr):
-    # TODO: test this function
     '''
     Pre-processing helper for :func:`convertFromString` that handles tuplets specified in
     <tupletSpan> elements.
@@ -651,8 +650,6 @@ def _ppTuplets(documentRoot, m21Attr):
     elements that do not include a @plist attribute.
     '''
     environLocal.printDebug('*** pre-processing tuplets')
-    # TODO: probably clean this up
-    # TODO: decide whether we can use the "m21Attributes" thing for tuplets without @plist
     # pre-processing <tupletSpan> tags
     for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
         if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None)
@@ -662,6 +659,7 @@ def _ppTuplets(documentRoot, m21Attr):
             # Ideally (for us) <tupletSpan> elements will have a @plist that enumerates the
             # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
             # @plist to add our custom @m21TupletNum and @m21TupletNumbase attributes.
+            # TODO: use @startid and @endid, if present, to set the duration.tuplets "type"
             for eachXmlid in eachTuplet.get('plist', '').split(' '):
                 eachXmlid = removeOctothorpe(eachXmlid)
                 if 0 < len(eachXmlid):
@@ -669,42 +667,18 @@ def _ppTuplets(documentRoot, m21Attr):
                     m21Attr[eachXmlid]['m21TupletNum'] = eachTuplet.get('num')
                     m21Attr[eachXmlid]['m21TupletNumbase'] = eachTuplet.get('numbase')
         else:
-            # TODO: rewrite this comment
-            # TODO: rewrite this to use m21Attr---because we don't return documentRoot!
             # For <tupletSpan> elements that don't give a @plist attribute, we have to do some
-            # guesswork and hope we find all the related elements.
+            # guesswork and hope we find all the related elements. Right here, we're only setting
+            # the "flags" that this guesswork must be done later.
             startid = removeOctothorpe(eachTuplet.get('startid'))
             endid = removeOctothorpe(eachTuplet.get('endid'))
-            foundTheStart = False
-            foundTheEnd = False
 
-            # We mark as a tuplet-member everything at the same hierarchic level as the @startid
-            # element, starting from the @startid element, ending either at the @endid element or
-            # the end of same-level elements.
-            startIdTag = documentRoot.find(
-                './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, startid, mei=_MEINS))
-            for eachObject in startIdTag.iterfind('*'):
-                if eachObject.get(_XMLID, '') == startid:
-                    foundTheStart = True
-                if foundTheStart and not foundTheEnd:
-                    eachObject.set('m21TupletNum', eachTuplet.get('num'))
-                    eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
-                if eachObject.get(_XMLID, '') == endid:
-                    foundTheEnd = True
-                    break
-
-            # And if we didn't already hit the @endid element, we'll find everything at the same
-            # hierarchic level as the @endid element marking as a tuplet-member everything at that
-            # level that precedes the @endid element.
-            if not foundTheEnd:
-                endIdTag = documentRoot.find(
-                    './/{mei}music//{mei}score//*[@{}="{}"]/..'.format(_XMLID, endid, mei=_MEINS))
-                for eachObject in endIdTag.iterfind('*'):
-                    eachObject.set('m21TupletNum', eachTuplet.get('num'))
-                    eachObject.set('m21TupletNumbase', eachTuplet.get('numbase'))
-                    if eachObject.get(_XMLID, '') == endid:
-                        foundTheEnd = True
-                        break
+            m21Attr[startid]['m21TupletSearch'] = 'start'
+            m21Attr[startid]['m21TupletNum'] = eachTuplet.get('num')
+            m21Attr[startid]['m21TupletNumbase'] = eachTuplet.get('numbase')
+            m21Attr[endid]['m21TupletSearch'] = 'end'
+            m21Attr[endid]['m21TupletNum'] = eachTuplet.get('num')
+            m21Attr[endid]['m21TupletNumbase'] = eachTuplet.get('numbase')
 
     return m21Attr
 

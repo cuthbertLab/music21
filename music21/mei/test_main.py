@@ -2265,3 +2265,38 @@ class TestPreprocessors(unittest.TestCase):
         # check all the right values were added to the m21Attr dict
         self.assertEqual(0, len(m21Attr))
         mockEnviron.warn.assert_called_once_with('Importing <tupletSpan> without @startid and @endid or @plist is not yet supported.')
+
+    def testUnitTuplets3(self):
+        '''
+        _ppTuplets(): that three notes in a tuplet are specified correctly in the m21Attr
+
+        without @plist (this should set @m21TupletSearch attributes)
+        '''
+        # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
+        #     is much more work than it's worth
+        m21Attr = defaultdict(lambda: {})
+        documentRoot = mock.MagicMock()
+        expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)
+        theNum = 42
+        theNumbase = 900
+        iterfindReturn = []
+        for i in xrange(3):
+            iterfindReturn.append(ETree.Element('tupletSpan',
+                                                attrib={'startid': '#start-{j}'.format(j=i),
+                                                        'endid': '#end-{j}'.format(j=i),
+                                                        'num': theNum,
+                                                        'numbase': theNumbase}))
+        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+
+        actual = main._ppTuplets(documentRoot, m21Attr)
+
+        self.assertTrue(m21Attr is actual)
+        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        # check all the right values were added to the m21Attr dict
+        for i in (0, 2):
+            self.assertEqual(theNum, m21Attr['start-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual('start', m21Attr['start-{}'.format(i)]['m21TupletSearch'])
+            self.assertEqual(theNum, m21Attr['end-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual('end', m21Attr['end-{}'.format(i)]['m21TupletSearch'])
