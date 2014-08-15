@@ -219,13 +219,85 @@ def convertFromString(dataStr):
                 environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
 
     # TODO: check if there's anything left in "inNextMeasure"
-    environLocal.printDebug('*** finished sections')
 
     # Convert the dict to a Score
     # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
     # document. Iterating the keys in "parsed" would not preserve the order.
+    environLocal.printDebug('*** making the Score')
     parsed = [parsed[n] for n in allPartNs]
     post = stream.Score(parsed)
+
+    environLocal.printDebug('*** correcting durations by guessing tuplets')
+    # TODO: put this in a helper function
+    # For the tuplets given in a <tupletSpan> with @startid and @endid but not @plist, we need to
+    # guess which elements are in the tuplet. Since we know the starting object and the ending
+    # object, we'll assume that all the tuplet objects are in the same Voice, so we'll use a list
+    # of all the Note/Rest/Chord objects in that Voice and change the duration for each of the
+    # objects between the @startid and @endid ones
+    for eachPart in post.parts:
+        # TODO: gotta remove the "@m21____" attributes
+        # TODO: this assumes there will be only one tuplet in only one voice per Part
+        inATuplet = False
+        tupletNum = None
+        tupletNumbase = None
+        previousOffset = None
+        previousQuarterLength = None
+        activeVoiceId = None
+        missingDuration = 0.0
+        # "missingDuration" is the quarterLength of the "missing duration" left by making a tuplet
+        # (i.e., the difference between a tuplet's actual duration and its duration it would have
+        # (if it weren't in a tuplet, which is the duration it has on initial creation)
+
+        for eachNote in eachPart._yieldElementsDownward(streamsOnly=False, classFilter=(note.Note, note.Rest, chord.Chord)):
+            # TODO: this doesn't work with voices yet... it collapses all the voice in a part into
+            # the same thing, and that's terrible... but eachPart.voices doesn't work because the
+            # Part is "dumb" and only looks for Voices in the immediate proximity
+            if hasattr(eachNote, 'm21TupletSearch') and eachNote.m21TupletSearch == 'start':
+                inATuplet = True
+                tupletNum = int(eachNote.m21TupletNum)
+                tupletNumbase = int(eachNote.m21TupletNumbase)
+                activeVoiceId = getVoiceId(eachNote.sites.get())
+
+            if inATuplet: # and getVoiceId(eachNote.sites.get()) == activeVoiceId:
+                previousDuration = eachNote.duration.quarterLength
+
+                # re-set the note's duration
+                eachNote.duration.appendTuplet(duration.Tuplet(numberNotesActual=tupletNum,
+                                                               numberNotesNormal=tupletNumbase,
+                                                               durationNormal=eachNote.duration.type,
+                                                               durationActual=eachNote.duration.type))
+
+                missingDuration += (previousDuration - eachNote.duration.quarterLength)
+
+                if previousOffset is None:
+                    # if this is the first note in the tuplet, set it to "start"; the offset remains
+                    eachNote.duration.tuplets[0].type = 'start'
+                else:
+                    # the offset of following notes in the tuplet must be adjusted
+                    eachNote.offset = previousOffset + previousQuarterLength
+
+                previousOffset = eachNote.offset
+                previousQuarterLength = eachNote.duration.quarterLength
+
+                if hasattr(eachNote, 'm21TupletSearch') and eachNote.m21TupletSearch == 'end':
+                    # we've reached the end of the tuplet!
+                    eachNote.duration.tuplets[0].type = 'stop'
+
+                    # TODO: rewrite this slow thing
+                    # We have to adjust the offset of all the elements following a tuplet, until
+                    # the end of that Measure. I have to find a faster way to do it than this.
+                    for eachThing in eachPart.recurse(streamsOnly=True):
+                        eachThing.shiftElements(offset=(-1 * missingDuration),
+                                                startOffset=(previousOffset + previousQuarterLength))
+
+                    # reset the tuplet-tracking variables
+                    inATuplet = False
+                    tupletNum = None
+                    tupletBase = None
+                    previousOffset = None
+                    previousQuarterLength = None
+                    activeVoiceId = None
+                    missingDuration = 0.0
 
     # insert metadata
     post.metadata = makeMetadata(documentRoot)
@@ -1449,9 +1521,15 @@ def noteFromElement(elem, slurBundle=None):
         if duration.convertTypeToNumber(post.duration.type) > 4:
             post.beams.fill(post.duration.type, elem.get('m21Beam'))
 
+    # tuplet indicated by a <tupletDef> held elsewhere, but without @plist
+    # TODO: break this tuplet stuff into a helper function shared for <note>, <rest>, and <chord>
+    #       elements, then test it
+    if elem.get('m21TupletSearch') is not None:
+        post.m21TupletSearch = elem.get('m21TupletSearch')
+        post.m21TupletNum = elem.get('m21TupletNum')
+        post.m21TupletNumbase = elem.get('m21TupletNumbase')
     # tuplets indicated in a <tupletDef> held elsewhere
-    # TODO: test this tuplet stuff (after you figure out whether it's sufficient)
-    if elem.get('m21TupletNum') is not None:
+    elif elem.get('m21TupletNum') is not None:
         post.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
                                                    numberNotesNormal=int(elem.get('m21TupletNumbase')),
                                                    durationNormal=post.duration.type,
@@ -1502,8 +1580,15 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     if elem.get(_XMLID) is not None:
         post.id = elem.get(_XMLID)
 
+    # tuplet indicated by a <tupletDef> held elsewhere, but without @plist
+    # TODO: break this tuplet stuff into a helper function shared for <note>, <rest>, and <chord>
+    #       elements, then test it
+    if elem.get('m21TupletSearch') is not None:
+        post.m21TupletSearch = elem.get('m21TupletSearch')
+        post.m21TupletNum = elem.get('m21TupletNum')
+        post.m21TupletNumbase = elem.get('m21TupletNumbase')
     # adjust for <tupletDef>-given tuplets
-    if elem.get('m21TupletNum') is not None:
+    elif elem.get('m21TupletNum') is not None:
         post.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
                                                    numberNotesNormal=int(elem.get('m21TupletNumbase')),
                                                    durationNormal=post.duration.type,
@@ -1642,8 +1727,15 @@ def chordFromElement(elem, slurBundle=None):
         if duration.convertTypeToNumber(post.duration.type) > 4:
             post.beams.fill(post.duration.type, elem.get('m21Beam'))
 
+    # tuplet indicated by a <tupletDef> held elsewhere, but without @plist
+    # TODO: break this tuplet stuff into a helper function shared for <note>, <rest>, and <chord>
+    #       elements, then test it
+    if elem.get('m21TupletSearch') is not None:
+        post.m21TupletSearch = elem.get('m21TupletSearch')
+        post.m21TupletNum = elem.get('m21TupletNum')
+        post.m21TupletNumbase = elem.get('m21TupletNumbase')
     # adjust for <tupletDef>-given tuplets
-    if elem.get('m21TupletNum') is not None:
+    elif elem.get('m21TupletNum') is not None:
         post.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
                                                    numberNotesNormal=int(elem.get('m21TupletNumbase')),
                                                    durationNormal=post.duration.type,
@@ -2147,15 +2239,15 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
 
     # see if any of the Measures are shorter than the others; if so, check for <mRest/> tags that
     # didn't have a @dur set
-    # TODO: write explanation and test (plus, it doesn't always work; we can catch errors with this)
-    for eachN in expectedNs:
-        if post[eachN].duration.quarterLength < maxBarDuration:
-            for eachVoice in post[eachN]:
-                for eachThing in eachVoice:
-                    if isinstance(eachThing, note.Rest):
-                        eachThing.duration = duration.Duration(maxBarDuration -
-                                                               post[eachN].duration.quarterLength +
-                                                               eachThing.duration.quarterLength)
+    # TODO: find a better way to deal with full-measure rests
+    #for eachN in expectedNs:
+        #if post[eachN].duration.quarterLength < maxBarDuration:
+            #for eachVoice in post[eachN]:
+                #for eachThing in eachVoice:
+                    #if isinstance(eachThing, note.Rest):
+                        #eachThing.duration = duration.Duration(maxBarDuration -
+                                                               #post[eachN].duration.quarterLength +
+                                                               #eachThing.duration.quarterLength)
 
     # assign left and right barlines
     if elem.get('left') is not None:
