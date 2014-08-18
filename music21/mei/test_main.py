@@ -915,6 +915,56 @@ class TestChordFromElement(unittest.TestCase):
         self.assertEqual('asdf1234', actual.id)
         self.assertEqual(tie.Tie('start'), actual.tie)
 
+    @mock.patch('music21.chord.Chord')
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.makeDuration')
+    @mock.patch('music21.mei.__main__.noteFromElement')
+    @mock.patch('music21.mei.__main__.scaleToTuplet')
+    def testUnit4(self, mockTuplet, mockNoteFromE, mockMakeDuration, mockProcEmbEl, mockChord):
+        '''
+        chordFromElement(): adds tuplet-related attributes
+        '''
+        elem = ETree.Element('chord', attrib={'dur': '4', 'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                              'm21TupletSearch': 'start'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, None, '4', '8', None) for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        mockNoteFromE.return_value = 'a note'
+        mockMakeDuration.return_value = 'makeDuration() return'
+        mockNewChord = mock.MagicMock()
+        mockChord.return_value = mockNewChord
+        mockProcEmbEl.return_value = []
+        mockTuplet.return_value = 'tupletified'
+        expected = mockTuplet.return_value
+
+        actual = main.chordFromElement(elem, 'slur bundle')
+
+        self.assertEqual(expected, actual)
+        mockMakeDuration.assert_called_once_with(1.0, 0)
+        mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
+        self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
+        mockTuplet.assert_called_once_with(mockNewChord, elem)
+
+    def testIntegration4(self):
+        '''
+        noteFromElement(): adds tuplet-related attributes
+
+        (corresponds to testUnit4() with no mocks)
+        '''
+        elem = ETree.Element('chord', attrib={'dur': '4', 'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                              'm21TupletSearch': 'start'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, 'n', '4', '8', '0') for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        expectedName = 'Chord {C-natural in octave 4 | E-natural in octave 4 | G-natural in octave 4} Quarter'
+
+        actual = main.chordFromElement(elem)
+
+        self.assertEqual(expectedName, actual.fullName)
+        self.assertEqual('5', actual.m21TupletNum)
+        self.assertEqual('4', actual.m21TupletNumbase)
+        self.assertEqual('start', actual.m21TupletSearch)
+
 
 #------------------------------------------------------------------------------
 class TestClefFromElement(unittest.TestCase):
