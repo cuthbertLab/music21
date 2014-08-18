@@ -1213,6 +1213,9 @@ def scaleToTuplet(objs, elem):
     consulted. Note that this attribute is ignored if the @m21TupletSearch attribute is present,
     since the ``type`` will be set later by the tuplet-finding algorithm.
 
+    .. note:: Objects without a :attr:`duration` attribute will be skipped silently, unless they
+        will be given the @m21TupletSearch attribute.
+
     :param objs: The object(s) whose durations will be scaled. You may provie either a single object
         or an iterable; the return type corresponds to the input type.
     :type objs: (list of) :class:`~music21.base.Music21Object`
@@ -1228,7 +1231,11 @@ def scaleToTuplet(objs, elem):
         wasList = True
 
     for obj in objs:
-        if elem.get('m21TupletSearch') is not None:
+        if not isinstance(obj, (note.Note, note.Rest, chord.Chord)):
+            # silently skip objects that don't have a duration
+            continue
+
+        elif elem.get('m21TupletSearch') is not None:
             obj.m21TupletSearch = elem.get('m21TupletSearch')
             obj.m21TupletNum = elem.get('m21TupletNum')
             obj.m21TupletNumbase = elem.get('m21TupletNumbase')

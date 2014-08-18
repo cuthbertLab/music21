@@ -657,22 +657,20 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.mei.__main__._processEmbeddedElements')
     @mock.patch('music21.mei.__main__.safePitch')
     @mock.patch('music21.mei.__main__.makeDuration')
-    @mock.patch('music21.duration.GraceDuration')
     @mock.patch('music21.mei.__main__.scaleToTuplet')
-    def testUnit4(self, mockTuplet, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+    def testUnit4(self, mockTuplet, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
         noteFromElement(): adds @grace, and tuplet-related attributes
 
         (mostly-unit test)
         '''
-        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4', 'grace': 'acc',
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4',
                                              'm21TupletNum': '5', 'm21TupletNumbase': '4',
                                              'm21TupletSearch': 'start'})
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
         mockNote.return_value = mockNewNote
         mockProcEmbEl.return_value = []
-        mockGrace.return_value = 1234
         mockTuplet.return_value = 'made the tuplet'
         expected = mockTuplet.return_value
 
@@ -683,7 +681,6 @@ class TestNoteFromElement(unittest.TestCase):
         mockMakeDuration.assert_calleed_once_with(1.0, 0)
         mockNote.assert_called_once_with(mockSafePitch.return_value,
                                          duration=mockMakeDuration.return_value)
-        self.assertEqual(mockGrace.return_value, mockNewNote.duration)
         mockTuplet.assert_called_once_with(mockNewNote, elem)
 
     def testIntegration4(self):
@@ -691,7 +688,7 @@ class TestNoteFromElement(unittest.TestCase):
         noteFromElement(): adds @grace, @m21TupletNum
         (corresponds to testUnit4() with no mocks)
         '''
-        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4', 'grace': 'acc',
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4',
                                              'm21TupletNum': '5', 'm21TupletNumbase': '4',
                                              'm21TupletSearch': 'start'})
         slurBundle = spanner.SpannerBundle()
@@ -699,7 +696,7 @@ class TestNoteFromElement(unittest.TestCase):
         actual = main.noteFromElement(elem, slurBundle)
 
         self.assertEqual('D2', actual.nameWithOctave)
-        self.assertEqual(0.0, actual.quarterLength)
+        self.assertEqual(1.0, actual.quarterLength)
         self.assertEqual('quarter', actual.duration.type)
         self.assertEqual('5', actual.m21TupletNum)
         self.assertEqual('4', actual.m21TupletNumbase)
@@ -2348,9 +2345,9 @@ class TestTuplets(unittest.TestCase):
 
     def testTuplets1(self):
         '''
-        With three objects, the "tuplet search" attributes are set properly.
+        scaleToTuplet(): with three objects, the "tuplet search" attributes are set properly.
         '''
-        objs = [mock.MagicMock('a mock') for _ in range(3)]
+        objs = [mock.MagicMock(spec=note.Note()) for _ in range(3)]
         elem = ETree.Element('tupletDef', attrib={'m21TupletNum': '12', 'm21TupletNumbase': '400',
                                                   'm21TupletSearch': 'the forest'})
 
@@ -2364,9 +2361,9 @@ class TestTuplets(unittest.TestCase):
     @mock.patch('music21.duration.Tuplet')
     def testTuplets2(self, mockTuplet):
         '''
-        With three objects, their duration is scaled properly. (With @m21TupletType).
+        scaleToTuplet(): with three objects, their duration is scaled properly. (With @m21TupletType).
         '''
-        objs = [mock.MagicMock('a mock') for _ in range(3)]
+        objs = [mock.MagicMock(spec=note.Note()) for _ in range(3)]
         for obj in objs:
             obj.duration = mock.MagicMock()
             obj.duration.type = 'duration type'
@@ -2388,9 +2385,9 @@ class TestTuplets(unittest.TestCase):
     @mock.patch('music21.duration.Tuplet')
     def testTuplets3(self, mockTuplet):
         '''
-        With three objects, their duration is scaled properly. (With @tuplet == 'i1').
+        scaleToTuplet(): with three objects, their duration is scaled properly. (With @tuplet == 'i1').
         '''
-        objs = [mock.MagicMock('a mock') for _ in range(3)]
+        objs = [mock.MagicMock(spec=note.Note()) for _ in range(3)]
         for obj in objs:
             obj.duration = mock.MagicMock()
             obj.duration.type = 'duration type'
@@ -2412,9 +2409,9 @@ class TestTuplets(unittest.TestCase):
     @mock.patch('music21.duration.Tuplet')
     def testTuplets4(self, mockTuplet):
         '''
-        With one object, its duration is scaled properly. (With @tuplet == 't1').
+        scaleToTuplet(): with one object, its duration is scaled properly. (With @tuplet == 't1').
         '''
-        obj = mock.MagicMock('a mock')
+        obj = mock.MagicMock(spec=note.Note())
         obj.duration = mock.MagicMock()
         obj.duration.type = 'duration type'
         obj.duration.tuplets = [mock.MagicMock()]
@@ -2429,3 +2426,30 @@ class TestTuplets(unittest.TestCase):
         self.assertEqual(1, mockTuplet.call_count)
         self.assertEqual(expectedCall, mockTuplet.call_args_list[0])
         self.assertEqual('stop', obj.duration.tuplets[0].type)
+
+    @mock.patch('music21.duration.Tuplet')
+    def testTuplets5(self, mockTuplet):
+        '''
+        scaleToTuplet(): with three objects, their duration is scaled properly. (One of the objects
+        isn't a Note/Chord/Rest).
+        '''
+        objs = [mock.MagicMock(spec=note.Note()) for _ in range(3)]
+        for obj in objs:
+            obj.duration = mock.MagicMock()
+            obj.duration.type = 'duration type'
+            obj.duration.tuplets = [mock.MagicMock()]
+        objs[1] = mock.MagicMock(spec=clef.TrebleClef())
+        elem = ETree.Element('tupletDef', attrib={'m21TupletNum': '12', 'm21TupletNumbase': '400',
+                                                  'tuplet': 'i1'})
+        mockTuplet.return_value = 'a Tuplet'
+        expectedCall = mock.call(numberNotesActual=12, durationActual='duration type',
+                                 numberNotesNormal=400, durationNormal='duration type')
+
+        actual = main.scaleToTuplet(objs, elem)
+
+        self.assertEqual(2, mockTuplet.call_count)
+        for eachCall in mockTuplet.call_args_list:
+            self.assertEqual(expectedCall, eachCall)
+        objs[0].duration.tuplets[0].type
+        self.assertEqual([], objs[1].duration.call_args_list)
+        objs[2].duration.tuplets[0].type
