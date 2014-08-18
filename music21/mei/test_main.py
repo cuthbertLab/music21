@@ -713,89 +713,45 @@ class TestRestFromElement(unittest.TestCase):
     '''Tests for restFromElement()'''
 
     @mock.patch('music21.note.Rest')
-    def testUnit1(self, mockRest):
+    @mock.patch('music21.mei.__main__.makeDuration')
+    @mock.patch('music21.mei.__main__.scaleToTuplet')
+    def testUnit1(self, mockTuplet, mockMakeDur, mockRest):
         '''
-        restFromElement(): all the elements that go in Rest.__init__()...
-                           'dur', 'dots'
-        (mostly-unit test; only mock out Rest and the ElementTree.Element)
+        restFromElement(): test @dur, @dots, @xml:id, and tuplet-related attributes
         '''
-        elem = mock.MagicMock()
-        expectedElemOrder = [mock.call('dur'), mock.call('dots', 0)]
-        expectedElemOrder.extend([mock.ANY for _ in xrange(2)])  # additional calls to elem.get(), not part of this test
-        elemReturns = ['4', '1']
-        elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
-        mockRest.return_value = mock.MagicMock(spec_set=note.Rest, name='rest return')
-        expected = mockRest.return_value
+        elem = ETree.Element('rest', attrib={'dur': '4', 'dots': '1', _XMLID: 'the id',
+                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                             'm21TupletType': 'start'})
+        mockMakeDur.return_value = 'the duration'
+        mockNewRest = mock.MagicMock('new rest')
+        mockRest.return_value = mockNewRest
+        mockTuplet.return_value = 'tupletized'
+        expected = mockTuplet.return_value
+
         actual = main.restFromElement(elem)
+
         self.assertEqual(expected, actual)
-        mockRest.assert_called_once_with(duration=duration.Duration(1.5))
-        self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
+        mockRest.assert_called_once_with(duration=mockMakeDur.return_value)
+        mockMakeDur.assert_called_once_with(1.0, 1)
+        mockTuplet.assert_called_once_with(mockRest.return_value, elem)
+        self.assertEqual('the id', mockNewRest.id)
 
-    def testIntegration1a(self):
+    def testIntegration1(self):
         '''
-        restFromElement(): all the elements that go in Rest.__init__()...
-                           'dur', 'dots'
-        (corresponds to testUnit1() with real Rest and real ElementTree.Element)
+        restFromElement(): test @dur, @dots, @xml:id, and tuplet-related attributes
+
+        (without mock objects)
         '''
-        elem = ETree.Element('rest')
-        attribDict = {'dur': '4', 'dots': '1'}
-        for eachKey in attribDict:
-            elem.set(eachKey, attribDict[eachKey])
+        elem = ETree.Element('rest', attrib={'dur': '4', 'dots': '1', _XMLID: 'the id',
+                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                             'm21TupletType': 'start'})
+
         actual = main.restFromElement(elem)
-        self.assertEqual(1.5, actual.quarterLength)
+
+        self.assertEqual(Fraction(6, 5), actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
-
-    def testIntegration1b(self):
-        '''
-        restFromElement(): all the elements that go in Rest.__init__()...
-                           'dur', 'dots'
-        (this has different arguments than testIntegration2())
-        '''
-        elem = ETree.Element('note')
-        attribDict = {'dur': '4'}
-        for eachKey in attribDict:
-            elem.set(eachKey, attribDict[eachKey])
-        actual = main.restFromElement(elem)
-        self.assertEqual(1.0, actual.quarterLength)
-        self.assertEqual(0, actual.duration.dots)
-
-    @mock.patch('music21.note.Rest')
-    def testUnit2(self, mockRest):
-        '''
-        restFromElement(): adds the "id" attribute
-        (mostly-unit test; only mock out Rest and the ElementTree.Element)
-        '''
-        elem = mock.MagicMock()
-        expectedElemOrder = [mock.ANY for _ in xrange(2)]  # not testing the calls from previous unit tests
-        expectedElemOrder.extend([mock.call(_XMLID), mock.call(_XMLID)])
-        expectedElemOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
-        expectedId = 42
-        elemReturns = ['4', '1',  # copied from testUnit1()---not important in this test
-                       expectedId, expectedId]  # xml:id for this test
-        elem.get.side_effect = lambda *x: elemReturns.pop(0) if len(elemReturns) > 0 else None
-        # NB: this can't use 'spec_set' because the "id" attribute is part of Music21Object, note.Rest
-        mockRest.return_value = mock.MagicMock(spec=note.Rest, name='rest return')
-        expected = mockRest.return_value
-        actual = main.restFromElement(elem)
-        self.assertEqual(expected, actual)
-        mockRest.assert_called_once_with(duration=duration.Duration(1.5))
-        self.assertSequenceEqual(expectedElemOrder, elem.get.call_args_list)
-        self.assertEqual(expectedId, actual.id)
-
-    def testIntegration2(self):
-        '''
-        restFromElement(): adds the "id" attribute
-        (corresponds to testUnit2() with real Rest and real ElementTree.Element)
-        '''
-        elem = ETree.Element('rest')
-        attribDict = {'dur': '4', 'dots': '1', _XMLID: 42}
-        for eachKey in attribDict:
-            elem.set(eachKey, attribDict[eachKey])
-        actual = main.restFromElement(elem)
-        self.assertEqual(1.5, actual.quarterLength)
-        self.assertEqual(1, actual.duration.dots)
-        self.assertEqual(42, actual.id)
-
+        self.assertEqual('the id', actual.id)
+        self.assertEqual('start', actual.duration.tuplets[0].type)
 
 
 #------------------------------------------------------------------------------
