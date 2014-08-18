@@ -84,6 +84,7 @@ from music21 import bar
 from music21 import spanner
 from music21 import tie
 from music21 import metadata
+from music21 import base
 
 from music21 import environment
 _MOD = 'mei.__main__'
@@ -1191,6 +1192,64 @@ def getVoiceId(fromThese):
         return fromThese[0].id
     else:
         raise RuntimeError('getVoiceId: found too few or too many Voice objects')
+
+
+def scaleToTuplet(objs, elem):
+    '''
+    Scale the duration of some objects by a ratio indicated by a tuplet. The ``elem`` must have the
+    @m21TupletNum and @m21TupletNumbase attributes set, and optionally the @m21TupletSearch or
+    @m21TupletType attributes.
+
+    The @m21TupletNum and @m21TupletNumbase attributes should be equal to the @num and @numbase
+    values of the <tuplet> or <tupletSpan> that indicates this tuplet.
+
+    The @m21TupletSearch attribute, whose value must either be ``'start'`` or ``'end'``, is required
+    when a <tupletSpan> does not include a @plist attribute. It indicates that the importer must
+    "search" for a tuplet near the end of the import process, which involves scaling the durations
+    of all objects discvoered between those with the "start" and "end" search values.
+
+    The @m21TupletType attribute is set directly as the :attr:`type` attribute of the music21
+    object's :class:`Tuplet` object. If @m21TupletType is not set, the @tuplet attribute will be
+    consulted. Note that this attribute is ignored if the @m21TupletSearch attribute is present,
+    since the ``type`` will be set later by the tuplet-finding algorithm.
+
+    :param objs: The object(s) whose durations will be scaled. You may provie either a single object
+        or an iterable; the return type corresponds to the input type.
+    :type objs: (list of) :class:`~music21.base.Music21Object`
+    :param elem: An :class:`Element` with the appropriate attributes (as specified above).
+    :type elem: :class:`xml.etree.ElementTree.Element
+    :returns: ``objs`` with scaled durations.
+    :rtype: (list of) :class:`~music21.base.Music21Object`
+    '''
+    if not isinstance(objs, (list, set, tuple)):
+        objs = [objs]
+        wasList = False
+    else:
+        wasList = True
+
+    for obj in objs:
+        if elem.get('m21TupletSearch') is not None:
+            obj.m21TupletSearch = elem.get('m21TupletSearch')
+            obj.m21TupletNum = elem.get('m21TupletNum')
+            obj.m21TupletNumbase = elem.get('m21TupletNumbase')
+
+        else:
+            obj.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
+                                                      numberNotesNormal=int(elem.get('m21TupletNumbase')),
+                                                      durationNormal=obj.duration.type,
+                                                      durationActual=obj.duration.type))
+
+            if elem.get('m21TupletType') is not None:
+                obj.duration.tuplets[0].type = elem.get('m21TupletType')
+            elif elem.get('tuplet', '').startswith('i'):
+                obj.duration.tuplets[0].type = 'start'
+            elif elem.get('tuplet', '').startswith('t'):
+                obj.duration.tuplets[0].type = 'stop'
+
+    if wasList:
+        return objs
+    else:
+        return objs[0]
 
 
 # Element-Based Converter Functions
@@ -2316,6 +2375,7 @@ if __name__ == "__main__":
                      test_main.TestAddSlurs,
                      test_main.TestBeams,
                      test_main.TestPreprocessors,
+                     test_main.TestTuplets,
                     )
 
 #------------------------------------------------------------------------------
