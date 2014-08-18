@@ -23,6 +23,38 @@ The following elements are not yet imported, though you might expect they would 
 * ``<sb>``: a system break, since this is not usually semantically significant
 * ``<lb>``: a line break, since this is not usually semantically significant
 * ``<pb>``: a page break, since this is not usually semantically significant
+
+**Where Elements Are Processed**
+
+Many elements are handled in a function called :func:`tagFromElement`, where "tag" is replaced by
+the element's tag name (e.g., :func:`staffDefFromElement` for <staffDef> elements). These public
+functions perform a transformation operation from a Python :class:`~xml.etree.ElementTree.Element`
+object to its corresponding music21 element.
+
+However, certain elements are processed primarily in another way, by private functions. Rather than
+transforming an :class:`Element` object into a music21 object, these modify the MEI document tree
+by adding instructions for the :func:`tagFromElement` functions. The elements processed by private
+functions include:
+
+* <slur>
+* <tie>
+* <beamSpan>
+* <tupletSpan>
+
+**Guidelines for Encoders**
+
+While we aim for the best possible compatibility, the MEI specification is large. The following
+guidelines will help you produce a file that this MEI-to-music21 module will import correctly and
+in the most efficient way, but should not necessarily be considered recommendations when encoding
+for any other context.
+
+* Tuplets indicated only in a @tuplet attribute do not work.
+* For elements that allow @startid, @endid, and @plist attributes, use all three. This is especially
+  important for tuplets.
+* For any tuplet, specify at least @num and @numbase. The module refuses to import a tuplet that
+  does not have the @numbase attribute.
+* Retain consistent @n values for the same voice, staff, and instrument throughout the score.
+* Always indicate the duration of an <mRest> element.
 '''
 
 # Determine which ElementTree implementation to use.
