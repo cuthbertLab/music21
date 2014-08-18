@@ -1612,24 +1612,9 @@ def noteFromElement(elem, slurBundle=None):
         if duration.convertTypeToNumber(post.duration.type) > 4:
             post.beams.fill(post.duration.type, elem.get('m21Beam'))
 
-    # tuplet indicated by a <tupletDef> held elsewhere, but without @plist
-    # TODO: break this tuplet stuff into a helper function shared for <note>, <rest>, and <chord>
-    #       elements, then test it
-    if elem.get('m21TupletSearch') is not None:
-        post.m21TupletSearch = elem.get('m21TupletSearch')
-        post.m21TupletNum = elem.get('m21TupletNum')
-        post.m21TupletNumbase = elem.get('m21TupletNumbase')
-    # tuplets indicated in a <tupletDef> held elsewhere
-    elif elem.get('m21TupletNum') is not None:
-        post.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
-                                                   numberNotesNormal=int(elem.get('m21TupletNumbase')),
-                                                   durationNormal=post.duration.type,
-                                                   durationActual=post.duration.type))
-        tupletAttr = elem.get('tuplet', '')
-        if tupletAttr.startswith('i'):
-            post.duration.tuplets[0].type = 'start'
-        elif tupletAttr.startswith('t'):
-            post.duration.tuplets[0].type = 'stop'
+    # tuplets
+    if elem.get('m21TupletNum') is not None:
+        post = scaleToTuplet(post, elem)
 
     return post
 

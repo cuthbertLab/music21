@@ -658,35 +658,42 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.mei.__main__.safePitch')
     @mock.patch('music21.mei.__main__.makeDuration')
     @mock.patch('music21.duration.GraceDuration')
-    def testUnit4(self, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+    @mock.patch('music21.mei.__main__.scaleToTuplet')
+    def testUnit4(self, mockTuplet, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
-        noteFromElement(): adds @grace
+        noteFromElement(): adds @grace, and tuplet-related attributes
 
         (mostly-unit test)
         '''
-        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4', 'grace': 'acc'})
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4', 'grace': 'acc',
+                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                             'm21TupletSearch': 'start'})
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
         mockNote.return_value = mockNewNote
         mockProcEmbEl.return_value = []
         mockGrace.return_value = 1234
-        expected = mockNewNote
+        mockTuplet.return_value = 'made the tuplet'
+        expected = mockTuplet.return_value
 
         actual = main.noteFromElement(elem, 'slur bundle')
 
-        self.assertEqual(expected, mockNewNote, actual)
+        self.assertEqual(expected, actual)
         mockSafePitch.assert_called_once_with('D', None, '2')
         mockMakeDuration.assert_calleed_once_with(1.0, 0)
         mockNote.assert_called_once_with(mockSafePitch.return_value,
                                          duration=mockMakeDuration.return_value)
         self.assertEqual(mockGrace.return_value, mockNewNote.duration)
+        mockTuplet.assert_called_once_with(mockNewNote, elem)
 
     def testIntegration4(self):
         '''
-        noteFromElement(): adds @grace
+        noteFromElement(): adds @grace, @m21TupletNum
         (corresponds to testUnit4() with no mocks)
         '''
-        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4', 'grace': 'acc'})
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4', 'grace': 'acc',
+                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                             'm21TupletSearch': 'start'})
         slurBundle = spanner.SpannerBundle()
 
         actual = main.noteFromElement(elem, slurBundle)
@@ -694,6 +701,9 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('D2', actual.nameWithOctave)
         self.assertEqual(0.0, actual.quarterLength)
         self.assertEqual('quarter', actual.duration.type)
+        self.assertEqual('5', actual.m21TupletNum)
+        self.assertEqual('4', actual.m21TupletNumbase)
+        self.assertEqual('start', actual.m21TupletSearch)
 
     # NOTE: consider adding to the testUnit4() and testIntegration4() rather than making a new test
 
