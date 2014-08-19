@@ -35,7 +35,6 @@ from music21 import pitch
 from music21 import note
 from music21 import duration
 from music21 import articulations
-from music21 import chord
 from music21 import clef
 from music21 import stream
 from music21 import instrument
@@ -2351,7 +2350,7 @@ class TestTuplets(unittest.TestCase):
         elem = ETree.Element('tupletDef', attrib={'m21TupletNum': '12', 'm21TupletNumbase': '400',
                                                   'm21TupletSearch': 'the forest'})
 
-        actual = main.scaleToTuplet(objs, elem)
+        main.scaleToTuplet(objs, elem)
 
         for obj in objs:
             self.assertEqual('12', obj.m21TupletNum)
@@ -2374,7 +2373,7 @@ class TestTuplets(unittest.TestCase):
         expectedCall = mock.call(numberNotesActual=12, durationActual='duration type',
                                  numberNotesNormal=400, durationNormal='duration type')
 
-        actual = main.scaleToTuplet(objs, elem)
+        main.scaleToTuplet(objs, elem)
 
         self.assertEqual(3, mockTuplet.call_count)
         for eachCall in mockTuplet.call_args_list:
@@ -2398,7 +2397,7 @@ class TestTuplets(unittest.TestCase):
         expectedCall = mock.call(numberNotesActual=12, durationActual='duration type',
                                  numberNotesNormal=400, durationNormal='duration type')
 
-        actual = main.scaleToTuplet(objs, elem)
+        main.scaleToTuplet(objs, elem)
 
         self.assertEqual(3, mockTuplet.call_count)
         for eachCall in mockTuplet.call_args_list:
@@ -2421,7 +2420,7 @@ class TestTuplets(unittest.TestCase):
         expectedCall = mock.call(numberNotesActual=12, durationActual='duration type',
                                  numberNotesNormal=400, durationNormal='duration type')
 
-        actual = main.scaleToTuplet(obj, elem)
+        main.scaleToTuplet(obj, elem)
 
         self.assertEqual(1, mockTuplet.call_count)
         self.assertEqual(expectedCall, mockTuplet.call_args_list[0])
@@ -2445,14 +2444,14 @@ class TestTuplets(unittest.TestCase):
         expectedCall = mock.call(numberNotesActual=12, durationActual='duration type',
                                  numberNotesNormal=400, durationNormal='duration type')
 
-        actual = main.scaleToTuplet(objs, elem)
+        main.scaleToTuplet(objs, elem)
 
         self.assertEqual(2, mockTuplet.call_count)
         for eachCall in mockTuplet.call_args_list:
             self.assertEqual(expectedCall, eachCall)
-        objs[0].duration.tuplets[0].type
+        self.assertEqual('start', objs[0].duration.tuplets[0].type)
         self.assertEqual([], objs[1].duration.call_args_list)
-        objs[2].duration.tuplets[0].type
+        self.assertEqual('start', objs[2].duration.tuplets[0].type)
 
     def testTuplets6(self):
         '''
@@ -2477,7 +2476,7 @@ class TestTuplets(unittest.TestCase):
     @mock.patch('music21.mei.__main__._processEmbeddedElements')
     @mock.patch('music21.mei.__main__.scaleToTuplet')
     @mock.patch('music21.mei.__main__.beamTogether')
-    def testTuplets7(self, mockBeam, mockTuplet, mockEmbedded):
+    def testTuplets7(self, mockBeam, mockTuplet, mockEmbedded):  # pylint: disable=unused-argument
         '''
         tupletFromElement(): everything set properly in a triplet; no extraneous elements
         '''
@@ -2500,7 +2499,7 @@ class TestTuplets(unittest.TestCase):
     @mock.patch('music21.mei.__main__._processEmbeddedElements')
     @mock.patch('music21.mei.__main__.scaleToTuplet')
     @mock.patch('music21.mei.__main__.beamTogether')
-    def testTuplets8(self, mockBeam, mockTuplet, mockEmbedded):
+    def testTuplets8(self, mockBeam, mockTuplet, mockEmbedded):  # pylint: disable=unused-argument
         '''
         tupletFromElement(): everything set properly in a triplet; extraneous elements interposed
         '''
@@ -2526,7 +2525,7 @@ class TestTuplets(unittest.TestCase):
     @mock.patch('music21.mei.__main__._processEmbeddedElements')
     @mock.patch('music21.mei.__main__.scaleToTuplet')
     @mock.patch('music21.mei.__main__.beamTogether')
-    def testTuplets9(self, mockBeam, mockTuplet, mockEmbedded):
+    def testTuplets9(self, mockBeam, mockTuplet, mockEmbedded):  # pylint: disable=unused-argument
         '''
         tupletFromElement(): everything set properly in a triplet; extraneous elements interposed,
             prepended, and appended
