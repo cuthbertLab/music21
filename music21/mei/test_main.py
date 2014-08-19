@@ -2549,3 +2549,32 @@ class TestTuplets(unittest.TestCase):
         self.assertEqual('start', mockNotes[1].duration.tuplets[0].type)
         self.assertEqual('default', mockNotes[4].duration.tuplets[0].type)
         self.assertEqual('stop', mockNotes[6].duration.tuplets[0].type)
+
+    def testTuplets10(self):
+        '''
+        _postGuessTuplets(): integration test that a single-part Score with one triplet is guessed
+        '''
+        # setup the Voice with tuplets
+        theVoice = stream.Voice()
+        for _ in range(3):
+            eachNote = note.Note('D-5', quarterLength=0.5)
+            theVoice.append(eachNote)
+        theVoice[0].m21TupletSearch = 'start'
+        theVoice[0].m21TupletNum = '3'
+        theVoice[0].m21TupletNumbase = '2'
+        theVoice[2].m21TupletSearch = 'stop'
+        theVoice[2].m21TupletNum = '3'
+        theVoice[2].m21TupletNumbase = '2'
+        # setup the Score->Part->Measure->Voice hierarchy
+        theMeasure = stream.Measure([theVoice])
+        thePart = stream.Part([theMeasure])
+        theScore = stream.Score(givenElements=[thePart])
+        # make the expected values
+        expectedOffsets = [0.0, Fraction(1, 3), Fraction(2, 3)]
+
+        actual = main._postGuessTuplets(theScore)
+
+        # the checking stage is simple for this score
+        for i in range(3):
+            self.assertEqual(expectedOffsets[i], actual[0][0][0][i].offset)
+            self.assertEqual(Fraction(1, 3), actual[0][0][0][i].duration.quarterLength)
