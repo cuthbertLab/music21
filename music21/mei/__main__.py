@@ -84,7 +84,6 @@ from music21 import bar
 from music21 import spanner
 from music21 import tie
 from music21 import metadata
-from music21 import base
 
 from music21 import environment
 _MOD = 'mei.__main__'
@@ -689,8 +688,8 @@ def _ppTuplets(documentRoot, m21Attr):
     environLocal.printDebug('*** pre-processing tuplets')
     # pre-processing <tupletSpan> tags
     for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
-        if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None)
-            and eachTuplet.get('plist') is None):
+        if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None) and
+            eachTuplet.get('plist') is None):
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tupletSpan>', '@startid and @endid or @plist'))
         elif eachTuplet.get('plist') is not None:
             # Ideally (for us) <tupletSpan> elements will have a @plist that enumerates the
