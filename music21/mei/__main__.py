@@ -1949,7 +1949,6 @@ def beamFromElement(elem, slurBundle=None):
 
 
 def tupletFromElement(elem, slurBundle=None):
-    # TODO: write tests
     '''
     <tuplet> A group of notes with "irregular" (sometimes called "irrational") rhythmic values,
     for example, three notes in the time normally occupied by two or nine in the time of five.
@@ -2004,26 +2003,33 @@ def tupletFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
 
     # get the @num and @numbase attributes, without which we can't properly calculate the tuplet
-    num = int(elem.get('num', '-1'))
-    numbase = int(elem.get('numbase', '-1'))
-    if -1 == num or -1 == numbase:
+    if elem.get('num') is None or elem.get('numbase') is None:
         raise MeiAttributeError(_MISSING_TUPLET_DATA)
 
     # iterate all immediate children
     post = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
 
     # "tuplet-ify" the duration of everything held within
-    for eachObj in post:
-        if hasattr(eachObj, 'duration'):
-            eachObj.duration.appendTuplet(duration.Tuplet(numberNotesActual=num,
-                                                          numberNotesNormal=numbase,
-                                                          durationNormal=eachObj.duration.type,
-                                                          durationActual=eachObj.duration.type))
+    newElem = ETree.Element('c', m21TupletNum=elem.get('num'), m21TupletNumbase=elem.get('numbase'))
+    post = scaleToTuplet(post, newElem)
 
-    # NB: it's undocumented, but we have to set the Tuplet.type property for the first and final
-    # note in a tuplet. Otherwise, the grouping bracket and fraction numbers won't show up.
-    post[0].duration.tuplets[0].type = 'start'
-    post[-1].duration.tuplets[0].type = 'stop'
+    # Set the Tuplet.type property for the first and final note in a tuplet.
+    # We have to find the first and last duration-having thing, not just the first and last objects
+    # between the <tuplet> tags.
+    firstNote = None
+    lastNote = None
+    for i, eachObj in enumerate(post):
+        if firstNote is None and isinstance(eachObj, note.GeneralNote):
+            firstNote = i
+        elif isinstance(eachObj, note.GeneralNote):
+            lastNote = i
+
+    post[firstNote].duration.tuplets[0].type = 'start'
+    if lastNote is None:
+        # when there is only one object in the tuplet
+        post[firstNote].duration.tuplets[0].type = 'stop'
+    else:
+        post[lastNote].duration.tuplets[0].type = 'stop'
 
     # beam it all together
     post = beamTogether(post)

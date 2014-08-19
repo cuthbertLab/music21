@@ -2453,3 +2453,99 @@ class TestTuplets(unittest.TestCase):
         objs[0].duration.tuplets[0].type
         self.assertEqual([], objs[1].duration.call_args_list)
         objs[2].duration.tuplets[0].type
+
+    def testTuplets6(self):
+        '''
+        tupletFromElement(): when either @num or @numbase isn't in the element, raise an
+            MeiAttributeError.
+        '''
+        # missing @numbase
+        elem = ETree.Element('tuplet', attrib={'num': '3'})
+        self.assertRaises(main.MeiAttributeError, main.tupletFromElement, elem)
+        try:
+            main.tupletFromElement(elem)
+        except main.MeiAttributeError as err:
+            self.assertEqual(main._MISSING_TUPLET_DATA, err.args[0])
+        # missing @num
+        elem = ETree.Element('tuplet', attrib={'numbase': '2'})
+        self.assertRaises(main.MeiAttributeError, main.tupletFromElement, elem)
+        try:
+            main.tupletFromElement(elem)
+        except main.MeiAttributeError as err:
+            self.assertEqual(main._MISSING_TUPLET_DATA, err.args[0])
+
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.scaleToTuplet')
+    @mock.patch('music21.mei.__main__.beamTogether')
+    def testTuplets7(self, mockBeam, mockTuplet, mockEmbedded):
+        '''
+        tupletFromElement(): everything set properly in a triplet; no extraneous elements
+        '''
+        elem = ETree.Element('tuplet', attrib={'num': '3', 'numbase': '2'})
+        mockNotes = [mock.MagicMock(spec=note.Note()) for _ in range(3)]
+        for obj in mockNotes:
+            obj.duration.tuplets = [mock.MagicMock(spec=duration.Tuplet())]
+            obj.duration.tuplets[0].type = 'default'
+        mockTuplet.return_value = mockNotes
+        mockBeam.side_effect = lambda x: x
+
+        actual = main.tupletFromElement(elem)
+
+        self.assertSequenceEqual(mockNotes, actual)
+        mockBeam.assert_called_once_with(mockNotes)
+        self.assertEqual('start', mockNotes[0].duration.tuplets[0].type)
+        self.assertEqual('default', mockNotes[1].duration.tuplets[0].type)
+        self.assertEqual('stop', mockNotes[2].duration.tuplets[0].type)
+
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.scaleToTuplet')
+    @mock.patch('music21.mei.__main__.beamTogether')
+    def testTuplets8(self, mockBeam, mockTuplet, mockEmbedded):
+        '''
+        tupletFromElement(): everything set properly in a triplet; extraneous elements interposed
+        '''
+        # NB: elements 0, 3, and 5 are the Notes; elements 1, 2, and 4 are not
+        elem = ETree.Element('tuplet', attrib={'num': '3', 'numbase': '2'})
+        mockNotes = [mock.MagicMock(spec=note.Note()) for _ in range(6)]
+        for obj in mockNotes:
+            obj.duration.tuplets = [mock.MagicMock(spec=duration.Tuplet())]
+            obj.duration.tuplets[0].type = 'default'
+        for i in (1, 2, 4):
+            mockNotes[i] = mock.MagicMock(spec=clef.TrebleClef())
+        mockTuplet.return_value = mockNotes
+        mockBeam.side_effect = lambda x: x
+
+        actual = main.tupletFromElement(elem)
+
+        self.assertSequenceEqual(mockNotes, actual)
+        mockBeam.assert_called_once_with(mockNotes)
+        self.assertEqual('start', mockNotes[0].duration.tuplets[0].type)
+        self.assertEqual('default', mockNotes[3].duration.tuplets[0].type)
+        self.assertEqual('stop', mockNotes[5].duration.tuplets[0].type)
+
+    @mock.patch('music21.mei.__main__._processEmbeddedElements')
+    @mock.patch('music21.mei.__main__.scaleToTuplet')
+    @mock.patch('music21.mei.__main__.beamTogether')
+    def testTuplets9(self, mockBeam, mockTuplet, mockEmbedded):
+        '''
+        tupletFromElement(): everything set properly in a triplet; extraneous elements interposed,
+            prepended, and appended
+        '''
+        # NB: elements 1, 4, and 6 are the Notes; elements 0, 2, 3, 5, and 7 are not
+        elem = ETree.Element('tuplet', attrib={'num': '3', 'numbase': '2'})
+        mockNotes = [mock.MagicMock(spec=note.Note()) for _ in range(8)]
+        for obj in mockNotes:
+            obj.duration.tuplets = [mock.MagicMock(spec=duration.Tuplet())]
+            obj.duration.tuplets[0].type = 'default'
+        for i in (0, 2, 3, 5, 7):
+            mockNotes[i] = mock.MagicMock(spec=clef.TrebleClef())
+        mockTuplet.return_value = mockNotes
+        mockBeam.side_effect = lambda x: x
+
+        actual = main.tupletFromElement(elem)
+
+        self.assertSequenceEqual(mockNotes, actual)
+        mockBeam.assert_called_once_with(mockNotes)
+        self.assertEqual('start', mockNotes[1].duration.tuplets[0].type)
+        self.assertEqual('default', mockNotes[4].duration.tuplets[0].type)
+        self.assertEqual('stop', mockNotes[6].duration.tuplets[0].type)
