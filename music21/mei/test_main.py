@@ -47,6 +47,7 @@ from music21 import spanner
 
 # six
 from six.moves import xrange  # pylint: disable=redefined-builtin
+from six.moves import range  # pylint: disable=redefined-builtin
 
 # Importing from __main__.py
 import music21.mei.__main__ as main

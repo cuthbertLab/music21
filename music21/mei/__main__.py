@@ -92,6 +92,7 @@ environLocal = environment.Environment(_MOD)
 # six
 from music21.ext import six
 from six.moves import xrange  # pylint: disable=redefined-builtin,import-error
+from six.moves import range  # pylint: disable=redefined-builtin,import-error
 
 
 # Module-Level Constants
