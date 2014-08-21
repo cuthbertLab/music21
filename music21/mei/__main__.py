@@ -762,6 +762,7 @@ def _ppConclude(documentRoot, m21Attr):
 
 
 def _postGuessTuplets(post):
+    # TODO: this tuplet-guessing still leaves the Measure at the wrong offset in the Part
     # TODO: finish tests for this function
     # TODO: make this work for nested tuplets
     # TODO: make this work for simultaneous tuplets in different voices in the same part
@@ -835,6 +836,7 @@ def _postGuessTuplets(post):
                     # We have to adjust the offset of all the elements following a tuplet, until
                     # the end of that Measure. I have to find a faster way to do it than this.
                     # NOTE: this is very slow
+                    # TODO: this causes problems because it adjusts every measure, rather than only the measure with tuplets
                     for eachThing in eachPart.recurse(streamsOnly=True):
                         eachThing.shiftElements(offset=(-1 * missingDuration),
                                                 startOffset=(previousOffset + previousQuarterLength))
