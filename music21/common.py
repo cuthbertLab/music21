@@ -534,7 +534,7 @@ def _preFracLimitDenominator(n, d):
     >>> for i in range(50):
     ...     x = random.random()
     ...     if myWay(x) != theirWay(x):
-    ...         print "boo: %s, %s, %s" % (x, myWay(x), theirWay(x))
+    ...         print("boo: %s, %s, %s" % (x, myWay(x), theirWay(x)))
     
     (n.b. -- nothing printed)
     

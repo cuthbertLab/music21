@@ -6896,7 +6896,7 @@ class Test(unittest.TestCase):
 {2/3 - 1 1/3} <music21.chord.Chord C5 B-2>
 {1 1/3 - 2} <music21.chord.Chord B-4 B-2>
 {2 - 4} <music21.chord.Chord A4 B-2>''') 
-        match = [([str(p) for p in n.pitches], str(round(n.offset, 2)), str(round(n.quarterLength, 3))) for n in m1.notes]
+        match = [([str(p) for p in n.pitches], str(round(float(n.offset), 2)), str(round(float(n.quarterLength), 3))) for n in m1.notes]
         self.assertEqual(str(match), "[(['B-4', 'B-2'], '0.0', '0.667'), " + \
                                      "(['C5', 'B-2'], '0.67', '0.667'), " + \
                                      "(['B-4', 'B-2'], '1.33', '0.667'), " + \
