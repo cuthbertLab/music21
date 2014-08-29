@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 import unittest

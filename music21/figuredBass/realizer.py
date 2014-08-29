@@ -6,7 +6,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 This module, the heart of fbRealizer, is all about realizing a bass line of (bassNote, notationString)

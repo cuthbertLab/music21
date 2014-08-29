@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 '''An object base-class for creating and editing specialized XML structures 

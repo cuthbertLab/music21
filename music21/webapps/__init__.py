@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2012-14 The music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Webapps is a module designed for using music21 with a webserver.

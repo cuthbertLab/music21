@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 #               Some parts of this module are in the Public Domain, see details.
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 __all__ = ['translate', 'realtime', 'percussion']
