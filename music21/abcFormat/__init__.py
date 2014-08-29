@@ -643,9 +643,7 @@ class ABCBar(ABCToken):
     def parse(self): 
         '''        
         Assign the bar-type based on the source string.
-
-        
-
+      
         >>> ab = abcFormat.ABCBar('|')
         >>> ab.parse()
         >>> ab
