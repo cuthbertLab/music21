@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 '''This method defines a number of performance test. Results for these performances are stored and dated, and used to track long-term performance changes.

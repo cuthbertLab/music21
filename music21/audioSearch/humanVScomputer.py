@@ -8,7 +8,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True

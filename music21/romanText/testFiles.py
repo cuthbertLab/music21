@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 '''Objects for processing roman numeral analysis text files, as defined and demonstrated by Dmitri Tymoczko.

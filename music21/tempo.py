@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 '''This module defines objects for describing tempo and changes in tempo.

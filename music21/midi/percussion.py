@@ -7,7 +7,7 @@
 #               Ben Houge
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 from music21 import pitch

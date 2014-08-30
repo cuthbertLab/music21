@@ -7,7 +7,7 @@
 #               based on an earlier version by Christopher Reyes
 #
 # Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Convert a music21 object into JSON and send it to the browser for music21j to use.
@@ -50,7 +50,7 @@ def fromObject(thisObject, mode='html', local=False):
     'ls": null, "_ties": null, "_rests": null, "_ornaments": null, "_client": null, "_beams": null, "_measures": nu' + 
     ...
     'd": null}, "definesExplicitSystemBreaks": false, "_idLastDeepCopyOf": ...}}';
-                var jpc = new music21.jsonPickle.Converter();
+                var jpc = new music21.fromPython.Converter();
                 streamObj = jpc.run(pickleIn);
                 streamObj.renderOptions.events.resize = "reflow";
                 streamObj.appendNewCanvas();

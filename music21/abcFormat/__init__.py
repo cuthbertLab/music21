@@ -8,7 +8,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010, 2013 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 __all__ = (
@@ -643,9 +643,7 @@ class ABCBar(ABCToken):
     def parse(self): 
         '''        
         Assign the bar-type based on the source string.
-
-        
-
+      
         >>> ab = abcFormat.ABCBar('|')
         >>> ab.parse()
         >>> ab

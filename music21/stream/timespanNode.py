@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
 Internal data structures for timespan collections.

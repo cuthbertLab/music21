@@ -8,7 +8,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Contains :class:`~music21.variant.Variant` and its subclasses, as well as functions for merging

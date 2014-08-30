@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2007-2014 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects

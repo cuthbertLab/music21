@@ -6,7 +6,7 @@
 # Authors:      Lars Johnson and Beth Hadley
 #
 # Copyright:    (c) 2009-2012 The music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True

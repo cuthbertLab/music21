@@ -9,7 +9,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2009-2014 The music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 '''

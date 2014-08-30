@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
 Tools for grouping notes and chords into a searchable tree

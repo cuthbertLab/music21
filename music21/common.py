@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
@@ -534,7 +534,7 @@ def _preFracLimitDenominator(n, d):
     >>> for i in range(50):
     ...     x = random.random()
     ...     if myWay(x) != theirWay(x):
-    ...         print "boo: %s, %s, %s" % (x, myWay(x), theirWay(x))
+    ...         print("boo: %s, %s, %s" % (x, myWay(x), theirWay(x)))
     
     (n.b. -- nothing printed)
     

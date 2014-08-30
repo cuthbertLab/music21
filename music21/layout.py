@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 The layout.py module contains two types of objects that specify the layout on
@@ -87,6 +87,8 @@ SmartScore Pro tends to produce very good MusicXML layout data.
 import copy
 import unittest
 
+from collections import namedtuple
+
 from music21 import base
 from music21 import exceptions21
 from music21 import spanner
@@ -96,6 +98,9 @@ from music21 import environment
 _MOD = "layout.py"
 environLocal = environment.Environment(_MOD)
 
+
+Systemsize = namedtuple("Systemsize", "top left right bottom")
+Pagesize = namedtuple("Pagesize", "top left right bottom width height")
 
 class LayoutBase(base.Music21Object):
     classSortOrder = -10
@@ -758,7 +763,7 @@ class LayoutScore(stream.Opus):
 
     def getMarginsAndSizeForPageId(self, pageId):
         '''
-        return a tuple of (top, left, bottom, right, width, height) margins for a given pageId in tenths
+        return a namedtuple of (top, left, bottom, right, width, height) margins for a given pageId in tenths
 
         Default of (100, 100, 100, 100, 850, 1100) if undefined
 
@@ -767,8 +772,8 @@ class LayoutScore(stream.Opus):
         >>> #_DOCS_SHOW g.parts[0].getElementsByClass('Measure')[22].getElementsByClass('PageLayout')[0].leftMargin = 204.0
         >>> #_DOCS_SHOW gl = layout.divideByPages(g)
         >>> #_DOCS_SHOW gl.getMarginsAndSizeForPageId(1)
-        >>> (171.0, 204.0, 171.0, 171.0, 1457.0, 1886.0) #_DOCS_HIDE
-        (171.0, 204.0, 171.0, 171.0, 1457.0, 1886.0)
+        >>> layout.Pagesize(171.0, 204.0, 171.0, 171.0, 1457.0, 1886.0) #_DOCS_HIDE
+        Pagesize(top=171.0, left=204.0, right=171.0, bottom=171.0, width=1457.0, height=1886.0)
         '''
         if 'marginsAndSizeForPageId' not in self._cache:
             self._cache['marginsAndSizeForPageId'] = {}
@@ -820,7 +825,7 @@ class LayoutScore(stream.Opus):
             if pl.bottomMargin is not None:
                 pageMarginBottom = pl.bottomMargin
 
-        dataTuple = (pageMarginTop, pageMarginLeft, pageMarginBottom, pageMarginRight, pageWidth, pageHeight)
+        dataTuple = Pagesize(pageMarginTop, pageMarginLeft, pageMarginBottom, pageMarginRight, pageWidth, pageHeight)
         dataCache[pageId] = dataTuple
         return dataTuple
 
@@ -828,7 +833,7 @@ class LayoutScore(stream.Opus):
         '''
         first systems on a page use a different positioning.
 
-        returns a tuple of the (top, left, right, and bottom) where each unit is 
+        returns a Named tuple of the (top, left, right, and bottom) where each unit is 
         relative to the page margins
 
         N.B. right is NOT the width -- it is different.  It is the offset to the right margin.  
@@ -838,15 +843,15 @@ class LayoutScore(stream.Opus):
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> ls.getPositionForSystem(0, 0)
-        (211.0, 70.0, 0.0, 696.0)
+        Systemsize(top=211.0, left=70.0, right=0.0, bottom=696.0)
         >>> ls.getPositionForSystem(0, 1)
-        (810.0, 0.0, 0.0, 1173.0)
+        Systemsize(top=810.0, left=0.0, right=0.0, bottom=1173.0)
         >>> ls.getPositionForSystem(0, 2)
-        (1340.0, 67.0, 92.0, 1610.0)
+        Systemsize(top=1340.0, left=67.0, right=92.0, bottom=1610.0)
         >>> ls.getPositionForSystem(0, 3)
-        (1724.0, 0.0, 0.0, 2030.0)
+        Systemsize(top=1724.0, left=0.0, right=0.0, bottom=2030.0)
         >>> ls.getPositionForSystem(0, 4)
-        (2144.0, 0.0, 0.0, 2583.0)
+        Systemsize(top=2144.0, left=0.0, right=0.0, bottom=2583.0)
         '''
         if 'positionForSystem' not in self._cache:
             self._cache['positionForSystem'] = {}
@@ -901,7 +906,7 @@ class LayoutScore(stream.Opus):
 
         if systemId > 0:
             lastSystemDimensions = self.getPositionForSystem(pageId, systemId - 1)
-            bottomOfLastSystem = lastSystemDimensions[3]
+            bottomOfLastSystem = lastSystemDimensions.bottom
         else:
             bottomOfLastSystem = 0
 
@@ -911,7 +916,7 @@ class LayoutScore(stream.Opus):
 
         top = previousDistance + bottomOfLastSystem
         bottom = top + systemHeight
-        dataTuple = (top, leftMargin, rightMargin, bottom)
+        dataTuple = Systemsize(top, leftMargin, rightMargin, bottom)
         positionForSystemCache[cacheKey] = dataTuple
         return dataTuple
 
@@ -1308,13 +1313,17 @@ class LayoutScore(stream.Opus):
 
         startXMeasure, endXMeasure = self.measurePositionWithinSystem(measureNumber, pageId, systemId)
         staffTop, staffBottom = self.getPositionForStaff(pageId, systemId, staffId)
-        systemTop, systemLeft, unused_systemRight, unused_systemBottom = self.getPositionForSystem(pageId, systemId)
-        pageMarginTop, pageMarginLeft, unused_pageMarginBottom, unusedPageMarginRight, pageWidth, pageHeight = self.getMarginsAndSizeForPageId(pageId)
-
-        top = pageMarginTop + systemTop + staffTop
-        left = pageMarginLeft + systemLeft + startXMeasure
-        bottom = pageMarginTop + systemTop + staffBottom
-        right = pageMarginLeft + systemLeft + endXMeasure
+        systemPos = self.getPositionForSystem(pageId, systemId)
+        systemTop = systemPos.top
+        systemLeft = systemPos.left
+        pageSize = self.getMarginsAndSizeForPageId(pageId)
+        
+        top = pageSize.top + systemTop + staffTop
+        left = pageSize.left + systemLeft + startXMeasure
+        bottom = pageSize.top + systemTop + staffBottom
+        right = pageSize.left + systemLeft + endXMeasure
+        pageWidth = pageSize.width
+        pageHeight = pageSize.height
 
         dataTuple = None
         if returnFormat == 'tenths':
