@@ -121,11 +121,11 @@ class MeiValueError(exceptions21.Music21Exception):
     pass
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    "When a tag has an invalid attribute."
+    "When an element has an invalid attribute."
     pass
 
-class MeiTagError(exceptions21.Music21Exception):
-    "When there's an invalid tag."
+class MeiElementError(exceptions21.Music21Exception):
+    "When an element itself is invalid."
     pass
 
 # Text Strings for Error Conditions
