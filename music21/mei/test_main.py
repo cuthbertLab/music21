@@ -18,10 +18,16 @@ Tests for :mod:`music21.mei.__main__`.
 from music21.ext import six
 
 import unittest
-if six.PY2:
-    import mock
-else:
+try:
+    # this works in Python 3.3+
     from unittest import mock  # pylint: disable=no-name-in-module
+except ImportError:
+    try:
+        # system library overrides the built-in
+        import mock
+    except ImportError:
+        # last resort
+        from music21.ext import mock
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
 # The C implementation provides some methods/attributes dynamically (notably "tag"), so MagicMock

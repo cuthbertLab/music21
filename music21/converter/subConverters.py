@@ -929,10 +929,16 @@ class Test(unittest.TestCase):
 
     def testImportMei1(self):
         # when the string starts with "mei:"
-        if six.PY2:
-            import mock
-        else:
-            from unittest import mock
+        try:
+            # this works in Python 3.3+
+            from unittest import mock  # pylint: disable=no-name-in-module
+        except ImportError:
+            try:
+                # system library overrides the built-in
+                import mock
+            except ImportError:
+                # last resort
+                from music21.ext import mock
         with mock.patch('music21.mei') as mock_mei:
             from music21 import mei
             testConverter = ConverterMEI()
@@ -941,10 +947,16 @@ class Test(unittest.TestCase):
 
     def testImportMei2(self):
         # when the string doesn't start with "mei:"
-        if six.PY2:
-            import mock
-        else:
-            from unittest import mock
+        try:
+            # this works in Python 3.3+
+            from unittest import mock  # pylint: disable=no-name-in-module
+        except ImportError:
+            try:
+                # system library overrides the built-in
+                import mock
+            except ImportError:
+                # last resort
+                from music21.ext import mock
         with mock.patch('music21.mei') as mock_mei:
             from music21 import mei
             testConverter = ConverterMEI()
