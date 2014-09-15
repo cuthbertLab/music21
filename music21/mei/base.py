@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         mei/__main__.py
+# Name:         mei/base.py
 # Purpose:      Public methods for the MEI module
 #
 # Authors:      Christopher Antila
@@ -86,7 +86,7 @@ from music21 import tie
 from music21 import metadata
 
 from music21 import environment
-_MOD = 'mei.__main__'
+_MOD = 'mei.base'
 environLocal = environment.Environment(_MOD)
 
 # six
@@ -288,7 +288,7 @@ def safePitch(name, accidental=None, octave=''):
     :returns: A :class:`Pitch` with the appropriate properties.
     :rtype: :class:`music21.pitch.Pitch`
 
-    >>> from music21.mei.__main__ import safePitch  # OMIT_FROM_DOCS
+    >>> from music21.mei.base import safePitch  # OMIT_FROM_DOCS
     >>> safePitch('D#6')
     <music21.pitch.Pitch D#6>
     >>> safePitch('D', '#', '6')
@@ -410,16 +410,16 @@ def _attrTranslator(attr, name, mapping):
 
     Examples:
 
-    >>> from music21.mei.__main__ import _attrTranslator, _ACCID_ATTR_DICT, _DUR_ATTR_DICT
+    >>> from music21.mei.base import _attrTranslator, _ACCID_ATTR_DICT, _DUR_ATTR_DICT
     >>> _attrTranslator('s', 'accid', _ACCID_ATTR_DICT)
     '#'
     >>> _attrTranslator('9', 'dur', _DUR_ATTR_DICT)
     Traceback (most recent call last):
       File "/usr/lib64/python2.7/doctest.py", line 1289, in __run
         compileflags, 1) in test.globs
-      File "<doctest __main__._attrTranslator[2]>", line 1, in <module>
+      File "<doctest base._attrTranslator[2]>", line 1, in <module>
         _attrTranslator('9', 'dur', _DUR_ATTR_DICT)
-      File "/home/crantila/Documents/DDMAL/programs/music21/music21/mei/__main__.py", line 131, in _attrTranslator
+      File "/home/crantila/Documents/DDMAL/programs/music21/music21/mei/base.py", line 131, in _attrTranslator
         raise MeiValueError('Unexpected value for "{}" attribute: {}'.format(name, attr))
     MeiValueError: Unexpected value for "dur" attribute: 9
     '''
@@ -504,7 +504,7 @@ def _sharpsFromAttr(signature):
     :returns: The number of sharps.
     :rtype: int
 
-    >>> from music21.mei.__main__ import _sharpsFromAttr
+    >>> from music21.mei.base import _sharpsFromAttr
     >>> _sharpsFromAttr('3s')
     3
     >>> _sharpsFromAttr('3f')
@@ -881,7 +881,7 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
     Because there is no ``'rest'`` key in the ``mapping``, that :class:`Element` is ignored:
 
     >>> from xml.etree.ElementTree import Element  #_DOCS_HIDE
-    >>> from music21.mei.__main__ import _processEmbeddedElements  #_DOCS_HIDE
+    >>> from music21.mei.base import _processEmbeddedElements  #_DOCS_HIDE
     >>> elements = [Element('note'), Element('rest'), Element('note')]
     >>> mapping = {'note': lambda x, y: note.Note('D2')}
     >>> _processEmbeddedElements(elements, mapping)
@@ -1123,7 +1123,7 @@ def removeOctothorpe(xmlid):
     '''
     Given a string with an @xml:id to search for, remove a leading octothorpe, if present.
 
-    >>> from music21.mei.__main__ import removeOctothorpe  # OMIT_FROM_DOCS
+    >>> from music21.mei.base import removeOctothorpe  # OMIT_FROM_DOCS
     >>> removeOctothorpe('110a923d-a13a-4a2e-b85c-e1d438e4c5d6')
     '110a923d-a13a-4a2e-b85c-e1d438e4c5d6'
     >>> removeOctothorpe('#e46cbe82-95fc-4522-9f7a-700e41a40c8e')
@@ -2352,22 +2352,22 @@ _DOC_ORDER = [noteFromElement, restFromElement]
 
 if __name__ == "__main__":
     import music21
-    from music21.mei import test_main
-    music21.mainTest(test_main.TestThings,
-                     test_main.TestAttrTranslators,
-                     test_main.TestNoteFromElement,
-                     test_main.TestRestFromElement,
-                     test_main.TestChordFromElement,
-                     test_main.TestClefFromElement,
-                     test_main.TestLayerFromElement,
-                     test_main.TestStaffFromElement,
-                     test_main.TestStaffDefFromElement,
-                     test_main.TestScoreDefFromElement,
-                     test_main.TestEmbeddedElements,
-                     test_main.TestAddSlurs,
-                     test_main.TestBeams,
-                     test_main.TestPreprocessors,
-                     test_main.TestTuplets,
+    from music21.mei import test_base
+    music21.mainTest(test_base.TestThings,
+                     test_base.TestAttrTranslators,
+                     test_base.TestNoteFromElement,
+                     test_base.TestRestFromElement,
+                     test_base.TestChordFromElement,
+                     test_base.TestClefFromElement,
+                     test_base.TestLayerFromElement,
+                     test_base.TestStaffFromElement,
+                     test_base.TestStaffDefFromElement,
+                     test_base.TestScoreDefFromElement,
+                     test_base.TestEmbeddedElements,
+                     test_base.TestAddSlurs,
+                     test_base.TestBeams,
+                     test_base.TestPreprocessors,
+                     test_base.TestTuplets,
                     )
 
 #------------------------------------------------------------------------------
