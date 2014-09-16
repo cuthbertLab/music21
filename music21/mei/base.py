@@ -210,7 +210,7 @@ class MeiToM21Converter(object):
 
         _ppSlurs(self)
         _ppTies(self)
-        _ppBeams(self.documentRoot, self.m21Attr)
+        _ppBeams(self)
         _ppTuplets(self.documentRoot, self.m21Attr)
         _ppConclude(self.documentRoot, self.m21Attr)
 
@@ -647,42 +647,43 @@ def _ppTies(theConverter):
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tie>', '@startid and @endid'))
 
 
-def _ppBeams(documentRoot, m21Attr):
+def _ppBeams(theConverter):
     '''
     Pre-processing helper for :func:`convertFromString` that handles beams specified in <beamSpan>
-    elements.
+    elements. The input is a :class:`MeiToM21Converter` with data about the file currently being
+    processed. This function reads from ``theConverter.documentRoot`` and writes into
+    ``theConverter.m21Attr``.
 
-    :param documentRoot: The root tag of the MEI document being imported.
-    :type documentRoot: :class:`xml.etree.ElementTree.Element`
-    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
-        element with that @xml:id (read below for more information).
-    :type m21Attr: defaultdict
-    :returns: The ``m21Attr`` mapping after specified transformations.
-    :rtype: defaultdict
+    :param theConverter: The object responsible for storing data about this import.
+    :type theConverter: :class:`MeiToM21Converter`.
 
     **Example of ``m21Attr``**
 
-    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
-    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
-    attribute names and their values that should be added to the element with the given @xml:id.
+    The ``theConverter.m21Attr`` argument must be a defaultdict that returns an empty (regular)
+    dict for non-existant keys. The defaultdict stores the @xml:id attribute of an element; the
+    dict holds attribute names and their values that should be added to the element with the
+    given @xml:id.
 
     For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
     element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
 
     **This Preprocessor**
-    The slur preprocessor adds the @m21Beam attribute. The value of this attribute is either
+    The beam preprocessor adds the @m21Beam attribute. The value of this attribute is either
     ``'start'``, ``'continue'``, or ``'stop'``, indicating the music21 ``type`` of the primary
     beam attached to this element.
     '''
     environLocal.printDebug('*** pre-processing beams')
+    # for readability, we use a single-letter variable
+    c = theConverter  # pylint: disable=invalid-name
+
     # pre-processing for <beamSpan> elements
-    for eachBeam in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
+    for eachBeam in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
         if eachBeam.get('startid') is None or eachBeam.get('endid') is None:
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<beamSpan>', '@startid and @endid'))
             continue
 
-        m21Attr[removeOctothorpe(eachBeam.get('startid'))]['m21Beam'] = 'start'
-        m21Attr[removeOctothorpe(eachBeam.get('endid'))]['m21Beam'] = 'stop'
+        c.m21Attr[removeOctothorpe(eachBeam.get('startid'))]['m21Beam'] = 'start'
+        c.m21Attr[removeOctothorpe(eachBeam.get('endid'))]['m21Beam'] = 'stop'
 
         # iterate things in the @plist attribute
         for eachXmlid in eachBeam.get('plist', '').split(' '):
@@ -690,11 +691,9 @@ def _ppBeams(documentRoot, m21Attr):
             if 0 == len(eachXmlid):
                 # this is either @plist not set or extra spaces around the contained xml:id values
                 pass
-            if 'm21Beam' not in m21Attr[eachXmlid]:
+            if 'm21Beam' not in c.m21Attr[eachXmlid]:
                 # only set to 'continue' if it wasn't previously set to 'start' or 'stop'
-                m21Attr[eachXmlid]['m21Beam'] = 'continue'
-
-    return m21Attr
+                c.m21Attr[eachXmlid]['m21Beam'] = 'continue'
 
 
 def _ppTuplets(documentRoot, m21Attr):

@@ -2228,8 +2228,9 @@ class TestPreprocessors(unittest.TestCase):
         '''
         # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
         #     is much more work than it's worth
-        m21Attr = defaultdict(lambda: {})
-        documentRoot = mock.MagicMock()
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
         iterfindReturn = []
         for i in xrange(3):
@@ -2237,17 +2238,16 @@ class TestPreprocessors(unittest.TestCase):
                                                 attrib={'startid': 'start-{}'.format(i),
                                                         'endid': 'end-{}'.format(i),
                                                         'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i)}))
-        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
-        actual = base._ppBeams(documentRoot, m21Attr)
+        base._ppBeams(mockConverter)
 
-        self.assertTrue(m21Attr is actual)
-        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in xrange(3):
-            self.assertEqual('start', m21Attr['start-{}'.format(i)]['m21Beam'])
-            self.assertEqual('continue', m21Attr['mid-{}'.format(i)]['m21Beam'])
-            self.assertEqual('stop', m21Attr['end-{}'.format(i)]['m21Beam'])
+            self.assertEqual('start', mockConverter.m21Attr['start-{}'.format(i)]['m21Beam'])
+            self.assertEqual('continue', mockConverter.m21Attr['mid-{}'.format(i)]['m21Beam'])
+            self.assertEqual('stop', mockConverter.m21Attr['end-{}'.format(i)]['m21Beam'])
 
     def testUnitBeams2(self):
         '''
@@ -2257,24 +2257,24 @@ class TestPreprocessors(unittest.TestCase):
         '''
         # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
         #     is much more work than it's worth
-        m21Attr = defaultdict(lambda: {})
-        documentRoot = mock.MagicMock()
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
         iterfindReturn = []
         for i in xrange(3):
             iterfindReturn.append(ETree.Element('beamSpan',
                                                 attrib={'startid': '#start-{}'.format(i),
                                                         'endid': '#end-{}'.format(i)}))
-        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
-        actual = base._ppBeams(documentRoot, m21Attr)
+        base._ppBeams(mockConverter)
 
-        self.assertTrue(m21Attr is actual)
-        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in xrange(3):
-            self.assertEqual('start', m21Attr['start-{}'.format(i)]['m21Beam'])
-            self.assertEqual('stop', m21Attr['end-{}'.format(i)]['m21Beam'])
+            self.assertEqual('start', mockConverter.m21Attr['start-{}'.format(i)]['m21Beam'])
+            self.assertEqual('stop', mockConverter.m21Attr['end-{}'.format(i)]['m21Beam'])
 
     @mock.patch('music21.mei.base.environLocal')
     def testUnitBeams3(self, mockEnviron):
@@ -2283,18 +2283,18 @@ class TestPreprocessors(unittest.TestCase):
         '''
         # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
         #     is much more work than it's worth
-        m21Attr = defaultdict(lambda: {})
-        documentRoot = mock.MagicMock()
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
         iterfindReturn = [ETree.Element('beamSpan', attrib={'tstamp': '12.4', 'tstamp2': '13.1'})]
-        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
-        actual = base._ppBeams(documentRoot, m21Attr)
+        base._ppBeams(mockConverter)
 
-        self.assertTrue(m21Attr is actual)
-        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
-        self.assertEqual(0, len(m21Attr))
+        self.assertEqual(0, len(mockConverter.m21Attr))
         mockEnviron.warn.assert_called_once_with('Importing <beamSpan> without @startid and @endid is not yet supported.')
 
     def testUnitTuplets1(self):
