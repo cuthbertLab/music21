@@ -2118,23 +2118,23 @@ class TestPreprocessors(unittest.TestCase):
         '''
         # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
         #     is much more work than it's worth
-        m21Attr = defaultdict(lambda: {})
-        documentRoot = mock.MagicMock()
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)
         iterfindReturn = []
         for i in xrange(3):
             iterfindReturn.append(ETree.Element('tie', attrib={'startid': 'start {}'.format(i),
                                                                'endid': 'end {}'.format(i)}))
-        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
-        actual = base._ppTies(documentRoot, m21Attr)
+        base._ppTies(mockConverter)
 
-        self.assertTrue(m21Attr is actual)
-        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in xrange(3):
-            self.assertEqual('i', m21Attr['start {}'.format(i)]['tie'])
-            self.assertEqual('t', m21Attr['end {}'.format(i)]['tie'])
+            self.assertEqual('i', mockConverter.m21Attr['start {}'.format(i)]['tie'])
+            self.assertEqual('t', mockConverter.m21Attr['end {}'.format(i)]['tie'])
 
     @mock.patch('music21.mei.base.environLocal')
     def testUnitTies2(self, mockEnviron):
@@ -2143,18 +2143,18 @@ class TestPreprocessors(unittest.TestCase):
         '''
         # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
         #     is much more work than it's worth
-        m21Attr = defaultdict(lambda: {})
-        documentRoot = mock.MagicMock()
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)
         iterfindReturn = [ETree.Element('tie', attrib={'tstamp': '4.1', 'tstamp2': '4.2'})]
-        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
-        actual = base._ppTies(documentRoot, m21Attr)
+        base._ppTies(mockConverter)
 
-        self.assertTrue(m21Attr is actual)
-        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
-        self.assertEqual(0, len(m21Attr))
+        self.assertEqual(0, len(mockConverter.m21Attr))
         mockEnviron.warn.assert_called_once_with('Importing <tie> without @startid and @endid is not yet supported.')
 
     @mock.patch('music21.spanner.Slur')

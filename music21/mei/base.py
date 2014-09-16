@@ -209,7 +209,7 @@ class MeiToM21Converter(object):
         environLocal.printDebug('*** preprocessing spanning elements')
 
         _ppSlurs(self)
-        _ppTies(self.documentRoot, self.m21Attr)
+        _ppTies(self)
         _ppBeams(self.documentRoot, self.m21Attr)
         _ppTuplets(self.documentRoot, self.m21Attr)
         _ppConclude(self.documentRoot, self.m21Attr)
@@ -611,23 +611,22 @@ def _ppSlurs(theConverter):
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<slur>', '@startid and @endid'))
 
 
-def _ppTies(documentRoot, m21Attr):
+def _ppTies(theConverter):
     '''
-    Pre-processing helper for :func:`convertFromString` that handles ties specified in <tie> elements.
+    Pre-processing helper for :func:`convertFromString` that handles ties specified in <tie>
+    elements. The input is a :class:`MeiToM21Converter` with data about the file currently being
+    processed. This function reads from ``theConverter.documentRoot`` and writes into
+    ``theConverter.m21Attr``.
 
-    :param documentRoot: The root tag of the MEI document being imported.
-    :type documentRoot: :class:`xml.etree.ElementTree.Element`
-    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
-        element with that @xml:id (read below for more information).
-    :type m21Attr: defaultdict
-    :returns: The ``m21Attr`` mapping after specified transformations.
-    :rtype: defaultdict
+    :param theConverter: The object responsible for storing data about this import.
+    :type theConverter: :class:`MeiToM21Converter`.
 
     **Example of ``m21Attr``**
 
-    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
-    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
-    attribute names and their values that should be added to the element with the given @xml:id.
+    The ``theConverter.m21Attr`` attribute must be a defaultdict that returns an empty (regular)
+    dict for non-existant keys. The defaultdict stores the @xml:id attribute of an element; the
+    dict holds attribute names and their values that should be added to the element with the
+    given @xml:id.
 
     For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
     element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
@@ -637,14 +636,15 @@ def _ppTies(documentRoot, m21Attr):
     Guidelines, so no special action is required.
     '''
     environLocal.printDebug('*** pre-processing ties')
-    for eachTie in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
+    # for readability, we use a single-letter variable
+    c = theConverter  # pylint: disable=invalid-name
+
+    for eachTie in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
         if eachTie.get('startid') is not None and eachTie.get('endid') is not None:
-            m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
-            m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
+            c.m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
+            c.m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
         else:
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tie>', '@startid and @endid'))
-
-    return m21Attr
 
 
 def _ppBeams(documentRoot, m21Attr):
