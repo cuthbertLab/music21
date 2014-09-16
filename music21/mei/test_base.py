@@ -144,15 +144,6 @@ class TestThings(unittest.TestCase):
         self.assertEqual(expected.accidental, actual.accidental)
         self.assertEqual(expected.octave, actual.octave)
 
-    def testMakeDuration(self):
-        '''makeDuration(): just a couple of things'''
-        self.assertEqual(2.0, base.makeDuration(2.0, 0).quarterLength)
-        self.assertEqual(3.0, base.makeDuration(2.0, 1).quarterLength)
-        self.assertEqual(3.5, base.makeDuration(2, 2).quarterLength) # "base" as int---should work
-        self.assertEqual(Fraction(4, 1), base.makeDuration(2.0, 20).quarterLength)
-        self.assertEqual(Fraction(1, 3), base.makeDuration(0.33333333333333333333, 0).quarterLength)
-        self.assertEqual(Fraction(1, 3), base.makeDuration(Fraction(1, 3), 0).quarterLength)
-
     def testAllPartsPresent1(self):
         '''allPartsPresent(): one <staffDef>, no repeats'''
         inputValue = [mock.MagicMock()]

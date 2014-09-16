@@ -349,23 +349,30 @@ def safePitch(name, accidental=None, octave=''):
 
 def makeDuration(base=0.0, dots=0):
     '''
-    Given a "base" duration and a number of "dots," create a :class:`Duration` instance with the
+    Given a ``base`` duration and a number of ``dots``, create a :class:`Duration` instance with the
     appropriate ``quarterLength`` value.
+
+    :param number base: The base duration that will be augmented.
+    :param int dots: The number of dots with which to augment the ``base`` duration.
+    :returns: A :class:`Duration` corresponding to the fully-augmented value.
+    :rtype: :class:`music21.duration.Duration`
 
     **Examples**
 
-    +------+------+-------------------+
-    | base | dots | quarterLength     |
-    +======+======+===================+
-    | 2.0  | 1    | 3.0               |
-    +------+------+-------------------+
-    | 2.0  | 2    | 3.5               |
-    +------+------+-------------------+
-    | 1.0  | 1    | 1.5               |
-    +------+------+-------------------+
-    | 2.0  | 20   | 3.999998092651367 |
-    +------+------+-------------------+
-    >>>
+    >>> from music21 import *
+    >>> from fractions import Fraction
+    >>> mei.base.makeDuration(base=2.0, dots=0).quarterLength  # half note, no dots
+    2.0
+    >>> mei.base.makeDuration(base=2.0, dots=1).quarterLength  # half note, one dot
+    3.0
+    >>> mei.base.makeDuration(base=2, dots=2).quarterLength  # 'base' can be an int or float
+    3.5
+    >>> mei.base.makeDuration(2.0, 10).quarterLength  # you want ridiculous dots? Sure...
+    3.998046875
+    >>> mei.base.makeDuration(0.33333333333333333333, 0).quarterLength  # works with fractions too
+    Fraction(1, 3)
+    >>> mei.base.makeDuration(Fraction(1, 3), 1).quarterLength
+    0.5
     '''
     return duration.Duration(base + sum([float(base) / x for x in [2 ** i for i in xrange(1, dots + 1)]]),
                              dots=dots)
