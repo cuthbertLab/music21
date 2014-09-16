@@ -61,6 +61,44 @@ from music21.mei.base import _XMLID
 from music21.mei.base import _MEINS
 
 
+class TestMeiToM21Class(unittest.TestCase):
+    '''Tests for the MeiToM21Converter class.'''
+
+    def testInit1(self):
+        '''__init__(): a valid MEI file is prepared properly'''
+        inputFile = '''<?xml version="1.0" encoding="UTF-8"?>
+                       <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+                       <music><score></score></music></mei>'''
+        actual = base.MeiToM21Converter(inputFile)
+        # NB: at first I did this:
+        # self.assertIsInstance(actual.documentRoot, ETree.Element)
+        # ... but that doesn't work in Python 2, and I couldn't figure out why.
+        self.assertIsNotNone(actual.documentRoot)
+        self.assertEqual('{}mei'.format(_MEINS), actual.documentRoot.tag)
+
+    def testInit2(self):
+        '''__init__(): an invalid XML file causes an MeiValidityError'''
+        inputFile = 'this is not an XML file'
+        self.assertRaises(base.MeiValidityError, base.MeiToM21Converter, inputFile)
+        try:
+            base.MeiToM21Converter(inputFile)
+        except base.MeiValidityError as theError:
+            self.assertEqual(base._INVALID_XML_DOC, theError.args[0])
+
+
+    def testInit3(self):
+        '''__init__(): a MusicXML file causes an MeiElementError'''
+        inputFile = '''<?xml version="1.0" encoding="UTF-8"?>
+                       <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                                       "http://www.musicxml.org/dtds/partwise.dtd">
+                       <score-partwise></score-partwise>'''
+        self.assertRaises(base.MeiElementError, base.MeiToM21Converter, inputFile)
+        try:
+            base.MeiToM21Converter(inputFile)
+        except base.MeiElementError as theError:
+            self.assertEqual(base._WRONG_ROOT_ELEMENT.format('score-partwise'), theError.args[0])
+
+
 class TestThings(unittest.TestCase):
     '''Tests for utility functions.'''
 

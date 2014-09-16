@@ -144,8 +144,8 @@ class MeiElementError(exceptions21.Music21Exception):
 
 # Text Strings for Error Conditions
 #------------------------------------------------------------------------------
-_WRONG_ROOT_TAG = 'Root tag is should be <mei>, not <{}>.'
-_MULTIPLE_ROOT_TAGS = 'Found multiple <mei> tags.'
+_INVALID_XML_DOC = 'MEI document is not valid XML.'
+_WRONG_ROOT_ELEMENT = 'Root element should be <mei>, not <{}>.'
 _UNKNOWN_TAG = 'Found unexpected tag while parsing MEI: <{}>.'
 _UNEXPECTED_ATTR_VALUE = 'Unexpected value for "{}" attribute: {}'
 _SEEMINGLY_NO_PARTS = 'There appear to be no <staffDef> tags in this score.'
@@ -165,10 +165,26 @@ class MeiToM21Converter(object):
 
     def __init__(self, theDocument):
         '''
+        If ``theDocument`` does not have <mei> as the root element, the class raises an
+        :class:`MeiElementError`. If ``theDocument`` is not a valid XML file, the class raises an
+        :class:`MeiValidityError`.
+
         :param str theDocument: A string containing an MEI document.
+        :raises: :exc:`MeiElementError` when the root element is not <mei>
+        :raises: :exc:`MeiValidityError` when the MEI file is not valid XML.
         '''
-        # TODO: the conversion to an ElementTree goes here
-        self._theDocument = theDocument
+        environLocal.printDebug('*** initializing MeiToM21Converter')
+
+        try:
+            self.documentRoot = ETree.fromstring(theDocument)
+        except ETree.ParseError:
+            raise MeiValidityError(_INVALID_XML_DOC)
+
+        if isinstance(self.documentRoot, ETree.ElementTree):
+            self.documentRoot = self.documentRoot.getroot()
+
+        if '{http://www.music-encoding.org/ns/mei}mei' != self.documentRoot.tag:
+            raise MeiElementError(_WRONG_ROOT_ELEMENT.format(self.documentRoot.tag))
 
     def run(self):
         '''
@@ -178,7 +194,7 @@ class MeiToM21Converter(object):
         :rtype: :class:`music21.stream.Score`
         '''
         # TODO: this replaces convertFromString()
-        return convertFromString(self._theDocument)
+        return convertFromString(self.documentRoot)
 
 
 # Module-level Functions
@@ -191,13 +207,9 @@ def convertFromString(dataStr):
     :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
     :rtype: :class:`music21.stream.Stream`
     '''
-    environLocal.printDebug('*** reached convertFromString()')
-    documentRoot = ETree.fromstring(dataStr)
-    if isinstance(documentRoot, ETree.ElementTree):
-        documentRoot = documentRoot.getroot()
 
-    if '{http://www.music-encoding.org/ns/mei}mei' != documentRoot.tag:
-        raise MeiTagError(_WRONG_ROOT_TAG.format(documentRoot.tag))
+    # TODO: this is temporary
+    documentRoot = dataStr
 
     # This defaultdict stores extra, music21-specific attributes that we add to elements to help
     # importing. The key is an element's @xml:id, and the value is a regular dict with keys
@@ -2393,7 +2405,8 @@ _DOC_ORDER = [noteFromElement, restFromElement]
 if __name__ == "__main__":
     import music21
     from music21.mei import test_base
-    music21.mainTest(test_base.TestThings,
+    music21.mainTest(test_base.TestMeiToM21Class,
+                     test_base.TestThings,
                      test_base.TestAttrTranslators,
                      test_base.TestNoteFromElement,
                      test_base.TestRestFromElement,
