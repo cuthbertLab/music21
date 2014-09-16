@@ -211,7 +211,7 @@ class MeiToM21Converter(object):
         _ppSlurs(self)
         _ppTies(self)
         _ppBeams(self)
-        _ppTuplets(self.documentRoot, self.m21Attr)
+        _ppTuplets(self)
         _ppConclude(self.documentRoot, self.m21Attr)
 
         environLocal.printDebug('*** preparing part and staff definitions')
@@ -696,24 +696,22 @@ def _ppBeams(theConverter):
                 c.m21Attr[eachXmlid]['m21Beam'] = 'continue'
 
 
-def _ppTuplets(documentRoot, m21Attr):
+def _ppTuplets(theConverter):
     '''
     Pre-processing helper for :func:`convertFromString` that handles tuplets specified in
-    <tupletSpan> elements.
+    <tupletSpan> elements.  The input is a :class:`MeiToM21Converter` with data about the file
+    currently being processed. This function reads from ``theConverter.documentRoot`` and writes
+    into ``theConverter.m21Attr``.
 
-    :param documentRoot: The root tag of the MEI document being imported.
-    :type documentRoot: :class:`xml.etree.ElementTree.Element`
-    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
-        element with that @xml:id (read below for more information).
-    :type m21Attr: defaultdict
-    :returns: The ``m21Attr`` mapping after specified transformations.
-    :rtype: defaultdict
+    :param theConverter: The object responsible for storing data about this import.
+    :type theConverter: :class:`MeiToM21Converter`.
 
     **Example of ``m21Attr``**
 
-    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
-    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
-    attribute names and their values that should be added to the element with the given @xml:id.
+    The ``theConverter.m21Attr`` attribute must be a defaultdict that returns an empty (regular)
+    dict for non-existant keys. The defaultdict stores the @xml:id attribute of an element; the
+    dict holds attribute names and their values that should be added to the element with the
+    given @xml:id.
 
     For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
     element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
@@ -726,8 +724,11 @@ def _ppTuplets(documentRoot, m21Attr):
     elements that do not include a @plist attribute.
     '''
     environLocal.printDebug('*** pre-processing tuplets')
+    # for readability, we use a single-letter variable
+    c = theConverter  # pylint: disable=invalid-name
+
     # pre-processing <tupletSpan> tags
-    for eachTuplet in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
+    for eachTuplet in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
         if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None) and
             eachTuplet.get('plist') is None):
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tupletSpan>', '@startid and @endid or @plist'))
@@ -740,8 +741,8 @@ def _ppTuplets(documentRoot, m21Attr):
                 eachXmlid = removeOctothorpe(eachXmlid)
                 if 0 < len(eachXmlid):
                     # protect against extra spaces around the contained xml:id values
-                    m21Attr[eachXmlid]['m21TupletNum'] = eachTuplet.get('num')
-                    m21Attr[eachXmlid]['m21TupletNumbase'] = eachTuplet.get('numbase')
+                    c.m21Attr[eachXmlid]['m21TupletNum'] = eachTuplet.get('num')
+                    c.m21Attr[eachXmlid]['m21TupletNumbase'] = eachTuplet.get('numbase')
         else:
             # For <tupletSpan> elements that don't give a @plist attribute, we have to do some
             # guesswork and hope we find all the related elements. Right here, we're only setting
@@ -749,14 +750,12 @@ def _ppTuplets(documentRoot, m21Attr):
             startid = removeOctothorpe(eachTuplet.get('startid'))
             endid = removeOctothorpe(eachTuplet.get('endid'))
 
-            m21Attr[startid]['m21TupletSearch'] = 'start'
-            m21Attr[startid]['m21TupletNum'] = eachTuplet.get('num')
-            m21Attr[startid]['m21TupletNumbase'] = eachTuplet.get('numbase')
-            m21Attr[endid]['m21TupletSearch'] = 'end'
-            m21Attr[endid]['m21TupletNum'] = eachTuplet.get('num')
-            m21Attr[endid]['m21TupletNumbase'] = eachTuplet.get('numbase')
-
-    return m21Attr
+            c.m21Attr[startid]['m21TupletSearch'] = 'start'
+            c.m21Attr[startid]['m21TupletNum'] = eachTuplet.get('num')
+            c.m21Attr[startid]['m21TupletNumbase'] = eachTuplet.get('numbase')
+            c.m21Attr[endid]['m21TupletSearch'] = 'end'
+            c.m21Attr[endid]['m21TupletNum'] = eachTuplet.get('num')
+            c.m21Attr[endid]['m21TupletNumbase'] = eachTuplet.get('numbase')
 
 
 def _ppConclude(documentRoot, m21Attr):

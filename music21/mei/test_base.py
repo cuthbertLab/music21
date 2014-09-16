@@ -2305,8 +2305,9 @@ class TestPreprocessors(unittest.TestCase):
         '''
         # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
         #     is much more work than it's worth
-        m21Attr = defaultdict(lambda: {})
-        documentRoot = mock.MagicMock()
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)
         theNum = 42
         theNumbase = 900
@@ -2316,20 +2317,19 @@ class TestPreprocessors(unittest.TestCase):
                                                 attrib={'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i),
                                                         'num': theNum,
                                                         'numbase': theNumbase}))
-        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
-        actual = base._ppTuplets(documentRoot, m21Attr)
+        base._ppTuplets(mockConverter)
 
-        self.assertTrue(m21Attr is actual)
-        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in xrange(3):
-            self.assertEqual(theNum, m21Attr['start-{}'.format(i)]['m21TupletNum'])
-            self.assertEqual(theNumbase, m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
-            self.assertEqual(theNum, m21Attr['mid-{}'.format(i)]['m21TupletNum'])
-            self.assertEqual(theNumbase, m21Attr['mid-{}'.format(i)]['m21TupletNumbase'])
-            self.assertEqual(theNum, m21Attr['end-{}'.format(i)]['m21TupletNum'])
-            self.assertEqual(theNumbase, m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual(theNum, mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual(theNum, mockConverter.m21Attr['mid-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, mockConverter.m21Attr['mid-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual(theNum, mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
 
     @mock.patch('music21.mei.base.environLocal')
     def testUnitTuplets2(self, mockEnviron):
@@ -2338,20 +2338,20 @@ class TestPreprocessors(unittest.TestCase):
         '''
         # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
         #     is much more work than it's worth
-        m21Attr = defaultdict(lambda: {})
-        documentRoot = mock.MagicMock()
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)
         theNum = 42
         theNumbase = 900
         iterfindReturn = [ETree.Element('tupletSpan', attrib={'num': theNum, 'numbase': theNumbase})]
-        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
-        actual = base._ppTuplets(documentRoot, m21Attr)
+        base._ppTuplets(mockConverter)
 
-        self.assertTrue(m21Attr is actual)
-        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
-        self.assertEqual(0, len(m21Attr))
+        self.assertEqual(0, len(mockConverter.m21Attr))
         mockEnviron.warn.assert_called_once_with('Importing <tupletSpan> without @startid and @endid or @plist is not yet supported.')
 
     def testUnitTuplets3(self):
@@ -2362,8 +2362,9 @@ class TestPreprocessors(unittest.TestCase):
         '''
         # NB: I'm mocking out the documentRoot because setting up an element tree for a unit test
         #     is much more work than it's worth
-        m21Attr = defaultdict(lambda: {})
-        documentRoot = mock.MagicMock()
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)
         theNum = 42
         theNumbase = 900
@@ -2374,20 +2375,19 @@ class TestPreprocessors(unittest.TestCase):
                                                         'endid': '#end-{j}'.format(j=i),
                                                         'num': theNum,
                                                         'numbase': theNumbase}))
-        documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
-        actual = base._ppTuplets(documentRoot, m21Attr)
+        base._ppTuplets(mockConverter)
 
-        self.assertTrue(m21Attr is actual)
-        documentRoot.iterfind.assert_called_once_with(expectedIterfind)
+        mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in (0, 2):
-            self.assertEqual(theNum, m21Attr['start-{}'.format(i)]['m21TupletNum'])
-            self.assertEqual(theNumbase, m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
-            self.assertEqual('start', m21Attr['start-{}'.format(i)]['m21TupletSearch'])
-            self.assertEqual(theNum, m21Attr['end-{}'.format(i)]['m21TupletNum'])
-            self.assertEqual(theNumbase, m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
-            self.assertEqual('end', m21Attr['end-{}'.format(i)]['m21TupletSearch'])
+            self.assertEqual(theNum, mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual('start', mockConverter.m21Attr['start-{}'.format(i)]['m21TupletSearch'])
+            self.assertEqual(theNum, mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNumbase, mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
+            self.assertEqual('end', mockConverter.m21Attr['end-{}'.format(i)]['m21TupletSearch'])
 
 
 
