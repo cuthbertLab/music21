@@ -2389,6 +2389,25 @@ class TestPreprocessors(unittest.TestCase):
             self.assertEqual(theNumbase, mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
             self.assertEqual('end', mockConverter.m21Attr['end-{}'.format(i)]['m21TupletSearch'])
 
+    def testUnitConclude1(self):
+        '''
+        _ppConclude(): that it works
+        '''
+        theDocument = '''<mei><music><note xml:id="one"/><note xml:id="two"/></music></mei>'''
+        mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
+        mockConverter.documentRoot = ETree.fromstring(theDocument)
+        mockConverter.m21Attr = defaultdict(lambda: {})
+        mockConverter.m21Attr['one']['new'] = '14'
+        mockConverter.m21Attr['one']['other'] = '42'
+        expNoteOneAttrib = {_XMLID: 'one', 'new': '14', 'other': '42'}
+        expNoteTwoAttrib = {_XMLID: 'two'}
+
+        base._ppConclude(mockConverter)
+
+        noteOne = mockConverter.documentRoot.find('*//*[@{}="one"]'.format(_XMLID))
+        noteTwo = mockConverter.documentRoot.find('*//*[@{}="two"]'.format(_XMLID))
+        self.assertEqual(expNoteOneAttrib, noteOne.attrib)
+        self.assertEqual(expNoteTwoAttrib, noteTwo.attrib)
 
 
 #------------------------------------------------------------------------------

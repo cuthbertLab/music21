@@ -212,7 +212,7 @@ class MeiToM21Converter(object):
         _ppTies(self)
         _ppBeams(self)
         _ppTuplets(self)
-        _ppConclude(self.documentRoot, self.m21Attr)
+        _ppConclude(self)
 
         environLocal.printDebug('*** preparing part and staff definitions')
 
@@ -699,7 +699,7 @@ def _ppBeams(theConverter):
 def _ppTuplets(theConverter):
     '''
     Pre-processing helper for :func:`convertFromString` that handles tuplets specified in
-    <tupletSpan> elements.  The input is a :class:`MeiToM21Converter` with data about the file
+    <tupletSpan> elements. The input is a :class:`MeiToM21Converter` with data about the file
     currently being processed. This function reads from ``theConverter.documentRoot`` and writes
     into ``theConverter.m21Attr``.
 
@@ -758,19 +758,15 @@ def _ppTuplets(theConverter):
             c.m21Attr[endid]['m21TupletNumbase'] = eachTuplet.get('numbase')
 
 
-def _ppConclude(documentRoot, m21Attr):
-    # TODO: test this function
+def _ppConclude(theConverter):
     '''
     Pre-processing helper for :func:`convertFromString` that adds attributes from ``m21Attr`` to the
-    appropriate elements in ``documentRoot``.
+    appropriate elements in ``documentRoot``. The input is a :class:`MeiToM21Converter` with data
+    about the file currently being processed. This function reads from ``theConverter.m21Attr`` and
+    writes into ``theConverter.documentRoot``.
 
-    :param documentRoot: The root tag of the MEI document being imported.
-    :type documentRoot: :class:`xml.etree.ElementTree.Element`
-    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
-        element with that @xml:id (read below for more information).
-    :type m21Attr: defaultdict
-    :returns: The ``documentRoot`` element.
-    :rtype: :class:`~xml.etree.ElementTree.Element`
+    :param theConverter: The object responsible for storing data about this import.
+    :type theConverter: :class:`MeiToM21Converter`.
 
     **Example of ``m21Attr``**
 
@@ -788,15 +784,17 @@ def _ppConclude(documentRoot, m21Attr):
     value.
     '''
     environLocal.printDebug('*** concluding pre-processing')
+    # for readability, we use a single-letter variable
+    c = theConverter  # pylint: disable=invalid-name
+
     # conclude pre-processing by adding music21-specific attributes to their respective elements
-    for eachObject in documentRoot.iterfind('*//*'):
+    for eachObject in c.documentRoot.iterfind('*//*'):
         # we have a defaultdict, so this "if" isn't strictly necessary; but without it, every single
         # element with an @xml:id creates a new, empty dict, which would consume a lot of memory
-        if eachObject.get(_XMLID) in m21Attr:
-            for eachAttr in m21Attr[eachObject.get(_XMLID)]:
-                eachObject.set(eachAttr, eachObject.get(eachAttr, '') + m21Attr[eachObject.get(_XMLID)][eachAttr])
-
-    return documentRoot
+        if eachObject.get(_XMLID) in c.m21Attr:
+            for eachAttr in c.m21Attr[eachObject.get(_XMLID)]:
+                eachObject.set(eachAttr, (eachObject.get(eachAttr, '') +
+                                          c.m21Attr[eachObject.get(_XMLID)][eachAttr]))
 
 
 def _postGuessTuplets(post):
