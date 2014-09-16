@@ -163,7 +163,7 @@ class MeiToM21Converter(object):
     objects.
     '''
 
-    def __init__(self, theDocument):
+    def __init__(self, theDocument=None):
         '''
         If ``theDocument`` does not have <mei> as the root element, the class raises an
         :class:`MeiElementError`. If ``theDocument`` is not a valid XML file, the class raises an
@@ -175,16 +175,28 @@ class MeiToM21Converter(object):
         '''
         environLocal.printDebug('*** initializing MeiToM21Converter')
 
-        try:
-            self.documentRoot = ETree.fromstring(theDocument)
-        except ETree.ParseError:
-            raise MeiValidityError(_INVALID_XML_DOC)
+        if theDocument is None:
+            self.documentRoot = ETree.Element('{http://www.music-encoding.org/ns/mei}mei')
+        else:
+            try:
+                self.documentRoot = ETree.fromstring(theDocument)
+            except ETree.ParseError:
+                raise MeiValidityError(_INVALID_XML_DOC)
 
-        if isinstance(self.documentRoot, ETree.ElementTree):
-            self.documentRoot = self.documentRoot.getroot()
+            if isinstance(self.documentRoot, ETree.ElementTree):
+                self.documentRoot = self.documentRoot.getroot()
 
-        if '{http://www.music-encoding.org/ns/mei}mei' != self.documentRoot.tag:
-            raise MeiElementError(_WRONG_ROOT_ELEMENT.format(self.documentRoot.tag))
+            if '{http://www.music-encoding.org/ns/mei}mei' != self.documentRoot.tag:
+                raise MeiElementError(_WRONG_ROOT_ELEMENT.format(self.documentRoot.tag))
+
+        # This defaultdict stores extra, music21-specific attributes that we add to elements to help
+        # importing. The key is an element's @xml:id, and the value is a regular dict with keys
+        # corresponding to attributes we'll add and values corresponding to those attributes's values.
+        self.m21Attr = defaultdict(lambda: {})
+
+        # This SpannerBundle holds the slurs that will be created by _ppSlurs() and used while
+        # importing whatever note, rest, chord, or other object.
+        self.slurBundle = spanner.SpannerBundle()
 
     def run(self):
         '''
@@ -193,13 +205,6 @@ class MeiToM21Converter(object):
         :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
         :rtype: :class:`music21.stream.Stream`
         '''
-
-        # This defaultdict stores extra, music21-specific attributes that we add to elements to help
-        # importing. The key is an element's @xml:id, and the value is a regular dict with keys
-        # corresponding to attributes we'll add and values corresponding to those attributes's values.
-        self.m21Attr = defaultdict(lambda: {})
-
-        self.slurBundle = spanner.SpannerBundle()
 
         environLocal.printDebug('*** preprocessing spanning elements')
 

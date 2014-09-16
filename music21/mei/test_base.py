@@ -65,6 +65,13 @@ class TestMeiToM21Class(unittest.TestCase):
     '''Tests for the MeiToM21Converter class.'''
 
     def testInit1(self):
+        '''__init__(): no argument gives an "empty" MeiToM21Converter instance'''
+        actual = base.MeiToM21Converter()
+        self.assertIsNotNone(actual.documentRoot)
+        self.assertIsInstance(actual.m21Attr, defaultdict)
+        self.assertIsInstance(actual.slurBundle, spanner.SpannerBundle)
+
+    def testInit2(self):
         '''__init__(): a valid MEI file is prepared properly'''
         inputFile = '''<?xml version="1.0" encoding="UTF-8"?>
                        <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
@@ -75,8 +82,10 @@ class TestMeiToM21Class(unittest.TestCase):
         # ... but that doesn't work in Python 2, and I couldn't figure out why.
         self.assertIsNotNone(actual.documentRoot)
         self.assertEqual('{}mei'.format(_MEINS), actual.documentRoot.tag)
+        self.assertIsInstance(actual.m21Attr, defaultdict)
+        self.assertIsInstance(actual.slurBundle, spanner.SpannerBundle)
 
-    def testInit2(self):
+    def testInit3(self):
         '''__init__(): an invalid XML file causes an MeiValidityError'''
         inputFile = 'this is not an XML file'
         self.assertRaises(base.MeiValidityError, base.MeiToM21Converter, inputFile)
@@ -85,8 +94,7 @@ class TestMeiToM21Class(unittest.TestCase):
         except base.MeiValidityError as theError:
             self.assertEqual(base._INVALID_XML_DOC, theError.args[0])
 
-
-    def testInit3(self):
+    def testInit4(self):
         '''__init__(): a MusicXML file causes an MeiElementError'''
         inputFile = '''<?xml version="1.0" encoding="UTF-8"?>
                        <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
