@@ -190,141 +190,129 @@ class MeiToM21Converter(object):
         '''
         Convert a string that is an MEI document into a music21 object.
 
-        :return: The :class:`Score` corresponding to the MEI document.
-        :rtype: :class:`music21.stream.Score`
+        :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
+        :rtype: :class:`music21.stream.Stream`
         '''
-        # TODO: this replaces convertFromString()
-        return convertFromString(self.documentRoot)
+
+        # This defaultdict stores extra, music21-specific attributes that we add to elements to help
+        # importing. The key is an element's @xml:id, and the value is a regular dict with keys
+        # corresponding to attributes we'll add and values corresponding to those attributes's values.
+        self.m21Attr = defaultdict(lambda: {})
+
+        self.slurBundle = spanner.SpannerBundle()
+
+        environLocal.printDebug('*** preprocessing spanning elements')
+
+        _ppSlurs(self.documentRoot, self.m21Attr, self.slurBundle)
+        _ppTies(self.documentRoot, self.m21Attr)
+        _ppBeams(self.documentRoot, self.m21Attr)
+        _ppTuplets(self.documentRoot, self.m21Attr)
+        _ppConclude(self.documentRoot, self.m21Attr)
+
+        environLocal.printDebug('*** preparing part and staff definitions')
+
+        # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
+        # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
+        # get all the <staffDef> tags that are in the <score>, no matter where they appear. This is just
+        # to fetch everything that will affect the maximum number of parts that might happen at a time.
+        # TODO: this doesn't always work. For some scores where a part uses more than one clef, more
+        #       than one @n is picked up, so more than one staff appears---though all the notes are put
+        #       in the highest relevant staff
+        allPartNs = allPartsPresent(self.documentRoot.findall('.//{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)))
+
+        # holds the music21.stream.Part that we're building
+        parsed = {n: stream.Part() for n in allPartNs}
+        # holds things that should go in the following Measure
+        inNextMeasure = {n: stream.Part() for n in allPartNs}
+
+        # set the initial Instrument for each staff
+        for eachN in allPartNs:
+            eachStaffDef = staffDefFromElement(self.documentRoot.find(
+                './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)))
+            if eachStaffDef is not None:
+                parsed[eachN].append(eachStaffDef)
+            else:
+                # TODO: try another strategy to get instrument information
+                pass
+
+        # process a <scoreDef> tag that happen before a <section> tag
+        scoreDefResults = self.documentRoot.find('.//{mei}music//{mei}scoreDef'.format(mei=_MEINS))
+        if scoreDefResults is not None:
+            # scoreDefResults would be None if there is no <scoreDef> outside of a <section>, but...
+            # TODO: we don't actually know whether this <scoreDef> happens before or between <section>
+            scoreDefResults = scoreDefFromElement(scoreDefResults)
+            for allPartObject in scoreDefResults['all-part objects']:
+                for partN in allPartNs:
+                    inNextMeasure[partN].append(allPartObject)
+
+        environLocal.printDebug('*** processing measures')
+
+        backupMeasureNum = 0
+        for eachSection in self.documentRoot.iterfind('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
+            # TODO: sections aren't divided or treated specially, yet
+            for eachObject in eachSection:
+                if '{http://www.music-encoding.org/ns/mei}measure' == eachObject.tag:
+                    # TODO: MEI's "rptboth" barlines require handling at the multi-measure level
+                    # TODO: follow the use of @n described on pg.585 (599) of the MEI Guidelines
+                    backupMeasureNum += 1
+                    # process all the stuff in the <measure>
+                    measureResult = measureFromElement(eachObject, backupMeasureNum, allPartNs,
+                                                       slurBundle=self.slurBundle)
+                    # process and append each part's stuff to the staff
+                    for eachN in allPartNs:
+                        # TODO: what if an @n doesn't exist in this <measure>?
+                        # insert objects specified in the immediately-preceding <scoreDef>
+                        for eachThing in inNextMeasure[eachN]:
+                            measureResult[eachN].insert(0, eachThing)
+                        inNextMeasure[eachN] = []
+                        # if it's the first measure, pad for a possible anacrusis
+                        # TODO: this may have to change when @n is better set
+                        # TODO: this doesn't actually solve the "pick-up measure" problem
+                        if 1 == backupMeasureNum:
+                            measureResult[eachN].padAsAnacrusis()
+                        # add this Measure to the Part
+                        parsed[eachN].append(measureResult[eachN])
+                elif '{http://www.music-encoding.org/ns/mei}scoreDef' == eachObject.tag:
+                    scoreDefResults = scoreDefFromElement(eachObject)
+                    # spread all-part elements across all the parts
+                    for allPartObject in scoreDefResults['all-part objects']:
+                        for partN in allPartNs:
+                            inNextMeasure[partN].append(allPartObject)
+                elif '{http://www.music-encoding.org/ns/mei}staffDef' == eachObject.tag:
+                    whichPart = eachObject.get('n')
+                    # to process this here, we need @n. But if something refers to this <staffDef> with
+                    # the @xml:id, it may not have an @n
+                    if whichPart is not None:
+                        staffDefResults = staffDefFromElement(eachObject)
+                        for thisPartObject in staffDefResults:
+                            parsed[whichPart].append(thisPartObject)
+                elif eachObject.tag not in _IGNORE_UNPROCESSED:
+                    environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
+
+        # TODO: check if there's anything left in "inNextMeasure"
+
+        # Convert the dict to a Score
+        # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
+        # document. Iterating the keys in "parsed" would not preserve the order.
+        environLocal.printDebug('*** making the Score')
+        parsed = [parsed[n] for n in allPartNs]
+        post = stream.Score(parsed)
+
+        # process tuplets indicated by the "m21TupletSearch" attribute (i.e., in the MEI file these are
+        # encoded with a <tupletSpan> that has @startid and @endid but not @plist).
+        post = _postGuessTuplets(post)
+
+        # insert metadata
+        post.metadata = makeMetadata(self.documentRoot)
+
+        # put slurs in the Score
+        post.append(self.slurBundle.list)
+
+        return post
 
 
 # Module-level Functions
 #------------------------------------------------------------------------------
-def convertFromString(dataStr):
-    '''
-    Convert a string from MEI markup to music21 objects.
-
-    :parameter str dataStr: A string with MEI markup.
-    :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
-    :rtype: :class:`music21.stream.Stream`
-    '''
-
-    # TODO: this is temporary
-    documentRoot = dataStr
-
-    # This defaultdict stores extra, music21-specific attributes that we add to elements to help
-    # importing. The key is an element's @xml:id, and the value is a regular dict with keys
-    # corresponding to attributes we'll add and values corresponding to those attributes's values.
-    m21Attr = defaultdict(lambda: {})
-
-    slurBundle = spanner.SpannerBundle()
-
-    _ppSlurs(documentRoot, m21Attr, slurBundle)
-    _ppTies(documentRoot, m21Attr)
-    _ppBeams(documentRoot, m21Attr)
-    _ppTuplets(documentRoot, m21Attr)
-    _ppConclude(documentRoot, m21Attr)
-
-    environLocal.printDebug('*** preparing part and staff definitions')
-
-    # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
-    # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
-    # get all the <staffDef> tags that are in the <score>, no matter where they appear. This is just
-    # to fetch everything that will affect the maximum number of parts that might happen at a time.
-    # TODO: this doesn't always work. For some scores where a part uses more than one clef, more
-    #       than one @n is picked up, so more than one staff appears---though all the notes are put
-    #       in the highest relevant staff
-    allPartNs = allPartsPresent(documentRoot.findall('.//{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)))
-
-    # holds the music21.stream.Part that we're building
-    parsed = {n: stream.Part() for n in allPartNs}
-    # holds things that should go in the following Measure
-    inNextMeasure = {n: stream.Part() for n in allPartNs}
-
-    # set the initial Instrument for each staff
-    for eachN in allPartNs:
-        eachStaffDef = staffDefFromElement(documentRoot.find(
-            './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)))
-        if eachStaffDef is not None:
-            parsed[eachN].append(eachStaffDef)
-        else:
-            # TODO: try another strategy to get instrument information
-            pass
-
-    # process a <scoreDef> tag that happen before a <section> tag
-    scoreDefResults = documentRoot.find('.//{mei}music//{mei}scoreDef'.format(mei=_MEINS))
-    if scoreDefResults is not None:
-        # scoreDefResults would be None if there is no <scoreDef> outside of a <section>, but...
-        # TODO: we don't actually know whether this <scoreDef> happens before or between <section>
-        scoreDefResults = scoreDefFromElement(scoreDefResults)
-        for allPartObject in scoreDefResults['all-part objects']:
-            for partN in allPartNs:
-                inNextMeasure[partN].append(allPartObject)
-
-    environLocal.printDebug('*** processing measures')
-
-    backupMeasureNum = 0
-    for eachSection in documentRoot.iterfind('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
-        # TODO: sections aren't divided or treated specially, yet
-        for eachObject in eachSection:
-            if '{http://www.music-encoding.org/ns/mei}measure' == eachObject.tag:
-                # TODO: MEI's "rptboth" barlines require handling at the multi-measure level
-                # TODO: follow the use of @n described on pg.585 (599) of the MEI Guidelines
-                backupMeasureNum += 1
-                # process all the stuff in the <measure>
-                measureResult = measureFromElement(eachObject, backupMeasureNum, allPartNs, slurBundle=slurBundle)
-                # process and append each part's stuff to the staff
-                for eachN in allPartNs:
-                    # TODO: what if an @n doesn't exist in this <measure>?
-                    # insert objects specified in the immediately-preceding <scoreDef>
-                    for eachThing in inNextMeasure[eachN]:
-                        measureResult[eachN].insert(0, eachThing)
-                    inNextMeasure[eachN] = []
-                    # if it's the first measure, pad for a possible anacrusis
-                    # TODO: this may have to change when @n is better set
-                    # TODO: this doesn't actually solve the "pick-up measure" problem
-                    if 1 == backupMeasureNum:
-                        measureResult[eachN].padAsAnacrusis()
-                    # add this Measure to the Part
-                    parsed[eachN].append(measureResult[eachN])
-            elif '{http://www.music-encoding.org/ns/mei}scoreDef' == eachObject.tag:
-                scoreDefResults = scoreDefFromElement(eachObject)
-                # spread all-part elements across all the parts
-                for allPartObject in scoreDefResults['all-part objects']:
-                    for partN in allPartNs:
-                        inNextMeasure[partN].append(allPartObject)
-            elif '{http://www.music-encoding.org/ns/mei}staffDef' == eachObject.tag:
-                whichPart = eachObject.get('n')
-                # to process this here, we need @n. But if something refers to this <staffDef> with
-                # the @xml:id, it may not have an @n
-                if whichPart is not None:
-                    staffDefResults = staffDefFromElement(eachObject)
-                    for thisPartObject in staffDefResults:
-                        parsed[whichPart].append(thisPartObject)
-            elif eachObject.tag not in _IGNORE_UNPROCESSED:
-                environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
-
-    # TODO: check if there's anything left in "inNextMeasure"
-
-    # Convert the dict to a Score
-    # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
-    # document. Iterating the keys in "parsed" would not preserve the order.
-    environLocal.printDebug('*** making the Score')
-    parsed = [parsed[n] for n in allPartNs]
-    post = stream.Score(parsed)
-
-    # process tuplets indicated by the "m21TupletSearch" attribute (i.e., in the MEI file these are
-    # encoded with a <tupletSpan> that has @startid and @endid but not @plist).
-    post = _postGuessTuplets(post)
-
-    # insert metadata
-    post.metadata = makeMetadata(documentRoot)
-
-    # put slurs in the Score
-    post.append(slurBundle.list)
-
-    return post
-
-
 def safePitch(name, accidental=None, octave=''):
     '''
     Safely build a :class:`Pitch` from a string.
