@@ -208,7 +208,7 @@ class MeiToM21Converter(object):
 
         environLocal.printDebug('*** preprocessing spanning elements')
 
-        _ppSlurs(self.documentRoot, self.m21Attr, self.slurBundle)
+        _ppSlurs(self)
         _ppTies(self.documentRoot, self.m21Attr)
         _ppBeams(self.documentRoot, self.m21Attr)
         _ppTuplets(self.documentRoot, self.m21Attr)
@@ -567,27 +567,22 @@ def _sharpsFromAttr(signature):
 
 # "Preprocessing" and "Postprocessing" Functions for convertFromString()
 #------------------------------------------------------------------------------
-def _ppSlurs(documentRoot, m21Attr, slurBundle):
+def _ppSlurs(theConverter):
     '''
     Pre-processing helper for :func:`convertFromString` that handles slurs specified in <slur>
-    elements.
+    elements. The input is a :class:`MeiToM21Converter` with data about the file currently being
+    processed. This function reads from ``theConverter.documentRoot`` and writes into
+    ``theConverter.m21Attr`` and ``theConverter.slurBundle``.
 
-    :param documentRoot: The root tag of the MEI document being imported.
-    :type documentRoot: :class:`xml.etree.ElementTree.Element`
-    :param m21Attr: A mapping of @xml:id attributes to mappings of attributes-to-values on the
-        element with that @xml:id (read below for more information).
-    :type m21Attr: defaultdict
-    :param slurBundle: The :class:`SpannerBundle` that holds :class:`Slur` objects for the MEI
-        document being imported.
-    :type slurBundle: :class:`music21.spanner.SpannerBundle`
-    :returns: The ``m21Attr`` mapping after specified transformations.
-    :rtype: defaultdict
+    :param theConverter: The object responsible for storing data about this import.
+    :type theConverter: :class:`MeiToM21Converter`.
 
-    **Example of ``m21Attr``**
+    **Example of Changes to ``m21Attr``**
 
-    The ``m21Attr`` argument must be a defaultdict that returns an empty (regular) dict for
-    non-existant keys. The defaultdict stores the @xml:id attribute of an element; the dict holds
-    attribute names and their values that should be added to the element with the given @xml:id.
+    The ``theConverter.m21Attr`` attribute must be a defaultdict that returns an empty (regular)
+    dict for non-existant keys. The defaultdict stores the @xml:id attribute of an element; the
+    dict holds attribute names and their values that should be added to the element with the
+    given @xml:id.
 
     For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
     element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
@@ -600,20 +595,20 @@ def _ppSlurs(documentRoot, m21Attr, slurBundle):
     ``idLocal`` of ``'82f87cd7'``.
     '''
     environLocal.printDebug('*** pre-processing slurs')
+    # for readability, we use a single-letter variable
+    c = theConverter  # pylint: disable=invalid-name
     # pre-processing for <slur> tags
-    for eachSlur in documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
+    for eachSlur in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
         if eachSlur.get('startid') is not None and eachSlur.get('endid') is not None:
             thisIdLocal = str(uuid4())
             thisSlur = spanner.Slur()
             thisSlur.idLocal = thisIdLocal
-            slurBundle.append(thisSlur)
+            c.slurBundle.append(thisSlur)
 
-            m21Attr[removeOctothorpe(eachSlur.get('startid'))]['m21SlurStart'] = thisIdLocal
-            m21Attr[removeOctothorpe(eachSlur.get('endid'))]['m21SlurEnd'] = thisIdLocal
+            c.m21Attr[removeOctothorpe(eachSlur.get('startid'))]['m21SlurStart'] = thisIdLocal
+            c.m21Attr[removeOctothorpe(eachSlur.get('endid'))]['m21SlurEnd'] = thisIdLocal
         else:
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<slur>', '@startid and @endid'))
-
-    return m21Attr
 
 
 def _ppTies(documentRoot, m21Attr):
