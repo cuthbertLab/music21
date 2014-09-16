@@ -888,9 +888,10 @@ class ConverterMEI(SubConverter):
         '''
         from music21 import mei
         if dataString.startswith('mei:'):
-            self._stream = mei.convertFromString(dataString[4:])
-        else:
-            self._stream = mei.convertFromString(dataString)
+            dataString = dataString[4:]
+
+        self._stream = mei.MeiToM21Converter(dataString).run()
+
         return self._stream
 
     def checkShowAbility(self, **keywords):
@@ -939,11 +940,11 @@ class Test(unittest.TestCase):
             except ImportError:
                 # last resort
                 from music21.ext import mock
-        with mock.patch('music21.mei') as mock_mei:
+        with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             from music21 import mei
             testConverter = ConverterMEI()
             testConverter.parseData('mei: <?xml><mei><note/></mei>')
-            mock_mei.convertFromString.assert_called_once_with(' <?xml><mei><note/></mei>')
+            mockConv.assert_called_once_with(' <?xml><mei><note/></mei>')
 
     def testImportMei2(self):
         # when the string doesn't start with "mei:"
@@ -957,11 +958,11 @@ class Test(unittest.TestCase):
             except ImportError:
                 # last resort
                 from music21.ext import mock
-        with mock.patch('music21.mei') as mock_mei:
+        with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             from music21 import mei
             testConverter = ConverterMEI()
             testConverter.parseData('<?xml><mei><note/></mei>')
-            mock_mei.convertFromString.assert_called_once_with('<?xml><mei><note/></mei>')
+            mockConv.assert_called_once_with('<?xml><mei><note/></mei>')
 
         
 class TestExternal(unittest.TestCase):

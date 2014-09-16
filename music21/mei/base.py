@@ -16,6 +16,20 @@ To convert a string with MEI markup into music21 objects, use :func:`convertFrom
 In the future, most of the functions in this module should be moved to a separate, import-only
 module, so that functions for writing music21-to-MEI will fit nicely.
 
+**Simple "How-To"**
+
+Use :class:`MeiToM21Converter` to convert a string to a set of music21 objects. In the future, the
+:class:`M21ToMeiConverter` class will convert a set of music21 objects into a string with an MEI
+document.
+
+TODO: make this use an actual file
+>> from music21 import *
+>> meiString = convert_some_file_to_a_string()
+>> conv = mei.MeiToM21Converter(meiString)
+>> result = conv.run()
+>> type(result)
+<class 'music21.stream.Score'>
+
 **Ignored Elements**
 
 The following elements are not yet imported, though you might expect they would be:
@@ -139,6 +153,32 @@ _MISSING_VOICE_ID = 'Found a <layer> without @n attribute and no override.'
 _CANNOT_FIND_XMLID = 'Could not find the @{} so we could not create the {}.'
 _MISSING_TUPLET_DATA = 'Both @num and @numbase attributes are required on <tuplet> tags.'
 _UNIMPLEMENTED_IMPORT = 'Importing {} without {} is not yet supported.'
+
+
+# Module-level Functions
+#------------------------------------------------------------------------------
+class MeiToM21Converter(object):
+    '''
+    A :class:`MeiToM21Converter` instance manages the conversion of an MEI document into music21
+    objects.
+    '''
+
+    def __init__(self, theDocument):
+        '''
+        :param str theDocument: A string containing an MEI document.
+        '''
+        # TODO: the conversion to an ElementTree goes here
+        self._theDocument = theDocument
+
+    def run(self):
+        '''
+        Convert a string that is an MEI document into a music21 object.
+
+        :return: The :class:`Score` corresponding to the MEI document.
+        :rtype: :class:`music21.stream.Score`
+        '''
+        # TODO: this replaces convertFromString()
+        return convertFromString(self._theDocument)
 
 
 # Module-level Functions
