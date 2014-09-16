@@ -232,13 +232,8 @@ class MeiToM21Converter(object):
         environLocal.printDebug('*** preparing part and staff definitions')
 
         # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
-        # corresponds to what will be a music21 Part. The specificer, the better. What I want to do is
-        # get all the <staffDef> tags that are in the <score>, no matter where they appear. This is just
-        # to fetch everything that will affect the maximum number of parts that might happen at a time.
-        # TODO: this doesn't always work. For some scores where a part uses more than one clef, more
-        #       than one @n is picked up, so more than one staff appears---though all the notes are put
-        #       in the highest relevant staff
-        allPartNs = allPartsPresent(self.documentRoot.findall('.//{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)))
+        # corresponds to what will be a music21 Part.
+        allPartNs = allPartsPresent(self)
 
         # holds the music21.stream.Part that we're building
         parsed = {n: stream.Part() for n in allPartNs}
@@ -393,32 +388,56 @@ def makeDuration(base=0.0, dots=0):
                              dots=dots)
 
 
-def allPartsPresent(allStaffDefs):
+def allPartsPresent(theConverter):
     # pylint: disable=line-too-long
     '''
-    Given an iterable of all <staffDef> :class:`Element` objects in an MEI file, deduplicate the @n
-    attributes, yielding a list of all @n attributes in the <score>.
+    Use an :class:`MeiToM21Converter` to find the @n values for all the <staffDef> elements in the
+    MEI document. This assumes that every MEI <staff> corresponds to a music21 :class:`Part`. This
+    function reads from ``theConverter.documentRoot``.
 
-    :param allStaffDefs: All the <staffDef> elements in a <score>.
-    :type allStaffDefs: iterable of :class:`~xml.etree.ElementTree.Element`
-    :returns: All the unique @n values in the <score>.
+    :param theConverter: An :class:`MeiToM21Converter` instance.
+    :returns: All the unique @n values associated with a part in the <score>.
     :rtype: tuple of str
 
-    ``allStaffDefs`` should probably be the result of this XPath query:::
-        documentRoot.findall('.//score//staffDef')
+    **Example**
 
-    But of course you must prefix it with the MEI namespace, so it's actually this:::
-        documentRoot.findall('.//{http://www.music-encoding.org/ns/mei}score//{http://www.music-encoding.org/ns/mei}staffDef')
+    >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    ...     <music><score>
+    ...     <scoreDef>
+    ...         <staffGrp>
+    ...             <staffDef n="1" clef.shape="G" clef.line="2"/>
+    ...             <staffDef n="2" clef.shape="F" clef.line="4"/>
+    ...         </staffGrp>
+    ...     </scoreDef>
+    ...     <section>
+    ...         <!-- ... some music ... -->
+    ...         <staffDef n="2" clef.shape="C" clef.line="4"/>
+    ...         <!-- ... some music ... -->
+    ...     </section>
+    ...     </score></music>
+    ... </mei>"""
+    >>> from music21 import *
+    >>> theConverter = mei.base.MeiToM21Converter(meiDoc)
+    >>> mei.base.allPartsPresent(theConverter)
+    ('1', '2')
 
-    If you don't do this, you may get misleading <staffDef> tags from, for example, the incipit.
+    Even though there are three <staffDef> elements in the document, there are only two unique @n
+    attributes. The second appearance of <staffDef> with @n="2" signals a change of clef on that
+    same staff---not that there is a new staff.
     '''
-    post = []
-    for staffDef in allStaffDefs:
-        if staffDef.get('n') not in post:
-            post.append(staffDef.get('n'))
-    if 0 == len(post):
+    # TODO: this doesn't always work. For some scores where a part uses more than one clef, more
+    #       than one @n is picked up, so more than one staff appears---though all the notes are put
+    #       in the highest relevant staff
+    xpathQuery = './/{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)
+    partNs = []  # hold the @n attribute for all the parts
+
+    for staffDef in theConverter.documentRoot.findall(xpathQuery):
+        if staffDef.get('n') not in partNs:
+            partNs.append(staffDef.get('n'))
+    if 0 == len(partNs):
         raise MeiValidityError(_SEEMINGLY_NO_PARTS)
-    return tuple(post)
+    return tuple(partNs)
 
 
 # Constants for One-to-One Translation
