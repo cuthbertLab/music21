@@ -484,6 +484,10 @@ def _attrTranslator(attr, name, mapping):
 def _accidentalFromAttr(attr):
     '''
     Use :func:`_attrTranslator` to convert the value of an "accid" attribute to its music21 string.
+
+    >>> from music21 import *
+    >>> mei.base._accidentalFromAttr('s')
+    '#'
     '''
     return _attrTranslator(attr, 'accid', _ACCID_ATTR_DICT)
 
@@ -491,6 +495,10 @@ def _accidentalFromAttr(attr):
 def _qlDurationFromAttr(attr):
     '''
     Use :func:`_attrTranslator` to convert an MEI "dur" attribute to a music21 quarterLength.
+
+    >>> from music21 import *
+    >>> mei.base._qlDurationFromAttr('4')
+    1.0
 
     .. note:: This function only handles data.DURATION.cmn, not data.DURATION.mensural.
     '''
