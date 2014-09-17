@@ -626,6 +626,17 @@ def _ppSlurs(theConverter):
     :param theConverter: The object responsible for storing data about this import.
     :type theConverter: :class:`MeiToM21Converter`.
 
+    **This Preprocessor**
+
+    The slur preprocessor adds @m21SlurStart and @m21SlurEnd attributes to elements that are at the
+    beginning or end of a slur. The value of these attributes is the ``idLocal`` of a :class:`Slur`
+    in the :attr:`slurBundle` attribute of ``theConverter``. This attribute is not part of the MEI
+    specification, and must therefore be handled specially.
+
+    If :func:`noteFromElement` encounters an element like ``<note m21SlurStart="82f87cd7"/>``, the
+    resulting :class:`music21.note.Note` should be set as the starting point of the slur with an
+    ``idLocal`` of ``'82f87cd7'``.
+
     **Example of Changes to ``m21Attr``**
 
     The ``theConverter.m21Attr`` attribute must be a defaultdict that returns an empty (regular)
@@ -636,12 +647,40 @@ def _ppSlurs(theConverter):
     For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
     element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
 
-    **This Preprocessor**
-    The slur preprocessor adds @m21SlurStart and @m21SlurEnd attributes. The value of these
-    attributes is the ``idLocal`` of a :class:`Slur` in the ``slurBundle`` argument. This means, for
-    example, that if you encounter an element like ``<note m21SlurStart="82f87cd7"/>``, the
-    resulting :class:`music21.note.Note` should be set as the starting point of the slur with and
-    ``idLocal`` of ``'82f87cd7'``.
+    **Example**
+
+    Consider the following example.
+
+    >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    ...     <music><score>
+    ...     <section>
+    ...         <note xml:id="1234"/>
+    ...         <note xml:id="2345"/>
+    ...         <slur startid="#1234" endid="#2345"/>
+    ...     </section>
+    ...     </score></music>
+    ... </mei>"""
+    >>> from music21 import *
+    >>> theConverter = mei.base.MeiToM21Converter(meiDoc)
+    >>>
+    >>> mei.base._ppSlurs(theConverter)
+    >>> 'm21SlurStart' in theConverter.m21Attr['1234']
+    True
+    >>> 'm21SlurEnd' in theConverter.m21Attr['2345']
+    True
+    >>> theConverter.slurBundle
+    <music21.spanner.SpannerBundle of size 1>
+    >>> (theConverter.m21Attr['1234']['m21SlurStart'] ==
+    ...  theConverter.m21Attr['2345']['m21SlurEnd'] ==
+    ...  theConverter.slurBundle.list[0].idLocal)
+    True
+
+    This example is a little artificial because of the limitations of a doctest, where we need to
+    know all values in advance. The point here is that the values of 'm21SlurStart' and 'm21SlurEnd'
+    of a particular slur-attached object will match the 'idLocal' of a slur in :attr:`slurBundle`.
+    The "id" is a UUID determined at runtime, which looks something like
+    ``'d3731f89-8a2f-4b82-ad02-f0bc6f5f8b04'``.
     '''
     environLocal.printDebug('*** pre-processing slurs')
     # for readability, we use a single-letter variable
@@ -670,6 +709,11 @@ def _ppTies(theConverter):
     :param theConverter: The object responsible for storing data about this import.
     :type theConverter: :class:`MeiToM21Converter`.
 
+    **This Preprocessor**
+
+    The tie preprocessor works similarly to the slur preprocessor, adding @tie attributes. The
+    value of these attributes conforms to the MEI Guidelines, so no special action is required.
+
     **Example of ``m21Attr``**
 
     The ``theConverter.m21Attr`` attribute must be a defaultdict that returns an empty (regular)
@@ -679,10 +723,6 @@ def _ppTies(theConverter):
 
     For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
     element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
-
-    **This Preprocessor**
-    The tie preprocessor adds @tie attributes. The value of these attributes conforms to the MEI
-    Guidelines, so no special action is required.
     '''
     environLocal.printDebug('*** pre-processing ties')
     # for readability, we use a single-letter variable
@@ -706,6 +746,13 @@ def _ppBeams(theConverter):
     :param theConverter: The object responsible for storing data about this import.
     :type theConverter: :class:`MeiToM21Converter`.
 
+    **This Preprocessor**
+
+    The beam preprocessor works similarly to the slur preprocessor, adding the @m21Beam attribute.
+    The value of this attribute is either ``'start'``, ``'continue'``, or ``'stop'``, indicating
+    the music21 ``type`` of the primary beam attached to this element. This attribute is not
+    part of the MEI specification, and must therefore be handled specially.
+
     **Example of ``m21Attr``**
 
     The ``theConverter.m21Attr`` argument must be a defaultdict that returns an empty (regular)
@@ -715,11 +762,6 @@ def _ppBeams(theConverter):
 
     For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
     element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
-
-    **This Preprocessor**
-    The beam preprocessor adds the @m21Beam attribute. The value of this attribute is either
-    ``'start'``, ``'continue'``, or ``'stop'``, indicating the music21 ``type`` of the primary
-    beam attached to this element.
     '''
     environLocal.printDebug('*** pre-processing beams')
     # for readability, we use a single-letter variable
@@ -755,6 +797,15 @@ def _ppTuplets(theConverter):
     :param theConverter: The object responsible for storing data about this import.
     :type theConverter: :class:`MeiToM21Converter`.
 
+    **This Preprocessor**
+
+    The slur preprocessor works similarly to the slur preprocessor, adding @m21TupletNum and
+    @m21TupletNumbase attributes. The value of these attributes corresponds to the @num and
+    @numbase attributes found on a <tuplet> element. This preprocessor also performs a significant
+    amount of guesswork to try to handle <tupletSpan> elements that do not include a @plist
+    attribute. This attribute is not part of the MEI specification, and must therefore be handled
+    specially.
+
     **Example of ``m21Attr``**
 
     The ``theConverter.m21Attr`` attribute must be a defaultdict that returns an empty (regular)
@@ -764,13 +815,6 @@ def _ppTuplets(theConverter):
 
     For example, if the value of ``m21Attr['fe93129e']['tie']`` is ``'i'``, then this means the
     element with an @xml:id of ``'fe93129e'`` should have the @tie attribute set to ``'i'``.
-
-    **This Preprocessor**
-    The slur preprocessor adds @m21TupletNum and @m21TupletNumbase attributes. The value of these
-    attributes corresponds to the @num and @numbase attributes found on a <tuplet> element.
-
-    This preprocessor also performs a significant amount of guesswork to try to handle <tupletSpan>
-    elements that do not include a @plist attribute.
     '''
     environLocal.printDebug('*** pre-processing tuplets')
     # for readability, we use a single-letter variable
