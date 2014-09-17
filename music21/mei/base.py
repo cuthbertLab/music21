@@ -1849,6 +1849,8 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     **Contained Elements not Implemented:** none
     '''
+    # NOTE: keep this in sync with spaceFromElement()
+
     post = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
 
@@ -1887,7 +1889,19 @@ def spaceFromElement(elem, slurBundle=None):
 
     .. note:: Since music21 lacks "spacer" objects, this is imported as a :class:`~music21.note.Rest`.
     '''
-    return restFromElement(elem, slurBundle)
+    # NOTE: keep this in sync with restFromElement()
+
+    post = note.SpacerRest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
+                                                 int(elem.get('dots', 0))))
+
+    if elem.get(_XMLID) is not None:
+        post.id = elem.get(_XMLID)
+
+    # tuplets
+    if elem.get('m21TupletNum') is not None:
+        post = scaleToTuplet(post, elem)
+
+    return post
 
 
 def mSpaceFromElement(elem, slurBundle=None):

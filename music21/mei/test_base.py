@@ -756,7 +756,7 @@ class TestNoteFromElement(unittest.TestCase):
 
 #------------------------------------------------------------------------------
 class TestRestFromElement(unittest.TestCase):
-    '''Tests for restFromElement()'''
+    '''Tests for restFromElement() and spaceFromElement()'''
 
     @mock.patch('music21.note.Rest')
     @mock.patch('music21.mei.base.makeDuration')
@@ -793,6 +793,47 @@ class TestRestFromElement(unittest.TestCase):
                                              'm21TupletType': 'start'})
 
         actual = base.restFromElement(elem)
+
+        self.assertEqual(Fraction(6, 5), actual.quarterLength)
+        self.assertEqual(1, actual.duration.dots)
+        self.assertEqual('the id', actual.id)
+        self.assertEqual('start', actual.duration.tuplets[0].type)
+
+    @mock.patch('music21.note.SpacerRest')
+    @mock.patch('music21.mei.base.makeDuration')
+    @mock.patch('music21.mei.base.scaleToTuplet')
+    def testUnit2(self, mockTuplet, mockMakeDur, mockSpacer):
+        '''
+        spaceFromElement(): test @dur, @dots, @xml:id, and tuplet-related attributes
+        '''
+        elem = ETree.Element('rest', attrib={'dur': '4', 'dots': '1', _XMLID: 'the id',
+                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                             'm21TupletType': 'start'})
+        mockMakeDur.return_value = 'the duration'
+        mockNewSpace = mock.MagicMock('new rest')
+        mockSpacer.return_value = mockNewSpace
+        mockTuplet.return_value = 'tupletized'
+        expected = mockTuplet.return_value
+
+        actual = base.spaceFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        mockSpacer.assert_called_once_with(duration=mockMakeDur.return_value)
+        mockMakeDur.assert_called_once_with(1.0, 1)
+        mockTuplet.assert_called_once_with(mockSpacer.return_value, elem)
+        self.assertEqual('the id', mockNewSpace.id)
+
+    def testIntegration2(self):
+        '''
+        spaceFromElement(): test @dur, @dots, @xml:id, and tuplet-related attributes
+
+        (without mock objects)
+        '''
+        elem = ETree.Element('space', attrib={'dur': '4', 'dots': '1', _XMLID: 'the id',
+                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                             'm21TupletType': 'start'})
+
+        actual = base.spaceFromElement(elem)
 
         self.assertEqual(Fraction(6, 5), actual.quarterLength)
         self.assertEqual(1, actual.duration.dots)
