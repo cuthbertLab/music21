@@ -1009,11 +1009,11 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
 
     Because there is no ``'rest'`` key in the ``mapping``, that :class:`Element` is ignored:
 
-    >>> from xml.etree.ElementTree import Element  #_DOCS_HIDE
-    >>> from music21.mei.base import _processEmbeddedElements  #_DOCS_HIDE
+    >>> from xml.etree.ElementTree import Element
+    >>> from music21 import *
     >>> elements = [Element('note'), Element('rest'), Element('note')]
     >>> mapping = {'note': lambda x, y: note.Note('D2')}
-    >>> _processEmbeddedElements(elements, mapping)
+    >>> mei.base._processEmbeddedElements(elements, mapping)
     [<music21.note.Note D>, <music21.note.Note D>]
 
     The "beam" element holds "note" elements. All elements appear in a single level of the list:
@@ -1021,7 +1021,7 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
     >>> elements = [Element('note'), Element('beam'), Element('note')]
     >>> mapping = {'note': lambda x, y: note.Note('D2'),
     ...            'beam': lambda x, y: [note.Note('E2') for _ in range(2)]}
-    >>> _processEmbeddedElements(elements, mapping)
+    >>> mei.base._processEmbeddedElements(elements, mapping)
     [<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note E>, <music21.note.Note D>]
     '''
     post = []
