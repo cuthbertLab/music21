@@ -2116,8 +2116,6 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
 
 def beamFromElement(elem, slurBundle=None):
-    # TODO: nested <beam> tags. This requires adjusting the beam.Beams object differently for
-    #       every level, which seems to require knowing which level to adjust. Hmm.
     # TODO: write tests
     '''
     <beam> A container for a series of explicitly beamed events that begins and ends entirely
@@ -2125,12 +2123,33 @@ def beamFromElement(elem, slurBundle=None):
 
     In MEI 2013: pg.264 (278 in PDF) (MEI.cmn module)
 
-    :param elem: The ``<beam>`` tag to process.
+    :param elem: The ``<beam>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :returns: An iterable of all the objects contained within the ``<beam>`` container.
     :rtype: list of :class:`~music21.base.Music21Object`
 
-    .. note:: Nested <beam> tags do not yet import properly.
+    **Example**
+
+    Here, three :class:`Note` objects are beamed together. Take note that the function returns
+    a list of three objects, none of which is a :class:`Beam` or similar.
+
+    >>> from xml.etree import ElementTree as ET
+    >>> from music21 import *
+    >>> meiSnippet = """<beam xmlns="http://www.music-encoding.org/ns/mei">
+    ...     <note pname='A' oct='7'/>
+    ...     <note pname='B' oct='7'/>
+    ...     <note pname='C' oct='6'/>
+    ... </beam>"""
+    >>> meiSnippet = ET.fromstring(meiSnippet)
+    >>> result = mei.base.beamFromElement(meiSnippet)
+    >>> len(result)
+    3
+    >>> result[0].pitch.nameWithOctave
+    'A7'
+    >>> result[1].pitch.nameWithOctave
+    'B7'
+    >>> result[2].pitch.nameWithOctave
+    'C6'
 
     **Attributes/Elements Implemented:**
 
