@@ -30,13 +30,26 @@ TODO: make this use an actual file
 >> type(result)
 <class 'music21.stream.Score'>
 
+**Terminology**
+
+This module's documentation adheres to the following terminology regarding XML documents, using
+this snippet, ``<note pname="C"/>`` as an example:
+
+- the entire snippet is an *element*.
+- the word ``note`` is the *tag*.
+- the word ``pname`` is an *attribute*.
+- the letter ``C`` is a *value*.
+
+Because Python also uses "attributes," an XML attribute is always preceded by an "at sign," as in
+@pname, whereas a Python attribute is set as :attr:`pname`.
+
 **Ignored Elements**
 
 The following elements are not yet imported, though you might expect they would be:
 
-* ``<sb>``: a system break, since this is not usually semantically significant
-* ``<lb>``: a line break, since this is not usually semantically significant
-* ``<pb>``: a page break, since this is not usually semantically significant
+* <sb>: a system break, since this is not usually semantically significant
+* <lb>: a line break, since this is not usually semantically significant
+* <pb>: a page break, since this is not usually semantically significant
 
 **Where Elements Are Processed**
 
@@ -161,17 +174,19 @@ class MeiToM21Converter(object):
     '''
     A :class:`MeiToM21Converter` instance manages the conversion of an MEI document into music21
     objects.
+
+    If ``theDocument`` does not have <mei> as the root element, the class raises an
+    :class:`MeiElementError`. If ``theDocument`` is not a valid XML file, the class raises an
+    :class:`MeiValidityError`.
+
+    :param str theDocument: A string containing an MEI document.
+    :raises: :exc:`MeiElementError` when the root element is not <mei>
+    :raises: :exc:`MeiValidityError` when the MEI file is not valid XML.
     '''
 
     def __init__(self, theDocument=None):
         '''
-        If ``theDocument`` does not have <mei> as the root element, the class raises an
-        :class:`MeiElementError`. If ``theDocument`` is not a valid XML file, the class raises an
-        :class:`MeiValidityError`.
-
-        :param str theDocument: A string containing an MEI document.
-        :raises: :exc:`MeiElementError` when the root element is not <mei>
-        :raises: :exc:`MeiValidityError` when the MEI file is not valid XML.
+        The __init__() documentation doesn't isn't processed by Sphinx, so I put it at class level.
         '''
         environLocal.printDebug('*** initializing MeiToM21Converter')
 
@@ -200,9 +215,9 @@ class MeiToM21Converter(object):
 
     def run(self):
         '''
-        Convert a string that is an MEI document into a music21 object.
+        Run conversion of the internal MEI document to produce a music21 object.
 
-        :returns: A :class:`Stream` subclass, depending on the markup in the ``dataStr``.
+        :returns: A :class:`Stream` subclass, depending on the MEI document.
         :rtype: :class:`music21.stream.Stream`
         '''
 
@@ -1359,37 +1374,40 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     :rtype: dict of list of :class:`Music21Objects`
 
     **Attributes/Elements Implemented:**
+
     - (att.meterSigDefault.log (@meter.count, @meter.unit))
     - (att.keySigDefault.log (@key.accid, @key.mode, @key.pname, @key.sig))
 
-    **Attributes/Elements in Testing:**
-    - none
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-               (att.id (@xml:id))
-    att.scoreDef.log (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place))
-                     (att.duration.default (@dur.default, @num.default, @numbase.default))
-                     (att.keySigDefault.log (@key.sig.mixed))
-                     (att.octavedefault (@octave.default))
-                     (att.transposition (@trans.diat, @trans.semi))
-                     (att.scoreDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
-                     (att.scoreDef.log.mensural (att.mensural.log (@mensur.dot, @mensur.sign,
-                                                                   @mensur.slash, @proport.num,
-                                                                   @proport.numbase)
-                                                (att.mensural.shared (@modusmaior, @modusminor,
-                                                                      @prolatio, @tempus))))
-    att.scoreDef.vis (all)
-    att.scoreDef.ges (all)
-    att.scoreDef.anl (none exist)
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.scoreDef.log
+
+        - (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place))
+        - (att.duration.default (@dur.default, @num.default, @numbase.default))
+        - (att.keySigDefault.log (@key.sig.mixed))
+        - (att.octavedefault (@octave.default))
+        - (att.transposition (@trans.diat, @trans.semi))
+        - (att.scoreDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
+        - (att.scoreDef.log.mensural
+
+            - (att.mensural.log (@mensur.dot, @mensur.sign, @mensur.slash, @proport.num, @proport.numbase)
+            - (att.mensural.shared (@modusmaior, @modusminor, @prolatio, @tempus))))
+
+    - att.scoreDef.vis (all)
+    - att.scoreDef.ges (all)
+    - att.scoreDef.anl (none exist)
 
     **Contained Elements not Implemented:**
-    MEI.cmn: meterSig meterSigGrp
-    MEI.harmony: chordTable
-    MEI.linkalign: timeline
-    MEI.midi: instrGrp
-    MEI.shared: keySig pgFoot pgFoot2 pgHead pgHead2 staffGrp
-    MEI.usersymbols: symbolTable
+
+    - MEI.cmn: meterSig meterSigGrp
+    - MEI.harmony: chordTable
+    - MEI.linkalign: timeline
+    - MEI.midi: instrGrp
+    - MEI.shared: keySig pgFoot pgFoot2 pgHead pgHead2 staffGrp
+    - MEI.usersymbols: symbolTable
     '''
     # make the dict
     allParts = 'all-part objects'
@@ -1419,6 +1437,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     :rtype: list of :class:`music21.instrument.Instrument` then :class:`music21.base.Music21Object`
 
     **Attributes/Elements Implemented:**
+
     - @label (att.common) as Instrument.partName
     - @label.abbr (att.labels.addl) as Instrument.partAbbreviation
     - @n (att.common) as Instrument.partId
@@ -1430,28 +1449,31 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - <clef> held within
 
     **Attributes/Elements Ignored:**
+
     - @key.sig.mixed (from att.keySigDefault.log)
 
-    **Attributes/Elements in Testing:**
-    - none
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
-    att.common (@n, @xml:base)
-               (att.id (@xml:id))
-    att.declaring (@decls)
-    att.staffDef.log (att.duration.default (@dur.default, @num.default, @numbase.default))
-                     (att.octavedefault (@octave.default))
-                     (att.staffDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
-                     (att.staffDef.log.mensural (att.mensural.log (@mensur.dot, @mensur.sign,
-                                                                   @mensur.slash, @proport.num,
-                                                                   @proport.numbase)
-                                                (att.mensural.shared (@modusmaior, @modusminor,
-                                                                      @prolatio, @tempus))))
-    att.staffDef.vis (all)
-    att.staffDef.ges (all)
-    att.staffDef.anl (none exist)
+
+    - att.common (@n, @xml:base) (att.id (@xml:id))
+    - att.declaring (@decls)
+    - att.staffDef.log
+
+        - (att.duration.default (@dur.default, @num.default, @numbase.default))
+        - (att.octavedefault (@octave.default))
+        - (att.staffDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
+        - (att.staffDef.log.mensural
+
+            - (att.mensural.log (@mensur.dot, @mensur.sign, @mensur.slash, @proport.num, @proport.numbase)
+            - (att.mensural.shared (@modusmaior, @modusminor, @prolatio, @tempus))))
+
+    - att.staffDef.vis (all)
+    - att.staffDef.ges (all)
+    - att.staffDef.anl (none exist)
 
     **Contained Elements not Implemented:**
+
     - MEI.cmn: meterSig meterSigGrp  TODO: these
     - MEI.mensural: mensur proport
     - MEI.shared: clefGrp keySig label layerDef  TODO: these
@@ -1503,22 +1525,19 @@ def dotFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.304 (318 in PDF) (MEI.shared module)
 
-    **Attributes/Elements Implemented:**
-    - none
+    **Attributes/Elements Implemented:** none
 
-    **Attributes/Elements in Testing:**
-    - none
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-               (att.id (@xml:id))
-    att.facsimile (@facs)
-    att.dot.log (all)
-    att.dot.vis (all)
-    att.dot.gesatt.dot.anl (all)
 
-    **Elements not Implemented:**
-    - none
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.facsimile (@facs)
+    - att.dot.log (all)
+    - att.dot.vis (all)
+    - att.dot.gesatt.dot.anl (all)
+
+    **Elements not Implemented:** none
     '''
     # TODO: implement @plist, in att.dot.log
     return 1
@@ -1530,27 +1549,31 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.259 (273 in PDF) (MEI.shared module)
 
-    **Attributes Implemented:**
-    - none
+    **Attributes Implemented:** none
 
     **Attributes/Elements in Testing:**
+
     - @artic
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-               (att.id (@xml:id))
-    att.facsimile (@facs)
-    att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
-    att.artic.log (att.controlevent (att.plist (@plist, @evaluate))  # TODO: this
-                                    (att.timestamp.musical (@tstamp))
-                                    (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                                    (att.staffident (@staff))
-                                    (att.layerident (@layer)))
-    att.artic.vis (all)
-    att.artic.gesatt.artic.anl (all)
 
-    **Contained Elements not Implemented:**
-    - none
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.facsimile (@facs)
+    - att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
+    - att.artic.log
+
+        - (att.controlevent
+
+            - (att.plist (@plist, @evaluate))  # TODO: this
+            - (att.timestamp.musical (@tstamp))
+            - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+            - (att.staffident (@staff))
+            - (att.layerident (@layer)))
+
+    - att.artic.vis (all)
+    - att.artic.gesatt.artic.anl (all)
+
+    **Contained Elements not Implemented:** none
     '''
     return _makeArticList(elem.get('artic'))
 
@@ -1561,27 +1584,30 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.248 (262 in PDF) (MEI.shared module)
 
-    **Attributes/Elements Implemented:**
-    - none
+    **Attributes/Elements Implemented:** none
 
     **Attributes/Elements in Testing:**
+
     - @accid (from att.accid.log)
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-               (att.id (@xml:id))
-    att.facsimile (@facs)
-    att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
-    att.accid.log (@func)
-                  (att.controlevent (att.plist (@plist, @evaluate))  # TODO: this
-                                    (att.timestamp.musical (@tstamp))
-                                    (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                                    (att.staffident (@staff)) (att.layerident (@layer)))
-    att.accid.vis (all)
-    att.accid.gesatt.accid.anl (all)
 
-    **Contained Elements not Implemented:**
-    - none
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.facsimile (@facs)
+    - att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
+    - att.accid.log (@func)
+
+        - (att.controlevent
+
+            - (att.plist (@plist, @evaluate))  # TODO: this
+            - (att.timestamp.musical (@tstamp))
+            - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+            - (att.staffident (@staff)) (att.layerident (@layer)))
+
+    - att.accid.vis (all)
+    - att.accid.gesatt.accid.anl (all)
+
+    **Contained Elements not Implemented:** none
     '''
     return _accidentalFromAttr(elem.get('accid'))
 
@@ -1597,6 +1623,7 @@ def noteFromElement(elem, slurBundle=None):
         spanners to :class:`Note` objects, so @xml:id *must* be imported from the MEI file.
 
     **Attributes/Elements Implemented:**
+
     - @accid and <accid>
     - @pname, from att.pitch: [a--g]
     - @oct, from att.octave: [0..9]
@@ -1610,38 +1637,56 @@ def noteFromElement(elem, slurBundle=None):
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
     **Attributes/Elements in Testing:**
+
     - @tuplet, (many of "[i|m|t][1-6]") ??????
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-    att.facsimile (@facs)
-    att.note.log (att.event (att.timestamp.musical (@tstamp))
-                            (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                            (att.staffident (@staff))
-                            (att.layerident (@layer)))
-                 (att.fermatapresent (@fermata))
-                 (att.syltext (@syl))
-                 (att.note.log.cmn (att.beamed (@beam))
-                                   (att.lvpresent (@lv))
-                                   (att.ornam (@ornam)))
-                 (att.note.log.mensural (@lig))
-    att.note.vis (all)
-    att.note.ges (@oct.ges, @pname.ges, @pnum)
-                 (att.accidental.performed (@accid.ges))  # TODO: consider this, in relation to key signature
-                 (att.articulation.performed (@artic.ges))
-                 (att.duration.performed (@dur.ges))
-                 (att.instrumentident (@instr))
-                 (att.note.ges.cmn (@gliss)
-                                   (att.graced (@grace, @grace.time)))  <-- partially implemented
-                 (att.note.ges.mensural (att.duration.ratio (@num, @numbase)))
-                 (att.note.ges.tablature (@tab.fret, @tab.string))
-    att.note.anl (all)
+
+    - att.common (@label, @n, @xml:base)
+    - att.facsimile (@facs)
+    - att.note.log
+
+        - (att.event
+
+            - (att.timestamp.musical (@tstamp))
+            - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+            - (att.staffident (@staff))
+            - (att.layerident (@layer)))
+
+        - (att.fermatapresent (@fermata))
+        - (att.syltext (@syl))
+        - (att.note.log.cmn
+
+            - (att.beamed (@beam))
+            - (att.lvpresent (@lv))
+            - (att.ornam (@ornam)))
+
+        - (att.note.log.mensural (@lig))
+
+    - att.note.vis (all)
+
+    - att.note.ges
+
+        - (@oct.ges, @pname.ges, @pnum)
+        - (att.accidental.performed (@accid.ges))  # TODO: consider this, in relation to key signature
+        - att.articulation.performed (@artic.ges))
+        - (att.duration.performed (@dur.ges))
+        - (att.instrumentident (@instr))
+        - (att.note.ges.cmn (@gliss)
+
+            - (att.graced (@grace, @grace.time)))  <-- partially implemented
+
+        - (att.note.ges.mensural (att.duration.ratio (@num, @numbase)))
+        - (att.note.ges.tablature (@tab.fret, @tab.string))
+
+    - att.note.anl (all)
 
     **Contained Elements not Implemented:**
-    MEI.critapp: app
-    MEI.edittrans: (all)
-    MEI.lyrics: verse
-    MEI.shared: syl
+
+    - MEI.critapp: app
+    - MEI.edittrans: (all)
+    - MEI.lyrics: verse
+    - MEI.shared: syl
     '''
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}dot': dotFromElement,
                      '{http://www.music-encoding.org/ns/mei}artic': articFromElement,
@@ -1708,29 +1753,38 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     In MEI 2013: pg.424 (438 in PDF) (MEI.shared module)
 
     **Attributes/Elements Implemented:**
+
     - xml:id (or id), an XML id (submitted as the Music21Object "id")
     - dur, from att.duration.musical: (via _qlDurationFromAttr())
     - dots, from att.augmentdots: [0..4]
 
     **Attributes/Elements in Testing:**
+
     - none
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-    att.facsimile (@facs)
-    att.rest.log (att.event (att.timestamp.musical (@tstamp))
-                            (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                            (att.staffident (@staff))
-                            (att.layerident (@layer)))
-                 (att.fermatapresent (@fermata))
-                 (att.tupletpresent (@tuplet))
-                 (att.rest.log.cmn (att.beamed (@beam)))
-    att.rest.vis (all)
-    att.rest.ges (all)
-    att.rest.anl (all)
 
-    **Contained Elements not Implemented:**
-    - none
+    - att.common (@label, @n, @xml:base)
+    - att.facsimile (@facs)
+    - att.rest.log
+
+        - (att.event
+
+            - (att.timestamp.musical (@tstamp))
+            - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+            - (att.staffident (@staff))
+            - (att.layerident (@layer)))
+
+        - (att.fermatapresent (@fermata))
+
+            - (att.tupletpresent (@tuplet))
+            - (att.rest.log.cmn (att.beamed (@beam)))
+
+    - att.rest.vis (all)
+    - att.rest.ges (all)
+    - att.rest.anl (all)
+
+    **Contained Elements not Implemented:** none
     '''
     post = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
@@ -1794,6 +1848,7 @@ def chordFromElement(elem, slurBundle=None):
     In MEI 2013: pg.280 (294 in PDF) (MEI.shared module)
 
     **Attributes/Elements Implemented:**
+
     - @xml:id (or id), an XML id (submitted as the Music21Object "id")
     - <note> contained within
     - @dur, from att.duration.musical: (via _qlDurationFromAttr())
@@ -1803,30 +1858,44 @@ def chordFromElement(elem, slurBundle=None):
     - @slur, (many of "[i|m|t][1-6]")
 
     **Attributes/Elements in Testing:**
+
     - @tuplet, (many of "[i|m|t][1-6]") ??????
     - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-    att.facsimile (@facs)
-    att.chord.log (att.event (att.timestamp.musical (@tstamp))
-                             (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                             (att.staffident (@staff))
-                             (att.layerident (@layer)))
-                  (att.fermatapresent (@fermata))
-                  (att.syltext (@syl))
-                  (att.chord.log.cmn (att.beamed (@beam))
-                                     (att.lvpresent (@lv))
-                                     (att.ornam (@ornam)))
-    att.chord.vis (all)
-    att.chord.ges (att.articulation.performed (@artic.ges))
-                  (att.duration.performed (@dur.ges))
-                  (att.instrumentident (@instr))
-                  (att.chord.ges.cmn (att.graced (@grace, @grace.time)))  <-- partially implemented
-    att.chord.anl (all)
+
+    - att.common (@label, @n, @xml:base)
+    - att.facsimile (@facs)
+    - att.chord.log
+
+        - (att.event
+
+            - (att.timestamp.musical (@tstamp))
+            - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+            - (att.staffident (@staff))
+            - (att.layerident (@layer)))
+
+        - (att.fermatapresent (@fermata))
+        - (att.syltext (@syl))
+        - (att.chord.log.cmn
+
+            - (att.beamed (@beam))
+            - (att.lvpresent (@lv))
+            - (att.ornam (@ornam)))
+
+    - att.chord.vis (all)
+    - att.chord.ges
+
+        - (att.articulation.performed (@artic.ges))
+        - (att.duration.performed (@dur.ges))
+        - (att.instrumentident (@instr))
+        - (att.chord.ges.cmn (att.graced (@grace, @grace.time)))  <-- partially implemented
+
+    - att.chord.anl (all)
 
     **Contained Elements not Implemented:**
+
     - MEI.edittrans: (all)
     '''
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}note': lambda *x: None,
@@ -1885,6 +1954,7 @@ def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     In MEI 2013: pg.284 (298 in PDF) (MEI.shared module)
 
     **Attributes/Elements Implemented:**
+
     - @xml:id (or id), an XML id (submitted as the Music21Object "id")
     - @shape, from att.clef.gesatt.clef.log
     - @line, from att.clef.gesatt.clef.log
@@ -1892,24 +1962,27 @@ def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     - @dis.place, from att.clef.gesatt.clef.log
 
     **Attributes/Elements Ignored:**
+
     - @cautionary, since this has no obvious implication for a music21 Clef
     - @octave, since this is likely obscure
 
-    **Attributes/Elements in Testing:**
-    - none
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-    att.event (att.timestamp.musical (@tstamp))
-              (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-              (att.staffident (@staff))
-              (att.layerident (@layer))
-    att.facsimile (@facs)
-    att.clef.anl (all)
-    att.clef.vis (all)
 
-    **Contained Elements not Implemented:**
-    - none
+    - att.common (@label, @n, @xml:base)
+    - att.event
+
+        - (att.timestamp.musical (@tstamp))
+        - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+        - (att.staffident (@staff))
+        - (att.layerident (@layer))
+
+    - att.facsimile (@facs)
+    - att.clef.anl (all)
+    - att.clef.vis (all)
+
+    **Contained Elements not Implemented:** none
     '''
     if 'perc' == elem.get('shape'):
         post = clef.PercussionClef()
@@ -1935,23 +2008,24 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     :returns: An :class:`Instrument`
 
-    **Attributes/Elements Implemented:**
-    - none
+    **Attributes/Elements Implemented:** none
 
     **Attributes/Elements in Testing:**
+
     - @midi.instrname (att.midiinstrument)
     - @midi.instrnum (att.midiinstrument)
 
     **Attributes/Elements Ignored:**
+
     - @xml:id
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-    att.channelized (@midi.channel, @midi.duty, @midi.port, @midi.track)
-    att.midiinstrument (@midi.pan, @midi.volume)
 
-    **Contained Elements not Implemented:**
-    - none
+    - att.common (@label, @n, @xml:base)
+    - att.channelized (@midi.channel, @midi.duty, @midi.port, @midi.track)
+    - att.midiinstrument (@midi.pan, @midi.volume)
+
+    **Contained Elements not Implemented:** none
     '''
     if elem.get('midi.instrnum') is not None:
         return instrument.instrumentFromMidiProgram(int(elem.get('midi.instrnum')))
@@ -1982,26 +2056,37 @@ def beamFromElement(elem, slurBundle=None):
     .. note:: Nested <beam> tags do not yet import properly.
 
     **Attributes/Elements Implemented:**
+
     - <clef>, <chord>, <note>, <rest>, <space>
 
     **Attributes/Elements Ignored:**
+
     - @xml:id
 
     **Attributes/Elements in Testing:**
+
     - <tuplet> and <beam> contained within
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-    att.facsimile (@facs)
-    att.beam.log (att.event (att.timestamp.musical (@tstamp))
-                            (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                            (att.staffident (@staff))
-                            (att.layerident (@layer)))
-                 (att.beamedwith (@beam.with))
-    att.beam.vis (all)
-    att.beam.gesatt.beam.anl (all)
+
+    - att.common (@label, @n, @xml:base)
+    - att.facsimile (@facs)
+    - att.beam.log
+
+        - (att.event
+
+            - (att.timestamp.musical (@tstamp))
+            - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+            - (att.staffident (@staff))
+            - (att.layerident (@layer)))
+
+        - (att.beamedwith (@beam.with))
+
+    - att.beam.vis (all)
+    - att.beam.gesatt.beam.anl (all)
 
     **Contained Elements not Implemented:**
+
     - MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
     - MEI.critapp: app
     - MEI.edittrans: (all)
@@ -2035,33 +2120,37 @@ def tupletFromElement(elem, slurBundle=None):
     :returns: An iterable of all the objects contained within the ``<tuplet>`` container.
     :rtype: tuple of :class:`~music21.base.Music21Object`
 
-    **Attributes/Elements Implemented:**
-    - none
+    **Attributes/Elements Implemented:** none
 
     **Attributes/Elements in Testing:**
+
     - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>
     - @num and @numbase
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-               (att.id (@xml:id))
-    att.facsimile (@facs)
-    att.tuplet.log (att.event (att.timestamp.musical (@tstamp))
-                              (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-                              (att.staffident (@staff))
-                              (att.layerident (@layer)))
-                   (att.beamedwith (@beam.with))
-                   (att.augmentdots (@dots))
-                   (att.duration.additive (@dur))
-                   (att.startendid (@endid) (att.startid (@startid)))
-    att.tuplet.vis (@bracket.place, @bracket.visible, @dur.visible, @num.format)
-                   (att.color (@color))
-                   (att.numberplacement (@num.place, @num.visible))
-    att.tuplet.ges (att.duration.performed (@dur.ges))
-    att.tuplet.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
-                                   (att.alignment (@when)))
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.facsimile (@facs)
+    - att.tuplet.log
+
+        - (att.event
+
+            - (att.timestamp.musical (@tstamp))
+            - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+            - (att.staffident (@staff))
+            - (att.layerident (@layer)))
+
+        - (att.beamedwith (@beam.with))
+        - (att.augmentdots (@dots))
+        - (att.duration.additive (@dur))
+        - (att.startendid (@endid) (att.startid (@startid)))
+
+    - att.tuplet.vis (all)
+    - att.tuplet.ges (att.duration.performed (@dur.ges))
+    - att.tuplet.anl (all)
 
     **Contained Elements not Implemented:**
+
     - MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
     - MEI.critapp: app
     - MEI.edittrans: (all)
@@ -2136,27 +2225,31 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     :raises: :exc:`MeiAttributeError` if neither ``overrideN`` nor @n are specified.
 
     **Attributes/Elements Implemented:**
+
     - <clef>, <chord>, <note>, <rest>, <mRest> contained within
     - @n, from att.common
 
     **Attributes Ignored:**
+
     - @xml:id
 
     **Attributes/Elements in Testing:**
+
     - <beam>, <tuplet>, <space>, <mSpace> contained within
 
     **Attributes not Implemented:**
-    att.common (@label, @xml:base)
-    att.declaring (@decls)
-    att.facsimile (@facs)
-    att.layer.log (@def)
-                  (att.meterconformance (@metcon))
-    att.layer.vis (att.visibility (@visible))
-    att.layer.gesatt.layer.anl (all)
+
+    - att.common (@label, @xml:base)
+    - att.declaring (@decls)
+    - att.facsimile (@facs)
+    - att.layer.log (@def) and (att.meterconformance (@metcon))
+    - att.layer.vis (att.visibility (@visible))
+    - att.layer.gesatt.layer.anl (all)
 
     **Contained Elements not Implemented:**
-    - MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
-               harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal
+
+    - MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt \
+               harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal \
                reh slur tie tuplet tupletSpan
     - MEI.cmnOrnaments: mordent trill turn
     - MEI.critapp: app
@@ -2166,7 +2259,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     - MEI.mensural: ligature mensur proport
     - MEI.midi: midi
     - MEI.neumes: ineume syllable uneume
-    - MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb
+    - MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb \
                   scoreDef staffDef tempo
     - MEI.text: div
     - MEI.usersymbols: anchoredText curve line symbol
@@ -2221,24 +2314,26 @@ def staffFromElement(elem, slurBundle=None):
     :rtype: list of :class:`music21.stream.Voice`
 
     **Attributes/Elements Implemented:**
+
     - <layer> contained within
 
     **Attributes Ignored:**
+
     - @xml:id
 
-    **Attributes/Elements in Testing:**
-    - none
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-    att.declaring (@decls)
-    att.facsimile (@facs)
-    att.staff.log (@def)
-                  (att.meterconformance (@metcon))
-    att.staff.vis (att.visibility (@visible))
-    att.staff.gesatt.staff.anl (all)
+
+    - att.common (@label, @n, @xml:base)
+    - att.declaring (@decls)
+    - att.facsimile (@facs)
+    - att.staff.log (@def) (att.meterconformance (@metcon))
+    - att.staff.vis (att.visibility (@visible))
+    - att.staff.gesatt.staff.anl (all)
 
     **Contained Elements not Implemented:**
+
     - MEI.cmn: ossia
     - MEI.critapp: app
     - MEI.edittrans: (all)
@@ -2297,10 +2392,10 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
         to the :class:`Part` instance with the value's @n attributes.
     :rtype: dict of :class:`music21.stream.Measure`
 
-    **Attributes/Elements Implemented:**
-    - none
+    **Attributes/Elements Implemented:** none
 
     **Attributes Ignored:**
+
     - @xml:id
     - <slur> and <tie> contained within. These spanners will usually be attached to their starting
       and ending notes with @xml:id attributes, so it's not necessary to process them when
@@ -2309,27 +2404,29 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
       spanner-attachable objects are processed. So we manage these tags at a higher level.
 
     **Attributes/Elements in Testing:**
+
     - <staff> contained within
     - @right and @left (att.measure.log)
 
     **Attributes not Implemented:**
-    att.common (@label, @n, @xml:base)
-               (att.id (@xml:id))
-    att.declaring (@decls)
-    att.facsimile (@facs)
-    att.typed (@type, @subtype)
-    att.pointing (@xlink:actuate, @xlink:role, @xlink:show, @target, @targettype, @xlink:title)
-    att.measure.log (att.meterconformance.bar (@metcon, @control))
-    att.measure.vis (all)
-    att.measure.ges (att.timestamp.performed (@tstamp.ges, @tstamp.real))
-    att.measure.anl (all)
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.declaring (@decls)
+    - att.facsimile (@facs)
+    - att.typed (@type, @subtype)
+    - att.pointing (@xlink:actuate, @xlink:role, @xlink:show, @target, @targettype, @xlink:title)
+    - att.measure.log (att.meterconformance.bar (@metcon, @control))
+    - att.measure.vis (all)
+    - att.measure.ges (att.timestamp.performed (@tstamp.ges, @tstamp.real))
+    - att.measure.anl (all)
 
     **Contained Elements not Implemented:**
-    - MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh
+
+    - MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh \
                tupletSpan
     - MEI.cmnOrnaments: mordent trill turn
     - MEI.critapp: app
-    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied
+    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied \
                      unclear
     - MEI.harmony: harm
     - MEI.lyrics: lyrics
