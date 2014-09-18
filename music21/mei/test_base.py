@@ -727,7 +727,7 @@ class TestNoteFromElement(unittest.TestCase):
 
         self.assertEqual(expected, actual)
         mockSafePitch.assert_called_once_with('D', None, '2')
-        mockMakeDuration.assert_calleed_once_with(1.0, 0)
+        mockMakeDuration.assert_called_once_with(1.0, 0)
         mockNote.assert_called_once_with(mockSafePitch.return_value,
                                          duration=mockMakeDuration.return_value)
         mockTuplet.assert_called_once_with(mockNewNote, elem)
@@ -1979,7 +1979,6 @@ class TestAddSlurs(unittest.TestCase):
         self.assertEqual(expected, actual)
         slurBundle.append.assert_called_once_with(mockSlur.return_value)
         mockSlur.return_value.addSpannedElements.assert_called_once_with(obj)
-        mockSlur.return_value.idLocal = '1'
         slurBundle.getByIdLocal.assert_called_once_with('2')
         mockNewSlur.addSpannedElements.assert_called_once_with(obj)
 
