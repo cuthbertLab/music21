@@ -1588,6 +1588,9 @@ def dotFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.304 (318 in PDF) (MEI.shared module)
 
+    :returns: 1
+    :rtype: int
+
     **Attributes/Elements Implemented:** none
 
     **Attributes/Elements in Testing:** none
