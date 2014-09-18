@@ -245,7 +245,8 @@ class MeiToM21Converter(object):
             eachStaffDef = staffDefFromElement(self.documentRoot.find(
                 './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)))
             if eachStaffDef is not None:
-                parsed[eachN].append(eachStaffDef)
+                for eachThing in six.itervalues(eachStaffDef):
+                    parsed[eachN].append(eachThing)
             else:
                 # TODO: try another strategy to get instrument information
                 pass
@@ -299,7 +300,7 @@ class MeiToM21Converter(object):
                     # the @xml:id, it may not have an @n
                     if whichPart is not None:
                         staffDefResults = staffDefFromElement(eachObject)
-                        for thisPartObject in staffDefResults:
+                        for thisPartObject in six.itervalues(staffDefResults):
                             parsed[whichPart].append(thisPartObject)
                 elif eachObject.tag not in _IGNORE_UNPROCESSED:
                     environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
