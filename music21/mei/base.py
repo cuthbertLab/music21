@@ -311,19 +311,19 @@ class MeiToM21Converter(object):
         # document. Iterating the keys in "parsed" would not preserve the order.
         environLocal.printDebug('*** making the Score')
         parsed = [parsed[n] for n in allPartNs]
-        post = stream.Score(parsed)
+        theScore = stream.Score(parsed)
 
         # process tuplets indicated by the "m21TupletSearch" attribute (i.e., in the MEI file these are
         # encoded with a <tupletSpan> that has @startid and @endid but not @plist).
-        post = _postGuessTuplets(post)
+        theScore = _postGuessTuplets(theScore)
 
         # insert metadata
-        post.metadata = makeMetadata(self.documentRoot)
+        theScore.metadata = makeMetadata(self.documentRoot)
 
         # put slurs in the Score
-        post.append(self.slurBundle.list)
+        theScore.append(self.slurBundle.list)
 
-        return post
+        return theScore
 
 
 # Module-level Functions
@@ -563,10 +563,10 @@ def _makeArticList(attr):
     Use :func:`_articulationFromAttr` to convert the actual value of an MEI "artic" attribute
     (including multiple items) into a list suitable for :attr:`GeneralNote.articulations`.
     '''
-    post = []
+    articList = []
     for eachArtic in attr.split(' '):
-        post.extend(_articulationFromAttr(eachArtic))
-    return post
+        articList.extend(_articulationFromAttr(eachArtic))
+    return articList
 
 
 def _getOctaveShift(dis, disPlace):
@@ -890,7 +890,7 @@ def _ppConclude(theConverter):
                                           c.m21Attr[eachObject.get(_XMLID)][eachAttr]))
 
 
-def _postGuessTuplets(post):
+def _postGuessTuplets(theScore):
     # TODO: this tuplet-guessing still leaves the Measure at the wrong offset in the Part
     # TODO: finish tests for this function
     # TODO: make this work for nested tuplets
@@ -909,14 +909,14 @@ def _postGuessTuplets(post):
 
     .. note:: At the moment, this will likely only work for a tuplet in one voice at a time.
 
-    :param post: The :class:`Score` in which to search for objects that have the
+    :param theScore: The :class:`Score` in which to search for objects that have the
         :attr:`m21TupletSearch` attribute.
-    :type post: :class:`music21.stream.Score`
+    :type theScore: :class:`music21.stream.Score`
     :returns: The same :class:`Score` adjusted for tuplets.
     '''
     environLocal.printDebug('*** correcting durations by guessing tuplets')
 
-    for eachPart in post.parts:
+    for eachPart in theScore.parts:
         inATuplet = False
         tupletNum = None
         tupletNumbase = None
@@ -979,7 +979,7 @@ def _postGuessTuplets(post):
                     previousOffset = None
                     missingDuration = 0.0
 
-    return post
+    return theScore
 
 
 # Helper Functions
@@ -1024,20 +1024,20 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
     >>> mei.base._processEmbeddedElements(elements, mapping)
     [<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note E>, <music21.note.Note D>]
     '''
-    post = []
+    processed = []
 
     for eachTag in elements:
         if eachTag.tag in mapping:
             result = mapping[eachTag.tag](eachTag, slurBundle)
             if isinstance(result, (tuple, list)):
                 for eachObject in result:
-                    post.append(eachObject)
+                    processed.append(eachObject)
             else:
-                post.append(result)
+                processed.append(result)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug('found an unprocessed <{}> element'.format(eachTag.tag))
 
-    return post
+    return processed
 
 
 def _timeSigFromAttrs(elem):
@@ -1182,7 +1182,7 @@ def addSlurs(elem, obj, slurBundle):
     .. caution:: If an ``elem`` has an @m21SlurStart or @m21SlurEnd attribute that refer to an
         object not found in the ``slurBundle``, the slur is silently dropped.
     '''
-    post = False
+    addedSlur = False
 
     def wrapGetByIdLocal(theId):
         "Avoid crashing when getByIdLocl() doesn't find the slur"
@@ -1194,9 +1194,9 @@ def addSlurs(elem, obj, slurBundle):
             return False
 
     if elem.get('m21SlurStart') is not None:
-        post = wrapGetByIdLocal(elem.get('m21SlurStart'))
+        addedSlur = wrapGetByIdLocal(elem.get('m21SlurStart'))
     if elem.get('m21SlurEnd') is not None:
-        post = wrapGetByIdLocal(elem.get('m21SlurEnd'))
+        addedSlur = wrapGetByIdLocal(elem.get('m21SlurEnd'))
 
     if elem.get('slur') is not None:
         theseSlurs = elem.get('slur').split(' ')
@@ -1207,12 +1207,12 @@ def addSlurs(elem, obj, slurBundle):
                 newSlur.idLocal = slurNum
                 slurBundle.append(newSlur)
                 newSlur.addSpannedElements(obj)
-                post = True
+                addedSlur = True
             elif 't' == slurType:
-                post = wrapGetByIdLocal(slurNum)
+                addedSlur = wrapGetByIdLocal(slurNum)
             # 'm' is currently ignored; we may need it for cross-staff slurs
 
-    return post
+    return addedSlur
 
 
 def beamTogether(someThings):
@@ -1759,7 +1759,7 @@ def noteFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}accid': accidFromElement}
 
     # pitch and duration... these are what we can set in the constructor
-    post = note.Note(safePitch(elem.get('pname', ''),
+    theNote = note.Note(safePitch(elem.get('pname', ''),
                                _accidentalFromAttr(elem.get('accid')),
                                elem.get('oct', '')),
                      duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
@@ -1771,45 +1771,45 @@ def noteFromElement(elem, slurBundle=None):
         if isinstance(subElement, six.integer_types):
             dotElements += subElement
         elif isinstance(subElement, articulations.Articulation):
-            post.articulations.append(subElement)
+            theNote.articulations.append(subElement)
         elif isinstance(subElement, six.string_types):
-            post.pitch.accidental = pitch.Accidental(subElement)
+            theNote.pitch.accidental = pitch.Accidental(subElement)
 
     # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
     if slurBundle is not None:
-        addSlurs(elem, post, slurBundle)
+        addSlurs(elem, theNote, slurBundle)
 
     # id in the @xml:id attribute
     if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+        theNote.id = elem.get(_XMLID)
 
     # articulations in the @artic attribute
     if elem.get('artic') is not None:
-        post.articulations.extend(_makeArticList(elem.get('artic')))
+        theNote.articulations.extend(_makeArticList(elem.get('artic')))
 
     # ties in the @tie attribute
     if elem.get('tie') is not None:
-        post.tie = _tieFromAttr(elem.get('tie'))
+        theNote.tie = _tieFromAttr(elem.get('tie'))
 
     # dots from inner <dot> elements
     if dotElements > 0:
-        post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), dotElements)
+        theNote.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), dotElements)
 
     # grace note (only mark as grace note---don't worry about "time-stealing")
     if elem.get('grace') is not None:
-        post.duration = duration.GraceDuration(post.duration.quarterLength)
+        theNote.duration = duration.GraceDuration(theNote.duration.quarterLength)
 
     # beams indicated by a <beamSpan> held elsewhere
     # TODO: test this beam stuff (after you figure out wheter it's sufficient)
     if elem.get('m21Beam') is not None:
-        if duration.convertTypeToNumber(post.duration.type) > 4:
-            post.beams.fill(post.duration.type, elem.get('m21Beam'))
+        if duration.convertTypeToNumber(theNote.duration.type) > 4:
+            theNote.beams.fill(theNote.duration.type, elem.get('m21Beam'))
 
     # tuplets
     if elem.get('m21TupletNum') is not None:
-        post = scaleToTuplet(post, elem)
+        theNote = scaleToTuplet(theNote, elem)
 
-    return post
+    return theNote
 
 
 def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
@@ -1854,17 +1854,17 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     # NOTE: keep this in sync with spaceFromElement()
 
-    post = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
+    theRest = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                            int(elem.get('dots', 0))))
 
     if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+        theRest.id = elem.get(_XMLID)
 
     # tuplets
     if elem.get('m21TupletNum') is not None:
-        post = scaleToTuplet(post, elem)
+        theRest = scaleToTuplet(theRest, elem)
 
-    return post
+    return theRest
 
 
 def mRestFromElement(elem, slurBundle=None):
@@ -1894,17 +1894,17 @@ def spaceFromElement(elem, slurBundle=None):
     '''
     # NOTE: keep this in sync with restFromElement()
 
-    post = note.SpacerRest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
+    theSpace = note.SpacerRest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
                                                  int(elem.get('dots', 0))))
 
     if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+        theSpace.id = elem.get(_XMLID)
 
     # tuplets
     if elem.get('m21TupletNum') is not None:
-        post = scaleToTuplet(post, elem)
+        theSpace = scaleToTuplet(theSpace, elem)
 
-    return post
+    return theSpace
 
 
 def mSpaceFromElement(elem, slurBundle=None):
@@ -1982,48 +1982,48 @@ def chordFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}artic': articFromElement}
 
     # pitch and duration... these are what we can set in the constructor
-    post = chord.Chord(notes=[noteFromElement(x, slurBundle) for x in elem.iterfind('{}note'.format(_MEINS))])
+    theChord = chord.Chord(notes=[noteFromElement(x, slurBundle) for x in elem.iterfind('{}note'.format(_MEINS))])
 
     # for a Chord, setting "duration" with a Duration object in __init__() doesn't work
-    post.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
+    theChord.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
 
     # iterate all immediate children
     for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle):
         if isinstance(subElement, articulations.Articulation):
-            post.articulations.append(subElement)
+            theChord.articulations.append(subElement)
 
     # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
     if slurBundle is not None:
-        addSlurs(elem, post, slurBundle)
+        addSlurs(elem, theChord, slurBundle)
 
     # id in the @xml:id attribute
     if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+        theChord.id = elem.get(_XMLID)
 
     # articulations in the @artic attribute
     if elem.get('artic') is not None:
-        post.articulations.extend(_makeArticList(elem.get('artic')))
+        theChord.articulations.extend(_makeArticList(elem.get('artic')))
 
     # ties in the @tie attribute
     if elem.get('tie') is not None:
-        post.tie = _tieFromAttr(elem.get('tie'))
+        theChord.tie = _tieFromAttr(elem.get('tie'))
 
     # grace note (only mark as grace note---don't worry about "time-stealing")
     if elem.get('grace') is not None:
         # TODO: test this
-        post.duration = duration.GraceDuration(post.duration.quarterLength)
+        theChord.duration = duration.GraceDuration(theChord.duration.quarterLength)
 
     # beams indicated by a <beamSpan> held elsewhere
     # TODO: test this beam stuff (after you figure out wheter it's sufficient)
     if elem.get('m21Beam') is not None:
-        if duration.convertTypeToNumber(post.duration.type) > 4:
-            post.beams.fill(post.duration.type, elem.get('m21Beam'))
+        if duration.convertTypeToNumber(theChord.duration.type) > 4:
+            theChord.beams.fill(theChord.duration.type, elem.get('m21Beam'))
 
     # tuplets
     if elem.get('m21TupletNum') is not None:
-        post = scaleToTuplet(post, elem)
+        theChord = scaleToTuplet(theChord, elem)
 
-    return post
+    return theChord
 
 
 def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
@@ -2065,18 +2065,18 @@ def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     **Contained Elements not Implemented:** none
     '''
     if 'perc' == elem.get('shape'):
-        post = clef.PercussionClef()
+        theClef = clef.PercussionClef()
     elif 'TAB' == elem.get('shape'):
-        post = clef.TabClef()
+        theClef = clef.TabClef()
     else:
-        post = clef.clefFromString(elem.get('shape') + elem.get('line'),
+        theClef = clef.clefFromString(elem.get('shape') + elem.get('line'),
                                    octaveShift=_getOctaveShift(elem.get('dis'),
                                                                elem.get('dis.place')))
 
     if elem.get(_XMLID) is not None:
-        post.id = elem.get(_XMLID)
+        theClef.id = elem.get(_XMLID)
 
-    return post
+    return theClef
 
 
 def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
@@ -2113,9 +2113,9 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
         try:
             return instrument.fromString(elem.get('midi.instrname'))
         except (AttributeError, instrument.InstrumentException):
-            post = instrument.Instrument()
-            post.partName = elem.get('midi.instrname', '')
-            return post
+            theInstr = instrument.Instrument()
+            theInstr.partName = elem.get('midi.instrname', '')
+            return theInstr
 
 
 def beamFromElement(elem, slurBundle=None):
@@ -2201,10 +2201,10 @@ def beamFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
 
-    post = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
-    post = beamTogether(post)
+    beamedStuff = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
+    beamedStuff = beamTogether(beamedStuff)
 
-    return post
+    return beamedStuff
 
 
 def tupletFromElement(elem, slurBundle=None):
@@ -2270,34 +2270,34 @@ def tupletFromElement(elem, slurBundle=None):
         raise MeiAttributeError(_MISSING_TUPLET_DATA)
 
     # iterate all immediate children
-    post = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
+    tupletMembers = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
 
     # "tuplet-ify" the duration of everything held within
     newElem = ETree.Element('c', m21TupletNum=elem.get('num'), m21TupletNumbase=elem.get('numbase'))
-    post = scaleToTuplet(post, newElem)
+    tupletMembers = scaleToTuplet(tupletMembers, newElem)
 
     # Set the Tuplet.type property for the first and final note in a tuplet.
     # We have to find the first and last duration-having thing, not just the first and last objects
     # between the <tuplet> tags.
     firstNote = None
     lastNote = None
-    for i, eachObj in enumerate(post):
+    for i, eachObj in enumerate(tupletMembers):
         if firstNote is None and isinstance(eachObj, note.GeneralNote):
             firstNote = i
         elif isinstance(eachObj, note.GeneralNote):
             lastNote = i
 
-    post[firstNote].duration.tuplets[0].type = 'start'
+    tupletMembers[firstNote].duration.tuplets[0].type = 'start'
     if lastNote is None:
         # when there is only one object in the tuplet
-        post[firstNote].duration.tuplets[0].type = 'stop'
+        tupletMembers[firstNote].duration.tuplets[0].type = 'stop'
     else:
-        post[lastNote].duration.tuplets[0].type = 'stop'
+        tupletMembers[lastNote].duration.tuplets[0].type = 'stop'
 
     # beam it all together
-    post = beamTogether(post)
+    tupletMembers = beamTogether(tupletMembers)
 
-    return tuple(post)
+    return tuple(tupletMembers)
 
 
 def layerFromElement(elem, overrideN=None, slurBundle=None):
@@ -2373,29 +2373,29 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
                      '{http://www.music-encoding.org/ns/mei}mSpace': mSpaceFromElement}
-    post = stream.Voice()
+    theVoice = stream.Voice()
 
     # iterate all immediate children
     for eachTag in elem.iterfind('*'):
         if eachTag.tag in tagToFunction:
             result = tagToFunction[eachTag.tag](eachTag, slurBundle)
             if not isinstance(result, (tuple, list)):
-                post.append(result)
+                theVoice.append(result)
             else:
                 for eachObject in result:
-                    post.append(eachObject)
+                    theVoice.append(eachObject)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     # try to set the Voice's "id" attribte
     if overrideN:
-        post.id = overrideN
+        theVoice.id = overrideN
     elif elem.get('n') is not None:
-        post.id = elem.get('n')
+        theVoice.id = elem.get('n')
     else:
         raise MeiAttributeError(_MISSING_VOICE_ID)
 
-    return post
+    return theVoice
 
 
 def staffFromElement(elem, slurBundle=None):
@@ -2443,7 +2443,7 @@ def staffFromElement(elem, slurBundle=None):
     # mapping from tag name to our converter function
     layerTagName = '{http://www.music-encoding.org/ns/mei}layer'
     tagToFunction = {}
-    post = []
+    layers = []
 
     # track the @n values given to layerFromElement()
     currentNValue = '1'
@@ -2457,17 +2457,17 @@ def staffFromElement(elem, slurBundle=None):
                 if isinstance(eachThing, (clef.Clef,)):
                     # TODO: this causes problems because a clef-change part-way through the measure
                     #       won't end up appearing part-way through
-                    post.append(eachThing)
+                    layers.append(eachThing)
                     thisLayer.remove(eachThing)
-            post.append(thisLayer)
+            layers.append(thisLayer)
             currentNValue = str(int(currentNValue) + 1)  # inefficient, but we need a string
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
-            post.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
+            layers.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
-    return post
+    return layers
 
 
 def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
@@ -2534,7 +2534,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
     - MEI.text: div
     - MEI.usersymbols: anchoredText curve line symbol
     '''
-    post = {}
+    staves = {}
 
     backupNum = 0 if backupNum is None else backupNum
     expectedNs = [] if expectedNs is None else expectedNs
@@ -2549,49 +2549,49 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
     # iterate all immediate children
     for eachTag in elem.iterfind('*'):
         if staffTagName == eachTag.tag:
-            post[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag, slurBundle=slurBundle),
+            staves[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag, slurBundle=slurBundle),
                                                     number=int(elem.get('n', backupNum)))
-            thisBarDuration = post[eachTag.get('n')].duration.quarterLength
+            thisBarDuration = staves[eachTag.get('n')].duration.quarterLength
             if maxBarDuration is None or maxBarDuration < thisBarDuration:
                 maxBarDuration = thisBarDuration
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
-            post[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag, slurBundle)
+            staves[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag, slurBundle)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
 
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
     for eachN in expectedNs:
-        if eachN not in post:
+        if eachN not in staves:
             restVoice = stream.Voice([note.Rest(quarterLength=maxBarDuration)])
             restVoice.id = '1'
-            post[eachN] = stream.Measure([restVoice], number=int(elem.get('n', backupNum)))
+            staves[eachN] = stream.Measure([restVoice], number=int(elem.get('n', backupNum)))
 
     # see if any of the Measures are shorter than the others; if so, check for <mRest/> tags that
     # didn't have a @dur set
     # TODO: find a better way to deal with full-measure rests
     #for eachN in expectedNs:
-        #if post[eachN].duration.quarterLength < maxBarDuration:
-            #for eachVoice in post[eachN]:
+        #if staves[eachN].duration.quarterLength < maxBarDuration:
+            #for eachVoice in staves[eachN]:
                 #for eachThing in eachVoice:
                     #if isinstance(eachThing, note.Rest):
                         #eachThing.duration = duration.Duration(maxBarDuration -
-                                                               #post[eachN].duration.quarterLength +
+                                                               #staves[eachN].duration.quarterLength +
                                                                #eachThing.duration.quarterLength)
 
     # assign left and right barlines
     if elem.get('left') is not None:
-        for eachMeasure in six.itervalues(post):
+        for eachMeasure in six.itervalues(staves):
             if not isinstance(eachMeasure, stream.Measure):
                 continue
             eachMeasure.leftBarline = _barlineFromAttr(elem.get('left'))
     if elem.get('right') is not None:
-        for eachMeasure in six.itervalues(post):
+        for eachMeasure in six.itervalues(staves):
             if not isinstance(eachMeasure, stream.Measure):
                 continue
             eachMeasure.rightBarline = _barlineFromAttr(elem.get('right'))
 
-    return post
+    return staves
 
 
 #------------------------------------------------------------------------------
