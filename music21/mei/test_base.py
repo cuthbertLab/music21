@@ -594,7 +594,7 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base._processEmbeddedElements')
     @mock.patch('music21.mei.base.safePitch')
     @mock.patch('music21.mei.base.makeDuration')
-    @mock.patch('music21.mei.pitch.Accidental')
+    @mock.patch('music21.mei.base.pitch.Accidental')
     def testUnit2(self, mockAccid, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
         noteFromElement(): adds <artic>, <accid>, and <dot> elements held within
