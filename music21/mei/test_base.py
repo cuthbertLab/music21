@@ -883,7 +883,7 @@ class TestChordFromElement(unittest.TestCase):
         self.assertEqual(0, mockNewChord.tie.call_count)
         self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
 
-    def testIntegration1a(self):
+    def testIntegration1(self):
         '''
         chordFromElement(): all the basic attributes (i.e., @pname, @accid, @oct, @dur, @dots)
 
@@ -1489,8 +1489,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         mockKey.return_value = 'mockKey return'
         mockClef.return_value = 'mockClef return'
         mockTrans.return_value = 'mockTrans return'
-        expected = [mockInstr.return_value, mockTime.return_value, mockKey.return_value,
-                    mockClef.return_value]
+        expected = {'instrument': mockInstr.return_value,
+                    'meter': mockTime.return_value,
+                    'key': mockKey.return_value,
+                    'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
         expectedAttrs = [('partName', 'the label'), ('partAbbreviation', 'the l.'), ('partId', '1'),
                          ('transposition', mockTrans.return_value)]
@@ -1540,14 +1542,14 @@ class TestStaffDefFromElement(unittest.TestCase):
         actual = base.staffDefFromElement(elem)
 
         # 3.) check
-        self.assertIsInstance(actual[0], instrument.Clarinet)
-        self.assertIsInstance(actual[1], meter.TimeSignature)
-        self.assertIsInstance(actual[2], key.KeySignature)
-        self.assertIsInstance(actual[3], clef.TrebleClef)
-        self.assertEqual('12', actual[0].partId)
-        self.assertEqual('3/8', actual[1].ratioString)
-        self.assertEqual('major', actual[2].mode)
-        self.assertEqual(0, actual[2].sharps)
+        self.assertIsInstance(actual['instrument'], instrument.Clarinet)
+        self.assertIsInstance(actual['meter'], meter.TimeSignature)
+        self.assertIsInstance(actual['key'], key.KeySignature)
+        self.assertIsInstance(actual['clef'], clef.TrebleClef)
+        self.assertEqual('12', actual['instrument'].partId)
+        self.assertEqual('3/8', actual['meter'].ratioString)
+        self.assertEqual('major', actual['key'].mode)
+        self.assertEqual(0, actual['key'].sharps)
 
     def testIntegration1b(self):
         '''
@@ -1566,14 +1568,14 @@ class TestStaffDefFromElement(unittest.TestCase):
         actual = base.staffDefFromElement(elem)
 
         # 3.) check
-        self.assertIsInstance(actual[0], instrument.Clarinet)
-        self.assertIsInstance(actual[1], meter.TimeSignature)
-        self.assertIsInstance(actual[2], key.KeySignature)
-        self.assertIsInstance(actual[3], clef.TrebleClef)
-        self.assertEqual('12', actual[0].partId)
-        self.assertEqual('3/8', actual[1].ratioString)
-        self.assertEqual('major', actual[2].mode)
-        self.assertEqual(0, actual[2].sharps)
+        self.assertIsInstance(actual['instrument'], instrument.Clarinet)
+        self.assertIsInstance(actual['meter'], meter.TimeSignature)
+        self.assertIsInstance(actual['key'], key.KeySignature)
+        self.assertIsInstance(actual['clef'], clef.TrebleClef)
+        self.assertEqual('12', actual['instrument'].partId)
+        self.assertEqual('3/8', actual['meter'].ratioString)
+        self.assertEqual('major', actual['key'].mode)
+        self.assertEqual(0, actual['key'].sharps)
 
     @mock.patch('music21.instrument.fromString')
     @mock.patch('music21.mei.base.instrDefFromElement')
@@ -1611,8 +1613,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         mockKey.return_value = 'mockKey return'
         mockClef.return_value = 'mockClef return'
         mockTrans.return_value = 'mockTrans return'
-        expected = [mockFromString.return_value, mockTime.return_value, mockKey.return_value,  # D1
-                    mockClef.return_value]
+        expected = {'instrument': mockFromString.return_value,  # D1
+                    'meter': mockTime.return_value,
+                    'key': mockKey.return_value,
+                    'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
         expectedAttrs = [('partName', 'the label'), ('partAbbreviation', 'the l.'), ('partId', '1'),
                          ('transposition', mockTrans.return_value)]
@@ -1661,14 +1665,14 @@ class TestStaffDefFromElement(unittest.TestCase):
         actual = base.staffDefFromElement(elem)
 
         # 3.) check
-        self.assertIsInstance(actual[0], instrument.Clarinet)
-        self.assertIsInstance(actual[1], meter.TimeSignature)
-        self.assertIsInstance(actual[2], key.KeySignature)
-        self.assertIsInstance(actual[3], clef.TrebleClef)
-        self.assertEqual('12', actual[0].partId)
-        self.assertEqual('3/8', actual[1].ratioString)
-        self.assertEqual('major', actual[2].mode)
-        self.assertEqual(0, actual[2].sharps)
+        self.assertIsInstance(actual['instrument'], instrument.Clarinet)
+        self.assertIsInstance(actual['meter'], meter.TimeSignature)
+        self.assertIsInstance(actual['key'], key.KeySignature)
+        self.assertIsInstance(actual['clef'], clef.TrebleClef)
+        self.assertEqual('12', actual['instrument'].partId)
+        self.assertEqual('3/8', actual['meter'].ratioString)
+        self.assertEqual('major', actual['key'].mode)
+        self.assertEqual(0, actual['key'].sharps)
 
     @mock.patch('music21.instrument.Instrument')
     @mock.patch('music21.instrument.fromString')
@@ -1709,8 +1713,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         mockKey.return_value = 'mockKey return'
         mockClef.return_value = 'mockClef return'
         mockTrans.return_value = 'mockTrans return'
-        expected = [mockInstrInit.return_value, mockTime.return_value, mockKey.return_value,  # D1 & D2
-                    mockClef.return_value]
+        expected = {'instrument': mockInstrInit.return_value,  # D1 & D2
+                    'meter': mockTime.return_value,
+                    'key': mockKey.return_value,
+                    'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
         expectedAttrs = [('partName', 'the label'), ('partAbbreviation', 'the l.'), ('partId', '1'),
                          ('transposition', mockTrans.return_value)]
@@ -1759,14 +1765,14 @@ class TestStaffDefFromElement(unittest.TestCase):
         actual = base.staffDefFromElement(elem)
 
         # 3.) check
-        self.assertIsInstance(actual[0], instrument.Instrument)
-        self.assertIsInstance(actual[1], meter.TimeSignature)
-        self.assertIsInstance(actual[2], key.KeySignature)
-        self.assertIsInstance(actual[3], clef.TrebleClef)
-        self.assertEqual('12', actual[0].partId)
-        self.assertEqual('3/8', actual[1].ratioString)
-        self.assertEqual('major', actual[2].mode)
-        self.assertEqual(0, actual[2].sharps)
+        self.assertIsInstance(actual['instrument'], instrument.Instrument)
+        self.assertIsInstance(actual['meter'], meter.TimeSignature)
+        self.assertIsInstance(actual['key'], key.KeySignature)
+        self.assertIsInstance(actual['clef'], clef.TrebleClef)
+        self.assertEqual('12', actual['instrument'].partId)
+        self.assertEqual('3/8', actual['meter'].ratioString)
+        self.assertEqual('major', actual['key'].mode)
+        self.assertEqual(0, actual['key'].sharps)
 
 
 

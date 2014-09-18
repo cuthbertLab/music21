@@ -1495,9 +1495,59 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     In MEI 2013: pg.445 (459 in PDF) (MEI.shared module)
 
-    :returns: A list with an :class:`Instrument` subclass with the staff's metadata, followed by
-        other music21 objects specified by the ``<staffDef>``, like a :class:`Clef` or :class:`Key`.
-    :rtype: list of :class:`music21.instrument.Instrument` then :class:`music21.base.Music21Object`
+    :returns: A dict with various types of metadata information, depending on what is specified in
+        this <staffDef> element. Read below for more information.
+    :rtype: dict
+
+    **Possible Return Values**
+
+    The contents of the returned dictionary depend on the contents of the <staffDef> element. The
+    dictionary keys correspond to types of information. Possible keys include:
+
+    - ``'instrument'``: for a :class:`music21.instrument.Instrument` subclass
+    - ``'clef'``: for a :class:`music21.clef.Clef` subclass
+    - ``'key'``: for a :class:`music21.key.Key` or :class:`~music21.key.KeySignature` subclass
+    - ``'meter'``: for a :class:`music21.meter.TimeSignature`
+
+    **Examples**
+
+    This <staffDef> only returns a single item.
+
+    >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <staffDef n="1" label="Clarinet" xmlns="http://www.music-encoding.org/ns/mei"/>
+    ... """
+    >>> from music21 import *
+    >>> from xml.etree import ElementTree as ET
+    >>> staffDef = ET.fromstring(meiDoc)
+    >>> result = mei.base.staffDefFromElement(staffDef)
+    >>> len(result)
+    1
+    >>> result
+    {'instrument': <music21.instrument.Instrument 1: Clarinet: Clarinet>}
+    >>> result['instrument'].partId
+    '1'
+    >>> result['instrument'].partName
+    'Clarinet'
+
+    This <staffDef> returns many objects.
+
+    >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <staffDef n="2" label="Tuba" key.pname="B" key.accid="f" key.mode="major" xmlns="http://www.music-encoding.org/ns/mei">
+    ...     <clef shape="F" line="4"/>
+    ... </staffDef>
+    ... """
+    >>> from music21 import *
+    >>> from xml.etree import ElementTree as ET
+    >>> staffDef = ET.fromstring(meiDoc)
+    >>> result = mei.base.staffDefFromElement(staffDef)
+    >>> len(result)
+    3
+    >>> result['instrument']
+    <music21.instrument.Instrument 2: Tuba: Tuba>
+    >>> result['clef']
+    <music21.clef.BassClef>
+    >>> result['key']
+    <music21.key.Key of B- major>
 
     **Attributes/Elements Implemented:**
 
@@ -1547,37 +1597,40 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     # first make the Instrument
     post = elem.find('{}instrDef'.format(_MEINS))
     if post is not None:
-        post = [instrDefFromElement(post)]
+        post = {'instrument': instrDefFromElement(post)}
     else:
         try:
-            post = [instrument.fromString(elem.get('label'))]
+            post = {'instrument': instrument.fromString(elem.get('label'))}
         except (AttributeError, instrument.InstrumentException):
-            post = [instrument.Instrument()]
-    post[0].partName = elem.get('label')
-    post[0].partAbbreviation = elem.get('label.abbr')
-    post[0].partId = elem.get('n')
+            post = {'instrument': instrument.Instrument()}
+    post['instrument'].partName = elem.get('label')
+    post['instrument'].partAbbreviation = elem.get('label.abbr')
+    post['instrument'].partId = elem.get('n')
+
+    # --> transposition
+    if elem.get('trans.semi') is not None:
+        post['instrument'].transposition = _transpositionFromAttrs(elem)
 
     # process other part-specific information
     # --> time signature
     if elem.get('meter.count') is not None:
-        post.append(_timeSigFromAttrs(elem))
+        post['meter'] = _timeSigFromAttrs(elem)
 
     # --> key signature
     if elem.get('key.pname') is not None or elem.get('key.sig') is not None:
-        post.append(_keySigFromAttrs(elem))
+        post['key'] = _keySigFromAttrs(elem)
 
     # --> clef
     if elem.get('clef.shape') is not None:
-        post.append(clefFromElement(ETree.Element('clef', {'shape': elem.get('clef.shape'),
-                                                           'line': elem.get('clef.line'),
-                                                           'dis': elem.get('clef.dis'),
-                                                           'dis.place': elem.get('clef.dis.place')})))
+        post['clef'] = clefFromElement(ETree.Element('clef', {'shape': elem.get('clef.shape'),
+                                                          'line': elem.get('clef.line'),
+                                                          'dis': elem.get('clef.dis'),
+                                                          'dis.place': elem.get('clef.dis.place')}))
 
-    # --> transposition
-    if elem.get('trans.semi') is not None:
-        post[0].transposition = _transpositionFromAttrs(elem)
-
-    post.extend(_processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle))
+    embeddedItems = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
+    for eachItem in embeddedItems:
+        if isinstance(eachItem, clef.Clef):
+            post['clef'] = eachItem
 
     return post
 
