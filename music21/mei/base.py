@@ -116,8 +116,11 @@ from music21 import environment
 _MOD = 'mei.base'
 environLocal = environment.Environment(_MOD)
 
-# six
-from music21.ext import six
+# six... prefer the system version, if present
+try:
+    import six
+except ImportError:
+    from music21.ext import six
 from six.moves import xrange  # pylint: disable=redefined-builtin,import-error
 from six.moves import range  # pylint: disable=redefined-builtin,import-error
 

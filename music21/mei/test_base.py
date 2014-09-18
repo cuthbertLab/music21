@@ -15,8 +15,6 @@ Tests for :mod:`music21.mei.base`.
 # pylint: disable=too-many-public-methods
 # pylint: disable=no-self-use
 
-from music21.ext import six
-
 import unittest
 try:
     # this works in Python 3.3+
@@ -51,7 +49,11 @@ from music21 import bar
 from music21 import tie
 from music21 import spanner
 
-# six
+# six... prefer the system version, if present
+try:
+    import six
+except ImportError:
+    from music21.ext import six
 from six.moves import xrange  # pylint: disable=redefined-builtin
 from six.moves import range  # pylint: disable=redefined-builtin
 
