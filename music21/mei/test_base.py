@@ -350,6 +350,13 @@ class TestAttrTranslators(unittest.TestCase):
         mockTrans.assert_called_once_with(attr, 'accid', base._ACCID_ATTR_DICT)
 
     @mock.patch('music21.mei.base._attrTranslator')
+    def testAccidGes(self, mockTrans):
+        '''_accidGesFromAttr(): ensure proper arguments to _attrTranslator'''
+        attr = 's'
+        base._accidGesFromAttr(attr)
+        mockTrans.assert_called_once_with(attr, 'accid.ges', base._ACCID_GES_ATTR_DICT)
+
+    @mock.patch('music21.mei.base._attrTranslator')
     def testDuration(self, mockTrans):
         '''_qlDurationFromAttr(): ensure proper arguments to _attrTranslator'''
         attr = 's'
@@ -709,7 +716,8 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base.safePitch')
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.mei.base.scaleToTuplet')
-    def testUnit4(self, mockTuplet, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+    @mock.patch('music21.pitch.Accidental')
+    def testUnit4(self, mockAccid, mockTuplet, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
         noteFromElement(): adds @grace, and tuplet-related attributes
 
@@ -717,12 +725,14 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4',
                                              'm21TupletNum': '5', 'm21TupletNumbase': '4',
-                                             'm21TupletSearch': 'start'})
+                                             'm21TupletSearch': 'start',
+                                             'accid.ges': 's'})
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
         mockNote.return_value = mockNewNote
         mockProcEmbEl.return_value = []
         mockTuplet.return_value = 'made the tuplet'
+        mockAccid.return_value = 'the accidental'
         expected = mockTuplet.return_value
 
         actual = base.noteFromElement(elem, 'slur bundle')
@@ -733,6 +743,7 @@ class TestNoteFromElement(unittest.TestCase):
         mockNote.assert_called_once_with(mockSafePitch.return_value,
                                          duration=mockMakeDuration.return_value)
         mockTuplet.assert_called_once_with(mockNewNote, elem)
+        mockAccid.assert_called_once_with('#')
 
     def testIntegration4(self):
         '''
@@ -741,12 +752,13 @@ class TestNoteFromElement(unittest.TestCase):
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4',
                                              'm21TupletNum': '5', 'm21TupletNumbase': '4',
-                                             'm21TupletSearch': 'start'})
+                                             'm21TupletSearch': 'start',
+                                             'accid.ges': 's'})
         slurBundle = spanner.SpannerBundle()
 
         actual = base.noteFromElement(elem, slurBundle)
 
-        self.assertEqual('D2', actual.nameWithOctave)
+        self.assertEqual('D#2', actual.nameWithOctave)
         self.assertEqual(1.0, actual.quarterLength)
         self.assertEqual('quarter', actual.duration.type)
         self.assertEqual('5', actual.m21TupletNum)

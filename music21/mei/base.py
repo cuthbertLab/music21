@@ -453,6 +453,12 @@ _ACCID_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'x': '##', 'ff': '--', 'xs':
                     'ts': '###', 'tf': '---', 'n': 'n', 'nf': '-', 'ns': '#', 'su': '???',
                     'sd': '???', 'fu': '???', 'fd': '???', 'nu': '???', 'nd': '???', None: None}
 
+# for _accidGesFromAttr()
+# None is for when @accid is omitted
+# TODO: figure out these equivalencies
+_ACCID_GES_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'ff': '--', 'n': 'n', 'su': '???',
+                        'sd': '???', 'fu': '???', 'fd': '???', None: None}
+
 # for _qlDurationFromAttr()
 # None is for when @dur is omitted
 _DUR_ATTR_DICT = {'long': 16.0, 'breve': 8.0, '1': 4.0, '2': 2.0, '4': 1.0, '8': 0.5, '16': 0.25,
@@ -528,6 +534,17 @@ def _accidentalFromAttr(attr):
     '#'
     '''
     return _attrTranslator(attr, 'accid', _ACCID_ATTR_DICT)
+
+
+def _accidGesFromAttr(attr):
+    '''
+    Use :func:`_attrTranslator` to convert the value of an @accid.ges attribute to its music21 string.
+
+    >>> from music21 import *
+    >>> mei.base._accidGesFromAttr('s')
+    '#'
+    '''
+    return _attrTranslator(attr, 'accid.ges', _ACCID_GES_ATTR_DICT)
 
 
 def _qlDurationFromAttr(attr):
@@ -1742,12 +1759,13 @@ def noteFromElement(elem, slurBundle=None):
 
     In MEI 2013: pg.382 (396 in PDF) (MEI.shared module)
 
-    .. note:: We use the ``id`` attribute (from the @xml:id attribute) to attach slurs and other
-        spanners to :class:`Note` objects, so @xml:id *must* be imported from the MEI file.
+    .. note:: If set, the @accid.ges attribute is always imported as the music21 :class:`Accidental`
+        for this note. We assume it corresponds to the accidental implied by a key signature.
 
     **Attributes/Elements Implemented:**
 
     - @accid and <accid>
+    - @accid.ges for key signatures
     - @pname, from att.pitch: [a--g]
     - @oct, from att.octave: [0..9]
     - @dur, from att.duration.musical: (via _qlDurationFromAttr())
@@ -1791,7 +1809,6 @@ def noteFromElement(elem, slurBundle=None):
     - att.note.ges
 
         - (@oct.ges, @pname.ges, @pnum)
-        - (att.accidental.performed (@accid.ges))  # TODO: consider this, in relation to key signature
         - att.articulation.performed (@artic.ges))
         - (att.duration.performed (@dur.ges))
         - (att.instrumentident (@instr))
@@ -1831,6 +1848,10 @@ def noteFromElement(elem, slurBundle=None):
             theNote.articulations.append(subElement)
         elif isinstance(subElement, six.string_types):
             theNote.pitch.accidental = pitch.Accidental(subElement)
+
+    # adjust for @accid.ges if present
+    if elem.get('accid.ges') is not None:
+        theNote.pitch.accidental = pitch.Accidental(_accidGesFromAttr(elem.get('accid.ges', '')))
 
     # we can only process slurs if we got a SpannerBundle as the "slurBundle" argument
     if slurBundle is not None:
