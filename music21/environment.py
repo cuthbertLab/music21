@@ -762,6 +762,8 @@ class _EnvironmentCore(object):
         # see common.fileExtensions for format names
         m21Format, unused_ext = common.findFormat(fmt)
         environmentKey = self.formatToKey(m21Format)
+        if environmentKey is None:
+            environmentKey = self.formatToKey(fmt)
         if m21Format == 'vexflow':
             try:
                 import webbrowser
@@ -798,7 +800,7 @@ class _EnvironmentCore(object):
                         for line in f:
                             print(line, end="")
                         print
-                    return
+                    return                    
                 else:
                     raise EnvironmentException(
                         "Cannot find a valid application path for format {}. "
@@ -808,9 +810,9 @@ class _EnvironmentCore(object):
         elif platform == 'win':  # note extra set of quotes!
             cmd = '""%s" %s "%s""' % (fpApp, options, filePath)
         elif platform == 'darwin':
-            cmd = 'open -a"%s" %s %s' % (fpApp, options, filePath)
+            cmd = 'open -a"%s" %s "%s"' % (fpApp, options, filePath)
         elif platform == 'nix':
-            cmd = '%s %s %s' % (fpApp, options, filePath)
+            cmd = '%s %s "%s"' % (fpApp, options, filePath)
         os.system(cmd)
 
     def read(self, filePath=None):

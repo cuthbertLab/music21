@@ -11,7 +11,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-from music21.test import test
+from music21.test import testSingleCoreAll as test
            
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':

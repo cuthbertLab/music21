@@ -131,6 +131,8 @@ from music21 import environment
 _MOD = 'romanText.translate.py'
 environLocal = environment.Environment(_MOD)
 
+USE_RN_CACHE = False ## Not currently using rnCache because of problems with PivotChords,
+                     ## See mail from Dmitri, 30 September 2014
 
 #-------------------------------------------------------------------------------
 
@@ -527,8 +529,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     #                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
     #                                        asrc = 'b' + asrc
                                 cacheTuple = (asrc, kCurrent.tonicPitchNameWithCase)
-                                if cacheTuple in rnKeyCache:
+                                if USE_RN_CACHE and cacheTuple in rnKeyCache:                                    
                                     #print "Got a match: " + str(cacheTuple)
+                                    # Problems with Caches not picking up pivot chords... Not faster, see below.
                                     rn = copy.deepcopy(rnKeyCache[cacheTuple])
                                 else:
                                     #print "No match for: " + str(cacheTuple)
@@ -546,6 +549,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 #16.09
                                 #>>> t('roman.RomanNumeral("IV", copy.deepcopy(k))', 'from music21 import roman, key; import copy; k = key.Key("c#")', number=1000)
                                 #22.49
+                                ## key cache, does not help much...
+                                #>>> t('copy.deepcopy(r)', 'from music21 import roman; import copy; r = roman.RomanNumeral("IV", "c#")', number=1000)
+                                #19.01
                                                               
                                 if setKeyChangeToken is True:
                                     rn.followsKeyChange = True
@@ -1003,6 +1009,26 @@ m8 I
         m = s.measure(8).flat
         self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
 
+    def testPivotInCopyMultiple2(self):
+        '''
+        test whether a chord in a pivot situation outside of copying affects copying
+        '''
+        
+        from music21 import converter
+        testCase = '''
+m1 G: I
+m2 V D: I
+m3 G: IV
+m4 V
+m5 I
+m6-7 = m4-5
+m8 I
+'''
+        s = converter.parse(testCase, format='romanText')
+        m = s.measure(5).flat
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'G major')
+
+
     def testPivotInCopySingle(self):
         from music21 import converter
         testCase = '''
@@ -1152,11 +1178,13 @@ _DOC_ORDER = []
 if __name__ == "__main__":
     import music21
     #from music21 import converter
-    #r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
+    #r = converter.parse('/Users/cuthbert/desktop/dmitri_rn2.rntxt', format='romantext')
+    #r.show('text')
     #import time
     #t = time.time()
     #import sys
-    #sys.argv.append('MeasureCopyingA')
+    #sys.argv.append('PivotInCopyMultiple2')
+    
     music21.mainTest(Test, TestSlow)
     #print(time.time() - t)
 

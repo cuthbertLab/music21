@@ -1697,7 +1697,6 @@ def getMd5(value=None):
     Return an md5 hash from a string.  If no value is given then
     the current time plus a random number is encoded.
 
-
     >>> common.getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6'
 
