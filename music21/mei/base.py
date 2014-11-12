@@ -430,9 +430,6 @@ def allPartsPresent(theConverter):
     attributes. The second appearance of <staffDef> with @n="2" signals a change of clef on that
     same staff---not that there is a new staff.
     '''
-    # TODO: this doesn't always work. For some scores where a part uses more than one clef, more
-    #       than one @n is picked up, so more than one staff appears---though all the notes are put
-    #       in the highest relevant staff
     xpathQuery = './/{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)
     partNs = []  # hold the @n attribute for all the parts
 
