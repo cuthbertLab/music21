@@ -147,6 +147,7 @@ class Instrument(base.Music21Object):
         self.transposition = None
         
         self.inGMPercMap = False
+        self.soundfontFn = None # if defined...
 
     def __str__(self):
         msg = []
@@ -210,6 +211,9 @@ class Instrument(base.Music21Object):
 
         Currently only 16 channels are used.
 
+        Note that the reused "usedChannels=[]" in the
+        signature is NOT a mistake, but necessary for
+        the case where there needs to be a global list.
         
         >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11]
         >>> i = instrument.Violin()
