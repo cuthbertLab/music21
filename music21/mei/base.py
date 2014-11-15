@@ -1334,6 +1334,67 @@ def scaleToTuplet(objs, elem):
         return objs[0]
 
 
+def _guessTuplets(theLayer):
+    # TODO: nested tuplets?
+    # TODO: adjust this to work with cross-measure tuplets (i.e., where only the "start" or "end"
+    #       is found in theLayer)
+    '''
+    Given a list of music21 objects, possibly containing :attr:`m21TupletSearch`,
+    :attr:`m21TupletNum`, and :attr:`m21TupletNumbase` attributes, adjust the durations of the
+    objects as specified by those "m21Tuplet" attributes, then remove the attributes.
+
+    This function finishes processing for tuplets encoded as a <tupletSpan> where @startid and
+    @endid are indicated, but not @plist. Knowing the starting and ending object in the tuplet, we
+    can guess that all the Note, Rest, and Chord objects between the starting and ending objects
+    in that <layer> are part of the tuplet. (Grace notes retain a 0.0 duration).
+
+    .. note:: At the moment, this will likely only work for simple tuplets---not nested tuplets.
+
+    :param theLayer: Objects from the <layer> in which to search for objects that have the
+        :attr:`m21TupletSearch` attribute.
+    :type theScore: list
+    :returns: The same list, with durations adjusted to account for tuplets.
+    '''
+    # NB: this is a hidden function because it uses the "m21TupletSearch" attribute, which are only
+    #     supposed to be used within the MEI import module
+
+    inATuplet = False  # we hit m21TupletSearch=='start' but not 'end' yet
+    tupletNum = None
+    tupletNumbase = None
+
+    for eachNote in theLayer:
+        # we'll skip objects that don't have a duration
+        if not isinstance(eachNote, (note.Note, note.Rest, chord.Chord)):
+            continue
+
+        if hasattr(eachNote, 'm21TupletSearch') and eachNote.m21TupletSearch == 'start':
+            inATuplet = True
+            tupletNum = int(eachNote.m21TupletNum)
+            tupletNumbase = int(eachNote.m21TupletNumbase)
+
+            del eachNote.m21TupletSearch
+            del eachNote.m21TupletNum
+            del eachNote.m21TupletNumbase
+
+        if inATuplet:
+            scaleToTuplet(eachNote, ETree.Element('',
+                                                  m21TupletNum=tupletNum,
+                                                  m21TupletNumbase=tupletNumbase))
+
+            if hasattr(eachNote, 'm21TupletSearch') and eachNote.m21TupletSearch == 'end':
+                # we've reached the end of the tuplet!
+                eachNote.duration.tuplets[0].type = 'stop'
+
+                del eachNote.m21TupletSearch
+                del eachNote.m21TupletNum
+                del eachNote.m21TupletNumbase
+
+                # reset the tuplet-tracking variables
+                inATuplet = False
+
+    return theLayer
+
+
 # Element-Based Converter Functions
 #------------------------------------------------------------------------------
 def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
@@ -1580,7 +1641,6 @@ def dotFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     **Elements not Implemented:** none
     '''
-    # TODO: implement @plist, in att.dot.log
     return 1
 
 
@@ -1640,7 +1700,7 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
         - (att.controlevent
 
-            - (att.plist (@plist, @evaluate))  # TODO: this
+            - (att.plist (@plist, @evaluate))
             - (att.timestamp.musical (@tstamp))
             - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
             - (att.staffident (@staff)) (att.layerident (@layer)))
@@ -2352,19 +2412,28 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
                      '{http://www.music-encoding.org/ns/mei}mSpace': mSpaceFromElement}
-    theVoice = stream.Voice()
+    theLayer = []
 
     # iterate all immediate children
     for eachTag in elem.iterfind('*'):
         if eachTag.tag in tagToFunction:
             result = tagToFunction[eachTag.tag](eachTag, slurBundle)
             if not isinstance(result, (tuple, list)):
-                theVoice.append(result)
+                theLayer.append(result)
             else:
                 for eachObject in result:
-                    theVoice.append(eachObject)
+                    theLayer.append(eachObject)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
+
+    # adjust the <layer>'s elements for possible tuplets
+    theLayer = _guessTuplets(theLayer)
+
+    # make the Voice
+    theVoice = stream.Voice()
+    for each in theLayer:
+        theVoice._appendCore(each)
+    theVoice._elementsChanged()
 
     # try to set the Voice's "id" attribte
     if overrideN:

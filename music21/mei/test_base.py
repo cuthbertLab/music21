@@ -1224,12 +1224,13 @@ class TestLayerFromElement(unittest.TestCase):
 
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
-    def testUnit1a(self, mockVoice, mockNoteFromElement):
+    @mock.patch('music21.mei.base._guessTuplets')
+    def testUnit1a(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
                             mapping works; that tags not in the mapping are ignored; and that a
                             Voice object is returned. And "id" is set from the @n attribute.
-        (mostly-unit test; only mock noteFromElement and the ElementTree.Element)
+        (mostly-unit test; only mock noteFromElement, _guessTuplets, and the ElementTree.Element)
         '''
         theNAttribute = '@n value'
         elem = mock.MagicMock()
@@ -1247,6 +1248,7 @@ class TestLayerFromElement(unittest.TestCase):
         expectedMNFEOrder = [mock.call(iterfindReturn[0], None), mock.call(iterfindReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        mockTuplets.side_effect = lambda x: x
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
         expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
 
@@ -1256,13 +1258,15 @@ class TestLayerFromElement(unittest.TestCase):
         self.assertEqual(mockVoice.return_value, actual)
         self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
         mockVoice.assert_called_once_with()
-        self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value.append.call_args_list)
+        self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value._appendCore.call_args_list)
+        mockVoice.return_value._elementsChanged.assert_called_once_with()
         self.assertEqual(theNAttribute, actual.id)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
 
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
-    def testUnit1b(self, mockVoice, mockNoteFromElement):
+    @mock.patch('music21.mei.base._guessTuplets')
+    def testUnit1b(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         Same as testUnit1a() *but* with ``overrideN`` provided.
         '''
@@ -1278,6 +1282,7 @@ class TestLayerFromElement(unittest.TestCase):
         expectedMNFEOrder = [mock.call(iterfindReturn[0], None), mock.call(iterfindReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        mockTuplets.side_effect = lambda x: x
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
         expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
         overrideN = 'my own @n'
@@ -1288,13 +1293,15 @@ class TestLayerFromElement(unittest.TestCase):
         self.assertEqual(mockVoice.return_value, actual)
         self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
         mockVoice.assert_called_once_with()
-        self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value.append.call_args_list)
+        self.assertSequenceEqual(expectedAppendCalls, mockVoice.return_value._appendCore.call_args_list)
+        mockVoice.return_value._elementsChanged.assert_called_once_with()
         self.assertEqual(overrideN, actual.id)
         self.assertEqual(0, elem.get.call_count)
 
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
-    def testUnit1c(self, mockVoice, mockNoteFromElement):
+    @mock.patch('music21.mei.base._guessTuplets')
+    def testUnit1c(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         Same as testUnit1a() *but* without ``overrideN`` or @n.
         '''
@@ -2677,3 +2684,81 @@ class TestTuplets(unittest.TestCase):
         self.assertEqual('start', mockNotes[1].duration.tuplets[0].type)
         self.assertEqual('default', mockNotes[4].duration.tuplets[0].type)
         self.assertEqual('stop', mockNotes[6].duration.tuplets[0].type)
+
+    def testTuplet10(self):
+        '''
+        _guessTuplets(): given a list of stuff without tuplet-guessing attributes, make no changes
+        '''
+        theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
+        expectedDurs = [1.0 for _ in xrange(5)]
+
+        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-acccess
+
+        for i in xrange(len(expectedDurs)):
+            self.assertEqual(expectedDurs[i], actual[i].quarterLength)
+
+    def testTuplet11a(self):
+        '''
+        _guessTuplets(): with 5 notes, a triplet at the beginning is done correctly
+        '''
+        theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
+        theLayer[0].m21TupletSearch = 'start'
+        theLayer[0].m21TupletNum = '3'
+        theLayer[0].m21TupletNumbase = '2'
+        theLayer[2].m21TupletSearch = 'end'
+        theLayer[2].m21TupletNum = '3'
+        theLayer[2].m21TupletNumbase = '2'
+        expectedDurs = [Fraction(2, 3), Fraction(2, 3), Fraction(2, 3), 1.0, 1.0]
+
+        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-acccess
+
+        for i in xrange(len(expectedDurs)):
+            self.assertEqual(expectedDurs[i], actual[i].quarterLength)
+        for i in [0, 2]:
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletSearch'))
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletNum'))
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletNumbase'))
+
+    def testTuplet11b(self):
+        '''
+        _guessTuplets(): with 5 notes, a triplet in the middle is done correctly
+        '''
+        theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
+        theLayer[1].m21TupletSearch = 'start'
+        theLayer[1].m21TupletNum = '3'
+        theLayer[1].m21TupletNumbase = '2'
+        theLayer[3].m21TupletSearch = 'end'
+        theLayer[3].m21TupletNum = '3'
+        theLayer[3].m21TupletNumbase = '2'
+        expectedDurs = [1.0, Fraction(2, 3), Fraction(2, 3), Fraction(2, 3), 1.0]
+
+        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-acccess
+
+        for i in xrange(len(expectedDurs)):
+            self.assertEqual(expectedDurs[i], actual[i].quarterLength)
+        for i in [1, 3]:
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletSearch'))
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletNum'))
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletNumbase'))
+
+    def testTuplet11c(self):
+        '''
+        _guessTuplets(): with 5 notes, a triplet at the end is done correctly
+        '''
+        theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
+        theLayer[2].m21TupletSearch = 'start'
+        theLayer[2].m21TupletNum = '3'
+        theLayer[2].m21TupletNumbase = '2'
+        theLayer[4].m21TupletSearch = 'end'
+        theLayer[4].m21TupletNum = '3'
+        theLayer[4].m21TupletNumbase = '2'
+        expectedDurs = [1.0, 1.0, Fraction(2, 3), Fraction(2, 3), Fraction(2, 3)]
+
+        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-acccess
+
+        for i in xrange(len(expectedDurs)):
+            self.assertEqual(expectedDurs[i], actual[i].quarterLength)
+        for i in [2, 4]:
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletSearch'))
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletNum'))
+            self.assertFalse(hasattr(theLayer[i], 'm21TupletNumbase'))
