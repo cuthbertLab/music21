@@ -317,10 +317,6 @@ class MeiToM21Converter(object):
         parsed = [parsed[n] for n in allPartNs]
         theScore = stream.Score(parsed)
 
-        # process tuplets indicated by the "m21TupletSearch" attribute (i.e., in the MEI file these are
-        # encoded with a <tupletSpan> that has @startid and @endid but not @plist).
-        theScore = _postGuessTuplets(theScore)
-
         # insert metadata
         theScore.metadata = makeMetadata(self.documentRoot)
 
@@ -906,98 +902,6 @@ def _ppConclude(theConverter):
             for eachAttr in c.m21Attr[eachObject.get(_XMLID)]:
                 eachObject.set(eachAttr, (eachObject.get(eachAttr, '') +
                                           c.m21Attr[eachObject.get(_XMLID)][eachAttr]))
-
-
-def _postGuessTuplets(theScore):
-    # TODO: this tuplet-guessing still leaves the Measure at the wrong offset in the Part
-    # TODO: finish tests for this function
-    # TODO: make this work for nested tuplets
-    # TODO: make this work for simultaneous tuplets in different voices in the same part
-    '''
-    A "postprocessing" function that takes an otherwise fully-imported score and completes the
-    import process by guessing tuplets indicated with :attr:`m21TupletSearch` attributes.
-
-    This is for the tuplets given in a <tupletSpan> with @startid and @endid but not @plist; we
-    need to guess which elements are in the tuplet. Since we know the starting object and the
-    ending object, we'll assume that all the tuplet objects are in the same Voice, so we'll use a
-    list of all the Note/Rest/Chord objects in that Voice and change the duration for each of the
-    objects between the @startid and @endid ones. (Grace notes retain a 0.0 duration).
-
-    .. note:: At the moment, this will likely only work for simple tuplets---not nested tuplets.
-
-    .. note:: At the moment, this will likely only work for a tuplet in one voice at a time.
-
-    :param theScore: The :class:`Score` in which to search for objects that have the
-        :attr:`m21TupletSearch` attribute.
-    :type theScore: :class:`music21.stream.Score`
-    :returns: The same :class:`Score` adjusted for tuplets.
-    '''
-    environLocal.printDebug('*** correcting durations by guessing tuplets')
-
-    for eachPart in theScore.parts:
-        inATuplet = False
-        tupletNum = None
-        tupletNumbase = None
-        previousOffset = None
-        previousQuarterLength = None
-        activeVoiceId = None
-        missingDuration = 0.0
-        # "missingDuration" is the quarterLength of the duration left by making a tuplet (i.e.,
-        # the difference between a tuplet's actual duration and its duration it would have (if it
-        # weren't in a tuplet, which is the duration it has on initial creation)
-
-        for eachNote in eachPart._yieldElementsDownward(streamsOnly=False,
-                                                        classFilter=[note.GeneralNote]):
-            if hasattr(eachNote, 'm21TupletSearch') and eachNote.m21TupletSearch == 'start':
-                inATuplet = True
-                tupletNum = int(eachNote.m21TupletNum)
-                tupletNumbase = int(eachNote.m21TupletNumbase)
-                activeVoiceId = getVoiceId(eachNote.sites.get())
-
-                del eachNote.m21TupletSearch
-                del eachNote.m21TupletNum
-                del eachNote.m21TupletNumbase
-
-            if inATuplet and getVoiceId(eachNote.sites.get()) == activeVoiceId:
-                previousDuration = eachNote.duration.quarterLength
-
-                scaleToTuplet(eachNote, ETree.Element('', m21TupletNum=tupletNum,
-                                                      m21TupletNumbase=tupletNumbase))
-
-                missingDuration += (previousDuration - eachNote.duration.quarterLength)
-
-                if previousOffset is None:
-                    # if this is the first note in the tuplet, set it to "start"; the offset remains
-                    eachNote.duration.tuplets[0].type = 'start'
-                else:
-                    # the offset of following notes in the tuplet must be adjusted
-                    eachNote.offset = previousOffset + previousQuarterLength
-
-                previousOffset = eachNote.offset
-                previousQuarterLength = eachNote.duration.quarterLength
-
-                if hasattr(eachNote, 'm21TupletSearch') and eachNote.m21TupletSearch == 'end':
-                    # we've reached the end of the tuplet!
-                    eachNote.duration.tuplets[0].type = 'stop'
-
-                    # We have to adjust the offset of all the elements following a tuplet, until
-                    # the end of that Measure. I have to find a faster way to do it than this.
-                    # NOTE: this is very slow
-                    # TODO: this causes problems because it adjusts every measure, rather than only the measure with tuplets
-                    for eachThing in eachPart.recurse(streamsOnly=True):
-                        eachThing.shiftElements(offset=(-1 * missingDuration),
-                                                startOffset=(previousOffset + previousQuarterLength))
-
-                    del eachNote.m21TupletSearch
-                    del eachNote.m21TupletNum
-                    del eachNote.m21TupletNumbase
-
-                    # reset the tuplet-tracking variables
-                    inATuplet = False
-                    previousOffset = None
-                    missingDuration = 0.0
-
-    return theScore
 
 
 # Helper Functions
