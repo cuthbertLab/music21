@@ -2181,9 +2181,9 @@ def beamFromElement(elem, slurBundle=None):
     >>> from xml.etree import ElementTree as ET
     >>> from music21 import *
     >>> meiSnippet = """<beam xmlns="http://www.music-encoding.org/ns/mei">
-    ...     <note pname='A' oct='7'/>
-    ...     <note pname='B' oct='7'/>
-    ...     <note pname='C' oct='6'/>
+    ...     <note pname='A' oct='7' dur='8'/>
+    ...     <note pname='B' oct='7' dur='8'/>
+    ...     <note pname='C' oct='6' dur='8'/>
     ... </beam>"""
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> result = mei.base.beamFromElement(meiSnippet)
