@@ -245,12 +245,20 @@ class MeiToM21Converter(object):
         # holds things that should go in the following Measure
         inNextMeasure = {n: stream.Part() for n in allPartNs}
 
+        # "activeMeter" holds the TimeSignature object that's currently active; it's used in the
+        # loop below to help determine the proper duration of a full-measure rest. It appears here
+        # so it persists between <section> elements, and so to collect the first TimeSignature from
+        # a <staffDef> or <scoreDef>.
+        activeMeter = None
+
         # set the initial Instrument for each staff
         for eachN in allPartNs:
             eachStaffDef = staffDefFromElement(self.documentRoot.find(
                 './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)))
             if eachStaffDef is not None:
                 for eachThing in six.itervalues(eachStaffDef):
+                    if activeMeter is None and isinstance(eachThing, meter.TimeSignature):
+                        activeMeter = eachThing
                     parsed[eachN].append(eachThing)
             else:
                 # TODO: try another strategy to get instrument information
@@ -263,6 +271,8 @@ class MeiToM21Converter(object):
             # TODO: we don't actually know whether this <scoreDef> happens before or between <section>
             scoreDefResults = scoreDefFromElement(scoreDefResults)
             for allPartObject in scoreDefResults['all-part objects']:
+                if activeMeter is None and isinstance(allPartObject, meter.TimeSignature):
+                    activeMeter = allPartObject
                 for partN in allPartNs:
                     inNextMeasure[partN].append(allPartObject)
 
@@ -278,7 +288,8 @@ class MeiToM21Converter(object):
                     backupMeasureNum += 1
                     # process all the stuff in the <measure>
                     measureResult = measureFromElement(eachObject, backupMeasureNum, allPartNs,
-                                                       slurBundle=self.slurBundle)
+                                                       slurBundle=self.slurBundle,
+                                                       activeMeter=activeMeter)
                     # process and append each part's stuff to the staff
                     for eachN in allPartNs:
                         # TODO: what if an @n doesn't exist in this <measure>?
@@ -297,6 +308,8 @@ class MeiToM21Converter(object):
                     scoreDefResults = scoreDefFromElement(eachObject)
                     # spread all-part elements across all the parts
                     for allPartObject in scoreDefResults['all-part objects']:
+                        if isinstance(allPartObject, meter.TimeSignature):
+                            activeMeter = allPartObject
                         for partN in allPartNs:
                             inNextMeasure[partN].append(allPartObject)
                 elif '{http://www.music-encoding.org/ns/mei}staffDef' == eachObject.tag:
@@ -306,6 +319,8 @@ class MeiToM21Converter(object):
                     if whichPart is not None:
                         staffDefResults = staffDefFromElement(eachObject)
                         for thisPartObject in six.itervalues(staffDefResults):
+                            if isinstance(thisPartObject, meter.TimeSignature):
+                                activeMeter = thisPartObject
                             parsed[whichPart].append(thisPartObject)
                 elif eachObject.tag not in _IGNORE_UNPROCESSED:
                     environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
@@ -455,10 +470,11 @@ _ACCID_GES_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'ff': '--', 'n': 'n', 's
                         'sd': '???', 'fu': '???', 'fd': '???', None: None}
 
 # for _qlDurationFromAttr()
-# None is for when @dur is omitted
+# None is for when @dur is omitted; it's silly so it can be identified
+# TODO: modify Duration so it accepts a 2048th note
 _DUR_ATTR_DICT = {'long': 16.0, 'breve': 8.0, '1': 4.0, '2': 2.0, '4': 1.0, '8': 0.5, '16': 0.25,
                   '32': 0.125, '64': 0.0625, '128': 0.03125, '256': 0.015625, '512': 0.0078125,
-                  '1024': 0.00390625, '2048': 0.001953125, None: 0.0}
+                  '1024': 0.00390625, '2048': 0.001953125, None: 0.00390625}
 
 # for _articulationFromAttr()
 # NOTE: 'marc-stacc' and 'ten-stacc' require multiple music21 events, so they are handled
@@ -2534,7 +2550,34 @@ def staffFromElement(elem, slurBundle=None):
     return layers
 
 
-def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
+def _correctMRestDurs(staves, targetLength):
+    '''
+    Helper function for measureFromElement(), not intended to be used elsewhere. It's a separate
+    function only (1) to reduce duplication, and (2) to improve testability.
+
+    Iterate the imported objects of <layer> elements in the <staff> elements in a <measure>,
+    detecting those with the "m21wasMRest" attribute and setting their duration to "targetLength."
+
+    The "staves" argument should be a dictionary where the values are Measure objects with at least
+    one Voice object inside.
+
+    The "targetLength" argument should be the duration of the measure.
+
+    Nothing is returned; the duration of affected objects is modified in-place.
+    '''
+    for eachMeasure in six.itervalues(staves):
+        for eachVoice in eachMeasure:
+            if not isinstance(eachVoice, stream.Stream):
+                continue
+            for eachObject in eachVoice:
+                if hasattr(eachObject, 'm21wasMRest'):
+                    eachObject.quarterLength = targetLength
+                    eachVoice.duration = duration.Duration(targetLength)
+                    eachMeasure.duration = duration.Duration(targetLength)
+                    del eachObject.m21wasMRest
+
+
+def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, activeMeter=None):
     # TODO: write tests
     '''
     <measure> Unit of musical time consisting of a fixed number of note-values of a given type, as
@@ -2550,9 +2593,13 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
         If an expected <staff> isn't in the <measure>, it will be created with a full-measure rest.
         The default is ``None``.
     :type expectedNs: iterable of str
+    :param activeMeter: The :class:`~music21.meter.TimeSignature` active in this <measure>. This is
+        used to adjust the duration of an <mRest> that was given without a @dur attribute.
     :returns: A dictionary where keys are the @n attributes for <staff> tags found in this
         <measure>, and values are :class:`~music21.stream.Measure` objects that should be appended
-        to the :class:`Part` instance with the value's @n attributes.
+        to the :class:`Part` instance with the value's @n attributes. Note also that, if all the
+        staves have an <mRest> with unmarked duration, the :class:`Measure` objects will be given a
+        :attr:`m21hasMRests` attribute (set to ``True``).
     :rtype: dict of :class:`music21.stream.Measure`
 
     **Attributes/Elements Implemented:** none
@@ -2611,18 +2658,18 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
     maxBarDuration = None
 
     # iterate all immediate children
-    for eachTag in elem.iterfind('*'):
-        if staffTagName == eachTag.tag:
-            staves[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag, slurBundle=slurBundle),
-                                                      number=int(elem.get('n', backupNum)))
-            thisBarDuration = staves[eachTag.get('n')].duration.quarterLength
+    for eachElem in elem.iterfind('*'):
+        if staffTagName == eachElem.tag:
+            staves[eachElem.get('n')] = stream.Measure(staffFromElement(eachElem, slurBundle=slurBundle),
+                                                       number=int(elem.get('n', backupNum)))
+            thisBarDuration = staves[eachElem.get('n')].duration.quarterLength
             if maxBarDuration is None or maxBarDuration < thisBarDuration:
                 maxBarDuration = thisBarDuration
-        elif eachTag.tag in tagToFunction:
+        elif eachElem.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
-            staves[eachTag.get('n')] = tagToFunction[eachTag.tag](eachTag, slurBundle)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
+            staves[eachElem.get('n')] = tagToFunction[eachElem.tag](eachElem, slurBundle)
+        elif eachElem.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug('unprocessed {} in {}'.format(eachElem.tag, elem.tag))
 
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
     for eachN in expectedNs:
@@ -2631,17 +2678,17 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
             restVoice.id = '1'
             staves[eachN] = stream.Measure([restVoice], number=int(elem.get('n', backupNum)))
 
-    # see if any of the Measures are shorter than the others; if so, check for <mRest/> tags that
-    # didn't have a @dur set
-    # TODO: find a better way to deal with full-measure rests
-    #for eachN in expectedNs:
-        #if staves[eachN].duration.quarterLength < maxBarDuration:
-            #for eachVoice in staves[eachN]:
-                #for eachThing in eachVoice:
-                    #if isinstance(eachThing, note.Rest):
-                        #eachThing.duration = duration.Duration(maxBarDuration -
-                                                               #staves[eachN].duration.quarterLength +
-                                                               #eachThing.duration.quarterLength)
+    # First search for Rest objects created by an <mRest> element that didn't have @dur set. This
+    # will only work in cases where not all of the parts are resting. However, it avoids a more
+    # time-consuming search later.
+    if (maxBarDuration == _DUR_ATTR_DICT[None] and
+        activeMeter is not None and
+        maxBarDuration != activeMeter.totalLength):
+        # In this case, all the staves have <mRest> elements without a @dur.
+        asdf(staves, activeMeter.totalLength)
+    else:
+        # In this case, some or none of the staves have an <mRest> element without a @dur.
+        asdf(staves, maxBarDuration)
 
     # assign left and right barlines
     if elem.get('left') is not None:
