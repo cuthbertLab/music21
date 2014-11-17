@@ -121,8 +121,8 @@ try:
     import six
 except ImportError:
     from music21.ext import six
-from six.moves import xrange  # pylint: disable=redefined-builtin,import-error
-from six.moves import range  # pylint: disable=redefined-builtin,import-error
+from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
+from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
 
 
 # Module-Level Constants
@@ -202,7 +202,9 @@ class MeiToM21Converter(object):
                 raise MeiValidityError(_INVALID_XML_DOC)
 
             if isinstance(self.documentRoot, ETree.ElementTree):
-                self.documentRoot = self.documentRoot.getroot()
+                # pylint warns that :class:`Element` doesn't have a getroot() method, which is
+                # true enough, but...
+                self.documentRoot = self.documentRoot.getroot()  # pylint: disable=maybe-no-member
 
             if '{http://www.music-encoding.org/ns/mei}mei' != self.documentRoot.tag:
                 raise MeiElementError(_WRONG_ROOT_ELEMENT.format(self.documentRoot.tag))
@@ -837,7 +839,7 @@ def _ppTuplets(theConverter):
     # pre-processing <tupletSpan> tags
     for eachTuplet in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
         if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None) and
-            eachTuplet.get('plist') is None):
+                eachTuplet.get('plist') is None):
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tupletSpan>', '@startid and @endid or @plist'))
         elif eachTuplet.get('plist') is not None:
             # Ideally (for us) <tupletSpan> elements will have a @plist that enumerates the
@@ -1515,7 +1517,8 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     This <staffDef> returns many objects.
 
     >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
-    ... <staffDef n="2" label="Tuba" key.pname="B" key.accid="f" key.mode="major" xmlns="http://www.music-encoding.org/ns/mei">
+    ... <staffDef n="2" label="Tuba" key.pname="B" key.accid="f" key.mode="major"
+    ...  xmlns="http://www.music-encoding.org/ns/mei">
     ...     <clef shape="F" line="4"/>
     ... </staffDef>
     ... """
@@ -1606,9 +1609,9 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     # --> clef
     if elem.get('clef.shape') is not None:
         post['clef'] = clefFromElement(ETree.Element('clef', {'shape': elem.get('clef.shape'),
-                                                          'line': elem.get('clef.line'),
-                                                          'dis': elem.get('clef.dis'),
-                                                          'dis.place': elem.get('clef.dis.place')}))
+                                                              'line': elem.get('clef.line'),
+                                                              'dis': elem.get('clef.dis'),
+                                                              'dis.place': elem.get('clef.dis.place')}))
 
     embeddedItems = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
     for eachItem in embeddedItems:
@@ -1795,10 +1798,10 @@ def noteFromElement(elem, slurBundle=None):
 
     # pitch and duration... these are what we can set in the constructor
     theNote = note.Note(safePitch(elem.get('pname', ''),
-                               _accidentalFromAttr(elem.get('accid')),
-                               elem.get('oct', '')),
-                     duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
-                                           int(elem.get('dots', 0))))
+                                  _accidentalFromAttr(elem.get('accid')),
+                                  elem.get('oct', '')),
+                        duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
+                                              int(elem.get('dots', 0))))
 
     # iterate all immediate children
     dotElements = 0  # count the number of <dot> elements
@@ -1894,7 +1897,7 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     # NOTE: keep this in sync with spaceFromElement()
 
     theRest = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
-                                           int(elem.get('dots', 0))))
+                                              int(elem.get('dots', 0))))
 
     if elem.get(_XMLID) is not None:
         theRest.id = elem.get(_XMLID)
@@ -1922,7 +1925,7 @@ def mRestFromElement(elem, slurBundle=None):
     return restFromElement(elem, slurBundle)
 
 
-def spaceFromElement(elem, slurBundle=None):
+def spaceFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <space>  A placeholder used to fill an incomplete measure, layer, etc. most often so that the
     combined duration of the events equals the number of beats in the measure.
@@ -1934,7 +1937,7 @@ def spaceFromElement(elem, slurBundle=None):
     # NOTE: keep this in sync with restFromElement()
 
     theSpace = note.SpacerRest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
-                                                 int(elem.get('dots', 0))))
+                                                     int(elem.get('dots', 0))))
 
     if elem.get(_XMLID) is not None:
         theSpace.id = elem.get(_XMLID)
@@ -2109,8 +2112,8 @@ def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
         theClef = clef.TabClef()
     else:
         theClef = clef.clefFromString(elem.get('shape') + elem.get('line'),
-                                   octaveShift=_getOctaveShift(elem.get('dis'),
-                                                               elem.get('dis.place')))
+                                      octaveShift=_getOctaveShift(elem.get('dis'),
+                                                                  elem.get('dis.place')))
 
     if elem.get(_XMLID) is not None:
         theClef.id = elem.get(_XMLID)
@@ -2432,8 +2435,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     # make the Voice
     theVoice = stream.Voice()
     for each in theLayer:
-        theVoice._appendCore(each)
-    theVoice._elementsChanged()
+        theVoice._appendCore(each)  # pylint: disable=protected-access
+    theVoice._elementsChanged()  # pylint: disable=protected-access
 
     # try to set the Voice's "id" attribte
     if overrideN:
@@ -2598,7 +2601,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None):
     for eachTag in elem.iterfind('*'):
         if staffTagName == eachTag.tag:
             staves[eachTag.get('n')] = stream.Measure(staffFromElement(eachTag, slurBundle=slurBundle),
-                                                    number=int(elem.get('n', backupNum)))
+                                                      number=int(elem.get('n', backupNum)))
             thisBarDuration = staves[eachTag.get('n')].duration.quarterLength
             if maxBarDuration is None or maxBarDuration < thisBarDuration:
                 maxBarDuration = thisBarDuration

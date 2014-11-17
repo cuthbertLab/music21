@@ -11,9 +11,21 @@
 '''
 Tests for :mod:`music21.mei.base`.
 '''
+
+# part of the whole point is to test protect things too
 # pylint: disable=protected-access
+
+# this often happens on TestCase subclasses
 # pylint: disable=too-many-public-methods
+
+# a test that uses only assertions on the Mocks will have no-self-use
 # pylint: disable=no-self-use
+
+# if we mock many things, this may be triggered
+# pylint: disable=too-many-arguments
+
+# pylint is bad at guessing types in these tests---reasonably so
+# pylint: disable=maybe-no-member
 
 import unittest
 try:
@@ -54,8 +66,8 @@ try:
     import six
 except ImportError:
     from music21.ext import six
-from six.moves import xrange  # pylint: disable=redefined-builtin
-from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
+from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
 
 # Importing from base.py
 import music21.mei.base as base
@@ -844,8 +856,8 @@ class TestRestFromElement(unittest.TestCase):
         (without mock objects)
         '''
         elem = ETree.Element('space', attrib={'dur': '4', 'dots': '1', _XMLID: 'the id',
-                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
-                                             'm21TupletType': 'start'})
+                                              'm21TupletNum': '5', 'm21TupletNumbase': '4',
+                                              'm21TupletType': 'start'})
 
         actual = base.spaceFromElement(elem)
 
@@ -885,11 +897,10 @@ class TestChordFromElement(unittest.TestCase):
         mockNewChord = mock.MagicMock()
         mockChord.return_value = mockNewChord
         mockProcEmbEl.return_value = []
-        expected = mockNewChord
 
         actual = base.chordFromElement(elem, None)
 
-        self.assertEqual(expected, mockNewChord, actual)  # TODO: this calls __eq__() but I don't know if that actually returns something useful
+        self.assertEqual(mockNewChord, actual)
         mockMakeDuration.assert_called_once_with(1.0, 1)
         mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
         self.assertEqual(0, mockNewChord.id.call_count)
@@ -984,11 +995,10 @@ class TestChordFromElement(unittest.TestCase):
         mockProcEmbEl.return_value = []
         mockArticList.return_value = ['staccato!']
         mockTie.return_value = 'a tie!'
-        expected = mockNewChord
 
         actual = base.chordFromElement(elem, 'slur bundle')
 
-        self.assertEqual(expected, mockNewChord, actual)
+        self.assertEqual(mockNewChord, actual)
         mockMakeDuration.assert_called_once_with(1.0, 1)
         mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
         self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
@@ -1301,7 +1311,7 @@ class TestLayerFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1c(self, mockTuplets, mockVoice, mockNoteFromElement):
+    def testUnit1c(self, mockTuplets, mockVoice, mockNoteFromElement):  # pylint: disable=unused-argument
         '''
         Same as testUnit1a() *but* without ``overrideN`` or @n.
         '''
@@ -2410,13 +2420,14 @@ class TestPreprocessors(unittest.TestCase):
         theNumbase = 900
         iterfindReturn = [ETree.Element('tupletSpan', attrib={'num': theNum, 'numbase': theNumbase})]
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
+        expWarning = 'Importing <tupletSpan> without @startid and @endid or @plist is not yet supported.'
 
         base._ppTuplets(mockConverter)
 
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         self.assertEqual(0, len(mockConverter.m21Attr))
-        mockEnviron.warn.assert_called_once_with('Importing <tupletSpan> without @startid and @endid or @plist is not yet supported.')
+        mockEnviron.warn.assert_called_once_with(expWarning)
 
     def testUnitTuplets3(self):
         '''
@@ -2692,7 +2703,7 @@ class TestTuplets(unittest.TestCase):
         theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
         expectedDurs = [1.0 for _ in xrange(5)]
 
-        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-acccess
+        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-access
 
         for i in xrange(len(expectedDurs)):
             self.assertEqual(expectedDurs[i], actual[i].quarterLength)
@@ -2710,7 +2721,7 @@ class TestTuplets(unittest.TestCase):
         theLayer[2].m21TupletNumbase = '2'
         expectedDurs = [Fraction(2, 3), Fraction(2, 3), Fraction(2, 3), 1.0, 1.0]
 
-        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-acccess
+        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-access
 
         for i in xrange(len(expectedDurs)):
             self.assertEqual(expectedDurs[i], actual[i].quarterLength)
@@ -2732,7 +2743,7 @@ class TestTuplets(unittest.TestCase):
         theLayer[3].m21TupletNumbase = '2'
         expectedDurs = [1.0, Fraction(2, 3), Fraction(2, 3), Fraction(2, 3), 1.0]
 
-        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-acccess
+        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-access
 
         for i in xrange(len(expectedDurs)):
             self.assertEqual(expectedDurs[i], actual[i].quarterLength)
@@ -2754,7 +2765,7 @@ class TestTuplets(unittest.TestCase):
         theLayer[4].m21TupletNumbase = '2'
         expectedDurs = [1.0, 1.0, Fraction(2, 3), Fraction(2, 3), Fraction(2, 3)]
 
-        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-acccess
+        actual = base._guessTuplets(theLayer)  # pylint: disable=protected-access
 
         for i in xrange(len(expectedDurs)):
             self.assertEqual(expectedDurs[i], actual[i].quarterLength)
