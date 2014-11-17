@@ -1916,13 +1916,19 @@ def mRestFromElement(elem, slurBundle=None):
     In MEI 2013: pg.375 (389 in PDF) (MEI.cmn module)
 
     This is a function wrapper for :func:`restFromElement`.
+
+    .. note:: If the <mRest> element does not have a @dur attribute, it will have the default
+        duration of 1.0. This must be fixed later, so the :class:`Rest` object returned from this
+        method is given the :attr:`m21wasMRest` attribute, set to True.
     '''
-    # TODO: <mRest> elements sometimes won't have a @dur set; it's simply supposed to take up the
-    #       whole measure. But then the quarterLength will be 1.0, which isn't good.
-    # TODO: even the algorithm currently in measureFromElement() won't necessarily do this correctly,
-    #       since if all parts have a full-measure rest, they will all have the same (incorrect)
-    #       duration set.
-    return restFromElement(elem, slurBundle)
+    # NOTE: keep this in sync with mSpaceFromElement()
+
+    if elem.get('dur') is not None:
+        return restFromElement(elem, slurBundle)
+    else:
+        theRest = restFromElement(elem, slurBundle)
+        theRest.m21wasMRest = True
+        return theRest
 
 
 def spaceFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
@@ -1931,8 +1937,6 @@ def spaceFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     combined duration of the events equals the number of beats in the measure.
 
     In MEI 2013: pg.440 (455 in PDF) (MEI.shared module)
-
-    .. note:: Since music21 lacks "spacer" objects, this is imported as a :class:`~music21.note.Rest`.
     '''
     # NOTE: keep this in sync with restFromElement()
 
@@ -1956,10 +1960,19 @@ def mSpaceFromElement(elem, slurBundle=None):
     In MEI 2013: pg.377 (391 in PDF) (MEI.cmn module)
 
     This is a function wrapper for :func:`spaceFromElement`.
+
+    .. note:: If the <mSpace> element does not have a @dur attribute, it will have the default
+        duration of 1.0. This must be fixed later, so the :class:`Space` object returned from this
+        method is given the :attr:`m21wasMRest` attribute, set to True.
     '''
-    # TODO: <mSpace> elements sometimes won't have a @dur set; it's simply supposed to take up the
-    #       whole measure. But then the quarterLength will be 1.0, which isn't good.
-    return spaceFromElement(elem, slurBundle)
+    # NOTE: keep this in sync with mRestFromElement()
+
+    if elem.get('dur') is not None:
+        return spaceFromElement(elem, slurBundle)
+    else:
+        theSpace = spaceFromElement(elem, slurBundle)
+        theSpace.m21wasMRest = True
+        return theSpace
 
 
 def chordFromElement(elem, slurBundle=None):

@@ -866,6 +866,60 @@ class TestRestFromElement(unittest.TestCase):
         self.assertEqual('the id', actual.id)
         self.assertEqual('start', actual.duration.tuplets[0].type)
 
+    @mock.patch('music21.mei.base.restFromElement')
+    def testUnit3(self, mockRest):
+        '''
+        mRestFromElement(): reacts properly to an Element with the @dur attribute
+        '''
+        elem = ETree.Element('mRest', attrib={'dur': '2'})
+        mockRest.return_value = 'the rest'
+
+        actual = base.mRestFromElement(elem)
+
+        self.assertEqual(mockRest.return_value, actual)
+        mockRest.assert_called_once_with(elem, None)
+
+    @mock.patch('music21.mei.base.restFromElement')
+    def testUnit4(self, mockRest):
+        '''
+        mRestFromElement(): reacts properly to an Element without the @dur attribute
+        '''
+        elem = ETree.Element('mRest')
+        mockRest.return_value = mock.MagicMock()
+
+        actual = base.mRestFromElement(elem)
+
+        self.assertEqual(mockRest.return_value, actual)
+        mockRest.assert_called_once_with(elem, None)
+        self.assertTrue(actual.m21wasMRest)
+
+    @mock.patch('music21.mei.base.spaceFromElement')
+    def testUnit5(self, mockSpace):
+        '''
+        mSpaceFromElement(): reacts properly to an Element with the @dur attribute
+        '''
+        elem = ETree.Element('mSpace', attrib={'dur': '2'})
+        mockSpace.return_value = 'the spacer'
+
+        actual = base.mSpaceFromElement(elem)
+
+        self.assertEqual(mockSpace.return_value, actual)
+        mockSpace.assert_called_once_with(elem, None)
+
+    @mock.patch('music21.mei.base.spaceFromElement')
+    def testUnit6(self, mockSpace):
+        '''
+        mSpaceFromElement(): reacts properly to an Element without the @dur attribute
+        '''
+        elem = ETree.Element('mSpace')
+        mockSpace.return_value = mock.MagicMock()
+
+        actual = base.mSpaceFromElement(elem)
+
+        self.assertEqual(mockSpace.return_value, actual)
+        mockSpace.assert_called_once_with(elem, None)
+        self.assertTrue(actual.m21wasMRest)
+
 
 #------------------------------------------------------------------------------
 class TestChordFromElement(unittest.TestCase):
