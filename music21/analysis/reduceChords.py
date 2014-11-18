@@ -721,9 +721,9 @@ class TestExternal(unittest.TestCase):
     def testTrecentoMadrigal(self):
         from music21 import corpus
 
-        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 10)
+        score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 10)
         #score = corpus.parse('bach/bwv846').measures(1, 19)
-        score = corpus.parse('bach/bwv66.6')
+        #score = corpus.parse('bach/bwv66.6')
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
         #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
         #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)

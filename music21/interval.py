@@ -498,9 +498,6 @@ class GenericInterval(base.Music21Object):
         >>> aInterval.undirected
         12
 
-
-
-
         >>> bInterval = aInterval.complement()
         >>> bInterval.staffDistance
         3

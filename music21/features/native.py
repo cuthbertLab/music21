@@ -705,11 +705,13 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
     be stored in i = 11).  i = 0 is always 0.0 since consecutive
     chords on the same pitch are ignored (unless there are 0 or 1 harmonies, in which case it is 1)
        
-    Sample test on the BlowinInTheWind, showing all motion is 3rds, 6ths, or especially 4ths and 5ths.
+    Sample test on Dylan's Blowing In The Wind (not included), showing all motion is 3rds, 6ths, or especially 4ths and 5ths.
     
-    >>> s = corpus.parse('demos/BlowinInTheWind') 
-    >>> fe = features.native.ChordBassMotionFeature(s)
-    >>> fe.extract().vector 
+    ::
+        s = corpus.parse('demos/BlowinInTheWind') 
+        fe = features.native.ChordBassMotionFeature(s)
+        fe.extract().vector 
+    
     [0.0, 0.0, 0.0, 0.0416..., 0.0416..., 0.166..., 0.0, 0.54166..., 0.0, 0.0, 0.2083... 0.0]
 
 
