@@ -278,12 +278,14 @@ class MeiToM21Converter(object):
 
         environLocal.printDebug('*** processing measures')
 
+        # "nextMeasureLeft" holds a Barline or Repeat object that was indicated in one measure, but
+        # about the following measure. This really only happens when @right="rptboth".
+        nextMeasureLeft = None
         backupMeasureNum = 0
         for eachSection in self.documentRoot.iterfind('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
             # TODO: sections aren't divided or treated specially, yet
             for eachObject in eachSection:
                 if '{http://www.music-encoding.org/ns/mei}measure' == eachObject.tag:
-                    # TODO: MEI's "rptboth" barlines require handling at the multi-measure level
                     # TODO: follow the use of @n described on pg.585 (599) of the MEI Guidelines
                     backupMeasureNum += 1
                     # process all the stuff in the <measure>
@@ -302,8 +304,16 @@ class MeiToM21Converter(object):
                         # TODO: this doesn't actually solve the "pick-up measure" problem
                         if 1 == backupMeasureNum:
                             measureResult[eachN].padAsAnacrusis()
+                        # if we got a left-side barline from the previous measure, use it
+                        if nextMeasureLeft is not None:
+                            measureResult[eachN].leftBarline = nextMeasureLeft
                         # add this Measure to the Part
                         parsed[eachN].append(measureResult[eachN])
+                    # if we got a barline for the next <measure>
+                    if 'next @left' in measureResult:
+                        nextMeasureLeft = measureResult['next @left']
+                    else:
+                        nextMeasureLeft = None
                 elif '{http://www.music-encoding.org/ns/mei}scoreDef' == eachObject.tag:
                     scoreDefResults = scoreDefFromElement(eachObject)
                     # spread all-part elements across all the parts
@@ -1053,18 +1063,19 @@ def _transpositionFromAttrs(elem):
 def _barlineFromAttr(attr):
     '''
     Use :func:`_attrTranslator` to convert the value of a "left" or "right" attribute to a
-    list of :class:`Barline` or :class:`Repeat`. Note this must be a list because an end-repeat and
-    start-repeat at the same time must be two distinct objects in music21.
+    :class:`Barline` or :class:`Repeat` or occaionsally a list of :class:`Repeat`. The only time a
+    list is returned is when "attr" is ``'rptboth'``, in which case the end and start barlines are
+    both returned.
 
     :param str attr: The MEI @left or @right attribute to convert to a barline.
     :returns: The barline.
-    :rtype: list of :class:`music21.bar.Barline` or :class:`~music21.bar.Repeat`
+    :rtype: :class:`music21.bar.Barline` or :class:`~music21.bar.Repeat` or list of them
     '''
     # NB: the MEI Specification says @left is used only for legcay-format conversions, so we'll
     #     just assume it's a @right attribute. Not a huge deal if we get this wrong (I hope).
     if attr.startswith('rpt'):
         if 'rptboth' == attr:
-            return None
+            return _barlineFromAttr('rptend'), _barlineFromAttr('rptstart')
         elif 'rptend' == attr:
             return bar.Repeat('end', times=2)
         else:
@@ -2597,10 +2608,12 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
         used to adjust the duration of an <mRest> that was given without a @dur attribute.
     :returns: A dictionary where keys are the @n attributes for <staff> tags found in this
         <measure>, and values are :class:`~music21.stream.Measure` objects that should be appended
-        to the :class:`Part` instance with the value's @n attributes. Note also that, if all the
-        staves have an <mRest> with unmarked duration, the :class:`Measure` objects will be given a
-        :attr:`m21hasMRests` attribute (set to ``True``).
+        to the :class:`Part` instance with the value's @n attributes.
     :rtype: dict of :class:`music21.stream.Measure`
+
+    .. note:: When the right barline is set to ``'rptboth'`` in MEI, it requires adjusting the left
+        barline of the following <measure>. If this happens, the :class:`Repeat` object is assigned
+        to the ``'next @left'`` key in the returned dictionary.
 
     **Attributes/Elements Implemented:** none
 
@@ -2692,15 +2705,24 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
 
     # assign left and right barlines
     if elem.get('left') is not None:
+        barz = _barlineFromAttr(elem.get('left'))
+        if hasattr(barz, '__len__'):
+            # this means @left was "rptboth"
+            barz = barz[1]
         for eachMeasure in six.itervalues(staves):
             if not isinstance(eachMeasure, stream.Measure):
                 continue
-            eachMeasure.leftBarline = _barlineFromAttr(elem.get('left'))
+            eachMeasure.rightBarline = barz
     if elem.get('right') is not None:
+        barz = _barlineFromAttr(elem.get('right'))
+        if hasattr(barz, '__len__'):
+            # this means @right was "rptboth"
+            staves['next @left'] = barz[1]
+            barz = barz[0]
         for eachMeasure in six.itervalues(staves):
             if not isinstance(eachMeasure, stream.Measure):
                 continue
-            eachMeasure.rightBarline = _barlineFromAttr(elem.get('right'))
+            eachMeasure.rightBarline = barz
 
     return staves
 

@@ -528,9 +528,10 @@ class TestAttrTranslators(unittest.TestCase):
     def testBarlineFromAttr1(self):
         '''_barlineFromAttr(): rptboth'''
         right = 'rptboth'
-        expected = None
+        expected = (bar.Repeat('end', times=2), bar.Repeat('start'))
         actual = base._barlineFromAttr(right)
-        self.assertEqual(type(expected), type(actual))
+        self.assertEqual(type(expected[0]), type(actual[0]))
+        self.assertEqual(type(expected[1]), type(actual[1]))
 
     def testBarlineFromAttr2(self):
         '''_barlineFromAttr(): rptend'''
