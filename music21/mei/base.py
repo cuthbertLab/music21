@@ -2685,10 +2685,10 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
         activeMeter is not None and
         maxBarDuration != activeMeter.totalLength):
         # In this case, all the staves have <mRest> elements without a @dur.
-        asdf(staves, activeMeter.totalLength)
+        _correctMRestDurs(staves, activeMeter.totalLength)
     else:
         # In this case, some or none of the staves have an <mRest> element without a @dur.
-        asdf(staves, maxBarDuration)
+        _correctMRestDurs(staves, maxBarDuration)
 
     # assign left and right barlines
     if elem.get('left') is not None:
