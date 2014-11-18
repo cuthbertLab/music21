@@ -230,8 +230,7 @@ if __name__ == "__main__":
     #test.leadsheetEx1()
     #sc = converter.parse('C:/wikifonia/wikifonia-4750.mxl') #hey Jude -- gone
     
-    #sc = corpus.parse('demos/BlowinInTheWind.mxl')
-    #test.realizeLeadsheet(sc)
+
 
     testfile1 = '''
 % Dylan - Blowin' in the Wind

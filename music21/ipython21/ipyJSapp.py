@@ -4,7 +4,9 @@
 
 
 # start with
-# ~/anaconda/bin/python ipythonNotebookStart 
+# ~/anaconda/bin/python ipyJSapp.py 
+
+# 
 
 #    -- needs ipython v.2  
 import os
