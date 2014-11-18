@@ -380,5 +380,7 @@ if __name__ == '__main__':
     groundTruthFilePath = correctors.K525groundTruthFilePath
     evaluateCorrectingModel(omrFilePath, groundTruthFilePath, debug = True)
 
+    omr.evalutators.evaluateCorrectingModel(     # @UndefinedVariable
+         omrFilePath, groundTruthFilePath)
 
 
