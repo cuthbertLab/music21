@@ -1737,11 +1737,29 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.248 (262 in PDF) (MEI.shared module)
 
-    **Attributes/Elements Implemented:** none
+    :returns: A string indicating the music21 representation of this accidental.
 
-    **Attributes/Elements in Testing:**
+    **Examples**
+
+    Unlike most of the ___FromElement() functions, this does not return any music21 object---just
+    a string. Accidentals up to triple-sharp and triple-flat are supported.
+
+    >>> from xml.etree import ElementTree as ET
+    >>> from music21 import *
+    >>> meiSnippet = """<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = ET.fromstring(meiSnippet)
+    >>> mei.base.accidFromElement(meiSnippet)
+    '#'
+    >>> meiSnippet = """<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = ET.fromstring(meiSnippet)
+    >>> mei.base.accidFromElement(meiSnippet)
+    '---'
+
+    **Attributes/Elements Implemented:**
 
     - @accid (from att.accid.log)
+
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
 
