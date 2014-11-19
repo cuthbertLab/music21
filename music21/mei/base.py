@@ -2200,7 +2200,8 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
 
 def beamFromElement(elem, slurBundle=None):
-    # TODO: write tests
+    # NB: The doctest is a sufficient integration test. Since there is no logic, I don't think we
+    #     need to bother with unit testing.
     '''
     <beam> A container for a series of explicitly beamed events that begins and ends entirely
            within a measure.
@@ -2226,14 +2227,22 @@ def beamFromElement(elem, slurBundle=None):
     ... </beam>"""
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> result = mei.base.beamFromElement(meiSnippet)
+    >>> isinstance(result, list)
+    True
     >>> len(result)
     3
     >>> result[0].pitch.nameWithOctave
     'A7'
+    >>> result[0].beams
+    <music21.beam.Beams <music21.beam.Beam 1/start>>
     >>> result[1].pitch.nameWithOctave
     'B7'
+    >>> result[1].beams
+    <music21.beam.Beams <music21.beam.Beam 1/continue>>
     >>> result[2].pitch.nameWithOctave
     'C6'
+    >>> result[2].beams
+    <music21.beam.Beams <music21.beam.Beam 1/stop>>
 
     **Attributes/Elements Implemented:**
 
@@ -2273,6 +2282,7 @@ def beamFromElement(elem, slurBundle=None):
     - MEI.mensural: ligature mensur proport
     - MEI.shared: barLine clefGrp custos keySig pad
     '''
+
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
