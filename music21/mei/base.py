@@ -1680,11 +1680,33 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     In MEI 2013: pg.259 (273 in PDF) (MEI.shared module)
 
-    **Attributes Implemented:** none
+    :returns: A list of :class:`~music21.articulations.Articulation` objects.
 
-    **Attributes/Elements in Testing:**
+    **Examples**
+
+    This function is normally called by, for example, :func:`noteFromElement`, to determine the
+    :class:`Articulation` objects that will be assigned to the
+    :attr:`~music21.note.GeneralNote.articulations` attribute.
+
+    >>> from xml.etree import ElementTree as ET
+    >>> from music21 import *
+    >>> meiSnippet = """<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = ET.fromstring(meiSnippet)
+    >>> mei.base.articFromElement(meiSnippet)
+    [<music21.articulations.Accent>]
+
+    A single <artic> element may indicate many :class:`Articulation` objects.
+
+    >>> meiSnippet = """<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = ET.fromstring(meiSnippet)
+    >>> mei.base.articFromElement(meiSnippet)
+    [<music21.articulations.Accent>, <music21.articulations.Tenuto>]
+
+    **Attributes Implemented:**
 
     - @artic
+
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
 
@@ -1695,7 +1717,7 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
         - (att.controlevent
 
-            - (att.plist (@plist, @evaluate))  # TODO: this
+            - (att.plist (@plist, @evaluate))
             - (att.timestamp.musical (@tstamp))
             - (att.timestamp.performed (@tstamp.ges, @tstamp.real))
             - (att.staffident (@staff))
