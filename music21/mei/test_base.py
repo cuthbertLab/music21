@@ -2874,3 +2874,74 @@ class TestTuplets(unittest.TestCase):
             self.assertFalse(hasattr(theLayer[i], 'm21TupletSearch'))
             self.assertFalse(hasattr(theLayer[i], 'm21TupletNum'))
             self.assertFalse(hasattr(theLayer[i], 'm21TupletNumbase'))
+
+
+#------------------------------------------------------------------------------
+class TestInstrDef(unittest.TestCase):
+    '''Tests for instrDefFromElement().'''
+
+    @mock.patch('music21.instrument.instrumentFromMidiProgram')
+    def testUnit1(self, mockFromProg):
+        '''instrDefFromElement(): when @midi.instrnum is given'''
+        elem = ETree.Element('instrDef', attrib={'midi.instrnum': '71'})
+        expFromProgArg = 71
+        mockFromProg.return_value = 'Guess Which Instrument'
+        expected = mockFromProg.return_value
+
+        actual = base.instrDefFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        mockFromProg.assert_called_once_with(expFromProgArg)
+
+    @mock.patch('music21.instrument.fromString')
+    def testUnit2(self, mockFromString):
+        '''instrDefFromElement(): when @midi.instrname is given, and it works'''
+        elem = ETree.Element('instrDef', attrib={'midi.instrname': 'Tuba'})
+        expFromStringArg = 'Tuba'
+        mockFromString.return_value = "That's right: tuba"
+        expected = mockFromString.return_value
+
+        actual = base.instrDefFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        mockFromString.assert_called_once_with(expFromStringArg)
+
+    @mock.patch('music21.mei.base.instrument')
+    def testUnit3a(self, mockInstr):
+        '''instrDefFromElement(): when @midi.instrname is given, and it explodes (AttributeError)'''
+        # For Py3 we have to replace the exception, since it's not okay to catch classes that don't
+        # inherit from BaseException (which a MagicMock obviously doesn't)
+        mockInstr.InstrumentException = instrument.InstrumentException
+        elem = ETree.Element('instrDef', attrib={'midi.instrname': 'Gold-Plated Kazoo'})
+        expFromStringArg = 'Gold-Plated Kazoo'
+        mockInstr.fromString = mock.MagicMock()
+        mockInstr.fromString.side_effect = AttributeError
+        mockInstr.Instrument.return_value = mock.MagicMock()
+        mockInstr.Instrument.return_value.partName = None
+        expected = mockInstr.Instrument.return_value
+
+        actual = base.instrDefFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        mockInstr.fromString.assert_called_once_with(expFromStringArg)
+        self.assertEqual(expFromStringArg, actual.partName)
+
+    @mock.patch('music21.mei.base.instrument')
+    def testUnit3b(self, mockInstr):
+        '''instrDefFromElement(): when @midi.instrname is given, and it explodes (InstrumentException)'''
+        # For Py3 we have to replace the exception, since it's not okay to catch classes that don't
+        # inherit from BaseException (which a MagicMock obviously doesn't)
+        mockInstr.InstrumentException = instrument.InstrumentException
+        elem = ETree.Element('instrDef', attrib={'midi.instrname': 'Gold-Plated Kazoo'})
+        expFromStringArg = 'Gold-Plated Kazoo'
+        mockInstr.fromString = mock.MagicMock()
+        mockInstr.fromString.side_effect = instrument.InstrumentException
+        mockInstr.Instrument.return_value = mock.MagicMock()
+        mockInstr.Instrument.return_value.partName = None
+        expected = mockInstr.Instrument.return_value
+
+        actual = base.instrDefFromElement(elem)
+
+        self.assertEqual(expected, actual)
+        mockInstr.fromString.assert_called_once_with(expFromStringArg)
+        self.assertEqual(expFromStringArg, actual.partName)

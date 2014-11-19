@@ -2162,7 +2162,6 @@ def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
 
 def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
-    # TODO: write tests
     '''
     <instrDef> (instrument definition)---MIDI instrument declaration.
 
@@ -2749,6 +2748,7 @@ if __name__ == "__main__":
                      test_base.TestBeams,
                      test_base.TestPreprocessors,
                      test_base.TestTuplets,
+                     test_base.TestInstrDef,
                     )
 
 #------------------------------------------------------------------------------
