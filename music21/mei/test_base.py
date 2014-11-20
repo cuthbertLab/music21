@@ -778,16 +778,19 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.pitch.Accidental')
     def testUnit4(self, mockAccid, mockTuplet, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
-        noteFromElement(): adds @grace, and tuplet-related attributes
+        noteFromElement(): adds @grace, and tuplet-related attributes; plus @m21Beam where the
+            duration doesn't require adjusting beams
 
         (mostly-unit test)
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4',
                                              'm21TupletNum': '5', 'm21TupletNumbase': '4',
                                              'm21TupletSearch': 'start',
-                                             'accid.ges': 's'})
+                                             'accid.ges': 's', 'm21Beam': 'start'})
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
+        mockNewNote.beams = mock.MagicMock()
+        mockNewNote.duration.type = 'quarter'
         mockNote.return_value = mockNewNote
         mockProcEmbEl.return_value = []
         mockTuplet.return_value = 'made the tuplet'
@@ -803,6 +806,7 @@ class TestNoteFromElement(unittest.TestCase):
                                          duration=mockMakeDuration.return_value)
         mockTuplet.assert_called_once_with(mockNewNote, elem)
         mockAccid.assert_called_once_with('#')
+        self.assertEqual(0, mockNewNote.beams.fill.call_count)
 
     def testIntegration4(self):
         '''
@@ -812,7 +816,7 @@ class TestNoteFromElement(unittest.TestCase):
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4',
                                              'm21TupletNum': '5', 'm21TupletNumbase': '4',
                                              'm21TupletSearch': 'start',
-                                             'accid.ges': 's'})
+                                             'accid.ges': 's', 'm21Beam': 'start'})
         slurBundle = spanner.SpannerBundle()
 
         actual = base.noteFromElement(elem, slurBundle)
@@ -824,7 +828,53 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('4', actual.m21TupletNumbase)
         self.assertEqual('start', actual.m21TupletSearch)
 
-    # NOTE: consider adding to the testUnit4() and testIntegration4() rather than making a new test
+    @mock.patch('music21.note.Note')
+    @mock.patch('music21.mei.base._processEmbeddedElements')
+    @mock.patch('music21.mei.base.safePitch')
+    @mock.patch('music21.mei.base.makeDuration')
+    def testUnit5(self, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+        '''
+        noteFromElement(): test @m21Beam where the duration requires adjusting beams
+
+        (mostly-unit test)
+        '''
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16', 'm21Beam': 'start'})
+        mockSafePitch.return_value = 'safePitch() return'
+        mockNewNote = mock.MagicMock()
+        mockNewNote.beams = mock.MagicMock()
+        mockNewNote.duration.type = '16th'
+        mockNote.return_value = mockNewNote
+        mockProcEmbEl.return_value = []
+        expected = mockNewNote
+
+        actual = base.noteFromElement(elem, 'slur bundle')
+
+        self.assertEqual(expected, actual)
+        mockSafePitch.assert_called_once_with('D', None, '2')
+        mockMakeDuration.assert_called_once_with(0.25, 0)
+        mockNote.assert_called_once_with(mockSafePitch.return_value,
+                                         duration=mockMakeDuration.return_value)
+        mockNewNote.beams.fill.assert_called_once_with('16th', 'start')
+
+    def testIntegration5(self):
+        '''
+        noteFromElement(): test @m21Beam where the duration requires adjusting beams
+        (corresponds to testUnit5() with no mocks)
+        '''
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16', 'm21Beam': 'start'})
+        slurBundle = spanner.SpannerBundle()
+
+        actual = base.noteFromElement(elem, slurBundle)
+
+        self.assertEqual('D2', actual.nameWithOctave)
+        self.assertEqual(0.25, actual.quarterLength)
+        self.assertEqual('16th', actual.duration.type)
+        self.assertTrue(1, actual.beams.beamsList[0].number)
+        self.assertTrue('start', actual.beams.beamsList[0].type)
+        self.assertTrue(2, actual.beams.beamsList[1].number)
+        self.assertTrue('start', actual.beams.beamsList[1].type)
+
+    # NOTE: consider adding to previous tests rather than making new ones
 
 
 #------------------------------------------------------------------------------
