@@ -1931,9 +1931,7 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     - dur, from att.duration.musical: (via _qlDurationFromAttr())
     - dots, from att.augmentdots: [0..4]
 
-    **Attributes/Elements in Testing:**
-
-    - none
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
 
@@ -2204,12 +2202,12 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     :returns: An :class:`Instrument`
 
-    **Attributes/Elements Implemented:** none
-
-    **Attributes/Elements in Testing:**
+    **Attributes/Elements Implemented:**
 
     - @midi.instrname (att.midiinstrument)
     - @midi.instrnum (att.midiinstrument)
+
+    **Attributes/Elements in Testing:** none
 
     **Attributes/Elements Ignored:**
 
@@ -2281,15 +2279,13 @@ def beamFromElement(elem, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <clef>, <chord>, <note>, <rest>, <space>
+    - <clef>, <chord>, <note>, <rest>, <space>, <tuplet>, <beam>
 
     **Attributes/Elements Ignored:**
 
     - @xml:id
 
-    **Attributes/Elements in Testing:**
-
-    - <tuplet> and <beam> contained within
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
 
@@ -2345,12 +2341,12 @@ def tupletFromElement(elem, slurBundle=None):
     :returns: An iterable of all the objects contained within the ``<tuplet>`` container.
     :rtype: tuple of :class:`~music21.base.Music21Object`
 
-    **Attributes/Elements Implemented:** none
-
-    **Attributes/Elements in Testing:**
+    **Attributes/Elements Implemented:**
 
     - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>
     - @num and @numbase
+
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
 
@@ -2451,16 +2447,14 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <clef>, <chord>, <note>, <rest>, <mRest> contained within
+    - <clef>, <chord>, <note>, <rest>, <mRest>, <beam>, <tuplet>, <space>, <mSpace> contained within
     - @n, from att.common
 
     **Attributes Ignored:**
 
     - @xml:id
 
-    **Attributes/Elements in Testing:**
-
-    - <beam>, <tuplet>, <space>, <mSpace> contained within
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
 
@@ -2663,7 +2657,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
 
     **Attributes Ignored:**
 
-    - @xml:id
+    - @xml:id (att.id)
     - <slur> and <tie> contained within. These spanners will usually be attached to their starting
       and ending notes with @xml:id attributes, so it's not necessary to process them when
       encountered in a <measure>. Furthermore, because the possibility exists for cross-measure
@@ -2674,10 +2668,11 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
 
     - <staff> contained within
     - @right and @left (att.measure.log)
+    - @n (att.common)
 
     **Attributes not Implemented:**
 
-    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.common (@label, @xml:base)
     - att.declaring (@decls)
     - att.facsimile (@facs)
     - att.typed (@type, @subtype)
