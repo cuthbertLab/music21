@@ -1238,17 +1238,18 @@ class TestChordFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base._processEmbeddedElements')
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.mei.base.noteFromElement')
-    def testUnit5(self, mockNoteFromE, mockMakeDuration, mockProcEmbEl, mockChord):
+    @mock.patch('music21.duration.GraceDuration')
+    def testUnit5(self, mockGrace, mockNoteFromE, mockMakeDuration, mockProcEmbEl, mockChord):
         '''
-        chordFromElement(): @m21Beam when the duration does require adjusting the beams
+        chordFromElement(): test @grace and @m21Beam when the duration does require adjusting the beams
         '''
-        elem = ETree.Element('chord', attrib={'dur': '16', 'm21Beam': 'start'})
+        elem = ETree.Element('chord', attrib={'dur': '16', 'm21Beam': 'start', 'grace': 'acc'})
         noteElements = [TestChordFromElement.makeNoteElems(x, None, '4', '8', None) for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
         mockNoteFromE.return_value = 'a note'
-        mockMakeDuration.return_value = mock.MagicMock(spec_set=duration.Duration)
-        mockMakeDuration.return_value.type = '16th'
+        mockGrace.return_value = mock.MagicMock(spec_set=duration.Duration)
+        mockGrace.return_value.type = '16th'
         mockNewChord = mock.MagicMock()
         mockChord.return_value = mockNewChord
         mockProcEmbEl.return_value = []
@@ -1259,16 +1260,16 @@ class TestChordFromElement(unittest.TestCase):
         self.assertEqual(expected, actual)
         mockMakeDuration.assert_called_once_with(0.25, 0)
         mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
-        self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
+        self.assertEqual(mockGrace.return_value, mockNewChord.duration)
         mockNewChord.beams.fill.assert_called_once_with('16th', 'start')
 
     def testIntegration5(self):
         '''
-        noteFromElement(): @m21Beam when the duration does require adjusting the beams
+        noteFromElement(): @grace and @m21Beam when the duration does require adjusting the beams
 
         (corresponds to testUnit5() with no mocks)
         '''
-        elem = ETree.Element('chord', attrib={'dur': '16', 'm21Beam': 'start'})
+        elem = ETree.Element('chord', attrib={'dur': '16', 'm21Beam': 'start', 'grace': 'acc'})
         noteElements = [TestChordFromElement.makeNoteElems(x, 'n', '4', '8', '0') for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
@@ -1277,6 +1278,7 @@ class TestChordFromElement(unittest.TestCase):
         actual = base.chordFromElement(elem)
 
         self.assertEqual(expectedName, actual.fullName)
+        self.assertEqual(0.0, actual.quarterLength)
         self.assertEqual('16th', actual.duration.type)
         self.assertTrue(1, actual.beams.beamsList[0].number)
         self.assertTrue('start', actual.beams.beamsList[0].type)

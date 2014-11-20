@@ -2056,11 +2056,10 @@ def chordFromElement(elem, slurBundle=None):
     - @artic and <artic>
     - @tie, (many of "[i|m|t]")
     - @slur, (many of "[i|m|t][1-6]")
-
-    **Attributes/Elements in Testing:**
-
     - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
+
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
 
@@ -2130,7 +2129,6 @@ def chordFromElement(elem, slurBundle=None):
 
     # grace note (only mark as grace note---don't worry about "time-stealing")
     if elem.get('grace') is not None:
-        # TODO: test this
         theChord.duration = duration.GraceDuration(theChord.duration.quarterLength)
 
     # beams indicated by a <beamSpan> held elsewhere
