@@ -2059,7 +2059,6 @@ def chordFromElement(elem, slurBundle=None):
 
     **Attributes/Elements in Testing:**
 
-    - @tuplet, (many of "[i|m|t][1-6]") ??????
     - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
 
@@ -2080,6 +2079,7 @@ def chordFromElement(elem, slurBundle=None):
         - (att.syltext (@syl))
         - (att.chord.log.cmn
 
+            - (att.tupletpresent (@tuplet))
             - (att.beamed (@beam))
             - (att.lvpresent (@lv))
             - (att.ornam (@ornam)))
@@ -2134,7 +2134,6 @@ def chordFromElement(elem, slurBundle=None):
         theChord.duration = duration.GraceDuration(theChord.duration.quarterLength)
 
     # beams indicated by a <beamSpan> held elsewhere
-    # TODO: test this beam stuff (after you figure out wheter it's sufficient)
     if elem.get('m21Beam') is not None:
         if duration.convertTypeToNumber(theChord.duration.type) > 4:
             theChord.beams.fill(theChord.duration.type, elem.get('m21Beam'))

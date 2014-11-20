@@ -1187,12 +1187,13 @@ class TestChordFromElement(unittest.TestCase):
         chordFromElement(): adds tuplet-related attributes
         '''
         elem = ETree.Element('chord', attrib={'dur': '4', 'm21TupletNum': '5', 'm21TupletNumbase': '4',
-                                              'm21TupletSearch': 'start'})
+                                              'm21TupletSearch': 'start', 'm21Beam': 'start'})
         noteElements = [TestChordFromElement.makeNoteElems(x, None, '4', '8', None) for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
         mockNoteFromE.return_value = 'a note'
-        mockMakeDuration.return_value = 'makeDuration() return'
+        mockMakeDuration.return_value = mock.MagicMock(spec_set=duration.Duration)
+        mockMakeDuration.return_value.type = 'quarter'
         mockNewChord = mock.MagicMock()
         mockChord.return_value = mockNewChord
         mockProcEmbEl.return_value = []
@@ -1206,6 +1207,7 @@ class TestChordFromElement(unittest.TestCase):
         mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
         self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
         mockTuplet.assert_called_once_with(mockNewChord, elem)
+        self.assertEqual(0, mockNewChord.beams.fill.call_count)
 
     def testIntegration4(self):
         '''
@@ -1214,7 +1216,7 @@ class TestChordFromElement(unittest.TestCase):
         (corresponds to testUnit4() with no mocks)
         '''
         elem = ETree.Element('chord', attrib={'dur': '4', 'm21TupletNum': '5', 'm21TupletNumbase': '4',
-                                              'm21TupletSearch': 'start'})
+                                              'm21TupletSearch': 'start', 'm21Beam': 'start'})
         noteElements = [TestChordFromElement.makeNoteElems(x, 'n', '4', '8', '0') for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
@@ -1226,6 +1228,57 @@ class TestChordFromElement(unittest.TestCase):
         self.assertEqual('5', actual.m21TupletNum)
         self.assertEqual('4', actual.m21TupletNumbase)
         self.assertEqual('start', actual.m21TupletSearch)
+
+    @mock.patch('music21.chord.Chord')
+    @mock.patch('music21.mei.base._processEmbeddedElements')
+    @mock.patch('music21.mei.base.makeDuration')
+    @mock.patch('music21.mei.base.noteFromElement')
+    def testUnit5(self, mockNoteFromE, mockMakeDuration, mockProcEmbEl, mockChord):
+        '''
+        chordFromElement(): @m21Beam when the duration does require adjusting the beams
+        '''
+        elem = ETree.Element('chord', attrib={'dur': '16', 'm21Beam': 'start'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, None, '4', '8', None) for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        mockNoteFromE.return_value = 'a note'
+        mockMakeDuration.return_value = mock.MagicMock(spec_set=duration.Duration)
+        mockMakeDuration.return_value.type = '16th'
+        mockNewChord = mock.MagicMock()
+        mockChord.return_value = mockNewChord
+        mockProcEmbEl.return_value = []
+        expected = mockNewChord
+
+        actual = base.chordFromElement(elem, 'slur bundle')
+
+        self.assertEqual(expected, actual)
+        mockMakeDuration.assert_called_once_with(0.25, 0)
+        mockChord.assert_called_once_with(notes=[mockNoteFromE.return_value for _ in range(3)])
+        self.assertEqual(mockMakeDuration.return_value, mockNewChord.duration)
+        mockNewChord.beams.fill.assert_called_once_with('16th', 'start')
+
+    def testIntegration5(self):
+        '''
+        noteFromElement(): @m21Beam when the duration does require adjusting the beams
+
+        (corresponds to testUnit5() with no mocks)
+        '''
+        elem = ETree.Element('chord', attrib={'dur': '16', 'm21Beam': 'start'})
+        noteElements = [TestChordFromElement.makeNoteElems(x, 'n', '4', '8', '0') for x in ('c', 'e', 'g')]
+        for eachElement in noteElements:
+            elem.append(eachElement)
+        expectedName = 'Chord {C-natural in octave 4 | E-natural in octave 4 | G-natural in octave 4} 16th'
+
+        actual = base.chordFromElement(elem)
+
+        self.assertEqual(expectedName, actual.fullName)
+        self.assertEqual('16th', actual.duration.type)
+        self.assertTrue(1, actual.beams.beamsList[0].number)
+        self.assertTrue('start', actual.beams.beamsList[0].type)
+        self.assertTrue(2, actual.beams.beamsList[1].number)
+        self.assertTrue('start', actual.beams.beamsList[1].type)
+
+    # NOTE: consider adding to previous tests rather than making new ones
 
 
 #------------------------------------------------------------------------------
