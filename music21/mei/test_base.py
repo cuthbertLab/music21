@@ -778,7 +778,7 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.pitch.Accidental')
     def testUnit4(self, mockAccid, mockTuplet, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
-        noteFromElement(): adds @grace, and tuplet-related attributes; plus @m21Beam where the
+        noteFromElement(): adds tuplet-related attributes; plus @m21Beam where the
             duration doesn't require adjusting beams
 
         (mostly-unit test)
@@ -810,7 +810,7 @@ class TestNoteFromElement(unittest.TestCase):
 
     def testIntegration4(self):
         '''
-        noteFromElement(): adds @grace, @m21TupletNum
+        noteFromElement(): @m21TupletNum
         (corresponds to testUnit4() with no mocks)
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '4',
@@ -832,19 +832,22 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base._processEmbeddedElements')
     @mock.patch('music21.mei.base.safePitch')
     @mock.patch('music21.mei.base.makeDuration')
-    def testUnit5(self, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+    @mock.patch('music21.duration.GraceDuration')
+    def testUnit5(self, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
-        noteFromElement(): test @m21Beam where the duration requires adjusting beams
+        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams
 
         (mostly-unit test)
         '''
-        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16', 'm21Beam': 'start'})
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16',
+                                             'm21Beam': 'start', 'grace': 'acc'})
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
         mockNewNote.beams = mock.MagicMock()
-        mockNewNote.duration.type = '16th'
         mockNote.return_value = mockNewNote
         mockProcEmbEl.return_value = []
+        mockGrace.return_value = mock.MagicMock(spec_set=duration.Duration)
+        mockGrace.return_value.type = '16th'
         expected = mockNewNote
 
         actual = base.noteFromElement(elem, 'slur bundle')
@@ -855,19 +858,21 @@ class TestNoteFromElement(unittest.TestCase):
         mockNote.assert_called_once_with(mockSafePitch.return_value,
                                          duration=mockMakeDuration.return_value)
         mockNewNote.beams.fill.assert_called_once_with('16th', 'start')
+        self.assertEqual(mockGrace.return_value, mockNewNote.duration)
 
     def testIntegration5(self):
         '''
-        noteFromElement(): test @m21Beam where the duration requires adjusting beams
+        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams
         (corresponds to testUnit5() with no mocks)
         '''
-        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16', 'm21Beam': 'start'})
+        elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16',
+                                             'm21Beam': 'start', 'grace': 'acc'})
         slurBundle = spanner.SpannerBundle()
 
         actual = base.noteFromElement(elem, slurBundle)
 
         self.assertEqual('D2', actual.nameWithOctave)
-        self.assertEqual(0.25, actual.quarterLength)
+        self.assertEqual(0.0, actual.quarterLength)
         self.assertEqual('16th', actual.duration.type)
         self.assertTrue(1, actual.beams.beamsList[0].number)
         self.assertTrue('start', actual.beams.beamsList[0].type)
