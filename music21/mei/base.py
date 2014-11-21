@@ -480,7 +480,6 @@ _ACCID_GES_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'ff': '--', 'n': 'n', 's
 
 # for _qlDurationFromAttr()
 # None is for when @dur is omitted; it's silly so it can be identified
-# TODO: modify Duration so it accepts a 2048th note
 _DUR_ATTR_DICT = {'long': 16.0, 'breve': 8.0, '1': 4.0, '2': 2.0, '4': 1.0, '8': 0.5, '16': 0.25,
                   '32': 0.125, '64': 0.0625, '128': 0.03125, '256': 0.015625, '512': 0.0078125,
                   '1024': 0.00390625, '2048': 0.001953125, None: 0.00390625}
@@ -2579,16 +2578,8 @@ def staffFromElement(elem, slurBundle=None):
     # iterate all immediate children
     for eachTag in elem.iterfind('*'):
         if layerTagName == eachTag.tag:
-            thisLayer = layerFromElement(eachTag, currentNValue, slurBundle=slurBundle)
-            # check for objects that must appear in the Measure, but are currently in the Voice
-            for eachThing in thisLayer:
-                if isinstance(eachThing, (clef.Clef,)):
-                    # TODO: this causes problems because a clef-change part-way through the measure
-                    #       won't end up appearing part-way through
-                    layers.append(eachThing)
-                    thisLayer.remove(eachThing)
-            layers.append(thisLayer)
-            currentNValue = str(int(currentNValue) + 1)  # inefficient, but we need a string
+            layers.append(layerFromElement(eachTag, currentNValue, slurBundle=slurBundle))
+            currentNValue = '{}'.format(int(currentNValue) + 1)  # inefficient, but we need a string
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             layers.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
