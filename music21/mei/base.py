@@ -158,6 +158,7 @@ class MeiElementError(exceptions21.Music21Exception):
     "When an element itself is invalid."
     pass
 
+
 # Text Strings for Error Conditions
 #------------------------------------------------------------------------------
 _INVALID_XML_DOC = 'MEI document is not valid XML.'
@@ -468,16 +469,14 @@ def allPartsPresent(theConverter):
 #------------------------------------------------------------------------------
 # for _accidentalFromAttr()
 # None is for when @accid is omitted
-# TODO: figure out these equivalencies
 _ACCID_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'x': '##', 'ff': '--', 'xs': '###',
-                    'ts': '###', 'tf': '---', 'n': 'n', 'nf': '-', 'ns': '#', 'su': '???',
-                    'sd': '???', 'fu': '???', 'fd': '???', 'nu': '???', 'nd': '???', None: None}
+                    'ts': '###', 'tf': '---', 'n': 'n', 'nf': '-', 'ns': '#', 'su': '#~',
+                    'sd': '~', 'fu': '`', 'fd': '-`', 'nu': '~', 'nd': '`', None: None}
 
 # for _accidGesFromAttr()
 # None is for when @accid is omitted
-# TODO: figure out these equivalencies
-_ACCID_GES_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'ff': '--', 'n': 'n', 'su': '???',
-                        'sd': '???', 'fu': '???', 'fd': '???', None: None}
+_ACCID_GES_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'ff': '--', 'n': 'n', 'su': '#~',
+                        'sd': '~', 'fu': '`', 'fd': '-`', None: None}
 
 # for _qlDurationFromAttr()
 # None is for when @dur is omitted; it's silly so it can be identified
