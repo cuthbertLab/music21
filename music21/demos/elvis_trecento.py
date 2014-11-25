@@ -32,7 +32,7 @@ class NGramJobHandler(object):
             worker.start()
         for job in jobs:
             jobQueue.put(pickle.dumps(job, protocol=0))
-        for i in xrange(len(jobs)):
+        for i in range(len(jobs)):
             finishedJobs.append(pickle.loads(resultQueue.get()))
         for worker in workers:
             jobQueue.put(None)
@@ -136,12 +136,12 @@ class NGramJob(common.SlottedObject):
     ### PUBLIC METHODS ###
 
     def debug(self, message):
-        print '[{}/{}] {}: {}'.format(
+        print('[{}/{}] {}: {}'.format(
             self.jobNumber,
             self.jobTotal,
             self.filename,
             message,
-            )
+            ))
 
     def iterateChordsNwise(self, chords, n=2):
         chordBuffer = []
@@ -230,6 +230,6 @@ if __name__ == '__main__':
     with open(outputFilename, 'w') as f:
         f.write(formattedResult)
     if failedJobs:
-        print 'FAILURES:'
+        print('FAILURES:')
         for failedJob in failedJobs:
-            print '\t{}'.format(failedJob.filename)
+            print('\t{}'.format(failedJob.filename))
