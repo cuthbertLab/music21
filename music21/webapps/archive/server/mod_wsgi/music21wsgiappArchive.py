@@ -494,7 +494,7 @@ def processCodeJSON(json_obj):
         message = "error: accessing sys is not allowed"
     else:
         compiledCode = compile(code,'<string>','exec')
-        exec compiledCode
+        exec(compiledCode)
     # Create an object to return :    
     obj = {"xml":sc.musicxml,
            "code":code,
