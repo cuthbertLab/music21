@@ -189,7 +189,11 @@ class ArchiveManager(object):
                     if six.PY2:
                         post.append(''.join(lines))
                     else:
-                        post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
+                        try:
+                            post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
+                        except:
+                            # python3 UTF-8 fails to read corpus/haydn/opus103/movement1.zip
+                            post.append(''.join([l.decode(encoding='ISO-8859-1') for l in lines]))
 
                     # note: the following methods do not properly employ
                     # universal new lines; this is a python problem:
