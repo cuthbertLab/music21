@@ -266,10 +266,15 @@ class MuseDataRecord(object):
 
     def getQuarterLength(self, divisionsPerQuarterNote=None):
         '''
+        Gets the quarterLength of the note given the prevailing divisionsPerQuarterNote        
+        
+        Here there is one division:
         
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> mdr.getQuarterLength(4)
         0.25
+        >>> mdr.getQuarterLength(8)
+        0.125
 
         >>> mdr = musedata.MuseDataRecord('Ef4    6        s     d  ==')
         >>> mdr.getQuarterLength(4)
@@ -284,6 +289,15 @@ class MuseDataRecord(object):
         else:
             divisions = int(self.src[5:8])
 
+        shouldBeBlank = self.src[4:5]
+        if shouldBeBlank != ' ':
+            try:
+                divHundreds = int(shouldBeBlank)
+                divisions += 100 * divHundreds
+                print("Error in parsing: " + self.src + "\n   Column 5 must be blank. Parsing as a part of the divisions")
+            except ValueError:
+                raise MuseDataException("Error in parsing: " + self.src + "\n   Column 5 must be blank.")
+        
         # the parent is the measure, and the parent of that is the part
         if self.parent != None:
             dpq = self.parent.parent.getDivisionsPerQuarterNote()

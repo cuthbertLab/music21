@@ -212,7 +212,7 @@ class ChordReducer(object):
         '''
         Everything from before plus consonance
         '''
-        consonanceScore = 1.0 if c.isConsonant() else 0.1
+        consonanceScore = 1.0# if c.isConsonant() else 0.1
         return self.quarterLengthBeatStrengthMeasurePosition(c) * consonanceScore
 
     def multiPartReduction(self, inStream, maxChords = 2, closedPosition = False, forceOctave = False):
@@ -344,7 +344,7 @@ class TestExternal(unittest.TestCase):
 
         cr = ChordReducer()
         #cr.printDebug = True
-        p = cr.multiPartReduction(c, maxChords = 3, closedPosition=True)
+        p = cr.multiPartReduction(c, maxChords = 3)
         #p = cr.multiPartReduction(c, closedPosition=True)
         c.insert(0, p)
         c.show()

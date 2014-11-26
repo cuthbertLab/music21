@@ -7600,6 +7600,8 @@ class Stream(base.Music21Object):
         returns a new Stream by default, but if the
         optional "inPlace" key is set to True then
         it modifies pitches in place.
+        
+        TODO: for generic interval set accidental by key signature.
 
         >>> aInterval = interval.Interval('d5')
 

@@ -90,45 +90,33 @@ class Lyric(SlottedObject):
     The note.lyric property is a simple way of specifying a single lyric, but
     Lyric objects are needed for working with multiple lyrics.
 
-    ::
-
-        >>> l = note.Lyric(text="hello")
-        >>> l
-        <music21.note.Lyric number=1 syllabic=single text="hello">
+    >>> l = note.Lyric(text="hello")
+    >>> l
+    <music21.note.Lyric number=1 syllabic=single text="hello">
 
     Music21 processes leading and following hyphens intelligently...
 
-    ::
-
-        >>> l2 = note.Lyric(text='hel-')
-        >>> l2
-        <music21.note.Lyric number=1 syllabic=begin text="hel">
+    >>> l2 = note.Lyric(text='hel-')
+    >>> l2
+    <music21.note.Lyric number=1 syllabic=begin text="hel">
 
     ...unless applyRaw is set to True
 
-    ::
-
-        >>> l3 = note.Lyric(number=3, text='hel-', applyRaw=True)
-        >>> l3
-        <music21.note.Lyric number=3 syllabic=single text="hel-">
+    >>> l3 = note.Lyric(number=3, text='hel-', applyRaw=True)
+    >>> l3
+    <music21.note.Lyric number=3 syllabic=single text="hel-">
 
     Lyrics have four properties: text, number, identifier, syllabic (single,
     begin, middle, end)
 
-    ::
+    >>> l3.text
+    'hel-'
 
-        >>> l3.text
-        'hel-'
+    >>> l3.number
+    3
 
-    ::
-
-        >>> l3.number
-        3
-
-    ::
-
-        >>> l3.syllabic
-        'single'
+    >>> l3.syllabic
+    'single'
 
     Note musicXML only supports one 'identifier' attribute which is called
     'number' but which can be a number or a descriptive identifier like
@@ -231,18 +219,14 @@ class Lyric(SlottedObject):
         this property will be stored in the lyric 'number' attribute which
         can store a number or a descriptive identifier but not both.
 
-        ::
+        >>> l = note.Lyric()
+        >>> l.number = 12
+        >>> l.identifier
+        12
 
-            >>> l = note.Lyric()
-            >>> l.number = 12
-            >>> l.identifier
-            12
-
-        ::
-
-            >>> l.identifier = 'Rainbow'
-            >>> l.identifier
-            'Rainbow'
+        >>> l.identifier = 'Rainbow'
+        >>> l.identifier
+        'Rainbow'
 
         '''
         if self._identifier is None:
@@ -1282,7 +1266,6 @@ class Note(NotRest):
         
         If the value is a string, any Interval string specification can be provided.
 
-
         >>> a = note.Note('g4')
         >>> b = a.transpose('m3')
         >>> b
@@ -1292,12 +1275,18 @@ class Note(NotRest):
         >>> b
         <music21.note.Note C#>
 
+        >>> c = b.transpose(interval.GenericInterval(2))
+        >>> c
+        <music21.note.Note D#>
+
         >>> a.transpose(aInterval, inPlace=True)
         >>> a
         <music21.note.Note C#>
 
         '''
         if hasattr(value, 'diatonic'): # its an Interval class
+            intervalObj = value
+        elif hasattr(value, 'classes') and 'GenericInterval' in value.classes:
             intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)

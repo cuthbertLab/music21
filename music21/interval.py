@@ -702,6 +702,34 @@ class GenericInterval(base.Music21Object):
         else:
             return GenericInterval(self.undirected * (-1 * self.direction))
 
+    def transposePitch(self, p):
+        '''
+        transpose a pitch, retaining the accidental if any.
+        
+        >>> aPitch = pitch.Pitch('g4')
+        >>> genericFifth = interval.GenericInterval(5)
+        >>> bPitch = genericFifth.transposePitch(aPitch)
+        >>> bPitch
+        <music21.pitch.Pitch D5>
+
+        >>> a2 = pitch.Pitch('B-')
+        >>> cPitch = genericFifth.transposePitch(a2)
+        >>> cPitch
+        <music21.pitch.Pitch F->
+        >>> a2.octave == cPitch.octave
+        True
+        '''
+        if p.octave is None:
+            useImplicitOctave = True
+        else:
+            useImplicitOctave = False
+        pdnn = p.diatonicNoteNum
+        newPitch = copy.deepcopy(p)
+        newPitch.diatonicNoteNum = pdnn + self.staffDistance
+        if useImplicitOctave is True:
+            newPitch.octave = None
+        return newPitch
+        
 
     def getDiatonic(self, specifier):
         '''Given a specifier, return a :class:`~music21.interval.DiatonicInterval` object. 

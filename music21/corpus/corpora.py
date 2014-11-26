@@ -113,41 +113,35 @@ class Corpus(object):
         Utility to get default extensions, or, optionally, expand extensions to
         all known formats.
 
-        ::
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> for extension in coreCorpus._translateExtensions():
+        ...     extension
+        ...
+        '.abc'
+        '.capx'
+        '.mid'
+        '.midi'
+        '.xml'
+        '.mxl'
+        '.mx'
+        '.musicxml'
+        '.md'
+        '.musedata'
+        '.zip'
+        '.krn'
+        '.rntxt'
+        '.rntext'
+        '.romantext'
+        '.rtxt'
+        '.nwctxt'
+        '.nwc'
 
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> for extension in coreCorpus._translateExtensions():
-            ...     extension
-            ...
-            '.abc'
-            '.capx'
-            '.mid'
-            '.midi'
-            '.xml'
-            '.mxl'
-            '.mx'
-            '.musicxml'
-            '.md'
-            '.musedata'
-            '.zip'
-            '.krn'
-            '.rntxt'
-            '.rntext'
-            '.romantext'
-            '.rtxt'
-            '.nwctxt'
-            '.nwc'
+        >>> coreCorpus._translateExtensions('.mid', False)
+        ['.mid']
 
-        ::
-
-            >>> coreCorpus._translateExtensions('.mid', False)
-            ['.mid']
-
-        ::
-
-            >>> coreCorpus._translateExtensions('.mid', True)
-            ['.mid', '.midi']
+        >>> coreCorpus._translateExtensions('.mid', True)
+        ['.mid', '.midi']
 
         '''
         if not common.isListLike(fileExtensions):
@@ -185,26 +179,18 @@ class Corpus(object):
         '''
         Instantiate a specific corpus based on `name`:
 
-        ::
+        >>> from music21 import corpus
+        >>> corpus.Corpus.fromName('core')
+        <music21.corpus.corpora.CoreCorpus>
 
-            >>> from music21 import corpus
-            >>> corpus.Corpus.fromName('core')
-            <music21.corpus.corpora.CoreCorpus>
+        >>> corpus.Corpus.fromName('virtual')
+        <music21.corpus.corpora.VirtualCorpus>
 
-        ::
+        >>> corpus.Corpus.fromName('local')
+        <music21.corpus.corpora.LocalCorpus: 'local'>
 
-            >>> corpus.Corpus.fromName('virtual')
-            <music21.corpus.corpora.VirtualCorpus>
-
-        ::
-
-            >>> corpus.Corpus.fromName('local')
-            <music21.corpus.corpora.LocalCorpus: 'local'>
-
-        ::
-
-            >>> corpus.Corpus.fromName('test')
-            <music21.corpus.corpora.LocalCorpus: 'test'>
+        >>> corpus.Corpus.fromName('test')
+        <music21.corpus.corpora.LocalCorpus: 'test'>
 
         '''
         if name == 'core':
@@ -227,31 +213,29 @@ class Corpus(object):
         r'''
         List all available search field names:
 
-        ::
-
-            >>> for field in corpus.Corpus.listSearchFields():
-            ...     field
-            ...
-            'alternativeTitle'
-            'ambitus'
-            'composer'
-            'date'
-            'keySignatureFirst'
-            'keySignatures'
-            'localeOfComposition'
-            'movementName'
-            'movementNumber'
-            'noteCount'
-            'number'
-            'opusNumber'
-            'pitchHighest'
-            'pitchLowest'
-            'quarterLength'
-            'tempoFirst'
-            'tempos'
-            'timeSignatureFirst'
-            'timeSignatures'
-            'title'
+        >>> for field in corpus.Corpus.listSearchFields():
+        ...     field
+        ...
+        'alternativeTitle'
+        'ambitus'
+        'composer'
+        'date'
+        'keySignatureFirst'
+        'keySignatures'
+        'localeOfComposition'
+        'movementName'
+        'movementNumber'
+        'noteCount'
+        'number'
+        'opusNumber'
+        'pitchHighest'
+        'pitchLowest'
+        'quarterLength'
+        'tempoFirst'
+        'tempos'
+        'timeSignatureFirst'
+        'timeSignatures'
+        'title'
 
         '''
         from music21 import metadata
@@ -291,20 +275,16 @@ class Corpus(object):
         need to be specified, nor does the name Bach even (since it's the only
         piece with the title BWV 66.6)
 
-        ::
-
-            >>> from music21 import corpus
-            >>> bachChorale = corpus.Corpus.parse('bwv66.6')
-            >>> len(bachChorale.parts)
-            4
+        >>> from music21 import corpus
+        >>> bachChorale = corpus.Corpus.parse('bwv66.6')
+        >>> len(bachChorale.parts)
+        4
 
         After parsing, the file path within the corpus is stored as
         ``.corpusFilePath``
 
-        ::
-
-            >>> bachChorale.corpusFilepath
-            u'bach/bwv66.6.mxl'
+        >>> bachChorale.corpusFilepath
+        u'bach/bwv66.6.mxl'
 
         '''
         from music21 import corpus
@@ -371,13 +351,11 @@ class Corpus(object):
         The ``names`` parameter can be used to specify which corpora to search,
         for example:
 
-        ::
-
-            >>> corpus.Corpus.search(
-            ...     'bach',
-            ...     corpusNames=('core', 'virtual'),
-            ...     )
-            <music21.metadata.bundles.MetadataBundle {150 entries}>
+        >>> corpus.Corpus.search(
+        ...     'bach',
+        ...     corpusNames=('core', 'virtual'),
+        ...     )
+        <music21.metadata.bundles.MetadataBundle {150 entries}>
 
         If ``names`` is None, all corpora known to music21 will be searched.
 
@@ -427,11 +405,9 @@ class Corpus(object):
         r'''
         The metadata bundle for a corpus:
 
-        ::
-
-            >>> from music21 import corpus
-            >>> corpus.CoreCorpus().metadataBundle
-            <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+        >>> from music21 import corpus
+        >>> corpus.CoreCorpus().metadataBundle
+        <music21.metadata.bundles.MetadataBundle 'core': {14957 entries}>
 
         '''
         from music21 import metadata
@@ -451,9 +427,7 @@ class CoreCorpus(Corpus):
     r'''
     A model of the *core* corpus.
 
-    ::
-
-        >>> coreCorpus = corpus.CoreCorpus()
+    >>> coreCorpus = corpus.CoreCorpus()
 
     '''
 
@@ -502,31 +476,23 @@ class CoreCorpus(Corpus):
         N.B. Look at the module corpus.chorales for many better ways to work
         with the chorales.
 
-        ::
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> a = coreCorpus.getBachChorales()
+        >>> len(a) > 400
+        True
 
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> a = coreCorpus.getBachChorales()
-            >>> len(a) > 400
-            True
+        >>> a = coreCorpus.getBachChorales('krn')
+        >>> len(a) > 10
+        False
 
-        ::
+        >>> a = coreCorpus.getBachChorales('xml')
+        >>> len(a) > 400
+        True
 
-            >>> a = coreCorpus.getBachChorales('krn')
-            >>> len(a) > 10
-            False
-
-        ::
-
-            >>> a = coreCorpus.getBachChorales('xml')
-            >>> len(a) > 400
-            True
-
-        ::
-
-            >>> #_DOCS_SHOW a[0]
-            >>> u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
-            u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
+        >>> #_DOCS_SHOW a[0]
+        >>> u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
+        u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
 
         '''
         names = ( 'bwv1.6.mxl', 'bwv10.7.mxl', 'bwv101.7.mxl', 'bwv102.7.mxl',
@@ -652,25 +618,19 @@ class CoreCorpus(Corpus):
         '''
         Return a list of all Beethoven String Quartet filenames.
 
-        ::
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> a = coreCorpus.getBeethovenStringQuartets()
+        >>> len(a) > 10
+        True
 
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> a = coreCorpus.getBeethovenStringQuartets()
-            >>> len(a) > 10
-            True
+        >>> a = coreCorpus.getBeethovenStringQuartets('krn')
+        >>> len(a) < 10 and len(a) > 0
+        True
 
-        ::
-
-            >>> a = coreCorpus.getBeethovenStringQuartets('krn')
-            >>> len(a) < 10 and len(a) > 0
-            True
-
-        ::
-
-            >>> a = coreCorpus.getBeethovenStringQuartets('xml')
-            >>> len(a) > 400
-            False
+        >>> a = coreCorpus.getBeethovenStringQuartets('xml')
+        >>> len(a) > 400
+        False
 
         '''
         names = (
@@ -715,31 +675,23 @@ class CoreCorpus(Corpus):
 
         Note that xml and mxl are treated equivalently.
 
-        ::
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> a = coreCorpus.getComposer('beethoven')
+        >>> len(a) > 10
+        True
 
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> a = coreCorpus.getComposer('beethoven')
-            >>> len(a) > 10
-            True
+        >>> a = coreCorpus.getComposer('mozart')
+        >>> len(a) > 10
+        True
 
-        ::
+        >>> a = coreCorpus.getComposer('bach', 'krn')
+        >>> len(a) < 10
+        True
 
-            >>> a = coreCorpus.getComposer('mozart')
-            >>> len(a) > 10
-            True
-
-        ::
-
-            >>> a = coreCorpus.getComposer('bach', 'krn')
-            >>> len(a) < 10
-            True
-
-        ::
-
-            >>> a = coreCorpus.getComposer('bach', 'xml')
-            >>> len(a) > 10
-            True
+        >>> a = coreCorpus.getComposer('bach', 'xml')
+        >>> len(a) > 10
+        True
 
         '''
         paths = self.getPaths(fileExtensions)
@@ -771,26 +723,20 @@ class CoreCorpus(Corpus):
         Given the name of a composer, get the path to the top-level directory
         of that composer:
 
-        ::
+        >>> import os
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> a = coreCorpus.getComposerDirectoryPath('beethoven')
+        >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
+        True
 
-            >>> import os
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> a = coreCorpus.getComposerDirectoryPath('beethoven')
-            >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
-            True
+        >>> a = coreCorpus.getComposerDirectoryPath('bach')
+        >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
+        True
 
-        ::
-
-            >>> a = coreCorpus.getComposerDirectoryPath('bach')
-            >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
-            True
-
-        ::
-
-            >>> a = coreCorpus.getComposerDirectoryPath('mozart')
-            >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
-            True
+        >>> a = coreCorpus.getComposerDirectoryPath('mozart')
+        >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
+        True
 
         '''
         match = None
@@ -811,13 +757,11 @@ class CoreCorpus(Corpus):
         '''
         Return a list of the filenames of all parts of Handel's Messiah:
 
-        ::
-
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> a = coreCorpus.getHandelMessiah()
-            >>> len(a)
-            43
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> a = coreCorpus.getHandelMessiah()
+        >>> len(a)
+        43
 
         '''
         names = (
@@ -861,13 +805,11 @@ class CoreCorpus(Corpus):
         '''
         Return a list of the filenames of all Monteverdi madrigals.
 
-        ::
-
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> a = coreCorpus.getMonteverdiMadrigals()
-            >>> len(a) > 40
-            True
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> a = coreCorpus.getMonteverdiMadrigals()
+        >>> len(a) > 40
+        True
 
         '''
         results = []
@@ -920,25 +862,19 @@ class CoreCorpus(Corpus):
         This is convenient when an input format might match for multiple
         extensions.
 
-        ::
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> corpusFilePaths = coreCorpus.getPaths()
+        >>> len(corpusFilePaths)
+        3045
 
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> corpusFilePaths = coreCorpus.getPaths()
-            >>> len(corpusFilePaths)
-            3045
+        >>> kernFilePaths = coreCorpus.getPaths('krn')
+        >>> len(kernFilePaths) >= 500
+        True
 
-        ::
-
-            >>> kernFilePaths = coreCorpus.getPaths('krn')
-            >>> len(kernFilePaths) >= 500
-            True
-
-        ::
-
-            >>> abcFilePaths = coreCorpus.getPaths('abc')
-            >>> len(abcFilePaths) >= 100
-            True
+        >>> abcFilePaths = coreCorpus.getPaths('abc')
+        >>> len(abcFilePaths) >= 100
+        True
 
         '''
         fileExtensions = self._translateExtensions(
@@ -966,56 +902,38 @@ class CoreCorpus(Corpus):
 
         If no matches are found, an empty list is returned.
 
-        ::
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> len(coreCorpus.getWorkList('beethoven/opus18no1'))
+        8
 
-            >>> from music21 import corpus
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> len(coreCorpus.getWorkList('beethoven/opus18no1'))
-            8
+        >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1))
+        2
 
-        ::
+        >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1, '.krn'))
+        1
 
-            >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1))
-            2
+        >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1, '.xml'))
+        1
 
-        ::
+        >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 0, '.xml'))
+        0
 
-            >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1, '.krn'))
-            1
+        >>> len(coreCorpus.getWorkList('handel/hwv56', '1-02', '.md'))
+        1
 
-        ::
+        >>> len(coreCorpus.getWorkList('handel/hwv56', (2, 1), '.md'))
+        1
 
-            >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1, '.xml'))
-            1
-
-        ::
-
-            >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 0, '.xml'))
-            0
-
-        ::
-
-            >>> len(coreCorpus.getWorkList('handel/hwv56', '1-02', '.md'))
-            1
-
-        ::
-
-            >>> len(coreCorpus.getWorkList('handel/hwv56', (2, 1), '.md'))
-            1
-
-        ::
-
-            >>> len(coreCorpus.getWorkList(
-            ...     'bach/artOfFugue_bwv1080', 2, '.md'))
-            1
+        >>> len(coreCorpus.getWorkList(
+        ...     'bach/artOfFugue_bwv1080', 2, '.md'))
+        1
 
         Make sure that 'verdi' just gets the single Verdi piece and not the
         Monteverdi pieces:
 
-        ::
-
-            >>> len(coreCorpus.getWorkList('verdi'))
-            1
+        >>> len(coreCorpus.getWorkList('verdi'))
+        1
 
         '''
         if not common.isListLike(fileExtensions):
@@ -1099,27 +1017,21 @@ class CoreCorpus(Corpus):
         r'''
         Search the core corpus for metadata entries:
 
-        ::
+        >>> corpus.CoreCorpus().search('3/4')
+        <music21.metadata.bundles.MetadataBundle {2012 entries}>
 
-            >>> corpus.CoreCorpus().search('3/4')
-            <music21.metadata.bundles.MetadataBundle {2012 entries}>
+        >>> corpus.CoreCorpus().search(
+        ...      'bach',
+        ...      field='composer',
+        ...      )
+        <music21.metadata.bundles.MetadataBundle {21 entries}>
 
-        ::
-
-            >>> corpus.CoreCorpus().search(
-            ...      'bach',
-            ...      field='composer',
-            ...      )
-            <music21.metadata.bundles.MetadataBundle {21 entries}>
-
-        ::
-
-            >>> predicate = lambda noteCount: noteCount < 20
-            >>> corpus.CoreCorpus().search(
-            ...     predicate,
-            ...     field='noteCount',
-            ...     )
-            <music21.metadata.bundles.MetadataBundle {131 entries}>
+        >>> predicate = lambda noteCount: noteCount < 20
+        >>> corpus.CoreCorpus().search(
+        ...     predicate,
+        ...     field='noteCount',
+        ...     )
+        <music21.metadata.bundles.MetadataBundle {131 entries}>
 
         '''
         from music21 import metadata
@@ -1143,18 +1055,14 @@ class CoreCorpus(Corpus):
 
         Set it to a directory:
 
-        ::
-
-            >>> coreCorpus = corpus.CoreCorpus()
-            >>> coreCorpus.manualCoreCorpusPath = '~/Desktop'
+        >>> coreCorpus = corpus.CoreCorpus()
+        >>> coreCorpus.manualCoreCorpusPath = '~/Desktop'
 
         Unset it:
 
-        ::
-
-            >>> coreCorpus.manualCoreCorpusPath = None
-            >>> coreCorpus.manualCoreCorpusPath is None
-            True
+        >>> coreCorpus.manualCoreCorpusPath = None
+        >>> coreCorpus.manualCoreCorpusPath is None
+        True
 
         '''
         userSettings = environment.UserSettings()
@@ -1182,11 +1090,9 @@ class CoreCorpus(Corpus):
         '''
         Return True or False if this is a `corpus` or `noCoprus` distribution.
 
-        ::
-
-            >>> from music21 import corpus
-            >>> corpus.CoreCorpus().noCorpus
-            False
+        >>> from music21 import corpus
+        >>> corpus.CoreCorpus().noCorpus
+        False
 
         '''
         if CoreCorpus._noCorpus is None:
@@ -1204,16 +1110,12 @@ class LocalCorpus(Corpus):
     r'''
     A model of a *local* corpus.
 
-    ::
-
-        >>> localCorpus = corpus.LocalCorpus()
+    >>> localCorpus = corpus.LocalCorpus()
 
     The default local corpus is unnamed, but an arbitrary number of
     independent, named local corpora can be defined and persisted:
 
-    ::
-
-        >>> namedLocalCorpus = corpus.LocalCorpus('with a name')
+    >>> namedLocalCorpus = corpus.LocalCorpus('with a name')
 
     '''
 
@@ -1269,10 +1171,8 @@ class LocalCorpus(Corpus):
         r'''
         Add a directory path to a local corpus:
 
-        ::
-
-            >>> localCorpus = corpus.LocalCorpus('a new corpus')
-            >>> localCorpus.addPath('~/Desktop')
+        >>> localCorpus = corpus.LocalCorpus('a new corpus')
+        >>> localCorpus.addPath('~/Desktop')
 
         Paths added in this way will not be persisted from session to session
         unless explicitly saved by a call to ``LocalCorpus.save()``.
@@ -1440,16 +1340,12 @@ class LocalCorpus(Corpus):
         r'''
         The name of a given local corpus.
 
-        ::
+        >>> from music21 import corpus
+        >>> corpus.LocalCorpus().name
+        'local'
 
-            >>> from music21 import corpus
-            >>> corpus.LocalCorpus().name
-            'local'
-
-        ::
-
-            >>> corpus.LocalCorpus(name='Bach Chorales').name
-            'Bach Chorales'
+        >>> corpus.LocalCorpus(name='Bach Chorales').name
+        'Bach Chorales'
 
         '''
         if self._name is None:
@@ -1464,9 +1360,7 @@ class VirtualCorpus(Corpus):
     r'''
     A model of the *virtual* corpus.
 
-    ::
-
-        >>> virtualCorpus = corpus.VirtualCorpus()
+    >>> virtualCorpus = corpus.VirtualCorpus()
 
     '''
 
@@ -1499,11 +1393,9 @@ class VirtualCorpus(Corpus):
 
         An extension of None will return all known extensions.
 
-        ::
-
-            >>> from music21 import corpus
-            >>> len(corpus.VirtualCorpus().getPaths()) > 6
-            True
+        >>> from music21 import corpus
+        >>> len(corpus.VirtualCorpus().getPaths()) > 6
+        True
 
         '''
         fileExtensions = self._translateExtensions(
@@ -1530,17 +1422,13 @@ class VirtualCorpus(Corpus):
         Given a work name, search all virtual works and return a list of URLs
         for any matches.
 
-        ::
+        >>> from music21 import corpus
+        >>> virtualCorpus = corpus.VirtualCorpus()
+        >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
+        ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 
-            >>> from music21 import corpus
-            >>> virtualCorpus = corpus.VirtualCorpus()
-            >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
-            ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
-
-        ::
-
-            >>> virtualCorpus.getWorkList('junk')
-            []
+        >>> virtualCorpus.getWorkList('junk')
+        []
 
         '''
         if not common.isListLike(fileExtensions):
@@ -1572,10 +1460,8 @@ class VirtualCorpus(Corpus):
         r'''
         The name of the virtual corpus:
 
-        ::
-
-            >>> corpus.VirtualCorpus().name
-            'virtual'
+        >>> corpus.VirtualCorpus().name
+        'virtual'
 
         '''
         return 'virtual'
