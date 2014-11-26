@@ -285,19 +285,10 @@ class MuseDataRecord(object):
         1.0
         '''
         if self.stage == 1:
-            divisions = int(self.src[5:7])
+            divisions = int(self.src[4:7])
         else:
             divisions = int(self.src[5:8])
 
-        shouldBeBlank = self.src[4:5]
-        if shouldBeBlank != ' ':
-            try:
-                divHundreds = int(shouldBeBlank)
-                divisions += 100 * divHundreds
-                print("Error in parsing: " + self.src + "\n   Column 5 must be blank. Parsing as a part of the divisions")
-            except ValueError:
-                raise MuseDataException("Error in parsing: " + self.src + "\n   Column 5 must be blank.")
-        
         # the parent is the measure, and the parent of that is the part
         if self.parent != None:
             dpq = self.parent.parent.getDivisionsPerQuarterNote()
