@@ -882,7 +882,6 @@ class ConverterMEI(SubConverter):
 
         :param str dataString: The string with XML to convert.
         :param NoneType number: Unused in this class. Default is ``None``.
-
         :returns: The music21 objects corresponding to the MEI file.
         :rtype: :class:`~music21.stream.Stream` or subclass
         '''
@@ -955,7 +954,9 @@ class Test(unittest.TestCase):
         unused_x = s.show('textLine')
 
     def testImportMei1(self):
-        # when the string starts with "mei:"
+        '''
+        When the string starts with "mei:"
+        '''
         try:
             # this works in Python 3.3+
             from unittest import mock  # pylint: disable=no-name-in-module
@@ -967,13 +968,14 @@ class Test(unittest.TestCase):
                 # last resort
                 from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
-            from music21 import mei
             testConverter = ConverterMEI()
             testConverter.parseData('mei: <?xml><mei><note/></mei>')
             mockConv.assert_called_once_with(' <?xml><mei><note/></mei>')
 
     def testImportMei2(self):
-        # when the string doesn't start with "mei:"
+        '''
+        When the string doesn't start with "mei:"
+        '''
         try:
             # this works in Python 3.3+
             from unittest import mock  # pylint: disable=no-name-in-module
@@ -985,7 +987,6 @@ class Test(unittest.TestCase):
                 # last resort
                 from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
-            from music21 import mei
             testConverter = ConverterMEI()
             testConverter.parseData('<?xml><mei><note/></mei>')
             mockConv.assert_called_once_with('<?xml><mei><note/></mei>')
