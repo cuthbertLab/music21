@@ -195,11 +195,14 @@ class MeiToM21Converter(object):
         environLocal.printDebug('*** initializing MeiToM21Converter')
 
         if theDocument is None:
+            # Without this, the class can't be pickled.
             self.documentRoot = ETree.Element('{http://www.music-encoding.org/ns/mei}mei')
         else:
             try:
                 self.documentRoot = ETree.fromstring(theDocument)
-            except ETree.ParseError:
+            except ETree.ParseError as parseErr:
+                environLocal.printDebug('\n\nERROR: Parsing the MEI document with ElementTree failed.')
+                environLocal.printDebug('We got the following error:\n{}'.format(parseErr))
                 raise MeiValidityError(_INVALID_XML_DOC)
 
             if isinstance(self.documentRoot, ETree.ElementTree):
@@ -227,7 +230,7 @@ class MeiToM21Converter(object):
         :rtype: :class:`music21.stream.Stream`
         '''
 
-        environLocal.printDebug('*** preprocessing spanning elements')
+        environLocal.printDebug('*** pre-processing spanning elements')
 
         _ppSlurs(self)
         _ppTies(self)
