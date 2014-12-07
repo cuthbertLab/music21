@@ -2619,6 +2619,43 @@ def _correctMRestDurs(staves, targetLength):
                     del eachObject.m21wasMRest
 
 
+def _makeBarlines(elem, staves):
+    '''
+    This is a helper function for :func:`measureFromElement`, made independent only to improve
+    that function's ease of testing.
+
+    Given a <measure> element and a dictionary with the :class:`Measure` objects that have already
+    been processed, change the barlines of the :class:`Measure` objects in accordance with the
+    element's @left and @right attributes.
+
+    :param :class:`~xml.etree.ElementTree.Element` elem: The ``<measure>`` tag to process.
+    :param dict staves: Dictionary where keys are @n attributes and values are corresponding
+        :class:`~music21.stream.Measure` objects.
+    :returns: The ``staves`` dictionary with properly-set barlines.
+    :rtype: dict
+    '''
+    if elem.get('left') is not None:
+        barz = _barlineFromAttr(elem.get('left'))
+        if hasattr(barz, '__len__'):
+            # this means @left was "rptboth"
+            barz = barz[1]
+        for eachMeasure in six.itervalues(staves):
+            if isinstance(eachMeasure, stream.Measure):
+                eachMeasure.leftBarline = barz
+
+    if elem.get('right') is not None:
+        barz = _barlineFromAttr(elem.get('right'))
+        if hasattr(barz, '__len__'):
+            # this means @right was "rptboth"
+            staves['next @left'] = barz[1]
+            barz = barz[0]
+        for eachMeasure in six.itervalues(staves):
+            if isinstance(eachMeasure, stream.Measure):
+                eachMeasure.rightBarline = barz
+
+    return staves
+
+
 def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, activeMeter=None):
     # TODO: write tests
     '''
@@ -2736,25 +2773,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
         _correctMRestDurs(staves, maxBarDuration)
 
     # assign left and right barlines
-    if elem.get('left') is not None:
-        barz = _barlineFromAttr(elem.get('left'))
-        if hasattr(barz, '__len__'):
-            # this means @left was "rptboth"
-            barz = barz[1]
-        for eachMeasure in six.itervalues(staves):
-            if not isinstance(eachMeasure, stream.Measure):
-                continue
-            eachMeasure.rightBarline = barz
-    if elem.get('right') is not None:
-        barz = _barlineFromAttr(elem.get('right'))
-        if hasattr(barz, '__len__'):
-            # this means @right was "rptboth"
-            staves['next @left'] = barz[1]
-            barz = barz[0]
-        for eachMeasure in six.itervalues(staves):
-            if not isinstance(eachMeasure, stream.Measure):
-                continue
-            eachMeasure.rightBarline = barz
+    staves = _makeBarlines(elem, staves)
 
     return staves
 
@@ -2782,6 +2801,7 @@ if __name__ == "__main__":
                      test_base.TestPreprocessors,
                      test_base.TestTuplets,
                      test_base.TestInstrDef,
+                     test_base.TestMeasureFromElement,
                     )
 
 #------------------------------------------------------------------------------

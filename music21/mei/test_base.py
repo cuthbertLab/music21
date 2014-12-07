@@ -3055,3 +3055,54 @@ class TestInstrDef(unittest.TestCase):
         self.assertEqual(expected, actual)
         mockInstr.fromString.assert_called_once_with(expFromStringArg)
         self.assertEqual(expFromStringArg, actual.partName)
+
+
+#------------------------------------------------------------------------------
+class TestMeasureFromElement(unittest.TestCase):
+    '''Tests for measureFromElement() and its helper functions.'''
+
+    def testMakeBarline1(self):
+        '''
+        _makeBarlines(): when @left and @right are None, nothing happens
+        '''
+        elem = ETree.Element('measure')
+        staves = {'1': stream.Measure(), '2': stream.Measure(), '3': stream.Measure(), '4': 4}
+
+        staves = base._makeBarlines(elem, staves)
+
+        for i in ('1', '2', '3'):
+            self.assertIsNone(staves[i].leftBarline)
+            self.assertIsNone(staves[i].rightBarline)
+        self.assertEqual(4, staves['4'])
+
+    def testMakeBarline2(self):
+        '''
+        _makeBarlines(): when @left and @right are a simple barline, that barline is assigned
+        '''
+        elem = ETree.Element('measure', attrib={'left': 'dbl', 'right': 'dbl'})
+        staves = {'1': stream.Measure(), '2': stream.Measure(), '3': stream.Measure(), '4': 4}
+
+        staves = base._makeBarlines(elem, staves)
+
+        for i in ('1', '2', '3'):
+            self.assertIsInstance(staves[i].leftBarline, bar.Barline)
+            self.assertEqual('double', staves[i].leftBarline.style)
+            self.assertIsInstance(staves[i].rightBarline, bar.Barline)
+            self.assertEqual('double', staves[i].rightBarline.style)
+        self.assertEqual(4, staves['4'])
+
+    def testMakeBarline3(self):
+        '''
+        _makeBarlines(): when @left and @right are "rptboth," that's done properly
+        '''
+        elem = ETree.Element('measure', attrib={'left': 'rptboth', 'right': 'rptboth'})
+        staves = {'1': stream.Measure(), '2': stream.Measure(), '3': stream.Measure(), '4': 4}
+
+        staves = base._makeBarlines(elem, staves)
+
+        for i in ('1', '2', '3'):
+            self.assertIsInstance(staves[i].leftBarline, bar.Repeat)
+            self.assertEqual('heavy-light', staves[i].leftBarline.style)
+            self.assertIsInstance(staves[i].rightBarline, bar.Repeat)
+            self.assertEqual('final', staves[i].rightBarline.style)
+        self.assertEqual(4, staves['4'])
