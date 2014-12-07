@@ -2656,8 +2656,7 @@ def _makeBarlines(elem, staves):
     return staves
 
 
-def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, activeMeter=None):
-    # TODO: write tests
+def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter=None):
     '''
     <measure> Unit of musical time consisting of a fixed number of note-values of a given type, as
     determined by the prevailing meter, and delimited in musical notation by two bar lines.
@@ -2667,10 +2666,9 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
     :param elem: The ``<measure>`` tag to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :param int backupNum: A fallback value for the resulting :class:`Measure` objects' ``number``
-        attribute. The default will be 0.
+        attribute.
     :param expectedNs: A list of the expected @n attributes for the <staff> tags in this <measure>.
         If an expected <staff> isn't in the <measure>, it will be created with a full-measure rest.
-        The default is ``None``.
     :type expectedNs: iterable of str
     :param activeMeter: The :class:`~music21.meter.TimeSignature` active in this <measure>. This is
         used to adjust the duration of an <mRest> that was given without a @dur attribute.
@@ -2683,7 +2681,11 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
         barline of the following <measure>. If this happens, the :class:`Repeat` object is assigned
         to the ``'next @left'`` key in the returned dictionary.
 
-    **Attributes/Elements Implemented:** none
+    **Attributes/Elements Implemented:**
+
+    - <staff> contained within
+    - @right and @left (att.measure.log)
+    - @n (att.common)
 
     **Attributes Ignored:**
 
@@ -2694,11 +2696,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
       slurs and ties, we can't guarantee we'll be able to process all spanners until all
       spanner-attachable objects are processed. So we manage these tags at a higher level.
 
-    **Attributes/Elements in Testing:**
-
-    - <staff> contained within
-    - @right and @left (att.measure.log)
-    - @n (att.common)
+    **Attributes/Elements in Testing:** none
 
     **Attributes not Implemented:**
 
@@ -2729,11 +2727,8 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
     '''
     staves = {}
 
-    backupNum = 0 if backupNum is None else backupNum
-    expectedNs = [] if expectedNs is None else expectedNs
-
     # mapping from tag name to our converter function
-    staffTagName = '{http://www.music-encoding.org/ns/mei}staff'
+    staffTag = '{http://www.music-encoding.org/ns/mei}staff'
     tagToFunction = {}
 
     # track the bar's duration
@@ -2741,7 +2736,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
 
     # iterate all immediate children
     for eachElem in elem.iterfind('*'):
-        if staffTagName == eachElem.tag:
+        if staffTag == eachElem.tag:
             staves[eachElem.get('n')] = stream.Measure(staffFromElement(eachElem, slurBundle=slurBundle),
                                                        number=int(elem.get('n', backupNum)))
             thisBarDuration = staves[eachElem.get('n')].duration.quarterLength
@@ -2758,6 +2753,7 @@ def measureFromElement(elem, backupNum=None, expectedNs=None, slurBundle=None, a
         if eachN not in staves:
             restVoice = stream.Voice([note.Rest(quarterLength=maxBarDuration)])
             restVoice.id = '1'
+            restVoice[0].m21wasMRest = True  # just in case (e.g., when all the other voices are <mRest>)
             staves[eachN] = stream.Measure([restVoice], number=int(elem.get('n', backupNum)))
 
     # First search for Rest objects created by an <mRest> element that didn't have @dur set. This

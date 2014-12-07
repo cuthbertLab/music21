@@ -3106,3 +3106,237 @@ class TestMeasureFromElement(unittest.TestCase):
         self.assertEqual(1.0, staves['2'][1][0].quarterLength)
         self.assertFalse(hasattr(staves['1'][0][0], 'm21wasMRest'))
         self.assertFalse(hasattr(staves['1'][1][0], 'm21wasMRest'))
+
+    @mock.patch('music21.mei.base.staffFromElement')
+    @mock.patch('music21.mei.base._correctMRestDurs')
+    @mock.patch('music21.mei.base._makeBarlines')
+    @mock.patch('music21.stream.Measure')
+    @mock.patch('music21.stream.Voice')
+    def testMeasureUnit1(self, mockVoice, mockMeasure, mockMakeBarlines, mockCorrectDurs, mockStaffFE):
+        '''
+        measureFromElement(): test 1
+            - "elem" has an @n attribute
+            - some staves have <mRest> without @dur (same behaviour to as if no staves did)
+            - a rest-filled measure is created for the "n" value in "expectedNs" that's missing a
+              corresponding <staff> element, and its Measure has the same @n as "elem"
+            - activeMeter isn't None, and it is larger than the (internal) maxBarDuration
+
+        mocked: staffFromElement(), stream.Measure() and Voice, _correctMRestDurs(), _makeBarlines()
+        '''
+        staffTag = '{}staff'.format(_MEINS)
+        elem = ETree.Element('measure', attrib={'n': '42'})
+        innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
+        for eachStaff in innerStaffs:
+            elem.append(eachStaff)
+        # @n="4" is in "expectedNs" but we're leaving it out as part of the test
+        backupNum = 900  # should be ignored by measureFromElement()
+        expectedNs = ['1', '2', '3', '4']
+        slurBundle = mock.MagicMock(name='slurBundle')
+        activeMeter = mock.MagicMock(name='activeMeter')
+        activeMeter.totalLength = 4.0  # this must match Measure.duration.quarterLength
+        # prepare the mock Measure objects returned by mockMeasure
+        mockMeasRets = [mock.MagicMock(name='Measure {}'.format(i + 1)) for i in range(4)]
+        expected = mockMeasRets  # finish preparing "expected" below...
+        for meas in mockMeasRets:
+            meas.duration = mock.MagicMock(spec_set=duration.Duration)
+            meas.duration.quarterLength = 4.0  # must match activeMeter.totalLength
+        mockMeasure.side_effect = lambda *x, **y: mockMeasRets.pop(0)
+        # prepare mock of _makeBarlines() which returns "staves"
+        mockMakeBarlines.side_effect = lambda elem, staves: staves
+        # prepare mock of _correctMRestDurs()
+        mockCorrectDurs.return_value = None
+        # prepare mock of staffFromElement(), which just needs to return several unique things
+        staffFEreturns = [i for i in range(len(innerStaffs))]
+        mockStaffFE.side_effect = lambda *x, **y: staffFEreturns.pop(0)
+        # prepare mock of stream.Voice
+        mockVoice.return_value = mock.MagicMock(name='Voice')
+        # ... finish preparing "expected"
+        expected = {n: expected[i] for i, n in enumerate(expectedNs)}
+
+        actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
+
+        self.assertDictEqual(expected, actual)
+        # ensure staffFromElement() was called properly
+        self.assertEqual(len(innerStaffs), mockStaffFE.call_count)
+        for eachStaff in innerStaffs:
+            mockStaffFE.assert_any_call(eachStaff, slurBundle=slurBundle)
+        # ensure Measure.__init__() was called properly
+        self.assertEqual(len(expected), mockMeasure.call_count)
+        for i in range(len(innerStaffs)):
+            mockMeasure.assert_any_call(i, number=int(elem.get('n')))
+        mockMeasure.assert_any_call([mockVoice.return_value], number=int(elem.get('n')))
+        # ensure the mocked Voice was set to "id" of 1
+        self.assertEqual('1', mockVoice.return_value.id)
+        # ensure the mocked _correctMRestDurs() was called properly
+        mockCorrectDurs.assert_called_once_with(expected, 4.0)
+        # ensure the mocked _makeBarlines() was called prooperly
+        mockMakeBarlines.assert_called_once_with(elem, expected)
+
+    def testMeasureIntegration1(self):
+        '''
+        measureFromElement(): test 1
+            - "elem" has an @n attribute
+            - some staves have <mRest> without @dur (same behaviour to as if no staves did)
+            - a rest-filled measure is created for the "n" value in "expectedNs" that's missing a
+              corresponding <staff> element, and its Measure has the same @n as "elem"
+            - activeMeter isn't None, and it is larger than the (internal) maxBarDuration
+            - the right barline is set properly ("dbl")
+
+        no mocks
+        '''
+        staffTag = '{}staff'.format(_MEINS)
+        layerTag = '{}layer'.format(_MEINS)
+        noteTag = '{}note'.format(_MEINS)
+        elem = ETree.Element('measure', attrib={'n': '42', 'right': 'dbl'})
+        innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
+        for i, eachStaff in enumerate(innerStaffs):
+            thisLayer = ETree.Element(layerTag, attrib={'n': '1'})
+            thisLayer.append(ETree.Element(noteTag,
+                                           attrib={'pname': 'G', 'oct': str(i + 1), 'dur': '1'}))
+            eachStaff.append(thisLayer)
+            elem.append(eachStaff)
+        # @n="4" is in "expectedNs" but we're leaving it out as part of the test
+        backupNum = 900  # should be ignored by measureFromElement()
+        expectedNs = ['1', '2', '3', '4']
+        slurBundle = spanner.SpannerBundle()
+        activeMeter = meter.TimeSignature('8/8')  # bet you thought this would be 4/4, eh?
+
+        actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
+
+        # ensure the right number and @n of parts
+        self.assertEqual(4, len(actual.keys()))
+        for eachN in expectedNs:
+            self.assertTrue(eachN in actual.keys())
+        # ensure the measure number is set properly,
+        #        there is one voice with one note with its octave set equal to the staff's @n,
+        #        the right barline was set properly
+        for eachN in ['1', '2', '3']:
+            self.assertEqual(42, actual[eachN].number)
+            self.assertEqual(2, len(actual[eachN]))  # first the Note, then the Barline
+            self.assertIsInstance(actual[eachN][0], stream.Voice)
+            self.assertEqual(1, len(actual[eachN][0]))
+            self.assertIsInstance(actual[eachN][0][0], note.Note)
+            self.assertEqual(int(eachN), actual[eachN][0][0].pitch.octave)
+            self.assertIsInstance(actual[eachN].rightBarline, bar.Barline)
+            self.assertEqual('double', actual[eachN].rightBarline.style)
+        # ensure voice '4' with Rest of proper duration, right measure number, and right barline
+        self.assertEqual(42, actual['4'].number)
+        self.assertEqual(2, len(actual['4']))  # first the Rest, then the Barline
+        self.assertIsInstance(actual['4'][0], stream.Voice)
+        self.assertEqual(1, len(actual['4'][0]))
+        self.assertIsInstance(actual['4'][0][0], note.Rest)
+        self.assertEqual(activeMeter.totalLength, actual['4'][0][0].duration.quarterLength)
+        self.assertIsInstance(actual[eachN].rightBarline, bar.Barline)
+        self.assertEqual('double', actual[eachN].rightBarline.style)
+
+    @mock.patch('music21.mei.base.staffFromElement')
+    @mock.patch('music21.mei.base._correctMRestDurs')
+    @mock.patch('music21.mei.base._makeBarlines')
+    @mock.patch('music21.stream.Measure')
+    @mock.patch('music21.stream.Voice')
+    def testMeasureUnit2(self, mockVoice, mockMeasure, mockMakeBarlines, mockCorrectDurs, mockStaffFE):
+        '''
+        measureFromElement(): test 2
+            - "elem" doesn't have an @n attribute
+            - all staves have <mRest> without @dur
+            - a rest-filled measure is created for the "n" value in "expectedNs" that's missing a
+              corresponding <staff> element, and it properly uses "backupNum"
+
+        mocked: staffFromElement(), stream.Measure() and Voice, _correctMRestDurs(), _makeBarlines()
+        '''
+        staffTag = '{}staff'.format(_MEINS)
+        elem = ETree.Element('measure')
+        innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
+        for eachStaff in innerStaffs:
+            elem.append(eachStaff)
+        # @n="4" is in "expectedNs" but we're leaving it out as part of the test
+        backupNum = 900  # should be used by measureFromElement()
+        expectedNs = ['1', '2', '3', '4']
+        slurBundle = mock.MagicMock(name='slurBundle')
+        activeMeter = mock.MagicMock(name='activeMeter')
+        activeMeter.totalLength = 12.0  # this must be longer than Measure.duration.quarterLength
+        # prepare the mock Measure objects returned by mockMeasure
+        mockMeasRets = [mock.MagicMock(name='Measure {}'.format(i + 1)) for i in range(4)]
+        expected = mockMeasRets  # finish preparing "expected" below...
+        for meas in mockMeasRets:
+            meas.duration = mock.MagicMock(spec_set=duration.Duration)
+            meas.duration.quarterLength = base._DUR_ATTR_DICT[None]  # must be _DUR_ATTR_DICT[None]
+        mockMeasure.side_effect = lambda *x, **y: mockMeasRets.pop(0)
+        # prepare mock of _makeBarlines() which returns "staves"
+        mockMakeBarlines.side_effect = lambda elem, staves: staves
+        # prepare mock of _correctMRestDurs()
+        mockCorrectDurs.return_value = None
+        # prepare mock of staffFromElement(), which just needs to return several unique things
+        staffFEreturns = [i for i in range(len(innerStaffs))]
+        mockStaffFE.side_effect = lambda *x, **y: staffFEreturns.pop(0)
+        # prepare mock of stream.Voice
+        mockVoice.return_value = mock.MagicMock(name='Voice')
+        # ... finish preparing "expected"
+        expected = {n: expected[i] for i, n in enumerate(expectedNs)}
+
+        actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
+
+        self.assertDictEqual(expected, actual)
+        # ensure staffFromElement() was called properly
+        self.assertEqual(len(innerStaffs), mockStaffFE.call_count)
+        for eachStaff in innerStaffs:
+            mockStaffFE.assert_any_call(eachStaff, slurBundle=slurBundle)
+        # ensure Measure.__init__() was called properly
+        self.assertEqual(len(expected), mockMeasure.call_count)
+        for i in range(len(innerStaffs)):
+            mockMeasure.assert_any_call(i, number=backupNum)
+        mockMeasure.assert_any_call([mockVoice.return_value], number=backupNum)
+        # ensure the mocked Voice was set to "id" of 1
+        self.assertEqual('1', mockVoice.return_value.id)
+        # ensure the mocked _correctMRestDurs() was called properly
+        mockCorrectDurs.assert_called_once_with(expected, 12.0)
+        # ensure the mocked _makeBarlines() was called prooperly
+        mockMakeBarlines.assert_called_once_with(elem, expected)
+
+    def testMeasureIntegration2(self):
+        '''
+        measureFromElement(): test 2
+            - "elem" doesn't have an @n attribute
+            - all staves have <mRest> without @dur (and only 3 of the 4 are specified at all)
+            - a rest-filled measure is created for the "n" value in "expectedNs" that's missing a
+              corresponding <staff> element, and it properly uses "backupNum"
+            - the right barline is set properly ("rptboth")
+
+        no mocks
+        '''
+        staffTag = '{}staff'.format(_MEINS)
+        layerTag = '{}layer'.format(_MEINS)
+        mRestTag = '{}mRest'.format(_MEINS)
+        elem = ETree.Element('measure', attrib={'right': 'rptboth'})
+        innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
+        for i, eachStaff in enumerate(innerStaffs):
+            thisLayer = ETree.Element(layerTag, attrib={'n': '1'})
+            thisLayer.append(ETree.Element(mRestTag))
+            eachStaff.append(thisLayer)
+            elem.append(eachStaff)
+        # @n="4" is in "expectedNs" but we're leaving it out as part of the test
+        backupNum = 900  # should be used by measureFromElement()
+        expectedNs = ['1', '2', '3', '4']
+        slurBundle = spanner.SpannerBundle()
+        activeMeter = meter.TimeSignature('8/8')  # bet you thought this would be 4/4, eh?
+
+        actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
+
+        # ensure the right number and @n of parts (we expect one additional key, for the "rptboth")
+        self.assertEqual(5, len(actual.keys()))
+        for eachN in expectedNs:
+            self.assertTrue(eachN in actual.keys())
+        self.assertTrue('next @left' in actual.keys())
+        # ensure the measure number is set properly,
+        #        there is one voice with one note with its octave set equal to the staff's @n,
+        #        the right barline was set properly
+        # (Note we can test all four parts together this time---the fourth should be indistinguishable)
+        for eachN in expectedNs:
+            self.assertEqual(backupNum, actual[eachN].number)
+            self.assertEqual(2, len(actual[eachN]))  # first the Note, then the Barline
+            self.assertIsInstance(actual[eachN][0], stream.Voice)
+            self.assertEqual(1, len(actual[eachN][0]))
+            self.assertIsInstance(actual[eachN][0][0], note.Rest)
+            self.assertEqual(activeMeter.totalLength, actual['4'][0][0].duration.quarterLength)
+            self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
+            self.assertEqual('final', actual[eachN].rightBarline.style)
