@@ -2502,19 +2502,9 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
                      '{http://www.music-encoding.org/ns/mei}mSpace': mSpaceFromElement}
-    theLayer = []
 
     # iterate all immediate children
-    for eachTag in elem.iterfind('*'):
-        if eachTag.tag in tagToFunction:
-            result = tagToFunction[eachTag.tag](eachTag, slurBundle)
-            if not isinstance(result, (tuple, list)):
-                theLayer.append(result)
-            else:
-                for eachObject in result:
-                    theLayer.append(eachObject)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachTag.tag, elem.tag))
+    theLayer = _processEmbeddedElements(elem.iterfind('*'), tagToFunction, elem.tag, slurBundle)
 
     # adjust the <layer>'s elements for possible tuplets
     theLayer = _guessTuplets(theLayer)
