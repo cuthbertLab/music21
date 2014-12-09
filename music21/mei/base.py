@@ -1453,7 +1453,7 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     Note that it is the caller's responsibility to determine the right actions if there are
     conflicting objects in the returned dictionary.
 
-    :param elem: The ``<scoreDef>`` tag to process.
+    :param elem: The ``<scoreDef>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :returns: Objects from the ``<scoreDef>`` relevant on a per-part and whole-score basis.
     :rtype: dict of list of :class:`Music21Objects`
@@ -2350,7 +2350,7 @@ def tupletFromElement(elem, slurBundle=None):
 
     In MEI 2013: pg.473 (487 in PDF) (MEI.cmn module)
 
-    :param elem: The ``<tuplet>`` tag to process.
+    :param elem: The ``<tuplet>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :returns: An iterable of all the objects contained within the ``<tuplet>`` container.
     :rtype: tuple of :class:`~music21.base.Music21Object`
@@ -2452,7 +2452,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
         Because improperly-set :attr:`~music21.stream.Voice.id` attributes nearly guarantees errors
         in the imported :class:`Score`, either ``overrideN`` or @n must be specified.
 
-    :param elem: The ``<layer>`` tag to process.
+    :param elem: The ``<layer>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :param str overrideN: The value to be set as the ``id`` attribute in the outputted :class:`Voice`.
     :returns: A :class:`Voice` with the objects found in the provided :class:`Element`.
@@ -2540,7 +2540,7 @@ def staffFromElement(elem, slurBundle=None):
 
     In MEI 2013: pg.444 (458 in PDF) (MEI.shared module)
 
-    :param elem: The ``<staff>`` tag to process.
+    :param elem: The ``<staff>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :returns: The :class:`Voice` classes corresponding to the ``<layer>`` tags in ``elem``.
     :rtype: list of :class:`music21.stream.Voice`
@@ -2666,7 +2666,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
 
     In MEI 2013: pg.365 (379 in PDF) (MEI.cmn module)
 
-    :param elem: The ``<measure>`` tag to process.
+    :param elem: The ``<measure>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :param int backupNum: A fallback value for the resulting :class:`Measure` objects' ``number``
         attribute.
