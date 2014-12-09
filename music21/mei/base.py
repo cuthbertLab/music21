@@ -421,22 +421,20 @@ def makeDuration(base=0.0, dots=0):
                              dots=dots)
 
 
-def allPartsPresent(theConverter):
+def allPartsPresent(scoreElem):
     # pylint: disable=line-too-long
     '''
-    Use an :class:`MeiToM21Converter` to find the @n values for all the <staffDef> elements in the
-    MEI document. This assumes that every MEI <staff> corresponds to a music21 :class:`Part`. This
-    function reads from ``theConverter.documentRoot``.
+    Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
+    MEI <staff> corresponds to a music21 :class:`Part`.
 
-    :param theConverter: An :class:`MeiToM21Converter` instance.
+    :param scoreElem: The <score> :class:`Element` in which to find the part names.
     :returns: All the unique @n values associated with a part in the <score>.
     :rtype: tuple of str
 
     **Example**
 
     >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
-    ... <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
-    ...     <music><score>
+    ... <score xmlns="http://www.music-encoding.org/ns/mei">
     ...     <scoreDef>
     ...         <staffGrp>
     ...             <staffDef n="1" clef.shape="G" clef.line="2"/>
@@ -448,21 +446,22 @@ def allPartsPresent(theConverter):
     ...         <staffDef n="2" clef.shape="C" clef.line="4"/>
     ...         <!-- ... some music ... -->
     ...     </section>
-    ...     </score></music>
-    ... </mei>"""
+    ... </score>"""
+    >>> import xml.etree.ElementTree as ETree
     >>> from music21 import *
-    >>> theConverter = mei.base.MeiToM21Converter(meiDoc)
-    >>> mei.base.allPartsPresent(theConverter)
+    >>> meiDoc = ETree.fromstring(meiDoc)
+    >>> mei.base.allPartsPresent(meiDoc)
     ('1', '2')
 
     Even though there are three <staffDef> elements in the document, there are only two unique @n
     attributes. The second appearance of <staffDef> with @n="2" signals a change of clef on that
     same staff---not that there is a new staff.
     '''
-    xpathQuery = './/{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)
+    #xpathQuery = './/{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)
+    xpathQuery = './/{}staffDef'.format(_MEINS)
     partNs = []  # hold the @n attribute for all the parts
 
-    for staffDef in theConverter.documentRoot.findall(xpathQuery):
+    for staffDef in scoreElem.findall(xpathQuery):
         if staffDef.get('n') not in partNs:
             partNs.append(staffDef.get('n'))
     if 0 == len(partNs):

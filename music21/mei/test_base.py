@@ -160,42 +160,42 @@ class TestThings(unittest.TestCase):
 
     def testAllPartsPresent1(self):
         '''allPartsPresent(): one <staffDef>, no repeats'''
-        theConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         staffDefs = [mock.MagicMock(spec_set=ETree.Element)]
         staffDefs[0].get = mock.MagicMock(return_value='1')
-        theConverter.documentRoot.findall = mock.MagicMock(return_value=staffDefs)
+        elem = mock.MagicMock(spec_set=ETree.Element)
+        elem.findall = mock.MagicMock(return_value=staffDefs)
         expected = ['1']
-        actual = base.allPartsPresent(theConverter)
+        actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
     def testAllPartsPresent2(self):
         '''allPartsPresent(): four <staffDef>s'''
-        theConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         staffDefs = [mock.MagicMock(spec_set=ETree.Element) for _ in xrange(4)]
         for i in xrange(4):
             staffDefs[i].get = mock.MagicMock(return_value=str(i + 1))
-        theConverter.documentRoot.findall = mock.MagicMock(return_value=staffDefs)
+        elem = mock.MagicMock(spec_set=ETree.Element)
+        elem.findall = mock.MagicMock(return_value=staffDefs)
         expected = list('1234')
-        actual = base.allPartsPresent(theConverter)
+        actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
     def testAllPartsPresent3(self):
         '''allPartsPresent(): four unique <staffDef>s, several repeats'''
-        theConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         staffDefs = [mock.MagicMock(spec_set=ETree.Element) for _ in xrange(12)]
         for i in xrange(12):
             staffDefs[i].get = mock.MagicMock(return_value=str((i % 4) + 1))
-        theConverter.documentRoot.findall = mock.MagicMock(return_value=staffDefs)
+        elem = mock.MagicMock(spec_set=ETree.Element)
+        elem.findall = mock.MagicMock(return_value=staffDefs)
         expected = list('1234')
-        actual = base.allPartsPresent(theConverter)
+        actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
     def testAllPartsPresent4(self):
         '''allPartsPresent(): error: no <staffDef>s'''
-        theConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
-        self.assertRaises(base.MeiValidityError, base.allPartsPresent, theConverter)
+        elem = mock.MagicMock(spec_set=ETree.Element)
+        self.assertRaises(base.MeiValidityError, base.allPartsPresent, elem)
         try:
-            base.allPartsPresent(theConverter)
+            base.allPartsPresent(elem)
         except base.MeiValidityError as mvErr:
             self.assertEqual(base._SEEMINGLY_NO_PARTS, mvErr.args[0])
 
