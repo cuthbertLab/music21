@@ -104,7 +104,7 @@
             </measure>
 
             <scoreDef meter.count="3" meter.unit="4" key.pname="B" key.accid="f" key.mode="major"/>
-            <staffDef n="2" lines="5" clef.line="4" clef.shape="C"/>  <!-- this isn't used? -->
+            <staffDef n="2" lines="5" clef.line="4" clef.shape="C"/>
             <measure n="3" right="dbl">
                 <staff n="1">
                     <layer n="1" xml:id="upper">
@@ -160,6 +160,7 @@
             </measure>
 
             <measure n="5">
+                <staffDef n="2" lines="5" clef.line="4" clef.shape="F"/>
                 <staff n="1">
                     <layer n="1" xml:id="upper">
                         <tuplet num="7" numbase="1">
@@ -188,7 +189,7 @@
                         </chord>
                     </layer>
                 </staff>
-                <staff n="2" clef.shape="F" clef.line="4">  <!-- TODO: this is unnecessary until the <staffDef> before m.3 is used -->
+                <staff n="2">
                     <layer n="1" xml:id="lower">
                         <note pname="E" accid="f" oct="3" dur="8" xml:id="9555d426-a200-4639-bf50-1b363984bbf4"/>
                         <rest dur="32"/>

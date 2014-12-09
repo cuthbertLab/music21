@@ -57,8 +57,13 @@ PartOne =  \relative e' {
       \bar ":.|.:"  |
 
    % m.5
-   \times 1/7 { \times 4/5  { d8 f a g es }
-      c2 d c bes c d } <g' beses,,>4  |
+   \clef "treble"
+   \times 1/7 {
+      \times 4/5  { d8 f a g es }
+      \clef "alto"
+      c2 d c bes c d }
+   \clef "treble"
+   <g' beses,,>4  |
 
    % m.6
    R2. |
@@ -86,6 +91,7 @@ PartTwo =  \relative c {
    e4\( r f( r \bar "|."  |
 
    % m.3
+   \clef "tenor"
    \key bes \major
    \time 3/4
    g4)\) r f8 r \bar "||"  |
@@ -94,6 +100,7 @@ PartTwo =  \relative c {
    R2.  |
 
    % m.5
+   \clef "bass"
    \times 4/5 { es8 r32 r r16 r } r4 bes'  |
 
    % mm.6 through 9
