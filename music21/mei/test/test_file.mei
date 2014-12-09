@@ -164,7 +164,7 @@
                 <staff n="1">
                     <layer n="1" xml:id="upper">
                         <tuplet num="7" numbase="1">
-                            <clef shape="G" line="2"/>
+                            <clef shape="G" line="2"/>  <!-- This won't be outputted in MusicXML: https://github.com/cuthbertLab/music21/issues/28 -->
                             <tuplet num="5" numbase="4">
                                 <note pname="D" oct="5" dur="8" beam="i1"/>
                                 <note pname="f" oct="5" dur="8" beam="m1"/>
@@ -180,7 +180,7 @@
                             <note pname="C" oct="5" dur="2"/>
                             <note pname="d" oct="5" dur="2"/>
                         </tuplet>
-                        <clef shape="G" line="2"/>
+                        <clef shape="G" line="2"/>  <!-- This won't be outputted in MusicXML: https://github.com/cuthbertLab/music21/issues/28 -->
                         <chord dur="4">
                             <note pname="g" oct="6"/>
                             <note pname="b" oct="4">
