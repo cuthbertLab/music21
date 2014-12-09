@@ -3328,3 +3328,143 @@ class TestMeasureFromElement(unittest.TestCase):
             self.assertEqual(activeMeter.totalLength, actual['4'][0][0].duration.quarterLength)
             self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
             self.assertEqual('final', actual[eachN].rightBarline.style)
+
+    @mock.patch('music21.mei.base.staffFromElement')
+    @mock.patch('music21.mei.base._correctMRestDurs')
+    @mock.patch('music21.mei.base._makeBarlines')
+    @mock.patch('music21.stream.Measure')
+    @mock.patch('music21.mei.base.staffDefFromElement')
+    def testMeasureUnit3a(self, mockStaffDefFE, mockMeasure, mockMakeBarlines, mockCorrectDurs, mockStaffFE):
+        '''
+        measureFromElement(): test 3a
+            - there is one part
+            - there is a <staffDef> which has its required @n attribute
+
+        mocked: staffFromElement(), staffDefFromElement, stream.Measure(), _correctMRestDurs(), _makeBarlines(),
+        '''
+        staffTag = '{}staff'.format(_MEINS)
+        staffDefTag = '{}staffDef'.format(_MEINS)
+        elem = ETree.Element('measure', attrib={'n': '42'})
+        staffDefElem = ETree.Element(staffDefTag, attrib={'n': '1', 'lines': '5'})
+        elem.append(staffDefElem)
+        staffElem = ETree.Element(staffTag, attrib={'n': '1'})
+        elem.append(staffElem)
+        backupNum = 900  # should be ignored by measureFromElement()
+        expectedNs = ['1']
+        slurBundle = mock.MagicMock(name='slurBundle')
+        activeMeter = mock.MagicMock(name='activeMeter')
+        activeMeter.totalLength = 4.0  # this must match Measure.duration.quarterLength
+        # prepare the mock Measure object returned by mockMeasure
+        mockMeasure.return_value = mock.MagicMock(name='Measure 1')
+        # prepare mock of _makeBarlines() which returns "staves"
+        mockMakeBarlines.side_effect = lambda elem, staves: staves
+        # prepare mock of _correctMRestDurs()
+        mockCorrectDurs.return_value = None
+        # prepare mock of staffFromElement(), which just needs to return several unique things
+        mockStaffFE.return_value = 'staffFromElement() return value'
+        # prepare mock of staffDefFromElement()
+        mockStaffDefFE.return_value = {'clef': mock.MagicMock(name='SomeClef')}
+        # prepare the expected return value
+        expected = {'1': mockMeasure.return_value}
+
+        actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
+
+        self.assertDictEqual(expected, actual)
+        # ensure staffFromElement() was called properly
+        mockStaffFE.assert_called_once_with(staffElem, slurBundle=slurBundle)
+        # ensure staffDefFromElement() was called properly
+        mockStaffDefFE.assert_called_once_with(staffDefElem, slurBundle)
+        # ensure Measure.__init__() was called properly
+        mockMeasure.assert_called_once_with(mockStaffFE.return_value, number=42)
+        mockMeasure.return_value.insert.assert_called_once_with(0, mockStaffDefFE.return_value['clef'])
+
+    @mock.patch('music21.mei.base.staffFromElement')
+    @mock.patch('music21.mei.base._correctMRestDurs')
+    @mock.patch('music21.mei.base._makeBarlines')
+    @mock.patch('music21.stream.Measure')
+    @mock.patch('music21.mei.base.environLocal')
+    def testMeasureUnit3b(self, mockEnviron, mockMeasure, mockMakeBarlines, mockCorrectDurs, mockStaffFE):
+        '''
+        measureFromElement(): test 3b
+            - there is one part
+            - there is a <staffDef> which does not have its required @n attribute
+
+        mocked: staffFromElement(), environLocal, stream.Measure(), _correctMRestDurs(), _makeBarlines(),
+        '''
+        staffTag = '{}staff'.format(_MEINS)
+        staffDefTag = '{}staffDef'.format(_MEINS)
+        elem = ETree.Element('measure', attrib={'n': '42'})
+        staffDefElem = ETree.Element(staffDefTag, attrib={'lines': '5'})
+        elem.append(staffDefElem)
+        staffElem = ETree.Element(staffTag, attrib={'n': '1'})
+        elem.append(staffElem)
+        backupNum = 900  # should be ignored by measureFromElement()
+        expectedNs = ['1']
+        slurBundle = mock.MagicMock(name='slurBundle')
+        activeMeter = mock.MagicMock(name='activeMeter')
+        activeMeter.totalLength = 4.0  # this must match Measure.duration.quarterLength
+        # prepare the mock Measure object returned by mockMeasure
+        mockMeasure.return_value = mock.MagicMock(name='Measure 1')
+        # prepare mock of _makeBarlines() which returns "staves"
+        mockMakeBarlines.side_effect = lambda elem, staves: staves
+        # prepare mock of _correctMRestDurs()
+        mockCorrectDurs.return_value = None
+        # prepare mock of staffFromElement(), which just needs to return several unique things
+        mockStaffFE.return_value = 'staffFromElement() return value'
+        # prepare the expected return value
+        expected = {'1': mockMeasure.return_value}
+
+        actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
+
+        self.assertDictEqual(expected, actual)
+        # ensure staffFromElement() was called properly
+        mockStaffFE.assert_called_once_with(staffElem, slurBundle=slurBundle)
+        # ensure Measure.__init__() was called properly
+        mockMeasure.assert_called_once_with(mockStaffFE.return_value, number=42)
+        self.assertEqual(0, mockMeasure.return_value.insert.call_count)
+        # ensure environLocal.warn() was called properly
+        mockEnviron.warn.assert_called_once_with(base._UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
+
+    def testMeasureIntegration3(self):
+        '''
+        measureFromElement(): test 3
+            - there is one part
+            - there is a <staffDef> which has its required @n attribute
+
+        NB: I won't bother making an integration equivalent to unit test 3b, since I would have to
+            mock "environLocal" to know whether it worked, and "no mocks" is the whole point of this
+
+        no mocks
+        '''
+        staffTag = '{}staff'.format(_MEINS)
+        layerTag = '{}layer'.format(_MEINS)
+        noteTag = '{}note'.format(_MEINS)
+        staffDefTag = '{}staffDef'.format(_MEINS)
+        elem = ETree.Element('measure')
+        elem.append(ETree.Element(staffDefTag, attrib={'n': '1', 'lines': '5', 'clef.line': '4', 'clef.shape': 'F'}))
+        innerStaff = ETree.Element(staffTag, attrib={'n': '1'})
+        innerLayer = ETree.Element(layerTag, attrib={'n': '1'})
+        innerLayer.append(ETree.Element(noteTag))
+        innerStaff.append(innerLayer)
+        elem.append(innerStaff)
+        backupNum = 900  # should be used by measureFromElement()
+        expectedNs = ['1']
+        slurBundle = spanner.SpannerBundle()
+        activeMeter = meter.TimeSignature('8/8')  # bet you thought this would be 4/4, eh?
+
+        actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
+
+        # ensure the right number and @n of parts
+        self.assertEqual(['1'], list(actual.keys()))
+        # ensure the Measure has its expected Voice, BassClef, and Instrument
+        self.assertEqual(backupNum, actual['1'].number)
+        self.assertEqual(2, len(actual['1']))  # the Voice, plus a Clef and Instrument from staffDefFE()
+        foundVoice = False
+        foundClef = False
+        for item in actual['1']:
+            if isinstance(item, stream.Voice):
+                foundVoice = True
+            elif isinstance(item, clef.BassClef):
+                foundClef = True
+        self.assertTrue(foundVoice is True)
+        self.assertTrue(foundClef is True)

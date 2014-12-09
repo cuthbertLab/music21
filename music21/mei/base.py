@@ -2686,7 +2686,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
 
     **Attributes/Elements Implemented:**
 
-    - <staff> contained within
+    - contained elements: <staff> and <staffDef>
     - @right and @left (att.measure.log)
     - @n (att.common)
 
@@ -2724,14 +2724,16 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     - MEI.harmony: harm
     - MEI.lyrics: lyrics
     - MEI.midi: midi
-    - MEI.shared: annot dir dynam pb phrase sb staffDef tempo
+    - MEI.shared: annot dir dynam pb phrase sb tempo
     - MEI.text: div
     - MEI.usersymbols: anchoredText curve line symbol
     '''
     staves = {}
+    stavesWaiting = {}  # for staff-specific objects processed before the corresponding staff
 
     # mapping from tag name to our converter function
     staffTag = '{http://www.music-encoding.org/ns/mei}staff'
+    staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
     tagToFunction = {}
 
     # track the bar's duration
@@ -2745,11 +2747,23 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
             thisBarDuration = staves[eachElem.get('n')].duration.quarterLength
             if maxBarDuration is None or maxBarDuration < thisBarDuration:
                 maxBarDuration = thisBarDuration
-        elif eachElem.tag in tagToFunction:
-            # NB: this won't be tested until there's something in tagToFunction
-            staves[eachElem.get('n')] = tagToFunction[eachElem.tag](eachElem, slurBundle)
+        elif staffDefTag == eachElem.tag:
+            whichN = eachElem.get('n')
+            if whichN is None:
+                environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
+            else:
+                stavesWaiting[whichN] = staffDefFromElement(eachElem, slurBundle)
         elif eachElem.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, elem.tag))
+
+    # Process objects from a <staffDef>...
+    # We must process them now because, if we did it in the loop above, the respective <staff> may
+    # not be processed before the <staffDef>.
+    for whichN, eachDict in six.iteritems(stavesWaiting):
+        for eachObj in six.itervalues(eachDict):
+            # We must insert() these objects because a <staffDef> signals its changes for the
+            # *start* of the <measure> in which it appears.
+            staves[whichN].insert(0, eachObj)
 
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
     for eachN in expectedNs:
