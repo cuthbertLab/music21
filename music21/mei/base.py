@@ -335,7 +335,7 @@ class MeiToM21Converter(object):
                         for thisPartObject in six.itervalues(staffDefResults):
                             if isinstance(thisPartObject, meter.TimeSignature):
                                 activeMeter = thisPartObject
-                            parsed[whichPart].append(thisPartObject)
+                            inNextMeasure[whichPart].append(thisPartObject)
                 elif eachObject.tag not in _IGNORE_UNPROCESSED:
                     environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
 
