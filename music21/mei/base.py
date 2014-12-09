@@ -986,16 +986,16 @@ def _processEmbeddedElements(elements, mapping, callerTag=None, slurBundle=None)
     '''
     processed = []
 
-    for eachTag in elements:
-        if eachTag.tag in mapping:
-            result = mapping[eachTag.tag](eachTag, slurBundle)
+    for eachElem in elements:
+        if eachElem.tag in mapping:
+            result = mapping[eachElem.tag](eachElem, slurBundle)
             if isinstance(result, (tuple, list)):
                 for eachObject in result:
                     processed.append(eachObject)
             else:
                 processed.append(result)
-        elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachTag.tag, callerTag))
+        elif eachElem.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, callerTag))
 
     return processed
 
