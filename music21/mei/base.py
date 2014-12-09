@@ -170,6 +170,7 @@ _MISSING_VOICE_ID = 'Found a <layer> without @n attribute and no override.'
 _CANNOT_FIND_XMLID = 'Could not find the @{} so we could not create the {}.'
 _MISSING_TUPLET_DATA = 'Both @num and @numbase attributes are required on <tuplet> tags.'
 _UNIMPLEMENTED_IMPORT = 'Importing {} without {} is not yet supported.'
+_UNPROCESSED_SUBELEMENT = 'Found an unprocessed <{}> element in a <{}>.'
 
 
 # Module-level Functions
@@ -935,7 +936,7 @@ def _ppConclude(theConverter):
 
 # Helper Functions
 #------------------------------------------------------------------------------
-def _processEmbeddedElements(elements, mapping, slurBundle=None):
+def _processEmbeddedElements(elements, mapping, callerTag=None, slurBundle=None):
     '''
     From an iterable of MEI ``elements``, use functions in the ``mapping`` to convert each element
     to its music21 object. This function was designed for use with elements that may contain other
@@ -950,6 +951,9 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
     :param mapping: A dictionary where keys are the :attr:`Element.tag` attribute and values are
         the function to call to convert that :class:`Element` to a music21 object.
     :type mapping: mapping of str to function
+    :param str callerTag: The tag of the element on behalf of which this function is processing
+        sub-elements (e.g., 'note' or 'staffDef'). Do not include < and >. This is used in a
+        warning message on finding an unprocessed element.
     :param slurBundle: A slur bundle, as used by the other :func:`*fromElements` functions.
     :type slurBundle: :class:`music21.spanner.SlurBundle`
     :returns: A list of the music21 objects returned by the converter functions, or an empty list
@@ -958,14 +962,18 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
 
     **Examples:**
 
-    Because there is no ``'rest'`` key in the ``mapping``, that :class:`Element` is ignored:
+    Because there is no ``'rest'`` key in the ``mapping``, that :class:`Element` is ignored.
 
     >>> from xml.etree.ElementTree import Element
     >>> from music21 import *
     >>> elements = [Element('note'), Element('rest'), Element('note')]
     >>> mapping = {'note': lambda x, y: note.Note('D2')}
-    >>> mei.base._processEmbeddedElements(elements, mapping)
+    >>> mei.base._processEmbeddedElements(elements, mapping, 'doctest')
     [<music21.note.Note D>, <music21.note.Note D>]
+
+    If debugging is enabled for the previous example, this warning would be displayed:
+
+    ``mei.base: Found an unprocessed <rest> element in a <doctest>.
 
     The "beam" element holds "note" elements. All elements appear in a single level of the list:
 
@@ -986,7 +994,7 @@ def _processEmbeddedElements(elements, mapping, slurBundle=None):
             else:
                 processed.append(result)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('found an unprocessed <{}> element'.format(eachTag.tag))
+            environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachTag.tag, callerTag))
 
     return processed
 
@@ -1641,7 +1649,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
                                                               'dis': elem.get('clef.dis'),
                                                               'dis.place': elem.get('clef.dis.place')}))
 
-    embeddedItems = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
+    embeddedItems = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
     for eachItem in embeddedItems:
         if isinstance(eachItem, clef.Clef):
             post['clef'] = eachItem
@@ -1872,7 +1880,7 @@ def noteFromElement(elem, slurBundle=None):
 
     # iterate all immediate children
     dotElements = 0  # count the number of <dot> elements
-    for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle):
+    for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle):
         if isinstance(subElement, six.integer_types):
             dotElements += subElement
         elif isinstance(subElement, articulations.Articulation):
@@ -2106,7 +2114,7 @@ def chordFromElement(elem, slurBundle=None):
     theChord.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
 
     # iterate all immediate children
-    for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle):
+    for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle):
         if isinstance(subElement, articulations.Articulation):
             theChord.articulations.append(subElement)
 
@@ -2324,7 +2332,7 @@ def beamFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
 
-    beamedStuff = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
+    beamedStuff = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
     beamedStuff = beamTogether(beamedStuff)
 
     return beamedStuff
@@ -2393,7 +2401,7 @@ def tupletFromElement(elem, slurBundle=None):
         raise MeiAttributeError(_MISSING_TUPLET_DATA)
 
     # iterate all immediate children
-    tupletMembers = _processEmbeddedElements(elem.findall('*'), tagToFunction, slurBundle)
+    tupletMembers = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
 
     # "tuplet-ify" the duration of everything held within
     newElem = ETree.Element('c', m21TupletNum=elem.get('num'), m21TupletNumbase=elem.get('numbase'))
@@ -2506,7 +2514,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
                 for eachObject in result:
                     theLayer.append(eachObject)
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
+            environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachTag.tag, elem.tag))
 
     # adjust the <layer>'s elements for possible tuplets
     theLayer = _guessTuplets(theLayer)
@@ -2587,7 +2595,7 @@ def staffFromElement(elem, slurBundle=None):
             # NB: this won't be tested until there's something in tagToFunction
             layers.append(tagToFunction[eachTag.tag](eachTag, slurBundle))
         elif eachTag.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('unprocessed {} in {}'.format(eachTag.tag, elem.tag))
+            environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachTag.tag, elem.tag))
 
     return layers
 
@@ -2746,7 +2754,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
             # NB: this won't be tested until there's something in tagToFunction
             staves[eachElem.get('n')] = tagToFunction[eachElem.tag](eachElem, slurBundle)
         elif eachElem.tag not in _IGNORE_UNPROCESSED:
-            environLocal.printDebug('unprocessed {} in {}'.format(eachElem.tag, elem.tag))
+            environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, elem.tag))
 
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
     for eachN in expectedNs:

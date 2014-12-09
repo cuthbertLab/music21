@@ -2079,13 +2079,15 @@ class TestEmbeddedElements(unittest.TestCase):
         mockTranslator = mock.MagicMock(return_value='translator return')
         elements = [ETree.Element('note'), ETree.Element('bream')]
         mapping = {'note': mockTranslator}
+        callerName = 'ocean'
         expected = ['translator return']
+        exp_err = base._UNPROCESSED_SUBELEMENT.format(elements[1].tag, callerName)
 
-        actual = base._processEmbeddedElements(elements, mapping)
+        actual = base._processEmbeddedElements(elements, mapping, callerName)
 
         self.assertSequenceEqual(expected, actual)
         mockTranslator.assert_called_once_with(elements[0], None)
-        mockEnviron.printDebug.assert_called_once_with('found an unprocessed <bream> element')
+        mockEnviron.printDebug.assert_called_once_with(exp_err)
 
 
 
