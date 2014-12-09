@@ -137,6 +137,7 @@ _IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
                        '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
                        '{}tupletSpan'.format(_MEINS),  # tuplets; handled in convertFromString()
                        '{}beamSpan'.format(_MEINS),  # beams; handled in convertFromString()
+                       '{}instrDef'.format(_MEINS),  # instrument; handled separately by staffDefFromElement()
                       )
 
 
@@ -1622,15 +1623,19 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
         post = {'instrument': instrDefFromElement(post)}
     else:
         try:
-            post = {'instrument': instrument.fromString(elem.get('label'))}
-        except (AttributeError, instrument.InstrumentException):
-            post = {'instrument': instrument.Instrument()}
-    post['instrument'].partName = elem.get('label')
-    post['instrument'].partAbbreviation = elem.get('label.abbr')
-    post['instrument'].partId = elem.get('n')
+            post = {'instrument': instrument.fromString(elem.get('label', ''))}
+        except instrument.InstrumentException:
+            post = {}
+
+    if 'instrument' in post:
+        post['instrument'].partName = elem.get('label')
+        post['instrument'].partAbbreviation = elem.get('label.abbr')
+        post['instrument'].partId = elem.get('n')
 
     # --> transposition
     if elem.get('trans.semi') is not None:
+        if 'instrument' not in post:
+            post['instrument'] = instrument.Instrument()
         post['instrument'].transposition = _transpositionFromAttrs(elem)
 
     # process other part-specific information

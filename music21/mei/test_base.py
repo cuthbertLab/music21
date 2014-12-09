@@ -1662,23 +1662,15 @@ class TestStaffDefFromElement(unittest.TestCase):
         @meter.unit, @clef.shape, @clef.line, @clef.dis, @clef.dis.place, @trans.diat, @trans.demi
         '''
         # 1.) prepare
-        elem = mock.MagicMock()
-        elem.find = mock.MagicMock(name='{}instrDef', return_value='{}instrDef tag')
-        elem.findall = mock.MagicMock(return_value=[])
-        def elemGetSideEffect(which, default=None):
-            "mock the behaviour of Element.get()"
-            theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
-                       'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
-                       'key.pname': 'G', 'trans.semi': '123'}
-            if which in theDict:
-                return theDict[which]
-            else:
-                return default
-        elem.get = mock.MagicMock(side_effect=elemGetSideEffect)
-        expectedGetCalls = ['label', 'label.abbr', 'n', 'meter.count', 'key.pname',
-                            'clef.shape', 'clef.shape', 'clef.line', 'clef.dis', 'clef.dis.place',
-                            'trans.semi']
-        expectedGetCalls = [mock.call(x) for x in expectedGetCalls]
+        elem = ETree.Element('{}staffDef'.format(_MEINS),
+                             attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
+                                     'clef.dis.place': 'cdp', 'label': 'the label',
+                                     'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
+                                     'key.pname': 'G', 'trans.semi': '123'})
+        theInstrDef = ETree.Element('{}instrDef'.format(_MEINS),
+                                    attrib={'midi.channel': '1', 'midi.instrnum': '71',
+                                            'midi.instrname': 'Clarinet'})
+        elem.append(theInstrDef)
         theMockInstrument = mock.MagicMock('mock instrument')
         mockInstr.return_value = theMockInstrument
         mockTime.return_value = 'mockTime return'
@@ -1697,19 +1689,12 @@ class TestStaffDefFromElement(unittest.TestCase):
         actual = base.staffDefFromElement(elem)
 
         # 3.) check
-        self.assertSequenceEqual(expected, actual)
-        # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
-        # be in a particular order
-        if six.PY2:
-            self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
-        else:
-            self.assertCountEqual(expectedGetCalls, elem.get.mock_calls)
-        mockInstr.assert_called_once_with('{}instrDef tag')
+        self.assertDictEqual(expected, actual)
+        mockInstr.assert_called_once_with(theInstrDef)
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
         # mockClef is more difficult because it's given an Element
         mockTrans.assert_called_once_with(elem)
-        elem.findall.assert_called_once_with('*')
         # check that all attributes are set with their expected values
         for attrName, attrValue in expectedAttrs:
             self.assertEqual(getattr(theMockInstrument, attrName), attrValue)
@@ -1727,12 +1712,14 @@ class TestStaffDefFromElement(unittest.TestCase):
         staffDefFromElement(): corresponds to testUnit1() without mock objects
         '''
         # 1.) prepare
-        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"
-                                clef.shape="G" key.sig="0" key.mode="major" trans.semi="-3"
-                                trans.diat="-2" meter.count="3" meter.unit="8">
-                         <instrDef midi.channel="1" midi.instrnum="71" midi.instrname="Clarinet"/>
-                      </staffDef>'''
-        elem = ETree.fromstring(inputXML)
+        elem = ETree.Element('{}staffDef'.format(_MEINS),
+                             attrib={'clef.shape': 'G', 'clef.line': '2', 'n': '12',
+                                     'meter.count': '3', 'meter.unit': '8', 'key.sig': '0',
+                                     'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2'})
+        theInstrDef = ETree.Element('{}instrDef'.format(_MEINS),
+                                    attrib={'midi.channel': '1', 'midi.instrnum': '71',
+                                            'midi.instrname': 'Clarinet'})
+        elem.append(theInstrDef)
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
@@ -1752,13 +1739,14 @@ class TestStaffDefFromElement(unittest.TestCase):
         staffDefFromElement(): testIntegration1() with <clef> tag inside
         '''
         # 1.) prepare
-        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" key.sig="0"
-                                key.mode="major" trans.semi="-3" trans.diat="-2" meter.count="3"
-                                meter.unit="8">
-                         <instrDef midi.channel="1" midi.instrnum="71" midi.instrname="Clarinet"/>
-                         <clef shape="G" line="2"/>
-                      </staffDef>'''
-        elem = ETree.fromstring(inputXML)
+        elem = ETree.Element('{}staffDef'.format(_MEINS),
+                             attrib={'n': '12', 'meter.count': '3', 'meter.unit': '8', 'key.sig': '0',
+                                     'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2'})
+        theInstrDef = ETree.Element('{}instrDef'.format(_MEINS),
+                                    attrib={'midi.channel': '1', 'midi.instrnum': '71',
+                                            'midi.instrname': 'Clarinet'})
+        elem.append(theInstrDef)
+        elem.append(ETree.Element('{}clef'.format(_MEINS), attrib={'shape': 'G', 'line': '2'}))
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
@@ -1786,23 +1774,11 @@ class TestStaffDefFromElement(unittest.TestCase):
         '''
         # NB: differences from testUnit1() are marked with a "D1" comment at the end of the line
         # 1.) prepare
-        elem = mock.MagicMock()
-        elem.find = mock.MagicMock(name='{}instrDef', return_value=None)  # D1
-        elem.findall = mock.MagicMock(return_value=[])
-        def elemGetSideEffect(which, default=None):
-            "mock the behaviour of Element.get()"
-            theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
-                       'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
-                       'key.pname': 'G', 'trans.semi': '123'}
-            if which in theDict:
-                return theDict[which]
-            else:
-                return default
-        elem.get = mock.MagicMock(side_effect=elemGetSideEffect)
-        expectedGetCalls = ['label', 'label', 'label.abbr', 'n', 'meter.count', 'key.pname',  # D1
-                            'clef.shape', 'clef.shape', 'clef.line', 'clef.dis', 'clef.dis.place',
-                            'trans.semi']
-        expectedGetCalls = [mock.call(x) for x in expectedGetCalls]
+        elem = ETree.Element('{}staffDef'.format(_MEINS),
+                             attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
+                                     'clef.dis.place': 'cdp', 'label': 'the label',
+                                     'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
+                                     'key.pname': 'G', 'trans.semi': '123'})
         theMockInstrument = mock.MagicMock('mock instrument')
         mockFromString.return_value = theMockInstrument  # D1
         mockTime.return_value = 'mockTime return'
@@ -1821,19 +1797,12 @@ class TestStaffDefFromElement(unittest.TestCase):
         actual = base.staffDefFromElement(elem)
 
         # 3.) check
-        self.assertSequenceEqual(expected, actual)
-        # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
-        # be in a particular order
-        if six.PY2:
-            self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
-        else:
-            self.assertCountEqual(expectedGetCalls, elem.get.mock_calls)
+        self.assertDictEqual(expected, actual)
         self.assertEqual(0, mockInstr.call_count)  # D1
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
         # mockClef is more difficult because it's given an Element
         mockTrans.assert_called_once_with(elem)
-        elem.findall.assert_called_once_with('*')
         # check that all attributes are set with their expected values
         for attrName, attrValue in expectedAttrs:
             self.assertEqual(getattr(theMockInstrument, attrName), attrValue)
@@ -1851,11 +1820,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         staffDefFromElement(): corresponds to testUnit2() but without mock objects
         '''
         # 1.) prepare
-        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"
-                                clef.shape="G" key.sig="0" key.mode="major" trans.semi="-3"
-                                trans.diat="-2" meter.count="3" meter.unit="8" label="clarinet">
-                      </staffDef>'''
-        elem = ETree.fromstring(inputXML)
+        elem = ETree.Element('{}staffDef'.format(_MEINS),
+                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G', 'key.sig': '0',
+                                     'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2',
+                                     'meter.count': '3', 'meter.unit': '8', 'label': 'clarinet'})
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
@@ -1885,23 +1853,11 @@ class TestStaffDefFromElement(unittest.TestCase):
         # NB: differences from testUnit1() are marked with a "D1" comment at the end of the line
         # NB: differences from testUnit2() are marked with a "D2" comment at the end of the line
         # 1.) prepare
-        elem = mock.MagicMock()
-        elem.find = mock.MagicMock(name='{}instrDef', return_value=None)  # D1
-        elem.findall = mock.MagicMock(return_value=[])
-        def elemGetSideEffect(which, default=None):
-            "mock the behaviour of Element.get()"
-            theDict = {'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd', 'clef.dis.place': 'cdp',
-                       'label': 'the label', 'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
-                       'key.pname': 'G', 'trans.semi': '123'}
-            if which in theDict:
-                return theDict[which]
-            else:
-                return default
-        elem.get = mock.MagicMock(side_effect=elemGetSideEffect)
-        expectedGetCalls = ['label', 'label', 'label.abbr', 'n', 'meter.count', 'key.pname',  # D1
-                            'clef.shape', 'clef.shape', 'clef.line', 'clef.dis', 'clef.dis.place',
-                            'trans.semi']
-        expectedGetCalls = [mock.call(x) for x in expectedGetCalls]
+        elem = ETree.Element('{}staffDef'.format(_MEINS),
+                        attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
+                                'clef.dis.place': 'cdp', 'label': 'the label',
+                                'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
+                                'key.pname': 'G', 'trans.semi': '123'})
         theMockInstrument = mock.MagicMock('mock instrument')
         mockFromString.side_effect = instrument.InstrumentException  # D2
         mockInstrInit.return_value = theMockInstrument  # D1 & D2
@@ -1914,26 +1870,20 @@ class TestStaffDefFromElement(unittest.TestCase):
                     'key': mockKey.return_value,
                     'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
-        expectedAttrs = [('partName', 'the label'), ('partAbbreviation', 'the l.'), ('partId', '1'),
-                         ('transposition', mockTrans.return_value)]
+        # NB: because the part name wasn't recognized by music21, there won't be a part name on the
+        #     Instrument... the only reason we get an Instrument at all is because of @trans.semi
+        expectedAttrs = [('transposition', mockTrans.return_value)]  # D3
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
 
         # 3.) check
-        self.assertSequenceEqual(expected, actual)
-        # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
-        # be in a particular order
-        if six.PY2:
-            self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
-        else:
-            self.assertCountEqual(expectedGetCalls, elem.get.mock_calls)
+        self.assertDictEqual(expected, actual)
         self.assertEqual(0, mockInstr.call_count)  # D1
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
         # mockClef is more difficult because it's given an Element
         mockTrans.assert_called_once_with(elem)
-        elem.findall.assert_called_once_with('*')
         # check that all attributes are set with their expected values
         for attrName, attrValue in expectedAttrs:
             self.assertEqual(getattr(theMockInstrument, attrName), attrValue)
@@ -1951,11 +1901,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         staffDefFromElement(): corresponds to testUnit3() but without mock objects
         '''
         # 1.) prepare
-        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei" n="12" clef.line="2"
-                                clef.shape="G" key.sig="0" key.mode="major" trans.semi="-3"
-                                trans.diat="-2" meter.count="3" meter.unit="8">
-                      </staffDef>'''
-        elem = ETree.fromstring(inputXML)
+        elem = ETree.Element('{}staffDef'.format(_MEINS),
+                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G', 'key.sig': '0',
+                                     'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2',
+                                     'meter.count': '3', 'meter.unit': '8'})
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
@@ -1965,10 +1914,47 @@ class TestStaffDefFromElement(unittest.TestCase):
         self.assertIsInstance(actual['meter'], meter.TimeSignature)
         self.assertIsInstance(actual['key'], key.KeySignature)
         self.assertIsInstance(actual['clef'], clef.TrebleClef)
-        self.assertEqual('12', actual['instrument'].partId)
         self.assertEqual('3/8', actual['meter'].ratioString)
         self.assertEqual('major', actual['key'].mode)
         self.assertEqual(0, actual['key'].sharps)
+        self.assertEqual('m-3', actual['instrument'].transposition.directedName)
+
+    @mock.patch('music21.instrument.Instrument')
+    @mock.patch('music21.instrument.fromString')
+    @mock.patch('music21.mei.base.instrDefFromElement')
+    @mock.patch('music21.mei.base._timeSigFromAttrs')
+    @mock.patch('music21.mei.base._keySigFromAttrs')
+    @mock.patch('music21.mei.base.clefFromElement')
+    @mock.patch('music21.mei.base._transpositionFromAttrs')
+    def testUnit4(self, mockTrans, mockClef, mockKey, mockTime, mockInstr, mockFromString, mockInstrInit):
+        '''
+        staffDefFromElement(): only specifies a meter
+        '''
+        # 1.) prepare
+        elem = ETree.Element('{}staffDef'.format(_MEINS), attrib={'meter.count': '1', 'meter.unit': '3'})
+        mockTime.return_value = 'mockTime return'
+        mockFromString.side_effect = instrument.InstrumentException  # otherwise staffDefFromElement() thinks it got a real Instrument
+        expected = {'meter': mockTime.return_value}
+
+        # 2.) run
+        actual = base.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertDictEqual(expected, actual)
+
+    def testIntegration4(self):
+        '''
+        staffDefFromElement(): corresponds to testUnit3() but without mock objects
+        '''
+        # 1.) prepare
+        elem = ETree.Element('{}staffDef'.format(_MEINS), attrib={'meter.count': '1', 'meter.unit': '3'})
+
+        # 2.) run
+        actual = base.staffDefFromElement(elem)
+
+        # 3.) check
+        self.assertIsInstance(actual['meter'], meter.TimeSignature)
+        self.assertEqual('1/3', actual['meter'].ratioString)
 
 
 
