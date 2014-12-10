@@ -1510,6 +1510,50 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     return post
 
 
+def staffGrpFromElement(elem, slurBundle=None):
+    '''
+    <staffGrp> A group of bracketed or braced staves.
+
+    In MEI 2013: pg.448 (462 in PDF) (MEI.shared module)
+
+    For now, this function is merely a container-processor-thing  for <staffDef> elements contained
+    in this <staffGrp> element given as the "elem" argument. That is, the function does not yet
+    create the brackets/braces and labels expected of a staff group.
+
+    :param elem: The ``<staffGrp>`` element to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :returns: Dictionary where keys are the @n attribute on a contained <staffDef>, and values are
+        the result of calling :func:`staffDefFromElement` with that <staffDef>.
+
+    **Attributes/Elements Implemented:**
+
+    - contained <staffDef>
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:**
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.declaring (@decls)
+    - att.facsimile (@facs)
+    - att.staffGrp.vis (@barthru)
+
+        - (att.labels.addl (@label.abbr))
+        - (att.staffgroupingsym (@symbol))
+        - (att.visibility (@visible))
+
+    - att.staffGrp.ges (att.instrumentident (@instr))
+
+    **Contained Elements not Implemented:**
+
+    - MEI.midi: instrDef
+    - MEI.shared: grpSym label staffGrp
+    '''
+    staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
+    return {sd.get('n'): staffDefFromElement(sd, slurBundle) for sd in elem.iterfind(staffDefTag)}
+    # Check that out, eh? Dictionary comprehensions! Sometimes Python does impress me.
+
+
 def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <staffDef> Container for staff meta-information.

@@ -1956,6 +1956,45 @@ class TestStaffDefFromElement(unittest.TestCase):
         self.assertIsInstance(actual['meter'], meter.TimeSignature)
         self.assertEqual('1/3', actual['meter'].ratioString)
 
+    @mock.patch('music21.mei.base.staffDefFromElement')
+    def testStaffGrpUnit1(self, mockStaffDefFE):
+        '''
+        staffGrpFromElement(): it's not a complicated function!
+        '''
+        elem = ETree.Element('staffGrp')
+        innerElems = [ETree.Element('{}staffDef'.format(_MEINS), attrib={'n': str(n)}) for n in range(4)]
+        for eachElem in innerElems:
+            elem.append(eachElem)
+        mockStaffDefFE.side_effect = lambda x, y: 'processed {}'.format(x.get('n'))
+        expected = {str(n): 'processed {}'.format(n) for n in range(4)}
+
+        actual = base.staffGrpFromElement(elem, None)
+
+        self.assertEqual(expected, actual)
+        self.assertEqual(len(innerElems), mockStaffDefFE.call_count)
+        for eachElem in innerElems:
+            mockStaffDefFE.assert_any_call(eachElem, None)
+
+    def testStaffGrpInt1(self):
+        '''
+        staffGrpFromElement(): we'll use
+        '''
+        elem = ETree.Element('staffGrp')
+        innerElems = [ETree.Element('{}staffDef'.format(_MEINS),
+                                    attrib={'n': str(n + 1), 'key.mode': 'major',
+                                            'key.sig': '{}f'.format(n + 1)})
+                      for n in range(4)]
+        for eachElem in innerElems:
+            elem.append(eachElem)
+        expected = {'1': {'key': key.KeySignature(sharps=-1, mode='major')},
+                    '2': {'key': key.KeySignature(sharps=-2, mode='major')},
+                    '3': {'key': key.KeySignature(sharps=-3, mode='major')},
+                    '4': {'key': key.KeySignature(sharps=-4, mode='major')}}
+
+        actual = base.staffGrpFromElement(elem, None)
+
+        self.assertDictEqual(expected, actual)
+
 
 
 #------------------------------------------------------------------------------
