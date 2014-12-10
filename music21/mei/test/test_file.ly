@@ -69,13 +69,15 @@ PartOne =  \relative e' {
    R2. |
 
    % m.7
-   \acciaccatura { d,16 f \times 2/3 { d16 f d }} es2.  |
+   \time 6/8
+   \key g \major
+   \acciaccatura { d,16 fis \times 2/3 { d16 fis d }} es2.  |
 
    % m.8
    R2. |
 
    % m.9
-   d16 f \times 2/3 { d16 f d } es2  |
+   d16 fis \times 2/3 { d16 fis d } es2  |
 }
 
 
@@ -103,8 +105,15 @@ PartTwo =  \relative c {
    \clef "bass"
    \times 4/5 { es8 r32 r r16 r } r4 bes'  |
 
-   % mm.6 through 9
-   R2.*4  |
+   % m.6
+   R2.  |
+
+   % m.7
+   \key g \major
+   R2.  |
+
+   % mm.8--9
+   R2.*2  |
 }
 
 

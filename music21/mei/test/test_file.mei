@@ -215,28 +215,34 @@
                     </layer>
                 </staff>
             </measure>
+        </section>
 
-            <measure n="7">
-                <staff n="1">
-                    <layer n="1">
-                        <beam>
-                            <note pname="D" oct="5" dur="16" beam="i1" grace="unacc"/>
-                            <note pname="f" oct="5" dur="16" beam="m1" grace="unacc"/>
-                            <tuplet num="3" numbase="2">
+        <scoreDef key.pname="G" key.accid="n" key.mode="major"/>  <!-- ensure stuff is insert to <section>-in-a-<score> -->
+        <section>
+            <scoreDef meter.count="6" meter.unit="8"/>  <!-- ensure stuff is inserted to <section>-in-a-<section> -->
+            <section>
+                <measure n="7">
+                    <staff n="1">
+                        <layer n="1">
+                            <beam>
                                 <note pname="D" oct="5" dur="16" beam="i1" grace="unacc"/>
-                                <note pname="f" oct="5" dur="16" beam="m1" grace="unacc"/>
-                                <note pname="d" oct="5" dur="16" beam="t1" grace="unacc"/>
-                            </tuplet>
-                        </beam>
-                        <note pname="E" accid.ges="f" oct="5" dur="2" dots="1"/>
-                    </layer>
-                </staff>
-                <staff n="2">
-                    <layer n="1">
-                        <mRest/>
-                    </layer>
-                </staff>
-            </measure>
+                                <note pname="f" accid.ges="s" oct="5" dur="16" beam="m1" grace="unacc"/>
+                                <tuplet num="3" numbase="2">
+                                    <note pname="D" oct="5" dur="16" beam="i1" grace="unacc"/>
+                                    <note pname="f" accid.ges="s" oct="5" dur="16" beam="m1" grace="unacc"/>
+                                    <note pname="d" oct="5" dur="16" beam="t1" grace="unacc"/>
+                                </tuplet>
+                            </beam>
+                            <note pname="E" accid.ges="f" oct="5" dur="2" dots="1"/>
+                        </layer>
+                    </staff>
+                    <staff n="2">
+                        <layer n="1">
+                            <mRest/>
+                        </layer>
+                    </staff>
+                </measure>
+            </section>
 
             <measure n="8">
                 <staff n="1">
@@ -256,9 +262,9 @@
                     <layer n="1">
                         <beam>
                             <note pname="D" oct="5" dur="16" beam="i1"/>
-                            <note pname="f" oct="5" dur="16" beam="m1"/>
+                            <note pname="f" accid.ges="s" oct="5" dur="16" beam="m1"/>
                             <note pname="D" oct="5" dur="16" beam="i1" xml:id="a2e480ea-46a6-4dca-afaf-31f794983c82"/>
-                            <note pname="f" oct="5" dur="16" beam="m1"/>
+                            <note pname="f" accid.ges="s" oct="5" dur="16" beam="m1"/>
                             <note pname="d" oct="5" dur="16" beam="t1" xml:id="a75b7384-73ef-4fcc-aa23-8cde967819cc"/>
                         </beam>
                         <note pname="E" accid.ges="f" oct="5" dur="2"/>
