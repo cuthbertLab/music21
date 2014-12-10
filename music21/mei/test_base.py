@@ -2011,16 +2011,8 @@ class TestScoreDefFromElement(unittest.TestCase):
         @meter.count, @meter.unit, @key.accid, @key.mode, @key.pname, @key.sig
         '''
         # 1.) prepare
-        elem = mock.MagicMock()
-        def elemGetSideEffect(which, default=None):  # pylint: disable=missing-docstring
-            theDict = {'meter.count': '7', 'key.pname': 'G'}
-            if which in theDict:
-                return theDict[which]
-            else:
-                return default
-        elem.get = mock.MagicMock(side_effect=elemGetSideEffect)
-        expectedGetCalls = ['meter.count', 'key.pname']
-        expectedGetCalls = [mock.call(x) for x in expectedGetCalls]
+        elem = ETree.Element('staffDef', attrib={'key.sig': '4s', 'key.mode': 'major',
+                                                 'meter.count': '3', 'meter.unit': '8'})
         mockTime.return_value = 'mockTime return'
         mockKey.return_value = 'mockKey return'
         expected = {'all-part objects': [mockTime.return_value, mockKey.return_value],
@@ -2031,12 +2023,6 @@ class TestScoreDefFromElement(unittest.TestCase):
 
         # 3.) check
         self.assertEqual(expected, actual)
-        # ensure elem.get() was called with all the expected calls; it doesn't necessarily have to
-        # be in a particular order
-        if six.PY2:
-            self.assertItemsEqual(expectedGetCalls, elem.get.mock_calls)
-        else:
-            self.assertCountEqual(expectedGetCalls, elem.get.mock_calls)
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
 
@@ -2045,9 +2031,8 @@ class TestScoreDefFromElement(unittest.TestCase):
         scoreDefFromElement(): corresponds to testUnit1() without mock objects
         '''
         # 1.) prepare
-        inputXML = '''<staffDef xmlns="http://www.music-encoding.org/ns/mei"
-                                key.sig="4s" key.mode="major" meter.count="3" meter.unit="8"/>'''
-        elem = ETree.fromstring(inputXML)
+        elem = ETree.Element('staffDef', attrib={'key.sig': '4s', 'key.mode': 'major',
+                                                 'meter.count': '3', 'meter.unit': '8'})
 
         # 2.) run
         actual = base.scoreDefFromElement(elem)
