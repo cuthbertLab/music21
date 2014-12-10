@@ -2044,6 +2044,63 @@ class TestScoreDefFromElement(unittest.TestCase):
         self.assertEqual('major', actual['all-part objects'][1].mode)
         self.assertEqual(4, actual['all-part objects'][1].sharps)
 
+    @mock.patch('music21.mei.base._timeSigFromAttrs')
+    @mock.patch('music21.mei.base._keySigFromAttrs')
+    @mock.patch('music21.mei.base.staffGrpFromElement')
+    def testUnit2(self, mockStaffGrpFE, mockKey, mockTime):
+        '''
+        scoreDefFromElement(): test for a <staffGrp> held within
+        '''
+        # 1.) prepare
+        elem = ETree.Element('staffDef', attrib={'key.sig': '4s', 'key.mode': 'major',
+                                                 'meter.count': '3', 'meter.unit': '8'})
+        staffGrp = ETree.Element('{}staffGrp'.format(_MEINS))
+        staffDef = ETree.Element('{}staffDef'.format(_MEINS),
+                                 attrib={'n': '1', 'label': 'Clarinet'})
+        staffGrp.append(staffDef)
+        elem.append(staffGrp)
+        mockTime.return_value = 'mockTime return'
+        mockKey.return_value = 'mockKey return'
+        mockStaffGrpFE.return_value = {'1': {'instrument': 'A clarinet'}}  # but is it "any clarinet," or a specific clarinet in A? Ambiguity!
+        expected = {'all-part objects': [mockTime.return_value, mockKey.return_value],
+                    'whole-score objects': [],
+                    '1': {'instrument': 'A clarinet'}}
+
+        # 2.) run
+        actual = base.scoreDefFromElement(elem)
+
+        # 3.) check
+        self.assertEqual(expected, actual)
+        mockTime.assert_called_once_with(elem)
+        mockKey.assert_called_once_with(elem)
+        mockStaffGrpFE.assert_called_once_with(staffGrp, None)
+
+    def testIntegration2(self):
+        '''
+        scoreDefFromElement(): corresponds to testUnit2() without mock objects
+        '''
+        # 1.) prepare
+        elem = ETree.Element('staffDef', attrib={'key.sig': '4s', 'key.mode': 'major',
+                                                 'meter.count': '3', 'meter.unit': '8'})
+        staffGrp = ETree.Element('{}staffGrp'.format(_MEINS))
+        staffDef = ETree.Element('{}staffDef'.format(_MEINS),
+                                 attrib={'n': '1', 'label': 'Clarinet'})
+        staffGrp.append(staffDef)
+        elem.append(staffGrp)
+
+        # 2.) run
+        actual = base.scoreDefFromElement(elem)
+
+        # 3.) check
+        self.assertIsInstance(actual['all-part objects'][0], meter.TimeSignature)
+        self.assertIsInstance(actual['all-part objects'][1], key.KeySignature)
+        self.assertEqual('3/8', actual['all-part objects'][0].ratioString)
+        self.assertEqual('major', actual['all-part objects'][1].mode)
+        self.assertEqual(4, actual['all-part objects'][1].sharps)
+        self.assertEqual('1', actual['1']['instrument'].partId)
+        self.assertEqual('Clarinet', actual['1']['instrument'].partName)
+        self.assertIsInstance(actual['1']['instrument'], instrument.Clarinet)
+
 
 
 #------------------------------------------------------------------------------

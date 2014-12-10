@@ -1441,28 +1441,52 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     In MEI 2013: pg.431 (445 in PDF) (MEI.shared module)
 
-    This function returns objects related to the score overall, and those relevant only to
-    specific parts, depending on the attributes and contents of the given :class:`Element`.
+    This function returns a dictionary with objects that may relate to the entire score, to all
+    parts at a particular moment, or only to a specific part at a particular moment. The dictionary
+    keys determine the object's scope. If the key is...
 
-    Objects relevant only to a particular part are accessible in the returned dictionary using that
-    part's @n attribute. The dictionary also has two special keys:
-    * ``'whole-score objects'``, which are related to the entire score (e.g., page size), and
-    * ``'all-part objects'``, which should appear in every part.
+    * ``'whole-score objects'``, it applies to the entire score (e.g., page size);
+    * ``'all-part objects'``, it applies to all parts at the moment this <scoreDef> appears;
+    * the @n attribute of a part, it applies only to that part at the moment this <scoreDef> appears.
 
-    Note that it is the caller's responsibility to determine the right actions if there are
+    While the multi-part objects will be held in a list, the single-part objects will be in a dict
+    like that returned by :func:`staffDefFromElement`.
+
+    Note that it is the caller's responsibility to determine the right action if there are
     conflicting objects in the returned dictionary.
+
+    For example:::
+
+    >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <scoreDef meter.count="3" meter.unit="4" xmlns="http://www.music-encoding.org/ns/mei">
+    ...     <staffGrp><staffDef n="1" label="Clarinet"/></staffGrp>
+    ... </scoreDef>
+    ... """
+    >>> from music21 import *
+    >>> from xml.etree import ElementTree as ET
+    >>> scoreDef = ET.fromstring(meiDoc)
+    >>> result = mei.base.scoreDefFromElement(scoreDef)
+    >>> len(result)
+    3
+    >>> result['1']
+    {'instrument': <music21.instrument.Instrument 1: Clarinet: Clarinet>}
+    >>> result['all-part objects']
+    [<music21.meter.TimeSignature 3/4>]
+    >>> result['whole-score objects']
+    []
 
     :param elem: The ``<scoreDef>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
-    :returns: Objects from the ``<scoreDef>`` relevant on a per-part and whole-score basis.
-    :rtype: dict of list of :class:`Music21Objects`
+    :returns: Objects from the ``<scoreDef>``, as described above.
+    :rtype: dict
 
     **Attributes/Elements Implemented:**
 
     - (att.meterSigDefault.log (@meter.count, @meter.unit))
     - (att.keySigDefault.log (@key.accid, @key.mode, @key.pname, @key.sig))
+    - contained <staffGrp>
 
-    **Attributes/Elements in Testing:** none
+    **Attributes/Elements in Testing:** None
 
     **Attributes not Implemented:**
 
@@ -1490,15 +1514,16 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - MEI.harmony: chordTable
     - MEI.linkalign: timeline
     - MEI.midi: instrGrp
-    - MEI.shared: keySig pgFoot pgFoot2 pgHead pgHead2 staffGrp
+    - MEI.shared: keySig pgFoot pgFoot2 pgHead pgHead2
     - MEI.usersymbols: symbolTable
     '''
+
     # make the dict
     allParts = 'all-part objects'
     wholeScore = 'whole-score objects'
     post = {allParts: [], wholeScore: []}
 
-    # 1.) process whole-score objects
+    # 1.) process all-part attributes
     # --> time signature
     if elem.get('meter.count') is not None:
         post[allParts].append(_timeSigFromAttrs(elem))
@@ -1506,6 +1531,10 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     # --> key signature
     if elem.get('key.pname') is not None or elem.get('key.sig') is not None:
         post[allParts].append(_keySigFromAttrs(elem))
+
+    # 2.) staff-specific things (from contained <staffGrp> >> <staffDef>)
+    for eachGrp in elem.iterfind('{http://www.music-encoding.org/ns/mei}staffGrp'):
+        post.update(staffGrpFromElement(eachGrp, slurBundle))
 
     return post
 
