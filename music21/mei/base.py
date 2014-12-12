@@ -2954,8 +2954,12 @@ def scoreFromElement(elem, slurBundle):
 
     In MEI 2013: pg.430 (444 in PDF) (MEI.shared module)
 
-    :param elem: The ``<score>`` element to process.
+    :param elem: The <score> element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
+    :param slurBundle: This :class:`SpannerBundle` holds the :class:`~music21.spanner.Slur` objects
+        created during pre-processing. The slurs are attached to their respective :class:`Note` and
+        :class:`Chord` objects as they are processed.
+    :type slurBundle: :class:`music21.spanner.SpannerBundle`
     :returns: A completed :class:`~music21.stream.Score` object.
 
     **Attributes/Elements Implemented:**
@@ -2991,7 +2995,7 @@ def scoreFromElement(elem, slurBundle):
     allPartNs = allPartsPresent(elem)
 
     # This is the actual processing.
-    parsed = sectionScoreCore(elem, allPartNs)[0]
+    parsed = sectionScoreCore(elem, allPartNs, slurBundle=slurBundle)[0]
 
     # Convert the dict to a Score
     # We must iterate here over "allPartNs," which preserves the part-order found in the MEI

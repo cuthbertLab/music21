@@ -3578,3 +3578,44 @@ class TestSectionScore(unittest.TestCase):
                                          nextMeasureLeft=nextMeasureLeft,
                                          backupMeasureNum=backupMeasureNum,
                                          slurBundle=slurBundle)
+
+    @mock.patch('music21.mei.base.allPartsPresent')
+    @mock.patch('music21.mei.base.sectionScoreCore')
+    @mock.patch('music21.stream.Part')
+    @mock.patch('music21.stream.Score')
+    def testScoreUnit1(self, mockScore, mockPart, mockCore, mockAllParts):
+        '''
+        scoreFromElement(): unit test with all basic functionality
+
+        Mocks on allPartsPresent(), sectionScoreCore(), stream.Part(), and stream.Score().
+        '''
+        elem = ETree.Element('score')
+        mockAllParts.return_value = ['1', '2']
+        mockCore.return_value = ({'1': ['1-1', '1-2'], '2': ['2-1', '2-2']},
+                                 'three', 'other', 'things')
+        mockScore.side_effect = lambda x: [x[0], x[1]]  # can't just return "x" in this case because it confuses the mocks
+        mockPart1 = mock.MagicMock()
+        mockPart1.append = mock.MagicMock()
+        mockPart2 = mock.MagicMock()
+        mockPart2.append = mock.MagicMock()
+        mockPartReturns = [mockPart1, mockPart2]
+        mockPart.side_effect = lambda: mockPartReturns.pop(0)
+        slurBundle = mock.MagicMock(spec_set=spanner.SpannerBundle)
+        slurBundle.list = 'slurBundle list'
+        expected = [mockPart1, mockPart2, slurBundle.list]
+
+        actual = base.scoreFromElement(elem, slurBundle)
+
+        self.assertEqual(expected, actual)
+        mockAllParts.assert_called_once_with(elem)
+        mockCore.assert_called_once_with(elem, mockAllParts.return_value, slurBundle=slurBundle)
+        mockScore.assert_called_once_with([mockPart1, mockPart2])
+        self.assertEqual(2, mockPart1.append.call_count)
+        self.assertEqual(2, mockPart2.append.call_count)
+        mockPart1.append.assert_any_call('1-1')
+        mockPart1.append.assert_any_call('1-2')
+        mockPart2.append.assert_any_call('2-1')
+        mockPart2.append.assert_any_call('2-2')
+
+    # TODO: corresponding integration test for testScoreUnit1()
+    # TODO: unit and integration tests for sectionScoreCore()
