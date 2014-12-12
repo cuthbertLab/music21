@@ -267,7 +267,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     >>> p.append(c4)
     >>> p.makeMeasures(inPlace=True)
     >>> s.append(p)
-    >>> aData = webapps.commands.determineDissonantIdentificationAccuracy(s, [2.3,3.2])
+    >>> aData = webapps.commands.determineDissonantIdentificationAccuracy(s, [2.3, 3.2])
     >>> chords = aData['stream'].flat.getElementsByClass('Chord')
     >>> chords[0].color == None #BLACK (by default)
     True

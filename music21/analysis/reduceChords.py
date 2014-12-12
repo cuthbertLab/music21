@@ -273,37 +273,31 @@ class ChordReducer(object):
         '''
         Compute measure chord weights:
 
-        ::
-
-            >>> s = analysis.reduceChords.testMeasureStream1().notes
-            >>> cr = analysis.reduceChords.ChordReducer()
-            >>> cws = cr.computeMeasureChordWeights(s)
-            >>> for pcs in sorted(cws):
-            ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
-                (0, 4, 7)  3.0
-            (0, 11, 4, 5)  1.0
+        >>> s = analysis.reduceChords.testMeasureStream1().notes
+        >>> cr = analysis.reduceChords.ChordReducer()
+        >>> cws = cr.computeMeasureChordWeights(s)
+        >>> for pcs in sorted(cws):
+        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+            (0, 4, 7)  3.0
+        (0, 11, 4, 5)  1.0
 
         Add beatStrength:
 
-        ::
-
-            >>> cws = cr.computeMeasureChordWeights(s,
-            ...     weightAlgorithm=cr.quarterLengthBeatStrength)
-            >>> for pcs in sorted(cws):
-            ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
-                (0, 4, 7)  2.2
-            (0, 11, 4, 5)  0.5
+        >>> cws = cr.computeMeasureChordWeights(s,
+        ...     weightAlgorithm=cr.quarterLengthBeatStrength)
+        >>> for pcs in sorted(cws):
+        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+            (0, 4, 7)  2.2
+        (0, 11, 4, 5)  0.5
 
         Give extra weight to the last element in a measure:
 
-        ::
-
-            >>> cws = cr.computeMeasureChordWeights(s,
-            ...     weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
-            >>> for pcs in sorted(cws):
-            ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
-                (0, 4, 7)  3.0
-            (0, 11, 4, 5)  0.5
+        >>> cws = cr.computeMeasureChordWeights(s,
+        ...     weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
+        >>> for pcs in sorted(cws):
+        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+            (0, 4, 7)  3.0
+        (0, 11, 4, 5)  0.5
 
         Make consonance count a lot:
 
@@ -349,7 +343,14 @@ class ChordReducer(object):
                     startOffset = bassTimespan.startOffset
                     previousTimespan = tree.findPreviousElementTimespanInSameStreamByClass(group[0])
                     if previousTimespan is not None:
-                        assert previousTimespan.stopOffset <= group[0].startOffset
+                        if previousTimespan.stopOffset > group[0].startOffset:
+                            msg = ('Timespan offset errors: previousTimespan.stopOffset, ' + 
+                                                        str(previousTimespan.stopOffset) + ' should be before ' +
+                                                        str(group[0].startOffset) + ' previousTimespan: ' + repr(previousTimespan) +
+                                                        ' groups: ' + repr(group) + ' group[0]: ' + repr(group[0])
+                                                        )
+                            print(msg)
+                            #raise ChordReducerException(msg)
                         if startOffset < previousTimespan.stopOffset:
                             startOffset = previousTimespan.stopOffset
                     tree.remove(group[0])
@@ -487,27 +488,21 @@ class ChordReducer(object):
         '''
         Reduces measure to `n` chords:
 
-        ::
-
-            >>> s = analysis.reduceChords.testMeasureStream1()
-            >>> cr = analysis.reduceChords.ChordReducer()
+        >>> s = analysis.reduceChords.testMeasureStream1()
+        >>> cr = analysis.reduceChords.ChordReducer()
 
         Reduce to a maximum of 3 chords; though here we will only get one
         because the other chord is below the trimBelow threshold.
 
-        ::
+        >>> newS = cr.reduceMeasureToNChords(s, 3,
+        ...     weightAlgorithm=cr.qlbsmpConsonance,
+        ...     trimBelow=0.3)
+        >>> newS.show('text')
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.chord.Chord C4 E4 G4 C5>
 
-            >>> newS = cr.reduceMeasureToNChords(s, 3,
-            ...     weightAlgorithm=cr.qlbsmpConsonance,
-            ...     trimBelow=0.3)
-            >>> newS.show('text')
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.chord.Chord C4 E4 G4 C5>
-
-        ::
-
-            >>> newS[-1].quarterLength
-            4.0
+        >>> newS[-1].quarterLength
+        4.0
 
         '''
         #from music21 import note

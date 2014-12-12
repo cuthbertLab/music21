@@ -746,6 +746,7 @@ class ElementTimespan(object):
             startOffset = self.startOffset
         if stopOffset is None:
             stopOffset = self.stopOffset
+        
         return type(self)(
             beatStrength=beatStrength,
             element=element,

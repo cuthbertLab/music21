@@ -64,7 +64,6 @@ environLocal = environment.Environment(_MOD)
 # Metaclass
 _OffsetMap = collections.namedtuple('OffsetMap', ['element','offset', 'endTime', 'voiceIndex'])
 
-
 class StreamException(exceptions21.Music21Exception):
     pass
 
@@ -1382,6 +1381,8 @@ class Stream(base.Music21Object):
         after all operations are completed.
 
         Do not mix _insertCore with _appendCore operations.
+        
+        Returns boolean if the Stream is now sorted.
         '''
         #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
         # need to compare highest time before inserting the element in
@@ -1390,8 +1391,27 @@ class Stream(base.Music21Object):
         if not ignoreSort:
             # if sorted and our insertion is > the highest time, then
             # are still inserted
-            if self.isSorted is True and self.highestTime <= offset:
-                storeSorted = True
+#            if self.isSorted is True and self.highestTime <= offset:
+#                storeSorted = True
+            if self.isSorted is True: 
+                ht = self.highestTime
+                if ht < offset:
+                    storeSorted = True
+                elif ht == offset:
+                    # TODO: check if this element's SortTuple will be after the previous
+                    #       for the case of say a TrebleClef inserted after a KeySignature
+                    # TODO: Fix BUG! See usersGuide_90_sorting
+                    if len(self._elements) == 0:
+                        storeSorted = True
+                    else:
+                        highestSortTuple = self._elements[-1].sortTuple()
+                        thisSortTuple = list(element.sortTuple())
+                        thisSortTuple[1] = offset
+                        thisSortTuple = tuple(thisSortTuple)
+                        
+                        if highestSortTuple < thisSortTuple:
+                            storeSorted = True
+                    
         element.sites.add(self, float(offset))
         # need to explicitly set the activeSite of the element
         if setActiveSite:
@@ -1500,6 +1520,7 @@ class Stream(base.Music21Object):
         # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)
         # main insert procedure here
+        
         storeSorted = self._insertCore(offset, element,
                      ignoreSort=ignoreSort, setActiveSite=setActiveSite)
         updateIsFlat = False
@@ -1661,8 +1682,6 @@ class Stream(base.Music21Object):
 
         Runs fast for multiple addition and will preserve isSorted if True
 
-
-
         >>> a = stream.Stream()
         >>> notes = []
         >>> for x in range(0,3):
@@ -1694,10 +1713,8 @@ class Stream(base.Music21Object):
         >>> a.isSequence()
         True
 
-
         Adding a note that already has an offset set does nothing different
-        from above!  That is, it is still added to the end of the Stream:
-
+        from above! That is, it is still added to the end of the Stream:
 
         >>> n3 = note.Note("B-")
         >>> n3.offset = 1
@@ -1707,6 +1724,8 @@ class Stream(base.Music21Object):
         (18.0, 21.0)
         >>> n3.getOffsetBySite(a)
         18.0
+        
+        TODO: Appending a Clef after a KeySignature will not cause sorting to be re-run.
         '''
         # store and increment highest time for insert offset
         highestTime = self.highestTime
@@ -1728,7 +1747,6 @@ class Stream(base.Music21Object):
             e.activeSite = self
             self._elements.append(e)
 
-            # TODO: may need to be replaced with a common almost equal
             if e.duration.quarterLength != 0:
                 #environLocal.printDebug(['incrementing highest time', 'e.duration.quarterLength', e.duration.quarterLength])
                 highestTime += e.duration.quarterLength
@@ -6939,10 +6957,9 @@ class Stream(base.Music21Object):
         self._cache["HighestTime"] = value
 
     def _getHighestTime(self):
-        '''returns the largest offset plus duration.
+        '''
+        Returns the largest offset plus duration.
         see complete instructions in property highestTime.
-
-
 
         >>> n = note.Note('C#')
         >>> n.quarterLength = 3
@@ -6992,7 +7009,6 @@ class Stream(base.Music21Object):
                     highestTimeSoFar = candidateOffset
             self._cache["HighestTime"] = float(highestTimeSoFar)
         return self._cache["HighestTime"]
-
 
     highestTime = property(_getHighestTime, doc='''
         Returns the maximum of all Element offsets plus their Duration
@@ -7600,6 +7616,8 @@ class Stream(base.Music21Object):
         returns a new Stream by default, but if the
         optional "inPlace" key is set to True then
         it modifies pitches in place.
+        
+        TODO: for generic interval set accidental by key signature.
 
         >>> aInterval = interval.Interval('d5')
 
@@ -12174,8 +12192,7 @@ class Opus(Stream):
         '''
         Return a list of all numbers defined in this Opus.
 
-
-        >>> o = corpus.parse('josquin/ovenusbant')
+        >>> o = corpus.parse('josquin/oVenusBant')
         >>> o.getNumbers()
         ['1', '2', '3']
         '''
@@ -12192,7 +12209,7 @@ class Opus(Stream):
         and returns the first result.
 
 
-        >>> o = corpus.parse('josquin/ovenusbant')
+        >>> o = corpus.parse('josquin/oVenusBant')
         >>> o.getNumbers()
         ['1', '2', '3']
         >>> s = o.getScoreByNumber(2)
@@ -12238,8 +12255,6 @@ class Opus(Stream):
         doc='''
         Return all :class:`~music21.stream.Score` objects
         in a :class:`~music21.stream.Opus`.
-
-
         ''')
 
     def mergeScores(self):

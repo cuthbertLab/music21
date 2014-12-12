@@ -1,50 +1,49 @@
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 6903, in testChordifyF
-    "(['A4', 'B-2'], '2.0', '2.0')]")
-AssertionError: "[(['[17 chars]0', '667/1000'), (['C5', 'B-2'], '67/100', '66[77 chars]0')]" != "[(['[17 chars]0', '0.667'), (['C5', 'B-2'], '0.67', '0.667')[63 chars]0')]"
-- [(['B-4', 'B-2'], '0.0', '667/1000'), (['C5', 'B-2'], '67/100', '667/1000'), (['B-4', 'B-2'], '133/100', '667/1000'), (['A4', 'B-2'], '2.0', '2.0')]
-?                              -----                       ----       -----                         ----       -----
-+ [(['B-4', 'B-2'], '0.0', '0.667'), (['C5', 'B-2'], '0.67', '0.667'), (['B-4', 'B-2'], '1.33', '0.667'), (['A4', 'B-2'], '2.0', '2.0')]
-?                           ++                        ++      ++                          +      ++
-
-
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.common._preFracLimitDenominator
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/common.py", line 496, in _preFracLimitDenominator
+AssertionError: Failed doctest test for music21.corpus.corpora.CoreCorpus.getPaths
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/corpora.py", line 912, in getPaths
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/common.py", line 534, in music21.common._preFracLimitDenominator
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/corpora.py", line 928, in music21.corpus.corpora.CoreCorpus.getPaths
 Failed example:
-    for i in range(50):
-        x = random.random()
-        if myWay(x) != theirWay(x):
-            print "boo: %s, %s, %s" % (x, myWay(x), theirWay(x))
-Exception raised:
-    Traceback (most recent call last):
-      File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 1324, in __run
-        compileflags, 1), test.globs)
-      File "<doctest music21.common._preFracLimitDenominator[7]>", line 4
-        print "boo: %s, %s, %s" % (x, myWay(x), theirWay(x))
-                              ^
-    SyntaxError: invalid syntax
-
-
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.abcFormat.ABCMetadata.getMetronomeMarkObject
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abcFormat/__init__.py", line 485, in getMetronomeMarkObject
-
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abcFormat/__init__.py", line 507, in music21.abcFormat.ABCMetadata.getMetronomeMarkObject
-Failed example:
-    am.getMetronomeMarkObject()
+    len(corpusFilePaths)
 Expected:
-    <music21.tempo.MetronomeMark grave Whole tied to Quarter (5.0 total QL)=40.0>
+    3045
 Got:
-    <music21.tempo.MetronomeMark grave Whole tied to Quarter (5 total QL)=40.0>
+    3044
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.corpus.corpora.Corpus.metadataBundle
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/corpora.py", line unknown line number, in metadataBundle
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/corpora.py", line ?, in music21.corpus.corpora.Corpus.metadataBundle
+Failed example:
+    corpus.CoreCorpus().metadataBundle
+Expected:
+    <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+Got:
+    <music21.metadata.bundles.MetadataBundle 'core': {14957 entries}>
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.corpus.getCorePaths
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/__init__.py", line 55, in getCorePaths
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/__init__.py", line 70, in music21.corpus.getCorePaths
+Failed example:
+    len(corpusFilePaths)
+Expected:
+    3045
+Got:
+    3044
 
 
 
@@ -98,6 +97,7 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/x
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/xlrd/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/webcolors.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/six.py
+Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/parmap.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/version.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/util.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/ext/jsonpickle/unpickler.py
@@ -139,177 +139,177 @@ Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/demos/__init__.py
 Skipped: /Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/configure.py
 xmlnode successfully ran 12 tests in 0 seconds
-webapps_apps successfully ran 6 tests in 2 seconds
-webapps_templates successfully ran 9 tests in 3 seconds
+webapps_apps successfully ran 6 tests in 3 seconds
+webapps_templates successfully ran 9 tests in 4 seconds
 webapps___init__ successfully ran 14 tests in 0 seconds
 volume successfully ran 20 tests in 1 seconds
 vexflow_toMusic21j successfully ran 9 tests in 0 seconds
 vexflow_indent successfully ran 3 tests in 0 seconds
 voiceLeading successfully ran 64 tests in 2 seconds
-vexflow___init__ successfully ran 30 tests in 1 seconds
+vexflow___init__ successfully ran 30 tests in 3 seconds
 trecento_trecentoCadence successfully ran 7 tests in 0 seconds
-variant successfully ran 34 tests in 3 seconds
-webapps_commands successfully ran 10 tests in 10 seconds
+variant successfully ran 34 tests in 5 seconds
+webapps_commands successfully ran 10 tests in 13 seconds
 trecento_polyphonicSnippet successfully ran 9 tests in 1 seconds
 trecento_findTrecentoFragments successfully ran 3 tests in 0 seconds
-trecento_notation successfully ran 17 tests in 2 seconds
-trecento_capua successfully ran 9 tests in 3 seconds
-trecento_tonality successfully ran 5 tests in 6 seconds
+trecento_notation successfully ran 17 tests in 3 seconds
+trecento_capua successfully ran 9 tests in 5 seconds
 trecento___init__ successfully ran 3 tests in 0 seconds
-tinyNotation successfully ran 11 tests in 0 seconds
-tie successfully ran 7 tests in 0 seconds
-theoryAnalysis_theoryResult successfully ran 4 tests in 0 seconds
-theoryAnalysis___init__ successfully ran 3 tests in 0 seconds
-trecento_cadencebook successfully ran 23 tests in 10 seconds
-theoryAnalysis_theoryAnalyzer successfully ran 43 tests in 12 seconds
+trecento_tonality successfully ran 5 tests in 12 seconds
+tinyNotation successfully ran 11 tests in 1 seconds
+tie successfully ran 7 tests in 1 seconds
+theoryAnalysis_theoryResult successfully ran 4 tests in 1 seconds
+theoryAnalysis___init__ successfully ran 3 tests in 1 seconds
+trecento_cadencebook successfully ran 23 tests in 17 seconds
+theoryAnalysis_theoryAnalyzer successfully ran 43 tests in 20 seconds
 test___init__ successfully ran 3 tests in 0 seconds
 tempo successfully ran 45 tests in 0 seconds
-text successfully ran 23 tests in 15 seconds
-stream_timespanNode successfully ran 11 tests in 0 seconds
+text successfully ran 23 tests in 25 seconds
+stream_timespanNode successfully ran 11 tests in 1 seconds
 stream_timespanAnalysis successfully ran 20 tests in 5 seconds
-stream_streamStatus successfully ran 5 tests in 1 seconds
+stream_streamStatus successfully ran 5 tests in 0 seconds
+stream_timespans successfully ran 51 tests in 13 seconds
 stream_makeNotation successfully ran 10 tests in 1 seconds
-stream_timespans successfully ran 51 tests in 15 seconds
 spanner successfully ran 53 tests in 3 seconds
-sites successfully ran 26 tests in 3 seconds
+sites successfully ran 26 tests in 5 seconds
 sieve successfully ran 40 tests in 0 seconds
 stream___init__ successfully ran 142 tests in 15 seconds
-serial successfully ran 47 tests in 8 seconds
-search_segment successfully ran 7 tests in 16 seconds
-search___init__ successfully ran 19 tests in 29 seconds
+serial successfully ran 47 tests in 9 seconds
+search_segment successfully ran 7 tests in 24 seconds
+search___init__ successfully ran 19 tests in 40 seconds
 scala_scl___init__ successfully ran 3 tests in 0 seconds
-scale successfully ran 90 tests in 19 seconds
-scala___init__ successfully ran 12 tests in 0 seconds
+scala___init__ successfully ran 12 tests in 1 seconds
 romanText_testFiles successfully ran 4 tests in 0 seconds
+scale successfully ran 90 tests in 26 seconds
 romanText___init__ successfully ran 45 tests in 0 seconds
-roman successfully ran 30 tests in 11 seconds
-romanText_clercqTemperley successfully ran 19 tests in 33 seconds
-pitch successfully ran 94 tests in 1 seconds
-repeat successfully ran 72 tests in 25 seconds
-omr_evaluators successfully ran 8 tests in 5 seconds
-omr_correctors successfully ran 24 tests in 2 seconds
+roman successfully ran 30 tests in 15 seconds
+test_testStream successfully ran 206 tests in 134 seconds
+romanText_clercqTemperley successfully ran 19 tests in 50 seconds
+pitch successfully ran 94 tests in 3 seconds
+omr_correctors successfully ran 24 tests in 3 seconds
 omr___init__ successfully ran 3 tests in 0 seconds
 noteworthy_translate successfully ran 21 tests in 0 seconds
-noteworthy___init__ successfully ran 3 tests in 0 seconds
 noteworthy_binaryTranslate successfully ran 7 tests in 0 seconds
-note successfully ran 47 tests in 3 seconds
+noteworthy___init__ successfully ran 3 tests in 0 seconds
+omr_evaluators successfully ran 8 tests in 8 seconds
+note successfully ran 49 tests in 4 seconds
 musicxml_toMxObjects successfully ran 38 tests in 1 seconds
+musicxml_xmlHandler successfully ran 13 tests in 6 seconds
+repeat successfully ran 72 tests in 44 seconds
 musicxml_testFiles successfully ran 5 tests in 0 seconds
-musicxml_xmlHandler successfully ran 13 tests in 4 seconds
 musicxml_mxObjects successfully ran 45 tests in 1 seconds
-musicxml_testPrimitive successfully ran 5 tests in 3 seconds
+musicxml_testPrimitive successfully ran 5 tests in 5 seconds
 musicxml___init__ successfully ran 3 tests in 0 seconds
-musicxml_m21ToString successfully ran 45 tests in 13 seconds
+musicxml_m21ToString successfully ran 45 tests in 15 seconds
 musedata_base40 successfully ran 9 tests in 0 seconds
-musedata___init__ successfully ran 49 tests in 10 seconds
-midi_translate successfully ran 49 tests in 7 seconds
+musedata___init__ successfully ran 49 tests in 5 seconds
+midi_translate successfully ran 49 tests in 9 seconds
 midi_realtime successfully ran 4 tests in 0 seconds
 midi_percussion successfully ran 7 tests in 0 seconds
-musedata_translate successfully ran 16 tests in 40 seconds
-musicxml_fromMxObjects successfully ran 65 tests in 44 seconds
-metadata_primitives successfully ran 38 tests in 0 seconds
-meter successfully ran 108 tests in 2 seconds
-midi___init__ successfully ran 29 tests in 13 seconds
+midi___init__ successfully ran 29 tests in 18 seconds
+meter successfully ran 108 tests in 3 seconds
+metadata_primitives successfully ran 38 tests in 1 seconds
+musedata_translate successfully ran 16 tests in 53 seconds
+musicxml_fromMxObjects successfully ran 65 tests in 68 seconds
 metadata___init__ successfully ran 18 tests in 0 seconds
-medren successfully ran 30 tests in 4 seconds
-lily_translate successfully ran 32 tests in 3 seconds
+medren successfully ran 30 tests in 6 seconds
+metadata_caching successfully ran 6 tests in 24 seconds
 lily_lilyObjects successfully ran 14 tests in 0 seconds
 lily___init__ successfully ran 3 tests in 0 seconds
-metadata_caching successfully ran 6 tests in 16 seconds
-languageExcerpts_naturalLanguageObjects successfully ran 9 tests in 0 seconds
+lily_translate successfully ran 32 tests in 5 seconds
+languageExcerpts_naturalLanguageObjects successfully ran 9 tests in 1 seconds
 languageExcerpts_instrumentLookup successfully ran 3 tests in 0 seconds
 languageExcerpts___init__ successfully ran 3 tests in 0 seconds
-key successfully ran 21 tests in 1 seconds
+key successfully ran 21 tests in 3 seconds
 ipython21_objects successfully ran 3 tests in 0 seconds
 ipython21_ipExtension successfully ran 3 tests in 0 seconds
 ipython21___init__ successfully ran 3 tests in 0 seconds
-intervalNetwork successfully ran 57 tests in 2 seconds
-interval successfully ran 55 tests in 0 seconds
+intervalNetwork successfully ran 57 tests in 3 seconds
+interval successfully ran 56 tests in 1 seconds
 instrument successfully ran 23 tests in 1 seconds
 humdrum_testFiles successfully ran 3 tests in 0 seconds
-layout successfully ran 22 tests in 20 seconds
-humdrum_instruments successfully ran 8 tests in 2 seconds
+humdrum_spineParser successfully ran 32 tests in 9 seconds
+layout successfully ran 22 tests in 29 seconds
 humdrum___init__ successfully ran 3 tests in 0 seconds
-humdrum_spineParser successfully ran 32 tests in 6 seconds
-metadata_bundles successfully ran 34 tests in 40 seconds
-harmony successfully ran 28 tests in 10 seconds
+humdrum_instruments successfully ran 8 tests in 3 seconds
+harmony successfully ran 28 tests in 12 seconds
+metadata_bundles successfully ran 34 tests in 72 seconds
 figuredBass_segment successfully ran 16 tests in 3 seconds
 figuredBass_rules successfully ran 5 tests in 0 seconds
 figuredBass_resolution successfully ran 17 tests in 3 seconds
-figuredBass_realizerScale successfully ran 9 tests in 0 seconds
-freezeThaw successfully ran 30 tests in 19 seconds
-figuredBass_possibility successfully ran 20 tests in 0 seconds
+figuredBass_realizerScale successfully ran 9 tests in 1 seconds
+freezeThaw successfully ran 30 tests in 27 seconds
+figuredBass_possibility successfully ran 20 tests in 1 seconds
 figuredBass_notation successfully ran 15 tests in 0 seconds
-figuredBass_realizer successfully ran 12 tests in 12 seconds
+figuredBass_realizer successfully ran 12 tests in 15 seconds
 figuredBass_checker successfully ran 16 tests in 3 seconds
 figuredBass___init__ successfully ran 3 tests in 0 seconds
-graph successfully ran 63 tests in 65 seconds
-figuredBass_examples successfully ran 15 tests in 67 seconds
-features_jSymbolic successfully ran 86 tests in 33 seconds
-features___init__ successfully ran 8 tests in 2 seconds
-expressions successfully ran 26 tests in 0 seconds
+graph successfully ran 63 tests in 83 seconds
+figuredBass_examples successfully ran 15 tests in 74 seconds
+features_jSymbolic successfully ran 86 tests in 42 seconds
+features_base successfully ran 27 tests in 13 seconds
+features___init__ successfully ran 8 tests in 3 seconds
+expressions successfully ran 26 tests in 1 seconds
 exceptions21 successfully ran 3 tests in 0 seconds
 environment successfully ran 31 tests in 0 seconds
 editorial successfully ran 10 tests in 0 seconds
-features_base successfully ran 27 tests in 8 seconds
 dynamics successfully ran 15 tests in 1 seconds
 documentation_library_writers successfully ran 3 tests in 0 seconds
-duration successfully ran 70 tests in 1 seconds
-documentation_library_iterators successfully ran 6 tests in 1 seconds
+duration successfully ran 70 tests in 2 seconds
+documentation_library_iterators successfully ran 6 tests in 2 seconds
+documentation_library_documenters successfully ran 28 tests in 3 seconds
 documentation_library_cleaners successfully ran 3 tests in 0 seconds
 documentation_library___init__ successfully ran 3 tests in 0 seconds
-documentation_library_documenters successfully ran 28 tests in 2 seconds
 documentation___init__ successfully ran 3 tests in 0 seconds
 defaults successfully ran 4 tests in 0 seconds
-derivation successfully ran 8 tests in 1 seconds
+counterpoint_species successfully ran 27 tests in 1 seconds
 counterpoint___init__ successfully ran 3 tests in 0 seconds
-counterpoint_species successfully ran 27 tests in 0 seconds
+derivation successfully ran 8 tests in 3 seconds
 corpus_virtual successfully ran 5 tests in 0 seconds
-corpus_corpora successfully ran 28 tests in 3 seconds
-corpus_chorales successfully ran 9 tests in 3 seconds
-corpus___init__ successfully ran 17 tests in 4 seconds
-converter_subConverters successfully ran 10 tests in 1 seconds
-corpus_testCorpus successfully ran 25 tests in 22 seconds
-features_native successfully ran 26 tests in 102 seconds
-converter___init__ successfully ran 40 tests in 14 seconds
+corpus_chorales successfully ran 9 tests in 5 seconds
+converter_subConverters successfully ran 10 tests in 2 seconds
+features_native successfully ran 25 tests in 119 seconds
+composition_seeger successfully ran 3 tests in 0 seconds
+converter___init__ successfully ran 40 tests in 24 seconds
 composition___init__ successfully ran 3 tests in 0 seconds
+composition_phasing successfully ran 5 tests in 9 seconds
+common successfully ran 61 tests in 1 seconds
 clef successfully ran 28 tests in 0 seconds
 chordTables successfully ran 17 tests in 0 seconds
-contour successfully ran 10 tests in 11 seconds
 chant successfully ran 12 tests in 0 seconds
-composition_phasing successfully ran 5 tests in 9 seconds
 capella_fromCapellaXML successfully ran 20 tests in 0 seconds
 capella___init__ successfully ran 3 tests in 0 seconds
-braille_translate successfully ran 7 tests in 0 seconds
+braille_translate successfully ran 7 tests in 1 seconds
+contour successfully ran 10 tests in 17 seconds
 braille_text successfully ran 4 tests in 0 seconds
-chord successfully ran 108 tests in 6 seconds
-braille_lookup successfully ran 3 tests in 0 seconds
 braille_segment successfully ran 11 tests in 1 seconds
-braille_basic successfully ran 24 tests in 0 seconds
+braille_lookup successfully ran 3 tests in 0 seconds
+chord successfully ran 108 tests in 9 seconds
+braille_basic successfully ran 24 tests in 1 seconds
 braille___init__ successfully ran 3 tests in 0 seconds
 beam successfully ran 15 tests in 0 seconds
-base successfully ran 86 tests in 2 seconds
+base successfully ran 86 tests in 4 seconds
 bar successfully ran 9 tests in 0 seconds
-braille_examples successfully ran 5 tests in 6 seconds
+braille_examples successfully ran 5 tests in 10 seconds
 audioSearch_recording successfully ran 4 tests in 0 seconds
-audioSearch_transcriber successfully ran 4 tests in 2 seconds
+audioSearch_transcriber successfully ran 4 tests in 3 seconds
 articulations successfully ran 26 tests in 1 seconds
-audioSearch___init__ successfully ran 19 tests in 5 seconds
-analysis_search successfully ran 4 tests in 2 seconds
-braille_test successfully ran 151 tests in 22 seconds
-analysis_reduceChords successfully ran 7 tests in 0 seconds
-analysis_phrasing successfully ran 3 tests in 0 seconds
+audioSearch___init__ successfully ran 19 tests in 14 seconds
+analysis_search successfully ran 4 tests in 6 seconds
+braille_test successfully ran 151 tests in 44 seconds
+analysis_reduceChordsOld successfully ran 7 tests in 1 seconds
+analysis_reduceChords successfully ran 7 tests in 1 seconds
 analysis_patel successfully ran 6 tests in 1 seconds
-analysis_neoRiemannian successfully ran 10 tests in 1 seconds
-analysis_metrical successfully ran 6 tests in 0 seconds
-analysis_reduction successfully ran 15 tests in 10 seconds
-analysis_windowed successfully ran 9 tests in 16 seconds
+analysis_neoRiemannian successfully ran 10 tests in 2 seconds
+analysis_windowed successfully ran 9 tests in 33 seconds
+analysis_metrical successfully ran 6 tests in 1 seconds
+analysis_reduction successfully ran 15 tests in 21 seconds
 analysis___init__ successfully ran 3 tests in 0 seconds
-analysis_correlate successfully ran 6 tests in 3 seconds
-analysis_discrete successfully ran 31 tests in 5 seconds
+analysis_correlate successfully ran 6 tests in 7 seconds
+analysis_discrete successfully ran 31 tests in 8 seconds
 _version successfully ran 3 tests in 0 seconds
-abcFormat_translate successfully ran 18 tests in 11 seconds
-abcFormat_testFiles successfully ran 5 tests in 10 seconds
+abcFormat___init__ successfully ran 53 tests in 1 seconds
+abcFormat_translate successfully ran 18 tests in 15 seconds
 Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testDocumentation is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -334,7 +334,7 @@ Not in Tree Error: documentation.upload is in the music21 directory but not impo
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -344,71 +344,67 @@ Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but n
 Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: abcFormat.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
 
 -----------------------------
-test_testStream had 0 ERRORS and 1 FAILURES in 206 tests after 113 seconds:
+corpus_corpora had 0 ERRORS and 2 FAILURES in 28 tests after 7 seconds:
 -----------------------------
 
 Traceback (most recent call last):
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/test/testStream.py", line 6903, in testChordifyF
-    "(['A4', 'B-2'], '2.0', '2.0')]")
-AssertionError: "[(['[17 chars]0', '667/1000'), (['C5', 'B-2'], '67/100', '66[77 chars]0')]" != "[(['[17 chars]0', '0.667'), (['C5', 'B-2'], '0.67', '0.667')[63 chars]0')]"
-- [(['B-4', 'B-2'], '0.0', '667/1000'), (['C5', 'B-2'], '67/100', '667/1000'), (['B-4', 'B-2'], '133/100', '667/1000'), (['A4', 'B-2'], '2.0', '2.0')]
-?                              -----                       ----       -----                         ----       -----
-+ [(['B-4', 'B-2'], '0.0', '0.667'), (['C5', 'B-2'], '0.67', '0.667'), (['B-4', 'B-2'], '1.33', '0.667'), (['A4', 'B-2'], '2.0', '2.0')]
-?                           ++                        ++      ++                          +      ++
-
-
-
------------------------------
-common had 0 ERRORS and 1 FAILURES in 61 tests after 0 seconds:
------------------------------
-
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.common._preFracLimitDenominator
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/common.py", line 496, in _preFracLimitDenominator
+AssertionError: Failed doctest test for music21.corpus.corpora.CoreCorpus.getPaths
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/corpora.py", line 912, in getPaths
 
 ----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/common.py", line 534, in music21.common._preFracLimitDenominator
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/corpora.py", line 928, in music21.corpus.corpora.CoreCorpus.getPaths
 Failed example:
-    for i in range(50):
-        x = random.random()
-        if myWay(x) != theirWay(x):
-            print "boo: %s, %s, %s" % (x, myWay(x), theirWay(x))
-Exception raised:
-    Traceback (most recent call last):
-      File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 1324, in __run
-        compileflags, 1), test.globs)
-      File "<doctest music21.common._preFracLimitDenominator[7]>", line 4
-        print "boo: %s, %s, %s" % (x, myWay(x), theirWay(x))
-                              ^
-    SyntaxError: invalid syntax
-
-
-
------------------------------
-abcFormat___init__ had 0 ERRORS and 1 FAILURES in 53 tests after 1 seconds:
------------------------------
-
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/doctest.py", line 2193, in runTest
-    raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.abcFormat.ABCMetadata.getMetronomeMarkObject
-  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abcFormat/__init__.py", line 485, in getMetronomeMarkObject
-
-----------------------------------------------------------------------
-File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/abcFormat/__init__.py", line 507, in music21.abcFormat.ABCMetadata.getMetronomeMarkObject
-Failed example:
-    am.getMetronomeMarkObject()
+    len(corpusFilePaths)
 Expected:
-    <music21.tempo.MetronomeMark grave Whole tied to Quarter (5.0 total QL)=40.0>
+    3045
 Got:
-    <music21.tempo.MetronomeMark grave Whole tied to Quarter (5 total QL)=40.0>
+    3044
+
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.corpus.corpora.Corpus.metadataBundle
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/corpora.py", line unknown line number, in metadataBundle
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/corpora.py", line ?, in music21.corpus.corpora.Corpus.metadataBundle
+Failed example:
+    corpus.CoreCorpus().metadataBundle
+Expected:
+    <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+Got:
+    <music21.metadata.bundles.MetadataBundle 'core': {14957 entries}>
+
+
+
+-----------------------------
+corpus___init__ had 0 ERRORS and 1 FAILURES in 17 tests after 21 seconds:
+-----------------------------
+
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/doctest.py", line 2201, in runTest
+    raise self.failureException(self.format_failure(new.getvalue()))
+AssertionError: Failed doctest test for music21.corpus.getCorePaths
+  File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/__init__.py", line 55, in getCorePaths
+
+----------------------------------------------------------------------
+File "/Users/cuthbert/Documents/music21/eclipseWork/music21base/music21/corpus/__init__.py", line 70, in music21.corpus.getCorePaths
+Failed example:
+    len(corpusFilePaths)
+Expected:
+    3045
+Got:
+    3044
 
 
 -------------------------------------------------------------------------
-Ran 4048 tests in 406.6443 seconds
-Run at 2014-07-07 17:39:19
+Ran 4027 tests in 558.2188 seconds
+Run at 2014-11-25 15:25:11

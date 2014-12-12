@@ -354,69 +354,50 @@ class Microtone(SlottedObject):
     The Microtone object defines a pitch transformation above or below a
     standard Pitch and its Accidental.
 
-    ::
+    >>> m = pitch.Microtone(20)
+    >>> m.cents
+    20
 
-        >>> m = pitch.Microtone(20)
-        >>> m.cents
-        20
+    >>> m.alter
+    0.2...
 
-    ::
-
-        >>> m.alter
-        0.2...
-
-    ::
-
-        >>> m
-        (+20c)
+    >>> m
+    (+20c)
 
     Microtones can be shifted according to the harmonic. Here we take the 3rd
     harmonic of the previous microtone
 
-    ::
+ 
+    >>> m.harmonicShift = 3
+    >>> m
+    (+20c+3rdH)
 
-        >>> m.harmonicShift = 3
-        >>> m
-        (+20c+3rdH)
+    >>> m.cents
+    1922
 
-    ::
-
-        >>> m.cents
-        1922
-
-    ::
-
-        >>> m.alter
-        19.2...
+    >>> m.alter
+    19.2...
 
     Microtonal changes can be positive or negative.  Both Positive and negative
     numbers can optionally be placed in parentheses Negative numbers in
     parentheses still need the minus sign.
 
-    ::
+    >>> m = pitch.Microtone('(-33.333333)')
+    >>> m
+    (-33c)
 
-        >>> m = pitch.Microtone('(-33.333333)')
-        >>> m
-        (-33c)
-
-    ::
-
-        >>> m = pitch.Microtone('33.333333')
-        >>> m
-        (+33c)
+    >>> m = pitch.Microtone('33.333333')
+    >>> m
+    (+33c)
 
     Note that we round the display of microtones to the nearest cent, but we
     keep the exact alteration in both .cents and .alter:
 
-    ::
+    >>> m.cents
+    33.333...
 
-        >>> m.cents
-        33.333...
-
-    ::
-
-        >>> m.alter
-        0.3333...
+    >>> m.alter
+    0.3333...
 
     '''
 
@@ -557,11 +538,9 @@ class Accidental(SlottedObject):
 
     Natural-sharp etc. (for canceling a previous flat) are not yet supported.
 
-    ::
-
-        >>> a = pitch.Accidental('sharp')
-        >>> a.name, a.alter, a.modifier
-        ('sharp', 1.0, '#')
+    >>> a = pitch.Accidental('sharp')
+    >>> a.name, a.alter, a.modifier
+    ('sharp', 1.0, '#')
 
     '''
 
@@ -641,18 +620,14 @@ class Accidental(SlottedObject):
         '''
         Equality. Needed for pitch comparisons.
 
-        ::
+        >>> a = pitch.Accidental('double-flat')
+        >>> b = pitch.Accidental('double-flat')
+        >>> c = pitch.Accidental('double-sharp')
+        >>> a == b
+        True
 
-            >>> a = pitch.Accidental('double-flat')
-            >>> b = pitch.Accidental('double-flat')
-            >>> c = pitch.Accidental('double-sharp')
-            >>> a == b
-            True
-
-        ::
-
-            >>> a == c
-            False
+        >>> a == c
+        False
 
         '''
         if other is None or not isinstance(other, Accidental):
@@ -666,12 +641,10 @@ class Accidental(SlottedObject):
         '''
         Greater than or equal.  Based on the accidentals' alter function.
 
-        ::
-
-            >>> a = pitch.Accidental('sharp')
-            >>> b = pitch.Accidental('flat')
-            >>> a >= b
-            True
+        >>> a = pitch.Accidental('sharp')
+        >>> b = pitch.Accidental('flat')
+        >>> a >= b
+        True
 
         '''
         return self.__gt__(other) or self.__eq__(other)
@@ -680,17 +653,13 @@ class Accidental(SlottedObject):
         '''
         Greater than.  Based on the accidentals' alter function.
 
-        ::
+        >>> a = pitch.Accidental('sharp')
+        >>> b = pitch.Accidental('flat')
+        >>> a < b
+        False
 
-            >>> a = pitch.Accidental('sharp')
-            >>> b = pitch.Accidental('flat')
-            >>> a < b
-            False
-
-        ::
-
-            >>> a > b
-            True
+        >>> a > b
+        True
 
         '''
         if other is None:
@@ -704,18 +673,14 @@ class Accidental(SlottedObject):
         '''
         Less than or equal.  Based on the accidentals' alter function.
 
-        ::
+        >>> a = pitch.Accidental('sharp')
+        >>> b = pitch.Accidental('flat')
+        >>> c = pitch.Accidental('sharp')
+        >>> a <= b
+        False
 
-            >>> a = pitch.Accidental('sharp')
-            >>> b = pitch.Accidental('flat')
-            >>> c = pitch.Accidental('sharp')
-            >>> a <= b
-            False
-
-        ::
-
-            >>> a <= c
-            True
+        >>> a <= c
+        True
 
         '''
         return self.__lt__(other) or self.__eq__(other)
@@ -724,17 +689,13 @@ class Accidental(SlottedObject):
         '''
         Less than.
 
-        ::
+        >>> a = pitch.Accidental('natural')
+        >>> b = pitch.Accidental('flat')
+        >>> a > b
+        True
 
-            >>> a = pitch.Accidental('natural')
-            >>> b = pitch.Accidental('flat')
-            >>> a > b
-            True
-
-        ::
-
-            >>> a < b
-            False
+        >>> a < b
+        False
 
         '''
         if other is None:
@@ -1008,19 +969,15 @@ class Accidental(SlottedObject):
     fullName = property(_getFullName,
         doc = '''Return the most complete representation of this Accidental.
 
-        ::
-
-            >>> a = pitch.Accidental('double-flat')
-            >>> a.fullName
-            'double-flat'
+        >>> a = pitch.Accidental('double-flat')
+        >>> a.fullName
+        'double-flat'
 
         Note that non-standard microtones are converted to standard ones
 
-        ::
-
-            >>> a = pitch.Accidental('quarter-flat')
-            >>> a.fullName
-            'half-flat'
+        >>> a = pitch.Accidental('quarter-flat')
+        >>> a.fullName
+        'half-flat'
 
         ''')
 
@@ -3618,68 +3575,59 @@ class Pitch(object):
         Alternatively, a :class:`music21.interval.Interval` object can be
         supplied.
 
-        ::
+        >>> aPitch = pitch.Pitch('g4')
+        >>> bPitch = aPitch.transpose('m3')
+        >>> bPitch
+        <music21.pitch.Pitch B-4>
+        >>> cPitch = bPitch.transpose(interval.GenericInterval(2))
+        >>> cPitch
+        <music21.pitch.Pitch C-5>
 
-            >>> aPitch = pitch.Pitch('g4')
-            >>> bPitch = aPitch.transpose('m3')
-            >>> bPitch
-            <music21.pitch.Pitch B-4>
 
-        ::
+        >>> aInterval = interval.Interval(-6)
+        >>> bPitch = aPitch.transpose(aInterval)
+        >>> bPitch
+        <music21.pitch.Pitch C#4>
 
-            >>> aInterval = interval.Interval(-6)
-            >>> bPitch = aPitch.transpose(aInterval)
-            >>> bPitch
-            <music21.pitch.Pitch C#4>
+        >>> aPitch
+        <music21.pitch.Pitch G4>
 
-        ::
-
-            >>> aPitch
-            <music21.pitch.Pitch G4>
-
-        ::
-
-            >>> aPitch.transpose(aInterval, inPlace=True)
-            >>> aPitch
-            <music21.pitch.Pitch C#4>
+        >>> aPitch.transpose(aInterval, inPlace=True)
+        >>> aPitch
+        <music21.pitch.Pitch C#4>
 
         OMIT_FROM_DOCS
 
         Test to make sure that extreme ranges work
 
-        ::
-
-            >>> dPitch = pitch.Pitch('D2')
-            >>> lowC = dPitch.transpose('m-23')
-            >>> lowC
-            <music21.pitch.Pitch C#-1>
+        >>> dPitch = pitch.Pitch('D2')
+        >>> lowC = dPitch.transpose('m-23')
+        >>> lowC
+        <music21.pitch.Pitch C#-1>
 
         Implicit octaves should remain implicit:
 
-        ::
+        >>> anyGsharp = pitch.Pitch("G#")
+        >>> print(anyGsharp.transpose("P8"))
+        G#
 
-            >>> anyGsharp = pitch.Pitch("G#")
-            >>> print(anyGsharp.transpose("P8"))
-            G#
+        >>> print(anyGsharp.transpose("P5"))
+        D#
 
-        ::
-
-            >>> print(anyGsharp.transpose("P5"))
-            D#
-
-        ::
-
-            >>> otherPitch = pitch.Pitch('D2')
-            >>> otherPitch.transpose('m-23', inPlace = True)
-            >>> print(otherPitch)
-            C#-1
+        >>> otherPitch = pitch.Pitch('D2')
+        >>> otherPitch.transpose('m-23', inPlace = True)
+        >>> print(otherPitch)
+        C#-1
 
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'diatonic'): # its an Interval class with a DiatonicInterval class
             intervalObj = value
+        elif hasattr(value, 'classes') and 'GenericInterval' in value.classes:
+            intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)
+
         if not inPlace:
             return intervalObj.transposePitch(self)
         else:
@@ -3707,39 +3655,27 @@ class Pitch(object):
         If `minimize` is True, a pitch below the target will move up to the
         nearest octave.
 
-        ::
-
-            >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
-            <music21.pitch.Pitch G3>
+        >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
+        <music21.pitch.Pitch G3>
 
         If already below the target, make no change:
 
-        ::
-
-            >>> pitch.Pitch('g#3').transposeBelowTarget(pitch.Pitch('c#6'))
-            <music21.pitch.Pitch G#3>
+        >>> pitch.Pitch('g#3').transposeBelowTarget(pitch.Pitch('c#6'))
+        <music21.pitch.Pitch G#3>
 
         Accept the same pitch:
 
-        ::
+        >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
+        <music21.pitch.Pitch G#1>
 
-            >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
-            <music21.pitch.Pitch G#1>
+        >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
+        <music21.pitch.Pitch G#2>
 
-        ::
+        >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+        <music21.pitch.Pitch G#7>
 
-            >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
-            <music21.pitch.Pitch G#2>
-
-        ::
-
-            >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
-            <music21.pitch.Pitch G#7>
-
-        ::
-
-            >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
-            <music21.pitch.Pitch F#8>
+        >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+        <music21.pitch.Pitch F#8>
 
         '''
         # TODO: add inPlace as an option, default is True
@@ -3768,41 +3704,29 @@ class Pitch(object):
         If `minimize` is True, a pitch above the target will move down to the
         nearest octave.
 
-        ::
-
-            >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
-            <music21.pitch.Pitch D5>
+        >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
+        <music21.pitch.Pitch D5>
 
         If already above the target, make no change:
 
-        ::
-
-            >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'))
-            <music21.pitch.Pitch D7>
+        >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'))
+        <music21.pitch.Pitch D7>
 
         Accept the same pitch:
 
-        ::
-
-            >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('d8'))
-            <music21.pitch.Pitch D8>
+        >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('d8'))
+        <music21.pitch.Pitch D8>
 
         If minimize is True, we go the closest position:
 
-        ::
+        >>> pitch.Pitch('d#8').transposeAboveTarget(pitch.Pitch('d2'), minimize=True)
+        <music21.pitch.Pitch D#2>
 
-            >>> pitch.Pitch('d#8').transposeAboveTarget(pitch.Pitch('d2'), minimize=True)
-            <music21.pitch.Pitch D#2>
+        >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
+        <music21.pitch.Pitch D3>
 
-        ::
-
-            >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
-            <music21.pitch.Pitch D3>
-
-        ::
-
-            >>> pitch.Pitch('d0').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
-            <music21.pitch.Pitch D3>
+        >>> pitch.Pitch('d0').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
+        <music21.pitch.Pitch D3>
 
         '''
         src = self
@@ -3830,18 +3754,14 @@ class Pitch(object):
         Determine if this pitch is in the collection of supplied altered
         pitches, derived from a KeySignature object
 
-        ::
+        >>> a = pitch.Pitch('c#')
+        >>> b = pitch.Pitch('g#')
+        >>> ks = key.KeySignature(2)
+        >>> a._nameInKeySignature(ks.alteredPitches)
+        True
 
-            >>> a = pitch.Pitch('c#')
-            >>> b = pitch.Pitch('g#')
-            >>> ks = key.KeySignature(2)
-            >>> a._nameInKeySignature(ks.alteredPitches)
-            True
-
-        ::
-
-            >>> b._nameInKeySignature(ks.alteredPitches)
-            False
+        >>> b._nameInKeySignature(ks.alteredPitches)
+        False
 
         '''
         for p in alteredPitches: # all are altered tones, must have acc
@@ -3855,18 +3775,14 @@ class Pitch(object):
         Determine if this pitch is in the collection of supplied altered
         pitches, derived from a KeySignature object
 
-        ::
+        >>> a = pitch.Pitch('c')
+        >>> b = pitch.Pitch('g')
+        >>> ks = key.KeySignature(2)
+        >>> a._stepInKeySignature(ks.alteredPitches)
+        True
 
-            >>> a = pitch.Pitch('c')
-            >>> b = pitch.Pitch('g')
-            >>> ks = key.KeySignature(2)
-            >>> a._stepInKeySignature(ks.alteredPitches)
-            True
-
-        ::
-
-            >>> b._stepInKeySignature(ks.alteredPitches)
-            False
+        >>> b._stepInKeySignature(ks.alteredPitches)
+        False
 
         '''
         for p in alteredPitches: # all are altered tones, must have acc
@@ -3922,32 +3838,26 @@ class Pitch(object):
         If `lastNoteWasTied` is True then this note will be treated as
         immediately following a tie.
 
-        ::
+        >>> a = pitch.Pitch('a')
+        >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
+        >>> a.accidental, a.accidental.displayStatus
+        (<accidental natural>, True)
 
-            >>> a = pitch.Pitch('a')
-            >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
-            >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
-            >>> a.accidental, a.accidental.displayStatus
-            (<accidental natural>, True)
-
-        ::
-
-            >>> b = pitch.Pitch('a')
-            >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
-            >>> b.updateAccidentalDisplay(past) # should add a natural
-            >>> b.accidental, b.accidental.displayStatus
-            (<accidental natural>, True)
+        >>> b = pitch.Pitch('a')
+        >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        >>> b.updateAccidentalDisplay(past) # should add a natural
+        >>> b.accidental, b.accidental.displayStatus
+        (<accidental natural>, True)
 
         In this example, the method will not add a natural because the match is
         pitchSpace and our octave is different.
 
-        ::
-
-            >>> a4 = pitch.Pitch('a4')
-            >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
-            >>> a4.updateAccidentalDisplay(past, cautionaryPitchClass=False)
-            >>> a4.accidental is None
-            True
+        >>> a4 = pitch.Pitch('a4')
+        >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        >>> a4.updateAccidentalDisplay(past, cautionaryPitchClass=False)
+        >>> a4.accidental is None
+        True
 
         '''
         ### N.B. -- this is a very complex method
@@ -4288,20 +4198,18 @@ class Pitch(object):
         harmonic and then returns a new chord with the proper sounding pitch
         added.
 
-        ::
-
-            >>> n1 = note.Note('d3')
-            >>> n2 = note.Note('g3')
-            >>> n2.notehead = 'diamond'
-            >>> n2.noteheadFill = 'no'
-            >>> p1 = pitch.Pitch('d3')
-            >>> harmChord = chord.Chord([n1, n2])
-            >>> harmChord.quarterLength = 1
-            >>> newChord = p1.getStringHarmonic(harmChord)
-            >>> newChord.quarterLength = 1
-            >>> pitchList = newChord.pitches
-            >>> pitchList
-            (<music21.pitch.Pitch D3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch D5>)
+        >>> n1 = note.Note('d3')
+        >>> n2 = note.Note('g3')
+        >>> n2.notehead = 'diamond'
+        >>> n2.noteheadFill = 'no'
+        >>> p1 = pitch.Pitch('d3')
+        >>> harmChord = chord.Chord([n1, n2])
+        >>> harmChord.quarterLength = 1
+        >>> newChord = p1.getStringHarmonic(harmChord)
+        >>> newChord.quarterLength = 1
+        >>> pitchList = newChord.pitches
+        >>> pitchList
+        (<music21.pitch.Pitch D3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch D5>)
 
         '''
         #Takes in a chord, finds the interval between the notes

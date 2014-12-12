@@ -3025,7 +3025,7 @@ class Test(unittest.TestCase):
         # this adds to elements list
         m1.leftBarline = b1
         self.assertEqual(len(m1), 2)
-        self.assertEqual(m1[1], b1) # this is on elements
+        self.assertEqual(m1[0], b1) # this is on elements
         self.assertEqual(m1.rightBarline, None) # this is on elements
 
         b2 = bar.Barline('heavy')

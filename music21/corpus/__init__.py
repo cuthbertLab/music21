@@ -63,24 +63,18 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
     This is convenient when an input format might match for multiple
     extensions.
 
-    ::
+    >>> from music21 import corpus
+    >>> corpusFilePaths = corpus.getCorePaths()
+    >>> len(corpusFilePaths)
+    3044
 
-        >>> from music21 import corpus
-        >>> corpusFilePaths = corpus.getCorePaths()
-        >>> len(corpusFilePaths)
-        3045
+    >>> kernFilePaths = corpus.getCorePaths('krn')
+    >>> len(kernFilePaths) >= 500
+    True
 
-    ::
-
-        >>> kernFilePaths = corpus.getCorePaths('krn')
-        >>> len(kernFilePaths) >= 500
-        True
-
-    ::
-
-        >>> abcFilePaths = corpus.getCorePaths('abc')
-        >>> len(abcFilePaths) >= 100
-        True
+    >>> abcFilePaths = corpus.getCorePaths('abc')
+    >>> len(abcFilePaths) >= 100
+    True
 
     '''
     return corpora.CoreCorpus().getPaths(
@@ -94,11 +88,9 @@ def getVirtualPaths(fileExtensions=None, expandExtensions=True):
 
     An extension of None will return all known extensions.
 
-    ::
-
-        >>> from music21 import corpus
-        >>> len(corpus.getVirtualPaths()) > 6
-        True
+    >>> from music21 import corpus
+    >>> len(corpus.getVirtualPaths()) > 6
+    True
 
     '''
     return corpora.VirtualCorpus().getPaths(
@@ -138,17 +130,13 @@ def addPath(filePath):
     set the 'localCorpusPath' or 'localCorpusSettings' setting of
     the :class:`~music21.environment.UserSettings` object.
 
-    ::
-
-        >>> #_DOCS_SHOW corpus.addPath('~/Documents')
+    >>> #_DOCS_SHOW corpus.addPath('~/Documents')
 
     Alternatively, add a directory permanently (see link above
     for more details):
 
-    ::
-
-        >>> #_DOCS_SHOW us = environment.UserSettings()
-        >>> #_DOCS_SHOW us['localCorpusPath'] = 'd:/desktop/'
+    >>> #_DOCS_SHOW us = environment.UserSettings()
+    >>> #_DOCS_SHOW us['localCorpusPath'] = 'd:/desktop/'
 
     Restart music21 after adding paths.
     '''
@@ -231,20 +219,14 @@ def search(
     This method uses stored metadata and thus, on first usage, will incur a
     performance penalty during metadata loading.
     
-    ::
+    >>> corpus.search('china')
+    <music21.metadata.bundles.MetadataBundle {1235 entries}>
 
-        >>> corpus.search('china')
-        <music21.metadata.bundles.MetadataBundle {1235 entries}>
-
-    ::
-
-        >>> corpus.search('bach', field='composer')
-        <music21.metadata.bundles.MetadataBundle {21 entries}>
-       
-    ::
-
-        >>> corpus.search('coltrane', corpusNames=('virtual',))
-        <music21.metadata.bundles.MetadataBundle {1 entry}>
+    >>> corpus.search('bach', field='composer')
+    <music21.metadata.bundles.MetadataBundle {21 entries}>
+   
+    >>> corpus.search('coltrane', corpusNames=('virtual',))
+    <music21.metadata.bundles.MetadataBundle {1 entry}>
 
     '''
     return corpora.Corpus.search(
@@ -267,30 +249,22 @@ def getComposer(composerName, fileExtensions=None):
 
     Note that xml and mxl are treated equivalently.
 
-    ::
+    >>> from music21 import corpus
+    >>> a = corpus.getComposer('beethoven')
+    >>> len(a) > 10
+    True
 
-        >>> from music21 import corpus
-        >>> a = corpus.getComposer('beethoven')
-        >>> len(a) > 10
-        True
+    >>> a = corpus.getComposer('mozart')
+    >>> len(a) > 10
+    True
 
-    ::
+    >>> a = corpus.getComposer('bach', 'krn')
+    >>> len(a) < 10
+    True
 
-        >>> a = corpus.getComposer('mozart')
-        >>> len(a) > 10
-        True
-
-    ::
-
-        >>> a = corpus.getComposer('bach', 'krn')
-        >>> len(a) < 10
-        True
-
-    ::
-
-        >>> a = corpus.getComposer('bach', 'xml')
-        >>> len(a) > 10
-        True
+    >>> a = corpus.getComposer('bach', 'xml')
+    >>> len(a) > 10
+    True
 
     '''
     return corpora.CoreCorpus().getComposer(
@@ -304,25 +278,19 @@ def getComposerDir(composerName):
     Given the name of a composer, get the path to the top-level directory of
     that composer:
 
-    ::
+    >>> import os
+    >>> from music21 import corpus
+    >>> a = corpus.getComposerDir('beethoven')
+    >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
+    True
 
-        >>> import os
-        >>> from music21 import corpus
-        >>> a = corpus.getComposerDir('beethoven')
-        >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
-        True
+    >>> a = corpus.getComposerDir('bach')
+    >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
+    True
 
-    ::
-
-        >>> a = corpus.getComposerDir('bach')
-        >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
-        True
-
-    ::
-
-        >>> a = corpus.getComposerDir('mozart')
-        >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
-        True
+    >>> a = corpus.getComposerDir('mozart')
+    >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
+    True
 
     '''
     return corpora.CoreCorpus().getComposerDirectoryPath(composerName)
@@ -333,11 +301,9 @@ def noCorpus():
     '''
     Return True or False if this is a `corpus` or `noCoprus` distribution.
 
-    ::
-
-        >>> from music21 import corpus
-        >>> corpus.noCorpus
-        False
+    >>> from music21 import corpus
+    >>> corpus.noCorpus
+    False
 
     '''
     return corpora.CoreCorpus.noCorpus
@@ -352,54 +318,36 @@ def getWorkList(workName, movementNumber=None, fileExtensions=None):
 
     If no matches are found, an empty list is returned.
 
-    ::
+    >>> from music21 import corpus
+    >>> len(corpus.getWorkList('beethoven/opus18no1'))
+    8
 
-        >>> from music21 import corpus
-        >>> len(corpus.getWorkList('beethoven/opus18no1'))
-        8
+    >>> len(corpus.getWorkList('beethoven/opus18no1', 1))
+    2
 
-    ::
+    >>> len(corpus.getWorkList('beethoven/opus18no1', 1, '.krn'))
+    1
 
-        >>> len(corpus.getWorkList('beethoven/opus18no1', 1))
-        2
+    >>> len(corpus.getWorkList('beethoven/opus18no1', 1, '.xml'))
+    1
 
-    ::
+    >>> len(corpus.getWorkList('beethoven/opus18no1', 0, '.xml'))
+    0
 
-        >>> len(corpus.getWorkList('beethoven/opus18no1', 1, '.krn'))
-        1
+    >>> len(corpus.getWorkList('handel/hwv56', '1-02', '.md'))
+    1
 
-    ::
+    >>> len(corpus.getWorkList('handel/hwv56', (2,1), '.md'))
+    1
 
-        >>> len(corpus.getWorkList('beethoven/opus18no1', 1, '.xml'))
-        1
-
-    ::
-
-        >>> len(corpus.getWorkList('beethoven/opus18no1', 0, '.xml'))
-        0
-
-    ::
-
-        >>> len(corpus.getWorkList('handel/hwv56', '1-02', '.md'))
-        1
-
-    ::
-
-        >>> len(corpus.getWorkList('handel/hwv56', (2,1), '.md'))
-        1
-
-    ::
-
-        >>> len(corpus.getWorkList('bach/artOfFugue_bwv1080', 2, '.md'))
-        1
+    >>> len(corpus.getWorkList('bach/artOfFugue_bwv1080', 2, '.md'))
+    1
 
     Make sure that 'verdi' just gets the single Verdi piece and not the
     Monteverdi pieces:
 
-    ::
-
-        >>> len(corpus.getWorkList('verdi'))
-        1
+    >>> len(corpus.getWorkList('verdi'))
+    1
 
     '''
     return corpora.CoreCorpus().getWorkList(
@@ -415,16 +363,12 @@ def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
     any matches.
 
 
-    ::
+    >>> from music21 import corpus
+    >>> corpus.getVirtualWorkList('bach/bwv1007/prelude')
+    ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 
-        >>> from music21 import corpus
-        >>> corpus.getVirtualWorkList('bach/bwv1007/prelude')
-        ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
-
-    ::
-
-        >>> corpus.getVirtualWorkList('junk')
-        []
+    >>> corpus.getVirtualWorkList('junk')
+    []
 
     '''
     return corpora.VirtualCorpus().getWorkList(
@@ -446,10 +390,8 @@ def getWorkReferences(sort=True):
 
     This is used in the generation of corpus documentation
 
-    ::
-
-        >>> from music21 import corpus
-        >>> post = corpus.getWorkReferences()
+    >>> from music21 import corpus
+    >>> post = corpus.getWorkReferences()
 
     '''
     # from music21 import corpus; corpus.getWorkReferences()
@@ -576,27 +518,21 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     single match, a single file path. If no matches are found an Exception is
     raised.
 
-    ::
+    >>> import os
+    >>> from music21 import corpus
+    >>> a = corpus.getWork('opus74no2', 4)
+    >>> a.endswith(os.path.sep.join([
+    ...     'haydn', 'opus74no2', 'movement4.mxl']))
+    True
 
-        >>> import os
-        >>> from music21 import corpus
-        >>> a = corpus.getWork('opus74no2', 4)
-        >>> a.endswith(os.path.sep.join([
-        ...     'haydn', 'opus74no2', 'movement4.mxl']))
-        True
+    >>> a = corpus.getWork(['haydn', 'opus74no2', 'movement4.xml'])
+    >>> a.endswith(os.path.sep.join([
+    ...     'haydn', 'opus74no2', 'movement4.mxl']))
+    True
 
-    ::
-
-        >>> a = corpus.getWork(['haydn', 'opus74no2', 'movement4.xml'])
-        >>> a.endswith(os.path.sep.join([
-        ...     'haydn', 'opus74no2', 'movement4.mxl']))
-        True
-
-    ::
-
-        >>> trecentoFiles = corpus.getWork('trecento')
-        >>> len(trecentoFiles) > 100 and len(trecentoFiles) < 200
-        True
+    >>> trecentoFiles = corpus.getWork('trecento')
+    >>> len(trecentoFiles) > 100 and len(trecentoFiles) < 200
+    True
 
     '''
     if not common.isListLike(fileExtensions):
@@ -649,20 +585,16 @@ def parse(
     be specified, nor does the name Bach even (since it's the only piece with
     the title BWV 66.6)
 
-    ::
-
-        >>> from music21 import corpus
-        >>> bachChorale = corpus.parse('bwv66.6')
-        >>> len(bachChorale.parts)
-        4
+    >>> from music21 import corpus
+    >>> bachChorale = corpus.parse('bwv66.6')
+    >>> len(bachChorale.parts)
+    4
 
     After parsing, the file path within the corpus is stored as
     `.corpusFilePath`
 
-    ::
-
-        >>> bachChorale.corpusFilepath
-        u'bach/bwv66.6.mxl'
+    >>> bachChorale.corpusFilepath
+    u'bach/bwv66.6.mxl'
 
     '''
     return corpora.Corpus.parse(
@@ -815,30 +747,22 @@ def getBachChorales(fileExtensions='xml'):
     N.B. Look at the module corpus.chorales for many better ways to work with
     the chorales.
 
-    ::
+    >>> from music21 import corpus
+    >>> a = corpus.getBachChorales()
+    >>> len(a) > 400
+    True
 
-        >>> from music21 import corpus
-        >>> a = corpus.getBachChorales()
-        >>> len(a) > 400
-        True
+    >>> a = corpus.getBachChorales('krn')
+    >>> len(a) > 10
+    False
 
-    ::
+    >>> a = corpus.getBachChorales('xml')
+    >>> len(a) > 400
+    True
 
-        >>> a = corpus.getBachChorales('krn')
-        >>> len(a) > 10
-        False
-
-    ::
-
-        >>> a = corpus.getBachChorales('xml')
-        >>> len(a) > 400
-        True
-
-    ::
-
-        >>> #_DOCS_SHOW a[0]
-        >>> u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
-        u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
+    >>> #_DOCS_SHOW a[0]
+    >>> u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
+    u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
 
     '''
     cc = corpora.CoreCorpus()
@@ -850,12 +774,10 @@ def getHandelMessiah(fileExtensions='md'):
     Return a list of the filenames of all parts of Handel's Messiah.
 
 
-    ::
-
-        >>> from music21 import corpus
-        >>> a = corpus.getHandelMessiah()
-        >>> len(a)
-        43
+    >>> from music21 import corpus
+    >>> a = corpus.getHandelMessiah()
+    >>> len(a)
+    43
 
     '''
     return corpora.CoreCorpus().getHandelMessiah(
@@ -867,12 +789,10 @@ def getMonteverdiMadrigals(fileExtensions='xml'):
     '''
     Return a list of the filenames of all Monteverdi madrigals.
 
-    ::
-
-        >>> from music21 import corpus
-        >>> a = corpus.getMonteverdiMadrigals()
-        >>> len(a) > 40
-        True
+    >>> from music21 import corpus
+    >>> a = corpus.getMonteverdiMadrigals()
+    >>> len(a) > 40
+    True
 
     '''
     return corpora.CoreCorpus().getMonteverdiMadrigals(
@@ -884,24 +804,18 @@ def getBeethovenStringQuartets(fileExtensions=None):
     '''
     Return a list of all Beethoven String Quartet filenames.
 
-    ::
+    >>> from music21 import corpus
+    >>> a = corpus.getBeethovenStringQuartets()
+    >>> len(a) > 10
+    True
 
-        >>> from music21 import corpus
-        >>> a = corpus.getBeethovenStringQuartets()
-        >>> len(a) > 10
-        True
+    >>> a = corpus.getBeethovenStringQuartets('krn')
+    >>> len(a) < 10 and len(a) > 0
+    True
 
-    ::
-
-        >>> a = corpus.getBeethovenStringQuartets('krn')
-        >>> len(a) < 10 and len(a) > 0
-        True
-
-    ::
-
-        >>> a = corpus.getBeethovenStringQuartets('xml')
-        >>> len(a) > 400
-        False
+    >>> a = corpus.getBeethovenStringQuartets('xml')
+    >>> len(a) > 400
+    False
 
     '''
     return corpora.CoreCorpus().getBeethovenStringQuartets(
