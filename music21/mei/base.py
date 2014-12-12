@@ -2941,8 +2941,12 @@ def sectionFromElement(elem, allPartNs, activeMeter, nextMeasureLeft, backupMeas
     - MEI.usersymbols: anchoredText curve line symbol
     '''
     environLocal.printDebug('*** processing a <section>')
-    return sectionScoreCore(elem, allPartNs, activeMeter, nextMeasureLeft, backupMeasureNum, slurBundle)
-
+    return sectionScoreCore(elem,
+                            allPartNs,
+                            activeMeter=activeMeter,
+                            nextMeasureLeft=nextMeasureLeft,
+                            backupMeasureNum=backupMeasureNum,
+                            slurBundle=slurBundle)
 
 def scoreFromElement(elem, slurBundle):
     '''
@@ -3030,6 +3034,7 @@ if __name__ == "__main__":
                      test_base.TestTuplets,
                      test_base.TestInstrDef,
                      test_base.TestMeasureFromElement,
+                     test_base.TestSectionScore,
                     )
 
 #------------------------------------------------------------------------------

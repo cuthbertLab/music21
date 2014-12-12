@@ -3549,3 +3549,32 @@ class TestMeasureFromElement(unittest.TestCase):
                 foundClef = True
         self.assertTrue(foundVoice is True)
         self.assertTrue(foundClef is True)
+
+
+#------------------------------------------------------------------------------
+class TestSectionScore(unittest.TestCase):
+    '''Tests for scoreFromElement(), sectionFromElement(), and their helper function sectionScoreCore().'''
+
+    @mock.patch('music21.mei.base.sectionScoreCore')
+    def testSection1(self, mockCore):
+        '''
+        Mock sectionScoreCore(). This is very straight-forward.
+        '''
+        mockCore.return_value = 5
+        elem = ETree.Element('section')
+        allPartNs = ['1', '2', '3']
+        activeMeter = meter.TimeSignature('12/8')
+        nextMeasureLeft = bar.Repeat()
+        backupMeasureNum = 42
+        slurBundle = spanner.SpannerBundle()
+        expected = mockCore.return_value
+
+        actual = base.sectionFromElement(elem, allPartNs, activeMeter, nextMeasureLeft, backupMeasureNum, slurBundle)
+
+        self.assertEqual(expected, actual)
+        mockCore.assert_called_once_with(elem,
+                                         allPartNs,
+                                         activeMeter=activeMeter,
+                                         nextMeasureLeft=nextMeasureLeft,
+                                         backupMeasureNum=backupMeasureNum,
+                                         slurBundle=slurBundle)
