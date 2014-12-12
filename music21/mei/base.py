@@ -2752,37 +2752,72 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     return staves
 
 
-# TODO: fold the optional params into an optional tuple
-def sectionScoreCore(elem, allPartNs, activeMeter=None, nextMeasureLeft=None, backupMeasureNum=None, slurBundle=None):
+def sectionScoreCore(elem, allPartNs, **kwargs):
     '''
-    NB: activeMeter will be optional because, if called from scoreFromElement() it will be empty
+    This function is the "core" of both :func:`sectionFromElement` and :func:`scoreFromElement`,
+    since both elements are treated quite similarly (though not identically). It's a separate and
+    shared function to reduce code duplication and increase ease of testing. It's a "public" function
+    to help spread the burden of API documentation complexity: while the parameters and return
+    values are described in this function, the compliance with the MEI Guidelines is described in
+    both :func:`sectionFromElement` and :func:`scoreFromElement`, as expected.
+
+    **Required Parameters**
 
     :param elem: The <section> or <score> element to process.
     :type elem: :class:`xml.etree.ElementTree.Element`
-    :param allPartNs: A list of the expected @n attributes for the <staff> tags in this <section>.
-        This is required---by the time we are processing <section> elements, we must know how many
-        parts there are and what @n values they use.
+    :param allPartNs: A list or tuple of the expected @n attributes for the <staff> tags in this
+        <section>. This tells the function how many parts there are and what @n values they use.
     :type allPartNs: iterable of str
+
+    **Optional Keyword Parameters**
+
+    The following parameters are all optional, and must be specified as a keyword argument (i.e.,
+    you specify the parameter name before its value).
+
     :param activeMeter: The :class:`~music21.meter.TimeSignature` active at the start of this
-        <section>. This is adjusted as required, and given to functions like
-        :func:`measureFromElement`. This is optional in case a :class:`TimeSignature has not yet
-        been encountered.
+        <section> or <score>. This is updated automatically as the music is processed, and the
+        :class:`TimeSignature` active at the end of the element is returned.
     :type activeMeter: :class:`music21.meter.TimeSignature`
-    :param nextMeasureLeft:
-    :type nextMeasureLeft:
-    :param backupMeasureNum:
+    :param nextMeasureLeft: The @left attribute to use for the next <measure> element encountered.
+        This is used for situations where one <measure> element specified a @right attribute that
+        must be imported by music21 as *both* the right barline of one measure and the left barline
+        of the following; at the moment this is only @rptboth, which requires a :class:`Repeat` in
+        both cases.
+    :type nextMeasureLeft: :class:`music21.bar.Barline` or :class:`music21.bar.Repeat`
+    :param backupMeasureNum: In case a <measure> element is missing its @n attribute,
+        :func:`measureFromElement` will use this automatically-incremented number instead. The
+        ``backupMeasureNum`` corresponding to the final <measure> in this <score> or <section> is
+        returned from this function.
     :type backupMeasureNum: int
-    :param slurBundle:
+    :param slurBundle: This :class:`SpannerBundle` holds the :class:`~music21.spanner.Slur` objects
+        created during pre-processing. The slurs are attached to their respective :class:`Note` and
+        :class:`Chord` objects as they are processed.
     :type slurBundle: :class:`music21.spanner.SpannerBundle`
-    :returns: Four-tuple as described below.
+    :returns: Four-tuple with a dictionary of results, the new value of ``activeMeter``, the new
+        value of ``nextMeasureLeft``, and the new value of ``backupMeasureNum``.
     :rtype: (dict, :class:`~music21.meter.TimeSignature`, :class:`~music21.bar.Barline`, int)
 
     **Return Value**
 
     In short, it's ``parsed``, ``activeMeter``, ``nextMeasureLeft``, ``backupMeasureNum``.
 
-    In long, ...
+    - ``'parsed'`` is a dictionary where the keys are the values in ``allPartNs`` and the values are
+        a list of all the :class:`Measure` objects in that part, as found in this <section> or
+        <score>.
+    - ``'activeMeter'`` is the :class:`~music21.meter.TimeSignature` in effect at the end of this
+        <section> or <score>.
+    - ``'nextMeasureLeft'`` is the value that should be assigned to the :attr:`leftBarline` attribute
+        of the first :class:`Measure` found in the next <section>. This will almost always be None.
+    - ``'backupMeasureNum'`` is equal to the ``backupMeasureNum`` argument plus the number of
+        <measure> elements found in this <score> or <section>.
     '''
+    # TODO: replace the returned 4-tuple with a namedtuple
+
+    # set the optional kwargs
+    activeMeter = kwargs['activeMeter'] if 'activeMeter' in kwargs else None
+    nextMeasureLeft = kwargs['nextMeasureLeft'] if 'nextMeasureLeft' in kwargs else None
+    backupMeasureNum = kwargs['backupMeasureNum'] if 'backupMeasureNum' in kwargs else None
+    slurBundle = kwargs['slurBundle'] if 'slurBundle' in kwargs else None
 
     scoreTag = '{http://www.music-encoding.org/ns/mei}score'
     sectionTag = '{http://www.music-encoding.org/ns/mei}section'
@@ -2796,19 +2831,14 @@ def sectionScoreCore(elem, allPartNs, activeMeter=None, nextMeasureLeft=None, ba
     # a <staffDef> or <scoreDef>.
     # --> defined as a parameter above
 
-    # "nextMeasureLeft" holds a Barline or Repeat object that was indicated in one measure, but
-    # about the following measure. This really only happens when @right="rptboth".
-    nextMeasureLeft = None
-    backupMeasureNum = 0
-
-    # holds the music21.stream.Part that we're building
+    # hold the music21.stream.Part that we're building
     parsed = {n: [] for n in allPartNs}
-    # holds things that should go in the following "Thing" (either Measure or Section)
+    # hold things that belong in the following "Thing" (either Measure or Section)
     inNextThing = {n: [] for n in allPartNs}
 
     for eachElem in elem.iterfind('*'):
+        # only process <measure> elements if this is a <section>
         if measureTag == eachElem.tag and sectionTag == elem.tag:
-            # only process <measure> elements if this is a <section>
             backupMeasureNum += 1
             # process all the stuff in the <measure>
             measureResult = measureFromElement(eachElem, backupMeasureNum, allPartNs,
@@ -2837,7 +2867,6 @@ def sectionScoreCore(elem, allPartNs, activeMeter=None, nextMeasureLeft=None, ba
                 nextMeasureLeft = None
 
         elif scoreDefTag == eachElem.tag:
-            # NOTE: same as scoreFE() (except the name of "inNextThing")
             localResult = scoreDefFromElement(eachElem)
             for allPartObject in localResult['all-part objects']:
                 if isinstance(allPartObject, meter.TimeSignature):
@@ -2850,7 +2879,6 @@ def sectionScoreCore(elem, allPartNs, activeMeter=None, nextMeasureLeft=None, ba
                         inNextThing[eachN].append(eachObj)
 
         elif staffDefTag == eachElem.tag:
-            # NOTE: same as scoreFE() (except the name of "inNextThing")
             if eachElem.get('n') is not None:
                 for eachObj in six.itervalues(staffDefFromElement(eachElem, slurBundle)):
                     if isinstance(eachObj, meter.TimeSignature):
@@ -2866,10 +2894,10 @@ def sectionScoreCore(elem, allPartNs, activeMeter=None, nextMeasureLeft=None, ba
             # NOTE: same as scoreFE() (except the name of "inNextThing")
             localParsed, activeMeter, nextMeasureLeft, backupMeasureNum = sectionFromElement(eachElem,
                                                                                              allPartNs,
-                                                                                             activeMeter,
-                                                                                             nextMeasureLeft,
-                                                                                             backupMeasureNum,
-                                                                                             slurBundle)
+                                                                                             activeMeter=activeMeter,
+                                                                                             nextMeasureLeft=nextMeasureLeft,
+                                                                                             backupMeasureNum=backupMeasureNum,
+                                                                                             slurBundle=slurBundle)
             for eachN, eachList in six.iteritems(localParsed):
                 # first: if there were objects from a previous <scoreDef> or <staffDef>, we need to
                 #        put those into the first Measure object we encounter in this Part
@@ -2881,7 +2909,7 @@ def sectionScoreCore(elem, allPartNs, activeMeter=None, nextMeasureLeft=None, ba
                             break
                     inNextThing[eachN] = []
                 # Then we can append the objects in this Part to the dict of all parsed objects, but
-                # NOTE that this is different depending for <section> and <score>.
+                # NOTE that this is different for <section> and <score>.
                 if sectionTag == elem.tag:
                     # If this is a <section>, which would really be nested <section> elements, we
                     # must "flatten" everything so it doesn't cause a disaster when we try to make
