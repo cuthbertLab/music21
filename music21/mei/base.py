@@ -2696,7 +2696,6 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     # mapping from tag name to our converter function
     staffTag = '{http://www.music-encoding.org/ns/mei}staff'
     staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
-    tagToFunction = {}
 
     # track the bar's duration
     maxBarDuration = None
