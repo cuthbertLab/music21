@@ -407,7 +407,7 @@ class Corpus(object):
 
         >>> from music21 import corpus
         >>> corpus.CoreCorpus().metadataBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {14957 entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
 
         '''
         from music21 import metadata
@@ -866,7 +866,7 @@ class CoreCorpus(Corpus):
         >>> coreCorpus = corpus.CoreCorpus()
         >>> corpusFilePaths = coreCorpus.getPaths()
         >>> len(corpusFilePaths)
-        3045
+        3044
 
         >>> kernFilePaths = coreCorpus.getPaths('krn')
         >>> len(kernFilePaths) >= 500
