@@ -1405,8 +1405,10 @@ class Stream(base.Music21Object):
                         storeSorted = True
                     else:
                         highestSortTuple = self._elements[-1].sortTuple()
-                        element.offset = float(offset)
-                        thisSortTuple = element.sortTuple()
+                        thisSortTuple = list(element.sortTuple())
+                        thisSortTuple[1] = offset
+                        thisSortTuple = tuple(thisSortTuple)
+                        
                         if highestSortTuple < thisSortTuple:
                             storeSorted = True
                     
