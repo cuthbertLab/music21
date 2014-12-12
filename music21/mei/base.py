@@ -3011,7 +3011,8 @@ _DOC_ORDER = [noteFromElement, restFromElement]
 if __name__ == "__main__":
     import music21
     from music21.mei import test_base
-    music21.mainTest(test_base.TestMeiToM21Class,
+    music21.mainTest(
+                     test_base.TestMeiToM21Class,
                      test_base.TestThings,
                      test_base.TestAttrTranslators,
                      test_base.TestNoteFromElement,
