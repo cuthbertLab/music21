@@ -233,128 +233,18 @@ class MeiToM21Converter(object):
         '''
 
         environLocal.printDebug('*** pre-processing spanning elements')
-
         _ppSlurs(self)
         _ppTies(self)
         _ppBeams(self)
         _ppTuplets(self)
         _ppConclude(self)
 
-        environLocal.printDebug('*** preparing part and staff definitions')
+        environLocal.printDebug('*** processing <score> elements')
+        theScore = scoreFromElement(self.documentRoot.find('.//{mei}music//{mei}score'.format(mei=_MEINS)),
+                                    self.slurBundle)
 
-        # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
-        # corresponds to what will be a music21 Part.
-        allPartNs = allPartsPresent(self)
-
-        # holds the music21.stream.Part that we're building
-        parsed = {n: stream.Part() for n in allPartNs}
-        # holds things that should go in the following Measure
-        inNextMeasure = {n: stream.Part() for n in allPartNs}
-
-        # "activeMeter" holds the TimeSignature object that's currently active; it's used in the
-        # loop below to help determine the proper duration of a full-measure rest. It appears here
-        # so it persists between <section> elements, and so to collect the first TimeSignature from
-        # a <staffDef> or <scoreDef>.
-        activeMeter = None
-
-        # set the initial Instrument for each staff
-        for eachN in allPartNs:
-            eachStaffDef = staffDefFromElement(self.documentRoot.find(
-                './/{mei}music//{mei}staffDef[@n="{n}"]'.format(mei=_MEINS, n=eachN)))
-            if eachStaffDef is not None:
-                for eachThing in six.itervalues(eachStaffDef):
-                    if activeMeter is None and isinstance(eachThing, meter.TimeSignature):
-                        activeMeter = eachThing
-                    parsed[eachN].append(eachThing)
-            else:
-                # TODO: try another strategy to get instrument information
-                pass
-
-        # process a <scoreDef> tag that happen before a <section> tag
-        scoreDefResults = self.documentRoot.find('.//{mei}music//{mei}scoreDef'.format(mei=_MEINS))
-        if scoreDefResults is not None:
-            # scoreDefResults would be None if there is no <scoreDef> outside of a <section>, but...
-            # TODO: we don't actually know whether this <scoreDef> happens before or between <section>
-            scoreDefResults = scoreDefFromElement(scoreDefResults)
-            for allPartObject in scoreDefResults['all-part objects']:
-                if activeMeter is None and isinstance(allPartObject, meter.TimeSignature):
-                    activeMeter = allPartObject
-                for partN in allPartNs:
-                    inNextMeasure[partN].append(allPartObject)
-
-        environLocal.printDebug('*** processing measures')
-
-        # "nextMeasureLeft" holds a Barline or Repeat object that was indicated in one measure, but
-        # about the following measure. This really only happens when @right="rptboth".
-        nextMeasureLeft = None
-        backupMeasureNum = 0
-        for eachSection in self.documentRoot.iterfind('.//{mei}music//{mei}score//*[{mei}measure]'.format(mei=_MEINS)):
-            # TODO: sections aren't divided or treated specially, yet
-            for eachObject in eachSection:
-                if '{http://www.music-encoding.org/ns/mei}measure' == eachObject.tag:
-                    # TODO: follow the use of @n described on pg.585 (599) of the MEI Guidelines
-                    backupMeasureNum += 1
-                    # process all the stuff in the <measure>
-                    measureResult = measureFromElement(eachObject, backupMeasureNum, allPartNs,
-                                                       slurBundle=self.slurBundle,
-                                                       activeMeter=activeMeter)
-                    # process and append each part's stuff to the staff
-                    for eachN in allPartNs:
-                        # TODO: what if an @n doesn't exist in this <measure>?
-                        # insert objects specified in the immediately-preceding <scoreDef>
-                        for eachThing in inNextMeasure[eachN]:
-                            measureResult[eachN].insert(0, eachThing)
-                        inNextMeasure[eachN] = []
-                        # if it's the first measure, pad for a possible anacrusis
-                        # TODO: this may have to change when @n is better set
-                        # TODO: this doesn't actually solve the "pick-up measure" problem
-                        if 1 == backupMeasureNum:
-                            measureResult[eachN].padAsAnacrusis()
-                        # if we got a left-side barline from the previous measure, use it
-                        if nextMeasureLeft is not None:
-                            measureResult[eachN].leftBarline = nextMeasureLeft
-                        # add this Measure to the Part
-                        parsed[eachN].append(measureResult[eachN])
-                    # if we got a barline for the next <measure>
-                    if 'next @left' in measureResult:
-                        nextMeasureLeft = measureResult['next @left']
-                    else:
-                        nextMeasureLeft = None
-                elif '{http://www.music-encoding.org/ns/mei}scoreDef' == eachObject.tag:
-                    scoreDefResults = scoreDefFromElement(eachObject)
-                    # spread all-part elements across all the parts
-                    for allPartObject in scoreDefResults['all-part objects']:
-                        if isinstance(allPartObject, meter.TimeSignature):
-                            activeMeter = allPartObject
-                        for partN in allPartNs:
-                            inNextMeasure[partN].append(allPartObject)
-                elif '{http://www.music-encoding.org/ns/mei}staffDef' == eachObject.tag:
-                    whichPart = eachObject.get('n')
-                    # to process this here, we need @n. But if something refers to this <staffDef> with
-                    # the @xml:id, it may not have an @n
-                    if whichPart is not None:
-                        staffDefResults = staffDefFromElement(eachObject)
-                        for thisPartObject in six.itervalues(staffDefResults):
-                            if isinstance(thisPartObject, meter.TimeSignature):
-                                activeMeter = thisPartObject
-                            inNextMeasure[whichPart].append(thisPartObject)
-                elif eachObject.tag not in _IGNORE_UNPROCESSED:
-                    environLocal.printDebug('unprocessed {} in {}'.format(eachObject.tag, eachSection.tag))
-
-        # TODO: check if there's anything left in "inNextMeasure"
-
-        # Convert the dict to a Score
-        # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
-        # document. Iterating the keys in "parsed" would not preserve the order.
-        environLocal.printDebug('*** making the Score')
-        parsed = [parsed[n] for n in allPartNs]
-        theScore = stream.Score(parsed)
-
-        # insert metadata
+        environLocal.printDebug('*** preparing metadata')
         theScore.metadata = makeMetadata(self.documentRoot)
-
-        # put slurs in the Score
-        theScore.append(self.slurBundle.list)
 
         return theScore
 
@@ -2861,6 +2751,259 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     staves = _makeBarlines(elem, staves)
 
     return staves
+
+
+# TODO: fold the optional params into an optional tuple
+def sectionScoreCore(elem, allPartNs, activeMeter=None, nextMeasureLeft=None, backupMeasureNum=None, slurBundle=None):
+    '''
+    NB: activeMeter will be optional because, if called from scoreFromElement() it will be empty
+
+    :param elem: The <section> or <score> element to process.
+    :type elem: :class:`xml.etree.ElementTree.Element`
+    :param allPartNs: A list of the expected @n attributes for the <staff> tags in this <section>.
+        This is required---by the time we are processing <section> elements, we must know how many
+        parts there are and what @n values they use.
+    :type allPartNs: iterable of str
+    :param activeMeter: The :class:`~music21.meter.TimeSignature` active at the start of this
+        <section>. This is adjusted as required, and given to functions like
+        :func:`measureFromElement`. This is optional in case a :class:`TimeSignature has not yet
+        been encountered.
+    :type activeMeter: :class:`music21.meter.TimeSignature`
+    :param nextMeasureLeft:
+    :type nextMeasureLeft:
+    :param backupMeasureNum:
+    :type backupMeasureNum: int
+    :param slurBundle:
+    :type slurBundle: :class:`music21.spanner.SpannerBundle`
+    :returns: Four-tuple as described below.
+    :rtype: (dict, :class:`~music21.meter.TimeSignature`, :class:`~music21.bar.Barline`, int)
+
+    **Return Value**
+
+    In short, it's ``parsed``, ``activeMeter``, ``nextMeasureLeft``, ``backupMeasureNum``.
+
+    In long, ...
+    '''
+
+    scoreTag = '{http://www.music-encoding.org/ns/mei}score'
+    sectionTag = '{http://www.music-encoding.org/ns/mei}section'
+    measureTag = '{http://www.music-encoding.org/ns/mei}measure'
+    scoreDefTag = '{http://www.music-encoding.org/ns/mei}scoreDef'
+    staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
+
+    # "activeMeter" holds the TimeSignature object that's currently active; it's used in the
+    # loop below to help determine the proper duration of a full-measure rest. It appears here
+    # so it persists between <section> elements, and so to collect the first TimeSignature from
+    # a <staffDef> or <scoreDef>.
+    # --> defined as a parameter above
+
+    # "nextMeasureLeft" holds a Barline or Repeat object that was indicated in one measure, but
+    # about the following measure. This really only happens when @right="rptboth".
+    nextMeasureLeft = None
+    backupMeasureNum = 0
+
+    # holds the music21.stream.Part that we're building
+    parsed = {n: [] for n in allPartNs}
+    # holds things that should go in the following "Thing" (either Measure or Section)
+    inNextThing = {n: [] for n in allPartNs}
+
+    for eachElem in elem.iterfind('*'):
+        if measureTag == eachElem.tag and sectionTag == elem.tag:
+            # only process <measure> elements if this is a <section>
+            backupMeasureNum += 1
+            # process all the stuff in the <measure>
+            measureResult = measureFromElement(eachElem, backupMeasureNum, allPartNs,
+                                               slurBundle=slurBundle,
+                                               activeMeter=activeMeter)
+            # process and append each part's stuff to the staff
+            for eachN in allPartNs:
+                # insert objects specified in the immediately-preceding <scoreDef>
+                for eachThing in inNextThing[eachN]:
+                    measureResult[eachN].insert(0, eachThing)
+                inNextThing[eachN] = []
+                # if it's the first measure, pad for a possible anacrusis
+                # TODO: this may have to change when @n is better set
+                # TODO: this doesn't actually solve the "pick-up measure" problem
+                if 1 == backupMeasureNum:
+                    measureResult[eachN].padAsAnacrusis()
+                # if we got a left-side barline from the previous measure, use it
+                if nextMeasureLeft is not None:
+                    measureResult[eachN].leftBarline = nextMeasureLeft
+                # add this Measure to the Part
+                parsed[eachN].append(measureResult[eachN])
+            # if we got a barline for the next <measure>
+            if 'next @left' in measureResult:
+                nextMeasureLeft = measureResult['next @left']
+            else:
+                nextMeasureLeft = None
+
+        elif scoreDefTag == eachElem.tag:
+            # NOTE: same as scoreFE() (except the name of "inNextThing")
+            localResult = scoreDefFromElement(eachElem)
+            for allPartObject in localResult['all-part objects']:
+                if isinstance(allPartObject, meter.TimeSignature):
+                    activeMeter = allPartObject
+                for eachN in allPartNs:
+                    inNextThing[eachN].append(allPartObject)
+            for eachN in allPartNs:
+                if eachN in localResult:
+                    for eachObj in six.itervalues(localResult[eachN]):
+                        inNextThing[eachN].append(eachObj)
+
+        elif staffDefTag == eachElem.tag:
+            # NOTE: same as scoreFE() (except the name of "inNextThing")
+            if eachElem.get('n') is not None:
+                for eachObj in six.itervalues(staffDefFromElement(eachElem, slurBundle)):
+                    if isinstance(eachObj, meter.TimeSignature):
+                        activeMeter = eachObj
+                    inNextThing[eachElem.get('n')].append(eachObj)
+            else:
+                # At the moment, to process this here, we need an @n on the <staffDef>. A document
+                # may have a still-valid <staffDef> if the <staffDef> has an @xml:id with which
+                # <staff> elements may refer to it.
+                environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
+
+        elif sectionTag == eachElem.tag:
+            # NOTE: same as scoreFE() (except the name of "inNextThing")
+            localParsed, activeMeter, nextMeasureLeft, backupMeasureNum = sectionFromElement(eachElem,
+                                                                                             allPartNs,
+                                                                                             activeMeter,
+                                                                                             nextMeasureLeft,
+                                                                                             backupMeasureNum,
+                                                                                             slurBundle)
+            for eachN, eachList in six.iteritems(localParsed):
+                # first: if there were objects from a previous <scoreDef> or <staffDef>, we need to
+                #        put those into the first Measure object we encounter in this Part
+                if len(inNextThing[eachN]) > 0:
+                    for eachObj in eachList:
+                        if isinstance(eachObj, stream.Stream):
+                            for eachInsertion in inNextThing[eachN]:
+                                eachObj.insert(0.0, eachInsertion)
+                            break
+                    inNextThing[eachN] = []
+                # Then we can append the objects in this Part to the dict of all parsed objects, but
+                # NOTE that this is different depending for <section> and <score>.
+                if sectionTag == elem.tag:
+                    # If this is a <section>, which would really be nested <section> elements, we
+                    # must "flatten" everything so it doesn't cause a disaster when we try to make
+                    # a Part out of it.
+                    for eachObj in eachList:
+                        parsed[eachN].append(eachObj)
+                elif scoreTag == elem.tag:
+                    # If this is a <score>, we can just append the result of each <section> to the
+                    # list that will become the Part.
+                    parsed[eachN].append(eachList)
+
+        elif eachElem.tag not in _IGNORE_UNPROCESSED:
+            environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, elem.tag))
+
+    # TODO: write the <section @label=""> part
+    # TODO: check if there's anything left in "inNextMeasure"
+
+    return parsed, activeMeter, nextMeasureLeft, backupMeasureNum
+
+
+def sectionFromElement(elem, allPartNs, activeMeter, nextMeasureLeft, backupMeasureNum, slurBundle):
+    '''
+    <section> Segment of music data.
+
+    In MEI 2013: pg.432 (446 in PDF) (MEI.shared module)
+
+    .. note:: The parameters and return values are exactly the same for :func:`sectionFromElement`
+        and :func:`sectionScoreCore`, so refer to the latter function's documentation for more
+        information.
+
+    **Attributes/Elements Implemented:**
+
+    **Attributes Ignored:**
+
+    **Attributes/Elements in Testing:**
+
+    - @label
+    - contained <measure>, <scoreDef>, <staffDef>, <section>
+
+    **Attributes not Implemented:**
+
+    - att.common (@n, @xml:base) (att.id (@xml:id))
+    - att.declaring (@decls)
+    - att.facsimile (@facs)
+    - att.typed (@type, @subtype)
+    - att.pointing (@xlink:actuate, @xlink:role, @xlink:show, @target, @targettype, @xlink:title)
+    - att.section.vis (@restart)
+    - att.section.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                      (att.alignment (@when)))
+
+    **Contained Elements not Implemented:**
+
+    - MEI.critapp: app
+    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    - MEI.shared: annot ending expansion pb sb section staff
+    - MEI.text: div
+    - MEI.usersymbols: anchoredText curve line symbol
+    '''
+    environLocal.printDebug('*** processing a <section>')
+    return sectionScoreCore(elem, allPartNs, activeMeter, nextMeasureLeft, backupMeasureNum, slurBundle)
+
+
+def scoreFromElement(elem, slurBundle):
+    '''
+    <score> Full score view of the musical content.
+
+    In MEI 2013: pg.430 (444 in PDF) (MEI.shared module)
+
+    :param elem: The ``<score>`` element to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :returns: A completed :class:`~music21.stream.Score` object.
+
+    **Attributes/Elements Implemented:**
+
+    **Attributes Ignored:**
+
+    **Attributes/Elements in Testing:**
+
+    - contained <section>, <scoreDef>, and <staffDef>
+
+    **Attributes not Implemented:**
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.declaring (@decls)
+    - att.typed (@type, @subtype)
+    - att.score.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+                                    (att.alignment (@when)))
+
+    **Contained Elements not Implemented:**
+
+    - MEI.critapp: app
+    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    - MEI.shared: annot ending pb sb
+    - MEI.text: div
+    - MEI.usersymbols: anchoredText curve line symbol
+    '''
+
+    environLocal.printDebug('*** processing a <score>')
+    # That's an outright lie. We're also processing <scoreDef>, <staffDef>, and other elements!
+
+    # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
+    # corresponds to what will be a music21 Part.
+    allPartNs = allPartsPresent(elem)
+
+    # This is the actual processing.
+    parsed = sectionScoreCore(elem, allPartNs)[0]
+
+    # Convert the dict to a Score
+    # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
+    # document. Iterating the keys in "parsed" would not preserve the order.
+    environLocal.printDebug('*** making the Score')
+    theScore = [stream.Part() for _ in range(len(allPartNs))]
+    for i, eachN in enumerate(allPartNs):
+        for eachObj in parsed[eachN]:
+            theScore[i].append(eachObj)
+    theScore = stream.Score(theScore)
+
+    # put slurs in the Score
+    theScore.append(slurBundle.list)
+
+    return theScore
 
 
 #------------------------------------------------------------------------------
