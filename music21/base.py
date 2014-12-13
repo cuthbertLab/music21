@@ -1757,7 +1757,7 @@ class Music21Object(object):
     offsetFloat = property(_getOffsetFloat, _setOffset, doc='''old style: always returns a float''')
     offsetRational = property(_getOffsetRational, _setOffset, doc='''synonym for .offset''')
 
-    def sortTuple(self, useSite=None):
+    def sortTuple(self, useSite=False):
         '''
         Returns a collections.namedtuple called SortTuple(atEnd, offset, priority, classSortOrder,
         isNotGrace, insertIndex)
@@ -1823,12 +1823,22 @@ class Music21Object(object):
         >>> n2InsertIndex = n2.sortTuple().insertIndex
         >>> n2InsertIndex > nInsertIndex
         True
+        
+        >>> rb = bar.Barline()
+        >>> s.storeAtEnd(rb)
+        >>> rb.sortTuple()
+        SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, isNotGrace=1, insertIndex=...)        
         '''
         if useSite is False: # False or a Site; since None is a valid site, default is False
+            useSite = self.activeSite
+        if useSite is None:                
             foundOffset = self.offset
         else:
-            foundOffset = self.getOffsetBySite(useSite)
-
+            try:
+                foundOffset = self.sites.siteDict[id(useSite)].offset  # allows for text offsets
+            except KeyError:
+                foundOffset = self.getOffsetBySite(useSite)
+                
         if foundOffset == 'highestTime':
             offset = 0.0
             atEnd = 1

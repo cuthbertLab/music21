@@ -69,10 +69,11 @@
     
     function getData(msg) {
            var data = handle_output(msg);
+           console.log(data);
            data = data.slice(1, -1);       
-    var jpc = new music21.jsonPickle.Converter();
-    var streamObj = jpc.run(data);
-    streamObj.replaceLastCanvas("#heya");
+           var jpc = new music21.jsonPickle.Converter();
+           var streamObj = jpc.run(data);
+           streamObj.replaceCanvas("#heya");
            document.getElementById("result_output").value = streamObj._elements.length;
     
     }
@@ -82,7 +83,7 @@
            console.log(out);
            var res = null;
             // if output is a print statement
-           if(out.msg_type == "stream"){
+           if(out.msg_type == "stream"){ // nothing to do with music21 stream
                res = out.content.data;
            }
            // if output is a python object
@@ -176,6 +177,221 @@
 .. code:: python
 
     
+
+.. code:: python
+
+    c = converter.parse('tinyNotation: 2/4 c4 d e f g a b c\'')
+    c.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_07.png
+
+
+.. code:: python
+
+    e = converter.parse("tinyNotation: 2/4 e4 f g a b c' d' e'")
+    g = converter.parse("tinyNotation: 2/4 g4 a b c' d' e' f' g'")
+    s = stream.Score()
+    s.insert(0, c)
+    s.insert(0, e)
+    s.insert(0, g)
+    sc = s.chordify()
+    sc.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_09.png
+
+
+.. code:: python
+
+    d = converter.parse("tinyNotation: 2/4 c#4 d- d# e- f# g- g# a- a# b-")
+    d.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_11.png
+
+
+.. code:: python
+
+    db = converter.parse("tinyNotation: 2/4 e#4 f- b# c'-")
+    db.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_13.png
+
+
+.. code:: python
+
+    e = converter.parse("tinyNotation: 2/4 e'4 f' g' a' b' c'' d'' e''")
+    g = converter.parse("tinyNotation: 2/4 g4 a b c' d' e' f' g'")
+    s = stream.Score()
+    s.insert(0, c)
+    s.insert(0, e)
+    s.insert(0, g)
+    sc = s.chordify()
+    sc.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_15.png
+
+
+.. code:: python
+
+    r1 = converter.parse("tinyNotation: 4/4 g4 g8 g g4 g8 g")
+    r2 = converter.parse("tinyNotation: 4/4 g8 g g g  g g g g")
+    r3 = converter.parse("tinyNotation: 4/4 g4   g    g   g")
+    r1.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_17.png
+
+
+.. code:: python
+
+    r2.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_19.png
+
+
+.. code:: python
+
+    r3.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_21.png
+
+
+.. code:: python
+
+    r4 = converter.parse("tinyNotation: 4/4 g4 g8 g g4 g8 g   g4 g8 g g4 g8 g   g8 g g g  g g g g   g4   g    g   g    g4 g8 g g4 g8 g   g4 g8 g g4 g8 g   g8 g g g  g g g g   g4   g    g   g ")
+    r4.makeMeasures(inPlace=True)
+
+.. code:: python
+
+    r4.getElementsByClass('Measure')[0].notes[0].lyric = "A"
+    r4.getElementsByClass('Measure')[1].notes[0].lyric = "A"
+    r4.getElementsByClass('Measure')[2].notes[0].lyric = "B"
+    r4.getElementsByClass('Measure')[3].notes[0].lyric = "C"
+    r4.getElementsByClass('Measure')[4].notes[0].lyric = "A"
+    r4.getElementsByClass('Measure')[5].notes[0].lyric = "A"
+    r4.getElementsByClass('Measure')[6].notes[0].lyric = "B"
+    r4.getElementsByClass('Measure')[7].notes[0].lyric = "C"
+    r4.__class__ = stream.Part
+    r4.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_23.png
+
+
+.. code:: python
+
+    c = converter.parse("tinyNotation: 4/4 C1 G")
+    e = converter.parse("tinyNotation: 4/4 E1 B")
+    g = converter.parse("tinyNotation: 4/4 G1 d")
+    s = stream.Score()
+    s.insert(0, c)
+    s.insert(0, e)
+    s.insert(0, g)
+    sc = s.chordify()
+    sc.insert(0, clef.BassClef())
+    sc.flat.notes[0].lyric = "I"
+    sc.flat.notes[1].lyric = "V"
+    sc.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_25.png
+
+
+.. code:: python
+
+    I = sc.flat.notes[0]
+    V = sc.flat.notes[1]
+    from copy import deepcopy
+    sc3 = stream.Part()
+    sc3.insert(0, clef.BassClef())
+    sc3.insert(0, meter.TimeSignature('4/4'))
+    sc3.append(deepcopy(I))
+    sc3.append(deepcopy(I))
+    sc3.append(deepcopy(I))
+    sc3.append(deepcopy(V))
+    
+    sc3.append(deepcopy(I))
+    sc3.append(deepcopy(I))
+    sc3.append(deepcopy(V))
+    sc3.append(deepcopy(I))
+    sc3.makeMeasures(inPlace = True)
+    sc3.measure(4).rightBarline = 'double'
+    sc3.show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_27.png
+
+
+.. code:: python
+
+    all = stream.Score()
+    all.insert(0, r4)
+    all.insert(0, sc3)
+    all.show('musicxml')
+
+.. code:: python
+
+    import random
+    random.randint(10,20)
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    12
+
+
+.. code:: python
+
+    
+
+.. code:: python
+
+    from os.path import expanduser
+
+.. code:: python
+
+    home = expanduser("~")
+
+.. code:: python
+
+    home
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    '/Users/cuthbert'
+
+
+.. code:: python
+
+    c = corpus.parse('luca/gloria')
+
+.. code:: python
+
+    len(c)
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    13
+
+
+.. code:: python
+
+    c.measures(1, 40).show()
+
+
+.. image:: usersGuide_96_ipython_comm_files/_fig_32.png
+
 
 .. code:: python
 

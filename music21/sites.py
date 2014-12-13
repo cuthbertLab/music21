@@ -772,22 +772,20 @@ class Sites(common.SlottedObject):
         For a given site return this Sites's offset in it. The None site is
         permitted. The id() of the site is used to find the offset.
 
-        ::
+        >>> import music21
+        >>> class Mock(music21.Music21Object):
+        ...     pass
+        ...
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> aLocations = music21.Sites()
+        >>> aLocations.add(aSite, 23)
+        >>> aLocations.add(bSite, 121.5)
+        >>> aLocations.getOffsetBySite(aSite)
+        23.0
 
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 23)
-            >>> aLocations.add(bSite, 121.5)
-            >>> aLocations.getOffsetBySite(aSite)
-            23.0
-
-            >>> aLocations.getOffsetBySite(bSite)
-            121.5
+        >>> aLocations.getOffsetBySite(bSite)
+        121.5
 
 
         The object might not actually be in the _elements for the site object, because
@@ -809,57 +807,49 @@ class Sites(common.SlottedObject):
         '''
         Main method for getting an offset from a location key.
 
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> dSite = Mock()
-            >>> eSite = Mock()
-            >>> sitesObj = music21.Sites()
-            >>> sitesObj.add(aSite, 0)
-            >>> sitesObj.add(cSite) # a context
-            >>> sitesObj.add(bSite, 234) # can add at same offset or a different one
-            >>> sitesObj.add(dSite) # a context
-            >>> sitesObj.getOffsetBySiteId(id(bSite))
-            234.0
+        >>> import music21
+        >>> class Mock(music21.Music21Object):
+        ...     pass
+        ...
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> dSite = Mock()
+        >>> eSite = Mock()
+        >>> sitesObj = music21.Sites()
+        >>> sitesObj.add(aSite, 0)
+        >>> sitesObj.add(cSite) # a context
+        >>> sitesObj.add(bSite, 234) # can add at same offset or a different one
+        >>> sitesObj.add(dSite) # a context
+        >>> sitesObj.getOffsetBySiteId(id(bSite))
+        234.0
 
         If strictDeadCheck is False (default) we can still retrieve the context
         from a dead weakref.  This is necessary to get the offset from an
         iterated Stream often.  Eventually, this should become True -- but too
         many errors for now.
 
-        ::
+        >>> idBSite = id(bSite)
+        >>> del(bSite)
+        >>> sitesObj.siteDict[idBSite].siteWeakref
+        <weakref at 0x...; dead>
 
-            >>> idBSite = id(bSite)
-            >>> del(bSite)
-            >>> sitesObj.siteDict[idBSite].siteWeakref
-            <weakref at 0x...; dead>
+        >>> sitesObj.siteDict[idBSite].siteWeakref is None
+        False
 
-            >>> sitesObj.siteDict[idBSite].siteWeakref is None
-            False
+        >>> sitesObj.siteDict[idBSite].site is None
+        True
 
-            >>> sitesObj.siteDict[idBSite].site is None
-            True
-
-        ::
-        
-            >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = False) # default
-            234.0
+        >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = False) # default
+        234.0
 
         With this, you'll get an exception:
 
-        ::
-
-            >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = True)
-            Traceback (most recent call last):
-            SitesException: Could not find the object with id ... in the Site marked with idKey ... (was there, now site is dead).
-            object <music21.sites.Sites object at 0x...>, sitesDict: {...}
-            containedById = ...
+        >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = True)
+        Traceback (most recent call last):
+        SitesException: Could not find the object with id ... in the Site marked with idKey ... (was there, now site is dead).
+        object <music21.sites.Sites object at 0x...>, sitesDict: {...}
+        containedById = ...
 
         '''
         # NOTE: this is a core method called very frequently

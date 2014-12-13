@@ -11450,6 +11450,7 @@ class Measure(Stream):
         ''')
 
     def _getRightBarline(self):
+        # TODO: Move to Stream or make setting .rightBarline, etc. on Stream raise an exception...
         # look on _endElements
         barList = []
         for e in self._endElements:
