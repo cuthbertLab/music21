@@ -1398,9 +1398,6 @@ class Stream(base.Music21Object):
                 if ht < offset:
                     storeSorted = True
                 elif ht == offset:
-                    # TODO: check if this element's SortTuple will be after the previous
-                    #       for the case of say a TrebleClef inserted after a KeySignature
-                    # TODO: Fix BUG! See usersGuide_90_sorting
                     if len(self._elements) == 0:
                         storeSorted = True
                     else:
