@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <work n="1">
+                <titleStmt>
+                    <title>Test File</title>
+                    <title type="subtitle">For Importing MEI to music21</title>
+                    <respStmt>
+                        <persName role="composer">Christopher Antila</persName>
+                        <persName role="encoder">Christopher Antila</persName>
+                    </respStmt>
+                </titleStmt>
+                <tempo>Movement title</tempo>
+            </work>
+        </fileDesc>
+    </meiHead>
+
+    <music>
+    <score>
+        <scoreDef meter.count="8" meter.unit="8">
+            <staffGrp>
+                <staffDef n="1">
+                    <clef shape="G" line="1"/>
+                </staffDef>
+                <staffDef n="2" clef.shape="F" clef.line="4"/>
+            </staffGrp>
+        </scoreDef>
+
+        <section>
+            <scoreDef key.sig="1f" key.mode="major"/>
+            <measure n="1">
+                <staff n="1">
+                    <layer n="1" xml:id="upper">
+                        <beam>
+                            <note pname="E" oct="4" dur="8" artic="stacc"/>
+                            <note pname="E" oct="4" dur="8"/>
+                            <beam>
+                                <note pname="G" oct="4" dur="16" grace="unacc"/>
+                                <note pname="F" oct="4" dur="16" grace="unacc"/>
+                            </beam>
+                            <note pname="E" oct="4" dur="8">
+                                <artic artic="stacc"/>
+                            </note>
+                        </beam>
+                        <beam>
+                            <note pname="E" oct="4" dur="8"/>
+                        </beam>
+                        <chord dur="2">
+                            <note pname="F" oct="4"/>
+                            <note pname="a" oct="4" accid="f"/>
+                        </chord>
+                    </layer>
+                </staff>
+                <staff n="2">
+                    <layer n="1" xml:id="lower">
+                        <note pname="C" oct="3" dur="4" xml:id="fa517568-0847-11e4-a056-b888e3e07116">
+                            <dot/>
+                        </note>
+                        <rest dur="8"/>
+                        <note pname="D" oct="3" dur="4" xml:id="0eff48dc-0848-11e4-a056-b888e3e07116"/>
+                        <rest dur="4"/>
+                    </layer>
+                </staff>
+                <slur startid="fa517568-0847-11e4-a056-b888e3e07116" endid="0eff48dc-0848-11e4-a056-b888e3e07116"/>
+            </measure>
+
+            <measure n="2" right="end">
+                <staff n="1">
+                    <layer n="1" xml:id="upper">
+                        <note pname="a" accid="f" oct="4" dur="8" grace="unacc"/>
+                        <note pname="G" oct="4" dur="2"/>
+                        <note pname="b" accid="s" oct="4" dur="long" grace="unacc"/>
+                        <note pname="b" accid="n" oct="4" dur="long" grace="unacc"/>
+                        <chord dur="breve" grace="unacc">
+                            <note pname="b" accid="f" oct="4"/>
+                            <note pname="d" accid="ss" oct="5"/>
+                            <artic artic="marc"/>
+                        </chord>
+                        <note pname="b" accid="ff" oct="4" dur="1" grace="unacc"/>
+                        <note pname="A" oct="4" dur="4" xml:id="5ed5f1e4-0848-11e4-8845-b888e3e07116"/>
+                        <note pname="A" oct="4" dur="4" xml:id="5f86b4fc-0848-11e4-8845-b888e3e07116"/>
+                    </layer>
+                    <layer n="1">
+                        <note pname="e" oct="4" dur="4" dots="1"/>
+                        <note pname="f" oct="4" dur="8"/>
+                        <note pname="d" oct="4" dur="4" tie="i"/>
+                        <tuplet num="3" numbase="2">
+                            <note pname="d" oct="4" dur="8" tuplet="i1" tie="t"/>
+                            <note pname="c" accid="s" oct="4" dur="8" tuplet="m1"/>
+                            <note pname="d" oct="4" dur="8" tuplet="t1"/>
+                        </tuplet>
+                    </layer>
+                </staff>
+                <staff n="2">
+                    <layer n="1" xml:id="lower">
+                        <note pname="E" oct="3" dur="4" slur="1i"/>
+                        <rest dur="4"/>
+                        <note pname="F" oct="3" dur="4" slur="1m 2i"/>
+                        <rest dur="4"/>
+                    </layer>
+                </staff>
+                <tie startid="5ed5f1e4-0848-11e4-8845-b888e3e07116" endid="5f86b4fc-0848-11e4-8845-b888e3e07116"/>
+            </measure>
+
+            <scoreDef meter.count="3" meter.unit="4" key.pname="B" key.accid="f" key.mode="major"/>
+            <staffDef n="2" lines="5" clef.line="4" clef.shape="C"/>
+            <measure n="3" right="dbl">
+                <staff n="1">
+                    <layer n="1" xml:id="upper">
+                        <!-- start beam -->
+                        <note pname="G" oct="4" dur="16" xml:id="327a05a5-4b44-4fd2-9a33-d5d1f93a4806"/>
+                        <note pname="A" oct="4" dur="16" xml:id="872c9445-ee0d-4453-9785-ce86e01b11ab"/>
+                        <note pname="B" accid.ges="f" oct="4" dur="16" xml:id="4c14357d-b576-4f59-a604-39631b6094ac"/>
+                        <note pname="C" oct="5" dur="16" xml:id="20e8ab72-798c-4edb-aef8-423251aad14e"/>
+                        <note pname="G" oct="4" dur="16" xml:id="9d15322d-a8d3-411c-9283-8a8463d3810e"/>
+                        <note pname="A" oct="4" dur="16" xml:id="205e2531-a644-461e-bf4a-9b8be67df26c"/>
+                        <!-- end beam -->
+                        <!-- start beam -->
+                        <note pname="B" accid.ges="f" oct="4" dur="8" xml:id="8065b651-c364-4d53-95a0-ac2c448e4e26"/>
+                        <note pname="A" oct="4" dur="16" xml:id="00420b7a-620f-49a9-b071-9443e871227f"/>
+                        <note pname="A" oct="4" dur="16" xml:id="b925ee37-030b-4664-8524-0451c3a8f013"/>
+                        <note pname="A" oct="4" dur="16" xml:id="21407ca9-99f2-4051-ac90-282dcea867ad"/>
+                        <note pname="A" oct="4" dur="16" xml:id="31e49df2-a7da-453b-a3c9-259a1901d772"/>
+                        <!-- end beam -->
+                        <beamSpan startid="#327a05a5-4b44-4fd2-9a33-d5d1f93a4806" endid="#205e2531-a644-461e-bf4a-9b8be67df26c" plist="#327a05a5-4b44-4fd2-9a33-d5d1f93a4806 #872c9445-ee0d-4453-9785-ce86e01b11ab #4c14357d-b576-4f59-a604-39631b6094ac #20e8ab72-798c-4edb-aef8-423251aad14e #9d15322d-a8d3-411c-9283-8a8463d3810e #205e2531-a644-461e-bf4a-9b8be67df26c"/>
+                        <beamSpan startid="#8065b651-c364-4d53-95a0-ac2c448e4e26" endid="#7bbe9898-9a3f-4b17-8dd2-b12a17fc89ed" plist="#8065b651-c364-4d53-95a0-ac2c448e4e26 #00420b7a-620f-49a9-b071-9443e871227f #b925ee37-030b-4664-8524-0451c3a8f013 #21407ca9-99f2-4051-ac90-282dcea867ad #31e49df2-a7da-453b-a3c9-259a1901d772 #7bbe9898-9a3f-4b17-8dd2-b12a17fc89ed"/>
+                    </layer>
+                </staff>
+                <staff n="2">
+                    <layer n="1" xml:id="lower">
+                        <!-- NB: nested slurs won't show properly in music21's MusicXML output -->
+                        <note pname="g" oct="3" dur="4" slur="1t 2t"/>
+                        <rest dur="4"/>
+                        <note pname="F" oct="3" dur="8"/>
+                        <rest dur="8"/>
+                    </layer>
+                </staff>
+            </measure>
+
+            <measure n="4" right="rptboth">
+                <staff n="1">
+                    <layer n="1" xml:id="upper">
+                        <tuplet num="3" numbase="2">
+                            <chord dur="8" xml:id="7bbe9898-9a3f-4b17-8dd2-b12a17fc89ed">
+                                <note pname="C" oct="5"/>
+                                <note pname="F" oct="5"/>
+                            </chord>
+                            <note pname="C" oct="5" dur="8"/>
+                            <tuplet num="3" numbase="2">
+                                <note pname="D" oct="5" dur="8"/>
+                                <note pname="E" oct="5" dur="8"/>
+                                <note pname="D" oct="5" dur="8"/>
+                            </tuplet>
+                            <note pname="C" oct="5" dur="4"/>
+                        </tuplet>
+                        <note pname="b" accid="f" oct="4" dur="4"/>
+                    </layer>
+                </staff>
+            </measure>
+
+            <measure n="5">
+                <staffDef n="2" lines="5" clef.line="4" clef.shape="F"/>
+                <staff n="1">
+                    <layer n="1" xml:id="upper">
+                        <tuplet num="7" numbase="1">
+                            <clef shape="G" line="2"/>  <!-- This won't be outputted in MusicXML: https://github.com/cuthbertLab/music21/issues/28 -->
+                            <tuplet num="5" numbase="4">
+                                <note pname="D" oct="5" dur="8" beam="i1"/>
+                                <note pname="f" oct="5" dur="8" beam="m1"/>
+                                <note pname="a" oct="5" dur="8" beam="m1"/>
+                                <note pname="g" oct="5" dur="8" beam="t1"/>
+                                <note pname="e" accid="f" oct="5" dur="8"/>
+                            </tuplet>
+                            <clef shape="C" line="3"/>
+                            <note pname="C" oct="5" dur="2"/>
+                            <note pname="d" oct="5" dur="2"/>
+                            <note pname="C" oct="5" dur="2"/>
+                            <note pname="b" oct="4" accid="f" dur="2"/>
+                            <note pname="C" oct="5" dur="2"/>
+                            <note pname="d" oct="5" dur="2"/>
+                        </tuplet>
+                        <clef shape="G" line="2"/>  <!-- This won't be outputted in MusicXML: https://github.com/cuthbertLab/music21/issues/28 -->
+                        <chord dur="4">
+                            <note pname="g" oct="6"/>
+                            <note pname="b" oct="4">
+                                <accid accid="ff"/>
+                            </note>
+                        </chord>
+                    </layer>
+                </staff>
+                <staff n="2">
+                    <layer n="1" xml:id="lower">
+                        <note pname="E" accid="f" oct="3" dur="8" xml:id="9555d426-a200-4639-bf50-1b363984bbf4"/>
+                        <rest dur="32"/>
+                        <rest dur="32"/>
+                        <rest dur="16"/>
+                        <rest dur="16" xml:id="982b938a-6f59-449b-900f-f0d44fc818b0"/>
+                        <rest dur="4"/>
+                        <note pname="b" accid="f" oct="3" dur="4"/>
+                        <tupletSpan num="5" numbase="4" startid="9555d426-a200-4639-bf50-1b363984bbf4" endid="982b938a-6f59-449b-900f-f0d44fc818b0"/>
+                    </layer>
+                </staff>
+            </measure>
+
+            <measure n="6">
+                <staff n="1">
+                    <layer n="1">
+                        <mRest/>
+                    </layer>
+                </staff>
+                <staff n="2">
+                    <layer n="">
+                        <mRest/>
+                    </layer>
+                </staff>
+            </measure>
+        </section>
+
+        <scoreDef key.pname="G" key.accid="n" key.mode="major"/>  <!-- ensure stuff is insert to <section>-in-a-<score> -->
+        <section>
+            <scoreDef meter.count="6" meter.unit="8"/>  <!-- ensure stuff is inserted to <section>-in-a-<section> -->
+            <section>
+                <measure n="7">
+                    <staff n="1">
+                        <layer n="1">
+                            <beam>
+                                <note pname="D" oct="5" dur="16" beam="i1" grace="unacc"/>
+                                <note pname="f" accid.ges="s" oct="5" dur="16" beam="m1" grace="unacc"/>
+                                <tuplet num="3" numbase="2">
+                                    <note pname="D" oct="5" dur="16" beam="i1" grace="unacc"/>
+                                    <note pname="f" accid.ges="s" oct="5" dur="16" beam="m1" grace="unacc"/>
+                                    <note pname="d" oct="5" dur="16" beam="t1" grace="unacc"/>
+                                </tuplet>
+                            </beam>
+                            <note pname="E" accid.ges="f" oct="5" dur="2" dots="1"/>
+                        </layer>
+                    </staff>
+                    <staff n="2">
+                        <layer n="1">
+                            <mRest/>
+                        </layer>
+                    </staff>
+                </measure>
+            </section>
+
+            <measure n="8">
+                <staff n="1">
+                    <layer n="1">
+                        <mSpace/>
+                    </layer>
+                </staff>
+                <staff n="2">
+                    <layer n="">
+                        <mSpace/>
+                    </layer>
+                </staff>
+            </measure>
+
+            <measure n="9">
+                <staff n="1">
+                    <layer n="1">
+                        <beam>
+                            <note pname="D" oct="5" dur="16" beam="i1"/>
+                            <note pname="f" accid.ges="s" oct="5" dur="16" beam="m1"/>
+                            <note pname="D" oct="5" dur="16" beam="i1" xml:id="a2e480ea-46a6-4dca-afaf-31f794983c82"/>
+                            <note pname="f" accid.ges="s" oct="5" dur="16" beam="m1"/>
+                            <note pname="d" oct="5" dur="16" beam="t1" xml:id="a75b7384-73ef-4fcc-aa23-8cde967819cc"/>
+                        </beam>
+                        <note pname="E" accid.ges="f" oct="5" dur="2"/>
+                        <tupletSpan num="3" numbase="2" startid="#a2e480ea-46a6-4dca-afaf-31f794983c82" endid="#a75b7384-73ef-4fcc-aa23-8cde967819cc"/>
+                    </layer>
+                </staff>
+                <staff n="2">
+                    <layer n="1">
+                        <mSpace/>
+                    </layer>
+                </staff>
+            </measure>
+
+        </section>
+    </score>
+    </music>
+</mei>
