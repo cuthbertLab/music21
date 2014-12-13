@@ -28,7 +28,7 @@ topics will be linked and added as the topics are written:
 18. More durations: Complex, ties, and tuplets
 19. Environment
 20. Basic Analysis Tools
-21. Advanced Meter topics
+21. :ref:`Order and Sorting of Streams <usersGuide_21_sorting>`
 22. Graphing
 23. Searching for Files and Metadata
 24. Making a local corpus
@@ -62,4 +62,5 @@ topics will be linked and added as the topics are written:
 52. MIDI -- advanced
 53. Medieval and Renaissance extensions
 54. :ref:`Extending Converter with New Formats <usersGuide_54_extendingConverter>`
+55. Advanced Meter topics
 

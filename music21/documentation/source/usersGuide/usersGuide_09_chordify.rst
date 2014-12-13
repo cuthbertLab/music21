@@ -18,7 +18,7 @@ that is happening in the score. Take this short chorale by Bach:
     b.show()
 
 
-.. image:: usersGuide_09_chordify_files/_fig_01.png
+.. image:: usersGuide_09_chordify_files/_fig_02.png
 
 
 Let's take it and chordify it using the
@@ -67,7 +67,7 @@ should go at the beginning) and then show just measures 0 (pickup) to 4:
     b.measures(0, 4).show()
 
 
-.. image:: usersGuide_09_chordify_files/_fig_04.png
+.. image:: usersGuide_09_chordify_files/_fig_05.png
 
 
 That's a bit messy to read, so let's put all these chords in
@@ -84,7 +84,7 @@ information).
     b.measures(0,2).show()
 
 
-.. image:: usersGuide_09_chordify_files/_fig_06.png
+.. image:: usersGuide_09_chordify_files/_fig_07.png
 
 
 We can use the function ``roman.romanNumeralFromChord`` to label each of
@@ -101,7 +101,7 @@ the chordified Chords:
     b.measures(0, 2).show()
 
 
-.. image:: usersGuide_09_chordify_files/_fig_08.png
+.. image:: usersGuide_09_chordify_files/_fig_09.png
 
 
 As we've said, Lilypond output (what we use for the User's Guide) is not
@@ -160,3 +160,16 @@ documentation. We will get to the option, ``addPartNameAsGroup`` later,
 which will let you know exactly where each pitch in the chordified Chord
 comes from. But for now, let's jump to
 :ref:`usersGuide_10_fileFormats`
+
+.. code:: python
+
+    from music21 import *
+    n = note.Note("C#6")
+
+.. code:: python
+
+    n.show()
+
+.. code:: python
+
+    
