@@ -2752,7 +2752,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     return staves
 
 
-def sectionScoreCore(elem, allPartNs, **kwargs):
+def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
     '''
     This function is the "core" of both :func:`sectionFromElement` and :func:`scoreFromElement`,
     since both elements are treated quite similarly (though not identically). It's a separate and
@@ -2768,6 +2768,10 @@ def sectionScoreCore(elem, allPartNs, **kwargs):
     :param allPartNs: A list or tuple of the expected @n attributes for the <staff> tags in this
         <section>. This tells the function how many parts there are and what @n values they use.
     :type allPartNs: iterable of str
+    :param slurBundle: This :class:`SpannerBundle` holds the :class:`~music21.spanner.Slur` objects
+        created during pre-processing. The slurs are attached to their respective :class:`Note` and
+        :class:`Chord` objects as they are processed.
+    :type slurBundle: :class:`music21.spanner.SpannerBundle`
 
     **Optional Keyword Parameters**
 
@@ -2789,10 +2793,6 @@ def sectionScoreCore(elem, allPartNs, **kwargs):
         ``backupMeasureNum`` corresponding to the final <measure> in this <score> or <section> is
         returned from this function.
     :type backupMeasureNum: int
-    :param slurBundle: This :class:`SpannerBundle` holds the :class:`~music21.spanner.Slur` objects
-        created during pre-processing. The slurs are attached to their respective :class:`Note` and
-        :class:`Chord` objects as they are processed.
-    :type slurBundle: :class:`music21.spanner.SpannerBundle`
     :returns: Four-tuple with a dictionary of results, the new value of ``activeMeter``, the new
         value of ``nextMeasureLeft``, and the new value of ``backupMeasureNum``.
     :rtype: (dict, :class:`~music21.meter.TimeSignature`, :class:`~music21.bar.Barline`, int)
@@ -2816,8 +2816,7 @@ def sectionScoreCore(elem, allPartNs, **kwargs):
     # set the optional kwargs
     activeMeter = kwargs['activeMeter'] if 'activeMeter' in kwargs else None
     nextMeasureLeft = kwargs['nextMeasureLeft'] if 'nextMeasureLeft' in kwargs else None
-    backupMeasureNum = kwargs['backupMeasureNum'] if 'backupMeasureNum' in kwargs else None
-    slurBundle = kwargs['slurBundle'] if 'slurBundle' in kwargs else None
+    backupMeasureNum = kwargs['backupMeasureNum'] if 'backupMeasureNum' in kwargs else 0
 
     scoreTag = '{http://www.music-encoding.org/ns/mei}score'
     sectionTag = '{http://www.music-encoding.org/ns/mei}section'
@@ -2971,10 +2970,10 @@ def sectionFromElement(elem, allPartNs, activeMeter, nextMeasureLeft, backupMeas
     environLocal.printDebug('*** processing a <section>')
     return sectionScoreCore(elem,
                             allPartNs,
+                            slurBundle,
                             activeMeter=activeMeter,
                             nextMeasureLeft=nextMeasureLeft,
-                            backupMeasureNum=backupMeasureNum,
-                            slurBundle=slurBundle)
+                            backupMeasureNum=backupMeasureNum)
 
 def scoreFromElement(elem, slurBundle):
     '''

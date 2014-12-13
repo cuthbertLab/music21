@@ -3574,10 +3574,10 @@ class TestSectionScore(unittest.TestCase):
         self.assertEqual(expected, actual)
         mockCore.assert_called_once_with(elem,
                                          allPartNs,
+                                         slurBundle,
                                          activeMeter=activeMeter,
                                          nextMeasureLeft=nextMeasureLeft,
-                                         backupMeasureNum=backupMeasureNum,
-                                         slurBundle=slurBundle)
+                                         backupMeasureNum=backupMeasureNum)
 
     @mock.patch('music21.mei.base.allPartsPresent')
     @mock.patch('music21.mei.base.sectionScoreCore')
