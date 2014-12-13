@@ -2866,7 +2866,7 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
                 nextMeasureLeft = None
 
         elif scoreDefTag == eachElem.tag:
-            localResult = scoreDefFromElement(eachElem)
+            localResult = scoreDefFromElement(eachElem, slurBundle)
             for allPartObject in localResult['all-part objects']:
                 if isinstance(allPartObject, meter.TimeSignature):
                     activeMeter = allPartObject
