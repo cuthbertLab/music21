@@ -3139,10 +3139,10 @@ class TestMeasureFromElement(unittest.TestCase):
         staves = {'1': stream.Measure([stream.Voice([note.Rest(), note.Rest()])]),
                   '2': stream.Measure([stream.Voice([note.Rest(), note.Rest()])])}
         base._correctMRestDurs(staves, 2.0)
-        self.assertEqual(1.0, staves['1'][0][0].quarterLength)
-        self.assertEqual(1.0, staves['1'][0][1].quarterLength)
-        self.assertEqual(1.0, staves['2'][0][0].quarterLength)
-        self.assertEqual(1.0, staves['2'][0][1].quarterLength)
+        self.assertEqual(1.0, staves['1'].voices[0][0].quarterLength)
+        self.assertEqual(1.0, staves['1'].voices[0][1].quarterLength)
+        self.assertEqual(1.0, staves['2'].voices[0][0].quarterLength)
+        self.assertEqual(1.0, staves['2'].voices[0][1].quarterLength)
 
     def testCorrectMRestDurs2(self):
         '''
@@ -3154,10 +3154,10 @@ class TestMeasureFromElement(unittest.TestCase):
                   '2': stream.Measure([stream.Voice([note.Rest(), note.Rest()])])}
         staves['1'][0][0].m21wasMRest = True
         base._correctMRestDurs(staves, 2.0)
-        self.assertEqual(2.0, staves['1'][0][0].quarterLength)
-        self.assertEqual(1.0, staves['2'][0][0].quarterLength)
-        self.assertEqual(1.0, staves['2'][0][1].quarterLength)
-        self.assertFalse(hasattr(staves['1'][0][0], 'm21wasMRest'))
+        self.assertEqual(2.0, staves['1'].voices[0][0].quarterLength)
+        self.assertEqual(1.0, staves['2'].voices[0][0].quarterLength)
+        self.assertEqual(1.0, staves['2'].voices[0][1].quarterLength)
+        self.assertFalse(hasattr(staves['1'].voices[0][0], 'm21wasMRest'))
 
     def testCorrectMRestDurs3(self):
         '''
@@ -3170,9 +3170,9 @@ class TestMeasureFromElement(unittest.TestCase):
         staves['1'][0][0].m21wasMRest = True
         staves['1'][1][0].m21wasMRest = True
         base._correctMRestDurs(staves, 2.0)
-        self.assertEqual(2.0, staves['1'][0][0].quarterLength)
-        self.assertEqual(2.0, staves['1'][1][0].quarterLength)
-        self.assertEqual(1.0, staves['2'][1][0].quarterLength)
+        self.assertEqual(2.0, staves['1'].voices[0][0].quarterLength)
+        self.assertEqual(2.0, staves['1'].voices[1][0].quarterLength)
+        self.assertEqual(1.0, staves['2'].voices[0][0].quarterLength)
         self.assertFalse(hasattr(staves['1'][0][0], 'm21wasMRest'))
         self.assertFalse(hasattr(staves['1'][1][0], 'm21wasMRest'))
 
