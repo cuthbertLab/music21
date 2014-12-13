@@ -3587,6 +3587,8 @@ class TestSectionScore(unittest.TestCase):
         '''
         scoreFromElement(): unit test with all basic functionality
 
+        It's two parts, each with two things in them.
+
         Mocks on allPartsPresent(), sectionScoreCore(), stream.Part(), and stream.Score().
         '''
         elem = ETree.Element('score')
@@ -3617,5 +3619,71 @@ class TestSectionScore(unittest.TestCase):
         mockPart2.append.assert_any_call('2-1')
         mockPart2.append.assert_any_call('2-2')
 
-    # TODO: corresponding integration test for testScoreUnit1()
+    def testScoreIntegration1(self):
+        '''
+        scoreFromElement(): integration test with all basic functionality
+
+        It's two parts, each with two things in them.
+        '''
+        elem = """<score xmlns="http://www.music-encoding.org/ns/mei">
+            <scoreDef meter.count="8" meter.unit="8">
+                <staffGrp>
+                    <staffDef n="1" clef.shape="G" clef.line="2"/>
+                    <staffDef n="2" clef.shape="F" clef.line="4"/>
+                </staffGrp>
+            </scoreDef>
+            <section>
+                <measure>
+                    <staff n="1">
+                        <layer n="1">
+                            <note pname="G" oct="4" dur="2" slur="1i"/>
+                            <note pname="A" oct="4" dur="2" slur="1t"/>
+                        </layer>
+                    </staff>
+                    <staff n="2">
+                        <layer n="1">
+                            <note pname="G" oct="2" dur="1"/>
+                        </layer>
+                    </staff>
+                </measure>
+            </section>
+        </score>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+
+        actual = base.scoreFromElement(elem, slurBundle)
+
+        # This is complicated... I'm sorry... but it's a rather detailed test of the whole system,
+        # so I hope it's worth it!
+        self.assertEqual(2, len(actual.parts))
+        self.assertEqual(3, len(actual))  # parts plus "slurBundle"
+        self.assertEqual(1, len(actual.parts[0]))  # one Measure in each part
+        self.assertEqual(1, len(actual.parts[1]))
+        self.assertIsInstance(actual.parts[0][0], stream.Measure)
+        self.assertIsInstance(actual.parts[1][0], stream.Measure)
+        self.assertEqual(3, len(actual.parts[0][0]))  # each Measure has a Voice, a Clef, a TimeSignature
+        self.assertEqual(3, len(actual.parts[1][0]))
+        # Inspect the Voice and the Note objects inside it
+        self.assertIsInstance(actual.parts[0][0][0], stream.Voice)
+        self.assertIsInstance(actual.parts[1][0][0], stream.Voice)
+        self.assertEqual(2, len(actual.parts[0][0][0]))  # two Note in upper part
+        self.assertEqual(1, len(actual.parts[1][0][0]))  # one Note in lower part
+        self.assertIsInstance(actual.parts[0][0][0][0], note.Note)  # upper part, note 1
+        self.assertEqual('G4', actual.parts[0][0][0][0].nameWithOctave)
+        self.assertEqual(2.0, actual.parts[0][0][0][0].quarterLength)
+        self.assertIsInstance(actual.parts[0][0][0][1], note.Note)  # upper part, note 2
+        self.assertEqual('A4', actual.parts[0][0][0][1].nameWithOctave)
+        self.assertEqual(2.0, actual.parts[0][0][0][1].quarterLength)
+        self.assertIsInstance(actual.parts[1][0][0][0], note.Note)  # lower part
+        self.assertEqual('G2', actual.parts[1][0][0][0].nameWithOctave)
+        self.assertEqual(4.0, actual.parts[1][0][0][0].quarterLength)
+        # Inspect the Clef and TimeSignature objects that follow the Voice
+        self.assertIsInstance(actual.parts[0][0][1], clef.TrebleClef)  # upper
+        self.assertIsInstance(actual.parts[0][0][2], meter.TimeSignature)
+        self.assertEqual('8/8', actual.parts[0][0][2].ratioString)
+        self.assertIsInstance(actual.parts[1][0][1], clef.BassClef)  # lower
+        self.assertIsInstance(actual.parts[1][0][2], meter.TimeSignature)
+        self.assertEqual('8/8', actual.parts[1][0][2].ratioString)
+
+
     # TODO: unit and integration tests for sectionScoreCore()

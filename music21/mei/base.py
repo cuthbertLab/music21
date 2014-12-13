@@ -3037,6 +3037,8 @@ def scoreFromElement(elem, slurBundle):
 
     # put slurs in the Score
     theScore.append(slurBundle.list)
+    # TODO: when all the Slur objects are are at the end, they'll only be outputted properly if the
+    #       whole Score is outputted. show()-ing one Part or Measure won't display the slurs.
 
     return theScore
 
