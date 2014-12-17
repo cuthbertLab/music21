@@ -9,13 +9,20 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
-This is the documentation for the "mei" module.
+The :mod:`mei` module provides functionality related to the interactions between music21 and MEI.
 
-I'm going to write it soon, I promise.
+As of December 2014, we provide basic conversion from an MEI document to related music21 objects.
+You may import an MEI file in the same way you import any other file to music21. You may also use
+the :class:`music21.mei.MeiToM21Converter` directly for a complete file, or one of the functions,
+like :func:`music21.mei.base.noteFromElement` to convert from a :class:`xml.etree.Element`
+to the corresponding music21 object.
+
+For more information, including about which elements and attributes are currently supported, please
+refer to the :mod:`~music21.mei.base` module's documentation.
 '''
 
-# NOTE: in the end, I'll only want to import things that will be accessible under the
-#       music21.mei.* namespace. This should be almost nothing---only the things used by the
-#       SubConverter. Everything else should be imported through its submodule, like
-#       "music21.mei.functions.*" or whatever.
+# NOTE: I want to keep the "mei" namespace relatively clean---we should only put here those classes
+#       and functions that will be used regularly by other parts of music21, which is probably just
+#       the MeiToM21Converter used by the MEI-specific SubConverter class. Everything else belongs
+#       in its "music21.mei.base.*" module, or similar.
 from music21.mei.base import MeiToM21Converter
