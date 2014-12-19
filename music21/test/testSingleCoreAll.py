@@ -212,7 +212,14 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
     
     environLocal.printDebug('running Tests...\n')
     runner = unittest.TextTestRunner(verbosity=verbosity)
-    unused_testResult = runner.run(s1)  
+    finalTestResults = runner.run(s1)  
+    
+    if (len(finalTestResults.errors) > 0 or
+        len(finalTestResults.failures) > 0 or
+        len(finalTestResults.unexpectedSuccesses) > 0):
+            exit(1)
+    else:
+        exit(0)
 
     # this should work but requires python 2.7 and the testRunner arg does not
     # seem to work properly
