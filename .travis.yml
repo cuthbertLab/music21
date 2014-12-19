@@ -18,7 +18,7 @@ before_install:
 
 install:
     - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools
-    - python setup.py install
+    - python setup.py install |> /dev/null
 
 script:
     - python music21/test/testSingleCoreAll.py
