@@ -8,6 +8,7 @@ install:
     - sudo apt-get install python-numpy 
     - sudo apt-get install python-scipy 
     - sudo apt-get install python-matplotlib
+    - pip install -e . 
 
 script:
     - python music21/test/testSingleCoreAll.py
