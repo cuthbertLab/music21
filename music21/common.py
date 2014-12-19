@@ -1658,19 +1658,25 @@ def stripAddresses(textString, replacement = "ADDRESS"):
 
 
 def sortModules(moduleList):
-    '''Sort a lost of imported module names such that most recently modified is
-    first'''
+    '''
+    Sort a lost of imported module names such that most recently modified is
+    first.  In ties, last accesstime is used then module name
+    
+    Will return a different order each time depending on the last mod time
+    '''
     sort = []
+    modNameToMod = {}    
     for mod in moduleList:
+        modNameToMod[mod.__name__] = mod
         fp = mod.__file__ # returns the pyc file
         stat = os.stat(fp)
         lastmod = time.localtime(stat[8])
         asctime = time.asctime(lastmod)
-        sort.append((lastmod, asctime, mod))
+        sort.append((lastmod, asctime, mod.__name__))
     sort.sort()
     sort.reverse()
     # just return module list
-    return [mod for lastmod, asctime, mod in sort]
+    return [modNameToMod[modName] for lastmod, asctime, modName in sort]
 
 
 def sortFilesRecent(fileList):

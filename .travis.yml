@@ -5,6 +5,9 @@ python:
     - "3.4"
 
 install:
+    - pip install numpy
+    - pip install matplotlib
+    - pip install scipy
     - pip install -e . 
 
 script:
