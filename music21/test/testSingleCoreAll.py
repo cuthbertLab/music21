@@ -210,6 +210,8 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
             environLocal.printDebug('%s cannot load Doctests' % module)
             continue
     
+    common.fixTestsForPy2and3(s1)
+    
     environLocal.printDebug('running Tests...\n')
     runner = unittest.TextTestRunner(verbosity=verbosity)
     finalTestResults = runner.run(s1)  
