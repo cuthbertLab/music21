@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # An interface for music21 using mod_python
 # Created by Lars Johnson - Music Hack Day - Nov 5-6, 2011
 #

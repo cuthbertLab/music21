@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # A simple test to get note information
 from mod_python import apache
 

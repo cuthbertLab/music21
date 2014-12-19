@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 '''Runs a series of tests against the database to see if any of the following unidentified fragments are in there...'''
 

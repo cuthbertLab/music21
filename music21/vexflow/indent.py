@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 def indent(text, prefix, predicate=None):
     """Adds 'prefix' to the beginning of selected lines in 'text'.
 

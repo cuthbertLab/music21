@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import unittest
 from music21 import freezeThaw

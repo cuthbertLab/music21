@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import music21.ipython21.objects
 import os
 

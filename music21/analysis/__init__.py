@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __ALL__ = ['correlate',  'discrete', 'metrical', 'neoRiemannian', 'patel', 'reduceChords', 'reduceChordsOld', 'reduction', 'search', 'windowed']
 
 # this is necessary to get these names available with a 

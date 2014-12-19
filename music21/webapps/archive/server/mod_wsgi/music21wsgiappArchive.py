@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # An interface for music21 using mod_wsgi
 #
 # To use, first install mod_wsgi and include it in the HTTPD.conf file.

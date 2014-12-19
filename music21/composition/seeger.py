@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Dynamically generating the 4th movement of Ruth Crawford Seeger's String Quartet 1931
 '''
