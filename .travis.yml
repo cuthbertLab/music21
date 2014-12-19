@@ -4,12 +4,17 @@ python:
     - "2.7"
     - "3.4"
 
-install:
+virtualenv:
+    system_site_packages: true
+
+before_install:
     - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.15-1.linux-64.sh
     - sudo sh lilypond-2.19.15-1.linux-64.sh --batch
     - sudo apt-get install python-numpy 
     - sudo apt-get install python-scipy 
     - sudo apt-get install python-matplotlib
+
+install:
     - pip install -e . 
 
 script:
