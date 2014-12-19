@@ -5,10 +5,9 @@ python:
     - "3.4"
 
 install:
-    - pip install numpy
-    - pip install matplotlib
-    - pip install scipy
-    - pip install -e . 
+    - sudo apt-get install python-numpy 
+    - sudo apt-get install python-scipy 
+    - sudo apt-get install python-matplotlib
 
 script:
     - python music21/test/testSingleCoreAll.py
