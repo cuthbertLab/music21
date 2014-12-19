@@ -228,8 +228,11 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
-    reload(sys)
-    sys.setdefaultencoding("UTF-8") # @UndefinedVariable
+    try:
+        reload(sys)
+        sys.setdefaultencoding("UTF-8") # @UndefinedVariable
+    except:
+        pass # no need in Python3
 
     # if optional command line arguments are given, assume they are  
     # test group arguments

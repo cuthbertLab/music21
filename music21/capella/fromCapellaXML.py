@@ -47,7 +47,7 @@ try:
     reload(sys)
     sys.setdefaultencoding('utf-8') # @UndefinedVariable
 except NameError:
-    pass
+    pass  # python3
 sys.stdout = currentStdOut
 sys.stdin = currentStdIn
 sys.stderr = currentStdErr

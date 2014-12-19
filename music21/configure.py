@@ -17,6 +17,11 @@ import sys
 import unittest
 import textwrap
 
+
+try:
+    reload  # python2
+except:
+    from importlib import reload
 #try:
 #    import readline
 #except ImportError:
