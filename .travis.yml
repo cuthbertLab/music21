@@ -17,7 +17,7 @@ before_install:
     - sudo ln -s /run/shm /dev/shm
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools
     - python setup.py install
 
 script:
