@@ -15,15 +15,18 @@ Controller to run all module tests in the music21 folders.
 Runs great, but slowly on multiprocessor systems.
 '''
 
-import unittest, doctest
-import os, imp, sys
+import doctest
+import imp
+import os 
+import sys
+import unittest
+import warnings
 
 from music21 import base
 from music21 import common
 from music21 import environment
 _MOD = 'test.py'
 environLocal = environment.Environment(_MOD)
-
 
 #-------------------------------------------------------------------------------
 class ModuleGather(object):
@@ -50,12 +53,10 @@ class ModuleGather(object):
             'testPerformance.py',
             'timeGraphs.py',
             'exceldiff.py', 
-            # not testing translate due to dependency
-            'abj/translate.py', 
             'multiprocessTest.py',
             ]
         # skip any path that contains this string
-        self.pathSkip = ['obsolete', 'xlrd', 'jsonpickle', 'ext', 'webapps/server']
+        self.pathSkip = ['obsolete', 'xlrd', 'jsonpickle', 'ext', 'webapps/server', 'webapps/archive']
         # search on init
         self._walk()
 
@@ -132,9 +133,14 @@ class ModuleGather(object):
         if skip:
             return None
         name = self._getName(fp)
+        #print(name, os.path.dirname(fp))
+        #fmFile, fmPathname, fmDescription = imp.find_module(name, os.path.dirname(fp) + os.sep)
         try:
             #environLocal.printDebug(['import:', fp]) 
-            mod = imp.load_source(name, fp)
+            #mod = imp.load_module(name, fmFile, fmPathname, fmDescription)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                mod = imp.load_source(name, fp)
         except Exception as excp: # this takes all exceptions!
             environLocal.printDebug(['failed import:', fp, '\n', 
                 '\tEXCEPTION:', str(excp).strip()])

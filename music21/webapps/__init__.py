@@ -105,10 +105,16 @@ from music21 import clef #@UnusedImport
 from music21 import tempo #@UnusedImport
 from music21.theoryAnalysis import theoryAnalyzer #@UnusedImport
 
+from music21.ext import six
 
-from music21.webapps import commands
-from music21.webapps import templates
-from music21.webapps import apps
+if six.PY2:
+    import apps
+    import commands
+    import templates
+else:
+    from . import templates # @Reimport
+    from . import apps      # @Reimport
+    from . import commands  # @Reimport
 
 # python library imports
 import json
