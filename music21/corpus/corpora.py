@@ -407,7 +407,7 @@ class Corpus(object):
 
         >>> from music21 import corpus
         >>> corpus.CoreCorpus().metadataBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {149... entries}>
 
         '''
         from music21 import metadata

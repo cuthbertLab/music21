@@ -140,7 +140,7 @@ class MetadataBundle(object):
     >>> from music21 import corpus, metadata
     >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
     >>> coreBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {149... entries}>
 
     >>> searchResults = coreBundle.search('bach', field='composer')
     >>> searchResults
@@ -188,7 +188,7 @@ class MetadataBundle(object):
     For the others, you'll need to call ``read()``:
 
     >>> coreBundle.read()
-    <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {149... entries}>
 
     Additionally, any two metadata bundles can be operated on together as
     though they were sets, allowing us to build up more complex searches:
@@ -582,7 +582,7 @@ class MetadataBundle(object):
         >>> from music21 import metadata
         >>> coreBundle = metadata.MetadataBundle.fromCoreCorpus()
         >>> coreBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {149... entries}>
         >>> coreBundle.corpus
         <music21.corpus.corpora.CoreCorpus>
         '''
@@ -1245,6 +1245,11 @@ class MetadataBundle(object):
         If the entry represents a non-virtual corpus asset, test that its
         source path is locatable on disk.  If not, remove the metadata entry
         from the metadata bundle.
+        
+        Currently (Dec 2014) there is one entry in the metadata bundle that
+        has been removed, so calling validate (called from addFromPaths) results in
+        14957 instead of 14958 entries
+        
         '''
         timer = common.Timer()
         timer.start()
