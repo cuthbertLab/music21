@@ -1840,9 +1840,9 @@ class Music21Object(object):
             except KeyError:
                 try:
                     foundOffset = self.getOffsetBySite(useSite)
-                except SitesException as r:
-                    environLocal.warn(r)  # activeSite may have vanished! or does not have the element
-                    foundOffset = self.offset
+                except SitesException:
+                    #environLocal.warn(r)  # activeSite may have vanished! or does not have the element
+                    foundOffset = self.getOffsetBySite(None)
                 
         if foundOffset == 'highestTime':
             offset = 0.0
