@@ -25,6 +25,7 @@ install:
     - mv music21 music21base
     - cd music21base
     - python -m compileall music21
+    - export PYTHONPATH=/home/travis/music21base:
 
 script:
     - python music21/test/testSingleCoreAll.py
