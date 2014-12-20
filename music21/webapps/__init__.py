@@ -127,7 +127,6 @@ except ImportError:
 import re #@UnusedImport
 import traceback
 
-from music21.ext import six
 from music21.ext.six import StringIO
 
 if six.PY3:
