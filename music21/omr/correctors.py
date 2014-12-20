@@ -21,8 +21,8 @@ pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 
 K525omrFilePath = pathName + os.sep + 'k525OMRMvt1.xml'
 K525groundTruthFilePath = pathName + os.sep + 'k525GTMvt1.xml'
-K525omrShortPath = pathName + os.sep + 'k525OMRShort.xml'
-K525groundTruthShortPath = pathName + os.sep + 'k525GTShort.xml'
+K525omrShortPath = pathName + os.sep + 'k525OMRshort.xml'
+K525groundTruthShortPath = pathName + os.sep + 'k525GTshort.xml'
 
 debug = False
 

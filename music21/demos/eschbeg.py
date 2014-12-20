@@ -136,7 +136,7 @@ def findEmbeddedChords(testSet = "0234589", cardinality = 3, skipInverse = False
     appear just as often.   
     
     >>> from music21.demos import eschbeg
-    >>> print eschbeg.findEmbeddedChords("0234589")
+    >>> print(eschbeg.findEmbeddedChords("0234589"))
     [012]: (234) (345) 
     [013]: (235) 
     [023]: (023) (245) 
@@ -161,7 +161,7 @@ def findEmbeddedChords(testSet = "0234589", cardinality = 3, skipInverse = False
     
     This is the all trichord hexachord:
 
-    >>> print eschbeg.findEmbeddedChords("012478", skipInverse=True)
+    >>> print(eschbeg.findEmbeddedChords("012478", skipInverse=True))
     [012]: (012) 
     [013]: (124) 
     [014]: (014) 
@@ -177,7 +177,7 @@ def findEmbeddedChords(testSet = "0234589", cardinality = 3, skipInverse = False
 
     But it does not contain every inversion:
     
-    >>> print eschbeg.findEmbeddedChords("012478")
+    >>> print(eschbeg.findEmbeddedChords("012478"))
     [012]: (012) 
     [013]: (124) 
     [023]: 

@@ -139,7 +139,7 @@ class ModuleGather(object):
             #environLocal.printDebug(['import:', fp]) 
             #mod = imp.load_module(name, fmFile, fmPathname, fmDescription)
             with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
+                warnings.simplefilter('ignore', RuntimeWarning)
                 mod = imp.load_source(name, fp)
         except Exception as excp: # this takes all exceptions!
             environLocal.printDebug(['failed import:', fp, '\n', 
@@ -219,8 +219,10 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
     common.fixTestsForPy2and3(s1)
     
     environLocal.printDebug('running Tests...\n')
-    runner = unittest.TextTestRunner(verbosity=verbosity)
-    finalTestResults = runner.run(s1)  
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', RuntimeWarning)  # import modules...
+        runner = unittest.TextTestRunner(verbosity=verbosity)
+        finalTestResults = runner.run(s1)  
     
     if (len(finalTestResults.errors) > 0 or
         len(finalTestResults.failures) > 0 or
