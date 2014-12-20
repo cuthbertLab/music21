@@ -1136,11 +1136,11 @@ class MeasureHash(object):
 if __name__ == '__main__':
     import music21
 #     s = converter.parse(K525omrFilePath)
-    from music21 import *                        # @UnusedImport @UnusedWildImport
-    s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
-                 'K525_from_SmartScore.xml')
-    scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
-    s2 = scor.run()
-    s2.show()
+    #from music21 import *                        # @UnusedImport @UnusedWildImport
+    #s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
+    #             'K525_from_SmartScore.xml')
+    #scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
+    #s2 = scor.run()
+    #s2.show()
 
     music21.mainTest()

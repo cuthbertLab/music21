@@ -21,10 +21,10 @@ before_install:
 
 install:
     - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools
-    - python setup.py install > /dev/null
     - cd ..
     - mv music21 music21base
     - cd music21base
+    - python -m compileall music21
 
 script:
     - python music21/test/testSingleCoreAll.py
