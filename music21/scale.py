@@ -535,9 +535,9 @@ class AbstractScale(Scale):
             nodeName=nodeName, 
             pitchOrigin=pitchOrigin,      
             direction=direction,
-            stepSize = stepSize,
+            stepSize=stepSize,
             alteredDegrees=self._alteredDegrees,
-            getNeighbor = getNeighbor
+            getNeighbor=getNeighbor
             )
         return copy.deepcopy(post)
 
@@ -3651,7 +3651,7 @@ class Test(unittest.TestCase):
 
         # this should always work, regardless of what scale is 
         # realized
-        for unused_trial in range(30):
+        for unused_trial in range(15):
             self.assertEqual(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'], True)
             # presently this might return the same note, if the
             # F# is taken as out of the scale and then found back in the Scale

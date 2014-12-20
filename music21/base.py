@@ -1831,13 +1831,18 @@ class Music21Object(object):
         '''
         if useSite is False: # False or a Site; since None is a valid site, default is False
             useSite = self.activeSite
+
         if useSite is None:                
             foundOffset = self.offset
         else:
             try:
                 foundOffset = self.sites.siteDict[id(useSite)].offset  # allows for text offsets
             except KeyError:
-                foundOffset = self.getOffsetBySite(useSite)
+                try:
+                    foundOffset = self.getOffsetBySite(useSite)
+                except SitesException as r:
+                    environLocal.warn(r)  # activeSite may have vanished! or does not have the element
+                    foundOffset = self.offset
                 
         if foundOffset == 'highestTime':
             offset = 0.0

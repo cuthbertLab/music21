@@ -286,21 +286,23 @@ class FiguredBassLine(object):
         {3.5} <music21.note.Note C>
         '''
         bassLine = stream.Part()
-        bassLine.append(copy.deepcopy(self.inTime))
-        bassLine.append(key.KeySignature(self.inKey.sharps))
         bassLine.append(clef.BassClef())
+        bassLine.append(key.KeySignature(self.inKey.sharps))
+        bassLine.append(copy.deepcopy(self.inTime))
         r = None
         if self._paddingLeft != 0.0:
             r = note.Rest(quarterLength = self._paddingLeft)
             bassLine.append(r)
+
         for (bassNote, unused_notationString) in self._fbList:
             bassLine.append(bassNote)
         
-        bassLine.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bl2 = bassLine.makeNotation(inPlace=False, cautionaryNotImmediateRepeat=False)
         if r is not None:
-            bassLine[0].pop(3)
-            bassLine[0].padAsAnacrusis()
-        return bassLine
+            m0 = bl2.getElementsByClass('Measure')[0]
+            m0.remove(m0.getElementsByClass('Rest')[0])
+            m0.padAsAnacrusis()
+        return bl2
     
     def retrieveSegments(self, fbRules = None, numParts = 4, maxPitch = None):
         '''

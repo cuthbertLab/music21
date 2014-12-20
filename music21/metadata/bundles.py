@@ -657,16 +657,16 @@ class MetadataBundle(object):
 
         >>> from music21 import corpus, metadata
         >>> metadataBundle = metadata.MetadataBundle()
+        >>> p = corpus.getWorkList('bach/bwv66.6')
         >>> metadataBundle.addFromPaths(
-        ...     corpus.getWorkList('bwv66.6'),
-        ...     useCorpus=True,
+        ...     p,
+        ...     useCorpus=False,
         ...     useMultiprocessing=False,
         ...     storeOnDisk=False, #_DOCS_HIDE
         ...     )
         []
         >>> len(metadataBundle._metadataEntries)
         1
-
         '''
         from music21 import metadata
         jobs = []
@@ -1124,7 +1124,7 @@ class MetadataBundle(object):
         >>> metadataBundle = metadata.MetadataBundle()
         >>> failedPaths = metadataBundle.addFromPaths(
         ...     workList,
-        ...     useCorpus=True,
+        ...     useCorpus=False,
         ...     useMultiprocessing=False,
         ...     storeOnDisk=False, #_DOCS_HIDE
         ...     )
