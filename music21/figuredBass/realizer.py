@@ -77,6 +77,9 @@ def figuredBassFromStream(streamPart):
     
     >>> s = tinyNotation.TinyNotationStream('4/4 C4 D8_6 E8_6 F4 G4_7 c1')
     >>> fb = figuredBass.realizer.figuredBassFromStream(s)
+    >>> fb
+    <music21.figuredBass.realizer.FiguredBassLine object at 0x...>
+    
     >>> fbRules = figuredBass.rules.Rules()
     >>> fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
     >>> fbRealization = fb.realize(fbRules)
@@ -130,6 +133,8 @@ def figuredBassFromStream(streamPart):
 def figuredBassFromStreamPart(streamPart):
     '''
     Deprecated. Use :meth:`~music21.figuredBass.realizer.figuredBassFromStream` instead.
+    
+    (Keep because it appears in the Cabel-Ugaz thesis)
     '''
     _environRules = environment.Environment(_MOD)
     _environRules.warn("The method figuredBassFromStreamPart() is deprecated. Use figuredBassFromStream().", DeprecationWarning)
