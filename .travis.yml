@@ -15,13 +15,14 @@ before_install:
     - sh -e /etc/init.d/xvfb start
     - conda update --yes conda
     - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.15-1.linux-64.sh
+    - pip install coveralls
     - sudo sh lilypond-2.19.15-1.linux-64.sh --batch
     # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
     - sudo rm -rf /dev/shm
     - sudo ln -s /run/shm /dev/shm
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools coverage coveralls
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools coverage
     - cd ..
     - mv music21 music21base
     - cd music21base
