@@ -12,6 +12,8 @@ before_install:
     - conda update --yes conda
     - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.15-1.linux-64.sh
     - sudo sh lilypond-2.19.15-1.linux-64.sh --batch
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
     # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
     - sudo rm -rf /dev/shm
     - sudo ln -s /run/shm /dev/shm
