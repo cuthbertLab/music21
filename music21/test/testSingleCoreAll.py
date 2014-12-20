@@ -28,6 +28,12 @@ from music21 import environment
 _MOD = 'test.py'
 environLocal = environment.Environment(_MOD)
 
+try:
+    import coverage
+except ImportError:
+    coverage = None
+
+
 #-------------------------------------------------------------------------------
 class ModuleGather(object):
     r'''
@@ -219,10 +225,19 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
     common.fixTestsForPy2and3(s1)
     
     environLocal.printDebug('running Tests...\n')
+    
+    if coverage is not None:
+        cov = coverage.coverage()
+        cov.start()
+        
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', RuntimeWarning)  # import modules...
         runner = unittest.TextTestRunner(verbosity=verbosity)
         finalTestResults = runner.run(s1)  
+    
+    if coverage is not None:
+        cov.stop()
+        cov.save()
     
     if (len(finalTestResults.errors) > 0 or
         len(finalTestResults.failures) > 0 or

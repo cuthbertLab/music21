@@ -21,7 +21,7 @@ before_install:
     - sudo ln -s /run/shm /dev/shm
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools coverage coveralls
     - cd ..
     - mv music21 music21base
     - cd music21base
@@ -30,3 +30,6 @@ install:
 
 script:
     - python -c 'from music21.test.testSingleCoreAll import main as tm; tm()'
+    
+after_success:
+      coveralls
