@@ -25,14 +25,19 @@ import warnings
 from music21 import base
 from music21 import common
 from music21 import environment
+from music21.ext import six
+
 _MOD = 'test.py'
 environLocal = environment.Environment(_MOD)
 
-try:
-    import coverage
-except ImportError:
-    coverage = None
-
+if six.PY2:
+    try:
+        import coverage
+    except ImportError:
+        coverage = None
+else:
+    coverage = None # coverage is extremely slow on Python 3.4 for some reason
+        # in any case we only need to run it once.
 
 #-------------------------------------------------------------------------------
 class ModuleGather(object):
@@ -61,6 +66,7 @@ class ModuleGather(object):
             'exceldiff.py', 
             'multiprocessTest.py',
             'figuredBass' + os.sep + 'examples.py',
+            'trecento' + os.sep + 'tonality.py'
             ]
         # skip any path that contains this string
         self.pathSkip = ['obsolete', 'xlrd', 'jsonpickle', 'ext', 'webapps' + os.sep + 'server', 

@@ -579,9 +579,11 @@ class Test(unittest.TestCase):
             s.flat.getElementsByClass('TempoIndication')[0]), 
             '<music21.tempo.MetronomeMark Largo Quarter=46>')
 
-    def testMuseDataImportDynamicsA(self):
+    def xtestMuseDataImportDynamicsA(self):
         # note: this is importing a large work, but this seems to presently
         # be the only one with dynamics
+        
+        # TODO: Turn back on when a smaller work is found...
         from music21 import corpus
         s = corpus.parse('symphony94', 3)
         sFlat = s.flat

@@ -19,6 +19,7 @@ before_install:
     - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.15-1.linux-64.sh
     - pip install coveralls
     - sh lilypond-2.19.15-1.linux-64.sh --batch
+    - export PATH=/home/travis/bin:$PATH
 
 install:
     - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools coverage
