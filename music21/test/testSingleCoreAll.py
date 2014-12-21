@@ -60,9 +60,11 @@ class ModuleGather(object):
             'timeGraphs.py',
             'exceldiff.py', 
             'multiprocessTest.py',
+            'figuredBass' + os.sep + 'examples.py',
             ]
         # skip any path that contains this string
-        self.pathSkip = ['obsolete', 'xlrd', 'jsonpickle', 'ext', 'webapps/server', 'webapps/archive']
+        self.pathSkip = ['obsolete', 'xlrd', 'jsonpickle', 'ext', 'webapps' + os.sep + 'server', 
+                         'webapps' + os.sep + 'archive']
         # search on init
         self._walk()
 

@@ -1,5 +1,7 @@
 language: python
 
+sudo: false
+
 python:
     - "2.7"
     - "3.4"
@@ -16,10 +18,7 @@ before_install:
     - conda update --yes conda
     - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.15-1.linux-64.sh
     - pip install coveralls
-    - sudo sh lilypond-2.19.15-1.linux-64.sh --batch
-    # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
-    - sudo rm -rf /dev/shm
-    - sudo ln -s /run/shm /dev/shm
+    - sh lilypond-2.19.15-1.linux-64.sh --batch
 
 install:
     - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools coverage
@@ -27,7 +26,6 @@ install:
     - mv music21 music21base
     - cd music21base
     - python -m compileall music21
-    - sudo rm -rf build
 
 script:
     - python -c 'from music21.test.testSingleCoreAll import main as tm; tm()'

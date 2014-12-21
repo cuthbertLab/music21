@@ -526,7 +526,7 @@ def deleteMeasures(s, toDelete, inPlace=False):
         >>> from copy import deepcopy
         >>> chorale1 = corpus.parse('bwv10.7.mxl')
         >>> s = deepcopy(chorale1)
-        >>> repeat.deleteMeasures(s,[6, 3, 4], inPlace=True)
+        >>> repeat.deleteMeasures(s, [6, 3, 4], inPlace=True)
         >>> m2 = search.translateStreamToString( chorale1.parts[1].measure(2).notesAndRests)
         >>> resm2 = search.translateStreamToString( s.parts[1].measure(2).notesAndRests)
         >>> m2 == resm2

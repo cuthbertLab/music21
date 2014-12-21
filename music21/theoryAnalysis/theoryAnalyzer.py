@@ -2124,16 +2124,17 @@ class TheoryAnalyzerException(music21.Music21Exception):
 class Test(unittest.TestCase):
     
     def testChordMotionExample(self):
-        from music21 import harmony, theoryAnalysis
-        p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
-        harmony.realizeChordSymbolDurations(p)
-        averageMotion = 0
-        l = theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony'])
-        for x in l:
-            averageMotion+= abs(x.rootInterval().intervalClass)
-        averageMotion = averageMotion // len(l)
-        self.assertEqual(averageMotion, 4)
-    
+        pass # in doctest
+#         from music21 import harmony, theoryAnalysis
+#         p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
+#         harmony.realizeChordSymbolDurations(p)
+#         averageMotion = 0
+#         l = theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony'])
+#         for x in l:
+#             averageMotion+= abs(x.rootInterval().intervalClass)
+#         averageMotion = averageMotion // len(l)
+#         self.assertEqual(averageMotion, 4)
+#     
         
     
 class TestExternal(unittest.TestCase):
