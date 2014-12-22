@@ -1128,7 +1128,7 @@ def removeOctothorpe(xmlid):
     '''
     Given a string with an @xml:id to search for, remove a leading octothorpe, if present.
 
-    >>> from music21.mei.base import removeOctothorpe  # OMIT_FROM_DOCS
+    >>> from music21.mei.base import removeOctothorpe
     >>> removeOctothorpe('110a923d-a13a-4a2e-b85c-e1d438e4c5d6')
     '110a923d-a13a-4a2e-b85c-e1d438e4c5d6'
     >>> removeOctothorpe('#e46cbe82-95fc-4522-9f7a-700e41a40c8e')
